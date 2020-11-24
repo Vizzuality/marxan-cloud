@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "${API_PORT}:3000"
+    container_name: marxan-api
+    command: develop
+    volumes:
+      - ./api/src:/opt/marxan-api/src
+      - ./api/test:/opt/marxan-api/test
+    env_file: .env
+    environment:
+      - NODE_PATH=src
+      - NODE_ENV=development
+networks:
+  default:
+    external:
+      name: marxan-cloud-network

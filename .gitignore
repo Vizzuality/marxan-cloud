@@ -1,0 +1,25 @@
+# python
+**/__pycache__/
+
+# env
+**/.env
+
+# emacs/vim
+*#
+*~
+
+# MacOS
+.DS_Store
+
+# IDE
+.idea
+.vscode
+
+# IDE stuff
+.vscode/
+
+# yarn stuff
+yarn.lock
+
+# node stuff
+node_modules/
