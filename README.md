@@ -40,7 +40,7 @@ Run `make start` to start all the services.
 ## Bugs
 
 Please use the [Marxan Cloud issue
-tracker](https://github.com/marxanweb/marxan-server/issues) to report bugs.
+tracker](https://github.com/Vizzuality/marxan-cloud/issues) to report bugs.
 
 ## License
 
