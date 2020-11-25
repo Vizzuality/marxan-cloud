@@ -30,6 +30,9 @@ orchestrated via Kubernetes (forthcoming).
    * `APP_PORT` (number, required): the port on which the App service should
      listen on the local machine
 
+4. Create a Docker network for the local instance of the Marxan platform:
+   `docker network create marxan-cloud-network`.
+
 ### Running the Marxan Cloud platform
 
 Run `make start` to start all the services.
