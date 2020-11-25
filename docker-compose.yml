@@ -15,6 +15,21 @@ services:
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    ports:
+      - "${APP_PORT}:3000"
+    container_name: marxan-app
+    command: dummy
+    volumes:
+      - ./app/src:/opt/marxan-app/src
+      - ./app/test:/opt/marxan-app/test
+    env_file: .env
+    environment:
+      - NODE_PATH=src
+      - NODE_ENV=development
 networks:
   default:
     external:
