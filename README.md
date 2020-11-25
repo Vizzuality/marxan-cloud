@@ -37,6 +37,23 @@ orchestrated via Kubernetes (forthcoming).
 
 Run `make start` to start all the services.
 
+## Development workflow (TBD)
+
+We use a lightweight git flow workflow. `develop`, `main`, feature/bug fix
+branches, release branches (`release/vX.Y.Z-etc`).
+
+Please use per component+task feature branches: `<feature
+type>/<component>/NNNN-brief-description`. For example:
+`feature/api/12345-helm-setup`.
+
+PRs should be rebased on `develop`.
+
+As feature types:
+
+* `feature`
+* `bugfix` (regular bug fix)
+* `hotfix` (urgent bug fixes fast-tracked to `main`)
+
 ## Bugs
 
 Please use the [Marxan Cloud issue
