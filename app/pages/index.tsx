@@ -1,8 +1,9 @@
-import Head from 'next/head'
+import React from 'react';
+import Head from 'next/head';
 
 import Header from 'components/header';
 
-export default function Home() {
+export default function Home(): React.ReactNode {
   return (
     <>
       <Head>
@@ -14,5 +15,5 @@ export default function Home() {
         <Header />
       </main>
     </>
-  )
+  );
 }
