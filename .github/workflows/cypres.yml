@@ -9,6 +9,8 @@ jobs:
 
       - name: Install dependencies
         run: yarn && yarn build
+        with:
+          working-directory: app
 
       # and run all Cypress tests
       - name: Cypress run
