@@ -8,10 +8,7 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Install dependencies
-        uses: yarn && yarn build
-
-      - name: Start server in the background
-        run: yarn dev
+        run: yarn && yarn build
 
       # and run all Cypress tests
       - name: Cypress run
