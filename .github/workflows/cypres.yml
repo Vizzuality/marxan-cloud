@@ -1,7 +1,7 @@
-name: example-basic
+name: Tests
 on: [push]
 jobs:
-  basic-ubuntu-18:
+  cypress:
     runs-on: ubuntu-latest
     container: cypress/included:3.8.3
     steps:
