@@ -3,11 +3,11 @@ import Head from 'next/head';
 
 import Header from 'components/header';
 
-const Home: React.FC = () => {
+const About: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Home</title>
+        <title>About</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -18,4 +18,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default About;
