@@ -18,8 +18,5 @@
 # IDE stuff
 .vscode/
 
-# yarn stuff
-yarn.lock
-
 # node stuff
 node_modules/
