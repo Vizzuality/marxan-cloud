@@ -5,19 +5,23 @@ jobs:
     runs-on: ubuntu-latest
     container: cypress/included:3.8.3
     steps:
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          working-directory: app
+          node-version: '12.13.x'
+
       - name: Checkout
         uses: actions/checkout@v1
         with:
           working-directory: app
 
-      - uses: actions/setup-node@v1
-        with:
-          working-directory: app
-          node-version: '12.13.x'
-
       - name: Cypress tests
         uses: cypress-io/github-action@v2.2.7
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         with:
           working-directory: app
           build: yarn build
           start: yarn start
+          wait-on: 'http://localhost:3000'
