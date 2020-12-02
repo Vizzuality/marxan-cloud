@@ -15,6 +15,15 @@ module.exports = {
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
+      primary: {
+        200: '#4dd2ff',
+        300: '#33ccff',
+        400: '#1ac5ff',
+        500: '#00BFFF',
+        600: '#00ace6',
+        700: '#0099cc',
+        800: '#0086b3',
+      },
 
       black: colors.black,
       white: colors.white,
@@ -191,6 +200,7 @@ module.exports = {
       ],
     },
     fontSize: {
+      xxs: ['0.625rem', { lineHeight: '0.75rem' }],
       xs: ['0.75rem', { lineHeight: '1rem' }],
       sm: ['0.875rem', { lineHeight: '1.25rem' }],
       base: ['1rem', { lineHeight: '1.5rem' }],
