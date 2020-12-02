@@ -1,5 +1,4 @@
 const path = require("path");
-const SpriteLoaderPlugin = require('svg-sprite-loader/plugin');
 
 module.exports = {
   stories: ["../components/**/*.stories.@(js|jsx|ts|tsx)"],
