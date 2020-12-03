@@ -1,11 +1,10 @@
 import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
-import Input, { InputProps } from './component';
+import Textarea, { TextareaProps } from './component';
 
 export default {
-  title: 'Components/Forms/Input',
-  component: Input,
-  parameters: { actions: { argTypesRegex: '^on.*' } },
+  title: 'Components/Forms/Textarea',
+  component: Textarea,
   argTypes: {
     theme: {
       control: {
@@ -28,7 +27,7 @@ export default {
   },
 };
 
-const Template: Story<InputProps> = (args) => <Input {...args} />;
+const Template: Story<TextareaProps> = (args) => <Textarea {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
