@@ -17,12 +17,15 @@ const Header: React.FC = () => {
               className="block px-3 py-1 text-xl leading-none bg-transparent border border-transparent border-solid rounded outline-none cursor-pointer lg:hidden focus:outline-none"
               type="button"
             >
-              <span className="relative block w-6 h-px bg-white rounded-sm"></span>
-              <span className="relative block w-6 h-px mt-1 bg-white rounded-sm"></span>
-              <span className="relative block w-6 h-px mt-1 bg-white rounded-sm"></span>
+              <span className="relative block w-6 h-px bg-white rounded-sm" />
+              <span className="relative block w-6 h-px mt-1 bg-white rounded-sm" />
+              <span className="relative block w-6 h-px mt-1 bg-white rounded-sm" />
             </button>
           </div>
-          <div className="flex items-center lg:flex-grow" id="example-navbar-info">
+          <div
+            className="flex items-center lg:flex-grow"
+            id="example-navbar-info"
+          >
             <ul className="flex flex-col ml-auto list-none lg:flex-row">
               <li className="nav-item">
                 <a

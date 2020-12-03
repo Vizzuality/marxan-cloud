@@ -3,7 +3,8 @@ import cx from 'classnames';
 
 const THEME = {
   primary: {
-    base: 'leading-tight text-white bg-gray-800 border rounded appearance-none focus:outline-none focus:bg-gray-700',
+    base:
+      'leading-tight text-white bg-gray-800 border rounded appearance-none focus:outline-none focus:bg-gray-700',
     states: {
       none: 'border-gray-900',
       valid: 'border-green-500',
@@ -18,7 +19,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   state?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
-export const Input: React.FC<InputProps> = ({
+const Input: React.FC<InputProps> = ({
   theme = 'primary',
   state = 'none',
   disabled = false,

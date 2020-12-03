@@ -1,7 +1,7 @@
 import React from 'react';
 
 export interface FieldProps {
-  name?: string;
+  id: string;
   label?: string;
   input?: Record<string, unknown>;
   meta?: Record<string, unknown>;
@@ -9,10 +9,16 @@ export interface FieldProps {
   className?: string;
 }
 
-export const Field: React.FC<FieldProps> = ({ label, children, input, meta }: FieldProps) => {
-  const getState = (meta) => {
-    if (meta.touched && meta.valid) return 'valid';
-    if (meta.touched && meta.error) return 'error';
+const Field: React.FC<FieldProps> = ({
+  id,
+  label,
+  children,
+  input,
+  meta,
+}: FieldProps) => {
+  const getState = (m) => {
+    if (m.touched && m.valid) return 'valid';
+    if (m.touched && m.error) return 'error';
 
     return 'none';
   };
@@ -24,6 +30,7 @@ export const Field: React.FC<FieldProps> = ({ label, children, input, meta }: Fi
 
       return React.cloneElement(child, {
         ...input,
+        id,
         state,
       });
     }
@@ -33,7 +40,7 @@ export const Field: React.FC<FieldProps> = ({ label, children, input, meta }: Fi
   return (
     <div>
       {label && (
-        <label className="block mb-3 text-xs text-white uppercase" htmlFor="">
+        <label className="block mb-3 text-xs text-white uppercase" htmlFor={id}>
           {label}
         </label>
       )}

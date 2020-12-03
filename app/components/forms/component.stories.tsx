@@ -14,25 +14,31 @@ export default {
 export const Form = (): React.ReactNode => {
   return (
     <FormRFF
-      onSubmit={(props) => {
-        console.log(props);
+      onSubmit={() => {
+        // console.log(values);
       }}
     >
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off">
           <div>
-            <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
-              {(props) => (
-                <Field label="Name" {...props}>
+            <FieldRFF
+              name="name"
+              validate={composeValidators([{ presence: true }])}
+            >
+              {(fprops) => (
+                <Field id="form-name" label="Name" {...fprops}>
                   <Input />
                 </Field>
               )}
             </FieldRFF>
           </div>
           <div className="mt-5">
-            <FieldRFF name="email" validate={composeValidators([{ presence: true, email: true }])}>
-              {(props) => (
-                <Field label="Email" {...props}>
+            <FieldRFF
+              name="email"
+              validate={composeValidators([{ presence: true, email: true }])}
+            >
+              {(fprops) => (
+                <Field id="form-email" label="Email" {...fprops}>
                   <Input type="email" />
                 </Field>
               )}
