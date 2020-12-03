@@ -1,7 +1,7 @@
 import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
 import Field, { FieldProps } from './component';
-import Input from 'components/input';
+import Input from 'components/forms/input';
 
 export default {
   title: 'Components/Forms/Field',

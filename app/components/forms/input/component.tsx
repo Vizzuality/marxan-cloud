@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { InputHTMLAttributes } from 'react';
 import cx from 'classnames';
 
 const THEME = {
@@ -13,21 +13,13 @@ const THEME = {
   },
 };
 
-const SIZE = {
-  base: 'block w-full px-4 py-2',
-};
-
-export interface InputProps {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   theme?: 'primary';
-  size?: 'base';
   state?: 'none' | 'valid' | 'error' | 'disabled';
-  disabled?: boolean;
-  className?: string;
 }
 
 export const Input: React.FC<InputProps> = ({
   theme = 'primary',
-  size = 'base',
   state = 'none',
   disabled = false,
   className,
@@ -40,7 +32,7 @@ export const Input: React.FC<InputProps> = ({
       {...props}
       disabled={disabled}
       className={cx({
-        [SIZE[size]]: true,
+        'block w-full px-4 py-2': true,
         [THEME[theme].base]: true,
         [THEME[theme].states[st]]: true,
         [className]: !!className,

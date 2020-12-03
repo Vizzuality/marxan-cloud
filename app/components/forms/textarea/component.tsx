@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { TextareaHTMLAttributes } from 'react';
 import cx from 'classnames';
 
 const THEME = {
@@ -13,21 +13,14 @@ const THEME = {
   },
 };
 
-const SIZE = {
-  base: 'block w-full px-4 py-2',
-};
-
-export interface TextareaProps {
+export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   theme?: 'primary';
   size?: 'base';
   state?: 'none' | 'valid' | 'error' | 'disabled';
-  disabled?: boolean;
-  className?: string;
 }
 
 export const Textarea: React.FC<TextareaProps> = ({
   theme = 'primary',
-  size = 'base',
   state = 'none',
   disabled = false,
   className,
@@ -40,7 +33,7 @@ export const Textarea: React.FC<TextareaProps> = ({
       {...props}
       disabled={disabled}
       className={cx({
-        [SIZE[size]]: true,
+        'block w-full px-4 py-2': true,
         [THEME[theme].base]: true,
         [THEME[theme].states[st]]: true,
         [className]: !!className,

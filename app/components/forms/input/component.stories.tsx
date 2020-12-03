@@ -13,12 +13,6 @@ export default {
         options: ['primary'],
       },
     },
-    size: {
-      control: {
-        type: 'select',
-        options: ['base'],
-      },
-    },
     state: {
       control: {
         type: 'select',
