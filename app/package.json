@@ -59,7 +59,6 @@
     "*.{js,ts,tsx}": [
       "eslint --fix"
     ],
-    "*.{js,jsx,ts,tsx,md,html,css}": "prettier --write",
-    "ignore": ["public"]
+    "*.{js,jsx,ts,tsx,md,html}": "prettier --write"
   }
 }
