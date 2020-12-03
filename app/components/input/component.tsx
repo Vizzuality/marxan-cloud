@@ -3,12 +3,12 @@ import cx from 'classnames';
 
 const THEME = {
   primary: {
-    base: 'leading-tight text-white bg-gray-800 rounded appearance-none focus:outline-none focus:bg-gray-700',
+    base: 'leading-tight text-white bg-gray-800 border rounded appearance-none focus:outline-none focus:bg-gray-700',
     states: {
-      none: 'border border-gray-900',
-      valid: 'border border-green-500',
-      error: 'border border-red-500',
-      disabled: 'opacity-50',
+      none: 'border-gray-900',
+      valid: 'border-green-500',
+      error: 'border-red-500',
+      disabled: 'border-gray-900 opacity-50',
     },
   },
 };
@@ -20,21 +20,21 @@ const SIZE = {
 export interface InputProps {
   theme?: 'primary';
   size?: 'base';
-  className?: string;
+  state?: 'none' | 'valid' | 'error' | 'disabled';
   disabled?: boolean;
-  valid?: boolean;
-  error?: boolean;
+  className?: string;
 }
 
 export const Input: React.FC<InputProps> = ({
   theme = 'primary',
   size = 'base',
+  state = 'none',
   disabled = false,
-  valid = false,
-  error = false,
   className,
   ...props
 }: InputProps) => {
+  const st = disabled ? 'disabled' : state;
+
   return (
     <input
       {...props}
@@ -42,10 +42,7 @@ export const Input: React.FC<InputProps> = ({
       className={cx({
         [SIZE[size]]: true,
         [THEME[theme].base]: true,
-        [THEME[theme].states.none]: !valid && !error,
-        [THEME[theme].states.valid]: valid,
-        [THEME[theme].states.error]: error,
-        [THEME[theme].states.disabled]: disabled,
+        [THEME[theme].states[st]]: true,
         [className]: !!className,
       })}
     />
