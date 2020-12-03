@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+
 export interface IconProps {
   icon: {
     id: string;
@@ -8,7 +9,10 @@ export interface IconProps {
   className?: string;
 }
 
-export const Icon: React.FC<IconProps> = ({ icon, className = 'w-5 h-5' }: IconProps) => {
+const Icon: React.FC<IconProps> = ({
+  icon,
+  className = 'w-5 h-5',
+}: IconProps) => {
   return (
     <svg
       className={cx({

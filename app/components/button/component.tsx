@@ -25,27 +25,25 @@ export interface ButtonProps {
   className?: string;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<ButtonProps> = ({
   children,
   theme = 'primary',
   size = 'base',
   className,
   ...restProps
-}: ButtonProps) => {
-  return (
-    <button
-      type="button"
-      className={cx({
-        'flex rounded focus:outline-none': true,
-        [THEME[theme]]: true,
-        [SIZE[size]]: true,
-        [className]: !!className,
-      })}
-      {...restProps}
-    >
-      {children}
-    </button>
-  );
-};
+}: ButtonProps) => (
+  <button
+    type="button"
+    className={cx({
+      'flex rounded focus:outline-none': true,
+      [THEME[theme]]: true,
+      [SIZE[size]]: true,
+      [className]: !!className,
+    })}
+    {...restProps}
+  >
+    {children}
+  </button>
+);
 
 export default Button;
