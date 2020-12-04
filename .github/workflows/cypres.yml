@@ -5,16 +5,23 @@ jobs:
     runs-on: ubuntu-latest
     container: cypress/included:3.8.3
     steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 100
+          working-directory: app
+
+      - name: Check app path
+        uses: marceloprado/has-changed-path@v1
+        id: changed-front
+        with:
+          paths: app
+
       - name: Setup node
         uses: actions/setup-node@v1
         with:
           working-directory: app
           node-version: '12.13.x'
-
-      - name: Checkout
-        uses: actions/checkout@v1
-        with:
-          working-directory: app
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
