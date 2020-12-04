@@ -19,6 +19,18 @@ export default {
         options: ['none', 'valid', 'error', 'disabled'],
       },
     },
+    InputHTMLAttributes: {
+      name: 'InputHTMLAttributes',
+      description: 'https://www.w3schools.com/tags/tag_input.asp',
+      table: {
+        type: {
+          summary: 'InputHTMLAttributes',
+        },
+      },
+      control: {
+        disabled: true,
+      },
+    },
   },
 };
 
@@ -26,6 +38,5 @@ const Template: Story<InputProps> = (args) => <Input {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  type: 'text',
   theme: 'primary',
 };
