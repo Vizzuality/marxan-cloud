@@ -9,7 +9,7 @@ export interface FieldProps {
   className?: string;
 }
 
-const Field: React.FC<FieldProps> = ({
+export const Field: React.FC<FieldProps> = ({
   id,
   label,
   children,

@@ -17,11 +17,10 @@ const THEME = {
 export interface TextareaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   theme?: 'primary';
-  size?: 'base';
   state?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
-const Textarea: React.FC<TextareaProps> = ({
+export const Textarea: React.FC<TextareaProps> = ({
   theme = 'primary',
   state = 'none',
   disabled = false,

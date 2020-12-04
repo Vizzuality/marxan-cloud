@@ -9,7 +9,7 @@ export interface IconProps {
   className?: string;
 }
 
-const Icon: React.FC<IconProps> = ({
+export const Icon: React.FC<IconProps> = ({
   icon,
   className = 'w-5 h-5',
 }: IconProps) => {

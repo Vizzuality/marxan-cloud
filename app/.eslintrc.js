@@ -27,5 +27,6 @@ module.exports = {
     'no-console': [1, { allow: ['warn', 'error'] }],
     'react/jsx-props-no-spreading': [0, {}],
     'arrow-body-style': 0,
+    'import/no-named-as-default': 0,
   },
 };

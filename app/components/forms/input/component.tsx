@@ -19,7 +19,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   state?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
-const Input: React.FC<InputProps> = ({
+export const Input: React.FC<InputProps> = ({
   theme = 'primary',
   state = 'none',
   disabled = false,
