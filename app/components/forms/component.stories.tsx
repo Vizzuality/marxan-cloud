@@ -6,9 +6,7 @@ import { composeValidators } from 'components/forms/validations';
 
 export default {
   title: 'Components/Forms',
-  component: Field,
   parameters: { actions: { argTypesRegex: '^on.*' } },
-  argTypes: {},
 };
 
 export const Form = (): React.ReactNode => {

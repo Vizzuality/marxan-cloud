@@ -7,7 +7,18 @@ export default {
   title: 'Components/Forms/Field',
   component: Field,
   parameters: { actions: { argTypesRegex: '^on.*' } },
-  argTypes: {},
+  argTypes: {
+    input: {
+      control: {
+        disable: true,
+      },
+    },
+    meta: {
+      control: {
+        disable: true,
+      },
+    },
+  },
 };
 
 const Template: Story<FieldProps> = (args) => (
@@ -18,9 +29,9 @@ const Template: Story<FieldProps> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  name: 'name',
-  placeholder: 'Write scenario name',
+  id: 'scenario',
   label: 'Name the scenario',
+  input: {},
   meta: {
     touched: true,
     error: true,

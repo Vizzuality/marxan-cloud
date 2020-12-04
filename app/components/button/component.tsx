@@ -25,7 +25,7 @@ export interface ButtonProps {
   className?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({
+export const Button: React.FC<ButtonProps> = ({
   children,
   theme = 'primary',
   size = 'base',
