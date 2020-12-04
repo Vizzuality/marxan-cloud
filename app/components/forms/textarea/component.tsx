@@ -3,7 +3,8 @@ import cx from 'classnames';
 
 const THEME = {
   primary: {
-    base: 'leading-tight text-white bg-gray-800 border rounded appearance-none focus:outline-none focus:bg-gray-700',
+    base:
+      'leading-tight text-white bg-gray-800 border rounded appearance-none focus:outline-none focus:bg-gray-700',
     states: {
       none: 'border-gray-900',
       valid: 'border-green-500',
@@ -13,9 +14,9 @@ const THEME = {
   },
 };
 
-export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextareaProps
+  extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   theme?: 'primary';
-  size?: 'base';
   state?: 'none' | 'valid' | 'error' | 'disabled';
 }
 

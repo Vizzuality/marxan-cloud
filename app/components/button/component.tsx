@@ -31,21 +31,19 @@ export const Button: React.FC<ButtonProps> = ({
   size = 'base',
   className,
   ...restProps
-}: ButtonProps) => {
-  return (
-    <button
-      type="button"
-      className={cx({
-        'flex rounded focus:outline-none': true,
-        [THEME[theme]]: true,
-        [SIZE[size]]: true,
-        [className]: !!className,
-      })}
-      {...restProps}
-    >
-      {children}
-    </button>
-  );
-};
+}: ButtonProps) => (
+  <button
+    type="button"
+    className={cx({
+      'flex rounded focus:outline-none': true,
+      [THEME[theme]]: true,
+      [SIZE[size]]: true,
+      [className]: !!className,
+    })}
+    {...restProps}
+  >
+    {children}
+  </button>
+);
 
 export default Button;
