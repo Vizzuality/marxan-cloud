@@ -15,6 +15,9 @@ services:
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
+      - POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+    depends_on:
+      - postgresql-api
   app:
     build:
       context: ./app
@@ -30,7 +33,22 @@ services:
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
+  postgresql-api:
+    build:
+      context: ./postgresql
+      dockerfile: Dockerfile
+    container_name: marxan-postgresql-api
+    ports:
+      - "${POSTGRES_API_SERVICE_PORT}:5432"
+    volumes:
+      - marxan-cloud-postgresql-api-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${API_POSTGRES_PASSWORD}
+      - POSTGRES_USER=${API_POSTGRES_USER}
+    restart: always
 networks:
   default:
     external:
       name: marxan-cloud-network
+volumes:
+  marxan-cloud-postgresql-api-data:
