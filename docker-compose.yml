@@ -5,7 +5,7 @@ services:
       context: ./api
       dockerfile: Dockerfile
     ports:
-      - "${API_PORT}:3000"
+      - "${API_SERVICE_PORT}:3000"
     container_name: marxan-api
     command: develop
     volumes:
@@ -23,9 +23,9 @@ services:
       context: ./app
       dockerfile: Dockerfile
     ports:
-      - "${APP_PORT}:3000"
+      - "${APP_SERVICE_PORT}:3000"
     container_name: marxan-app
-    command: dummy
+    command: start
     volumes:
       - ./app/src:/opt/marxan-app/src
       - ./app/test:/opt/marxan-app/test
