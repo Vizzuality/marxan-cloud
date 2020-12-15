@@ -1,20 +1,19 @@
 import type { FieldValidator, FieldState } from 'final-form';
 import validate from 'validate.js';
-import isObject from 'lodash/isObject';
 
-export const composeValidators = (validations: Record<string, unknown>[]) => (
+export const composeValidators = (validations: any[]) => (
   value: unknown,
   allValues: Record<string, unknown>,
   meta?: FieldState<unknown>,
 ): FieldValidator<unknown>[] => {
   if (validations) {
     const errors = validations.map((validator: unknown) => {
-      if (isObject(validator)) {
-        return validate.single(value, validator);
-      }
-
       if (typeof validator === 'function') {
         return validator(value, allValues, meta);
+      }
+
+      if (validator) {
+        return validate.single(value, validator);
       }
 
       return undefined;
@@ -24,6 +23,18 @@ export const composeValidators = (validations: Record<string, unknown>[]) => (
       return errors;
     }
   }
+
+  return undefined;
+};
+
+export const checkboxValidator = (value) => {
+  if (!value) return 'Error';
+
+  return undefined;
+};
+
+export const checkboxGroupValidator = (value) => {
+  if (!value || !value.length) return 'Error';
 
   return undefined;
 };

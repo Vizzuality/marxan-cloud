@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 
 export interface FieldProps {
   id: string;
@@ -11,10 +12,10 @@ export interface FieldProps {
 
 export const Field: React.FC<FieldProps> = ({
   id,
-  label,
   children,
   input,
   meta,
+  className,
 }: FieldProps) => {
   const getState = (m) => {
     if (m.touched && m.valid) return 'valid';
@@ -38,12 +39,11 @@ export const Field: React.FC<FieldProps> = ({
   });
 
   return (
-    <div>
-      {label && (
-        <label className="block mb-3 text-xs text-white uppercase" htmlFor={id}>
-          {label}
-        </label>
-      )}
+    <div
+      className={cx({
+        [className]: !!className,
+      })}
+    >
       {childrenWithProps}
     </div>
   );
