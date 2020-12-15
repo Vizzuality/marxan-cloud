@@ -17,7 +17,7 @@ COPY nodemon.json ./nodemon.json
 COPY tsconfig.json ./tsconfig.json
 COPY tsconfig.build.json ./tsconfig.build.json
 COPY config ./config
-COPY ormconfig.js ./ormconfig.js
+COPY ormconfig.ts ./ormconfig.ts
 
 COPY ./src ./src
 
