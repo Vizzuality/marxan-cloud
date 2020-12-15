@@ -3,8 +3,15 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
+import Textarea from 'components/forms/textarea';
 import Checkbox from 'components/forms/checkbox';
-import { composeValidators } from 'components/forms/validations';
+import Radio from 'components/forms/radio';
+import Button from 'components/button';
+import {
+  composeValidators,
+  checkboxValidator,
+  checkboxGroupValidator,
+} from 'components/forms/validations';
 
 export default {
   title: 'Components/Forms',
@@ -14,15 +21,24 @@ export default {
 export const Form = (): React.ReactNode => {
   return (
     <FormRFF
-      debug={(values) => {
-        console.log(values);
-      }}
-      onSubmit={() => {
+      debug={() => {
         // console.log(values);
       }}
+      onSubmit={() => {
+        // console.info(values);
+      }}
+      // initialValues={{
+      //   name: 'Testing initial values',
+      //   email: 'barrenechea.miguel@gmail.com',
+      //   description: 'Lorem ipsum dolor sit amet',
+      //   checkbox: true,
+      //   'checkbox-group': ['option-1', 'option-2'],
+      //   'radio-group': 'option-1',
+      // }}
     >
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off">
+          {/* NAME */}
           <div>
             <FieldRFF
               name="name"
@@ -36,6 +52,8 @@ export const Form = (): React.ReactNode => {
               )}
             </FieldRFF>
           </div>
+
+          {/* EMAIL */}
           <div className="mt-5">
             <FieldRFF
               name="email"
@@ -50,29 +68,124 @@ export const Form = (): React.ReactNode => {
             </FieldRFF>
           </div>
 
+          {/* TEXTAREA */}
           <div className="mt-5">
             <FieldRFF
-              name="boolean"
-              type="checkbox"
+              name="description"
               validate={composeValidators([
-                {
-                  presence: {
-                    message: '^You need to check the checkbox',
-                  },
-                  inclusion: {
-                    within: [true],
-                    message: '^You need to check the checkbox',
-                  },
-                },
+                { presence: true, length: { minimum: 20 } },
               ])}
             >
               {(fprops) => (
-                <Field className="flex" id="form-boolean" {...fprops}>
-                  <Checkbox />
-                  <Label className="ml-2">This is a checkbox</Label>
+                <Field id="form-email" {...fprops}>
+                  <Label className="mb-3 uppercase">Description</Label>
+                  <Textarea rows={4} />
                 </Field>
               )}
             </FieldRFF>
+          </div>
+
+          {/* CHECKBOX */}
+          <div className="mt-5">
+            <Label className="mb-3 uppercase">Checkbox</Label>
+            <FieldRFF
+              name="checkbox"
+              type="checkbox"
+              validate={composeValidators([checkboxValidator])}
+            >
+              {(fprops) => (
+                <Field className="flex mt-2" id="form-checkbox" {...fprops}>
+                  <Checkbox />
+                  <Label className="ml-2">This is a standalone checkbox</Label>
+                </Field>
+              )}
+            </FieldRFF>
+          </div>
+
+          {/* CHECKBOX GROUP */}
+          <div className="mt-5">
+            <Label className="mb-3 uppercase">Checkbox group</Label>
+            <FieldRFF
+              name="checkbox-group"
+              type="checkbox"
+              value="option-1"
+              validate={composeValidators([checkboxGroupValidator])}
+            >
+              {(fprops) => (
+                <Field
+                  className="flex mt-2"
+                  id="form-checkbox-group-1"
+                  {...fprops}
+                >
+                  <Checkbox />
+                  <Label className="ml-2">Option 1</Label>
+                </Field>
+              )}
+            </FieldRFF>
+
+            <FieldRFF
+              name="checkbox-group"
+              type="checkbox"
+              value="option-2"
+              validate={composeValidators([checkboxGroupValidator])}
+            >
+              {(fprops) => (
+                <Field
+                  className="flex mt-2"
+                  id="form-checkbox-group-2"
+                  {...fprops}
+                >
+                  <Checkbox />
+                  <Label className="ml-2">Option 2</Label>
+                </Field>
+              )}
+            </FieldRFF>
+          </div>
+
+          {/* RADIO GROUP */}
+          <div className="mt-5">
+            <Label className="mb-3 uppercase">Radio group</Label>
+            <FieldRFF
+              name="radio-group"
+              type="radio"
+              value="option-1"
+              validate={composeValidators([{ presence: true }])}
+            >
+              {(fprops) => (
+                <Field
+                  className="flex mt-2"
+                  id="radio-group-option-1"
+                  {...fprops}
+                >
+                  <Radio />
+                  <Label className="ml-2">Option 1</Label>
+                </Field>
+              )}
+            </FieldRFF>
+
+            <FieldRFF
+              name="radio-group"
+              type="radio"
+              value="option-2"
+              validate={composeValidators([{ presence: true }])}
+            >
+              {(fprops) => (
+                <Field
+                  className="flex mt-2"
+                  id="radio-group-option-2"
+                  {...fprops}
+                >
+                  <Radio />
+                  <Label className="ml-2">Option 2</Label>
+                </Field>
+              )}
+            </FieldRFF>
+          </div>
+
+          <div className="mt-10">
+            <Button theme="primary" size="base" type="submit">
+              Submit
+            </Button>
           </div>
         </form>
       )}
