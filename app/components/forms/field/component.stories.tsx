@@ -1,5 +1,6 @@
 import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
+import Label from 'components/forms/label';
 import Input from 'components/forms/input';
 import Field, { FieldProps } from './component';
 
@@ -23,6 +24,7 @@ export default {
 
 const Template: Story<FieldProps> = (args) => (
   <Field {...args}>
+    <Label className="mb-3 uppercase">Name the scenario</Label>
     <Input />
   </Field>
 );
@@ -30,7 +32,6 @@ const Template: Story<FieldProps> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   id: 'scenario',
-  label: 'Name the scenario',
   input: {},
   meta: {
     touched: true,
