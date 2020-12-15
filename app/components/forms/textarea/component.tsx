@@ -4,7 +4,7 @@ import cx from 'classnames';
 const THEME = {
   primary: {
     base:
-      'leading-tight text-white bg-gray-800 border rounded appearance-none focus:outline-none focus:bg-gray-700',
+      'leading-tight text-white bg-gray-800 border rounded focus:outline-none focus:bg-gray-700',
     states: {
       none: 'border-gray-900',
       valid: 'border-green-500',
@@ -34,7 +34,7 @@ export const Textarea: React.FC<TextareaProps> = ({
       {...props}
       disabled={disabled}
       className={cx({
-        'block w-full px-4 py-2': true,
+        'form-textarea w-full': true,
         [THEME[theme].base]: true,
         [THEME[theme].states[st]]: true,
         [className]: !!className,
