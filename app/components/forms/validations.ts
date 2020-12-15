@@ -10,6 +10,7 @@ export const composeValidators = (validations: Record<string, unknown>[]) => (
   if (validations) {
     const errors = validations.map((validator: unknown) => {
       if (isObject(validator)) {
+        console.log(value, validator);
         return validate.single(value, validator);
       }
 
