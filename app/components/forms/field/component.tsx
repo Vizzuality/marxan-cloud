@@ -12,7 +12,6 @@ export interface FieldProps {
 
 export const Field: React.FC<FieldProps> = ({
   id,
-  label,
   children,
   input,
   meta,
@@ -45,11 +44,6 @@ export const Field: React.FC<FieldProps> = ({
         [className]: !!className,
       })}
     >
-      {label && (
-        <label className="block mb-3 text-xs text-white uppercase" htmlFor={id}>
-          {label}
-        </label>
-      )}
       {childrenWithProps}
     </div>
   );
