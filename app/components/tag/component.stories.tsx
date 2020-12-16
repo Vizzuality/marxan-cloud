@@ -23,4 +23,7 @@ export const Default = Template.bind({});
 Default.args = {
   children: 'Source name',
   removable: true,
+  onRemove: () => {
+    console.info('Clicked on remove tag');
+  },
 };
