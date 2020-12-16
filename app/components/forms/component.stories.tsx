@@ -4,6 +4,7 @@ import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
 import Textarea from 'components/forms/textarea';
+import Select from 'components/forms/select';
 import Checkbox from 'components/forms/checkbox';
 import Radio from 'components/forms/radio';
 import Button from 'components/button';
@@ -80,6 +81,28 @@ export const Form = (): React.ReactNode => {
                 <Field id="form-email" {...fprops}>
                   <Label className="mb-3 uppercase">Description</Label>
                   <Textarea rows={4} />
+                </Field>
+              )}
+            </FieldRFF>
+          </div>
+
+          {/* SELECT */}
+          <div className="mt-5">
+            <FieldRFF
+              name="category"
+              validate={composeValidators([{ presence: true }])}
+            >
+              {(fprops) => (
+                <Field id="form-select" {...fprops}>
+                  <Label className="mb-3 uppercase">Category</Label>
+                  <Select
+                    options={[
+                      { label: 'Option 1', value: 'option-1' },
+                      { label: 'Option 2', value: 'option-2' },
+                      { label: 'Option 3', value: 'option-3', disabled: true },
+                      { label: 'Option 4', value: 'option-4' },
+                    ]}
+                  />
                 </Field>
               )}
             </FieldRFF>
