@@ -22,7 +22,7 @@ services:
 #        - ${LOCAL_MODULES}:/home/jovyan/work/modules
 #    hostname: dask-worker
 #    command: ["dask-worker", "tcp://scheduler:8786"]
-  science-notebooks:
+  marxan-science-notebooks:
       build:
         context: ./notebooks
         dockerfile: Dockerfile
@@ -32,9 +32,11 @@ services:
         - /opt/ssl-certs/jupyter:/etc/ssl/notebook
       ports:
         - 8888:8888
-      container_name: science_jupyter_notebook
+      container_name: marxan-science_jupyter_notebook
       command: "start-notebook.sh \
         --NotebookApp.token=''"
+      networks:
+        marxan-cloud-network
     #   environment:
     #         - DASK_SCHEDULER_ADDRESS="tcp://scheduler:8786"
       #extra_hosts:
