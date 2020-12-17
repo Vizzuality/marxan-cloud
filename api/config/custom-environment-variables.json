@@ -1,1 +1,10 @@
-{}
+{
+  "postgres": {
+    "url": "POSTGRES_URL"
+   },
+  "network": {
+    "cors": {
+        "origins_extra": "NETWORK_CORS_ORIGINS"
+    }
+  }
+}
