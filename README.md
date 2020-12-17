@@ -29,6 +29,18 @@ orchestrated via Kubernetes (forthcoming).
      listen on the local machine
    * `APP_PORT` (number, required): the port on which the App service should
      listen on the local machine
+   * `POSTGRES_API_SERVICE_PORT` (number, required): the port on which the
+     PostgreSQL service should listen on the local machine
+   * `API_POSTGRES_USER` (string, required): username to be used for the
+     PostgreSQL connection (API)
+   * `API_POSTGRES_PASSWORD` (string, required): password to be used for the
+     PostgreSQL connection (API)
+   * `API_POSTGRES_DB` (string, required): name of the database to be used for
+     the PostgreSQL connection (API)
+
+The PostgreSQL credentials are used to create a database user when the
+PostgreSQL container is started for the first time. PostgreSQL data is persisted
+via a Docker volume.
 
 4. Create a Docker network for the local instance of the Marxan platform:
    `docker network create marxan-cloud-network`.
