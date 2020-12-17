@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { ButtonHTMLAttributes } from 'react';
 import cx from 'classnames';
 
 import Icon from 'components/icon';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-left.svg';
 
-export interface BreadcrumProps {
+export interface BreadcrumProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   className?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void | unknown;
