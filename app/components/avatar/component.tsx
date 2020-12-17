@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { ButtonHTMLAttributes } from 'react';
 import cx from 'classnames';
 
-export interface AvatarProps {
-  children: React.ReactNode;
+export interface AvatarProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children?: React.ReactNode;
   className?: string;
   bgImage?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void | unknown;
@@ -17,7 +17,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   <button
     type="button"
     className={cx({
-      'flex items-center justify-center bg-transparent bg-cover text-black w-10 h-10 rounded-full overflow-hidden focus:outline-none': true,
+      'relative transform transition-transform z-0 hover:z-10 hover:scale-105 flex items-center justify-center bg-transparent bg-cover bg-no-repeat text-black border-2 border-gray-700 w-10 h-10 rounded-full overflow-hidden focus:outline-none': true,
       [className]: !!className,
     })}
     style={{

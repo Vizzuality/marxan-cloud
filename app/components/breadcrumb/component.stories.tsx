@@ -16,7 +16,7 @@ const Template: Story<BreadcrumProps> = ({
 export const Default = Template.bind({});
 Default.args = {
   children: 'All projects',
-  onClick: () => {
-    console.info('Do stuff with the router');
+  onClick: (e) => {
+    console.info('onClick', e);
   },
 };
