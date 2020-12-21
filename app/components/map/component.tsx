@@ -16,9 +16,6 @@ import { fitBounds } from '@math.gl/web-mercator';
 import { easeCubic } from 'd3-ease';
 
 export interface MapProps extends InteractiveMapProps {
-  /** Mapbox Api Access Token */
-  mapboxApiAccessToken: string;
-
   /** A function that returns the map instance */
   children: React.ReactNode;
 
@@ -31,39 +28,22 @@ export interface MapProps extends InteractiveMapProps {
   viewport?: ViewportProps;
 
   /** An object that defines the bounds */
-  bounds: {
+  bounds?: {
     bbox: number[];
-    options: {};
-    viewportOptions: ViewportProps;
+    options?: {};
+    viewportOptions?: ViewportProps;
   };
-  /** A boolean that allows panning */
-  dragPan: boolean;
 
-  /** A boolean that allows rotating */
-  dragRotate: boolean;
-
-  /** A boolean that allows zooming */
-  scrollZoom: boolean;
-
-  /** A boolean that allows zooming */
-  touchZoom: boolean;
-
-  /** A boolean that allows touch rotating */
-  touchRotate: boolean;
-
-  /** A boolean that allows double click zooming */
-  doubleClickZoom: boolean;
-
-  /** A function that exposes when the map is ready.
-   * It returns and object with the `this.map` and `this.mapContainerRef` reference. */
-  onReady: (values) => void;
+  /** A function that exposes when the map is mounted.
+   * It returns and object with the `mapRef` and `mapContainerRef` reference. */
+  onMapReady?: ({ map, mapContainer }) => void;
 
   /** A function that exposes when the map is loaded.
-   * It returns and object with the `this.map` and `this.mapContainerRef` reference. */
-  onLoad: (values) => void;
+   * It returns and object with the `mapRef` and `mapContainerRef` reference. */
+  onMapLoad?: ({ map, mapContainer }) => void;
 
   /** A function that exposes the viewport */
-  onViewportChange: (viewport: ViewportProps) => void;
+  onMapViewportChange?: (viewport: ViewportProps) => void;
 }
 
 const DEFAULT_VIEWPORT = {
@@ -78,9 +58,9 @@ export const Map = ({
   className,
   viewport,
   bounds,
-  onReady,
-  onLoad,
-  onViewportChange,
+  onMapReady,
+  onMapLoad,
+  onMapViewportChange,
   dragPan,
   dragRotate,
   scrollZoom,
@@ -103,34 +83,44 @@ export const Map = ({
     ...viewport,
   });
   const [flying, setFlight] = useState(false);
-  const [loaded, setLoader] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   /**
    * CALLBACKS
    */
-  const onMapLoad = () => {
-    setLoader(true);
-    onLoad({ map: mapRef.current, mapContainer: mapContainerRef.current });
+  const handleLoad = () => {
+    setLoaded(true);
+    onMapLoad({ map: mapRef.current, mapContainer: mapContainerRef.current });
   };
 
-  const onMapViewportChange = (v) => {
+  const handleViewportChange = (v) => {
     setViewport(v);
-    onViewportChange(v);
+    onMapViewportChange(v);
   };
 
-  const onMapResize = (v) => {
+  const handleResize = (v) => {
     const newViewport = {
       ...mapViewport,
       ...v,
     };
 
     setViewport(newViewport);
-    onViewportChange(newViewport);
+    onMapViewportChange(newViewport);
   };
 
-  const onMapFitBounds = useCallback(
+  const handleFitBounds = useCallback(
     (transitionDuration = 2500) => {
+      if (!ready) return null;
       const { bbox, options, viewportOptions } = bounds;
+
+      if (
+        mapContainerRef.current.offsetWidth <= 0
+        || mapContainerRef.current.offsetHeight <= 0
+      ) {
+        console.error("mapContainerRef doesn't have dimensions");
+        return null;
+      }
 
       const { longitude, latitude, zoom } = fitBounds({
         width: mapContainerRef.current.offsetWidth,
@@ -156,27 +146,34 @@ export const Map = ({
         ...prevViewport,
         ...newViewport,
       }));
-      onViewportChange(newViewport);
+      onMapViewportChange(newViewport);
 
-      setTimeout(() => {
+      return setTimeout(() => {
         setFlight(false);
       }, transitionDuration);
     },
-    [bounds, onViewportChange],
+    [ready, bounds, onMapViewportChange],
   );
+
+  const handleGetCursor = useCallback(({ isHovering, isDragging }) => {
+    if (isHovering) return 'pointer';
+    if (isDragging) return 'grabbing';
+    return 'grab';
+  }, []);
 
   /**
    * EFFECTS
    */
   useEffect(() => {
-    onReady({ map: mapRef, mapContainer: mapContainerRef });
-  }, [onReady]);
+    setReady(true);
+    onMapReady({ map: mapRef.current, mapContainer: mapContainerRef.current });
+  }, [onMapReady]);
 
   useEffect(() => {
     if (!isEmpty(bounds) && !!bounds.bbox && bounds.bbox.every((b) => !!b)) {
-      onMapFitBounds();
+      handleFitBounds();
     }
-  }, [bounds, onMapFitBounds]);
+  }, [bounds, handleFitBounds]);
 
   useEffect(() => {
     setViewport((prevViewportState) => ({
@@ -214,14 +211,15 @@ export const Map = ({
         touchRotate={!flying && touchRotate}
         doubleClickZoom={!flying && doubleClickZoom}
         // DEFAULT FUNC IMPLEMENTATIONS
-        onViewportChange={onMapViewportChange}
-        onResize={onMapResize}
-        onLoad={onMapLoad}
-        // getCursor={getCursor}
+        onViewportChange={handleViewportChange}
+        onResize={handleResize}
+        onLoad={handleLoad}
+        getCursor={handleGetCursor}
         transitionInterpolator={new FlyToInterpolator()}
         transitionEasing={easeCubic}
       >
-        {loaded
+        {ready
+          && loaded
           && !!mapRef.current
           && typeof children === 'function'
           && children(mapRef.current)}

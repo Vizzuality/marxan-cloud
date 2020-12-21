@@ -6,7 +6,18 @@ export default {
   title: 'Components/Map',
   component: Map,
   argTypes: {
-    mapboxApiAccessToken: { control: { type: null } },
+    ReactMapGLAttributes: {
+      name: 'ReactMapGLAttributes',
+      description: 'http://visgl.github.io/react-map-gl/',
+      table: {
+        type: {
+          summary: 'ReactMapGLAttributes',
+        },
+      },
+      control: {
+        disabled: true,
+      },
+    },
   },
 };
 
@@ -22,7 +33,10 @@ const Template: Story<MapProps> = ({ children, ...args }: MapProps) => (
 
 export const Default = Template.bind({});
 Default.args = {
+  className: '',
+  viewport: {},
   mapboxApiAccessToken: process.env.MAPBOX_API_TOKEN,
+  mapStyle: 'mapbox://styles/mapbox/dark-v9',
   bounds: {
     bbox: [
       9.909667968749998,
@@ -34,5 +48,17 @@ Default.args = {
     viewportOptions: {
       transitionDuration: 0,
     },
+  },
+  children: (map) => {
+    console.info(map);
+  },
+  onMapViewportChange: (viewport) => {
+    console.info(viewport);
+  },
+  onMapReady: ({ map, mapContainer }) => {
+    console.info('onMapReady: ', map, mapContainer);
+  },
+  onMapLoad: ({ map, mapContainer }) => {
+    console.info('onMapLoad: ', map, mapContainer);
   },
 };
