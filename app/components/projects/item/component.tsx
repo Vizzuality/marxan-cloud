@@ -12,9 +12,9 @@ export interface ItemProps {
   description: string;
   lastUpdate: string;
   contributors?: Record<string, unknown>[];
-  onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void | unknown;
-  onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void | unknown;
-  onDelete: (event: React.MouseEvent<HTMLButtonElement>) => void | unknown;
+  onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export const Item: React.FC<ItemProps> = ({
