@@ -5,12 +5,13 @@ import Avatar from 'components/avatar';
 import Button from 'components/button';
 
 export interface ItemProps {
-  className: string;
+  id: string;
+  className?: string;
   name: string;
   area: string;
   description: string;
   lastUpdate: string;
-  contributors: Record<string, unknown>[];
+  contributors?: Record<string, unknown>[];
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void | unknown;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void | unknown;
   onDelete: (event: React.MouseEvent<HTMLButtonElement>) => void | unknown;
@@ -29,20 +30,22 @@ export const Item: React.FC<ItemProps> = ({
 }: ItemProps) => (
   <div
     className={cx({
-      'flex-column rounded bg-gray-700 p-8 text-white': true,
+      'flex flex-col rounded-4xl bg-gray-800 px-8 py-10 text-white': true,
       [className]: !!className,
     })}
   >
     <header className="flex-1">
-      <h3 className="text-xs uppercase">{area}</h3>
-      <h2 className="mt-2 text-3xl mb-7">{name}</h2>
+      <h3 className="text-xs font-medium tracking-widest uppercase font-heading">
+        {area}
+      </h3>
+      <h2 className="mt-3 mb-10 text-lg font-medium font-heading">{name}</h2>
       <div className="mb-3 text-sm">
         <span>Last scenario creation:</span>
         <span className="ml-2 text-primary-500">
           {lastUpdate || 'no scenario'}
         </span>
       </div>
-      <div className="text-sm opacity-50">{description}</div>
+      <div className="text-sm opacity-50 clamp-2">{description}</div>
     </header>
 
     <footer className="mt-7">
@@ -67,23 +70,18 @@ export const Item: React.FC<ItemProps> = ({
       )}
 
       <div className="flex">
-        <Button className="" theme="primary-alt" size="xs" onClick={onDownload}>
+        <Button className="" theme="secondary" size="xs" onClick={onDownload}>
           Download
         </Button>
         <Button
           className="ml-3"
-          theme="primary-alt"
+          theme="secondary"
           size="xs"
           onClick={onDuplicate}
         >
           Duplicate
         </Button>
-        <Button
-          className="ml-3"
-          theme="primary-alt"
-          size="xs"
-          onClick={onDelete}
-        >
+        <Button className="ml-3" theme="secondary" size="xs" onClick={onDelete}>
           Delete
         </Button>
       </div>
