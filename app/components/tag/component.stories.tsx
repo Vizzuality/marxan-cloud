@@ -5,14 +5,7 @@ import Tag, { TagProps } from './component';
 export default {
   title: 'Components/Tag',
   component: Tag,
-  argTypes: {
-    size: {
-      control: {
-        type: 'select',
-        options: ['s', 'base'],
-      },
-    },
-  },
+  argTypes: {},
 };
 
 const Template: Story<TagProps> = ({ children, ...args }: TagProps) => (
@@ -22,8 +15,16 @@ const Template: Story<TagProps> = ({ children, ...args }: TagProps) => (
 export const Default = Template.bind({});
 Default.args = {
   children: 'Source name',
-  removable: true,
-  onRemove: () => {
-    console.info('Clicked on remove tag');
-  },
+};
+
+export const Yellow = Template.bind({});
+Yellow.args = {
+  children: 'Species',
+  className: 'text-black bg-yellow-500',
+};
+
+export const Blue = Template.bind({});
+Blue.args = {
+  children: 'Bioregional',
+  className: 'text-black bg-primary-500',
 };
