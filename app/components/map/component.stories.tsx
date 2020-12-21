@@ -1,6 +1,10 @@
 import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
+import { LayerManager, Layer } from 'layer-manager/dist/components';
+import { PluginMapboxGl } from 'layer-manager';
+
 import Map, { MapProps } from './component';
+import LAYERS from './layers';
 
 export default {
   title: 'Components/Map',
@@ -35,19 +39,24 @@ export default {
         disable: true,
       },
     },
-    mapStyle: {
-      table: {
-        disable: true,
-      },
-    },
   },
 };
 
 const Template: Story<MapProps> = ({ children, ...args }: MapProps) => (
   <div className="w-full h-96">
-    <Map {...args}>
+    <Map
+      {...args}
+      mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
+      mapStyle="mapbox://styles/mapbox/dark-v9"
+    >
       {(map) => {
-        console.info(map);
+        return (
+          <LayerManager map={map} plugin={PluginMapboxGl}>
+            {LAYERS.map((l) => (
+              <Layer key={l.id} {...l} />
+            ))}
+          </LayerManager>
+        );
       }}
     </Map>
   </div>
@@ -55,10 +64,8 @@ const Template: Story<MapProps> = ({ children, ...args }: MapProps) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  mapboxApiAccessToken: process.env.MAPBOX_API_TOKEN,
   className: '',
   viewport: {},
-  mapStyle: 'mapbox://styles/mapbox/dark-v9',
   bounds: {
     bbox: [
       9.909667968749998,
@@ -71,7 +78,6 @@ Default.args = {
       transitionDuration: 0,
     },
   },
-  children: null,
   onMapViewportChange: (viewport) => {
     console.info('onMapViewportChange: ', viewport);
   },
