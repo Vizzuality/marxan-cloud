@@ -17,7 +17,7 @@ import { easeCubic } from 'd3-ease';
 
 export interface MapProps extends InteractiveMapProps {
   /** A function that returns the map instance */
-  children: React.ReactNode;
+  children?: React.ReactNode;
 
   /** Custom css class for styling */
   className?: string;
