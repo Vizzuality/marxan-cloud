@@ -1,5 +1,8 @@
 const colors = require('tailwindcss/colors');
+
+// PLUGINS
 const customForms = require('@tailwindcss/custom-forms');
+const lineClamp = require('./styles/line-clamp');
 
 module.exports = {
   purge: {
@@ -28,10 +31,18 @@ module.exports = {
         700: '#0099cc',
         800: '#0086b3',
       },
-
       black: colors.black,
       white: colors.white,
-      gray: colors.coolGray,
+      gray: {
+        100: '#E8E8E8',
+        200: '#C4C4C4',
+        300: '#A2A2A9',
+        400: '#5F646E',
+        500: '#36373E',
+        600: '#37393d',
+        700: '#151515',
+        800: '#111111',
+      },
       red: colors.red,
       yellow: colors.amber,
       green: colors.emerald,
@@ -131,6 +142,7 @@ module.exports = {
       xl: '0.75rem',
       '2xl': '1rem',
       '3xl': '1.5rem',
+      '4xl': '40px',
       full: '9999px',
     },
     borderWidth: {
@@ -183,7 +195,9 @@ module.exports = {
       DEFAULT: '1',
     },
     fontFamily: {
+      heading: 'Poppins',
       sans: [
+        'Basier Circle',
         'ui-sans-serif',
         'system-ui',
         '-apple-system',
@@ -744,6 +758,11 @@ module.exports = {
       40: '40',
       50: '50',
     },
+    lineClamp: {
+      1: 1,
+      2: 2,
+      3: 3,
+    },
   },
   variantOrder: [
     'first',
@@ -925,7 +944,7 @@ module.exports = {
     whitespace: ['responsive'],
     width: ['responsive'],
     wordBreak: ['responsive'],
-    zIndex: ['responsive', 'focus-within', 'focus'],
+    zIndex: ['responsive', 'focus-within', 'focus', 'hover'],
   },
-  plugins: [customForms],
+  plugins: [customForms, lineClamp],
 };

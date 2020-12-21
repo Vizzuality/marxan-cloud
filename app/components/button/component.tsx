@@ -35,7 +35,7 @@ export const Button: React.FC<ButtonProps> = ({
   <button
     type="button"
     className={cx({
-      'flex rounded focus:outline-none': true,
+      'flex rounded-4xl focus:outline-none': true,
       [THEME[theme]]: true,
       [SIZE[size]]: true,
       [className]: !!className,
