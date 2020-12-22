@@ -23,7 +23,7 @@
     "d3-ease": "^2.0.0",
     "deck.gl": "7.3.6",
     "final-form": "^4.20.1",
-    "layer-manager": "3.0.8",
+    "layer-manager": "3.0.9",
     "lodash": "^4.17.20",
     "luma.gl": "7.3.2",
     "next": "10.0.3",
@@ -34,8 +34,7 @@
     "react-final-form": "^6.5.2",
     "react-map-gl": "^6.0.1",
     "tailwindcss": "^2.0.2",
-    "validate.js": "^0.13.1",
-    "viewport-mercator-project": "6.1.1"
+    "validate.js": "^0.13.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
