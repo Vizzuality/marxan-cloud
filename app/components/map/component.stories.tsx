@@ -46,7 +46,7 @@ const Template: Story<MapProps> = ({ children, ...args }: MapProps) => (
   <div className="w-full h-96">
     <Map
       {...args}
-      mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
+      mapboxApiAccessToken={process.env.STORYBOOK_MAPBOX_API_TOKEN}
       mapStyle="mapbox://styles/mapbox/dark-v9"
     >
       {(map) => {
