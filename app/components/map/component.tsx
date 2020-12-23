@@ -76,7 +76,6 @@ export const Map = ({
    */
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
-  const mounted = useRef(false);
 
   /**
    * STATE
@@ -122,51 +121,49 @@ export const Map = ({
     [mapViewport, debouncedOnMapViewportChange],
   );
 
-  const handleFitBounds = useCallback(
-    (transitionDuration = 2500) => {
-      if (!ready) return null;
-      const { bbox, options, viewportOptions } = bounds;
+  const handleFitBounds = useCallback(() => {
+    if (!ready) return null;
+    const { bbox, options = {}, viewportOptions = {} } = bounds;
+    const { transitionDuration = 0 } = viewportOptions;
 
-      if (
-        mapContainerRef.current.offsetWidth <= 0
-        || mapContainerRef.current.offsetHeight <= 0
-      ) {
-        console.error("mapContainerRef doesn't have dimensions");
-        return null;
-      }
+    if (
+      mapContainerRef.current.offsetWidth <= 0
+      || mapContainerRef.current.offsetHeight <= 0
+    ) {
+      console.error("mapContainerRef doesn't have dimensions");
+      return null;
+    }
 
-      const { longitude, latitude, zoom } = fitBounds({
-        width: mapContainerRef.current.offsetWidth,
-        height: mapContainerRef.current.offsetHeight,
-        bounds: [
-          [bbox[0], bbox[1]],
-          [bbox[2], bbox[3]],
-        ],
-        ...options,
-      });
+    const { longitude, latitude, zoom } = fitBounds({
+      width: mapContainerRef.current.offsetWidth,
+      height: mapContainerRef.current.offsetHeight,
+      bounds: [
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[3]],
+      ],
+      ...options,
+    });
 
-      const newViewport = {
-        longitude,
-        latitude,
-        zoom,
-        transitionDuration,
-        transitionInterruption: TRANSITION_EVENTS.UPDATE,
-        ...viewportOptions,
-      };
+    const newViewport = {
+      longitude,
+      latitude,
+      zoom,
+      transitionDuration,
+      transitionInterruption: TRANSITION_EVENTS.UPDATE,
+      ...viewportOptions,
+    };
 
-      setFlight(true);
-      setViewport((prevViewport) => ({
-        ...prevViewport,
-        ...newViewport,
-      }));
-      debouncedOnMapViewportChange.callback(newViewport);
+    setFlight(true);
+    setViewport((prevViewport) => ({
+      ...prevViewport,
+      ...newViewport,
+    }));
+    debouncedOnMapViewportChange.callback(newViewport);
 
-      return setTimeout(() => {
-        setFlight(false);
-      }, transitionDuration);
-    },
-    [ready, bounds, debouncedOnMapViewportChange],
-  );
+    return setTimeout(() => {
+      setFlight(false);
+    }, +transitionDuration);
+  }, [ready, bounds, debouncedOnMapViewportChange]);
 
   const handleGetCursor = useCallback(({ isHovering, isDragging }) => {
     if (isHovering) return 'pointer';
@@ -184,9 +181,7 @@ export const Map = ({
 
   useEffect(() => {
     if (!isEmpty(bounds) && !!bounds.bbox && bounds.bbox.every((b) => !!b)) {
-      const time = mounted.current ? 2500 : 0;
-      mounted.current = true;
-      handleFitBounds(time);
+      handleFitBounds();
     }
   }, [bounds, handleFitBounds]);
 
