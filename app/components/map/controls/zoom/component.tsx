@@ -3,15 +3,13 @@ import cx from 'classnames';
 
 import Icon from 'components/icon';
 
+import { ViewportProps } from 'react-map-gl';
+
 import ZOOM_IN_SVG from 'svgs/map/zoom-in.svg?sprite';
 import ZOOM_OUT_SVG from 'svgs/map/zoom-out.svg?sprite';
 
 export interface ZoomControlProps {
-  viewport: {
-    zoom: number;
-    maxZoom: number;
-    minZoom: number;
-  };
+  viewport: Partial<ViewportProps>;
   className?: string;
   onZoomChange: (zoom: number) => void;
 }
@@ -27,7 +25,7 @@ export const ZoomControl = ({
     (e) => {
       e.stopPropagation();
 
-      onZoomChange(zoom === maxZoom ? zoom : zoom + 1);
+      onZoomChange(zoom + 1 >= maxZoom ? maxZoom : zoom + 1);
     },
     [zoom, maxZoom, onZoomChange],
   );
@@ -36,7 +34,7 @@ export const ZoomControl = ({
     (e) => {
       e.stopPropagation();
 
-      onZoomChange(zoom === minZoom ? zoom : zoom - 1);
+      onZoomChange(zoom - 1 <= minZoom ? minZoom : zoom - 1);
     },
     [zoom, minZoom, onZoomChange],
   );
