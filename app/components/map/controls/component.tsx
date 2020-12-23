@@ -7,7 +7,7 @@ export interface ControlsProps {
 }
 
 export const Controls: React.FC<ControlsProps> = ({
-  className = '',
+  className = 'absolute bottom-10 left-2',
   children,
 }: ControlsProps) => {
   return (
@@ -17,7 +17,17 @@ export const Controls: React.FC<ControlsProps> = ({
         [className]: !!className,
       })}
     >
-      {children}
+      {React.Children.map(children, (child, i) => {
+        return (
+          <div
+            className={cx({
+              'mt-2': i !== 0,
+            })}
+          >
+            {child}
+          </div>
+        );
+      })}
     </div>
   );
 };
