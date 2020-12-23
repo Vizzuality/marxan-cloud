@@ -1,6 +1,8 @@
 import React, {
   useEffect, useState, useRef, useCallback,
 } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
+
 import cx from 'classnames';
 
 import isEmpty from 'lodash/isEmpty';
@@ -25,13 +27,13 @@ export interface MapProps extends InteractiveMapProps {
   /** An object that defines the viewport
    * @see https://uber.github.io/react-map-gl/#/Documentation/api-reference/interactive-map?section=initialization
    */
-  viewport?: ViewportProps;
+  viewport?: Partial<ViewportProps>;
 
   /** An object that defines the bounds */
   bounds?: {
     bbox: number[];
     options?: {};
-    viewportOptions?: ViewportProps;
+    viewportOptions?: Partial<ViewportProps>;
   };
 
   /** A function that exposes when the map is mounted.
@@ -43,7 +45,7 @@ export interface MapProps extends InteractiveMapProps {
   onMapLoad?: ({ map, mapContainer }) => void;
 
   /** A function that exposes the viewport */
-  onMapViewportChange?: (viewport: ViewportProps) => void;
+  onMapViewportChange?: (viewport: Partial<ViewportProps>) => void;
 }
 
 const DEFAULT_VIEWPORT = {
@@ -74,6 +76,7 @@ export const Map = ({
    */
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
+  const mounted = useRef(false);
 
   /**
    * STATE
@@ -89,25 +92,35 @@ export const Map = ({
   /**
    * CALLBACKS
    */
-  const handleLoad = () => {
+  const handleLoad = useCallback(() => {
     setLoaded(true);
     onMapLoad({ map: mapRef.current, mapContainer: mapContainerRef.current });
-  };
+  }, [onMapLoad]);
 
-  const handleViewportChange = (v) => {
-    setViewport(v);
+  const debouncedOnMapViewportChange = useDebouncedCallback((v) => {
     onMapViewportChange(v);
-  };
+  }, 250);
 
-  const handleResize = (v) => {
-    const newViewport = {
-      ...mapViewport,
-      ...v,
-    };
+  const handleViewportChange = useCallback(
+    (v) => {
+      setViewport(v);
+      debouncedOnMapViewportChange.callback(v);
+    },
+    [debouncedOnMapViewportChange],
+  );
 
-    setViewport(newViewport);
-    onMapViewportChange(newViewport);
-  };
+  const handleResize = useCallback(
+    (v) => {
+      const newViewport = {
+        ...mapViewport,
+        ...v,
+      };
+
+      setViewport(newViewport);
+      debouncedOnMapViewportChange.callback(newViewport);
+    },
+    [mapViewport, debouncedOnMapViewportChange],
+  );
 
   const handleFitBounds = useCallback(
     (transitionDuration = 2500) => {
@@ -146,13 +159,13 @@ export const Map = ({
         ...prevViewport,
         ...newViewport,
       }));
-      onMapViewportChange(newViewport);
+      debouncedOnMapViewportChange.callback(newViewport);
 
       return setTimeout(() => {
         setFlight(false);
       }, transitionDuration);
     },
-    [ready, bounds, onMapViewportChange],
+    [ready, bounds, debouncedOnMapViewportChange],
   );
 
   const handleGetCursor = useCallback(({ isHovering, isDragging }) => {
@@ -171,7 +184,9 @@ export const Map = ({
 
   useEffect(() => {
     if (!isEmpty(bounds) && !!bounds.bbox && bounds.bbox.every((b) => !!b)) {
-      handleFitBounds();
+      const time = mounted.current ? 2500 : 0;
+      mounted.current = true;
+      handleFitBounds(time);
     }
   }, [bounds, handleFitBounds]);
 

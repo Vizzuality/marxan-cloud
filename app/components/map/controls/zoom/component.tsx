@@ -25,7 +25,7 @@ export const ZoomControl = ({
     (e) => {
       e.stopPropagation();
 
-      onZoomChange(zoom + 1 >= maxZoom ? maxZoom : zoom + 1);
+      onZoomChange(zoom + 1 > maxZoom ? maxZoom : zoom + 1);
     },
     [zoom, maxZoom, onZoomChange],
   );
@@ -34,7 +34,7 @@ export const ZoomControl = ({
     (e) => {
       e.stopPropagation();
 
-      onZoomChange(zoom - 1 <= minZoom ? minZoom : zoom - 1);
+      onZoomChange(zoom - 1 < minZoom ? minZoom : zoom - 1);
     },
     [zoom, minZoom, onZoomChange],
   );

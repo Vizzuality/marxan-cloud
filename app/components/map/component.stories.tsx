@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Story } from '@storybook/react/types-6-0';
+
+// Layer manager
 import { LayerManager, Layer } from 'layer-manager/dist/components';
 import { PluginMapboxGl } from 'layer-manager';
 
+// Controls
+import Controls from 'components/map/controls';
+import ZoomControl from 'components/map/controls/zoom';
+
+// Map
 import Map, { MapProps } from './component';
 import LAYERS from './layers';
 
@@ -42,25 +49,61 @@ export default {
   },
 };
 
-const Template: Story<MapProps> = ({ children, ...args }: MapProps) => (
-  <div className="w-full h-96">
-    <Map
-      {...args}
-      mapboxApiAccessToken={process.env.STORYBOOK_MAPBOX_API_TOKEN}
-      mapStyle="mapbox://styles/mapbox/dark-v9"
-    >
-      {(map) => {
-        return (
-          <LayerManager map={map} plugin={PluginMapboxGl}>
-            {LAYERS.map((l) => (
-              <Layer key={l.id} {...l} />
-            ))}
-          </LayerManager>
-        );
-      }}
-    </Map>
-  </div>
-);
+const Template: Story<MapProps> = ({ children, ...args }: MapProps) => {
+  const minZoom = 2;
+  const maxZoom = 10;
+  const [viewport, setViewport] = useState({});
+
+  const handleViewportChange = useCallback((vw) => {
+    setViewport(vw);
+  }, []);
+
+  const handleZoomChange = useCallback(
+    (zoom) => {
+      setViewport({
+        ...viewport,
+        zoom,
+        transitionDuration: 500,
+      });
+    },
+    [viewport],
+  );
+
+  return (
+    <div className="relative w-full h-96">
+      <Map
+        {...args}
+        minZoom={minZoom}
+        maxZoom={maxZoom}
+        viewport={viewport}
+        mapboxApiAccessToken={process.env.STORYBOOK_MAPBOX_API_TOKEN}
+        mapStyle="mapbox://styles/mapbox/dark-v9"
+        onMapViewportChange={handleViewportChange}
+      >
+        {(map) => {
+          return (
+            <LayerManager map={map} plugin={PluginMapboxGl}>
+              {LAYERS.map((l) => (
+                <Layer key={l.id} {...l} />
+              ))}
+            </LayerManager>
+          );
+        }}
+      </Map>
+
+      <Controls>
+        <ZoomControl
+          viewport={{
+            ...viewport,
+            minZoom,
+            maxZoom,
+          }}
+          onZoomChange={handleZoomChange}
+        />
+      </Controls>
+    </div>
+  );
+};
 
 export const Default = Template.bind({});
 Default.args = {
