@@ -12,6 +12,12 @@ module.exports = {
   presets: [],
   darkMode: false, // or 'media' or 'class'
   theme: {
+    extend: {
+      colors: {
+        'gradient-initial': '#01BDFE',
+        'gradient-final': '#973CD5',
+      },
+    },
     screens: {
       sm: '640px',
       md: '768px',
@@ -507,6 +513,10 @@ module.exports = {
       '5xl': '64rem',
       '6xl': '72rem',
       '7xl': '80rem',
+      '1/5': '20%',
+      '1/4': '25%',
+      '1/2': '50%',
+      '3/4': '75%',
       full: '100%',
       min: 'min-content',
       max: 'max-content',
