@@ -39,7 +39,7 @@ export interface MapProps extends InteractiveMapProps {
   onMapReady?: ({ map, mapContainer }) => void;
 
   /** A function that exposes when the map is loaded.
-   * It returns and object with the `mapRef` and `mapContainerRef` reference. */
+   * It receives and object with the `mapRef` and `mapContainerRef` reference. */
   onMapLoad?: ({ map, mapContainer }) => void;
 
   /** A function that exposes the viewport */
