@@ -8,6 +8,11 @@ c = get_config()
 c.NotebookApp.ip = '0.0.0.0'
 c.NotebookApp.port = 8888
 c.NotebookApp.open_browser = False
+# c.NotebookApp.iopub_data_rate_limit=1.0e10
+# c.NotebookApp.iopub_msg_rate_limitFloat=30000
+c.NotebookApp.max_buffer_size = 20000000
+c.NotebookApp.default_url = '/lab'
+c.NotebookApp.line_numbers = True
 
 # https://github.com/jupyter/notebook/issues/3130
 c.FileContentsManager.delete_to_trash = False
