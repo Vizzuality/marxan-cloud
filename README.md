@@ -37,6 +37,10 @@ orchestrated via Kubernetes (forthcoming).
      PostgreSQL connection (API)
    * `API_POSTGRES_DB` (string, required): name of the database to be used for
      the PostgreSQL connection (API)
+   * `POSTGRES_AIRFLOW_SERVICE_PORT` (number, required): the port on which the
+     PostgreSQL for Airflow service should listen on the local machine
+   * `AIRFLOW_PORT` (number, required): the port on which the
+     Airflow service should listen on the local machine
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted
