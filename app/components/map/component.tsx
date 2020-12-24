@@ -1,6 +1,8 @@
 import React, {
   useEffect, useState, useRef, useCallback,
 } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
+
 import cx from 'classnames';
 
 import isEmpty from 'lodash/isEmpty';
@@ -25,13 +27,13 @@ export interface MapProps extends InteractiveMapProps {
   /** An object that defines the viewport
    * @see https://uber.github.io/react-map-gl/#/Documentation/api-reference/interactive-map?section=initialization
    */
-  viewport?: ViewportProps;
+  viewport?: Partial<ViewportProps>;
 
   /** An object that defines the bounds */
   bounds?: {
     bbox: number[];
     options?: {};
-    viewportOptions?: ViewportProps;
+    viewportOptions?: Partial<ViewportProps>;
   };
 
   /** A function that exposes when the map is mounted.
@@ -43,7 +45,7 @@ export interface MapProps extends InteractiveMapProps {
   onMapLoad?: ({ map, mapContainer }) => void;
 
   /** A function that exposes the viewport */
-  onMapViewportChange?: (viewport: ViewportProps) => void;
+  onMapViewportChange?: (viewport: Partial<ViewportProps>) => void;
 }
 
 const DEFAULT_VIEWPORT = {
@@ -89,71 +91,79 @@ export const Map = ({
   /**
    * CALLBACKS
    */
-  const handleLoad = () => {
+  const handleLoad = useCallback(() => {
     setLoaded(true);
     onMapLoad({ map: mapRef.current, mapContainer: mapContainerRef.current });
-  };
+  }, [onMapLoad]);
 
-  const handleViewportChange = (v) => {
-    setViewport(v);
+  const debouncedOnMapViewportChange = useDebouncedCallback((v) => {
     onMapViewportChange(v);
-  };
+  }, 250);
 
-  const handleResize = (v) => {
-    const newViewport = {
-      ...mapViewport,
-      ...v,
-    };
+  const handleViewportChange = useCallback(
+    (v) => {
+      setViewport(v);
+      debouncedOnMapViewportChange.callback(v);
+    },
+    [debouncedOnMapViewportChange],
+  );
 
-    setViewport(newViewport);
-    onMapViewportChange(newViewport);
-  };
-
-  const handleFitBounds = useCallback(
-    (transitionDuration = 2500) => {
-      if (!ready) return null;
-      const { bbox, options, viewportOptions } = bounds;
-
-      if (
-        mapContainerRef.current.offsetWidth <= 0
-        || mapContainerRef.current.offsetHeight <= 0
-      ) {
-        console.error("mapContainerRef doesn't have dimensions");
-        return null;
-      }
-
-      const { longitude, latitude, zoom } = fitBounds({
-        width: mapContainerRef.current.offsetWidth,
-        height: mapContainerRef.current.offsetHeight,
-        bounds: [
-          [bbox[0], bbox[1]],
-          [bbox[2], bbox[3]],
-        ],
-        ...options,
-      });
-
+  const handleResize = useCallback(
+    (v) => {
       const newViewport = {
-        longitude,
-        latitude,
-        zoom,
-        transitionDuration,
-        transitionInterruption: TRANSITION_EVENTS.UPDATE,
-        ...viewportOptions,
+        ...mapViewport,
+        ...v,
       };
 
-      setFlight(true);
-      setViewport((prevViewport) => ({
-        ...prevViewport,
-        ...newViewport,
-      }));
-      onMapViewportChange(newViewport);
-
-      return setTimeout(() => {
-        setFlight(false);
-      }, transitionDuration);
+      setViewport(newViewport);
+      debouncedOnMapViewportChange.callback(newViewport);
     },
-    [ready, bounds, onMapViewportChange],
+    [mapViewport, debouncedOnMapViewportChange],
   );
+
+  const handleFitBounds = useCallback(() => {
+    if (!ready) return null;
+    const { bbox, options = {}, viewportOptions = {} } = bounds;
+    const { transitionDuration = 0 } = viewportOptions;
+
+    if (
+      mapContainerRef.current.offsetWidth <= 0
+      || mapContainerRef.current.offsetHeight <= 0
+    ) {
+      console.error("mapContainerRef doesn't have dimensions");
+      return null;
+    }
+
+    const { longitude, latitude, zoom } = fitBounds({
+      width: mapContainerRef.current.offsetWidth,
+      height: mapContainerRef.current.offsetHeight,
+      bounds: [
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[3]],
+      ],
+      ...options,
+    });
+
+    const newViewport = {
+      longitude,
+      latitude,
+      zoom,
+      transitionDuration,
+      transitionInterruption: TRANSITION_EVENTS.UPDATE,
+      ...viewportOptions,
+    };
+
+    setFlight(true);
+    setViewport((prevViewport) => ({
+      ...prevViewport,
+      ...newViewport,
+    }));
+    debouncedOnMapViewportChange.callback(newViewport);
+
+    return setTimeout(() => {
+      setFlight(false);
+    }, +transitionDuration);
+  }, [ready, bounds, debouncedOnMapViewportChange]);
 
   const handleGetCursor = useCallback(({ isHovering, isDragging }) => {
     if (isHovering) return 'pointer';
