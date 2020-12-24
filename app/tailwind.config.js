@@ -17,6 +17,9 @@ module.exports = {
         'gradient-initial': '#01BDFE',
         'gradient-final': '#973CD5',
       },
+      outline: {
+        blue: '2px dotted #00ace6',
+      },
     },
     screens: {
       sm: '640px',
