@@ -9,6 +9,7 @@
 !include DEVICONS/redis.puml
 !include DEVICONS/python.puml
 !include DEVICONS/react.puml
+!include DEVICONS2/apache.puml
 
 ' skinparam wrapWidth 200
 ' skinparam maxMessageSize 200
@@ -34,7 +35,7 @@ System_Boundary(c1, "Backend") {
       Container(worker1, "Airflow worker", "Typescript, Next", "The point of access for customer information")
       Container(worker2, "Airflow worker", "Typescript, Next", "The point of access for customer information")
     }
-    Container(Airflow, "Airflow", "Apache Airflow", "The point of access for customer information")
+    Container(Airflow, "Airflow", "Apache Airflow", "The point of access for customer information","apache")
 
   }
 
