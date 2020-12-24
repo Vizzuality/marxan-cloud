@@ -18,21 +18,21 @@ services:
       - POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
     depends_on:
       - postgresql-api
-  app:
-    build:
-      context: ./app
-      dockerfile: Dockerfile
-    ports:
-      - "${APP_SERVICE_PORT}:3000"
-    container_name: marxan-app
-    command: start
-    volumes:
-      - ./app/src:/opt/marxan-app/src
-      - ./app/test:/opt/marxan-app/test
-    env_file: .env
-    environment:
-      - NODE_PATH=src
-      - NODE_ENV=development
+  # app:
+  #   build:
+  #     context: ./app
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "${APP_SERVICE_PORT}:3000"
+  #   container_name: marxan-app
+  #   command: start
+  #   volumes:
+  #     - ./app/src:/opt/marxan-app/src
+  #     - ./app/test:/opt/marxan-app/test
+  #   env_file: .env
+  #   environment:
+  #     - NODE_PATH=src
+  #     - NODE_ENV=development
   postgresql-api:
     build:
       context: ./postgresql
@@ -46,6 +46,41 @@ services:
       - POSTGRES_PASSWORD=${API_POSTGRES_PASSWORD}
       - POSTGRES_USER=${API_POSTGRES_USER}
     restart: always
+  postgresql-airflow:
+    build:
+      context: ./postgresql
+      dockerfile: Dockerfile
+    container_name: marxan-postgresql-airflow
+    ports:
+      - "${POSTGRES_AIRFLOW_SERVICE_PORT}:5432"
+    environment:
+        - POSTGRES_USER=airflow
+        - POSTGRES_PASSWORD=airflow
+        - POSTGRES_DB=airflow
+  airflow-scheduler:
+    container_name: marxan-airflow-scheduler
+    image: apache/airflow
+    command: scheduler
+    depends_on:
+        - postgresql-airflow
+    env_file:
+        - .env
+    volumes:
+        - ./airflow/dags:/opt/airflow/dags
+  airflow-webserver:
+    container_name: marxan-airflow-webserver
+    image: apache/airflow
+    entrypoint: ['sh','./scripts/entrypoint.sh']
+    depends_on:
+        - postgresql-api
+        - airflow-scheduler
+    env_file:
+        - .env
+    volumes:
+        - ./airflow/dags:/opt/airflow/dags
+        - ./airflow/scripts:/opt/airflow/scripts
+    ports:
+        - "${AIRFLOW_PORT}:8080"
 networks:
   default:
     external:
