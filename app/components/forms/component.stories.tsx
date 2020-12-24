@@ -78,7 +78,7 @@ export const Form = (): React.ReactNode => {
               ])}
             >
               {(fprops) => (
-                <Field id="form-email" {...fprops}>
+                <Field id="form-description" {...fprops}>
                   <Label className="mb-3 uppercase">Description</Label>
                   <Textarea rows={4} />
                 </Field>
