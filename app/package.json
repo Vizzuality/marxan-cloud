@@ -22,6 +22,7 @@
     "classnames": "^2.2.6",
     "d3-ease": "^2.0.0",
     "deck.gl": "7.3.6",
+    "date-fns": "^2.16.1",
     "final-form": "^4.20.1",
     "layer-manager": "3.0.9",
     "lodash": "^4.17.20",
