@@ -16,6 +16,6 @@ export const Default = Template.bind({});
 Default.args = {
   name: 'Scenario 1',
   progress: 20,
-  scenarioState: 'running',
+  status: 'running',
   updatedAt: '2020-04-11T10:20:30Z',
 };

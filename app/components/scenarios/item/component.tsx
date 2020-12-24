@@ -5,8 +5,8 @@ import { formatDistanceToNow } from 'date-fns';
 import Button from 'components/button';
 import ProgressBar from 'components/progress-bar';
 import Icon from 'components/icon';
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-right.svg';
-import WARNING_SVG from 'svgs/ui/bang.svg';
+import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg';
+import WARNING_SVG from 'svgs/ui/warning.svg';
 
 const SCENARIO_STATES = {
   running: {
@@ -30,7 +30,7 @@ export interface ItemProps {
   progress?: number;
   updatedAt: string;
   className?: string;
-  scenarioState: 'running' | 'completed' | 'draft';
+  status: 'running' | 'completed' | 'draft';
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onView: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onSettings: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -42,7 +42,7 @@ export const Item: React.FC<ItemProps> = ({
   progress,
   updatedAt,
   className,
-  scenarioState,
+  status,
   onEdit,
   onView,
   onSettings,
@@ -58,31 +58,34 @@ export const Item: React.FC<ItemProps> = ({
         <div className="flex items-center flex-grow max-h-full space-x-4 text-lg text-white">
           <section className="flex-grow">
             <div className="flex flex-row items-center">
+              {warnings && (
+                <div className="relative flex items-center w-10 h-10 mr-5 border border-white border-solid rounded-full">
+                  <div className="absolute w-4 h-4 bg-red-500 border-4 border-gray-700 border-solid rounded-full -top-1 -right-1" />
+                  <Icon className="w-10 h-10" icon={WARNING_SVG} />
+                </div>
+              )}
               <div>
-                {warnings && (
-                  <div className="relative flex items-center w-10 h-10 mr-5 border border-white border-solid rounded-full">
-                    <div className="absolute w-4 h-4 bg-red-500 border-4 border-black border-solid rounded-full -top-1 -right-1" />
-                    <Icon className="w-10 h-10" icon={WARNING_SVG} />
-                  </div>
-                )}
-              </div>
-              <div>
-                <h2 className="m-0 font-medium font-heading clamp-1">{name}</h2>
+                <h2
+                  className="m-0 text-sm font-medium font-heading clamp-1"
+                  title={name}
+                >
+                  {name}
+                </h2>
                 <div className="clamp-1">
                   <span
                     className={cx({
-                      'font-normal m-0': true,
-                      [SCENARIO_STATES[scenarioState].styles]:
-                        scenarioState !== SCENARIO_STATES[scenarioState].text,
+                      'm-0 text-xs': true,
+                      [SCENARIO_STATES[status].styles]:
+                        status !== SCENARIO_STATES[status].text,
                     })}
                   >
-                    {`${SCENARIO_STATES[scenarioState].text} `}
+                    {`${SCENARIO_STATES[status].text} `}
                   </span>
                   <span
                     className={cx({
-                      'font-normal m-0': true,
-                      [SCENARIO_STATES[scenarioState].styles]:
-                        scenarioState !== SCENARIO_STATES[scenarioState].text,
+                      'm-0 text-xs': true,
+                      [SCENARIO_STATES[status].styles]:
+                        status !== SCENARIO_STATES[status].text,
                     })}
                   >
                     {formatDistanceToNow(new Date(updatedAt), {
@@ -93,28 +96,37 @@ export const Item: React.FC<ItemProps> = ({
               </div>
             </div>
           </section>
-          <Button size="s" theme="secondary" onClick={onSettings}>
+          <Button
+            className="flex-shrink-0"
+            size="s"
+            theme="secondary"
+            onClick={onSettings}
+          >
             View settings
           </Button>
-          <Button size="s" theme="primary" onClick={onEdit}>
+          <Button
+            className="flex-shrink-0"
+            size="s"
+            theme="primary"
+            onClick={onEdit}
+          >
             Edit
           </Button>
         </div>
       </div>
-      {scenarioState === 'running' && progress && (
-        <ProgressBar progress={progress} />
-      )}
+      {status === 'running' && progress && <ProgressBar progress={progress} />}
     </div>
     <button
       type="button"
       onClick={onView}
+      disabled={status !== 'completed'}
       className={cx({
         'flex items-center h-full px-8 bg-gray-700 text-primary-500 flex-column rounded-r-3xl focus:outline-blue': true,
-        'text-gray-400 pointer-events-none': scenarioState !== 'completed',
+        'text-gray-400 pointer-events-none': status !== 'completed',
       })}
     >
-      <span className="mr-2">View</span>
-      <Icon className="w-3 h-3" icon={ARROW_LEFT_SVG} />
+      <span className="mr-2 text-sm">View</span>
+      <Icon className="w-3 h-3" icon={ARROW_RIGHT_SVG} />
     </button>
   </div>
 );
