@@ -40,7 +40,7 @@ export const Item: React.FC<ItemProps> = ({
   name,
   warnings,
   progress,
-  updatedAt = '2020-04-11T10:20:30Z',
+  updatedAt,
   className,
   scenarioState,
   onEdit,

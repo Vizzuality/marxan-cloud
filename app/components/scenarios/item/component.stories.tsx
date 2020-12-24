@@ -15,6 +15,7 @@ const Template: Story<ItemProps> = ({ ...args }: ItemProps) => (
 export const Default = Template.bind({});
 Default.args = {
   name: 'Scenario 1',
-  scenarioState: 'running',
   progress: 20,
+  scenarioState: 'running',
+  updatedAt: '2020-04-11T10:20:30Z',
 };
