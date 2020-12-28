@@ -18,6 +18,9 @@ orchestrated via Kubernetes (forthcoming).
 ## Architecture
 ![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-api-architecture.puml)
 
+## Data Architecture
+![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-data-processing-architecture.puml)
+
 ### Prerequisites
 
 1. Install Docker (19.03+):
