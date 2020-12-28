@@ -15,7 +15,7 @@
 ' skinparam maxMessageSize 200
 
 LAYOUT_TOP_DOWN()
-' LAYOUT_AS_SKETCH()
+LAYOUT_AS_SKETCH()
 LAYOUT_WITH_LEGEND()
 
 Person(Admin, Admin, "Marxan platform administrators")

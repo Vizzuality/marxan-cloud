@@ -16,10 +16,7 @@ In CI, testing, staging and production environments, microservices are
 orchestrated via Kubernetes (forthcoming).
 
 ## Architecture
-
-```plantuml alt="My super diagram placeholder" source="marxan-api-architecture.puml" format="png" width="300px" height="300px"
-    '' This code is appended to the contents of basic.puml
-```
+![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-api-architecture.puml)
 
 ### Prerequisites
 
