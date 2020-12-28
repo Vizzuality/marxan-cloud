@@ -15,6 +15,12 @@ Microservices are set up to be run via Docker Compose for local development.
 In CI, testing, staging and production environments, microservices are
 orchestrated via Kubernetes (forthcoming).
 
+## Architecture
+
+```plantuml alt="My super diagram placeholder" source="marxan-api-architecture.puml" format="png" width="300px" height="300px"
+    '' This code is appended to the contents of basic.puml
+```
+
 ### Prerequisites
 
 1. Install Docker (19.03+):
