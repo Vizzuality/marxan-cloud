@@ -18,21 +18,40 @@ services:
       - POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
     depends_on:
       - postgresql-api
-  app:
+  # app:
+  #   build:
+  #     context: ./app
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "${APP_SERVICE_PORT}:3000"
+  #   container_name: marxan-app
+  #   command: start
+  #   volumes:
+  #     - ./app/src:/opt/marxan-app/src
+  #     - ./app/test:/opt/marxan-app/test
+  #   env_file: .env
+  #   environment:
+  #     - NODE_PATH=src
+  #     - NODE_ENV=development
+  geoprocessing:
     build:
-      context: ./app
+      context: ./geoprocessing
       dockerfile: Dockerfile
     ports:
-      - "${APP_SERVICE_PORT}:3000"
-    container_name: marxan-app
-    command: start
+      - "${GEOPROCESSING_SERVICE_PORT}:3001"
+    container_name: marxan-geoprocessing
+    command: develop
     volumes:
-      - ./app/src:/opt/marxan-app/src
-      - ./app/test:/opt/marxan-app/test
+      - ./geoprocessing/src:/opt/marxan-geoprocessing/src
+      - ./geoprocessing/test:/opt/marxan-geoprocessing/test
     env_file: .env
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
+      - POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+    depends_on:
+      - postgresql-api
+      - api
   postgresql-api:
     build:
       context: ./postgresql
@@ -46,9 +65,58 @@ services:
       - POSTGRES_PASSWORD=${API_POSTGRES_PASSWORD}
       - POSTGRES_USER=${API_POSTGRES_USER}
     restart: always
+  redis-api:
+    build:
+      context: ./redis
+      dockerfile: Dockerfile
+    container_name: marxan-redis-api
+    ports:
+      - "${REDIS_API_SERVICE_PORT}:6379"
+    volumes:
+      - marxan-cloud-redis-api-data:/data
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    restart: always
+  postgresql-airflow:
+    build:
+      context: ./postgresql
+      dockerfile: Dockerfile
+    container_name: marxan-postgresql-airflow
+    ports:
+      - "${POSTGRES_AIRFLOW_SERVICE_PORT}:5432"
+    environment:
+        - POSTGRES_USER=airflow
+        - POSTGRES_PASSWORD=airflow
+        - POSTGRES_DB=airflow
+  airflow-scheduler:
+    container_name: marxan-airflow-scheduler
+    image: apache/airflow
+    command: scheduler
+    depends_on:
+        - postgresql-airflow
+    env_file:
+        - .env
+    volumes:
+        - ./airflow/dags:/opt/airflow/dags
+  airflow-webserver:
+    container_name: marxan-airflow-webserver
+    image: apache/airflow
+    entrypoint: ['sh','./scripts/entrypoint.sh']
+    depends_on:
+        - postgresql-api
+        - airflow-scheduler
+    env_file:
+        - .env
+    volumes:
+        - ./airflow/dags:/opt/airflow/dags
+        - ./airflow/scripts:/opt/airflow/scripts
+    ports:
+        - "${AIRFLOW_PORT}:8080"
 networks:
   default:
     external:
       name: marxan-cloud-network
 volumes:
   marxan-cloud-postgresql-api-data:
+
+  marxan-cloud-redis-api-data:

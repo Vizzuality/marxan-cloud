@@ -8,6 +8,9 @@ endif
 start:
 	docker-compose up --build
 
+notebooks:
+	docker-compose -f ./data/docker-compose.yml up --build
+
 stop:
 	docker-compose stop
 
