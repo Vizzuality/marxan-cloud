@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Story } from '@storybook/react/types-6-0';
+
+// Layer manager
 import { LayerManager, Layer } from 'layer-manager/dist/components';
 import { PluginMapboxGl } from 'layer-manager';
 
+// Controls
+import Controls from 'components/map/controls';
+import ZoomControl from 'components/map/controls/zoom';
+import FitBoundsControl from 'components/map/controls/fit-bounds';
+
+// Map
 import Map, { MapProps } from './component';
 import LAYERS from './layers';
 
@@ -42,25 +50,77 @@ export default {
   },
 };
 
-const Template: Story<MapProps> = ({ children, ...args }: MapProps) => (
-  <div className="w-full h-96">
-    <Map
-      {...args}
-      mapboxApiAccessToken={process.env.STORYBOOK_MAPBOX_API_TOKEN}
-      mapStyle="mapbox://styles/mapbox/dark-v9"
-    >
-      {(map) => {
-        return (
-          <LayerManager map={map} plugin={PluginMapboxGl}>
-            {LAYERS.map((l) => (
-              <Layer key={l.id} {...l} />
-            ))}
-          </LayerManager>
-        );
-      }}
-    </Map>
-  </div>
-);
+const Template: Story<MapProps> = ({ children, ...args }: MapProps) => {
+  const minZoom = 2;
+  const maxZoom = 10;
+  const [viewport, setViewport] = useState({});
+  const [bounds, setBounds] = useState(args.bounds);
+
+  const handleViewportChange = useCallback((vw) => {
+    setViewport(vw);
+  }, []);
+
+  const handleZoomChange = useCallback(
+    (zoom) => {
+      setViewport({
+        ...viewport,
+        zoom,
+        transitionDuration: 500,
+      });
+    },
+    [viewport],
+  );
+
+  const handleFitBoundsChange = useCallback((b) => {
+    setBounds(b);
+  }, []);
+
+  return (
+    <div className="relative w-full h-96">
+      <Map
+        {...args}
+        bounds={bounds}
+        minZoom={minZoom}
+        maxZoom={maxZoom}
+        viewport={viewport}
+        mapboxApiAccessToken={process.env.STORYBOOK_MAPBOX_API_TOKEN}
+        mapStyle="mapbox://styles/mapbox/dark-v9"
+        onMapViewportChange={handleViewportChange}
+      >
+        {(map) => {
+          return (
+            <LayerManager map={map} plugin={PluginMapboxGl}>
+              {LAYERS.map((l) => (
+                <Layer key={l.id} {...l} />
+              ))}
+            </LayerManager>
+          );
+        }}
+      </Map>
+
+      <Controls>
+        <ZoomControl
+          viewport={{
+            ...viewport,
+            minZoom,
+            maxZoom,
+          }}
+          onZoomChange={handleZoomChange}
+        />
+
+        <FitBoundsControl
+          bounds={{
+            ...bounds,
+            viewportOptions: {
+              transitionDuration: 1500,
+            },
+          }}
+          onFitBoundsChange={handleFitBoundsChange}
+        />
+      </Controls>
+    </div>
+  );
+};
 
 export const Default = Template.bind({});
 Default.args = {
@@ -68,12 +128,14 @@ Default.args = {
   viewport: {},
   bounds: {
     bbox: [
-      9.909667968749998,
-      43.54854811091286,
-      12.19482421875,
-      44.35527821160296,
+      10.5194091796875,
+      43.6499881760459,
+      10.9588623046875,
+      44.01257086123085,
     ],
-    options: {},
+    options: {
+      padding: 50,
+    },
     viewportOptions: {
       transitionDuration: 0,
     },
