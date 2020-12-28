@@ -22,6 +22,7 @@
     "classnames": "^2.2.6",
     "d3-ease": "^2.0.0",
     "deck.gl": "7.3.6",
+    "date-fns": "^2.16.1",
     "final-form": "^4.20.1",
     "layer-manager": "3.0.9",
     "lodash": "^4.17.20",
@@ -34,6 +35,7 @@
     "react-final-form": "^6.5.2",
     "react-map-gl": "^6.0.1",
     "tailwindcss": "^2.0.2",
+    "use-debounce": "^5.2.0",
     "validate.js": "^0.13.1"
   },
   "devDependencies": {
