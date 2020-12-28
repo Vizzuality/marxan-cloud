@@ -45,13 +45,19 @@ System_Boundary(c1, "Backend") {
 
 Rel(User, app, "Uses", "HTTPS")
 
-Rel_Back(Admin, c1, "Can access kubernetes clusters", "Backend")
-Rel_Back(bastion, c1, "Can access kubernetes clusters", "Backend")
+Rel(Admin, c1, "Can access kubernetes clusters", "Backend")
+Rel(bastion, c1, "Can access kubernetes clusters", "Backend")
 
 Rel_R(app, api, "Updates customer information using", "async, JSON/HTTPS")
 Rel_L(api, app, "Sends events to", "WebSocket")
+
 Rel(api, redis, "Reads/Writes")
 Rel(api, postgres_db, "Reads/Writes")
+
+Rel(api, Airflow, "Reads/Writes")
+
+Rel(worker2, postgres_db, "Reads/Writes")
+Rel(worker1, postgres_db, "Reads/Writes")
 
 
 
