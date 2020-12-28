@@ -14,71 +14,58 @@
 ' skinparam wrapWidth 200
 ' skinparam maxMessageSize 200
 
-LAYOUT_TOP_DOWN()
-' LAYOUT_AS_SKETCH()
+' LAYOUT_TOP_DOWN()
+LAYOUT_AS_SKETCH()
 LAYOUT_WITH_LEGEND()
 System_Ext(dataSources, "Data Sources")
 System_Boundary(dataPipes, "Data pipes"){
-  System_Boundary(dataPipe1, "data preprocessing"){
+  System_Boundary(dataPipe1, "data preprocessing for ingestion"){
     Container(rawStorage, "Raw storage", "Azure blobs, s3, gcs", "container to store the raw data")
     System_Boundary(dataValidation, "Data Validation"){
-
       }
     System_Boundary(dataRepair, "Data Repair"){
-
       }
     System_Boundary(dataTransformation, "Data Transformation"){
-
       }
     System_Boundary(dataIngesting, "Data Ingestion"){
-
+        ContainerDb(dataStorage2, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
       }
     }
-    System_Boundary(dataPipe2, "data postprocessing"){
-    ContainerDb(dataStorage, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
+
+    System_Boundary(dataPipe2, "data preparation"){
+    ContainerDb(dataStorage2, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
     System_Boundary(dataValidation2, "Data Validation"){
       }
     System_Boundary(dataTransformation2, "Data Transformation"){
+      }
+    }
 
+    System_Boundary(dataPipe3, "data analysis"){
+    ContainerDb(dataStorage3, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
+    System_Boundary(dataValidation3, "Data Validation"){
+      }
+    System_Boundary(dataTransformation3, "Data Transformation"){
+      }
+    }
+
+     System_Boundary(dataPipe4, "data postprocessing"){
+    ContainerDb(dataStorage4, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
+    System_Boundary(dataValidation4, "Data Validation"){
+      }
+    System_Boundary(dataTransformation4, "Data Transformation"){
       }
     }
   }
-System_Boundary(c1, "Backend") {
-  System_Boundary(c2, "API") {
-    Container(api, "API Service", "Typescript, Next", "The point of access for customer information")
-    Container(geoprocessing, "Geoprocessing Service", "Typescript, Next", "The central focus for geoprocessing")
-    Container(marxanExec, "Marxan executer Service", "Typescript, Next", "executer for marxan program")
-    ContainerDb(redis, "K/V store", "Redis", "Cache and jobs queues", "redis" )
-    ContainerDb(postgres_db, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql" )
-  }
-  System_Boundary(c3, "Data pipes") {
-    System_Boundary(c4, "Airflow workers") {
-      Container(worker1, "Airflow worker", "Typescript, Next", "The point of access for customer information")
-      Container(worker2, "Airflow worker", "Typescript, Next", "The point of access for customer information")
-    }
-    Container(Airflow, "Airflow", "Apache Airflow", "The point of access for customer information","apache")
 
-  }
-
-}
 
 
 
 Rel(dataSources, rawStorage, "Downloads")
 
-Rel(api, redis, "Reads/Writes")
-Rel(api, postgres_db, "Reads/Writes")
-
-Rel(api, geoprocessing, "")
-Rel(api, marxanExec, "")
-
-Rel(api, Airflow, "Reads/Writes")
-
-
-Rel(worker2, postgres_db, "Reads/Writes")
-Rel(worker1, postgres_db, "Reads/Writes")
 
 Lay_U(dataPipe2, dataPipe1)
-Lay_U(dataPipes, c1)
+Lay_U(dataPipe3, dataPipe2)
+Lay_U(dataPipe4, dataPipe3)
+
 
 @enduml

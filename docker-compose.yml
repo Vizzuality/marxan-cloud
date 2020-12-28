@@ -33,6 +33,25 @@ services:
   #   environment:
   #     - NODE_PATH=src
   #     - NODE_ENV=development
+  geoprocessing:
+    build:
+      context: ./geoprocessing
+      dockerfile: Dockerfile
+    ports:
+      - "${GEOPROCESSING_SERVICE_PORT}:3001"
+    container_name: marxan-geoprocessing
+    command: develop
+    volumes:
+      - ./geoprocessing/src:/opt/marxan-geoprocessing/src
+      - ./geoprocessing/test:/opt/marxan-geoprocessing/test
+    env_file: .env
+    environment:
+      - NODE_PATH=src
+      - NODE_ENV=development
+      - POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+    depends_on:
+      - postgresql-api
+      - api
   postgresql-api:
     build:
       context: ./postgresql
