@@ -1,0 +1,69 @@
+@startuml "Marxan Api"
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define DEVICONS2 https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons2
+
+!include DEVICONS/postgresql.puml
+!include DEVICONS/redis.puml
+!include DEVICONS/python.puml
+!include DEVICONS/react.puml
+!include DEVICONS2/apache.puml
+
+' skinparam wrapWidth 200
+' skinparam maxMessageSize 200
+
+LAYOUT_TOP_DOWN()
+LAYOUT_AS_SKETCH()
+LAYOUT_WITH_LEGEND()
+
+Person(Admin, Admin, "Marxan platform administrators")
+
+Person(User, User, "A User")
+Container(app, "Frontend App", "React / NextJs", "Main interface for the user to interact with","react")
+Container(bastion, "Bastion host", "Linux / VM", "")
+
+System_Boundary(c1, "Backend") {
+  System_Boundary(c2, "API") {
+    Container(api, "API Service", "Typescript, Next", "The point of access for customer information")
+    Container(geoprocessing, "Geoprocessing Service", "Typescript, Next", "The central focus for geoprocessing")
+    Container(marxanExec, "Marxan executer Service", "Typescript, Next", "executer for marxan program")
+    ContainerDb(redis, "K/V store", "Redis", "Cache and jobs queues", "redis" )
+    ContainerDb(postgres_db, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql" )
+  }
+  System_Boundary(c3, "Data pipes") {
+    System_Boundary(c4, "Airflow workers") {
+      Container(worker1, "Airflow worker", "Typescript, Next", "The point of access for customer information")
+      Container(worker2, "Airflow worker", "Typescript, Next", "The point of access for customer information")
+    }
+    Container(Airflow, "Airflow", "Apache Airflow", "The point of access for customer information","apache")
+
+  }
+
+}
+Lay_R(api, geoprocessing)
+Lay_L(bastion, app)
+Lay_U(c1, app)
+
+Rel(User, app, "Uses", "HTTPS")
+
+Rel(Admin, c1, "Can access kubernetes clusters", "Backend")
+
+Rel_R(app, api, "Updates customer information using", "async, JSON/HTTPS")
+Rel_L(api, app, "Sends events to", "WebSocket")
+
+Rel(api, redis, "Reads/Writes")
+Rel(api, postgres_db, "Reads/Writes")
+
+Rel(api, geoprocessing, "")
+Rel(api, marxanExec, "")
+
+Rel(api, Airflow, "Reads/Writes")
+
+Rel(worker2, postgres_db, "Reads/Writes")
+Rel(worker1, postgres_db, "Reads/Writes")
+
+
+
+@enduml

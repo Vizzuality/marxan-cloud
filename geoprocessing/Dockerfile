@@ -1,7 +1,7 @@
 FROM node:14.15.1-alpine
 LABEL maintainer="hello@vizzuality.com"
 
-ENV NAME marxan-api
+ENV NAME marxan-geoprocessing
 ENV USER $NAME
 
 RUN addgroup -S $USER && adduser -S $USER -G $USER
@@ -19,9 +19,10 @@ COPY tsconfig.build.json ./tsconfig.build.json
 COPY config ./config
 COPY ormconfig.ts ./ormconfig.ts
 
+
 COPY ./src ./src
 
 RUN yarn prestart:prod
 
-EXPOSE 3000
+EXPOSE 3001
 ENTRYPOINT ["./entrypoint.sh"]
