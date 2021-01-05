@@ -12,7 +12,7 @@
     "baseUrl": "./",
     "incremental": true,
     "noImplicitAny": true,
-    "strictNullChecks": true,
+    "strictNullChecks": true
   },
   "exclude": ["node_modules", "dist"]
 }
