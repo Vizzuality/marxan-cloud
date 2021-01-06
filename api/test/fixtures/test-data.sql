@@ -25,7 +25,7 @@ VALUES
 ('Example Project 1 Org 1', (SELECT id FROM organizations WHERE name = 'Example Org 1')),
 ('Example Project 2 Org 1', (SELECT id FROM organizations WHERE name = 'Example Org 1')),
 ('Example Project 1 Org 2', (SELECT id FROM organizations WHERE name = 'Example Org 1')),
-('Example Project 1 Org 2', (SELECT id FROM organizations WHERE name = 'Example Org 1'));
+('Example Project 2 Org 2', (SELECT id FROM organizations WHERE name = 'Example Org 1'));
 
 INSERT INTO users_organizations
 (user_id, organization_id, role_id)
