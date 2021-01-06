@@ -15,7 +15,7 @@ stop:
 	docker-compose stop
 
 psql:
-	docker exec -it marxan-postgresql-api psql -U "${API_POSTGRES_USER}"
+	docker-compose exec postgresql-api psql -U "${API_POSTGRES_USER}"
 
 # Stop all containers and remove the postgresql-api container and the named
 # Docker volume used to persists PostgreSQL data
