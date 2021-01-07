@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   Entity,
@@ -11,15 +12,19 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty()
   @Column('character varying')
   email: string;
 
+  @ApiProperty()
   @Column('character varying')
   fname: string | null;
 
+  @ApiProperty()
   @Column('character varying')
   lname: string | null;
 
+  @ApiProperty({ type: () => Project, isArray: true })
   @ManyToMany((_type) => Project, (project) => project.users, { eager: false })
   @JoinTable({
     name: 'users_projects',
