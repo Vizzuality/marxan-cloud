@@ -12,6 +12,12 @@ Unreleased
 
 ### Added
 
+- API scaffolding.
+- Stub `UsersModule`.
+- Stub `ProjectsModule`.
+- Stub roles.
+- PoC JSON:API serialization.
+
 ### Changed
 
 ### Fixed
