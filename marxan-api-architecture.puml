@@ -28,12 +28,12 @@ System_Boundary(c1, "Backend") {
   System_Boundary(c2, "API") {
     Container(api, "API Service", "Typescript, Next", "The point of access for customer information")
     Container(geoprocessing, "Geoprocessing Service", "Typescript, Next", "The central focus for geoprocessing")
-    Container(marxanExec, "Marxan executer Service", "Typescript, Next", "executer for marxan program")
     ContainerDb(redis, "K/V store", "Redis", "Cache and jobs queues", "redis" )
     ContainerDb(postgres_db, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql" )
   }
   System_Boundary(c3, "Data pipes") {
     System_Boundary(c4, "Airflow workers") {
+      Container(marxanExec, "Marxan executer Service", "Typescript, Next", "executer for marxan program")
       Container(worker1, "Airflow worker", "Typescript, Next", "The point of access for customer information")
       Container(worker2, "Airflow worker", "Typescript, Next", "The point of access for customer information")
     }

@@ -32,8 +32,6 @@ Marxan is the most widely used decision-support software for conservation planni
 
 ## data transformation operations
 
-
-
 ## data calculations
 ### Targets
 
