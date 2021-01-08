@@ -1,1 +1,9 @@
-{}
+{
+  "network": {
+    "cors": {
+      "origins": [
+        "http://localhost:3010"
+      ]
+    }
+  }
+}
