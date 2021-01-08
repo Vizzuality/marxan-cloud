@@ -15,6 +15,8 @@ Unreleased
 - API scaffolding.
   - Base setup.
   - OpenAPI plugin.
+  - CORS origin configuration
+  - Helmet
 - Stub `UsersModule`.
 - Stub `ProjectsModule`.
 - Stub roles.
