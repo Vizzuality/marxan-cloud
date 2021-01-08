@@ -40,7 +40,7 @@ System_Boundary(dataPipes, "Data pipes"){
       }
     }
 
-    System_Boundary(dataPipe3, "data analysis"){
+    System_Boundary(dataPipe3, "marxan runner"){
     ContainerDb(dataStorage3, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
     System_Boundary(dataValidation3, "Data Validation"){
       }

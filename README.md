@@ -15,11 +15,8 @@ Microservices are set up to be run via Docker Compose for local development.
 In CI, testing, staging and production environments, microservices are
 orchestrated via Kubernetes (forthcoming).
 
-## Architecture
+## Architecture (TBD)
 ![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-api-architecture.puml)
-
-## Data Architecture
-![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-data-processing-architecture.puml)
 
 ### Prerequisites
 
