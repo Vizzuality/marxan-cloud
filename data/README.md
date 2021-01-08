@@ -31,8 +31,8 @@ Project Organization
     ├── data
     │   ├── processed           <- The final, canonical data sets for modeling.
     │   └── raw                 <- The original, immutable data dump.
-    |
-    |
+    |   |
+    |   |
     │   ├── notebooks           <- Naming convention is a number (for ordering),
     │   │                       the creator's initials, and a short `-` delimited e.g.
     │   │                       `1.0-jqp-initial-data-exploration`.
