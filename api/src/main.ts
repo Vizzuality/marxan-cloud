@@ -2,8 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+import { CorsUtils } from './utils/cors.utils';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    allowedHeaders: 'Content-Type,Authorization,Content-Disposition',
+    exposedHeaders: 'Authorization',
+    origin: CorsUtils.originHandler,
+  });
 
   // Set a global prefix for all API controller routes; this needs to be set
   // before setting up the OpenAPI document in order for the prefix to be
