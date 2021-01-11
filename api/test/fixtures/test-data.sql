@@ -1,9 +1,9 @@
 INSERT INTO users
-(email, fname, lname)
+(email, fname, lname, password_hash)
 VALUES
-('aa@example.com', 'a', 'a'),
-('bb@example.com', 'b', 'b'),
-('cc@example.com', 'c', 'c');
+('aa@example.com', 'a', 'a', crypt('aauserpassword', gen_salt('bf'))),
+('bb@example.com', 'b', 'b', crypt('bbuserpassword', gen_salt('bf'))),
+('cc@example.com', 'c', 'c', crypt('ccuserpassword', gen_salt('bf')));
 
 INSERT INTO roles
 VALUES
