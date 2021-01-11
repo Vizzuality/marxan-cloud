@@ -52,4 +52,23 @@ export class User {
     },
   })
   projects: Project[];
+
+  /**
+   * Whether this user is active (email is confirmed).
+   *
+   * @todo This is just a stub: it should be implemented as an entity property.
+   */
+  get isActive() {
+    return true;
+  }
+
+  /**
+   * Whether the user should be considered as deleted. This is used to implement
+   * a grace period before full deletion.
+   *
+   * @todo This is just a stub: it should be implemented as an entity property.
+   */
+  get isDeleted() {
+    return false;
+  }
 }
