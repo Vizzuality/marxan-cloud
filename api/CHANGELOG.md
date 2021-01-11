@@ -12,6 +12,14 @@ Unreleased
 
 ### Added
 
+- API scaffolding.
+  - Base setup.
+  - OpenAPI plugin.
+- Stub `UsersModule`.
+- Stub `ProjectsModule`.
+- Stub roles.
+- PoC JSON:API serialization.
+
 ### Changed
 
 ### Fixed
