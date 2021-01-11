@@ -31,6 +31,9 @@ orchestrated via Kubernetes (forthcoming).
    environment variables listed below. In most cases, for variables other
    than secrets, the defaults in `env.default` may just work - YMMV.
 
+   * `API_AUTH_JWT_SECRET` (string, required): a base64-encoded secret for the
+     signing of API JWT tokens; can be generated via a command such as `dd
+     if=/dev/urandom bs=1024 count=1 | base64 -w0`
    * `API_PORT` (number, required): the port on which the API service should
      listen on the local machine
    * `APP_PORT` (number, required): the port on which the App service should
