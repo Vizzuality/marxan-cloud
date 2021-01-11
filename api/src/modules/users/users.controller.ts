@@ -1,4 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  ValidationPipe,
+} from '@nestjs/common';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -10,10 +17,14 @@ import {
   ApiQuery,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { AuthenticationService } from 'modules/authentication/authentication.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(public readonly service: UsersService) {}
+  constructor(
+    public readonly service: UsersService,
+    private readonly authenticationService: AuthenticationService,
+  ) {}
 
   @ApiOperation({
     description: 'Find all users',
@@ -73,5 +84,13 @@ export class UsersController {
       },
     });
     return serializer.serialize(await this.service.findAll());
+  }
+
+  @Post('sign-up')
+  async signUp(
+    @Request() req: Request,
+    @Body(new ValidationPipe()) signupDto: { email: string; password: string },
+  ) {
+    await this.authenticationService.createUser(signupDto);
   }
 }
