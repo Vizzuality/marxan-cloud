@@ -85,12 +85,4 @@ export class UsersController {
     });
     return serializer.serialize(await this.service.findAll());
   }
-
-  @Post('sign-up')
-  async signUp(
-    @Request() req: Request,
-    @Body(new ValidationPipe()) signupDto: { email: string; password: string },
-  ) {
-    await this.authenticationService.createUser(signupDto);
-  }
 }
