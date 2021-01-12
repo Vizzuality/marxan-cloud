@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MaxLength } from 'class-validator';
-import { AuthenticationToken } from 'modules/authentication/authentication-token.entity';
+import { IssuedAuthnToken } from 'modules/authentication/issued-authn-token.entity';
 import {
   Column,
   Entity,
@@ -55,8 +55,8 @@ export class User {
   })
   projects: Project[];
 
-  @OneToMany((_type) => AuthenticationToken, (token) => token.userId)
-  authenticationTokens: AuthenticationToken[];
+  @OneToMany((_type) => IssuedAuthnToken, (token) => token.userId)
+  issuedAuthnTokens: IssuedAuthnToken[];
 
   /**
    * Whether this user is active (email is confirmed).
