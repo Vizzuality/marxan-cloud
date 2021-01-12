@@ -1,10 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MaxLength } from 'class-validator';
+import { AuthenticationToken } from 'modules/authentication/authentication-token.entity';
 import {
   Column,
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Project } from '../projects/project.entity';
@@ -52,6 +54,9 @@ export class User {
     },
   })
   projects: Project[];
+
+  @OneToMany((_type) => AuthenticationToken, (token) => token.userId)
+  authenticationTokens: AuthenticationToken[];
 
   /**
    * Whether this user is active (email is confirmed).
