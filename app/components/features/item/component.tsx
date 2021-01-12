@@ -8,6 +8,7 @@ export interface ItemProps {
   id: string;
   className?: string;
   name: string;
+  subfeatures: number;
   description: string;
   tags?: Record<string, unknown>[];
   selected: boolean;
@@ -17,6 +18,7 @@ export interface ItemProps {
 export const Item: React.FC<ItemProps> = ({
   className,
   name,
+  subfeatures = 0,
   description,
   tags = [],
   selected,
@@ -29,9 +31,15 @@ export const Item: React.FC<ItemProps> = ({
         [className]: !!className,
       })}
     >
-      <header className="flex justify-between flex-1">
-        <div>
+      <header className="flex justify-between align-baseline">
+        <div className="flex divide-x">
           <h2 className="text-sm font-medium font-heading">{name}</h2>
+
+          {!!subfeatures && (
+            <div className="pl-2 ml-2 text-sm underline">
+              {`${subfeatures} Sub-features`}
+            </div>
+          )}
         </div>
         <div>
           <Button
@@ -47,24 +55,26 @@ export const Item: React.FC<ItemProps> = ({
         </div>
       </header>
 
-      <div className="flex">
-        {tags.map((t, i) => (
-          <div
-            key={`${t.id}`}
-            className={cx({
-              'ml-1.5': i !== 0,
-            })}
-          >
-            <Tag
+      {!!tags.length && (
+        <div className="flex mt-1">
+          {tags.map((t, i) => (
+            <div
+              key={`${t.id}`}
               className={cx({
-                [`${t.className}`]: !!t.className,
+                'ml-1.5': i !== 0,
               })}
             >
-              {t.name}
-            </Tag>
-          </div>
-        ))}
-      </div>
+              <Tag
+                className={cx({
+                  [`${t.className}`]: !!t.className,
+                })}
+              >
+                {t.name}
+              </Tag>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="mt-4 text-sm opacity-50 clamp-2">{description}</div>
     </div>
