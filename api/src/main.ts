@@ -24,11 +24,6 @@ async function bootstrap() {
     origin: CorsUtils.originHandler,
   });
 
-  // Set a global prefix for all API controller routes; this needs to be set
-  // before setting up the OpenAPI document in order for the prefix to be
-  // applied automatically to the routes in the OpenAPI documentation.
-  app.setGlobalPrefix('/api/v1');
-
   // OpenAPI documentation module - setup
   const swaggerOptions = new DocumentBuilder()
     .setTitle('MarxanCloud API')
