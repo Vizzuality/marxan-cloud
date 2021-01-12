@@ -67,10 +67,10 @@ export class AuthenticationService {
    * @todo Allow to set all of a user's data on signup
    * @todo Implement email verification
    */
-  async createUser(signupDto: { email: string; password: string }) {
+  async createUser(signupDto: { username: string; password: string }) {
     const user = new User();
     user.passwordHash = await hash(signupDto.password, 10);
-    user.email = signupDto.email;
+    user.email = signupDto.username;
     this.usersRepository.save(user);
   }
 
