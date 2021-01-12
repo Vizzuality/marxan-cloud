@@ -14,6 +14,8 @@ CREATE TABLE authentication_tokens (
   exp timestamp without time zone NOT NULL,
   created_at timestamp NOT NULL default now()
 );
+
+CREATE INDEX authentication_tokens_user_id_idx ON authentication_tokens(user_id);
     `);
   }
 
