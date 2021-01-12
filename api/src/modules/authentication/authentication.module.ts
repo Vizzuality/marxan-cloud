@@ -6,6 +6,7 @@ import { User } from 'modules/users/user.entity';
 
 import { UsersModule } from 'modules/users/users.module';
 import { AppConfig } from 'utils/config.utils';
+import { IssuedAuthnToken } from './issued-authn-token.entity';
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -22,7 +23,7 @@ export const logger = new Logger('Authentication');
       secret: AppConfig.get('auth.jwt.secret'),
       signOptions: { expiresIn: AppConfig.get('auth.jwt.expiresIn', '2h') },
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, IssuedAuthnToken]),
   ],
   providers: [AuthenticationService, LocalStrategy, JwtStrategy],
   controllers: [AuthenticationController],

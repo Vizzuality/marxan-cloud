@@ -7,12 +7,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('authentication_tokens')
-export class AuthenticationToken {
+@Entity('issued_authn_tokens')
+export class IssuedAuthnToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne((_type) => User, (user) => user.authenticationTokens)
+  @ManyToOne((_type) => User, (user) => user.issuedAuthnTokens)
   @JoinColumn({
     name: 'user_id',
     referencedColumnName: 'id',
