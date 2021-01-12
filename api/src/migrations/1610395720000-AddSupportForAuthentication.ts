@@ -1,6 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddUserPasswordHashes1610395720000 implements MigrationInterface {
+export class AddSupportForAuthentication1610395720000
+  implements MigrationInterface {
   async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(`
 CREATE EXTENSION pgcrypto;
