@@ -26,10 +26,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * @debt We should add the ability to revoke tokens and deny authorization
    * if the token being presented has been revoked.
    */
-  public async validate({ email }: { email: string }) {
+  public async validate({
+    email,
+    tokenId,
+  }: {
+    email: string;
+    tokenId: string;
+  }) {
     const user = await this.usersService.findByEmail(email);
+    const token = await this.authenticationService.findTokenById(tokenId);
 
-    if (!user) {
+    if (!user || !token) {
       throw new UnauthorizedException();
     }
 
