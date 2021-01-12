@@ -4,7 +4,7 @@
    },
   "network": {
     "cors": {
-        "origins_extra": "NETWORK_CORS_ORIGINS"
+      "origins_extra": "NETWORK_CORS_ORIGINS"
     }
   }
 }
