@@ -11,8 +11,9 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthenticationService } from 'modules/authentication/authentication.service';
+import { apiGlobalPrefixes } from 'api.config';
 
-@Controller('users')
+@Controller(`${apiGlobalPrefixes.v1}/users`)
 export class UsersController {
   constructor(
     public readonly service: UsersService,

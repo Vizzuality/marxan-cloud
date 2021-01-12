@@ -10,8 +10,9 @@ import {
   ApiQuery,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { apiGlobalPrefixes } from 'api.config';
 
-@Controller('projects')
+@Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectsController {
   constructor(public readonly service: ProjectsService) {}
 
