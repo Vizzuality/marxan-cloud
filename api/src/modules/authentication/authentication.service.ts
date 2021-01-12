@@ -17,6 +17,7 @@ export interface AccessToken {
    * Whitelisted user metadata
    */
   user: Partial<User>;
+
   /**
    * Signed JWT
    */
@@ -27,8 +28,26 @@ export interface AccessToken {
  * JWT payload
  */
 export interface JwtAppPayload {
-  email: string;
+  /**
+   * Username (user email address).
+   */
+  sub: string;
+
+  /**
+   * Unique id of the JWT token.
+   *
+   * This is used to check tokens presented to the API against revoked tokens.
+   */
+  tokenId: string;
+
+  /**
+   * Issued At: epoch timestamp in seconds, UTC.
+   */
   iat: number;
+
+  /**
+   * Expiration time: epoch timestamp in seconds, UTC.
+   */
   exp: number;
 }
 
