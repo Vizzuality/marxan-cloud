@@ -132,4 +132,6 @@ networks:
 volumes:
   marxan-cloud-postgresql-api-data:
 
+  marxan-cloud-postgresql-geo-data:
+
   marxan-cloud-redis-api-data:

@@ -29,7 +29,8 @@ System_Boundary(c1, "Backend") {
     Container(api, "API Service", "Typescript, Next", "The point of access for customer information")
     Container(geoprocessing, "Geoprocessing Service", "Typescript, Next", "The central focus for geoprocessing")
     ContainerDb(redis, "K/V store", "Redis", "Cache and jobs queues", "redis" )
-    ContainerDb(postgres_db, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql" )
+    ContainerDb(postgresDB, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql" )
+    ContainerDb(postgresGeoDB, "GeoDatabase", "Postgres 13 + Postgis 3", "Stores user data", "postgresql" )
   }
   System_Boundary(c3, "Data pipes") {
     System_Boundary(c4, "Airflow workers") {
@@ -54,15 +55,18 @@ Rel_R(app, api, "Updates customer information using", "async, JSON/HTTPS")
 Rel_L(api, app, "Sends events to", "WebSocket")
 
 Rel(api, redis, "Reads/Writes")
-Rel(api, postgres_db, "Reads/Writes")
+Rel(api, postgresDB, "Reads/Writes")
 
 Rel(api, geoprocessing, "")
+Rel(geoprocessing, postgresGeoDB, "Reads/Writes")
+Rel(api, postgresGeoDB, "Reads/Writes")
+Rel(postgresDB, postgresGeoDB, "Reads/Writes")
 Rel(api, marxanExec, "")
 
 Rel(api, Airflow, "Reads/Writes")
 
-Rel(worker2, postgres_db, "Reads/Writes")
-Rel(worker1, postgres_db, "Reads/Writes")
+Rel(worker2, postgresDB, "Reads/Writes")
+Rel(worker1, postgresDB, "Reads/Writes")
 
 
 

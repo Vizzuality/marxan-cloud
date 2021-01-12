@@ -19,7 +19,7 @@ LAYOUT_AS_SKETCH()
 LAYOUT_WITH_LEGEND()
 System_Ext(dataSources, "Data Sources")
 System_Boundary(dataPipes, "Data pipes"){
-  ContainerDb(dataStorage2, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
+  ContainerDb(dataStorage2, "GeoDatabase", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
   System_Boundary(dataPipe1, "data preprocessing for ingestion"){
     Container(rawStorage, "Raw storage", "Azure blobs, s3, gcs", "container to store the raw data")
     System_Boundary(dataValidation, "Data Validation"){
