@@ -68,7 +68,7 @@ Rel(api, marxanExec, "")
 
 Rel(api, Airflow, "Reads/Writes")
 
-Rel(worker2, postgresDB, "Reads/Writes")
+Rel(worker2, postgresGeoDB, "Reads/Writes")
 Rel(worker1, postgresDB, "Reads/Writes")
 
 
