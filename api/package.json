@@ -19,7 +19,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "ts-coverage": "typescript-coverage-report"
   },
   "husky": {
     "hooks": {
@@ -86,7 +87,8 @@
     "ts-loader": "^8.0.8",
     "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.0.5"
+    "typescript": "^4.0.5",
+    "typescript-coverage-report": "^0.4.0"
   },
   "jest": {
     "moduleFileExtensions": [
