@@ -28,6 +28,9 @@ For those datasets that are over 5gb in terms of storage; a different aproach is
 * IUCN species range
 * Human footprint 
 * Hansen forest cover
+### Database model
+![DB - model diagram](https://dbdiagram.io/d/5ff8693580d742080a358e7f)
+
 
 ## Geoprocessing operations.
 
