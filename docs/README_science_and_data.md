@@ -16,7 +16,7 @@ Marxan is the most widely used decision-support software for conservation planni
 
 
 ## Data processing Architecture
-![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-data-processing-architecture.puml)
+![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/develop/marxan-data-processing-architecture.puml)
 
 Datasets with a size lower than 5gb, will have a full automated pipe and be directly stored on the Geoprocessing DB as part of the initial available data; this includes:  
 * Protected Areas 
@@ -29,7 +29,7 @@ For those datasets that are over 5gb in terms of storage; a different aproach is
 * Human footprint 
 * Hansen forest cover
 ### Database model
-![DB - model diagram](https://dbdiagram.io/d/5ff8693580d742080a358e7f)
+![DB data model](https://dbdiagram.io/embed/5ff8693580d742080a358e7f)
 
 
 ## Geoprocessing operations.
