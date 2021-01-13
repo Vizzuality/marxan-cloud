@@ -3,17 +3,15 @@ import cx from 'classnames';
 
 export interface TagProps {
   children: React.ReactNode;
-  className?: string;
+  className?: string | unknown;
 }
 
-export const Tag: React.FC<TagProps> = ({
-  children,
-  className = 'text-black bg-gray-300',
-}: TagProps) => (
+export const Tag: React.FC<TagProps> = ({ children, className }: TagProps) => (
   <div
     className={cx({
       'relative inline-flex rounded': true,
-      [className]: !!className,
+      [`${className}`]: !!className,
+      'text-black bg-gray-200': !className,
     })}
   >
     <div

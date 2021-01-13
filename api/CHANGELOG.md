@@ -24,11 +24,15 @@ Unreleased
 - Stub `ProjectsModule`.
 - Stub roles.
 - PoC JSON:API serialization.
+<<<<<<< HEAD
 - Authentication
   - local authentication strategy (username+password)
   - JWT tokens are issued
   - initial support for JWT token invalidation
   - refresh of a still-valid JWT token
+=======
+- Ping/liveness endpoint.
+>>>>>>> develop
 
 ### Changed
 
