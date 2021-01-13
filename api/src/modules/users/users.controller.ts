@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -6,28 +6,25 @@ import JSONAPISerializer = require('jsonapi-serializer');
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiQuery,
+  ApiResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthenticationService } from 'modules/authentication/authentication.service';
 import { apiGlobalPrefixes } from 'api.config';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'guards/jwt-auth.guard';
+import { RequestWithAuthenticatedUser } from 'app.controller';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller(`${apiGlobalPrefixes.v1}/users`)
 export class UsersController {
-  constructor(
-    public readonly service: UsersService,
-    private readonly authenticationService: AuthenticationService,
-  ) {}
+  constructor(public readonly service: UsersService) {}
 
   @ApiOperation({
     description: 'Find all users',
   })
-  @ApiOkResponse({
+  @ApiResponse({
     type: User,
   })
   @ApiUnauthorizedResponse({
@@ -82,5 +79,32 @@ export class UsersController {
       },
     });
     return serializer.serialize(await this.service.findAll());
+  }
+
+  @ApiOperation({
+    description: 'Retrieve attributes of the current user',
+  })
+  @ApiResponse({
+    type: User,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized.',
+  })
+  @ApiForbiddenResponse({
+    description:
+      'The current user does not have suitable permissions for this request.',
+  })
+  @Get('me')
+  async userMetadata(
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<Partial<User>> {
+    const serializer = new JSONAPISerializer.Serializer('users', {
+      attributes: ['fname', 'lname', 'email', 'projects'],
+      keyForAttribute: 'camelCase',
+      projects: {
+        ref: 'name',
+      },
+    });
+    return serializer.serialize(await this.service.findOne(req.user.id));
   }
 }
