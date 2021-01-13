@@ -20,6 +20,8 @@ orchestrated via Kubernetes (forthcoming).
 
 [Frontend architecture (TBD)]()
 
+![Data management architecture](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/develop/marxan-data-processing-architecture.puml)
+
 [DB data model](https://dbdiagram.io/embed/5ff8693580d742080a358e7f)
 
 ### Prerequisites
@@ -67,6 +69,10 @@ via a Docker volume.
 ### Running the Marxan Cloud platform
 
 Run `make start` to start all the services.
+
+### Running the notebooks
+
+Run `make notebooks` to start the jupyterlab service.
 
 ## Development workflow (TBD)
 
