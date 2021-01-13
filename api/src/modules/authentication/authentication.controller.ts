@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Logger,
   Post,
   Request,
   UseGuards,
@@ -14,7 +13,6 @@ import {
   AccessToken,
   AuthenticationService,
 } from 'modules/authentication/authentication.service';
-import { inspect } from 'util';
 import { LocalAuthGuard } from './local-auth.guard';
 
 @Controller('/auth')
@@ -27,7 +25,6 @@ export class AuthenticationController {
   async login(
     @Request() req: RequestWithAuthenticatedUser,
   ): Promise<AccessToken> {
-    Logger.debug(inspect(req.user));
     return this.authenticationService.login(req.user);
   }
 
