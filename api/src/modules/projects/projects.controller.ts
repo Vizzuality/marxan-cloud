@@ -1,9 +1,10 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { Project } from './project.entity';
 import { ProjectsService } from './projects.service';
 
 import JSONAPISerializer = require('jsonapi-serializer');
 import {
+  ApiBearerAuth,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
@@ -11,7 +12,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
+import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectsController {
   constructor(public readonly service: ProjectsService) {}
