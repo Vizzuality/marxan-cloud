@@ -5,5 +5,10 @@
         "http://localhost:3010"
       ]
     }
+  },
+  "auth": {
+    "jwt": {
+      "expiresIn": "2h"
+    }
   }
 }
