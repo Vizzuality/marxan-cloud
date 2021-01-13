@@ -1,11 +1,20 @@
+import { Logger } from '@nestjs/common';
 import { MigrationInterface, QueryRunner } from 'typeorm';
+import { PostgreSQLUtils } from 'utils/postgresql.utils';
 
 export class AddSupportForAuthentication1610395720000
   implements MigrationInterface {
   async up(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.query(`
+    // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
+    if (await PostgreSQLUtils.version13Plus()) {
+      await queryRunner.query(`
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
-    `);
+      `);
+    } else {
+      Logger.warn(
+        'The PostgreSQL extension `pgcrypto` is needed for the Marxan API but it was not possible to activate it. Please activate it manually (see setup documentation).',
+      );
+    }
 
     await queryRunner.query(`
 ALTER TABLE users ADD COLUMN password_hash varchar(64) NOT NULL DEFAULT uuid_generate_v4();
@@ -33,8 +42,10 @@ DROP TABLE issued_authn_tokens;
 ALTER TABLE users DROP COLUMN password_hash;
     `);
 
-    await queryRunner.query(`
-DROP EXTENSION pgcrypto;
-    `);
+    if (await PostgreSQLUtils.version13Plus()) {
+      await queryRunner.query(`
+DROP EXTENSION IF EXISTS pgcrypto;
+      `);
+    }
   }
 }
