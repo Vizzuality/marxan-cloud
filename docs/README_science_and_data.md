@@ -29,7 +29,7 @@ For those datasets that are over 5gb in terms of storage; a different aproach is
 * Human footprint 
 * Hansen forest cover
 ### Database model
-![DB data model](https://dbdiagram.io/embed/5ff8693580d742080a358e7f)
+[DB data model](https://dbdiagram.io/embed/5ff8693580d742080a358e7f)
 
 
 ## Geoprocessing operations.

@@ -18,9 +18,9 @@ orchestrated via Kubernetes (forthcoming).
 ## Architecture (TBD)
 ![Backend architecture](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/develop/marxan-api-architecture.puml)
 
-![Frontend architecture (TBD)]()
+[Frontend architecture (TBD)]()
 
-![DB data model](https://dbdiagram.io/embed/5ff8693580d742080a358e7f)
+[DB data model](https://dbdiagram.io/embed/5ff8693580d742080a358e7f)
 
 ### Prerequisites
 
