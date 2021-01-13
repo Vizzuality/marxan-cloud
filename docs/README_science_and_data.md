@@ -7,6 +7,7 @@ Marxan is the most widely used decision-support software for conservation planni
 [Marxan web](https://app.marxanweb.org/)
 
 ### Dataset providers:
+* [Administrative Regions](https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_WDOECM_wdpa_shp.zip)
 * [Protected Areas](https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_WDOECM_wdpa_shp.zip)
 * [GBIF](https://api.gbif.org/v1/)
 * [Human footprint](https://figshare.com/articles/Global_Human_Modification/7283087)
@@ -17,14 +18,22 @@ Marxan is the most widely used decision-support software for conservation planni
 ## Data processing Architecture
 ![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-data-processing-architecture.puml)
 
+Datasets with a size lower than 5gb, will have a full automated pipe and be directly stored on the Geoprocessing DB as part of the initial available data; this includes:  
+* Protected Areas 
+* Administrative regions
+* World Terrestrial Ecosystems  
+
+For those datasets that are over 5gb in terms of storage; a different aproach is needed; this will be an on demand one, similar to what Andrew did for GBIF, and will have a pipe triggered by user needs trying to avoid as much as possible duplicities in storage: 
+* GBIF
+* IUCN species range
+* Human footprint 
+* Hansen forest cover
 
 ## Geoprocessing operations.
 
-![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-geoprocessing-architecture.puml)
-
 This are the main operations handled by the service
 * Format conversion
-* Reprojection
+* Re-projection
 * Validation
 * Geometry sanitization (Repair and simplification)
 * Spatial intersection
@@ -33,7 +42,6 @@ This are the main operations handled by the service
 * Stratification; special spatial intersection
 
 ## Vector tile service
-![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-geoprocessing-architecture.puml)
 
 * Serve vector tiles from the db on the fly with a Redis cache upfront
 
