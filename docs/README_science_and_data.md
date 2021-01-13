@@ -7,11 +7,11 @@ Marxan is the most widely used decision-support software for conservation planni
 [Marxan web](https://app.marxanweb.org/)
 
 ### Dataset providers:
-* [Protected Areas]()
-* [GBIF]()
+* [Protected Areas](https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_WDOECM_wdpa_shp.zip)
+* [GBIF](https://api.gbif.org/v1/)
 * [Human footprint](https://figshare.com/articles/Global_Human_Modification/7283087)
 * [Species range datasets](https://www.iucnredlist.org/resources/spatial-data-download)
-* [World Terrestrial Ecosystems](https://www.arcgis.com/home/item.html?id=140af3e5389a4afcb421ee4633d18d3a )
+* [World Terrestrial Ecosystems](https://www.arcgis.com/home/item.html?id=140af3e5389a4afcb421ee4633d18d3a)
 
 
 ## Data processing Architecture
@@ -20,6 +20,9 @@ Marxan is the most widely used decision-support software for conservation planni
 
 ## Geoprocessing operations.
 
+![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-geoprocessing-architecture.puml)
+
+This are the main operations handled by the service
 * Format conversion
 * Reprojection
 * Validation
@@ -27,12 +30,21 @@ Marxan is the most widely used decision-support software for conservation planni
 * Spatial intersection
 * Area calculation
 * Split by property
-* Stratification, special spatial intersection.
+* Stratification; special spatial intersection
+
+## Vector tile service
+![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-geoprocessing-architecture.puml)
+
+* Serve vector tiles from the db on the fly with a Redis cache upfront
 
 
-## data transformation operations
+### For the future:
+* Raster management
 
-## data calculations
+## Data transformation operations
+
+
+## Data calculations
 ### Targets
 
 ### BLM calibration
