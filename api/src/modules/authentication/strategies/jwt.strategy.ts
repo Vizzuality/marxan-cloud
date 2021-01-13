@@ -1,7 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
-import { AuthenticationService } from 'modules/authentication/authentication.service';
+import {
+  AuthenticationService,
+  JwtDataPayload,
+} from 'modules/authentication/authentication.service';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from 'modules/users/users.service';
@@ -20,19 +23,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   /**
-   * Validate that the email in the JWT's payload matches that of an existing
-   * user.
-   *
-   * @debt We should add the ability to revoke tokens and deny authorization
-   * if the token being presented has been revoked.
+   * Validate that the email in the JWT payload's `sub` property matches that of
+   * an existing user, and that the token was not revoked (removed from the list
+   * of issued tokens).
    */
-  public async validate({
-    email,
-    tokenId,
-  }: {
-    email: string;
-    tokenId: string;
-  }) {
+  public async validate({ sub: email, tokenId }: JwtDataPayload) {
     const user = await this.usersService.findByEmail(email);
     const token = await this.authenticationService.findTokenById(tokenId);
 

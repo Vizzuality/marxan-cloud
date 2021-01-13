@@ -27,9 +27,9 @@ export interface AccessToken {
 }
 
 /**
- * JWT payload
+ * JWT payload (decoded)
  */
-export interface JwtAppPayload {
+export interface JwtDataPayload {
   /**
    * Username (user email address).
    */
