@@ -21,8 +21,8 @@ import {
  * logged out of all their open sessions, if needed), or specific ones (may be
  * useful for long-lived JWT tokens).
  *
- * @TODO The actual functionality (API endpoint to delete IssuedAuthnToken)
- * needs to be implemented.
+ * @TODO The actual "revoke" functionality (API endpoint to delete
+ * IssuedAuthnToken) needs to be implemented.
  */
 export class IssuedAuthnToken {
   /**
