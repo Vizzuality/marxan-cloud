@@ -21,6 +21,7 @@ Unreleased
 - Stub `ProjectsModule`.
 - Stub roles.
 - PoC JSON:API serialization.
+- Ping/liveness endpoint.
 
 ### Changed
 
