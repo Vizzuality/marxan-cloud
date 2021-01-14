@@ -49,6 +49,8 @@ System_Boundary(dataPipes, "Data pipes"){
     System_Boundary(dataTransformation3, "Data Transformation"){
       }
     System_Boundary(marxanExecuter, "Executer"){
+      Container(mountVolume, "Persisted volume", "Azure blobs, s3, gcs", "container to store the marxan project folder")
+      Container(dockerImage, "Worker executer", "dockerImage", "Run marxan executer")
       }
     }
 
@@ -77,17 +79,19 @@ Rel(dataStorage2, dataTransformation3, "Read")
 Rel(dataTransformation3, dataValidation3, "Transform marxan executable project")
 Rel(dataValidation3, marxanExecuter, "Execute marxan")
 
-Rel(dataPipe3, dataPipe4, "Read")
+Rel(mountVolume, dockerImage, "Reads/Writes")
+
+Rel(mountVolume, dataPipe4, "Read")
 
 Rel(dataTransformation4, dataValidation4, "Transform marxan executable project")
 Rel( dataValidation4, dataStorage2, "Write")
 
 
 ' Lay_U(dataPipe2, dataPipe1)
-Lay_U(dataStorage2, dataPipe1)
 Lay_U(dataStorage2, dataPipe3)
 Lay_U(dataPipe3, dataPipe1)
 Lay_U(dataPipe3, dataPipe4)
+Lay_D(dataStorage2, dataPipe4)
 
 
 @enduml
