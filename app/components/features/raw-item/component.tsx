@@ -8,7 +8,7 @@ export interface ItemProps {
   id: string;
   className?: string;
   name: string;
-  subfeatures: number;
+  categories: number;
   description: string;
   tags?: Record<string, unknown>[];
   selected: boolean;
@@ -18,7 +18,7 @@ export interface ItemProps {
 export const Item: React.FC<ItemProps> = ({
   className,
   name,
-  subfeatures = 0,
+  categories = 0,
   description,
   tags = [],
   selected,
@@ -31,13 +31,13 @@ export const Item: React.FC<ItemProps> = ({
         [className]: !!className,
       })}
     >
-      <header className="flex justify-between align-baseline">
+      <header className="flex items-baseline justify-between">
         <div className="flex divide-x">
           <h2 className="text-sm font-medium font-heading">{name}</h2>
 
-          {!!subfeatures && (
+          {!!categories && (
             <div className="pl-2 ml-2 text-sm underline">
-              {`${subfeatures} Sub-features`}
+              {`${categories} Categories`}
             </div>
           )}
         </div>
