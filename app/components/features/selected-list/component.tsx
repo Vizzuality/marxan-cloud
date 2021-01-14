@@ -1,8 +1,8 @@
 import React from 'react';
 import cx from 'classnames';
 
-import Item from 'components/features/item';
-import { ItemProps } from 'components/features/item/component';
+import Item from 'components/features/selected-item';
+import { ItemProps } from 'components/features/selected-item/component';
 
 export interface ListProps {
   className: string;

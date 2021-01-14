@@ -3,7 +3,7 @@ import { Story } from '@storybook/react/types-6-0';
 import List, { ListProps } from './component';
 
 export default {
-  title: 'Components/Features/List',
+  title: 'Components/Features/Selected-List',
   component: List,
   argTypes: {},
 };
