@@ -17,10 +17,22 @@ Unreleased
   - OpenAPI plugin.
   - CORS origin configuration
   - Helmet
+  - (development environments) Type coverage report
 - Stub `UsersModule`.
+  - Get users
+  - Get current user info (`/users/me`)
 - Stub `ProjectsModule`.
 - Stub roles.
 - PoC JSON:API serialization.
+<<<<<<< HEAD
+- Authentication
+  - local authentication strategy (username+password)
+  - JWT tokens are issued
+  - initial support for JWT token invalidation
+  - refresh of a still-valid JWT token
+=======
+- Ping/liveness endpoint.
+>>>>>>> develop
 
 ### Changed
 
