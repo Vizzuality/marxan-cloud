@@ -188,7 +188,10 @@ module.exports = {
     divideColor: (theme) => theme('borderColor'),
     divideOpacity: (theme) => theme('borderOpacity'),
     divideWidth: (theme) => theme('borderWidth'),
-    fill: { current: 'currentColor' },
+    fill: (theme) => ({
+      current: 'currentColor',
+      primary: theme('colors.primary.500'),
+    }),
     flex: {
       1: '1 1 0%',
       auto: '1 1 auto',
