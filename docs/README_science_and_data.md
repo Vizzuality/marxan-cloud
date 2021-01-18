@@ -52,17 +52,17 @@ This are the main operations handled by the service
 ### For the future:
 * Raster management
 
-## Data transformation operations
+## Data transformation operations (TBD)
 
 
-## Data calculations
-### Targets
+## Data calculations (TBD)
+### Targets (TBD)
 
-### BLM calibration
+### BLM calibration (TBD)
 
 
-## Marxan executer
+## Marxan executer (TBD)
 
-## data postprocessing
-### Targets
-### Solutions
+## data postprocessing (TBD)
+### Targets (TBD)
+### Solutions (TBD)
