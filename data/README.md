@@ -58,7 +58,18 @@ Project Organization
 ------------
 #### First, setup one of your environments
 
-- With [docker]() and [docker-compose]() in your system, you can develop inside containers:
+- With [docker]() and [docker-compose]() in your system, for notebooks you need to generate a ssl certificate:
+``` bash
+# SSL
+# Generate cert like this:
+openssl req -x509 -nodes -newkey rsa:2048 -keyout jupyter.pem -out jupyter.pem
+
+cp jupyter.pem /opt/ssl-certs/jupyter
+
+# Copy the jupyter.pem file into the location below.
+# /opt/ssl-certs/jupyter
+```
+you can develop inside containers:
 ``` bash
 make up
 ```
