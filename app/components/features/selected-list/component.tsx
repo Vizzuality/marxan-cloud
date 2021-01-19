@@ -15,13 +15,18 @@ export const List: React.FC<ListProps> = ({
 }: ListProps) => (
   <div
     className={cx({
-      'bg-white divide-y divide-black divide-dashed divide-opacity-20': true,
+      'bg-gray-800': true,
       [className]: !!className,
     })}
   >
-    {items.map((item) => {
+    {items.map((item, i) => {
       return (
-        <div key={`${item.id}`}>
+        <div
+          className={cx({
+            'mt-1.5': i !== 0,
+          })}
+          key={`${item.id}`}
+        >
           <Item {...item} />
         </div>
       );
