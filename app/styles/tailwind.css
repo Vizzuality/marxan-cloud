@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    -webkit-font-smoothing: antialiased;
+  }
+
   /* Poppins */
   @font-face {
     font-family: 'Poppins';

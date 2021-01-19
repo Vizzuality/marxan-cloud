@@ -5,6 +5,7 @@ import Icon from 'components/icon';
 import Select from 'components/forms/select';
 import Checkbox from 'components/forms/checkbox';
 
+import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 
 export interface ItemProps {
@@ -90,8 +91,8 @@ export const Item: React.FC<ItemProps> = ({
       <header
         className={cx({
           'px-4 pt-2 pb-4 border-l-4': true,
-          'border-primary-500': type === 'bioregional',
-          'border-yellow-300': type === 'species',
+          'border-bioregional': type === 'bioregional',
+          'border-species': type === 'species',
         })}
       >
         <h2 className="text-sm font-heading">{name}</h2>
@@ -100,9 +101,13 @@ export const Item: React.FC<ItemProps> = ({
         {type === 'bioregional' && (
           <div>
             <div className="flex items-center mt-3 tracking-wide font-heading">
-              <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-primary-500" />
+              <Icon icon={SPLIT_SVG} className="w-5 h-5 text-bioregional" />
               <h4 className="ml-2 text-xs text-white uppercase">
-                You can select different attributtes to split the feature
+                You can
+                {' '}
+                <strong>split</strong>
+                {' '}
+                this feature into categories
               </h4>
             </div>
 
@@ -122,9 +127,13 @@ export const Item: React.FC<ItemProps> = ({
         {type === 'species' && (
           <div>
             <div className="flex items-center mt-3 tracking-wide font-heading">
-              <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-yellow-300" />
+              <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-species" />
               <h4 className="ml-2 text-xs text-white uppercase">
-                You can intersect this feature with others
+                You can
+                {' '}
+                <strong>intersect</strong>
+                {' '}
+                this feature with others
               </h4>
             </div>
 
@@ -151,15 +160,15 @@ export const Item: React.FC<ItemProps> = ({
             return (
               <li
                 key={`${f.value}`}
-                className="flex items-center px-2 py-1 mt-1 border-l border-primary-500"
+                className="flex items-center pr-2.5 py-2 mt-0.5 border-l border-bioregional"
               >
                 <div className="relative flex text-xs font-heading">
-                  <div className="mt-0.5 mr-2">
+                  <div className="mx-2.5">
                     <Checkbox
                       id={`checkbox-${f.value}`}
                       value={`${f.value}`}
                       checked={checked}
-                      className="block"
+                      className="block w-4 h-4 text-bioregional form-checkbox-dark"
                       onChange={onSplitFeaturesChanged}
                     />
                   </div>
