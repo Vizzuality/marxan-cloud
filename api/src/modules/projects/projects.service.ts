@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AppInfoDTO } from 'dto/info.dto';
+import { BaseService } from 'nestjs-base-service';
 import { Repository } from 'typeorm';
 import { Project } from './project.api.entity';
 
 @Injectable()
-export class ProjectsService {
+export class ProjectsService extends BaseService<
+  Project,
+  CreateProjectDTO,
+  UpdateProjectDTO,
+  AppInfoDTO
+> {
   constructor(
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
