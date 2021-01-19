@@ -1,8 +1,7 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { Project } from './project.api.entity';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Project, ProjectResult } from './project.api.entity';
 import { ProjectsService } from './projects.service';
 
-import JSONAPISerializer = require('jsonapi-serializer');
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -70,18 +69,13 @@ export class ProjectsController {
   })
   @Get()
   async findAll(): Promise<Project[]> {
-    const serializer = new JSONAPISerializer.Serializer('projects', {
-      attributes: ['name', 'users'],
-      keyForAttribute: 'camelCase',
-      users: {
-        ref: 'id',
-        attributes: ['fname', 'lname', 'email', 'projectRoles'],
-        projectRoles: {
-          ref: 'name',
-          attributes: ['name'],
-        },
-      },
-    });
-    return serializer.serialize(await this.service.findAll());
+    return this.service.serialize(await this.service.findAll());
+  }
+
+  @ApiOperation({ description: 'Find project by id' })
+  @ApiOkResponse({ type: ProjectResult })
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Project> {
+    return await this.service.serialize([await this.service.fakeFindOne(id)]);
   }
 }
