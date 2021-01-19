@@ -7,17 +7,23 @@ export default {
   component: DropdownMultiSelect,
   parameters: { actions: { argTypesRegex: '^on.*' } },
   argTypes: {
+    options: {
+      description: 'Array of options to be displayed on the dropdown. Option interface allows for this properties: label, value, disabled and hideCheckbox',
+    },
     theme: {
-      control: {
-        type: 'select',
-        options: ['dark', 'light'],
-      },
+      description: 'Controls the visual aspect of the dropdown',
     },
     state: {
-      control: {
-        type: 'select',
-        options: ['valid', 'error', 'none'],
-      },
+      description: 'When embedded into forms, this state could be defined after validation',
+    },
+    disabled: {
+      description: 'Defines the interactivity of the component. No interaction is possible when this option is set to true',
+    },
+    placeholder: {
+      description: 'String to be displayed on the dropdown toggle when no option is selected',
+    },
+    batchSelectionActive: {
+      description: 'Defines wether options for selecting and removing all the elements in the dropdown should be present',
     },
   },
 };
@@ -42,5 +48,5 @@ Default.args = {
     { label: 'IUCN I-V', value: 'IUCN_I-V', disabled: true },
     { label: 'IUCN I-VI', value: 'IUCN_I-VI' },
   ],
-  onSelect: (option) => console.info(option),
+  onChange: (option, selectedItems) => console.info(option, selectedItems),
 };
