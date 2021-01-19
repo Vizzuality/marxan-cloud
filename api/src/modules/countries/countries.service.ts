@@ -35,7 +35,7 @@ export class CountriesService extends BaseService<
 
   serializer;
 
-  async fakeFindOne(id: string): Promise<Country> {
+  async fakeFindOne(_id: string): Promise<Country> {
     return this.serializer.serialize({
       ...new Country(),
       id: faker.address.countryCode(),
