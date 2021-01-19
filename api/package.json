@@ -50,7 +50,7 @@
     "jsonapi-serializer": "^3.6.6",
     "lodash": "^4.17.20",
     "ms": "^2.1.3",
-    "nestjs-base-service": "^0.1.0",
+    "nestjs-base-service": "0.2.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
@@ -59,7 +59,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
     "swagger-ui-express": "^4.1.6",
-    "typeorm": "^0.2.30"
+    "typeorm": "0.2.30"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
