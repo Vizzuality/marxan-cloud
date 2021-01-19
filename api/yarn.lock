@@ -5221,10 +5221,10 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nestjs-base-service@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.1.0.tgz#65bbfe03f0af80648060f1c53f81b18cbce54b80"
-  integrity sha512-1V+6LaLOX9K+n9MhpZejqHb/ZA2KzMoeKGPhihuPyzCYrbbeYaWGCemF9Zernr6mJ+5RB3f2+j2JWa7H7vaRMA==
+nestjs-base-service@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.2.0.tgz#bfd0f8cfc99378bc562b57e709fbf0710996caed"
+  integrity sha512-LSgGTAFed3js4bOCeIFrEXTMJz45hFPNLLmjEnkqPxi/YaU2hstLZKVVdyvRqfbV2JJmKrkQ2htZNniDtLWSCA==
   dependencies:
     "@nestjs/common" "7.6.5"
     class-validator "0.13.1"
@@ -7419,7 +7419,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typeorm@0.2.30, typeorm@^0.2.30:
+typeorm@0.2.30:
   version "0.2.30"
   resolved "https://registry.yarnpkg.com/typeorm/-/typeorm-0.2.30.tgz#a0df2256402cbcdde8049a244437560495ce9b38"
   integrity sha512-qpr8AO3Phi6ZF7qMHOrRdNisVt8jE1KfmW0ooLFcXscA87aJ12aBPyB9cJfxGNjNwd7B3WIK9ZlBveWiqd74QA==
