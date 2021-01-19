@@ -2,11 +2,13 @@ import React, { useCallback } from 'react';
 import cx from 'classnames';
 
 import Icon from 'components/icon';
+import Button from 'components/button';
 import Select from 'components/forms/select';
 import Checkbox from 'components/forms/checkbox';
 
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
+import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 export interface ItemProps {
   id: string;
@@ -23,9 +25,8 @@ export interface ItemProps {
   splitFeaturesOptions: Record<string, unknown>[];
   onSplitFeaturesSelected: (selected: string[]) => void;
 
-  intersectSelected: string[];
-  intersectOptions: Record<string, unknown>[];
-  onIntersectSelected: (selected: string[]) => void;
+  intersectFeaturesSelected: string[];
+  intersectFeaturesOptions: Record<string, unknown>[];
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -42,9 +43,8 @@ export const Item: React.FC<ItemProps> = ({
   splitFeaturesOptions = [],
   onSplitFeaturesSelected,
 
-  intersectSelected,
-  intersectOptions = [],
-  onIntersectSelected,
+  intersectFeaturesSelected,
+  intersectFeaturesOptions = [],
 }: ItemProps) => {
   // EVENTS
   const onSplitChanged = useCallback(
@@ -68,16 +68,6 @@ export const Item: React.FC<ItemProps> = ({
       onSplitFeaturesSelected(newSplitFeaturesSelected);
     },
     [splitFeaturesSelected, onSplitFeaturesSelected],
-  );
-
-  const onIntersectChanged = useCallback(
-    (e) => {
-      const OPTIONS = [...e.currentTarget.options];
-      onIntersectSelected(
-        OPTIONS.filter((o) => o.selected).map((o) => o.value),
-      );
-    },
-    [onIntersectSelected],
   );
 
   // RENDER
@@ -139,13 +129,13 @@ export const Item: React.FC<ItemProps> = ({
 
             {/* TODO: Select from javi!! */}
             <div className="inline-block mt-2">
-              <Select
-                multiple
-                className="py-0.5 text-sm pr-8"
-                value={intersectSelected}
-                options={intersectOptions}
-                onChange={onIntersectChanged}
-              />
+              <Button theme="secondary-alt" size="xs">
+                <div className="flex items-center">
+                  <span>Select features</span>
+
+                  <Icon icon={PLUS_SVG} className="w-3 h-3 ml-3" />
+                </div>
+              </Button>
             </div>
           </div>
         )}
@@ -160,10 +150,11 @@ export const Item: React.FC<ItemProps> = ({
             return (
               <li
                 key={`${f.value}`}
-                className="flex items-center pr-2.5 py-2 mt-0.5 border-l border-bioregional"
+                className="flex items-center pr-2.5 py-2 mt-0.5 relative"
               >
+                <div className="absolute top-0 left-0 block w-px h-full bg-bioregional" />
                 <div className="relative flex text-xs font-heading">
-                  <div className="mx-2.5">
+                  <div className="ml-2.5">
                     <Checkbox
                       id={`checkbox-${f.value}`}
                       value={`${f.value}`}
@@ -175,10 +166,33 @@ export const Item: React.FC<ItemProps> = ({
 
                   <label
                     htmlFor={`checkbox-${f.value}`}
-                    className="inline-block max-w-sm"
+                    className="inline-block max-w-sm ml-2.5"
                   >
                     {f.label}
                   </label>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {type === 'species' && intersectFeaturesSelected && (
+        <ul className="pl-3">
+          {intersectFeaturesOptions.map((f) => {
+            return (
+              <li
+                key={`${f.value}`}
+                className="flex items-center pr-2.5 py-2 mt-0.5 relative"
+              >
+                <div className="absolute top-0 left-0 block w-px h-full bg-gradient-to-b from-bioregional to-species" />
+                <div className="relative flex text-xs font-heading">
+                  <div className="inline-block max-w-sm ml-2.5">
+                    {name}
+                    {' '}
+                    in
+                    {f.label}
+                  </div>
                 </div>
               </li>
             );
