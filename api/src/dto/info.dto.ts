@@ -1,4 +1,4 @@
-import { InfoDto } from 'nestjs-base-service';
+import { InfoDTO } from 'nestjs-base-service';
 import { User } from 'modules/users/user.entity';
 
-export type AppInfoDto = InfoDto<User>;
+export type AppInfoDTO = InfoDTO<User>;

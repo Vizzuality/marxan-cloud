@@ -4,9 +4,22 @@ import { ILike, Repository } from 'typeorm';
 import { User } from './user.api.entity';
 
 import { get } from 'lodash';
+import { CreateUserDTO } from './dto/create.user.dto';
+import { UpdateUserDTO } from './dto/update.user.dto';
+import { AppInfoDTO } from 'dto/info.dto';
+import { BaseService } from 'nestjs-base-service';
+
+import JSONAPISerializer = require('jsonapi-serializer');
+
+import * as faker from 'faker';
 
 @Injectable()
-export class UsersService {
+export class UsersService extends BaseService<
+  User,
+  CreateUserDTO,
+  UpdateUserDTO,
+  AppInfoDTO
+> {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AppInfoDto } from 'dto/info.dto';
-import { GenericService } from 'nestjs-base-service';
+import { AppInfoDTO } from 'dto/info.dto';
+import { BaseService } from 'nestjs-base-service';
 import { Repository } from 'typeorm';
 import { Country } from './country.entity';
 import { CreateCountryDTO } from './dto/create.country.dto';
@@ -12,11 +12,11 @@ import JSONAPISerializer = require('jsonapi-serializer');
 import * as faker from 'faker';
 
 @Injectable()
-export class CountriesService extends GenericService<
+export class CountriesService extends BaseService<
   Country,
   CreateCountryDTO,
   UpdateCountryDTO,
-  AppInfoDto
+  AppInfoDTO
 > {
   constructor(
     @InjectRepository(Country)
