@@ -22,15 +22,37 @@ export class UsersService extends BaseService<
 > {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
-  ) {}
+    protected readonly repository: Repository<User>,
+  ) {
+    super(repository, 'user');
+    this.serializer = new JSONAPISerializer.Serializer('users', {
+      attributes: ['fname', 'lname', 'email'],
+      keyForAttribute: 'camelCase',
+    });
+  }
+
+  serializer;
+
+  async serialize(entities: User[]) {
+    return this.serializer.serialize(entities);
+  }
+
+  async fakeFindOne(_id: string): Promise<Partial<User>> {
+    return {
+      ...new User(),
+      id: faker.random.uuid(),
+      email: faker.internet.email(),
+      fname: faker.name.firstName(),
+      lname: faker.name.lastName(),
+    };
+  }
 
   async findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+    return this.repository.find();
   }
 
   async findOne(id: string): Promise<User | undefined> {
-    return this.usersRepository.findOne(id);
+    return this.repository.findOne(id);
   }
 
   /**
@@ -40,11 +62,11 @@ export class UsersService extends BaseService<
    * the lookup case-insensitively.
    */
   async findByEmail(email: string): Promise<User | undefined> {
-    return this.usersRepository.findOne({ email: ILike(email.toLowerCase()) });
+    return this.repository.findOne({ email: ILike(email.toLowerCase()) });
   }
 
   async remove(id: string): Promise<void> {
-    await this.usersRepository.delete(id);
+    await this.repository.delete(id);
   }
 
   /**
