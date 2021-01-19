@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useSelect, useMultipleSelection } from 'downshift';
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg';
 import Icon from 'components/icon';
@@ -63,6 +63,7 @@ export interface MultiSelectProps {
   clearSelectionLabel?: string;
   batchSelectionLabel?: string;
   batchSelectionActive?: boolean;
+  labelFormatter?: (selectedItems: Array<Option>) => string;
 }
 
 export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
@@ -78,9 +79,14 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
   batchSelectionLabel = 'Add all scenarios',
   clearSelectionLabel = 'Remove all scenarios',
   batchSelectionActive,
+  labelFormatter,
 }: MultiSelectProps) => {
-  const itemToString = (option) => (option ? option.label : '');
-  const enabledOptions = () => options.filter((op) => !op.disabled);
+  const itemToString: (option: Option) => string = (option) => (option ? option.label : '');
+
+  const enabledOptions: () => Array<Option> = useCallback(() => {
+    return options.filter((op) => !op.disabled);
+  }, [options]);
+
   const items = batchSelectionActive
     ? [{ value: 'batch-selection', label: batchSelectionLabel, hideCheckbox: true },
       { value: 'clear-selection', label: clearSelectionLabel, hideCheckbox: true },
@@ -91,21 +97,15 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
     selectedItems.some((i) => i.value === selected.value)
   );
 
-  const selectLabel = (selectedItems) => {
-    if (!selectedItems.length) return placeholder;
-    if (selectedItems.length === 1) return itemToString(selectedItems[0]);
-    return `${selectedItems.length} items selected`;
-  };
-
   const handleSelectedItem = ({
-    selected,
+    option,
     selectedItems,
     addSelectedItem,
     removeSelectedItem,
     setSelectedItems,
     reset,
   }) => {
-    switch (selected.value) {
+    switch (option.value) {
       case 'clear-selection':
         reset();
         break;
@@ -113,12 +113,12 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
         setSelectedItems(enabledOptions());
         break;
       default:
-        if (isSelected(selected, selectedItems)) {
-          removeSelectedItem(selected);
-        } else if (selected.disabled) {
+        if (isSelected(option, selectedItems)) {
+          removeSelectedItem(option);
+        } else if (option.disabled) {
           break;
         } else {
-          addSelectedItem(selected);
+          addSelectedItem(option);
         }
         break;
     }
@@ -131,7 +131,14 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
     setSelectedItems,
     selectedItems,
     reset,
-  } = useMultipleSelection({ initialSelectedItems: defaultSelection });
+  } = useMultipleSelection({
+    initialSelectedItems: defaultSelection,
+    stateReducer: (st, actionAndChanges) => {
+      const { changes, selectedItem } = actionAndChanges;
+      onChange(selectedItem, changes.selectedItems);
+      return actionAndChanges.changes;
+    },
+  });
 
   const {
     isOpen,
@@ -142,26 +149,41 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
     getItemProps,
   } = useSelect({
     items,
-    onStateChange: ({ type, selectedItem: selected }) => {
+    stateReducer: (st, actionAndChanges) => {
+      const { type, changes } = actionAndChanges;
+      const { selectedItem: option } = changes;
       switch (type) {
         case useSelect.stateChangeTypes.MenuKeyDownEnter:
         case useSelect.stateChangeTypes.ItemClick:
-          if (selected) {
-            handleSelectedItem({
-              selected,
-              selectedItems,
-              addSelectedItem,
-              removeSelectedItem,
-              setSelectedItems,
-              reset,
-            });
-          }
-          break;
+          handleSelectedItem({
+            option,
+            selectedItems,
+            addSelectedItem,
+            removeSelectedItem,
+            setSelectedItems,
+            reset,
+          });
+          return {
+            ...changes,
+            highlightedIndex: st.highlightedIndex,
+            isOpen: true,
+          };
         default:
-          break;
+          return changes;
       }
     },
   });
+
+  const labelDefaultFormatter:() => string = useCallback(() => {
+    if (!selectedItems.length) return placeholder;
+    if (selectedItems.length === 1) return itemToString(selectedItems[0]);
+    if (selectedItems.length === enabledOptions().length) return 'All items selected';
+    return `${selectedItems.length} items selected`;
+  }, [selectedItems, placeholder, enabledOptions]);
+
+  const customLabelFormatter: () => string = useCallback(() => {
+    return labelFormatter(selectedItems);
+  }, [selectedItems, labelFormatter]);
 
   return (
     <div
@@ -184,7 +206,7 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
       >
         {prefix && <span className="mr-2 text-base">{prefix}</span>}
         <span className="text-base">
-          {selectLabel(selectedItems)}
+          {labelFormatter ? customLabelFormatter() : labelDefaultFormatter()}
         </span>
         <Icon
           className={cx({
@@ -206,7 +228,7 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
           items.map((option, index) => (
             <li
               className={cx({
-                'px-4 mt-2 cursor-pointer': true,
+                'px-4 py-1 mt-0.5 cursor-pointer': true,
                 [THEME[theme].item.base]: highlightedIndex !== index,
                 [THEME[theme].item.highlighted]: highlightedIndex === index,
                 [THEME[theme].item.disabled]: option.disabled,
