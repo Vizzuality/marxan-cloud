@@ -1,78 +1,41 @@
 import React from 'react';
 import { useSelect } from 'downshift';
-import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg';
+import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import Icon from 'components/icon';
 import cx from 'classnames';
-
-const THEME = {
-  dark: {
-    container: 'text-white bg-gray-800 border-2 rounded-3xl py-1.5',
-    open: 'border-2 border-primary-400 text-base',
-    closed: 'border-gray-400 text-gray-400',
-    icon: {
-      closed: 'text-white',
-      open: 'fill-primary transform rotate-180',
-      disabled: 'text-gray-400',
-    },
-    item: {
-      base: 'text-gray-300',
-      highlighted: 'bg-gray-700 text-white',
-    },
-  },
-  light: {
-    container: 'text-gray-600 bg-white border-2 rounded-3xl py-1.5',
-    open: 'border-2 border-primary-400 text-base',
-    closed: 'border-gray-400 text-gray-400',
-    icon: {
-      closed: 'text-gray-600',
-      open: 'fill-primary transform rotate-180',
-      disabled: 'text-gray-400',
-    },
-    item: {
-      base: 'text-gray-400',
-      highlighted: 'bg-gray-100 text-gray-800',
-    },
-  },
-  states: {
-    none: '',
-    error: 'border-red-500',
-    valid: 'border-green-500',
-  },
-};
+import THEME from '../default-theme';
 
 interface Option {
   label: string;
   value: string | number;
-  checkbox?: boolean;
   disabled?: boolean;
 }
 
 export interface SingleSelectProps {
-  theme?: 'dark' | 'light';
-  disabled?: boolean;
-  prefix?: string;
-  placeholder?: string;
-  options?: Array<Option>;
-  onChange: (option: Option) => void;
-  clearable?: boolean;
-  clearSelectionLabel?: string;
-  className?: string;
+  theme: 'dark' | 'light';
   state: 'none' | 'error' | 'valid';
+  onChange: (option: Option) => void;
+  prefix?: string;
+  options?: Option[];
+  disabled?: boolean;
+  clearable?: boolean;
+  className?: string;
+  placeholder?: string;
+  clearSelectionLabel?: string;
 }
 
 export const DropdownSelect: React.FC<SingleSelectProps> = ({
-  theme = 'dark',
-  state = 'none',
-  disabled = false,
-  prefix,
-  placeholder,
-  options = [],
+  theme,
+  state,
   onChange,
+  prefix,
+  options = [],
+  disabled = false,
   clearable,
-  clearSelectionLabel = 'Clear selection',
   className,
+  placeholder,
+  clearSelectionLabel = 'Clear selection',
 }: SingleSelectProps) => {
-  const itemToString = (option) => (option ? option.label : '');
   const items = clearable
     ? [{ value: null, label: clearSelectionLabel }, ...options]
     : options;
@@ -117,7 +80,7 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
       className={cx({
         'w-full leading-tight overflow-hidden absolute left-0': true,
         [THEME[theme].container]: true,
-        [THEME[theme].closed]: !itemToString(selectedItem) && !isOpen,
+        [THEME[theme].closed]: !selectedItem && !isOpen,
         [THEME[theme].open]: isOpen,
         [THEME.states[state]]: true,
         [className]: !!className,
@@ -133,7 +96,7 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
       >
         {prefix && <span className="mr-2 text-base">{prefix}</span>}
         <span className="text-base">
-          {`${itemToString(selectedItem)}` || placeholder}
+          {selectedItem?.label || placeholder}
         </span>
         <Icon
           className={cx({
@@ -155,7 +118,7 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
           && items.map((option, index) => (
             <li
               className={cx({
-                'px-4 mt-2 cursor-pointer': true,
+                'px-4 py-1 mt-0.5 cursor-pointer': true,
                 [THEME[theme].item.base]: highlightedIndex !== index,
                 [THEME[theme].item.highlighted]: highlightedIndex === index,
               })}

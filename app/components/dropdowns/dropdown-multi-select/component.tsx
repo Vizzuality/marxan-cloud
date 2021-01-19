@@ -1,99 +1,60 @@
 import React, { useCallback } from 'react';
 import { useSelect, useMultipleSelection } from 'downshift';
-import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg';
+import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import Icon from 'components/icon';
 import Checkbox from 'components/forms/checkbox';
 import cx from 'classnames';
-
-const THEME = {
-  dark: {
-    container: 'text-white bg-gray-800 border-2 rounded-3xl py-1.5',
-    open: 'border-2 border-primary-400 text-base',
-    closed: 'border-gray-400 text-gray-400',
-    icon: {
-      closed: 'text-white',
-      open: 'fill-primary transform rotate-180',
-      disabled: 'text-gray-400',
-    },
-    item: {
-      base: 'text-gray-300',
-      highlighted: 'bg-gray-700 text-white',
-      disabled: 'opacity-50 pointer-events-none',
-    },
-  },
-  light: {
-    container: 'text-gray-600 bg-white border-2 rounded-3xl py-1.5',
-    open: 'border-2 border-primary-400 text-base',
-    closed: 'border-gray-400 text-gray-400',
-    icon: {
-      closed: 'text-gray-600',
-      open: 'fill-primary transform rotate-180',
-      disabled: 'text-gray-400',
-    },
-    item: {
-      base: 'text-gray-400',
-      highlighted: 'bg-gray-100 text-gray-800',
-      disabled: 'opacity-50 pointer-events-none',
-    },
-  },
-  states: {
-    none: '',
-    error: 'border-red-500',
-    valid: 'border-green-500',
-  },
-};
+import THEME from '../default-theme';
 
 interface Option {
   label: string;
   value: string | number;
-  hideCheckbox?: boolean;
   disabled?: boolean;
+  hideCheckbox?: boolean;
 }
 
 export interface MultiSelectProps {
+  options: Option[];
   theme: 'dark' | 'light';
   state: 'none' | 'error' | 'valid';
-  options: Array<Option>;
-  onChange: (option: Option, selectedItems: Array<Option>) => void;
+  onChange: (option: Option, selectedItems: Option[]) => void;
   prefix?: string;
   disabled?: boolean;
   className?: string;
   placeholder?: string;
-  defaultSelection?: Array<Option>;
+  defaultSelection?: Option[];
   clearSelectionLabel?: string;
   batchSelectionLabel?: string;
   batchSelectionActive?: boolean;
-  labelFormatter?: (selectedItems: Array<Option>) => string;
+  labelFormatter?: (selectedItems: Option[]) => string;
 }
 
 export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
+  options,
   theme = 'dark',
   state = 'none',
-  options,
   onChange,
   prefix,
   disabled,
   className,
   placeholder,
   defaultSelection = [],
-  batchSelectionLabel = 'Add all scenarios',
-  clearSelectionLabel = 'Remove all scenarios',
+  batchSelectionLabel,
+  clearSelectionLabel,
   batchSelectionActive,
   labelFormatter,
 }: MultiSelectProps) => {
-  const itemToString: (option: Option) => string = (option) => (option ? option.label : '');
-
   const enabledOptions: () => Array<Option> = useCallback(() => {
     return options.filter((op) => !op.disabled);
   }, [options]);
 
   const items = batchSelectionActive
     ? [{ value: 'batch-selection', label: batchSelectionLabel, hideCheckbox: true },
-      { value: 'clear-selection', label: clearSelectionLabel, hideCheckbox: true },
+      { value: null, label: clearSelectionLabel, hideCheckbox: true },
       ...options]
     : options;
 
-  const isSelected = (selected: Option, selectedItems: Array<Option>) => (
+  const isSelected = (selected: Option, selectedItems: Option[]) => (
     selectedItems.some((i) => i.value === selected.value)
   );
 
@@ -106,7 +67,7 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
     reset,
   }) => {
     switch (option.value) {
-      case 'clear-selection':
+      case null:
         reset();
         break;
       case 'batch-selection':
@@ -176,7 +137,7 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
 
   const labelDefaultFormatter:() => string = useCallback(() => {
     if (!selectedItems.length) return placeholder;
-    if (selectedItems.length === 1) return itemToString(selectedItems[0]);
+    if (selectedItems.length === 1) return selectedItems[0].label;
     if (selectedItems.length === enabledOptions().length) return 'All items selected';
     return `${selectedItems.length} items selected`;
   }, [selectedItems, placeholder, enabledOptions]);
@@ -190,7 +151,7 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
       className={cx({
         'w-full leading-tight overflow-hidden absolute left-0': true,
         [THEME[theme].container]: true,
-        [THEME[theme].closed]: !itemToString(selectedItem) && !isOpen,
+        [THEME[theme].closed]: !selectedItem?.value && !isOpen,
         [THEME[theme].open]: isOpen,
         [THEME.states[state]]: true,
         [className]: !!className,
