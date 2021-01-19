@@ -18,7 +18,9 @@
 LAYOUT_AS_SKETCH()
 LAYOUT_WITH_LEGEND()
 System_Ext(dataSources, "Data Sources")
+System_Ext(userData, "User Data Sources")
 System_Boundary(dataPipes, "Data pipes"){
+  ContainerDb(dataStorage2, "GeoDatabase", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
   System_Boundary(dataPipe1, "data preprocessing for ingestion"){
     Container(rawStorage, "Raw storage", "Azure blobs, s3, gcs", "container to store the raw data")
     System_Boundary(dataValidation, "Data Validation"){
@@ -27,29 +29,33 @@ System_Boundary(dataPipes, "Data pipes"){
       }
     System_Boundary(dataTransformation, "Data Transformation"){
       }
-    System_Boundary(dataIngesting, "Data Ingestion"){
-        ContainerDb(dataStorage2, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
-      }
+    ' System_Boundary(dataIngesting, "Data Ingestion"){
+
+      ' }
     }
 
-    System_Boundary(dataPipe2, "data preparation"){
-    ContainerDb(dataStorage2, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
-    System_Boundary(dataValidation2, "Data Validation"){
-      }
-    System_Boundary(dataTransformation2, "Data Transformation"){
-      }
-    }
+    ' System_Boundary(dataPipe2, "data preparation"){
+    ' ContainerDb(dataStorage2, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
+    ' System_Boundary(dataValidation2, "Data Validation"){
+    '   }
+    ' System_Boundary(dataTransformation2, "Data Transformation"){
+    '   }
+    ' }
 
-    System_Boundary(dataPipe3, "data analysis"){
-    ContainerDb(dataStorage3, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
+    System_Boundary(dataPipe3, "marxan runner"){
+    ' ContainerDb(dataStorage3, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
     System_Boundary(dataValidation3, "Data Validation"){
       }
     System_Boundary(dataTransformation3, "Data Transformation"){
       }
+    System_Boundary(marxanExecuter, "Executer"){
+      Container(mountVolume, "Persisted volume", "Azure blobs, s3, gcs", "container to store the marxan project folder")
+      Container(dockerImage, "Worker executer", "dockerImage", "Run marxan executer")
+      }
     }
 
      System_Boundary(dataPipe4, "data postprocessing"){
-    ContainerDb(dataStorage4, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
+    ' ContainerDb(dataStorage4, "Database", "Postgres 13 + Postgis 3", "Stores user data", "postgresql")
     System_Boundary(dataValidation4, "Data Validation"){
       }
     System_Boundary(dataTransformation4, "Data Transformation"){
@@ -61,11 +67,31 @@ System_Boundary(dataPipes, "Data pipes"){
 
 
 Rel(dataSources, rawStorage, "Downloads")
+Rel(userData, rawStorage, "Downloads")
+Rel(rawStorage, dataValidation, "Read")
+' Rel(dataValidation, dataRepair, "Not Valid")
+' Rel(dataRepair, dataValidation, "Read")
+Rel(dataValidation, dataRepair, "Make Valid")
+Rel(dataRepair, dataTransformation, "")
+Rel(dataTransformation, dataStorage2,"ingestion")
+
+Rel(dataStorage2, dataTransformation3, "Read")
+Rel(dataTransformation3, dataValidation3, "Transform marxan executable project")
+Rel(dataValidation3, marxanExecuter, "Execute marxan")
+
+Rel(mountVolume, dockerImage, "Reads/Writes")
+
+Rel(mountVolume, dataPipe4, "Read")
+
+Rel(dataTransformation4, dataValidation4, "Transform marxan executable project")
+Rel( dataValidation4, dataStorage2, "Write")
 
 
-Lay_U(dataPipe2, dataPipe1)
-Lay_U(dataPipe3, dataPipe2)
-Lay_U(dataPipe4, dataPipe3)
+' Lay_U(dataPipe2, dataPipe1)
+Lay_U(dataStorage2, dataPipe3)
+Lay_U(dataPipe3, dataPipe1)
+Lay_U(dataPipe3, dataPipe4)
+Lay_D(dataStorage2, dataPipe4)
 
 
 @enduml

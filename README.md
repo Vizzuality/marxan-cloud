@@ -15,11 +15,14 @@ Microservices are set up to be run via Docker Compose for local development.
 In CI, testing, staging and production environments, microservices are
 orchestrated via Kubernetes (forthcoming).
 
-## Architecture
-![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-api-architecture.puml)
+## Architecture (TBD)
+![Backend architecture](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/develop/marxan-api-architecture.puml)
 
-## Data Architecture
-![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/feature/add-new-services-processing/marxan-data-processing-architecture.puml)
+[Frontend architecture (TBD)]()
+
+![Data management architecture](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Vizzuality/marxan-cloud/develop/marxan-data-processing-architecture.puml)
+
+[DB data model](https://dbdiagram.io/embed/5ff8693580d742080a358e7f)
 
 ### Prerequisites
 
@@ -44,8 +47,16 @@ orchestrated via Kubernetes (forthcoming).
      PostgreSQL connection (API)
    * `API_POSTGRES_PASSWORD` (string, required): password to be used for the
      PostgreSQL connection (API)
-   * `API_POSTGRES_DB` (string, required): name of the database to be used for
+	* `API_POSTGRES_DB` (string, required): name of the database to be used for
      the PostgreSQL connection (API)
+   * `POSTGRES_GEO_SERVICE_PORT`(number, required): the port on which the
+     geoprocessing PostgreSQL service should listen on the local machine
+   * `GEO_POSTGRES_USER`(string, required): username to be used for the
+      geoprocessing PostgreSQL connection (API)
+   * `GEO_POSTGRES_PASSWORD`(string, required): password to be used for the
+     geoprocessing PostgreSQL connection (API)
+   * `GEO_POSTGRES_DB`(string, required): name of the database to be used for
+     the geoprocessing PostgreSQL connection (API)
    * `POSTGRES_AIRFLOW_SERVICE_PORT` (number, required): the port on which the
      PostgreSQL for Airflow service should listen on the local machine
    * `AIRFLOW_PORT` (number, required): the port on which the
@@ -61,6 +72,10 @@ via a Docker volume.
 ### Running the Marxan Cloud platform
 
 Run `make start` to start all the services.
+
+### Running the notebooks
+
+Run `make notebooks` to start the jupyterlab service.
 
 ## Development workflow (TBD)
 
