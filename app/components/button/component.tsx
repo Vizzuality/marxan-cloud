@@ -9,7 +9,7 @@ const THEME = {
   secondary:
     'text-white bg-gray-500 hover:bg-gray-400 active:bg-gray-300 border border-gray-500 hover:border-gray-400 active:border-gray-300',
   'secondary-alt':
-    'text-gray-500 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-500 hover:border-gray-400 active:border-gray-300',
+    'text-gray-400 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-500 hover:border-gray-400 active:border-gray-300',
 };
 
 const SIZE = {
