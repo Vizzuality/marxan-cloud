@@ -4,7 +4,7 @@ import cx from 'classnames';
 const THEME = {
   primary: {
     base:
-      'bg-gray-800 border rounded text-primary-500 focus:border-primary-500 focus:outline-none',
+      'bg-gray-800 border rounded-sm text-primary-500 focus:border-primary-500 focus:outline-none',
     states: {
       none: 'border-gray-900',
       valid: 'border-gray-900',
