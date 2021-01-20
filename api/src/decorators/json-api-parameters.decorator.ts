@@ -12,7 +12,11 @@ import { ApiQuery } from '@nestjs/swagger';
  * - page[number] (https://jsonapi.org/format/1.0/#fetching-pagination)
  * - [TODO] filter (https://jsonapi.org/format/1.0/#fetching-filtering)
  */
-export function JSONAPIQueryParams(): Function {
+export function JSONAPIQueryParams(): (
+  target: Object,
+  propertyKey: string | symbol,
+  descriptor: TypedPropertyDescriptor<unknown>,
+) => void {
   const includeQueryParam = ApiQuery({
     name: 'include',
     description:
@@ -50,7 +54,7 @@ export function JSONAPIQueryParams(): Function {
   });
 
   return function (
-    target: Object,
+    target: Record<string, unknown>,
     propertyKey: string | symbol,
     descriptor: TypedPropertyDescriptor<unknown>,
   ) {
