@@ -42,8 +42,11 @@ export class UsersService extends BaseService<
       ...new User(),
       id: faker.random.uuid(),
       email: faker.internet.email(),
+      displayName: `${faker.name.firstName()} ${faker.name.lastName()}`,
       fname: faker.name.firstName(),
       lname: faker.name.lastName(),
+      isActive: faker.random.boolean(),
+      isDeleted: faker.random.boolean(),
     };
   }
 
