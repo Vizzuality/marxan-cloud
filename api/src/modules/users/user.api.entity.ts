@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { MaxLength } from 'class-validator';
 import { IssuedAuthnToken } from 'modules/authentication/issued-authn-token.api.entity';
+import { Dictionary } from 'lodash';
 import {
   Column,
   Entity,
@@ -19,11 +20,15 @@ export class User {
   @Column('character varying')
   email: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @Column('character varying')
+  displayName: string | null;
+
+  @ApiPropertyOptional()
   @Column('character varying')
   fname: string | null;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Column('character varying')
   lname: string | null;
 
@@ -39,6 +44,16 @@ export class User {
   // byte count of the chosen passphrase is at most 72.
   @MaxLength(18)
   passwordHash: string;
+
+  /**
+   * JSONB storage for non-relational user attributes (e.g. whether a user has
+   * accepted terms of use of the instance, etc.)
+   *
+   * @debt We should use versioned types for metadata.
+   */
+  @ApiPropertyOptional()
+  @Column('jsonb')
+  metadata: Dictionary<string>;
 
   @ApiProperty({ type: () => Project, isArray: true })
   @ManyToMany((_type) => Project, (project) => project.users, { eager: false })

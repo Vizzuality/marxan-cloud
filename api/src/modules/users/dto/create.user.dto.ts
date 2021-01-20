@@ -1,14 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { MaxLength } from 'class-validator';
 
 export class CreateUserDTO {
   @ApiProperty()
   email: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  displayName: string | null;
+
+  @ApiPropertyOptional()
   fname: string | null;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   lname: string | null;
 
   @ApiProperty()
