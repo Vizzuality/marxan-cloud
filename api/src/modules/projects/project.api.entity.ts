@@ -1,8 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Dictionary } from 'lodash';
-import { JSONAPIData } from 'modules/countries/country.entity';
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from '../users/user.api.entity';
+import { User } from 'modules/users/user.api.entity';
+import { Scenario } from 'modules/scenarios/scenario.entity';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('projects')
 export class Project {
@@ -19,13 +25,16 @@ export class Project {
   description: string;
 
   /**
-   * JSONB storage for non-relational user attributes
+   * JSONB storage for non-relational attributes
    *
    * @debt We should use versioned types for metadata.
    */
   @ApiPropertyOptional()
   @Column('jsonb')
   metadata: Dictionary<string>;
+
+  @OneToMany((_type) => Scenario, (scenario) => scenario.project)
+  scenarios: Scenario[];
 
   @ApiProperty({
     type: () => User,
@@ -35,7 +44,18 @@ export class Project {
   users: Partial<User>[];
 }
 
+export class JSONAPIProjectData {
+  @ApiProperty()
+  type = 'projects';
+
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  attributes: Project;
+}
+
 export class ProjectResult {
   @ApiProperty()
-  data: JSONAPIData<Project>;
+  data: JSONAPIProjectData;
 }

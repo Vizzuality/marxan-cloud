@@ -37,18 +37,18 @@ export class Country {
   localNames: Dictionary<LocalName>;
 }
 
-export class JSONAPIData<Entity> {
+export class JSONAPICountryData {
   @ApiProperty()
-  type: string = 'countries';
+  type = 'countries';
 
   @ApiProperty()
   id: string;
 
   @ApiProperty()
-  attributes: Entity;
+  attributes: Country;
 }
 
 export class CountryResult {
   @ApiProperty()
-  data: JSONAPIData<Country>;
+  data: JSONAPICountryData;
 }
