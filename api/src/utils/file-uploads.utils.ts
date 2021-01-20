@@ -2,7 +2,7 @@ import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer
 
 import { AppConfig } from './config.utils';
 
-import multer from 'multer';
+import * as multer from 'multer';
 
 import { v4 as uuidv4 } from 'uuid';
 
