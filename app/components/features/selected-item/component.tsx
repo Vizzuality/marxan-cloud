@@ -129,7 +129,7 @@ export const Item: React.FC<ItemProps> = ({
 
             {/* TODO: Select from javi!! */}
             <div className="inline-block mt-2">
-              <Button theme="secondary-alt" size="xs">
+              <Button theme="secondary-alt" size="s">
                 <div className="flex items-center">
                   <span>Select features</span>
 
