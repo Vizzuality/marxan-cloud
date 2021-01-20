@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { MaxLength } from 'class-validator';
 import { IssuedAuthnToken } from 'modules/authentication/issued-authn-token.api.entity';
 import { Dictionary } from 'lodash';
 import {
@@ -10,7 +9,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Project } from '../projects/project.api.entity';
+import { Project } from 'modules/projects/project.api.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -37,7 +36,7 @@ export class User {
   passwordHash: string;
 
   /**
-   * JSONB storage for non-relational user attributes (e.g. whether a user has
+   * JSONB storage for non-relational attributes (e.g. whether a user has
    * accepted terms of use of the instance, etc.)
    *
    * @debt We should use versioned types for metadata.

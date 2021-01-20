@@ -51,6 +51,10 @@ export class ProjectsController {
    *
    * @debt We may want to use a custom interceptor to process import files
    */
+  @ApiOperation({
+    description: 'Import a Marxan project via file upload',
+    summary: 'Import a Marxan project',
+  })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @Post('legacy')
   async importLegacyProject(
