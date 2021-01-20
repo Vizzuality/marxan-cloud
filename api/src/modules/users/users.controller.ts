@@ -8,15 +8,26 @@ import {
   ApiForbiddenResponse,
   ApiOperation,
   ApiResponse,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { RequestWithAuthenticatedUser } from 'app.controller';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import { BaseServiceResource } from 'types/resource.interface';
+
+const resource: BaseServiceResource = {
+  className: 'User',
+  name: {
+    singular: 'user',
+    plural: 'users',
+  },
+};
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
+@ApiTags(resource.className)
 @Controller(`${apiGlobalPrefixes.v1}/users`)
 export class UsersController {
   constructor(public readonly service: UsersService) {}

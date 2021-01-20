@@ -1,9 +1,13 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Patch,
   UploadedFile,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { Project, ProjectResult } from './project.api.entity';
 import { ProjectsService } from './projects.service';
@@ -13,6 +17,7 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
@@ -23,9 +28,20 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadOptions } from 'utils/file-uploads.utils';
 
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import { BaseServiceResource } from 'types/resource.interface';
+import { UpdateProjectDTO } from './dto/update.project.dto';
+
+const resource: BaseServiceResource = {
+  className: 'Project',
+  name: {
+    singular: 'project',
+    plural: 'projects',
+  },
+};
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
+@ApiTags(resource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectsController {
   constructor(public readonly service: ProjectsService) {}
