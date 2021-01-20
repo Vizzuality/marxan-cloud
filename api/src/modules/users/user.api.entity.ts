@@ -60,6 +60,23 @@ export class User {
   })
   projects: Project[];
 
+  @ApiProperty({ type: () => Scenario, isArray: true })
+  @ManyToMany((_type) => Scenario, (scenario) => scenario.users, {
+    eager: false,
+  })
+  @JoinTable({
+    name: 'users_scenarios',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'scenario_id',
+      referencedColumnName: 'id',
+    },
+  })
+  scenarios: Scenario[];
+
   @OneToMany((_type) => IssuedAuthnToken, (token) => token.userId)
   issuedAuthnTokens: IssuedAuthnToken[];
 
