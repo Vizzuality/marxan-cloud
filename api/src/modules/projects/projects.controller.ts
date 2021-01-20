@@ -88,4 +88,21 @@ export class ProjectsController {
   async findOne(@Param('id') id: string): Promise<Project> {
     return await this.service.serialize([await this.service.fakeFindOne(id)]);
   }
+
+  @ApiOperation({ description: 'Update project' })
+  @ApiOkResponse({ type: ProjectResult })
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body(new ValidationPipe()) dto: UpdateProjectDTO,
+  ): Promise<ProjectResult> {
+    return await this.service.serialize([await this.service.update(id, dto)]);
+  }
+
+  @ApiOperation({ description: 'Delete project' })
+  @ApiOkResponse()
+  @Delete(':id')
+  async delete(@Param('id') id: string): Promise<void> {
+    return await this.service.remove(id);
+  }
 }
