@@ -14,7 +14,7 @@ const THEME = {
 
 const SIZE = {
   xs: 'text-sm px-2 py-0.5',
-  s: 'text-sm px-3 py-1',
+  s: 'text-sm px-3 py-0.5',
   base: 'text-base px-8 py-2',
 };
 
