@@ -23,7 +23,11 @@ module.exports = [
   logging: ['error'],
   cache: false,
   // migrations: ['src/migrations/geoprocessing/**/*.ts'],
-  // migrationsRun: true,
+  // Migrations will run automatically on startup, unless the
+  // `API_RUN_MIGRATIONS_ON_STARTUP` environment variable is set and its value
+  // matches, case-insensitively, the string `false`.
+  // @debt I think this should be way more resilient to user input.
+  // migrationsRun: config.get('postgresGeoApi.runMigrationsOnStartup')?.toLowerCase() !== 'false' ? true : false,,
   // cli: {
   //   migrationsDir: "src/migrations/geoprocessing",
   //   migrationsTableName: "migrations",
@@ -43,7 +47,8 @@ module.exports = [
   logging: ['error'],
   cache: false,
   migrations: ['src/migrations/api/**/*.ts'],
-  migrationsRun: true,
+  // See notes above in the other connection
+  migrationsRun: config.get('postgresGeoApi.runMigrationsOnStartup')?.toLowerCase() !== 'false' ? true : false,
   cli: {
     migrationsDir: "src/migrations/api",
     migrationsTableName: "migrations",
