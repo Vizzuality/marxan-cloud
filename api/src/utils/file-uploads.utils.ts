@@ -31,7 +31,7 @@ export const uploadOptions: MulterOptions = {
       );
       return fileUploadsSizeLimitMebibytes
         ? fileUploadsSizeLimitMebibytes * 1024e2
-        : 5 * 1024e2;
+        : 50 * 1024e2;
     })(),
   },
 };
