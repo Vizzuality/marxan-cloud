@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { MaxLength } from 'class-validator';
+import { Dictionary } from 'lodash';
 
 export class CreateUserDTO {
   @ApiProperty()
@@ -27,4 +28,7 @@ export class CreateUserDTO {
    */
   @MaxLength(18)
   password: string;
+
+  @ApiPropertyOptional()
+  metadata: Dictionary<string>;
 }
