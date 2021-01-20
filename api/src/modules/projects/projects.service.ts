@@ -45,6 +45,10 @@ export class ProjectsService extends BaseService<
     return this.serializer.serialize(entities);
   }
 
+  async importLegacyProject(_file: Express.Multer.File): Promise<Project> {
+    return new Project();
+  }
+
   async fakeFindOne(_id: string): Promise<Project> {
     const project = {
       ...new Project(),
