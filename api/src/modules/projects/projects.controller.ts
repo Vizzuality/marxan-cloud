@@ -23,6 +23,8 @@ import { UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadOptions } from 'utils/file-uploads.utils';
 
+import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -97,6 +99,7 @@ export class ProjectsController {
 
   @ApiOperation({ description: 'Find project by id' })
   @ApiOkResponse({ type: ProjectResult })
+  @JSONAPIQueryParams()
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Project> {
     return await this.service.serialize([await this.service.fakeFindOne(id)]);
