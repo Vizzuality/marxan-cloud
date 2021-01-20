@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Dictionary } from 'lodash';
 import { JSONAPIData } from 'modules/countries/country.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../users/user.api.entity';
@@ -16,6 +17,15 @@ export class Project {
   @ApiPropertyOptional()
   @Column('character varying')
   description: string;
+
+  /**
+   * JSONB storage for non-relational user attributes
+   *
+   * @debt We should use versioned types for metadata.
+   */
+  @ApiPropertyOptional()
+  @Column('jsonb')
+  metadata: Dictionary<string>;
 
   @ApiProperty({
     type: () => User,
