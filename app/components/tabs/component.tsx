@@ -15,16 +15,10 @@ export interface TabsProps {
 
 export const Tabs: React.FC<TabsProps> = ({
   tabs = [],
-  className,
   onClick,
 }: TabsProps) => (
   <div className="flex flex-col px-4 bg-gray-700 rounded-3xl border border-gray-700">
-    <ul
-      className={cx('flex flex-grow justify-between py-3', {
-        'border-b': tabs.find((t) => !!t.warning),
-        [className]: !!className,
-      })}
-    >
+    <ul className="flex flex-grow justify-between py-3">
       {tabs.map((tab) => (
         <li key={tab.id}>
           <button
@@ -43,6 +37,9 @@ export const Tabs: React.FC<TabsProps> = ({
         </li>
       ))}
     </ul>
+    {tabs.some((tab) => !!tab.warning) && (
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-50" />
+    )}
     {tabs.map(
       (tab) => tab.warning
         && tab.requirements && (
