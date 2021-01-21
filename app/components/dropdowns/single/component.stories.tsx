@@ -31,10 +31,11 @@ const Template: Story<SingleSelectProps> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   theme: 'dark',
-  // className: 'w-full',
+  size: 'base',
   disabled: false,
   placeholder: 'Select Scenario',
   clearable: true,
+  prefix: 'FILTER BY:',
   options: [
     { label: 'Scenario 1', value: 'scenario-1' },
     { label: 'Scenario 2', value: 'scenario-2' },

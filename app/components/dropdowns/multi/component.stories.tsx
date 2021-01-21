@@ -37,6 +37,7 @@ const Template: Story<MultiSelectProps> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   theme: 'dark',
+  size: 'base',
   disabled: false,
   placeholder: 'Select Scenario',
   batchSelectionActive: true,
