@@ -8,13 +8,20 @@ const THEME = {
   secondary: 'text-black',
 };
 
+const SIZES = {
+  sm: 'text-sm',
+  base: 'text-base',
+};
+
 export interface SearchProps extends InputHTMLAttributes<HTMLInputElement> {
-  theme?: 'primary';
+  theme?: 'primary' | 'secondary';
+  sizes: 'sm' | 'base';
   text?: string;
 }
 
 export const Search: React.FC<SearchProps> = ({
   theme = 'primary',
+  sizes = 'base',
   text,
   className,
   onChange,
@@ -23,8 +30,9 @@ export const Search: React.FC<SearchProps> = ({
   return (
     <div
       className={cx(
-        'flex w-full relative border-b border-gray-400 text-base p-4',
+        'flex w-full relative border-b border-gray-400 p-4',
         { [THEME[theme]]: true },
+        { [SIZES[sizes]]: true },
       )}
     >
       <Icon
@@ -36,10 +44,8 @@ export const Search: React.FC<SearchProps> = ({
         placeholder={text}
         type="text"
         className={cx(
-          'absolute top-1 left-9 bg-transparent truncate focus:outline-none leading-4',
-          {
-            [className]: !!className,
-          },
+          'absolute top-1 left-9 bg-transparent truncate focus:outline-none leading-4 placeholder-gray-300 placeholder-opacity-50',
+          { [THEME[theme]]: true },
         )}
         onChange={onChange}
       />
