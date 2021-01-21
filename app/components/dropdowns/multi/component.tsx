@@ -16,6 +16,7 @@ interface Option {
 export interface MultiSelectProps {
   options: Option[];
   theme: 'dark' | 'light';
+  size: 'base' | 's';
   state: 'none' | 'error' | 'valid';
   onChange: (option: Option, selectedItems: Option[]) => void;
   prefix?: string;
@@ -32,6 +33,7 @@ export interface MultiSelectProps {
 export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
   options,
   theme = 'dark',
+  size = 'base',
   state = 'none',
   onChange,
   prefix,
@@ -167,13 +169,23 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
         type="button"
         disabled={disabled}
         className={cx({
-          'relative w-full flex items-center focus:outline-none px-4 py-1.5': true,
+          'relative w-full flex items-center focus:outline-none': true,
+          [THEME.sizes[size]]: true,
         })}
         {...getToggleButtonProps(getDropdownProps({ preventKeyAction: isOpen }))}
       >
-        {prefix && <span className="mr-2 text-base">{prefix}</span>}
+        {prefix && (
+          <span
+            className={cx({
+              'mr-2 text-xs font-heading leading-none tracking-wide': true,
+              [THEME[theme].prefix.base]: true,
+            })}
+          >
+            {prefix}
+          </span>
+        )}
 
-        <span className="text-base">
+        <span className="text-sm">
           {labelFormatter ? customLabelFormatter() : labelDefaultFormatter()}
         </span>
 

@@ -13,6 +13,7 @@ interface Option {
 
 export interface SingleSelectProps {
   theme: 'dark' | 'light';
+  size: 'base' | 's';
   state: 'none' | 'error' | 'valid';
   onChange: (option: Option) => void;
   prefix?: string;
@@ -25,7 +26,8 @@ export interface SingleSelectProps {
 }
 
 export const DropdownSelect: React.FC<SingleSelectProps> = ({
-  theme,
+  theme = 'dark',
+  size = 'base',
   state,
   onChange,
   prefix,
@@ -90,13 +92,23 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
         type="button"
         disabled={disabled}
         className={cx({
-          'relative w-full flex items-center focus:outline-none pl-4 pr-10 py-1.5': true,
+          'relative w-full flex items-center focus:outline-none tracking-wide': true,
+          [THEME.sizes[size]]: true,
         })}
         {...getToggleButtonProps()}
       >
-        {prefix && <span className="mr-2 text-base">{prefix}</span>}
+        {prefix && (
+          <span
+            className={cx({
+              'mr-2 text-xs font-heading': true,
+              [THEME[theme].prefix.base]: true,
+            })}
+          >
+            {prefix}
+          </span>
+        )}
 
-        <span className="text-base">
+        <span className="text-sm leading-none">
           {selectedItem?.label || placeholder}
         </span>
 
