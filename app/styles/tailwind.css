@@ -62,4 +62,8 @@
       backdrop-filter: blur(4px);
     }
   }
+
+  .touch-action-none {
+    touch-action: none;
+  }
 }
