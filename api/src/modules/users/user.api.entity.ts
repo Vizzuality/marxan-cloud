@@ -20,7 +20,7 @@ export class User {
   email: string;
 
   @ApiPropertyOptional()
-  @Column('character varying')
+  @Column('character varying', { name: 'display_name' })
   displayName: string | null;
 
   @ApiPropertyOptional()
@@ -31,7 +31,6 @@ export class User {
   @Column('character varying')
   lname: string | null;
 
-  @ApiProperty()
   @Column('character varying', { name: 'password_hash' })
   passwordHash: string;
 
@@ -44,6 +43,21 @@ export class User {
   @ApiPropertyOptional()
   @Column('jsonb')
   metadata: Dictionary<string>;
+
+  /**
+   * Whether this user is active (email is confirmed).
+   */
+  @ApiProperty()
+  @Column('boolean', { name: 'is_active' })
+  isActive: boolean;
+
+  /**
+   * Whether the user should be considered as deleted. This is used to implement
+   * a grace period before full deletion.
+   */
+  @ApiProperty()
+  @Column('boolean', { name: 'is_deleted' })
+  isDeleted: boolean;
 
   @ApiProperty({ type: () => Project, isArray: true })
   @ManyToMany((_type) => Project, (project) => project.users, { eager: false })
@@ -79,23 +93,4 @@ export class User {
 
   @OneToMany((_type) => IssuedAuthnToken, (token) => token.userId)
   issuedAuthnTokens: IssuedAuthnToken[];
-
-  /**
-   * Whether this user is active (email is confirmed).
-   *
-   * @todo This is just a stub: it should be implemented as an entity property.
-   */
-  get isActive() {
-    return true;
-  }
-
-  /**
-   * Whether the user should be considered as deleted. This is used to implement
-   * a grace period before full deletion.
-   *
-   * @todo This is just a stub: it should be implemented as an entity property.
-   */
-  get isDeleted() {
-    return false;
-  }
 }
