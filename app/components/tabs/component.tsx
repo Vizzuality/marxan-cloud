@@ -17,8 +17,8 @@ export const Tabs: React.FC<TabsProps> = ({
   tabs = [],
   onClick,
 }: TabsProps) => (
-  <div className="flex flex-col px-4 bg-gray-700 rounded-3xl border border-gray-700">
-    <ul className="flex flex-grow justify-between py-3">
+  <div className="flex flex-col px-8 bg-gray-700 rounded-3xl border border-gray-700">
+    <ul className="flex flex-grow justify-between font-heading py-3">
       {tabs.map((tab) => (
         <li key={tab.id}>
           <button
