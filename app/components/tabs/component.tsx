@@ -38,7 +38,10 @@ export const Tabs: React.FC<TabsProps> = ({
       ))}
     </ul>
     {tabs.some((tab) => !!tab.warning) && (
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-50" />
+      <div
+        aria-hidden="true"
+        className="w-full h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-50"
+      />
     )}
     {tabs.map(
       (tab) => tab.warning
