@@ -78,8 +78,8 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
   return (
     <div
       className={cx({
-        'w-full leading-tight overflow-hidden absolute left-0': true,
-        [THEME[theme].container]: true,
+        'w-full leading-tight overflow-hidden': true,
+        [THEME[theme].container]: !isOpen,
         [THEME[theme].closed]: !selectedItem && !isOpen,
         [THEME[theme].open]: isOpen,
         [THEME.states[state]]: true,
@@ -90,14 +90,16 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
         type="button"
         disabled={disabled}
         className={cx({
-          'relative w-full flex items-center focus:outline-blue px-4': true,
+          'relative w-full flex items-center focus:outline-none pl-4 pr-10 py-1.5': true,
         })}
         {...getToggleButtonProps()}
       >
         {prefix && <span className="mr-2 text-base">{prefix}</span>}
+
         <span className="text-base">
           {selectedItem?.label || placeholder}
         </span>
+
         <Icon
           className={cx({
             'absolute w-3 h-3 right-4': true,
@@ -108,14 +110,16 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
           icon={ARROW_DOWN_SVG}
         />
       </button>
-      <ul
-        className={cx({
-          'focus:outline-none': true,
-        })}
-        {...getMenuProps()}
-      >
-        {isOpen
-          && items.map((option, index) => (
+
+      {/* Menu */}
+      {isOpen && (
+        <ul
+          className={cx({
+            'pt-1 pb-3 focus:outline-none': true,
+          })}
+          {...getMenuProps()}
+        >
+          {items.map((option, index) => (
             <li
               className={cx({
                 'px-4 py-1 mt-0.5 cursor-pointer': true,
@@ -128,7 +132,8 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
               {option.label}
             </li>
           ))}
-      </ul>
+        </ul>
+      )}
     </div>
   );
 };
