@@ -20,8 +20,8 @@ module.exports = {
   // logging.
   logging: ['error'],
   cache: false,
-  // migrations: ['src/migrations/**/*.ts'],
-  // migrationsRun: false,
+  migrations: ['src/migrations/**/*.ts'],
+  migrationsRun: true,
   cli: {
     migrationsDir: "src/migrations",
     migrationsTableName: "migrations",
