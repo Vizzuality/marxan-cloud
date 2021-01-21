@@ -44,15 +44,21 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
   batchSelectionActive,
   labelFormatter,
 }: MultiSelectProps) => {
-  const enabledOptions: () => Array<Option> = useCallback(() => {
-    return options.filter((op) => !op.disabled);
-  }, [options]);
+  const enabledOptions = options.filter((op) => !op.disabled);
 
-  const items = batchSelectionActive
-    ? [{ value: 'batch-selection', label: batchSelectionLabel, hideCheckbox: true },
-      { value: null, label: clearSelectionLabel, hideCheckbox: true },
-      ...options]
-    : options;
+  const items = batchSelectionActive ? [
+    {
+      value: 'batch-selection',
+      label: batchSelectionLabel,
+      hideCheckbox: true,
+    },
+    {
+      value: null,
+      label: clearSelectionLabel,
+      hideCheckbox: true,
+    },
+    ...options,
+  ] : options;
 
   const isSelected = (selected: Option, selectedItems: Option[]) => (
     selectedItems.some((i) => i.value === selected.value)
@@ -71,7 +77,7 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
         reset();
         break;
       case 'batch-selection':
-        setSelectedItems(enabledOptions());
+        setSelectedItems(enabledOptions);
         break;
       default:
         if (isSelected(option, selectedItems)) {
@@ -138,7 +144,7 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
   const labelDefaultFormatter:() => string = useCallback(() => {
     if (!selectedItems.length) return placeholder;
     if (selectedItems.length === 1) return selectedItems[0].label;
-    if (selectedItems.length === enabledOptions().length) return 'All items selected';
+    if (selectedItems.length === enabledOptions.length) return 'All items selected';
     return `${selectedItems.length} items selected`;
   }, [selectedItems, placeholder, enabledOptions]);
 
@@ -149,8 +155,8 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
   return (
     <div
       className={cx({
-        'w-full leading-tight overflow-hidden absolute left-0': true,
-        [THEME[theme].container]: true,
+        'w-full leading-tight overflow-hidden': true,
+        [THEME[theme].container]: !isOpen,
         [THEME[theme].closed]: !selectedItem?.value && !isOpen,
         [THEME[theme].open]: isOpen,
         [THEME.states[state]]: true,
@@ -161,14 +167,16 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
         type="button"
         disabled={disabled}
         className={cx({
-          'relative w-full flex items-center focus:outline-blue px-4': true,
+          'relative w-full flex items-center focus:outline-none px-4 py-1.5': true,
         })}
         {...getToggleButtonProps(getDropdownProps({ preventKeyAction: isOpen }))}
       >
         {prefix && <span className="mr-2 text-base">{prefix}</span>}
+
         <span className="text-base">
           {labelFormatter ? customLabelFormatter() : labelDefaultFormatter()}
         </span>
+
         <Icon
           className={cx({
             'absolute w-3 h-3 right-4': true,
@@ -179,14 +187,16 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
           icon={ARROW_DOWN_SVG}
         />
       </button>
-      <ul
-        className={cx({
-          'focus:outline-none': true,
-        })}
-        {...getMenuProps()}
-      >
-        {isOpen && (
-          items.map((option, index) => (
+
+      {/* MENU */}
+      {isOpen && (
+        <ul
+          className={cx({
+            'pt-1 pb-3 focus:outline-none': true,
+          })}
+          {...getMenuProps()}
+        >
+          {items.map((option, index) => (
             <li
               className={cx({
                 'px-4 py-1 mt-0.5 cursor-pointer': true,
@@ -198,22 +208,23 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
               {...getItemProps({ item: option, index })}
             >
               {!option.hideCheckbox && (
-              <Checkbox
-                className="absolute bg-opacity-0 left-4"
-                checked={isSelected(option, selectedItems)}
-                onChange={() => onChange(option, selectedItems)}
-                disabled={option.disabled}
-              />
+                <Checkbox
+                  className="absolute bg-opacity-0 left-4"
+                  checked={isSelected(option, selectedItems)}
+                  onChange={() => onChange(option, selectedItems)}
+                  disabled={option.disabled}
+                />
               )}
+
               <span
                 className="ml-6"
               >
                 {option.label}
               </span>
             </li>
-          ))
-        )}
-      </ul>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

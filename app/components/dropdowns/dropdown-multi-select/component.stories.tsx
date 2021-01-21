@@ -29,7 +29,7 @@ export default {
 };
 
 const Template: Story<MultiSelectProps> = (args) => (
-  <div className="relative h-60 w-72">
+  <div className="relative h-60">
     <DropdownMultiSelect {...args} />
   </div>
 );

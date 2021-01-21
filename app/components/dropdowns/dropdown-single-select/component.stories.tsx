@@ -23,7 +23,7 @@ export default {
 };
 
 const Template: Story<SingleSelectProps> = (args) => (
-  <div className="relative h-40">
+  <div className="relative h-60">
     <Select {...args} />
   </div>
 );
@@ -31,14 +31,15 @@ const Template: Story<SingleSelectProps> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   theme: 'dark',
+  // className: 'w-full',
   disabled: false,
   placeholder: 'Select Scenario',
   clearable: true,
   options: [
-    { label: 'scenario 1', value: 'scenario-1' },
-    { label: 'scenario 2', value: 'scenario-2' },
-    { label: 'scenario 3', value: 'scenario-3', disabled: true },
-    { label: 'scenario 4', value: 'scenario-4' },
+    { label: 'Scenario 1', value: 'scenario-1' },
+    { label: 'Scenario 2', value: 'scenario-2' },
+    { label: 'Scenario 3', value: 'scenario-3', disabled: true },
+    { label: 'Scenario 4', value: 'scenario-4' },
   ],
   onSelect: (option) => console.info(option),
 };

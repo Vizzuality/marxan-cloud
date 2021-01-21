@@ -1,7 +1,7 @@
 export default {
   dark: {
-    container: 'text-white bg-gray-800 border-2 rounded-3xl py-1.5',
-    open: 'border-2 border-primary-400 text-base',
+    container: 'text-white bg-gray-800 border rounded-3xl',
+    open: 'border-2 border-primary-400 bg-gray-800 text-white text-base rounded-2xl',
     closed: 'border-gray-400 text-gray-400',
     icon: {
       closed: 'text-white',
@@ -15,8 +15,8 @@ export default {
     },
   },
   light: {
-    container: 'text-gray-600 bg-white border-2 rounded-3xl py-1.5',
-    open: 'border-2 border-primary-400 text-base',
+    container: 'text-gray-600 bg-white border rounded-3xl',
+    open: 'border-2 border-primary-400 bg-white text-gray-600 text-base rounded-2xl',
     closed: 'border-gray-400 text-gray-400',
     icon: {
       closed: 'text-gray-600',
