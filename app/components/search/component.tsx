@@ -4,8 +4,8 @@ import Icon from 'components/icon';
 import SEARCH_SVG from 'svgs/ui/search.svg';
 
 const THEME = {
-  primary: 'text-white',
-  secondary: 'text-black',
+  dark: 'text-white',
+  light: 'text-black',
 };
 
 const SIZES = {
@@ -14,13 +14,13 @@ const SIZES = {
 };
 
 export interface SearchProps extends InputHTMLAttributes<HTMLInputElement> {
-  theme?: 'primary' | 'secondary';
+  theme?: 'dark' | 'light';
   sizes: 'sm' | 'base';
   text?: string;
 }
 
 export const Search: React.FC<SearchProps> = ({
-  theme = 'primary',
+  theme = 'dark',
   sizes = 'base',
   text,
   className,
@@ -37,7 +37,7 @@ export const Search: React.FC<SearchProps> = ({
     >
       <Icon
         icon={SEARCH_SVG}
-        className="absolute top-1 left-1 w-4 h-4 fill-current"
+        className="absolute top-1 left-1 w-4.5 h-4.5 fill-current"
       />
       <input
         {...props}
