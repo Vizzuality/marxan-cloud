@@ -19,6 +19,7 @@ services:
       - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
     depends_on:
       - postgresql-api
+      - postgresql-geo-api
   # app:
   #   build:
   #     context: ./app
@@ -53,6 +54,7 @@ services:
       - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
     depends_on:
       - postgresql-geo-api
+      - postgresql-api
       - api
   postgresql-api:
     build:
