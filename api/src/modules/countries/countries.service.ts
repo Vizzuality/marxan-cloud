@@ -35,6 +35,10 @@ export class CountriesService extends BaseService<
 
   serializer;
 
+  async serialize(entities: Country[]) {
+    return this.serializer.serialize(entities);
+  }
+
   async fakeFindOne(_id: string): Promise<Country> {
     return this.serializer.serialize({
       ...new Country(),

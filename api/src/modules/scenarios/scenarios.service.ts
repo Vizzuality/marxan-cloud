@@ -24,13 +24,13 @@ export class ScenariosService extends BaseService<
     protected readonly repository: Repository<Scenario>,
     @Inject(UsersService) private readonly usersService: UsersService,
   ) {
-    super(repository, 'project');
-    this.serializer = new JSONAPISerializer.Serializer('projects', {
-      attributes: ['name', 'description', 'users'],
+    super(repository, 'scenario');
+    this.serializer = new JSONAPISerializer.Serializer('scenarios', {
+      attributes: ['name', 'description', 'type', 'users'],
       keyForAttribute: 'camelCase',
       users: {
         ref: 'id',
-        attributes: ['fname', 'lname', 'email', 'projectRoles'],
+        attributes: ['fname', 'lname', 'email'],
         projectRoles: {
           ref: 'name',
           attributes: ['name'],
@@ -50,7 +50,7 @@ export class ScenariosService extends BaseService<
   }
 
   async fakeFindOne(_id: string): Promise<Scenario> {
-    const project = {
+    const scenario = {
       ...new Scenario(),
       id: faker.random.uuid(),
       name: faker.lorem.words(5),
@@ -62,7 +62,7 @@ export class ScenariosService extends BaseService<
         ),
       ),
     };
-    return project;
+    return scenario;
   }
 
   async findAll(): Promise<Scenario[]> {
