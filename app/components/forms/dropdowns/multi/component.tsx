@@ -17,8 +17,8 @@ export interface MultiSelectProps {
   options: Option[];
   theme: 'dark' | 'light';
   size: 'base' | 's';
-  state: 'none' | 'error' | 'valid';
-  onChange: (option: Option, selectedItems: Option[]) => void;
+  state?: 'none' | 'error' | 'valid';
+  onChange?: (option: Option, selectedItems: Option[]) => void;
   prefix?: string;
   disabled?: boolean;
   className?: string;

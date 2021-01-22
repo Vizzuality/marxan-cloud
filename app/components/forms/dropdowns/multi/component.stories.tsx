@@ -3,7 +3,7 @@ import { Story } from '@storybook/react/types-6-0';
 import DropdownMultiSelect, { MultiSelectProps } from './component';
 
 export default {
-  title: 'Components/Dropdowns/Multi select',
+  title: 'Components/Forms/Multi select',
   component: DropdownMultiSelect,
   parameters: { actions: { argTypesRegex: '^on.*' } },
   argTypes: {
