@@ -95,15 +95,14 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
 
       CREATE TABLE "features_metadata" (
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-        "feature_data_id" uuid,
+        "feature_data_id" uuid NOT NULL,
         "feature_class_name" varchar,
         "alias" varchar,
         "description" varchar,
-        "creation_date" timestamp,
         "property_name" varchar,
-        "creation_status" status,
         "intersection" uuid[],
-        "tag" tags,
+        "tag" tags NOT NULL,
+        "creation_status" status NOT NULL,
         "created_at" timestamp NOT NULL default now(),
         "created_by" uuid NOT NULL,
         "modify_at" timestamp NOT NULL default now()
