@@ -66,11 +66,12 @@ RUN jupyter contrib nbextension install --sys-prefix && \
                 jupyter nbextension install --sys-prefix --py vega && \
                 jupyter nbextension enable vega --py --sys-prefix &&  \
                 jupyter nbextension enable --py --sys-prefix ipyleaflet && \
-                jupyter nbextension enable --py --sys-prefix qgrid 
-                # jupyter labextension install @jupyter-widgets/jupyterlab-manager dask-labextension@2.0.2 && \
-                # jupyter labextension install jupyterlab_templates && \
-                # jupyter labextension install qgrid2 && \
-                # jupyter serverextension enable --py jupyterlab_templates
+                jupyter nbextension enable --py --sys-prefix qgrid && \
+                jupyter labextension install @jupyter-widgets/jupyterlab-manager dask-labextension@3.0 && \
+                jupyter labextension install nbdime-jupyterlab && \
+                jupyter labextension install jupyterlab_templates && \
+                jupyter labextension install qgrid2 && \
+                jupyter serverextension enable --py jupyterlab_templates
 
 # Add requirements file
 COPY jupyter_notebook_config.py /etc/jupyter/
