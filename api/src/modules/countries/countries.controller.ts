@@ -47,19 +47,7 @@ export class CountriesController {
   @JSONAPIQueryParams()
   @Get()
   async findAll(): Promise<Country[]> {
-    const serializer = new JSONAPISerializer.Serializer('projects', {
-      attributes: ['name', 'users'],
-      keyForAttribute: 'camelCase',
-      users: {
-        ref: 'id',
-        attributes: ['fname', 'lname', 'email', 'projectRoles'],
-        projectRoles: {
-          ref: 'name',
-          attributes: ['name'],
-        },
-      },
-    });
-    return serializer.serialize(await this.service.findAll());
+    return this.service.serialize(await this.service.findAll());
   }
 
   @ApiOperation({ description: 'Find country by id' })
