@@ -15,7 +15,8 @@ services:
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
-      - POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
     depends_on:
       - postgresql-api
   # app:
@@ -48,7 +49,8 @@ services:
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
-      - POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
+      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
     depends_on:
       - postgresql-geo-api
       - api

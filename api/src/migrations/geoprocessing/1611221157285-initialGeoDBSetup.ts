@@ -110,7 +110,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
 
       CREATE TABLE "features_data" (
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-        "geometry" geometry,
+        "geometry" geometry NOT NULL,
         "properties" jsonb,
         "source" source_type
       );

@@ -1,14 +1,14 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { User } from 'modules/users/user.entity';
+import { User } from 'modules/users/user.api.entity';
 import { UsersService } from 'modules/users/users.service';
 import { AppConfig } from 'utils/config.utils';
 import { hash, compare } from 'bcrypt';
 
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IssuedAuthnToken } from './issued-authn-token.entity';
+import { IssuedAuthnToken } from './issued-authn-token.api.entity';
 import ms = require('ms');
 
 /**
