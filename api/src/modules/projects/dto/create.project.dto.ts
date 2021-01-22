@@ -3,9 +3,6 @@ import { Dictionary } from 'lodash';
 
 export class CreateProjectDTO {
   @ApiProperty()
-  id: string;
-
-  @ApiProperty()
   name: string;
 
   @ApiPropertyOptional()
