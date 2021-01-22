@@ -3,7 +3,7 @@ import { Story } from '@storybook/react/types-6-0';
 import Search, { SearchProps } from './component';
 
 export default {
-  title: 'Components/Forms/Search',
+  title: 'Components/Search',
   component: Search,
 };
 
