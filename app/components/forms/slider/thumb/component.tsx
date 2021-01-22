@@ -1,0 +1,92 @@
+import React from 'react';
+import cx from 'classnames';
+import { SliderState } from '@react-stately/slider';
+import { useSliderThumb } from '@react-aria/slider';
+import { useFocusRing } from '@react-aria/focus';
+import { VisuallyHidden } from '@react-aria/visually-hidden';
+import { mergeProps } from '@react-aria/utils';
+
+const THEME = {
+  primary: {
+    thumb:
+      'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+    states: {
+      default: 'border-white',
+      dragging: 'border-white opacity-80',
+      focused: 'border-white ring-2 ring-primary-500',
+      valid: 'border-green-500',
+      error: 'border-red-500',
+      disabled: 'border-white',
+    },
+  },
+};
+
+export interface ThumbProps {
+  theme: 'primary';
+  state: 'none' | 'valid' | 'error' | 'disabled';
+  sliderState: SliderState;
+  trackRef: React.MutableRefObject<HTMLElement | null>;
+  isDisabled: boolean;
+  id?: string;
+}
+
+export const Thumb: React.FC<ThumbProps> = ({
+  theme,
+  state: rawState,
+  sliderState,
+  trackRef,
+  isDisabled,
+  id = undefined,
+  ...rest
+}: ThumbProps) => {
+  const inputRef = React.useRef(null);
+  const { thumbProps, inputProps } = useSliderThumb(
+    {
+      ...rest,
+      id,
+      index: 0,
+      trackRef,
+      inputRef,
+      isDisabled,
+    },
+    sliderState,
+  );
+
+  const { focusProps, isFocusVisible } = useFocusRing();
+
+  let state: keyof typeof THEME.primary.states;
+  if (isFocusVisible) {
+    state = 'focused';
+  } else if (sliderState.isThumbDragging(0)) {
+    state = 'dragging';
+  } else if (rawState === 'none') {
+    state = 'default';
+  } else {
+    state = rawState;
+  }
+
+  const mergedInputProps = mergeProps(inputProps, focusProps, {
+    // If `Slider` receives an `id` prop, `Thumb` receives it too, otherwise we default to what
+    // `inputProps` provides
+    id: id ?? inputProps.id,
+  });
+
+  return (
+    <div
+      {...thumbProps}
+      className={cx({
+        [THEME[theme].thumb]: true,
+        [THEME[theme].states[state]]: true,
+      })}
+      style={{
+        left: `${sliderState.getThumbPercent(0) * 100}%`,
+      }}
+    >
+      <VisuallyHidden>
+        <input ref={inputRef} {...mergedInputProps} />
+      </VisuallyHidden>
+    </div>
+  );
+};
+
+export default Thumb;
