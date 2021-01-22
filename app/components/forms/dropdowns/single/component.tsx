@@ -14,8 +14,7 @@ interface Option {
 export interface SingleSelectProps {
   theme: 'dark' | 'light';
   size: 'base' | 's';
-  state: 'none' | 'error' | 'valid';
-  onChange: (option: Option) => void;
+  state?: 'none' | 'error' | 'valid';
   prefix?: string;
   options?: Option[];
   disabled?: boolean;
@@ -23,6 +22,7 @@ export interface SingleSelectProps {
   className?: string;
   placeholder?: string;
   clearSelectionLabel?: string;
+  onChange?: (selected: string) => void;
 }
 
 export const DropdownSelect: React.FC<SingleSelectProps> = ({
@@ -37,6 +37,7 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
   className,
   placeholder,
   clearSelectionLabel = 'Clear selection',
+  ...props
 }: SingleSelectProps) => {
   const items = clearable
     ? [{ value: null, label: clearSelectionLabel }, ...options]
@@ -46,9 +47,10 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
     switch (selected.value) {
       case null:
         clearSelection();
+        onChange(null);
         break;
       default:
-        onChange(selected);
+        onChange(selected.value);
         break;
     }
   };
@@ -87,6 +89,7 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
         [THEME.states[state]]: true,
         [className]: !!className,
       })}
+      {...props}
     >
       <button
         type="button"
@@ -124,28 +127,33 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
       </button>
 
       {/* Menu */}
-      {isOpen && (
-        <ul
-          className={cx({
-            'pt-1 pb-3 focus:outline-none': true,
-          })}
-          {...getMenuProps()}
-        >
-          {items.map((option, index) => (
-            <li
-              className={cx({
-                'px-4 py-1 mt-0.5 cursor-pointer': true,
-                [THEME[theme].item.base]: highlightedIndex !== index,
-                [THEME[theme].item.highlighted]: highlightedIndex === index,
-              })}
-              key={`${option.value}`}
-              {...getItemProps({ item: option, index })}
-            >
-              {option.label}
-            </li>
-          ))}
-        </ul>
-      )}
+      <div
+        className="focus:outline-none"
+        {...getMenuProps()}
+      >
+        {isOpen && (
+          <ul
+            className={cx({
+              'pt-1 pb-3': true,
+            })}
+
+          >
+            {items.map((option, index) => (
+              <li
+                className={cx({
+                  'px-4 py-1 mt-0.5 cursor-pointer': true,
+                  [THEME[theme].item.base]: highlightedIndex !== index,
+                  [THEME[theme].item.highlighted]: highlightedIndex === index,
+                })}
+                key={`${option.value}`}
+                {...getItemProps({ item: option, index })}
+              >
+                {option.label}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

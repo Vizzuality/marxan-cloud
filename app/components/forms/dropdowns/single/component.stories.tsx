@@ -3,7 +3,7 @@ import { Story } from '@storybook/react/types-6-0';
 import Select, { SingleSelectProps } from './component';
 
 export default {
-  title: 'Components/Dropdowns/Single select',
+  title: 'Components/Forms/Single select',
   component: Select,
   parameters: { actions: { argTypesRegex: '^on.*' } },
   argTypes: {
@@ -42,5 +42,5 @@ Default.args = {
     { label: 'Scenario 3', value: 'scenario-3', disabled: true },
     { label: 'Scenario 4', value: 'scenario-4' },
   ],
-  onSelect: (option) => console.info(option),
+  onSelect: (selected) => console.info(selected),
 };
