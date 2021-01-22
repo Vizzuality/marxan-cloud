@@ -4,7 +4,12 @@
    },
   "network": {
     "cors": {
-        "origins_extra": "NETWORK_CORS_ORIGINS"
+      "origins_extra": "NETWORK_CORS_ORIGINS"
+    }
+  },
+  "auth": {
+    "jwt": {
+      "secret": "API_AUTH_JWT_SECRET"
     }
   }
 }

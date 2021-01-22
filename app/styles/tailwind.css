@@ -11,7 +11,7 @@
   @font-face {
     font-family: 'Poppins';
     src: url('/fonts/Poppins-Bold.woff2') format('woff2'),
-        url('/fonts/Poppins-Bold.woff') format('woff');
+      url('/fonts/Poppins-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
@@ -20,7 +20,7 @@
   @font-face {
     font-family: 'Poppins';
     src: url('/fonts/Poppins-Medium.woff2') format('woff2'),
-        url('/fonts/Poppins-Medium.woff') format('woff');
+      url('/fonts/Poppins-Medium.woff') format('woff');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -30,7 +30,7 @@
   @font-face {
     font-family: 'Basier Circle';
     src: url('/fonts/basiercircle-regular-webfont.woff2') format('woff2'),
-        url('/fonts/basiercircle-regular-webfont.woff') format('woff');
+      url('/fonts/basiercircle-regular-webfont.woff') format('woff');
     font-weight: 400;
     font-style: normal;
   }
@@ -38,7 +38,7 @@
   @font-face {
     font-family: 'Basier Circle';
     src: url('/fonts/basiercircle-medium-webfont.woff2') format('woff2'),
-        url('/fonts/basiercircle-medium-webfont.woff') format('woff');
+      url('/fonts/basiercircle-medium-webfont.woff') format('woff');
     font-weight: 500;
     font-style: normal;
   }
@@ -46,8 +46,28 @@
   @font-face {
     font-family: 'Basier Circle';
     src: url('/fonts/basiercircle-semibold-webfont.woff2') format('woff2'),
-        url('/fonts/basiercircle-semibold-webfont.woff') format('woff');
+      url('/fonts/basiercircle-semibold-webfont.woff') format('woff');
     font-weight: 600;
     font-style: normal;
+  }
+}
+
+@layer utilities {
+  /* We want a blur effect without having a high opacity background, but we still want the
+  background to be visible for the browsers that don't support backdrop-filter, so we double the
+  background opacity. This can be tested on Firefox. */
+  .bg-blur {
+    @apply bg-opacity-40;
+  }
+
+  @supports (backdrop-filter: blur(4px)) {
+    .bg-blur {
+      @apply bg-opacity-20;
+      backdrop-filter: blur(4px);
+    }
+  }
+
+  .touch-action-none {
+    touch-action: none;
   }
 }

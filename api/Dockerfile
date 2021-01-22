@@ -9,7 +9,7 @@ RUN addgroup -S $USER && adduser -S $USER -G $USER
 WORKDIR /opt/$NAME
 
 COPY package.json ./package.json
-COPY yarn.lock ./yarn.lock
+# COPY yarn.lock ./yarn.lock
 RUN yarn install --frozen-lockfile
 
 COPY entrypoint.sh ./entrypoint.sh

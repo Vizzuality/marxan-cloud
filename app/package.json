@@ -16,13 +16,21 @@
   },
   "dependencies": {
     "@math.gl/web-mercator": "^3.3.2",
+    "@react-aria/focus": "^3.2.3",
+    "@react-aria/i18n": "^3.2.0",
+    "@react-aria/interactions": "^3.3.2",
+    "@react-aria/slider": "^3.0.0",
+    "@react-aria/utils": "^3.5.0",
+    "@react-aria/visually-hidden": "^3.2.1",
+    "@react-stately/slider": "^3.0.0",
     "@storybook/react": "^6.1.11",
     "@tailwindcss/custom-forms": "^0.2.1",
     "axios": "^0.21.0",
     "classnames": "^2.2.6",
     "d3-ease": "^2.0.0",
-    "deck.gl": "7.3.6",
     "date-fns": "^2.16.1",
+    "deck.gl": "7.3.6",
+    "downshift": "^6.0.15",
     "final-form": "^4.20.1",
     "layer-manager": "3.0.9",
     "lodash": "^4.17.20",
@@ -34,6 +42,7 @@
     "react-dom": "17.0.1",
     "react-final-form": "^6.5.2",
     "react-map-gl": "^6.0.1",
+    "react-modal": "^3.12.1",
     "tailwindcss": "^2.0.2",
     "use-debounce": "^5.2.0",
     "validate.js": "^0.13.1"
@@ -76,7 +85,6 @@
   "lint-staged": {
     "*.{js,ts,tsx}": [
       "eslint --fix"
-    ],
-    "*.{js,jsx,ts,tsx,md,html}": "prettier --write"
+    ]
   }
 }
