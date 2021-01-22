@@ -23,9 +23,14 @@ export interface LocalName {
 @Entity('countries')
 export class Country {
   @ApiProperty()
-  @PrimaryColumn('character varying')
+  @PrimaryColumn('character varying', { name: 'iso_3166_1_alpha2' })
   @Transform((_) => fakerStatic.address.countryCode())
-  id: string;
+  alpha2: string;
+
+  @ApiProperty()
+  @PrimaryColumn('character varying', { name: 'iso_3166_1_alpha3' })
+  @Transform((_) => fakerStatic.address.countryCode())
+  alpha3: string;
 
   @ApiProperty()
   @Column('character varying')
@@ -33,7 +38,7 @@ export class Country {
   name: string;
 
   @ApiPropertyOptional()
-  @Column('jsonb')
+  @Column('jsonb', { name: 'local_names' })
   localNames: Dictionary<LocalName>;
 }
 
