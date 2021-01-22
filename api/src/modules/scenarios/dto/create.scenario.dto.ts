@@ -4,16 +4,16 @@ import { ScenarioType } from '../scenario.entity';
 
 export class CreateScenarioDTO {
   @ApiProperty()
-  id: string;
-
-  @ApiProperty()
   name: string;
 
   @ApiPropertyOptional()
   description: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   type: ScenarioType;
+
+  @ApiProperty()
+  projectId: string;
 
   @ApiPropertyOptional()
   metadata: Dictionary<string>;
