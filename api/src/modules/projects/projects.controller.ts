@@ -1,5 +1,5 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { Project } from './project.entity';
+import { Project } from './project.api.entity';
 import { ProjectsService } from './projects.service';
 
 import JSONAPISerializer = require('jsonapi-serializer');

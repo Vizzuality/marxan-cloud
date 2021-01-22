@@ -12,7 +12,7 @@ module.exports = [{
   name: "default",
   synchronize: false,
   type: 'postgres',
-  url: config.get('postgres.url'),
+  url: config.get('postgresApi.url'),
   ssl: false,
   entities: ['src/modules/**/*.api.entity.ts'],
   // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
@@ -32,7 +32,7 @@ module.exports = [{
   name: 'geoprocessingDB',
   synchronize: false,
   type: 'postgres',
-  url: config.get('postgres.url'),
+  url: config.get('postgresGeoApi.url'),
   ssl: false,
   entities: ['src/modules/**/*.geo.entity.ts'],
   // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
