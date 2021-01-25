@@ -33,3 +33,5 @@ clean-slate: stop
 
 seed-api-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
+seed-geodb-data:
+	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
