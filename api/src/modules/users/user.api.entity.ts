@@ -10,7 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Project } from 'modules/projects/project.api.entity';
-import { Scenario } from 'modules/scenarios/scenario.entity';
+import { Scenario } from 'modules/scenarios/scenario.api.entity';
 
 @Entity('users')
 export class User {

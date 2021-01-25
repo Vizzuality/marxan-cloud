@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ScenariosController } from './scenarios.controller';
-import { Scenario } from './scenario.entity';
+import { Scenario } from './scenario.api.entity';
 import { ScenariosService } from './scenarios.service';
 import { UsersModule } from 'modules/users/users.module';
 

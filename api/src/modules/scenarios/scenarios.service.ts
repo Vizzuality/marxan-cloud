@@ -5,7 +5,7 @@ import { BaseService } from 'nestjs-base-service';
 import { Repository } from 'typeorm';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
-import { Scenario } from './scenario.entity';
+import { Scenario } from './scenario.api.entity';
 
 import JSONAPISerializer = require('jsonapi-serializer');
 

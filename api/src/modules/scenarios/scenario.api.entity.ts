@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Dictionary } from 'lodash';
-import { Project } from 'modules/projects/project.entity';
+import { Project } from 'modules/projects/project.api.entity';
 import {
   Column,
   Entity,
@@ -9,7 +9,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../users/user.entity';
+import { User } from 'modules/users/user.api.entity';
 
 /**
  * The kind of Marxan scenario (standard, Marxan with Zones, and possibly other

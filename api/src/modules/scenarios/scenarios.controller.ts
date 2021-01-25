@@ -8,7 +8,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { Scenario, ScenarioResult } from './scenario.entity';
+import { Scenario, ScenarioResult } from './scenario.api.entity';
 import { ScenariosService } from './scenarios.service';
 
 import {

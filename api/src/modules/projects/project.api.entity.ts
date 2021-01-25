@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Dictionary } from 'lodash';
 import { User } from 'modules/users/user.api.entity';
-import { Scenario } from 'modules/scenarios/scenario.entity';
+import { Scenario } from 'modules/scenarios/scenario.api.entity';
 import {
   Column,
   Entity,

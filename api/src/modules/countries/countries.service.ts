@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { BaseService } from 'nestjs-base-service';
 import { Repository } from 'typeorm';
-import { Country } from './country.entity';
+import { Country } from './country.api.entity';
 import { CreateCountryDTO } from './dto/create.country.dto';
 import { UpdateCountryDTO } from './dto/update.country.dto';
 
