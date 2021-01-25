@@ -12,6 +12,10 @@ ADD COLUMN is_deleted boolean default false;
 -- keep existing users active/non-deleted
 UPDATE users set is_active = true, is_deleted = false;
 
+ALTER TABLE projects
+  ADD COLUMN description text,
+  ADD COLUMN metadata jsonb;
+
 CREATE TYPE scenario_types AS ENUM (
   'marxan',
   'marxan-with-zones'
@@ -55,6 +59,10 @@ DROP COLUMN metadata,
 ALTER COLUMN name DROP not null;
 
 DROP TYPE scenario_types;
+
+ALTER TABLE projects
+DROP COLUMN description,
+DROP COLUMN metadata;
 
 ALTER TABLE users
 DROP COLUMN display_name,
