@@ -74,7 +74,7 @@ export class ScenariosController {
   @ApiCreatedResponse({ type: ScenarioResult })
   @Post()
   async create(
-    @Body(new ValidationPipe()) dto: CreateScenarioDTO,
+    @Body(new ValidationPipe()) _dto: CreateScenarioDTO,
   ): Promise<ScenarioResult> {
     return await this.service.serialize([await this.service.fakeFindOne('id')]);
   }
@@ -84,7 +84,7 @@ export class ScenariosController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) dto: UpdateScenarioDTO,
+    @Body(new ValidationPipe()) _dto: UpdateScenarioDTO,
   ): Promise<ScenarioResult> {
     return await this.service.serialize([await this.service.fakeFindOne('id')]);
   }
