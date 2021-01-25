@@ -33,7 +33,7 @@ export class initialDataMetadataEntities1611329857558
       CREATE TABLE "scenarios" (
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
         "name" varchar,
-        "projects_id" uuid NOT NULL REFERENCES "projects" ("id"),
+        "project_id" uuid NOT NULL REFERENCES "projects" ("id"),
         "country_id" varchar(3) NOT NULL,
         "extent" geometry NOT NULL,
         "wdpa_filter" jsonb default NULL,
