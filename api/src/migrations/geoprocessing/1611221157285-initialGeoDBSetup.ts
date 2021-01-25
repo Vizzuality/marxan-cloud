@@ -161,17 +161,16 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
       DROP TABLE IF EXISTS "output_results_data";
       DROP TABLE IF EXISTS "scenarios_pu_cost_data";
       DROP TABLE IF EXISTS "scenarios_pu_data";
-      DROP TABLE IF EXISTS "scenarios_metadata";
       DROP TABLE IF EXISTS "planing_units_geom";
       DROP TABLE IF EXISTS "scenario_features_data";
       DROP TABLE IF EXISTS "features_data";
-      DROP TABLE IF EXISTS "admin_regions";
       DROP TABLE IF EXISTS "wdpa";
-
+      DROP TABLE IF EXISTS "admin_regions";
 
       DROP TYPE IF EXISTS source_type;
       DROP TYPE IF EXISTS shape_type;
       DROP TYPE IF EXISTS status;
+      DROP TYPE IF EXISTS adm_level;
 
       DROP EXTENSION postgis_topology; -- OPTIONAL
       DROP EXTENSION postgis_raster; -- OPTIONAL
