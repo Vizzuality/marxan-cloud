@@ -33,16 +33,21 @@ export class initialDataMetadataEntities1611329857558 implements MigrationInterf
 
       CREATE TABLE "scenarios" (
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-        "full_name" varchar,
-        "project_id" varchar REFERENCES "projects" ("id"),
+        "name" varchar,
+        "project_id" varchar NOT NULL REFERENCES "projects" ("id"),
+        "iso3" varchar(3) NOT NULL,
+        "extent" geometry NOT NULL,
+        "wdpa_filter" jsonb default NULL,
+        "wdpa_threshold" int CHECK (wdpa_threshold BETWEEN 0 AND 100),
+        "admin_region_id" uuid,
+        "runs" int NOT NULL,
+        "blm" float8 NOT NULL,
+        "aditional_fields" jsonb,
+        "status" status NOT NULL,
+        "parent_id" uuid REFERENCES "scenarios" ("id"),
         "created_at" timestamp NOT NULL default now(),
         "created_by" uuid NOT NULL,
-        "modify_at" timestamp NOT NULL default now(),
-        "iso3" varchar(3),
-        "extent" geometry,
-        "admin_region_id" uuid,
-        "status" status,
-        "parent_id" uuid REFERENCES "scenarios" ("id"),
+        "modify_at" timestamp NOT NULL default now()
       );
 
       CREATE TABLE "output_results" (
@@ -60,12 +65,6 @@ export class initialDataMetadataEntities1611329857558 implements MigrationInterf
         "missing_values" float8,
         "aditional_fields" jsonb
       );
-
-      ALTER TABLE "features_metadata" ADD FOREIGN KEY ("feature_data_id") REFERENCES "features_data" ("id");
-      ALTER TABLE "scenarios_metadata" ADD FOREIGN KEY ("admin_region_id") REFERENCES "admin_regions_0" ("id");
-      ALTER TABLE "output_results_metadata" ADD FOREIGN KEY ("scenario_id") REFERENCES "scenarios_metadata" ("id");
-      ALTER TABLE "scenarios_metadata" ADD FOREIGN KEY ("country_code") REFERENCES "admin_regions_0" ("iso3");
-      ALTER TABLE "scenarios_metadata" ADD FOREIGN KEY ("parent_id") REFERENCES "scenarios_metadata" ("id");
 
 
       COMMENT ON TABLE "features" IS 'Feature management';

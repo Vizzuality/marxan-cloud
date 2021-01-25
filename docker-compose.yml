@@ -8,6 +8,7 @@ services:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-api
     command: develop
+    user: "$UID:$GID"
     volumes:
       - ./api/src:/opt/marxan-api/src
       - ./api/test:/opt/marxan-api/test
