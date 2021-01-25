@@ -13,8 +13,6 @@ const Template: Story<SearchProps> = ({ ...args }: SearchProps) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  text: 'Search by feature, planning area name...',
-  onChange: (e) => {
-    console.info('onChange', e.target.value);
-  },
+  label: 'Search',
+  placeholder: 'Search by feature, planning area name...',
 };
