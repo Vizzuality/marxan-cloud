@@ -1,8 +1,6 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { Country, CountryResult } from './country.api.entity';
 import { CountriesService } from './countries.service';
-
-import JSONAPISerializer = require('jsonapi-serializer');
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
