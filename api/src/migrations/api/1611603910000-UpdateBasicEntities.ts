@@ -17,14 +17,12 @@ CREATE TYPE scenario_types AS ENUM (
   'marxan-with-zones'
 );
 
-CREATE TABLE scenarios (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name varchar not null,
-  description text,
-  type scenario_types not null default 'marxan',
-  project_id uuid references projects(id) not null,
-  metadata jsonb
-);
+ALTER TABLE scenarios
+  ALTER COLUMN name set not null,
+  ADD COLUMN description text,
+  ADD COLUMN type scenario_types not null default 'marxan',
+  ADD COLUMN metadata jsonb
+;
 
 CREATE TABLE users_scenarios (
   user_id uuid not null references users(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -50,7 +48,11 @@ DROP TABLE countries;
 
 DROP TABLE users_scenarios;
 
-DROP TABLE scenarios;
+ALTER TABLE scenarios
+DROP COLUMN description,
+DROP COLUMN type,
+DROP COLUMN metadata,
+ALTER COLUMN name DROP not null;
 
 DROP TYPE scenario_types;
 
