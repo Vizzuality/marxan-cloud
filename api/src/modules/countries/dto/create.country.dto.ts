@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Dictionary } from 'lodash';
-import { LocalName } from '../country.entity';
+import { LocalName } from '../country.api.entity';
 
 export class CreateCountryDTO {
   /**

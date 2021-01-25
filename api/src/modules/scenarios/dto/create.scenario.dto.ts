@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Dictionary } from 'lodash';
-import { ScenarioType } from '../scenario.entity';
+import { ScenarioType } from '../scenario.api.entity';
 
 export class CreateScenarioDTO {
   @ApiProperty()
