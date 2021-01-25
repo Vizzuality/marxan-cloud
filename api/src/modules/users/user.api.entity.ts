@@ -10,6 +10,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Project } from 'modules/projects/project.api.entity';
+import { Scenario } from 'modules/scenarios/scenario.entity';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
