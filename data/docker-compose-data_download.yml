@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  marxan-science-notebooks:
+      build:
+        context: ./data_download
+        dockerfile: Dockerfile
+      volumes:
+        - './data/:/data/'
+        command: make
+        environment:
+          - POSTGRES_PASSWORD=mgis-api
+networks:
+    default:
+      external:
+        name: marxan-cloud-network
