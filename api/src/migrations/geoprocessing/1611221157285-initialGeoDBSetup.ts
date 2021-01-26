@@ -180,7 +180,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
 
       DROP TYPE IF EXISTS source_type;
       DROP TYPE IF EXISTS shape_type;
-      DROP TYPE IF EXISTS ingestion_status;
+      DROP TYPE IF EXISTS job_status;
       DROP TYPE IF EXISTS adm_level;
 
       DROP EXTENSION postgis_topology; -- OPTIONAL

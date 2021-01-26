@@ -4,7 +4,7 @@ export class initialDataMetadataEntities1611329857558
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-      CREATE TYPE "ingestion_status" AS ENUM (
+      CREATE TYPE "job_status" AS ENUM (
         'created',
         'running',
         'done',
@@ -23,8 +23,8 @@ export class initialDataMetadataEntities1611329857558
         "description" varchar,
         "property_name" varchar,
         "intersection" uuid[],
-        "tag" tags NOT NULL,
-        "creation_status" status NOT NULL,
+        "tag" features_tags NOT NULL,
+        "creation_status" job_status NOT NULL,
         "created_at" timestamp NOT NULL default now(),
         "created_by" uuid NOT NULL REFERENCES "users" ("id"),
         "last_modified_at" timestamp NOT NULL default now()
@@ -33,7 +33,7 @@ export class initialDataMetadataEntities1611329857558
       CREATE TABLE "scenarios" (
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
         "name" varchar,
-        "project_id" varchar NOT NULL REFERENCES "projects" ("id"),
+        "projects_id" uuid NOT NULL REFERENCES "projects" ("id"),
         "country_id" varchar(3) NOT NULL,
         "extent" geometry NOT NULL,
         "wdpa_filter" jsonb default NULL,
@@ -42,7 +42,7 @@ export class initialDataMetadataEntities1611329857558
         "number_of_runs" int NOT NULL,
         "blm" float8 NOT NULL,
         "metadata" jsonb,
-        "status" status NOT NULL,
+        "status" job_status NOT NULL,
         "parent_id" uuid REFERENCES "scenarios" ("id"),
         "created_at" timestamp NOT NULL default now(),
         "created_by" uuid NOT NULL REFERENCES "users" ("id"),
@@ -51,7 +51,7 @@ export class initialDataMetadataEntities1611329857558
 
       CREATE TABLE "output_results" (
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-        "scenario_id" uuid REFERENCES "scenarios" ("id"),
+        "scenarios_id" uuid REFERENCES "scenarios" ("id"),
         "run_id" int,
         "score" float8,
         "cost" float8,
@@ -74,7 +74,7 @@ export class initialDataMetadataEntities1611329857558
       DROP TABLE IF EXISTS "scenarios";
 
       DROP TYPE IF EXISTS features_tags;
-      DROP TYPE IF EXISTS ingestion_status;
+      DROP TYPE IF EXISTS job_status;
       `);
   }
 }
