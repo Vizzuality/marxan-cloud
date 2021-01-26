@@ -39,7 +39,7 @@ export class initialDataMetadataEntities1611329857558 implements MigrationInterf
         "wdpa_filter" jsonb default NULL,
         "wdpa_threshold" int CHECK (wdpa_threshold BETWEEN 0 AND 100),
         "admin_region_id" uuid,
-        "runs" int NOT NULL,
+        "number_of_runs" int NOT NULL,
         "blm" float8 NOT NULL,
         "metadata" jsonb,
         "status" status NOT NULL,
@@ -52,7 +52,7 @@ export class initialDataMetadataEntities1611329857558 implements MigrationInterf
       CREATE TABLE "output_results" (
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
         "scenario_id" uuid REFERENCES "scenarios" ("id"),
-        "run_number" int,
+        "run_id" int,
         "score" float8,
         "cost" float8,
         "planning_units" float8,
