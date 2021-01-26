@@ -5,6 +5,13 @@ endif
 
 .PHONY: start
 
+# Start only API and Geoprocessing services
+#
+# Useful when developing on API components only, to avoid spinning services
+# which may not be needed.
+start-api:
+	docker-compose up --build api geoprocessing postgresql-api postgresql-geo-api redis-api
+
 start:
 	docker-compose up --build
 
