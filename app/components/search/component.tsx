@@ -1,9 +1,14 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import cx from 'classnames';
 
+// react aria
 import { useSearchField } from '@react-aria/searchfield';
 import { useSearchFieldState } from '@react-stately/searchfield';
 import { useButton } from '@react-aria/button';
+import { setInteractionModality } from '@react-aria/interactions';
+
+// react types
+import { AriaSearchFieldProps } from '@react-types/searchfield';
 
 import Icon from 'components/icon';
 import SEARCH_SVG from 'svgs/ui/search.svg';
@@ -19,23 +24,41 @@ const SIZES = {
   base: 'text-base',
 };
 
-export interface SearchProps {
+export interface SearchProps extends AriaSearchFieldProps {
   theme?: 'dark' | 'light';
   size: 'sm' | 'base';
-  placeholder?: string;
-  className?: string;
+  labelRef: React.MutableRefObject<HTMLLabelElement | null>;
 }
 
-export const Search: React.FC<SearchProps> = (props, {
+export const Search: React.FC<SearchProps> = ({
   theme = 'dark',
   size = 'base',
-  placeholder,
+  labelRef,
+  ...rest
 }: SearchProps) => {
-  const state = useSearchFieldState(props);
+  const { placeholder } = rest;
+  const state = useSearchFieldState(rest);
+
   const ref = useRef();
-  const buttonRef = useRef();
-  const { inputProps, clearButtonProps } = useSearchField(props, state, ref);
-  const { buttonProps } = useButton(clearButtonProps, buttonRef);
+  const { inputProps, clearButtonProps } = useSearchField(rest, state, ref);
+  const { buttonProps } = useButton(clearButtonProps, null);
+  console.log(inputProps, clearButtonProps);
+
+  useEffect(() => {
+    const label = labelRef.current;
+    // https://github.com/adobe/react-spectrum/blob/main/packages/%40react-aria/slider/src/useSlider.ts#L178-L181
+    const handler = () => setInteractionModality('keyboard');
+
+    if (label) {
+      label.addEventListener('click', handler);
+    }
+
+    return () => {
+      if (label) {
+        label.removeEventListener('click', handler);
+      }
+    };
+  }, [labelRef]);
 
   return (
     <div
@@ -61,10 +84,10 @@ export const Search: React.FC<SearchProps> = (props, {
         )}
       />
       {state.value !== '' && (
-        <button type="button" ref={buttonRef} {...buttonProps}>
+        <button type="button" {...buttonProps}>
           <Icon
             icon={CLOSE_SVG}
-            className="relative inline-block w-2 h-2"
+            className="absolute inline-block w-2 h-2 right-1 top-1\/2"
           />
         </button>
       )}
