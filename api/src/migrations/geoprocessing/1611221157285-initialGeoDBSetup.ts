@@ -25,7 +25,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         'irregular'
       );
 
-      CREATE TYPE "status" AS ENUM (
+      CREATE TYPE "ingestion_status" AS ENUM (
         'created',
         'running',
         'done',
@@ -53,7 +53,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         "level" adm_level NOT NULL,
         "created_at" timestamp NOT NULL default now(),
         "created_by" uuid NOT NULL,
-        "modify_at" timestamp NOT NULL default now()
+        "last_modified_at" timestamp NOT NULL default now()
       ) PARTITION BY LIST(level);
 
       CREATE TABLE admin_regions_0 PARTITION OF admin_regions FOR VALUES IN (0);
@@ -74,7 +74,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         "desig" text,
         "created_at" timestamp NOT NULL default now(),
         "created_by" uuid NOT NULL,
-        "modify_at" timestamp NOT NULL default now()
+        "last_modified_at" timestamp NOT NULL default now()
       );
 
       -- Features data table (will hold species and bioma data).
@@ -82,8 +82,9 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
         "the_geom" geometry CONSTRAINT features_geometry_valid_check CHECK (ST_IsValid(the_geom)),
         "properties" jsonb,
-        "source" source_type
-      );
+        "source" source_type,
+        "features_id" uuid
+      ) PARTITION BY LIST (source);
 
       -- Usage of features data within scenarios table (will hold species and bioma data).
       CREATE TABLE "scenario_features_data" (
@@ -100,11 +101,11 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         "sepnum" float8,
         "created_at" timestamp NOT NULL default now(),
         "created_by" uuid NOT NULL,
-        "modify_at" timestamp NOT NULL default now()
+        "last_modified_at" timestamp NOT NULL default now()
       );
 
       -- Planning units geometry data table.
-      CREATE TABLE "planing_units_geom" (
+      CREATE TABLE "planning_units_geom" (
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
         "the_geom" geometry UNIQUE NOT NULL CONSTRAINT features_geometry_valid_check CHECK (ST_IsValid(the_geom)),
         "type" shape_type,
@@ -118,7 +119,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
       -- Planning units usage by scenario.
       CREATE TABLE "scenarios_pu_data" (
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-        "pu_geomid" uuid NOT NULL REFERENCES "planing_units_geom" ("id"),
+        "pu_geomid" uuid NOT NULL REFERENCES "planning_units_geom" ("id"),
         "scenario_id" uuid NOT NULL,
         "puid" int NOT NULL,
         "lockin_status" int,
@@ -143,25 +144,15 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         "missing_values" jsonb
       );
 
-
-      COMMENT ON TABLE "admin_regions" IS 'will cover adm0,adm1 and adm2';
-      COMMENT ON TABLE "features_data" IS 'For geometry storage';
-      COMMENT ON COLUMN "features_data"."properties" IS 'Either have the properties as a jsonb or as columns on this tables';
-      COMMENT ON COLUMN "planing_units_geom"."size" IS 'represent km';
-      COMMENT ON TABLE "scenarios_pu_data" IS 'marxan view from an output_results';
-      COMMENT ON TABLE "scenarios_pu_cost_data" IS 'marxan view from an output_results';
-      COMMENT ON TABLE "output_results_data" IS 'output_results from marxan runs under an scenario';
-
       `);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
       await queryRunner.query(`
-      DROP TABLE IF EXISTS "output_results_metadata";
       DROP TABLE IF EXISTS "output_results_data";
       DROP TABLE IF EXISTS "scenarios_pu_cost_data";
       DROP TABLE IF EXISTS "scenarios_pu_data";
-      DROP TABLE IF EXISTS "planing_units_geom";
+      DROP TABLE IF EXISTS "planning_units_geom";
       DROP TABLE IF EXISTS "scenario_features_data";
       DROP TABLE IF EXISTS "features_data";
       DROP TABLE IF EXISTS "wdpa";
@@ -169,7 +160,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
 
       DROP TYPE IF EXISTS source_type;
       DROP TYPE IF EXISTS shape_type;
-      DROP TYPE IF EXISTS status;
+      DROP TYPE IF EXISTS ingestion_status;
       DROP TYPE IF EXISTS adm_level;
 
       DROP EXTENSION postgis_topology; -- OPTIONAL
