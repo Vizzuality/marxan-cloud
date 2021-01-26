@@ -12,6 +12,7 @@ endif
 start-api:
 	docker-compose up --build api geoprocessing postgresql-api postgresql-geo-api redis-api
 
+# Start all the services.
 start:
 	docker-compose up --build
 
