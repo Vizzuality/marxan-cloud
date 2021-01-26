@@ -8,8 +8,29 @@ const config = require('config');
  *
  * ['staging', 'production'].includes(config.util.getEnv('NODE_ENV')) ? true : false
  */
-module.exports = [{
-  name: "default",
+module.exports = [
+{ name: 'geoprocessingDB',
+  connectionName: 'geoprocessingDB',
+  synchronize: false,
+  type: 'postgres',
+  url: config.get('postgresGeoApi.url'),
+  ssl: false,
+  entities: ['src/modules/**/*.geo.entity.ts'],
+  // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
+  // 'query' if needing to see the actual generated SQL statements (this should
+  // be limited to `NODE_ENV=development`). Use 'error' for least verbose
+  // logging.
+  logging: ['error'],
+  cache: false,
+  // migrations: ['src/migrations/geoprocessing/**/*.ts'],
+  // migrationsRun: true,
+  // cli: {
+  //   migrationsDir: "src/migrations/geoprocessing",
+  //   migrationsTableName: "migrations",
+  // }
+},
+{name: 'default',
+  connectionName: "default",
   synchronize: false,
   type: 'postgres',
   url: config.get('postgresApi.url'),
@@ -25,26 +46,6 @@ module.exports = [{
   migrationsRun: true,
   cli: {
     migrationsDir: "src/migrations/api",
-    migrationsTableName: "migrations",
-  }
-},
-{
-  name: 'geoprocessingDB',
-  synchronize: false,
-  type: 'postgres',
-  url: config.get('postgresGeoApi.url'),
-  ssl: false,
-  entities: ['src/modules/**/*.geo.entity.ts'],
-  // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
-  // 'query' if needing to see the actual generated SQL statements (this should
-  // be limited to `NODE_ENV=development`). Use 'error' for least verbose
-  // logging.
-  logging: ['error'],
-  cache: false,
-  migrations: ['src/migrations/geoprocessing/**/*.ts'],
-  migrationsRun: true,
-  cli: {
-    migrationsDir: "src/migrations/geoprocessing",
     migrationsTableName: "migrations",
   }
 }];
