@@ -1,6 +1,6 @@
 import { Controller, Get, Request } from '@nestjs/common';
 import { AuthenticationService } from 'modules/authentication/authentication.service';
-import { User } from 'modules/users/user.entity';
+import { User } from 'modules/users/user.api.entity';
 import { AppService } from './app.service';
 
 // Request object augmented with user data

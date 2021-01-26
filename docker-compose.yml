@@ -8,6 +8,7 @@ services:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-api
     command: develop
+    user: "$UID:$GID"
     volumes:
       - ./api/src:/opt/marxan-api/src
       - ./api/test:/opt/marxan-api/test
@@ -15,9 +16,11 @@ services:
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
-      - POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
     depends_on:
       - postgresql-api
+      - postgresql-geo-api
   # app:
   #   build:
   #     context: ./app
@@ -48,8 +51,10 @@ services:
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
-      - POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
     depends_on:
+      - postgresql-geo-api
       - postgresql-api
       - api
   postgresql-api:
@@ -64,7 +69,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=${API_POSTGRES_PASSWORD}
       - POSTGRES_USER=${API_POSTGRES_USER}
-    restart: always
+    restart: on-failure
   postgresql-geo-api:
     build:
       context: ./postgresql
@@ -78,60 +83,68 @@ services:
       - POSTGRES_PASSWORD=${GEO_POSTGRES_PASSWORD}
       - POSTGRES_USER=${GEO_POSTGRES_USER}
     restart: always
-  redis-api:
-    build:
-      context: ./redis
-      dockerfile: Dockerfile
-    container_name: marxan-redis-api
-    ports:
-      - "${REDIS_API_SERVICE_PORT}:6379"
-    volumes:
-      - marxan-cloud-redis-api-data:/data
-    environment:
-      - REDIS_REPLICATION_MODE=master
-    restart: always
-  postgresql-airflow:
-    build:
-      context: ./postgresql
-      dockerfile: Dockerfile
-    container_name: marxan-postgresql-airflow
-    ports:
-      - "${POSTGRES_AIRFLOW_SERVICE_PORT}:5432"
-    environment:
-        - POSTGRES_USER=airflow
-        - POSTGRES_PASSWORD=airflow
-        - POSTGRES_DB=airflow
-  airflow-scheduler:
-    container_name: marxan-airflow-scheduler
-    image: apache/airflow
-    command: scheduler
-    depends_on:
-        - postgresql-airflow
-    env_file:
-        - .env
-    volumes:
-        - ./airflow/dags:/opt/airflow/dags
-  airflow-webserver:
-    container_name: marxan-airflow-webserver
-    image: apache/airflow
-    entrypoint: ['sh','./scripts/entrypoint.sh']
-    depends_on:
-        - postgresql-api
-        - airflow-scheduler
-    env_file:
-        - .env
-    volumes:
-        - ./airflow/dags:/opt/airflow/dags
-        - ./airflow/scripts:/opt/airflow/scripts
-    ports:
-        - "${AIRFLOW_PORT}:8080"
+  # redis-api:
+  #   build:
+  #     context: ./redis
+  #     dockerfile: Dockerfile
+  #   container_name: marxan-redis-api
+  #   ports:
+  #     - "${REDIS_API_SERVICE_PORT}:6379"
+  #   volumes:
+  #     - marxan-cloud-redis-api-data:/data
+  #   environment:
+  #     - REDIS_REPLICATION_MODE=master
+  #   restart: on-failure
+  # postgresql-airflow:
+  #   image: postgres
+  #   container_name: marxan-postgresql-airflow
+  #   environment:
+  #     - POSTGRES_USER=airflow
+  #     - POSTGRES_PASSWORD=airflow
+  #     - POSTGRES_DB=airflow
+  # airflow-scheduler:
+  #   container_name: marxan-airflow-scheduler
+  #   image: apache/airflow:2.0.0
+  #   command: scheduler
+  #   depends_on:
+  #       - postgresql-airflow
+  #   restart: on-failure
+  #   environment:
+  #     - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgresql-airflow/airflow
+  #     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  #   volumes:
+  #       - ./airflow/dags:/opt/airflow/dags
+  #       - marxan-airflow-logs:/opt/airflow/logs
+  # airflow-webserver:
+  #   container_name: marxan-airflow-webserver
+  #   image: apache/airflow:2.0.0
+  #   restart: on-failure
+  #   entrypoint: ['sh','./scripts/entrypoint.sh']
+  #   env_file:
+  #       - .env
+  #   environment:
+  #     - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgresql-airflow/airflow
+  #     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  #   volumes:
+  #       - ./airflow/dags:/opt/airflow/dags
+  #       - ./airflow/scripts:/opt/airflow/scripts
+  #       - marxan-airflow-logs:/opt/airflow/logs
+  #   ports:
+  #       - "${AIRFLOW_PORT}:8080"
+  #   depends_on:
+  #     - postgresql-airflow
+  #     - airflow-scheduler
+
 networks:
   default:
     external:
       name: marxan-cloud-network
+
 volumes:
   marxan-cloud-postgresql-api-data:
 
   marxan-cloud-postgresql-geo-data:
 
   marxan-cloud-redis-api-data:
+
+  marxan-airflow-logs:

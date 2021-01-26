@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MaxLength } from 'class-validator';
-import { IssuedAuthnToken } from 'modules/authentication/issued-authn-token.entity';
+import { IssuedAuthnToken } from 'modules/authentication/issued-authn-token.api.entity';
 import {
   Column,
   Entity,
@@ -9,7 +9,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Project } from '../projects/project.entity';
+import { Project } from '../projects/project.api.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')

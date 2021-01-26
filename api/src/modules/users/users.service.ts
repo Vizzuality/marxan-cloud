@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from './user.api.entity';
 
 import { get } from 'lodash';
 
