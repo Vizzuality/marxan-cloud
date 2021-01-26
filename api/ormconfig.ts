@@ -1,3 +1,5 @@
+import { AppConfig } from "utils/config.utils";
+
 const config = require('config');
 
 /**
@@ -23,11 +25,18 @@ module.exports = [
   logging: ['error'],
   cache: false,
   // migrations: ['src/migrations/geoprocessing/**/*.ts'],
-  // migrationsRun: true,
+  /** Migrations will run automatically on startup, unless the
+   * `API_RUN_MIGRATIONS_ON_STARTUP` or `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP`
+   * environment variables are set and their value matches, case-insensitively,
+   * the string `false`.
+   *
+   * @debt I think this should be way more resilient to user input.
+   */
+  // migrationsRun: AppConfig.get<string>('postgresGeoApi.runMigrationsOnStartup')?.toLowerCase() !== 'false' ? true : false,
   // cli: {
-  //   migrationsDir: "src/migrations/geoprocessing",
+  //   migrationsDir: "src/migrations/groprocessing",
   //   migrationsTableName: "migrations",
-  // }
+  // } 
 },
 {name: 'default',
   connectionName: "default",
@@ -43,7 +52,8 @@ module.exports = [
   logging: ['error'],
   cache: false,
   migrations: ['src/migrations/api/**/*.ts'],
-  migrationsRun: true,
+  // See notes above in the other connection
+  migrationsRun: AppConfig.get<string>('postgresApi.runMigrationsOnStartup')?.toLowerCase() !== 'false' ? true : false,
   cli: {
     migrationsDir: "src/migrations/api",
     migrationsTableName: "migrations",

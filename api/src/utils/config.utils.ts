@@ -12,7 +12,7 @@ export class AppConfig {
    */
   static get<T>(property: string, defaultValue?: T): T | undefined {
     try {
-      return config.get(property);
+      return config.has(property) ? config.get(property) : defaultValue;
     } catch (e) {
       return defaultValue;
     }
