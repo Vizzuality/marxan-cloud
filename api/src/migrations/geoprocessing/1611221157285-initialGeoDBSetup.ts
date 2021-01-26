@@ -4,12 +4,12 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
       await queryRunner.query(`
-      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-      CREATE EXTENSION IF NOT EXISTS tablefunc;
-      CREATE EXTENSION IF NOT EXISTS plpgsql;
-      CREATE EXTENSION IF NOT EXISTS postgis;
-      CREATE EXTENSION IF NOT EXISTS postgis_raster; -- OPTIONAL
-      CREATE EXTENSION IF NOT EXISTS postgis_topology; -- OPTIONAL
+      CREATE EXTENSION "uuid-ossp";
+      CREATE EXTENSION tablefunc;
+      CREATE EXTENSION plpgsql;
+      CREATE EXTENSION postgis;
+      CREATE EXTENSION postgis_raster; -- OPTIONAL
+      CREATE EXTENSION postgis_topology; -- OPTIONAL
 
       CREATE TYPE "source_type" AS ENUM (
         'user_imported',
@@ -144,11 +144,32 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         "missing_values" jsonb
       );
 
+      CREATE INDEX admin_regions_geom_idx
+      ON admin_regions
+      USING GIST (the_geom);
+
+      CREATE INDEX wdpa_geom_idx
+      ON admin_regions
+      USING GIST (the_geom);
+
+      CREATE INDEX features_data_geom_idx
+      ON features_data
+      USING GIST (the_geom);
+
+      CREATE INDEX planning_units_geom_geom_idx
+      ON planning_units_geom
+      USING GIST (the_geom);
+
       `);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
       await queryRunner.query(`
+      DROP INDEX admin_regions_geom_idx;
+      DROP INDEX wdpa_geom_idx;
+      DROP INDEX features_data_geom_idx;
+      DROP INDEX planning_units_geom_geom_idx;
+
       DROP TABLE IF EXISTS "output_results_data";
       DROP TABLE IF EXISTS "scenarios_pu_cost_data";
       DROP TABLE IF EXISTS "scenarios_pu_data";
