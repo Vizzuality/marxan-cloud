@@ -31,7 +31,7 @@ clean-slate: stop
 	docker-compose rm -f postgresql-api
 	docker-compose rm -f postgresql-geo-api
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data
-	docker volume rm -f marxan-cloud-postgresql-geo-data
+	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data
 
 seed-api-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql

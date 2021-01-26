@@ -20,7 +20,13 @@ module.exports = [{
   // be limited to `NODE_ENV=development`). Use 'error' for least verbose
   // logging.
   logging: ['error'],
-  cache: false
+  cache: false,
+  migrations: ['src/migrations/geoprocessing/**/*.ts'],
+  migrationsRun: true,
+  cli: {
+    migrationsDir: "src/migrations/geoprocessing",
+    migrationsTableName: "migrations",
+  }
 },
 {
   name: "apiDB",
