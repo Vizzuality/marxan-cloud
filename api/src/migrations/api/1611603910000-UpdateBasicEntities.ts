@@ -24,9 +24,7 @@ CREATE TYPE scenario_types AS ENUM (
 ALTER TABLE scenarios
   ALTER COLUMN name set not null,
   ADD COLUMN description text,
-  ADD COLUMN type scenario_types not null default 'marxan',
-  ADD COLUMN metadata jsonb
-;
+  ADD COLUMN type scenario_types not null default 'marxan';
 
 CREATE TABLE users_scenarios (
   user_id uuid not null references users(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -55,7 +53,6 @@ DROP TABLE users_scenarios;
 ALTER TABLE scenarios
 DROP COLUMN description,
 DROP COLUMN type,
-DROP COLUMN metadata,
 ALTER COLUMN name DROP not null;
 
 DROP TYPE scenario_types;
