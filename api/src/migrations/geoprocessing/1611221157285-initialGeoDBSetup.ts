@@ -24,7 +24,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         'irregular'
       );
 
-      CREATE TYPE "ingestion_status" AS ENUM (
+      CREATE TYPE "job_status" AS ENUM (
         'created',
         'running',
         'done',
@@ -120,7 +120,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
         "pu_geom_id" uuid NOT NULL REFERENCES "planning_units_geom" ("id"),
         "scenario_id" uuid NOT NULL,
-        "pu_id" int NOT NULL,
+        "puid" int NOT NULL,
         "lockin_status" int,
         "xloc" float8,
         "yloc" float8,
@@ -136,7 +136,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
 
       CREATE TABLE "output_results_data" (
         "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-        "puid" int REFERENCES "scenarios_pu_data" ("pu_id"),
+        "puid" int REFERENCES "scenarios_pu_data" ("puid"),
         "scenario_id" uuid,
         "run_id" uuid,
         "value" float8,

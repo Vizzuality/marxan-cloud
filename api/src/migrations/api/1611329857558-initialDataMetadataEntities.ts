@@ -70,13 +70,11 @@ export class initialDataMetadataEntities1611329857558
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       DROP TABLE IF EXISTS "features";
-      DROP TABLE IF EXISTS "scenarios";
       DROP TABLE IF EXISTS "output_results";
-
+      DROP TABLE IF EXISTS "scenarios";
 
       DROP TYPE IF EXISTS features_tags;
       DROP TYPE IF EXISTS ingestion_status;
-
       `);
   }
 }
