@@ -21,8 +21,11 @@ notebooks:
 stop:
 	docker-compose stop
 
-psql:
+psql-api:
 	docker-compose exec postgresql-api psql -U "${API_POSTGRES_USER}"
+
+psql-geo:
+	docker-compose exec postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"
 
 # Stop all containers and remove the postgresql-api container and the named
 # Docker volume used to persists PostgreSQL data
