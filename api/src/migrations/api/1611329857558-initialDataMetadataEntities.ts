@@ -1,9 +1,9 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class initialDataMetadataEntities1611329857558 implements MigrationInterface {
-
-    public async up(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(`
+export class initialDataMetadataEntities1611329857558
+  implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
       CREATE TYPE "ingestion_status" AS ENUM (
         'created',
         'running',
@@ -64,11 +64,11 @@ export class initialDataMetadataEntities1611329857558 implements MigrationInterf
         "missing_values" float8,
         "metadata" jsonb
       );
-      `)
-    }
+      `);
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
       DROP TABLE IF EXISTS "features";
       DROP TABLE IF EXISTS "scenarios";
       DROP TABLE IF EXISTS "output_results";
@@ -77,7 +77,6 @@ export class initialDataMetadataEntities1611329857558 implements MigrationInterf
       DROP TYPE IF EXISTS features_tags;
       DROP TYPE IF EXISTS ingestion_status;
 
-      `)
-    }
-
+      `);
+  }
 }

@@ -1,9 +1,8 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class initialGeoDBSetup1611221157285 implements MigrationInterface {
-
-    public async up(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
       CREATE EXTENSION "uuid-ossp";
       CREATE EXTENSION tablefunc;
       CREATE EXTENSION plpgsql;
@@ -161,10 +160,10 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
       USING GIST (the_geom);
 
       `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
       DROP INDEX admin_regions_geom_idx;
       DROP INDEX wdpa_geom_idx;
       DROP INDEX features_data_geom_idx;
@@ -191,6 +190,5 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
       DROP EXTENSION tablefunc;
       DROP EXTENSION uuid-ossp;
       `);
-    }
-
+  }
 }
