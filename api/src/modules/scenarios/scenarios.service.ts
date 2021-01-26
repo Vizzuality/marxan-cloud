@@ -3,9 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { BaseService } from 'nestjs-base-service';
 import { Repository } from 'typeorm';
-import { Project } from './project.api.entity';
-import { CreateProjectDTO } from './dto/create.project.dto';
-import { UpdateProjectDTO } from './dto/update.project.dto';
+import { CreateScenarioDTO } from './dto/create.scenario.dto';
+import { UpdateScenarioDTO } from './dto/update.scenario.dto';
+import { Scenario } from './scenario.api.entity';
 
 import JSONAPISerializer = require('jsonapi-serializer');
 
@@ -13,24 +13,24 @@ import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
 
 @Injectable()
-export class ProjectsService extends BaseService<
-  Project,
-  CreateProjectDTO,
-  UpdateProjectDTO,
+export class ScenariosService extends BaseService<
+  Scenario,
+  CreateScenarioDTO,
+  UpdateScenarioDTO,
   AppInfoDTO
 > {
   constructor(
-    @InjectRepository(Project)
-    protected readonly repository: Repository<Project>,
+    @InjectRepository(Scenario)
+    protected readonly repository: Repository<Scenario>,
     @Inject(UsersService) private readonly usersService: UsersService,
   ) {
-    super(repository, 'project');
-    this.serializer = new JSONAPISerializer.Serializer('projects', {
-      attributes: ['name', 'description', 'users'],
+    super(repository, 'scenario');
+    this.serializer = new JSONAPISerializer.Serializer('scenarios', {
+      attributes: ['name', 'description', 'type', 'users'],
       keyForAttribute: 'camelCase',
       users: {
         ref: 'id',
-        attributes: ['fname', 'lname', 'email', 'projectRoles'],
+        attributes: ['fname', 'lname', 'email'],
         projectRoles: {
           ref: 'name',
           attributes: ['name'],
@@ -41,17 +41,17 @@ export class ProjectsService extends BaseService<
 
   serializer;
 
-  async serialize(entities: Project[]) {
+  async serialize(entities: Scenario[]) {
     return this.serializer.serialize(entities);
   }
 
-  async importLegacyProject(_file: Express.Multer.File): Promise<Project> {
-    return new Project();
+  async importLegacyScenario(_file: Express.Multer.File): Promise<Scenario> {
+    return new Scenario();
   }
 
-  async fakeFindOne(_id: string): Promise<Project> {
-    const project = {
-      ...new Project(),
+  async fakeFindOne(_id: string): Promise<Scenario> {
+    const scenario = {
+      ...new Scenario(),
       id: faker.random.uuid(),
       name: faker.lorem.words(5),
       description: faker.lorem.sentence(),
@@ -62,14 +62,14 @@ export class ProjectsService extends BaseService<
         ),
       ),
     };
-    return project;
+    return scenario;
   }
 
-  async findAll(): Promise<Project[]> {
+  async findAll(): Promise<Scenario[]> {
     return this.repository.find();
   }
 
-  findOne(id: string): Promise<Project | undefined> {
+  findOne(id: string): Promise<Scenario | undefined> {
     return this.repository.findOne(id);
   }
 

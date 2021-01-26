@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { MaxLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IssuedAuthnToken } from 'modules/authentication/issued-authn-token.api.entity';
+import { Dictionary } from 'lodash';
 import {
   Column,
   Entity,
@@ -9,7 +9,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Project } from '../projects/project.api.entity';
+import { Project } from 'modules/projects/project.api.entity';
+import { Scenario } from 'modules/scenarios/scenario.api.entity';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -19,26 +21,45 @@ export class User {
   @Column('character varying')
   email: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @Column('character varying', { name: 'display_name' })
+  displayName: string | null;
+
+  @ApiPropertyOptional()
   @Column('character varying')
   fname: string | null;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Column('character varying')
   lname: string | null;
 
-  @ApiProperty()
   @Column('character varying', { name: 'password_hash' })
-  // 18 UTF-8 characters may be at most 4*18 bytes (72 bytes), which is the
-  // maximum string length that can be compared fully by bcrypt (see
-  // https://www.npmjs.com/package/bcrypt#security-issues-and-concerns).
-  //
-  // @debt I don't think we should really limit this to 18 *characters* though.
-  // If users want to set longer passphrases using mostly alphanumeric
-  // characters then they should welcome to do so, as long as the *effective*
-  // byte count of the chosen passphrase is at most 72.
-  @MaxLength(18)
   passwordHash: string;
+
+  /**
+   * JSONB storage for non-relational attributes (e.g. whether a user has
+   * accepted terms of use of the instance, etc.)
+   *
+   * @debt We should use versioned types for metadata.
+   */
+  @ApiPropertyOptional()
+  @Column('jsonb')
+  metadata: Dictionary<string>;
+
+  /**
+   * Whether this user is active (email is confirmed).
+   */
+  @ApiProperty()
+  @Column('boolean', { name: 'is_active' })
+  isActive: boolean;
+
+  /**
+   * Whether the user should be considered as deleted. This is used to implement
+   * a grace period before full deletion.
+   */
+  @ApiProperty()
+  @Column('boolean', { name: 'is_deleted' })
+  isDeleted: boolean;
 
   @ApiProperty({ type: () => Project, isArray: true })
   @ManyToMany((_type) => Project, (project) => project.users, { eager: false })
@@ -55,25 +76,23 @@ export class User {
   })
   projects: Project[];
 
+  @ApiProperty({ type: () => Scenario, isArray: true })
+  @ManyToMany((_type) => Scenario, (scenario) => scenario.users, {
+    eager: false,
+  })
+  @JoinTable({
+    name: 'users_scenarios',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'scenario_id',
+      referencedColumnName: 'id',
+    },
+  })
+  scenarios: Scenario[];
+
   @OneToMany((_type) => IssuedAuthnToken, (token) => token.userId)
   issuedAuthnTokens: IssuedAuthnToken[];
-
-  /**
-   * Whether this user is active (email is confirmed).
-   *
-   * @todo This is just a stub: it should be implemented as an entity property.
-   */
-  get isActive() {
-    return true;
-  }
-
-  /**
-   * Whether the user should be considered as deleted. This is used to implement
-   * a grace period before full deletion.
-   *
-   * @todo This is just a stub: it should be implemented as an entity property.
-   */
-  get isDeleted() {
-    return false;
-  }
 }

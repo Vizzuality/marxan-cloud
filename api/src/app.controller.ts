@@ -1,5 +1,4 @@
-import { Controller, Get, Request } from '@nestjs/common';
-import { AuthenticationService } from 'modules/authentication/authentication.service';
+import { Controller, Request } from '@nestjs/common';
 import { User } from 'modules/users/user.api.entity';
 import { AppService } from './app.service';
 
@@ -10,13 +9,5 @@ export interface RequestWithAuthenticatedUser extends Request {
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly authenticationService: AuthenticationService,
-  ) {}
-
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+  constructor(private readonly _service: AppService) {}
 }

@@ -37,9 +37,12 @@ orchestrated via Kubernetes (forthcoming).
    * `API_AUTH_JWT_SECRET` (string, required): a base64-encoded secret for the
      signing of API JWT tokens; can be generated via a command such as `dd
      if=/dev/urandom bs=1024 count=1 | base64 -w0`
-   * `API_PORT` (number, required): the port on which the API service should
+   * `API_SERVICE_PORT` (number, required): the port on which the API service should
      listen on the local machine
-   * `APP_PORT` (number, required): the port on which the App service should
+   * `API_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default is
+     `true`): set this to `false` if migrations for the API service should not
+     run automatically on startup
+   * `APP_SERVICE_PORT` (number, required): the port on which the App service should
      listen on the local machine
    * `POSTGRES_API_SERVICE_PORT` (number, required): the port on which the
      PostgreSQL service should listen on the local machine
@@ -47,15 +50,20 @@ orchestrated via Kubernetes (forthcoming).
      PostgreSQL connection (API)
    * `API_POSTGRES_PASSWORD` (string, required): password to be used for the
      PostgreSQL connection (API)
-	* `API_POSTGRES_DB` (string, required): name of the database to be used for
+	 * `API_POSTGRES_DB` (string, required): name of the database to be used for
      the PostgreSQL connection (API)
-   * `POSTGRES_GEO_SERVICE_PORT`(number, required): the port on which the
+   * `GEOPROCESSING_SERVICE_PORT` (number, required): the port on which the
+     Geoprocessing service should listen on the local machine
+   * `POSTGRES_GEO_SERVICE_PORT` (number, required): the port on which the
      geoprocessing PostgreSQL service should listen on the local machine
-   * `GEO_POSTGRES_USER`(string, required): username to be used for the
+   * `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default
+     is `true`): set this to `false` if migrations for the Geoprocessing service
+     should not run automatically on startup
+   * `GEO_POSTGRES_USER` (string, required): username to be used for the
       geoprocessing PostgreSQL connection (API)
-   * `GEO_POSTGRES_PASSWORD`(string, required): password to be used for the
+   * `GEO_POSTGRES_PASSWORD` (string, required): password to be used for the
      geoprocessing PostgreSQL connection (API)
-   * `GEO_POSTGRES_DB`(string, required): name of the database to be used for
+   * `GEO_POSTGRES_DB` (string, required): name of the database to be used for
      the geoprocessing PostgreSQL connection (API)
    * `POSTGRES_AIRFLOW_SERVICE_PORT` (number, required): the port on which the
      PostgreSQL for Airflow service should listen on the local machine
