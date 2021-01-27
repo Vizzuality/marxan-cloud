@@ -10,7 +10,7 @@ endif
 # Useful when developing on API components only, to avoid spinning services
 # which may not be needed.
 start-api:
-	docker-compose up --build api geoprocessing postgresql-api postgresql-geo-api redis-api
+	docker-compose up --build api geoprocessing
 
 # Start all the services.
 start:

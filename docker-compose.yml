@@ -21,6 +21,7 @@ services:
     depends_on:
       - postgresql-api
       - postgresql-geo-api
+      - redis-api
   app:
     build:
       context: ./app
