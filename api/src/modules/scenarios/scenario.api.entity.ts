@@ -8,8 +8,14 @@ import {
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Tree,
+  TreeChildren,
+  TreeParent,
 } from 'typeorm';
 import { User } from 'modules/users/user.api.entity';
+import { Country } from 'modules/countries/country.api.entity';
+import { IsInt, IsNumber, Max, Min } from 'class-validator';
+import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 
 /**
  * The kind of Marxan scenario (standard, Marxan with Zones, and possibly other
@@ -20,8 +26,16 @@ export enum ScenarioType {
   marxanWithZones = 'Marxan with zones',
 }
 
+export enum JobStatus {
+  created = 'created',
+  running = 'running',
+  done = 'done',
+  failure = 'failure',
+}
+
 @Entity('scenarios')
-export class Scenario {
+@Tree('materialized-path')
+export class Scenario extends TimeUserEntityMetadata {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -41,12 +55,77 @@ export class Scenario {
   /**
    * The project to which this scenario belongs.
    */
+  @ApiProperty({ type: () => Project })
   @ManyToOne((_type) => Project, (project) => project.scenarios)
   @JoinColumn({
     name: 'project_id',
     referencedColumnName: 'id',
   })
   project: Project;
+
+  /**
+   * The country where this scenario is located.
+   */
+  @ApiProperty()
+  @ManyToOne((_type) => Country)
+  @JoinColumn({
+    name: 'country_id',
+    referencedColumnName: 'alpha2',
+  })
+  country: Country;
+
+  /**
+   * Extent of the scenario
+   */
+  @ApiPropertyOptional()
+  @Column('geometry')
+  extent: object | null;
+
+  /**
+   * Filter for WDPA data selection.
+   */
+  @ApiPropertyOptional()
+  @Column('jsonb', { name: 'wdpa_filter' })
+  wdpaFilter: object | null;
+
+  /**
+   * Threshold - which portion (%) of a protected area needs to intersect a
+   * planning unit for this to be locked in as protected.
+   * @todo document possible values/range (should this be a [0,1] range
+   * instead), add validator decorators...
+   */
+  @ApiPropertyOptional()
+  @Column('integer', { name: 'wdpa_threshold' })
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  wdpaThreshold: number | null;
+
+  /**
+   * The smallest administrative region that contains the whole scenario's
+   * geometry.
+   * @todo check description, link to AdminRegion entity
+   */
+  @ApiProperty()
+  @Column('uuid', { name: 'admin_region_id' })
+  adminRegion: object;
+
+  /**
+   * Number of runs for Marxan calculations.
+   */
+  @ApiProperty()
+  @Column('integer')
+  @IsInt()
+  @Min(0)
+  numberOfRuns: number;
+
+  /**
+   * Boundary Length Modifier
+   */
+  @ApiProperty()
+  @Column('double precision')
+  @IsNumber()
+  boundaryLengthModifier: number;
 
   /**
    * JSONB storage for non-relational attributes
@@ -56,6 +135,29 @@ export class Scenario {
   @ApiPropertyOptional()
   @Column('jsonb')
   metadata: Dictionary<string>;
+
+  /**
+   * Status of the scenario calculation job.
+   *
+   * @todo Check description.
+   */
+  @ApiProperty({ enum: JobStatus, enumName: 'JobStatus' })
+  @Column('enum')
+  status: JobStatus;
+
+  /**
+   * Parent scenario.
+   */
+  @ApiPropertyOptional()
+  @TreeParent()
+  @Column('uuid', { name: 'parent_id' })
+  parentScenario: Scenario;
+
+  /**
+   * Children scenarios
+   */
+  @TreeChildren()
+  childrenScenarios: Scenario[];
 
   @ApiProperty({
     type: () => User,
