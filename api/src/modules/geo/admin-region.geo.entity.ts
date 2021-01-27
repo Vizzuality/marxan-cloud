@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsUUID } from 'class-validator';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 
 @Entity('admin_regions')
-export class AdminRegion extends TimeUserEntityMetadata {
+export class AdminRegion {
   @IsUUID(4)
-  @Column('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   /**
@@ -18,27 +18,27 @@ export class AdminRegion extends TimeUserEntityMetadata {
   ogcFid: number;
 
   @ApiProperty()
-  @Column('geometry')
+  @Column('geometry', { name: 'the_geom' })
   theGeom: object | null;
 
   /**
    * Level 0 name.
    */
   @ApiProperty()
-  @Column('character varying')
+  @Column('character varying', { name: 'name_0' })
   name0: string | null;
 
   /**
    * Level 1 name.
    */
   @ApiProperty()
-  @Column('character varying')
+  @Column('character varying', { name: 'name_1' })
   name1: string | null;
 
   /**
    * Level 2 name.
    */
   @ApiProperty()
-  @Column('character varying')
+  @Column('character varying', { name: 'name_2' })
   name2: string | null;
 }
