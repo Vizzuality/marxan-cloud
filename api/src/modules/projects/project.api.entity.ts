@@ -33,6 +33,7 @@ export class Project {
   @Column('jsonb')
   metadata: Dictionary<string>;
 
+  @ApiPropertyOptional({ type: () => Scenario })
   @OneToMany((_type) => Scenario, (scenario) => scenario.project)
   scenarios: Scenario[];
 
