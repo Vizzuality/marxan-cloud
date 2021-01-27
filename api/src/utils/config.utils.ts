@@ -11,11 +11,17 @@ export class AppConfig {
    * property does not exist.
    */
   static get<T>(property: string, defaultValue?: T): T | undefined {
-    try {
-      return config.has(property) ? config.get(property) : defaultValue;
-    } catch (e) {
+    if (config.has(property)) {
+      return config.get(property);
+    }
+
+    if (defaultValue) {
       return defaultValue;
     }
+
+    throw new Error(
+      `The environment variable for config property ${property} is not defined and no default was provided.`,
+    );
   }
 
   /**
