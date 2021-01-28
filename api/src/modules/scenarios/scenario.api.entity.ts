@@ -11,7 +11,15 @@ import {
 } from 'typeorm';
 import { User } from 'modules/users/user.api.entity';
 import { Country } from 'modules/countries/country.api.entity';
-import { IsInt, IsNumber, Max, Min } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
 import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 
 /**
@@ -75,24 +83,29 @@ export class Scenario extends TimeUserEntityMetadata {
    */
   @ApiPropertyOptional()
   @Column('geometry')
-  extent: object | null;
+  extent: Record<string, unknown> | null;
 
   /**
    * Filter for WDPA data selection.
+   *
+   * @todo Improve description, add examples.
    */
   @ApiPropertyOptional()
+  @IsOptional()
   @Column('jsonb', { name: 'wdpa_filter' })
-  wdpaFilter: object | null;
+  wdpaFilter: Record<string, unknown> | null;
 
   /**
    * Threshold - which portion (%) of a protected area needs to intersect a
    * planning unit for this to be locked in as protected.
-   * @todo document possible values/range (should this be a [0,1] range
+   *
+   * @todo Document possible values/range (should this be a [0,1] range
    * instead), add validator decorators...
    */
   @ApiPropertyOptional()
   @Column('integer', { name: 'wdpa_threshold' })
   @IsInt()
+  @IsOptional()
   @Min(0)
   @Max(100)
   wdpaThreshold: number | null;
@@ -100,7 +113,8 @@ export class Scenario extends TimeUserEntityMetadata {
   /**
    * The smallest administrative region that contains the whole scenario's
    * geometry.
-   * @todo check description, link to AdminRegion entity
+   *
+   * @todo Check description.
    */
   @ApiProperty()
   @Column('uuid', { name: 'admin_region_id' })
@@ -146,6 +160,8 @@ export class Scenario extends TimeUserEntityMetadata {
    * Parent scenario.
    */
   @ApiPropertyOptional()
+  @IsUUID()
+  @IsOptional()
   @Column('uuid', { name: 'parent_id' })
   parentScenario: Scenario;
 
@@ -153,6 +169,7 @@ export class Scenario extends TimeUserEntityMetadata {
     type: () => User,
     isArray: true,
   })
+  @IsArray()
   @ManyToMany((_type) => User, (user) => user.scenarios, { eager: true })
   users: Partial<User>[];
 }
