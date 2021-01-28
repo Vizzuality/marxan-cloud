@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsUUID } from 'class-validator';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 
 @Entity('admin_regions')
 export class AdminRegion {
@@ -10,16 +9,20 @@ export class AdminRegion {
   id: string;
 
   /**
-   * @todo Add description
+   * @todo Add description.
    */
   @ApiProperty()
   @IsInt()
   @Column('integer', { name: 'ogc_fid' })
   ogcFid: number;
 
+  /**
+   * @todo Add description. Also we can probably do better than using the `any`
+   * type.
+   */
   @ApiProperty()
   @Column('geometry', { name: 'the_geom' })
-  theGeom: object | null;
+  theGeom: any | null;
 
   /**
    * Level 0 name.
