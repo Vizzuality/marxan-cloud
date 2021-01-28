@@ -104,7 +104,8 @@ export class Scenario extends TimeUserEntityMetadata {
    */
   @ApiProperty()
   @Column('uuid', { name: 'admin_region_id' })
-  adminRegion: object;
+  @IsUUID()
+  adminRegionId: string;
 
   /**
    * Number of runs for Marxan calculations.
