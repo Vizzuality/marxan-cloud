@@ -8,11 +8,13 @@ import { AppService } from './app.service';
 import { PingController } from './modules/ping/ping.controller';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { UsersModule } from './modules/users/users.module';
+import { GeoModule } from 'modules/geo/geo.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
     CountriesModule,
+    GeoModule,
     ProjectsModule,
     ScenariosModule,
     UsersModule,
