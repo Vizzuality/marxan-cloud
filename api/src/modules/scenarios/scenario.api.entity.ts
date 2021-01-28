@@ -8,9 +8,6 @@ import {
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
-  Tree,
-  TreeChildren,
-  TreeParent,
 } from 'typeorm';
 import { User } from 'modules/users/user.api.entity';
 import { Country } from 'modules/countries/country.api.entity';
@@ -34,7 +31,6 @@ export enum JobStatus {
 }
 
 @Entity('scenarios')
-@Tree('materialized-path')
 export class Scenario extends TimeUserEntityMetadata {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
@@ -149,15 +145,8 @@ export class Scenario extends TimeUserEntityMetadata {
    * Parent scenario.
    */
   @ApiPropertyOptional()
-  @TreeParent()
   @Column('uuid', { name: 'parent_id' })
   parentScenario: Scenario;
-
-  /**
-   * Children scenarios
-   */
-  @TreeChildren()
-  childrenScenarios: Scenario[];
 
   @ApiProperty({
     type: () => User,
