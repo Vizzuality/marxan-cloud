@@ -114,7 +114,7 @@ export class Scenario extends TimeUserEntityMetadata {
    * Number of runs for Marxan calculations.
    */
   @ApiProperty()
-  @Column('integer')
+  @Column('integer', { name: 'number_of_runs' })
   @IsInt()
   @Min(0)
   numberOfRuns: number;
@@ -123,7 +123,7 @@ export class Scenario extends TimeUserEntityMetadata {
    * Boundary Length Modifier
    */
   @ApiProperty()
-  @Column('double precision')
+  @Column('double precision', { name: 'blm' })
   @IsNumber()
   boundaryLengthModifier: number;
 
