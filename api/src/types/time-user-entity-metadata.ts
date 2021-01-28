@@ -35,6 +35,5 @@ export abstract class TimeUserEntityMetadata {
     name: 'last_modified_at',
     type: 'timestamp without time zone',
   })
-  @Column('timestamp without time zone')
   lastModifiedAt: Date;
 }
