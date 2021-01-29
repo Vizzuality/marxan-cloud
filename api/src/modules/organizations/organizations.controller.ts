@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -28,6 +29,7 @@ import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { CreateOrganizationDTO } from './dto/create.organization.dto';
 import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
+import { RequestWithAuthenticatedUser } from 'app.controller';
 
 const resource: BaseServiceResource = {
   className: 'Organization',
@@ -74,9 +76,12 @@ export class OrganizationsController {
   @ApiCreatedResponse({ type: OrganizationResult })
   @Post()
   async create(
-    @Body(new ValidationPipe()) _dto: CreateOrganizationDTO,
+    @Body(new ValidationPipe()) dto: CreateOrganizationDTO,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<OrganizationResult> {
-    return await this.service.serialize([await this.service.fakeFindOne('id')]);
+    return await this.service.serialize([
+      await this.service.create(dto, { authenticatedUser: req.user }),
+    ]);
   }
 
   @ApiOperation({ description: 'Update organization' })
