@@ -50,4 +50,5 @@ seed-geodb-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 
 test-e2e-api:
+	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e rm --stop --force test-e2e-postgresql-api test-e2e-postgresql-geo-api
 	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e up --build --abort-on-container-exit --exit-code-from api api
