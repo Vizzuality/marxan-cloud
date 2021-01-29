@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, Logger } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
+import * as faker from 'faker';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -63,7 +64,7 @@ describe('AppController (e2e)', () => {
       expect(resources[0].type).toBe('projects');
     });
 
-    let anOrganization: { id: string, type: 'organizations' };
+    let anOrganization: { id: string; type: 'organizations' };
 
     it('Gets organizations', async () => {
       const response = await request(app.getHttpServer())
@@ -81,8 +82,8 @@ describe('AppController (e2e)', () => {
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send({
-          name: 'Test Project 1234',
-          description: 'Description for this awesome project',
+          name: faker.lorem.words(3),
+          description: faker.lorem.sentence(),
           organizationId: anOrganization.id,
         })
         .expect(201);
