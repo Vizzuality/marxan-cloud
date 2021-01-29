@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Req,
   UploadedFile,
   UseGuards,
   ValidationPipe,
@@ -30,6 +31,8 @@ import { uploadOptions } from 'utils/file-uploads.utils';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateProjectDTO } from './dto/update.project.dto';
+import { CreateProjectDTO } from './dto/create.project.dto';
+import { RequestWithAuthenticatedUser } from 'app.controller';
 
 const resource: BaseServiceResource = {
   className: 'Project',
@@ -87,6 +90,18 @@ export class ProjectsController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Project> {
     return await this.service.serialize([await this.service.fakeFindOne(id)]);
+  }
+
+  @ApiOperation({ description: 'Create project' })
+  @ApiOkResponse({ type: ProjectResult })
+  @Post()
+  async create(
+    @Body(new ValidationPipe()) dto: CreateProjectDTO,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ProjectResult> {
+    return await this.service.serialize([
+      await this.service.create(dto, { authenticatedUser: req.user }),
+    ]);
   }
 
   @ApiOperation({ description: 'Update project' })
