@@ -35,6 +35,7 @@ Unreleased
 - Integration with faker.js for mock data.
 - Shared ORM config setup, allowing to use multiple connections in NestJS as
   well as via the TypeORM CLI util.
+- Setup of E2E tests.
 
 ### Changed
 
