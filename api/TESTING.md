@@ -25,8 +25,6 @@ etc.) *are named exactly the same* as the ones used to configure the development
 instance of the services, but by using a different dotenv file
 (`.env-test-e2e`).
 
-### Running e2e tests
-
 ```
 cp .env .env-test-e2e
 ```
@@ -40,8 +38,9 @@ free on the local machine, for example:
 POSTGRES_API_SERVICE_PORT=3532
 POSTGRES_GEO_SERVICE_PORT=3533
 ```
+### Running e2e tests
 
-Then run the tests
+Once the testing environment is configured (see above) run the tests:
 
 ```
 make test-e2e-api
