@@ -65,6 +65,21 @@ export class ProjectsService extends BaseService<
     return project;
   }
 
+  async setDataCreate(
+    create: CreateProjectDTO,
+    info?: AppInfoDTO,
+  ): Promise<Project> {
+    /**
+     * @debt Temporary setup. I think we should remove TimeUserEntityMetadata
+     * from entities and just use a separate event log, and a view to obtain the
+     * same information (who created an entity and when, and when it was last
+     * modified) from that log, kind of event sourcing way.
+     */
+    const project = await super.setDataCreate(create, info);
+    project.createdBy = info?.authenticatedUser?.id!;
+    return project;
+  }
+
   async findAll(): Promise<Project[]> {
     return this.repository.find();
   }
