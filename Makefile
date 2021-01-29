@@ -8,7 +8,7 @@ API_POSTGRES_USER := $(shell grep -e API_POSTGRES_USER .env | sed 's/^.*=//')
 
 # Start only API and Geoprocessing services
 #
-# Useful when developing on API components only, to avoid spinning services
+# Useful when developing on API components only, to avoid spinning up services
 # which may not be needed.
 start-api:
 	docker-compose up --build api geoprocessing
