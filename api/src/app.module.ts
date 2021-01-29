@@ -10,6 +10,7 @@ import { ProjectsModule } from './modules/projects/projects.module';
 import { UsersModule } from './modules/users/users.module';
 import { GeoModule } from 'modules/geo/geo.module';
 import { apiConnections } from './ormconfig';
+import { OrganizationsModule } from 'modules/organizations/organizations.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { apiConnections } from './ormconfig';
     TypeOrmModule.forRoot(apiConnections.geoprocessingDB),
     CountriesModule,
     GeoModule,
+    OrganizationsModule,
     ProjectsModule,
     ScenariosModule,
     UsersModule,
