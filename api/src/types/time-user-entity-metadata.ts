@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'modules/users/user.api.entity';
 import {
+  Column,
   CreateDateColumn,
   JoinColumn,
   ManyToOne,
@@ -24,7 +25,10 @@ export abstract class TimeUserEntityMetadata {
     name: 'created_by',
     referencedColumnName: 'id',
   })
-  createdBy: User;
+  createdByUser: User;
+
+  @Column('uuid', { name: 'created_by' })
+  createdBy: string;
 
   /**
    * Time of last edit.
