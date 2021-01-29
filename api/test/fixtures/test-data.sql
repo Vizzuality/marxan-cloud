@@ -14,18 +14,18 @@ VALUES
 ('organization_user'),
 ('project_user');
 
-INSERT INTO organizations (name)
+INSERT INTO organizations (name, created_by)
 VALUES
-('Example Org 1'),
-('Example Org 2');
+('Example Org 1', (SELECT id FROM users WHERE email = 'aa@example.com')),
+('Example Org 2', (SELECT id FROM users WHERE email = 'aa@example.com'));
 
 INSERT INTO projects
-(name, organization_id)
+(name, organization_id, created_by)
 VALUES
-('Example Project 1 Org 1', (SELECT id FROM organizations WHERE name = 'Example Org 1')),
-('Example Project 2 Org 1', (SELECT id FROM organizations WHERE name = 'Example Org 1')),
-('Example Project 1 Org 2', (SELECT id FROM organizations WHERE name = 'Example Org 1')),
-('Example Project 2 Org 2', (SELECT id FROM organizations WHERE name = 'Example Org 1'));
+('Example Project 1 Org 1', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com')),
+('Example Project 2 Org 1', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com')),
+('Example Project 1 Org 2', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com')),
+('Example Project 2 Org 2', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com'));
 
 INSERT INTO users_organizations
 (user_id, organization_id, role_id)
