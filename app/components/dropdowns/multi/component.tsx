@@ -4,7 +4,7 @@ import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import Icon from 'components/icon';
 import Checkbox from 'components/forms/checkbox';
 import cx from 'classnames';
-import THEME from '../default-theme';
+import THEME from '../constants/theme';
 
 interface Option {
   label: string;

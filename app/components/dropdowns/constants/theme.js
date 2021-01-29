@@ -13,8 +13,8 @@ export default {
     },
     item: {
       base: 'text-sm text-gray-300',
-      highlighted: 'bg-gray-700 text-white',
-      disabled: 'opacity-50 pointer-events-none',
+      highlighted: 'text-sm bg-gray-700 text-white',
+      disabled: 'text-sm opacity-50 pointer-events-none',
     },
   },
   light: {
@@ -31,8 +31,8 @@ export default {
     },
     item: {
       base: 'text-sm text-gray-400',
-      highlighted: 'bg-gray-100 text-gray-800',
-      disabled: 'opacity-50 pointer-events-none',
+      highlighted: 'text-sm bg-gray-100 text-gray-800',
+      disabled: 'text-sm opacity-50 pointer-events-none',
     },
   },
   states: {
