@@ -55,6 +55,21 @@ export class OrganizationsService extends BaseService<
     return this.repository.findOne(id);
   }
 
+  async setDataCreate(
+    create: CreateOrganizationDTO,
+    info?: AppInfoDTO,
+  ): Promise<Organization> {
+    /**
+     * @debt Temporary setup. I think we should remove TimeUserEntityMetadata
+     * from entities and just use a separate event log, and a view to obtain the
+     * same information (who created an entity and when, and when it was last
+     * modified) from that log, kind of event sourcing way.
+     */
+    const organization = await super.setDataCreate(create, info);
+    organization.createdBy = info?.authenticatedUser?.id!;
+    return organization;
+  }
+
   async remove(id: string): Promise<void> {
     await this.repository.delete(id);
   }
