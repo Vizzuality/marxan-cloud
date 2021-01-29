@@ -23,6 +23,7 @@ Unreleased
   - Get current user info (`/users/me`)
 - Stub `ProjectsModule`.
 - Stub `ScenariosModule`.
+- Stub `OrganizationsModule`.
 - Stub roles.
 - PoC JSON:API serialization.
 - Authentication
