@@ -1,10 +1,11 @@
 import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
-import Select, { SingleSelectProps } from './component';
+import Dropdown from './component';
+import { DropdownProps } from './types';
 
 export default {
-  title: 'Components/Dropdowns/Single select',
-  component: Select,
+  title: 'Components/Dropdowns/Default',
+  component: Dropdown,
   parameters: { actions: { argTypesRegex: '^on.*' } },
   argTypes: {
     theme: {
@@ -22,9 +23,9 @@ export default {
   },
 };
 
-const Template: Story<SingleSelectProps> = (args) => (
-  <div className="relative h-60">
-    <Select {...args} />
+const Template: Story<DropdownProps> = (args) => (
+  <div className="relative">
+    <Dropdown {...args} />
   </div>
 );
 
