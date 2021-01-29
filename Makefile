@@ -49,9 +49,14 @@ seed-api-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 
 seed-geodb-data:
+<<<<<<< HEAD
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 
 test-e2e-api:
 	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e rm --stop --force test-e2e-postgresql-api test-e2e-postgresql-geo-api
 	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e up --build --abort-on-container-exit --exit-code-from api api
 	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e rm --stop --force
+=======
+	docker-compose -f ./data/docker-compose-data_download.yml up --build
+	# docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
+>>>>>>> added results and exetend to a metadata column  in the scenario feature data table that controls usage of features in a scenario
