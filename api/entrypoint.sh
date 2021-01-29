@@ -13,6 +13,7 @@ case "$1" in
     test-e2e)
         echo "Running e2e Tests"
         apk update && apk add postgresql-client
+        yarn typeorm migration:run
         psql $API_POSTGRES_URL < ./test/fixtures/test-data.sql
         exec yarn test:e2e
         ;;
