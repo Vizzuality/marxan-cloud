@@ -16,7 +16,8 @@ interface DropdownDataProps {
   options?: DropdownOptionProps[];
   placeholder?: string;
   prefix?: string;
-  initialSelected?: [];
+  initialSelected?: string | string[];
+  initialValues?: string | string[];
   clearSelectionActive?: boolean;
   clearSelectionLabel?: string;
   batchSelectionActive?: boolean;

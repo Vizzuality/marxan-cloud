@@ -20,6 +20,16 @@ export default {
         options: ['valid', 'error', 'none'],
       },
     },
+    onSelect: {
+      table: {
+        disable: true,
+      },
+    },
+    initialValues: {
+      table: {
+        disable: true,
+      },
+    },
   },
 };
 
@@ -33,6 +43,7 @@ export const Default = Template.bind({});
 Default.args = {
   theme: 'dark',
   size: 'base',
+  status: 'none',
   prefix: 'FILTER BY:',
   placeholder: 'Select Scenario',
   options: [
@@ -41,8 +52,10 @@ Default.args = {
     { label: 'Scenario 3', value: 'scenario-3', disabled: true },
     { label: 'Scenario 4', value: 'scenario-4' },
   ],
+  initialSelected: ['scenario-1', 'scenario-2', 'scenario-4'],
   disabled: false,
-  multiple: false,
+  multiple: true,
+  searchable: false,
   clearSelectionActive: true,
   clearSelectionLabel: 'Clear Selection',
   batchSelectionActive: true,
