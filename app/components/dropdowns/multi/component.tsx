@@ -23,7 +23,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
   status,
   prefix,
   options = [],
-  initialSelected = [],
+  initialValues = [],
   disabled = false,
   multiple = true,
   placeholder,
@@ -63,6 +63,10 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
   const getOptionsEnabled = useMemo(() => {
     return getOptions.filter((op) => !op.disabled && op.enabled);
   }, [getOptions]);
+
+  const getInitialSelected = useMemo(() => {
+    return getOptions.filter((o) => initialValues.includes(`${o.value}`));
+  }, [getOptions, initialValues]);
 
   const isSelected = (selected: DropdownOptionProps, selectedItms: DropdownOptionProps[]) => (
     selectedItms.some((i) => i.value === selected.value)
@@ -106,7 +110,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
     selectedItems,
     reset,
   } = useMultipleSelection({
-    initialSelectedItems: initialSelected,
+    initialSelectedItems: getInitialSelected,
     stateReducer: (st, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
       if (
@@ -260,7 +264,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
                       ),
                     })}
                     key={`${option.value}`}
-                    {...getItemProps({ item: option, index })}
+                    {...getItemProps({ item: option, index, disabled: option.disabled })}
                   >
                     <span
                       className={cx({

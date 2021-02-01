@@ -24,6 +24,7 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
   options = [],
   disabled = false,
   placeholder,
+  initialValues,
   clearSelectionActive,
   clearSelectionLabel = 'Clear selection',
   onSelect,
@@ -46,6 +47,10 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
     clearSelectionActive,
     clearSelectionLabel,
   ]);
+
+  const getInitialSelected = useMemo(() => {
+    return getOptions.find((o) => o.value === initialValues);
+  }, [getOptions, initialValues]);
 
   // Events
   const handleSelectedItems = (selected, reset) => {
@@ -74,6 +79,7 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
     reset,
   } = useSelect({
     items: getOptions,
+    initialSelectedItem: getInitialSelected,
     stateReducer: (st, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
 
