@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import * as config from 'config';
+import { isNil } from 'lodash';
 
 /**
  * Utility functions related to app configuration.
@@ -15,7 +16,7 @@ export class AppConfig {
       return config.get(property);
     }
 
-    if (defaultValue) {
+    if (!isNil(defaultValue)) {
       return defaultValue;
     }
 
@@ -33,14 +34,22 @@ export class AppConfig {
   static getFromArrayAndParsedString<T>(
     arrayProperty: string,
     stringProperty?: string,
+    defaultValue?: T,
   ): (T | string)[] {
     // Array from config property
     const valuesFromArray = this.get<T[]>(arrayProperty, []);
     let valuesFromParsedString: string[] = [];
     if (stringProperty) {
       // This may be a comma-separated list
-      const valuesFromString = stringProperty ? this.get(stringProperty) : null;
-      // If valuesFromString is a string, split it as comma-separated
+      const valuesFromString = stringProperty
+        ? this.get(stringProperty, defaultValue)
+        : null;
+      /**
+       * If valuesFromString is a string, split it as comma-separated
+       *
+       * @debt we should provide a way to use escaped commas if actual values
+       * can contain such character.
+       */
       if (typeof valuesFromString === 'string') {
         valuesFromParsedString = valuesFromString.split(',');
       } else {
