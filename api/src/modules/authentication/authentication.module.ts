@@ -2,11 +2,11 @@ import { forwardRef, Logger, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'modules/users/user.entity';
+import { User } from 'modules/users/user.api.entity';
 
 import { UsersModule } from 'modules/users/users.module';
 import { AppConfig } from 'utils/config.utils';
-import { IssuedAuthnToken } from './issued-authn-token.entity';
+import { IssuedAuthnToken } from './issued-authn-token.api.entity';
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { JwtStrategy } from './strategies/jwt.strategy';

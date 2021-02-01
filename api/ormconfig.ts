@@ -1,29 +1,16 @@
-const config = require('config');
+import { apiConnections } from "ormconfig";
 
 /**
- * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs
- * 
- * If needing to set any of these parameters depending on environment, with
- * fallback for any other environment, we could use something like:
- * 
- * ['staging', 'production'].includes(config.util.getEnv('NODE_ENV')) ? true : false
+ * We just re-export what we import from the actual ORM configuration file
+ * within the NestJS app.
+ *
+ * This is so we can reuse the same configuration in `AppModule`
+ * (`TypeOrmModule.forRoot()` imports for both connections in use in the API)
+ * and as an `ormconfig.ts` file which can be found by the TypeORM CLI utility
+ * without having to explicitly tell it from which file to load the ORM
+ * configuration from.
  */
-module.exports = {
-  synchronize: false,
-  type: 'postgres',
-  url: config.get('postgres.url'),
-  ssl: false,
-  entities: ['src/modules/**/*.entity.ts'],
-  // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
-  // 'query' if needing to see the actual generated SQL statements (this should
-  // be limited to `NODE_ENV=development`). Use 'error' for least verbose
-  // logging.
-  logging: ['error'],
-  cache: false,
-  migrations: ['src/migrations/**/*.ts'],
-  migrationsRun: true,
-  cli: {
-    migrationsDir: "src/migrations",
-    migrationsTableName: "migrations",
-  }
-};
+module.exports = [
+  apiConnections.default,
+  apiConnections.geoprocessingDB
+];

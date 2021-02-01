@@ -22,17 +22,20 @@ Unreleased
   - Get users
   - Get current user info (`/users/me`)
 - Stub `ProjectsModule`.
+- Stub `ScenariosModule`.
 - Stub roles.
 - PoC JSON:API serialization.
-<<<<<<< HEAD
 - Authentication
   - local authentication strategy (username+password)
   - JWT tokens are issued
   - initial support for JWT token invalidation
   - refresh of a still-valid JWT token
-=======
 - Ping/liveness endpoint.
->>>>>>> develop
+- NestJS services are based on `nestjs-base-service`.
+- Integration with faker.js for mock data.
+- Shared ORM config setup, allowing to use multiple connections in NestJS as
+  well as via the TypeORM CLI util.
+- Setup of E2E tests.
 
 ### Changed
 

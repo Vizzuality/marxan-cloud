@@ -1,6 +1,11 @@
 {
-  "postgres": {
-    "url": "POSTGRES_URL"
+  "postgresApi": {
+    "url": "API_POSTGRES_URL",
+    "runMigrationsOnStartup": "API_RUN_MIGRATIONS_ON_STARTUP"
+   },
+   "postgresGeoApi": {
+    "url": "GEO_POSTGRES_URL",
+    "runMigrationsOnStartup": "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP"
    },
   "network": {
     "cors": {
