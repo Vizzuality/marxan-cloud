@@ -4,12 +4,12 @@ import cx from 'classnames';
 const THEME = {
   primary: {
     base:
-      'w-full leading-tight text-white bg-gray-800 border rounded focus:outline-none focus:bg-gray-700',
+      'w-full leading-tight text-white bg-gray-800 border rounded-4xl focus:outline-none focus:bg-gray-700',
     states: {
-      none: 'border-gray-900',
+      none: 'border-white border-opacity-50',
       valid: 'border-green-500',
       error: 'border-red-500',
-      disabled: 'border-gray-900 opacity-50',
+      disabled: 'border-white border-opacity-50 opacity-25',
     },
   },
 };
@@ -38,6 +38,8 @@ export const Select: React.FC<SelectProps> = ({
   theme = 'primary',
   state = 'none',
   disabled = false,
+  placeholder = '',
+  value,
   options = [],
   className,
   ...props
@@ -55,8 +57,10 @@ export const Select: React.FC<SelectProps> = ({
         [className]: !!className,
       })}
     >
-      {options.map(({ value, ...o }) => (
-        <Option key={`${value}`} value={`${value}`} {...o} />
+      {placeholder && <Option disabled selected={!value} label={placeholder} />}
+
+      {options.map(({ value: v, ...o }) => (
+        <Option key={`${v}`} value={`${v}`} {...o} />
       ))}
     </select>
   );
