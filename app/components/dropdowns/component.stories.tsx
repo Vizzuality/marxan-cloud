@@ -33,15 +33,19 @@ export const Default = Template.bind({});
 Default.args = {
   theme: 'dark',
   size: 'base',
-  disabled: false,
-  placeholder: 'Select Scenario',
-  clearable: true,
   prefix: 'FILTER BY:',
+  placeholder: 'Select Scenario',
   options: [
     { label: 'Scenario 1', value: 'scenario-1' },
     { label: 'Scenario 2', value: 'scenario-2' },
     { label: 'Scenario 3', value: 'scenario-3', disabled: true },
     { label: 'Scenario 4', value: 'scenario-4' },
   ],
-  onSelect: (option) => console.info(option),
+  disabled: false,
+  multiple: false,
+  clearSelectionActive: true,
+  clearSelectionLabel: 'Clear Selection',
+  batchSelectionActive: true,
+  batchSelectionLabel: 'Select all',
+  onChange: (option) => console.info(option),
 };

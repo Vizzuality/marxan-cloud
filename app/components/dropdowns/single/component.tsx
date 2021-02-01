@@ -3,10 +3,9 @@ import { createPortal } from 'react-dom';
 import cx from 'classnames';
 
 // Downshift;
-import { useSelect, useMultipleSelection } from 'downshift';
+import { useSelect } from 'downshift';
 import Toggle from 'components/dropdowns/toggle';
 import Menu from 'components/dropdowns/menu';
-import Checkbox from 'components/forms/checkbox';
 
 // Popper
 import { usePopper } from 'react-popper';
@@ -17,20 +16,16 @@ import THEME from 'components/dropdowns/constants/theme';
 
 import { DropdownProps, DropdownOptionProps } from 'components/dropdowns/types';
 
-export const MultiDropdown: React.FC<DropdownProps> = ({
+export const SingleDropdown: React.FC<DropdownProps> = ({
   theme = 'dark',
   size = 'base',
   status,
   prefix,
   options = [],
-  initialSelected = [],
   disabled = false,
-  multiple = true,
   placeholder,
-  clearSelectionActive = true,
+  clearSelectionActive,
   clearSelectionLabel = 'Clear selection',
-  batchSelectionActive,
-  batchSelectionLabel = 'Select all',
   onSelect,
 }: DropdownProps) => {
   const triggerRef = useRef();
@@ -38,122 +33,70 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
 
   const getOptions = useMemo(() => {
     return [
-      ...clearSelectionActive ? [{
-        value: null,
-        label: clearSelectionLabel,
-        checkbox: false,
-        enabled: false,
-      }] : [],
-      ...batchSelectionActive ? [{
-        value: 'batch-selection',
-        label: batchSelectionLabel,
-        checkbox: false,
-        enabled: false,
-      }] : [],
-      ...options.map((o) => ({ ...o, checkbox: true, enabled: true })),
+      ...clearSelectionActive ? [
+        {
+          value: null,
+          label: clearSelectionLabel,
+        },
+      ] : [],
+      ...options,
     ];
   }, [
     options,
     clearSelectionActive,
     clearSelectionLabel,
-    batchSelectionActive,
-    batchSelectionLabel,
   ]);
 
-  const getOptionsEnabled = useMemo(() => {
-    return getOptions.filter((op) => !op.disabled && op.enabled);
-  }, [getOptions]);
+  // Events
+  const handleSelectedItems = (selected, reset) => {
+    switch (selected.value) {
+      case null:
+        reset();
+        break;
+      default:
+        break;
+    }
+  };
 
   const isSelected = (selected: DropdownOptionProps, selectedItms: DropdownOptionProps[]) => (
     selectedItms.some((i) => i.value === selected.value)
   );
 
-  const handleSelectedItem = ({
-    option,
-    selectedItems,
-    addSelectedItem,
-    removeSelectedItem,
-    setSelectedItems,
-    reset,
-  }) => {
-    switch (option.value) {
-      case null:
-        reset();
-        break;
-      case 'batch-selection':
-        setSelectedItems(getOptionsEnabled);
-        break;
-      default:
-        if (option.disabled) {
-          break;
-        }
-
-        if (isSelected(option, selectedItems)) {
-          removeSelectedItem(option);
-          break;
-        } else {
-          addSelectedItem(option);
-          break;
-        }
-    }
-  };
-
-  const {
-    getDropdownProps,
-    addSelectedItem,
-    removeSelectedItem,
-    setSelectedItems,
-    selectedItems,
-    reset,
-  } = useMultipleSelection({
-    initialSelectedItems: initialSelected,
-    stateReducer: (st, actionAndChanges) => {
-      const { changes, type } = actionAndChanges;
-      if (
-        type === useMultipleSelection.stateChangeTypes.FunctionAddSelectedItem
-        || type === useMultipleSelection.stateChangeTypes.FunctionRemoveSelectedItem
-        || type === useMultipleSelection.stateChangeTypes.FunctionSetSelectedItems
-        || type === useMultipleSelection.stateChangeTypes.FunctionReset
-      ) {
-        onSelect(changes.selectedItems);
-      }
-
-      return changes;
-    },
-  });
-
+  // 'useSelect'
   const {
     isOpen,
+    selectedItem,
     highlightedIndex,
     getToggleButtonProps,
     getMenuProps,
     getItemProps,
     closeMenu,
+    reset,
   } = useSelect({
     items: getOptions,
     stateReducer: (st, actionAndChanges) => {
-      const { type, changes } = actionAndChanges;
-      const { selectedItem: option } = changes;
+      const { changes, type } = actionAndChanges;
 
+      if (
+        type === useSelect.stateChangeTypes.MenuKeyDownEnter
+        || type === useSelect.stateChangeTypes.MenuKeyDownSpaceButton
+        || type === useSelect.stateChangeTypes.ItemClick
+      ) {
+        onSelect(changes.selectedItem);
+      }
+
+      return changes;
+    },
+    onStateChange: ({ type, selectedItem: selected }) => {
       switch (type) {
         case useSelect.stateChangeTypes.MenuKeyDownEnter:
         case useSelect.stateChangeTypes.ItemClick:
-          handleSelectedItem({
-            option,
-            selectedItems,
-            addSelectedItem,
-            removeSelectedItem,
-            setSelectedItems,
-            reset,
-          });
-
-          return {
-            ...changes,
-            highlightedIndex: st.highlightedIndex,
-            isOpen: true,
-          };
+          if (selected) {
+            handleSelectedItems(selected, reset);
+          }
+          break;
         default:
-          return changes;
+          break;
       }
     },
   });
@@ -178,6 +121,8 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
     }
   }, [referenceHidden, closeMenu]);
 
+  const selectedItems = selectedItem ? [selectedItem] : [];
+
   return (
     <div
       className={cx({
@@ -192,18 +137,16 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
         ref={triggerRef}
       >
         <Toggle
-          options={getOptionsEnabled}
+          options={getOptions}
           theme={theme}
           size={size}
           status={status}
           prefix={prefix}
           disabled={disabled}
-          multiple
           opened={isOpen}
           selectedItems={selectedItems}
           placeholder={placeholder}
           getToggleButtonProps={getToggleButtonProps}
-          getDropdownProps={getDropdownProps}
         />
       </div>
 
@@ -220,25 +163,22 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
             size={size}
             status={status}
             disabled={disabled}
-            multiple
             opened={isOpen}
             attributes={attributes}
             getMenuProps={getMenuProps}
           >
             {isOpen && (
               <Toggle
-                options={getOptionsEnabled}
+                options={options}
                 theme={theme}
                 size={size}
                 status={status}
                 prefix={prefix}
                 disabled={disabled}
-                multiple={multiple}
                 opened={isOpen}
                 selectedItems={selectedItems}
                 placeholder={placeholder}
                 getToggleButtonProps={getToggleButtonProps}
-                getDropdownProps={getDropdownProps}
               />
             )}
 
@@ -260,7 +200,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
                       ),
                     })}
                     key={`${option.value}`}
-                    {...getItemProps({ item: option, index })}
+                    {...getItemProps({ item: option, index, disabled: option.disabled })}
                   >
                     <span
                       className={cx({
@@ -269,15 +209,6 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
                     >
                       {option.label}
                     </span>
-
-                    {option.checkbox && (
-                      <Checkbox
-                        className="absolute bg-opacity-0 left-4"
-                        checked={isSelected(option, selectedItems)}
-                        disabled={option.disabled}
-                        onChange={() => {}}
-                      />
-                    )}
                   </li>
                 ))}
               </ul>
@@ -290,4 +221,4 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
   );
 };
 
-export default MultiDropdown;
+export default SingleDropdown;

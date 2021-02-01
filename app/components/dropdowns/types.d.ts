@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 interface DropdownThemeProps {
   theme: 'dark' | 'light';
   size: 'base' | 's';
@@ -6,43 +8,43 @@ interface DropdownThemeProps {
 
 interface DropdownStatusProps {
   disabled?: boolean;
-  clearable?: boolean;
   searchable?: boolean;
+  multiple?: boolean;
 }
 
 interface DropdownDataProps {
   options?: DropdownOptionProps[];
   placeholder?: string;
   prefix?: string;
+  initialSelected?: [];
+  clearSelectionActive?: boolean;
+  clearSelectionLabel?: string;
+  batchSelectionActive?: boolean;
+  batchSelectionLabel?: string;
 }
 
 export interface DropdownProps extends
   DropdownStatusProps,
   DropdownDataProps,
   DropdownThemeProps {
-  clearSelectionLabel?: string;
-  onChange?: (option: DropdownOptionProps) => void;
+  onChange?: (selection: string | string[]) => void;
+  onSelect?: (option: DropdownOptionProps | DropdownOptionProps[]) => void;
 }
 
 export interface DropdownOptionProps {
   label: string;
   value: string | number;
   disabled?: boolean;
+  checkbox?: boolean;
 }
 
 export interface DropdownMenuProps extends
   DropdownStatusProps,
-  DropdownDataProps,
   DropdownThemeProps {
+  children: ReactNode;
   opened: boolean;
-  selectedItem: {
-    label: string;
-  };
-  highlightedIndex: number;
   attributes: Record<string, unknown>,
-  getToggleButtonProps: () => void;
   getMenuProps: () => void;
-  getItemProps: (e) => void;
 }
 
 export interface DropdownToggleProps extends
@@ -50,8 +52,7 @@ export interface DropdownToggleProps extends
   DropdownDataProps,
   DropdownThemeProps {
   opened: boolean;
-  selectedItem: {
-    label: string;
-  };
+  selectedItems: DropdownOptionProps[];
   getToggleButtonProps: () => void;
+  getDropdownProps?: () => void;
 }
