@@ -6,7 +6,14 @@ import MultipleDropdown from 'components/dropdowns/multi';
 import { DropdownProps } from './types';
 
 export const Dropdown: React.FC<DropdownProps> = (props: DropdownProps) => {
-  const { multiple, initialSelected, onChange } = props;
+  const {
+    theme = 'dark',
+    size = 'base',
+    placeholder = 'Select...',
+    multiple,
+    initialSelected,
+    onChange,
+  } = props;
 
   const initialValues = useMemo(() => {
     if (multiple) {
@@ -29,10 +36,28 @@ export const Dropdown: React.FC<DropdownProps> = (props: DropdownProps) => {
   }, [onChange]);
 
   if (multiple) {
-    return <MultipleDropdown {...props} onSelect={handleChange} initialValues={initialValues} />;
+    return (
+      <MultipleDropdown
+        {...props}
+        theme={theme}
+        size={size}
+        placeholder={placeholder}
+        initialValues={initialValues}
+        onSelect={handleChange}
+      />
+    );
   }
 
-  return <SingleDropdown {...props} onSelect={handleChange} initialValues={initialValues} />;
+  return (
+    <SingleDropdown
+      {...props}
+      theme={theme}
+      size={size}
+      placeholder={placeholder}
+      initialValues={initialValues}
+      onSelect={handleChange}
+    />
+  );
 };
 
 export default Dropdown;
