@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import cx from 'classnames';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
@@ -9,15 +9,29 @@ import THEME from 'components/dropdowns/constants/theme';
 import { DropdownToggleProps } from 'components/dropdowns/types';
 
 export const DropdownToggle: React.FC<DropdownToggleProps> = ({
+  options,
   theme,
   size,
   prefix,
   disabled,
+  multiple,
   opened,
-  selectedItem,
+  selectedItems,
   placeholder,
   getToggleButtonProps,
+  getDropdownProps,
 }: DropdownToggleProps) => {
+  const getEnabledOptions = useMemo(() => {
+    return options.filter((o) => !o.disabled);
+  }, [options]);
+
+  const labelDefaultFormatter:() => string = useCallback(() => {
+    if (!selectedItems.length) return placeholder;
+    if (selectedItems.length === 1) return selectedItems[0].label;
+    if (selectedItems.length === getEnabledOptions.length) return 'All items selected';
+    return `${selectedItems.length} items selected`;
+  }, [selectedItems, placeholder, getEnabledOptions]);
+
   return (
     <button
       type="button"
@@ -26,21 +40,22 @@ export const DropdownToggle: React.FC<DropdownToggleProps> = ({
         'relative w-full flex items-center focus:outline-none tracking-wide': true,
         [THEME.sizes[size]]: true,
       })}
-      {...getToggleButtonProps()}
+      {...!multiple && getToggleButtonProps()}
+      {...multiple && getToggleButtonProps(getDropdownProps({ preventKeyAction: opened }))}
     >
       {prefix && (
-      <span
-        className={cx({
-          'mr-2 text-xs font-heading': true,
-          [THEME[theme].prefix.base]: true,
-        })}
-      >
-        {prefix}
-      </span>
+        <span
+          className={cx({
+            'mr-2 text-xs font-heading': true,
+            [THEME[theme].prefix.base]: true,
+          })}
+        >
+          {prefix}
+        </span>
       )}
 
       <span className="text-sm leading-none">
-        {selectedItem?.label || placeholder}
+        {labelDefaultFormatter()}
       </span>
 
       <Icon
