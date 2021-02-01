@@ -7,6 +7,7 @@ import Textarea from 'components/forms/textarea';
 import Select from 'components/forms/select';
 import Checkbox from 'components/forms/checkbox';
 import Radio from 'components/forms/radio';
+import Slider from 'components/forms/slider';
 import Button from 'components/button';
 import {
   composeValidators,
@@ -20,6 +21,8 @@ export default {
 };
 
 export const Form = (): React.ReactNode => {
+  const sliderLabelRef = React.useRef(null);
+
   return (
     <FormRFF
       debug={() => {
@@ -200,6 +203,27 @@ export const Form = (): React.ReactNode => {
                 >
                   <Radio />
                   <Label className="ml-2">Option 2</Label>
+                </Field>
+              )}
+            </FieldRFF>
+          </div>
+
+          <div className="mt-5">
+            <FieldRFF
+              name="slider"
+              validate={composeValidators([{ presence: true }])}
+            >
+              {(fprops) => (
+                <Field id="form-slider" {...fprops}>
+                  <Label ref={sliderLabelRef} className="mb-1 uppercase">
+                    Slider
+                  </Label>
+                  <Slider
+                    labelRef={sliderLabelRef}
+                    minValue={0}
+                    maxValue={1}
+                    step={0.01}
+                  />
                 </Field>
               )}
             </FieldRFF>

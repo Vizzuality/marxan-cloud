@@ -12,12 +12,12 @@ export interface LabelProps {
   className?: string;
 }
 
-export const Label: React.FC<LabelProps> = ({
-  id,
-  theme = 'primary',
-  children,
-  className,
-}: LabelProps) => {
+const LabelComponent = (
+  {
+    id, theme = 'primary', children, className,
+  }: LabelProps,
+  ref,
+) => {
   return (
     <label
       className={cx({
@@ -25,10 +25,15 @@ export const Label: React.FC<LabelProps> = ({
         [className]: !!className,
       })}
       htmlFor={id}
+      ref={ref}
     >
       {children}
     </label>
   );
 };
+
+export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
+  LabelComponent,
+);
 
 export default Label;
