@@ -20,6 +20,8 @@ COPY config ./config
 COPY ormconfig.ts ./ormconfig.ts
 
 COPY ./src ./src
+# @debt we should do this only for images used for tests
+COPY ./test ./test
 
 RUN yarn prestart:prod
 

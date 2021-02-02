@@ -2,7 +2,7 @@
 **/__pycache__/
 
 # env
-**/.env
+**/.env*
 
 # emacs/vim
 *#
