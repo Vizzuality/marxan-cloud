@@ -54,6 +54,6 @@ export interface DropdownToggleProps extends
   DropdownThemeProps {
   opened: boolean;
   selectedItems: DropdownOptionProps[];
-  getToggleButtonProps: () => void;
-  getDropdownProps?: () => void;
+  getToggleButtonProps: (e?:any) => void;
+  getDropdownProps?: (e?:any) => void;
 }
