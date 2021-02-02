@@ -16,11 +16,30 @@ module.exports = {
       colors: {
         'gradient-initial': '#01BDFE',
         'gradient-final': '#973CD5',
+        bioregional: '#03E7D1',
+        species: '#FFCA42',
       },
       outline: {
         blue: '2px dotted #00ace6',
       },
     },
+    customForms: (theme) => ({
+      default: {
+        checkbox: {
+          borderRadius: 'rounded-sm',
+        },
+      },
+      dark: {
+        checkbox: {
+          icon: (iconColor) => `<svg fill="${iconColor}" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" ><path d="M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z"/></svg>`,
+          iconColor: theme('colors.gray.800'),
+        },
+        radio: {
+          icon: (iconColor) => `icon: '<svg fill="${iconColor}" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="3"/></svg>'`,
+          iconColor: theme('colors.gray.800'),
+        },
+      },
+    }),
     screens: {
       sm: '640px',
       md: '768px',
