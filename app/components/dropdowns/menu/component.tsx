@@ -10,10 +10,15 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   attributes,
   getMenuProps,
   children,
+  onFocus,
+  onBlur,
 }: DropdownMenuProps) => {
   return (
     <div
-      {...getMenuProps()}
+      {...getMenuProps({
+        onFocus,
+        onBlur,
+      })}
       className={cx({
         'focus:outline-none overflow-hidden': true,
         'invisible pointer-events-none': attributes?.popper?.['data-popper-reference-hidden'],

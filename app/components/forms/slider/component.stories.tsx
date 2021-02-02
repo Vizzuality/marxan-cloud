@@ -15,7 +15,7 @@ export default {
         options: ['primary'],
       },
     },
-    state: {
+    status: {
       control: {
         type: 'select',
         options: ['none', 'valid', 'error'],
@@ -49,7 +49,7 @@ const Template: Story<SliderProps> = (args: SliderProps) => {
 export const Default = Template.bind({});
 Default.args = {
   theme: 'primary',
-  state: 'none',
+  status: 'none',
   disabled: false,
   formatOptions: { style: 'percent' },
   minValue: 0,

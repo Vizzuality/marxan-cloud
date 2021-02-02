@@ -5,7 +5,7 @@ const THEME = {
   primary: {
     base:
       'w-full leading-tight text-white bg-gray-800 border rounded focus:outline-none focus:bg-gray-700',
-    states: {
+    status: {
       none: 'border-gray-900',
       valid: 'border-green-500',
       error: 'border-red-500',
@@ -16,17 +16,17 @@ const THEME = {
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   theme?: 'primary';
-  state?: 'none' | 'valid' | 'error' | 'disabled';
+  status?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
 export const Input: React.FC<InputProps> = ({
   theme = 'primary',
-  state = 'none',
+  status = 'none',
   disabled = false,
   className,
   ...props
 }: InputProps) => {
-  const st = disabled ? 'disabled' : state;
+  const st = disabled ? 'disabled' : status;
 
   return (
     <input
@@ -35,7 +35,7 @@ export const Input: React.FC<InputProps> = ({
       className={cx({
         'form-input': true,
         [THEME[theme].base]: true,
-        [THEME[theme].states[st]]: true,
+        [THEME[theme].status[st]]: true,
         [className]: !!className,
       })}
     />
