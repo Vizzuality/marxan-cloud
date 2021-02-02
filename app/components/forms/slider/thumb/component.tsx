@@ -10,7 +10,7 @@ const THEME = {
   primary: {
     thumb:
       'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
-    states: {
+    status: {
       default: 'border-white',
       dragging: 'border-white opacity-80',
       focused: 'border-white ring-2 ring-primary-500',
@@ -23,7 +23,7 @@ const THEME = {
 
 export interface ThumbProps {
   theme: 'primary';
-  state: 'none' | 'valid' | 'error' | 'disabled';
+  status: 'none' | 'valid' | 'error' | 'disabled';
   sliderState: SliderState;
   trackRef: React.MutableRefObject<HTMLElement | null>;
   isDisabled: boolean;
@@ -32,7 +32,7 @@ export interface ThumbProps {
 
 export const Thumb: React.FC<ThumbProps> = ({
   theme,
-  state: rawState,
+  status: rawState,
   sliderState,
   trackRef,
   isDisabled,
@@ -54,15 +54,15 @@ export const Thumb: React.FC<ThumbProps> = ({
 
   const { focusProps, isFocusVisible } = useFocusRing();
 
-  let state: keyof typeof THEME.primary.states;
+  let status: keyof typeof THEME.primary.status;
   if (isFocusVisible) {
-    state = 'focused';
+    status = 'focused';
   } else if (sliderState.isThumbDragging(0)) {
-    state = 'dragging';
+    status = 'dragging';
   } else if (rawState === 'none') {
-    state = 'default';
+    status = 'default';
   } else {
-    state = rawState;
+    status = rawState;
   }
 
   const mergedInputProps = mergeProps(inputProps, focusProps, {
@@ -76,7 +76,7 @@ export const Thumb: React.FC<ThumbProps> = ({
       {...thumbProps}
       className={cx({
         [THEME[theme].thumb]: true,
-        [THEME[theme].states[state]]: true,
+        [THEME[theme].status[status]]: true,
       })}
       style={{
         left: `${sliderState.getThumbPercent(0) * 100}%`,

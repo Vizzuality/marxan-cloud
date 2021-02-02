@@ -28,6 +28,8 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
   clearSelectionActive,
   clearSelectionLabel = 'Clear selection',
   onSelect,
+  onFocus,
+  onBlur,
 }: DropdownProps) => {
   const triggerRef = useRef();
   const menuRef = useRef();
@@ -172,6 +174,8 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
             opened={isOpen}
             attributes={attributes}
             getMenuProps={getMenuProps}
+            onFocus={onFocus}
+            onBlur={onBlur}
           >
             {isOpen && (
               <Toggle
