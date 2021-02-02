@@ -1,10 +1,19 @@
-ifneq (,$(wildcard ./.env))
-    include .env
-    export
-endif
-
 .PHONY: start
 
+# Read values as needed from .env
+# If using the same variables in recipes that need to use a dotenv file other
+# than .env, remember to check that no values from .env are being used
+# inadvertently.
+API_POSTGRES_USER := $(shell grep -e API_POSTGRES_USER .env | sed 's/^.*=//')
+
+# Start only API and Geoprocessing services
+#
+# Useful when developing on API components only, to avoid spinning services
+# which may not be needed.
+start-api:
+	docker-compose up --build api geoprocessing
+
+# Start all the services.
 start:
 	docker-compose up --build
 
@@ -14,8 +23,11 @@ notebooks:
 stop:
 	docker-compose stop
 
-psql:
+psql-api:
 	docker-compose exec postgresql-api psql -U "${API_POSTGRES_USER}"
+
+psql-geo:
+	docker-compose exec postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"
 
 # Stop all containers and remove the postgresql-api container and the named
 # Docker volume used to persists PostgreSQL data
@@ -35,5 +47,10 @@ clean-slate: stop
 
 seed-api-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
+
 seed-geodb-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
+
+test-e2e-api:
+	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e rm --stop --force test-e2e-postgresql-api test-e2e-postgresql-geo-api
+	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e up --build --abort-on-container-exit --exit-code-from api api

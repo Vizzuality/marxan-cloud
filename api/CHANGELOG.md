@@ -22,6 +22,7 @@ Unreleased
   - Get users
   - Get current user info (`/users/me`)
 - Stub `ProjectsModule`.
+- Stub `ScenariosModule`.
 - Stub roles.
 - PoC JSON:API serialization.
 - Authentication
@@ -32,6 +33,9 @@ Unreleased
 - Ping/liveness endpoint.
 - NestJS services are based on `nestjs-base-service`.
 - Integration with faker.js for mock data.
+- Shared ORM config setup, allowing to use multiple connections in NestJS as
+  well as via the TypeORM CLI util.
+- Setup of E2E tests.
 
 ### Changed
 

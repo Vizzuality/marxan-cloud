@@ -28,10 +28,9 @@ export const uploadOptions: MulterOptions = {
     fileSize: (() => {
       const fileUploadsSizeLimitMebibytes = AppConfig.get<number>(
         'fileUploads.limits.fileSize',
+        50 * 1024e2,
       );
-      return fileUploadsSizeLimitMebibytes
-        ? fileUploadsSizeLimitMebibytes * 1024e2
-        : 50 * 1024e2;
+      return fileUploadsSizeLimitMebibytes;
     })(),
   },
 };

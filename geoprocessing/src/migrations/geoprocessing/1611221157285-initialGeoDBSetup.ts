@@ -1,14 +1,21 @@
+import { PostgreSQLUtils } from 'src/utils/postgresql.utils';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class initialGeoDBSetup1611221157285 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
+    // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
+    if (await PostgreSQLUtils.version13Plus()) {
+      await queryRunner.query(`
     CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     CREATE EXTENSION IF NOT EXISTS tablefunc;
     CREATE EXTENSION IF NOT EXISTS plpgsql;
     CREATE EXTENSION IF NOT EXISTS postgis;
     CREATE EXTENSION IF NOT EXISTS postgis_raster; -- OPTIONAL
     CREATE EXTENSION IF NOT EXISTS postgis_topology; -- OPTIONAL
+      `);
+    }
+
+    await queryRunner.query(`
 
         CREATE TYPE "source_type" AS ENUM (
           'user_imported',
@@ -187,7 +194,11 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
       DROP TYPE IF EXISTS shape_type;
       DROP TYPE IF EXISTS job_status;
       DROP TYPE IF EXISTS adm_level;
+    `);
 
+    // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
+    if (await PostgreSQLUtils.version13Plus()) {
+      await queryRunner.query(`
       DROP EXTENSION postgis_topology; -- OPTIONAL
       DROP EXTENSION postgis_raster; -- OPTIONAL
       DROP EXTENSION postgis;
@@ -195,5 +206,6 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
       DROP EXTENSION tablefunc;
       DROP EXTENSION uuid-ossp;
       `);
+    }
   }
 }

@@ -13,6 +13,7 @@ export class CorsUtils {
     const whitelist = AppConfig.getFromArrayAndParsedString<string>(
       'network.cors.origins',
       'network.cors.origins_extra',
+      '',
     );
 
     if (!requestOrigin) {
