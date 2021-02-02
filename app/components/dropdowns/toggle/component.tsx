@@ -54,7 +54,11 @@ export const DropdownToggle: React.FC<DropdownToggleProps> = ({
         </span>
       )}
 
-      <span className="text-sm leading-none">
+      <span className={cx({
+        'text-sm leading-none': true,
+        'text-white': selectedItems.length,
+      })}
+      >
         {labelDefaultFormatter()}
       </span>
 

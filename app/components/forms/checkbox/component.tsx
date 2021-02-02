@@ -5,7 +5,7 @@ const THEME = {
   primary: {
     base:
       'bg-gray-800 border rounded-sm text-primary-500 focus:border-primary-500 focus:outline-none',
-    states: {
+    status: {
       none: 'border-gray-900',
       valid: 'border-gray-900',
       error: 'border-red-500 focus:border-red-500',
@@ -16,17 +16,17 @@ const THEME = {
 
 export interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
   theme?: 'primary';
-  state?: 'none' | 'valid' | 'error' | 'disabled';
+  status?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
 export const Checkbox: React.FC<CheckboxProps> = ({
   theme = 'primary',
-  state = 'none',
+  status = 'none',
   disabled = false,
   className,
   ...props
 }: CheckboxProps) => {
-  const st = disabled ? 'disabled' : state;
+  const st = disabled ? 'disabled' : status;
 
   return (
     <input
@@ -36,7 +36,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       className={cx({
         'form-checkbox': true,
         [THEME[theme].base]: true,
-        [THEME[theme].states[st]]: true,
+        [THEME[theme].status[st]]: true,
         [className]: !!className,
       })}
     />

@@ -27,12 +27,12 @@ export const Field: React.FC<FieldProps> = ({
   const childrenWithProps = React.Children.map(children, (child) => {
     // checking isValidElement is the safe way and avoids a typescript error too
     if (React.isValidElement(child)) {
-      const state = getState(meta);
+      const status = getState(meta);
 
       return React.cloneElement(child, {
         ...input,
         id,
-        state,
+        status,
       });
     }
     return child;

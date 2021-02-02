@@ -27,10 +27,10 @@ export interface SliderProps {
    */
   theme?: 'primary';
   /**
-   * Validation state of the input. If the `disabled` prop is set to `true`, it is overwritten to
+   * Validation status of the input. If the `disabled` prop is set to `true`, it is overwritten to
    * `'disabled'`.
    */
-  state?: 'none' | 'valid' | 'error' | 'disabled';
+  status?: 'none' | 'valid' | 'error' | 'disabled';
   /**
    * Whether the input is disabled
    */
@@ -79,13 +79,13 @@ export interface SliderProps {
 
 export const Slider: React.FC<SliderProps> = ({
   theme = 'primary',
-  state: rawState = 'none',
+  status: rawState = 'none',
   disabled = false,
   formatOptions = { style: 'percent' },
   labelRef,
   ...rest
 }: SliderProps) => {
-  const state = disabled ? 'disabled' : rawState;
+  const status = disabled ? 'disabled' : rawState;
   const onChangeOverride = rest.onChange
     ? (values: number[]) => rest.onChange(values[0])
     : undefined;
@@ -124,8 +124,8 @@ export const Slider: React.FC<SliderProps> = ({
   );
 
   // When the user clicks the external `<label />`, the hidden range input is focused but the
-  // component's state isn't updated
-  // Calling `setInteractionModality` make sure the component is in the focus state
+  // component's status isn't updated
+  // Calling `setInteractionModality` make sure the component is in the focus status
   React.useEffect(() => {
     const label = labelRef.current;
     // Why `'keyboard'`? This is based on React Aria's on code:
@@ -148,7 +148,7 @@ export const Slider: React.FC<SliderProps> = ({
       {...groupProps}
       className={cx({
         [THEME[theme].base]: true,
-        'opacity-30': state === 'disabled',
+        'opacity-30': status === 'disabled',
       })}
     >
       <div
@@ -175,7 +175,7 @@ export const Slider: React.FC<SliderProps> = ({
         <Thumb
           {...rest}
           theme={theme}
-          state={state}
+          status={status}
           sliderState={sliderState}
           trackRef={trackRef}
           isDisabled={disabled}
