@@ -13,7 +13,7 @@ export default {
         options: ['dark', 'light'],
       },
     },
-    state: {
+    status: {
       control: {
         type: 'select',
         options: ['none', 'valid', 'error', 'disabled'],

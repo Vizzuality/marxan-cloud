@@ -5,7 +5,7 @@ const THEME = {
   primary: {
     base:
       'leading-tight text-white bg-gray-800 border rounded focus:outline-none focus:bg-gray-700',
-    states: {
+    status: {
       none: 'border-gray-900',
       valid: 'border-green-500',
       error: 'border-red-500',
@@ -17,17 +17,17 @@ const THEME = {
 export interface TextareaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   theme?: 'primary';
-  state?: 'none' | 'valid' | 'error' | 'disabled';
+  status?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
 export const Textarea: React.FC<TextareaProps> = ({
   theme = 'primary',
-  state = 'none',
+  status = 'none',
   disabled = false,
   className,
   ...props
 }: TextareaProps) => {
-  const st = disabled ? 'disabled' : state;
+  const st = disabled ? 'disabled' : status;
 
   return (
     <textarea
@@ -36,7 +36,7 @@ export const Textarea: React.FC<TextareaProps> = ({
       className={cx({
         'form-textarea w-full': true,
         [THEME[theme].base]: true,
-        [THEME[theme].states[st]]: true,
+        [THEME[theme].status[st]]: true,
         [className]: !!className,
       })}
     />

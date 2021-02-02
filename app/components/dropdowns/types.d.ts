@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, FocusEventHandler } from 'react';
 
 interface DropdownThemeProps {
   theme: 'dark' | 'light';
@@ -30,6 +30,8 @@ export interface DropdownProps extends
   DropdownThemeProps {
   onChange?: (selection: string | string[]) => void;
   onSelect?: (option: DropdownOptionProps | DropdownOptionProps[]) => void;
+  onFocus?: FocusEventHandler;
+  onBlur?: FocusEventHandler;
 }
 
 export interface DropdownOptionProps {
@@ -45,7 +47,9 @@ export interface DropdownMenuProps extends
   children: ReactNode;
   opened: boolean;
   attributes: Record<string, unknown>,
-  getMenuProps: () => void;
+  getMenuProps: (e?:any) => void;
+  onFocus?: FocusEventHandler;
+  onBlur?: FocusEventHandler;
 }
 
 export interface DropdownToggleProps extends
