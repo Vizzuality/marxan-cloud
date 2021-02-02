@@ -32,6 +32,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
   batchSelectionActive,
   batchSelectionLabel = 'Select all',
   onSelect,
+  onFocus,
   onBlur,
 }: DropdownProps) => {
   const triggerRef = useRef();
@@ -229,6 +230,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
             opened={isOpen}
             attributes={attributes}
             getMenuProps={getMenuProps}
+            onFocus={onFocus}
             onBlur={onBlur}
           >
             {isOpen && (
