@@ -1,10 +1,11 @@
 import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
-import Select, { SingleSelectProps } from './component';
+import Dropdown from './component';
+import { DropdownProps } from './types';
 
 export default {
-  title: 'Components/Forms/Single select',
-  component: Select,
+  title: 'Components/Dropdowns/Default',
+  component: Dropdown,
   parameters: { actions: { argTypesRegex: '^on.*' } },
   argTypes: {
     theme: {
@@ -19,12 +20,22 @@ export default {
         options: ['valid', 'error', 'none'],
       },
     },
+    onSelect: {
+      table: {
+        disable: true,
+      },
+    },
+    initialValues: {
+      table: {
+        disable: true,
+      },
+    },
   },
 };
 
-const Template: Story<SingleSelectProps> = (args) => (
-  <div className="relative h-60">
-    <Select {...args} />
+const Template: Story<DropdownProps> = (args) => (
+  <div className="relative">
+    <Dropdown {...args} />
   </div>
 );
 
@@ -32,15 +43,22 @@ export const Default = Template.bind({});
 Default.args = {
   theme: 'dark',
   size: 'base',
-  disabled: false,
-  placeholder: 'Select Scenario',
-  clearable: true,
+  status: 'none',
   prefix: 'FILTER BY:',
+  placeholder: 'Select Scenario',
   options: [
     { label: 'Scenario 1', value: 'scenario-1' },
     { label: 'Scenario 2', value: 'scenario-2' },
     { label: 'Scenario 3', value: 'scenario-3', disabled: true },
     { label: 'Scenario 4', value: 'scenario-4' },
   ],
-  onSelect: (selected) => console.info(selected),
+  initialSelected: ['scenario-1', 'scenario-2', 'scenario-4'],
+  disabled: false,
+  multiple: true,
+  searchable: false,
+  clearSelectionActive: true,
+  clearSelectionLabel: 'Clear Selection',
+  batchSelectionActive: true,
+  batchSelectionLabel: 'Select all',
+  onChange: (option) => console.info(option),
 };

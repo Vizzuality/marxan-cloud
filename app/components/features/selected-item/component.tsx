@@ -9,6 +9,7 @@ import Checkbox from 'components/forms/checkbox';
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
+import { DropdownOptionProps } from 'components/dropdowns/types';
 
 export interface ItemProps {
   id: string;
@@ -18,7 +19,7 @@ export interface ItemProps {
   type: 'bioregional' | 'species';
 
   splitSelected: string;
-  splitOptions: Record<string, unknown>[];
+  splitOptions: DropdownOptionProps[];
   onSplitSelected: (selected: string) => void;
 
   splitFeaturesSelected: string[];
@@ -48,8 +49,8 @@ export const Item: React.FC<ItemProps> = ({
 }: ItemProps) => {
   // EVENTS
   const onSplitChanged = useCallback(
-    (e) => {
-      onSplitSelected(e.currentTarget.value);
+    (selected) => {
+      onSplitSelected(selected);
     },
     [onSplitSelected],
   );
@@ -104,9 +105,11 @@ export const Item: React.FC<ItemProps> = ({
             {/* TODO: Select from javi!! */}
             <div className="inline-block mt-2">
               <Select
-                className="py-0.5 text-sm pr-8"
+                theme="dark"
+                size="s"
+                status="none"
                 placeholder="Select..."
-                value={splitSelected}
+                initialValues={splitSelected}
                 options={splitOptions}
                 onChange={onSplitChanged}
               />

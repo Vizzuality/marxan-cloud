@@ -4,7 +4,7 @@ import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
 import Textarea from 'components/forms/textarea';
-import SingleSelect from 'components/forms/dropdowns/single';
+import Select from 'components/forms/select';
 import Checkbox from 'components/forms/checkbox';
 import Radio from 'components/forms/radio';
 import Slider from 'components/forms/slider';
@@ -98,11 +98,10 @@ export const Form = (): React.ReactNode => {
               {(fprops) => (
                 <Field id="form-select" {...fprops}>
                   <Label className="mb-3 uppercase">Category</Label>
-                  <SingleSelect
+                  <Select
                     theme="dark"
+                    status="none"
                     size="base"
-                    placeholder="Select category..."
-                    clearable
                     options={[
                       { label: 'Option 1', value: 'option-1' },
                       { label: 'Option 2', value: 'option-2' },
