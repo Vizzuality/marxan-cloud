@@ -6,39 +6,70 @@ import Link from 'next/link';
 import Wrapper from 'layout/wrapper';
 
 import Icon from 'components/icon';
+import Button from 'components/button';
+import Avatar from 'components/avatar';
+
 import LOGO_SVG from 'svgs/logo.svg?sprite';
+import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
 export interface HeaderProps {
-  theme: 'primary' | 'home'
+  size: 'base' | 'lg',
+  user?: Record <string, unknown> // As soon as he define the User we must define this type better
 }
 
-export const Header: React.FC<HeaderProps> = ({ theme }:HeaderProps) => {
+const SIZE = {
+  base: {
+    logo: 'h-12 w-28',
+  },
+  lg: {
+    logo: 'h-20 w-36',
+  },
+};
+
+export const Header: React.FC<HeaderProps> = ({ size, user }:HeaderProps) => {
   return (
     <header
-      className={cx({
-        'w-full': true,
-        'bg-black': theme === 'primary',
-      })}
+      className="w-full"
     >
       <nav className="relative flex flex-wrap items-center justify-between py-1 bg-black navbar-expand-lg">
         <Wrapper>
-          <div className="relative flex justify-between w-full lg:w-auto lg:static lg:block lg:justify-start">
+          <div className="relative flex justify-between w-full">
             <Link
               href="/"
             >
               <a href="/">
-                <Icon icon={LOGO_SVG} className="h-12 w-28" />
+                <Icon
+                  icon={LOGO_SVG}
+                  className={cx({
+                    [`${SIZE[size].logo}`]: true,
+                  })}
+                />
               </a>
             </Link>
 
-            <button
-              className="block py-1 text-xl leading-none bg-transparent border border-transparent border-solid rounded outline-none cursor-pointer lg:hidden focus:outline-none"
-              type="button"
-            >
-              <span className="relative block w-6 h-px bg-white rounded-sm" />
-              <span className="relative block w-6 h-px mt-1 bg-white rounded-sm" />
-              <span className="relative block w-6 h-px mt-1 bg-white rounded-sm" />
-            </button>
+            {user?.isLogged && (
+              <button
+                type="button"
+                className="flex items-center justify-start"
+              >
+                <Avatar className="text-sm text-white uppercase bg-primary-700">
+                  MB
+                </Avatar>
+                <Icon icon={ARROW_DOWN_SVG} className="w-2.5 h-2.5 text-white" />
+              </button>
+            )}
+
+            {!user?.isLogged && (
+              <div className="flex items-center gap-4">
+                <Button theme="secondary-alt" size="s" className="">
+                  Sign in
+                </Button>
+
+                <Button theme="primary" size="s" className="">
+                  Sign up
+                </Button>
+              </div>
+            )}
           </div>
         </Wrapper>
       </nav>
