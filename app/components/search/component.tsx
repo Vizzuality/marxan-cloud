@@ -4,7 +4,7 @@ import cx from 'classnames';
 // react aria
 import { useSearchField } from '@react-aria/searchfield';
 import { useSearchFieldState } from '@react-stately/searchfield';
-import { useButton } from '@react-aria/button';
+import { useButton } from '@react-aria/button'; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { setInteractionModality } from '@react-aria/interactions';
 
 // react types
@@ -12,7 +12,7 @@ import { AriaSearchFieldProps } from '@react-types/searchfield';
 
 import Icon from 'components/icon';
 import SEARCH_SVG from 'svgs/ui/search.svg';
-import CLOSE_SVG from 'svgs/ui/close.svg';
+import CLOSE_SVG from 'svgs/ui/close.svg'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 const THEME = {
   dark: 'text-white',
@@ -40,9 +40,11 @@ export const Search: React.FC<SearchProps> = ({
   const state = useSearchFieldState(rest);
 
   const ref = useRef();
-  const { inputProps, clearButtonProps } = useSearchField(rest, state, ref);
-  const { buttonProps } = useButton(clearButtonProps, null);
-  console.log(inputProps, clearButtonProps);
+  const {
+    inputProps,
+    clearButtonProps, // eslint-disable-line @typescript-eslint/no-unused-vars
+  } = useSearchField(rest, state, ref);
+  // const { buttonProps } = useButton(clearButtonProps, null);
 
   useEffect(() => {
     const label = labelRef.current;
@@ -83,14 +85,14 @@ export const Search: React.FC<SearchProps> = ({
           { [THEME[theme]]: true },
         )}
       />
-      {state.value !== '' && (
+      {/* {state.value !== '' && (
         <button type="button" {...buttonProps}>
           <Icon
             icon={CLOSE_SVG}
             className="absolute inline-block w-2 h-2 right-1 top-1\/2"
           />
         </button>
-      )}
+      )} */}
     </div>
   );
 };
