@@ -12,7 +12,7 @@ const About: React.FC = () => {
       </Head>
 
       <main>
-        <Header theme="primary" />
+        <Header size="base" />
       </main>
     </>
   );

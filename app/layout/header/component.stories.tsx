@@ -16,5 +16,5 @@ const Template: Story<HeaderProps> = (args: HeaderProps) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  theme: 'primary',
+  size: 'base',
 };

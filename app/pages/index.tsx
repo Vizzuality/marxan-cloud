@@ -12,7 +12,7 @@ const Home: React.FC = () => {
       </Head>
 
       <main>
-        <Header theme="home" />
+        <Header size="lg" />
       </main>
     </>
   );
