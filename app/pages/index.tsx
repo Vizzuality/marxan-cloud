@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 
-import Header from 'components/header';
+import Header from 'layout/header';
 
 const Home: React.FC = () => {
   return (
@@ -12,7 +12,7 @@ const Home: React.FC = () => {
       </Head>
 
       <main>
-        <Header />
+        <Header size="lg" />
       </main>
     </>
   );

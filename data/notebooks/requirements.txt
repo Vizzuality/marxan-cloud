@@ -37,3 +37,5 @@ s3fs
 carto==1.11.1
 google-cloud-storage
 google-api-python-client
+datamodel-code-generator
+sa2schema
