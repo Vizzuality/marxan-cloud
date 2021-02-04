@@ -17,11 +17,11 @@ export const Avatar: React.FC<AvatarProps> = ({
   <button
     type="button"
     className={cx({
-      'relative transform transition-transform z-0 hover:z-10 hover:scale-105 flex items-center justify-center bg-transparent bg-cover bg-no-repeat text-black border-2 border-gray-700 w-10 h-10 rounded-full overflow-hidden focus:outline-none': true,
+      'relative transform transition-transform z-0 hover:z-10 hover:scale-105 flex items-center justify-center bg-transparent bg-cover bg-no-repeat border-2 border-gray-700 w-10 h-10 rounded-full overflow-hidden focus:outline-none': true,
       [className]: !!className,
     })}
     style={{
-      backgroundImage: `url(${bgImage})`,
+      ...bgImage && { backgroundImage: `url(${bgImage})` },
     }}
     onClick={onClick}
   >
