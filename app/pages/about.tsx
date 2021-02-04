@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 
-import Header from 'components/header';
+import Header from 'layout/header';
 
 const About: React.FC = () => {
   return (
@@ -12,7 +12,7 @@ const About: React.FC = () => {
       </Head>
 
       <main>
-        <Header />
+        <Header size="base" />
       </main>
     </>
   );
