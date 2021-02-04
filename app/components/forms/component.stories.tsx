@@ -99,6 +99,9 @@ export const Form = (): React.ReactNode => {
                 <Field id="form-select" {...fprops}>
                   <Label className="mb-3 uppercase">Category</Label>
                   <Select
+                    theme="dark"
+                    status="none"
+                    size="base"
                     options={[
                       { label: 'Option 1', value: 'option-1' },
                       { label: 'Option 2', value: 'option-2' },

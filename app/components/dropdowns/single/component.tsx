@@ -1,68 +1,100 @@
-import React from 'react';
-import { useSelect } from 'downshift';
-import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
-import Icon from 'components/icon';
+import React, { useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import cx from 'classnames';
-import THEME from '../default-theme';
 
-interface Option {
-  label: string;
-  value: string | number;
-  disabled?: boolean;
-}
+// Downshift;
+import { useSelect } from 'downshift';
+import Toggle from 'components/dropdowns/toggle';
+import Menu from 'components/dropdowns/menu';
 
-export interface SingleSelectProps {
-  theme: 'dark' | 'light';
-  size: 'base' | 's';
-  state: 'none' | 'error' | 'valid';
-  onChange: (option: Option) => void;
-  prefix?: string;
-  options?: Option[];
-  disabled?: boolean;
-  clearable?: boolean;
-  className?: string;
-  placeholder?: string;
-  clearSelectionLabel?: string;
-}
+// Popper
+import { usePopper } from 'react-popper';
+import {
+  flipModifier, hideModifier, sameWidthModifier, offsetModifier,
+} from 'components/dropdowns/constants/popper-modifiers';
+import THEME from 'components/dropdowns/constants/theme';
 
-export const DropdownSelect: React.FC<SingleSelectProps> = ({
+import { DropdownProps, DropdownOptionProps } from 'components/dropdowns/types';
+
+export const SingleDropdown: React.FC<DropdownProps> = ({
   theme = 'dark',
   size = 'base',
-  state,
-  onChange,
+  status,
   prefix,
   options = [],
   disabled = false,
-  clearable,
-  className,
   placeholder,
+  initialValues,
+  clearSelectionActive,
   clearSelectionLabel = 'Clear selection',
-}: SingleSelectProps) => {
-  const items = clearable
-    ? [{ value: null, label: clearSelectionLabel }, ...options]
-    : options;
+  onSelect,
+  onFocus,
+  onBlur,
+}: DropdownProps) => {
+  const triggerRef = useRef();
+  const menuRef = useRef();
 
-  const handleSelectedItems = (selected, clearSelection) => {
+  const getOptions = useMemo(() => {
+    return [
+      ...clearSelectionActive ? [
+        {
+          value: null,
+          label: clearSelectionLabel,
+        },
+      ] : [],
+      ...options,
+    ];
+  }, [
+    options,
+    clearSelectionActive,
+    clearSelectionLabel,
+  ]);
+
+  const getInitialSelected = useMemo(() => {
+    return getOptions.find((o) => o.value === initialValues);
+  }, [getOptions, initialValues]);
+
+  // Events
+  const handleSelectedItems = (selected, reset) => {
     switch (selected.value) {
       case null:
-        clearSelection();
+        reset();
         break;
       default:
-        onChange(selected);
         break;
     }
   };
 
+  const isSelected = (selected: DropdownOptionProps, selectedItms: DropdownOptionProps[]) => (
+    selectedItms.some((i) => i.value === selected.value)
+  );
+
+  // 'useSelect'
   const {
     isOpen,
     selectedItem,
+    highlightedIndex,
     getToggleButtonProps,
     getMenuProps,
-    highlightedIndex,
     getItemProps,
+    closeMenu,
     reset,
   } = useSelect({
-    items,
+    items: getOptions,
+    initialSelectedItem: getInitialSelected,
+    stateReducer: (st, actionAndChanges) => {
+      const { changes, type } = actionAndChanges;
+
+      if (
+        type === useSelect.stateChangeTypes.MenuKeyDownEnter
+        || type === useSelect.stateChangeTypes.MenuKeyDownSpaceButton
+        || type === useSelect.stateChangeTypes.ItemClick
+      ) {
+        onSelect(changes.selectedItem);
+      }
+
+      return changes;
+    },
     onStateChange: ({ type, selectedItem: selected }) => {
       switch (type) {
         case useSelect.stateChangeTypes.MenuKeyDownEnter:
@@ -77,77 +109,126 @@ export const DropdownSelect: React.FC<SingleSelectProps> = ({
     },
   });
 
+  // 'usePopper'
+  const { styles, attributes } = usePopper(triggerRef.current, menuRef.current, {
+    placement: 'bottom',
+    // strategy: 'fixed',
+    modifiers: [
+      offsetModifier,
+      flipModifier,
+      hideModifier,
+      sameWidthModifier,
+    ],
+  });
+
+  // Hide menu if reference is outside the boundaries
+  const referenceHidden = attributes?.popper?.['data-popper-reference-hidden'] || attributes?.popper?.['data-popper-reference-scaped'];
+  useEffect(() => {
+    if (referenceHidden) {
+      closeMenu();
+    }
+  }, [referenceHidden, closeMenu]);
+
+  const selectedItems = selectedItem ? [selectedItem] : [];
+
   return (
     <div
       className={cx({
         'w-full leading-tight overflow-hidden': true,
-        [THEME[theme].container]: !isOpen,
-        [THEME[theme].closed]: !selectedItem && !isOpen,
-        [THEME[theme].open]: isOpen,
-        [THEME.states[state]]: true,
-        [className]: !!className,
+        [THEME[theme].container]: true,
+        [THEME[theme].closed]: true,
+        [THEME.states[status]]: true,
       })}
     >
-      <button
-        type="button"
-        disabled={disabled}
-        className={cx({
-          'relative w-full flex items-center focus:outline-none tracking-wide': true,
-          [THEME.sizes[size]]: true,
-        })}
-        {...getToggleButtonProps()}
+      <div
+        className="relative w-full"
+        ref={triggerRef}
       >
-        {prefix && (
-          <span
-            className={cx({
-              'mr-2 text-xs font-heading': true,
-              [THEME[theme].prefix.base]: true,
-            })}
-          >
-            {prefix}
-          </span>
-        )}
-
-        <span className="text-sm leading-none">
-          {selectedItem?.label || placeholder}
-        </span>
-
-        <Icon
-          className={cx({
-            'absolute w-3 h-3 right-4': true,
-            [THEME[theme].icon.closed]: !isOpen,
-            [THEME[theme].icon.open]: isOpen,
-            [THEME[theme].icon.disabled]: disabled,
-          })}
-          icon={ARROW_DOWN_SVG}
+        <Toggle
+          options={getOptions}
+          theme={theme}
+          size={size}
+          status={status}
+          prefix={prefix}
+          disabled={disabled}
+          opened={isOpen}
+          selectedItems={selectedItems}
+          placeholder={placeholder}
+          getToggleButtonProps={getToggleButtonProps}
         />
-      </button>
+      </div>
 
       {/* Menu */}
-      {isOpen && (
-        <ul
-          className={cx({
-            'pt-1 pb-3 focus:outline-none': true,
-          })}
-          {...getMenuProps()}
+      {createPortal(
+        <div
+          className="z-50"
+          ref={menuRef}
+          style={styles.popper}
+          {...attributes.popper}
         >
-          {items.map((option, index) => (
-            <li
-              className={cx({
-                'px-4 py-1 mt-0.5 cursor-pointer': true,
-                [THEME[theme].item.base]: highlightedIndex !== index,
-                [THEME[theme].item.highlighted]: highlightedIndex === index,
-              })}
-              key={`${option.value}`}
-              {...getItemProps({ item: option, index })}
-            >
-              {option.label}
-            </li>
-          ))}
-        </ul>
+          <Menu
+            theme={theme}
+            size={size}
+            status={status}
+            disabled={disabled}
+            opened={isOpen}
+            attributes={attributes}
+            getMenuProps={getMenuProps}
+            onFocus={onFocus}
+            onBlur={onBlur}
+          >
+            {isOpen && (
+              <Toggle
+                options={options}
+                theme={theme}
+                size={size}
+                status={status}
+                prefix={prefix}
+                disabled={disabled}
+                opened={isOpen}
+                selectedItems={selectedItems}
+                placeholder={placeholder}
+                getToggleButtonProps={getToggleButtonProps}
+              />
+            )}
+
+            {isOpen && (
+              <ul
+                className={cx({
+                  'py-1 focus:outline-none': true,
+                })}
+              >
+                {getOptions.map((option, index) => (
+                  <li
+                    className={cx({
+                      'px-4 py-1 mt-0.5 cursor-pointer': true,
+                      [THEME[theme].item.base]: highlightedIndex !== index,
+                      [THEME[theme].item.disabled]: option.disabled,
+                      [THEME[theme].item.highlighted]: (
+                        (highlightedIndex === index && !option.disabled)
+                        || isSelected(option, selectedItems)
+                      ),
+                    })}
+                    key={`${option.value}`}
+                    {...getItemProps({ item: option, index, disabled: option.disabled })}
+                  >
+                    <span
+                      className={cx({
+                        'ml-6': !!option.checkbox,
+                      })}
+                    >
+                      {option.label}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Menu>
+        </div>,
+        document.body,
       )}
     </div>
   );
 };
 
-export default DropdownSelect;
+export default SingleDropdown;
