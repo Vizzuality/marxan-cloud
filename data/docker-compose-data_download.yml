@@ -5,7 +5,10 @@ services:
         context: ./data_download
         dockerfile: Dockerfile
     volumes:
-    - './data/:/data/'
+    - './data/raw:/gadm_3.6/data/'
+    - './data/raw:/wdpa/data/'
+    - './data/raw:/iucn/data/'
+    - './data/raw:/WorldTerrestrialEcosystems/data/'
     command: make
     environment:
         - POSTGRES_API_SERVICE_PORT=3432
