@@ -1,22 +1,19 @@
 import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
 import { withNextRouter } from 'storybook-addon-next-router';
-import Wrapper, { WrapperProps } from './component';
+import Projects, { ProjectsProps } from './component';
 
 export default {
-  title: 'Layout/Wrapper',
-  component: Wrapper,
+  title: 'Layout/Projects',
+  component: Projects,
   argTypes: {},
   decorators: [withNextRouter],
 };
 
-const Template: Story<WrapperProps> = ({ children, ...args }:WrapperProps) => (
-  <Wrapper {...args}>
-    {children}
-  </Wrapper>
+const Template: Story<ProjectsProps> = (args: ProjectsProps) => (
+  <Projects {...args} />
 );
 
 export const Default = Template.bind({});
 Default.args = {
-  children: (<div>Just testing</div>),
 };
