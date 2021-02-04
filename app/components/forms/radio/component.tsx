@@ -5,7 +5,7 @@ const THEME = {
   primary: {
     base:
       'bg-gray-800 border rounded-full text-primary-500 focus:border-primary-500 focus:outline-none',
-    states: {
+    status: {
       none: 'border-gray-900',
       valid: 'border-gray-900',
       error: 'border-red-500',
@@ -16,17 +16,17 @@ const THEME = {
 
 export interface RadioProps extends InputHTMLAttributes<HTMLInputElement> {
   theme?: 'primary';
-  state?: 'none' | 'valid' | 'error' | 'disabled';
+  status?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
 export const Radio: React.FC<RadioProps> = ({
   theme = 'primary',
-  state = 'none',
+  status = 'none',
   disabled = false,
   className,
   ...props
 }: RadioProps) => {
-  const st = disabled ? 'disabled' : state;
+  const st = disabled ? 'disabled' : status;
 
   return (
     <input
@@ -36,7 +36,7 @@ export const Radio: React.FC<RadioProps> = ({
       className={cx({
         'form-radio': true,
         [THEME[theme].base]: true,
-        [THEME[theme].states[st]]: true,
+        [THEME[theme].status[st]]: true,
         [className]: !!className,
       })}
     />

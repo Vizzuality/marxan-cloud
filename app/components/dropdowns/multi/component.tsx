@@ -1,69 +1,76 @@
-import React, { useCallback } from 'react';
-import { useSelect, useMultipleSelection } from 'downshift';
-import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
-import Icon from 'components/icon';
-import Checkbox from 'components/forms/checkbox';
+import React, { useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import cx from 'classnames';
-import THEME from '../default-theme';
 
-interface Option {
-  label: string;
-  value: string | number;
-  disabled?: boolean;
-  hideCheckbox?: boolean;
-}
+// Downshift;
+import { useSelect, useMultipleSelection } from 'downshift';
+import Toggle from 'components/dropdowns/toggle';
+import Menu from 'components/dropdowns/menu';
+import Checkbox from 'components/forms/checkbox';
 
-export interface MultiSelectProps {
-  options: Option[];
-  theme: 'dark' | 'light';
-  size: 'base' | 's';
-  state: 'none' | 'error' | 'valid';
-  onChange: (option: Option, selectedItems: Option[]) => void;
-  prefix?: string;
-  disabled?: boolean;
-  className?: string;
-  placeholder?: string;
-  defaultSelection?: Option[];
-  clearSelectionLabel?: string;
-  batchSelectionLabel?: string;
-  batchSelectionActive?: boolean;
-  labelFormatter?: (selectedItems: Option[]) => string;
-}
+// Popper
+import { usePopper } from 'react-popper';
+import {
+  flipModifier, hideModifier, sameWidthModifier, offsetModifier,
+} from 'components/dropdowns/constants/popper-modifiers';
+import THEME from 'components/dropdowns/constants/theme';
 
-export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
-  options,
+import { DropdownProps, DropdownOptionProps } from 'components/dropdowns/types';
+
+export const MultiDropdown: React.FC<DropdownProps> = ({
   theme = 'dark',
   size = 'base',
-  state = 'none',
-  onChange,
+  status,
   prefix,
-  disabled,
-  className,
+  options = [],
+  initialValues = [],
+  disabled = false,
+  multiple = true,
   placeholder,
-  defaultSelection = [],
-  batchSelectionLabel,
-  clearSelectionLabel,
+  clearSelectionActive = true,
+  clearSelectionLabel = 'Clear selection',
   batchSelectionActive,
-  labelFormatter,
-}: MultiSelectProps) => {
-  const enabledOptions = options.filter((op) => !op.disabled);
+  batchSelectionLabel = 'Select all',
+  onSelect,
+  onBlur,
+}: DropdownProps) => {
+  const triggerRef = useRef();
+  const menuRef = useRef();
 
-  const items = batchSelectionActive ? [
-    {
-      value: 'batch-selection',
-      label: batchSelectionLabel,
-      hideCheckbox: true,
-    },
-    {
-      value: null,
-      label: clearSelectionLabel,
-      hideCheckbox: true,
-    },
-    ...options,
-  ] : options;
+  const getOptions = useMemo(() => {
+    return [
+      ...clearSelectionActive ? [{
+        value: null,
+        label: clearSelectionLabel,
+        checkbox: false,
+        enabled: false,
+      }] : [],
+      ...batchSelectionActive ? [{
+        value: 'batch-selection',
+        label: batchSelectionLabel,
+        checkbox: false,
+        enabled: false,
+      }] : [],
+      ...options.map((o) => ({ ...o, checkbox: true, enabled: true })),
+    ];
+  }, [
+    options,
+    clearSelectionActive,
+    clearSelectionLabel,
+    batchSelectionActive,
+    batchSelectionLabel,
+  ]);
 
-  const isSelected = (selected: Option, selectedItems: Option[]) => (
-    selectedItems.some((i) => i.value === selected.value)
+  const getOptionsEnabled = useMemo(() => {
+    return getOptions.filter((op) => !op.disabled && op.enabled);
+  }, [getOptions]);
+
+  const getInitialSelected = useMemo(() => {
+    return getOptions.filter((o) => initialValues.includes(`${o.value}`));
+  }, [getOptions, initialValues]);
+
+  const isSelected = (selected: DropdownOptionProps, selectedItms: DropdownOptionProps[]) => (
+    selectedItms.some((i) => i.value === selected.value)
   );
 
   const handleSelectedItem = ({
@@ -79,17 +86,20 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
         reset();
         break;
       case 'batch-selection':
-        setSelectedItems(enabledOptions);
+        setSelectedItems(getOptionsEnabled);
         break;
       default:
+        if (option.disabled) {
+          break;
+        }
+
         if (isSelected(option, selectedItems)) {
           removeSelectedItem(option);
-        } else if (option.disabled) {
           break;
         } else {
           addSelectedItem(option);
+          break;
         }
-        break;
     }
   };
 
@@ -101,26 +111,35 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
     selectedItems,
     reset,
   } = useMultipleSelection({
-    initialSelectedItems: defaultSelection,
+    initialSelectedItems: getInitialSelected,
     stateReducer: (st, actionAndChanges) => {
-      const { changes, selectedItem } = actionAndChanges;
-      onChange(selectedItem, changes.selectedItems);
-      return actionAndChanges.changes;
+      const { changes, type } = actionAndChanges;
+      if (
+        type === useMultipleSelection.stateChangeTypes.FunctionAddSelectedItem
+        || type === useMultipleSelection.stateChangeTypes.FunctionRemoveSelectedItem
+        || type === useMultipleSelection.stateChangeTypes.FunctionSetSelectedItems
+        || type === useMultipleSelection.stateChangeTypes.FunctionReset
+      ) {
+        onSelect(changes.selectedItems);
+      }
+
+      return changes;
     },
   });
 
   const {
     isOpen,
-    selectedItem,
+    highlightedIndex,
     getToggleButtonProps,
     getMenuProps,
-    highlightedIndex,
     getItemProps,
+    closeMenu,
   } = useSelect({
-    items,
+    items: getOptions,
     stateReducer: (st, actionAndChanges) => {
       const { type, changes } = actionAndChanges;
       const { selectedItem: option } = changes;
+
       switch (type) {
         case useSelect.stateChangeTypes.MenuKeyDownEnter:
         case useSelect.stateChangeTypes.ItemClick:
@@ -132,6 +151,7 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
             setSelectedItems,
             reset,
           });
+
           return {
             ...changes,
             highlightedIndex: st.highlightedIndex,
@@ -143,102 +163,137 @@ export const DropdownMultiSelect: React.FC<MultiSelectProps> = ({
     },
   });
 
-  const labelDefaultFormatter:() => string = useCallback(() => {
-    if (!selectedItems.length) return placeholder;
-    if (selectedItems.length === 1) return selectedItems[0].label;
-    if (selectedItems.length === enabledOptions.length) return 'All items selected';
-    return `${selectedItems.length} items selected`;
-  }, [selectedItems, placeholder, enabledOptions]);
+  // 'usePopper'
+  const { styles, attributes } = usePopper(triggerRef.current, menuRef.current, {
+    placement: 'bottom',
+    // strategy: 'fixed',
+    modifiers: [
+      offsetModifier,
+      flipModifier,
+      hideModifier,
+      sameWidthModifier,
+    ],
+  });
 
-  const customLabelFormatter: () => string = useCallback(() => {
-    return labelFormatter(selectedItems);
-  }, [selectedItems, labelFormatter]);
+  // Hide menu if reference is outside the boundaries
+  const referenceHidden = attributes?.popper?.['data-popper-reference-hidden'] || attributes?.popper?.['data-popper-reference-scaped'];
+  useEffect(() => {
+    if (referenceHidden) {
+      closeMenu();
+    }
+  }, [referenceHidden, closeMenu]);
 
   return (
     <div
       className={cx({
         'w-full leading-tight overflow-hidden': true,
-        [THEME[theme].container]: !isOpen,
-        [THEME[theme].closed]: !selectedItem?.value && !isOpen,
-        [THEME[theme].open]: isOpen,
-        [THEME.states[state]]: true,
-        [className]: !!className,
+        [THEME[theme].container]: true,
+        [THEME[theme].closed]: true,
+        [THEME.states[status]]: true,
       })}
     >
-      <button
-        type="button"
-        disabled={disabled}
-        className={cx({
-          'relative w-full flex items-center focus:outline-none': true,
-          [THEME.sizes[size]]: true,
-        })}
-        {...getToggleButtonProps(getDropdownProps({ preventKeyAction: isOpen }))}
+      <div
+        className="relative w-full"
+        ref={triggerRef}
       >
-        {prefix && (
-          <span
-            className={cx({
-              'mr-2 text-xs font-heading leading-none tracking-wide': true,
-              [THEME[theme].prefix.base]: true,
-            })}
-          >
-            {prefix}
-          </span>
-        )}
-
-        <span className="text-sm">
-          {labelFormatter ? customLabelFormatter() : labelDefaultFormatter()}
-        </span>
-
-        <Icon
-          className={cx({
-            'absolute w-3 h-3 right-4': true,
-            [THEME[theme].icon.closed]: !isOpen,
-            [THEME[theme].icon.open]: isOpen,
-            [THEME[theme].icon.disabled]: disabled,
-          })}
-          icon={ARROW_DOWN_SVG}
+        <Toggle
+          options={getOptionsEnabled}
+          theme={theme}
+          size={size}
+          status={status}
+          prefix={prefix}
+          disabled={disabled}
+          multiple
+          opened={isOpen}
+          selectedItems={selectedItems}
+          placeholder={placeholder}
+          getToggleButtonProps={getToggleButtonProps}
+          getDropdownProps={getDropdownProps}
         />
-      </button>
+      </div>
 
-      {/* MENU */}
-      {isOpen && (
-        <ul
-          className={cx({
-            'pt-1 pb-3 focus:outline-none': true,
-          })}
-          {...getMenuProps()}
+      {/* Menu */}
+      {createPortal(
+        <div
+          className="z-50"
+          ref={menuRef}
+          style={styles.popper}
+          {...attributes.popper}
         >
-          {items.map((option, index) => (
-            <li
-              className={cx({
-                'px-4 py-1 mt-0.5 cursor-pointer': true,
-                [THEME[theme].item.base]: highlightedIndex !== index,
-                [THEME[theme].item.highlighted]: highlightedIndex === index,
-                [THEME[theme].item.disabled]: option.disabled,
-              })}
-              key={`${option.value}`}
-              {...getItemProps({ item: option, index })}
-            >
-              {!option.hideCheckbox && (
-                <Checkbox
-                  className="absolute bg-opacity-0 left-4"
-                  checked={isSelected(option, selectedItems)}
-                  onChange={() => onChange(option, selectedItems)}
-                  disabled={option.disabled}
-                />
-              )}
+          <Menu
+            theme={theme}
+            size={size}
+            status={status}
+            disabled={disabled}
+            multiple
+            opened={isOpen}
+            attributes={attributes}
+            getMenuProps={getMenuProps}
+            onBlur={onBlur}
+          >
+            {isOpen && (
+              <Toggle
+                options={getOptionsEnabled}
+                theme={theme}
+                size={size}
+                status={status}
+                prefix={prefix}
+                disabled={disabled}
+                multiple={multiple}
+                opened={isOpen}
+                selectedItems={selectedItems}
+                placeholder={placeholder}
+                getToggleButtonProps={getToggleButtonProps}
+                getDropdownProps={getDropdownProps}
+              />
+            )}
 
-              <span
-                className="ml-6"
+            {isOpen && (
+              <ul
+                className={cx({
+                  'py-1 focus:outline-none': true,
+                })}
               >
-                {option.label}
-              </span>
-            </li>
-          ))}
-        </ul>
+                {getOptions.map((option, index) => (
+                  <li
+                    className={cx({
+                      'px-4 py-1 mt-0.5 cursor-pointer': true,
+                      [THEME[theme].item.base]: highlightedIndex !== index,
+                      [THEME[theme].item.disabled]: option.disabled,
+                      [THEME[theme].item.highlighted]: (
+                        (highlightedIndex === index && !option.disabled)
+                        || isSelected(option, selectedItems)
+                      ),
+                    })}
+                    key={`${option.value}`}
+                    {...getItemProps({ item: option, index, disabled: option.disabled })}
+                  >
+                    <span
+                      className={cx({
+                        'ml-6': !!option.checkbox,
+                      })}
+                    >
+                      {option.label}
+                    </span>
+
+                    {option.checkbox && (
+                      <Checkbox
+                        className="absolute bg-opacity-0 left-4"
+                        checked={isSelected(option, selectedItems)}
+                        disabled={option.disabled}
+                        onChange={() => {}}
+                      />
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Menu>
+        </div>,
+        document.body,
       )}
     </div>
   );
 };
 
-export default DropdownMultiSelect;
+export default MultiDropdown;

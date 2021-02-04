@@ -10,25 +10,13 @@ export default {
     theme: {
       control: {
         type: 'select',
-        options: ['primary'],
+        options: ['dark', 'light'],
       },
     },
-    state: {
+    status: {
       control: {
         type: 'select',
         options: ['none', 'valid', 'error', 'disabled'],
-      },
-    },
-    SelectHTMLAttributes: {
-      name: 'SelectHTMLAttributes',
-      description: 'https://www.w3schools.com/tags/tag_input.asp',
-      table: {
-        type: {
-          summary: 'SelectHTMLAttributes',
-        },
-      },
-      control: {
-        disabled: true,
       },
     },
   },
@@ -38,7 +26,8 @@ const Template: Story<SelectProps> = (args) => <Select {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  theme: 'primary',
+  theme: 'dark',
+  placeholder: 'Select option',
   options: [
     { label: 'Option 1', value: 'option-1' },
     { label: 'Option 2', value: 'option-2' },
