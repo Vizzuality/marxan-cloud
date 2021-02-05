@@ -6,12 +6,15 @@ export interface LabelValue {
   value: Object;
 }
 
-export interface TableHeaderItem extends LabelValue {
-  selectable: boolean
+export interface TableHeaderItem {
+  id: string,
+  label: string,
+  customCell?: (data: TableRow) => React.ReactNode | JSX.Element;
 }
 
 export interface TableRow {
-  id: string
+  id: string,
+  isSelected?: boolean
 }
 
 export interface TableProps {
@@ -55,7 +58,16 @@ export const Table: React.FC<TableProps> = ({
       role="grid"
     >
       <thead>
-        {headers.map((header) => <th key={`header-${header.value}`}>{header.label}</th>)}
+        <tr>
+          {headers.map((header) => (
+            <th
+              key={`header-${header.id}`}
+              className="px-4"
+            >
+              {header.label}
+            </th>
+          ))}
+        </tr>
       </thead>
       <tbody>
         {body.map((row, rowIndex) => {
@@ -66,13 +78,13 @@ export const Table: React.FC<TableProps> = ({
               className={cx({
                 'bg-gray-100': (!rowIsSelected || cellSelectable) && (rowIndex + 1) % 2 === 0,
                 'bg-primary-500': rowIsSelected && !cellSelectable,
-                'hover:cursor-pointer': rowSelectable,
+                'cursor-pointer': rowSelectable,
               })}
               onClick={() => handleRowClick(row)}
             >
               {
-                Object.keys(row).filter((key) => key !== 'id').map((propertyKey) => {
-                  const currentCell = row[propertyKey];
+                headers.map(({ id, customCell }) => {
+                  const currentCell = row[id];
                   const { value, label } = currentCell;
                   const cellIsSelected = selectedCell === value
                     && selectedRow === row.id;
@@ -82,12 +94,17 @@ export const Table: React.FC<TableProps> = ({
                       className={cx({
                         'bg-primary-500': cellIsSelected,
                         'hover:cursor-pointer': cellSelectable,
+                        'px-4 py-2': true,
                       })}
                       onClick={() => cellSelectable && handleCellClick(currentCell)}
                       onKeyPress={() => cellSelectable && handleCellClick(currentCell)}
                       role="gridcell"
                     >
-                      {label}
+                      {customCell ? customCell({
+                        ...currentCell,
+                        isSelected: rowIsSelected,
+                      })
+                        : label}
                     </td>
                   );
                 })
