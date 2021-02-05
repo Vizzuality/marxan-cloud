@@ -15,11 +15,9 @@ import { ProjectsService } from './projects.service';
 
 import {
   ApiBearerAuth,
-  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
@@ -33,6 +31,7 @@ import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
+import { FetchSpecification, Pagination } from 'nestjs-base-service';
 
 const resource: BaseServiceResource = {
   className: 'Project',
@@ -69,27 +68,21 @@ export class ProjectsController {
   @ApiOperation({
     description: 'Find all projects',
   })
-  @ApiOkResponse({
-    type: Project,
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized.',
-  })
-  @ApiForbiddenResponse({
-    description:
-      'The current user does not have suitable permissions for this request.',
-  })
+  @ApiOkResponse({ type: ProjectResult })
   @JSONAPIQueryParams()
   @Get()
-  async findAll(): Promise<Project[]> {
-    return this.service.serialize(await this.service.findAll());
+  async findAll(
+    @Pagination() pagination: FetchSpecification,
+  ): Promise<ProjectResult> {
+    const results = await this.service.findAllPaginated(pagination);
+    return await this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find project by id' })
   @ApiOkResponse({ type: ProjectResult })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Project> {
-    return await this.service.serialize([await this.service.fakeFindOne(id)]);
+  async findOne(@Param('id') id: string): Promise<ProjectResult> {
+    return await this.service.serialize([await this.service.getById(id)]);
   }
 
   @ApiOperation({ description: 'Create project' })
