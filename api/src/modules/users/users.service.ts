@@ -7,14 +7,12 @@ import { get } from 'lodash';
 import { CreateUserDTO } from './dto/create.user.dto';
 import { UpdateUserDTO } from './dto/update.user.dto';
 import { AppInfoDTO } from 'dto/info.dto';
-import { BaseService } from 'nestjs-base-service';
-
-import JSONAPISerializer = require('jsonapi-serializer');
 
 import * as faker from 'faker';
+import { AppBaseService } from 'utils/app-base.service';
 
 @Injectable()
-export class UsersService extends BaseService<
+export class UsersService extends AppBaseService<
   User,
   CreateUserDTO,
   UpdateUserDTO,
@@ -24,17 +22,14 @@ export class UsersService extends BaseService<
     @InjectRepository(User)
     protected readonly repository: Repository<User>,
   ) {
-    super(repository, 'user');
-    this.serializer = new JSONAPISerializer.Serializer('users', {
-      attributes: ['fname', 'lname', 'email'],
-      keyForAttribute: 'camelCase',
-    });
+    super(repository, 'user', 'users');
   }
 
-  serializer;
-
-  async serialize(entities: User[]) {
-    return this.serializer.serialize(entities);
+  get serializerConfig() {
+    return {
+      attributes: ['fname', 'lname', 'email'],
+      keyForAttribute: 'camelCase',
+    };
   }
 
   async fakeFindOne(_id: string): Promise<Partial<User>> {
@@ -48,10 +43,6 @@ export class UsersService extends BaseService<
       isActive: faker.random.boolean(),
       isDeleted: faker.random.boolean(),
     };
-  }
-
-  async findAll(): Promise<User[]> {
-    return this.repository.find();
   }
 
   async findOne(id: string): Promise<User | undefined> {
