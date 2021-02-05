@@ -58,7 +58,7 @@ export abstract class AppBaseService<
   ): Promise<[Entity[], number]> {
     Logger.debug(`Finding all ${this.repository.metadata.name}`);
     let query = this.repository.createQueryBuilder(this.alias);
-    const i = { ...info, fetchSpecification };
+    const _i = { ...info, fetchSpecification };
     query = this.setFilters(query, filters, info);
     query = PaginationUtil.addPagination(query, this.alias, fetchSpecification);
     Logger.debug(query.getQueryAndParameters());
