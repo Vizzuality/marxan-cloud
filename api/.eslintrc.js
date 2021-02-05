@@ -25,6 +25,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['warn', {
       'varsIgnorePattern': '^_',
       'argsIgnorePattern': '^_'
-    }]
+    }],
   },
+  "reportUnusedDisableDirectives": true
 };
