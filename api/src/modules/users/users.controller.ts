@@ -16,6 +16,7 @@ import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { RequestWithAuthenticatedUser } from 'app.controller';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { BaseServiceResource } from 'types/resource.interface';
+import { FetchSpecification, Pagination } from 'nestjs-base-service';
 
 const resource: BaseServiceResource = {
   className: 'User',
@@ -47,15 +48,9 @@ export class UsersController {
   })
   @JSONAPIQueryParams()
   @Get()
-  async findAll(): Promise<User[]> {
-    const serializer = new JSONAPISerializer.Serializer('users', {
-      attributes: ['fname', 'lname', 'email', 'projects'],
-      keyForAttribute: 'camelCase',
-      projects: {
-        ref: 'name',
-      },
-    });
-    return serializer.serialize(await this.service.findAll());
+  async findAll(@Pagination() pagination: FetchSpecification): Promise<User[]> {
+    const results = await this.service.findAllPaginated(pagination);
+    return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({
