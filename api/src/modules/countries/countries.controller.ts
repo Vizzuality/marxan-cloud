@@ -13,6 +13,7 @@ import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { BaseServiceResource } from 'types/resource.interface';
+import { FetchSpecification, Pagination } from 'nestjs-base-service';
 
 const resource: BaseServiceResource = {
   className: 'Country',
@@ -35,17 +36,15 @@ export class CountriesController {
   @ApiOkResponse({
     type: Country,
   })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized.',
-  })
-  @ApiForbiddenResponse({
-    description:
-      'The current user does not have suitable permissions for this request.',
-  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
   @JSONAPIQueryParams()
   @Get()
-  async findAll(): Promise<Country[]> {
-    return this.service.serialize(await this.service.findAll());
+  async findAll(
+    @Pagination() pagination: FetchSpecification,
+  ): Promise<Country[]> {
+    const results = await this.service.findAllPaginated(pagination);
+    return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find country by id' })

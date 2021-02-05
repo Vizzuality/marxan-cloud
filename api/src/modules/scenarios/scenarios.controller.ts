@@ -4,21 +4,22 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { Scenario, ScenarioResult } from './scenario.api.entity';
+import { ScenarioResult } from './scenario.api.entity';
 import { ScenariosService } from './scenarios.service';
+import { Pagination, FetchSpecification } from 'nestjs-base-service';
 
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
@@ -28,6 +29,7 @@ import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
+import { RequestWithAuthenticatedUser } from 'app.controller';
 
 const resource: BaseServiceResource = {
   className: 'Scenario',
@@ -48,25 +50,23 @@ export class ScenariosController {
     description: 'Find all scenarios',
   })
   @ApiOkResponse({
-    type: Scenario,
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized.',
-  })
-  @ApiForbiddenResponse({
-    description:
-      'The current user does not have suitable permissions for this request.',
+    type: ScenarioResult,
   })
   @JSONAPIQueryParams()
   @Get()
-  async findAll(): Promise<Scenario[]> {
-    return this.service.serialize(await this.service.findAll());
+  async findAll(
+    @Pagination() pagination: FetchSpecification,
+  ): Promise<ScenarioResult> {
+    const results = await this.service.findAllPaginated(pagination);
+    return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find scenario by id' })
   @ApiOkResponse({ type: ScenarioResult })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Scenario> {
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ScenarioResult> {
     return await this.service.serialize([await this.service.fakeFindOne(id)]);
   }
 
@@ -74,9 +74,12 @@ export class ScenariosController {
   @ApiCreatedResponse({ type: ScenarioResult })
   @Post()
   async create(
-    @Body(new ValidationPipe()) _dto: CreateScenarioDTO,
+    @Body(new ValidationPipe()) dto: CreateScenarioDTO,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ScenarioResult> {
-    return await this.service.serialize([await this.service.fakeFindOne('id')]);
+    return await this.service.serialize([
+      await this.service.create(dto, { authenticatedUser: req.user }),
+    ]);
   }
 
   @ApiOperation({ description: 'Update scenario' })
@@ -84,9 +87,9 @@ export class ScenariosController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) _dto: UpdateScenarioDTO,
+    @Body(new ValidationPipe()) dto: UpdateScenarioDTO,
   ): Promise<ScenarioResult> {
-    return await this.service.serialize([await this.service.fakeFindOne('id')]);
+    return await this.service.serialize([await this.service.update(id, dto)]);
   }
 
   @ApiOperation({ description: 'Delete scenario' })
