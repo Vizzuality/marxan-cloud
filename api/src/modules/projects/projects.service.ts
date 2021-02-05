@@ -1,19 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
-import { BaseService } from 'nestjs-base-service';
 import { Repository } from 'typeorm';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 
-import JSONAPISerializer = require('jsonapi-serializer');
-
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
+import { ScenariosService } from 'modules/scenarios/scenarios.service';
+import { AppBaseService } from 'utils/app-base.service';
 
 @Injectable()
-export class ProjectsService extends BaseService<
+export class ProjectsService extends AppBaseService<
   Project,
   CreateProjectDTO,
   UpdateProjectDTO,
@@ -22,10 +21,15 @@ export class ProjectsService extends BaseService<
   constructor(
     @InjectRepository(Project)
     protected readonly repository: Repository<Project>,
+    @Inject(ScenariosService)
+    private readonly scenariosService: ScenariosService,
     @Inject(UsersService) private readonly usersService: UsersService,
   ) {
-    super(repository, 'project');
-    this.serializer = new JSONAPISerializer.Serializer('projects', {
+    super(repository, 'project', 'projects');
+  }
+
+  get serializerConfig() {
+    return {
       attributes: ['name', 'description', 'users'],
       keyForAttribute: 'camelCase',
       users: {
@@ -36,13 +40,24 @@ export class ProjectsService extends BaseService<
           attributes: ['name'],
         },
       },
-    });
-  }
-
-  serializer;
-
-  async serialize(entities: Project[]) {
-    return this.serializer.serialize(entities);
+      scenarios: {
+        ref: 'id',
+        attributes: [
+          'name',
+          'description',
+          'type',
+          'country',
+          'extent',
+          'wdpaFilter',
+          'wdpaThreshold',
+          'adminRegionId',
+          'numberOfRuns',
+          'boundaryLengthModifier',
+          'metadata',
+          'status',
+        ],
+      },
+    };
   }
 
   async importLegacyProject(_file: Express.Multer.File): Promise<Project> {
@@ -59,6 +74,12 @@ export class ProjectsService extends BaseService<
         Array.from({ length: 10 }).map(
           async (_userId) =>
             await this.usersService.fakeFindOne(faker.random.uuid()),
+        ),
+      ),
+      attributes: await Promise.all(
+        Array.from({ length: 5 }).map(
+          async (_scenarioId) =>
+            await this.scenariosService.fakeFindOne(faker.random.uuid()),
         ),
       ),
     };
@@ -78,17 +99,5 @@ export class ProjectsService extends BaseService<
     const project = await super.setDataCreate(create, info);
     project.createdBy = info?.authenticatedUser?.id!;
     return project;
-  }
-
-  async findAll(): Promise<Project[]> {
-    return this.repository.find();
-  }
-
-  findOne(id: string): Promise<Project | undefined> {
-    return this.repository.findOne(id);
-  }
-
-  async remove(id: string): Promise<void> {
-    await this.repository.delete(id);
   }
 }
