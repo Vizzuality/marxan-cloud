@@ -1,13 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import cx from 'classnames';
 
 export interface LabelValue {
   label: string;
   value: Object;
-}
-
-export interface TableDataItem extends LabelValue {
-  selectable: boolean
 }
 
 export interface TableHeaderItem extends LabelValue {
@@ -19,10 +15,12 @@ export interface TableRow {
 }
 
 export interface TableProps {
-  headers: TableHeaderItem[],
-  body: TableRow[],
-  rowSelectable: boolean,
-  cellSelectable: boolean,
+  headers: TableHeaderItem[];
+  body: TableRow[];
+  rowSelectable?: boolean;
+  cellSelectable?: boolean;
+  onRowSelected?: (row: TableRow) => void;
+  onCellSelected?: (cell: LabelValue) => void;
   className?: string;
 }
 
@@ -31,10 +29,22 @@ export const Table: React.FC<TableProps> = ({
   body,
   rowSelectable,
   cellSelectable,
+  onRowSelected,
+  onCellSelected,
   className,
 }: TableProps) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [selectedCell, setSelectedCell] = useState(null);
+
+  const handleRowClick = useCallback((row) => {
+    setSelectedRow(row.id);
+    if (onRowSelected) onRowSelected(row);
+  }, [onRowSelected]);
+
+  const handleCellClick = useCallback((cell) => {
+    setSelectedCell(cell.value);
+    if (onCellSelected) onCellSelected(cell);
+  }, [onCellSelected]);
 
   return (
     <table
@@ -58,14 +68,14 @@ export const Table: React.FC<TableProps> = ({
                 'bg-primary-500': rowIsSelected && !cellSelectable,
                 'hover:cursor-pointer': rowSelectable,
               })}
-              onClick={() => setSelectedRow(row.id)}
+              onClick={() => handleRowClick(row)}
             >
               {
                 Object.keys(row).filter((key) => key !== 'id').map((propertyKey) => {
-                  const { value, label } = row[propertyKey];
+                  const currentCell = row[propertyKey];
+                  const { value, label } = currentCell;
                   const cellIsSelected = selectedCell === value
                     && selectedRow === row.id;
-                  const handleCellClick = () => cellSelectable && setSelectedCell(value);
                   return (
                     <td
                       key={`td-${value}`}
@@ -73,8 +83,8 @@ export const Table: React.FC<TableProps> = ({
                         'bg-primary-500': cellIsSelected,
                         'hover:cursor-pointer': cellSelectable,
                       })}
-                      onClick={handleCellClick}
-                      onKeyPress={handleCellClick}
+                      onClick={() => cellSelectable && handleCellClick(currentCell)}
+                      onKeyPress={() => cellSelectable && handleCellClick(currentCell)}
                       role="gridcell"
                     >
                       {label}
