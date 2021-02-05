@@ -15,8 +15,7 @@ export interface TableHeaderItem extends LabelValue {
 }
 
 export interface TableRow {
-  id: string,
-  items: TableDataItem[]
+  id: string
 }
 
 export interface TableProps {
@@ -62,12 +61,14 @@ export const Table: React.FC<TableProps> = ({
               onClick={() => setSelectedRow(row.id)}
             >
               {
-                row.items.map((item) => {
-                  const cellIsSelected = selectedCell === item.value && selectedRow === row.id;
-                  const handleCellClick = () => cellSelectable && setSelectedCell(item.value);
+                Object.keys(row).filter((key) => key !== 'id').map((propertyKey) => {
+                  const { value, label } = row[propertyKey];
+                  const cellIsSelected = selectedCell === value
+                    && selectedRow === row.id;
+                  const handleCellClick = () => cellSelectable && setSelectedCell(value);
                   return (
                     <td
-                      key={`td-${item.value}`}
+                      key={`td-${value}`}
                       className={cx({
                         'bg-primary-500': cellIsSelected,
                         'hover:cursor-pointer': cellSelectable,
@@ -76,7 +77,7 @@ export const Table: React.FC<TableProps> = ({
                       onKeyPress={handleCellClick}
                       role="gridcell"
                     >
-                      {item.label}
+                      {label}
                     </td>
                   );
                 })
