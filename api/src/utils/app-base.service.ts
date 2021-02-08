@@ -1,7 +1,7 @@
 import {
   BaseService,
   FetchSpecification,
-  PaginationUtil,
+  PaginationUtils,
 } from 'nestjs-base-service';
 
 import JSONAPISerializer = require('jsonapi-serializer');
@@ -60,7 +60,11 @@ export abstract class AppBaseService<
     let query = this.repository.createQueryBuilder(this.alias);
     const _i = { ...info, fetchSpecification };
     query = this.setFilters(query, filters, info);
-    query = PaginationUtil.addPagination(query, this.alias, fetchSpecification);
+    query = PaginationUtils.addPagination(
+      query,
+      this.alias,
+      fetchSpecification,
+    );
     Logger.debug(query.getQueryAndParameters());
     return query.getManyAndCount();
   }
