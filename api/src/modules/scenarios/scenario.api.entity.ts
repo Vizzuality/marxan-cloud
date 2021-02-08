@@ -67,6 +67,9 @@ export class Scenario extends TimeUserEntityMetadata {
   })
   project: Project;
 
+  @Column('uuid', { name: 'project_id' })
+  projectId: string;
+
   /**
    * The country where this scenario is located.
    */
