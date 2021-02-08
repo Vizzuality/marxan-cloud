@@ -1,4 +1,4 @@
-FROM node:14.15.1-alpine
+FROM node:14.15.4-alpine3.12
 LABEL maintainer="hello@vizzuality.com"
 
 ENV NAME marxan-api
