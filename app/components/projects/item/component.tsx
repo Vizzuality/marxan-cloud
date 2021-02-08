@@ -4,6 +4,8 @@ import cx from 'classnames';
 import Avatar from 'components/avatar';
 import Button from 'components/button';
 
+import { animated } from 'react-spring';
+
 export interface ItemProps {
   id: string;
   className?: string;
@@ -12,6 +14,7 @@ export interface ItemProps {
   description: string;
   lastUpdate: string;
   contributors?: Record<string, unknown>[];
+  style?: Record<string, unknown>;
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -24,11 +27,13 @@ export const Item: React.FC<ItemProps> = ({
   description,
   lastUpdate,
   contributors = [],
+  style,
   onDownload,
   onDuplicate,
   onDelete,
 }: ItemProps) => (
-  <div
+  <animated.div
+    style={style}
     className={cx({
       'flex flex-col rounded-4xl bg-gray-800 px-8 py-10 text-white': true,
       [className]: !!className,
@@ -86,7 +91,7 @@ export const Item: React.FC<ItemProps> = ({
         </Button>
       </div>
     </footer>
-  </div>
+  </animated.div>
 );
 
 export default Item;
