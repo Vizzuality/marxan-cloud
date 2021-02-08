@@ -1,14 +1,21 @@
 version: "3.8"
 services:
-  marxan-science-notebooks:
-      build:
+  marxan-seed-data:
+    build:
         context: ./data_download
         dockerfile: Dockerfile
-      volumes:
-        - './data/:/data/'
-        command: make
-        environment:
-          - POSTGRES_PASSWORD=mgis-api
+    volumes:
+    - './data/:/data/'
+    command: make
+    environment:
+        - POSTGRES_API_SERVICE_PORT=3432
+        - POSTGRES_GEO_SERVICE_PORT=3433
+        - GEO_POSTGRES_USER=marxan-geo-api
+        - GEO_POSTGRES_PASSWORD=marxan-geo-api
+        - GEO_POSTGRES_DB=marxan-geo-api
+        - API_POSTGRES_USER=marxan-api
+        - API_POSTGRES_PASSWORD=marxan-api
+        - API_POSTGRES_DB=marxan-api
 networks:
     default:
       external:

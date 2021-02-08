@@ -23,8 +23,6 @@ requirements:
 ## Make Dataset
 seed-data:
 	docker-compose -f ./docker-compose-data_download.yml up --build
-# data: requirements
-# 	python3 src/data/make_dataset.py data/raw data/processed
 
 ## Delete all compiled Python files
 clean:
