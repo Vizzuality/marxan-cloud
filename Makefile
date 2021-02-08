@@ -58,5 +58,8 @@ test-e2e-api:
 	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e rm --stop --force
 =======
 	docker-compose -f ./data/docker-compose-data_download.yml up --build
+<<<<<<< HEAD
 	# docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 >>>>>>> added results and exetend to a metadata column  in the scenario feature data table that controls usage of features in a scenario
+=======
+>>>>>>> allow parallel execution of gadm make, and update recipe for node buffer and seed
