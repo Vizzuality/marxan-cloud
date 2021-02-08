@@ -33,6 +33,7 @@
     "deck.gl": "7.3.6",
     "downshift": "^6.0.15",
     "final-form": "^4.20.1",
+    "jsona": "^1.8.0",
     "layer-manager": "3.0.9",
     "lodash": "^4.17.20",
     "luma.gl": "7.3.2",

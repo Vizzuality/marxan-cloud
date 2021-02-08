@@ -1,17 +1,19 @@
 import { useMemo } from 'react';
 import { useQuery } from 'react-query';
+import { useAuth } from 'hooks/authorization';
 
 import { ItemProps } from 'components/projects/item/component';
 
 import PROJECTS from 'services/projects';
 
 export function useProjects() {
+  const { token } = useAuth();
+
   const query = useQuery('projects', async () => PROJECTS.request({
     method: 'GET',
     url: '/',
-    params: {
-      _page: 1,
-      _limit: 10,
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
   }));
 
@@ -21,11 +23,12 @@ export function useProjects() {
     return {
       ...query,
       data: Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
-        const { id } = d;
+        const { id, name } = d;
+
         return {
           id,
           area: 'Planning area name',
-          name: 'Project Name 1',
+          name,
           description: 'Donec est ad luctus dapibus sociosqu.',
           lastUpdate: '1995-12-17T03:24:00',
           contributors: [

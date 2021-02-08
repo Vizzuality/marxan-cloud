@@ -9,12 +9,14 @@ import Icon from 'components/icon';
 import Button from 'components/button';
 import Avatar from 'components/avatar';
 
+import { useMe } from 'hooks/users';
+import { useTransition, animated, config } from 'react-spring';
+
 import LOGO_SVG from 'svgs/logo.svg?sprite';
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
 export interface HeaderProps {
   size: 'base' | 'lg',
-  user?: Record <string, unknown> // As soon as he define the User we must define this type better
 }
 
 const SIZE = {
@@ -26,7 +28,20 @@ const SIZE = {
   },
 };
 
-export const Header: React.FC<HeaderProps> = ({ size, user }:HeaderProps) => {
+export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
+  const { user, isLoading } = useMe();
+
+  const transitionConfig = {
+    config: config.gentle,
+    unique: true,
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
+  };
+
+  const isUserTransition = useTransition((user && !isLoading), null, transitionConfig);
+  const isNotUserTransition = useTransition((!user && !isLoading), null, transitionConfig);
+
   return (
     <header
       className="w-full"
@@ -47,20 +62,22 @@ export const Header: React.FC<HeaderProps> = ({ size, user }:HeaderProps) => {
               </a>
             </Link>
 
-            {user?.isLogged && (
-              <button
+            {isUserTransition.map(({ item, key, props }) => item && (
+              <animated.button
+                key={key}
                 type="button"
+                style={props}
                 className="flex items-center justify-start"
               >
                 <Avatar className="text-sm text-white uppercase bg-primary-700">
                   MB
                 </Avatar>
                 <Icon icon={ARROW_DOWN_SVG} className="w-2.5 h-2.5 text-white" />
-              </button>
-            )}
+              </animated.button>
+            ))}
 
-            {!user?.isLogged && (
-              <div className="flex items-center gap-4">
+            {isNotUserTransition.map(({ item, key, props }) => item && (
+              <animated.div key={key} style={props} className="flex items-center gap-4">
                 <Button theme="secondary-alt" size="s" className="">
                   Sign in
                 </Button>
@@ -68,8 +85,8 @@ export const Header: React.FC<HeaderProps> = ({ size, user }:HeaderProps) => {
                 <Button theme="primary" size="s" className="">
                   Sign up
                 </Button>
-              </div>
-            )}
+              </animated.div>
+            ))}
           </div>
         </Wrapper>
       </nav>
