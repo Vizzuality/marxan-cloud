@@ -6,8 +6,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm i -g mapshaper
+# RUN node  --max-old-space-size=16000 `which mapshaper` <mapshaper commands>
 RUN mkdir -p "gadm_3.6" && mkdir -p "wdpa" && mkdir -p "iucn" && mkdir -p "WorldTerrestrialEcosystems"
-COPY ./gadm_3.6/Makefile-inner ./gadm_3.6/Makefile
-COPY ./wdpa/Makefile-inner ./wdpa/Makefile
-COPY ./iucn/Makefile-inner ./iucn/Makefile
-COPY ./WorldTerrestrialEcosystems/Makefile-inner ./WorldTerrestrialEcosystems/Makefile
+COPY ./gadm_3.6/Makefile ./gadm_3.6/Makefile
+COPY ./wdpa/Makefile ./wdpa/Makefile
+COPY ./iucn/Makefile ./iucn/Makefile
+COPY ./WorldTerrestrialEcosystems/Makefile ./WorldTerrestrialEcosystems/Makefile
+COPY Makefile Makefile
