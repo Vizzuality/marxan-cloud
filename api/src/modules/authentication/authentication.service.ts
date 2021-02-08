@@ -98,6 +98,13 @@ export class AuthenticationService {
     const user = new User();
     user.passwordHash = await hash(signupDto.password, 10);
     user.email = signupDto.email;
+    /**
+     * @todo `isActive` should never be set to true here - we do this only in
+     * dev environments until the email validation feature is ready.
+     */
+    if (process.env['NODE_ENV'] === 'development') {
+      user.isActive = true;
+    }
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
