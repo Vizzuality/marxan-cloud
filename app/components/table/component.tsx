@@ -1,53 +1,26 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import cx from 'classnames';
 
-export interface LabelValue {
-  label: string;
-  value: Object;
-}
-
-export interface TableHeaderItem {
-  id: string,
-  label: string,
-  customCell?: (data: TableRow) => React.ReactNode | JSX.Element;
-}
-
-export interface TableRow {
-  id: string,
-  isSelected?: boolean
-}
-
-export interface TableProps {
-  headers: TableHeaderItem[];
-  body: TableRow[];
-  rowSelectable?: boolean;
-  cellSelectable?: boolean;
-  onRowSelected?: (row: TableRow) => void;
-  onCellSelected?: (cell: LabelValue) => void;
-  className?: string;
-}
+import { TableProps } from './types';
 
 export const Table: React.FC<TableProps> = ({
   headers,
   body,
   rowSelectable,
-  cellSelectable,
   onRowSelected,
-  onCellSelected,
+  selectedIndex,
   className,
 }: TableProps) => {
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [selectedCell, setSelectedCell] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(selectedIndex);
 
-  const handleRowClick = useCallback((row) => {
-    setSelectedRow(row.id);
+  useEffect(() => {
+    setSelectedRow(selectedIndex);
+  }, [selectedIndex]);
+
+  const handleRowClick = useCallback((row, rowIndex) => {
+    setSelectedRow(rowIndex);
     if (onRowSelected) onRowSelected(row);
   }, [onRowSelected]);
-
-  const handleCellClick = useCallback((cell) => {
-    setSelectedCell(cell.value);
-    if (onCellSelected) onCellSelected(cell);
-  }, [onCellSelected]);
 
   return (
     <table
@@ -71,41 +44,33 @@ export const Table: React.FC<TableProps> = ({
       </thead>
       <tbody>
         {body.map((row, rowIndex) => {
-          const rowIsSelected = selectedRow === row.id;
+          const rowIsSelected = selectedRow === rowIndex;
           return (
             <tr
               key={row.id}
               className={cx({
-                'bg-gray-100': (!rowIsSelected || cellSelectable) && (rowIndex + 1) % 2 === 0,
-                'bg-white': (!rowIsSelected || cellSelectable) && (rowIndex + 1) % 2 === 1,
-                'bg-primary-500': rowIsSelected && !cellSelectable,
+                'bg-gray-100': !rowIsSelected && (rowIndex + 1) % 2 === 0,
+                'bg-white': !rowIsSelected && (rowIndex + 1) % 2 === 1,
+                'bg-primary-500': rowIsSelected,
                 'cursor-pointer': rowSelectable,
               })}
-              onClick={() => handleRowClick(row)}
+              onClick={() => handleRowClick(row, rowIndex)}
             >
               {
                 headers.map(({ id, customCell }) => {
-                  const currentCell = row[id];
-                  const { value, label } = currentCell;
-                  const cellIsSelected = selectedCell === value
-                    && selectedRow === row.id;
+                  const value = row[id];
                   return (
                     <td
                       key={`td-${value}`}
-                      className={cx({
-                        'bg-primary-500': cellIsSelected,
-                        'hover:cursor-pointer': cellSelectable,
-                        'px-4 py-2': true,
-                      })}
-                      onClick={() => cellSelectable && handleCellClick(currentCell)}
-                      onKeyPress={() => cellSelectable && handleCellClick(currentCell)}
+                      className="px-4 py-2"
                       role="gridcell"
                     >
-                      {customCell ? customCell({
-                        ...currentCell,
-                        isSelected: rowIsSelected,
-                      })
-                        : label}
+                      {customCell ? customCell(value,
+                        {
+                          ...row,
+                          isSelected: rowIsSelected,
+                        })
+                        : value}
                     </td>
                   );
                 })
