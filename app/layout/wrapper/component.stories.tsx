@@ -11,12 +11,14 @@ export default {
 };
 
 const Template: Story<WrapperProps> = ({ children, ...args }:WrapperProps) => (
-  <Wrapper {...args}>
-    {children}
-  </Wrapper>
+  <div className="bg-green-500">
+    <Wrapper {...args}>
+      {children}
+    </Wrapper>
+  </div>
 );
 
 export const Default = Template.bind({});
 Default.args = {
-  children: (<div>Just testing</div>),
+  children: (<div className="text-white uppercase font-heading bg-primary-800">Just testing</div>),
 };
