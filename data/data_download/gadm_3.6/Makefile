@@ -1,7 +1,7 @@
 .PHONY: import
 
 import: data/gadm/gadm36_simp.geojson
-	ogr2ogr -makevalid -overwrite -nln admin_regions -nlt PROMOTE_TO_MULTI -lco GEOMETRY_NAME=geom -f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD" data/gadm/gadm36_simp.geojson
+	ogr2ogr -makevalid -overwrite -nln admin_regions -nlt PROMOTE_TO_MULTI -lco GEOMETRY_NAME=the_geom -f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD" data/gadm/gadm36_simp.geojson
 
 data/gadm/gadm36_simp.geojson: data/gadm/gadm36_0.shp data/gadm/gadm36_1.shp data/gadm/gadm36_2.shp
 	mapshaper-xl -i data/gadm/gadm36_0.shp data/gadm/gadm36_1.shp data/gadm/gadm36_2.shp snap combine-files \
