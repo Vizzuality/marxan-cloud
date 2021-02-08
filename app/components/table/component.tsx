@@ -52,17 +52,17 @@ export const Table: React.FC<TableProps> = ({
   return (
     <table
       className={cx({
-        '': true,
+        'w-full': true,
         [className]: !!className,
       })}
       role="grid"
     >
       <thead>
-        <tr>
+        <tr className="bg-white">
           {headers.map((header) => (
             <th
               key={`header-${header.id}`}
-              className="px-4"
+              className="px-4 text-left"
             >
               {header.label}
             </th>
@@ -77,6 +77,7 @@ export const Table: React.FC<TableProps> = ({
               key={row.id}
               className={cx({
                 'bg-gray-100': (!rowIsSelected || cellSelectable) && (rowIndex + 1) % 2 === 0,
+                'bg-white': (!rowIsSelected || cellSelectable) && (rowIndex + 1) % 2 === 1,
                 'bg-primary-500': rowIsSelected && !cellSelectable,
                 'cursor-pointer': rowSelectable,
               })}
