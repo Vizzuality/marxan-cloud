@@ -90,6 +90,5 @@ Default.args = {
     },
   ],
   rowSelectable: true,
-  cellSelectable: false,
   onRowSelected: (row) => console.info(row),
 };
