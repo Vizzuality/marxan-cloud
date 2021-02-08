@@ -2,7 +2,7 @@ FROM osgeo/gdal:ubuntu-full-latest
 ENV NODE_OPTIONS=--max_old_space_size=16384
 RUN apt-get update \
     && curl -sL https://deb.nodesource.com/setup_13.x | sh - \
-    && apt-get install -y --no-install-recommends nodejs make \
+    && apt-get install -y --no-install-recommends nodejs make jq \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm i -g mapshaper
