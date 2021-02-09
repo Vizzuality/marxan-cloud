@@ -30,6 +30,7 @@ import { CreateOrganizationDTO } from './dto/create.organization.dto';
 import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
+import { FetchSpecification, Pagination } from 'nestjs-base-service';
 
 const resource: BaseServiceResource = {
   className: 'Organization',
@@ -61,8 +62,11 @@ export class OrganizationsController {
   })
   @JSONAPIQueryParams()
   @Get()
-  async findAll(): Promise<Organization[]> {
-    return this.service.serialize(await this.service.findAll());
+  async findAll(
+    @Pagination() pagination: FetchSpecification,
+  ): Promise<Organization[]> {
+    const results = await this.service.findAllPaginated(pagination);
+    return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find organization by id' })
