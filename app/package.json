@@ -15,6 +15,7 @@
     "storybook:build": "yarn storybook:styles:prod && build-storybook -s ./public -c .storybook"
   },
   "dependencies": {
+    "@hapi/iron": "^6.0.0",
     "@math.gl/web-mercator": "^3.3.2",
     "@popperjs/core": "^2.6.0",
     "@react-aria/focus": "^3.2.3",
@@ -28,6 +29,7 @@
     "@tailwindcss/custom-forms": "^0.2.1",
     "axios": "^0.21.1",
     "classnames": "^2.2.6",
+    "cookie": "^0.4.1",
     "d3-ease": "^2.0.0",
     "date-fns": "^2.16.1",
     "deck.gl": "7.3.6",
@@ -39,7 +41,10 @@
     "luma.gl": "7.3.2",
     "next": "10.0.3",
     "next-compose-plugins": "^2.2.1",
+    "next-connect": "^0.9.1",
     "next-optimized-images": "^2.6.2",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-final-form": "^6.5.2",

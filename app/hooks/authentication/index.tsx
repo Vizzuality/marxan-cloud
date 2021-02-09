@@ -2,7 +2,7 @@ import React, {
   createContext, useState, useContext,
 } from 'react';
 
-import AUTHENTICATION from 'services/authorization';
+import AUTHENTICATION from 'services/authentication';
 
 const AuthContext = createContext({
   token: null,

@@ -3,7 +3,7 @@ import React from 'react';
 import { themes } from '@storybook/theming';
 
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { AuthorizationProvider } from 'hooks/authorization';
+import { AuthorizationProvider } from 'hooks/authentication';
 
 import PROJECTS from 'services/projects';
 
