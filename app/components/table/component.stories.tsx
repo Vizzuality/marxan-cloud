@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Story } from '@storybook/react/types-6-0';
 import Button from 'components/button';
 import Icon from 'components/icon';
 import STAR_SVG from 'svgs/ui/star.svg?sprite';
 import Table from './component';
-import { TableProps, TableRow } from './types';
+import { TableProps } from './types';
 
 export default {
   title: 'Components/Table',
@@ -12,20 +12,36 @@ export default {
   argTypes: {},
 };
 
-const Template: Story<TableProps> = ({ ...args }: TableProps) => (
-  <Table {...args} />
-);
+const Template: Story<TableProps> = ({ ...args }: TableProps) => {
+  const [selectedRowId, setSelectedRowId] = useState('row1');
 
-export const Default = Template.bind({});
-Default.args = {
-  headers: [
+  const BestCell = (value) => {
+    if (value) return <Icon className="w-3 h-3" icon={STAR_SVG} />;
+    return '';
+  };
+
+  const ViewOnMapCell = (value, row) => {
+    const { isSelected } = row;
+
+    return (
+      <Button
+        theme="secondary-alt"
+        size="s"
+        className="flex justify-center w-full"
+        onClick={() => {
+          setSelectedRowId(row.id);
+        }}
+      >
+        {isSelected ? 'Selected' : 'Select solution'}
+      </Button>
+    );
+  };
+
+  const headers = [
     {
       label: 'Best',
       id: 'best',
-      customCell: (value) => {
-        if (value) return <Icon className="w-3 h-3" icon={STAR_SVG} />;
-        return '';
-      },
+      Cell: BestCell,
     },
     {
       label: 'RUN',
@@ -42,21 +58,12 @@ Default.args = {
     {
       label: 'View on map',
       id: 'view-on-map',
-      customCell: function selectSolutionButton(value, { isSelected } : TableRow) {
-        return (
-          <Button
-            theme="secondary-alt"
-            size="s"
-            className="flex justify-center w-full"
-          >
-            {isSelected ? 'Selected' : 'Select solution'}
-          </Button>
-        );
-      },
+      Cell: ViewOnMapCell,
       className: 'w-40',
     },
-  ],
-  body: [
+  ];
+
+  const body = [
     {
       run: 1,
       score: 170,
@@ -89,6 +96,18 @@ Default.args = {
       best: false,
       id: 'row4',
     },
-  ],
-  onRowSelected: (row) => console.info(row),
+  ];
+
+  return (
+    <Table
+      {...args}
+      headers={headers}
+      body={body}
+      selectedRowId={selectedRowId}
+    />
+  );
+};
+
+export const Default = Template.bind({});
+Default.args = {
 };
