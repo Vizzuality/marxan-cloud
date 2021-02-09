@@ -64,7 +64,7 @@ export class ScenariosService extends AppBaseService<
       id: faker.random.uuid(),
       name: faker.lorem.words(5),
       description: faker.lorem.sentence(),
-      type: ScenarioType.standard,
+      type: ScenarioType.marxan,
       extent: {},
       wdpaFilter: {},
       wdpaThreshold: faker.random.number(100),
