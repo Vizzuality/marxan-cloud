@@ -96,6 +96,7 @@ export class AuthenticationService {
    */
   async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
     const user = new User();
+    user.displayName = signupDto.displayName;
     user.passwordHash = await hash(signupDto.password, 10);
     user.email = signupDto.email;
     /**
