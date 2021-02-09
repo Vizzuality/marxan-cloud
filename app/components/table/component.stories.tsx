@@ -53,6 +53,7 @@ Default.args = {
           </Button>
         );
       },
+      className: 'w-40',
     },
   ],
   body: [
