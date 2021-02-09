@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import cx from 'classnames';
 import Icon from 'components/icon';
 
@@ -12,19 +12,13 @@ import {
 const DEFAULT_SORT_DIRECTION: Direction = Direction.DESC;
 
 export const Table: React.FC<TableProps> = ({
+  className,
   headers,
   body,
-  onRowSelected,
-  selectedIndex,
-  className,
+  selectedRowId,
 }: TableProps) => {
-  const [selectedRow, setSelectedRow] = useState(selectedIndex);
   const [headerSelected, setHeaderSelected] = useState<HeaderSelection>(null);
   const [sortedBody, setSortedBody] = useState<TableRow[]>(body);
-
-  useEffect(() => {
-    setSelectedRow(selectedIndex);
-  }, [selectedIndex]);
 
   const sort = (selection: HeaderSelection) => {
     const { order, id } = selection;
@@ -33,11 +27,6 @@ export const Table: React.FC<TableProps> = ({
     );
     setSortedBody(newBody);
   };
-
-  const handleRowClick = useCallback((row, rowIndex) => {
-    setSelectedRow(rowIndex);
-    if (onRowSelected) onRowSelected(row);
-  }, [onRowSelected]);
 
   const handleHeaderClick = (header: TableHeaderItem) => {
     if (headerSelected && headerSelected.id === header.id) {
@@ -91,7 +80,9 @@ export const Table: React.FC<TableProps> = ({
       </thead>
       <tbody>
         {sortedBody.map((row, rowIndex) => {
-          const rowIsSelected = selectedRow === rowIndex;
+          const { id: rowId } = row;
+          const rowIsSelected = rowId === selectedRowId;
+
           return (
             <tr
               key={row.id}
@@ -100,14 +91,12 @@ export const Table: React.FC<TableProps> = ({
                 'bg-white': !rowIsSelected && (rowIndex + 1) % 2 === 1,
                 'bg-primary-500': rowIsSelected,
               })}
-              onClick={() => handleRowClick(row, rowIndex)}
             >
               {
-                headers.map(({ id, customCell }: TableHeaderItem) => {
-                  const value = row[id];
-                  const customCellIsJSX: boolean = typeof customCell === 'object';
-                  const customCellIsFunction: boolean = typeof customCell === 'function';
-                  const CustomComponent = customCell;
+                headers.map(({ id: headerId, Cell }: TableHeaderItem) => {
+                  const value = row[headerId];
+                  const CellIsFunction = typeof Cell === 'function';
+
                   const rowData = {
                     ...row,
                     isSelected: rowIsSelected,
@@ -115,17 +104,14 @@ export const Table: React.FC<TableProps> = ({
 
                   return (
                     <td
-                      key={`td-${id}-${value}`}
+                      key={`td-${headerId}-${value}`}
                       className="px-4 py-2"
                       role="gridcell"
                     >
-                      {/* customCell is a function */}
-                      {customCellIsFunction
-                        && customCell(value, rowData)}
-                      {/* customCell is a JSX component */}
-                      {customCellIsJSX && CustomComponent
-                        && <CustomComponent value={value} data={rowData} />}
-                      {!customCell && value}
+                      {/* Cell is a function */}
+                      {CellIsFunction && Cell(value, rowData)}
+
+                      {!Cell && value}
                     </td>
                   );
                 })

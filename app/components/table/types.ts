@@ -1,18 +1,22 @@
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 
+export interface TableProps {
+  className?: string;
+  headers: TableHeaderItem[];
+  body: TableRow[];
+  selectedRowId?: string | number;
+}
 export interface TableHeaderItem {
   id: string,
   label: string,
-  customCell?: ((customCellProps: CustomCellProps) => ReactElement)
-  | ReactElement;
+  Cell?: ((value: any, row: TableRow) => ReactNode);
   customSort?: (a: any, b: any) => number;
-  defaultSort?: HeaderSelection;
   className?: string;
 }
 
-export interface CustomCellProps {
-  value: any;
-  data: TableRow;
+export interface TableRow {
+  id: string,
+  isSelected?: boolean
 }
 
 export enum Direction {
@@ -24,18 +28,4 @@ export interface HeaderSelection {
   id: string;
   order: Direction;
   customSort?: (a: any, b: any) => number;
-}
-
-export interface TableRow {
-  id: string,
-  isSelected?: boolean
-}
-
-export interface TableProps {
-  headers: TableHeaderItem[];
-  body: TableRow[];
-  selectedIndex?: number;
-  rowSelectable?: boolean;
-  onRowSelected?: (row: TableRow) => void;
-  className?: string;
 }
