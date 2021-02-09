@@ -1,7 +1,28 @@
+import { ReactElement } from 'react';
+
 export interface TableHeaderItem {
   id: string,
   label: string,
-  customCell?: (value, data: TableRow) => React.ReactNode | JSX.Element;
+  customCell?: ((customCellProps: CustomCellProps) => ReactElement)
+  | ReactElement;
+  customSort?: (a: any, b: any) => number;
+  defaultSort?: HeaderSelection;
+}
+
+export interface CustomCellProps {
+  value: any;
+  data: TableRow;
+}
+
+export enum Direction {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
+export interface HeaderSelection {
+  id: string;
+  order: Direction;
+  customSort?: (a: any, b: any) => number;
 }
 
 export interface TableRow {
