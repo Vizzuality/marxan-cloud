@@ -27,8 +27,8 @@ import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
  * kinds in the future).
  */
 export enum ScenarioType {
-  standard = 'Standard',
-  marxanWithZones = 'Marxan with zones',
+  marxan = 'marxan',
+  marxanWithZones = 'marxan-with-zones',
 }
 
 export enum JobStatus {
