@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from 'react-query';
-import { useAuth } from 'hooks/authorization';
+import { useAuth } from 'hooks/authentication';
 
 import { ItemProps } from 'components/projects/item/component';
 

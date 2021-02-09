@@ -9,7 +9,7 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 
-import { useAuth } from 'hooks/authorization';
+import { useAuth } from 'hooks/authentication';
 
 export interface LoginProps {
 
