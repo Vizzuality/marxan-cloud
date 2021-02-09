@@ -56,11 +56,11 @@ describe('OrganizationsController (e2e)', () => {
         })
         .expect(201);
 
-        const resources = response.body.data;
+      const resources = response.body.data;
 
-        anOrganization = resources[0];
-        expect(anOrganization.type).toBe('organizations');
-      });
+      anOrganization = resources[0];
+      expect(anOrganization.type).toBe('organizations');
+    });
 
     it('Gets organizations', async () => {
       const response = await request(app.getHttpServer())
