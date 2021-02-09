@@ -7,6 +7,7 @@ export interface TableHeaderItem {
   | ReactElement;
   customSort?: (a: any, b: any) => number;
   defaultSort?: HeaderSelection;
+  className?: string;
 }
 
 export interface CustomCellProps {
