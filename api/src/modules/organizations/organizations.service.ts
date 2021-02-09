@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
-import { BaseService } from 'nestjs-base-service';
 import { Repository } from 'typeorm';
 import { CreateOrganizationDTO } from './dto/create.organization.dto';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
@@ -11,9 +10,10 @@ import JSONAPISerializer = require('jsonapi-serializer');
 
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
+import { AppBaseService } from 'utils/app-base.service';
 
 @Injectable()
-export class OrganizationsService extends BaseService<
+export class OrganizationsService extends AppBaseService<
   Organization,
   CreateOrganizationDTO,
   UpdateOrganizationDTO,
@@ -24,17 +24,22 @@ export class OrganizationsService extends BaseService<
     protected readonly repository: Repository<Organization>,
     @Inject(UsersService) private readonly usersService: UsersService,
   ) {
-    super(repository, 'organization');
-    this.serializer = new JSONAPISerializer.Serializer('organizations', {
-      attributes: ['name', 'description'],
-      keyForAttribute: 'camelCase',
-    });
+    super(repository, 'organization', 'organizations');
   }
 
-  serializer;
-
-  async serialize(entities: Organization[]) {
-    return this.serializer.serialize(entities);
+  get serializerConfig() {
+    return {
+      attributes: ['name', 'description', 'metadata'],
+      keyForAttribute: 'camelCase',
+      projects: {
+        ref: 'id',
+        attributes: ['name', 'description', 'metadata'],
+        scenarios: {
+          ref: 'id',
+          attributes: ['name', 'description', 'metadata'],
+        },
+      },
+    };
   }
 
   async fakeFindOne(_id: string): Promise<Organization> {
@@ -45,14 +50,6 @@ export class OrganizationsService extends BaseService<
       description: faker.lorem.sentence(),
     };
     return organization;
-  }
-
-  async findAll(): Promise<Organization[]> {
-    return this.repository.find();
-  }
-
-  findOne(id: string): Promise<Organization | undefined> {
-    return this.repository.findOne(id);
   }
 
   async setDataCreate(
