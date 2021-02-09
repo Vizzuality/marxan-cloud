@@ -5,7 +5,7 @@
 .PHONY: seed-data seed-gadm seed-wdpa seed-iucn seed-ecosystems
 .DEFAULT_GOAL := seed-data
 
-seed-data: seed-wdpa
+seed-data: seed-iucn
 # seed-gadm seed-wdpa seed-iucn seed-ecosystems
 
 seed-gadm:
