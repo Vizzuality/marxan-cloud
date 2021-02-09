@@ -10,7 +10,6 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IssuedAuthnToken } from './issued-authn-token.api.entity';
 import ms = require('ms');
-import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 
 /**
