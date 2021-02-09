@@ -69,13 +69,15 @@ export const Table: React.FC<TableProps> = ({
     >
       <thead>
         <tr className="bg-white">
-          {/* Add custom styles through a prop or something like that */}
           {/* Add property to specify header to sort by, this should probably work as well when
           clicking on header, also support custom sort function */}
           {headers.map((header) => (
             <th
               key={`header-${header.id}`}
-              className="px-4 text-left cursor-pointer"
+              className={cx({
+                'px-4 text-left cursor-pointer': true,
+                [header.className]: !!header.className,
+              })}
               onClick={() => handleHeaderClick(header)}
             >
               <div className="flex items-center">
