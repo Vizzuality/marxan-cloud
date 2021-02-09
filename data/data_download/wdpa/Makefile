@@ -7,8 +7,17 @@ URL := $(shell curl -sS 'https://www.protectedplanet.net/downloads' \
 		--data-raw '{"domain":"general","format":"shp","token":"wdpa","id":51216}' \
 		--compressed | jq '.url')
 # @debt
+# USER_TOKEN := $(shell curl -sS 'https://mgis.vizzuality.com/auth/login' \
+# 		-H 'content-type: application/json;charset=UTF-8' \
+# 		--data-raw '{"email":"aa@example.com","password":"aauserpassword"}' \
+# 		--compressed | jq '.url')
 # need to add as the main admin user through auth and calling for it.
-import: data/wdpa/simp/0 data/wdpa/simp/1 data/wdpa/simp/2
+LIST = 0 1 2
+targets = $(addprefix exec, $(LIST))
+
+import: $(targets)
+
+$(targets): exec%: data/wdpa/simp/%
 	for i in $</*.json; do ogr2ogr -makevalid -update -append -nln wdpa -nlt PROMOTE_TO_MULTI -lco  \
 		GEOMETRY_NAME=the_geom -f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
 		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD schemas=myshapefiles" "$$i" \
