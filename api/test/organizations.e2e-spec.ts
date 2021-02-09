@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import * as faker from 'faker';
+import { E2E_CONFIG } from './e2e.config';
 
 describe('OrganizationsController (e2e)', () => {
   let app: INestApplication;
@@ -20,8 +21,8 @@ describe('OrganizationsController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post('/auth/sign-in')
       .send({
-        username: 'aa@example.com',
-        password: 'aauserpassword',
+        username: E2E_CONFIG.users.aa.username,
+        password: E2E_CONFIG.users.aa.password,
       })
       .expect(201);
 
