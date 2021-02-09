@@ -18,7 +18,7 @@ describe('OrganizationsController (e2e)', () => {
     await app.init();
 
     const response = await request(app.getHttpServer())
-      .post('/auth/login')
+      .post('/auth/sign-in')
       .send({
         username: 'aa@example.com',
         password: 'aauserpassword',

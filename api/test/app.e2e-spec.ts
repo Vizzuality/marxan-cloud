@@ -25,7 +25,7 @@ describe('AppController (e2e)', () => {
 
     it('Retrieves a JWT token when authenticating with valid credentials', async () => {
       const response = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/auth/sign-in')
         .send({
           username: 'aa@example.com',
           password: 'aauserpassword',
@@ -37,8 +37,8 @@ describe('AppController (e2e)', () => {
 
     it('Fails to authenticate a user with an incorrect password', async () => {
       const response = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({ email: 'test@example.com', password: 'wrong' })
+        .post('/auth/sign-in')
+        .send({ email: E2E_CONFIG.users.aa.username, password: 'wrong' })
         .expect(401);
 
       expect(response.body.accessToken).not.toBeDefined();
@@ -46,7 +46,7 @@ describe('AppController (e2e)', () => {
 
     it('Fails to authenticate a non-existing user', async () => {
       const response = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/auth/sign-in')
         .send({ email: 'test@example.com', password: 'wrong' })
         .expect(401);
 
