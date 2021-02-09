@@ -10,7 +10,7 @@ URL := $(shell curl -sS 'https://www.protectedplanet.net/downloads' \
 # USER_TOKEN := $(shell curl -sS 'https://mgis.vizzuality.com/auth/login' \
 # 		-H 'content-type: application/json;charset=UTF-8' \
 # 		--data-raw '{"email":"aa@example.com","password":"aauserpassword"}' \
-# 		--compressed | jq '.url')
+# 		--compressed | jq '.token')
 # need to add as the main admin user through auth and calling for it.
 LIST = 0 1 2
 targets = $(addprefix exec, $(LIST))
@@ -18,10 +18,12 @@ targets = $(addprefix exec, $(LIST))
 import: $(targets)
 
 $(targets): exec%: data/wdpa/simp/%
-	for i in $</*.json; do ogr2ogr -makevalid -update -append -nln wdpa -nlt PROMOTE_TO_MULTI -lco  \
+	for i in $</*.json; do \
+		ogr2ogr -makevalid -update -append -nln wdpa -nlt PROMOTE_TO_MULTI -lco  \
 		GEOMETRY_NAME=the_geom -f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
 		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD schemas=myshapefiles" "$$i" \
-		-sql "select *,'a10fc9017970474a8ff52915258057c3' as created_by from \"$$(basename -s .json "$$i")\""; done;
+		-sql "select *,'a10fc9017970474a8ff52915258057c3' as created_by from \"$$(basename -s .json "$$i")\""; \
+		done;
 
 merge-original: data/wdpa/WDPA_WDOECM_wdpa_shp0/ data/wdpa/WDPA_WDOECM_wdpa_shp1/ data/wdpa/WDPA_WDOECM_wdpa_shp2/
 	mapshaper-xl 16gb -i data/wdpa/WDPA_WDOECM_wdpa_shp0/*-polygons.shp data/wdpa/WDPA_WDOECM_wdpa_shp1/*-polygons.shp data/wdpa/WDPA_WDOECM_wdpa_shp2/*-polygons.shp snap combine-files \
@@ -48,12 +50,15 @@ data/wdpa/simp/%: data/wdpa/geojson/%/$(wildcard *.geojson)
 # need to review a better way to split the files than using the iucn category
 data/wdpa/geojson/%/$(wildcard *.geojson): data/wdpa/WDPA_WDOECM_wdpa_shp%/
 	mkdir -p $@
-	mapshaper-xl 16gb -i $<*-polygons.shp name='$(shell basename $<)' -split IUCN_CAT -o $@ format=geojson precision=0.0000001
+	mapshaper-xl 16gb -i $<*-polygons.shp name='$(shell basename $<)' \
+					-split IUCN_CAT \
+					-o $@ format=geojson precision=0.0000001
 
 data/wdpa/WDPA_WDOECM_wdpa_shp0/ data/wdpa/WDPA_WDOECM_wdpa_shp1/ data/wdpa/WDPA_WDOECM_wdpa_shp2/: data/wdpa/WDPA_WDOECM_wdpa_shp.zip
 	unzip -u $< -d data/wdpa/out
 
-	unzip data/wdpa/out/$(shell basename $@).zip -d data/wdpa/"$(shell basename $@)"
+	unzip data/wdpa/out/$(shell basename $@).zip \
+			-d data/wdpa/"$(shell basename $@)"
 
 data/wdpa/WDPA_WDOECM_wdpa_shp.zip: | data/wdpa
 	cd data/wdpa && curl -O $(URL)

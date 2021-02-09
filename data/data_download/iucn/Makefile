@@ -1,22 +1,39 @@
 .PHONY: import
 
+# @debt
+	# iucn downloads came from https://spatial-data-2020onwards.s3-eu-west-1.amazonaws.com/
+	# in the future it should came from the api and be ingested throught the features pipe.
 
+import: data/iucn/MAMMALS_simp.shp
+	# import data in the geodb for further use
+	ogr2ogr -makevalid -overwrite \
+		-nln mamals_feature -nlt PROMOTE_TO_MULTI \
+		-lco GEOMETRY_NAME=the_geom \
+		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
+		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD" $<
+	# Creates a new feature dataset in the api db
+	psql "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@marxan-postgresql-api:5432/$$API_POSTGRES_DB" \
+	-c "insert into features(item_id, item_group, name) \
+		(SELECT * FROM mamals_feature);"
+	# Ingest the features in the dataset feature geodb features_data table
+	psql "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@marxan-postgresql-geo-api:5432/$$GEO_POSTGRES_DB" \
+	-c "insert into features_data(item_id, item_group, name) \
+		(SELECT * FROM mamals_feature);"
 
-import: data/gadm36_0_simp.shp data/gadm36_1_simp.shp data/gadm36_2_simp.shp
-	ogr2ogr -overwrite -nln gadm_admin0 -nlt PROMOTE_TO_MULTI -lco GEOMETRY_NAME=geom -f PostgreSQL PG:"dbname='mgis-api' host='mgis-postgres' port=5432 user='mgis-api' password=$$POSTGRES_PASSWORD" data/gadm36_0_simp.shp
-	ogr2ogr -overwrite -nln gadm_admin1 -nlt PROMOTE_TO_MULTI -lco GEOMETRY_NAME=geom -f PostgreSQL PG:"dbname='mgis-api' host='mgis-postgres' port=5432 user='mgis-api' password=$$POSTGRES_PASSWORD" data/gadm36_1_simp.shp
-	ogr2ogr -overwrite -nln gadm_admin2 -nlt PROMOTE_TO_MULTI -lco GEOMETRY_NAME=geom -f PostgreSQL PG:"dbname='mgis-api' host='mgis-postgres' port=5432 user='mgis-api' password=$$POSTGRES_PASSWORD" data/gadm36_2_simp.shp
+data/iucn/MAMMALS_simp.shp: data/iucn/MAMMALS.shp
+	mapshaper-xl 16gb -i $< \
+		-filter-islands min-vertices=3 \
+		-filter-slivers \
+		-clean rewind \
+		-o $@ precision=0.00001 force
 
-data/gadm36_%_simp.shp: data/gadm36_%.shp
-	mapshaper $< -simplify 10% -filter-islands min-vertices=3 -filter-slivers -clean -o $@ force
+data/iucn/MAMMALS.shp: data/iucn/MAMMALS.zip
+	unzip -u $< -d data/iucn
 
-data/gadm36_0.shp data/gadm36_1.shp data/gadm36_2.shp: data/gadm36_levels_shp.zip
-	unzip -u $< -d data
+data/iucn/MAMMALS.zip: | data/iucn
+	cd data/iucn && curl -O https://spatial-data-2020onwards.s3-eu-west-1.amazonaws.com/groups/MAMMALS.zip
 
-data/gadm36_levels_shp.zip: | data
-	cd data && curl -O https://data.biogeo.ucdavis.edu/data/gadm3.6/gadm36_levels_shp.zip
-
-data:
+data/iucn:
 	mkdir -p $@
 
 clean:
