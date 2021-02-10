@@ -9,8 +9,7 @@ import Icon from 'components/icon';
 import Button from 'components/button';
 import Avatar from 'components/avatar';
 
-import { useMe } from 'hooks/users';
-import { useTransition, animated, config } from 'react-spring';
+import { useAuth } from 'hooks/authentication';
 
 import LOGO_SVG from 'svgs/logo.svg?sprite';
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
@@ -29,18 +28,7 @@ const SIZE = {
 };
 
 export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
-  const { user, isLoading } = useMe();
-
-  const transitionConfig = {
-    config: config.gentle,
-    unique: true,
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
-  };
-
-  const isUserTransition = useTransition((user && !isLoading), null, transitionConfig);
-  const isNotUserTransition = useTransition((!user && !isLoading), null, transitionConfig);
+  const auth = useAuth();
 
   return (
     <header
@@ -62,22 +50,20 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
               </a>
             </Link>
 
-            {isUserTransition.map(({ item, key, props }) => item && (
-              <animated.button
-                key={key}
+            {auth.user && (
+              <button
                 type="button"
-                style={props}
                 className="flex items-center justify-start"
               >
                 <Avatar className="text-sm text-white uppercase bg-primary-700">
                   MB
                 </Avatar>
                 <Icon icon={ARROW_DOWN_SVG} className="w-2.5 h-2.5 text-white" />
-              </animated.button>
-            ))}
+              </button>
+            )}
 
-            {isNotUserTransition.map(({ item, key, props }) => item && (
-              <animated.div key={key} style={props} className="flex items-center gap-4">
+            {!auth.user && (
+              <div className="flex items-center gap-4">
                 <Button theme="secondary-alt" size="s" className="">
                   Sign in
                 </Button>
@@ -85,8 +71,8 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
                 <Button theme="primary" size="s" className="">
                   Sign up
                 </Button>
-              </animated.div>
-            ))}
+              </div>
+            )}
           </div>
         </Wrapper>
       </nav>

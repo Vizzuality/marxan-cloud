@@ -19,8 +19,18 @@ export const Login: React.FC<LoginProps> = () => {
   const auth = useAuth();
 
   const handleSubmit = useCallback(async (data) => {
-    auth.signin(data);
+    await auth.signin(data);
   }, [auth]);
+
+  const handleLogout = useCallback(async () => {
+    await auth.signout();
+  }, [auth]);
+
+  if (auth.user) {
+    return (
+      <Button theme="primary" size="base" onClick={handleLogout}>Logout</Button>
+    );
+  }
 
   return (
     <FormRFF
