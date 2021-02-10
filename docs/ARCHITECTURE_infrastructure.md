@@ -79,7 +79,6 @@ four key system contexts:
 These are shown (though not yet fully articulated in C4 logical terms, please
 bear with us!) here:
 
-!(./ARCHITECTURE_infrastructure/marxan-contexts.png)
-
+![Marxan Cloud platform - contexts](./ARCHITECTURE_infrastructure/marxan-contexts.png)
 
 
