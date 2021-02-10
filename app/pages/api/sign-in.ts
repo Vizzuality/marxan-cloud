@@ -3,13 +3,14 @@ import nextConnect from 'next-connect';
 import { setLoginSession } from 'auth';
 import { localStrategy } from 'auth/strategies/local';
 import USERS from 'services/users';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-interface TokenProps {
+interface AuthenticateProps {
   accessToken: string;
 }
 
-const authenticate = (method, req, res) => new Promise((resolve, reject) => {
-  passport.authenticate(method, { session: false }, (error, token: TokenProps) => {
+const authenticate = (method, req, res) => new Promise<AuthenticateProps>((resolve, reject) => {
+  return passport.authenticate(method, { session: false }, (error, token) => {
     if (error) {
       reject(error);
     } else {
@@ -20,23 +21,23 @@ const authenticate = (method, req, res) => new Promise((resolve, reject) => {
 
 passport.use(localStrategy);
 
-export default nextConnect()
+export default nextConnect<NextApiRequest, NextApiResponse>()
   .use(passport.initialize())
   .post(async (req, res) => {
     try {
-      const { accessToken } = await authenticate('local', req, res);
+      const Auth = await authenticate('local', req, res);
 
       const { data: user } = await USERS.request({
         method: 'GET',
         url: '/me',
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${Auth.accessToken}`,
         },
       });
 
       const userWithToken = {
         ...user,
-        token: accessToken,
+        token: Auth.accessToken,
       };
 
       await setLoginSession(res, userWithToken);
