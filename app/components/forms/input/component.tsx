@@ -12,10 +12,20 @@ const THEME = {
       disabled: 'border-gray-900 opacity-50',
     },
   },
+  secondary: {
+    base:
+      'w-full leading-tight text-white bg-gray-800 border-dashed border-b-2 focus:outline-none focus:bg-gray-700',
+    status: {
+      none: 'border-b-dashed-gray-900',
+      valid: 'border-b-dashed-green-500',
+      error: 'border-b-dashed-red-500',
+      disabled: 'border-b-dashed-gray-900 opacity-50',
+    },
+  },
 };
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  theme?: 'primary';
+  theme?: 'primary' | 'secondary';
   status?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
