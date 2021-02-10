@@ -81,4 +81,17 @@ bear with us!) here:
 
 ![Marxan Cloud platform - contexts](./ARCHITECTURE_infrastructure/marxan-contexts.png)
 
+Within the API subsystem, the core data layer is split between two distinct
+PostgreSQL cloud database instances for resource isolation purposes:
+
+- *Database* stores user, project, scenario metadata
+- *GeoDatabase* stores scenario geo data and performs CPU-bound geoprocessing
+  tasks
+
+We will evaluate performance metrics, job latency, priority handling, etc. in
+live instances of the platform to inform a possible decision, in later project
+phases, on whether to provide physical tenant isolation for geoprocessing only,
+e.g. by orchestrating the creation and eventual teardown of per-organization or
+per-project PostgreSQL cloud database instances for the *GeoDatabase*.
+
 
