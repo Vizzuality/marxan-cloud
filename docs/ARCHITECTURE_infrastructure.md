@@ -94,6 +94,35 @@ We will evaluate performance metrics, job latency, priority handling, etc. in
 live instances of the platform to inform a possible decision, in later project
 phases, on whether to provide physical tenant isolation for geoprocessing only,
 e.g. by orchestrating the creation and eventual teardown of per-organization or
-per-project PostgreSQL cloud database instances for the *GeoDatabase*.
+per-project PostgreSQL cloud database instances for the *GeoDatabase* component.
 
+### Pub/Sub and job queues
 
+An Airflow instance orchestrates data and geo processing jobs, communicating
+with the API via Redis Pub/Sub queues to retrieve jobs ready to be processed,
+and to update job status as computation jobs in the Airflow cluster start,
+progress, terminate successfully or result in error conditions.
+
+## Data processing and geoprocessing context
+
+Within this architectural context, an async job orchestrator dispatches to
+available workers computation jobs which are enqueued on Redis Pub/Sub queues by
+the API.
+
+We are currently expecting to handle three main kinds of async computation
+pipelines:
+
+1. data preprocessing for ingestion: geoprocessing pipelines to ingest geo
+   datasets or user-provided geo data
+2. Marxan runs (potentially other kinds of solvers in later development phases)
+3. data postprocessing, either from data ingested via pipelines of kind #1 or
+   from results of Marxan computations (kind #2)
+
+An outline of these pipelines is provided in the following diagram.
+
+![Marxan Cloud platform - geoprocessing context](./ARCHITECTURE_infrastructure/marxan-data-pipeline-context.png)
+
+### Geo data
+
+For an outline of data sources and processing strategies, please see the
+[Science and Data](./README_science_and_data.md) overview.
