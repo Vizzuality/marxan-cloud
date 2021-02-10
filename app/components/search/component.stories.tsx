@@ -35,7 +35,6 @@ const Template: Story<SearchProps> = ({ ...args }: SearchProps) => {
 
   const onChange = (e) => {
     setSubmittedText(e);
-    args.onChange(e);
   };
 
   return (

@@ -42,9 +42,9 @@ export const Search: React.FC<SearchProps> = ({
   const ref = useRef();
   const {
     inputProps,
-    clearButtonProps, // eslint-disable-line @typescript-eslint/no-unused-vars
+    clearButtonProps,
   } = useSearchField(rest, state, ref);
-  // const { buttonProps } = useButton(clearButtonProps, null);
+  const { buttonProps } = useButton(clearButtonProps, null);
 
   useEffect(() => {
     const label = labelRef.current;
@@ -85,14 +85,14 @@ export const Search: React.FC<SearchProps> = ({
           { [THEME[theme]]: true },
         )}
       />
-      {/* {state.value !== '' && (
-        <button type="button" {...buttonProps}>
+      {state.value !== '' && (
+        <button className="relative w-2 h-2 self-center" type="button" {...buttonProps}>
           <Icon
             icon={CLOSE_SVG}
-            className="absolute inline-block w-2 h-2 right-1 top-1\/2"
+            className="absolute inline-block w-2 h-2 right-0 top-0"
           />
         </button>
-      )} */}
+      )}
     </div>
   );
 };
