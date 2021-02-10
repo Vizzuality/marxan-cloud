@@ -65,7 +65,7 @@ instances via Terraform and Helm workflows, thus allowing users to benefit from
 full resource isolation, where either data security requirements or performance
 requirements make the use of multi-tenant instances unsuitable.
 
-## Architectural contexts
+## System contexts
 
 With reference to the C4 model, the current Marxan Cloud architecture spans over
 four key system contexts:
@@ -80,6 +80,8 @@ These are shown (though not yet fully articulated in C4 logical terms, please
 bear with us!) here:
 
 ![Marxan Cloud platform - contexts](./ARCHITECTURE_infrastructure/marxan-contexts.png)
+
+### Data layer and multi-tenant isolation
 
 Within the API subsystem, the core data layer is split between two distinct
 PostgreSQL cloud database instances for resource isolation purposes:
