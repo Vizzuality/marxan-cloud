@@ -1,6 +1,6 @@
 import { serialize, parse } from 'cookie';
 
-const TOKEN_NAME = 'token';
+const TOKEN_NAME = 'user';
 
 export const MAX_AGE = 60 * 60 * 8; // 8 hours
 

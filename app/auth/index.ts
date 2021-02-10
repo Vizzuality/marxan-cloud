@@ -15,7 +15,7 @@ export async function setLoginSession(res, session) {
 export async function getLoginSession(req) {
   const token = getTokenCookie(req);
 
-  if (!token) return;
+  if (!token) return undefined;
 
   const session = await Iron.unseal(token, TOKEN_SECRET, Iron.defaults);
   const expiresAt = session.createdAt + session.maxAge * 1000;
@@ -24,4 +24,6 @@ export async function getLoginSession(req) {
   if (Date.now() > expiresAt) {
     throw new Error('Session expired');
   }
+
+  return session;
 }

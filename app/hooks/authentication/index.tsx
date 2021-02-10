@@ -1,39 +1,36 @@
 import React, {
-  createContext, useState, useContext,
+  createContext, useContext, useMemo,
 } from 'react';
+import { useQuery } from 'react-query';
 
-import AUTHENTICATION from 'services/authentication';
+import LOCAL from 'services/local';
 
 const AuthContext = createContext({
-  token: null,
+  user: null,
+  successRedirect: '',
+  errorRedirect: '',
   signin: (data) => { console.info(data); },
   signup: (data) => { console.info(data); },
   signout: () => {},
 });
 
 // Provider hook that creates auth object and handles state
-function useProvideAuth() {
-  const [token, setToken] = useState(localStorage.getItem('token'));
+function useProvideAuth(options) {
+  const { successRedirect, errorRedirect } = options;
 
-  // Wrap any Firebase methods we want to use making sure ...
-  // ... to save the user to state.
   const signin = async (data) => {
-    // Get token
+    // Get user
     try {
-      const t = await AUTHENTICATION
+      const t = await LOCAL
         .request({
           method: 'POST',
-          url: '/login',
+          url: '/sign-in',
           data,
         });
 
-      setToken(t.data.accessToken);
-      localStorage.setItem('token', t.data.accessToken);
+      window.location.href = successRedirect;
       return t;
     } catch (error) {
-      setToken(null);
-      localStorage.setItem('token', null);
-
       console.error(error);
       return error;
     }
@@ -41,7 +38,7 @@ function useProvideAuth() {
 
   const signup = async (data) => {
     try {
-      await AUTHENTICATION
+      await LOCAL
         .request({
           method: 'POST',
           url: '/sign-up',
@@ -49,33 +46,27 @@ function useProvideAuth() {
         });
 
       const t = await signin(data);
-
-      setToken(t.data.accessToken);
-      localStorage.setItem('token', t.data.accessToken);
       return t;
     } catch (error) {
-      setToken(null);
-      localStorage.setItem('token', null);
       console.error(error);
       return error;
     }
   };
 
   const signout = async () => {
-    // const response = await AUTHENTICATION
-    //   .request({
-    //     method: 'GET',
-    //     url: '/logout',
-    //   });
+    await LOCAL
+      .request({
+        method: 'POST',
+        url: '/sign-out',
+      });
 
-    // console.info(response);
-    setToken(null);
-    localStorage.setItem('token', null);
+    window.location.href = errorRedirect;
   };
 
   // Return the user object and auth methods
   return {
-    token,
+    successRedirect,
+    errorRedirect,
     signin,
     signup,
     signout,
@@ -88,19 +79,48 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
+// Hook for child components to get the user object ...
+// ... and re-render when it changes.
+function useMe() {
+  const query = useQuery('me', async () => LOCAL.request({
+    method: 'GET',
+    url: '/me',
+  }));
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      user: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
 interface AuthorizationProviderProps {
-  children: React.ReactNode
+  successRedirect: string;
+  errorRedirect: string;
+  children: React.ReactNode;
+
 }
 // Provider component that wraps your app and makes auth object ...
 // ... available to any child component that calls useAuth().
-export function AuthorizationProvider({ children }: AuthorizationProviderProps) {
-  const auth = useProvideAuth();
+export function AuthorizationProvider({
+  successRedirect,
+  errorRedirect,
+  children,
+}: AuthorizationProviderProps) {
+  const auth = useProvideAuth({ successRedirect, errorRedirect });
+  const user = useMe();
 
   return (
     <AuthContext.Provider
-      value={auth}
+      value={{
+        ...auth,
+        ...user,
+      }}
     >
-      {children}
+      {user.isFetched && children}
     </AuthContext.Provider>
   );
 }

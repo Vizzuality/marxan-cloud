@@ -7,13 +7,13 @@ import { ItemProps } from 'components/projects/item/component';
 import PROJECTS from 'services/projects';
 
 export function useProjects() {
-  const { token } = useAuth();
+  const { user } = useAuth();
 
   const query = useQuery('projects', async () => PROJECTS.request({
     method: 'GET',
     url: '/',
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${user.token}`,
     },
   }));
 
