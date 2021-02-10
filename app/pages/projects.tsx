@@ -6,6 +6,7 @@ import { useAuth } from 'hooks/authentication';
 
 import Header from 'layout/header';
 import Projects from 'layout/projects';
+import Protected from 'layout/protected';
 
 const ProjectsPage: React.FC = () => {
   const { user, errorRedirect } = useAuth();
@@ -17,7 +18,7 @@ const ProjectsPage: React.FC = () => {
   }
 
   return (
-    <>
+    <Protected>
       <Head>
         <title>Projects</title>
         <link rel="icon" href="/favicon.ico" />
@@ -28,7 +29,7 @@ const ProjectsPage: React.FC = () => {
 
         <Projects />
       </main>
-    </>
+    </Protected>
   );
 };
 
