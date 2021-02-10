@@ -10,7 +10,7 @@ export default {
     theme: {
       control: {
         type: 'select',
-        options: ['primary'],
+        options: ['dark'],
       },
     },
     status: {
@@ -38,5 +38,5 @@ const Template: Story<InputProps> = (args) => <Input {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  theme: 'primary',
+  theme: 'dark',
 };

@@ -2,9 +2,19 @@ import React, { InputHTMLAttributes } from 'react';
 import cx from 'classnames';
 
 const THEME = {
-  primary: {
+  dark: {
     base:
       'w-full leading-tight text-white bg-gray-800 border rounded focus:outline-none focus:bg-gray-700',
+    status: {
+      none: 'border-gray-900',
+      valid: 'border-green-500',
+      error: 'border-red-500',
+      disabled: 'border-gray-900 opacity-50',
+    },
+  },
+  light: {
+    base:
+      'w-full leading-tight text-gray-800 bg-white border rounded focus:outline-none focus:bg-gray-100',
     status: {
       none: 'border-gray-900',
       valid: 'border-green-500',
@@ -15,12 +25,12 @@ const THEME = {
 };
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  theme?: 'primary';
+  theme?: 'dark' | 'light';
   status?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
 export const Input: React.FC<InputProps> = ({
-  theme = 'primary',
+  theme = 'dark',
   status = 'none',
   disabled = false,
   className,

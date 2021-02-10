@@ -11,7 +11,7 @@ export default {
     theme: {
       control: {
         type: 'select',
-        options: ['primary'],
+        options: ['dark'],
       },
     },
   },
@@ -27,5 +27,5 @@ export const Default = Template.bind({});
 Default.args = {
   id: 'scenario',
   label: 'Name the scenario',
-  theme: 'primary',
+  theme: 'dark',
 };
