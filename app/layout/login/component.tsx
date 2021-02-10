@@ -35,10 +35,6 @@ export const Login: React.FC<LoginProps> = () => {
   return (
     <FormRFF
       onSubmit={handleSubmit}
-      initialValues={{
-        username: 'aa@example.com',
-        password: 'aauserpassword',
-      }}
     >
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off">
@@ -51,7 +47,7 @@ export const Login: React.FC<LoginProps> = () => {
               {(fprops) => (
                 <Field id="login-username" {...fprops}>
                   <Label className="mb-3 uppercase">Email</Label>
-                  <Input type="email" />
+                  <Input theme="light" type="email" />
                 </Field>
               )}
             </FieldRFF>
@@ -66,7 +62,7 @@ export const Login: React.FC<LoginProps> = () => {
               {(fprops) => (
                 <Field id="login-password" {...fprops}>
                   <Label className="mb-3 uppercase">Password</Label>
-                  <Input type="password" />
+                  <Input theme="light" type="password" />
                 </Field>
               )}
             </FieldRFF>

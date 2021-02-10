@@ -3,6 +3,7 @@ import Head from 'next/head';
 
 import Header from 'layout/header';
 import Login from 'layout/login';
+import Wrapper from 'layout/wrapper';
 
 const Home: React.FC = () => {
   return (
@@ -15,7 +16,9 @@ const Home: React.FC = () => {
       <main>
         <Header size="lg" />
 
-        <Login />
+        <Wrapper>
+          <Login />
+        </Wrapper>
       </main>
     </>
   );
