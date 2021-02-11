@@ -21,7 +21,12 @@ export const Login: React.FC<LoginProps> = () => {
 
   const handleSubmit = useCallback(async (data) => {
     setSubmitting(true);
-    await auth.signin(data);
+    try {
+      await auth.signin(data);
+    } catch (error) {
+      console.error(error);
+      setSubmitting(false);
+    }
   }, [auth]);
 
   // This shouldn't be here, it's here just for testing
