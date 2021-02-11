@@ -9,7 +9,7 @@ const THEME = {
   secondary:
     'text-white bg-gray-500 hover:bg-gray-400 active:bg-gray-300 border border-gray-500 hover:border-gray-400 active:border-gray-300',
   'secondary-alt':
-    'text-gray-400 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-500 hover:border-gray-400 active:border-gray-300',
+    'text-gray-300 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
 };
 
 const SIZE = {
@@ -36,7 +36,7 @@ export const Button: React.FC<ButtonProps> = ({
   <button
     type="button"
     className={cx({
-      'flex rounded-4xl focus:outline-blue': true,
+      'flex justify-center rounded-4xl focus:outline-blue': true,
       [THEME[theme]]: true,
       [SIZE[size]]: true,
       [className]: !!className,

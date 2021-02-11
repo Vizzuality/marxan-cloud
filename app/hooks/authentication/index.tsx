@@ -7,8 +7,8 @@ import LOCAL from 'services/local';
 
 const AuthContext = createContext({
   user: null,
-  successRedirect: '',
-  errorRedirect: '',
+  successRedirect: '/login',
+  errorRedirect: '/',
   signin: (data) => { console.info(data); },
   signup: (data) => { console.info(data); },
   signout: () => {},
@@ -19,38 +19,25 @@ function useProvideAuth(options) {
   const { successRedirect, errorRedirect } = options;
 
   const signin = async (data) => {
-    // Get user
-    try {
-      const t = await LOCAL
-        .request({
-          method: 'POST',
-          url: '/sign-in',
-          data,
-        });
+    await LOCAL
+      .request({
+        method: 'POST',
+        url: '/sign-in',
+        data,
+      });
 
-      window.location.href = successRedirect;
-      return t;
-    } catch (error) {
-      console.error(error);
-      return error;
-    }
+    window.location.href = successRedirect;
   };
 
   const signup = async (data) => {
-    try {
-      await LOCAL
-        .request({
-          method: 'POST',
-          url: '/sign-up',
-          data,
-        });
+    await LOCAL
+      .request({
+        method: 'POST',
+        url: '/sign-up',
+        data,
+      });
 
-      const t = await signin(data);
-      return t;
-    } catch (error) {
-      console.error(error);
-      return error;
-    }
+    await signin(data);
   };
 
   const signout = async () => {
