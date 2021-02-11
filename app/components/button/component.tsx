@@ -30,6 +30,7 @@ export const Button: React.FC<ButtonProps> = ({
   theme = 'primary',
   size = 'base',
   className,
+  disabled,
   ...restProps
 }: ButtonProps) => (
   <button
@@ -39,6 +40,7 @@ export const Button: React.FC<ButtonProps> = ({
       [THEME[theme]]: true,
       [SIZE[size]]: true,
       [className]: !!className,
+      'opacity-50': disabled,
     })}
     {...restProps}
   >
