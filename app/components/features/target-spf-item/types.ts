@@ -7,8 +7,8 @@ export enum Type {
 export interface TargetSPF {
   isAllTargets: boolean;
   id: string;
-  targetValue: number;
-  spfValue: number;
+  target: number;
+  spf: number;
   type?: Type;
   surface?: string;
   name?: string;

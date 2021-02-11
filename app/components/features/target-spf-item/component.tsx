@@ -16,7 +16,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
   const [targetSPFValue, setTargetSPFValue] = useState<TargetSPF>(targetSPF);
   const sliderLabelRef = useRef(null);
   const {
-    isAllTargets, type, name, surface, targetValue, spfValue, id,
+    isAllTargets, type, name, surface, target, spf, id,
   } = targetSPFValue;
 
   return (
@@ -56,12 +56,12 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
             labelRef={sliderLabelRef}
             minValue={0}
             maxValue={1}
-            defaultValue={targetValue}
+            defaultValue={target}
             step={0.01}
             onChange={(sliderValue) => {
               const newValue: TargetSPF = {
                 ...targetSPFValue,
-                targetValue: sliderValue,
+                target: sliderValue,
               };
               setTargetSPFValue(newValue);
               if (onChange) onChange(newValue);
@@ -76,11 +76,11 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
           <span>{isAllTargets ? 'ALL SPF' : 'SPF'}</span>
           <Input
             theme="secondary"
-            defaultValue={spfValue}
+            defaultValue={spf}
             onChange={({ target: { value: inputValue } }) => {
               const newValue: TargetSPF = {
                 ...targetSPFValue,
-                spfValue: Number(inputValue),
+                spf: Number(inputValue),
               };
               setTargetSPFValue(newValue);
               if (onChange) onChange(newValue);
