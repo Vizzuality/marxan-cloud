@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
@@ -16,12 +16,15 @@ export interface LoginProps {
 }
 
 export const Login: React.FC<LoginProps> = () => {
+  const [submitting, setSubmitting] = useState(false);
   const auth = useAuth();
 
   const handleSubmit = useCallback(async (data) => {
+    setSubmitting(true);
     await auth.signin(data);
   }, [auth]);
 
+  // This shouldn't be here, it's here just for testing
   const handleLogout = useCallback(async () => {
     await auth.signout();
   }, [auth]);
@@ -69,7 +72,7 @@ export const Login: React.FC<LoginProps> = () => {
           </div>
 
           <div className="mt-10">
-            <Button theme="primary" size="base" type="submit">
+            <Button theme="primary" size="base" type="submit" disabled={submitting}>
               Sign in
             </Button>
           </div>
