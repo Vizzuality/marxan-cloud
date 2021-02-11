@@ -9,7 +9,7 @@ const SignUpPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Sign in</title>
+        <title>Sign up</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
