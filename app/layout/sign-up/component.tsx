@@ -4,6 +4,7 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
+import Error from 'components/forms/error';
 import Button from 'components/button';
 import {
   composeValidators,
@@ -17,6 +18,7 @@ export interface SignUpProps {
 
 export const SignUp: React.FC<SignUpProps> = () => {
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(false);
   const auth = useAuth();
 
   const handleSubmit = useCallback(async (data) => {
@@ -24,9 +26,10 @@ export const SignUp: React.FC<SignUpProps> = () => {
 
     try {
       await auth.signup(data);
-    } catch (error) {
+    } catch (err) {
       setSubmitting(false);
-      console.error(error);
+      setError(true);
+      console.error(err);
     }
   }, [auth]);
 
@@ -47,6 +50,10 @@ export const SignUp: React.FC<SignUpProps> = () => {
     >
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off">
+          <Error visible={error && !submitting}>
+            Ooops! Something went wrong. Try again
+          </Error>
+
           {/* DISPLAY NAME */}
           <div>
             <FieldRFF
