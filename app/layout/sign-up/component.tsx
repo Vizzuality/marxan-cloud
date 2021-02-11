@@ -1,11 +1,14 @@
 import React, { useCallback, useState } from 'react';
 
+import Button from 'components/button';
+import Loading from 'components/loading';
+
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
 import Error from 'components/forms/error';
-import Button from 'components/button';
+
 import {
   composeValidators,
 } from 'components/forms/validations';
@@ -49,10 +52,16 @@ export const SignUp: React.FC<SignUpProps> = () => {
       onSubmit={handleSubmit}
     >
       {(props) => (
-        <form onSubmit={props.handleSubmit} autoComplete="off">
+        <form onSubmit={props.handleSubmit} autoComplete="off" className="relative">
           <Error visible={error && !submitting}>
             Ooops! Something went wrong. Try again
           </Error>
+
+          <Loading
+            visible={submitting}
+            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
+            iconClassName="w-10 h-10 text-primary-500"
+          />
 
           {/* DISPLAY NAME */}
           <div>
