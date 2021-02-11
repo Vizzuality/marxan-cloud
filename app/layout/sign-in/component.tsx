@@ -4,6 +4,7 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
+import Error from 'components/forms/error';
 import Button from 'components/button';
 import {
   composeValidators,
@@ -49,11 +50,9 @@ export const SignIn: React.FC<SignInProps> = () => {
     >
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off">
-          {error && !submitting && (
-            <div className="px-3 py-1 mb-5 text-sm text-red-500 bg-red-100 border border-red-500 rounded">
-              Invalid username or password.
-            </div>
-          )}
+          <Error visible={error && !submitting}>
+            Invalid username or password.
+          </Error>
 
           {/* EMAIL */}
           <div>
