@@ -1,17 +1,16 @@
 import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
-import DOWNLOAD_SVG from 'svgs/ui/download.svg';
-import Icon, { IconProps } from './component';
+import Loading, { LoadingProps } from './component';
 
 export default {
-  title: 'Components/Icon',
-  component: Icon,
+  title: 'Components/Loading',
+  component: Loading,
 };
 
-const Template: Story<IconProps> = (args) => <Icon {...args} />;
+const Template: Story<LoadingProps> = (args) => <Loading {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
   className: 'w-5 h-5 text-blue-500',
-  icon: DOWNLOAD_SVG,
+  visible: true,
 };

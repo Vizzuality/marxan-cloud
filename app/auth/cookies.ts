@@ -11,7 +11,7 @@ export function setTokenCookie(res, token) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     path: '/',
-    sameSite: 'lax',
+    sameSite: 'strict',
   });
 
   res.setHeader('Set-Cookie', cookie);
