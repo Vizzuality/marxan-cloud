@@ -11,21 +11,24 @@ import {
 
 import { useAuth } from 'hooks/authentication';
 
-export interface LoginProps {
+export interface SignInProps {
 
 }
 
-export const Login: React.FC<LoginProps> = () => {
+export const SignIn: React.FC<SignInProps> = () => {
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(false);
   const auth = useAuth();
 
   const handleSubmit = useCallback(async (data) => {
     setSubmitting(true);
+
     try {
       await auth.signin(data);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
       setSubmitting(false);
+      setError(true);
+      console.error(err);
     }
   }, [auth]);
 
@@ -46,6 +49,12 @@ export const Login: React.FC<LoginProps> = () => {
     >
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off">
+          {error && !submitting && (
+            <div className="px-3 py-1 mb-5 text-sm text-red-500 bg-red-100 border border-red-500 rounded">
+              Invalid username or password.
+            </div>
+          )}
+
           {/* EMAIL */}
           <div>
             <FieldRFF
@@ -54,7 +63,7 @@ export const Login: React.FC<LoginProps> = () => {
             >
               {(fprops) => (
                 <Field id="login-username" {...fprops}>
-                  <Label className="mb-3 uppercase">Email</Label>
+                  <Label theme="light" className="mb-3 uppercase">Email</Label>
                   <Input theme="light" type="email" />
                 </Field>
               )}
@@ -69,7 +78,7 @@ export const Login: React.FC<LoginProps> = () => {
             >
               {(fprops) => (
                 <Field id="login-password" {...fprops}>
-                  <Label className="mb-3 uppercase">Password</Label>
+                  <Label theme="light" className="mb-3 uppercase">Password</Label>
                   <Input theme="light" type="password" />
                 </Field>
               )}
@@ -77,7 +86,7 @@ export const Login: React.FC<LoginProps> = () => {
           </div>
 
           <div className="mt-10">
-            <Button theme="primary" size="base" type="submit" disabled={submitting}>
+            <Button theme="primary" size="base" type="submit" disabled={submitting} className="w-full">
               Sign in
             </Button>
           </div>
@@ -87,4 +96,4 @@ export const Login: React.FC<LoginProps> = () => {
   );
 };
 
-export default Login;
+export default SignIn;
