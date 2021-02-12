@@ -9,7 +9,7 @@ export default {
     theme: {
       control: {
         type: 'select',
-        options: ['dark'],
+        options: ['dark', 'light'],
       },
     },
     status: {

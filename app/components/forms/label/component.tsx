@@ -2,8 +2,8 @@ import React from 'react';
 import cx from 'classnames';
 
 const THEME = {
-  dark: 'block text-xs text-white',
-  light: 'block text-xs text-gray-800',
+  dark: 'block font-heading font-medium text-xs text-white',
+  light: 'block font-heading font-medium text-xs text-gray-800',
 };
 
 export interface LabelProps {

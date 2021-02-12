@@ -6,20 +6,20 @@ const THEME = {
     base:
       'bg-gray-800 border rounded-sm text-primary-500 focus:border-primary-500 focus:outline-none',
     status: {
-      none: 'border-gray-900',
-      valid: 'border-gray-900',
+      none: 'border-gray-800',
+      valid: 'border-gray-800',
       error: 'border-red-500 focus:border-red-500',
-      disabled: 'border-gray-900 opacity-50',
+      disabled: 'border-gray-800 opacity-50',
     },
   },
   light: {
     base:
       'bg-white border rounded-sm text-primary-500 focus:border-primary-500 focus:outline-none',
     status: {
-      none: 'border-gray-900',
-      valid: 'border-gray-900',
+      none: 'border-gray-800',
+      valid: 'border-gray-800',
       error: 'border-red-500 focus:border-red-500',
-      disabled: 'border-gray-900 opacity-50',
+      disabled: 'border-gray-800 opacity-50',
     },
   },
 };
