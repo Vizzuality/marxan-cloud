@@ -15,6 +15,9 @@ import {
 
 import { useAuth } from 'hooks/authentication';
 
+import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
+import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
+
 export interface SignInProps {
 
 }
@@ -72,7 +75,7 @@ export const SignIn: React.FC<SignInProps> = () => {
               {(fprops) => (
                 <Field id="login-username" {...fprops}>
                   <Label theme="light" className="mb-3 uppercase">Email</Label>
-                  <Input theme="light" type="email" />
+                  <Input theme="light" type="email" icon={EMAIL_SVG} />
                 </Field>
               )}
             </FieldRFF>
@@ -87,7 +90,7 @@ export const SignIn: React.FC<SignInProps> = () => {
               {(fprops) => (
                 <Field id="login-password" {...fprops}>
                   <Label theme="light" className="mb-3 uppercase">Password</Label>
-                  <Input theme="light" type="password" />
+                  <Input theme="light" type="password" icon={PASSWORD_SVG} />
                 </Field>
               )}
             </FieldRFF>
