@@ -11,7 +11,7 @@ export interface LoadingProps {
   iconClassName?: string;
 }
 
-export const Loading = ({
+export const Loading: React.FC<LoadingProps> = ({
   visible = false,
   className = 'absolute',
   iconClassName = 'w-5 h-5',
@@ -22,17 +22,21 @@ export const Loading = ({
     leave: { opacity: 0 },
   });
 
-  return transitions.map(({ item, key, props }) => item && (
-    <animated.div
-      key={key}
-      style={props}
-      className={cx({
-        [className]: !!className,
-      })}
-    >
-      <Icon icon={LOADING_SVG} className={iconClassName} />
-    </animated.div>
-  ));
+  return (
+    <>
+      {transitions.map(({ item, key, props }) => item && (
+        <animated.div
+          key={key}
+          style={props}
+          className={cx({
+            [className]: !!className,
+          })}
+        >
+          <Icon icon={LOADING_SVG} className={iconClassName} />
+        </animated.div>
+      ))}
+    </>
+  );
 };
 
 export default Loading;
