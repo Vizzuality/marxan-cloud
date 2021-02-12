@@ -26,7 +26,7 @@ const THEME = {
 
 export interface TextareaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  theme?: 'dark';
+  theme?: 'dark' | 'light';
   status?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
