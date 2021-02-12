@@ -1,22 +1,11 @@
 import React from 'react';
 import Head from 'next/head';
 
-import { useRouter } from 'next/router';
-import { useAuth } from 'hooks/authentication';
-
 import Header from 'layout/header';
 import Projects from 'layout/projects';
 import Protected from 'layout/protected';
 
 const ProjectsPage: React.FC = () => {
-  const { user, errorRedirect } = useAuth();
-  const router = useRouter();
-
-  if (!user) {
-    router.push(errorRedirect);
-    return null;
-  }
-
   return (
     <Protected>
       <Head>

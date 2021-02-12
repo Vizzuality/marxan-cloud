@@ -42,6 +42,7 @@ export const Button: React.FC<ButtonProps> = ({
       [className]: !!className,
       'opacity-50': disabled,
     })}
+    disabled={disabled}
     {...restProps}
   >
     {children}
