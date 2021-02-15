@@ -1,14 +1,14 @@
 .PHONY: import
 
-#MAKEFLAGS := --jobs=$(shell nproc)
-#MAKEFLAGS += --output-sync=target
+MAKEFLAGS := --jobs=$(shell nproc)
+MAKEFLAGS += --output-sync=target
 # @debt
 # iucn downloads came from https://spatial-data-2020onwards.s3-eu-west-1.amazonaws.com/
 # in the future it should came from the api and be ingested throught the features pipe.
 
 MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@marxan-postgresql-api:5432/$$API_POSTGRES_DB" -c "select id from users limit 1")
 
-import:
+import: data/iucn/simp/%
 	for i in data/iucn/simp/*.json; do \
 		echo "creating table $$(basename -s .json "$$i" | tr -d ' \t\n\r' | tr [:upper:] [:lower:])_feature"; \
 		ogr2ogr -makevalid \

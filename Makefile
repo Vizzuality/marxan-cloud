@@ -45,11 +45,12 @@ clean-slate: stop
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data
 
-seed-dbs: clean-slate | start-api | seed-api-with-test-data | seed-geodb-data
+seed-dbs: seed-api-with-test-data | seed-geodb-data-full
 
 seed-api-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 
+<<<<<<< HEAD
 seed-geodb-data:
 <<<<<<< HEAD
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
@@ -59,6 +60,9 @@ test-e2e-api:
 	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e up --build --abort-on-container-exit --exit-code-from api api
 	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e rm --stop --force
 =======
+=======
+seed-geodb-data-full:
+>>>>>>> added pipe for terrestrial ecosystems
 	docker-compose -f ./data/docker-compose-data_download.yml up --build
 <<<<<<< HEAD
 	# docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
