@@ -1,6 +1,7 @@
 export interface User {
   email: string;
   isFetched: boolean;
+  token?: string;
 }
 
 export interface AuthContextProps {
