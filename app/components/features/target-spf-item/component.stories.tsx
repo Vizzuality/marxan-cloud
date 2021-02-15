@@ -18,11 +18,23 @@ Default.args = {
   targetSPF: {
     id: 1,
     isAllTargets: false,
-    targetValue: 0.17,
-    spfValue: 1,
+    target: 0.17,
+    spf: 1,
     type: Type.BIOREGIONAL,
     surface: '30 km²',
     name: 'Inland water',
+  },
+  onRemove: (value: TargetSPF) => console.info('Remove: ', value),
+  onChange: (value: TargetSPF) => console.info('Change', value),
+};
+
+export const AllTargets = Template.bind({});
+AllTargets.args = {
+  targetSPF: {
+    id: 2,
+    isAllTargets: true,
+    target: 0.17,
+    spf: 1,
   },
   onRemove: (value: TargetSPF) => console.info('Remove: ', value),
   onChange: (value: TargetSPF) => console.info('Change', value),
