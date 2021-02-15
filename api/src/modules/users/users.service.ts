@@ -45,10 +45,6 @@ export class UsersService extends AppBaseService<
     };
   }
 
-  async findOne(id: string): Promise<User | undefined> {
-    return this.repository.findOne(id);
-  }
-
   /**
    * Select one user by email address.
    *
@@ -57,10 +53,6 @@ export class UsersService extends AppBaseService<
    */
   async findByEmail(email: string): Promise<User | undefined> {
     return this.repository.findOne({ email: ILike(email.toLowerCase()) });
-  }
-
-  async remove(id: string): Promise<void> {
-    await this.repository.delete(id);
   }
 
   /**
