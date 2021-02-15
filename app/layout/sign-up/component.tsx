@@ -93,11 +93,11 @@ export const SignUp: React.FC<SignUpProps> = () => {
             {/* EMAIL */}
             <div className="mt-5">
               <FieldRFF
-                name="email"
+                name="username"
                 validate={composeValidators([{ presence: true, email: true }])}
               >
                 {(fprops) => (
-                  <Field id="login-email" {...fprops}>
+                  <Field id="login-username" {...fprops}>
                     <Label theme="light" className="mb-3 uppercase">Email</Label>
                     <Input theme="light" type="email" icon={EMAIL_SVG} />
                   </Field>
