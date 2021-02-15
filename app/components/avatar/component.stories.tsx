@@ -19,9 +19,6 @@ export const Default = Template.bind({});
 Default.args = {
   // children: <Icon icon={HELP_SVG} className="w-5 h-5" />,
   bgImage: '/images/avatar.png',
-  onClick: (e) => {
-    console.info('onClick', e);
-  },
 };
 
 export const Groups = () => {
@@ -30,41 +27,26 @@ export const Groups = () => {
       <li>
         <Avatar
           bgImage="/images/avatar.png"
-          onClick={() => {
-            console.info('first avatar clicked');
-          }}
         />
       </li>
       <li className="-ml-3">
         <Avatar
           bgImage="/images/avatar.png"
-          onClick={() => {
-            console.info('second avatar clicked');
-          }}
         />
       </li>
       <li className="-ml-3">
         <Avatar
           bgImage="/images/avatar.png"
-          onClick={() => {
-            console.info('second avatar clicked');
-          }}
         />
       </li>
       <li className="-ml-3">
         <Avatar
           bgImage="/images/avatar.png"
-          onClick={() => {
-            console.info('second avatar clicked');
-          }}
         />
       </li>
       <li className="ml-3">
         <Avatar
           className="bg-white"
-          onClick={() => {
-            console.info('third avatar clicked');
-          }}
         >
           <Icon icon={HELP_SVG} className="w-5 h-5" />
         </Avatar>

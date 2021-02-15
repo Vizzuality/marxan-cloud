@@ -4,17 +4,17 @@ import cx from 'classnames';
 import Link from 'next/link';
 
 import Wrapper from 'layout/wrapper';
+import User from 'layout/header/user';
 
 import Icon from 'components/icon';
 import Button from 'components/button';
-import Avatar from 'components/avatar';
+
+import { useAuth } from 'hooks/authentication';
 
 import LOGO_SVG from 'svgs/logo.svg?sprite';
-import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
 export interface HeaderProps {
   size: 'base' | 'lg',
-  user?: Record <string, unknown> // As soon as he define the User we must define this type better
 }
 
 const SIZE = {
@@ -26,10 +26,12 @@ const SIZE = {
   },
 };
 
-export const Header: React.FC<HeaderProps> = ({ size, user }:HeaderProps) => {
+export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
+  const auth = useAuth();
+
   return (
     <header
-      className="w-full"
+      className="w-full row-auto"
     >
       <nav className="relative flex flex-wrap items-center justify-between py-1 bg-black navbar-expand-lg">
         <Wrapper>
@@ -47,27 +49,23 @@ export const Header: React.FC<HeaderProps> = ({ size, user }:HeaderProps) => {
               </a>
             </Link>
 
-            {user?.isLogged && (
-              <button
-                type="button"
-                className="flex items-center justify-start"
-              >
-                <Avatar className="text-sm text-white uppercase bg-primary-700">
-                  MB
-                </Avatar>
-                <Icon icon={ARROW_DOWN_SVG} className="w-2.5 h-2.5 text-white" />
-              </button>
+            {auth.user && (
+              <User />
             )}
 
-            {!user?.isLogged && (
+            {!auth.user && (
               <div className="flex items-center gap-4">
-                <Button theme="secondary-alt" size="s" className="">
-                  Sign in
-                </Button>
+                <Link href="sign-in">
+                  <Button theme="secondary-alt" size="s">
+                    Sign in
+                  </Button>
+                </Link>
 
-                <Button theme="primary" size="s" className="">
-                  Sign up
-                </Button>
+                <Link href="sign-up">
+                  <Button theme="primary" size="s">
+                    Sign up
+                  </Button>
+                </Link>
               </div>
             )}
           </div>
