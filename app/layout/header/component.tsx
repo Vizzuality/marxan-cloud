@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import cx from 'classnames';
 
 import Link from 'next/link';
@@ -12,7 +12,6 @@ import Button from 'components/button';
 import { useAuth } from 'hooks/authentication';
 
 import LOGO_SVG from 'svgs/logo.svg?sprite';
-import { useRouter } from 'next/router';
 
 export interface HeaderProps {
   size: 'base' | 'lg',
@@ -29,16 +28,6 @@ const SIZE = {
 
 export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
   const auth = useAuth();
-  const router = useRouter();
-
-  // Events
-  const onClickSignIn = useCallback(() => {
-    router.push('/sign-in');
-  }, [router]);
-
-  const onClickSignUp = useCallback(() => {
-    router.push('/sign-up');
-  }, [router]);
 
   return (
     <header
@@ -66,13 +55,17 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
 
             {!auth.user && (
               <div className="flex items-center gap-4">
-                <Button theme="secondary-alt" size="s" onClick={onClickSignIn}>
-                  Sign in
-                </Button>
+                <Link href="sign-in">
+                  <Button theme="secondary-alt" size="s">
+                    Sign in
+                  </Button>
+                </Link>
 
-                <Button theme="primary" size="s" onClick={onClickSignUp}>
-                  Sign up
-                </Button>
+                <Link href="sign-up">
+                  <Button theme="primary" size="s">
+                    Sign up
+                  </Button>
+                </Link>
               </div>
             )}
           </div>
