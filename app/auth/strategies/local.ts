@@ -9,7 +9,7 @@ export const localStrategy = new Local.Strategy(
     done,
   ) => {
     AUTHENTICATION.request({
-      url: '/login',
+      url: '/sign-in',
       method: 'POST',
       data: { username, password },
       headers: { 'Content-Type': 'application/json' },
