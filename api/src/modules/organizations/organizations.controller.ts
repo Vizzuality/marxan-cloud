@@ -73,7 +73,7 @@ export class OrganizationsController {
   @ApiOkResponse({ type: OrganizationResult })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Organization> {
-    return await this.service.serialize([await this.service.fakeFindOne(id)]);
+    return await this.service.serialize([await this.service.getById(id)]);
   }
 
   @ApiOperation({ description: 'Create organization' })
@@ -93,9 +93,9 @@ export class OrganizationsController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) _dto: UpdateOrganizationDTO,
+    @Body(new ValidationPipe()) dto: UpdateOrganizationDTO,
   ): Promise<OrganizationResult> {
-    return await this.service.serialize([await this.service.fakeFindOne(id)]);
+    return await this.service.serialize([await this.service.update(id, dto)]);
   }
 
   @ApiOperation({ description: 'Delete organization' })

@@ -67,7 +67,7 @@ export class ScenariosController {
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ScenarioResult> {
-    return await this.service.serialize([await this.service.fakeFindOne(id)]);
+    return await this.service.serialize([await this.service.getById(id)]);
   }
 
   @ApiOperation({ description: 'Create scenario' })
