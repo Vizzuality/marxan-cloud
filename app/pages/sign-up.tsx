@@ -17,7 +17,7 @@ const SignUpPage: React.FC = () => {
         <Header size="base" />
 
         <Wrapper>
-          <div className="mt-10">
+          <div className="flex items-center justify-center">
             <SignUp />
           </div>
         </Wrapper>

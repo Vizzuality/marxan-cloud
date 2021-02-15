@@ -9,7 +9,7 @@ export default {
     size: {
       control: {
         type: 'select',
-        options: ['xs', 's', 'base'],
+        options: ['xs', 's', 'base', 'lg'],
       },
     },
     theme: {

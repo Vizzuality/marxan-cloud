@@ -55,7 +55,9 @@ export const SignIn: React.FC<SignInProps> = () => {
       onSubmit={handleSubmit}
     >
       {(props) => (
-        <form onSubmit={props.handleSubmit} autoComplete="off" className="relative">
+        <form onSubmit={props.handleSubmit} autoComplete="off" className="relative w-full max-w-xs mx-auto">
+          <h2 className="mb-5 text-lg font-medium text-center font-heading">Get in Marxan!</h2>
+
           <Error visible={error && !submitting}>
             Invalid username or password.
           </Error>
@@ -97,7 +99,7 @@ export const SignIn: React.FC<SignInProps> = () => {
           </div>
 
           <div className="mt-10">
-            <Button theme="primary" size="base" type="submit" disabled={submitting} className="w-full">
+            <Button theme="primary" size="lg" type="submit" disabled={submitting} className="w-full">
               Sign in
             </Button>
           </div>

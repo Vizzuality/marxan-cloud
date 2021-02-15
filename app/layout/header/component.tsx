@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
 
   return (
     <header
-      className="w-full"
+      className="w-full row-auto"
     >
       <nav className="relative flex flex-wrap items-center justify-between py-1 bg-black navbar-expand-lg">
         <Wrapper>
