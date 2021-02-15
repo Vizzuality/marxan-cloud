@@ -72,20 +72,23 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
             <span>100%</span>
           </div>
         </div>
-        <div className="flex-col w-20 px-4 border-l-2">
+        <div className="flex flex-col justify-between w-24 px-4 border-l">
           <span>{isAllTargets ? 'ALL SPF' : 'SPF'}</span>
-          <Input
-            theme="secondary"
-            defaultValue={spf}
-            onChange={({ target: { value: inputValue } }) => {
-              const newValue: TargetSPF = {
-                ...targetSPFValue,
-                spf: Number(inputValue),
-              };
-              setTargetSPFValue(newValue);
-              if (onChange) onChange(newValue);
-            }}
-          />
+          <div className="w-10 mb-6">
+            <Input
+              className="px-0 py-1"
+              theme="secondary"
+              defaultValue={spf}
+              onChange={({ target: { value: inputValue } }) => {
+                const newValue: TargetSPF = {
+                  ...targetSPFValue,
+                  spf: Number(inputValue),
+                };
+                setTargetSPFValue(newValue);
+                if (onChange) onChange(newValue);
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
