@@ -3,7 +3,6 @@ import Head from 'next/head';
 
 import Header from 'layout/header';
 import SignUp from 'layout/sign-up';
-import Wrapper from 'layout/wrapper';
 
 const SignUpPage: React.FC = () => {
   return (
@@ -13,14 +12,14 @@ const SignUpPage: React.FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
 
-        <Wrapper>
-          <div className="mt-10">
+        <div className="md:flex-grow">
+          <div className="flex items-center justify-center h-full py-10">
             <SignUp />
           </div>
-        </Wrapper>
+        </div>
       </main>
     </>
   );

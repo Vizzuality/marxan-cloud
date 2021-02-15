@@ -3,7 +3,7 @@ import cx from 'classnames';
 
 const THEME = {
   dark: 'block font-heading font-medium text-xs text-white',
-  light: 'block font-heading font-medium text-xs text-gray-800',
+  light: 'block font-heading font-medium text-xs text-gray-600',
 };
 
 export interface LabelProps {
