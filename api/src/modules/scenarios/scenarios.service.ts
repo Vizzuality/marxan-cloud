@@ -83,14 +83,6 @@ export class ScenariosService extends AppBaseService<
     return scenario;
   }
 
-  findOne(id: string): Promise<Scenario | undefined> {
-    return this.repository.findOne(id);
-  }
-
-  async remove(id: string): Promise<void> {
-    await this.repository.delete(id);
-  }
-
   async setDataCreate(
     create: CreateScenarioDTO,
     info?: AppInfoDTO,
