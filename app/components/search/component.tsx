@@ -65,15 +65,18 @@ export const Search: React.FC<SearchProps> = ({
   return (
     <div
       className={cx(
-        'flex w-full relative border-b border-gray-400 p-4',
-        { [THEME[theme]]: true },
-        { [SIZES[size]]: true },
+        'flex w-full relative border-b border-gray-400 py-3 px-4',
+        {
+          [THEME[theme]]: true,
+          [SIZES[size]]: true,
+        },
       )}
     >
       <Icon
         icon={SEARCH_SVG}
         className="absolute top-1\/2 left-1 w-4.5 h-4.5 fill-current"
       />
+
       <input
         {...inputProps}
         ref={ref}
@@ -81,15 +84,19 @@ export const Search: React.FC<SearchProps> = ({
         aria-label="search field"
         type="search"
         className={cx(
-          'w-full pl-5 bg-transparent truncate focus:outline-none leading-4 placeholder-gray-300 placeholder-opacity-50',
-          { [THEME[theme]]: true },
+          'w-full font-sans pl-5 bg-transparent truncate focus:outline-none leading-4 placeholder-gray-300 placeholder-opacity-50',
+          {
+            [THEME[theme]]: true,
+            [SIZES[size]]: true,
+          },
         )}
       />
+
       {state.value !== '' && (
-        <button className="relative w-2 h-2 self-center" type="button" {...buttonProps}>
+        <button className="relative self-center w-2 h-2" type="button" {...buttonProps}>
           <Icon
             icon={CLOSE_SVG}
-            className="absolute inline-block w-2 h-2 right-0 top-0"
+            className="absolute top-0 right-0 inline-block w-2 h-2"
           />
         </button>
       )}

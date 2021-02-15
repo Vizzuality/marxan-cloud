@@ -31,10 +31,10 @@ export default {
 
 const Template: Story<SearchProps> = ({ ...args }: SearchProps) => {
   const labelRef = React.useRef(null);
-  const [value, setSubmittedText] = useState('');
+  const [value, setValue] = useState('');
 
   const onChange = (e) => {
-    setSubmittedText(e);
+    setValue(e);
   };
 
   return (
