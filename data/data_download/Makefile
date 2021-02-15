@@ -6,7 +6,7 @@
 #seed-data seed-gadm seed-wdpa seed-iucn seed-ecosystems
 .DEFAULT_GOAL := seed-data
 
-seed-data: seed-iucn
+seed-data: seed-iucn seed-ecosystems
 
 seed-gadm:
 	@echo "Starting seeding gadm data... "
@@ -22,4 +22,4 @@ seed-iucn:
 
 seed-ecosystems:
 	@echo "Starting seeding ecosystems data... "
-	$(MAKE) -C ./WorldTerrestrialEcosystems/Makefile import
+	$(MAKE) -C ./world_terrestrial_ecosystems import

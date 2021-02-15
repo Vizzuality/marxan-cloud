@@ -13,9 +13,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm i -g mapshaper
-RUN mkdir -p "gadm_3.6/data" && mkdir -p "wdpa/data" && mkdir -p "iucn/data" && mkdir -p "WorldTerrestrialEcosystems/data"
+RUN mkdir -p "gadm_3.6/data" && mkdir -p "wdpa/data" && mkdir -p "iucn/data" && mkdir -p "world_terrestrial_ecosystems/data"
 COPY ./gadm_3.6/Makefile ./gadm_3.6/Makefile
 COPY ./wdpa/Makefile ./wdpa/Makefile
 COPY ./iucn/Makefile ./iucn/Makefile
-COPY ./WorldTerrestrialEcosystems/Makefile ./WorldTerrestrialEcosystems/Makefile
+COPY ./world_terrestrial_ecosystems/Makefile ./world_terrestrial_ecosystems/Makefile
 COPY Makefile Makefile

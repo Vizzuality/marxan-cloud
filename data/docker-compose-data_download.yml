@@ -8,7 +8,7 @@ services:
     - './data/seed/gadm_3.6/:/gadm_3.6/data/'
     - './data/seed/wdpa/:/wdpa/data/'
     - './data/seed/iucn/:/iucn/data/'
-    - './data/seed/WorldTerrestrialEcosystems/:/WorldTerrestrialEcosystems/data/'
+    - './data/seed/world_terrestrial_ecosystems/:/world_terrestrial_ecosystems/data/'
     user: "$UID:$GID"
     command: make
     environment:
