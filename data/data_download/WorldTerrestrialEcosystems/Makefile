@@ -2,21 +2,20 @@
 
 
 
-import: data/gadm36_0_simp.shp data/gadm36_1_simp.shp data/gadm36_2_simp.shp
-	ogr2ogr -overwrite -nln gadm_admin0 -nlt PROMOTE_TO_MULTI -lco GEOMETRY_NAME=geom -f PostgreSQL PG:"dbname='mgis-api' host='mgis-postgres' port=5432 user='mgis-api' password=$$POSTGRES_PASSWORD" data/gadm36_0_simp.shp
-	ogr2ogr -overwrite -nln gadm_admin1 -nlt PROMOTE_TO_MULTI -lco GEOMETRY_NAME=geom -f PostgreSQL PG:"dbname='mgis-api' host='mgis-postgres' port=5432 user='mgis-api' password=$$POSTGRES_PASSWORD" data/gadm36_1_simp.shp
-	ogr2ogr -overwrite -nln gadm_admin2 -nlt PROMOTE_TO_MULTI -lco GEOMETRY_NAME=geom -f PostgreSQL PG:"dbname='mgis-api' host='mgis-postgres' port=5432 user='mgis-api' password=$$POSTGRES_PASSWORD" data/gadm36_2_simp.shp
+import: data/ecosystems/World_Ecosystems_simp.geojson
 
-data/gadm36_%_simp.shp: data/gadm36_%.shp
+
+
+data/ecosystems/World_Ecosystems_simp.geojson: data/ecosystems/World_Ecosystems.geojson
 	mapshaper $< -simplify 10% -filter-islands min-vertices=3 -filter-slivers -clean -o $@ force
 
-data/gadm36_0.shp data/gadm36_1.shp data/gadm36_2.shp: data/gadm36_levels_shp.zip
-	unzip -u $< -d data
+data/ecosystems/World_Ecosystems.geojson: data/ecosystems/World_Ecosystems.tif
+	gdal_polygonize $< -f GeoJSONSeq $@
 
-data/gadm36_levels_shp.zip: | data
-	cd data && curl -O https://data.biogeo.ucdavis.edu/data/gadm3.6/gadm36_levels_shp.zip
+data/ecosystems/World_Ecosystems.tif: | data/ecosystems
+	cd data && curl -O https://esri.maps.arcgis.com/sharing/rest/content/items/12230625b4d8409982f1361a1c03270f/data
 
-data:
+data/ecosystems:
 	mkdir -p $@
 
 clean:

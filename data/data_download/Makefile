@@ -2,11 +2,11 @@
 # make        # compile all binary
 # make clean  # remove ALL binaries and objects
 
-.PHONY: seed-data seed-gadm seed-wdpa seed-iucn seed-ecosystems
+.PHONY:
+#seed-data seed-gadm seed-wdpa seed-iucn seed-ecosystems
 .DEFAULT_GOAL := seed-data
 
 seed-data: seed-iucn
-# seed-gadm seed-wdpa seed-iucn seed-ecosystems
 
 seed-gadm:
 	@echo "Starting seeding gadm data... "

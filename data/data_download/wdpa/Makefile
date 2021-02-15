@@ -12,6 +12,7 @@ URL := $(shell curl -sS 'https://www.protectedplanet.net/downloads' \
 # 		--data-raw '{"email":"aa@example.com","password":"aauserpassword"}' \
 # 		--compressed | jq '.token')
 # need to add as the main admin user through auth and calling for it.
+MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@marxan-postgresql-api:5432/$$API_POSTGRES_DB" -c "select id from users limit 1")
 LIST = 0 1 2
 targets = $(addprefix exec, $(LIST))
 
@@ -22,8 +23,8 @@ $(targets): exec%: data/wdpa/simp/%
 		ogr2ogr -makevalid -update -append -nln wdpa -nlt PROMOTE_TO_MULTI -lco  \
 		GEOMETRY_NAME=the_geom -f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
 		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD schemas=myshapefiles" "$$i" \
-		-sql "select *,'a10fc9017970474a8ff52915258057c3' as created_by from \"$$(basename -s .json "$$i")\""; \
-		done;
+		-sql "select *,'$$MarxanUser' as created_by from \"$$(basename -s .json "$$i")\""; \
+	done;
 
 merge-original: data/wdpa/WDPA_WDOECM_wdpa_shp0/ data/wdpa/WDPA_WDOECM_wdpa_shp1/ data/wdpa/WDPA_WDOECM_wdpa_shp2/
 	mapshaper-xl 16gb -i data/wdpa/WDPA_WDOECM_wdpa_shp0/*-polygons.shp data/wdpa/WDPA_WDOECM_wdpa_shp1/*-polygons.shp data/wdpa/WDPA_WDOECM_wdpa_shp2/*-polygons.shp snap combine-files \
