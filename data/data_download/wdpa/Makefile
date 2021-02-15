@@ -23,7 +23,7 @@ $(targets): exec%: data/wdpa/simp/%
 		ogr2ogr -makevalid -update -append -nln wdpa -nlt PROMOTE_TO_MULTI -lco  \
 		GEOMETRY_NAME=the_geom -f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
 		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD schemas=myshapefiles" "$$i" \
-		-sql "select *,'$$MarxanUser' as created_by from \"$$(basename -s .json "$$i")\""; \
+		-sql "select *,'$(MarxanUser)' as created_by from \"$$(basename -s .json "$$i")\""; \
 	done;
 
 merge-original: data/wdpa/WDPA_WDOECM_wdpa_shp0/ data/wdpa/WDPA_WDOECM_wdpa_shp1/ data/wdpa/WDPA_WDOECM_wdpa_shp2/
