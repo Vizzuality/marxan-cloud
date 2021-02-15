@@ -5,7 +5,9 @@ import { useQuery } from 'react-query';
 
 import LOCAL from 'services/local';
 
-const AuthContext = createContext({
+import { AuthContextProps } from './types';
+
+const AuthContext = createContext<AuthContextProps>({
   user: null,
   successRedirect: '/login',
   errorRedirect: '/',
