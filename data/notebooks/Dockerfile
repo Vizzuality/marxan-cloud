@@ -33,13 +33,13 @@ RUN git clone https://github.com/mapbox/tippecanoe.git && \
 	make -j && make install && cd ..
 RUN export CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
+# also bugg for jupyter lab# nbdime \
 RUN pip install jupyter_contrib_nbextensions \
                 jupyter_nbextensions_configurator \
                 version_information \
                 jupyterlab \
                 nbdev \
                 autopep8 \
-                nbdime \
                 vega \
                 ipyleaflet \
                 jupyterlab_templates \
@@ -51,27 +51,30 @@ RUN conda update -n base conda && conda install -c conda-forge \
             python-blosc \
             cytoolz \
             gdal \
-            dask==2.30 \
+            dask \
             xhistogram \
             lz4 \
             nomkl \
-            dask-labextension==3.0 \
+            dask-labextension \
             python-graphviz \
-            tini==0.18.0 \
-            xarray=0.16.1
+            tini \
+            xarray \
+            jupyterlab_widgets
 
-# Enable extensions
+# Enable extensions nbdime support for lab3 is still in progress#jupyter labextension install nbdime-jupyterlab && \
+#jupyter labextension install jupyterlab_templates && \
+#jupyter serverextension enable --py jupyterlab_templates && \
+#&& \
+# jupyter labextension install qgrid2
+
 RUN jupyter contrib nbextension install --sys-prefix && \
-                jupyter nbextensions_configurator enable  && \
-                jupyter nbextension install --sys-prefix --py vega && \
-                jupyter nbextension enable vega --py --sys-prefix &&  \
-                jupyter nbextension enable --py --sys-prefix ipyleaflet && \
-                jupyter nbextension enable --py --sys-prefix qgrid && \
-                jupyter labextension install @jupyter-widgets/jupyterlab-manager dask-labextension@3.0 && \
-                jupyter labextension install nbdime-jupyterlab && \
-                jupyter labextension install jupyterlab_templates && \
-                jupyter labextension install qgrid2 && \
-                jupyter serverextension enable --py jupyterlab_templates
+    jupyter nbextension install --sys-prefix --py vega && \
+    jupyter nbextension enable vega --py --sys-prefix &&  \
+    jupyter nbextensions_configurator enable  && \
+    jupyter nbextension enable --py --sys-prefix ipyleaflet && \
+    jupyter nbextension enable --py --sys-prefix qgrid && \
+    jupyter labextension install jupyterlab_templates && \
+    jupyter serverextension enable --py jupyterlab_templates
 
 # Add requirements file
 COPY jupyter_notebook_config.py /etc/jupyter/
