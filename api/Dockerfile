@@ -1,28 +1,28 @@
 FROM node:14.15.4-alpine3.12
 LABEL maintainer="hello@vizzuality.com"
 
+ARG UID
+ARG GID
+
 ENV NAME marxan-api
 ENV USER $NAME
+ENV APP_HOME /opt/$NAME
 
-RUN addgroup -S $USER && adduser -S $USER -G $USER
+RUN addgroup -g $GID $USER && adduser -u $UID -D -G $USER $USER
 
-WORKDIR /opt/$NAME
+WORKDIR $APP_HOME
+RUN chown $USER:$USER $APP_HOME
 
-COPY package.json ./package.json
-COPY yarn.lock ./yarn.lock
+USER $USER
+
+COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
-COPY entrypoint.sh ./entrypoint.sh
-COPY nodemon.json ./nodemon.json
-COPY tsconfig.json ./tsconfig.json
-COPY tsconfig.build.json ./tsconfig.build.json
-COPY config ./config
-COPY ormconfig.ts ./ormconfig.ts
-
-COPY ./src ./src
-
+COPY --chown=$USER:$USER entrypoint.sh nodemon.json tsconfig.json tsconfig.build.json ormconfig.ts ./
+COPY --chown=$USER:$USER config ./config
+COPY --chown=$USER:$USER src ./src
 # @debt we should do this only for images used for tests
-COPY ./test ./test
+COPY --chown=$USER:$USER test ./test
 
 RUN yarn prestart:prod
 
