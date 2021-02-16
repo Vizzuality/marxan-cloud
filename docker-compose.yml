@@ -4,11 +4,14 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
+      args:
+        UID: 5000
+        GID: 5000
     ports:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-api
     command: develop
-    user: "$UID:$GID"
+    user: "5000:5000"
     volumes:
       - ./api/src:/opt/marxan-api/src
       - ./api/test:/opt/marxan-api/test
