@@ -77,7 +77,7 @@ RUN jupyter contrib nbextension install --sys-prefix && \
     jupyter serverextension enable --py jupyterlab_templates
 
 # Add requirements file
-COPY jupyter_notebook_config.py /etc/jupyter/
+COPY jupyter_server_config.py /etc/jupyter/
 COPY requirements.txt /app/
 RUN pip install wheel -r /app/requirements.txt
 RUN mkdir /opt/app

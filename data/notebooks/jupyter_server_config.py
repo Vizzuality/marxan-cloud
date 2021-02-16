@@ -5,14 +5,14 @@ import errno
 import stat
 
 c = get_config()
-c.NotebookApp.ip = '0.0.0.0'
-c.NotebookApp.port = 8888
-c.NotebookApp.open_browser = False
+c.ServerApp.ip = '0.0.0.0'
+c.ServerApp.port = 8888
+c.ServerApp.open_browser = False
 # c.NotebookApp.iopub_data_rate_limit=1.0e10
 # c.NotebookApp.iopub_msg_rate_limitFloat=30000
-c.NotebookApp.max_buffer_size = 20000000
-c.NotebookApp.default_url = '/lab'
-c.NotebookApp.line_numbers = True
+c.ServerApp.max_buffer_size = 20000000
+c.ServerApp.default_url = '/lab'
+c.ServerApp.line_numbers = True
 
 # https://github.com/jupyter/notebook/issues/3130
 c.FileContentsManager.delete_to_trash = False
@@ -49,7 +49,7 @@ distinguished_name = req_distinguished_name
                            '-out', pem_file])
     # Restrict access to the file
     os.chmod(pem_file, stat.S_IRUSR | stat.S_IWUSR)
-    c.NotebookApp.certfile = pem_file
+    c.ServerApp.certfile = pem_file
 
 # Change default umask for all subprocesses of the notebook server if set in
 # the environment
