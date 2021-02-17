@@ -16,7 +16,7 @@ const SignInPage: React.FC = () => {
         <Header size="base" />
 
         <div className="md:flex-grow">
-          <div className="flex items-center justify-center h-full py-10">
+          <div className="flex items-center justify-center h-full py-10 bg-white">
             <SignIn />
           </div>
         </div>

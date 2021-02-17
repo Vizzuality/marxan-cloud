@@ -4,8 +4,6 @@ import cx from 'classnames';
 import Avatar from 'components/avatar';
 import Button from 'components/button';
 
-import { animated } from 'react-spring';
-
 export interface ItemProps {
   id: string;
   className?: string;
@@ -32,7 +30,7 @@ export const Item: React.FC<ItemProps> = ({
   onDuplicate,
   onDelete,
 }: ItemProps) => (
-  <animated.div
+  <div
     style={style}
     className={cx({
       'flex flex-col rounded-4xl bg-gray-800 px-8 py-10 text-white': true,
@@ -91,7 +89,7 @@ export const Item: React.FC<ItemProps> = ({
         </Button>
       </div>
     </footer>
-  </animated.div>
+  </div>
 );
 
 export default Item;
