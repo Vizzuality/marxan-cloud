@@ -16,7 +16,7 @@ const ProjectsPage: React.FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <main className="relative">
         <Header size="base" />
 
         <ProjectsWelcome />
