@@ -2,8 +2,11 @@ import React from 'react';
 import Head from 'next/head';
 
 import Header from 'layout/header';
-import Projects from 'layout/projects';
 import Protected from 'layout/protected';
+
+import ProjectsWelcome from 'layout/projects/welcome';
+import ProjectsToolbar from 'layout/projects/toolbar';
+import ProjectsList from 'layout/projects/list';
 
 const ProjectsPage: React.FC = () => {
   return (
@@ -16,7 +19,9 @@ const ProjectsPage: React.FC = () => {
       <main>
         <Header size="base" />
 
-        <Projects />
+        <ProjectsWelcome />
+        <ProjectsToolbar />
+        <ProjectsList />
       </main>
     </Protected>
   );
