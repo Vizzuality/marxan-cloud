@@ -24,5 +24,5 @@ COPY ./src ./src
 
 RUN yarn prestart:prod
 
-EXPOSE 3001
+EXPOSE 3000
 ENTRYPOINT ["./entrypoint.sh"]

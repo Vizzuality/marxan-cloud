@@ -48,7 +48,7 @@ services:
         UID: 5000
         GID: 5000
     ports:
-      - "${GEOPROCESSING_SERVICE_PORT}:3001"
+      - "${GEOPROCESSING_SERVICE_PORT}:3000"
     container_name: marxan-geoprocessing
     command: develop
     user: "5000:5000"
