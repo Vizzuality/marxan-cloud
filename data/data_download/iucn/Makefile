@@ -21,7 +21,7 @@ import: data/iucn/simp/%
  			VALUES ('iucn_$$(basename -s .json $$i|tr -d ' \t\n\r' | tr [:upper:] [:lower:])', 'binomial', 'species','created','$(MarxanUser)') RETURNING id;"`; \
 		psql "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@marxan-postgresql-geo-api:5432/$$GEO_POSTGRES_DB" \
 		-c "insert into features_data(the_geom, properties, source, features_id) \
-			(SELECT the_geom, row_to_json(t)::jsonb - '{the_geom}'::text[] as properties, 'uicn' as source, '$$feature_id' as features_id from (select * from \"$$(basename -s .json "$$i" | tr -d ' \t\n\r' | tr [:upper:] [:lower:])_feature\") t); \
+			(SELECT the_geom, row_to_json(t)::jsonb - '{the_geom}'::text[] as properties, 'iucn' as source, '$$feature_id' as features_id from (select * from \"$$(basename -s .json "$$i" | tr -d ' \t\n\r' | tr [:upper:] [:lower:])_feature\") t); \
 			 DROP TABLE \"$$(basename -s .json "$$i" | tr -d ' \t\n\r' | tr [:upper:] [:lower:])_feature\""; \
 	done
 data/iucn/simp/%: data/iucn/out/%
