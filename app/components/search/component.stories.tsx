@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Story } from '@storybook/react/types-6-0';
 
-import Label from 'components/forms/label';
-
 import Search, { SearchProps } from './component';
 
 export default {
@@ -30,7 +28,6 @@ export default {
 };
 
 const Template: Story<SearchProps> = ({ ...args }: SearchProps) => {
-  const labelRef = React.useRef(null);
   const [value, setValue] = useState('');
 
   const onChange = (e) => {
@@ -39,10 +36,7 @@ const Template: Story<SearchProps> = ({ ...args }: SearchProps) => {
 
   return (
     <>
-      <Label ref={labelRef} id="search-component" className="uppercase sr-only">
-        Search
-      </Label>
-      <Search id="search-component" labelRef={labelRef} value={value} onChange={onChange} {...args} />
+      <Search id="search-component" value={value} onChange={onChange} {...args} />
     </>
   );
 };
