@@ -7,6 +7,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
            postgresql postgresql-client \
            iputils-ping \
+           time \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm i -g mapshaper
