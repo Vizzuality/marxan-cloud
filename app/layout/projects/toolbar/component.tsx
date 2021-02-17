@@ -33,10 +33,14 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
 
         <div className="flex gap-1">
           <Link href="/projects/new" passHref>
-            <Button theme="primary" size="base">
-              <span>Create new project</span>
-              <Icon className="w-3 h-3 ml-4" icon={PLUS_SVG} />
-            </Button>
+            <a
+              href="/projects/new"
+            >
+              <Button theme="primary" size="base">
+                <span>Create new project</span>
+                <Icon className="w-3 h-3 ml-4" icon={PLUS_SVG} />
+              </Button>
+            </a>
           </Link>
         </div>
       </div>
