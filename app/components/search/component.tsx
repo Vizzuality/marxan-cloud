@@ -76,10 +76,10 @@ export const Search: React.FC<SearchProps> = ({
       />
 
       {state.value !== '' && (
-        <button className="relative self-center w-2 h-2" type="button" {...buttonProps}>
+        <button className="relative flex items-center self-center justify-center w-5 h-5" type="button" {...buttonProps}>
           <Icon
             icon={CLOSE_SVG}
-            className="absolute top-0 right-0 inline-block w-2 h-2"
+            className="inline-block w-2 h-2"
           />
         </button>
       )}

@@ -7,7 +7,7 @@ interface ProjectListStateProps {
 const initialState = { search: '' } as ProjectListStateProps;
 
 const projectsSlice = createSlice({
-  name: 'projects-list',
+  name: '/projects',
   initialState,
   reducers: {
     setSearch: (state, action: PayloadAction<string>) => {
