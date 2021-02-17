@@ -44,10 +44,14 @@ services:
     build:
       context: ./geoprocessing
       dockerfile: Dockerfile
+      args:
+        UID: 5000
+        GID: 5000
     ports:
       - "${GEOPROCESSING_SERVICE_PORT}:3001"
     container_name: marxan-geoprocessing
     command: develop
+    user: "5000:5000"
     volumes:
       - ./geoprocessing/src:/opt/marxan-geoprocessing/src
       - ./geoprocessing/test:/opt/marxan-geoprocessing/test
