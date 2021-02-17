@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { PostgreSQLUtils } from 'src/utils/postgresql.utils';
 
-export class addFeatureScenarioOutputEntity1611828857842
+export class AddFeatureScenarioOutputEntity1611828857842
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
