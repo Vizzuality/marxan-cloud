@@ -1,4 +1,4 @@
-FROM osgeo/gdal:ubuntu-full-latest
+FROM osgeo/gdal:ubuntu-full-3.2.1
 LABEL maintainer="hello@vizzuality.com"
 ENV PG_MAJOR 13
 ENV POSTGIS_MAJOR 3
