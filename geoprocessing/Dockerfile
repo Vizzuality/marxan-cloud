@@ -1,4 +1,4 @@
-FROM node:14.15.1-alpine
+FROM node:14.15.5-alpine3.13
 LABEL maintainer="hello@vizzuality.com"
 
 ENV NAME marxan-geoprocessing
