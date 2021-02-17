@@ -7,10 +7,6 @@ URL := $(shell curl -sS 'https://www.protectedplanet.net/downloads' \
 		--data-raw '{"domain":"general","format":"shp","token":"wdpa","id":51216}' \
 		--compressed | jq '.url')
 # @debt
-# USER_TOKEN := $(shell curl -sS 'https://mgis.vizzuality.com/auth/login' \
-# 		-H 'content-type: application/json;charset=UTF-8' \
-# 		--data-raw '{"email":"aa@example.com","password":"aauserpassword"}' \
-# 		--compressed | jq '.token')
 # need to add as the main admin user through auth and calling for it.
 MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@marxan-postgresql-api:5432/$$API_POSTGRES_DB" -c "select id from users limit 1")
 LIST = 0 1 2
