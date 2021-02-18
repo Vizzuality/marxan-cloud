@@ -4,6 +4,8 @@ import Head from 'next/head';
 import Header from 'layout/header';
 import Protected from 'layout/protected';
 
+import NewProject from 'layout/projects/new';
+
 const NewProjectsPage: React.FC = () => {
   return (
     <Protected>
@@ -14,6 +16,7 @@ const NewProjectsPage: React.FC = () => {
 
       <main>
         <Header size="base" />
+        <NewProject />
       </main>
     </Protected>
   );
