@@ -20,7 +20,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         CREATE TYPE "source_type" AS ENUM (
           'user_imported',
           'gbif',
-          'uicn',
+          'iucn',
           'ecoregions',
           'intersection'
         );

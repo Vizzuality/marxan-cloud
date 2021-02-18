@@ -34,7 +34,7 @@ merge-simplify: data/wdpa/simp/0 data/wdpa/simp/1 data/wdpa/simp/2
 
 # @debt
 # need to review island removal
-data/wdpa/simp/%: data/wdpa/geojson/%/$(wildcard *.geojson)
+data/wdpa/simp/%: data/wdpa/geojson/%/
 	mkdir -p $@
 	mapshaper-xl 16gb -i $<*.json snap \
 				-simplify 10% planar keep-shapes \
@@ -45,7 +45,7 @@ data/wdpa/simp/%: data/wdpa/geojson/%/$(wildcard *.geojson)
 
 # @debt
 # need to review a better way to split the files than using the iucn category
-data/wdpa/geojson/%/$(wildcard *.geojson): data/wdpa/WDPA_WDOECM_wdpa_shp%/
+data/wdpa/geojson/%/: data/wdpa/WDPA_WDOECM_wdpa_shp%/
 	mkdir -p $@
 	mapshaper-xl 16gb -i $<*-polygons.shp name='$(shell basename $<)' \
 					-split IUCN_CAT \

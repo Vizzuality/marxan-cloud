@@ -109,7 +109,7 @@ or up and serve the documentation:
 make serve-doc
 ```
 ### Seed geodata into the geodb.
-note: Yo need at least 16 gb of Ram in order to fulfill some of the tasks (GADM pipe and WDPA) Also the number of cores will impact the time needed to run the full pipes.
+note: Yo need at least 16 gb of Ram and 40gb of disk space in order to fulfill some of the tasks (GADM pipe and WDPA) Also the number of cores will impact the time needed to run the full pipes.
 
 To seed the geodb database you need to follow the next instructions:
 And have a user set already in the metadata DB.
