@@ -90,7 +90,7 @@ describe('AppController (e2e)', () => {
 
       const resources = response.body.data;
 
-      expect(resources[0].type).toBe('projects');
+      expect(resources.type).toBe('projects');
     });
   });
 });
