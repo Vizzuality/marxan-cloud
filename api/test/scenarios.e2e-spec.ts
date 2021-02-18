@@ -72,10 +72,8 @@ describe('ScenariosModule (e2e)', () => {
         .send(createScenarioDTO)
         .expect(201);
 
-      const resources = response.body.data;
-      aScenario = resources[0];
+      aScenario = response.body.data;
       expect(aScenario.type).toBe('scenarios');
-      expect(resources.length).toBe(1);
     });
 
     it('Gets scenarios', async () => {
