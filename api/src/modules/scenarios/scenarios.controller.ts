@@ -77,9 +77,9 @@ export class ScenariosController {
     @Body(new ValidationPipe()) dto: CreateScenarioDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ScenarioResult> {
-    return await this.service.serialize([
+    return await this.service.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
-    ]);
+    );
   }
 
   @ApiOperation({ description: 'Update scenario' })
@@ -89,7 +89,7 @@ export class ScenariosController {
     @Param('id') id: string,
     @Body(new ValidationPipe()) dto: UpdateScenarioDTO,
   ): Promise<ScenarioResult> {
-    return await this.service.serialize([await this.service.update(id, dto)]);
+    return await this.service.serialize(await this.service.update(id, dto));
   }
 
   @ApiOperation({ description: 'Delete scenario' })
