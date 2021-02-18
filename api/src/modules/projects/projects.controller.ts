@@ -82,7 +82,7 @@ export class ProjectsController {
   @ApiOkResponse({ type: ProjectResult })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ProjectResult> {
-    return await this.service.serialize([await this.service.getById(id)]);
+    return await this.service.serialize(await this.service.getById(id));
   }
 
   @ApiOperation({ description: 'Create project' })

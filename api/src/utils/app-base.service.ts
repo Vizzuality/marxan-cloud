@@ -69,7 +69,7 @@ export abstract class AppBaseService<
     return query.getManyAndCount();
   }
 
-  async getSerializedData(data: Entity[], meta?: PaginationMeta) {
+  async getSerializedData(data: Entity | Entity[], meta?: PaginationMeta) {
     const serializer = new JSONAPISerializer.Serializer(this.pluralAlias, {
       ...this.serializerConfig,
       meta,
@@ -79,7 +79,7 @@ export abstract class AppBaseService<
   }
 
   async serialize(
-    entities: Entity[],
+    entities: Entity | Entity[],
     paginationMeta?: PaginationMeta,
   ): Promise<any> {
     return this.getSerializedData(entities, paginationMeta);
