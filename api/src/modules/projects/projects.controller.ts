@@ -92,9 +92,9 @@ export class ProjectsController {
     @Body(new ValidationPipe()) dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResult> {
-    return await this.service.serialize([
+    return await this.service.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
-    ]);
+    );
   }
 
   @ApiOperation({ description: 'Update project' })
@@ -104,7 +104,7 @@ export class ProjectsController {
     @Param('id') id: string,
     @Body(new ValidationPipe()) dto: UpdateProjectDTO,
   ): Promise<ProjectResult> {
-    return await this.service.serialize([await this.service.update(id, dto)]);
+    return await this.service.serialize(await this.service.update(id, dto));
   }
 
   @ApiOperation({ description: 'Delete project' })

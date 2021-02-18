@@ -9,7 +9,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { Organization, OrganizationResult } from './organization.api.entity';
+import { OrganizationResult } from './organization.api.entity';
 import { OrganizationsService } from './organizations.service';
 
 import {
@@ -83,9 +83,9 @@ export class OrganizationsController {
     @Body(new ValidationPipe()) dto: CreateOrganizationDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<OrganizationResult> {
-    return await this.service.serialize([
+    return await this.service.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
-    ]);
+    );
   }
 
   @ApiOperation({ description: 'Update organization' })
@@ -95,7 +95,7 @@ export class OrganizationsController {
     @Param('id') id: string,
     @Body(new ValidationPipe()) dto: UpdateOrganizationDTO,
   ): Promise<OrganizationResult> {
-    return await this.service.serialize([await this.service.update(id, dto)]);
+    return await this.service.serialize(await this.service.update(id, dto));
   }
 
   @ApiOperation({ description: 'Delete organization' })
