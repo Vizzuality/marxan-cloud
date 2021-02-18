@@ -57,9 +57,8 @@ describe('OrganizationsController (e2e)', () => {
         })
         .expect(201);
 
-      const resources = response.body.data;
+      anOrganization = response.body.data;
 
-      anOrganization = resources[0];
       expect(anOrganization.type).toBe('organizations');
     });
 
@@ -86,8 +85,7 @@ describe('OrganizationsController (e2e)', () => {
         })
         .expect(201);
 
-      const resources = response.body.data;
-      aProject = resources[0];
+      aProject = response.body.data;
       expect(aProject.type).toBe('projects');
     });
 
