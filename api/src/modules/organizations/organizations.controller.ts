@@ -51,7 +51,7 @@ export class OrganizationsController {
     description: 'Find all organizations',
   })
   @ApiOkResponse({
-    type: Organization,
+    type: OrganizationResult,
   })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized.',
@@ -64,7 +64,7 @@ export class OrganizationsController {
   @Get()
   async findAll(
     @Pagination() pagination: FetchSpecification,
-  ): Promise<Organization[]> {
+  ): Promise<OrganizationResult> {
     const results = await this.service.findAllPaginated(pagination);
     return this.service.serialize(results.data, results.metadata);
   }
@@ -72,8 +72,8 @@ export class OrganizationsController {
   @ApiOperation({ description: 'Find organization by id' })
   @ApiOkResponse({ type: OrganizationResult })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Organization> {
-    return await this.service.serialize([await this.service.getById(id)]);
+  async findOne(@Param('id') id: string): Promise<OrganizationResult> {
+    return await this.service.serialize(await this.service.getById(id));
   }
 
   @ApiOperation({ description: 'Create organization' })
