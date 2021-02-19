@@ -20,7 +20,7 @@ env:
   GEO_POSTGRES_DB: marxan-geo-api
   POSTGRES_GEO_SERVICE_PORT: 3533
 jobs:
-  build:
+  test-api-e2e:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
