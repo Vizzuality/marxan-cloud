@@ -1,10 +1,10 @@
-
 name: API e2e tests
 on:
   push:
     paths:
       - 'api/**'
       - 'geoprocessing/**'
+  workflow_dispatch:
 env:
   API_SERVICE_PORT: 3130
   API_AUTH_JWT_SECRET: ${{ secrets.API_AUTH_JWT_SECRET }}
