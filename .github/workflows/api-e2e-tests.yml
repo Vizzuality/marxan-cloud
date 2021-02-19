@@ -25,4 +25,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the docker-compose stack
-      run: docker-compose -f docker-compose-test-e2e.yml up --build --abort-on-container-exit --exit-code-from api api
+      run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml up --build --abort-on-container-exit --exit-code-from api api
