@@ -17,12 +17,13 @@ const SIZE = {
   s: 'text-sm px-3 py-0.5',
   base: 'text-base px-8 py-2',
   lg: 'text-base px-8 py-3',
+  xl: 'text-base px-14 py-3',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   theme: 'primary' | 'primary-alt' | 'secondary' | 'secondary-alt';
-  size: 'xs' | 's' | 'base' | 'lg';
+  size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }
 

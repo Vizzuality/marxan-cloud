@@ -6,6 +6,7 @@ import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
 import Textarea from 'components/forms/textarea';
+import Button from 'components/button';
 
 import {
   composeValidators,
@@ -13,11 +14,16 @@ import {
 
 import Wrapper from 'layout/wrapper';
 
+import PlanningUnitGrid from 'components/projects/planning-unit-grid';
 import { NewProjectProps } from './types';
 
 export const NewProject: React.FC<NewProjectProps> = () => {
   const handleSubmit = (values) => {
-    console.log('values', values);
+    console.info('values', values);
+  };
+
+  const handleCancel = () => {
+    console.info('cancel');
   };
 
   return (
@@ -33,9 +39,9 @@ export const NewProject: React.FC<NewProjectProps> = () => {
                 autoComplete="off"
                 className="justify-start w-full p-8"
               >
-                <h2 className="max-w-xs text-white font-heading">
+                <h1 className="max-w-xs text-white font-heading">
                   Name your project and define a planning area:
-                </h2>
+                </h1>
 
                 {/* NAME */}
                 <div className="mt-8">
@@ -65,6 +71,32 @@ export const NewProject: React.FC<NewProjectProps> = () => {
                       </Field>
                     )}
                   </FieldRFF>
+                </div>
+
+                <h2 className="mt-12 text-white font-heading">
+                  Do you have a planning region shapefile?
+                </h2>
+
+                <PlanningUnitGrid unit={null} />
+
+                {/* BUTTON BAR */}
+                <div className="flex mt-8">
+                  <Button
+                    theme="secondary"
+                    size="xl"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="ml-6"
+                    theme="primary"
+                    size="xl"
+                    type="submit"
+                    disabled
+                  >
+                    Save
+                  </Button>
                 </div>
               </form>
             )}
