@@ -38,17 +38,6 @@ describe('ScenariosModule (e2e)', () => {
     let aScenario: { id: string; type: 'scenarios' };
     let projects: { id: string }[] = [];
 
-    it('Gets scenarios', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/api/v1/scenarios')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .expect(200);
-
-      const resources = response.body.data;
-
-      expect(resources[0].type).toBe('scenarios');
-    });
-
     it('Gets projects', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
@@ -87,6 +76,17 @@ describe('ScenariosModule (e2e)', () => {
       aScenario = resources[0];
       expect(aScenario.type).toBe('scenarios');
       expect(resources.length).toBe(1);
+    });
+
+    it('Gets scenarios', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/v1/scenarios')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources = response.body.data;
+
+      expect(resources[0].type).toBe('scenarios');
     });
 
     it('Gets scenarios (paginated; pages of up to 5 items, no explicit page number - should default to 1)', async () => {
