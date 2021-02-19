@@ -17,9 +17,8 @@ export interface ProjectsListProps {
 export const ProjectsList: React.FC<ProjectsListProps> = () => {
   const { search } = useSelector((state) => state['/projects']);
   const {
-    data, isFetching, isFetched, ...rest
+    data, isFetching, isFetched,
   } = useProjects({ search });
-  console.log(rest);
 
   return (
     <Wrapper>

@@ -8,11 +8,22 @@ import Wrapper from 'layout/wrapper';
 import ScenariosSidebar from 'layout/scenarios/sidebar';
 import ScenariosMap from 'layout/scenarios/map';
 
+import { useProject } from 'hooks/projects';
+import { useRouter } from 'next/router';
+
 const NewScenarioPage: React.FC = () => {
+  const { query } = useRouter();
+  const { pid } = query;
+  const { data: projectData } = useProject(pid);
+
   return (
     <Protected>
       <Head>
-        <title>New Scenario</title>
+        <title>
+          {projectData?.name}
+          {' '}
+          - New Scenario
+        </title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

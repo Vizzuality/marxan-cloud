@@ -41,7 +41,7 @@ export const Button: React.FC<ButtonProps> = ({
       [THEME[theme]]: true,
       [SIZE[size]]: true,
       [className]: !!className,
-      'opacity-50': disabled,
+      'opacity-50 pointer-events-none': disabled,
     })}
     disabled={disabled}
     {...restProps}

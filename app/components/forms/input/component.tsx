@@ -5,12 +5,12 @@ import cx from 'classnames';
 const THEME = {
   dark: {
     base:
-      'w-full leading-tight text-white bg-gray-800 border rounded focus:outline-none focus:bg-gray-700',
+      'w-full leading-tight text-white bg-gray-800 bg-opacity-0 border rounded focus:outline-none focus:bg-gray-700',
     status: {
-      none: 'border-gray-800',
+      none: 'border-gray-500',
       valid: 'border-green-500',
       error: 'border-red-500',
-      disabled: 'border-gray-800 opacity-50',
+      disabled: 'border-gray-500 opacity-50',
     },
     icon: 'text-white',
   },
