@@ -1,0 +1,28 @@
+
+name: API e2e tests
+on:
+  push:
+    paths:
+      - 'api/**'
+      - 'geoprocessing/**'
+env:
+  API_SERVICE_PORT: 3130
+  API_AUTH_JWT_SECRET: ${{ secrets.API_AUTH_JWT_SECRET }}
+  API_RUN_MIGRATIONS_ON_STARTUP: true
+  API_POSTGRES_USER: marxan-api
+  API_POSTGRES_PASSWORD: ${{ secrets.API_POSTGRES_PASSWORD }}
+  API_POSTGRES_DB: marxan-api
+  POSTGRES_API_SERVICE_PORT: 3532
+  GEOPROCESSING_SERVICE_PORT: 3140
+  GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP: true
+  GEO_POSTGRES_USER: marxan-geo-api
+  GEO_POSTGRES_PASSWORD: ${{ secrets.GEO_POSTGRES_PASSWORD }}
+  GEO_POSTGRES_DB: marxan-geo-api
+  POSTGRES_GEO_SERVICE_PORT: 3533
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build the docker-compose stack
+      run: docker-compose -f docker-compose-test-e2e.yml up
