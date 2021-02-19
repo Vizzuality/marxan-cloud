@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.6"
 services:
   api:
     build:
@@ -12,7 +12,6 @@ services:
     volumes:
       - ./api/src:/opt/marxan-api/src
       - ./api/test:/opt/marxan-api/test
-    env_file: .env-test-e2e
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
@@ -32,7 +31,6 @@ services:
     volumes:
       - ./geoprocessing/src:/opt/marxan-geoprocessing/src
       - ./geoprocessing/test:/opt/marxan-geoprocessing/test
-    env_file: .env-test-e2e
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
@@ -47,7 +45,6 @@ services:
       context: ./postgresql
       dockerfile: Dockerfile
     container_name: marxan-test-e2e-postgresql-api
-    env_file: .env-test-e2e
     volumes:
       - ./api/test/fixtures/test-data.sql:/docker-entrypoint-initdb.d/test-data.sql
     ports:
@@ -61,7 +58,6 @@ services:
       context: ./postgresql
       dockerfile: Dockerfile
     container_name: marxan-test-e2e-postgresql-geo-api
-    env_file: .env-test-e2e
     ports:
       - "${POSTGRES_GEO_SERVICE_PORT}:5432"
     environment:
