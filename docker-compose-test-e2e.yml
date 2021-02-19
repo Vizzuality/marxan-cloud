@@ -5,6 +5,9 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
+      args:
+        UID: 5000
+        GID: 5000
     ports:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-api
@@ -25,10 +28,14 @@ services:
     build:
       context: ./geoprocessing
       dockerfile: Dockerfile
+      args:
+        UID: 5000
+        GID: 5000
     ports:
-      - "${GEOPROCESSING_SERVICE_PORT}:3001"
+      - "${GEOPROCESSING_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-geoprocessing
     command: test-e2e
+    user: "$UID:$GID"
     volumes:
       - ./geoprocessing/src:/opt/marxan-geoprocessing/src
       - ./geoprocessing/test:/opt/marxan-geoprocessing/test
