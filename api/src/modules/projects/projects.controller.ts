@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Req,
   UploadedFile,
   UseGuards,
   ValidationPipe,
@@ -14,11 +15,9 @@ import { ProjectsService } from './projects.service';
 
 import {
   ApiBearerAuth,
-  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
@@ -30,6 +29,9 @@ import { uploadOptions } from 'utils/file-uploads.utils';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateProjectDTO } from './dto/update.project.dto';
+import { CreateProjectDTO } from './dto/create.project.dto';
+import { RequestWithAuthenticatedUser } from 'app.controller';
+import { FetchSpecification, Pagination } from 'nestjs-base-service';
 
 const resource: BaseServiceResource = {
   className: 'Project',
@@ -66,27 +68,33 @@ export class ProjectsController {
   @ApiOperation({
     description: 'Find all projects',
   })
-  @ApiOkResponse({
-    type: Project,
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized.',
-  })
-  @ApiForbiddenResponse({
-    description:
-      'The current user does not have suitable permissions for this request.',
-  })
+  @ApiOkResponse({ type: ProjectResult })
   @JSONAPIQueryParams()
   @Get()
-  async findAll(): Promise<Project[]> {
-    return this.service.serialize(await this.service.findAll());
+  async findAll(
+    @Pagination() pagination: FetchSpecification,
+  ): Promise<ProjectResult> {
+    const results = await this.service.findAllPaginated(pagination);
+    return await this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find project by id' })
   @ApiOkResponse({ type: ProjectResult })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Project> {
-    return await this.service.serialize([await this.service.fakeFindOne(id)]);
+  async findOne(@Param('id') id: string): Promise<ProjectResult> {
+    return await this.service.serialize(await this.service.getById(id));
+  }
+
+  @ApiOperation({ description: 'Create project' })
+  @ApiOkResponse({ type: ProjectResult })
+  @Post()
+  async create(
+    @Body(new ValidationPipe()) dto: CreateProjectDTO,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ProjectResult> {
+    return await this.service.serialize(
+      await this.service.create(dto, { authenticatedUser: req.user }),
+    );
   }
 
   @ApiOperation({ description: 'Update project' })
@@ -96,7 +104,7 @@ export class ProjectsController {
     @Param('id') id: string,
     @Body(new ValidationPipe()) dto: UpdateProjectDTO,
   ): Promise<ProjectResult> {
-    return await this.service.serialize([await this.service.update(id, dto)]);
+    return await this.service.serialize(await this.service.update(id, dto));
   }
 
   @ApiOperation({ description: 'Delete project' })

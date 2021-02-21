@@ -85,6 +85,17 @@ Run `make start` to start all the services.
 
 Run `make notebooks` to start the jupyterlab service.
 
+### Seed data
+note: Yo need at least 16 gb of Ram and 40gb of disk space in order to fulfill some of the tasks (GADM pipe and WDPA) Also the number of cores will impact the time needed to run the full pipes.
+
+To seed the geodb database you need to follow the next instructions:
+
+``` bash
+make seed-dbs
+```
+
+This will populate the metadata DB and will trigger the geo-pipelines to seed the geoDB.
+
 ## Development workflow (TBD)
 
 We use a lightweight git flow workflow. `develop`, `main`, feature/bug fix

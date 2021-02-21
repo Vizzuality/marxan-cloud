@@ -1,5 +1,5 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { Country, CountryResult } from './country.api.entity';
+import { CountryResult } from './country.api.entity';
 import { CountriesService } from './countries.service';
 import {
   ApiBearerAuth,
@@ -13,6 +13,7 @@ import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { BaseServiceResource } from 'types/resource.interface';
+import { FetchSpecification, Pagination } from 'nestjs-base-service';
 
 const resource: BaseServiceResource = {
   className: 'Country',
@@ -33,25 +34,23 @@ export class CountriesController {
     description: 'Find all countries',
   })
   @ApiOkResponse({
-    type: Country,
+    type: CountryResult,
   })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized.',
-  })
-  @ApiForbiddenResponse({
-    description:
-      'The current user does not have suitable permissions for this request.',
-  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
   @JSONAPIQueryParams()
   @Get()
-  async findAll(): Promise<Country[]> {
-    return this.service.serialize(await this.service.findAll());
+  async findAll(
+    @Pagination() pagination: FetchSpecification,
+  ): Promise<CountryResult> {
+    const results = await this.service.findAllPaginated(pagination);
+    return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find country by id' })
   @ApiOkResponse({ type: CountryResult })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Country> {
-    return await this.service.fakeFindOne(id);
+  async findOne(@Param('id') id: string): Promise<CountryResult> {
+    return await this.service.serialize(await this.service.getById(id));
   }
 }

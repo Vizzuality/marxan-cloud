@@ -5,6 +5,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as helmet from 'helmet';
 import { CorsUtils } from './utils/cors.utils';
 import { AppConfig } from 'utils/config.utils';
+import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from 'filters/all-exceptions.exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -37,6 +39,9 @@ async function bootstrap() {
     .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);
   SwaggerModule.setup('/swagger', app, swaggerDocument);
+
+  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(3000);
 }

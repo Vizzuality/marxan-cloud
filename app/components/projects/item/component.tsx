@@ -12,6 +12,7 @@ export interface ItemProps {
   description: string;
   lastUpdate: string;
   contributors?: Record<string, unknown>[];
+  style?: Record<string, unknown>;
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -24,11 +25,13 @@ export const Item: React.FC<ItemProps> = ({
   description,
   lastUpdate,
   contributors = [],
+  style,
   onDownload,
   onDuplicate,
   onDelete,
 }: ItemProps) => (
   <div
+    style={style}
     className={cx({
       'flex flex-col rounded-4xl bg-gray-800 px-8 py-10 text-white': true,
       [className]: !!className,

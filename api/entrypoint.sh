@@ -18,6 +18,7 @@ case "$1" in
         # a `RUN` directive with a conditional shell statement that only
         # installs the package if a specific build argument or env var is set.
         apk update && apk add postgresql-client
+        sleep 15
         yarn typeorm migration:run
         psql $API_POSTGRES_URL < ./test/fixtures/test-data.sql
         exec yarn test:e2e

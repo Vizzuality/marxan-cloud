@@ -23,6 +23,7 @@ Unreleased
   - Get current user info (`/users/me`)
 - Stub `ProjectsModule`.
 - Stub `ScenariosModule`.
+- Stub `OrganizationsModule`.
 - Stub roles.
 - PoC JSON:API serialization.
 - Authentication
@@ -36,6 +37,9 @@ Unreleased
 - Shared ORM config setup, allowing to use multiple connections in NestJS as
   well as via the TypeORM CLI util.
 - Setup of E2E tests.
+- Support for pagination of plural responses.
+- Catch-all error handling via exception filter.
+- Serialization of error response payloads as JSON:API errors.
 
 ### Changed
 
