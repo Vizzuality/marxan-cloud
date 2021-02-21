@@ -27,8 +27,8 @@ import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
  * kinds in the future).
  */
 export enum ScenarioType {
-  standard = 'Standard',
-  marxanWithZones = 'Marxan with zones',
+  marxan = 'marxan',
+  marxanWithZones = 'marxan-with-zones',
 }
 
 export enum JobStatus {
@@ -66,6 +66,9 @@ export class Scenario extends TimeUserEntityMetadata {
     referencedColumnName: 'id',
   })
   project: Project;
+
+  @Column('uuid', { name: 'project_id' })
+  projectId: string;
 
   /**
    * The country where this scenario is located.

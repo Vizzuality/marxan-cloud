@@ -2,19 +2,20 @@ import React from 'react';
 import cx from 'classnames';
 
 const THEME = {
-  primary: 'block text-xs text-white',
+  dark: 'block font-heading font-medium text-xs text-white',
+  light: 'block font-heading font-medium text-xs text-gray-600',
 };
 
 export interface LabelProps {
   id?: string;
-  theme?: 'primary';
+  theme?: 'dark' | 'light';
   children: React.ReactNode;
   className?: string;
 }
 
 const LabelComponent = (
   {
-    id, theme = 'primary', children, className,
+    id, theme = 'dark', children, className,
   }: LabelProps,
   ref,
 ) => {

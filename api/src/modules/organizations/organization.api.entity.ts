@@ -1,0 +1,39 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Project } from 'modules/projects/project.api.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
+
+@Entity('organizations')
+export class Organization extends TimeUserEntityMetadata {
+  @ApiProperty()
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ApiProperty()
+  @Column('character varying')
+  name: string;
+
+  @ApiPropertyOptional()
+  @Column('character varying')
+  description: string;
+
+  @ApiPropertyOptional({ type: () => Project })
+  @OneToMany((_type) => Project, (project) => project.organization)
+  projects: Project[];
+}
+
+export class JSONAPIOrganizationData {
+  @ApiProperty()
+  type = 'organizations';
+
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  attributes: Organization;
+}
+
+export class OrganizationResult {
+  @ApiProperty()
+  data: JSONAPIOrganizationData;
+}

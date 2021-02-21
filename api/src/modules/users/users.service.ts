@@ -7,14 +7,12 @@ import { get } from 'lodash';
 import { CreateUserDTO } from './dto/create.user.dto';
 import { UpdateUserDTO } from './dto/update.user.dto';
 import { AppInfoDTO } from 'dto/info.dto';
-import { BaseService } from 'nestjs-base-service';
-
-import JSONAPISerializer = require('jsonapi-serializer');
 
 import * as faker from 'faker';
+import { AppBaseService } from 'utils/app-base.service';
 
 @Injectable()
-export class UsersService extends BaseService<
+export class UsersService extends AppBaseService<
   User,
   CreateUserDTO,
   UpdateUserDTO,
@@ -24,17 +22,14 @@ export class UsersService extends BaseService<
     @InjectRepository(User)
     protected readonly repository: Repository<User>,
   ) {
-    super(repository, 'user');
-    this.serializer = new JSONAPISerializer.Serializer('users', {
-      attributes: ['fname', 'lname', 'email'],
-      keyForAttribute: 'camelCase',
-    });
+    super(repository, 'user', 'users');
   }
 
-  serializer;
-
-  async serialize(entities: User[]) {
-    return this.serializer.serialize(entities);
+  get serializerConfig() {
+    return {
+      attributes: ['fname', 'lname', 'email'],
+      keyForAttribute: 'camelCase',
+    };
   }
 
   async fakeFindOne(_id: string): Promise<Partial<User>> {
@@ -50,14 +45,6 @@ export class UsersService extends BaseService<
     };
   }
 
-  async findAll(): Promise<User[]> {
-    return this.repository.find();
-  }
-
-  async findOne(id: string): Promise<User | undefined> {
-    return this.repository.findOne(id);
-  }
-
   /**
    * Select one user by email address.
    *
@@ -68,17 +55,13 @@ export class UsersService extends BaseService<
     return this.repository.findOne({ email: ILike(email.toLowerCase()) });
   }
 
-  async remove(id: string): Promise<void> {
-    await this.repository.delete(id);
-  }
-
   /**
    * Assemble a sanitized user object from whitelisted properties of the User
    * entity.
    *
    * @debt Should be extended to include roles and permissions.
    */
-  getSanitizedUserMetadata(user: Partial<User>): Partial<User> {
+  static getSanitizedUserMetadata(user: Partial<User>): Partial<User> {
     const allowedProps = ['email', 'fname', 'lname'];
 
     return get(user, allowedProps);

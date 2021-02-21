@@ -1,4 +1,4 @@
-FROM node:14.15.1-alpine
+FROM node:14.15.4-alpine3.12
 LABEL maintainer="hello@vizzuality.com"
 
 ENV NAME marxan-api
@@ -9,7 +9,7 @@ RUN addgroup -S $USER && adduser -S $USER -G $USER
 WORKDIR /opt/$NAME
 
 COPY package.json ./package.json
-# COPY yarn.lock ./yarn.lock
+COPY yarn.lock ./yarn.lock
 RUN yarn install --frozen-lockfile
 
 COPY entrypoint.sh ./entrypoint.sh
@@ -20,6 +20,7 @@ COPY config ./config
 COPY ormconfig.ts ./ormconfig.ts
 
 COPY ./src ./src
+
 # @debt we should do this only for images used for tests
 COPY ./test ./test
 
