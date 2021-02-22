@@ -23,6 +23,7 @@ import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 
 import INFO_SVG from 'svgs/project/info.svg?sprite';
+import UPLOAD_SHAPEFILE_SVG from 'svgs/project/upload-shapefile.svg?sprite';
 
 import {
   composeValidators,
@@ -164,6 +165,21 @@ const NewProject: React.FC<NewProjectProps> = () => {
                 </div>
 
                 {!hasPlanningArea && <PlanningUnitGrid unit={null} />}
+                {hasPlanningArea && (
+                  <Button
+                    className="flex w-full mt-4"
+                    theme="secondary"
+                    size="base"
+                    onClick={() => console.info('Upload shapefile')}
+                  >
+                    <span className="w-full">
+                      Upload shapefile
+                    </span>
+                    <Icon
+                      icon={UPLOAD_SHAPEFILE_SVG}
+                    />
+                  </Button>
+                )}
 
                 {/* BUTTON BAR */}
                 <div className="flex mt-8">
