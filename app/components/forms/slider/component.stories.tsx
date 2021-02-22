@@ -12,7 +12,7 @@ export default {
     theme: {
       control: {
         type: 'select',
-        options: ['primary'],
+        options: ['dark', 'light'],
       },
     },
     status: {
@@ -48,7 +48,7 @@ const Template: Story<SliderProps> = (args: SliderProps) => {
 
 export const Default = Template.bind({});
 Default.args = {
-  theme: 'primary',
+  theme: 'dark',
   status: 'none',
   disabled: false,
   formatOptions: { style: 'percent' },

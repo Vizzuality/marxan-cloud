@@ -8,6 +8,9 @@ export class CreateProjectDTO {
   @ApiPropertyOptional()
   description: string;
 
+  @ApiProperty()
+  organizationId: string;
+
   @ApiPropertyOptional()
   metadata: Dictionary<string>;
 }

@@ -77,7 +77,8 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
           <div className="w-10 mb-6">
             <Input
               className="px-0 py-1"
-              theme="secondary"
+              theme="dark"
+              mode="dashed"
               defaultValue={spf}
               onChange={({ target: { value: inputValue } }) => {
                 const newValue: TargetSPF = {

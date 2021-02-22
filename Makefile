@@ -8,7 +8,7 @@ API_POSTGRES_USER := $(shell grep -e API_POSTGRES_USER .env | sed 's/^.*=//')
 
 # Start only API and Geoprocessing services
 #
-# Useful when developing on API components only, to avoid spinning services
+# Useful when developing on API components only, to avoid spinning up services
 # which may not be needed.
 start-api:
 	docker-compose up --build api geoprocessing
@@ -45,12 +45,15 @@ clean-slate: stop
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data
 
+seed-dbs: seed-api-with-test-data | seed-geodb-data
+
 seed-api-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 
 seed-geodb-data:
-	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
+	docker-compose -f ./data/docker-compose-data_download.yml up --build
 
 test-e2e-api:
-	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e rm --stop --force test-e2e-postgresql-api test-e2e-postgresql-geo-api
-	docker-compose -f docker-compose-test-e2e.yml --env-file .env-test-e2e up --build --abort-on-container-exit --exit-code-from api api
+	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e rm --stop --force test-e2e-postgresql-api test-e2e-postgresql-geo-api
+	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e up --build --abort-on-container-exit --exit-code-from api api
+	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e rm --stop --force

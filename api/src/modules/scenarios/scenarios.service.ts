@@ -1,19 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
-import { BaseService } from 'nestjs-base-service';
 import { Repository } from 'typeorm';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
-import { Scenario } from './scenario.api.entity';
-
-import JSONAPISerializer = require('jsonapi-serializer');
+import { JobStatus, Scenario, ScenarioType } from './scenario.api.entity';
 
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
+import { AppBaseService } from 'utils/app-base.service';
 
 @Injectable()
-export class ScenariosService extends BaseService<
+export class ScenariosService extends AppBaseService<
   Scenario,
   CreateScenarioDTO,
   UpdateScenarioDTO,
@@ -24,9 +22,26 @@ export class ScenariosService extends BaseService<
     protected readonly repository: Repository<Scenario>,
     @Inject(UsersService) private readonly usersService: UsersService,
   ) {
-    super(repository, 'scenario');
-    this.serializer = new JSONAPISerializer.Serializer('scenarios', {
-      attributes: ['name', 'description', 'type', 'users'],
+    super(repository, 'scenario', 'scenarios');
+  }
+
+  get serializerConfig() {
+    return {
+      attributes: [
+        'name',
+        'description',
+        'type',
+        'country',
+        'extent',
+        'wdpaFilter',
+        'wdpaThreshold',
+        'adminRegionId',
+        'numberOfRuns',
+        'boundaryLengthModifier',
+        'metadata',
+        'status',
+        'users',
+      ],
       keyForAttribute: 'camelCase',
       users: {
         ref: 'id',
@@ -36,13 +51,7 @@ export class ScenariosService extends BaseService<
           attributes: ['name'],
         },
       },
-    });
-  }
-
-  serializer;
-
-  async serialize(entities: Scenario[]) {
-    return this.serializer.serialize(entities);
+    };
   }
 
   async importLegacyScenario(_file: Express.Multer.File): Promise<Scenario> {
@@ -55,6 +64,15 @@ export class ScenariosService extends BaseService<
       id: faker.random.uuid(),
       name: faker.lorem.words(5),
       description: faker.lorem.sentence(),
+      type: ScenarioType.marxan,
+      extent: {},
+      wdpaFilter: {},
+      wdpaThreshold: faker.random.number(100),
+      adminRegionId: faker.random.uuid(),
+      numberOfRuns: faker.random.number(100),
+      boundaryLengthModifier: faker.random.number(100),
+      metadata: {},
+      status: JobStatus.created,
       users: await Promise.all(
         Array.from({ length: 10 }).map(
           async (_userId) =>
@@ -65,15 +83,12 @@ export class ScenariosService extends BaseService<
     return scenario;
   }
 
-  async findAll(): Promise<Scenario[]> {
-    return this.repository.find();
-  }
-
-  findOne(id: string): Promise<Scenario | undefined> {
-    return this.repository.findOne(id);
-  }
-
-  async remove(id: string): Promise<void> {
-    await this.repository.delete(id);
+  async setDataCreate(
+    create: CreateScenarioDTO,
+    info?: AppInfoDTO,
+  ): Promise<Scenario> {
+    const model = await super.setDataCreate(create, info);
+    model.createdBy = info?.authenticatedUser?.id!;
+    return model;
   }
 }

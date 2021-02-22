@@ -20,25 +20,25 @@ requirements:
 	python3 -m pip install -U pip setuptools wheel
 	python3 -m pip install -r requirements.txt
 
-# ## Make Dataset
-# data: requirements
-# 	python3 src/data/make_dataset.py data/raw data/processed
+## Make Dataset
+seed-data:
+	docker-compose -f ./docker-compose-data_download.yml up --build
 
 ## Delete all compiled Python files
 clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
 
-## Upload Data to S3
-# sync_data_to_s3:
+## Upload Data to Azure
+# sync_data_to_azure:
 # ifeq (default,$(PROFILE))
 # 	aws s3 sync data/ s3://$(BUCKET)/data/
 # else
 # 	aws s3 sync data/ s3://$(BUCKET)/data/ --profile $(PROFILE)
 # endif
 
-## Download Data from S3
-# sync_data_from_s3:
+## Download Data from Azure
+# sync_data_from_azure:
 # ifeq (default,$(PROFILE))
 # 	aws s3 sync s3://$(BUCKET)/data/ data/
 # else
