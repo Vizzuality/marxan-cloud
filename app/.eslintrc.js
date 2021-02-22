@@ -5,7 +5,6 @@ module.exports = {
     sourceType: 'module', // Allows for the use of imports
     tsconfigRootDir: __dirname,
     project: './tsconfig.eslint.json',
-    tsconfigRootDir: __dirname,
     ecmaFeatures: {
       jsx: true, // Allows for the parsing of JSX
     },
@@ -30,5 +29,7 @@ module.exports = {
     'react/jsx-props-no-spreading': [0, {}],
     'arrow-body-style': 0,
     'import/no-named-as-default': 0,
+    'import/prefer-default-export': 0,
+    'no-param-reassign': ['error', { props: false }],
   },
 };

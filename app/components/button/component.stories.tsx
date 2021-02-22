@@ -9,7 +9,7 @@ export default {
     size: {
       control: {
         type: 'select',
-        options: ['xs', 's', 'base'],
+        options: ['xs', 's', 'base', 'lg'],
       },
     },
     theme: {
@@ -28,4 +28,5 @@ const Template: Story<ButtonProps> = ({ children, ...args }: ButtonProps) => (
 export const Default = Template.bind({});
 Default.args = {
   children: 'Button',
+  disabled: false,
 };

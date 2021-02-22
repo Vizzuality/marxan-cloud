@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IssuedAuthnToken } from './issued-authn-token.api.entity';
 import ms = require('ms');
+import { SignUpDto } from './dto/sign-up.dto';
 
 /**
  * Access token for the app: key user data and access token
@@ -89,14 +90,25 @@ export class AuthenticationService {
   /**
    * Create a new user from the signup data provided.
    *
-   * @todo Allow to set all of a user's data on signup
-   * @todo Implement email verification
+   * @todo Allow to set all of a user's data on signup, if needed.
+   * @todo Implement email verification.
    */
-  async createUser(signupDto: { username: string; password: string }) {
+  async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
     const user = new User();
+    user.displayName = signupDto.displayName;
     user.passwordHash = await hash(signupDto.password, 10);
-    user.email = signupDto.username;
-    this.usersRepository.save(user);
+    user.email = signupDto.email;
+    /**
+     * @todo `isActive` should never be set to true here - we do this only in
+     * dev environments until the email validation feature is ready.
+     */
+    if (process.env['NODE_ENV'] === 'development') {
+      user.isActive = true;
+    }
+    const newUser = UsersService.getSanitizedUserMetadata(
+      await this.usersRepository.save(user),
+    );
+    return newUser;
   }
 
   /**
@@ -144,7 +156,7 @@ export class AuthenticationService {
     };
 
     return {
-      user: this.usersService.getSanitizedUserMetadata(user),
+      user: UsersService.getSanitizedUserMetadata(user),
       accessToken: this.jwtService.sign(
         { ...payload },
         {

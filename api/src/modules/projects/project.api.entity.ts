@@ -5,13 +5,17 @@ import { Scenario } from 'modules/scenarios/scenario.api.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Organization } from 'modules/organizations/organization.api.entity';
+import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 
 @Entity('projects')
-export class Project {
+export class Project extends TimeUserEntityMetadata {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -23,6 +27,20 @@ export class Project {
   @ApiPropertyOptional()
   @Column('character varying')
   description: string;
+
+  /**
+   * The organization to which this scenario belongs.
+   */
+  @ApiProperty({ type: () => Organization })
+  @ManyToOne((_type) => Organization, (organization) => organization.projects)
+  @JoinColumn({
+    name: 'organization_id',
+    referencedColumnName: 'id',
+  })
+  organization: Organization;
+
+  @Column('uuid', { name: 'organization_id' })
+  organizationId: string;
 
   /**
    * JSONB storage for non-relational attributes

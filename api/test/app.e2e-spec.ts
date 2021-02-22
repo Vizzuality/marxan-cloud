@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, Logger } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
+import { E2E_CONFIG } from './e2e.config';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -24,10 +25,10 @@ describe('AppController (e2e)', () => {
 
     it('Retrieves a JWT token when authenticating with valid credentials', async () => {
       const response = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/auth/sign-in')
         .send({
-          username: 'aa@example.com',
-          password: 'aauserpassword',
+          username: E2E_CONFIG.users.aa.username,
+          password: E2E_CONFIG.users.aa.password,
         })
         .expect(201);
 
@@ -36,8 +37,8 @@ describe('AppController (e2e)', () => {
 
     it('Fails to authenticate a user with an incorrect password', async () => {
       const response = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({ email: 'test@example.com', password: 'wrong' })
+        .post('/auth/sign-in')
+        .send({ email: E2E_CONFIG.users.aa.username, password: 'wrong' })
         .expect(401);
 
       expect(response.body.accessToken).not.toBeDefined();
@@ -45,7 +46,7 @@ describe('AppController (e2e)', () => {
 
     it('Fails to authenticate a non-existing user', async () => {
       const response = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/auth/sign-in')
         .send({ email: 'test@example.com', password: 'wrong' })
         .expect(401);
 
@@ -63,7 +64,7 @@ describe('AppController (e2e)', () => {
       expect(resources[0].type).toBe('projects');
     });
 
-    let anOrganization: { id: string, type: 'organizations' };
+    let anOrganization: { id: string; type: 'organizations' };
 
     it('Gets organizations', async () => {
       const response = await request(app.getHttpServer())
@@ -89,7 +90,7 @@ describe('AppController (e2e)', () => {
 
       const resources = response.body.data;
 
-      expect(resources[0].type).toBe('projects');
+      expect(resources.type).toBe('projects');
     });
   });
 });

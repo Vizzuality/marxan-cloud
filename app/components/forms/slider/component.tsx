@@ -8,11 +8,18 @@ import { setInteractionModality } from '@react-aria/interactions';
 import Thumb from './thumb';
 
 const THEME = {
-  primary: {
+  dark: {
     base: 'w-full h-12 pt-8 touch-action-none',
     output:
       'absolute bottom-1 transform -translate-y-full -translate-x-1/2 text-sm text-white border border-t-0 border-l-0 border-r-0 border-dashed border-white',
     filledTrack: 'absolute left-0 h-1.5 bg-white rounded',
+    track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
+  },
+  light: {
+    base: 'w-full h-12 pt-8 touch-action-none',
+    output:
+      'absolute bottom-1 transform -translate-y-full -translate-x-1/2 text-sm text-gray-800 border border-t-0 border-l-0 border-r-0 border-dashed border-gray-800',
+    filledTrack: 'absolute left-0 h-1.5 bg-gray-800 rounded',
     track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
   },
 };
@@ -25,7 +32,7 @@ export interface SliderProps {
   /**
    * Theme of the component
    */
-  theme?: 'primary';
+  theme?: 'dark' | 'light';
   /**
    * Validation status of the input. If the `disabled` prop is set to `true`, it is overwritten to
    * `'disabled'`.
@@ -78,7 +85,7 @@ export interface SliderProps {
 }
 
 export const Slider: React.FC<SliderProps> = ({
-  theme = 'primary',
+  theme = 'dark',
   status: rawState = 'none',
   disabled = false,
   formatOptions = { style: 'percent' },
@@ -154,7 +161,7 @@ export const Slider: React.FC<SliderProps> = ({
       <div
         {...trackProps}
         ref={trackRef}
-        className="relative w-full h-full flex items-center"
+        className="relative flex items-center w-full h-full"
       >
         <output
           {...outputProps}

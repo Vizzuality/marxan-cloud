@@ -7,7 +7,19 @@ import { VisuallyHidden } from '@react-aria/visually-hidden';
 import { mergeProps } from '@react-aria/utils';
 
 const THEME = {
-  primary: {
+  dark: {
+    thumb:
+      'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+    status: {
+      default: 'border-white',
+      dragging: 'border-white opacity-80',
+      focused: 'border-white ring-2 ring-primary-500',
+      valid: 'border-green-500',
+      error: 'border-red-500',
+      disabled: 'border-white',
+    },
+  },
+  light: {
     thumb:
       'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
     status: {
@@ -22,7 +34,7 @@ const THEME = {
 };
 
 export interface ThumbProps {
-  theme: 'primary';
+  theme: 'dark' | 'light';
   status: 'none' | 'valid' | 'error' | 'disabled';
   sliderState: SliderState;
   trackRef: React.MutableRefObject<HTMLElement | null>;
@@ -54,7 +66,7 @@ export const Thumb: React.FC<ThumbProps> = ({
 
   const { focusProps, isFocusVisible } = useFocusRing();
 
-  let status: keyof typeof THEME.primary.status;
+  let status: keyof typeof THEME.dark.status;
   if (isFocusVisible) {
     status = 'focused';
   } else if (sliderState.isThumbDragging(0)) {
