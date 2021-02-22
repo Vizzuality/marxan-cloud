@@ -6,5 +6,5 @@ export interface Project {
 export enum PlanningUnit {
   SQUARE = 'square',
   HEXAGON = 'hexagon',
-  CUSTOM = 'custom',
+  UPLOAD = 'upload',
 }

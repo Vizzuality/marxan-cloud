@@ -1,5 +1,5 @@
 import React from 'react';
-
+import cx from 'classnames';
 import { PlanningUnit } from 'types/project-model';
 import Icon from 'components/icon';
 
@@ -7,27 +7,62 @@ import SQUARE_SVG from 'svgs/project/square.svg?sprite';
 import SQUARE_SELECTED_SVG from 'svgs/project/square-selected.svg?sprite';
 import HEXAGON_SVG from 'svgs/project/hexagon.svg?sprite';
 import HEXAGON_SELECTED_SVG from 'svgs/project/hexagon-selected.svg?sprite';
+import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
-import { PlanningUnitButtonProps } from './types';
+import { ButtonSize, PlanningUnitButtonProps } from './types';
 
 export const PlanningUnitButton: React.FC<PlanningUnitButtonProps> = ({
   unit,
   selected,
-}: PlanningUnitButtonProps) => (
-  <div className="flex flex-col cursor-pointer">
-    { unit === PlanningUnit.HEXAGON && (
-      <>
-        <Icon icon={selected ? HEXAGON_SELECTED_SVG : HEXAGON_SVG} />
-        Hexagon
-      </>
-    )}
-    { unit === PlanningUnit.SQUARE && (
-      <>
-        <Icon icon={selected ? SQUARE_SELECTED_SVG : SQUARE_SVG} />
-        Square
-      </>
-    )}
-  </div>
-);
+  size,
+  onClick,
+}: PlanningUnitButtonProps) => {
+  const getButtonClassName = () => cx({
+    'mb-2': true,
+    'w-10 h-10': size === ButtonSize.MEDIUM,
+    'w-20 h-20': size === ButtonSize.LARGE,
+    'w-4 h-4': size === ButtonSize.SMALL,
+  });
+  return (
+    <div
+      className={cx({
+        'flex flex-col cursor-pointer text-white mr-8 text-xs': true,
+        'opacity-50': !selected,
+      })}
+      role="button"
+      tabIndex={0}
+      onKeyPress={() => onClick && onClick(unit)}
+      onClick={() => onClick && onClick(unit)}
+    >
+      { unit === PlanningUnit.HEXAGON && (
+        <>
+          <Icon
+            icon={selected ? HEXAGON_SELECTED_SVG : HEXAGON_SVG}
+            className={getButtonClassName()}
+          />
+          Hexagon
+        </>
+      )}
+      { unit === PlanningUnit.SQUARE && (
+        <>
+          <Icon
+            icon={selected ? SQUARE_SELECTED_SVG : SQUARE_SVG}
+            className={getButtonClassName()}
+          />
+          Square
+        </>
+      )}
+      { unit === PlanningUnit.UPLOAD && (
+        <>
+          <Icon
+            icon={UPLOAD_SVG}
+            className={getButtonClassName()}
+          />
+          Upload
+        </>
+      )}
+    </div>
+  );
+};
 
 export default PlanningUnitButton;
