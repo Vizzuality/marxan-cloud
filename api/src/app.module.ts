@@ -17,6 +17,8 @@ import { GeoModule } from 'modules/geo/geo.module';
 import { apiConnections } from './ormconfig';
 import { OrganizationsModule } from 'modules/organizations/organizations.module';
 import { PaginationMiddleware } from 'middleware/pagination.middleware';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from 'filters/all-exceptions.exception.filter';
 
 @Module({
   imports: [
@@ -31,7 +33,13 @@ import { PaginationMiddleware } from 'middleware/pagination.middleware';
     AuthenticationModule,
   ],
   controllers: [AppController, PingController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   /**

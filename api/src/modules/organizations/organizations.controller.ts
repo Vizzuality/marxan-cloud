@@ -9,7 +9,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { Organization, OrganizationResult } from './organization.api.entity';
+import { OrganizationResult } from './organization.api.entity';
 import { OrganizationsService } from './organizations.service';
 
 import {
@@ -51,7 +51,7 @@ export class OrganizationsController {
     description: 'Find all organizations',
   })
   @ApiOkResponse({
-    type: Organization,
+    type: OrganizationResult,
   })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized.',
@@ -64,7 +64,7 @@ export class OrganizationsController {
   @Get()
   async findAll(
     @Pagination() pagination: FetchSpecification,
-  ): Promise<Organization[]> {
+  ): Promise<OrganizationResult> {
     const results = await this.service.findAllPaginated(pagination);
     return this.service.serialize(results.data, results.metadata);
   }
@@ -72,8 +72,8 @@ export class OrganizationsController {
   @ApiOperation({ description: 'Find organization by id' })
   @ApiOkResponse({ type: OrganizationResult })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Organization> {
-    return await this.service.serialize([await this.service.fakeFindOne(id)]);
+  async findOne(@Param('id') id: string): Promise<OrganizationResult> {
+    return await this.service.serialize(await this.service.getById(id));
   }
 
   @ApiOperation({ description: 'Create organization' })
@@ -83,9 +83,9 @@ export class OrganizationsController {
     @Body(new ValidationPipe()) dto: CreateOrganizationDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<OrganizationResult> {
-    return await this.service.serialize([
+    return await this.service.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
-    ]);
+    );
   }
 
   @ApiOperation({ description: 'Update organization' })
@@ -93,9 +93,9 @@ export class OrganizationsController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) _dto: UpdateOrganizationDTO,
+    @Body(new ValidationPipe()) dto: UpdateOrganizationDTO,
   ): Promise<OrganizationResult> {
-    return await this.service.serialize([await this.service.fakeFindOne(id)]);
+    return await this.service.serialize(await this.service.update(id, dto));
   }
 
   @ApiOperation({ description: 'Delete organization' })

@@ -4,8 +4,9 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import * as faker from 'faker';
 import { E2E_CONFIG } from './e2e.config';
+import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
 
-describe('OrganizationsController (e2e)', () => {
+describe('ScenariosModule (e2e)', () => {
   let app: INestApplication;
 
   let jwtToken: string;
@@ -33,7 +34,10 @@ describe('OrganizationsController (e2e)', () => {
     await Promise.all([app.close()]);
   });
 
-  describe('Organizations', () => {
+  describe('Scenarios', () => {
+    let aScenario: { id: string; type: 'scenarios' };
+    let projects: { id: string }[] = [];
+
     it('Gets projects', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
@@ -41,68 +45,75 @@ describe('OrganizationsController (e2e)', () => {
         .expect(200);
 
       const resources = response.body.data;
-
+      projects = resources;
       expect(resources[0].type).toBe('projects');
     });
 
-    let anOrganization: { id: string; type: 'organizations' };
-
-    it('Creates an organization', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/api/v1/organizations')
+    it('Creating a scenario with incomplete data should fail', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send({
           name: faker.random.words(3),
           description: faker.lorem.sentence(),
         })
+        .expect(400);
+    });
+
+    it('Creating a scenario with complete data should succeed', async () => {
+      const createScenarioDTO: CreateScenarioDTO = {
+        ...E2E_CONFIG.scenarios.validScenarios[0],
+        projectId: projects[0].id,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/scenarios')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(createScenarioDTO)
         .expect(201);
 
-      anOrganization = response.body.data;
-
-      expect(anOrganization.type).toBe('organizations');
+      aScenario = response.body.data;
+      expect(aScenario.type).toBe('scenarios');
     });
 
-    it('Gets organizations', async () => {
+    it('Gets scenarios', async () => {
       const response = await request(app.getHttpServer())
-        .get('/api/v1/organizations')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .expect(200);
-
-      const resources = response.body.data;
-      expect(resources[0].type).toBe('organizations');
-    });
-
-    let aProject: { id: string; type: 'organizations' };
-
-    it('Creates a project in the newly created organization', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/api/v1/projects')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .send({
-          name: faker.lorem.words(3),
-          description: faker.lorem.sentence(),
-          organizationId: anOrganization.id,
-        })
-        .expect(201);
-
-      aProject = response.body.data;
-      expect(aProject.type).toBe('projects');
-    });
-
-    it('Deletes the newly created project', async () => {
-      const response = await request(app.getHttpServer())
-        .delete('/api/v1/projects/' + aProject.id)
+        .get('/api/v1/scenarios')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
 
       const resources = response.body.data;
 
-      expect(resources).toBeUndefined();
+      expect(resources[0].type).toBe('scenarios');
     });
 
-    it('Deletes the newly created organization', async () => {
+    it('Gets scenarios (paginated; pages of up to 5 items, no explicit page number - should default to 1)', async () => {
       const response = await request(app.getHttpServer())
-        .delete('/api/v1/organizations/' + anOrganization.id)
+        .get('/api/v1/scenarios?page[size]=5')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources = response.body.data;
+      expect(resources[0].type).toBe('scenarios');
+      expect(resources.length).toBeLessThanOrEqual(5);
+      expect(resources.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('Gets scenarios (paginated; pages of up to 5 items, first page)', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/v1/scenarios?page[size]=5&page[number]=1')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources = response.body.data;
+      expect(resources[0].type).toBe('scenarios');
+      expect(resources.length).toBeLessThanOrEqual(5);
+      expect(resources.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('Deletes the newly created scenario', async () => {
+      const response = await request(app.getHttpServer())
+        .delete('/api/v1/scenarios/' + aScenario.id)
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
 

@@ -10,7 +10,6 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IssuedAuthnToken } from './issued-authn-token.api.entity';
 import ms = require('ms');
-import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 
 /**
@@ -96,6 +95,7 @@ export class AuthenticationService {
    */
   async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
     const user = new User();
+    user.displayName = signupDto.displayName;
     user.passwordHash = await hash(signupDto.password, 10);
     user.email = signupDto.email;
     /**

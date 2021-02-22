@@ -1,5 +1,5 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { Country, CountryResult } from './country.api.entity';
+import { CountryResult } from './country.api.entity';
 import { CountriesService } from './countries.service';
 import {
   ApiBearerAuth,
@@ -34,7 +34,7 @@ export class CountriesController {
     description: 'Find all countries',
   })
   @ApiOkResponse({
-    type: Country,
+    type: CountryResult,
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
@@ -42,7 +42,7 @@ export class CountriesController {
   @Get()
   async findAll(
     @Pagination() pagination: FetchSpecification,
-  ): Promise<Country[]> {
+  ): Promise<CountryResult> {
     const results = await this.service.findAllPaginated(pagination);
     return this.service.serialize(results.data, results.metadata);
   }
@@ -50,7 +50,7 @@ export class CountriesController {
   @ApiOperation({ description: 'Find country by id' })
   @ApiOkResponse({ type: CountryResult })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Country> {
-    return await this.service.fakeFindOne(id);
+  async findOne(@Param('id') id: string): Promise<CountryResult> {
+    return await this.service.serialize(await this.service.getById(id));
   }
 }
