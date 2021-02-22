@@ -15,43 +15,29 @@ import {
 } from 'components/forms/validations';
 
 import { useRouter } from 'next/router';
-import { useMutation } from 'react-query';
-import SCENARIOS from 'services/scenarios';
-import { useAuth } from 'hooks/authentication';
+import { useSaveScenario } from 'hooks/scenarios';
 
 export interface ScenariosSidebarProps {
 }
 
 export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
   const [submitting, setSubmitting] = useState(false);
-  const { user } = useAuth();
   const { query } = useRouter();
   const { pid } = query;
 
-  const mutation = useMutation((data) => {
-    return SCENARIOS.request({
-      method: 'POST',
-      url: '/',
-      data,
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
-  });
-  // const [error, setError] = useState(false);
+  const mutation = useSaveScenario();
 
   const handleSubmit = useCallback(async (data) => {
     setSubmitting(true);
 
-    const scenario = mutation.mutate({
+    await mutation.mutate({
       ...data,
       projectId: pid,
+    }, {
+      onError: () => {
+        setSubmitting(false);
+      },
     });
-
-    console.info({
-      ...data,
-      projectId: pid,
-    }, scenario);
   }, [mutation, pid]);
 
   return (
