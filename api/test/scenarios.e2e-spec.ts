@@ -53,16 +53,13 @@ describe('ScenariosModule (e2e)', () => {
       await request(app.getHttpServer())
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send({
-          name: faker.random.words(3),
-          description: faker.lorem.sentence(),
-        })
+        .send(E2E_CONFIG.scenarios.invalid.missingRequiredFields)
         .expect(400);
     });
 
     it('Creating a scenario with complete data should succeed', async () => {
       const createScenarioDTO: CreateScenarioDTO = {
-        ...E2E_CONFIG.scenarios.validScenarios[0],
+        ...E2E_CONFIG.scenarios.valid.complete,
         projectId: projects[0].id,
       };
 
