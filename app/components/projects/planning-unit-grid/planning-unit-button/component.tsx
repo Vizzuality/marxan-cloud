@@ -19,14 +19,14 @@ export const PlanningUnitButton: React.FC<PlanningUnitButtonProps> = ({
 }: PlanningUnitButtonProps) => {
   const getButtonClassName = () => cx({
     'mb-2': true,
-    'w-10 h-10': size === ButtonSize.MEDIUM,
-    'w-20 h-20': size === ButtonSize.LARGE,
+    'w-8 h-8': size === ButtonSize.MEDIUM,
+    'w-16 h-16': size === ButtonSize.LARGE,
     'w-4 h-4': size === ButtonSize.SMALL,
   });
   return (
     <div
       className={cx({
-        'flex flex-col cursor-pointer text-white mr-8 text-xs': true,
+        'flex flex-col cursor-pointer text-white mr-8 text-xxs': true,
         'opacity-50': !selected,
       })}
       role="button"
