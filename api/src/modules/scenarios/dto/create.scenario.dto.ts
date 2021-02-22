@@ -17,7 +17,7 @@ export class CreateScenarioDTO {
 
   @ApiPropertyOptional()
   @IsOptional()
-  description: string;
+  description?: string;
 
   @ApiProperty()
   type: ScenarioType;
@@ -30,24 +30,24 @@ export class CreateScenarioDTO {
   @Length(3)
   country: string;
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  extent: Record<string, unknown> | null;
+  @ApiProperty()
+  extent: Record<string, unknown>;
 
   @ApiPropertyOptional()
   @IsOptional()
-  wdpaFilter: Record<string, unknown> | null;
+  wdpaFilter?: Record<string, unknown>;
 
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
   @Min(0)
   @Max(100)
-  wdpaThreshold: number | null;
+  wdpaThreshold?: number;
 
+  @ApiProperty()
   @IsUUID()
   adminRegionId: string;
 
   @ApiPropertyOptional()
-  metadata: Dictionary<string>;
+  metadata?: Dictionary<string>;
 }
