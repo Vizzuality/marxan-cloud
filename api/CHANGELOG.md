@@ -38,6 +38,8 @@ Unreleased
   well as via the TypeORM CLI util.
 - Setup of E2E tests.
 - Support for pagination of plural responses.
+- Catch-all error handling via exception filter.
+- Serialization of error response payloads as JSON:API errors.
 
 ### Changed
 

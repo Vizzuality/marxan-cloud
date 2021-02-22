@@ -2,7 +2,6 @@ import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { User } from './user.api.entity';
 import { UsersService } from './users.service';
 
-import JSONAPISerializer = require('jsonapi-serializer');
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -70,13 +69,6 @@ export class UsersController {
   async userMetadata(
     @Request() req: RequestWithAuthenticatedUser,
   ): Promise<Partial<User>> {
-    const serializer = new JSONAPISerializer.Serializer('users', {
-      attributes: ['fname', 'lname', 'email', 'projects'],
-      keyForAttribute: 'camelCase',
-      projects: {
-        ref: 'name',
-      },
-    });
-    return serializer.serialize(await this.service.findOne(req.user.id));
+    return this.service.serialize([await this.service.getById(req.user.id)]);
   }
 }
