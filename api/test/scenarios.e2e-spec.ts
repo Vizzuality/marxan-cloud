@@ -57,6 +57,22 @@ describe('ScenariosModule (e2e)', () => {
         .expect(400);
     });
 
+    it('Creating a scenario with minimum required data should succeed', async () => {
+      const createScenarioDTO: CreateScenarioDTO = {
+        ...E2E_CONFIG.scenarios.valid.complete,
+        projectId: projects[0].id,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/scenarios')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(createScenarioDTO)
+        .expect(201);
+
+      aScenario = response.body.data;
+      expect(aScenario.type).toBe('scenarios');
+    });
+
     it('Creating a scenario with complete data should succeed', async () => {
       const createScenarioDTO: CreateScenarioDTO = {
         ...E2E_CONFIG.scenarios.valid.complete,
