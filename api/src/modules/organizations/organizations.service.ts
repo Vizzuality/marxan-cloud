@@ -6,8 +6,6 @@ import { CreateOrganizationDTO } from './dto/create.organization.dto';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
 import { Organization } from './organization.api.entity';
 
-import JSONAPISerializer = require('jsonapi-serializer');
-
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
 import { AppBaseService } from 'utils/app-base.service';

@@ -21,7 +21,6 @@ import {
   AccessToken,
   AuthenticationService,
 } from 'modules/authentication/authentication.service';
-import { User } from 'modules/users/user.api.entity';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { LocalAuthGuard } from './local-auth.guard';
@@ -38,7 +37,7 @@ export class AuthenticationController {
   })
   async login(
     @Request() req: RequestWithAuthenticatedUser,
-    @Body(new ValidationPipe()) dto: LoginDto,
+    @Body(new ValidationPipe()) _dto: LoginDto,
   ): Promise<AccessToken> {
     return this.authenticationService.login(req.user);
   }
@@ -49,7 +48,7 @@ export class AuthenticationController {
   @ApiBadRequestResponse()
   @ApiForbiddenResponse()
   async signUp(
-    @Request() req: Request,
+    @Request() _req: Request,
     @Body(new ValidationPipe()) signupDto: SignUpDto,
   ): Promise<void> {
     await this.authenticationService.createUser(signupDto);
