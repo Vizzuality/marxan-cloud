@@ -9,7 +9,12 @@ export const E2E_CONFIG = {
     },
   },
   scenarios: {
-    validScenarios: [
+    valid: {
+      minimal: {
+        name: faker.random.words(5),
+        projectId: null,
+      },
+      complete:
       {
         name: faker.random.words(5),
         type: ScenarioType.marxan,
@@ -33,6 +38,12 @@ export const E2E_CONFIG = {
         boundaryLengthModifier: 0,
         status: JobStatus.created,
       },
-    ],
+    },
+    invalid: {
+      missingRequiredFields: {
+        name: faker.random.words(3),
+        description: faker.lorem.sentence(),
+      },
+    },
   },
 };
