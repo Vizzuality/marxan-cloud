@@ -86,6 +86,4 @@ export function useProject(id) {
       data: data?.data,
     };
   }, [query, data?.data]);
-
-  return query;
 }
