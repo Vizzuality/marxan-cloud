@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, IsUUID, Length } from 'class-validator';
 import { Dictionary } from 'lodash';
 
 export class CreateProjectDTO {
@@ -6,11 +7,27 @@ export class CreateProjectDTO {
   name: string;
 
   @ApiPropertyOptional()
-  description: string;
+  description?: string;
 
   @ApiProperty()
+  @IsUUID()
   organizationId: string;
 
   @ApiPropertyOptional()
-  metadata: Dictionary<string>;
+  @IsString()
+  @Length(3)
+  @IsOptional()
+  country?: string;
+
+  @ApiPropertyOptional()
+  @IsUUID()
+  @IsOptional()
+  adminRegionId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  extent?: Record<string, unknown>;
+
+  @ApiPropertyOptional()
+  metadata?: Dictionary<string>;
 }

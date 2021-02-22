@@ -1,6 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsEnum,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -20,18 +22,12 @@ export class CreateScenarioDTO {
   description?: string;
 
   @ApiProperty()
+  @IsEnum(ScenarioType)
   type: ScenarioType;
 
   @ApiProperty()
+  @IsUUID()
   projectId: string;
-
-  @ApiProperty()
-  @IsString()
-  @Length(3)
-  country: string;
-
-  @ApiProperty()
-  extent: Record<string, unknown>;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -44,10 +40,18 @@ export class CreateScenarioDTO {
   @Max(100)
   wdpaThreshold?: number;
 
-  @ApiProperty()
-  @IsUUID()
-  adminRegionId: string;
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  numberOfRuns?: number;
 
   @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  boundaryLengthModifier: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   metadata?: Dictionary<string>;
 }
