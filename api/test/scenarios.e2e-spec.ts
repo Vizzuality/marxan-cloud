@@ -52,13 +52,13 @@ describe('ScenariosModule (e2e)', () => {
       await request(app.getHttpServer())
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send(E2E_CONFIG.scenarios.invalid.missingRequiredFields)
+        .send(E2E_CONFIG.scenarios.invalid.missingRequiredFields())
         .expect(400);
     });
 
     it('Creating a scenario with minimum required data should succeed', async () => {
       const createScenarioDTO: CreateScenarioDTO = {
-        ...E2E_CONFIG.scenarios.valid.minimal,
+        ...E2E_CONFIG.scenarios.valid.minimal(),
         projectId: projects[0].id,
       };
 
@@ -74,7 +74,7 @@ describe('ScenariosModule (e2e)', () => {
 
     it('Creating a scenario with complete data should succeed', async () => {
       const createScenarioDTO: CreateScenarioDTO = {
-        ...E2E_CONFIG.scenarios.valid.complete,
+        ...E2E_CONFIG.scenarios.valid.complete(),
         projectId: projects[0].id,
       };
 
