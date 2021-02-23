@@ -49,7 +49,7 @@ export class CreateScenarioDTO {
   @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
-  boundaryLengthModifier: number;
+  boundaryLengthModifier?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
