@@ -66,10 +66,24 @@ export function useProjects(filters) {
 }
 
 export function useProject(id) {
+  const { user } = useAuth();
+
   const query = useQuery(`projects/${id}`, async () => PROJECTS.request({
     method: 'GET',
     url: `/${id}`,
-  }));
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+    },
+  }), {
+    enabled: !!id,
+  });
 
-  return query;
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
 }
