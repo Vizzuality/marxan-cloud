@@ -8,17 +8,25 @@ export const E2E_CONFIG = {
       password: 'aauserpassword',
     },
   },
+  organizations: {
+    valid: {
+      minimal: () => ({
+        name: faker.random.words(3),
+        description: faker.lorem.sentence(),
+      }),
+    },
+  },
   projects: {
     valid: {
-      minimal: {
+      minimal: () => ({
         name: faker.random.words(5),
         organizationId: null,
-      },
-      complete: {
+      }),
+      complete: (options: { countryCode: string }) => ({
         name: faker.random.words(5),
         organizationId: null,
         description: faker.lorem.paragraphs(2),
-        countryId: faker.address.countryCode(),
+        countryId: options.countryCode,
         adminRegionId: faker.random.uuid(),
         extent: {
           type: 'Polygon',
@@ -35,22 +43,22 @@ export const E2E_CONFIG = {
           [faker.random.word()]: faker.random.words(3),
           [faker.random.word()]: faker.random.uuid(),
         },
-      },
+      }),
     },
     invalid: {
-      incomplete: {
+      incomplete: () => ({
         name: faker.random.words(5),
-      },
+      }),
     },
   },
   scenarios: {
     valid: {
-      minimal: {
+      minimal: () => ({
         name: faker.random.words(5),
         type: ScenarioType.marxan,
         projectId: null,
-      },
-      complete: {
+      }),
+      complete: () => ({
         name: faker.random.words(5),
         type: ScenarioType.marxan,
         projectId: null,
@@ -59,13 +67,13 @@ export const E2E_CONFIG = {
         numberOfRuns: 100,
         boundaryLengthModifier: 0,
         status: JobStatus.created,
-      },
+      }),
     },
     invalid: {
-      missingRequiredFields: {
+      missingRequiredFields: () => ({
         name: faker.random.words(3),
         description: faker.lorem.sentence(),
-      },
+      }),
     },
   },
 };
