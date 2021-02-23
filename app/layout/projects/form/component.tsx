@@ -1,0 +1,155 @@
+import React, { useState } from 'react';
+import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+
+import Icon from 'components/icon';
+import Field from 'components/forms/field';
+import Label from 'components/forms/label';
+import Input from 'components/forms/input';
+import Textarea from 'components/forms/textarea';
+import Button from 'components/button';
+
+import INFO_SVG from 'svgs/project/info.svg?sprite';
+import UPLOAD_SHAPEFILE_SVG from 'svgs/ui/upload.svg?sprite';
+
+import {
+  composeValidators,
+} from 'components/forms/validations';
+
+import PlanningArea from './planning-area';
+import ProjectFormProps from './types';
+
+const ProjectForm: React.FC<ProjectFormProps> = () => {
+  const [hasPlanningArea, setHasPlanningArea] = useState(false);
+
+  const handleSubmit = (values) => {
+    console.info('values', values);
+  };
+
+  const handleCancel = () => {
+    console.info('cancel');
+  };
+
+  return (
+    <FormRFF
+      onSubmit={handleSubmit}
+    >
+      {(props) => (
+        <form
+          onSubmit={props.handleSubmit}
+          autoComplete="off"
+          className="justify-start w-full p-8"
+        >
+          <h1 className="max-w-xs text-white font-heading">
+            Name your project and define a planning area:
+          </h1>
+
+          {/* NAME */}
+          <div className="mt-8">
+            <FieldRFF
+              name="name"
+              validate={composeValidators([{ presence: true }])}
+            >
+              {(fprops) => (
+                <Field id="name" {...fprops}>
+                  <Label theme="dark" className="mb-3 uppercase">Project Name</Label>
+                  <Input theme="dark" type="text" placeholder="Write project name..." />
+                </Field>
+              )}
+            </FieldRFF>
+          </div>
+
+          {/* DESCRIPTION */}
+          <div className="mt-8">
+            <FieldRFF
+              name="description"
+              validate={composeValidators([{ presence: true }])}
+            >
+              {(fprops) => (
+                <Field id="description" {...fprops}>
+                  <Label theme="dark" className="mb-3 uppercase">Description</Label>
+                  <Textarea rows={4} placeholder="Write your project description..." />
+                </Field>
+              )}
+            </FieldRFF>
+          </div>
+
+          <h2 className="mt-12 text-white font-heading">
+            Do you have a planning region shapefile?
+          </h2>
+
+          {/* PLANNING AREA */}
+          <div className="flex items-center justify-between mt-6">
+            <div className="flex items-center">
+              <h5 className="text-white uppercase text-xxs">Planning area</h5>
+              <button
+                className="w-5 h-5 ml-2"
+                type="button"
+                onClick={() => console.info('Planning Area info button click')}
+              >
+                <Icon icon={INFO_SVG} />
+              </button>
+            </div>
+            {/* TEMPORARILY HIDDEN, it will be implemented in the future */}
+            <div className="hidden">
+              <Button
+                className="w-20 h-6 mr-4"
+                size="xs"
+                theme={!hasPlanningArea ? 'white' : 'secondary'}
+                onClick={() => setHasPlanningArea(false)}
+              >
+                No
+              </Button>
+              <Button
+                className="w-20 h-6"
+                size="xs"
+                theme={hasPlanningArea ? 'white' : 'secondary'}
+                onClick={() => setHasPlanningArea(true)}
+              >
+                Yes
+              </Button>
+            </div>
+          </div>
+
+          {!hasPlanningArea && <PlanningArea /> }
+          {hasPlanningArea && (
+            <Button
+              className="flex w-full mt-4"
+              theme="secondary"
+              size="base"
+              onClick={() => console.info('Upload shapefile')}
+            >
+              <span className="w-full">
+                Upload shapefile
+              </span>
+              <Icon
+                icon={UPLOAD_SHAPEFILE_SVG}
+              />
+            </Button>
+          )}
+
+          {/* BUTTON BAR */}
+          <div className="flex mt-8">
+            <Button
+              theme="secondary"
+              size="xl"
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="ml-6"
+              theme="primary"
+              size="xl"
+              type="submit"
+              disabled
+            >
+              Save
+            </Button>
+          </div>
+        </form>
+      )}
+    </FormRFF>
+  );
+};
+
+export default ProjectForm;
