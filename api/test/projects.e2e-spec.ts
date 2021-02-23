@@ -5,7 +5,7 @@ import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
 
-describe('AppController (e2e)', () => {
+describe('ProjectsModule (e2e)', () => {
   let app: INestApplication;
 
   let jwtToken: string;
@@ -38,28 +38,29 @@ describe('AppController (e2e)', () => {
     let minimalProject: { id: string; type: 'projects' };
     let completeProject: { id: string; type: 'projects' };
 
-    it('Gets organizations', async () => {
+    it('Creates an organization', async () => {
       const response = await request(app.getHttpServer())
-        .get('/api/v1/organizations')
+        .post('/api/v1/organizations')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .expect(200);
+        .send(E2E_CONFIG.organizations.valid.minimal())
+        .expect(201);
 
-      const resources = response.body.data;
-      anOrganization = resources[0];
-      expect(resources[0].type).toBe('organizations');
+      anOrganization = response.body.data;
+
+      expect(anOrganization.type).toBe('organizations');
     });
 
     it('Creating a project with incomplete data should fail', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send(E2E_CONFIG.projects.invalid.incomplete)
+        .send(E2E_CONFIG.projects.invalid.incomplete())
         .expect(400);
     });
 
     it('Creating a project with minimum required data should succeed', async () => {
       const createScenarioDTO: CreateProjectDTO = {
-        ...E2E_CONFIG.projects.valid.minimal,
+        ...E2E_CONFIG.projects.valid.minimal(),
         organizationId: anOrganization.id,
       };
 
@@ -76,7 +77,7 @@ describe('AppController (e2e)', () => {
 
     it('Creating a project with complete data should succeed', async () => {
       const createScenarioDTO: CreateProjectDTO = {
-        ...E2E_CONFIG.projects.valid.complete,
+        ...E2E_CONFIG.projects.valid.complete({ countryCode: 'ESP' }),
         organizationId: anOrganization.id,
       };
 
@@ -105,15 +106,30 @@ describe('AppController (e2e)', () => {
     it('Deleting existing projects should succeed', async () => {
       const response1 = await request(app.getHttpServer())
         .delete(`/api/v1/projects/${minimalProject.id}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
 
       expect(response1.body.data).toBeUndefined();
 
       const response2 = await request(app.getHttpServer())
         .delete(`/api/v1/projects/${completeProject.id}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
 
       expect(response2.body.data).toBeUndefined();
+
+      /**
+       * Finally, we delete the organization we had created for these projects
+       */
+      await request(app.getHttpServer())
+      .delete(`/api/v1/organizations/${anOrganization.id}`)
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(200);
     });
+
+    /**
+     * @debt We should test that deleting a project which contains
+     * scenarios must fail.
+     */
   });
 });
