@@ -8,15 +8,19 @@ export default {
   argTypes: {},
 };
 
-const Template: Story<TooltipProps> = ({ children, ...args }: TooltipProps) => (
-  <p>
+const Template: Story<TooltipProps> = (args: TooltipProps) => (
+  <p className="text-white">
     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odit
     {' '}
     <Tooltip
       {...args}
-      content={(<span>Tooltip</span>)}
+      content={(
+        <div className="px-2 py-1">
+          <span>Tooltip</span>
+        </div>
+      )}
     >
-      {children}
+      <span className="underline text-primary-500">HOVER ME!</span>
     </Tooltip>
     {' '}
     quisquam explicabo iure nihil, eveniet dolorum at hic voluptatem in maxime enim a aspernatur?
@@ -32,14 +36,16 @@ const Template: Story<TooltipProps> = ({ children, ...args }: TooltipProps) => (
         </div>
       )}
     >
-      {children}
+      <span className="underline text-primary-500">CLICK ME!</span>
     </Tooltip>
-    , doloremque iusto! Sunt, dignissimos sint.
+    {' '}
+    doloremque iusto! Sunt, dignissimos sint.
 
   </p>
 );
 
 export const Default = Template.bind({});
+
 Default.args = {
   children: (
     <span className="text-primary-500">Source name</span>
