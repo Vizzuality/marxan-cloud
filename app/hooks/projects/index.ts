@@ -6,8 +6,9 @@ import { useAuth } from 'hooks/authentication';
 import { ItemProps } from 'components/projects/item/component';
 
 import PROJECTS from 'services/projects';
+import { UseProjectsProps } from './types';
 
-export function useProjects(filters) {
+export function useProjects(filters: UseProjectsProps) {
   const { user } = useAuth();
   const { search } = filters;
 
