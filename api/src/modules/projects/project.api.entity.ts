@@ -46,13 +46,8 @@ export class Project extends TimeUserEntityMetadata {
   /**
    * The country where this project is located.
    */
-  @ApiProperty()
-  @ManyToOne((_type) => Country)
-  @JoinColumn({
-    name: 'country_id',
-    referencedColumnName: 'alpha3',
-  })
-  country: Country;
+  @Column('uuid', { name: 'country_id' })
+  countryId: string;
 
   /**
    * The smallest administrative region that contains the whole project's

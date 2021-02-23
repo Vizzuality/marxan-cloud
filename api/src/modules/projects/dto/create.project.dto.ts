@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import {
+  IsAlpha,
+  IsOptional,
+  IsString,
+  IsUppercase,
+  IsUUID,
+  Length,
+} from 'class-validator';
 import { Dictionary } from 'lodash';
 
 export class CreateProjectDTO {
@@ -13,11 +20,15 @@ export class CreateProjectDTO {
   @IsUUID()
   organizationId: string;
 
-  @ApiPropertyOptional()
-  @IsString()
-  @Length(3)
+  @ApiPropertyOptional({
+    description: 'ISO 3166-1 alpha3 country code (uppercase)',
+    example: 'ESP',
+  })
+  @IsAlpha()
+  @IsUppercase()
+  @Length(3, 3)
   @IsOptional()
-  country?: string;
+  countryId?: string;
 
   @ApiPropertyOptional()
   @IsUUID()
