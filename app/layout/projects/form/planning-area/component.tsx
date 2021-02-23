@@ -1,5 +1,8 @@
 import React from 'react';
 
+import PlanningUnitGrid from 'components/projects/planning-unit-grid';
+import { PlanningUnit } from 'types/project-model';
+
 import { PlanningAreaProps } from './types';
 
 export const PlanningArea: React.FC<PlanningAreaProps> = ({
@@ -9,7 +12,7 @@ export const PlanningArea: React.FC<PlanningAreaProps> = ({
 
   return (
     <div>
-      Hey!
+      <PlanningUnitGrid unit={PlanningUnit.HEXAGON} />
     </div>
   );
 };

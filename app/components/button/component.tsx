@@ -6,7 +6,7 @@ const THEME = {
     'text-black bg-primary-500 hover:bg-primary-400 active:bg-primary-300 border border-primary-500 hover:border-primary-400 active:border-primary-300',
   'primary-alt':
     'text-primary-500 bg-transparent hover:bg-transparent active:bg-transparent border border-primary-500 hover:border-primary-400 active:border-primary-300',
-  'primary-white':
+  white:
     'text-gray-700 bg-white hover:text-white hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
   secondary:
     'text-white bg-gray-500 hover:bg-gray-400 active:bg-gray-300 border border-gray-500 hover:border-gray-400 active:border-gray-300',
@@ -24,7 +24,7 @@ const SIZE = {
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  theme: 'primary' | 'primary-alt' | 'primary-white' | 'secondary' | 'secondary-alt';
+  theme: 'primary' | 'primary-alt' | 'white' | 'secondary' | 'secondary-alt';
   size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }
