@@ -12,6 +12,7 @@ export const E2E_CONFIG = {
     valid: {
       minimal: {
         name: faker.random.words(5),
+        type: ScenarioType.marxan,
         projectId: null,
       },
       complete:
