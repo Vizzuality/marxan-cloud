@@ -10,16 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from 'modules/users/user.api.entity';
-import { Country } from 'modules/countries/country.api.entity';
-import {
-  IsArray,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsUUID,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 
 /**
@@ -128,7 +119,6 @@ export class Scenario extends TimeUserEntityMetadata {
    * Parent scenario.
    */
   @ApiPropertyOptional()
-  @IsUUID()
   @IsOptional()
   @Column('uuid', { name: 'parent_id' })
   parentScenario: Scenario;
