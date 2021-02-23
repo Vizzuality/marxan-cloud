@@ -5,7 +5,7 @@ export class UpdateNullableColumnsForProjectsAndScenarios1613988195000
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
 ALTER TABLE projects
-  ADD COLUMN country_id varchar(2) REFERENCES countries(iso_3166_1_alpha2),
+  ADD COLUMN country_id varchar(3),
   ADD COLUMN admin_region_id uuid,
   ADD COLUMN extent geometry;
 
@@ -24,7 +24,7 @@ ALTER TABLE scenarios
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
 ALTER TABLE scenarios
-  ADD COLUMN country_id varchar(2) REFERENCES countries(iso_3166_1_alpha2),
+  ADD COLUMN country_id varchar(3),
   ADD COLUMN admin_region_id uuid,
   ADD COLUMN extent geometry;
   
