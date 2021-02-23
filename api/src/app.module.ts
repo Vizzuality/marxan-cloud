@@ -19,6 +19,7 @@ import { OrganizationsModule } from 'modules/organizations/organizations.module'
 import { PaginationMiddleware } from 'middleware/pagination.middleware';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from 'filters/all-exceptions.exception.filter';
+import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AllExceptionsFilter } from 'filters/all-exceptions.exception.filter';
       ...apiConnections.geoprocessingDB,
       keepConnectionAlive: true,
     }),
+    AdminAreasModule,
     CountriesModule,
     GeoModule,
     OrganizationsModule,
