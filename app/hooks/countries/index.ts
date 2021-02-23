@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from 'react-query';
 import { useAuth } from 'hooks/authentication';
 
-import COUNTRIES from 'services/projects';
+import COUNTRIES from 'services/countries';
 
 export function useCountries(filters) {
   const { user } = useAuth();

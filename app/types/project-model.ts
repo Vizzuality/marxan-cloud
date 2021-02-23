@@ -9,3 +9,8 @@ export enum PlanningUnit {
   HEXAGON = 'hexagon',
   UPLOAD = 'upload',
 }
+
+export enum PlanningUnitAreaSizeUnit {
+  KM2 = 'KM2',
+  ML2 = 'ML2',
+}
