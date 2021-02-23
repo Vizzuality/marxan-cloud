@@ -1,6 +1,6 @@
 export interface Project {
-  name: String;
-  description: String;
+  name: string;
+  description: string;
   hasCustomArea: boolean;
 }
 
