@@ -12,6 +12,7 @@ import {
   Y_AXIS_WIDTH,
   Y_BASELINE_OFFSET,
   THUMBNAIL_SIZE,
+  BORDER_RADIUS,
 } from './constants';
 import { getThumbnailPosition } from './helpers';
 
@@ -148,6 +149,18 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   return (
     <div ref={containerRef} className="w-full h-full">
       <svg width={width} height={height}>
+        <defs>
+          {/* Clip path used to round the corners of the area */}
+          <clipPath id="area-border-radius">
+            <rect
+              x={xScale(xDomain[0])}
+              y={yScale(yDomain[1]) - BORDER_RADIUS}
+              width={xScale(xDomain[1]) - xScale(xDomain[0])}
+              height={yScale(yDomain[0]) - yScale(yDomain[1]) + BORDER_RADIUS}
+              rx={BORDER_RADIUS}
+            />
+          </clipPath>
+        </defs>
         {/* Y axis */}
         <g>
           <g transform={`translate(${0} ${yScale(yDomain[1])})`}>
@@ -204,7 +217,11 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
           </g>
         </g>
         {/* Area */}
-        <path d={areaGenerator(data)} className="text-primary-500 fill-current opacity-20" />
+        <path
+          d={areaGenerator(data)}
+          clipPath="url(#area-border-radius)"
+          className="text-primary-500 fill-current opacity-20"
+        />
         {/* Line */}
         <path d={lineGenerator(data)} className="text-black stroke-current fill-none" />
         {/* BLM indicator */}
