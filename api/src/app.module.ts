@@ -22,8 +22,14 @@ import { AllExceptionsFilter } from 'filters/all-exceptions.exception.filter';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(apiConnections.default),
-    TypeOrmModule.forRoot(apiConnections.geoprocessingDB),
+    TypeOrmModule.forRoot({
+      ...apiConnections.default,
+      keepConnectionAlive: true,
+    }),
+    TypeOrmModule.forRoot({
+      ...apiConnections.geoprocessingDB,
+      keepConnectionAlive: true,
+    }),
     CountriesModule,
     GeoModule,
     OrganizationsModule,
