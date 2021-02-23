@@ -18,7 +18,7 @@ export function useScenarios() {
   return query;
 }
 
-export function useScenario(id) {
+export function useScenario(id: string) {
   const { user } = useAuth();
 
   const query = useQuery(`scenarios/${id}`, async () => SCENARIOS.request({
