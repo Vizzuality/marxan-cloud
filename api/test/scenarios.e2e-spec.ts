@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import * as faker from 'faker';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
 
