@@ -122,9 +122,9 @@ describe('ProjectsModule (e2e)', () => {
        * Finally, we delete the organization we had created for these projects
        */
       await request(app.getHttpServer())
-      .delete(`/api/v1/organizations/${anOrganization.id}`)
-      .set('Authorization', `Bearer ${jwtToken}`)
-      .expect(200);
+        .delete(`/api/v1/organizations/${anOrganization.id}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
     });
 
     /**
