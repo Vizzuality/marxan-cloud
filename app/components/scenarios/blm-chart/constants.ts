@@ -9,7 +9,8 @@ export const Y_AXIS_WIDTH = 100;
 export const Y_BASELINE_OFFSET = 0.15;
 /** Width and height of the thumbnail */
 export const THUMBNAIL_SIZE = 64;
-/** Desired offset between a point and its thumbnail */
+/** Desired offset between a point and its thumbnail, needs to be at least twice the size of
+ * BORDER_RADIUS */
 export const THUMBNAIL_OFFSET = 30;
-/** Border radius used by the blue area */
+/** Border radius used by the blue area and the lines between points and thumbnails */
 export const BORDER_RADIUS = 15;
