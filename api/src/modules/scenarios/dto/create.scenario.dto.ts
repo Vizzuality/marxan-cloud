@@ -20,7 +20,7 @@ export class CreateScenarioDTO {
   description?: string;
 
   @ApiProperty()
-  @IsEnum(ScenarioType)
+  @IsEnum(Object.values(ScenarioType))
   type: ScenarioType;
 
   @ApiProperty()
