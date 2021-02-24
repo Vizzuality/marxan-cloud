@@ -15,6 +15,7 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
     size: { value: 10, unit: PlanningUnitAreaSizeUnit.KM2 },
     unit: PlanningUnit.HEXAGON,
     country: null,
+    region: null,
   });
   const { size, unit } = data;
 
@@ -38,8 +39,17 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
           }}
         />
         <PlanningUnitAreaSize
-          size={size.value}
-          unit={size.unit}
+          data={size}
+          onChange={(value) => {
+            const newData = {
+              ...data,
+              size: value,
+            };
+            setData(newData);
+            if (onChange) {
+              onChange(newData);
+            }
+          }}
         />
       </div>
     </div>

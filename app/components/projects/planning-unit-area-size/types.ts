@@ -1,7 +1,6 @@
-import { PlanningAreaSize, PlanningUnitAreaSizeUnit } from 'types/project-model';
+import { PlanningAreaSize } from 'types/project-model';
 
 export interface PlanningUnitAreaSizeProps {
-  size: number;
-  unit: PlanningUnitAreaSizeUnit;
+  data: PlanningAreaSize;
   onChange?: (value: PlanningAreaSize) => void;
 }
