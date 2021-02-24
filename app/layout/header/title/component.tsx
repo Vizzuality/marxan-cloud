@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
-import { useProject } from 'hooks/projects';
-import { useScenario } from 'hooks/scenarios';
+import { useProject, useSaveProject } from 'hooks/projects';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useRouter } from 'next/router';
 import { useTransition, animated } from 'react-spring';
+
+import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import {
+  composeValidators,
+} from 'components/forms/validations';
 
 export interface TitleProps {
 }
@@ -14,22 +19,116 @@ export const Title: React.FC<TitleProps> = () => {
   const { data: projectData, isLoading: projectIsLoading } = useProject(pid);
   const { data: scenarioData, isLoading: scenarioIsLoading } = useScenario(sid);
 
-  const transitions = useTransition(!projectIsLoading && !scenarioIsLoading, null, {
+  const transitions = useTransition((!projectIsLoading && !scenarioIsLoading), null, {
     from: { opacity: 0, transform: 'translateY(-5px)' },
     enter: { opacity: 1, transform: 'translateY(0)' },
     leave: { opacity: 0, transform: 'translateY(-5px)' },
   });
 
+  // Project mutation and submit
+  const saveProjectMutation = useSaveProject({
+    requestOptions: {
+      method: 'PATCH',
+      url: `/${projectData?.id}`,
+    },
+  });
+
+  const handleProjectSubmit = useCallback(async (data) => {
+    saveProjectMutation.mutate(data, {
+      onSuccess: ({ data: s }) => {
+        console.info('Project name saved succesfully', s);
+      },
+      onError: () => {
+        console.error('Project name not saved');
+      },
+    });
+  }, [saveProjectMutation]);
+
+  // Scenario mutation and submit
+  const saveScenarioMutation = useSaveScenario({
+    requestOptions: {
+      method: 'PATCH',
+      url: `/${scenarioData?.id}`,
+    },
+  });
+
+  const handleScenarioSubmit = useCallback(async (data) => {
+    saveScenarioMutation.mutate(data, {
+      onSuccess: ({ data: s }) => {
+        console.info('Scenario name saved succesfully', s);
+      },
+      onError: () => {
+        console.error('Scenario name not saved');
+      },
+    });
+  }, [saveScenarioMutation]);
+
   return (
     <>
       {transitions.map(({ item, key, props }) => item && (
         <animated.div key={key} style={props} className="flex divide-x">
+          {/* Project title */}
           {projectData?.name && (
-            <h1 className="font-medium font-heading px-2.5">{projectData.name}</h1>
+            <FormRFF
+              onSubmit={handleProjectSubmit}
+              initialValues={{
+                name: projectData?.name || '',
+              }}
+            >
+              {(fprops) => (
+                <form onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
+                  <FieldRFF
+                    name="name"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {({ input }) => (
+                      <div className="relative h-6">
+                        <input
+                          {...input}
+                          className="absolute top-0 left-0 w-full h-full px-1 py-1 font-normal leading-4 bg-transparent border-none font-heading overflow-ellipsis"
+                          value={`${input.value}`}
+                          onBlur={fprops.handleSubmit}
+                        />
+                        <h1 className="invisible px-1.5 py-1 font-heading font-normal leading-4">{input.value}</h1>
+                      </div>
+
+                    )}
+                  </FieldRFF>
+                </form>
+              )}
+            </FormRFF>
           )}
 
+          {/* Scenario title */}
           {scenarioData?.name && (
-            <h1 className="font-medium font-heading px-2.5 opacity-50">{scenarioData.name}</h1>
+            <FormRFF
+              onSubmit={handleScenarioSubmit}
+              initialValues={{
+                name: scenarioData?.name || '',
+              }}
+            >
+              {(fprops) => (
+                <form onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
+                  <FieldRFF
+                    name="name"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {({ input }) => (
+                      <div className="relative h-6">
+                        <input
+                          {...input}
+                          className="absolute top-0 left-0 w-full h-full px-1 py-1 font-sans font-normal leading-4 bg-transparent border-none overflow-ellipsis"
+                          value={`${input.value}`}
+                          onBlur={fprops.handleSubmit}
+                        />
+                        <h1 className="invisible px-1.5 py-1 font-sans font-normal leading-4">{input.value}</h1>
+                      </div>
+
+                    )}
+                  </FieldRFF>
+                </form>
+              )}
+            </FormRFF>
           )}
         </animated.div>
       ))}
