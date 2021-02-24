@@ -25,12 +25,8 @@ export class CountriesService extends AppBaseService<
 
   get serializerConfig() {
     return {
-      attributes: ['id', 'name'],
+      attributes: ['alpha2', 'alpha3', 'name'],
       keyForAttribute: 'camelCase',
-      users: {
-        ref: 'id',
-        attributes: ['id', 'name'],
-      },
     };
   }
 
