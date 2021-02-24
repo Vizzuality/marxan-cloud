@@ -19,6 +19,7 @@ import { DropdownProps, DropdownOptionProps } from 'components/dropdowns/types';
 export const SingleDropdown: React.FC<DropdownProps> = ({
   theme = 'dark',
   size = 'base',
+  mode,
   status,
   prefix,
   options = [],
@@ -138,6 +139,7 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
         [THEME[theme].container]: true,
         [THEME[theme].closed]: true,
         [THEME.states[status]]: true,
+        [THEME.mode[mode]]: true,
       })}
     >
       <div
