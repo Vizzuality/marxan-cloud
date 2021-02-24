@@ -4,7 +4,6 @@ interface DropdownThemeProps {
   theme: 'dark' | 'light';
   size: 'base' | 's';
   status: 'none' | 'error' | 'valid';
-  mode: 'normal' | 'minimalistic';
 }
 
 interface DropdownStatusProps {

@@ -41,7 +41,6 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
           theme="dark"
           size="base"
           status="none"
-          mode="minimalistic"
           multiple={false}
           initialSelected={selectedUnit}
           options={Object.values(PlanningUnitAreaSizeUnit)
