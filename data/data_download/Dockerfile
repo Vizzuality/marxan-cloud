@@ -1,4 +1,5 @@
 FROM osgeo/gdal:ubuntu-full-3.2.1
+ENV LANG=en_US.UTF-8
 LABEL maintainer="hello@vizzuality.com"
 ENV NODE_OPTIONS=--max_old_space_size=16384
 RUN apt-get update \
@@ -10,6 +11,6 @@ RUN apt-get update \
            time \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm i -g mapshaper
-# RUN mkdir -p "gadm_3.6/data" && mkdir -p "wdpa/data" && mkdir -p "iucn/data" && mkdir -p "world_terrestrial_ecosystems/data"
+RUN npm i -g mapshaper@0.5.34
+
 COPY ./ ./
