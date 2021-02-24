@@ -1,10 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsUUID } from 'class-validator';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('admin_regions')
-export class AdminRegion {
-  @IsUUID(4)
+export class AdminArea {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -12,7 +10,6 @@ export class AdminRegion {
    * @todo Add description.
    */
   @ApiProperty()
-  @IsInt()
   @Column('integer', { name: 'ogc_fid' })
   ogcFid: number;
 
@@ -44,4 +41,20 @@ export class AdminRegion {
   @ApiProperty()
   @Column('character varying', { name: 'name_2' })
   name2: string | null;
+}
+
+export class JSONAPIAdminAreaData {
+  @ApiProperty()
+  type = 'administative-areas';
+
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  attributes: AdminArea;
+}
+
+export class AdminAreaResult {
+  @ApiProperty()
+  data: JSONAPIAdminAreaData;
 }
