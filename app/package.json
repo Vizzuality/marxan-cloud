@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@hapi/iron": "^6.0.0",
+    "@mariusmarais/tailwind-cascade": "^0.0.4",
     "@math.gl/web-mercator": "^3.3.2",
     "@popperjs/core": "^2.6.0",
     "@react-aria/button": "^3.3.0",

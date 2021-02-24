@@ -29,12 +29,14 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
           <Icon icon={INFO_SVG} />
         </button>
       </div>
-      <div className="flex">
-        <Input
-          defaultValue={selectedSize}
-          onChange={(event) => setSelectedSize(Number(event.target.value))}
-          mode="dashed"
-        />
+      <div className="flex mt-4">
+        <div className="w-16 mr-1">
+          <Input
+            defaultValue={selectedSize}
+            onChange={(event) => setSelectedSize(Number(event.target.value))}
+            mode="dashed"
+          />
+        </div>
         <Select
           theme="dark"
           size="base"

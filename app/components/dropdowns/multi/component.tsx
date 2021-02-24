@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import cx from 'classnames';
+import { twCascade } from '@mariusmarais/tailwind-cascade';
 
 // Downshift;
 import { useSelect, useMultipleSelection } from 'downshift';
@@ -187,13 +188,13 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
 
   return (
     <div
-      className={cx({
-        'w-full leading-tight overflow-hidden': true,
-        [THEME[theme].container]: true,
-        [THEME[theme].closed]: true,
-        [THEME.states[status]]: true,
-        [THEME.mode[mode]]: true,
-      })}
+      className={twCascade(
+        'w-full leading-tight overflow-hidden',
+        [THEME[theme].container],
+        [THEME[theme].closed],
+        [THEME.states[status]],
+        [THEME.mode[mode]],
+      )}
     >
       <div
         className="relative w-full"
