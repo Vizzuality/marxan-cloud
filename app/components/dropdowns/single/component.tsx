@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import cx from 'classnames';
-import { twCascade } from '@mariusmarais/tailwind-cascade';
 
 // Downshift;
 import { useSelect } from 'downshift';
@@ -20,7 +19,6 @@ import { DropdownProps, DropdownOptionProps } from 'components/dropdowns/types';
 export const SingleDropdown: React.FC<DropdownProps> = ({
   theme = 'dark',
   size = 'base',
-  mode = 'normal',
   status,
   prefix,
   options = [],
@@ -135,13 +133,12 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
 
   return (
     <div
-      className={twCascade(
-        'w-full leading-tight overflow-hidden',
-        [THEME[theme].container],
-        [THEME[theme].closed],
-        [THEME.states[status]],
-        [THEME.mode[mode]],
-      )}
+      className={cx({
+        'w-full leading-tight overflow-hidden': true,
+        [THEME[theme].container]: true,
+        [THEME[theme].closed]: true,
+        [THEME.states[status]]: true,
+      })}
     >
       <div
         className="relative w-full"
@@ -151,7 +148,6 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
           options={getOptions}
           theme={theme}
           size={size}
-          mode={mode}
           status={status}
           prefix={prefix}
           disabled={disabled}
@@ -173,7 +169,6 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
           <Menu
             theme={theme}
             size={size}
-            mode={mode}
             status={status}
             disabled={disabled}
             opened={isOpen}
@@ -187,7 +182,6 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
                 options={options}
                 theme={theme}
                 size={size}
-                mode={mode}
                 status={status}
                 prefix={prefix}
                 disabled={disabled}

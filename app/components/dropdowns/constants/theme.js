@@ -35,10 +35,6 @@ export default {
       disabled: 'text-sm opacity-50 pointer-events-none',
     },
   },
-  mode: {
-    normal: '',
-    minimalistic: 'border-none ring-0',
-  },
   states: {
     none: '',
     error: 'ring-red-500',

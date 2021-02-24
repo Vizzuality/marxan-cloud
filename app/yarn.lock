@@ -1636,14 +1636,6 @@
   resolved "https://registry.yarnpkg.com/@mapbox/whoots-js/-/whoots-js-3.1.0.tgz#497c67a1cef50d1a2459ba60f315e448d2ad87fe"
   integrity sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==
 
-"@mariusmarais/tailwind-cascade@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@mariusmarais/tailwind-cascade/-/tailwind-cascade-0.0.4.tgz#0133262f0f6b81bfa0b6b44c83d04bf13cdf8c3c"
-  integrity sha512-NZTHjeiQcYgL8aSH6esg1ImbuIE0CjBSd7DlMJZGiHH8fEiZNrc+imrRJ5plbLrkrZOHuu82i8uuWhboqGeECg==
-  dependencies:
-    classnames "^2.2.6"
-    escape-regex-string "^1.0.6"
-
 "@math.gl/core@3.3.2":
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/@math.gl/core/-/core-3.3.2.tgz#5ab38984c61a49e6c38671253f5b90b8a3ab784e"
@@ -7031,11 +7023,6 @@ escape-html@~1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
   integrity sha1-Aljq5NPQwJdN4cFpGI7wBR0dGYg=
-
-escape-regex-string@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/escape-regex-string/-/escape-regex-string-1.0.6.tgz#f536d8997ab19ec395385dcf2ea28b4e080899eb"
-  integrity sha512-AcaPwAOKpF52ETT4uu4vmpqQphuQGjIEhdDwG/gAJYah8ixJlrSBFjhtLMT7frc9y3RWgOnLov9E0MsRBdeRbw==
 
 escape-string-regexp@1.0.5, escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.5:
   version "1.0.5"

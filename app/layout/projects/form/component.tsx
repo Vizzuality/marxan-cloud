@@ -110,7 +110,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
             </div>
           </div>
 
-          {!hasPlanningArea && <PlanningArea /> }
+          {!hasPlanningArea && <PlanningArea area={null} /> }
           {hasPlanningArea && (
             <Button
               className="flex w-full mt-4"
@@ -128,7 +128,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
           )}
 
           {/* BUTTON BAR */}
-          <div className="flex mt-8">
+          <div className="flex mt-12">
             <Button
               theme="secondary"
               size="xl"
