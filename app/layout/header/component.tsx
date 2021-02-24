@@ -5,15 +5,14 @@ import Link from 'next/link';
 
 import Wrapper from 'layout/wrapper';
 import User from 'layout/header/user';
+import Title from 'layout/header/title';
 
 import Icon from 'components/icon';
 import Button from 'components/button';
 
 import { useAuth } from 'hooks/authentication';
-import { useProject } from 'hooks/projects';
 
 import LOGO_SVG from 'svgs/logo.svg?sprite';
-import { useRouter } from 'next/router';
 
 export interface HeaderProps {
   size: 'base' | 'lg',
@@ -30,9 +29,6 @@ const SIZE = {
 
 export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
   const auth = useAuth();
-  const { query } = useRouter();
-  const { pid } = query;
-  const { data: projectData } = useProject(pid);
 
   return (
     <header
@@ -53,9 +49,7 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
             </a>
           </Link>
 
-          {projectData?.name && (
-            <h1 className="font-medium font-heading">{projectData.name}</h1>
-          )}
+          <Title />
 
           {auth.user && (
             <User />
