@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import Icon from 'components/icon';
 import Input from 'components/forms/input';
-import Dropdown from 'components/dropdowns';
+import Select from 'components/dropdowns';
 
 import INFO_SVG from 'svgs/project/info.svg?sprite';
 
@@ -35,10 +35,11 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
           onChange={(event) => setSelectedSize(Number(event.target.value))}
           mode="dashed"
         />
-        <Dropdown
+        <Select
           theme="dark"
           size="base"
           status="none"
+          mode="minimalistic"
           multiple={false}
           initialSelected={selectedUnit}
           options={Object.values(PlanningUnitAreaSizeUnit)

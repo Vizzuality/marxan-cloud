@@ -21,6 +21,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
   theme = 'dark',
   size = 'base',
   status,
+  mode,
   prefix,
   options = [],
   initialValues = [],
@@ -191,6 +192,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
         [THEME[theme].container]: true,
         [THEME[theme].closed]: true,
         [THEME.states[status]]: true,
+        [THEME.mode[mode]]: true,
       })}
     >
       <div
@@ -202,6 +204,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
           theme={theme}
           size={size}
           status={status}
+          mode={mode}
           prefix={prefix}
           disabled={disabled}
           multiple
@@ -225,6 +228,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
             theme={theme}
             size={size}
             status={status}
+            mode={mode}
             disabled={disabled}
             multiple
             opened={isOpen}
@@ -238,6 +242,7 @@ export const MultiDropdown: React.FC<DropdownProps> = ({
                 options={getOptionsEnabled}
                 theme={theme}
                 size={size}
+                mode={mode}
                 status={status}
                 prefix={prefix}
                 disabled={disabled}
