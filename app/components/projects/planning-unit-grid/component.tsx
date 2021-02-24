@@ -11,8 +11,15 @@ import { ButtonSize } from './planning-unit-button/types';
 
 export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
   unit,
+  onChange,
 }: PlanningUnitGridProps) => {
   const [unitSelected, setUnitSelected] = useState(unit);
+  const handleClick = (value) => {
+    setUnitSelected(value);
+    if (onChange) {
+      onChange(value);
+    }
+  };
   return (
     <div className="mt-6">
       <div className="flex items-center">
@@ -30,19 +37,19 @@ export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
           unit={PlanningUnit.SQUARE}
           selected={unitSelected === PlanningUnit.SQUARE}
           size={ButtonSize.MEDIUM}
-          onClick={(value) => setUnitSelected(value)}
+          onClick={handleClick}
         />
         <PlanningUnitButton
           unit={PlanningUnit.HEXAGON}
           selected={unitSelected === PlanningUnit.HEXAGON}
           size={ButtonSize.MEDIUM}
-          onClick={(value) => setUnitSelected(value)}
+          onClick={handleClick}
         />
         <PlanningUnitButton
           unit={PlanningUnit.UPLOAD}
           selected={unitSelected === PlanningUnit.UPLOAD}
           size={ButtonSize.MEDIUM}
-          onClick={(value) => setUnitSelected(value)}
+          onClick={handleClick}
         />
       </div>
     </div>
