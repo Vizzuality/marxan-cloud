@@ -15,7 +15,7 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 
-import PlanningArea from './planning-area';
+import PlanningAreaSelector from './planning-area-selector';
 import ProjectFormProps from './types';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
@@ -110,7 +110,12 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
             </div>
           </div>
 
-          {!hasPlanningArea && <PlanningArea area={null} /> }
+          {!hasPlanningArea && (
+            <PlanningAreaSelector
+              area={null}
+              onChange={(value) => console.info('Planning are change: ', value)}
+            />
+          )}
           {hasPlanningArea && (
             <Button
               className="flex w-full mt-4"

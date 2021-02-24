@@ -2,6 +2,19 @@ export interface Project {
   name: string;
   description: string;
   hasCustomArea: boolean;
+  area: PlanningArea;
+}
+
+export interface PlanningArea {
+  unit: PlanningUnit;
+  size: PlanningAreaSize;
+  country: Object;
+  region?: Object;
+}
+
+export interface PlanningAreaSize {
+  value: number;
+  unit: PlanningUnitAreaSizeUnit;
 }
 
 export enum PlanningUnit {
