@@ -155,6 +155,8 @@ export class AuthenticationService {
       tokenId: issuedToken.id,
     };
 
+    await this.purgeExpiredIssuedTokens();
+
     return {
       user: UsersService.getSanitizedUserMetadata(user),
       accessToken: this.jwtService.sign(
