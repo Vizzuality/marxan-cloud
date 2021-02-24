@@ -6,16 +6,15 @@ import Select from 'components/dropdowns';
 
 import INFO_SVG from 'svgs/project/info.svg?sprite';
 
-import { PlanningUnitAreaSizeUnit } from 'types/project-model';
+import { PlanningUnitAreaSizeUnit, PlanningAreaSize } from 'types/project-model';
 
 import { PlanningUnitAreaSizeProps } from './types';
 
 export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
-  size,
-  unit,
+  data,
+  onChange,
 }: PlanningUnitAreaSizeProps) => {
-  const [selectedSize, setSelectedSize] = useState(size);
-  const [selectedUnit, setSelectedUnit] = useState(unit);
+  const [selectedData, setSelectedData] = useState<PlanningAreaSize>(data);
 
   return (
     <div className="mt-6">
@@ -32,8 +31,17 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
       <div className="flex mt-4">
         <div className="w-16 mr-1">
           <Input
-            defaultValue={selectedSize}
-            onChange={(event) => setSelectedSize(Number(event.target.value))}
+            defaultValue={selectedData.value}
+            onChange={(event) => {
+              const newData = {
+                ...selectedData,
+                value: Number(event.target.value),
+              };
+              setSelectedData(newData);
+              if (onChange) {
+                onChange(newData);
+              }
+            }}
             mode="dashed"
           />
         </div>
@@ -42,10 +50,19 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
           size="base"
           status="none"
           multiple={false}
-          initialSelected={selectedUnit}
+          initialSelected={selectedData.unit}
           options={Object.values(PlanningUnitAreaSizeUnit)
             .map((e) => ({ label: e, value: e }))}
-          onChange={(value: string) => setSelectedUnit(PlanningUnitAreaSizeUnit[value])}
+          onChange={(value: string) => {
+            const newData = {
+              ...selectedData,
+              unit: PlanningUnitAreaSizeUnit[value],
+            };
+            setSelectedData(newData);
+            if (onChange) {
+              onChange(newData);
+            }
+          }}
         />
       </div>
     </div>
