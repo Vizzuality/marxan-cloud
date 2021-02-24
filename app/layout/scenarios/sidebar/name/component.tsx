@@ -25,12 +25,17 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
   const { query, push } = useRouter();
   const { pid } = query;
 
-  const mutation = useSaveScenario();
+  const mutation = useSaveScenario({
+    requestOptions: {
+      method: 'POST',
+      url: '/',
+    },
+  });
 
   const handleSubmit = useCallback(async (data) => {
     setSubmitting(true);
 
-    await mutation.mutate({
+    mutation.mutate({
       ...data,
       type: 'marxan',
       projectId: pid,
