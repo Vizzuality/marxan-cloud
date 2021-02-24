@@ -22,7 +22,7 @@ export interface ScenariosSidebarProps {
 
 export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
   const [submitting, setSubmitting] = useState(false);
-  const { query } = useRouter();
+  const { query, push } = useRouter();
   const { pid } = query;
 
   const mutation = useSaveScenario();
@@ -32,13 +32,17 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
 
     await mutation.mutate({
       ...data,
+      type: 'marxan',
       projectId: pid,
     }, {
+      onSuccess: ({ data: s }) => {
+        push(`/projects/${pid}/scenarios/${s.id}/edit`);
+      },
       onError: () => {
         setSubmitting(false);
       },
     });
-  }, [mutation, pid]);
+  }, [mutation, pid, push]);
 
   return (
     <Pill>
