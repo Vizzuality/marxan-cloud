@@ -53,7 +53,7 @@ describe('CountriesModule (e2e)', () => {
     it('Should list administrative areas within a given country', async () => {
       const response = await request(app.getHttpServer())
         .get(
-          `/api/v1/countries/${aCountry.alpha3}/administrative-areas?page[size]=25`,
+          `/api/v1/countries/${aCountry.gid0}/administrative-areas?page[size]=25`,
         )
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
