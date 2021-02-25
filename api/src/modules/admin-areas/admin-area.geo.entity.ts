@@ -1,46 +1,43 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Country } from 'modules/countries/country.geo.entity';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('admin_regions')
-export class AdminArea {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class AdminArea extends Country {
   /**
-   * @todo Add description.
+   * Country id (ISO 3166-1 alpha-3).
    */
   @ApiProperty()
-  @Column('integer', { name: 'ogc_fid' })
-  ogcFid: number;
+  @PrimaryColumn('character varying', { name: 'gid_0' })
+  gid0: string;
 
   /**
-   * @todo Add description. Also we can probably do better than using the `any`
-   * type.
+   * Level 1 id.
    */
   @ApiProperty()
-  @Column('geometry', { name: 'the_geom' })
-  theGeom: any | null;
-
-  /**
-   * Level 0 name.
-   */
-  @ApiProperty()
-  @Column('character varying', { name: 'name_0' })
-  name0: string | null;
+  @PrimaryColumn('character varying', { name: 'gid_0' })
+  gid1: string;
 
   /**
    * Level 1 name.
    */
   @ApiProperty()
-  @Column('character varying', { name: 'name_1' })
-  name1: string | null;
+  @PrimaryColumn('character varying', { name: 'name_1' })
+  name1?: string;
+
+  /**
+   * Level 2 id.
+   */
+  @ApiProperty()
+  @PrimaryColumn('character varying', { name: 'gid_0' })
+  gid2: string;
 
   /**
    * Level 2 name.
    */
   @ApiProperty()
   @Column('character varying', { name: 'name_2' })
-  name2: string | null;
+  name2?: string;
 }
 
 export class JSONAPIAdminAreaData {
