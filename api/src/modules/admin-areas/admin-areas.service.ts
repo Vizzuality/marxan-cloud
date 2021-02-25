@@ -25,7 +25,15 @@ export class AdminAreasService extends AppBaseService<
 
   get serializerConfig() {
     return {
-      attributes: ['alpha2', 'alpha3', 'name'],
+      attributes: [
+        'gid0',
+        'name0',
+        'gid1',
+        'name1',
+        'gid2',
+        'name2',
+        'theGeom',
+      ],
       keyForAttribute: 'camelCase',
     };
   }
