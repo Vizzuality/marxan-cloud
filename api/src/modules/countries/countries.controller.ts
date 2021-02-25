@@ -1,5 +1,5 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { CountryResult } from './country.api.entity';
+import { CountryResult } from './country.geo.entity';
 import { CountriesService } from './countries.service';
 import {
   ApiBearerAuth,
