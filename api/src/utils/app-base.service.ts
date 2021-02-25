@@ -87,8 +87,10 @@ export abstract class AppBaseService<
 
   async findAllPaginated(
     pagination: FetchSpecification,
+    info?: Info,
+    filters?: Record<string, unknown>,
   ): Promise<{ data: Entity[]; metadata: PaginationMeta }> {
-    const entitiesAndCount = await this.findAll(pagination);
+    const entitiesAndCount = await this.findAll(pagination, info, filters);
     const totalItems = entitiesAndCount[1];
     const entities = entitiesAndCount[0];
     const pageSize = pagination?.pageSize ?? DEFAULT_PAGINATION.pageSize!;
