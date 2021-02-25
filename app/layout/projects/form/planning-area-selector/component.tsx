@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import CountryRegionSelector from 'components/countries/country-region-selector';
 import PlanningUnitGrid from 'components/projects/planning-unit-grid';
 import PlanningUnitAreaSize from 'components/projects/planning-unit-area-size';
-import { PlanningUnit, PlanningUnitAreaSizeUnit, PlanningArea } from 'types/project-model';
+import { PlanningUnit, PlanningArea } from 'types/project-model';
 
 import { PlanningAreaSelectorProps } from './types';
 
@@ -12,7 +12,7 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
   onChange,
 }: PlanningAreaSelectorProps) => {
   const [data, setData] = useState<PlanningArea>({
-    size: { value: 10, unit: PlanningUnitAreaSizeUnit.KM2 },
+    size: 10,
     unit: PlanningUnit.HEXAGON,
     country: null,
     region: null,
@@ -39,7 +39,7 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
           }}
         />
         <PlanningUnitAreaSize
-          data={size}
+          size={size}
           onChange={(value) => {
             const newData = {
               ...data,

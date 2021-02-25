@@ -2,19 +2,16 @@ import React, { useState } from 'react';
 
 import Icon from 'components/icon';
 import Input from 'components/forms/input';
-import Select from 'components/dropdowns';
 
 import INFO_SVG from 'svgs/project/info.svg?sprite';
-
-import { PlanningUnitAreaSizeUnit, PlanningAreaSize } from 'types/project-model';
 
 import { PlanningUnitAreaSizeProps } from './types';
 
 export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
-  data,
+  size,
   onChange,
 }: PlanningUnitAreaSizeProps) => {
-  const [selectedData, setSelectedData] = useState<PlanningAreaSize>(data);
+  const [selectedSize, setSelectedSize] = useState<number>(size);
 
   return (
     <div className="mt-6">
@@ -28,42 +25,22 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
           <Icon icon={INFO_SVG} />
         </button>
       </div>
-      <div className="flex mt-4">
-        <div className="w-16 mr-1">
+      <div className="flex items-baseline mt-4">
+        <div className="w-12">
           <Input
-            defaultValue={selectedData.value}
+            className="text-2xl"
+            defaultValue={selectedSize}
             onChange={(event) => {
-              const newData = {
-                ...selectedData,
-                value: Number(event.target.value),
-              };
-              setSelectedData(newData);
+              const newSize = Number(event.target.value);
+              setSelectedSize(newSize);
               if (onChange) {
-                onChange(newData);
+                onChange(newSize);
               }
             }}
             mode="dashed"
           />
         </div>
-        <Select
-          theme="dark"
-          size="base"
-          status="none"
-          multiple={false}
-          initialSelected={selectedData.unit}
-          options={Object.values(PlanningUnitAreaSizeUnit)
-            .map((e) => ({ label: e, value: e }))}
-          onChange={(value: string) => {
-            const newData = {
-              ...selectedData,
-              unit: PlanningUnitAreaSizeUnit[value],
-            };
-            setSelectedData(newData);
-            if (onChange) {
-              onChange(newData);
-            }
-          }}
-        />
+        <span>KM2</span>
       </div>
     </div>
   );
