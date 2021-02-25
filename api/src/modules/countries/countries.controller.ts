@@ -51,6 +51,8 @@ export class CountriesController {
   @ApiOkResponse({ type: CountryResult })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<CountryResult> {
-    return await this.service.serialize(await this.service.getById(id));
+    return await this.service.serialize(
+      await this.service.getById(id, undefined, 'gid0'),
+    );
   }
 }
