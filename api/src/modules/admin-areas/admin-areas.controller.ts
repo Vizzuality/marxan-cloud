@@ -6,6 +6,7 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -39,11 +40,20 @@ export class AdminAreasController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @JSONAPIQueryParams()
-  @Get('/countries/:id/administrative-regions')
-  async findAllAdminAreas(
+  @ApiParam({
+    name: 'countryId',
+    description: 'Parent country of administrative areas',
+    type: String,
+    required: true,
+  })
+  @Get('/countries/:countryId/administrative-areas')
+  async findAllAdminAreasInGivenCountry(
     @Pagination() pagination: FetchSpecification,
+    @Param('countryId') countryId: string,
   ): Promise<AdminAreaResult[]> {
-    const results = await this.service.findAllPaginated(pagination);
+    const results = await this.service.findAllPaginated(pagination, undefined, {
+      countryId,
+    });
     return this.service.serialize(results.data, results.metadata);
   }
 
