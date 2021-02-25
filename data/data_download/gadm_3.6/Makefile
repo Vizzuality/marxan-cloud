@@ -6,7 +6,7 @@ MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGR
 
 import: data/gadm/gadm36_simp.geojson
 	ogr2ogr -makevalid \
-		-overwrite \
+		-update -append \
 		-nln admin_regions -nlt PROMOTE_TO_MULTI \
 		-lco GEOMETRY_NAME=the_geom \
 		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
