@@ -1,3 +1,2 @@
-import Component from './component';
-
-export default Component;
+export { default } from './component';
+export type { ItemProps } from './component';

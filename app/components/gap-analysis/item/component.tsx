@@ -19,6 +19,7 @@ export interface ItemProps {
     value: number;
     unit: string;
   }
+  className?: string;
   onMap: boolean;
   onToggleOnMap: (onMap: boolean) => void;
   muted: boolean;
@@ -27,15 +28,16 @@ export interface ItemProps {
 }
 
 export const Item: React.FC<ItemProps> = ({
-  name, current, target, onMap, onToggleOnMap, muted, onMouseEnter, onMouseLeave,
+  name, current, target, className, onMap, onToggleOnMap, muted, onMouseEnter, onMouseLeave,
 }: ItemProps) => {
   const percentFormatter = useNumberFormatter({ style: 'percent' });
   const decimalFormatter = useNumberFormatter({ style: 'decimal' });
   return (
     <div
       className={classnames({
-        'bg-gray-800 text-white px-4 pt-1 pb-4 border-l-4 border-gap-analysis': true,
+        'bg-gray-800 text-white px-4 pt-1 pb-4 border-l-4 border-gap-analysis transition-opacity duration-300': true,
         'opacity-20': muted,
+        [className]: className !== undefined && className !== null,
       })}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
