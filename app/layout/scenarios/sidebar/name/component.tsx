@@ -26,7 +26,7 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
   const { pid } = query;
 
   const mutation = useSaveScenario({
-    requestOptions: {
+    requestConfig: {
       method: 'POST',
       url: '/',
     },

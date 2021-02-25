@@ -27,13 +27,23 @@ export const Title: React.FC<TitleProps> = () => {
 
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({
-    requestOptions: {
+    requestConfig: {
       method: 'PATCH',
       url: `/${projectData?.id}`,
     },
   });
 
-  const handleProjectSubmit = useCallback(async (data) => {
+  const handleProjectSubmit = useCallback((data, form) => {
+    // Blur children
+    const $form = document.getElementById('form-title-project');
+    form.getRegisteredFields().forEach((name) => {
+      const element = $form.querySelector(`[name="${name}"]`);
+
+      if (element instanceof HTMLElement) {
+        element.blur();
+      }
+    });
+
     saveProjectMutation.mutate(data, {
       onSuccess: ({ data: s }) => {
         console.info('Project name saved succesfully', s);
@@ -46,13 +56,23 @@ export const Title: React.FC<TitleProps> = () => {
 
   // Scenario mutation and submit
   const saveScenarioMutation = useSaveScenario({
-    requestOptions: {
+    requestConfig: {
       method: 'PATCH',
       url: `/${scenarioData?.id}`,
     },
   });
 
-  const handleScenarioSubmit = useCallback(async (data) => {
+  const handleScenarioSubmit = useCallback((data, form) => {
+    // Blur children
+    const $form = document.getElementById('form-title-scenario');
+    form.getRegisteredFields().forEach((name) => {
+      const element = $form.querySelector(`[name="${name}"]`);
+
+      if (element instanceof HTMLElement) {
+        element.blur();
+      }
+    });
+
     saveScenarioMutation.mutate(data, {
       onSuccess: ({ data: s }) => {
         console.info('Scenario name saved succesfully', s);
@@ -76,7 +96,7 @@ export const Title: React.FC<TitleProps> = () => {
               }}
             >
               {(fprops) => (
-                <form onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
+                <form id="form-title-project" onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
                   <FieldRFF
                     name="name"
                     validate={composeValidators([{ presence: true }])}
@@ -108,7 +128,7 @@ export const Title: React.FC<TitleProps> = () => {
               }}
             >
               {(fprops) => (
-                <form onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
+                <form id="form-title-scenario" onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
                   <FieldRFF
                     name="name"
                     validate={composeValidators([{ presence: true }])}
@@ -117,13 +137,13 @@ export const Title: React.FC<TitleProps> = () => {
                       <div className="relative h-6">
                         <input
                           {...input}
+                          id="form-scenario-name"
                           className="absolute top-0 left-0 w-full h-full px-1 py-1 font-sans font-normal leading-4 bg-transparent border-none overflow-ellipsis"
                           value={`${input.value}`}
                           onBlur={fprops.handleSubmit}
                         />
                         <h1 className="invisible px-1.5 py-1 font-sans font-normal leading-4">{input.value}</h1>
                       </div>
-
                     )}
                   </FieldRFF>
                 </form>

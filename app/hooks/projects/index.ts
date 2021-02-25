@@ -90,7 +90,7 @@ export function useProject(id) {
 }
 
 export function useSaveProject({
-  requestOptions = {
+  requestConfig = {
     method: 'POST',
     url: '/',
   },
@@ -105,7 +105,7 @@ export function useSaveProject({
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
-      ...requestOptions,
+      ...requestConfig,
     });
   }, {
     onSuccess: (data, variables, context) => {

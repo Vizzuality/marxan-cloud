@@ -44,7 +44,7 @@ export function useScenario(id) {
 }
 
 export function useSaveScenario({
-  requestOptions = {
+  requestConfig = {
     method: 'POST',
     url: '/',
   },
@@ -59,7 +59,7 @@ export function useSaveScenario({
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
-      ...requestOptions,
+      ...requestConfig,
     });
   }, {
     onSuccess: (data, variables, context) => {
