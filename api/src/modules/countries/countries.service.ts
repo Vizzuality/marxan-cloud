@@ -25,7 +25,7 @@ export class CountriesService extends AppBaseService<
 
   get serializerConfig() {
     return {
-      attributes: ['alpha2', 'alpha3', 'name'],
+      attributes: ['gid0', 'name0'],
       keyForAttribute: 'camelCase',
     };
   }
@@ -34,8 +34,10 @@ export class CountriesService extends AppBaseService<
     return this.serialize([
       {
         ...new Country(),
-        alpha2: faker.address.countryCode(),
-        name: faker.address.country(),
+        // faker.address.countryCode() gives alpha2 codes, but we need alpha3
+        // here, so (marginally) better to hardcode something here instead 🤷.
+        gid0: faker.address.countryCode('ESP'),
+        name0: faker.address.country(),
       },
     ]);
   }
