@@ -1,3 +1,5 @@
+import { AxiosRequestConfig } from 'axios';
+
 export interface UseSaveScenarioProps {
-  requestOptions: {}
+  requestConfig: AxiosRequestConfig
 }

@@ -1,3 +1,5 @@
+import { AxiosRequestConfig } from 'axios';
+
 export interface UseSaveProjectProps {
-  requestOptions: {}
+  requestConfig: AxiosRequestConfig
 }
