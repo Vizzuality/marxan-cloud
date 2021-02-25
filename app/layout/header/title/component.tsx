@@ -10,6 +10,8 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 
+import Tooltip from 'components/tooltip';
+
 export interface TitleProps {
 }
 
@@ -101,17 +103,31 @@ export const Title: React.FC<TitleProps> = () => {
                     name="name"
                     validate={composeValidators([{ presence: true }])}
                   >
-                    {({ input }) => (
-                      <div className="relative h-6">
-                        <input
-                          {...input}
-                          className="absolute top-0 left-0 w-full h-full px-1 py-1 font-normal leading-4 bg-transparent border-none font-heading overflow-ellipsis"
-                          value={`${input.value}`}
-                          onBlur={fprops.handleSubmit}
-                        />
-                        <h1 className="invisible px-1.5 py-1 font-heading font-normal leading-4">{input.value}</h1>
-                      </div>
+                    {({ input, meta }) => (
+                      <Tooltip
+                        arrow
+                        placement="bottom"
+                        disabled={meta.active}
+                        content={(
+                          <div className="px-2 py-1">
+                            <span>Edit name</span>
+                          </div>
+                        )}
+                      >
+                        <div className="relative h-6">
+                          <input
+                            {...input}
+                            className="absolute top-0 left-0 w-full h-full px-1 py-1 font-normal leading-4 bg-transparent border-none font-heading overflow-ellipsis focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
+                            value={`${input.value}`}
+                            onBlur={() => {
+                              input.onBlur();
+                              fprops.handleSubmit();
+                            }}
+                          />
 
+                          <h1 className="invisible px-1.5 py-1 font-heading font-normal leading-4">{input.value}</h1>
+                        </div>
+                      </Tooltip>
                     )}
                   </FieldRFF>
                 </form>
@@ -133,17 +149,32 @@ export const Title: React.FC<TitleProps> = () => {
                     name="name"
                     validate={composeValidators([{ presence: true }])}
                   >
-                    {({ input }) => (
-                      <div className="relative h-6">
-                        <input
-                          {...input}
-                          id="form-scenario-name"
-                          className="absolute top-0 left-0 w-full h-full px-1 py-1 font-sans font-normal leading-4 bg-transparent border-none overflow-ellipsis"
-                          value={`${input.value}`}
-                          onBlur={fprops.handleSubmit}
-                        />
-                        <h1 className="invisible px-1.5 py-1 font-sans font-normal leading-4">{input.value}</h1>
-                      </div>
+                    {({ input, meta }) => (
+                      <Tooltip
+                        arrow
+                        placement="bottom"
+                        disabled={meta.active}
+                        content={(
+                          <div className="px-2 py-1">
+                            <span>Edit name</span>
+                          </div>
+                        )}
+                      >
+                        <div className="relative h-6">
+                          <input
+                            {...input}
+                            id="form-scenario-name"
+                            className="absolute top-0 left-0 w-full h-full px-1 py-1 font-sans font-normal leading-4 bg-transparent border-none overflow-ellipsis focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
+                            value={`${input.value}`}
+                            onBlur={() => {
+                              input.onBlur();
+                              fprops.handleSubmit();
+                            }}
+                          />
+                          <h1 className="invisible px-1.5 py-1 font-sans font-normal leading-4">{input.value}</h1>
+                        </div>
+                      </Tooltip>
+
                     )}
                   </FieldRFF>
                 </form>
