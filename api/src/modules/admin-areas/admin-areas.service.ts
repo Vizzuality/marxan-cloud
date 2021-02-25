@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AdminArea } from './admin-area.geo.entity';
 import { CreateAdminAreaDTO } from './dto/create.admin-area.dto';
 import { UpdateAdminAreaDTO } from './dto/update.admin-area.dto';
@@ -36,5 +36,19 @@ export class AdminAreasService extends AppBaseService<
       name0: faker.address.country(),
       name1: faker.address.state(),
     });
+  }
+
+  setFilters(
+    query: SelectQueryBuilder<AdminArea>,
+    filters: any,
+    _info?: AppInfoDTO,
+  ): SelectQueryBuilder<AdminArea> {
+    if (filters.countryId) {
+      query.andWhere(`"${this.alias}"."gid_0" = :countryId`, {
+        countryId: filters.countryId,
+      });
+    }
+
+    return query;
   }
 }
