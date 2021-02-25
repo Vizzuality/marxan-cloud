@@ -25,7 +25,7 @@ export class CountriesService extends AppBaseService<
 
   get serializerConfig() {
     return {
-      attributes: ['gid0', 'name0'],
+      attributes: ['gid0', 'name0', 'theGeom'],
       keyForAttribute: 'camelCase',
     };
   }
