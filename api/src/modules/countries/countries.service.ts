@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository } from 'typeorm';
-import { Country } from './country.api.entity';
+import { Country } from './country.geo.entity';
 import { CreateCountryDTO } from './dto/create.country.dto';
 import { UpdateCountryDTO } from './dto/update.country.dto';
 
@@ -17,7 +17,7 @@ export class CountriesService extends AppBaseService<
   AppInfoDTO
 > {
   constructor(
-    @InjectRepository(Country)
+    @InjectRepository(Country, 'geoprocessingDB')
     private readonly countriesRepository: Repository<Country>,
   ) {
     super(countriesRepository, 'country', 'countries');
