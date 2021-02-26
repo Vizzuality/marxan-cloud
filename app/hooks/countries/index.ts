@@ -2,9 +2,12 @@ import { useMemo } from 'react';
 import { useQuery } from 'react-query';
 import { useAuth } from 'hooks/authentication';
 
-import COUNTRIES from 'services/countries';
+import { Country } from 'types/country-model';
 
-export function useCountries(filters) {
+import COUNTRIES from 'services/countries';
+import { UseCountriesResponse } from './types';
+
+export function useCountries(filters): UseCountriesResponse {
   const { user } = useAuth();
   const { includeAll } = filters;
 
@@ -23,10 +26,14 @@ export function useCountries(filters) {
 
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data) ? data?.data : [];
+    const countries: Country[] = parsedData.map((c) => ({
+      name: c.name0,
+      id: c.gid0,
+    }));
 
     return {
       ...query,
-      data: parsedData,
+      data: countries,
     };
   }, [query, data?.data]);
 }

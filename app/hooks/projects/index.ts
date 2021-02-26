@@ -1,12 +1,12 @@
 import Fuse from 'fuse.js';
 import { useMemo } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useAuth } from 'hooks/authentication';
 
 import { ItemProps } from 'components/projects/item/component';
 
 import PROJECTS from 'services/projects';
-import { UseProjectsProps } from './types';
+import { UseProjectsProps, UseSaveProjectProps } from './types';
 
 export function useProjects(filters: UseProjectsProps) {
   const { user } = useAuth();
@@ -87,4 +87,33 @@ export function useProject(id: string) {
       data: data?.data,
     };
   }, [query, data?.data]);
+}
+
+export function useSaveProject({
+  requestConfig = {
+    method: 'POST',
+    url: '/',
+  },
+}: UseSaveProjectProps) {
+  const { user } = useAuth();
+
+  return useMutation((data) => {
+    return PROJECTS.request({
+      method: 'POST',
+      url: '/',
+      data,
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+      ...requestConfig,
+    });
+  }, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
 }
