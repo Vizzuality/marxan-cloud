@@ -38,7 +38,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
             status="none"
             size="base"
             theme="dark"
-            options={data}
+            options={data.map((c) => ({ label: c.name, value: c.id }))}
             initialSelected={selectedCountry?.id}
             onChange={handleCountryChange}
           />
@@ -47,7 +47,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
             status="none"
             size="base"
             theme="dark"
-            options={data}
+            options={[]}
             initialSelected={selectedRegion?.id}
             onChange={handleRegionChange}
           />
