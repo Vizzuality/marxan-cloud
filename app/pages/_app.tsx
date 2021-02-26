@@ -20,7 +20,7 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
       <QueryClientProvider client={queryClient}>
         <AuthorizationProvider
           successRedirect="/projects"
-          errorRedirect="/" // We should create a login page
+          errorRedirect="/sign-in"
         >
           <OverlayProvider>
             <ToastProvider
