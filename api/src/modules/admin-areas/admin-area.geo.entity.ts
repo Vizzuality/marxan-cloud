@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Country } from 'modules/countries/country.geo.entity';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
@@ -15,7 +15,7 @@ export class AdminArea extends Country {
    * Level 1 id.
    */
   @ApiProperty()
-  @PrimaryColumn('character varying', { name: 'gid_0' })
+  @PrimaryColumn('character varying', { name: 'gid_1' })
   gid1: string;
 
   /**
@@ -23,19 +23,19 @@ export class AdminArea extends Country {
    */
   @ApiProperty()
   @PrimaryColumn('character varying', { name: 'name_1' })
-  name1?: string;
+  name1: string;
 
   /**
    * Level 2 id.
    */
-  @ApiProperty()
-  @PrimaryColumn('character varying', { name: 'gid_0' })
-  gid2: string;
+  @ApiPropertyOptional()
+  @PrimaryColumn('character varying', { name: 'gid_2' })
+  gid2?: string;
 
   /**
    * Level 2 name.
    */
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Column('character varying', { name: 'name_2' })
   name2?: string;
 }
