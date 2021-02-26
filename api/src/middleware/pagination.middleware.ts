@@ -33,9 +33,14 @@ export class PaginationMiddleware implements NestMiddleware {
       typeof pageNumber === 'number' && pageNumber > 0 ? pageNumber : undefined;
 
     fetchSpecification.fields = req?.query?.fields?.split(',');
-    if (fetchSpecification.fields?.indexOf('id') < 0) {
-      fetchSpecification.fields.push('id');
-    }
+    /**
+     * @todo Most entities will use `id` as unique id, but since some do not,
+     * this will not work. We need to make this configurable in this middleware,
+     * with fallback to `id` if no custom key is provided.
+     */
+    // if (fetchSpecification.fields?.indexOf('id') < 0) {
+    //  fetchSpecification.fields.push('id');
+    // }
 
     /**
      * @todo Possibly reinstate whitelisting of allowed includes, e.g.
