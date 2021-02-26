@@ -33,6 +33,7 @@ export class PaginationMiddleware implements NestMiddleware {
       typeof pageNumber === 'number' && pageNumber > 0 ? pageNumber : undefined;
 
     fetchSpecification.fields = req?.query?.fields?.split(',');
+    fetchSpecification.omitFields = req?.query?.omitFields?.split(',');
     /**
      * @todo Most entities will use `id` as unique id, but since some do not,
      * this will not work. We need to make this configurable in this middleware,
