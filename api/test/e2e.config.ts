@@ -2,6 +2,7 @@ import * as faker from 'faker';
 import { CreateOrganizationDTO } from 'modules/organizations/dto/create.organization.dto';
 import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
 import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
+import { PlanningUnitGridShape } from 'modules/projects/project.api.entity';
 import { JobStatus, ScenarioType } from 'modules/scenarios/scenario.api.entity';
 import { CreateUserDTO } from 'modules/users/dto/create.user.dto';
 import { UpdateUserDTO } from 'modules/users/dto/update.user.dto';
@@ -76,12 +77,15 @@ export const E2E_CONFIG: {
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
       }),
-      complete: (options: { countryCode: string }) => ({
+      complete: (options: { countryCode: string }): CreateProjectDTO => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
         description: faker.lorem.paragraphs(2),
         countryId: options.countryCode,
-        adminRegionId: faker.random.uuid(),
+        adminAreaLevel1Id: faker.random.alphaNumeric(7),
+        adminAreaLevel2Id: faker.random.alphaNumeric(12),
+        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitAreakm2: 10,
         extent: {
           type: 'Polygon',
           coordinates: [
