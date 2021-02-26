@@ -38,7 +38,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       {...props}
       render={(attrs) => (
         <animated.div style={styles} {...attrs}>
-          <div className="relative text-gray-500 bg-white">
+          <div className="relative text-gray-500 bg-white rounded">
             {content}
 
             {arrow && <Arrow data-popper-arrow="" {...attrs} />}
