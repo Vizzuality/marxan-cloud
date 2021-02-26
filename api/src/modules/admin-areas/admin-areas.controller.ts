@@ -19,8 +19,8 @@ import { FetchSpecification, Pagination } from 'nestjs-base-service';
 const resource: BaseServiceResource = {
   className: 'AdminArea',
   name: {
-    singular: 'admin-area',
-    plural: 'admin-areas',
+    singular: 'admin_area',
+    plural: 'admin_areas',
   },
 };
 

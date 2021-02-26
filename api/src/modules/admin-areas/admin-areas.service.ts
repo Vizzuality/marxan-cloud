@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -8,6 +8,8 @@ import { UpdateAdminAreaDTO } from './dto/update.admin-area.dto';
 
 import * as faker from 'faker';
 import { AppBaseService } from 'utils/app-base.service';
+import { FetchSpecification, FetchUtils } from 'nestjs-base-service';
+import { omit } from 'lodash';
 
 @Injectable()
 export class AdminAreasService extends AppBaseService<
@@ -20,7 +22,7 @@ export class AdminAreasService extends AppBaseService<
     @InjectRepository(AdminArea, 'geoprocessingDB')
     private readonly adminAreasRepository: Repository<AdminArea>,
   ) {
-    super(adminAreasRepository, 'admin-area', 'admin-areas');
+    super(adminAreasRepository, 'admin_area', 'admin_areas');
   }
 
   get serializerConfig() {
@@ -58,5 +60,50 @@ export class AdminAreasService extends AppBaseService<
     }
 
     return query;
+  }
+
+  /**
+   * Get Admin Area (level 1 or level 2) by its id.
+   *
+   * We only rely on the id provided for the lookup: we search for a level 1 or
+   * level 2 area depending on the pattern of the id provided.
+   */
+  async getByLevel1OrLevel2Id(
+    fetchSpecification: FetchSpecification,
+    areaId: string,
+  ): Promise<Partial<AdminArea>> {
+    const query = this.repository.createQueryBuilder(this.alias);
+
+    const queryWithFilters = FetchUtils.processFetchSpecification<AdminArea>(
+      query,
+      this.alias,
+      fetchSpecification,
+    );
+    if (this.isLevel1AreaId(areaId)) {
+      query.where(
+        `${this.alias}.gid1z = :areaId AND ${this.alias}.gid2 IS NULL`,
+        { areaId },
+      );
+    }
+    if (this.isLevel2AreaId(areaId)) {
+      query.where(`${this.alias}.gid2 = :areaId`, { areaId });
+    }
+
+    const results = await queryWithFilters.getOne();
+    if (!results) {
+      throw new NotFoundException(`No such administrative area (${areaId}).`);
+    }
+    const result = fetchSpecification?.omitFields?.length
+      ? omit(results, fetchSpecification.omitFields)
+      : results;
+    return result;
+  }
+
+  isLevel1AreaId(areaId: string): boolean {
+    return areaId.match(/\./g)?.length === 1;
+  }
+
+  isLevel2AreaId(areaId: string): boolean {
+    return areaId.match(/\./g)?.length === 2;
   }
 }
