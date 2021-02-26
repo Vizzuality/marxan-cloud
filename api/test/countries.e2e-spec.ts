@@ -36,7 +36,7 @@ describe('CountriesModule (e2e)', () => {
   });
 
   describe('Countries', () => {
-    let aCountry: JSONAPICountryData;
+    let _aCountry: JSONAPICountryData;
     let aLevel1AdminArea: JSONAPIAdminAreaData;
     const countryCodeForTests = 'ESP';
 
