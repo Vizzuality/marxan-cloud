@@ -14,7 +14,10 @@ import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { BaseServiceResource } from 'types/resource.interface';
-import { FetchSpecification, Pagination } from 'nestjs-base-service';
+import {
+  FetchSpecification,
+  ProcessFetchSpecification,
+} from 'nestjs-base-service';
 
 const resource: BaseServiceResource = {
   className: 'AdminArea',
@@ -48,19 +51,29 @@ export class AdminAreasController {
   })
   @Get('/countries/:countryId/administrative-areas')
   async findAllAdminAreasInGivenCountry(
-    @Pagination() pagination: FetchSpecification,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Param('countryId') countryId: string,
   ): Promise<AdminAreaResult[]> {
-    const results = await this.service.findAllPaginated(pagination, undefined, {
-      countryId,
-    });
+    const results = await this.service.findAllPaginated(
+      fetchSpecification,
+      undefined,
+      {
+        countryId,
+      },
+    );
     return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find administrative area by id' })
   @ApiOkResponse({ type: AdminAreaResult })
-  @Get('/administrative-areas/:id')
-  async findOne(@Param('id') id: string): Promise<AdminAreaResult> {
-    return await this.service.serialize(await this.service.getById(id));
+  @JSONAPIQueryParams()
+  @Get('/administrative-areas/:areaId')
+  async findOne(
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Param('areaId') areaId: string,
+  ): Promise<AdminAreaResult> {
+    return await this.service.serialize(
+      await this.service.getByLevel1OrLevel2Id(fetchSpecification, areaId),
+    );
   }
 }

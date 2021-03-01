@@ -12,7 +12,10 @@ import {
 } from '@nestjs/common';
 import { ScenarioResult } from './scenario.api.entity';
 import { ScenariosService } from './scenarios.service';
-import { Pagination, FetchSpecification } from 'nestjs-base-service';
+import {
+  ProcessFetchSpecification,
+  FetchSpecification,
+} from 'nestjs-base-service';
 
 import {
   ApiBearerAuth,
@@ -55,9 +58,9 @@ export class ScenariosController {
   @JSONAPIQueryParams()
   @Get()
   async findAll(
-    @Pagination() pagination: FetchSpecification,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioResult> {
-    const results = await this.service.findAllPaginated(pagination);
+    const results = await this.service.findAllPaginated(fetchSpecification);
     return this.service.serialize(results.data, results.metadata);
   }
 
