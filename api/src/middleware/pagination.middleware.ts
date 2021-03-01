@@ -51,8 +51,8 @@ export class PaginationMiddleware implements NestMiddleware {
 
     /**
      * @debt We are already interpreting `+` and `-` prefixes in
-     * `PaginationUtils`, so doing it here must be removed - we can pass the sort
-     * param values as they are to `PaginationUtils.addPagination()`.
+     * `FetchUtils`, so doing it here must be removed - we can pass the sort
+     * param values as they are to `FetchUtils.processFetchSpecification()`.
      */
     fetchSpecification.sort = req?.query?.sort
       ?.split(',')
