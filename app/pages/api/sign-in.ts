@@ -10,11 +10,11 @@ interface AuthenticateProps {
 }
 
 const authenticate = (method, req, res) => new Promise<AuthenticateProps>((resolve, reject) => {
-  return passport.authenticate(method, { session: false }, (error, token) => {
+  return passport.authenticate(method, { session: false }, (error, data) => {
     if (error) {
       reject(error);
     } else {
-      resolve(token);
+      resolve(data);
     }
   })(req, res);
 });
