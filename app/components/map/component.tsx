@@ -69,6 +69,8 @@ export const Map = ({
   touchZoom,
   touchRotate,
   doubleClickZoom,
+  width = '100%',
+  height = '100%',
   ...mapboxProps
 }: MapProps) => {
   /**
@@ -93,7 +95,7 @@ export const Map = ({
    */
   const handleLoad = useCallback(() => {
     setLoaded(true);
-    onMapLoad({ map: mapRef.current, mapContainer: mapContainerRef.current });
+    if (onMapLoad) onMapLoad({ map: mapRef.current, mapContainer: mapContainerRef.current });
   }, [onMapLoad]);
 
   const debouncedOnMapViewportChange = useDebouncedCallback((v) => {
@@ -176,7 +178,7 @@ export const Map = ({
    */
   useEffect(() => {
     setReady(true);
-    onMapReady({ map: mapRef.current, mapContainer: mapContainerRef.current });
+    if (onMapReady) onMapReady({ map: mapRef.current, mapContainer: mapContainerRef.current });
   }, [onMapReady]);
 
   useEffect(() => {
@@ -211,8 +213,8 @@ export const Map = ({
         {...mapboxProps}
         // VIEWPORT
         {...mapViewport}
-        width="100%"
-        height="100%"
+        width={width}
+        height={height}
         // INTERACTIVITY
         dragPan={!flying && dragPan}
         dragRotate={!flying && dragRotate}

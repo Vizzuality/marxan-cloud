@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import * as faker from 'faker';
 import { E2E_CONFIG } from './e2e.config';
+import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
 
 describe('OrganizationsController (e2e)', () => {
   let app: INestApplication;
@@ -51,10 +51,7 @@ describe('OrganizationsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/organizations')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send({
-          name: faker.random.words(3),
-          description: faker.lorem.sentence(),
-        })
+        .send(E2E_CONFIG.organizations.valid.minimal())
         .expect(201);
 
       anOrganization = response.body.data;
@@ -75,14 +72,15 @@ describe('OrganizationsController (e2e)', () => {
     let aProject: { id: string; type: 'organizations' };
 
     it('Creates a project in the newly created organization', async () => {
+      const createProjectDTO: CreateProjectDTO = {
+        ...E2E_CONFIG.projects.valid.minimal(),
+        organizationId: anOrganization.id,
+      };
+
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send({
-          name: faker.lorem.words(3),
-          description: faker.lorem.sentence(),
-          organizationId: anOrganization.id,
-        })
+        .send(createProjectDTO)
         .expect(201);
 
       aProject = response.body.data;
@@ -110,5 +108,10 @@ describe('OrganizationsController (e2e)', () => {
 
       expect(resources).toBeUndefined();
     });
+
+    /**
+     * @debt We should test that deleting an organization which contains
+     * projects must fail.
+     */
   });
 });

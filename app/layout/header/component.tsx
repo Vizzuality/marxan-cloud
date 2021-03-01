@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import Wrapper from 'layout/wrapper';
 import User from 'layout/header/user';
+import Title from 'layout/header/title';
 
 import Icon from 'components/icon';
 import Button from 'components/button';
@@ -33,44 +34,44 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
     <header
       className="w-full row-auto"
     >
-      <nav className="relative flex flex-wrap items-center justify-between py-1 bg-black navbar-expand-lg">
-        <Wrapper>
-          <div className="relative flex justify-between w-full">
-            <Link
-              href="/"
-            >
-              <a href="/">
-                <Icon
-                  icon={LOGO_SVG}
-                  className={cx({
-                    [`${SIZE[size].logo}`]: true,
-                  })}
-                />
-              </a>
-            </Link>
+      <Wrapper>
+        <nav className="relative flex flex-wrap items-center justify-between py-1 bg-black navbar-expand-lg">
+          <Link
+            href="/"
+          >
+            <a href="/">
+              <Icon
+                icon={LOGO_SVG}
+                className={cx({
+                  [`${SIZE[size].logo}`]: true,
+                })}
+              />
+            </a>
+          </Link>
 
-            {auth.user && (
-              <User />
-            )}
+          <Title />
 
-            {!auth.user && (
-              <div className="flex items-center gap-4">
-                <Link href="sign-in">
-                  <Button theme="secondary-alt" size="s">
-                    Sign in
-                  </Button>
-                </Link>
+          {auth.user && (
+            <User />
+          )}
 
-                <Link href="sign-up">
-                  <Button theme="primary" size="s">
-                    Sign up
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </div>
-        </Wrapper>
-      </nav>
+          {!auth.user && (
+            <div className="flex items-center gap-4">
+              <Link href="sign-in">
+                <Button theme="secondary-alt" size="s">
+                  Sign in
+                </Button>
+              </Link>
+
+              <Link href="sign-up">
+                <Button theme="primary" size="s">
+                  Sign up
+                </Button>
+              </Link>
+            </div>
+          )}
+        </nav>
+      </Wrapper>
     </header>
   );
 };
