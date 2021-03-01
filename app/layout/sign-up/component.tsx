@@ -145,7 +145,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
               </Button>
             </div>
 
-            <div className="mt-5 text-sm text-center">
+            <div className="mt-5 text-sm text-center text-black">
               Already registered.
               {' '}
               <Link href="/sign-in"><a href="/sign-in" className="underline">Sign in</a></Link>
