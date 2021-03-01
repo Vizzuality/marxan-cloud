@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import * as faker from 'faker';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
 
@@ -53,16 +52,29 @@ describe('ScenariosModule (e2e)', () => {
       await request(app.getHttpServer())
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send({
-          name: faker.random.words(3),
-          description: faker.lorem.sentence(),
-        })
+        .send(E2E_CONFIG.scenarios.invalid.missingRequiredFields())
         .expect(400);
+    });
+
+    it('Creating a scenario with minimum required data should succeed', async () => {
+      const createScenarioDTO: CreateScenarioDTO = {
+        ...E2E_CONFIG.scenarios.valid.minimal(),
+        projectId: projects[0].id,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/scenarios')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(createScenarioDTO)
+        .expect(201);
+
+      aScenario = response.body.data;
+      expect(aScenario.type).toBe('scenarios');
     });
 
     it('Creating a scenario with complete data should succeed', async () => {
       const createScenarioDTO: CreateScenarioDTO = {
-        ...E2E_CONFIG.scenarios.validScenarios[0],
+        ...E2E_CONFIG.scenarios.valid.complete(),
         projectId: projects[0].id,
       };
 

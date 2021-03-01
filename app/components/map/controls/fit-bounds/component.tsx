@@ -9,7 +9,7 @@ import FIT_BOUNDS_SVG from 'svgs/map/fit-bounds.svg?sprite';
 
 export interface FitBoundsControlProps {
   bounds?: {
-    bbox: number[];
+    bbox?: number[];
     options?: {};
     viewportOptions?: Partial<ViewportProps>;
   };

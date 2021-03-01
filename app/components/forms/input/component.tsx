@@ -5,14 +5,18 @@ import cx from 'classnames';
 const THEME = {
   dark: {
     base:
-      'w-full leading-tight text-white bg-gray-800 border rounded focus:outline-none focus:bg-gray-700',
+      'w-full leading-tight text-white bg-gray-800 bg-opacity-0 focus:outline-none focus:bg-gray-700',
     status: {
-      none: 'border-gray-800',
+      none: 'border-gray-500',
       valid: 'border-green-500',
       error: 'border-red-500',
-      disabled: 'border-gray-800 opacity-50',
+      disabled: 'border-gray-500 opacity-50',
     },
     icon: 'text-white',
+    mode: {
+      normal: 'border rounded',
+      dashed: 'border-dashed border-b',
+    },
   },
   light: {
     base:
@@ -24,12 +28,17 @@ const THEME = {
       disabled: 'border-gray-800 opacity-50',
     },
     icon: 'text-gray-800 text-opacity-50',
+    mode: {
+      normal: 'border rounded',
+      dashed: 'border-dashed border-b',
+    },
   },
 };
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   theme?: 'dark' | 'light';
   status?: 'none' | 'valid' | 'error' | 'disabled';
+  mode?: 'dashed' | 'normal';
   icon?: {
     id: string;
     viewBox: string;
@@ -39,6 +48,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 export const Input: React.FC<InputProps> = ({
   theme = 'dark',
   status = 'none',
+  mode = 'normal',
   disabled = false,
   icon,
   className,
@@ -65,6 +75,7 @@ export const Input: React.FC<InputProps> = ({
           'form-input': true,
           [THEME[theme].base]: true,
           [THEME[theme].status[st]]: true,
+          [THEME[theme].mode[mode]]: true,
           'pl-10': icon,
           [className]: !!className,
         })}

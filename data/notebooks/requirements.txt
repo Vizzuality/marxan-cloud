@@ -39,3 +39,4 @@ google-cloud-storage
 google-api-python-client
 datamodel-code-generator
 sa2schema
+kneed

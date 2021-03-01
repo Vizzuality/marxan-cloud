@@ -1,3 +1,4 @@
+SHELL=/bin/bash
 .PHONY: import
 MAKEFLAGS := --jobs=$(shell nproc)
 MAKEFLAGS += --output-sync=target
@@ -34,31 +35,47 @@ merge-simplify: data/wdpa/simp/0 data/wdpa/simp/1 data/wdpa/simp/2
 
 # @debt
 # need to review island removal
-data/wdpa/simp/%: data/wdpa/geojson/%/
+data/wdpa/simp/%: data/wdpa/geojson/%
 	mkdir -p $@
-	mapshaper-xl 16gb -i $<*.json snap \
-				-simplify 10% planar keep-shapes \
-				-filter-islands min-vertices=3 remove-empty \
-				-filter-slivers \
+	mapshaper-xl 16gb -i $</*.json snap \
+				-simplify 15% planar keep-shapes \
+				-filter-islands min-vertices=3 min-area=100 remove-empty \
+				-filter-slivers min-area=100 \
 				-clean rewind \
 				-o $@ format=geojson force
+	rm -rf $<
 
 # @debt
 # need to review a better way to split the files than using the iucn category
-data/wdpa/geojson/%/: data/wdpa/WDPA_WDOECM_wdpa_shp%/
-	mkdir -p $@
-	mapshaper-xl 16gb -i $<*-polygons.shp name='$(shell basename $<)' \
-					-split IUCN_CAT \
-					-o $@ format=geojson precision=0.0000001
+data/wdpa/geojson/%: data/wdpa/data
+	@for f in data/wdpa/data/*.shp; \
+		do filename=`(basename -s .shp "$$f")`; \
+		readarray -td '_' a < <(echo "$${filename}_"); unset 'a[-1]'; \
+		declare -p a; \
+		echo "$${a[-1]}"; \
+		mkdir -p $@; \
+		mapshaper-xl 16gb -i $$f name="$$filename" \
+						-split IUCN_CAT \
+						-o $@ format=geojson precision=0.0000001; \
+	done
+	rm -rf $<
 
-data/wdpa/WDPA_WDOECM_wdpa_shp0/ data/wdpa/WDPA_WDOECM_wdpa_shp1/ data/wdpa/WDPA_WDOECM_wdpa_shp2/: data/wdpa/WDPA_WDOECM_wdpa_shp.zip
-	unzip -u $< -d data/wdpa/out
+data/wdpa/data: data/wdpa/wdpa.zip
+	@unzip -u $< -d data/wdpa/out
+	@for f in data/wdpa/out/*.zip; \
+		do echo "$$(basename $$f)"; \
+		mkdir -p $@/temp; \
+		unzip "$$f" -d $@/temp; \
+		mv $@/temp/*-polygons.shp $@/$$(basename $$f .zip).shp; \
+   		mv $@/temp/*-polygons.shx $@/$$(basename $$f .zip).shx; \
+		mv $@/temp/*-polygons.dbf $@/$$(basename $$f .zip).dbf; \
+      	mv $@/temp/*-polygons.prj $@/$$(basename $$f .zip).prj; \
+        mv $@/temp/*-polygons.cpg $@/$$(basename $$f .zip).cpg; \
+		rm -rf $@/temp; \
+	done
 
-	unzip data/wdpa/out/$(shell basename $@).zip \
-			-d data/wdpa/"$(shell basename $@)"
-
-data/wdpa/WDPA_WDOECM_wdpa_shp.zip: | data/wdpa
-	cd data/wdpa && curl -O $(URL)
+data/wdpa/wdpa.zip: | data/wdpa
+	cd data/wdpa && curl -o $(shell basename $@) $(URL)
 
 data/wdpa:
 	mkdir -p $@

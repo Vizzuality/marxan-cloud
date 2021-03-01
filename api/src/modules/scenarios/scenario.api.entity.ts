@@ -10,16 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from 'modules/users/user.api.entity';
-import { Country } from 'modules/countries/country.api.entity';
-import {
-  IsArray,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsUUID,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 
 /**
@@ -71,24 +62,6 @@ export class Scenario extends TimeUserEntityMetadata {
   projectId: string;
 
   /**
-   * The country where this scenario is located.
-   */
-  @ApiProperty()
-  @ManyToOne((_type) => Country)
-  @JoinColumn({
-    name: 'country_id',
-    referencedColumnName: 'alpha2',
-  })
-  country: Country;
-
-  /**
-   * Extent of the scenario
-   */
-  @ApiPropertyOptional()
-  @Column('geometry')
-  extent: Record<string, unknown> | null;
-
-  /**
    * Filter for WDPA data selection.
    *
    * @todo Improve description, add examples.
@@ -107,39 +80,22 @@ export class Scenario extends TimeUserEntityMetadata {
    */
   @ApiPropertyOptional()
   @Column('integer', { name: 'wdpa_threshold' })
-  @IsInt()
   @IsOptional()
-  @Min(0)
-  @Max(100)
   wdpaThreshold: number | null;
-
-  /**
-   * The smallest administrative region that contains the whole scenario's
-   * geometry.
-   *
-   * @todo Check description.
-   */
-  @ApiProperty()
-  @Column('uuid', { name: 'admin_region_id' })
-  @IsUUID()
-  adminRegionId: string;
 
   /**
    * Number of runs for Marxan calculations.
    */
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Column('integer', { name: 'number_of_runs' })
-  @IsInt()
-  @Min(0)
-  numberOfRuns: number;
+  numberOfRuns?: number;
 
   /**
    * Boundary Length Modifier
    */
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Column('double precision', { name: 'blm' })
-  @IsNumber()
-  boundaryLengthModifier: number;
+  boundaryLengthModifier?: number;
 
   /**
    * JSONB storage for non-relational attributes
@@ -157,13 +113,12 @@ export class Scenario extends TimeUserEntityMetadata {
    */
   @ApiProperty({ enum: JobStatus, enumName: 'JobStatus' })
   @Column('enum')
-  status: JobStatus;
+  status?: JobStatus;
 
   /**
    * Parent scenario.
    */
   @ApiPropertyOptional()
-  @IsUUID()
   @IsOptional()
   @Column('uuid', { name: 'parent_id' })
   parentScenario: Scenario;

@@ -13,6 +13,7 @@ import {
 } from 'typeorm';
 import { Organization } from 'modules/organizations/organization.api.entity';
 import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
+import { Country } from 'modules/countries/country.api.entity';
 
 @Entity('projects')
 export class Project extends TimeUserEntityMetadata {
@@ -41,6 +42,29 @@ export class Project extends TimeUserEntityMetadata {
 
   @Column('uuid', { name: 'organization_id' })
   organizationId: string;
+
+  /**
+   * The country where this project is located.
+   */
+  @Column('uuid', { name: 'country_id' })
+  countryId: string;
+
+  /**
+   * The smallest administrative region that contains the whole project's
+   * geometry.
+   *
+   * @todo Check description.
+   */
+  @ApiProperty()
+  @Column('uuid', { name: 'admin_region_id' })
+  adminRegionId: string;
+
+  /**
+   * Extent of the project
+   */
+  @ApiPropertyOptional()
+  @Column('geometry')
+  extent: Record<string, unknown> | null;
 
   /**
    * JSONB storage for non-relational attributes

@@ -9,7 +9,7 @@ export const Wrapper: React.FC<WrapperProps> = ({ children }:WrapperProps) => {
   return (
     <div
       className={cx({
-        'container mx-auto lg:px-10 px-4': true,
+        'container mx-auto lg:px-10 px-4 w-full h-full': true,
       })}
     >
       {children}
