@@ -66,4 +66,23 @@ export class UsersService extends AppBaseService<
 
     return get(user, allowedProps);
   }
+
+  /**
+   * Mark user as deleted (and inactive).
+   *
+   * We don't currently delete users physically from the system when an account
+   * deletion is requested, as this would mean needing to remove them from all
+   * the objects (scenarios, etc) to which they are linked, which may not be the
+   * desired default behaviour.
+   *
+   * @debt We will need to implement hard-deletion later on, so that instance
+   * administrators can enforce compliance with relevant data protection
+   * regulations.
+   */
+  async markAsDeleted(userId: string): Promise<void> {
+    await this.repository.update(
+      { id: userId },
+      { isDeleted: true, isActive: false },
+    );
+  }
 }
