@@ -15,6 +15,7 @@ export interface HeaderUserProps {
 
 export const HeaderUser: React.FC<HeaderUserProps> = () => {
   const auth = useAuth();
+  const { user: { displayName } } = auth;
 
   return (
     <Tooltip
@@ -59,7 +60,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
         className="flex items-center justify-start focus:outline-none"
       >
         <Avatar className="text-sm text-white uppercase bg-primary-700">
-          MB
+          {displayName.slice(0, 2)}
         </Avatar>
         <Icon icon={ARROW_DOWN_SVG} className="w-2.5 h-2.5 text-white" />
       </button>

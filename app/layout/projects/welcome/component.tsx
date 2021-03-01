@@ -1,14 +1,15 @@
 import React from 'react';
 
 import Wrapper from 'layout/wrapper';
-// import { useAuth } from 'hooks/authentication';
+import { useAuth } from 'hooks/authentication';
 
 export interface ProjectsWelcomeProps {
 
 }
 
 export const ProjectsWelcome: React.FC<ProjectsWelcomeProps> = () => {
-  // const { user } = useAuth();
+  const auth = useAuth();
+  const { user: { displayName } } = auth;
 
   return (
     <Wrapper>
@@ -16,7 +17,7 @@ export const ProjectsWelcome: React.FC<ProjectsWelcomeProps> = () => {
         Welcome,
         {' '}
         <strong>
-          Tamara
+          {displayName}
         </strong>
       </h2>
     </Wrapper>
