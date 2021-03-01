@@ -47,6 +47,7 @@
     "framer-motion": "^3.9.1",
     "fuse.js": "^6.4.6",
     "jsona": "^1.8.0",
+    "jsonwebtoken": "^8.5.1",
     "layer-manager": "3.0.9",
     "lodash": "^4.17.20",
     "luma.gl": "7.3.2",
