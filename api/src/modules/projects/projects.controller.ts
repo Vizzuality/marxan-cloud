@@ -31,7 +31,10 @@ import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
-import { FetchSpecification, Pagination } from 'nestjs-base-service';
+import {
+  FetchSpecification,
+  ProcessFetchSpecification,
+} from 'nestjs-base-service';
 
 const resource: BaseServiceResource = {
   className: 'Project',
@@ -72,9 +75,9 @@ export class ProjectsController {
   @JSONAPIQueryParams()
   @Get()
   async findAll(
-    @Pagination() pagination: FetchSpecification,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ProjectResult> {
-    const results = await this.service.findAllPaginated(pagination);
+    const results = await this.service.findAllPaginated(fetchSpecification);
     return await this.service.serialize(results.data, results.metadata);
   }
 
