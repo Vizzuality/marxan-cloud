@@ -81,7 +81,7 @@ export class AdminAreasService extends AppBaseService<
     );
     if (this.isLevel1AreaId(areaId)) {
       query.where(
-        `${this.alias}.gid1z = :areaId AND ${this.alias}.gid2 IS NULL`,
+        `${this.alias}.gid1 = :areaId AND ${this.alias}.gid2 IS NULL`,
         { areaId },
       );
     }
