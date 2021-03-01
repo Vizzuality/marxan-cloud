@@ -9,9 +9,6 @@ API_POSTGRES_DB := $(shell grep -e API_POSTGRES_DB .env | sed 's/^.*=//')
 GEO_POSTGRES_USER := $(shell grep -e GEO_POSTGRES_USER .env | sed 's/^.*=//')
 GEO_POSTGRES_DB := $(shell grep -e GEO_POSTGRES_DB .env | sed 's/^.*=//')
 
-# This test location corresponds with Tanzania BBOX but touches adyacent countries
-TEST_LOCATION :='{"type":"Polygon","coordinates":[[[30.5419921875,-11.953349393643416],[41.24267578125,-11.953349393643416],[41.24267578125,-1.0546279422758742],[30.5419921875,-1.0546279422758742],[30.5419921875,-11.953349393643416]]]}'
-
 #This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
 TEST_OKAVANGO := '{\"type\":\"Polygon\",\"coordinates\":[[[17.5341796875,-20.756113874762068],[25.444335937499996,-20.756113874762068],[25.444335937499996,-9.492408153765531],[17.5341796875,-9.492408153765531],[17.5341796875,-20.756113874762068]]]}'
 
@@ -65,14 +62,17 @@ seed-api-with-test-data:
 seed-geoapi-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-wdpa-data.sql  | sed -e "s/\$${user}/${USERID}/" api/test/fixtures/test-wdpa-data.sql
 	docker-compose exec -T postgresql-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-admin-data.sql | sed -e "s/\$${user}/${USERID}/" api/test/fixtures/test-admin-data.sql
-	# docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/features/test-features.sql
+	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/features/test-features.sql
+
 	# docker-compose exec -T postgresql-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/features/*/test-features-data.sql | sed -e "s/\$${user}/${USERID}/" -e "s/\$${feature_id}/${FEATUREID}/" api/test/fixtures/test-admin-data.sql
 
 # need notebook service to execute a expecific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
-	docker-compose -f ./data/docker-compose.yml exec -T marxan-science-notebooks jupyter nbconvert --to notebook --execute work/notebooks/Lab/convert_csv_sql.ipynb
+	docker-compose -f ./data/docker-compose.yml exec -T marxan-science-notebooks papermill work/notebooks/Lab/convert_csv_sql.ipynb /dev/null
 	mv data/data/processed/test-wdpa-data.sql api/test/fixtures/test-wdpa-data.sql
 	mv data/data/processed/test-admin-data.sql api/test/fixtures/test-admin-data.sql
+	mv data/data/processed/test-features.sql api/test/fixtures/test-features.sql
+	mv data/data/processed/features api/test/fixtures/features
 
 seed-geodb-data:
 	docker-compose -f ./data/docker-compose-data_download.yml up --build
