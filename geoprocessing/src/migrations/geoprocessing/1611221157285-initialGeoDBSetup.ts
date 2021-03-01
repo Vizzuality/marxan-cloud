@@ -47,8 +47,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
   -- Administrative regions table.
         CREATE TABLE "admin_regions" (
           "id" uuid DEFAULT uuid_generate_v4(),
-          "ogc_fid" int NOT NULL,
-          "the_geom" geometry CONSTRAINT admin_regions_geometry_valid_check CHECK (ST_IsValid(the_geom)),
+          "the_geom" geometry(MultiPolygon,4326) CONSTRAINT admin_regions_geometry_valid_check CHECK (ST_IsValid(the_geom)),
           "name_0" varchar,
           "name_1" varchar,
           "name_2" varchar,
@@ -72,7 +71,7 @@ export class initialGeoDBSetup1611221157285 implements MigrationInterface {
         CREATE TABLE "wdpa" (
           "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
           "wdpaid" float8,
-          "the_geom" geometry CONSTRAINT wdpa_geometry_valid_check CHECK (ST_IsValid(the_geom)),
+          "the_geom" geometry(MultiPolygon, 4326) CONSTRAINT wdpa_geometry_valid_check CHECK (ST_IsValid(the_geom)),
           "full_name" varchar,
           "iucn_cat" varchar,
           "shape_leng" float8,

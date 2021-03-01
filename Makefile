@@ -29,6 +29,9 @@ start:
 notebooks:
 	docker-compose -f ./data/docker-compose.yml up --build
 
+notebooks-stop:
+	docker-compose -f ./data/docker-compose.yml stop
+
 stop:
 	docker-compose stop
 
@@ -60,7 +63,16 @@ seed-api-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 
 seed-geoapi-with-test-data:
-	docker-compose exec -T postgresql-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-data.sql
+	docker-compose exec -T postgresql-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-wdpa-data.sql  | sed -e "s/\$${user}/${USERID}/" api/test/fixtures/test-wdpa-data.sql
+	docker-compose exec -T postgresql-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-admin-data.sql | sed -e "s/\$${user}/${USERID}/" api/test/fixtures/test-admin-data.sql
+	# docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/features/test-features.sql
+	# docker-compose exec -T postgresql-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/features/*/test-features-data.sql | sed -e "s/\$${user}/${USERID}/" -e "s/\$${feature_id}/${FEATUREID}/" api/test/fixtures/test-admin-data.sql
+
+# need notebook service to execute a expecific notebook. this requires a full geodb
+generate-geo-test-data: extract-geo-test-data
+	docker-compose -f ./data/docker-compose.yml exec -T marxan-science-notebooks jupyter nbconvert --to notebook --execute work/notebooks/Lab/convert_csv_sql.ipynb
+	mv data/data/processed/test-wdpa-data.sql api/test/fixtures/test-wdpa-data.sql
+	mv data/data/processed/test-admin-data.sql api/test/fixtures/test-admin-data.sql
 
 seed-geodb-data:
 	docker-compose -f ./data/docker-compose-data_download.yml up --build
@@ -76,7 +88,13 @@ dump-geodb-data:
 dump-api-data:
 	docker-compose exec -T postgresql-api pg_dump -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/api_db-$$(date +%Y-%m-%d).tar.gz
 
-generate-geo-test-data:
+restore-geodb-dump:
+	docker-compose exec -T postgresql-geo-api pg_restore -d ${GEO_POSTGRES_DB} -U "${GEO_POSTGRES_USER}" dump_api_geo.tar.gz -C < data/data/processed/geo_db-*.tar.gz
+
+restore-api-dump:
+	docker-compose exec -T postgresql-geo-api pg_restore -d ${API_POSTGRES_DB} -U "${API_POSTGRES_USER}" dump_api_db.tar.gz -C < data/data/processed/api_db-*.tar.gz
+
+extract-geo-test-data:
 	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM admin_regions WHERE st_intersects(the_geom, st_geomfromgeojson($(TEST_OKAVANGO)))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_admin_regions_okavango.csv
 	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM wdpa WHERE st_intersects(the_geom, st_geomfromgeojson($(TEST_OKAVANGO)))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_wdpa_okavango.csv
 	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM features_data WHERE st_intersects(the_geom, st_geomfromgeojson($(TEST_OKAVANGO)))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_features_data_okavango.csv
