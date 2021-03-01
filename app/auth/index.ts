@@ -1,15 +1,31 @@
 import Iron from '@hapi/iron';
-import { MAX_AGE, setTokenCookie, getTokenCookie } from './cookies';
+import { decode } from 'jsonwebtoken';
+import { setTokenCookie, getTokenCookie } from './cookies';
 
 const { TOKEN_SECRET } = process.env;
 
-export async function setLoginSession(res, session) {
-  const createdAt = Date.now();
-  // Create a session object with a max age that we can validate later
-  const obj = { ...session, createdAt, maxAge: MAX_AGE };
-  const token = await Iron.seal(obj, TOKEN_SECRET, Iron.defaults);
+export async function setLoginSession(res, userData) {
+  const { token } = userData;
+  const decodedToken = decode(token);
+  const { iat, exp } = decodedToken; // iat and ext are seconds
+  const createdAt = new Date(iat * 1000); // converting to milliseconds
+  const expiresAt = new Date(exp * 1000); // converting to milliseconds
+  // Create a session object with params from token
+  const obj = {
+    ...userData,
+    createdAt,
+    expiresAt,
+    token,
+    decodedToken,
+  };
+  // Generates a new secure token only for the application
+  const newToken = await Iron.seal(obj, TOKEN_SECRET, Iron.defaults);
 
-  setTokenCookie(res, token);
+  // sync session expiration from token
+  setTokenCookie(res, newToken, {
+    maxAge: exp - iat, // seconds
+    expires: new Date(exp * 1000), // date format required
+  });
 }
 
 export async function getLoginSession(req) {
@@ -18,7 +34,7 @@ export async function getLoginSession(req) {
   if (!token) return undefined;
 
   const session = await Iron.unseal(token, TOKEN_SECRET, Iron.defaults);
-  const expiresAt = session.createdAt + session.maxAge * 1000;
+  const { expiresAt } = session;
 
   // Validate the expiration date of the session
   if (Date.now() > expiresAt) {
