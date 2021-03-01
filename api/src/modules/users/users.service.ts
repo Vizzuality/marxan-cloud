@@ -27,7 +27,7 @@ export class UsersService extends AppBaseService<
 
   get serializerConfig() {
     return {
-      attributes: ['fname', 'lname', 'email'],
+      attributes: ['fname', 'lname', 'email', 'displayName'],
       keyForAttribute: 'camelCase',
     };
   }
@@ -62,7 +62,7 @@ export class UsersService extends AppBaseService<
    * @debt Should be extended to include roles and permissions.
    */
   static getSanitizedUserMetadata(user: Partial<User>): Partial<User> {
-    const allowedProps = ['email', 'fname', 'lname'];
+    const allowedProps = ['email', 'fname', 'lname', 'displayName'];
 
     return get(user, allowedProps);
   }
