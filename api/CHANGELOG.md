@@ -19,6 +19,9 @@ Unreleased
 - Countries
   - move to geoprocessingDB
   - handle as subset of Admin Areas
+- Users
+  - add ability to soft-delete users [MARXAN-128]
+  - add endpoint to soft-delete one's own user [MARXAN-128]
 
 ### Changed
 
