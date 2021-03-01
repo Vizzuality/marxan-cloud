@@ -1,7 +1,7 @@
 import {
   BaseService,
   FetchSpecification,
-  PaginationUtils,
+  FetchUtils,
 } from 'nestjs-base-service';
 
 import JSONAPISerializer = require('jsonapi-serializer');
@@ -60,7 +60,7 @@ export abstract class AppBaseService<
     let query = this.repository.createQueryBuilder(this.alias);
     const _i = { ...info, fetchSpecification };
     query = this.setFilters(query, filters, info);
-    query = PaginationUtils.addPagination(
+    query = FetchUtils.processFetchSpecification(
       query,
       this.alias,
       fetchSpecification,
@@ -69,7 +69,10 @@ export abstract class AppBaseService<
     return query.getManyAndCount();
   }
 
-  async getSerializedData(data: Entity | Entity[], meta?: PaginationMeta) {
+  async getSerializedData(
+    data: Partial<Entity> | Partial<Entity[]>,
+    meta?: PaginationMeta,
+  ) {
     const serializer = new JSONAPISerializer.Serializer(this.pluralAlias, {
       ...this.serializerConfig,
       meta,
@@ -79,7 +82,7 @@ export abstract class AppBaseService<
   }
 
   async serialize(
-    entities: Entity | Entity[],
+    entities: Partial<Entity> | Partial<Entity[]>,
     paginationMeta?: PaginationMeta,
   ): Promise<any> {
     return this.getSerializedData(entities, paginationMeta);
