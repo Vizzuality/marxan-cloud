@@ -88,6 +88,9 @@ dump-geodb-data:
 dump-api-data:
 	docker-compose exec -T postgresql-api pg_dump -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
 
+upload-dump-data:
+	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00 -s data/data/processed/db_dumps
+
 restore-dumps:
 	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
 
