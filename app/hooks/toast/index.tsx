@@ -2,6 +2,8 @@ import React, {
   createContext, useContext, useState,
 } from 'react';
 
+import { AnimatePresence } from 'framer-motion';
+
 import Toast from 'components/toast';
 import ToastContainer from 'layout/toast';
 
@@ -18,7 +20,8 @@ export function generateUEID() {
 }
 
 const ToastContext = createContext<ToastContextProps>({
-  add: (id, content, options) => { console.info(content, options); },
+  add: (id, content, options) => { console.info(id, content, options); },
+  remove: (id) => { console.info(id); },
   toasts: [],
 });
 
@@ -35,6 +38,7 @@ export const useToasts = () => {
 
   return {
     addToast: ctx.add,
+    removeToast: ctx.remove,
     toasts: ctx.toasts,
   };
 };
@@ -60,24 +64,33 @@ export function ToastProvider({
     ]);
   };
 
+  const remove = (id) => {
+    setToasts(toasts.filter((t) => t.id !== id));
+  };
+
   return (
     <ToastContext.Provider
       value={{
         add,
+        remove,
         toasts,
       }}
     >
       {children}
 
       {/* Container */}
-      <ToastContainer placement={placement} hasToasts={!!toasts.length}>
-        <div className="flex flex-col gap-2">
-          {toasts.map((t: ToastItemProps) => (
-            <Toast key={`${t.id}`} {...t}>
-              {t.content}
-            </Toast>
+      <ToastContainer placement={placement}>
+        <AnimatePresence initial={false}>
+          {toasts.map((t) => (
+            <Toast
+              key={`${t.id}`}
+              {...t}
+              onDismiss={(id) => {
+                remove(id);
+              }}
+            />
           ))}
-        </div>
+        </AnimatePresence>
       </ToastContainer>
     </ToastContext.Provider>
   );
