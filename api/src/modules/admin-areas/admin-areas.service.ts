@@ -11,7 +11,12 @@ import { CreateAdminAreaDTO } from './dto/create.admin-area.dto';
 import { UpdateAdminAreaDTO } from './dto/update.admin-area.dto';
 
 import * as faker from 'faker';
-import { AppBaseService, PaginationMeta } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerAttributesConfig,
+  JSONAPISerializerConfig,
+  PaginationMeta,
+} from 'utils/app-base.service';
 import { FetchSpecification, FetchUtils } from 'nestjs-base-service';
 import { omit } from 'lodash';
 
@@ -51,7 +56,7 @@ export class AdminAreasService extends AppBaseService<
     super(adminAreasRepository, 'admin_area', 'admin_areas');
   }
 
-  get serializerConfig() {
+  get serializerConfig(): JSONAPISerializerConfig<AdminArea> {
     return {
       attributes: [
         'gid0',

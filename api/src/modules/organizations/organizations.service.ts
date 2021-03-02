@@ -8,7 +8,10 @@ import { Organization } from './organization.api.entity';
 
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
-import { AppBaseService } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+} from 'utils/app-base.service';
 
 @Injectable()
 export class OrganizationsService extends AppBaseService<
@@ -25,7 +28,7 @@ export class OrganizationsService extends AppBaseService<
     super(repository, 'organization', 'organizations');
   }
 
-  get serializerConfig() {
+  get serializerConfig(): JSONAPISerializerConfig<Organization> {
     return {
       attributes: ['name', 'description', 'metadata'],
       keyForAttribute: 'camelCase',

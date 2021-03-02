@@ -9,7 +9,10 @@ import { UpdateUserDTO } from './dto/update.user.dto';
 import { AppInfoDTO } from 'dto/info.dto';
 
 import * as faker from 'faker';
-import { AppBaseService } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+} from 'utils/app-base.service';
 
 @Injectable()
 export class UsersService extends AppBaseService<
@@ -25,7 +28,7 @@ export class UsersService extends AppBaseService<
     super(repository, 'user', 'users');
   }
 
-  get serializerConfig() {
+  get serializerConfig(): JSONAPISerializerConfig<User> {
     return {
       attributes: ['fname', 'lname', 'email', 'displayName'],
       keyForAttribute: 'camelCase',

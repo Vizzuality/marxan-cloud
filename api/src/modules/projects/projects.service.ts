@@ -9,7 +9,10 @@ import { UpdateProjectDTO } from './dto/update.project.dto';
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
 import { ScenariosService } from 'modules/scenarios/scenarios.service';
-import { AppBaseService } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+} from 'utils/app-base.service';
 
 @Injectable()
 export class ProjectsService extends AppBaseService<
@@ -28,7 +31,7 @@ export class ProjectsService extends AppBaseService<
     super(repository, 'project', 'projects');
   }
 
-  get serializerConfig() {
+  get serializerConfig(): JSONAPISerializerConfig<Project> {
     return {
       attributes: ['name', 'description', 'users'],
       keyForAttribute: 'camelCase',
