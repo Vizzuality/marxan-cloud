@@ -17,6 +17,10 @@ export class Organization extends TimeUserEntityMetadata {
   @Column('character varying')
   description: string;
 
+  @ApiPropertyOptional()
+  @Column('jsonb')
+  metadata: Record<string, unknown>;
+
   @ApiPropertyOptional({ type: () => Project })
   @OneToMany((_type) => Project, (project) => project.organization)
   projects: Project[];
