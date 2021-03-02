@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Provider as ReduxProvider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { OverlayProvider } from '@react-aria/overlays';
 import { AuthorizationProvider } from 'hooks/authentication';
 
 import type { AppProps } from 'next/app';
@@ -20,9 +21,11 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
           successRedirect="/projects"
           errorRedirect="/" // We should create a login page
         >
-          <div className="bg-black">
-            <Component {...pageProps} />
-          </div>
+          <OverlayProvider>
+            <div className="bg-black">
+              <Component {...pageProps} />
+            </div>
+          </OverlayProvider>
         </AuthorizationProvider>
       </QueryClientProvider>
     </ReduxProvider>

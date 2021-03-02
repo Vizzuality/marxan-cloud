@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { cloneElement } from 'react';
 import cx from 'classnames';
-import ReactModal from 'react-modal';
+import { useOverlayTriggerState } from '@react-stately/overlays';
+import {
+  useOverlay,
+  usePreventScroll,
+  useModal,
+  OverlayContainer,
+} from '@react-aria/overlays';
+import { useDialog } from '@react-aria/dialog';
+import { FocusScope } from '@react-aria/focus';
 
 import Icon from 'components/icon';
 import CLOSE_SVG from 'svgs/ui/close.svg';
@@ -20,25 +28,13 @@ export interface ModalProps {
    */
   title: string;
   /**
-   * Whether the modal is opened or closed
+   * Element that triggers the modal to open
    */
-  open: boolean;
-  /**
-   * Callback executed when the component requests its closure
-   */
-  onClose: (event: React.MouseEvent) => void;
+  trigger: React.ReactElement<{ onClick: () => void }>;
   /**
    * Size (width) of the modal
    */
   size?: 'narrow' | 'default' | 'wide';
-  /**
-   * Callback executed after the modal has opened
-   */
-  onAfterOpen?: () => void;
-  /**
-   * Callback executed after the modal has closed
-   */
-  onAfterClose?: () => void;
   children?: React.ReactNode;
   /**
    * Class name to assign to the modal
@@ -46,47 +42,61 @@ export interface ModalProps {
   className?: string;
 }
 
-// appElement is the root of the Next application
-// In Storybook, this element doesn't exist hence the condition
-const appElement = document.querySelector('#__next');
-if (appElement) {
-  ReactModal.setAppElement(appElement);
-}
-
 export const Modal: React.FC<ModalProps> = ({
   title,
-  open,
-  onClose,
+  trigger,
   size = 'default',
-  onAfterOpen,
-  onAfterClose,
   children,
   className,
-}: ModalProps) => (
-  <ReactModal
-    isOpen={open}
-    onRequestClose={onClose}
-    onAfterOpen={onAfterOpen}
-    onAfterClose={onAfterClose}
-    contentLabel={title}
-    className={cx({ [CONTENT_CLASSES[size]]: true, [className]: !!className })}
-    overlayClassName={cx({ [OVERLAY_CLASSES]: true })}
-  >
-    <div className="relative">
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute top-0 right-0 text-sm text-gray-300 focus:text-black hover:text-black"
-      >
-        Close
-        <Icon
-          icon={CLOSE_SVG}
-          className="inline-block ml-2 w-4 h-4 text-black"
-        />
-      </button>
-    </div>
-    {children}
-  </ReactModal>
-);
+}: ModalProps) => {
+  const { isOpen, close, open } = useOverlayTriggerState({});
+
+  const containerRef = React.useRef();
+  const { overlayProps } = useOverlay({
+    isDismissable: true,
+    isOpen,
+    onClose: close,
+  }, containerRef);
+  const { modalProps } = useModal();
+  const { dialogProps } = useDialog({ 'aria-label': title }, containerRef);
+
+  usePreventScroll();
+
+  return (
+    <>
+      {cloneElement(trigger, { onClick: open })}
+      {isOpen && (
+        <OverlayContainer>
+          <div className={cx({ [OVERLAY_CLASSES]: true })}>
+            <FocusScope contain restoreFocus autoFocus>
+              <div
+                {...overlayProps}
+                {...dialogProps}
+                {...modalProps}
+                ref={containerRef}
+                className={cx({ [CONTENT_CLASSES[size]]: true, [className]: !!className })}
+              >
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={close}
+                    className="absolute top-0 right-0 text-sm text-gray-300 focus:text-black hover:text-black"
+                  >
+                    Close
+                    <Icon
+                      icon={CLOSE_SVG}
+                      className="inline-block ml-2 w-4 h-4 text-black"
+                    />
+                  </button>
+                </div>
+                {children}
+              </div>
+            </FocusScope>
+          </div>
+        </OverlayContainer>
+      )}
+    </>
+  );
+};
 
 export default Modal;
