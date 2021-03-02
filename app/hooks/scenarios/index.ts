@@ -4,6 +4,8 @@ import { useAuth } from 'hooks/authentication';
 
 import SCENARIOS from 'services/scenarios';
 
+import { UseSaveScenarioProps } from './types';
+
 export function useScenarios() {
   const { user } = useAuth();
 
@@ -41,7 +43,12 @@ export function useScenario(id) {
   }, [query, data?.data]);
 }
 
-export function useSaveScenario() {
+export function useSaveScenario({
+  requestConfig = {
+    method: 'POST',
+    url: '/',
+  },
+}: UseSaveScenarioProps) {
   const { user } = useAuth();
 
   return useMutation((data) => {
@@ -52,14 +59,15 @@ export function useSaveScenario() {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
+      ...requestConfig,
     });
   }, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
     onError: (error, variables, context) => {
       // An error happened!
       console.info('Error', error, variables, context);
-    },
-    onSuccess: (data, variables, context) => {
-      console.info('Succces', data, variables, context);
     },
   });
 }
