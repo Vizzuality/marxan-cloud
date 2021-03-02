@@ -75,7 +75,7 @@ generate-geo-test-data: extract-geo-test-data
 	mv data/data/processed/features api/test/fixtures/features
 
 seed-geodb-data:
-	docker-compose -f ./data/docker-compose-data_download.yml up --build
+	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
 
 test-e2e-api:
 	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e rm --stop --force test-e2e-postgresql-api test-e2e-postgresql-geo-api
@@ -83,16 +83,13 @@ test-e2e-api:
 	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e rm --stop --force
 
 dump-geodb-data:
-	docker-compose exec -T postgresql-geo-api pg_dump -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/geo_db-$$(date +%Y-%m-%d).tar.gz
+	docker-compose exec -T postgresql-geo-api pg_dump -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
 
 dump-api-data:
-	docker-compose exec -T postgresql-api pg_dump -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/api_db-$$(date +%Y-%m-%d).tar.gz
+	docker-compose exec -T postgresql-api pg_dump -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
 
-restore-geodb-dump:
-	docker-compose exec -T postgresql-geo-api pg_restore -d ${GEO_POSTGRES_DB} -U "${GEO_POSTGRES_USER}" dump_api_geo.tar.gz -C < data/data/processed/geo_db-*.tar.gz
-
-restore-api-dump:
-	docker-compose exec -T postgresql-geo-api pg_restore -d ${API_POSTGRES_DB} -U "${API_POSTGRES_USER}" dump_api_db.tar.gz -C < data/data/processed/api_db-*.tar.gz
+restore-dumps:
+	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
 
 extract-geo-test-data:
 	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM admin_regions WHERE st_intersects(the_geom, st_geomfromgeojson($(TEST_OKAVANGO)))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_admin_regions_okavango.csv
