@@ -16,6 +16,7 @@ export function useCountries(filters): UseCountriesResponse {
     url: '/',
     params: {
       'page[size]': includeAll ? 0 : 25,
+      fields: 'gid0,name0',
     },
     headers: {
       Authorization: `Bearer ${user.token}`,
