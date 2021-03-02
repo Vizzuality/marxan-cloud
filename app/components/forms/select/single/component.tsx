@@ -4,19 +4,19 @@ import cx from 'classnames';
 
 // Downshift;
 import { useSelect } from 'downshift';
-import Toggle from 'components/dropdowns/toggle';
-import Menu from 'components/dropdowns/menu';
+import Toggle from 'components/forms/select/toggle';
+import Menu from 'components/forms/select/menu';
 
 // Popper
 import { usePopper } from 'react-popper';
 import {
   flipModifier, hideModifier, sameWidthModifier, offsetModifier,
-} from 'components/dropdowns/constants/popper-modifiers';
-import THEME from 'components/dropdowns/constants/theme';
+} from 'components/forms/select/constants/popper-modifiers';
+import THEME from 'components/forms/select/constants/theme';
 
-import { DropdownProps, DropdownOptionProps } from 'components/dropdowns/types';
+import { SelectProps, SelectOptionProps } from 'components/forms/select/types';
 
-export const SingleDropdown: React.FC<DropdownProps> = ({
+export const SingleSelect: React.FC<SelectProps> = ({
   theme = 'dark',
   size = 'base',
   status,
@@ -30,7 +30,7 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
   onSelect,
   onFocus,
   onBlur,
-}: DropdownProps) => {
+}: SelectProps) => {
   const triggerRef = useRef();
   const menuRef = useRef();
 
@@ -65,7 +65,7 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
     }
   };
 
-  const isSelected = (selected: DropdownOptionProps, selectedItms: DropdownOptionProps[]) => (
+  const isSelected = (selected: SelectOptionProps, selectedItms: SelectOptionProps[]) => (
     selectedItms.some((i) => i.value === selected.value)
   );
 
@@ -231,4 +231,4 @@ export const SingleDropdown: React.FC<DropdownProps> = ({
   );
 };
 
-export default SingleDropdown;
+export default SingleSelect;
