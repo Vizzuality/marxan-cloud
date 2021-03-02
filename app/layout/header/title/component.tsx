@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -17,6 +18,7 @@ export interface TitleProps {
 
 export const Title: React.FC<TitleProps> = () => {
   const { query } = useRouter();
+  const { addToast } = useToasts();
   const { pid, sid } = query;
   const { data: projectData, isLoading: projectIsLoading } = useProject(pid);
   const { data: scenarioData, isLoading: scenarioIsLoading } = useScenario(sid);
@@ -42,13 +44,31 @@ export const Title: React.FC<TitleProps> = () => {
 
     saveProjectMutation.mutate(data, {
       onSuccess: ({ data: s }) => {
+        addToast('success-project-name', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Project name saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
+
         console.info('Project name saved succesfully', s);
       },
       onError: () => {
+        addToast('error-project-name', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Project name not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
+
         console.error('Project name not saved');
       },
     });
-  }, [saveProjectMutation]);
+  }, [addToast, saveProjectMutation]);
 
   // Scenario mutation and submit
   const saveScenarioMutation = useSaveScenario({
@@ -71,13 +91,28 @@ export const Title: React.FC<TitleProps> = () => {
 
     saveScenarioMutation.mutate(data, {
       onSuccess: ({ data: s }) => {
+        addToast('save-scenario-name', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Scenario name saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
         console.info('Scenario name saved succesfully', s);
       },
       onError: () => {
-        console.error('Scenario name not saved');
+        addToast('error-scenario-name', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario name not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
       },
     });
-  }, [saveScenarioMutation]);
+  }, [addToast, saveScenarioMutation]);
 
   return (
     <AnimatePresence>

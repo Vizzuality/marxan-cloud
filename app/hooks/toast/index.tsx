@@ -1,5 +1,5 @@
 import React, {
-  createContext, useContext, useState,
+  createContext, useCallback, useContext, useState,
 } from 'react';
 
 import { AnimatePresence } from 'framer-motion';
@@ -51,22 +51,26 @@ export function ToastProvider({
 }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastItemProps[]>([]);
 
-  const add = (id: string, content: ToastContent, options: ToastItemOptionsProps) => {
+  const add = useCallback((id: string, content: ToastContent, options: ToastItemOptionsProps) => {
+    if (toasts.find((t) => t.id === id)) {
+      return false;
+    }
+
     const newToast = {
       id: id || generateUEID(),
       content,
       ...options,
     };
 
-    setToasts([
+    return setToasts([
       ...toasts,
       newToast,
     ]);
-  };
+  }, [toasts, setToasts]);
 
-  const remove = (id) => {
-    setToasts(toasts.filter((t) => t.id !== id));
-  };
+  const remove = useCallback((id) => {
+    return setToasts(toasts.filter((t) => t.id !== id));
+  }, [toasts, setToasts]);
 
   return (
     <ToastContext.Provider
@@ -85,9 +89,7 @@ export function ToastProvider({
             <Toast
               key={`${t.id}`}
               {...t}
-              onDismiss={(id) => {
-                remove(id);
-              }}
+              onDismiss={remove}
             />
           ))}
         </AnimatePresence>
