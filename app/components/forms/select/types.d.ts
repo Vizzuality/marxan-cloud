@@ -1,19 +1,19 @@
 import { ReactNode, FocusEventHandler } from 'react';
 
-interface DropdownThemeProps {
+interface SelectThemeProps {
   theme: 'dark' | 'light';
   size: 'base' | 's';
   status: 'none' | 'error' | 'valid';
 }
 
-interface DropdownStatusProps {
+interface SelectStatusProps {
   disabled?: boolean;
   searchable?: boolean;
   multiple?: boolean;
 }
 
-interface DropdownDataProps {
-  options?: DropdownOptionProps[];
+interface SelectDataProps {
+  options?: SelectOptionProps[];
   placeholder?: string;
   prefix?: string;
   initialSelected?: string | string[];
@@ -24,26 +24,26 @@ interface DropdownDataProps {
   batchSelectionLabel?: string;
 }
 
-export interface DropdownProps extends
-  DropdownStatusProps,
-  DropdownDataProps,
-  DropdownThemeProps {
+export interface SelectProps extends
+  SelectStatusProps,
+  SelectDataProps,
+  SelectThemeProps {
   onChange?: (selection: string | string[]) => void;
-  onSelect?: (option: DropdownOptionProps | DropdownOptionProps[]) => void;
+  onSelect?: (option: SelectOptionProps | SelectOptionProps[]) => void;
   onFocus?: FocusEventHandler;
   onBlur?: FocusEventHandler;
 }
 
-export interface DropdownOptionProps {
+export interface SelectOptionProps {
   label: string;
   value: string | number;
   disabled?: boolean;
   checkbox?: boolean;
 }
 
-export interface DropdownMenuProps extends
-  DropdownStatusProps,
-  DropdownThemeProps {
+export interface SelectMenuProps extends
+  SelectStatusProps,
+  SelectThemeProps {
   children: ReactNode;
   opened: boolean;
   attributes: Record<string, unknown>,
@@ -52,12 +52,12 @@ export interface DropdownMenuProps extends
   onBlur?: FocusEventHandler;
 }
 
-export interface DropdownToggleProps extends
-  DropdownStatusProps,
-  DropdownDataProps,
-  DropdownThemeProps {
+export interface SelectToggleProps extends
+  SelectStatusProps,
+  SelectDataProps,
+  SelectThemeProps {
   opened: boolean;
-  selectedItems: DropdownOptionProps[];
+  selectedItems: SelectOptionProps[];
   getToggleButtonProps: (e?:any) => void;
   getDropdownProps?: (e?:any) => void;
 }

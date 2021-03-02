@@ -4,11 +4,11 @@ import cx from 'classnames';
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import Icon from 'components/icon';
 
-import THEME from 'components/dropdowns/constants/theme';
+import THEME from 'components/forms/select/constants/theme';
 
-import { DropdownToggleProps } from 'components/dropdowns/types';
+import { SelectToggleProps } from 'components/forms/select/types';
 
-export const DropdownToggle: React.FC<DropdownToggleProps> = ({
+export const SelectToggle: React.FC<SelectToggleProps> = ({
   options,
   theme,
   size,
@@ -20,7 +20,7 @@ export const DropdownToggle: React.FC<DropdownToggleProps> = ({
   placeholder,
   getToggleButtonProps,
   getDropdownProps,
-}: DropdownToggleProps) => {
+}: SelectToggleProps) => {
   const getEnabledOptions = useMemo(() => {
     return options.filter((o) => !o.disabled);
   }, [options]);
@@ -75,4 +75,4 @@ export const DropdownToggle: React.FC<DropdownToggleProps> = ({
   );
 };
 
-export default DropdownToggle;
+export default SelectToggle;
