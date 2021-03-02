@@ -33,6 +33,38 @@ export class PaginationMeta {
   }
 }
 
+/**
+ * The part of the configuration object for jsonapi-serializer concerned with
+ * serializable properties.
+ *
+ * We handle this separately (while leaving the rest of the config object
+ * loosely typed as Record<string, unknown>) so that we can start to
+ * incrementally make typing stricter where this can be more useful to catch
+ * accidental mistakes (configuring the entity's own serializable properties).
+ */
+export interface JSONAPISerializerAttributesConfig<Entity> {
+  attributes: Array<keyof Entity>;
+  /**
+   * Approximate typing from jsonapi-serializer's documentation
+   * (https://github.com/SeyZ/jsonapi-serializer#available-serialization-option-opts-argument),
+   * but in practice we should only use `camelCase` in this project.
+   */
+  keyForAttribute:
+    | string
+    | (() => string)
+    | 'lisp-case'
+    | 'spinal-case'
+    | 'kebab-case'
+    | 'underscore_case'
+    | 'snake_case'
+    | 'camelCase'
+    | 'CamelCase';
+}
+
+export type JSONAPISerializerConfig<
+  Entity
+> = JSONAPISerializerAttributesConfig<Entity> & Record<string, unknown>;
+
 export abstract class AppBaseService<
   Entity extends object,
   CreateModel,
@@ -50,7 +82,7 @@ export abstract class AppBaseService<
   /**
    * @debt Add proper typing.
    */
-  abstract get serializerConfig(): Record<string, unknown>;
+  abstract get serializerConfig(): JSONAPISerializerConfig<Entity>;
 
   async findAll(
     fetchSpecification: FetchSpecification,
