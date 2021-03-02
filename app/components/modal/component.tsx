@@ -32,6 +32,11 @@ export interface ModalProps {
    */
   trigger: React.ReactElement<{ onClick: () => void }>;
   /**
+   * Whether the user can close the modal by clicking on the overlay, the close button or pressing
+   * the escape key
+   */
+  dismissable?: boolean;
+  /**
    * Size (width) of the modal
    */
   size?: 'narrow' | 'default' | 'wide';
@@ -45,6 +50,7 @@ export interface ModalProps {
 export const Modal: React.FC<ModalProps> = ({
   title,
   trigger,
+  dismissable = true,
   size = 'default',
   children,
   className,
@@ -53,7 +59,8 @@ export const Modal: React.FC<ModalProps> = ({
 
   const containerRef = React.useRef();
   const { overlayProps } = useOverlay({
-    isDismissable: true,
+    isKeyboardDismissDisabled: !dismissable,
+    isDismissable: dismissable,
     isOpen,
     onClose: close,
   }, containerRef);
@@ -76,19 +83,21 @@ export const Modal: React.FC<ModalProps> = ({
                 ref={containerRef}
                 className={cx({ [CONTENT_CLASSES[size]]: true, [className]: !!className })}
               >
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={close}
-                    className="absolute top-0 right-0 text-sm text-gray-300 focus:text-black hover:text-black"
-                  >
-                    Close
-                    <Icon
-                      icon={CLOSE_SVG}
-                      className="inline-block ml-2 w-4 h-4 text-black"
-                    />
-                  </button>
-                </div>
+                {dismissable && (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={close}
+                      className="absolute top-0 right-0 text-sm text-gray-300 focus:text-black hover:text-black"
+                    >
+                      Close
+                      <Icon
+                        icon={CLOSE_SVG}
+                        className="inline-block ml-2 w-4 h-4 text-black"
+                      />
+                    </button>
+                  </div>
+                )}
                 {children}
               </div>
             </FocusScope>
