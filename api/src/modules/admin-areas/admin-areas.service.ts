@@ -138,6 +138,24 @@ export class AdminAreasService extends AppBaseService<
     return result;
   }
 
+  async getChildrenAdminAreas(
+    fetchSpecification: FetchSpecification,
+    parentAreaId: string,
+  ): Promise<{
+    data: (AdminArea | Partial<AdminArea> | undefined)[];
+    metadata: PaginationMeta;
+  }> {
+    if (this.isLevel1AreaId(parentAreaId)) {
+      return this.findAllPaginated(fetchSpecification, undefined, {
+        level2AreaByArea1Id: parentAreaId,
+      });
+    } else {
+      throw new NotFoundException(
+        'Lookup of subdivisions is only supported for level 1 admin areas.',
+      );
+    }
+  }
+
   isLevel1AreaId(areaId: string): boolean {
     return areaId.match(/\./g)?.length === 1;
   }
