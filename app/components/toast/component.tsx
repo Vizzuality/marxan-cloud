@@ -87,7 +87,7 @@ export const Toast: React.FC<ToastProps> = ({
         })}
       >
         <div
-          className="flex w-full p-2 text-gray-500 bg-white rounded-2xl"
+          className="flex w-full p-2 text-gray-500 bg-white shadow-md rounded-2xl"
           onMouseEnter={() => {
             controls.stop();
           }}
