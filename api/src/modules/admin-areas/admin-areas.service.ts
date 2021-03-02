@@ -13,18 +13,24 @@ import { UpdateAdminAreaDTO } from './dto/update.admin-area.dto';
 import * as faker from 'faker';
 import {
   AppBaseService,
-  JSONAPISerializerAttributesConfig,
   JSONAPISerializerConfig,
   PaginationMeta,
 } from 'utils/app-base.service';
 import { FetchSpecification, FetchUtils } from 'nestjs-base-service';
 import { omit } from 'lodash';
+import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 /**
  * Supported admin area levels (sub-national): either level 1 or level 2.
  */
 export class AdminAreaLevel {
-  level: 1 | 2;
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(2)
+  @Transform((level: string) => parseInt(level))
+  level?: 1 | 2;
 }
 
 /**
