@@ -70,12 +70,7 @@ export class AdminAreasController {
   async findAllAdminAreasInGivenCountry(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Param('countryId') countryId: string,
-    @Query(
-      'level',
-      new ParseIntPipe(),
-      new ValidationPipe({ expectedType: AdminAreaLevel }),
-    )
-    level: AdminAreaLevel,
+    @Query() { level }: AdminAreaLevel,
   ): Promise<AdminAreaResult[]> {
     const results = await this.service.findAllPaginated(
       fetchSpecification,
