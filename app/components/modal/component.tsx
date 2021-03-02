@@ -73,6 +73,12 @@ export const Modal: React.FC<ModalProps> = ({
     }
   }, [close, onDismiss]);
 
+  const onClickTrigger = useCallback(() => {
+    // If the trigger element already has an `onClick` prop, we execute the callback
+    trigger.props.onClick?.();
+    onOpen();
+  }, [trigger, onOpen]);
+
   const containerRef = React.useRef();
   const { overlayProps } = useOverlay({
     isKeyboardDismissDisabled: !dismissable,
@@ -87,7 +93,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <>
-      {cloneElement(trigger, { onClick: onOpen })}
+      {cloneElement(trigger, { onClick: onClickTrigger })}
       {isOpen && (
         <OverlayContainer>
           <div className={cx({ [OVERLAY_CLASSES]: true })}>
