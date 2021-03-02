@@ -1,12 +1,21 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AdminAreaResult } from './admin-area.geo.entity';
-import { AdminAreasService } from './admin-areas.service';
+import { AdminAreaLevel, AdminAreasService } from './admin-areas.service';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -49,16 +58,31 @@ export class AdminAreasController {
     type: String,
     required: true,
   })
+  @ApiQuery({
+    name: 'level',
+    description:
+      'Whether to filter for areas of a specific level (1 or 2). By default areas of both level 1 and level 2 areas may be included in the response, if present in the search results.',
+    type: Number,
+    required: false,
+    example: '?level=2',
+  })
   @Get('/countries/:countryId/administrative-areas')
   async findAllAdminAreasInGivenCountry(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Param('countryId') countryId: string,
+    @Query(
+      'level',
+      new ParseIntPipe(),
+      new ValidationPipe({ expectedType: AdminAreaLevel }),
+    )
+    level: AdminAreaLevel,
   ): Promise<AdminAreaResult[]> {
     const results = await this.service.findAllPaginated(
       fetchSpecification,
       undefined,
       {
         countryId,
+        level,
       },
     );
     return this.service.serialize(results.data, results.metadata);
