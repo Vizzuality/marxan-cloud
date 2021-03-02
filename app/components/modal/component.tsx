@@ -67,7 +67,7 @@ export const Modal: React.FC<ModalProps> = ({
   const { modalProps } = useModal();
   const { dialogProps } = useDialog({ 'aria-label': title }, containerRef);
 
-  usePreventScroll();
+  usePreventScroll({ isDisabled: !isOpen });
 
   return (
     <>
