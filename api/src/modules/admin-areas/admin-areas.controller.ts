@@ -64,7 +64,7 @@ export class AdminAreasController {
       'Whether to filter for areas of a specific level (1 or 2). By default areas of both level 1 and level 2 areas may be included in the response, if present in the search results.',
     type: Number,
     required: false,
-    example: '?level=2',
+    example: '2',
   })
   @Get('/countries/:countryId/administrative-areas')
   async findAllAdminAreasInGivenCountry(
