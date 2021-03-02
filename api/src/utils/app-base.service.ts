@@ -103,16 +103,22 @@ export abstract class AppBaseService<
       filters,
     );
     const totalItems = entitiesAndCount[1];
+    /**
+     * @debt I don't think we should need a non-null assertion in the call to
+     * `omit()` because if we get to the first branch of the ternary operator
+     * `fetchSpecification.omitFields` must be non-null, but TS does know
+     * better.
+     */
     const entities = fetchSpecification?.omitFields?.length
       ? entitiesAndCount[0].map((e) => omit(e, fetchSpecification.omitFields!))
       : entitiesAndCount[0];
     const pageSize =
-      fetchSpecification?.pageSize ?? DEFAULT_PAGINATION.pageSize!;
+      fetchSpecification?.pageSize ?? DEFAULT_PAGINATION.pageSize;
     const meta = new PaginationMeta({
       totalPages: Math.ceil(totalItems / pageSize),
       totalItems,
       size: pageSize,
-      page: fetchSpecification?.pageNumber ?? DEFAULT_PAGINATION.pageNumber!,
+      page: fetchSpecification?.pageNumber ?? DEFAULT_PAGINATION.pageNumber,
     });
 
     return { data: entities, metadata: meta };
