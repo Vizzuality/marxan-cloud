@@ -52,11 +52,11 @@ export abstract class AppBaseService<
    */
   abstract get serializerConfig(): Record<string, unknown>;
 
-  findAll(
+  async findAll(
     fetchSpecification: FetchSpecification,
     info?: Info,
     filters: any = null,
-  ): Promise<[Entity[], number]> {
+  ): Promise<[Partial<Entity>[], number]> {
     Logger.debug(`Finding all ${this.repository.metadata.name}`);
     let query = this.repository.createQueryBuilder(this.alias);
     const _i = { ...info, fetchSpecification };
@@ -67,7 +67,22 @@ export abstract class AppBaseService<
       fetchSpecification,
     );
     Logger.debug(query.getQueryAndParameters());
-    return query.getManyAndCount();
+    const entitiesAndCount = await query.getManyAndCount();
+
+    /**
+     * Process `omitFields` - if a user specified any fields in this list,
+     * remove matching props from the items in the result set.
+     *
+     * @debt I don't think we should need a non-null assertion in the call to
+     * `omit()` because if we get to the first branch of the ternary operator
+     * `fetchSpecification.omitFields` must be non-null, but TS does know
+     * better.
+     */
+    const entities = fetchSpecification?.omitFields?.length
+      ? entitiesAndCount[0].map((e) => omit(e, fetchSpecification.omitFields!))
+      : entitiesAndCount[0];
+
+    return [entities, entitiesAndCount[1]];
   }
 
   async getSerializedData(
@@ -103,15 +118,7 @@ export abstract class AppBaseService<
       filters,
     );
     const totalItems = entitiesAndCount[1];
-    /**
-     * @debt I don't think we should need a non-null assertion in the call to
-     * `omit()` because if we get to the first branch of the ternary operator
-     * `fetchSpecification.omitFields` must be non-null, but TS does know
-     * better.
-     */
-    const entities = fetchSpecification?.omitFields?.length
-      ? entitiesAndCount[0].map((e) => omit(e, fetchSpecification.omitFields!))
-      : entitiesAndCount[0];
+    const entities = entitiesAndCount[0];
     const pageSize =
       fetchSpecification?.pageSize ?? DEFAULT_PAGINATION.pageSize;
     const meta = new PaginationMeta({
