@@ -1,11 +1,10 @@
-import { Controller, Delete, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { User } from './user.api.entity';
 import { UsersService } from './users.service';
 
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
