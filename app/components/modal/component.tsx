@@ -40,7 +40,7 @@ export interface ModalProps {
    * Size (width) of the modal
    */
   size?: 'narrow' | 'default' | 'wide';
-  children?: React.ReactNode;
+  children?: React.ReactNode | ((props: { close: () => void }) => React.ReactNode);
   /**
    * Class name to assign to the modal
    */
@@ -98,7 +98,7 @@ export const Modal: React.FC<ModalProps> = ({
                     </button>
                   </div>
                 )}
-                {children}
+                {typeof children === 'function' ? children({ close }) : children}
               </div>
             </FocusScope>
           </div>
