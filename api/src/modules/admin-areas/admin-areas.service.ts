@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -7,9 +7,31 @@ import { CreateAdminAreaDTO } from './dto/create.admin-area.dto';
 import { UpdateAdminAreaDTO } from './dto/update.admin-area.dto';
 
 import * as faker from 'faker';
-import { AppBaseService } from 'utils/app-base.service';
+import { AppBaseService, PaginationMeta } from 'utils/app-base.service';
 import { FetchSpecification, FetchUtils } from 'nestjs-base-service';
 import { omit } from 'lodash';
+
+/**
+ * Supported admin area levels (sub-national): either level 1 or level 2.
+ */
+export class AdminAreaLevel {
+  level: 1 | 2;
+}
+
+/**
+ * Possible filters for AdminAreas
+ */
+type AdminAreaFilters = {
+  /**
+   * Id of parent country if filtering admin areas by parent country.
+   */
+  countryId: string;
+
+  /**
+   * Id of level 1 area if filtering level 2 admin areas by parent level 1 area.
+   */
+  level2AreaByArea1Id: string;
+} & AdminAreaLevel;
 
 @Injectable()
 export class AdminAreasService extends AppBaseService<
@@ -50,13 +72,30 @@ export class AdminAreasService extends AppBaseService<
 
   setFilters(
     query: SelectQueryBuilder<AdminArea>,
-    filters: any,
+    filters: AdminAreaFilters,
     _info?: AppInfoDTO,
   ): SelectQueryBuilder<AdminArea> {
     if (filters.countryId) {
       query.andWhere(`"${this.alias}"."gid_0" = :countryId`, {
         countryId: filters.countryId,
       });
+    }
+
+    if (filters.level2AreaByArea1Id) {
+      query.andWhere(
+        `${this.alias}.gid1 = :parentLevel1AreaId AND ${this.alias}.gid2 IS NOT NULL`,
+        { parentLevel1AreaId: filters.level2AreaByArea1Id },
+      );
+    }
+
+    if (filters?.level === 2) {
+      query.andWhere(`${this.alias}.gid2 IS NOT NULL`);
+    }
+
+    if (filters?.level === 1) {
+      query.andWhere(
+        `${this.alias}.gid1 IS NOT NULL AND ${this.alias}.gid2 IS NULL`,
+      );
     }
 
     return query;
