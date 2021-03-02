@@ -84,39 +84,6 @@ export abstract class AppBaseService<
    */
   abstract get serializerConfig(): JSONAPISerializerConfig<Entity>;
 
-  async findAll(
-    fetchSpecification: FetchSpecification,
-    info?: Info,
-    filters: any = null,
-  ): Promise<[Partial<Entity>[], number]> {
-    Logger.debug(`Finding all ${this.repository.metadata.name}`);
-    let query = this.repository.createQueryBuilder(this.alias);
-    const _i = { ...info, fetchSpecification };
-    query = this.setFilters(query, filters, info);
-    query = FetchUtils.processFetchSpecification(
-      query,
-      this.alias,
-      fetchSpecification,
-    );
-    Logger.debug(query.getQueryAndParameters());
-    const entitiesAndCount = await query.getManyAndCount();
-
-    /**
-     * Process `omitFields` - if a user specified any fields in this list,
-     * remove matching props from the items in the result set.
-     *
-     * @debt I don't think we should need a non-null assertion in the call to
-     * `omit()` because if we get to the first branch of the ternary operator
-     * `fetchSpecification.omitFields` must be non-null, but TS does know
-     * better.
-     */
-    const entities = fetchSpecification?.omitFields?.length
-      ? entitiesAndCount[0].map((e) => omit(e, fetchSpecification.omitFields!))
-      : entitiesAndCount[0];
-
-    return [entities, entitiesAndCount[1]];
-  }
-
   async getSerializedData(
     data: Partial<Entity> | (Partial<Entity> | undefined)[],
     meta?: PaginationMeta,
