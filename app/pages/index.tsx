@@ -22,12 +22,54 @@ const Home: React.FC = () => {
         <Button
           theme="primary"
           size="base"
-          onClick={() => addToast(null, 'hola!', {
+          onClick={() => addToast(null, (
+            <h2 className="font-medium">Project saved successfully!!</h2>
+          ), {
             level: 'success',
           })}
         >
-          Hey!
+          Success
         </Button>
+
+        <Button
+          theme="primary"
+          size="base"
+          onClick={() => addToast(null, (
+            <h2 className="font-medium">Error!</h2>
+          ), {
+            level: 'error',
+          })}
+        >
+          Error
+        </Button>
+
+        <Button
+          theme="primary"
+          size="base"
+          onClick={() => addToast(null, (
+            <h2 className="font-medium">Warning!</h2>
+          ), {
+            level: 'warning',
+          })}
+        >
+          Warning
+        </Button>
+
+        <Button
+          theme="primary"
+          size="base"
+          onClick={() => addToast(null, (
+            <div>
+              <h2 className="font-medium">Info!</h2>
+              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+            </div>
+          ), {
+            level: 'info',
+          })}
+        >
+          Info
+        </Button>
+
       </main>
     </>
   );

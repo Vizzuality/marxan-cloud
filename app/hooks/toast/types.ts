@@ -5,7 +5,7 @@ export type ToastContent = ReactNode | string;
 export interface ToastItemOptionsProps {
   level: Level;
   autoDismiss?: boolean;
-  onDismiss?: (options: ToastItemProps) => void;
+  onDismiss?: (id: string) => void;
 }
 
 export interface ToastItemProps extends ToastItemOptionsProps {
@@ -16,11 +16,11 @@ export interface ToastItemProps extends ToastItemOptionsProps {
 export interface ToastContainerProps {
   children: ReactNode;
   placement: Placement;
-  hasToasts: boolean;
 }
 
 export interface ToastContextProps {
   add: (id: string, content: ToastContent, options: ToastItemOptionsProps) => void;
+  remove: (id: string) => void;
   toasts: ToastItemProps[];
 }
 

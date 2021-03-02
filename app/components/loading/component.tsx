@@ -3,7 +3,7 @@ import cx from 'classnames';
 
 import Icon from 'components/icon';
 import LOADING_SVG from 'svgs/ui/loading.svg?sprite';
-import { useTransition, animated } from 'react-spring';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export interface LoadingProps {
   visible?: boolean;
@@ -16,26 +16,26 @@ export const Loading: React.FC<LoadingProps> = ({
   className = 'absolute',
   iconClassName = 'w-5 h-5',
 }: LoadingProps) => {
-  const transitions = useTransition(visible, null, {
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
-  });
+  const variants = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
 
   return (
-    <>
-      {transitions.map(({ item, key, props }) => item && (
-        <animated.div
-          key={key}
-          style={props}
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          key="loading"
+          {...variants}
           className={cx({
             [className]: !!className,
           })}
         >
           <Icon icon={LOADING_SVG} className={iconClassName} />
-        </animated.div>
-      ))}
-    </>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
