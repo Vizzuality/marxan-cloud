@@ -1,4 +1,8 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -150,7 +154,7 @@ export class AdminAreasService extends AppBaseService<
         level2AreaByArea1Id: parentAreaId,
       });
     } else {
-      throw new NotFoundException(
+      throw new BadRequestException(
         'Lookup of subdivisions is only supported for level 1 admin areas.',
       );
     }
