@@ -32,4 +32,5 @@ const Template: Story<ModalProps> = ({ ...args }: ModalProps) => (
 export const Default: Story<ModalProps> = Template.bind({});
 Default.args = {
   title: 'Modal component',
+  dismissable: true,
 };
