@@ -14,7 +14,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 }: TooltipProps) => {
   const springConfig = { damping: 15, stiffness: 300 };
   const opacity = useSpring(0, springConfig);
-  const scale = useSpring(0.75, springConfig);
+  const scale = useSpring(0.95, springConfig);
 
   function onMount() {
     scale.set(1);
@@ -23,13 +23,13 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   function onHide({ unmount }) {
     const cleanup = scale.onChange((value) => {
-      if (value <= 0.75) {
+      if (value <= 0.95) {
         cleanup();
         unmount();
       }
     });
 
-    scale.set(0.75);
+    scale.set(0.95);
     opacity.set(0);
   }
 

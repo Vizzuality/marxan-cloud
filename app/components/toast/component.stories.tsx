@@ -9,7 +9,10 @@ export default {
 };
 
 const Template: Story<ToastProps> = (args: ToastProps) => (
-  <Toast {...args} />
+  <Toast
+    key={args.level}
+    {...args}
+  />
 );
 
 export const Default = Template.bind({});
