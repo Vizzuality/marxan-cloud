@@ -1,10 +1,10 @@
 import React from 'react';
 import cx from 'classnames';
 
-import THEME from 'components/dropdowns/constants/theme';
-import { DropdownMenuProps } from 'components/dropdowns/types';
+import THEME from 'components/forms/select/constants/theme';
+import { SelectMenuProps } from 'components/forms/select/types';
 
-export const DropdownMenu: React.FC<DropdownMenuProps> = ({
+export const SelectMenu: React.FC<SelectMenuProps> = ({
   theme,
   opened,
   attributes,
@@ -12,7 +12,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   children,
   onFocus,
   onBlur,
-}: DropdownMenuProps) => {
+}: SelectMenuProps) => {
   return (
     <div
       {...getMenuProps({
@@ -30,4 +30,4 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   );
 };
 
-export default DropdownMenu;
+export default SelectMenu;
