@@ -1,4 +1,4 @@
-import React, { cloneElement } from 'react';
+import React, { cloneElement, useCallback } from 'react';
 import cx from 'classnames';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import {
@@ -45,6 +45,11 @@ export interface ModalProps {
    * Class name to assign to the modal
    */
   className?: string;
+  /**
+   * Callback executed when the modal is dismissed by clicking on the overlay, the close button or
+   * pressing the escape key
+   */
+  onDismiss?: () => void;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -54,15 +59,26 @@ export const Modal: React.FC<ModalProps> = ({
   size = 'default',
   children,
   className,
+  onDismiss,
 }: ModalProps) => {
   const { isOpen, close, open } = useOverlayTriggerState({});
+
+  const onOpen = useCallback(() => open(), [open]);
+
+  const onClose = useCallback((isDismissing = true) => {
+    close();
+
+    if (isDismissing && onDismiss) {
+      onDismiss();
+    }
+  }, [close, onDismiss]);
 
   const containerRef = React.useRef();
   const { overlayProps } = useOverlay({
     isKeyboardDismissDisabled: !dismissable,
     isDismissable: dismissable,
     isOpen,
-    onClose: close,
+    onClose,
   }, containerRef);
   const { modalProps } = useModal();
   const { dialogProps } = useDialog({ 'aria-label': title }, containerRef);
@@ -71,7 +87,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <>
-      {cloneElement(trigger, { onClick: open })}
+      {cloneElement(trigger, { onClick: onOpen })}
       {isOpen && (
         <OverlayContainer>
           <div className={cx({ [OVERLAY_CLASSES]: true })}>
@@ -87,7 +103,7 @@ export const Modal: React.FC<ModalProps> = ({
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={close}
+                      onClick={onClose}
                       className="absolute top-0 right-0 text-sm text-gray-300 focus:text-black hover:text-black"
                     >
                       Close
@@ -98,7 +114,7 @@ export const Modal: React.FC<ModalProps> = ({
                     </button>
                   </div>
                 )}
-                {typeof children === 'function' ? children({ close }) : children}
+                {typeof children === 'function' ? children({ close: () => onClose(false) }) : children}
               </div>
             </FocusScope>
           </div>
