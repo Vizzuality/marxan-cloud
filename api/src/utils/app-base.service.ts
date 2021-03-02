@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
 import { DEFAULT_PAGINATION } from 'nestjs-base-service';
+import { omit } from 'lodash';
 
 export class PaginationMeta {
   totalPages: number;
@@ -33,7 +34,7 @@ export class PaginationMeta {
 }
 
 export abstract class AppBaseService<
-  Entity,
+  Entity extends object,
   CreateModel,
   UpdateModel,
   Info
@@ -70,7 +71,7 @@ export abstract class AppBaseService<
   }
 
   async getSerializedData(
-    data: Partial<Entity> | Partial<Entity[]>,
+    data: Partial<Entity> | (Partial<Entity> | undefined)[],
     meta?: PaginationMeta,
   ) {
     const serializer = new JSONAPISerializer.Serializer(this.pluralAlias, {
@@ -82,26 +83,36 @@ export abstract class AppBaseService<
   }
 
   async serialize(
-    entities: Partial<Entity> | Partial<Entity[]>,
+    entities: Partial<Entity> | (Partial<Entity> | undefined)[],
     paginationMeta?: PaginationMeta,
   ): Promise<any> {
     return this.getSerializedData(entities, paginationMeta);
   }
 
   async findAllPaginated(
-    pagination: FetchSpecification,
+    fetchSpecification: FetchSpecification,
     info?: Info,
     filters?: Record<string, unknown>,
-  ): Promise<{ data: Entity[]; metadata: PaginationMeta }> {
-    const entitiesAndCount = await this.findAll(pagination, info, filters);
+  ): Promise<{
+    data: (Partial<Entity> | undefined)[];
+    metadata: PaginationMeta;
+  }> {
+    const entitiesAndCount = await this.findAll(
+      fetchSpecification,
+      info,
+      filters,
+    );
     const totalItems = entitiesAndCount[1];
-    const entities = entitiesAndCount[0];
-    const pageSize = pagination?.pageSize ?? DEFAULT_PAGINATION.pageSize!;
+    const entities = fetchSpecification?.omitFields?.length
+      ? entitiesAndCount[0].map((e) => omit(e, fetchSpecification.omitFields!))
+      : entitiesAndCount[0];
+    const pageSize =
+      fetchSpecification?.pageSize ?? DEFAULT_PAGINATION.pageSize!;
     const meta = new PaginationMeta({
       totalPages: Math.ceil(totalItems / pageSize),
       totalItems,
       size: pageSize,
-      page: pagination?.pageNumber ?? DEFAULT_PAGINATION.pageNumber!,
+      page: fetchSpecification?.pageNumber ?? DEFAULT_PAGINATION.pageNumber!,
     });
 
     return { data: entities, metadata: meta };
