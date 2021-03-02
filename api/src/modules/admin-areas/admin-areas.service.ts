@@ -76,7 +76,7 @@ export class AdminAreasService extends AppBaseService<
     _info?: AppInfoDTO,
   ): SelectQueryBuilder<AdminArea> {
     if (filters.countryId) {
-      query.andWhere(`"${this.alias}"."gid_0" = :countryId`, {
+      query.andWhere(`${this.alias}.gid0 = :countryId`, {
         countryId: filters.countryId,
       });
     }
