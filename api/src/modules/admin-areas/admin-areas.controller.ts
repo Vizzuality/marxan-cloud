@@ -88,6 +88,29 @@ export class AdminAreasController {
     return this.service.serialize(results.data, results.metadata);
   }
 
+  @ApiOperation({
+    description: 'Find administrative areas that are children of a given one.',
+  })
+  @ApiOkResponse({ type: AdminAreaResult })
+  @JSONAPIQueryParams()
+  @ApiParam({
+    name: 'areaId',
+    description: 'Parent admin area (gid)',
+    type: String,
+    required: true,
+  })
+  @Get('/administrative-areas/:areaId/subdivisions')
+  async findAllChildrenAdminAreas(
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Param('areaId') areaId: string,
+  ): Promise<AdminAreaResult[]> {
+    const results = await this.service.getChildrenAdminAreas(
+      fetchSpecification,
+      areaId,
+    );
+    return await this.service.serialize(results.data, results.metadata);
+  }
+
   @ApiOperation({ description: 'Find administrative area by id' })
   @ApiOkResponse({ type: AdminAreaResult })
   @JSONAPIQueryParams()
