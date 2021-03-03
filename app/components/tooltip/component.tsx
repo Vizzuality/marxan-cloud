@@ -1,18 +1,16 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 
-import Tippy, { TippyProps } from '@tippyjs/react/headless';
+import Tippy from '@tippyjs/react/headless';
 import { useSpring, motion } from 'framer-motion';
+import { SpringOptions } from 'popmotion';
 
 import Arrow from './arrow';
-
-export interface TooltipProps extends TippyProps {
-  children: ReactElement;
-}
+import { TooltipProps } from './types';
 
 export const Tooltip: React.FC<TooltipProps> = ({
   children, content, arrow, ...props
 }: TooltipProps) => {
-  const springConfig = { damping: 15, stiffness: 300 };
+  const springConfig: SpringOptions = { damping: 15, stiffness: 300 };
   const opacity = useSpring(0, springConfig);
   const scale = useSpring(0.95, springConfig);
 
