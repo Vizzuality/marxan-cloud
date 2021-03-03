@@ -33,7 +33,16 @@ export class ProjectsService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<Project> {
     return {
-      attributes: ['name', 'description', 'users'],
+      attributes: [
+        'name',
+        'description',
+        'users',
+        'countryId',
+        'adminAreaLevel1Id',
+        'adminAreaLevel2Id',
+        'planningUnitGridShape',
+        'planningUnitAreakm2',
+      ],
       keyForAttribute: 'camelCase',
       users: {
         ref: 'id',
@@ -49,8 +58,6 @@ export class ProjectsService extends AppBaseService<
           'name',
           'description',
           'type',
-          'country',
-          'extent',
           'wdpaFilter',
           'wdpaThreshold',
           'adminRegionId',
