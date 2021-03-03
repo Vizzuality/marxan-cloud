@@ -27,6 +27,9 @@ Unreleased
 - Strict typing for JSON:API serializable field sets
 - Support for omitting specific fields from getAll results (blocklisting) where
   a whitelisting approach is not desirable/practical.
+- Projects
+  - handle planning unit grid shape, planning unit area, L1 and L2 admin area
+    ids.
 
 ### Changed
 
