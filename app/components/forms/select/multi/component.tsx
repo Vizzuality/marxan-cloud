@@ -20,6 +20,7 @@ import { SelectProps, SelectOptionProps } from 'components/forms/select/types';
 export const MultiSelect: React.FC<SelectProps> = ({
   theme = 'dark',
   size = 'base',
+  maxHeight = 300,
   status,
   prefix,
   options = [],
@@ -253,13 +254,16 @@ export const MultiSelect: React.FC<SelectProps> = ({
             {isOpen && (
               <ul
                 className={cx({
-                  'py-1 focus:outline-none': true,
+                  'py-1 focus:outline-none overflow-y-auto overflow-x-hidden': true,
                 })}
+                style={{
+                  maxHeight,
+                }}
               >
                 {getOptions.map((option, index) => (
                   <li
                     className={cx({
-                      'px-4 py-1 mt-0.5 cursor-pointer': true,
+                      'px-4 py-1 mt-0.5 cursor-pointer relative': true,
                       [THEME[theme].item.base]: highlightedIndex !== index,
                       [THEME[theme].item.disabled]: option.disabled,
                       [THEME[theme].item.highlighted]: (
@@ -280,7 +284,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
 
                     {option.checkbox && (
                       <Checkbox
-                        className="absolute bg-opacity-0 left-4"
+                        className="absolute bg-opacity-0 left-4 top-1.5"
                         checked={isSelected(option, selectedItems)}
                         disabled={option.disabled}
                         onChange={() => {}}
