@@ -33,7 +33,16 @@ export class UsersService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<User> {
     return {
-      attributes: ['displayName', 'fname', 'lname', 'email'],
+      attributes: [
+        'fname',
+        'lname',
+        'email',
+        'displayName',
+        'avatarDataUrl',
+        'isActive',
+        'isDeleted',
+        'metadata',
+      ],
       keyForAttribute: 'camelCase',
     };
   }
