@@ -42,6 +42,15 @@ export class User {
   @Column('character varying')
   lname: string | null;
 
+  /**
+   * User avatar, stored as data url.
+   *
+   * For example: `data:image/gif;base64,<base64-encoded image binary data>
+   */
+  @ApiPropertyOptional()
+  @Column('character varying', { name: 'avatar_data_url' })
+  avatarDataUrl?: string;
+
   @Column('character varying', { name: 'password_hash' })
   passwordHash: string;
 
