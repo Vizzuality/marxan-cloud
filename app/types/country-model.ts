@@ -6,4 +6,10 @@ export interface Country {
 export interface Region {
   name: string;
   id: string;
+  level: RegionLevel;
+}
+
+export enum RegionLevel {
+  ONE = 1,
+  TWO = 2,
 }

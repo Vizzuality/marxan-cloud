@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import { RegionLevel } from 'types/country-model';
+
 import { useCountries, useCountryRegions } from 'hooks/countries';
 
 import Loading from 'components/loading';
@@ -18,7 +20,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
   } = useCountries({ includeAll: true });
   const {
     data: regionsData, isFetching: isFetchingRegions, isFetched: isFetchedRegions,
-  } = useCountryRegions({ id: selectedCountry?.id, includeAll: true });
+  } = useCountryRegions({ id: selectedCountry?.id, includeAll: true, level: RegionLevel.ONE });
 
   const handleCountryChange = (value) => {
     setSelectedCountry(value);
