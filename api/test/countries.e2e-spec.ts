@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, Logger } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { JSONAPICountryData } from 'modules/countries/country.geo.entity';
+import { JSONAPIAdminAreaData } from 'modules/admin-areas/admin-area.geo.entity';
 
 describe('CountriesModule (e2e)', () => {
   let app: INestApplication;
@@ -16,6 +17,7 @@ describe('CountriesModule (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
     await app.init();
 
     const response = await request(app.getHttpServer())
@@ -35,6 +37,8 @@ describe('CountriesModule (e2e)', () => {
 
   describe('Countries', () => {
     let aCountry: JSONAPICountryData;
+    let aLevel1AdminArea: JSONAPIAdminAreaData;
+    const countryCodeForTests = 'ESP';
 
     it('Should list countries (paginated; pages of up to 25 items, no explicit page number - should default to 1)', async () => {
       const response = await request(app.getHttpServer())
@@ -53,7 +57,7 @@ describe('CountriesModule (e2e)', () => {
     it('Should list administrative areas within a given country', async () => {
       const response = await request(app.getHttpServer())
         .get(
-          `/api/v1/countries/${aCountry.attributes.gid0}/administrative-areas?page[size]=25`,
+          `/api/v1/countries/${countryCodeForTests}/administrative-areas?page[size]=25`,
         )
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
@@ -62,6 +66,55 @@ describe('CountriesModule (e2e)', () => {
       expect(resources[0].type).toBe('admin_areas');
       expect(resources.length).toBeLessThanOrEqual(25);
       expect(resources.length).toBeGreaterThanOrEqual(1);
+    });
+
+
+    it('Should throw a 400 error if filtering by level other than 1 or 2', async () => {
+      const response = await request(app.getHttpServer())
+        .get(
+          `/api/v1/countries/${countryCodeForTests}/administrative-areas?level=3`,
+        )
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(400);
+    });
+
+    it('When listing admin areas within a country by level 1, only level 1 areas should be returned', async () => {
+      const response = await request(app.getHttpServer())
+        /**
+         * Currently no country has more than 6000 between level 1 and level 2
+         * areas, so we set that as limit to make sure we would get all the
+         * areas in case the filter by level would not work anymore.
+         * We also omit `theGeom` to keep payloads smaller.
+         */
+        .get(
+          `/api/v1/countries/${countryCodeForTests}/administrative-areas?level=1&page[size]=6000&omitFields=theGeom`,
+        )
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources: JSONAPIAdminAreaData[] = response.body.data;
+      console.log(resources);
+      aLevel1AdminArea = resources[0];
+      // We (try to) select all the response items whose gid2 is set (these
+      // would be level 2 areas).
+      const level2Areas = resources.filter(e => e?.attributes?.gid2);
+      // And we expect to have none.
+      expect(level2Areas.length).toBe(0);
+      expect(resources[0].type).toBe('admin_areas');
+      expect(resources.length).toBeLessThanOrEqual(6000);
+      expect(resources.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('Should list level 2 areas within a given level 1 area', async () => {
+      const response = await request(app.getHttpServer())
+        .get(
+          `/api/v1/administrative-areas/${aLevel1AdminArea.attributes.gid1}/subdivisions?omitFields=theGeom`,
+        )
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources = response.body.data;
+      expect(resources[0].type).toBe('admin_areas');
     });
   });
 });
