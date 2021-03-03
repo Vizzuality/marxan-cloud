@@ -114,3 +114,19 @@ export class User {
   @OneToMany((_type) => IssuedAuthnToken, (token) => token.userId)
   issuedAuthnTokens: IssuedAuthnToken[];
 }
+
+export class JSONAPIUserData {
+  @ApiProperty()
+  type = userResource.name.plural;
+
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  attributes: User;
+}
+
+export class UserResult {
+  @ApiProperty()
+  data: JSONAPIUserData;
+}
