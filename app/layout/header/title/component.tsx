@@ -144,7 +144,7 @@ export const Title: React.FC<TitleProps> = () => {
                         placement="bottom"
                         disabled={meta.active}
                         content={(
-                          <div className="px-2 py-1">
+                          <div className="px-2 py-1 text-gray-500 bg-white rounded">
                             <span>Edit name</span>
                           </div>
                         )}
@@ -190,7 +190,7 @@ export const Title: React.FC<TitleProps> = () => {
                         placement="bottom"
                         disabled={meta.active}
                         content={(
-                          <div className="px-2 py-1">
+                          <div className="px-2 py-1 text-gray-500 bg-white rounded">
                             <span>Edit name</span>
                           </div>
                           )}
