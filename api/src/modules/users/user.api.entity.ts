@@ -62,7 +62,7 @@ export class User {
    */
   @ApiPropertyOptional()
   @Column('jsonb')
-  metadata: Dictionary<string>;
+  metadata?: Dictionary<string>;
 
   /**
    * Whether this user is active (email is confirmed).
