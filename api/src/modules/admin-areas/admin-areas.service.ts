@@ -159,7 +159,7 @@ export class AdminAreasService extends AppBaseService<
     parentAreaId: string,
   ): Promise<{
     data: (AdminArea | Partial<AdminArea> | undefined)[];
-    metadata: PaginationMeta;
+    metadata: PaginationMeta | undefined;
   }> {
     if (this.isLevel1AreaId(parentAreaId)) {
       return this.findAllPaginated(fetchSpecification, undefined, {

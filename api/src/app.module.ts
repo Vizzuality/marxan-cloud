@@ -16,7 +16,7 @@ import { UsersModule } from './modules/users/users.module';
 import { GeoModule } from 'modules/geo/geo.module';
 import { apiConnections } from './ormconfig';
 import { OrganizationsModule } from 'modules/organizations/organizations.module';
-import { PaginationMiddleware } from 'middleware/pagination.middleware';
+import { FetchSpecificationMiddleware } from 'nestjs-base-service';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from 'filters/all-exceptions.exception.filter';
 import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
@@ -56,7 +56,7 @@ export class AppModule implements NestModule {
    */
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(PaginationMiddleware)
+      .apply(FetchSpecificationMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.GET });
   }
 }
