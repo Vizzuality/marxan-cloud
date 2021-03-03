@@ -64,6 +64,7 @@ export class AdminAreasService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<AdminArea> {
     return {
+      transform: (item: AdminArea) => ({ ...item, id: item.gid2 ?? item.gid1 }),
       attributes: [
         'gid0',
         'name0',
