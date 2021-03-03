@@ -46,7 +46,7 @@ export function useCountries(filters: UseCountriesProps): UseCountriesResponse {
 
 export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegionsResponse {
   const { user } = useAuth();
-  const { includeAll, id } = props;
+  const { includeAll, id, level } = props;
 
   console.log('id', id);
 
@@ -54,7 +54,8 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
     method: 'GET',
     url: `/${id}/administrative-areas`,
     params: {
-      'page[size]': includeAll ? 0 : 25,
+      'page[size]': includeAll ? 6000 : 25,
+      level,
     },
     headers: {
       Authorization: `Bearer ${user.token}`,
@@ -72,6 +73,7 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
     const regions: Region[] = parsedData.map((r) => ({
       name: r.name1,
       id: r.id,
+      level: 1,
     }));
 
     return {
