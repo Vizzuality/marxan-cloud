@@ -1,4 +1,10 @@
-import { ForbiddenException, forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotImplementedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { User, userResource } from './user.api.entity';
@@ -128,5 +134,31 @@ export class UsersService extends AppBaseService<
     throw new ForbiddenException(
       'Updating the password is not allowed: the password provided for validation as current one does not match the actual current password. If you have forgotten your password, try resetting it instead.',
     );
+  }
+
+  /**
+   * Validate that an update request can be fulfilled.
+   *
+   * - we enforce updating passwords via a separate route (`PATCH
+   *   /api/v1/users/me/password`)
+   * - @debt also we don't allow updating the user's email address at this stage
+   *   (pending implementation of email verification)
+   */
+  async validateBeforeUpdate(
+    id: string,
+    updateModel: UpdateUserDTO,
+    info?: AppInfoDTO,
+  ): Promise<void> {
+    if (updateModel.password) {
+      throw new ForbiddenException(
+        "The user's password cannot be updated alongside other user data: please use the API endpoint for password updates.",
+      );
+    }
+
+    if (updateModel.email) {
+      throw new NotImplementedException(
+        "Updating a user's email address is not supported yet. This will be allowed once email address verification is implemented.",
+      );
+    }
   }
 }
