@@ -1,5 +1,15 @@
-import { Controller, Delete, Get, Request, UseGuards } from '@nestjs/common';
-import { User } from './user.api.entity';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Request,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
+import { User, userResource, UserResult } from './user.api.entity';
 import { UsersService } from './users.service';
 
 import {
@@ -15,23 +25,15 @@ import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { RequestWithAuthenticatedUser } from 'app.controller';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
-import { BaseServiceResource } from 'types/resource.interface';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-
-const resource: BaseServiceResource = {
-  className: 'User',
-  name: {
-    singular: 'user',
-    plural: 'users',
-  },
-};
+import { UpdateUserDTO } from './dto/update.user.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(resource.className)
+@ApiTags(userResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/users`)
 export class UsersController {
   constructor(public readonly service: UsersService) {}
