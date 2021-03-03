@@ -5,11 +5,7 @@ import Icon from 'components/icon';
 import LOADING_SVG from 'svgs/ui/loading.svg?sprite';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export interface LoadingProps {
-  visible?: boolean;
-  className?: string;
-  iconClassName?: string;
-}
+import { LoadingProps } from './types';
 
 export const Loading: React.FC<LoadingProps> = ({
   visible = false,
