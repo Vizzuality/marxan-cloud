@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { User } from './user.api.entity';
+import { User, userResource } from './user.api.entity';
 
 import { get } from 'lodash';
 import { CreateUserDTO } from './dto/create.user.dto';
@@ -28,7 +28,7 @@ export class UsersService extends AppBaseService<
     @Inject(forwardRef(() => AuthenticationService))
     private readonly authenticationService: AuthenticationService,
   ) {
-    super(repository, 'user', 'users');
+    super(repository, userResource.name.singular, userResource.name.plural);
   }
 
   get serializerConfig(): JSONAPISerializerConfig<User> {

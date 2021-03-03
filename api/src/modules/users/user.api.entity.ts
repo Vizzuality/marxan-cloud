@@ -11,6 +11,15 @@ import {
 } from 'typeorm';
 import { Project } from 'modules/projects/project.api.entity';
 import { Scenario } from 'modules/scenarios/scenario.api.entity';
+import { BaseServiceResource } from 'types/resource.interface';
+
+export const userResource: BaseServiceResource = {
+  className: 'User',
+  name: {
+    singular: 'user',
+    plural: 'users',
+  },
+};
 
 @Entity('users')
 export class User {
