@@ -9,9 +9,10 @@ import Loading from 'components/loading';
 import Item from 'components/projects/item';
 import Modal from 'components/modal';
 import Button from 'components/button';
-
-import { useProjects } from 'hooks/projects';
 import Icon from 'components/icon';
+
+import { useProjects, useDeleteProject } from 'hooks/projects';
+import { useToasts } from 'hooks/toast';
 
 import DELETE_PROJECT from 'svgs/projects/delete-project.svg?sprite';
 
@@ -20,10 +21,44 @@ import { ProjectsListProps } from './types';
 export const ProjectsList: React.FC<ProjectsListProps> = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [projectToBeDeleted, setProjectToBeDeleted] = useState<string>(null);
+
   const { search } = useSelector((state) => state['/projects']);
+  const { addToast } = useToasts();
+
   const {
     data, isFetching, isFetched,
   } = useProjects({ search });
+
+  const deleteProjectMutation = useDeleteProject({});
+  const handleDeleteConfirmation = () => {
+    deleteProjectMutation.mutate(projectToBeDeleted, {
+      onSuccess: ({ data: d }) => {
+        console.log('onSuccess', d);
+
+        addToast('success-delete-project', (
+          <>
+            <p className="text-sm">
+              {`The project with id: ${projectToBeDeleted} was successfully deleted`}
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
+      },
+      onError: () => {
+        addToast('error-delete-project', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              {`There was an error deleting the project with id: ${projectToBeDeleted}`}
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  };
 
   return (
     <Wrapper>
@@ -80,9 +115,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
               theme="primary"
               size="lg"
               className="ml-4 w-28"
-              onClick={() => {
-                console.log('delete', projectToBeDeleted);
-              }}
+              onClick={handleDeleteConfirmation}
             >
               Yes
             </Button>

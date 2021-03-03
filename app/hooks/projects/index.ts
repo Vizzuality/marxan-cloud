@@ -3,10 +3,10 @@ import { useMemo } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { useAuth } from 'hooks/authentication';
 
-import { ItemProps } from 'components/projects/item/component';
+import { ItemProps } from 'components/projects/item/types';
 
 import PROJECTS from 'services/projects';
-import { UseSaveProjectProps } from './types';
+import { UseSaveProjectProps, UseDeleteProjectProps } from './types';
 
 export function useProjects(filters) {
   const { user } = useAuth();
@@ -102,6 +102,33 @@ export function useSaveProject({
       method: 'POST',
       url: '/',
       data,
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+      ...requestConfig,
+    });
+  }, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeleteProject({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseDeleteProjectProps) {
+  const { user } = useAuth();
+
+  return useMutation((id: string) => {
+    return PROJECTS.request({
+      method: 'DELETE',
+      url: `/${id}`,
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
