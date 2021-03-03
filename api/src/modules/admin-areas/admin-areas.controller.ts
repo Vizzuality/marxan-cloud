@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Query,
-  UseGuards,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { AdminAreaResult } from './admin-area.geo.entity';
 import { AdminAreaLevel, AdminAreasService } from './admin-areas.service';
 import {

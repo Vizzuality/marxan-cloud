@@ -1,23 +1,14 @@
-import {
-  BaseService,
-  FetchSpecification,
-  FetchUtils,
-} from 'nestjs-base-service';
+import { BaseService, FetchSpecification } from 'nestjs-base-service';
 
 import JSONAPISerializer = require('jsonapi-serializer');
 import { Repository } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Logger } from '@nestjs/common';
 import { DEFAULT_PAGINATION } from 'nestjs-base-service';
-import { omit } from 'lodash';
 
 export class PaginationMeta {
   totalPages: number;
-
   totalItems: number;
-
   size: number;
-
   page: number;
 
   constructor(paginationMeta: {
