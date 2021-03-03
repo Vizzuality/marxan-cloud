@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import cx from 'classnames';
 
 import { useSelector } from 'react-redux';
@@ -7,14 +7,19 @@ import Wrapper from 'layout/wrapper';
 
 import Loading from 'components/loading';
 import Item from 'components/projects/item';
+import Modal from 'components/modal';
+import Button from 'components/button';
 
 import { useProjects } from 'hooks/projects';
+import Icon from 'components/icon';
 
-export interface ProjectsListProps {
+import DELETE_PROJECT from 'svgs/projects/delete-project.svg?sprite';
 
-}
+import { ProjectsListProps } from './types';
 
 export const ProjectsList: React.FC<ProjectsListProps> = () => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [projectToBeDeleted, setProjectToBeDeleted] = useState<string>(null);
   const { search } = useSelector((state) => state['/projects']);
   const {
     data, isFetching, isFetched,
@@ -35,7 +40,16 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
           })}
         >
           {data.map((d) => {
-            return <Item key={`${d.id}`} {...d} />;
+            return (
+              <Item
+                key={`${d.id}`}
+                {...d}
+                onDelete={() => {
+                  setProjectToBeDeleted(d.id);
+                  setShowDeleteModal(true);
+                }}
+              />
+            );
           })}
         </div>
       )}
@@ -45,6 +59,40 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
           No projects found
         </div>
       )}
+      <Modal
+        open={showDeleteModal}
+        title="Are you sure you want to delete this project?"
+        onClose={() => setShowDeleteModal(false)}
+        className="max-w-lg"
+      >
+        <h1 className="text-xl text-black w-60">Are you sure you want to delete this project?</h1>
+        <div className="flex items-end justify-between">
+          <div className="flex h-12">
+            <Button
+              theme="secondary"
+              size="lg"
+              className="w-28"
+              onClick={() => setShowDeleteModal(false)}
+            >
+              No
+            </Button>
+            <Button
+              theme="primary"
+              size="lg"
+              className="ml-4 w-28"
+              onClick={() => {
+                console.log('delete', projectToBeDeleted);
+              }}
+            >
+              Yes
+            </Button>
+          </div>
+          <Icon
+            icon={DELETE_PROJECT}
+            className="w-24 h-24"
+          />
+        </div>
+      </Modal>
     </Wrapper>
   );
 };

@@ -48,9 +48,11 @@ export interface ModalProps {
 
 // appElement is the root of the Next application
 // In Storybook, this element doesn't exist hence the condition
-const appElement = document.querySelector('#__next');
-if (appElement) {
-  ReactModal.setAppElement(appElement);
+if (typeof document !== 'undefined') {
+  const appElement = document.querySelector('#__next');
+  if (appElement) {
+    ReactModal.setAppElement(appElement);
+  }
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -81,7 +83,7 @@ export const Modal: React.FC<ModalProps> = ({
         Close
         <Icon
           icon={CLOSE_SVG}
-          className="inline-block ml-2 w-4 h-4 text-black"
+          className="inline-block w-4 h-4 ml-2 text-black"
         />
       </button>
     </div>
