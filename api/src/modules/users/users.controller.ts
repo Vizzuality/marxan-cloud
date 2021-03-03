@@ -64,7 +64,7 @@ export class UsersController {
     description: 'Retrieve attributes of the current user',
   })
   @ApiResponse({
-    type: User,
+    type: UserResult,
   })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized.',
@@ -76,7 +76,7 @@ export class UsersController {
   @Get('me')
   async userMetadata(
     @Request() req: RequestWithAuthenticatedUser,
-  ): Promise<Partial<User>> {
+  ): Promise<UserResult> {
     return this.service.serialize(await this.service.getById(req.user.id));
   }
 
