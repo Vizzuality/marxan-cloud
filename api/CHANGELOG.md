@@ -24,12 +24,14 @@ Unreleased
 - Users
   - add ability to soft-delete users [MARXAN-128]
   - add endpoint to soft-delete one's own user [MARXAN-128]
+  - add ability to create and update users [MARXAN-127]
+  - add ability to change password [MARXAN-129]
 - Strict typing for JSON:API serializable field sets
 - Support for omitting specific fields from getAll results (blocklisting) where
   a whitelisting approach is not desirable/practical.
 - Projects
   - handle planning unit grid shape, planning unit area, L1 and L2 admin area
-    ids.
+    ids [MARXAN-138]
 
 ### Changed
 
