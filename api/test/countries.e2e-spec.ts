@@ -50,8 +50,6 @@ describe('CountriesModule (e2e)', () => {
       expect(resources[0].type).toBe('countries');
       expect(resources.length).toBeLessThanOrEqual(25);
       expect(resources.length).toBeGreaterThanOrEqual(1);
-
-      aCountry = resources[0];
     });
 
     it('Should list administrative areas within a given country', async () => {
@@ -68,9 +66,8 @@ describe('CountriesModule (e2e)', () => {
       expect(resources.length).toBeGreaterThanOrEqual(1);
     });
 
-
     it('Should throw a 400 error if filtering by level other than 1 or 2', async () => {
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .get(
           `/api/v1/countries/${countryCodeForTests}/administrative-areas?level=3`,
         )
@@ -97,7 +94,7 @@ describe('CountriesModule (e2e)', () => {
       aLevel1AdminArea = resources[0];
       // We (try to) select all the response items whose gid2 is set (these
       // would be level 2 areas).
-      const level2Areas = resources.filter(e => e?.attributes?.gid2);
+      const level2Areas = resources.filter((e) => e?.attributes?.gid2);
       // And we expect to have none.
       expect(level2Areas.length).toBe(0);
       expect(resources[0].type).toBe('admin_areas');
