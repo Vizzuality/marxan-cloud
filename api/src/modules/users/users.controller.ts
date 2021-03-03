@@ -73,6 +73,21 @@ export class UsersController {
     });
   }
 
+  @ApiOperation({ description: 'Update a user.' })
+  @ApiOkResponse({ type: UserResult })
+  @Patch('me')
+  async update(
+    @Body(new ValidationPipe({ forbidNonWhitelisted: true }))
+    dto: UpdateUserDTO,
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<UserResult> {
+    return this.service.serialize(
+      await this.service.update(req.user.id, dto, {
+        authenticatedUser: req.user,
+      }),
+    );
+  }
+
   @ApiOperation({
     description: 'Retrieve attributes of the current user',
   })
