@@ -30,6 +30,7 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 import { UpdateUserDTO } from './dto/update.user.dto';
+import { UpdateUserPasswordDTO } from './dto/update.user-password';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -58,6 +59,18 @@ export class UsersController {
   ): Promise<User[]> {
     const results = await this.service.findAllPaginated(fetchSpecification);
     return this.service.serialize(results.data, results.metadata);
+  }
+
+  @ApiOperation({ description: 'Update a user.' })
+  @ApiOkResponse({ type: UserResult })
+  @Patch('me/password')
+  async updateOwnPassword(
+    @Body(new ValidationPipe()) dto: UpdateUserPasswordDTO,
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    return await this.service.updateOwnPassword(req.user.id, dto, {
+      authenticatedUser: req.user,
+    });
   }
 
   @ApiOperation({
