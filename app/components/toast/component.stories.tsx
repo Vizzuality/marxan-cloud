@@ -1,6 +1,7 @@
 import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
-import Toast, { ToastProps } from './component';
+import Toast from './component';
+import { ToastProps } from './types';
 
 export default {
   title: 'Components/Toast',
