@@ -2,7 +2,6 @@ import React, {
   useCallback, useEffect, useRef,
 } from 'react';
 import cx from 'classnames';
-import { ToastItemProps } from 'hooks/toast/types';
 
 import SUCCESS_SVG from 'svgs/notifications/success.svg?sprite';
 import ERROR_SVG from 'svgs/notifications/error.svg?sprite';
@@ -15,10 +14,9 @@ import Icon from 'components/icon';
 
 import { motion, useAnimation } from 'framer-motion';
 
-export interface ToastProps extends ToastItemProps {
-}
+import { ToastProps, ToastTheme } from './types';
 
-const THEME = {
+const THEME: ToastTheme = {
   info: {
     icon: INFO_SVG,
     bg: 'from-blue-400 to-blue-500',
