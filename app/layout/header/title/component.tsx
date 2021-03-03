@@ -2,8 +2,9 @@ import React, { useCallback } from 'react';
 
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 import { useRouter } from 'next/router';
-import { useTransition, animated } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import {
@@ -17,15 +18,10 @@ export interface TitleProps {
 
 export const Title: React.FC<TitleProps> = () => {
   const { query } = useRouter();
+  const { addToast } = useToasts();
   const { pid, sid } = query;
   const { data: projectData, isLoading: projectIsLoading } = useProject(pid);
   const { data: scenarioData, isLoading: scenarioIsLoading } = useScenario(sid);
-
-  const transitions = useTransition((!projectIsLoading && !scenarioIsLoading), null, {
-    from: { opacity: 0, transform: 'translateY(-5px)' },
-    enter: { opacity: 1, transform: 'translateY(0)' },
-    leave: { opacity: 0, transform: 'translateY(-5px)' },
-  });
 
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({
@@ -48,13 +44,31 @@ export const Title: React.FC<TitleProps> = () => {
 
     saveProjectMutation.mutate(data, {
       onSuccess: ({ data: s }) => {
+        addToast('success-project-name', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Project name saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
+
         console.info('Project name saved succesfully', s);
       },
       onError: () => {
+        addToast('error-project-name', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Project name not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
+
         console.error('Project name not saved');
       },
     });
-  }, [saveProjectMutation]);
+  }, [addToast, saveProjectMutation]);
 
   // Scenario mutation and submit
   const saveScenarioMutation = useSaveScenario({
@@ -77,18 +91,39 @@ export const Title: React.FC<TitleProps> = () => {
 
     saveScenarioMutation.mutate(data, {
       onSuccess: ({ data: s }) => {
+        addToast('save-scenario-name', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Scenario name saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
         console.info('Scenario name saved succesfully', s);
       },
       onError: () => {
-        console.error('Scenario name not saved');
+        addToast('error-scenario-name', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario name not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
       },
     });
-  }, [saveScenarioMutation]);
+  }, [addToast, saveScenarioMutation]);
 
   return (
-    <>
-      {transitions.map(({ item, key, props }) => item && (
-        <animated.div key={key} style={props} className="flex divide-x">
+    <AnimatePresence>
+      {!projectIsLoading && !scenarioIsLoading && (
+        <motion.div
+          key="project-scenario-loading"
+          className="flex divide-x"
+          initial={{ y: -10 }}
+          animate={{ y: 0 }}
+          exit={{ y: -10 }}
+        >
           {/* Project title */}
           {projectData?.name && (
             <FormRFF
@@ -158,7 +193,7 @@ export const Title: React.FC<TitleProps> = () => {
                           <div className="px-2 py-1">
                             <span>Edit name</span>
                           </div>
-                        )}
+                          )}
                       >
                         <div className="relative h-6">
                           <input
@@ -181,9 +216,9 @@ export const Title: React.FC<TitleProps> = () => {
               )}
             </FormRFF>
           )}
-        </animated.div>
-      ))}
-    </>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

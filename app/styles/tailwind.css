@@ -81,4 +81,11 @@
   .fill-none {
     fill: none;
   }
+
+  .with-stripes {
+    /* `--tw-gradient-from` is the background color and `--tw-gradient-to` is the 1px stripe line */
+    --tw-gradient-stops: var(--tw-gradient-from),
+      var(--tw-gradient-from) 0.125rem, var(--tw-gradient-to) 0.125rem,
+      var(--tw-gradient-to) 0.1875rem;
+  }
 }
