@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { User, userResource } from './user.api.entity';
@@ -13,6 +13,8 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
+import { UpdateUserPasswordDTO } from './dto/update.user-password';
+import { compare, hash } from 'bcrypt';
 import { AuthenticationService } from 'modules/authentication/authentication.service';
 
 @Injectable()
@@ -100,5 +102,31 @@ export class UsersService extends AppBaseService<
       { isDeleted: true, isActive: false },
     );
     this.authenticationService.invalidateAllTokensOfUser(userId);
+  }
+
+  /**
+   * Update a user's own password.
+   *
+   * We require a guard here - the user should be able to prove they know their
+   * current password. If they are not able to do so, they should go the 'reset
+   * password' route (@debt, this will be implemented later).
+   */
+  async updateOwnPassword(
+    userId: string,
+    currentAndNewPasswords: UpdateUserPasswordDTO,
+    info: AppInfoDTO,
+  ): Promise<void> {
+    const user = await this.getById(userId);
+    if (
+      user &&
+      (await compare(currentAndNewPasswords.currentPassword, user.passwordHash))
+    ) {
+      user.passwordHash = await hash(currentAndNewPasswords.newPassword, 10);
+      this.repository.save(user);
+      return;
+    }
+    throw new ForbiddenException(
+      'Updating the password is not allowed: the password provided for validation as current one does not match the actual current password. If you have forgotten your password, try resetting it instead.',
+    );
   }
 }
