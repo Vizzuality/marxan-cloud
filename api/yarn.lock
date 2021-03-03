@@ -4890,6 +4890,11 @@ lodash@4.17.20, lodash@^4.16.3, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.2
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
+lodash@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+
 log-symbols@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-4.0.0.tgz#69b3cc46d20f448eccdb75ea1fa733d9e821c920"
@@ -5233,14 +5238,15 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nestjs-base-service@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.3.0.tgz#6e1294b4317155f2ba4eef37eb8a55b5aaac1a28"
-  integrity sha512-wK/WTNF3uO1IBSQwunUwmf/3vsOIoarftqLlx/kVe8DBTxLxuJQTTKTDqoZo04yJtequGp5BNb4MMYkZ6urRaQ==
+nestjs-base-service@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.4.0.tgz#1cca6da2e174c6b053dffa8b7c3613ee5cde1983"
+  integrity sha512-D7irac5wIxVm1X93z+A+d/PeHu80bZc3QBnpFZNgoIwN1uP9cTQCLKcJQG2VyJAHaBn49h21STjAKHOAJdb9Xw==
   dependencies:
     "@nestjs/common" "7.6.5"
     class-validator "0.13.1"
     express "^4.17.1"
+    lodash "^4.17.21"
     nestjs-typeorm-paginate "2.2.6"
     typeorm "0.2.30"
     typescript "4.1.3"
