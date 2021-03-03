@@ -11,7 +11,6 @@ import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
 import Checkbox from 'components/forms/checkbox';
-import Error from 'components/forms/error';
 
 import {
   composeValidators,
@@ -19,6 +18,7 @@ import {
 } from 'components/forms/validations';
 
 import { useAuth } from 'hooks/authentication';
+import { useToasts } from 'hooks/toast';
 
 import USER_SVG from 'svgs/ui/user.svg?sprite';
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
@@ -30,8 +30,8 @@ export interface SignUpProps {
 
 export const SignUp: React.FC<SignUpProps> = () => {
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(false);
   const auth = useAuth();
+  const { addToast } = useToasts();
 
   const handleSubmit = useCallback(async (data) => {
     setSubmitting(true);
@@ -39,11 +39,19 @@ export const SignUp: React.FC<SignUpProps> = () => {
     try {
       await auth.signup(data);
     } catch (err) {
+      addToast('error-signup', (
+        <>
+          <h2 className="font-medium">Error!</h2>
+          <p className="text-sm">Ooops! Something went wrong. Try again</p>
+        </>
+      ), {
+        level: 'error',
+      });
+
       setSubmitting(false);
-      setError(true);
       console.error(err);
     }
-  }, [auth]);
+  }, [auth, addToast]);
 
   // This shouldn't be here, it's here just for testing
   const handleLogout = useCallback(async () => {
@@ -64,10 +72,6 @@ export const SignUp: React.FC<SignUpProps> = () => {
         {(props) => (
           <form onSubmit={props.handleSubmit} autoComplete="off" className="relative w-full max-w-xs mx-auto">
             <h2 className="mb-5 text-lg font-medium text-center font-heading">Get Started!</h2>
-
-            <Error visible={error && !submitting}>
-              Ooops! Something went wrong. Try again
-            </Error>
 
             <Loading
               visible={submitting}

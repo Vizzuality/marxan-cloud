@@ -10,13 +10,13 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
-import Error from 'components/forms/error';
 
 import {
   composeValidators,
 } from 'components/forms/validations';
 
 import { useAuth } from 'hooks/authentication';
+import { useToasts } from 'hooks/toast';
 
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
@@ -27,7 +27,7 @@ export interface SignInProps {
 
 export const SignIn: React.FC<SignInProps> = () => {
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(false);
+  const { addToast } = useToasts();
   const auth = useAuth();
 
   const handleSubmit = useCallback(async (data) => {
@@ -36,11 +36,19 @@ export const SignIn: React.FC<SignInProps> = () => {
     try {
       await auth.signin(data);
     } catch (err) {
+      addToast('error-signin', (
+        <>
+          <h2 className="font-medium">Error!</h2>
+          <p className="text-sm">Invalid username or password.</p>
+        </>
+      ), {
+        level: 'error',
+      });
+
       setSubmitting(false);
-      setError(true);
       console.error(err);
     }
-  }, [auth]);
+  }, [auth, addToast]);
 
   // This shouldn't be here, it's here just for testing
   const handleLogout = useCallback(async () => {
@@ -62,10 +70,6 @@ export const SignIn: React.FC<SignInProps> = () => {
         {(props) => (
           <form onSubmit={props.handleSubmit} autoComplete="off" className="relative w-full max-w-xs mx-auto">
             <h2 className="mb-5 text-lg font-medium text-center font-heading">Get in Marxan!</h2>
-
-            <Error visible={error && !submitting}>
-              Invalid username or password.
-            </Error>
 
             <Loading
               visible={submitting}
