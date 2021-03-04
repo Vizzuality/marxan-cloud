@@ -18,6 +18,7 @@
     "@hapi/iron": "^6.0.0",
     "@math.gl/web-mercator": "^3.3.2",
     "@popperjs/core": "^2.6.0",
+    "@react-aria/button": "^3.3.0",
     "@react-aria/dialog": "^3.1.2",
     "@react-aria/focus": "^3.2.3",
     "@react-aria/i18n": "^3.2.0",
