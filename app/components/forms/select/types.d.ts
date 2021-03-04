@@ -4,6 +4,7 @@ interface SelectThemeProps {
   theme: 'dark' | 'light';
   size: 'base' | 's';
   status: 'none' | 'error' | 'valid';
+  maxHeight?: number | string;
 }
 
 interface SelectStatusProps {
