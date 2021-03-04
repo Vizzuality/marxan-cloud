@@ -9,9 +9,6 @@ API_POSTGRES_DB := $(shell grep -e API_POSTGRES_DB .env | sed 's/^.*=//')
 GEO_POSTGRES_USER := $(shell grep -e GEO_POSTGRES_USER .env | sed 's/^.*=//')
 GEO_POSTGRES_DB := $(shell grep -e GEO_POSTGRES_DB .env | sed 's/^.*=//')
 
-#This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
-TEST_OKAVANGO := '{\"type\":\"Polygon\",\"coordinates\":[[[17.5341796875,-20.756113874762068],[25.444335937499996,-20.756113874762068],[25.444335937499996,-9.492408153765531],[17.5341796875,-9.492408153765531],[17.5341796875,-20.756113874762068]]]}'
-
 # Start only API and Geoprocessing services
 #
 # Useful when developing on API components only, to avoid spinning up services
@@ -102,7 +99,9 @@ restore-dumps:
 	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
 
 extract-geo-test-data:
-	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM admin_regions WHERE st_intersects(the_geom, st_geomfromgeojson($(TEST_OKAVANGO)))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_admin_regions_okavango.csv
-	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM wdpa WHERE st_intersects(the_geom, st_geomfromgeojson($(TEST_OKAVANGO)))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_wdpa_okavango.csv
-	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM features_data WHERE st_intersects(the_geom, st_geomfromgeojson($(TEST_OKAVANGO)))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_features_data_okavango.csv
+	#This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
+	TEST_GEOMETRY=`cat api/test/fixtures/test-geometry.json`; \
+	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM admin_regions WHERE st_intersects(the_geom, st_geomfromgeojson($$(TEST_GEOMETRY)))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_admin_regions_okavango.csv; \
+	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM wdpa WHERE st_intersects(the_geom, st_geomfromgeojson($$(TEST_GEOMETRY)))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_wdpa_okavango.csv; \
+	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM features_data WHERE st_intersects(the_geom, st_geomfromgeojson($$(TEST_GEOMETRY)))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_features_data_okavango.csv;
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" -c "COPY (SELECT * FROM features) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/api_features_okavango.csv
