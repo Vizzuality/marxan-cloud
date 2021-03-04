@@ -64,7 +64,7 @@ seed-geoapi-with-test-data:
 	@for i in api/test/fixtures/features/*.sql; do \
 		table_name=`basename -s .sql "$$i"`; \
 		featureid=`docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
-		echo "uppending data for $${table_name} with id $${featureid}"; \
+		echo "appending data for $${table_name} with id $${featureid}"; \
 		sed -e "s/\$$feature_id/$$featureid/g" api/test/fixtures/features/$${table_name}.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
 		done;
 
