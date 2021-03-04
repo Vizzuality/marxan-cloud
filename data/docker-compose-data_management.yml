@@ -25,8 +25,6 @@ services:
     build:
         context: ./data_restore
         dockerfile: Dockerfile
-    volumes:
-    - './data/processed/db_dumps/:/db_dumps'
     user: "$UID:$GID"
     command: make
     environment:
