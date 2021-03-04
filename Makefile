@@ -60,15 +60,18 @@ seed-api-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 
 seed-geoapi-with-test-data:
-	@docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-wdpa-data.sql  | sed -e "s/\$${user}/${USERID}/" api/test/fixtures/test-wdpa-data.sql
-	@docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-admin-data.sql | sed -e "s/\$${user}/${USERID}/" api/test/fixtures/test-admin-data.sql
-	@docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-features.sql
+	USERID=$(shell docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from users limit 1"); \
+	sed -e "s/\$$user/$$USERID/g" api/test/fixtures/test-admin-data.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
+	sed -e "s/\$$user/$$USERID/g" api/test/fixtures/test-wdpa-data.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
+	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-features.sql
 	@for i in api/test/fixtures/features/*.sql; do \
 		table_name=`basename -s .sql "$$i"`; \
-		echo "uppending table $${table_name}"; \
-		featureid=`docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}"`; \
-		docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/features/$${table_name}.sql | sed -e "s/\$${feature_id}/${FEATUREID}/" api/test/fixtures/test-admin-data.sql; \
+		featureid=`docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
+		echo "uppending data for $${table_name} with id $${featureid}"; \
+		sed -e "s/\$$feature_id/$$featureid/g" api/test/fixtures/features/$${table_name}.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
 		done;
+
+
 
 # need notebook service to execute a expecific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
