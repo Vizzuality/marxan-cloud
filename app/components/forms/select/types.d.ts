@@ -3,7 +3,7 @@ import { ReactNode, FocusEventHandler } from 'react';
 interface SelectThemeProps {
   theme: 'dark' | 'light';
   size: 'base' | 's';
-  status: 'none' | 'error' | 'valid';
+  status?: 'none' | 'error' | 'valid';
   maxHeight?: number | string;
 }
 
