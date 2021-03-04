@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { themes } from '@storybook/theming';
+import { OverlayProvider } from '@react-aria/overlays';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -12,9 +13,9 @@ export const parameters = {
 export const decorators = [
   (Story) => {
     return (
-      <div>
-        {Story()}
-      </div>
-    )
+      <OverlayProvider>
+        <div>{Story()}</div>
+      </OverlayProvider>
+    );
   },
-]
+];
