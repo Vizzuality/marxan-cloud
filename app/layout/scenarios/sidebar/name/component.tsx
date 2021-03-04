@@ -18,10 +18,10 @@ import { useRouter } from 'next/router';
 import { useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
-export interface ScenariosSidebarProps {
+export interface ScenariosSidebarNameProps {
 }
 
-export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
+export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
   const { query, push } = useRouter();
@@ -109,4 +109,4 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
   );
 };
 
-export default ScenariosSidebar;
+export default ScenariosSidebarName;

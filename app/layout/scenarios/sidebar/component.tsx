@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import cx from 'classnames';
 
-import SidebarName from 'layout/scenarios/sidebar/name';
-
 export interface ScenariosSidebarProps {
+  children: ReactNode
 }
 
-export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
+export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = ({
+  children,
+}:ScenariosSidebarProps) => {
   return (
     <div
       className={cx({
         'w-full h-full': true,
       })}
     >
-      <SidebarName />
+      {children}
     </div>
   );
 };

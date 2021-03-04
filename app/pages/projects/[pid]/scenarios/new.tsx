@@ -5,8 +5,10 @@ import Protected from 'layout/protected';
 import Header from 'layout/header';
 import Wrapper from 'layout/wrapper';
 
-import ScenariosSidebar from 'layout/scenarios/sidebar';
 import ScenariosMap from 'layout/scenarios/map';
+
+import ScenariosSidebar from 'layout/scenarios/sidebar';
+import SidebarName from 'layout/scenarios/sidebar/name';
 
 import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
@@ -33,7 +35,9 @@ const NewScenarioPage: React.FC = () => {
         <div className="pt-2.5 pb-10 md:flex-grow">
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
-              <ScenariosSidebar />
+              <ScenariosSidebar>
+                <SidebarName />
+              </ScenariosSidebar>
               <ScenariosMap />
             </div>
           </Wrapper>
