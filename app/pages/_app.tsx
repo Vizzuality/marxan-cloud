@@ -4,6 +4,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { OverlayProvider } from '@react-aria/overlays';
 import { AuthorizationProvider } from 'hooks/authentication';
+import { ToastProvider } from 'hooks/toast';
 
 import type { AppProps } from 'next/app';
 
@@ -22,9 +23,15 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
           errorRedirect="/" // We should create a login page
         >
           <OverlayProvider>
-            <div className="bg-black">
-              <Component {...pageProps} />
-            </div>
+            <ToastProvider
+              placement="top-right"
+              defaultAutoDismiss
+              defaultAutoDismissTime={5000}
+            >
+              <div className="bg-black">
+                <Component {...pageProps} />
+              </div>
+            </ToastProvider>
           </OverlayProvider>
         </AuthorizationProvider>
       </QueryClientProvider>

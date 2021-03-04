@@ -9,7 +9,7 @@ import Checkbox from 'components/forms/checkbox';
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
-import { DropdownOptionProps } from 'components/dropdowns/types';
+import { SelectOptionProps } from 'components/forms/select/types';
 
 export interface ItemProps {
   id: string;
@@ -19,7 +19,7 @@ export interface ItemProps {
   type: 'bioregional' | 'species';
 
   splitSelected: string;
-  splitOptions: DropdownOptionProps[];
+  splitOptions: SelectOptionProps[];
   onSplitSelected: (selected: string) => void;
 
   splitFeaturesSelected: string[];

@@ -18,6 +18,7 @@ module.exports = {
         'gradient-final': '#973CD5',
         bioregional: '#03E7D1',
         species: '#FFCA42',
+        'gap-analysis': '#717FFF',
       },
       outline: {
         blue: '2px dotted #00ace6',
@@ -139,6 +140,10 @@ module.exports = {
       'gradient-to-l': 'linear-gradient(to left, var(--tw-gradient-stops))',
       'gradient-to-tl':
         'linear-gradient(to top left, var(--tw-gradient-stops))',
+      // Repeating linear gradients
+      // Notice `-45deg` is not the same as `to bottom right`
+      'gradient-repeat-to-br':
+        'repeating-linear-gradient(-45deg, var(--tw-gradient-stops))',
     },
     backgroundOpacity: (theme) => theme('opacity'),
     backgroundPosition: {
@@ -923,11 +928,11 @@ module.exports = {
     pointerEvents: ['responsive'],
     position: ['responsive'],
     resize: ['responsive'],
-    ringColor: ['responsive', 'dark', 'focus-within', 'focus'],
-    ringOffsetColor: ['responsive', 'dark', 'focus-within', 'focus'],
-    ringOffsetWidth: ['responsive', 'focus-within', 'focus'],
-    ringOpacity: ['responsive', 'focus-within', 'focus'],
-    ringWidth: ['responsive', 'focus-within', 'focus'],
+    ringColor: ['responsive', 'dark', 'focus-within', 'focus', 'hover'],
+    ringOffsetColor: ['responsive', 'dark', 'focus-within', 'focus', 'hover'],
+    ringOffsetWidth: ['responsive', 'focus-within', 'focus', 'hover'],
+    ringOpacity: ['responsive', 'focus-within', 'focus', 'hover'],
+    ringWidth: ['responsive', 'focus-within', 'focus', 'hover'],
     rotate: ['responsive', 'hover', 'focus'],
     scale: ['responsive', 'hover', 'focus'],
     skew: ['responsive', 'hover', 'focus'],
