@@ -16,7 +16,7 @@ UseAdministrativeAreasResponse {
   const { user } = useAuth();
   const { includeAll, id } = props;
 
-  const query = useQuery('administrative areas', async () => ADMINISTRATIVE_AREAS.request({
+  const query = useQuery(['administrative areas', id], async () => ADMINISTRATIVE_AREAS.request({
     method: 'GET',
     url: `/${id}/subdivisions`,
     params: {
@@ -36,7 +36,7 @@ UseAdministrativeAreasResponse {
     const parsedData = Array.isArray(data?.data) ? data?.data : [];
 
     const regions: Region[] = parsedData.map((r) => ({
-      name: r.name1,
+      name: r.name2,
       id: r.id,
       level: 2,
     }));

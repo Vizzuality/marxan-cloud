@@ -48,7 +48,7 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
   const { user } = useAuth();
   const { includeAll, id, level } = props;
 
-  const query = useQuery('country regions', async () => COUNTRIES.request({
+  const query = useQuery(['country regions', id], async () => COUNTRIES.request({
     method: 'GET',
     url: `/${id}/administrative-areas`,
     params: {

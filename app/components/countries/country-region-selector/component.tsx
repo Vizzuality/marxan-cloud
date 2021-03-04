@@ -26,9 +26,11 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
   } = useCountryRegions({ id: selectedCountry?.id, includeAll: true, level: RegionLevel.ONE });
   const {
     data: subRegionsData, isFetching: isFetchingSubRegions, isFetched: isFetchedSubRegions,
-  } = useAdministrativeAreas({ id: selectedSubRegion?.id, includeAll: true });
+  } = useAdministrativeAreas({ id: selectedRegion?.id, includeAll: true });
 
   const handleCountryChange = (value) => {
+    console.log('country change', value);
+
     setSelectedCountry(value);
   };
   const handleRegionChange = (value) => {
@@ -48,35 +50,41 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
       {isFetchedCountries && countriesData?.length > 0 && (
         <div>
           {/* Country selector */}
-          <Select
-            status="none"
-            size="base"
-            theme="dark"
-            options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
-            initialSelected={selectedCountry?.id}
-            onChange={(value) => handleCountryChange({ id: value })}
-          />
-          {/* Region selector */}
-          {isFetchedRegions && regionsData?.length > 0 && (
+          <div className="mb-3">
             <Select
               status="none"
               size="base"
               theme="dark"
-              options={regionsData.map((c) => ({ label: c.name, value: c.id }))}
-              initialSelected={selectedRegion?.id}
-              onChange={handleRegionChange}
+              options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
+              initialSelected={selectedCountry?.id}
+              onChange={(value) => handleCountryChange({ id: value })}
             />
+          </div>
+          {/* Region selector */}
+          {isFetchedRegions && regionsData?.length > 0 && (
+            <div className="mb-3">
+              <Select
+                status="none"
+                size="base"
+                theme="dark"
+                options={regionsData.map((c) => ({ label: c.name, value: c.id }))}
+                initialSelected={selectedRegion?.id}
+                onChange={(value) => handleRegionChange({ id: value })}
+              />
+            </div>
           )}
           {/* Sub-Region selector */}
           {isFetchedSubRegions && subRegionsData?.length > 0 && (
-            <Select
-              status="none"
-              size="base"
-              theme="dark"
-              options={subRegionsData.map((c) => ({ label: c.name, value: c.id }))}
-              initialSelected={selectedSubRegion?.id}
-              onChange={handleSubRegionChange}
-            />
+            <div>
+              <Select
+                status="none"
+                size="base"
+                theme="dark"
+                options={subRegionsData.map((c) => ({ label: c.name, value: c.id }))}
+                initialSelected={selectedSubRegion?.id}
+                onChange={(value) => handleSubRegionChange({ id: value })}
+              />
+            </div>
           )}
         </div>
       )}
