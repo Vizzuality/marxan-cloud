@@ -19,6 +19,7 @@ import { SelectProps, SelectOptionProps } from 'components/forms/select/types';
 export const SingleSelect: React.FC<SelectProps> = ({
   theme = 'dark',
   size = 'base',
+  maxHeight = 300,
   status,
   prefix,
   options = [],
@@ -195,8 +196,11 @@ export const SingleSelect: React.FC<SelectProps> = ({
             {isOpen && (
               <ul
                 className={cx({
-                  'py-1 focus:outline-none': true,
+                  'py-1 focus:outline-none overflow-y-auto overflow-x-hidden': true,
                 })}
+                style={{
+                  maxHeight,
+                }}
               >
                 {getOptions.map((option, index) => (
                   <li
