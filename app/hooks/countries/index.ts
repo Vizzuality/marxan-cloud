@@ -21,7 +21,7 @@ export function useCountries(filters: UseCountriesProps): UseCountriesResponse {
     url: '/',
     params: {
       'page[size]': includeAll ? 0 : 25,
-      fields: 'gid0,name0',
+      omitFields: 'theGeom',
     },
     headers: {
       Authorization: `Bearer ${user.token}`,
@@ -48,14 +48,13 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
   const { user } = useAuth();
   const { includeAll, id, level } = props;
 
-  console.log('id', id);
-
   const query = useQuery('country regions', async () => COUNTRIES.request({
     method: 'GET',
     url: `/${id}/administrative-areas`,
     params: {
-      'page[size]': includeAll ? 6000 : 25,
+      'page[size]': includeAll ? 0 : 25,
       level,
+      omitFields: 'theGeom',
     },
     headers: {
       Authorization: `Bearer ${user.token}`,
@@ -68,7 +67,6 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
 
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data) ? data?.data : [];
-    console.log('parsedData Regions', parsedData);
 
     const regions: Region[] = parsedData.map((r) => ({
       name: r.name1,
@@ -80,6 +78,5 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
       ...query,
       data: regions,
     };
-    // eslint-disable-next-line no-else-return
   }, [query, data?.data]);
 }
