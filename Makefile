@@ -60,19 +60,23 @@ seed-api-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 
 seed-geoapi-with-test-data:
-	docker-compose exec -T postgresql-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-wdpa-data.sql  | sed -e "s/\$${user}/${USERID}/" api/test/fixtures/test-wdpa-data.sql
-	docker-compose exec -T postgresql-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-admin-data.sql | sed -e "s/\$${user}/${USERID}/" api/test/fixtures/test-admin-data.sql
-	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/features/test-features.sql
-
-	# docker-compose exec -T postgresql-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/features/*/test-features-data.sql | sed -e "s/\$${user}/${USERID}/" -e "s/\$${feature_id}/${FEATUREID}/" api/test/fixtures/test-admin-data.sql
+	@docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-wdpa-data.sql  | sed -e "s/\$${user}/${USERID}/" api/test/fixtures/test-wdpa-data.sql
+	@docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/test-admin-data.sql | sed -e "s/\$${user}/${USERID}/" api/test/fixtures/test-admin-data.sql
+	@docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-features.sql
+	@for i in api/test/fixtures/features/*.sql; do \
+		table_name=`basename -s .sql "$$i"`; \
+		echo "uppending table $${table_name}"; \
+		featureid=`docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}"`; \
+		docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" < api/test/fixtures/features/$${table_name}.sql | sed -e "s/\$${feature_id}/${FEATUREID}/" api/test/fixtures/test-admin-data.sql; \
+		done;
 
 # need notebook service to execute a expecific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
 	docker-compose -f ./data/docker-compose.yml exec -T marxan-science-notebooks papermill work/notebooks/Lab/convert_csv_sql.ipynb /dev/null
-	mv data/data/processed/test-wdpa-data.sql api/test/fixtures/test-wdpa-data.sql
-	mv data/data/processed/test-admin-data.sql api/test/fixtures/test-admin-data.sql
-	mv data/data/processed/test-features.sql api/test/fixtures/test-features.sql
-	mv data/data/processed/features api/test/fixtures/features
+	mv -f -u -Z data/data/processed/test-wdpa-data.sql api/test/fixtures/test-wdpa-data.sql
+	mv -f -u -Z data/data/processed/test-admin-data.sql api/test/fixtures/test-admin-data.sql
+	mv -f -u -Z data/data/processed/test-features.sql api/test/fixtures/test-features.sql
+	rm -rf api/test/fixtures/features && mv -f -u -Z data/data/processed/features api/test/fixtures/features
 
 seed-geodb-data:
 	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
