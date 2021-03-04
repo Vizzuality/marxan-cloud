@@ -3,7 +3,7 @@ import { Story } from '@storybook/react/types-6-0';
 
 import Button from 'components/button';
 import MAP_WARNING from 'svgs/ui/map-warning.svg';
-import ConfirmationPrompt, { ConfirmationPromptProps } from './component';
+import ConfirmationPrompt, { ConfirmationPromptProps } from './index';
 
 export default {
   title: 'Components/ConfirmationPrompt',

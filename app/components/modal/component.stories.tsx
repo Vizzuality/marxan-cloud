@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Story } from '@storybook/react/types-6-0';
 
 import Button from 'components/button';
-import Modal, { ModalProps } from './component';
+import Modal, { ModalProps } from './index';
 
 export default {
   title: 'Components/Modal',
