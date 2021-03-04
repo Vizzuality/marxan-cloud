@@ -11,6 +11,7 @@ import { FocusScope } from '@react-aria/focus';
 
 import Icon from 'components/icon';
 import CLOSE_SVG from 'svgs/ui/close.svg';
+import { ModalProps } from './types';
 
 const COMMON_CONTENT_CLASSES = 'absolute top-1/2 inset-x-4 sm:left-1/2 max-h-full transform -translate-y-1/2 sm:-translate-x-1/2 outline-none bg-white overflow-auto rounded-3xl py-7 px-8';
 const CONTENT_CLASSES = {
@@ -20,36 +21,6 @@ const CONTENT_CLASSES = {
 };
 
 const OVERLAY_CLASSES = 'z-10 fixed inset-0 bg-black bg-blur';
-
-export interface ModalProps {
-  /**
-   * Title used by screen readers
-   */
-  title: string;
-  /**
-   * Whether the modal is opened
-   */
-  open: boolean,
-  /**
-   * Whether the user can close the modal by clicking on the overlay, the close button or pressing
-   * the escape key
-   */
-  dismissable?: boolean;
-  /**
-   * Size (width) of the modal
-   */
-  size?: 'narrow' | 'default' | 'wide';
-  children?: React.ReactNode;
-  /**
-   * Class name to assign to the modal
-   */
-  className?: string;
-  /**
-   * Callback executed when the modal is dismissed by clicking on the overlay, the close button or
-   * pressing the escape key
-   */
-  onDismiss: () => void;
-}
 
 export const Modal: React.FC<ModalProps> = ({
   title,
@@ -74,7 +45,6 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <>
-      {/* {cloneElement(trigger, { onClick: onClickTrigger })} */}
       {open && (
         <OverlayContainer>
           <div className={cx({ [OVERLAY_CLASSES]: true })}>
