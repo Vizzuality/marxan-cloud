@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { User } from './user.api.entity';
@@ -9,10 +9,8 @@ import { UpdateUserDTO } from './dto/update.user.dto';
 import { AppInfoDTO } from 'dto/info.dto';
 
 import * as faker from 'faker';
-import {
-  AppBaseService,
-  JSONAPISerializerConfig,
-} from 'utils/app-base.service';
+import { AppBaseService, JSONAPISerializerConfig } from 'utils/app-base.service';
+import { AuthenticationService } from 'modules/authentication/authentication.service';
 
 @Injectable()
 export class UsersService extends AppBaseService<
@@ -24,6 +22,8 @@ export class UsersService extends AppBaseService<
   constructor(
     @InjectRepository(User)
     protected readonly repository: Repository<User>,
+    @Inject(forwardRef(() => AuthenticationService))
+    private readonly authenticationService: AuthenticationService,
   ) {
     super(repository, 'user', 'users');
   }
@@ -87,5 +87,6 @@ export class UsersService extends AppBaseService<
       { id: userId },
       { isDeleted: true, isActive: false },
     );
+    this.authenticationService.invalidateAllTokensOfUser(userId);
   }
 }
