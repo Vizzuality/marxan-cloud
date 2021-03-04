@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Story } from '@storybook/react/types-6-0';
 
 import Button from 'components/button';
@@ -8,19 +8,36 @@ export default {
   title: 'Components/Modal',
   component: Modal,
   parameters: { actions: { argTypesRegex: '^on.*' } },
-  argTypes: {},
+  argTypes: {
+    open: {
+      control: {
+        disable: true,
+      },
+    },
+    onDismiss: {
+      control: {
+        disable: true,
+      },
+    },
+  },
 };
 
-const Template: Story<ModalProps> = ({ ...args }: ModalProps) => (
-  <Modal
-    {...args}
-    trigger={(
-      <Button theme="primary" size="base">
+const Template: Story<ModalProps> = ({ ...args }: ModalProps) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button theme="primary" size="base" onClick={() => setOpen(true)}>
         Open modal
       </Button>
-    )}
-  />
-);
+      <Modal
+        {...args}
+        open={open}
+        onDismiss={() => setOpen(false)}
+      />
+    </>
+  );
+};
 
 export const Default: Story<ModalProps> = Template.bind({});
 Default.args = {
@@ -34,25 +51,6 @@ Default.args = {
       odio nec, fringilla ex. Quisque consectetur diam in massa egestas, vitae
       posuere magna semper. Sed ac iaculis purus, at pretium tellus. Duis non
       commodo lorem, non tincidunt ex.
-    </>
-  ),
-};
-
-export const RenderProp: Story<ModalProps> = Template.bind({});
-RenderProp.storyName = 'With a render prop';
-RenderProp.args = {
-  title: 'Modal component',
-  dismissable: true,
-  // eslint-disable-next-line react/display-name, react/prop-types
-  children: ({ close }) => (
-    <>
-      <h1 className="mb-5 text-xl font-medium">Modal content</h1>
-      <p className="mb-3">
-        With a render prop, you can close the modal with other UI elements or programmatically.
-      </p>
-      <Button theme="primary" size="base" onClick={close}>
-        Close modal
-      </Button>
     </>
   ),
 };

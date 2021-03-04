@@ -1,6 +1,5 @@
-import React, { cloneElement, useCallback } from 'react';
+import React from 'react';
 import cx from 'classnames';
-import { useOverlayTriggerState } from '@react-stately/overlays';
 import {
   useOverlay,
   usePreventScroll,
@@ -28,9 +27,9 @@ export interface ModalProps {
    */
   title: string;
   /**
-   * Element that triggers the modal to open
+   * Whether the modal is opened
    */
-  trigger: React.ReactElement<{ onClick: () => void }>;
+  open: boolean,
   /**
    * Whether the user can close the modal by clicking on the overlay, the close button or pressing
    * the escape key
@@ -40,7 +39,7 @@ export interface ModalProps {
    * Size (width) of the modal
    */
   size?: 'narrow' | 'default' | 'wide';
-  children?: React.ReactNode | ((props: { close: () => void }) => React.ReactNode);
+  children?: React.ReactNode;
   /**
    * Class name to assign to the modal
    */
@@ -49,52 +48,34 @@ export interface ModalProps {
    * Callback executed when the modal is dismissed by clicking on the overlay, the close button or
    * pressing the escape key
    */
-  onDismiss?: () => void;
+  onDismiss: () => void;
 }
 
 export const Modal: React.FC<ModalProps> = ({
   title,
-  trigger,
+  open,
   dismissable = true,
   size = 'default',
   children,
   className,
   onDismiss,
 }: ModalProps) => {
-  const { isOpen, close, open } = useOverlayTriggerState({});
-
-  const onOpen = useCallback(() => open(), [open]);
-
-  const onClose = useCallback((isDismissing = true) => {
-    close();
-
-    if (isDismissing && onDismiss) {
-      onDismiss();
-    }
-  }, [close, onDismiss]);
-
-  const onClickTrigger = useCallback(() => {
-    // If the trigger element already has an `onClick` prop, we execute the callback
-    trigger.props.onClick?.();
-    onOpen();
-  }, [trigger, onOpen]);
-
   const containerRef = React.useRef();
   const { overlayProps } = useOverlay({
     isKeyboardDismissDisabled: !dismissable,
     isDismissable: dismissable,
-    isOpen,
-    onClose,
+    isOpen: open,
+    onClose: onDismiss,
   }, containerRef);
   const { modalProps } = useModal();
   const { dialogProps } = useDialog({ 'aria-label': title }, containerRef);
 
-  usePreventScroll({ isDisabled: !isOpen });
+  usePreventScroll({ isDisabled: !open });
 
   return (
     <>
-      {cloneElement(trigger, { onClick: onClickTrigger })}
-      {isOpen && (
+      {/* {cloneElement(trigger, { onClick: onClickTrigger })} */}
+      {open && (
         <OverlayContainer>
           <div className={cx({ [OVERLAY_CLASSES]: true })}>
             <FocusScope contain restoreFocus autoFocus>
@@ -109,7 +90,7 @@ export const Modal: React.FC<ModalProps> = ({
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={onClose}
+                      onClick={onDismiss}
                       className="absolute top-0 right-0 text-sm text-gray-300 focus:text-black hover:text-black"
                     >
                       Close
@@ -120,7 +101,7 @@ export const Modal: React.FC<ModalProps> = ({
                     </button>
                   </div>
                 )}
-                {typeof children === 'function' ? children({ close: () => onClose(false) }) : children}
+                {children}
               </div>
             </FocusScope>
           </div>
