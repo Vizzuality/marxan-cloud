@@ -6,7 +6,7 @@ import MAP_WARNING from 'svgs/ui/map-warning.svg';
 import ConfirmationPrompt, { ConfirmationPromptProps } from './component';
 
 export default {
-  title: 'Components/Prompts/ConfirmationPrompt',
+  title: 'Components/ConfirmationPrompt',
   component: ConfirmationPrompt,
   parameters: { actions: { argTypesRegex: '^on.*' } },
   argTypes: {
