@@ -7,8 +7,9 @@ import { E2E_CONFIG } from './e2e.config';
 
 describe('UsersModule (e2e)', () => {
   let app: INestApplication;
-
   let jwtToken: string;
+
+  const aNewPassword = faker.random.uuid();
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -41,9 +42,7 @@ describe('UsersModule (e2e)', () => {
     await Promise.all([app.close()]);
   });
 
-  describe('Users', () => {
-    const aNewPassword = faker.random.alphaNumeric(18);
-
+  describe('Users - metadata', () => {
     it('A user should be able to read their own metadata', async () => {
       const results = await request(app.getHttpServer())
         .get('/api/v1/users/me')
@@ -56,12 +55,14 @@ describe('UsersModule (e2e)', () => {
 
     it('A user should be able to update their own metadata', async () => {
       await request(app.getHttpServer())
-        .patch('/api/v1/users')
+        .patch('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send(E2E_CONFIG.users.updated.bb())
         .expect(200);
     });
+  });
 
+  describe('Users - password updates which should fail', () => {
     it('A user should not be able to change their password as part of the user update lifecycle', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/users/me/')
@@ -73,39 +74,45 @@ describe('UsersModule (e2e)', () => {
         .expect(403);
     });
 
-    it('A user should be able to change their password if they provide the correct current password', async () => {
-      await request(app.getHttpServer())
-        .patch('/api/v1/users/me/password')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .send({
-          currentPassword: E2E_CONFIG.users.basic.bb.password,
-          password: aNewPassword,
-        })
-        .expect(200);
-    });
-
     it('A user should be not able to change their password if they provide an incorrect current password', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/users/me/password')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send({
           currentPassword: faker.random.uuid(),
-          password: aNewPassword,
+          newPassword: aNewPassword,
         })
         .expect(403);
     });
+  });
 
+  describe('Users - password updates which should succeed (1/2)', () => {
+    it('A user should be able to change their password if they provide the correct current password', async () => {
+      await request(app.getHttpServer())
+        .patch('/api/v1/users/me/password')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send({
+          currentPassword: E2E_CONFIG.users.basic.bb.password,
+          newPassword: aNewPassword,
+        })
+        .expect(200);
+    });
+  });
+
+  describe('Users - password updates which should succeed (2/2)', () => {
     it('A user should be able to change their password if they provide the correct current password (take 2, back to initial password)', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/users/me/password')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send({
           currentPassword: aNewPassword,
-          password: E2E_CONFIG.users.basic.bb.password,
+          newPassword: E2E_CONFIG.users.basic.bb.password,
         })
         .expect(200);
     });
+  });
 
+  describe('Users - account deletion', () => {
     it('A user should be able to delete their own account', async () => {
       await request(app.getHttpServer())
         .delete('/api/v1/users/me')
@@ -113,7 +120,9 @@ describe('UsersModule (e2e)', () => {
         .send()
         .expect(200);
     });
+  });
 
+  describe('Users - locked out after account deletion', () => {
     it('Once a user account is marked as deleted, the user should be logged out', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/users/me')
