@@ -9,7 +9,10 @@ import { UpdateUserDTO } from './dto/update.user.dto';
 import { AppInfoDTO } from 'dto/info.dto';
 
 import * as faker from 'faker';
-import { AppBaseService, JSONAPISerializerConfig } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+} from 'utils/app-base.service';
 import { AuthenticationService } from 'modules/authentication/authentication.service';
 
 @Injectable()
