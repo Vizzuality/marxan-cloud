@@ -61,7 +61,10 @@ export class UsersController {
     return this.service.serialize(results.data, results.metadata);
   }
 
-  @ApiOperation({ description: 'Update a user.' })
+  @ApiOperation({
+    description:
+      'Update the password of a user, if they can present the current one.',
+  })
   @ApiOkResponse({ type: UserResult })
   @Patch('me/password')
   async updateOwnPassword(
