@@ -8,11 +8,14 @@ services:
         - ./data:/home/jovyan/work/datasets
         - ./notebooks:/home/jovyan/work/notebooks
         - /opt/ssl-certs/jupyter:/etc/ssl/notebook
+      env_file:
+        - '../.env'
       ports:
         - 8888:8888
       container_name: marxan-science_jupyter_notebook
       command: "start-notebook.sh \
         --NotebookApp.token=''"
+
 networks:
     default:
       external:
