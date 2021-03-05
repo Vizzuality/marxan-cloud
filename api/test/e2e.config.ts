@@ -56,9 +56,7 @@ export const E2E_CONFIG: {
       bb: () => ({
         fname: faker.name.firstName(),
         lname: faker.name.lastName(),
-        displayName: `${faker.name.title()} ${faker.name.firstName()} ${
-          faker.name.firstName()
-        }`,
+        displayName: `${faker.name.title()} ${faker.name.firstName()} ${faker.name.firstName()}`,
         metadata: { key1: 'value1', key2: 2, key3: true },
       }),
     },
