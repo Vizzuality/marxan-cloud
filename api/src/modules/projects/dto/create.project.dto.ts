@@ -36,11 +36,6 @@ export class CreateProjectDTO {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  adminRegionId?: string;
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
   adminAreaLevel1Id?: string;
 
   @ApiPropertyOptional()
