@@ -1,4 +1,10 @@
 import React, { useState } from 'react';
+import { Field as FieldRFF } from 'react-final-form';
+
+import Field from 'components/forms/field';
+import {
+  composeValidators,
+} from 'components/forms/validations';
 
 import { RegionLevel } from 'types/country-model';
 
@@ -23,22 +29,10 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
   } = useCountries({ includeAll: true });
   const {
     data: regionsData, isFetching: isFetchingRegions, isFetched: isFetchedRegions,
-  } = useCountryRegions({ id: selectedCountry?.id, includeAll: true, level: RegionLevel.ONE });
+  } = useCountryRegions({ id: selectedCountry, includeAll: true, level: RegionLevel.ONE });
   const {
     data: subRegionsData, isFetching: isFetchingSubRegions, isFetched: isFetchedSubRegions,
-  } = useAdministrativeAreas({ id: selectedRegion?.id, includeAll: true });
-
-  const handleCountryChange = (value) => {
-    console.log('country change', value);
-
-    setSelectedCountry(value);
-  };
-  const handleRegionChange = (value) => {
-    setSelectedRegion(value);
-  };
-  const handleSubRegionChange = (value) => {
-    setSelectedSubRegion(value);
-  };
+  } = useAdministrativeAreas({ id: selectedRegion, includeAll: true });
 
   return (
     <div className="mt-6">
@@ -51,39 +45,75 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
         <div>
           {/* Country selector */}
           <div className="mb-3">
-            <Select
-              status="none"
-              size="base"
-              theme="dark"
-              options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
-              initialSelected={selectedCountry?.id}
-              onChange={(value) => handleCountryChange({ id: value })}
-            />
+            <FieldRFF
+              name="countryId"
+              validate={composeValidators([{ presence: true }])}
+            >
+              {(fprops) => (
+                <Field id="countryId" {...fprops}>
+                  <Select
+                    status="none"
+                    size="base"
+                    theme="dark"
+                    options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
+                    initialSelected={selectedCountry}
+                    onChange={(value: string) => {
+                      setSelectedCountry(value);
+                      fprops.input.onChange(value);
+                    }}
+                  />
+                </Field>
+              )}
+            </FieldRFF>
           </div>
           {/* Region selector */}
           {isFetchedRegions && regionsData?.length > 0 && (
             <div className="mb-3">
-              <Select
-                status="none"
-                size="base"
-                theme="dark"
-                options={regionsData.map((c) => ({ label: c.name, value: c.id }))}
-                initialSelected={selectedRegion?.id}
-                onChange={(value) => handleRegionChange({ id: value })}
-              />
+              <FieldRFF
+                name="adminAreaLevel1Id"
+                validate={composeValidators([{ presence: true }])}
+              >
+                {(fprops) => (
+                  <Field id="adminAreaLevel1Id" {...fprops}>
+                    <Select
+                      status="none"
+                      size="base"
+                      theme="dark"
+                      options={regionsData.map((c) => ({ label: c.name, value: c.id }))}
+                      initialSelected={selectedRegion}
+                      onChange={(value: string) => {
+                        setSelectedRegion(value);
+                        fprops.input.onChange(value);
+                      }}
+                    />
+                  </Field>
+                )}
+              </FieldRFF>
             </div>
           )}
           {/* Sub-Region selector */}
           {isFetchedSubRegions && subRegionsData?.length > 0 && (
             <div>
-              <Select
-                status="none"
-                size="base"
-                theme="dark"
-                options={subRegionsData.map((c) => ({ label: c.name, value: c.id }))}
-                initialSelected={selectedSubRegion?.id}
-                onChange={(value) => handleSubRegionChange({ id: value })}
-              />
+              <FieldRFF
+                name="adminAreaLevel2Id"
+                validate={composeValidators([{ presence: true }])}
+              >
+                {(fprops) => (
+                  <Field id="adminAreaLevel2Id" {...fprops}>
+                    <Select
+                      status="none"
+                      size="base"
+                      theme="dark"
+                      options={subRegionsData.map((c) => ({ label: c.name, value: c.id }))}
+                      initialSelected={selectedSubRegion}
+                      onChange={(value: string) => {
+                        setSelectedSubRegion(value);
+                        fprops.input.onChange(value);
+                      }}
+                    />
+                  </Field>
+                )}
+              </FieldRFF>
             </div>
           )}
         </div>

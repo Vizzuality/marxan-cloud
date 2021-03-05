@@ -44,6 +44,8 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
                     unit: value,
                   };
                   setData(newData);
+
+                  // React Final Form onChange
                   fprops.input.onChange(value);
                   if (onChange) {
                     onChange(newData);
@@ -54,19 +56,30 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
           )}
         </FieldRFF>
 
-        <PlanningUnitAreaSize
-          size={size}
-          onChange={(value) => {
-            const newData = {
-              ...data,
-              size: value,
-            };
-            setData(newData);
-            if (onChange) {
-              onChange(newData);
-            }
-          }}
-        />
+        <FieldRFF
+          name="planningUnitAreakm2"
+          validate={composeValidators([{ presence: true }])}
+        >
+          {(fprops) => (
+            <Field id="planningUnitAreakm2" {...fprops}>
+              <PlanningUnitAreaSize
+                size={size}
+                onChange={(value) => {
+                  const newData = {
+                    ...data,
+                    size: value,
+                  };
+                  setData(newData);
+                  // React Final Form onChange
+                  fprops.input.onChange(value);
+                  if (onChange) {
+                    onChange(newData);
+                  }
+                }}
+              />
+            </Field>
+          )}
+        </FieldRFF>
       </div>
     </div>
   );
