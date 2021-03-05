@@ -1,13 +1,18 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Dictionary } from 'lodash';
+import { IsObject, IsOptional, IsString } from 'class-validator';
 
 export class CreateOrganizationDTO {
   @ApiProperty()
+  @IsString()
   name: string;
 
   @ApiPropertyOptional()
-  description: string;
+  @IsOptional()
+  @IsString()
+  description?: string;
 
   @ApiPropertyOptional()
-  metadata: Dictionary<string>;
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, unknown>;
 }
