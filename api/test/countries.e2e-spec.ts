@@ -17,7 +17,13 @@ describe('CountriesModule (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
     await app.init();
 
     const response = await request(app.getHttpServer())
@@ -92,7 +98,6 @@ describe('CountriesModule (e2e)', () => {
         .expect(200);
 
       const resources: JSONAPIAdminAreaData[] = response.body.data;
-      console.log(resources);
       aLevel1AdminArea = resources[0];
       // We (try to) select all the response items whose gid2 is set (these
       // would be level 2 areas).
