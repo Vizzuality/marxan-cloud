@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
-import { Country } from 'modules/countries/country.geo.entity';
+import { JSONAPICountryData } from 'modules/countries/country.geo.entity';
 
 describe('CountriesModule (e2e)', () => {
   let app: INestApplication;
@@ -34,7 +34,7 @@ describe('CountriesModule (e2e)', () => {
   });
 
   describe('Countries', () => {
-    let aCountry: Country;
+    let aCountry: JSONAPICountryData;
 
     it('Should list countries (paginated; pages of up to 25 items, no explicit page number - should default to 1)', async () => {
       const response = await request(app.getHttpServer())
@@ -53,13 +53,13 @@ describe('CountriesModule (e2e)', () => {
     it('Should list administrative areas within a given country', async () => {
       const response = await request(app.getHttpServer())
         .get(
-          `/api/v1/countries/${aCountry.gid0}/administrative-areas?page[size]=25`,
+          `/api/v1/countries/${aCountry.attributes.gid0}/administrative-areas?page[size]=25`,
         )
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
 
       const resources = response.body.data;
-      expect(resources[0].type).toBe('administrative-areas');
+      expect(resources[0].type).toBe('admin_areas');
       expect(resources.length).toBeLessThanOrEqual(25);
       expect(resources.length).toBeGreaterThanOrEqual(1);
     });
