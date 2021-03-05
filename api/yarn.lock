@@ -5238,10 +5238,10 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nestjs-base-service@0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.4.1.tgz#1d37c07d948034e9b3e590b800a3528921a8f418"
-  integrity sha512-YSl1YhsBubl1O+WxdQnI0K4HUnoSMi7MQ0T2H38nDPbRq59ouC561/EWzgXzeRiNlUz2jTBtUz3bwKRDnlUcxA==
+nestjs-base-service@0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.4.2.tgz#b899e32318372443876a81dcdeabcac32c9c1d6a"
+  integrity sha512-BbJZ/RjGrbJ1ajfXo5vrI9mwzbr3oWSnDk7UejSxOGsF9zu/wW4ELKFn3iBr/6Orl9I1r2xpj78HcBUkQgjHOg==
   dependencies:
     "@nestjs/common" "7.6.5"
     class-validator "0.13.1"
