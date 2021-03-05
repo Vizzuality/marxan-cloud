@@ -1,5 +1,5 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { CountryResult } from './country.api.entity';
+import { CountryResult } from './country.geo.entity';
 import { CountriesService } from './countries.service';
 import {
   ApiBearerAuth,
@@ -13,7 +13,10 @@ import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { BaseServiceResource } from 'types/resource.interface';
-import { FetchSpecification, Pagination } from 'nestjs-base-service';
+import {
+  FetchSpecification,
+  ProcessFetchSpecification,
+} from 'nestjs-base-service';
 
 const resource: BaseServiceResource = {
   className: 'Country',
@@ -41,9 +44,9 @@ export class CountriesController {
   @JSONAPIQueryParams()
   @Get()
   async findAll(
-    @Pagination() pagination: FetchSpecification,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<CountryResult> {
-    const results = await this.service.findAllPaginated(pagination);
+    const results = await this.service.findAllPaginated(fetchSpecification);
     return this.service.serialize(results.data, results.metadata);
   }
 
@@ -51,6 +54,8 @@ export class CountriesController {
   @ApiOkResponse({ type: CountryResult })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<CountryResult> {
-    return await this.service.serialize(await this.service.getById(id));
+    return await this.service.serialize(
+      await this.service.getById(id, undefined, 'gid0'),
+    );
   }
 }

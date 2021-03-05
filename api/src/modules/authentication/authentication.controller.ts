@@ -31,6 +31,11 @@ export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @UseGuards(LocalAuthGuard)
+  @ApiOperation({
+    description: 'Sign user in, issuing a JWT token.',
+    summary: 'Sign user in',
+    operationId: 'sign-in',
+  })
   @Post('sign-in')
   @ApiCreatedResponse({
     type: 'AccessToken',
@@ -40,6 +45,20 @@ export class AuthenticationController {
     @Body(new ValidationPipe()) _dto: LoginDto,
   ): Promise<AccessToken> {
     return this.authenticationService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description:
+      'Sign user out of all their current sessions by invalidating all the JWT tokens issued to them',
+    summary: 'Sign user out',
+    operationId: 'sign-out',
+  })
+  @Post('sign-out')
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  async logout(@Request() req: RequestWithAuthenticatedUser): Promise<void> {
+    await this.authenticationService.invalidateAllTokensOfUser(req.user.id);
   }
 
   @Post('sign-up')

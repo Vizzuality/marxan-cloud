@@ -30,20 +30,12 @@ clean:
 	find . -type d -name "__pycache__" -delete
 
 ## Upload Data to Azure
-# sync_data_to_azure:
-# ifeq (default,$(PROFILE))
-# 	aws s3 sync data/ s3://$(BUCKET)/data/
-# else
-# 	aws s3 sync data/ s3://$(BUCKET)/data/ --profile $(PROFILE)
-# endif
+sync_data_to_azure:
+	@az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/data/ -s data/
 
 ## Download Data from Azure
-# sync_data_from_azure:
-# ifeq (default,$(PROFILE))
-# 	aws s3 sync s3://$(BUCKET)/data/ data/
-# else
-# 	aws s3 sync s3://$(BUCKET)/data/ data/ --profile $(PROFILE)
-# endif
+sync_data_from_azure:
+	@az storage blob download-batch--account-name marxancloudtest --auth-mode login -d data/ -s data-ingestion-test-00/data/ --pattern dir/*
 
 ## Set up python interpreter environment
 create_environment:

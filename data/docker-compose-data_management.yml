@@ -11,15 +11,17 @@ services:
     - './data/seed/world_terrestrial_ecosystems/:/world_terrestrial_ecosystems/data/'
     user: "$UID:$GID"
     command: make
-    environment:
-        - POSTGRES_API_SERVICE_PORT=3432
-        - POSTGRES_GEO_SERVICE_PORT=3433
-        - GEO_POSTGRES_USER=marxan-geo-api
-        - GEO_POSTGRES_PASSWORD=marxan-geo-api
-        - GEO_POSTGRES_DB=marxan-geo-api
-        - API_POSTGRES_USER=marxan-api
-        - API_POSTGRES_PASSWORD=marxan-api
-        - API_POSTGRES_DB=marxan-api
+    env_file:
+        - '../.env'
+
+  marxan-restore-data:
+    build:
+        context: ./data_restore
+        dockerfile: Dockerfile
+    user: "$UID:$GID"
+    command: make
+    env_file:
+        - '../.env'
 networks:
     default:
       external:
