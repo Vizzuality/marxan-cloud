@@ -38,7 +38,9 @@ describe('CountriesModule (e2e)', () => {
   describe('Countries', () => {
     let _aCountry: JSONAPICountryData;
     let aLevel1AdminArea: JSONAPIAdminAreaData;
-    const countryCodeForTests = 'ESP';
+    // Make sure we have GADM data for this country in the test data which
+    // is used to populate the geodb in CI pipelines.
+    const countryCodeForTests = 'AGO';
 
     it('Should list countries (paginated; pages of up to 25 items, no explicit page number - should default to 1)', async () => {
       const response = await request(app.getHttpServer())
