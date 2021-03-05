@@ -120,7 +120,7 @@ export class UsersService extends AppBaseService<
   async updateOwnPassword(
     userId: string,
     currentAndNewPasswords: UpdateUserPasswordDTO,
-    info: AppInfoDTO,
+    _info: AppInfoDTO,
   ): Promise<void> {
     const user = await this.getById(userId);
     if (
@@ -147,7 +147,7 @@ export class UsersService extends AppBaseService<
   async validateBeforeUpdate(
     id: string,
     updateModel: UpdateUserDTO,
-    info?: AppInfoDTO,
+    _info?: AppInfoDTO,
   ): Promise<void> {
     if (updateModel.password) {
       throw new ForbiddenException(
