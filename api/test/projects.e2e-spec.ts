@@ -21,8 +21,8 @@ describe('ProjectsModule (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post('/auth/sign-in')
       .send({
-        username: E2E_CONFIG.users.aa.username,
-        password: E2E_CONFIG.users.aa.password,
+        username: E2E_CONFIG.users.basic.aa.username,
+        password: E2E_CONFIG.users.basic.aa.password,
       })
       .expect(201);
 
@@ -59,7 +59,7 @@ describe('ProjectsModule (e2e)', () => {
     });
 
     it('Creating a project with minimum required data should succeed', async () => {
-      const createScenarioDTO: CreateProjectDTO = {
+      const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.minimal(),
         organizationId: anOrganization.id,
       };
@@ -67,7 +67,7 @@ describe('ProjectsModule (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send(createScenarioDTO)
+        .send(createProjectDTO)
         .expect(201);
 
       const resources = response.body.data;
@@ -76,7 +76,7 @@ describe('ProjectsModule (e2e)', () => {
     });
 
     it('Creating a project with complete data should succeed', async () => {
-      const createScenarioDTO: CreateProjectDTO = {
+      const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.complete({ countryCode: 'ESP' }),
         organizationId: anOrganization.id,
       };
@@ -84,7 +84,7 @@ describe('ProjectsModule (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send(createScenarioDTO)
+        .send(createProjectDTO)
         .expect(201);
 
       const resources = response.body.data;
