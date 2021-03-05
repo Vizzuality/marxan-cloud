@@ -23,8 +23,8 @@ describe('CountriesModule (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post('/auth/sign-in')
       .send({
-        username: E2E_CONFIG.users.aa.username,
-        password: E2E_CONFIG.users.aa.password,
+        username: E2E_CONFIG.users.basic.aa.username,
+        password: E2E_CONFIG.users.basic.aa.password,
       })
       .expect(201);
 
