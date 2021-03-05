@@ -1,45 +1,33 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { Dictionary } from 'lodash';
+import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-
-export interface LocalName {
-  /**
-   * Local name of a country.
-   *
-   * E.g. "Italia"
-   */
-  name: string;
-
-  /**
-   * Locale code for this name, composed of the dash-separated two-letter
-   * ISO-639 language code and the two-letter ISO 3166-1 alpha2 code.
-   *
-   * E.g. "it-IT"
-   */
-  locale: string;
-}
 
 @Entity('countries')
 export class Country {
-  @ApiProperty()
-  @PrimaryColumn('character varying', { name: 'iso_3166_1_alpha2' })
-  @Transform((_) => fakerStatic.address.countryCode())
-  alpha2: string;
+  get id() {
+    return this.gid0;
+  }
 
+  /**
+   * Country id (ISO 3166-1 alpha-3).
+   */
   @ApiProperty()
-  @PrimaryColumn('character varying', { name: 'iso_3166_1_alpha3' })
-  @Transform((_) => fakerStatic.address.countryCode())
-  alpha3: string;
+  @PrimaryColumn('character varying', { name: 'gid_0' })
+  gid0: string;
 
+  /**
+   * Country name
+   */
   @ApiProperty()
-  @Column('character varying')
-  @Transform((_) => fakerStatic.address.country())
-  name: string;
+  @Column('character varying', { name: 'name_0' })
+  name0: string;
 
-  @ApiPropertyOptional()
-  @Column('jsonb', { name: 'local_names' })
-  localNames: Dictionary<LocalName>;
+  /**
+   * @todo Add description. Also we can probably do better than using the `any`
+   * type.
+   */
+  @ApiProperty()
+  @Column('geometry', { name: 'the_geom' })
+  theGeom: any;
 }
 
 export class JSONAPICountryData {
