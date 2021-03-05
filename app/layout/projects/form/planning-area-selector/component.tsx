@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
+import { Field as FieldRFF } from 'react-final-form';
 
+import Field from 'components/forms/field';
+import {
+  composeValidators,
+} from 'components/forms/validations';
 import CountryRegionSelector from 'components/countries/country-region-selector';
 import PlanningUnitGrid from 'components/projects/planning-unit-grid';
 import PlanningUnitAreaSize from 'components/projects/planning-unit-area-size';
@@ -25,19 +30,30 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
     <div>
       <CountryRegionSelector />
       <div className="flex">
-        <PlanningUnitGrid
-          unit={unit}
-          onChange={(value) => {
-            const newData = {
-              ...data,
-              unit: value,
-            };
-            setData(newData);
-            if (onChange) {
-              onChange(newData);
-            }
-          }}
-        />
+        <FieldRFF
+          name="planningUnitGridShape"
+          validate={composeValidators([{ presence: true }])}
+        >
+          {(fprops) => (
+            <Field id="planningUnitGridShape" {...fprops}>
+              <PlanningUnitGrid
+                unit={unit}
+                onChange={(value) => {
+                  const newData = {
+                    ...data,
+                    unit: value,
+                  };
+                  setData(newData);
+                  fprops.input.onChange(value);
+                  if (onChange) {
+                    onChange(newData);
+                  }
+                }}
+              />
+            </Field>
+          )}
+        </FieldRFF>
+
         <PlanningUnitAreaSize
           size={size}
           onChange={(value) => {
