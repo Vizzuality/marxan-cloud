@@ -4,10 +4,6 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('admin_regions')
 export class AdminArea extends Country {
-  get id() {
-    return this.gid0;
-  }
-
   /**
    * Country id (ISO 3166-1 alpha-3).
    */
