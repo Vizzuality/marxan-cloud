@@ -17,7 +17,7 @@ const Template: Story<TooltipProps> = (args: TooltipProps) => (
       {...args}
       arrow
       content={(
-        <div className="px-2 py-1">
+        <div className="px-2 py-1 text-gray-500 bg-white rounded">
           <span>Tooltip</span>
         </div>
       )}
@@ -33,7 +33,7 @@ const Template: Story<TooltipProps> = (args: TooltipProps) => (
       trigger="click"
       placement="bottom-end"
       content={(
-        <div className="p-5">
+        <div className="p-5 text-gray-500 bg-white rounded">
           <h2 className="text-lg text-primary-500">Title</h2>
           <p>This is a content. We could have whateveryouwant</p>
         </div>

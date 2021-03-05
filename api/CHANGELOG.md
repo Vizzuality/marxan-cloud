@@ -6,9 +6,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0]
+
+## [0.0.1]
 
 Unreleased
+
+### Added
+
+- Admin Areas
+  - list by country [MARXAN-135]
+  - search by level 1 or level 2 id
+- Countries
+  - move to geoprocessingDB
+  - handle as subset of Admin Areas
+
+### Changed
+
+- Refactor processing of JSON:API fetch specifications (depends on
+  `nestjs-base-service >= 0.3.0`).
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+
+## [0.0.0.1]
+
+2021-02-22
+
+Initial release. Originally labelled 0.1.0, though we decided to start from
+0.0.1 for the first proper sprint, so this will be 0.0.0.1 🚀.
 
 ### Added
 
@@ -40,12 +69,4 @@ Unreleased
 - Support for pagination of plural responses.
 - Catch-all error handling via exception filter.
 - Serialization of error response payloads as JSON:API errors.
-
-### Changed
-
-### Fixed
-
-### Deprecated
-
-### Removed
-
+- Countries: findAll, findOne.

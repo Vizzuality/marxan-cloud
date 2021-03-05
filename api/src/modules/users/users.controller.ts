@@ -1,10 +1,11 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Request, UseGuards } from '@nestjs/common';
 import { User } from './user.api.entity';
 import { UsersService } from './users.service';
 
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -15,7 +16,10 @@ import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { RequestWithAuthenticatedUser } from 'app.controller';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { BaseServiceResource } from 'types/resource.interface';
-import { FetchSpecification, Pagination } from 'nestjs-base-service';
+import {
+  FetchSpecification,
+  ProcessFetchSpecification,
+} from 'nestjs-base-service';
 
 const resource: BaseServiceResource = {
   className: 'User',
@@ -47,8 +51,10 @@ export class UsersController {
   })
   @JSONAPIQueryParams()
   @Get()
-  async findAll(@Pagination() pagination: FetchSpecification): Promise<User[]> {
-    const results = await this.service.findAllPaginated(pagination);
+  async findAll(
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+  ): Promise<User[]> {
+    const results = await this.service.findAllPaginated(fetchSpecification);
     return this.service.serialize(results.data, results.metadata);
   }
 

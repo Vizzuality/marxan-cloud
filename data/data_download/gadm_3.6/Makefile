@@ -1,14 +1,15 @@
 .PHONY: import
-MAKEFLAGS := --jobs=$(shell nproc)
-MAKEFLAGS += --output-sync=target
+# MAKEFLAGS := --jobs=$(shell nproc)
+# MAKEFLAGS += --output-sync=target
 
 MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@marxan-postgresql-api:5432/$$API_POSTGRES_DB" -c "select id from users limit 1")
-
 import: data/gadm/gadm36_simp.geojson
 	ogr2ogr -makevalid \
-		-overwrite \
+		-update -append \
+		-geomfield the_geom \
+		--config OGR_TRUNCATE YES \
 		-nln admin_regions -nlt PROMOTE_TO_MULTI \
-		-lco GEOMETRY_NAME=the_geom \
+		-t_srs EPSG:4326 -a_srs EPSG:4326 \
 		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
 		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD" $< \
 		-sql "select *,'$(MarxanUser)' as created_by from \"$$(basename -s .geojson "$<")\"";
@@ -19,6 +20,10 @@ data/gadm/gadm36_simp.geojson: data/gadm/gadm36_0.shp data/gadm/gadm36_1.shp dat
 				-filter-islands min-vertices=3 remove-empty \
 				-filter-slivers \
 				-clean rewind \
+				-each 'level= this.layer_name =="gadm36_0" ? "country" \
+							: this.layer_name =="gadm36_1" ? "adm_1" \
+							: this.layer_name =="gadm36_2" ? "adm_2" \
+							: null' \
 				-merge-layers force name=test target=* \
 				-o $@ target=test format=geojson force
 

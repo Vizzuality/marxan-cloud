@@ -6,7 +6,7 @@ import { UsersService } from 'modules/users/users.service';
 import { AppConfig } from 'utils/config.utils';
 import { hash, compare } from 'bcrypt';
 
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IssuedAuthnToken } from './issued-authn-token.api.entity';
 import ms = require('ms');
@@ -155,6 +155,8 @@ export class AuthenticationService {
       tokenId: issuedToken.id,
     };
 
+    await this.purgeExpiredIssuedTokens();
+
     return {
       user: UsersService.getSanitizedUserMetadata(user),
       accessToken: this.jwtService.sign(
@@ -173,5 +175,25 @@ export class AuthenticationService {
    */
   async findTokenById(tokenId: string): Promise<IssuedAuthnToken | undefined> {
     return this.issuedAuthnTokensRepository.findOne({ id: tokenId });
+  }
+
+  /**
+   * Invalidate all JWT tokens for a given user.
+   *
+   * We basically delete all the tokens for the given user, which means the
+   * authentication workflow will reject any otherwise valid JWT tokens
+   * presented by an API client, even if their `exp` time is in the future.
+   */
+  async invalidateAllTokensOfUser(userId: string): Promise<void> {
+    await this.issuedAuthnTokensRepository.delete({ userId });
+  }
+
+  /**
+   * Purge all expired JWT tokens
+   */
+  async purgeExpiredIssuedTokens(): Promise<void> {
+    await this.issuedAuthnTokensRepository.delete({
+      exp: LessThan(new Date()),
+    });
   }
 }
