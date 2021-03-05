@@ -8,7 +8,6 @@ import {
   Req,
   UploadedFile,
   UseGuards,
-  ValidationPipe,
 } from '@nestjs/common';
 import { Project, ProjectResult } from './project.api.entity';
 import { ProjectsService } from './projects.service';
@@ -92,7 +91,7 @@ export class ProjectsController {
   @ApiOkResponse({ type: ProjectResult })
   @Post()
   async create(
-    @Body(new ValidationPipe()) dto: CreateProjectDTO,
+    @Body() dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResult> {
     return await this.service.serialize(
@@ -105,7 +104,7 @@ export class ProjectsController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) dto: UpdateProjectDTO,
+    @Body() dto: UpdateProjectDTO,
   ): Promise<ProjectResult> {
     return await this.service.serialize(await this.service.update(id, dto));
   }
