@@ -3,6 +3,7 @@ import {
   IsAlpha,
   IsEnum,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   IsUppercase,
@@ -14,9 +15,12 @@ import { PlanningUnitGridShape } from '../project.api.entity';
 
 export class CreateProjectDTO {
   @ApiProperty()
+  @IsString()
   name: string;
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   description?: string;
 
   @ApiProperty()
@@ -55,8 +59,11 @@ export class CreateProjectDTO {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsObject()
   extent?: Record<string, unknown>;
 
   @ApiPropertyOptional()
-  metadata?: Dictionary<string>;
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, unknown>;
 }
