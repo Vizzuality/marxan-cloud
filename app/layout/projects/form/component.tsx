@@ -146,7 +146,6 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
               theme="primary"
               size="xl"
               type="submit"
-              disabled
             >
               Save
             </Button>
