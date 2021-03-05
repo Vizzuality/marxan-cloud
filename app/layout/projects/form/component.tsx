@@ -15,14 +15,52 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 
+import { useSaveProject } from 'hooks/projects';
+import { useToasts } from 'hooks/toast';
+
 import PlanningAreaSelector from './planning-area-selector';
 import ProjectFormProps from './types';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
   const [hasPlanningArea, setHasPlanningArea] = useState(false);
+  const { addToast } = useToasts();
+
+  // Project mutation and submit
+  const saveProjectMutation = useSaveProject({ });
 
   const handleSubmit = (values) => {
-    console.info('values', values);
+    // TEMPORARY!!
+    // This should be removed once organizations IDs are handled in the app
+    const data = {
+      ...values,
+      organizationId: 'bd1689c8-8246-42d5-9005-4aaa8aeb0049',
+    };
+    saveProjectMutation.mutate(data, {
+      onSuccess: ({ data: s }) => {
+        addToast('success-project-creation', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Project saved successfully</p>
+          </>
+        ), {
+          level: 'success',
+        });
+
+        console.info('Project saved succesfully', s);
+      },
+      onError: () => {
+        addToast('error-project-creation', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Project could not be created</p>
+          </>
+        ), {
+          level: 'error',
+        });
+
+        console.error('Project could not be created');
+      },
+    });
   };
 
   const handleCancel = () => {
