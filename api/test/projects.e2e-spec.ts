@@ -10,7 +10,7 @@ describe('ProjectsModule (e2e)', () => {
 
   let jwtToken: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -36,11 +36,11 @@ describe('ProjectsModule (e2e)', () => {
     jwtToken = response.body.accessToken;
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await Promise.all([app.close()]);
   });
 
-  describe('Projects', () => {
+  describe('Projects', async () => {
     let anOrganization: { id: string; type: 'organizations' };
     let minimalProject: { id: string; type: 'projects' };
     let completeProject: { id: string; type: 'projects' };
