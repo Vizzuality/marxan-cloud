@@ -48,9 +48,6 @@ export interface SelectMenuProps extends
   children: ReactNode;
   opened: boolean;
   attributes: Record<string, unknown>,
-  getMenuProps: (e?:any) => void;
-  onFocus?: FocusEventHandler;
-  onBlur?: FocusEventHandler;
 }
 
 export interface SelectToggleProps extends
@@ -59,6 +56,6 @@ export interface SelectToggleProps extends
   SelectThemeProps {
   opened: boolean;
   selectedItems: SelectOptionProps[];
-  getToggleButtonProps: (e?:any) => void;
-  getDropdownProps?: (e?:any) => void;
+  getToggleButtonProps: (e?: any) => void;
+  getDropdownProps?: (e?: any) => void;
 }
