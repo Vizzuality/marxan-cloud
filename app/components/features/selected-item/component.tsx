@@ -82,8 +82,8 @@ export const Item: React.FC<ItemProps> = ({
       <header
         className={cx({
           'px-4 pt-2 pb-4 border-l-4': true,
-          'border-bioregional': type === 'bioregional',
-          'border-species': type === 'species',
+          'border-green-300': type === 'bioregional',
+          'border-yellow-300': type === 'species',
         })}
       >
         <h2 className="text-sm font-heading">{name}</h2>
@@ -92,7 +92,7 @@ export const Item: React.FC<ItemProps> = ({
         {type === 'bioregional' && (
           <div>
             <div className="flex items-center mt-3 tracking-wide font-heading">
-              <Icon icon={SPLIT_SVG} className="w-5 h-5 text-bioregional" />
+              <Icon icon={SPLIT_SVG} className="w-5 h-5 text-green-300" />
               <h4 className="ml-2 text-xs text-white uppercase">
                 You can
                 {' '}
@@ -120,7 +120,7 @@ export const Item: React.FC<ItemProps> = ({
         {type === 'species' && (
           <div>
             <div className="flex items-center mt-3 tracking-wide font-heading">
-              <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-species" />
+              <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-yellow-300" />
               <h4 className="ml-2 text-xs text-white uppercase">
                 You can
                 {' '}
@@ -155,14 +155,14 @@ export const Item: React.FC<ItemProps> = ({
                 key={`${f.value}`}
                 className="flex items-center pr-2.5 py-2 mt-0.5 relative"
               >
-                <div className="absolute top-0 left-0 block w-px h-full bg-bioregional" />
+                <div className="absolute top-0 left-0 block w-px h-full bg-green-300" />
                 <div className="relative flex text-xs font-heading">
                   <div className="ml-2.5">
                     <Checkbox
                       id={`checkbox-${f.value}`}
                       value={`${f.value}`}
                       checked={checked}
-                      className="block w-4 h-4 text-bioregional form-checkbox-dark"
+                      className="block w-4 h-4 text-green-300 form-checkbox-dark"
                       onChange={onSplitFeaturesChanged}
                     />
                   </div>
@@ -188,7 +188,7 @@ export const Item: React.FC<ItemProps> = ({
                 key={`${f.value}`}
                 className="flex items-center pr-2.5 py-2 mt-0.5 relative"
               >
-                <div className="absolute top-0 left-0 block w-px h-full bg-gradient-to-b from-bioregional to-species" />
+                <div className="absolute top-0 left-0 block w-px h-full bg-gradient-to-b from-green-300 to-yellow-300" />
                 <div className="relative flex text-xs font-heading">
                   <div className="inline-block max-w-sm ml-2.5">
                     {name}

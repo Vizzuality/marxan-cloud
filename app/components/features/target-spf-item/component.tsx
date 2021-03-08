@@ -25,8 +25,8 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
       className={cx({
         'bg-gray-800 text-white text-xs pl-4 py-2': true,
         'border-l-4': !isAllTargets,
-        'border-bioregional': type === Type.BIOREGIONAL,
-        'border-species': type === Type.SPECIES,
+        'border-green-300': type === Type.BIOREGIONAL,
+        'border-yellow-300': type === Type.SPECIES,
         'border-indigo': type === Type.BIOREGIONAL_AND_SPECIES, // temporary color
         [className]: !!className,
       })}
