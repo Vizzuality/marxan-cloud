@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import * as faker from 'faker';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
@@ -11,7 +11,7 @@ describe('UsersModule (e2e)', () => {
 
   const aNewPassword = faker.random.uuid();
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -40,7 +40,7 @@ describe('UsersModule (e2e)', () => {
     jwtToken = response.body.accessToken;
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await Promise.all([app.close()]);
   });
 
@@ -49,8 +49,7 @@ describe('UsersModule (e2e)', () => {
       const results = await request(app.getHttpServer())
         .get('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send()
-        .expect(200);
+        .expect(HttpStatus.OK);
 
       expect(results);
     });
@@ -60,7 +59,7 @@ describe('UsersModule (e2e)', () => {
         .patch('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send(E2E_CONFIG.users.updated.bb())
-        .expect(200);
+        .expect(HttpStatus.OK);
     });
   });
 
@@ -73,10 +72,10 @@ describe('UsersModule (e2e)', () => {
           ...E2E_CONFIG.users.updated.bb(),
           password: faker.random.alphaNumeric(),
         })
-        .expect(403);
+        .expect(HttpStatus.FORBIDDEN);
     });
 
-    it('A user should be not able to change their password if they provide an incorrect current password', async () => {
+    it('A user should not be able to change their password if they provide an incorrect current password', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/users/me/password')
         .set('Authorization', `Bearer ${jwtToken}`)
@@ -84,7 +83,7 @@ describe('UsersModule (e2e)', () => {
           currentPassword: faker.random.uuid(),
           newPassword: aNewPassword,
         })
-        .expect(403);
+        .expect(HttpStatus.FORBIDDEN);
     });
   });
 
@@ -97,7 +96,7 @@ describe('UsersModule (e2e)', () => {
           currentPassword: E2E_CONFIG.users.basic.bb.password,
           newPassword: aNewPassword,
         })
-        .expect(200);
+        .expect(HttpStatus.OK);
     });
   });
 
@@ -110,7 +109,7 @@ describe('UsersModule (e2e)', () => {
           currentPassword: aNewPassword,
           newPassword: E2E_CONFIG.users.basic.bb.password,
         })
-        .expect(200);
+        .expect(HttpStatus.OK);
     });
   });
 
@@ -119,8 +118,7 @@ describe('UsersModule (e2e)', () => {
       await request(app.getHttpServer())
         .delete('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send()
-        .expect(200);
+        .expect(HttpStatus.OK);
     });
   });
 
@@ -129,8 +127,7 @@ describe('UsersModule (e2e)', () => {
       await request(app.getHttpServer())
         .get('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send()
-        .expect(401);
+        .expect(HttpStatus.UNAUTHORIZED);
     });
 
     it('Once a user account is marked as deleted, the user should not be able to log back in', async () => {
@@ -140,7 +137,7 @@ describe('UsersModule (e2e)', () => {
           username: E2E_CONFIG.users.basic.bb.username,
           password: E2E_CONFIG.users.basic.bb.password,
         })
-        .expect(401);
+        .expect(HttpStatus.UNAUTHORIZED);
     });
   });
 });
