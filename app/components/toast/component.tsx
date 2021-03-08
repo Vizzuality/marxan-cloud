@@ -19,23 +19,23 @@ import { ToastProps, ToastTheme } from './types';
 const THEME: ToastTheme = {
   info: {
     icon: INFO_SVG,
-    bg: 'from-blue-400 to-blue-500',
-    hoverBg: 'from-blue-300 to-blue-400',
+    bg: 'from-blue-400 to-blue-700',
+    hoverBg: 'from-blue-100 to-blue-400',
   },
   success: {
     icon: SUCCESS_SVG,
-    bg: 'from-green-400 to-green-500',
-    hoverBg: 'from-green-300 to-green-400',
+    bg: 'from-green-400 to-green-700',
+    hoverBg: 'from-green-100 to-green-400',
   },
   warning: {
     icon: WARNING_SVG,
-    bg: 'from-yellow-400 to-yellow-500',
-    hoverBg: 'from-yellow-300 to-yellow-400',
+    bg: 'from-yellow-400 to-yellow-700',
+    hoverBg: 'from-yellow-100 to-yellow-400',
   },
   error: {
     icon: ERROR_SVG,
-    bg: 'from-red-400 to-red-500',
-    hoverBg: 'from-red-300 to-red-400',
+    bg: 'from-red-400 to-red-700',
+    hoverBg: 'from-red-100 to-red-400',
   },
 };
 
