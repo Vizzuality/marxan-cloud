@@ -10,7 +10,7 @@ describe('ScenariosModule (e2e)', () => {
 
   let jwtToken: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -36,7 +36,7 @@ describe('ScenariosModule (e2e)', () => {
     jwtToken = response.body.accessToken;
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await Promise.all([app.close()]);
   });
 
