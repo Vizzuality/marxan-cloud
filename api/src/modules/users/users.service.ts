@@ -33,7 +33,7 @@ export class UsersService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<User> {
     return {
-      attributes: ['fname', 'lname', 'email', 'displayName'],
+      attributes: ['displayName', 'fname', 'lname', 'email'],
       keyForAttribute: 'camelCase',
     };
   }
@@ -68,7 +68,7 @@ export class UsersService extends AppBaseService<
    * @debt Should be extended to include roles and permissions.
    */
   static getSanitizedUserMetadata(user: Partial<User>): Partial<User> {
-    const allowedProps = ['email', 'fname', 'lname', 'displayName'];
+    const allowedProps = ['displayName', 'email', 'fname', 'lname'];
 
     return get(user, allowedProps);
   }

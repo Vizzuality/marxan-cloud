@@ -1,18 +1,22 @@
 import React, { ReactNode } from 'react';
 
+import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
-import { useAuth } from 'hooks/authentication';
 
 interface ProtectedProps {
   children: ReactNode
 }
 
 const Protected: React.FC = ({ children }: ProtectedProps) => {
-  const { user, errorRedirect } = useAuth();
   const router = useRouter();
+  const [session, loading] = useSession();
 
-  if (!user) {
-    router.push(errorRedirect);
+  // Not display anything when session request is on progress
+  if (loading) return null;
+
+  // Redirect when session doesn't exist
+  if (!loading && !session) {
+    router.push('/auth/sign-in');
     return null;
   }
 

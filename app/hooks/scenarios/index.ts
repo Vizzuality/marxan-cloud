@@ -1,19 +1,19 @@
 import { useMemo } from 'react';
 import { useQuery, useMutation } from 'react-query';
-import { useAuth } from 'hooks/authentication';
+import { useSession } from 'next-auth/client';
 
 import SCENARIOS from 'services/scenarios';
 
 import { UseSaveScenarioProps } from './types';
 
 export function useScenarios() {
-  const { user } = useAuth();
+  const [session] = useSession();
 
   const query = useQuery('scenarios', async () => SCENARIOS.request({
     method: 'GET',
     url: '/',
     headers: {
-      Authorization: `Bearer ${user.token}`,
+      Authorization: `Bearer ${session.accessToken}`,
     },
   }));
 
@@ -21,13 +21,13 @@ export function useScenarios() {
 }
 
 export function useScenario(id) {
-  const { user } = useAuth();
+  const [session] = useSession();
 
   const query = useQuery(`scenarios/${id}`, async () => SCENARIOS.request({
     method: 'GET',
     url: `/${id}`,
     headers: {
-      Authorization: `Bearer ${user.token}`,
+      Authorization: `Bearer ${session.accessToken}`,
     },
   }), {
     enabled: !!id,
@@ -49,7 +49,7 @@ export function useSaveScenario({
     url: '/',
   },
 }: UseSaveScenarioProps) {
-  const { user } = useAuth();
+  const [session] = useSession();
 
   return useMutation((data) => {
     return SCENARIOS.request({
@@ -57,7 +57,7 @@ export function useSaveScenario({
       url: '/',
       data,
       headers: {
-        Authorization: `Bearer ${user.token}`,
+        Authorization: `Bearer ${session.accessToken}`,
       },
       ...requestConfig,
     });

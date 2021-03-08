@@ -3,7 +3,7 @@ import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { OverlayProvider } from '@react-aria/overlays';
-import { AuthorizationProvider } from 'hooks/authentication';
+import { Provider as AuthenticationProvider } from 'next-auth/client';
 import { ToastProvider } from 'hooks/toast';
 
 import type { AppProps } from 'next/app';
@@ -18,10 +18,7 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
   return (
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClient}>
-        <AuthorizationProvider
-          successRedirect="/projects"
-          errorRedirect="/" // We should create a login page
-        >
+        <AuthenticationProvider session={pageProps.session}>
           <OverlayProvider>
             <ToastProvider
               placement="top-right"
@@ -33,7 +30,7 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
               </div>
             </ToastProvider>
           </OverlayProvider>
-        </AuthorizationProvider>
+        </AuthenticationProvider>
       </QueryClientProvider>
     </ReduxProvider>
   );
