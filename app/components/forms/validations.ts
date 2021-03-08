@@ -27,13 +27,13 @@ export const composeValidators = (validations: any[]) => (
   return undefined;
 };
 
-export const checkboxValidator = (value) => {
+export const booleanValidator = (value) => {
   if (!value) return 'Error';
 
   return undefined;
 };
 
-export const checkboxGroupValidator = (value) => {
+export const arrayValidator = (value) => {
   if (!value || !value.length) return 'Error';
 
   return undefined;

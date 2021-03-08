@@ -12,6 +12,7 @@ import Select from 'components/forms/select';
 
 import {
   composeValidators,
+  arrayValidator,
 } from 'components/forms/validations';
 
 import { useRouter } from 'next/router';
@@ -26,6 +27,14 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   const { addToast } = useToasts();
   const { query } = useRouter();
   const { pid, sid } = query;
+
+  const WDPA_CATEGORIES_OPTIONS = [
+    { label: 'Category 1', value: 'category-1' },
+    { label: 'Category 2', value: 'category-2' },
+    { label: 'Category 3', value: 'category-3' },
+    { label: 'Category 4', value: 'category-4' },
+    { label: 'Category 5', value: 'category-5' },
+  ];
 
   const { data } = useScenario(sid);
 
@@ -88,7 +97,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
             <div>
               <FieldRFF
                 name="wdpaFilter"
-                validate={composeValidators([{ presence: true }])}
+                validate={composeValidators([{ presence: true }, arrayValidator])}
               >
                 {(fprops) => (
                   <Field id="scenario-wdpaFilter" {...fprops}>
@@ -104,13 +113,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
                       batchSelectionLabel="All protected areas"
                       initialSelected={data?.wdpaFilter}
                       initialValues={data?.wdpaFilter}
-                      options={[
-                        { label: 'Category 1', value: 'category-1' },
-                        { label: 'Category 2', value: 'category-2' },
-                        { label: 'Category 3', value: 'category-3' },
-                        { label: 'Category 4', value: 'category-4' },
-                        { label: 'Category 5', value: 'category-5' },
-                      ]}
+                      options={WDPA_CATEGORIES_OPTIONS}
                     />
                   </Field>
                 )}
