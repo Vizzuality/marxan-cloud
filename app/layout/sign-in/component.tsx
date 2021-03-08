@@ -61,7 +61,6 @@ export const SignIn: React.FC<SignInProps> = () => {
 
   return (
     <Wrapper>
-
       <FormRFF
         onSubmit={handleSubmit}
       >
@@ -114,7 +113,7 @@ export const SignIn: React.FC<SignInProps> = () => {
             <div className="mt-5 text-sm text-center text-black">
               Dont&apos;t have an account?
               {' '}
-              <Link href="/sign-up"><a href="/sign-up" className="underline">Sign up</a></Link>
+              <Link href="/auth/sign-up"><a href="/auth/sign-up" className="underline">Sign up</a></Link>
             </div>
 
           </form>

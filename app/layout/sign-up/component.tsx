@@ -37,17 +37,14 @@ export const SignUp: React.FC<SignUpProps> = () => {
     setSubmitting(true);
 
     try {
-      const request = await AUTHENTICATION
+      await AUTHENTICATION
         .request({
           method: 'POST',
           url: '/sign-up',
           data,
         });
 
-      // User is created, so login-in
-      if (request.statusText === 'Created') {
-        await signIn('credentials', { ...data, callbackUrl: `${window.location.protocol}//${window.location.host}/projects` });
-      }
+      await signIn('credentials', { ...data, callbackUrl: `${window.location.protocol}//${window.location.host}/projects` });
     } catch (error) {
       const { data: { errors } } = error.response;
 
@@ -156,7 +153,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
             <div className="mt-5 text-sm text-center text-black">
               Already registered.
               {' '}
-              <Link href="/sign-in"><a href="/sign-in" className="underline">Sign in</a></Link>
+              <Link href="/auth/sign-in"><a href="/auth/sign-in" className="underline">Sign in</a></Link>
             </div>
           </form>
         )}
