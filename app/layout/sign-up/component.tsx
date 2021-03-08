@@ -17,7 +17,8 @@ import {
   checkboxValidator,
 } from 'components/forms/validations';
 
-import { useAuth } from 'hooks/authentication';
+import AUTHENTICATION from 'services/authentication';
+import { signIn } from 'next-auth/client';
 import { useToasts } from 'hooks/toast';
 
 import USER_SVG from 'svgs/ui/user.svg?sprite';
@@ -30,39 +31,46 @@ export interface SignUpProps {
 
 export const SignUp: React.FC<SignUpProps> = () => {
   const [submitting, setSubmitting] = useState(false);
-  const auth = useAuth();
   const { addToast } = useToasts();
 
   const handleSubmit = useCallback(async (data) => {
     setSubmitting(true);
 
     try {
-      await auth.signup(data);
-    } catch (err) {
+      const request = await AUTHENTICATION
+        .request({
+          method: 'POST',
+          url: '/sign-up',
+          data,
+        });
+
+      // User is created, so login-in
+      if (request.statusText === 'Created') {
+        await signIn('credentials', { ...data, callbackUrl: `${window.location.protocol}//${window.location.host}/projects` });
+      }
+    } catch (error) {
+      const { data: { errors } } = error.response;
+
       addToast('error-signup', (
         <>
           <h2 className="font-medium">Error!</h2>
-          <p className="text-sm">Ooops! Something went wrong. Try again</p>
+          <ul>
+            {errors.map(({ title }) => (
+              <li key={title}>
+                <p className="text-sm">
+                  { title || 'Ooops! Something went wrong. Try again'}
+                </p>
+              </li>
+            ))}
+          </ul>
         </>
       ), {
         level: 'error',
       });
 
       setSubmitting(false);
-      console.error(err);
     }
-  }, [auth, addToast]);
-
-  // This shouldn't be here, it's here just for testing
-  const handleLogout = useCallback(async () => {
-    await auth.signout();
-  }, [auth]);
-
-  if (auth.user) {
-    return (
-      <Button theme="primary" size="base" onClick={handleLogout}>Logout</Button>
-    );
-  }
+  }, [addToast]);
 
   return (
     <Wrapper>
@@ -97,7 +105,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
             {/* EMAIL */}
             <div className="mt-5">
               <FieldRFF
-                name="username"
+                name="email"
                 validate={composeValidators([{ presence: true, email: true }])}
               >
                 {(fprops) => (
@@ -145,7 +153,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
               </Button>
             </div>
 
-            <div className="mt-5 text-sm text-center">
+            <div className="mt-5 text-sm text-center text-black">
               Already registered.
               {' '}
               <Link href="/sign-in"><a href="/sign-in" className="underline">Sign in</a></Link>
