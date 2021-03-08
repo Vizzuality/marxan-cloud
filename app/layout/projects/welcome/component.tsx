@@ -1,15 +1,18 @@
 import React from 'react';
 
 import Wrapper from 'layout/wrapper';
-import { useAuth } from 'hooks/authentication';
+import { useSession } from 'next-auth/client';
 
 export interface ProjectsWelcomeProps {
 
 }
 
 export const ProjectsWelcome: React.FC<ProjectsWelcomeProps> = () => {
-  const auth = useAuth();
-  const { user: { displayName } } = auth;
+  const [session, loading] = useSession();
+  const { user: { displayName } } = session;
+
+  // prevent show anything while session is loading
+  if (!session && loading) return null;
 
   return (
     <Wrapper>
