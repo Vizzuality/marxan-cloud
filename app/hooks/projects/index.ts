@@ -1,7 +1,7 @@
 import Fuse from 'fuse.js';
 import { useMemo } from 'react';
 import { useMutation, useQuery } from 'react-query';
-import { useAuth } from 'hooks/authentication';
+import { useSession } from 'next-auth/client';
 
 import { ItemProps } from 'components/projects/item/component';
 
@@ -9,14 +9,14 @@ import PROJECTS from 'services/projects';
 import { UseSaveProjectProps } from './types';
 
 export function useProjects(filters) {
-  const { user } = useAuth();
+  const [session] = useSession();
   const { search } = filters;
 
   const query = useQuery('projects', async () => PROJECTS.request({
     method: 'GET',
     url: '/',
     headers: {
-      Authorization: `Bearer ${user.token}`,
+      Authorization: `Bearer ${session.accessToken}`,
     },
   }));
 
@@ -67,13 +67,13 @@ export function useProjects(filters) {
 }
 
 export function useProject(id) {
-  const { user } = useAuth();
+  const [session] = useSession();
 
   const query = useQuery(`projects/${id}`, async () => PROJECTS.request({
     method: 'GET',
     url: `/${id}`,
     headers: {
-      Authorization: `Bearer ${user.token}`,
+      Authorization: `Bearer ${session.accessToken}`,
     },
   }), {
     enabled: !!id,
@@ -95,7 +95,7 @@ export function useSaveProject({
     url: '/',
   },
 }: UseSaveProjectProps) {
-  const { user } = useAuth();
+  const [session] = useSession();
 
   return useMutation((data) => {
     return PROJECTS.request({
@@ -103,7 +103,7 @@ export function useSaveProject({
       url: '/',
       data,
       headers: {
-        Authorization: `Bearer ${user.token}`,
+        Authorization: `Bearer ${session.accessToken}`,
       },
       ...requestConfig,
     });
