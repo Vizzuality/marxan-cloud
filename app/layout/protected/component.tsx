@@ -4,7 +4,7 @@ import { signIn, useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
 import { useInterval } from 'utils/use-interval';
 
-const TIME_INTERVAL = 1000 * 6; // 10 min
+const TIME_INTERVAL = 1000 * 60 * 10; // 10 min
 const SESSION_BUFFER_TIME = 30 * 60 * 1000; // 30 min
 
 interface ProtectedProps {
