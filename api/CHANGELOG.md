@@ -15,10 +15,21 @@ Unreleased
 
 - Admin Areas
   - list by country [MARXAN-135]
+    - optionally filter by level 1 or level 2
   - search by level 1 or level 2 id
+  - list subdivisions of a given level 1 area
 - Countries
   - move to geoprocessingDB
   - handle as subset of Admin Areas
+- Users
+  - add ability to soft-delete users [MARXAN-128]
+  - add endpoint to soft-delete one's own user [MARXAN-128]
+- Strict typing for JSON:API serializable field sets
+- Support for omitting specific fields from getAll results (blocklisting) where
+  a whitelisting approach is not desirable/practical.
+- Projects
+  - handle planning unit grid shape, planning unit area, L1 and L2 admin area
+    ids.
 
 ### Changed
 
@@ -26,6 +37,9 @@ Unreleased
   `nestjs-base-service >= 0.3.0`).
 
 ### Fixed
+
+- Sync entity props and serializable attributes configured for JSON:API
+  serialization (ht stricter typing for catching this issue).
 
 ### Deprecated
 

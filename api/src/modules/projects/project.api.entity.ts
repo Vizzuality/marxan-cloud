@@ -14,6 +14,12 @@ import {
 import { Organization } from 'modules/organizations/organization.api.entity';
 import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 
+export enum PlanningUnitGridShape {
+  square = 'square',
+  hexagon = 'hexagon',
+  fromShapefile = 'from_shapefile',
+}
+
 @Entity('projects')
 export class Project extends TimeUserEntityMetadata {
   @ApiProperty()
@@ -44,19 +50,45 @@ export class Project extends TimeUserEntityMetadata {
 
   /**
    * The country where this project is located.
+   *
+   * Uses the gid0 property of the Country entity.
    */
-  @Column('uuid', { name: 'country_id' })
+  @Column('character varying', { name: 'country_id' })
   countryId: string;
 
   /**
-   * The smallest administrative region that contains the whole project's
-   * geometry.
-   *
-   * @todo Check description.
+   * Administrative area (level 1) on which this project is focused.
    */
   @ApiProperty()
-  @Column('uuid', { name: 'admin_region_id' })
-  adminRegionId: string;
+  @Column('character varying', { name: 'admin_area_l1_id' })
+  adminAreaLevel1Id?: string;
+
+  /**
+   * Administrative area (level 2) on which this project is focused.
+   */
+  @ApiProperty()
+  @Column('character varying', { name: 'admin_area_l2_id' })
+  adminAreaLevel2Id?: string;
+
+  /**
+   * Shape of the planning units.
+   *
+   * Planning unit grids are generated algorithmically if the shape chosen is
+   * square or hexagon; if users want to upload their own shapefile, we set this
+   * to fromShapefile, and handle the upload of the shapefile separately.
+   */
+  @ApiProperty()
+  @Column('enum', { name: 'planning_unit_grid_shape' })
+  planningUnitGridShape?: PlanningUnitGridShape;
+
+  /**
+   * Area of planning units in km2.
+   *
+   * This is only used if the chosen shape is `square` or `hexagon`.
+   */
+  @ApiProperty()
+  @Column('float', { name: 'planning_unit_area_km2' })
+  planningUnitAreakm2?: number;
 
   /**
    * Extent of the project

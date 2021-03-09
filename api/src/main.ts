@@ -40,7 +40,11 @@ async function bootstrap() {
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);
   SwaggerModule.setup('/swagger', app, swaggerDocument);
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
   app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(3000);

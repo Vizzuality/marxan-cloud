@@ -1,14 +1,18 @@
 import React from 'react';
 
 import Wrapper from 'layout/wrapper';
-// import { useAuth } from 'hooks/authentication';
+import { useSession } from 'next-auth/client';
 
 export interface ProjectsWelcomeProps {
 
 }
 
 export const ProjectsWelcome: React.FC<ProjectsWelcomeProps> = () => {
-  // const { user } = useAuth();
+  const [session, loading] = useSession();
+  const { user: { displayName } } = session;
+
+  // prevent show anything while session is loading
+  if (!session && loading) return null;
 
   return (
     <Wrapper>
@@ -16,7 +20,7 @@ export const ProjectsWelcome: React.FC<ProjectsWelcomeProps> = () => {
         Welcome,
         {' '}
         <strong>
-          Tamara
+          {displayName}
         </strong>
       </h2>
     </Wrapper>

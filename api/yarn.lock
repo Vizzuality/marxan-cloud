@@ -4890,6 +4890,11 @@ lodash@4.17.20, lodash@^4.16.3, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.2
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
+lodash@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+
 log-symbols@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-4.0.0.tgz#69b3cc46d20f448eccdb75ea1fa733d9e821c920"
@@ -5233,14 +5238,15 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nestjs-base-service@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.3.0.tgz#6e1294b4317155f2ba4eef37eb8a55b5aaac1a28"
-  integrity sha512-wK/WTNF3uO1IBSQwunUwmf/3vsOIoarftqLlx/kVe8DBTxLxuJQTTKTDqoZo04yJtequGp5BNb4MMYkZ6urRaQ==
+nestjs-base-service@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.4.0.tgz#1cca6da2e174c6b053dffa8b7c3613ee5cde1983"
+  integrity sha512-D7irac5wIxVm1X93z+A+d/PeHu80bZc3QBnpFZNgoIwN1uP9cTQCLKcJQG2VyJAHaBn49h21STjAKHOAJdb9Xw==
   dependencies:
     "@nestjs/common" "7.6.5"
     class-validator "0.13.1"
     express "^4.17.1"
+    lodash "^4.17.21"
     nestjs-typeorm-paginate "2.2.6"
     typeorm "0.2.30"
     typescript "4.1.3"
@@ -7475,7 +7481,7 @@ typescript@4.0.5:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.5.tgz#ae9dddfd1069f1cb5beb3ef3b2170dd7c1332389"
   integrity sha512-ywmr/VrTVCmNTJ6iV2LwIrfG1P+lv6luD8sUJs+2eI9NLGigaN+nUQc13iHqisq7bra9lnmUSYqbJvegraBOPQ==
 
-typescript@4.1.3, typescript@^4.0.5:
+typescript@4.1.3:
   version "4.1.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.3.tgz#519d582bd94cba0cf8934c7d8e8467e473f53bb7"
   integrity sha512-B3ZIOf1IKeH2ixgHhj6la6xdwR9QrLC5d1VKeCSY4tvkqhF2eqd9O7txNlS0PO3GrBAFIdr3L1ndNwteUbZLYg==
@@ -7484,6 +7490,11 @@ typescript@^3.8.3:
   version "3.9.7"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
   integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
+
+typescript@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.2.tgz#1450f020618f872db0ea17317d16d8da8ddb8c4c"
+  integrity sha512-tbb+NVrLfnsJy3M59lsDgrzWIflR4d4TIUjz+heUnHZwdF7YsrMTKoRERiIvI2lvBG95dfpLxB21WZhys1bgaQ==
 
 undefsafe@^2.0.3:
   version "2.0.3"

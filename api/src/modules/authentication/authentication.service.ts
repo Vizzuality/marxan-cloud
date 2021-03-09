@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { User } from 'modules/users/user.api.entity';
@@ -57,6 +62,7 @@ export interface JwtDataPayload {
 @Injectable()
 export class AuthenticationService {
   constructor(
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     @InjectRepository(IssuedAuthnToken)

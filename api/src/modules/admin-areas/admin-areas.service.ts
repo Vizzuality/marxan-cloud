@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -7,9 +11,42 @@ import { CreateAdminAreaDTO } from './dto/create.admin-area.dto';
 import { UpdateAdminAreaDTO } from './dto/update.admin-area.dto';
 
 import * as faker from 'faker';
-import { AppBaseService } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+  PaginationMeta,
+} from 'utils/app-base.service';
 import { FetchSpecification, FetchUtils } from 'nestjs-base-service';
 import { omit } from 'lodash';
+import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
+
+/**
+ * Supported admin area levels (sub-national): either level 1 or level 2.
+ */
+export class AdminAreaLevel {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(2)
+  @Transform((level: string) => parseInt(level))
+  level?: 1 | 2;
+}
+
+/**
+ * Possible filters for AdminAreas
+ */
+type AdminAreaFilters = {
+  /**
+   * Id of parent country if filtering admin areas by parent country.
+   */
+  countryId: string;
+
+  /**
+   * Id of level 1 area if filtering level 2 admin areas by parent level 1 area.
+   */
+  level2AreaByArea1Id: string;
+} & AdminAreaLevel;
 
 @Injectable()
 export class AdminAreasService extends AppBaseService<
@@ -25,8 +62,9 @@ export class AdminAreasService extends AppBaseService<
     super(adminAreasRepository, 'admin_area', 'admin_areas');
   }
 
-  get serializerConfig() {
+  get serializerConfig(): JSONAPISerializerConfig<AdminArea> {
     return {
+      transform: (item: AdminArea) => ({ ...item, id: item.gid2 ?? item.gid1 }),
       attributes: [
         'gid0',
         'name0',
@@ -50,13 +88,30 @@ export class AdminAreasService extends AppBaseService<
 
   setFilters(
     query: SelectQueryBuilder<AdminArea>,
-    filters: any,
+    filters: AdminAreaFilters,
     _info?: AppInfoDTO,
   ): SelectQueryBuilder<AdminArea> {
     if (filters.countryId) {
-      query.andWhere(`"${this.alias}"."gid_0" = :countryId`, {
+      query.andWhere(`${this.alias}.gid0 = :countryId`, {
         countryId: filters.countryId,
       });
+    }
+
+    if (filters.level2AreaByArea1Id) {
+      query.andWhere(
+        `${this.alias}.gid1 = :parentLevel1AreaId AND ${this.alias}.gid2 IS NOT NULL`,
+        { parentLevel1AreaId: filters.level2AreaByArea1Id },
+      );
+    }
+
+    if (filters?.level === 2) {
+      query.andWhere(`${this.alias}.gid2 IS NOT NULL`);
+    }
+
+    if (filters?.level === 1) {
+      query.andWhere(
+        `${this.alias}.gid1 IS NOT NULL AND ${this.alias}.gid2 IS NULL`,
+      );
     }
 
     return query;
@@ -97,6 +152,24 @@ export class AdminAreasService extends AppBaseService<
       ? omit(results, fetchSpecification.omitFields)
       : results;
     return result;
+  }
+
+  async getChildrenAdminAreas(
+    fetchSpecification: FetchSpecification,
+    parentAreaId: string,
+  ): Promise<{
+    data: (AdminArea | Partial<AdminArea> | undefined)[];
+    metadata: PaginationMeta;
+  }> {
+    if (this.isLevel1AreaId(parentAreaId)) {
+      return this.findAllPaginated(fetchSpecification, undefined, {
+        level2AreaByArea1Id: parentAreaId,
+      });
+    } else {
+      throw new BadRequestException(
+        'Lookup of subdivisions is only supported for level 1 admin areas.',
+      );
+    }
   }
 
   isLevel1AreaId(areaId: string): boolean {
