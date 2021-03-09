@@ -37,14 +37,17 @@ export const SignUp: React.FC<SignUpProps> = () => {
     setSubmitting(true);
 
     try {
-      await AUTHENTICATION
+      const request = await AUTHENTICATION
         .request({
           method: 'POST',
           url: '/sign-up',
           data,
         });
 
-      await signIn('credentials', { ...data, callbackUrl: `${window.location.protocol}//${window.location.host}/projects` });
+      // User is created, so login-in
+      if (request.statusText === 'Created') {
+        await signIn('credentials', data);
+      }
     } catch (error) {
       const { data: { errors } } = error.response;
 
