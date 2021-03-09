@@ -20,8 +20,8 @@ export const Title: React.FC<TitleProps> = () => {
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid, sid } = query;
-  const { data: projectData, isLoading: projectIsLoading } = useProject(pid);
-  const { data: scenarioData, isLoading: scenarioIsLoading } = useScenario(sid);
+  const { data: projectData, isLoading: projectIsLoading } = useProject(`${pid}`);
+  const { data: scenarioData, isLoading: scenarioIsLoading } = useScenario(`${sid}`);
 
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({
