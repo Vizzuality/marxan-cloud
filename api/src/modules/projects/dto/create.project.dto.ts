@@ -10,7 +10,6 @@ import {
   IsUUID,
   Length,
 } from 'class-validator';
-import { Dictionary } from 'lodash';
 import { PlanningUnitGridShape } from '../project.api.entity';
 
 export class CreateProjectDTO {
