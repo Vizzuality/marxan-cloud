@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
+import omit from 'lodash/omit';
+
 import Wrapper from 'layout/wrapper';
 
 import Link from 'next/link';
@@ -37,16 +39,16 @@ export const SignUp: React.FC<SignUpProps> = () => {
     setSubmitting(true);
 
     try {
-      const request = await AUTHENTICATION
+      const signUpResponse = await AUTHENTICATION
         .request({
           method: 'POST',
           url: '/sign-up',
-          data,
+          data: omit(data, 'checkbox'),
         });
-
-      // User is created, so login-in
-      if (request.statusText === 'Created') {
-        await signIn('credentials', data);
+      // There is an inconsistency on the API
+      // where username is used for log in instead of email
+      if (signUpResponse.status === 201) {
+        await signIn('credentials', { ...data, username: data.email });
       }
     } catch (error) {
       const { data: { errors } } = error.response;
