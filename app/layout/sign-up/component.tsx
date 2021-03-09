@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
+import omit from 'lodash/omit';
+
 import Wrapper from 'layout/wrapper';
 
 import Link from 'next/link';
@@ -41,7 +43,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
         .request({
           method: 'POST',
           url: '/sign-up',
-          data,
+          data: omit(data, 'checkbox'),
         });
       // There is an inconsistency on the API
       // where username is used for log in instead of email
