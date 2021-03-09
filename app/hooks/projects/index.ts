@@ -66,7 +66,7 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
   }, [query, data?.data, search]);
 }
 
-export function useProject(id: string) {
+export function useProject(id) {
   const [session] = useSession();
 
   const query = useQuery(`projects/${id}`, async () => PROJECTS.request({

@@ -20,7 +20,7 @@ export function useScenarios() {
   return query;
 }
 
-export function useScenario(id: string) {
+export function useScenario(id) {
   const [session] = useSession();
 
   const query = useQuery(`scenarios/${id}`, async () => SCENARIOS.request({

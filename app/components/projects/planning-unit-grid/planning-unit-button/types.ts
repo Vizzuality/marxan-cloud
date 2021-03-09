@@ -3,11 +3,11 @@ import { PlanningUnit } from 'types/project-model';
 export interface PlanningUnitButtonProps {
   unit: PlanningUnit;
   selected: boolean;
-  size: ButtonSize;
+  size: PlanningUnitButtonSizeProps;
   onClick?: (unit: PlanningUnit) => void;
 }
 
-export enum ButtonSize {
+export enum PlanningUnitButtonSizeProps {
   SMALL = 'sm',
   MEDIUM = 'md',
   LARGE = 'lg',
