@@ -54,11 +54,10 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                   status="none"
                   size="base"
                   theme="dark"
+                  clearSelectionActive
                   options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
                   initialSelected={selectedCountry}
                   onChange={(value: string) => {
-                    console.log('value', value);
-
                     setSelectedCountry(value);
                     fprops.input.onChange(value);
                   }}
@@ -71,7 +70,6 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
             <div className="mb-3">
               <FieldRFF
                 name="adminAreaLevel1Id"
-                validate={composeValidators([{ presence: true }])}
               >
                 {(fprops) => (
                   <Field id="adminAreaLevel1Id" {...fprops}>
@@ -79,6 +77,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                       status="none"
                       size="base"
                       theme="dark"
+                      clearSelectionActive
                       options={regionsData.map((c) => ({ label: c.name, value: c.id }))}
                       initialSelected={selectedRegion}
                       onChange={(value: string) => {
@@ -96,7 +95,6 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
             <div>
               <FieldRFF
                 name="adminAreaLevel2Id"
-                validate={composeValidators([{ presence: true }])}
               >
                 {(fprops) => (
                   <Field id="adminAreaLevel2Id" {...fprops}>
@@ -104,6 +102,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                       status="none"
                       size="base"
                       theme="dark"
+                      clearSelectionActive
                       options={subRegionsData.map((c) => ({ label: c.name, value: c.id }))}
                       initialSelected={selectedSubRegion}
                       onChange={(value: string) => {
