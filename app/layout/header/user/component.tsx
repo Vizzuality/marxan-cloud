@@ -21,6 +21,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
 
   // prevent show anything while session is loading
   if (!session && loading) return null;
+
   const { user: { displayName } } = session;
 
   return (
