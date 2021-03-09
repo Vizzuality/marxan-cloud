@@ -4,6 +4,41 @@ import AUTHENTICATION from 'services/authentication';
 import USERS from 'services/users';
 import { SIGN_IN_DEFAULT_REDIRECT } from 'hooks/auth';
 
+const SESSION_BUFFER_TIME = 60 * 60 * 1000; // 1 hour
+
+/**
+ * Takes a token, and returns a new token
+ */
+async function refreshAccessToken(token) {
+  try {
+    const refreshTokenResponse = await AUTHENTICATION.request({
+      url: '/refresh-token',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const { data, statusText } = refreshTokenResponse;
+
+    if (statusText !== 'OK') {
+      throw new Error(data);
+    }
+
+    return {
+      ...token,
+      accessToken: data.accessToken,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
+}
+
 const options = {
   // Defining custom pages
   pages: {
@@ -67,7 +102,14 @@ const options = {
         token.accessToken = accessToken;
         token.user = rest;
       }
-      return token;
+
+      // Return previous token if the access token has not expired yet
+      const { iat } = token;
+      const tokenCloseToExpire = (Date.now() - SESSION_BUFFER_TIME) < (iat * 1000);
+      if (!tokenCloseToExpire) return token;
+
+      // Refresh token when less than 1 hour left
+      return refreshAccessToken(token);
     },
 
     // Extending session object
