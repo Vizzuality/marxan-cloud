@@ -7,8 +7,9 @@ import SQUARE_SVG from 'svgs/project/square.svg?sprite';
 import SQUARE_SELECTED_SVG from 'svgs/project/square-selected.svg?sprite';
 import HEXAGON_SVG from 'svgs/project/hexagon.svg?sprite';
 import HEXAGON_SELECTED_SVG from 'svgs/project/hexagon-selected.svg?sprite';
-import UPLOAD_SVG from 'svgs/project/upload.svg?sprite';
-import UPLOAD_SVG_SELECTED from 'svgs/project/upload-selected.svg?sprite';
+// TEMPORARILY DISABLED until this is implemented
+// import UPLOAD_SVG from 'svgs/project/upload.svg?sprite';
+// import UPLOAD_SVG_SELECTED from 'svgs/project/upload-selected.svg?sprite';
 
 import { PlanningUnitButtonSizeProps, PlanningUnitButtonProps } from './types';
 
@@ -53,7 +54,8 @@ export const PlanningUnitButton: React.FC<PlanningUnitButtonProps> = ({
           Square
         </>
       )}
-      { unit === PlanningUnit.UPLOAD && (
+      {/* TEMPORARILY HIDDEN until this is implemented
+       { unit === PlanningUnit.UPLOAD && (
         <>
           <Icon
             icon={selected ? UPLOAD_SVG_SELECTED : UPLOAD_SVG}
@@ -61,7 +63,7 @@ export const PlanningUnitButton: React.FC<PlanningUnitButtonProps> = ({
           />
           Upload
         </>
-      )}
+      )} */}
     </div>
   );
 };
