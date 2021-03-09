@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from 'react-query';
-import { useAuth } from 'hooks/authentication';
+import { useSession } from 'next-auth/client';
 
 import { Country, Region } from 'types/country-model';
 
@@ -13,7 +13,7 @@ import {
 } from './types';
 
 export function useCountries(filters: UseCountriesProps): UseCountriesResponse {
-  const { user } = useAuth();
+  const [session] = useSession();
   const { includeAll } = filters;
 
   const query = useQuery('countries', async () => COUNTRIES.request({
@@ -24,7 +24,7 @@ export function useCountries(filters: UseCountriesProps): UseCountriesResponse {
       omitFields: 'theGeom',
     },
     headers: {
-      Authorization: `Bearer ${user.token}`,
+      Authorization: `Bearer ${session.accessToken}`,
     },
   }));
 
@@ -45,10 +45,8 @@ export function useCountries(filters: UseCountriesProps): UseCountriesResponse {
 }
 
 export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegionsResponse {
-  const { user } = useAuth();
+  const [session] = useSession();
   const { includeAll, id, level } = props;
-
-  console.log('id', id);
 
   const query = useQuery(['country regions', id], async () => COUNTRIES.request({
     method: 'GET',
@@ -59,7 +57,7 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
       omitFields: 'theGeom',
     },
     headers: {
-      Authorization: `Bearer ${user.token}`,
+      Authorization: `Bearer ${session.accessToken}`,
     },
   }), {
     enabled: !!id,
