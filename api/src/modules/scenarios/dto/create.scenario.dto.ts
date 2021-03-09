@@ -9,7 +9,6 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { Dictionary } from 'lodash';
 import { JobStatus, ScenarioType } from '../scenario.api.entity';
 
 export class CreateScenarioDTO {
