@@ -4,6 +4,40 @@ import AUTHENTICATION from 'services/authentication';
 import USERS from 'services/users';
 import { SIGN_IN_DEFAULT_REDIRECT } from 'hooks/auth';
 
+/**
+ * Takes a token, and returns a new token
+ */
+async function refreshAccessToken(token) {
+  try {
+    const refreshTokenResponse = await AUTHENTICATION.request({
+      url: '/refresh-token',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const { data, statusText } = refreshTokenResponse;
+    console.log(refreshTokenResponse);
+
+    if (statusText !== 'OK') {
+      throw new Error(data);
+    }
+
+    return {
+      ...token,
+      accessToken: data.access_token,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
+}
+
 const options = {
   // Defining custom pages
   pages: {
@@ -67,7 +101,13 @@ const options = {
         token.accessToken = accessToken;
         token.user = rest;
       }
-      return token;
+
+      // Return previous token if the access token has not expired yet
+      const { iat } = token;
+      const tokenHasExpired = Date.now() < (iat * 1000);
+      if (tokenHasExpired) return token;
+
+      return refreshAccessToken(token);
     },
 
     // Extending session object
