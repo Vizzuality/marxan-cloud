@@ -11,8 +11,8 @@ import { useRouter } from 'next/router';
 const ShowScenarioPage: React.FC = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
-  const { data: projectData } = useProject(`${pid}`);
-  const { data: scenarioData } = useScenario(`${sid}`);
+  const { data: projectData } = useProject(pid);
+  const { data: scenarioData } = useScenario(sid);
 
   return (
     <Protected>

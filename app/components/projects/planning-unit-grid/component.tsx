@@ -7,7 +7,7 @@ import INFO_SVG from 'svgs/project/info.svg?sprite';
 
 import PlanningUnitButton from './planning-unit-button/component';
 import { PlanningUnitGridProps } from './types';
-import { ButtonSize } from './planning-unit-button/types';
+import { PlanningUnitButtonSizeProps } from './planning-unit-button/types';
 
 export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
   unit,
@@ -36,19 +36,19 @@ export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
         <PlanningUnitButton
           unit={PlanningUnit.SQUARE}
           selected={unitSelected === PlanningUnit.SQUARE}
-          size={ButtonSize.MEDIUM}
+          size={PlanningUnitButtonSizeProps.MEDIUM}
           onClick={handleClick}
         />
         <PlanningUnitButton
           unit={PlanningUnit.HEXAGON}
           selected={unitSelected === PlanningUnit.HEXAGON}
-          size={ButtonSize.MEDIUM}
+          size={PlanningUnitButtonSizeProps.MEDIUM}
           onClick={handleClick}
         />
         <PlanningUnitButton
           unit={PlanningUnit.UPLOAD}
           selected={unitSelected === PlanningUnit.UPLOAD}
-          size={ButtonSize.MEDIUM}
+          size={PlanningUnitButtonSizeProps.MEDIUM}
           onClick={handleClick}
         />
       </div>

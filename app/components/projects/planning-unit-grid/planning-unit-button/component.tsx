@@ -10,7 +10,7 @@ import HEXAGON_SELECTED_SVG from 'svgs/project/hexagon-selected.svg?sprite';
 import UPLOAD_SVG from 'svgs/project/upload.svg?sprite';
 import UPLOAD_SVG_SELECTED from 'svgs/project/upload-selected.svg?sprite';
 
-import { ButtonSize, PlanningUnitButtonProps } from './types';
+import { PlanningUnitButtonSizeProps, PlanningUnitButtonProps } from './types';
 
 export const PlanningUnitButton: React.FC<PlanningUnitButtonProps> = ({
   unit,
@@ -20,9 +20,9 @@ export const PlanningUnitButton: React.FC<PlanningUnitButtonProps> = ({
 }: PlanningUnitButtonProps) => {
   const getButtonClassName = () => cx({
     'mb-2': true,
-    'w-8 h-8': size === ButtonSize.MEDIUM,
-    'w-16 h-16': size === ButtonSize.LARGE,
-    'w-4 h-4': size === ButtonSize.SMALL,
+    'w-8 h-8': size === PlanningUnitButtonSizeProps.MEDIUM,
+    'w-16 h-16': size === PlanningUnitButtonSizeProps.LARGE,
+    'w-4 h-4': size === PlanningUnitButtonSizeProps.SMALL,
   });
   return (
     <div
