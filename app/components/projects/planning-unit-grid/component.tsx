@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import Icon from 'components/icon';
+import Label from 'components/forms/label';
 
 import { PlanningUnit } from 'types/project-model';
 import INFO_SVG from 'svgs/project/info.svg?sprite';
@@ -23,7 +24,7 @@ export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
   return (
     <div className="mt-6">
       <div className="flex items-center">
-        <h5 className="text-white uppercase text-xxs">Planning unit grid</h5>
+        <Label theme="dark" className="uppercase text-xxs">Planning unit grid</Label>
         <button
           className="w-5 h-5 ml-2"
           type="button"
