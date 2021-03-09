@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import Providers from 'next-auth/providers';
 import AUTHENTICATION from 'services/authentication';
 import USERS from 'services/users';
+import { SIGN_IN_DEFAULT_REDIRECT } from 'hooks/auth';
 
 const options = {
   // Defining custom pages
@@ -77,6 +78,14 @@ const options = {
       };
       session.accessToken = token.accessToken;
       return session;
+    },
+
+    async redirect(callbackUrl) {
+      // By default it should be redirect to /projects
+      if (callbackUrl.includes('/sign-in') || callbackUrl.includes('/sign-up')) {
+        return SIGN_IN_DEFAULT_REDIRECT;
+      }
+      return callbackUrl;
     },
   },
 
