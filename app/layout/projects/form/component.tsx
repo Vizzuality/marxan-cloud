@@ -21,6 +21,7 @@ import { useToasts } from 'hooks/toast';
 
 import PlanningAreaSelector from './planning-area-selector';
 import ProjectFormProps from './types';
+import { DEFAULT_AREA } from './constants';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
   const [hasPlanningArea, setHasPlanningArea] = useState(false);
@@ -30,12 +31,15 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const saveProjectMutation = useSaveProject({});
 
   const handleSubmit = (values) => {
+    console.log('handleSubmit', values);
+
     // TEMPORARY!!
     // This should be removed once organizations IDs are handled in the app
     const data = {
       ...values,
       organizationId: 'bd1689c8-8246-42d5-9005-4aaa8aeb0049',
     };
+
     saveProjectMutation.mutate(data, {
       onSuccess: ({ data: s }) => {
         addToast('success-project-creation', (
@@ -67,6 +71,9 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   return (
     <FormRFF
       onSubmit={handleSubmit}
+      initialValues={{
+        ...DEFAULT_AREA,
+      }}
     >
       {(props) => (
         <form
@@ -148,7 +155,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
           {!hasPlanningArea && (
             <PlanningAreaSelector
-              area={null}
+              area={DEFAULT_AREA}
               onChange={(value) => console.info('Planning are change: ', value)}
             />
           )}

@@ -22,3 +22,9 @@ export enum PlanningUnitAreaSizeUnit {
   KM2 = 'KM2',
   ML2 = 'ML2',
 }
+
+export interface Area {
+  planningUnitGridShape?: string;
+  planningUnitAreakm2: number;
+  countryId: string;
+}
