@@ -11,5 +11,5 @@ export interface UseProjectsResponse extends Response {
 
 // useSaveProject
 export interface UseSaveProjectProps {
-  requestConfig: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig
 }

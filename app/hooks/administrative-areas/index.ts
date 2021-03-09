@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from 'react-query';
-import { useAuth } from 'hooks/authentication';
+import { useSession } from 'next-auth/client';
 
 import { Region } from 'types/country-model';
 
@@ -13,7 +13,7 @@ import {
 
 export function useAdministrativeAreas(props: UseAdministrativeAreasProps):
 UseAdministrativeAreasResponse {
-  const { user } = useAuth();
+  const [session] = useSession();
   const { includeAll, id } = props;
 
   const query = useQuery(['administrative areas', id], async () => ADMINISTRATIVE_AREAS.request({
@@ -24,7 +24,7 @@ UseAdministrativeAreasResponse {
       omitFields: 'theGeom',
     },
     headers: {
-      Authorization: `Bearer ${user.token}`,
+      Authorization: `Bearer ${session.accessToken}`,
     },
   }), {
     enabled: !!id,
