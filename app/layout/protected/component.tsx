@@ -1,7 +1,11 @@
 import React, { ReactNode } from 'react';
 
-import { useSession } from 'next-auth/client';
+import { signIn, useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
+import { useInterval } from 'utils/use-interval';
+
+const TIME_INTERVAL = 1000 * 6; // 10 min
+const SESSION_BUFFER_TIME = 30 * 60 * 1000; // 30 min
 
 interface ProtectedProps {
   children: ReactNode
@@ -10,6 +14,17 @@ interface ProtectedProps {
 const Protected: React.FC = ({ children }: ProtectedProps) => {
   const router = useRouter();
   const [session, loading] = useSession();
+
+  // every 10 min check session expiration
+  useInterval(() => {
+    // When 30 min left for token expiration, request a new token
+    const current = Date.now() - SESSION_BUFFER_TIME;
+    const sessionExpiration = new Date(session.expires).getTime();
+    const tokenIsCloseToExpire = current > sessionExpiration;
+    if (tokenIsCloseToExpire) {
+      signIn(); // Token refresh using already existing login data
+    }
+  }, TIME_INTERVAL);
 
   // Not display anything when session request is on progress
   if (loading) return null;

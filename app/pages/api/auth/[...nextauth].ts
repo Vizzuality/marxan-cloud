@@ -4,6 +4,8 @@ import AUTHENTICATION from 'services/authentication';
 import USERS from 'services/users';
 import { SIGN_IN_DEFAULT_REDIRECT } from 'hooks/auth';
 
+const SESSION_BUFFER_TIME = 60 * 60 * 1000; // 1 hour
+
 /**
  * Takes a token, and returns a new token
  */
@@ -19,7 +21,6 @@ async function refreshAccessToken(token) {
     });
 
     const { data, statusText } = refreshTokenResponse;
-    console.log(refreshTokenResponse);
 
     if (statusText !== 'OK') {
       throw new Error(data);
@@ -27,7 +28,7 @@ async function refreshAccessToken(token) {
 
     return {
       ...token,
-      accessToken: data.access_token,
+      accessToken: data.accessToken,
     };
   } catch (error) {
     console.error(error);
@@ -104,9 +105,10 @@ const options = {
 
       // Return previous token if the access token has not expired yet
       const { iat } = token;
-      const tokenHasExpired = Date.now() < (iat * 1000);
-      if (tokenHasExpired) return token;
+      const tokenCloseToExpire = (Date.now() - SESSION_BUFFER_TIME) < (iat * 1000);
+      if (!tokenCloseToExpire) return token;
 
+      // Refresh token when less than 1 hour left
       return refreshAccessToken(token);
     },
 
