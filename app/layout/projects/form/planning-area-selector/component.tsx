@@ -29,6 +29,7 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
   return (
     <div>
       <CountryRegionSelector />
+
       <div className="flex">
         <FieldRFF
           name="planningUnitGridShape"
