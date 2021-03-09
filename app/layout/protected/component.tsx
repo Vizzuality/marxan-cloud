@@ -16,7 +16,7 @@ const Protected: React.FC = ({ children }: ProtectedProps) => {
 
   // Redirect when session doesn't exist
   if (!loading && !session) {
-    router.push('/auth/sign-in');
+    router.push(`/auth/sign-in?callbackUrl=${window.location.origin}${router.asPath}`);
     return null;
   }
 
