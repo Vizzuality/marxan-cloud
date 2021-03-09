@@ -50,19 +50,19 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
               validate={composeValidators([{ presence: true }])}
             >
               {(fprops) => (
-                <Field id="countryId" {...fprops}>
-                  <Select
-                    status="none"
-                    size="base"
-                    theme="dark"
-                    options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
-                    initialSelected={selectedCountry}
-                    onChange={(value: string) => {
-                      setSelectedCountry(value);
-                      fprops.input.onChange(value);
-                    }}
-                  />
-                </Field>
+                <Select
+                  status="none"
+                  size="base"
+                  theme="dark"
+                  options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
+                  initialSelected={selectedCountry}
+                  onChange={(value: string) => {
+                    console.log('value', value);
+
+                    setSelectedCountry(value);
+                    fprops.input.onChange(value);
+                  }}
+                />
               )}
             </FieldRFF>
           </div>

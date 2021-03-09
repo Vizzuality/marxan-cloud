@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import Link from 'next/link';
 
 import Icon from 'components/icon';
 import Field from 'components/forms/field';
@@ -26,7 +27,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const { addToast } = useToasts();
 
   // Project mutation and submit
-  const saveProjectMutation = useSaveProject({ });
+  const saveProjectMutation = useSaveProject({});
 
   const handleSubmit = (values) => {
     // TEMPORARY!!
@@ -61,10 +62,6 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
         console.error('Project could not be created');
       },
     });
-  };
-
-  const handleCancel = () => {
-    console.info('cancel');
   };
 
   return (
@@ -111,9 +108,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
             </FieldRFF>
           </div>
 
+          {/* TEMPORARILY HIDDEN, it will be implemented in the future
           <h2 className="mt-12 text-white font-heading">
             Do you have a planning region shapefile?
-          </h2>
+          </h2> */}
 
           {/* PLANNING AREA */}
           <div className="flex items-center justify-between mt-6">
@@ -172,13 +170,18 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
           {/* BUTTON BAR */}
           <div className="flex mt-12">
-            <Button
-              theme="secondary"
-              size="xl"
-              onClick={handleCancel}
-            >
-              Cancel
-            </Button>
+            <Link href="/projects" passHref>
+              <a
+                href="/projects"
+              >
+                <Button
+                  theme="secondary"
+                  size="xl"
+                >
+                  Cancel
+                </Button>
+              </a>
+            </Link>
             <Button
               className="ml-6"
               theme="primary"
