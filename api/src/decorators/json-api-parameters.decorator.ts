@@ -7,6 +7,7 @@ import { ApiQuery } from '@nestjs/swagger';
  * Wraps individual `@ApiQuery` decorators for these query parameters:
  * - include (https://jsonapi.org/format/1.0/#fetching-includes)
  * - fields (https://jsonapi.org/format/1.0/#fetching-sparse-fieldsets)
+ * - omitFields (not part of the JSON:API specification)
  * - sort (https://jsonapi.org/format/1.0/#fetching-sorting)
  * - page[size] (https://jsonapi.org/format/1.0/#fetching-pagination)
  * - page[number] (https://jsonapi.org/format/1.0/#fetching-pagination)
@@ -27,7 +28,14 @@ export function JSONAPIQueryParams(): (
   const fieldsQueryParam = ApiQuery({
     name: 'fields',
     description:
-      'A comma-separated list that refers to the name(s) of the fields to be returned. An empty value indicates that no fields should be returned.',
+      'A comma-separated list that refers to the name(s) of the fields to be returned. An empty value indicates that all fields will be returned (less any fields specified as `omitFields`).',
+    type: String,
+    required: false,
+  });
+  const omitFieldsQueryParam = ApiQuery({
+    name: 'omitFields',
+    description:
+      'A comma-separated list that refers to the name(s) of fields to be omitted from the results. This could be useful as a shortcut when a specific field such as large geometry fields should be omitted, but it is not practical to or not desirable to explicitly whitelist fields individually. An empty value indicates that no fields will be omitted (although they may still not be present in the result if an explicit choice of fields was provided via `fields`).',
     type: String,
     required: false,
   });
@@ -60,6 +68,7 @@ export function JSONAPIQueryParams(): (
   ) {
     includeQueryParam(target, propertyKey, descriptor);
     fieldsQueryParam(target, propertyKey, descriptor);
+    omitFieldsQueryParam(target, propertyKey, descriptor);
     sortQueryParam(target, propertyKey, descriptor);
     pageSizeQueryParam(target, propertyKey, descriptor);
     pageNumberQueryParam(target, propertyKey, descriptor);

@@ -7,7 +7,10 @@ import { CreateCountryDTO } from './dto/create.country.dto';
 import { UpdateCountryDTO } from './dto/update.country.dto';
 
 import * as faker from 'faker';
-import { AppBaseService } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+} from 'utils/app-base.service';
 
 @Injectable()
 export class CountriesService extends AppBaseService<
@@ -23,8 +26,9 @@ export class CountriesService extends AppBaseService<
     super(countriesRepository, 'country', 'countries');
   }
 
-  get serializerConfig() {
+  get serializerConfig(): JSONAPISerializerConfig<Country> {
     return {
+      transform: (item: Country) => ({ ...item, id: item.gid0 }),
       attributes: ['gid0', 'name0', 'theGeom'],
       keyForAttribute: 'camelCase',
     };

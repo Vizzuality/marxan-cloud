@@ -5,7 +5,7 @@ import { Response } from 'types/api-model';
 export interface UseProjectsProps {
   search?: string;
 }
-export interface UseProjectsResponse extends Response{
+export interface UseProjectsResponse extends Response {
 
 }
 

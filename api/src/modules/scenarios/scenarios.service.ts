@@ -8,7 +8,10 @@ import { JobStatus, Scenario, ScenarioType } from './scenario.api.entity';
 
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
-import { AppBaseService } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+} from 'utils/app-base.service';
 
 @Injectable()
 export class ScenariosService extends AppBaseService<
@@ -25,17 +28,14 @@ export class ScenariosService extends AppBaseService<
     super(repository, 'scenario', 'scenarios');
   }
 
-  get serializerConfig() {
+  get serializerConfig(): JSONAPISerializerConfig<Scenario> {
     return {
       attributes: [
         'name',
         'description',
         'type',
-        'country',
-        'extent',
         'wdpaFilter',
         'wdpaThreshold',
-        'adminRegionId',
         'numberOfRuns',
         'boundaryLengthModifier',
         'metadata',

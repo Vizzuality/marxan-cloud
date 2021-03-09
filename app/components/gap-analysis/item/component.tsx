@@ -35,7 +35,7 @@ export const Item: React.FC<ItemProps> = ({
   return (
     <div
       className={classnames({
-        'bg-gray-800 text-white px-4 pt-1 pb-4 border-l-4 border-gap-analysis transition-opacity duration-300': true,
+        'bg-gray-800 text-white px-4 pt-1 pb-4 border-l-4 border-purple-700 transition-opacity duration-300': true,
         'opacity-20': muted,
         [className]: className !== undefined && className !== null,
       })}
@@ -43,12 +43,12 @@ export const Item: React.FC<ItemProps> = ({
       onMouseLeave={onMouseLeave}
     >
       <div className="flex justify-between">
-        <div className="flex-shrink-1 overflow-hidden overflow-ellipsis whitespace-nowrap mr-4 pt-1 text-sm font-heading">
+        <div className="pt-1 mr-4 overflow-hidden text-sm flex-shrink-1 overflow-ellipsis whitespace-nowrap font-heading">
           {name}
         </div>
         <button
           type="button"
-          className="flex-shrink-0 py-1 px-2 text-xs flex justify-between items-center border border-transparent focus:border-white rounded-4xl"
+          className="flex items-center justify-between flex-shrink-0 px-2 py-1 text-xs border border-transparent focus:border-white rounded-4xl"
           onClick={() => onToggleOnMap(!onMap)}
         >
           {onMap ? 'Hide from map' : 'View on map'}
@@ -57,7 +57,7 @@ export const Item: React.FC<ItemProps> = ({
       </div>
       <div className="flex justify-start">
         <div className="mr-5">
-          <div className="inline-block w-3 h-3 rounded-sm mr-3 align-middle bg-gap-analysis" />
+          <div className="inline-block w-3 h-3 mr-3 align-middle bg-purple-700 rounded-sm" />
           <span className="text-sm">
             Current:
             {' '}
@@ -71,7 +71,7 @@ export const Item: React.FC<ItemProps> = ({
           </span>
         </div>
         <div>
-          <div className="inline-block w-3 h-3 rounded-sm mr-3 w- align-middle bg-gradient-repeat-to-br from-gray-100 with-stripes to-gray-800" />
+          <div className="inline-block w-3 h-3 mr-3 align-middle rounded-sm w- bg-gradient-repeat-to-br from-gray-100 with-stripes to-gray-800" />
           <span className="text-sm">
             Target:
             {' '}
@@ -86,7 +86,7 @@ export const Item: React.FC<ItemProps> = ({
         </div>
       </div>
       <div className="mt-4 relative h-2.5 bg-gray-600 rounded-sm">
-        <div className="absolute h-full bg-gap-analysis rounded-sm" style={{ width: `${current.percent * 100}%` }} />
+        <div className="absolute h-full bg-purple-700 rounded-sm" style={{ width: `${current.percent * 100}%` }} />
         <div className="absolute top-1/2 left-1 transform -translate-y-1/2 h-1.5 border border-black bg-gradient-repeat-to-br from-gray-100 with-stripes to-gray-800 rounded-md" style={{ width: `${target.percent * 100}%` }} />
       </div>
     </div>

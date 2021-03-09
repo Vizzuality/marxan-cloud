@@ -17,7 +17,6 @@ export const logger = new Logger('Authentication');
 @Module({
   imports: [
     forwardRef(() => UsersModule),
-    UsersModule,
     PassportModule,
     JwtModule.register({
       secret: AppConfig.get('auth.jwt.secret'),

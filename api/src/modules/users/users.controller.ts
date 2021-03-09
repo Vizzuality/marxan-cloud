@@ -75,6 +75,19 @@ export class UsersController {
   async userMetadata(
     @Request() req: RequestWithAuthenticatedUser,
   ): Promise<Partial<User>> {
-    return this.service.serialize([await this.service.getById(req.user.id)]);
+    return this.service.serialize(await this.service.getById(req.user.id));
+  }
+
+  @ApiOperation({
+    description: 'Mark user as deleted.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Delete('me')
+  async deleteOwnUser(
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    return this.service.markAsDeleted(req.user.id);
   }
 }

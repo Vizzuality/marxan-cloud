@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { User } from './user.api.entity';
@@ -9,7 +9,11 @@ import { UpdateUserDTO } from './dto/update.user.dto';
 import { AppInfoDTO } from 'dto/info.dto';
 
 import * as faker from 'faker';
-import { AppBaseService } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+} from 'utils/app-base.service';
+import { AuthenticationService } from 'modules/authentication/authentication.service';
 
 @Injectable()
 export class UsersService extends AppBaseService<
@@ -21,13 +25,15 @@ export class UsersService extends AppBaseService<
   constructor(
     @InjectRepository(User)
     protected readonly repository: Repository<User>,
+    @Inject(forwardRef(() => AuthenticationService))
+    private readonly authenticationService: AuthenticationService,
   ) {
     super(repository, 'user', 'users');
   }
 
-  get serializerConfig() {
+  get serializerConfig(): JSONAPISerializerConfig<User> {
     return {
-      attributes: ['fname', 'lname', 'email'],
+      attributes: ['displayName', 'fname', 'lname', 'email'],
       keyForAttribute: 'camelCase',
     };
   }
@@ -62,8 +68,28 @@ export class UsersService extends AppBaseService<
    * @debt Should be extended to include roles and permissions.
    */
   static getSanitizedUserMetadata(user: Partial<User>): Partial<User> {
-    const allowedProps = ['email', 'fname', 'lname'];
+    const allowedProps = ['displayName', 'email', 'fname', 'lname'];
 
     return get(user, allowedProps);
+  }
+
+  /**
+   * Mark user as deleted (and inactive).
+   *
+   * We don't currently delete users physically from the system when an account
+   * deletion is requested, as this would mean needing to remove them from all
+   * the objects (scenarios, etc) to which they are linked, which may not be the
+   * desired default behaviour.
+   *
+   * @debt We will need to implement hard-deletion later on, so that instance
+   * administrators can enforce compliance with relevant data protection
+   * regulations.
+   */
+  async markAsDeleted(userId: string): Promise<void> {
+    await this.repository.update(
+      { id: userId },
+      { isDeleted: true, isActive: false },
+    );
+    this.authenticationService.invalidateAllTokensOfUser(userId);
   }
 }
