@@ -45,11 +45,11 @@ const Template: Story<ConfirmationPromptProps> = ({ ...args }: ConfirmationPromp
         {...args}
         open={open}
         onAccept={() => {
-          console.log('Accepted deletion');
+          console.info('Accepted deletion');
           setOpen(false);
         }}
         onRefuse={() => {
-          console.log('Refused deletion');
+          console.info('Refused deletion');
           setOpen(false);
         }}
         onDismiss={() => setOpen(false)}
