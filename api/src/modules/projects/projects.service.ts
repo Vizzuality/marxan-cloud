@@ -43,6 +43,8 @@ export class ProjectsService extends AppBaseService<
         'planningUnitAreakm2',
         'users',
         'scenarios',
+        'createdAt',
+        'lastModifiedAt',
       ],
       keyForAttribute: 'camelCase',
       users: {
@@ -66,6 +68,8 @@ export class ProjectsService extends AppBaseService<
           'boundaryLengthModifier',
           'metadata',
           'status',
+          'createdAt',
+          'lastModifiedAt',
         ],
       },
     };
