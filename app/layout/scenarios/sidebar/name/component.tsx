@@ -28,7 +28,6 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
   const mutation = useSaveScenario({
     requestConfig: {
       method: 'POST',
-      url: '/',
     },
   });
 
@@ -36,9 +35,12 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
     setSubmitting(true);
 
     mutation.mutate({
-      ...data,
-      type: 'marxan',
-      projectId: pid,
+      id: null,
+      data: {
+        ...data,
+        type: 'marxan',
+        projectId: pid,
+      },
     }, {
       onSuccess: ({ data: s }) => {
         push(`/projects/${pid}/scenarios/${s.id}/edit`);

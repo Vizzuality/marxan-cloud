@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import cx from 'classnames';
 
 import { useSelector } from 'react-redux';
@@ -28,6 +28,37 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
   const deleteMutation = useDeleteProject({});
 
   const { addToast } = useToasts();
+
+  const onDelete = useCallback(() => {
+    deleteMutation.mutate({ id: deleteProject.id }, {
+      onSuccess: () => {
+        addToast(`success-project-delete-${deleteProject.id}`, (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">
+              {`Project "${deleteProject.name}" deleted`}
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
+        setDelete(null);
+      },
+      onError: () => {
+        addToast(`error-project-delete-${deleteProject.id}`, (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              {`Project "${deleteProject.name}" could not be deleted`}
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+        setDelete(null);
+      },
+    });
+  }, [deleteProject, deleteMutation, addToast]);
 
   return (
     <Wrapper>
@@ -61,39 +92,8 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
               description="The action cannot be reverted. All the scenarios created will be removed too."
               icon={DELETE_WARNING_SVG}
               open={!!deleteProject}
-              onAccept={() => {
-                deleteMutation.mutate(deleteProject.id, {
-                  onSuccess: () => {
-                    addToast(`success-project-delete-${deleteProject.id}`, (
-                      <>
-                        <h2 className="font-medium">Success!</h2>
-                        <p className="text-sm">
-                          {`Project "${deleteProject.name}" deleted`}
-                        </p>
-                      </>
-                    ), {
-                      level: 'success',
-                    });
-                    setDelete(null);
-                  },
-                  onError: () => {
-                    addToast(`error-project-delete-${deleteProject.id}`, (
-                      <>
-                        <h2 className="font-medium">Error!</h2>
-                        <p className="text-sm">
-                          {`Project "${deleteProject.name}" could not be deleted`}
-                        </p>
-                      </>
-                    ), {
-                      level: 'error',
-                    });
-                    setDelete(null);
-                  },
-                });
-              }}
-              onRefuse={() => {
-                setDelete(null);
-              }}
+              onAccept={onDelete}
+              onRefuse={() => setDelete(null)}
               onDismiss={() => setDelete(null)}
             />
 
