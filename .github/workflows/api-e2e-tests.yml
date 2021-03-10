@@ -24,5 +24,5 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
-    - name: Build the docker-compose stack
-      run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml up --build --abort-on-container-exit --exit-code-from api api
+    - name: Run CI tests via make task
+      run: make -f Makefile-ci test-e2e-api

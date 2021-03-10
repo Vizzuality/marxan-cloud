@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { signIn, signOut, useSession } from 'next-auth/client';
+import { signIn, useSession } from 'next-auth/client';
+import { useRouter } from 'next/router';
 import Wrapper from 'layout/wrapper';
-
 import Link from 'next/link';
 import Button from 'components/button';
 import Loading from 'components/loading';
@@ -16,6 +16,7 @@ import {
 } from 'components/forms/validations';
 
 import { useToasts } from 'hooks/toast';
+import { SIGN_IN_DEFAULT_REDIRECT } from 'hooks/auth';
 
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
@@ -28,11 +29,13 @@ export const SignIn: React.FC<SignInProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
   const [session] = useSession();
+  const router = useRouter();
+  const { callbackUrl } = router.query;
 
   const handleSubmit = useCallback(async (data) => {
     setSubmitting(true);
     try {
-      await signIn('credentials', { ...data, callbackUrl: `${window.location.protocol}//${window.location.host}/projects` });
+      await signIn('credentials', { ...data, callbackUrl });
     } catch (err) {
       addToast('error-signin', (
         <>
@@ -46,17 +49,12 @@ export const SignIn: React.FC<SignInProps> = () => {
       setSubmitting(false);
       console.error(err);
     }
-  }, [addToast]);
+  }, [addToast, callbackUrl]);
 
-  // This shouldn't be here, it's here just for testing
-  const handleLogout = useCallback(async () => {
-    signOut();
-  }, []);
-
+  // If session is already initialized, redirect to projects page
   if (session) {
-    return (
-      <Button theme="primary" size="base" onClick={handleLogout}>Logout</Button>
-    );
+    router.push(SIGN_IN_DEFAULT_REDIRECT);
+    return null;
   }
 
   return (

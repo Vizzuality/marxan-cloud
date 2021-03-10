@@ -1,7 +1,13 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotImplementedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { User } from './user.api.entity';
+import { User, userResource } from './user.api.entity';
 
 import { get } from 'lodash';
 import { CreateUserDTO } from './dto/create.user.dto';
@@ -13,6 +19,8 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
+import { UpdateUserPasswordDTO } from './dto/update.user-password';
+import { compare, hash } from 'bcrypt';
 import { AuthenticationService } from 'modules/authentication/authentication.service';
 
 @Injectable()
@@ -28,12 +36,21 @@ export class UsersService extends AppBaseService<
     @Inject(forwardRef(() => AuthenticationService))
     private readonly authenticationService: AuthenticationService,
   ) {
-    super(repository, 'user', 'users');
+    super(repository, userResource.name.singular, userResource.name.plural);
   }
 
   get serializerConfig(): JSONAPISerializerConfig<User> {
     return {
-      attributes: ['displayName', 'fname', 'lname', 'email'],
+      attributes: [
+        'fname',
+        'lname',
+        'email',
+        'displayName',
+        'avatarDataUrl',
+        'isActive',
+        'isDeleted',
+        'metadata',
+      ],
       keyForAttribute: 'camelCase',
     };
   }
@@ -91,5 +108,57 @@ export class UsersService extends AppBaseService<
       { isDeleted: true, isActive: false },
     );
     this.authenticationService.invalidateAllTokensOfUser(userId);
+  }
+
+  /**
+   * Update a user's own password.
+   *
+   * We require a guard here - the user should be able to prove they know their
+   * current password. If they are not able to do so, they should go the 'reset
+   * password' route (@debt, this will be implemented later).
+   */
+  async updateOwnPassword(
+    userId: string,
+    currentAndNewPasswords: UpdateUserPasswordDTO,
+    _info: AppInfoDTO,
+  ): Promise<void> {
+    const user = await this.getById(userId);
+    if (
+      user &&
+      (await compare(currentAndNewPasswords.currentPassword, user.passwordHash))
+    ) {
+      user.passwordHash = await hash(currentAndNewPasswords.newPassword, 10);
+      this.repository.save(user);
+      return;
+    }
+    throw new ForbiddenException(
+      'Updating the password is not allowed: the password provided for validation as current one does not match the actual current password. If you have forgotten your password, try resetting it instead.',
+    );
+  }
+
+  /**
+   * Validate that an update request can be fulfilled.
+   *
+   * - we enforce updating passwords via a separate route (`PATCH
+   *   /api/v1/users/me/password`)
+   * - @debt also we don't allow updating the user's email address at this stage
+   *   (pending implementation of email verification)
+   */
+  async validateBeforeUpdate(
+    id: string,
+    updateModel: UpdateUserDTO,
+    _info?: AppInfoDTO,
+  ): Promise<void> {
+    if (updateModel.password) {
+      throw new ForbiddenException(
+        "The user's password cannot be updated alongside other user data: please use the API endpoint for password updates.",
+      );
+    }
+
+    if (updateModel.email) {
+      throw new NotImplementedException(
+        "Updating a user's email address is not supported yet. This will be allowed once email address verification is implemented.",
+      );
+    }
   }
 }

@@ -11,13 +11,19 @@ describe('CountriesModule (e2e)', () => {
 
   let jwtToken: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
     await app.init();
 
     const response = await request(app.getHttpServer())
@@ -31,14 +37,16 @@ describe('CountriesModule (e2e)', () => {
     jwtToken = response.body.accessToken;
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await Promise.all([app.close()]);
   });
 
   describe('Countries', () => {
     let _aCountry: JSONAPICountryData;
     let aLevel1AdminArea: JSONAPIAdminAreaData;
-    const countryCodeForTests = 'ESP';
+    // Make sure we have GADM data for this country in the test data which
+    // is used to populate the geodb in CI pipelines.
+    const countryCodeForTests = 'AGO';
 
     it('Should list countries (paginated; pages of up to 25 items, no explicit page number - should default to 1)', async () => {
       const response = await request(app.getHttpServer())
@@ -90,7 +98,6 @@ describe('CountriesModule (e2e)', () => {
         .expect(200);
 
       const resources: JSONAPIAdminAreaData[] = response.body.data;
-      console.log(resources);
       aLevel1AdminArea = resources[0];
       // We (try to) select all the response items whose gid2 is set (these
       // would be level 2 areas).

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Jsona from 'jsona';
+import { signOut } from 'next-auth/client';
 
 const dataFormatter = new Jsona();
 
@@ -15,5 +16,18 @@ const PROJECTS = axios.create({
     }
   },
 });
+
+const onResponseSuccess = (response) => response;
+
+const onResponseError = (error) => {
+  // Any status codes that falls outside the range of 2xx cause this function to trigger
+  if (error.response.status === 401) {
+    signOut();
+  }
+  // Do something with response error
+  return Promise.reject(error);
+};
+
+PROJECTS.interceptors.response.use(onResponseSuccess, onResponseError);
 
 export default PROJECTS;

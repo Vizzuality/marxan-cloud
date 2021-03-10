@@ -100,7 +100,7 @@ export abstract class AppBaseService<
     filters?: Record<string, unknown>,
   ): Promise<{
     data: (Partial<Entity> | undefined)[];
-    metadata: PaginationMeta;
+    metadata: PaginationMeta | undefined;
   }> {
     const entitiesAndCount = await this.findAll(
       fetchSpecification,
@@ -111,12 +111,14 @@ export abstract class AppBaseService<
     const entities = entitiesAndCount[0];
     const pageSize =
       fetchSpecification?.pageSize ?? DEFAULT_PAGINATION.pageSize;
-    const meta = new PaginationMeta({
-      totalPages: Math.ceil(totalItems / pageSize),
-      totalItems,
-      size: pageSize,
-      page: fetchSpecification?.pageNumber ?? DEFAULT_PAGINATION.pageNumber,
-    });
+    const meta = fetchSpecification.disablePagination
+      ? undefined
+      : new PaginationMeta({
+          totalPages: Math.ceil(totalItems / pageSize),
+          totalItems,
+          size: pageSize,
+          page: fetchSpecification?.pageNumber ?? DEFAULT_PAGINATION.pageNumber,
+        });
 
     return { data: entities, metadata: meta };
   }

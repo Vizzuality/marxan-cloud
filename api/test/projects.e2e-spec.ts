@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
@@ -10,12 +10,19 @@ describe('ProjectsModule (e2e)', () => {
 
   let jwtToken: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
     await app.init();
 
     const response = await request(app.getHttpServer())
@@ -29,11 +36,11 @@ describe('ProjectsModule (e2e)', () => {
     jwtToken = response.body.accessToken;
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await Promise.all([app.close()]);
   });
 
-  describe('Projects', () => {
+  describe('Projects', async () => {
     let anOrganization: { id: string; type: 'organizations' };
     let minimalProject: { id: string; type: 'projects' };
     let completeProject: { id: string; type: 'projects' };
