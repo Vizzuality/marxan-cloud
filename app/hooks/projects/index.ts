@@ -1,6 +1,6 @@
 import Fuse from 'fuse.js';
 import { useMemo } from 'react';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
 import { formatDistance } from 'date-fns';
@@ -8,7 +8,7 @@ import { formatDistance } from 'date-fns';
 import { ItemProps } from 'components/projects/item/component';
 
 import PROJECTS from 'services/projects';
-import { UseSaveProjectProps } from './types';
+import { UseSaveProjectProps, UseDeleteProjectProps } from './types';
 
 export function useProjects(filters) {
   const [session] = useSession();
@@ -22,7 +22,7 @@ export function useProjects(filters) {
       Authorization: `Bearer ${session.accessToken}`,
     },
     params: {
-      include: 'scenarios',
+      include: 'scenarios,users',
     },
   }));
 
@@ -40,6 +40,10 @@ export function useProjects(filters) {
         name,
         description,
         lastUpdate,
+        contributors: [
+          { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
+          { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
+        ],
         onClick: () => {
           push(`/projects/${id}`);
         },
@@ -102,12 +106,13 @@ export function useSaveProject({
     url: '/',
   },
 }: UseSaveProjectProps) {
+  const queryClient = useQueryClient();
   const [session] = useSession();
 
   return useMutation((data) => {
     return PROJECTS.request({
       method: 'POST',
-      url: '/',
+      // url: id ? '/' : `/${id}`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
@@ -116,6 +121,36 @@ export function useSaveProject({
     });
   }, {
     onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('projects');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeleteProject({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseDeleteProjectProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  return useMutation((id) => {
+    return PROJECTS.request({
+      method: 'DELETE',
+      url: `/${id}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  }, {
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('projects');
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

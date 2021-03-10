@@ -27,7 +27,6 @@ export const Title: React.FC<TitleProps> = () => {
   const saveProjectMutation = useSaveProject({
     requestConfig: {
       method: 'PATCH',
-      url: `/${projectData?.id}`,
     },
   });
 
