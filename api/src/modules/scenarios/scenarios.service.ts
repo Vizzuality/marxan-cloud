@@ -41,6 +41,8 @@ export class ScenariosService extends AppBaseService<
         'metadata',
         'status',
         'users',
+        'createdAt',
+        'lastModifiedAt',
       ],
       keyForAttribute: 'camelCase',
       users: {
