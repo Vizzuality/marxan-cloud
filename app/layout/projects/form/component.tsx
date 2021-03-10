@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import Icon from 'components/icon';
 import Field from 'components/forms/field';
@@ -26,6 +27,7 @@ import { DEFAULT_AREA } from './constants';
 const ProjectForm: React.FC<ProjectFormProps> = () => {
   const [hasPlanningArea, setHasPlanningArea] = useState(false);
   const { addToast } = useToasts();
+  const { push } = useRouter();
 
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
@@ -50,6 +52,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
         });
 
         console.info('Project saved succesfully', s);
+        push('/projects');
       },
       onError: () => {
         addToast('error-project-creation', (
@@ -154,7 +157,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
           {!hasPlanningArea && (
             <PlanningAreaSelector
               area={DEFAULT_AREA}
-              onChange={(value) => console.info('Planning are change: ', value)}
+              onChange={(value) => console.info('Planning area change: ', value)}
             />
           )}
           {hasPlanningArea && (
