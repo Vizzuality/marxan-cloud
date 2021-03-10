@@ -20,6 +20,7 @@ import { FetchSpecificationMiddleware } from 'nestjs-base-service';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from 'filters/all-exceptions.exception.filter';
 import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
+import { ApiEventsModule } from 'modules/api-events/api-events.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
       keepConnectionAlive: true,
     }),
     AdminAreasModule,
+    ApiEventsModule,
     CountriesModule,
     GeoModule,
     OrganizationsModule,
