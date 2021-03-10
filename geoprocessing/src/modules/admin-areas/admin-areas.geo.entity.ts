@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-// //to-do - extend to country
+//to-do - extend to country
 @Entity('admin-regions')
 export class AdminAreas {
   /**
@@ -57,9 +57,6 @@ export class AdminAreas {
 export class JSONAPIAdministrativeAreasData {
   @ApiProperty()
   type = 'administrative-areas';
-
-  @ApiProperty()
-  id: string;
 
   @ApiProperty()
   attributes: AdminAreas;
