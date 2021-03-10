@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { setSearch } from 'store/slices/projects';
 
 import Wrapper from 'layout/wrapper';
@@ -17,6 +17,7 @@ export interface ProjectsToolbarProps {
 }
 
 export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
+  const { search } = useSelector((state) => state['/projects']);
   const dispatch = useDispatch();
 
   return (
@@ -24,6 +25,7 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
       <div className="flex items-baseline justify-between gap-20 mb-8">
         <div className="flex-grow">
           <Search
+            defaultValue={search}
             size="base"
             placeholder="Search by project name, planning area name..."
             aria-label="Search"

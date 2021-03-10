@@ -227,7 +227,7 @@ export const Item: React.FC<ItemProps> = ({
             ease: 'anticipate',
           }}
         >
-          <Icon icon={ARROW_RIGHT_2_SVG} className="w-5 h-5 text-white text-opacity-25" />
+          <Icon icon={ARROW_RIGHT_2_SVG} className="w-5 h-5 text-white opacity-25" />
         </motion.div>
       </button>
     </AnimatePresence>

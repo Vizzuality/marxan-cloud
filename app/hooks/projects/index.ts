@@ -8,7 +8,12 @@ import { formatDistance } from 'date-fns';
 import { ItemProps } from 'components/projects/item/component';
 
 import PROJECTS from 'services/projects';
-import { UseSaveProjectProps, UseDeleteProjectProps } from './types';
+import {
+  UseSaveProjectProps,
+  SaveProjectProps,
+  UseDeleteProjectProps,
+  DeleteProjectProps,
+} from './types';
 
 export function useProjects(filters) {
   const [session] = useSession();
@@ -104,23 +109,23 @@ export function useProject(id) {
 export function useSaveProject({
   requestConfig = {
     method: 'POST',
-    url: '/',
   },
 }: UseSaveProjectProps) {
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  return useMutation((data) => {
+  const saveProject = ({ id, data }: SaveProjectProps) => {
     return PROJECTS.request({
-      method: 'POST',
-      // url: id ? '/' : `/${id}`,
+      url: id ? `/${id}` : '/',
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
       ...requestConfig,
     });
-  }, {
+  };
+
+  return useMutation(saveProject, {
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries('projects');
       console.info('Succces', data, variables, context);
@@ -140,7 +145,7 @@ export function useDeleteProject({
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  return useMutation((id) => {
+  const deleteProject = ({ id }: DeleteProjectProps) => {
     return PROJECTS.request({
       method: 'DELETE',
       url: `/${id}`,
@@ -149,7 +154,9 @@ export function useDeleteProject({
       },
       ...requestConfig,
     });
-  }, {
+  };
+
+  return useMutation(deleteProject, {
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries('projects');
       console.info('Succces', data, variables, context);
