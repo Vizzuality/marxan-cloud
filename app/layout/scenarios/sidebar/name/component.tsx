@@ -16,6 +16,7 @@ import {
 
 import { useRouter } from 'next/router';
 import { useSaveScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
 export interface ScenariosSidebarProps {
 }
@@ -24,6 +25,8 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { query, push } = useRouter();
   const { pid } = query;
+
+  const { addToast } = useToasts();
 
   const mutation = useSaveScenario({
     requestConfig: {
@@ -43,13 +46,31 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
       },
     }, {
       onSuccess: ({ data: s }) => {
+        addToast('success-project-create', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">{`Scenario "${s.name}" created`}</p>
+          </>
+        ), {
+          level: 'success',
+        });
+
         push(`/projects/${pid}/scenarios/${s.id}/edit`);
       },
       onError: () => {
+        addToast('success-project-create', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario not created</p>
+          </>
+        ), {
+          level: 'error',
+        });
+
         setSubmitting(false);
       },
     });
-  }, [mutation, pid, push]);
+  }, [mutation, pid, push, addToast]);
 
   return (
     <Pill>
