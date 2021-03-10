@@ -6,8 +6,8 @@ export interface Project {
 }
 
 export interface PlanningArea {
-  unit: PlanningUnit;
-  size: number;
+  planningUnitGridShape: PlanningUnit;
+  planningUnitAreakm2: number;
   country: Object;
   region?: Object;
 }
