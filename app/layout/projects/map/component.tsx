@@ -36,7 +36,7 @@ export const ScenariosMap: React.FC<ProjectMapProps> = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-full overflow-hidden rounded-4xl">
+    <div className="relative w-full h-full overflow-hidden rounded-r-3xl">
       <Map
         // bounds={bounds}
         width="100%"

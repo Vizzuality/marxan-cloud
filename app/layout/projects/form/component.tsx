@@ -31,8 +31,6 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const saveProjectMutation = useSaveProject({});
 
   const handleSubmit = (values) => {
-    console.log('handleSubmit', values);
-
     // TEMPORARY!!
     // This should be removed once organizations IDs are handled in the app
     const data = {
@@ -79,7 +77,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
         <form
           onSubmit={props.handleSubmit}
           autoComplete="off"
-          className="justify-start w-full p-8"
+          className="justify-start w-full py-8 pl-8"
         >
           <h1 className="max-w-xs text-white font-heading">
             Name your project and define a planning area:
