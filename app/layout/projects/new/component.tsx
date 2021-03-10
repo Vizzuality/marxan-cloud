@@ -8,12 +8,16 @@ import { NewProjectProps } from './types';
 
 const NewProject: React.FC<NewProjectProps> = () => {
   return (
-    <Wrapper>
-      <div className="grid h-full grid-cols-1 gap-10 bg-gray-700 md:grid-cols-2 rounded-3xl">
-        <ProjectForm />
-        <ProjectMap />
+    <main className="flex flex-col w-screen h-screen">
+      <div className="pt-2.5 pb-10 md:flex-grow">
+        <Wrapper>
+          <div className="grid h-full grid-cols-1 gap-10 mt-2 bg-gray-700 md:grid-cols-2 rounded-3xl">
+            <ProjectForm />
+            <ProjectMap />
+          </div>
+        </Wrapper>
       </div>
-    </Wrapper>
+    </main>
   );
 };
 

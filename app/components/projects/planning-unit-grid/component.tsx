@@ -46,12 +46,6 @@ export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
           size={PlanningUnitButtonSizeProps.MEDIUM}
           onClick={handleClick}
         />
-        <PlanningUnitButton
-          unit={PlanningUnit.UPLOAD}
-          selected={unitSelected === PlanningUnit.UPLOAD}
-          size={PlanningUnitButtonSizeProps.MEDIUM}
-          onClick={handleClick}
-        />
       </div>
     </div>
   );
