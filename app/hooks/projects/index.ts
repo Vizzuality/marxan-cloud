@@ -64,6 +64,7 @@ export function useProjects(filters) {
     if (search) {
       const fuse = new Fuse(parsedData, {
         keys: ['name', 'area'],
+        threshold: 0.25,
       });
       filteredData = fuse.search(search).map((f) => {
         return f.item;

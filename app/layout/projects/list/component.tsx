@@ -25,11 +25,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
 
   // Delete projects
   const [deleteProject, setDelete] = useState(null);
-  const deleteMutation = useDeleteProject({
-    requestConfig: {
-      method: 'DELETE',
-    },
-  });
+  const deleteMutation = useDeleteProject({});
 
   const { addToast } = useToasts();
 
@@ -42,7 +38,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
           iconClassName="w-10 h-10 text-primary-500"
         />
 
-        {isFetched && data.length && (
+        {isFetched && !!data.length && (
           <div
             className={cx({
               'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4': true,
@@ -61,8 +57,8 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
             })}
 
             <ConfirmationPrompt
-              title="Are you sure you want to delete this project?"
-              description="The action cannot be reverted."
+              title={`Are you sure you want to delete "${deleteProject?.name}"?`}
+              description="The action cannot be reverted. All the scenarios created will be removed too."
               icon={DELETE_WARNING_SVG}
               open={!!deleteProject}
               onAccept={() => {
