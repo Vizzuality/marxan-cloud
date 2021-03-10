@@ -1,12 +1,21 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AdminAreasController } from './admin-areas.controller';
+import { AdminArea } from './admin-area.geo.entity';
 import { AdminAreasService } from './admin-areas.service';
-import { TileModule } from 'src/modules/tile/tile.module';
+import { VectorTileModule } from 'modules/vector-tile/vector-tile.service';
 
 @Module({
-  imports: [TileModule],
+  imports: [
+    TypeOrmModule.forFeature([AdminArea], 'geoprocessingDB'),
+    HttpModule.register({
+      maxContentLength: 100000000,
+    }),
+    VectorTileModule,
+  ],
   providers: [AdminAreasService],
   controllers: [AdminAreasController],
+  exports: [AdminAreasService],
 })
 export class AdminAreasModule {}
