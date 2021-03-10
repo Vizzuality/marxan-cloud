@@ -2,6 +2,7 @@ import Fuse from 'fuse.js';
 import { useMemo } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { useSession } from 'next-auth/client';
+import { useRouter } from 'next/router';
 
 import { ItemProps } from 'components/projects/item/component';
 
@@ -11,6 +12,7 @@ import { UseSaveProjectProps } from './types';
 export function useProjects(filters) {
   const [session] = useSession();
   const { search } = filters;
+  const { push } = useRouter();
 
   const query = useQuery('projects', async () => PROJECTS.request({
     method: 'GET',
@@ -36,6 +38,10 @@ export function useProjects(filters) {
           { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
           { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
         ],
+        onClick: (e) => {
+          console.info('onClick', e);
+          push(`/projects/${id}`);
+        },
         onDownload: (e) => {
           console.info('onDownload', e);
         },
@@ -63,7 +69,7 @@ export function useProjects(filters) {
       ...query,
       data: filteredData,
     };
-  }, [query, data?.data, search]);
+  }, [query, data?.data, search, push]);
 }
 
 export function useProject(id) {
