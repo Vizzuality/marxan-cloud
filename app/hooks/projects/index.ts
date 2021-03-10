@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
+import { formatDistance } from 'date-fns';
 
 import { ItemProps } from 'components/projects/item/component';
 
@@ -20,26 +21,26 @@ export function useProjects(filters) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+    params: {
+      include: 'scenarios',
+    },
   }));
 
   const { data } = query;
 
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
-      const { id, name } = d;
+      const { id, name, description } = d;
+
+      const lastUpdate = formatDistance(new Date('2021-03-10T11:22:00'), new Date(), { addSuffix: true });
 
       return {
         id,
         area: 'Planning area name',
         name,
-        description: 'Donec est ad luctus dapibus sociosqu.',
-        lastUpdate: '1995-12-17T03:24:00',
-        contributors: [
-          { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
-          { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
-        ],
-        onClick: (e) => {
-          console.info('onClick', e);
+        description,
+        lastUpdate,
+        onClick: () => {
           push(`/projects/${id}`);
         },
         onDownload: (e) => {
