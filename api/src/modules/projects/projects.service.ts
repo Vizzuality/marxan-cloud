@@ -36,12 +36,13 @@ export class ProjectsService extends AppBaseService<
       attributes: [
         'name',
         'description',
-        'users',
         'countryId',
         'adminAreaLevel1Id',
         'adminAreaLevel2Id',
         'planningUnitGridShape',
         'planningUnitAreakm2',
+        'users',
+        'scenarios',
       ],
       keyForAttribute: 'camelCase',
       users: {
