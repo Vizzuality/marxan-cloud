@@ -3,20 +3,23 @@ import {
   IsAlpha,
   IsEnum,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   IsUppercase,
   IsUUID,
   Length,
 } from 'class-validator';
-import { Dictionary } from 'lodash';
 import { PlanningUnitGridShape } from '../project.api.entity';
 
 export class CreateProjectDTO {
   @ApiProperty()
+  @IsString()
   name: string;
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   description?: string;
 
   @ApiProperty()
@@ -32,11 +35,6 @@ export class CreateProjectDTO {
   @Length(3, 3)
   @IsOptional()
   countryId?: string;
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  adminRegionId?: string;
 
   @ApiPropertyOptional()
   @IsString()
@@ -60,8 +58,11 @@ export class CreateProjectDTO {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsObject()
   extent?: Record<string, unknown>;
 
   @ApiPropertyOptional()
-  metadata?: Dictionary<string>;
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, unknown>;
 }

@@ -11,6 +11,15 @@ import {
 } from 'typeorm';
 import { Project } from 'modules/projects/project.api.entity';
 import { Scenario } from 'modules/scenarios/scenario.api.entity';
+import { BaseServiceResource } from 'types/resource.interface';
+
+export const userResource: BaseServiceResource = {
+  className: 'User',
+  name: {
+    singular: 'user',
+    plural: 'users',
+  },
+};
 
 @Entity('users')
 export class User {
@@ -33,6 +42,15 @@ export class User {
   @Column('character varying')
   lname: string | null;
 
+  /**
+   * User avatar, stored as data url.
+   *
+   * For example: `data:image/gif;base64,<base64-encoded image binary data>
+   */
+  @ApiPropertyOptional()
+  @Column('character varying', { name: 'avatar_data_url' })
+  avatarDataUrl?: string;
+
   @Column('character varying', { name: 'password_hash' })
   passwordHash: string;
 
@@ -44,7 +62,7 @@ export class User {
    */
   @ApiPropertyOptional()
   @Column('jsonb')
-  metadata: Dictionary<string>;
+  metadata?: Dictionary<string>;
 
   /**
    * Whether this user is active (email is confirmed).
@@ -95,4 +113,20 @@ export class User {
 
   @OneToMany((_type) => IssuedAuthnToken, (token) => token.userId)
   issuedAuthnTokens: IssuedAuthnToken[];
+}
+
+export class JSONAPIUserData {
+  @ApiProperty()
+  type = userResource.name.plural;
+
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  attributes: User;
+}
+
+export class UserResult {
+  @ApiProperty()
+  data: JSONAPIUserData;
 }

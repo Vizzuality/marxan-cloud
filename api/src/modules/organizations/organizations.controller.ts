@@ -7,7 +7,6 @@ import {
   Patch,
   Req,
   UseGuards,
-  ValidationPipe,
 } from '@nestjs/common';
 import { OrganizationResult } from './organization.api.entity';
 import { OrganizationsService } from './organizations.service';
@@ -83,7 +82,7 @@ export class OrganizationsController {
   @ApiCreatedResponse({ type: OrganizationResult })
   @Post()
   async create(
-    @Body(new ValidationPipe()) dto: CreateOrganizationDTO,
+    @Body() dto: CreateOrganizationDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<OrganizationResult> {
     return await this.service.serialize(
@@ -96,7 +95,7 @@ export class OrganizationsController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) dto: UpdateOrganizationDTO,
+    @Body() dto: UpdateOrganizationDTO,
   ): Promise<OrganizationResult> {
     return await this.service.serialize(await this.service.update(id, dto));
   }
