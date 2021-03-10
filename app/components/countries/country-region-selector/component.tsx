@@ -37,7 +37,9 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
   return (
     <div className="mt-6">
       <Loading
-        visible={isFetchingCountries || isFetchingRegions || isFetchingSubRegions}
+        visible={(isFetchingCountries && !isFetchedCountries)
+          || (isFetchingRegions && !isFetchedRegions)
+          || (isFetchingSubRegions && !isFetchedSubRegions)}
         className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
       />
