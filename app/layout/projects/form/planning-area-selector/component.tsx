@@ -17,7 +17,7 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
   onChange,
 }: PlanningAreaSelectorProps) => {
   const [data, setData] = useState<PlanningArea>(area);
-  const { size, unit } = data;
+  const { planningUnitAreakm2, planningUnitGridShape } = data;
 
   return (
     <div>
@@ -32,11 +32,11 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
             {(fprops) => (
               <Field id="planningUnitGridShape" {...fprops}>
                 <PlanningUnitGrid
-                  unit={unit}
+                  unit={planningUnitGridShape}
                   onChange={(value) => {
                     const newData = {
                       ...data,
-                      unit: value,
+                      planningUnitGridShape: value,
                     };
                     setData(newData);
 
@@ -59,11 +59,11 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
             {(fprops) => (
               <Field id="planningUnitAreakm2" {...fprops}>
                 <PlanningUnitAreaSize
-                  size={size}
+                  size={planningUnitAreakm2}
                   onChange={(value) => {
                     const newData = {
                       ...data,
-                      size: value,
+                      planningUnitAreakm2: value,
                     };
                     setData(newData);
                     // React Final Form onChange
