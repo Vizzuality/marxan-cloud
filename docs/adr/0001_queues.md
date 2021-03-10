@@ -108,6 +108,8 @@ for NestJS), if we ever do need.
 
 * Redis. Direct interface or via the API.
 
+* graphile/worker (https://github.com/graphile/worker)
+
 * Piggyback on an event queue.
 
 ## Decision outcome
