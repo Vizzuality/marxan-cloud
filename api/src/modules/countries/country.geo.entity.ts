@@ -1,5 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { BaseServiceResource } from 'types/resource.interface';
+
+export const countryResource: BaseServiceResource = {
+  className: 'Country',
+  name: {
+    singular: 'country',
+    plural: 'countries',
+  },
+};
 
 @Entity('countries')
 export class Country {

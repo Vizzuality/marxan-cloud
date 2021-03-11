@@ -30,21 +30,13 @@ import { Post } from '@nestjs/common';
 
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
-import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
-
-const resource: BaseServiceResource = {
-  className: 'Scenario',
-  name: {
-    singular: 'scenario',
-    plural: 'scenarios',
-  },
-};
+import { organizationResource } from 'modules/organizations/organization.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(resource.className)
+@ApiTags(organizationResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class ScenariosController {
   constructor(public readonly service: ScenariosService) {}

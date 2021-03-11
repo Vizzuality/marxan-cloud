@@ -30,14 +30,27 @@ export class OrganizationsService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<Organization> {
     return {
-      attributes: ['name', 'description', 'metadata'],
+      attributes: ['name', 'description', 'metadata', 'projects'],
       keyForAttribute: 'camelCase',
       projects: {
         ref: 'id',
-        attributes: ['name', 'description', 'metadata'],
+        attributes: ['name', 'description', 'metadata', 'scenarios'],
         scenarios: {
           ref: 'id',
-          attributes: ['name', 'description', 'metadata'],
+          attributes: [
+            'name',
+            'description',
+            'type',
+            'wdpaFilter',
+            'wdpaThreshold',
+            'numberOfRuns',
+            'boundaryLengthModifier',
+            'metadata',
+            'status',
+            'users',
+            'createdAt',
+            'lastModifiedAt',
+          ],
         },
       },
     };
