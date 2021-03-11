@@ -17,4 +17,9 @@ export interface BaseServiceResource {
    * Names used to reference the entity, singular and plural.
    */
   name: { singular: string; plural: string };
+
+  /**
+   * Entities that can be included in requests
+   */
+  entitiesAllowedAsIncludes?: string[];
 }
