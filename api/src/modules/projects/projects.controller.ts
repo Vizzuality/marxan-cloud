@@ -63,7 +63,9 @@ export class ProjectsController {
     description: 'Find all projects',
   })
   @ApiOkResponse({ type: ProjectResult })
-  @JSONAPIQueryParams()
+  @JSONAPIQueryParams({
+    entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
+  })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
