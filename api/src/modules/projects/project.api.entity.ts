@@ -13,6 +13,16 @@ import {
 } from 'typeorm';
 import { Organization } from 'modules/organizations/organization.api.entity';
 import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
+import { BaseServiceResource } from 'types/resource.interface';
+
+export const projectResource: BaseServiceResource = {
+  className: 'Project',
+  name: {
+    singular: 'project',
+    plural: 'projects',
+  },
+  entitiesAllowedAsIncludes: ['scenarios', 'users'],
+};
 
 export enum PlanningUnitGridShape {
   square = 'square',

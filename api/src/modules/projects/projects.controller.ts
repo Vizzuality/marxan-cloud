@@ -26,7 +26,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadOptions } from 'utils/file-uploads.utils';
 
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
-import { BaseServiceResource } from 'types/resource.interface';
+import { projectResource } from './project.api.entity';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
@@ -35,17 +35,9 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 
-const resource: BaseServiceResource = {
-  className: 'Project',
-  name: {
-    singular: 'project',
-    plural: 'projects',
-  },
-};
-
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(resource.className)
+@ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectsController {
   constructor(public readonly service: ProjectsService) {}
