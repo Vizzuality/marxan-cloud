@@ -12,6 +12,16 @@ import {
 import { User } from 'modules/users/user.api.entity';
 import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
+import { BaseServiceResource } from 'types/resource.interface';
+
+export const scenarioResource: BaseServiceResource = {
+  className: 'Scenario',
+  name: {
+    singular: 'scenario',
+    plural: 'scenarios',
+  },
+  entitiesAllowedAsIncludes: ['project', 'users'],
+};
 
 /**
  * The kind of Marxan scenario (standard, Marxan with Zones, and possibly other

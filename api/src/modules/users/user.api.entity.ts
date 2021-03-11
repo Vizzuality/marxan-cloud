@@ -19,6 +19,7 @@ export const userResource: BaseServiceResource = {
     singular: 'user',
     plural: 'users',
   },
+  entitiesAllowedAsIncludes: ['projects'],
 };
 
 @Entity('users')
