@@ -1,11 +1,13 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import Link from 'next/link';
 import Icon from 'components/icon';
 import Avatar from 'components/avatar';
 import Tooltip from 'components/tooltip';
 
-import { signOut, useSession } from 'next-auth/client';
+import { signOut } from 'next-auth/client';
+import { useMe } from 'hooks/me';
+
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import SIGN_OUT_SVG from 'svgs/ui/sign-out.svg?sprite';
 
@@ -13,25 +15,35 @@ export interface HeaderUserProps {
 }
 
 export const HeaderUser: React.FC<HeaderUserProps> = () => {
-  const [session, loading] = useSession();
+  const { user, isFetching, isFetched } = useMe();
+  const [open, setOpen] = useState(false);
+
+  const handleClick = useCallback(() => {
+    setOpen(!open);
+  }, [open, setOpen]);
+
+  const handleClickOutside = useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
 
   const handleSignOut = useCallback(() => {
     signOut();
   }, []);
 
   // prevent show anything while session is loading
-  if (!session && loading) return null;
+  if (!user || (isFetching && !isFetched)) return null;
 
-  const { user: { displayName } } = session;
+  const { displayName } = user;
 
   return (
     <Tooltip
-      trigger="click"
       placement="bottom-end"
       interactive
+      visible={open}
+      onClickOutside={handleClickOutside}
       content={(
         <div
-          className="overflow-hidden text-sm text-gray-500 bg-white rounded-2xl"
+          className="overflow-hidden text-sm text-gray-500 bg-white shadow-md rounded-2xl"
           style={{
             minWidth: 200,
           }}
@@ -65,6 +77,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
       <button
         type="button"
         className="flex items-center justify-start focus:outline-none"
+        onClick={handleClick}
       >
         <Avatar className="text-sm text-white uppercase bg-primary-700">
           {displayName.slice(0, 2)}
