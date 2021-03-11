@@ -51,7 +51,9 @@ export class UsersController {
     description:
       'The current user does not have suitable permissions for this request.',
   })
-  @JSONAPIQueryParams()
+  @JSONAPIQueryParams({
+    entitiesAllowedAsIncludes: userResource.entitiesAllowedAsIncludes,
+  })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
