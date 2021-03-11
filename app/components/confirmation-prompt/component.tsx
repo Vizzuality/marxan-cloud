@@ -23,10 +23,10 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
     dismissable={dismissible}
     onDismiss={onDismiss}
   >
-    <div className="mt-8 sm:mt-0 sm:pr-20 text-xl font-heading font-medium leading-9">
+    <div className="mt-8 text-xl font-medium text-gray-800 leading-1 sm:mt-0 sm:pr-32 font-heading">
       {title}
     </div>
-    <p className="mt-4 sm:pr-32 text-sm text-gray-400">{description}</p>
+    <p className="mt-4 text-sm text-gray-400 sm:pr-32">{description}</p>
     <div
       className={classnames({
         'flex justify-start items-end': true,
@@ -39,7 +39,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
       <Button
         theme="secondary"
         size="base"
-        className="mr-5 flex-shrink-0"
+        className="flex-shrink-0 mr-5"
         onClick={onRefuse}
       >
         No
@@ -47,13 +47,13 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
       <Button
         theme="primary"
         size="base"
-        className="sm:mr-5 flex-shrink-0"
+        className="flex-shrink-0 sm:mr-5"
         onClick={onAccept}
       >
         Yes
       </Button>
       {icon && (
-        <Icon icon={icon} className="hidden sm:block flex-shrink-1 flex-grow-1 ml-auto w-36" />
+        <Icon icon={icon} className="hidden ml-auto sm:block flex-shrink-1 flex-grow-1 w-36" />
       )}
     </div>
   </Modal>
