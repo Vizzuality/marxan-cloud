@@ -40,7 +40,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
       organizationId: 'bd1689c8-8246-42d5-9005-4aaa8aeb0049',
     };
 
-    saveProjectMutation.mutate(data, {
+    saveProjectMutation.mutate({ data }, {
       onSuccess: ({ data: s }) => {
         addToast('success-project-creation', (
           <>
