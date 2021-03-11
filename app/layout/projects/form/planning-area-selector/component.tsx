@@ -54,7 +54,13 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
         <div className="flex w-1/2">
           <FieldRFF
             name="planningUnitAreakm2"
-            validate={composeValidators([{ presence: true }])}
+            validate={composeValidators([{
+              presence: true,
+              numericality: {
+                onlyInteger: true,
+                greaterThan: 0,
+              },
+            }])}
           >
             {(fprops) => (
               <Field id="planningUnitAreakm2" {...fprops}>
