@@ -80,101 +80,103 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
         <form
           onSubmit={props.handleSubmit}
           autoComplete="off"
-          className="justify-start w-full py-8 pl-8"
+          className="flex flex-col justify-between w-full py-8 pl-8"
         >
-          <h1 className="max-w-xs text-white font-heading">
-            Name your project and define a planning area:
-          </h1>
+          <div>
+            <h1 className="max-w-xs text-white font-heading">
+              Name your project and define a planning area:
+            </h1>
 
-          {/* NAME */}
-          <div className="mt-8">
-            <FieldRFF
-              name="name"
-              validate={composeValidators([{ presence: true }])}
-            >
-              {(fprops) => (
-                <Field id="name" {...fprops}>
-                  <Label theme="dark" className="mb-3 uppercase">Project Name</Label>
-                  <Input theme="dark" type="text" placeholder="Write project name..." />
-                </Field>
-              )}
-            </FieldRFF>
-          </div>
-
-          {/* DESCRIPTION */}
-          <div className="mt-8">
-            <FieldRFF
-              name="description"
-              validate={composeValidators([{ presence: true }])}
-            >
-              {(fprops) => (
-                <Field id="description" {...fprops}>
-                  <Label theme="dark" className="mb-3 uppercase">Description</Label>
-                  <Textarea rows={4} placeholder="Write your project description..." />
-                </Field>
-              )}
-            </FieldRFF>
-          </div>
-
-          {/* TEMPORARILY HIDDEN, it will be implemented in the future
-          <h2 className="mt-12 text-white font-heading">
-            Do you have a planning region shapefile?
-          </h2> */}
-
-          {/* PLANNING AREA */}
-          <div className="flex items-center justify-between mt-6">
-            <div className="flex items-center">
-              <Label theme="dark" className="uppercase text-xxs">Planning area</Label>
-              <button
-                className="w-5 h-5 ml-2"
-                type="button"
-                onClick={() => console.info('Planning Area info button click')}
+            {/* NAME */}
+            <div className="mt-8">
+              <FieldRFF
+                name="name"
+                validate={composeValidators([{ presence: true }])}
               >
-                <Icon icon={INFO_SVG} />
-              </button>
+                {(fprops) => (
+                  <Field id="name" {...fprops}>
+                    <Label theme="dark" className="mb-3 uppercase">Project Name</Label>
+                    <Input theme="dark" type="text" placeholder="Write project name..." />
+                  </Field>
+                )}
+              </FieldRFF>
             </div>
-            {/* TEMPORARILY HIDDEN, it will be implemented in the future */}
-            <div className="hidden">
-              <Button
-                className="w-20 h-6 mr-4"
-                size="xs"
-                theme={!hasPlanningArea ? 'white' : 'secondary'}
-                onClick={() => setHasPlanningArea(false)}
-              >
-                No
-              </Button>
-              <Button
-                className="w-20 h-6"
-                size="xs"
-                theme={hasPlanningArea ? 'white' : 'secondary'}
-                onClick={() => setHasPlanningArea(true)}
-              >
-                Yes
-              </Button>
-            </div>
-          </div>
 
-          {!hasPlanningArea && (
-            <PlanningAreaSelector
-              area={DEFAULT_AREA}
-              onChange={(value) => console.info('Planning area change: ', value)}
-            />
-          )}
-          {hasPlanningArea && (
-            <Button
-              className="flex w-full mt-4"
-              theme="secondary"
-              size="base"
-              onClick={() => console.info('Upload shapefile')}
-            >
-              <span className="w-full">
-                Upload shapefile
-              </span>
-              <Icon
-                icon={UPLOAD_SHAPEFILE_SVG}
+            {/* DESCRIPTION */}
+            <div className="mt-8">
+              <FieldRFF
+                name="description"
+                validate={composeValidators([{ presence: true }])}
+              >
+                {(fprops) => (
+                  <Field id="description" {...fprops}>
+                    <Label theme="dark" className="mb-3 uppercase">Description</Label>
+                    <Textarea rows={4} placeholder="Write your project description..." />
+                  </Field>
+                )}
+              </FieldRFF>
+            </div>
+
+            {/* TEMPORARILY HIDDEN, it will be implemented in the future
+            <h2 className="mt-12 text-white font-heading">
+              Do you have a planning region shapefile?
+            </h2> */}
+
+            {/* PLANNING AREA */}
+            <div className="flex items-center justify-between mt-6">
+              <div className="flex items-center">
+                <Label theme="dark" className="uppercase text-xxs">Planning area</Label>
+                <button
+                  className="w-5 h-5 ml-2"
+                  type="button"
+                  onClick={() => console.info('Planning Area info button click')}
+                >
+                  <Icon icon={INFO_SVG} />
+                </button>
+              </div>
+              {/* TEMPORARILY HIDDEN, it will be implemented in the future */}
+              <div className="hidden">
+                <Button
+                  className="w-20 h-6 mr-4"
+                  size="xs"
+                  theme={!hasPlanningArea ? 'white' : 'secondary'}
+                  onClick={() => setHasPlanningArea(false)}
+                >
+                  No
+                </Button>
+                <Button
+                  className="w-20 h-6"
+                  size="xs"
+                  theme={hasPlanningArea ? 'white' : 'secondary'}
+                  onClick={() => setHasPlanningArea(true)}
+                >
+                  Yes
+                </Button>
+              </div>
+            </div>
+
+            {!hasPlanningArea && (
+              <PlanningAreaSelector
+                area={DEFAULT_AREA}
+                onChange={(value) => console.info('Planning area change: ', value)}
               />
-            </Button>
-          )}
+            )}
+            {hasPlanningArea && (
+              <Button
+                className="flex w-full mt-4"
+                theme="secondary"
+                size="base"
+                onClick={() => console.info('Upload shapefile')}
+              >
+                <span className="w-full">
+                  Upload shapefile
+                </span>
+                <Icon
+                  icon={UPLOAD_SHAPEFILE_SVG}
+                />
+              </Button>
+            )}
+          </div>
 
           {/* BUTTON BAR */}
           <div className="flex mt-12">
