@@ -7,9 +7,28 @@ and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.0.2]
+
+### Added
+
+- Ability to configure which entities can be requested as included relationships
+  in JSON:API responses via `?include=` query param.
+- Configure allowed included entities for some of the key entities.
+
+### Changed
+
+- Include `createdAt` and `lastModifiedAt` in responses for some key entities.
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+
 ## [0.0.1]
 
-Unreleased
+2021-03-10
 
 ### Added
 
