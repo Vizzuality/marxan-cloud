@@ -9,13 +9,15 @@ import { ItemProps } from 'components/projects/item/component';
 
 import PROJECTS from 'services/projects';
 import {
+  UseProjectsProps,
+  UseProjectsResponse,
   UseSaveProjectProps,
   SaveProjectProps,
   UseDeleteProjectProps,
   DeleteProjectProps,
 } from './types';
 
-export function useProjects(filters) {
+export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
   const [session] = useSession();
   const { search } = filters;
   const { push } = useRouter();

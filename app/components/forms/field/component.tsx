@@ -31,6 +31,7 @@ export const Field: React.FC<FieldProps> = ({
 
       return React.cloneElement(child, {
         ...input,
+        ...child.props,
         id,
         status,
       });
