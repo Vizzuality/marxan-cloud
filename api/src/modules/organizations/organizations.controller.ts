@@ -8,7 +8,10 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { OrganizationResult } from './organization.api.entity';
+import {
+  organizationResource,
+  OrganizationResult,
+} from './organization.api.entity';
 import { OrganizationsService } from './organizations.service';
 
 import {
@@ -26,7 +29,6 @@ import { Post } from '@nestjs/common';
 
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { CreateOrganizationDTO } from './dto/create.organization.dto';
-import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
 import {
@@ -34,17 +36,9 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 
-const resource: BaseServiceResource = {
-  className: 'Organization',
-  name: {
-    singular: 'organization',
-    plural: 'organizations',
-  },
-};
-
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(resource.className)
+@ApiTags(organizationResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/organizations`)
 export class OrganizationsController {
   constructor(public readonly service: OrganizationsService) {}

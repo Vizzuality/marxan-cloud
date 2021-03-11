@@ -50,8 +50,41 @@ export class UsersService extends AppBaseService<
         'isActive',
         'isDeleted',
         'metadata',
+        'projects',
+        'scenarios',
       ],
       keyForAttribute: 'camelCase',
+      projects: {
+        ref: 'id',
+        attributes: [
+          'name',
+          'description',
+          'countryId',
+          'adminAreaLevel1Id',
+          'adminAreaLevel2Id',
+          'planningUnitGridShape',
+          'planningUnitAreakm2',
+          'createdAt',
+          'lastModifiedAt',
+        ],
+      },
+      scenarios: {
+        ref: 'id',
+        attributes: [
+          'name',
+          'description',
+          'type',
+          'wdpaFilter',
+          'wdpaThreshold',
+          'adminRegionId',
+          'numberOfRuns',
+          'boundaryLengthModifier',
+          'metadata',
+          'status',
+          'createdAt',
+          'lastModifiedAt',
+        ],
+      },
     };
   }
 

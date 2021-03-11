@@ -1,5 +1,5 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { CountryResult } from './country.geo.entity';
+import { countryResource, CountryResult } from './country.geo.entity';
 import { CountriesService } from './countries.service';
 import {
   ApiBearerAuth,
@@ -12,23 +12,14 @@ import {
 import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
-import { BaseServiceResource } from 'types/resource.interface';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 
-const resource: BaseServiceResource = {
-  className: 'Country',
-  name: {
-    singular: 'country',
-    plural: 'countries',
-  },
-};
-
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(resource.className)
+@ApiTags(countryResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/countries`)
 export class CountriesController {
   constructor(public readonly service: CountriesService) {}
