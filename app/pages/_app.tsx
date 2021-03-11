@@ -18,7 +18,13 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
   return (
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClient}>
-        <AuthenticationProvider session={pageProps.session}>
+        <AuthenticationProvider
+          session={pageProps.session}
+          options={{
+            clientMaxAge: 60, // Re-fetch session if cache is older than 60 seconds
+            keepAlive: 5, // Send keepAlive message every 5 minutes
+          }}
+        >
           <OverlayProvider>
             <ToastProvider
               placement="top-right"
