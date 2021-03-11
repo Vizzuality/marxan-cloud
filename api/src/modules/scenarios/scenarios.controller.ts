@@ -47,7 +47,9 @@ export class ScenariosController {
   @ApiOkResponse({
     type: ScenarioResult,
   })
-  @JSONAPIQueryParams()
+  @JSONAPIQueryParams({
+    entitiesAllowedAsIncludes: organizationResource.entitiesAllowedAsIncludes,
+  })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
