@@ -1,13 +1,19 @@
 import Fuse from 'fuse.js';
 import { useMemo } from 'react';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
+import { formatDistance } from 'date-fns';
 
 import { ItemProps } from 'components/projects/item/component';
 
 import PROJECTS from 'services/projects';
-import { UseSaveProjectProps } from './types';
+import {
+  UseSaveProjectProps,
+  SaveProjectProps,
+  UseDeleteProjectProps,
+  DeleteProjectProps,
+} from './types';
 
 export function useProjects(filters) {
   const [session] = useSession();
@@ -20,26 +26,30 @@ export function useProjects(filters) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+    params: {
+      include: 'scenarios,users',
+    },
   }));
 
   const { data } = query;
 
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
-      const { id, name } = d;
+      const { id, name, description } = d;
+
+      const lastUpdate = formatDistance(new Date('2021-03-10T11:22:00'), new Date(), { addSuffix: true });
 
       return {
         id,
         area: 'Planning area name',
         name,
-        description: 'Donec est ad luctus dapibus sociosqu.',
-        lastUpdate: '1995-12-17T03:24:00',
+        description,
+        lastUpdate,
         contributors: [
           { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
           { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
         ],
-        onClick: (e) => {
-          console.info('onClick', e);
+        onClick: () => {
           push(`/projects/${id}`);
         },
         onDownload: (e) => {
@@ -59,6 +69,7 @@ export function useProjects(filters) {
     if (search) {
       const fuse = new Fuse(parsedData, {
         keys: ['name', 'area'],
+        threshold: 0.25,
       });
       filteredData = fuse.search(search).map((f) => {
         return f.item;
@@ -98,23 +109,56 @@ export function useProject(id) {
 export function useSaveProject({
   requestConfig = {
     method: 'POST',
-    url: '/',
   },
 }: UseSaveProjectProps) {
+  const queryClient = useQueryClient();
   const [session] = useSession();
 
-  return useMutation((data) => {
+  const saveProject = ({ id, data }: SaveProjectProps) => {
     return PROJECTS.request({
-      method: 'POST',
-      url: '/',
+      url: id ? `/${id}` : '/',
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
       ...requestConfig,
     });
-  }, {
+  };
+
+  return useMutation(saveProject, {
     onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('projects');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeleteProject({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseDeleteProjectProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const deleteProject = ({ id }: DeleteProjectProps) => {
+    return PROJECTS.request({
+      method: 'DELETE',
+      url: `/${id}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(deleteProject, {
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('projects');
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
