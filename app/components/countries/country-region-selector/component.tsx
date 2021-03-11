@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Field as FieldRFF } from 'react-final-form';
 
 import Field from 'components/forms/field';
@@ -33,6 +33,15 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
   const {
     data: subRegionsData, isFetching: isFetchingSubRegions, isFetched: isFetchedSubRegions,
   } = useAdministrativeAreas({ id: selectedRegion, includeAll: true });
+
+  useEffect(() => {
+    setSelectedRegion(null);
+    setSelectedSubRegion(null);
+  }, [selectedCountry]);
+
+  useEffect(() => {
+    setSelectedSubRegion(null);
+  }, [selectedRegion]);
 
   return (
     <div className="mt-6">
