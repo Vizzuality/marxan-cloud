@@ -11,6 +11,7 @@ import { PlanningUnitAreaSizeProps } from './types';
 export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
   size,
   onChange,
+  ...rest
 }: PlanningUnitAreaSizeProps) => {
   const [selectedSize, setSelectedSize] = useState<number>(size);
 
@@ -27,10 +28,12 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
         </button>
       </div>
       <div className="flex items-baseline mt-4">
-        <div className="w-12">
+        <div className="w-20">
           <Input
+            {...rest}
             className="text-2xl"
             defaultValue={selectedSize}
+            type="number"
             onChange={(event) => {
               const newSize = Number(event.target.value);
               setSelectedSize(newSize);
