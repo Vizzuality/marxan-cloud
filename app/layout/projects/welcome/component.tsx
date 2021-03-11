@@ -16,7 +16,7 @@ export const ProjectsWelcome: React.FC<ProjectsWelcomeProps> = () => {
 
   return (
     <Wrapper>
-      <h2 className="py-10 text-5xl text-center text-white font-heading">
+      <h2 className="pb-10 text-5xl text-white pt-14 font-heading">
         Welcome,
         {' '}
         <strong>
