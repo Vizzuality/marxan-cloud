@@ -56,7 +56,9 @@ export class OrganizationsController {
     description:
       'The current user does not have suitable permissions for this request.',
   })
-  @JSONAPIQueryParams()
+  @JSONAPIQueryParams({
+    entitiesAllowedAsIncludes: organizationResource.entitiesAllowedAsIncludes,
+  })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
