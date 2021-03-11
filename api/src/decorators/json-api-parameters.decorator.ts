@@ -1,4 +1,5 @@
 import { ApiQuery } from '@nestjs/swagger';
+import { DEFAULT_PAGINATION } from 'nestjs-base-service';
 
 /**
  * Method decorator: convenience wrapper for OpenAPI annotations common to most
@@ -13,15 +14,20 @@ import { ApiQuery } from '@nestjs/swagger';
  * - page[number] (https://jsonapi.org/format/1.0/#fetching-pagination)
  * - [TODO] filter (https://jsonapi.org/format/1.0/#fetching-filtering)
  */
-export function JSONAPIQueryParams(): (
+export function JSONAPIQueryParams(fetchConfiguration?: {
+  entitiesAllowedAsIncludes?: string[];
+}): (
   target: Object,
   propertyKey: string | symbol,
   descriptor: TypedPropertyDescriptor<unknown>,
 ) => void {
   const includeQueryParam = ApiQuery({
     name: 'include',
-    description:
-      'A comma-separated list of relationship paths. Allows the client to customize which related resources should be returned.',
+    description: fetchConfiguration?.entitiesAllowedAsIncludes?.length
+      ? `A comma-separated list of relationship paths. Allows the client to customize which related resources should be returned. Allowed values are: ${fetchConfiguration.entitiesAllowedAsIncludes
+          .map((i) => '`' + i + '`')
+          .join(', ')}.`
+      : 'A comma-separated list of relationship paths. Allows the client to customize which related resources should be returned.',
     type: String,
     required: false,
   });
@@ -35,7 +41,7 @@ export function JSONAPIQueryParams(): (
   const omitFieldsQueryParam = ApiQuery({
     name: 'omitFields',
     description:
-      'A comma-separated list that refers to the name(s) of fields to be omitted from the results. This could be useful as a shortcut when a specific field such as large geometry fields should be omitted, but it is not practical to or not desirable to explicitly whitelist fields individually. An empty value indicates that no fields will be omitted (although they may still not be present in the result if an explicit choice of fields was provided via `fields`).',
+      'A comma-separated list that refers to the name(s) of fields to be omitted from the results. This could be useful as a shortcut when a specific field such as large geometry fields should be omitted, but it is not practical or not desirable to explicitly whitelist fields individually. An empty value indicates that no fields will be omitted (although they may still not be present in the result if an explicit choice of fields was provided via `fields`).',
     type: String,
     required: false,
   });
@@ -48,8 +54,7 @@ export function JSONAPIQueryParams(): (
   });
   const pageSizeQueryParam = ApiQuery({
     name: 'page[size]',
-    description:
-      'Page size for pagination. If not supplied, pagination with default page size of 10 elements will be applied. Specify page[size]=0 to disable pagination.',
+    description: `Page size for pagination. If not supplied, pagination with default page size of ${DEFAULT_PAGINATION.pageSize} elements will be applied.`,
     type: Number,
     required: false,
   });
@@ -58,6 +63,12 @@ export function JSONAPIQueryParams(): (
     description:
       'Page number for pagination. If not supplied, the first page of results will be returned.',
     type: Number,
+    required: false,
+  });
+  const disablePaginationQueryParam = ApiQuery({
+    name: 'disablePagination',
+    description: `If set to \`true\`, pagination will be disabled. This overrides any other pagination query parameters, if supplied.`,
+    type: Boolean,
     required: false,
   });
 
@@ -72,5 +83,6 @@ export function JSONAPIQueryParams(): (
     sortQueryParam(target, propertyKey, descriptor);
     pageSizeQueryParam(target, propertyKey, descriptor);
     pageNumberQueryParam(target, propertyKey, descriptor);
+    disablePaginationQueryParam(target, propertyKey, descriptor);
   };
 }
