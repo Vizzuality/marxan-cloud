@@ -80,7 +80,7 @@ export const Item: React.FC<ItemProps> = ({
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
       >
-        <header className="flex-1">
+        <header className="flex-1 pr-5">
           <h3 className="text-xs font-medium tracking-widest uppercase font-heading">
             {area}
           </h3>
@@ -151,27 +151,28 @@ export const Item: React.FC<ItemProps> = ({
           <div className="text-sm opacity-50 clamp-2">{description}</div>
         </header>
 
-        <footer className="mt-7">
-          {!!contributors.length && (
-            <div className="flex items-center text-sm mb-7">
-              <p>Contributors:</p>
-              <ul className="flex ml-5">
-                {contributors.map((c, i) => {
-                  return (
-                    <li
-                      key={`${c.id}`}
-                      className={cx({
-                        '-ml-3': i !== 0,
-                      })}
-                    >
-                      <Avatar bgImage="/images/avatar.png" />
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
+        {/* CONTRIBUTORS */}
+        {!!contributors.length && (
+          <div className="flex items-center mt-4 text-sm">
+            <p>Contributors:</p>
+            <ul className="flex ml-1">
+              {contributors.map((c, i) => {
+                return (
+                  <li
+                    key={`${c.id}`}
+                    className={cx({
+                      '-ml-3': i !== 0,
+                    })}
+                  >
+                    <Avatar bgImage="/images/avatar.png" />
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
+        <footer className="mt-7">
           <div className="flex">
             <Button
               className=""
@@ -226,7 +227,7 @@ export const Item: React.FC<ItemProps> = ({
             ease: 'anticipate',
           }}
         >
-          <Icon icon={ARROW_RIGHT_2_SVG} className="w-5 h-5 text-white text-opacity-25" />
+          <Icon icon={ARROW_RIGHT_2_SVG} className="w-5 h-5 text-white opacity-25" />
         </motion.div>
       </button>
     </AnimatePresence>

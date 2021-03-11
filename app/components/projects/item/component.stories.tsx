@@ -33,4 +33,7 @@ Default.args = {
   onDelete: (e) => {
     console.info('onDelete', e);
   },
+  onClick: (e) => {
+    console.info('onClick', e);
+  },
 };

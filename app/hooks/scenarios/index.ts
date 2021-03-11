@@ -1,10 +1,15 @@
 import { useMemo } from 'react';
-import { useQuery, useMutation } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/client';
 
 import SCENARIOS from 'services/scenarios';
 
-import { UseSaveScenarioProps } from './types';
+import {
+  UseSaveScenarioProps,
+  SaveScenarioProps,
+  UseDeleteScenarioProps,
+  DeleteScenarioProps,
+} from './types';
 
 export function useScenarios() {
   const [session] = useSession();
@@ -46,23 +51,56 @@ export function useScenario(id) {
 export function useSaveScenario({
   requestConfig = {
     method: 'POST',
-    url: '/',
   },
 }: UseSaveScenarioProps) {
+  const queryClient = useQueryClient();
   const [session] = useSession();
 
-  return useMutation((data) => {
+  const saveScenario = ({ id, data }: SaveScenarioProps) => {
     return SCENARIOS.request({
-      method: 'POST',
-      url: '/',
+      url: id ? `/${id}` : '/',
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
       ...requestConfig,
     });
-  }, {
+  };
+
+  return useMutation(saveScenario, {
     onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('scenarios');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeleteScenario({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseDeleteScenarioProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const deleteScenario = ({ id }: DeleteScenarioProps) => {
+    return SCENARIOS.request({
+      method: 'DELETE',
+      url: `/${id}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(deleteScenario, {
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('scenarios');
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
