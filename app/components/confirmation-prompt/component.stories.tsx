@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Story } from '@storybook/react/types-6-0';
 
 import Button from 'components/button';
-import MAP_WARNING from 'svgs/ui/map-warning.svg';
+import MAP_WARNING_SVG from 'svgs/notifications/map-warning.svg';
 import ConfirmationPrompt, { ConfirmationPromptProps } from './index';
 
 export default {
@@ -74,5 +74,5 @@ export const WithIcon: Story<ConfirmationPromptProps> = Template.bind({});
 WithIcon.storyName = 'With icon';
 WithIcon.args = {
   title: 'Are you sure you want to delete this item?',
-  icon: MAP_WARNING,
+  icon: MAP_WARNING_SVG,
 };
