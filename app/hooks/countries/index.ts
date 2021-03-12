@@ -20,7 +20,8 @@ export function useCountries(filters: UseCountriesProps): UseCountriesResponse {
     method: 'GET',
     url: '/',
     params: {
-      'page[size]': includeAll ? 0 : 25,
+      ...(includeAll && { disablePagination: true }),
+      sort: 'name0',
       omitFields: 'theGeom',
     },
     headers: {
@@ -55,6 +56,7 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
       'page[size]': includeAll ? 0 : 25,
       level,
       omitFields: 'theGeom',
+      sort: 'name1',
     },
     headers: {
       Authorization: `Bearer ${session.accessToken}`,

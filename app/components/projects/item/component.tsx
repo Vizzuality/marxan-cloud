@@ -69,8 +69,8 @@ export const Item: React.FC<ItemProps> = ({
 
   return (
     <AnimatePresence>
-      <button
-        type="button"
+      <div
+        role="presentation"
         style={style}
         className={cx({
           'relative flex flex-col rounded-4xl bg-gray-800 px-8 py-10 text-white cursor-pointer text-left': true,
@@ -229,7 +229,7 @@ export const Item: React.FC<ItemProps> = ({
         >
           <Icon icon={ARROW_RIGHT_2_SVG} className="w-5 h-5 text-white opacity-25" />
         </motion.div>
-      </button>
+      </div>
     </AnimatePresence>
   );
 };
