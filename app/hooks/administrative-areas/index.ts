@@ -22,6 +22,7 @@ UseAdministrativeAreasResponse {
     params: {
       'page[size]': includeAll ? 6000 : 25,
       omitFields: 'theGeom',
+      sort: 'name2',
     },
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
