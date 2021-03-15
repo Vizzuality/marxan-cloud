@@ -3,22 +3,24 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { geoprocessingConnections } from './ormconfig';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PlanningUnitsModule } from 'src/modules/planning-units/planning-units.module';
-import { AdminAreasModule } from 'src/modules/admin-areas/admin-areas.module';
+import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module'
+
+export const logger = new Logger('app');
+logger.debug(AdminAreasModule)
+
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot({
-      ...geoprocessingConnections.default,
-      keepConnectionAlive: true,
-    }),
-    TypeOrmModule.forRoot({
-      ...geoprocessingConnections.apiDB,
-      keepConnectionAlive: true,
-    }),
-    PlanningUnitsModule,
-    AdminAreasModule,
-  ],
+  imports: [TypeOrmModule.forRoot({
+    ...geoprocessingConnections.default,
+    keepConnectionAlive: true,
+  }),
+  TypeOrmModule.forRoot({
+    ...geoprocessingConnections.apiDB,
+    keepConnectionAlive: true,
+  }),
+  AdminAreasModule
+  // forwardRef(() => AdminAreasModule),
+],
   controllers: [AppController],
   providers: [AppService],
 })
