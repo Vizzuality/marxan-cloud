@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
-// import { useInterval } from 'utils/use-interval';
 
 // const TIME_INTERVAL = 1000 * 60 * 10; // 10 min
 // const SESSION_BUFFER_TIME = 30 * 60 * 1000; // 30 min
@@ -15,7 +14,7 @@ const Protected: React.FC = ({ children }: ProtectedProps) => {
   const router = useRouter();
   const [session, loading] = useSession();
 
-  // every 10 min check session expiration
+  // // every 10 min check session expiration
   // useInterval(() => {
   //   // When 30 min left for token expiration, request a new token
   //   const current = Date.now() - SESSION_BUFFER_TIME;

@@ -15,7 +15,7 @@ export interface HeaderUserProps {
 }
 
 export const HeaderUser: React.FC<HeaderUserProps> = () => {
-  const { user, isFetching, isFetched } = useMe();
+  const { user } = useMe();
   const [open, setOpen] = useState(false);
 
   const handleClick = useCallback(() => {
@@ -30,8 +30,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
     signOut();
   }, []);
 
-  // prevent show anything while session is loading
-  if (!user || (isFetching && !isFetched)) return null;
+  if (!user) return null;
 
   const { displayName } = user;
 

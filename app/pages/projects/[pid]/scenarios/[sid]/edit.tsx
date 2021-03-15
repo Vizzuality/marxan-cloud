@@ -8,6 +8,10 @@ import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useRouter } from 'next/router';
 
+import { withProtection, withUser } from 'hoc/auth';
+
+export const getServerSideProps = withProtection(withUser());
+
 const EditScenarioPage: React.FC = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
