@@ -3,7 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { DeleteResult, getRepository, Repository } from 'typeorm';
 
-import { ApiEvent, QualifiedEventTopic } from './api-event.api.entity';
+import {
+  ApiEvent,
+  apiEventResource,
+  QualifiedEventTopic,
+} from './api-event.api.entity';
 import {
   ApiEventByTopicAndKind,
   LatestApiEventByTopicAndKind,
@@ -30,11 +34,11 @@ export class ApiEventsService extends AppBaseService<
   AppInfoDTO
 > {
   constructor(@InjectRepository(ApiEvent) readonly repo: Repository<ApiEvent>) {
-    super(repo);
+    super(repo, apiEventResource.name.singular, apiEventResource.name.plural);
   }
   get serializerConfig(): JSONAPISerializerConfig<ApiEvent> {
     return {
-      attributes: ['timestamp', 'topic', 'kind', 'apiVersion', 'data'],
+      attributes: ['timestamp', 'topic', 'kind', 'data'],
       keyForAttribute: 'camelCase',
     };
   }
@@ -73,12 +77,11 @@ export class ApiEventsService extends AppBaseService<
   ): Promise<DeleteResult> {
     if (!isNil(qualifiedTopic)) {
       logger.log(
-        `Purging events for topic ${qualifiedTopic.topic}/${qualifiedTopic.kind}/${qualifiedTopic.apiVersion}`,
+        `Purging events for topic ${qualifiedTopic.topic}/${qualifiedTopic.kind}}`,
       );
       return this.repo.delete({
         topic: qualifiedTopic.topic,
         kind: qualifiedTopic.kind,
-        apiVersion: qualifiedTopic.apiVersion,
       });
     } else {
       Logger.log(`Purging events`);

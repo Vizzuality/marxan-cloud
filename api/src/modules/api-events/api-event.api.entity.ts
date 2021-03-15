@@ -2,36 +2,36 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { IsEnum } from 'class-validator';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseServiceResource } from 'types/resource.interface';
+
+export const apiEventResource: BaseServiceResource = {
+  className: 'ApiEvent',
+  name: {
+    singular: 'api_event',
+    plural: 'api_events',
+  },
+};
 
 /**
  * Available kinds of API Events. See the Event.kind prop documentation below
  * for more information.
  */
 export enum API_EVENT_KINDS {
-  UserSignedUp = 'UserSignUp',
-  UserAccountActivationTokenGenerated = 'UserAccountActivationTokenGenerated',
-  UserAccountActivationSucceeded = 'UserAccountActivationSucceeded',
-  UserAccountActivationFailed = 'UserAccountActivationFailed',
-  UserPasswordResetTokenGenerated = 'UserPasswordResetTokenGenerated',
-  UserPasswordResetSucceeded = 'UserPasswordResetSucceeded',
-  UserPasswordResetFailed = 'UserPasswordResetFailed',
+  user__signedUp__v1alpha1 = 'user.signedUp/v1alpha1',
+  user__accountActivationTokenGenerated__v1alpha1 = 'user.accountActivationTokenGenerated/v1alpha1',
+  user__accountActivationSucceeded__v1alpha1 = 'user.accountActivationSucceeded/v1alpha1',
+  user__accountActivationFailed__v1alpha1 = 'user.accountActivationFailed/v1alpha1',
+  user__passwordResetTokenGenerated__v1alpha1 = 'user.passwordResetTokenGenerated/v1alpha1',
+  user__passwordResetSucceeded__v1alpha1 = 'user.passwordResetSucceeded/v1alpha1',
+  user__passwordResetFailed__v1alpha1 = 'user.passwordResetFailed/v1alpha1',
 }
 
 /**
- * Available apiVersions of API Events. See the Event.apiVersion prop
- * documentation below for more information.
- */
-export enum API_EVENT_APIVERSIONS {
-  v1alpha1 = 'v1alpha1',
-}
-
-/**
- * An event topic qualified by kind and apiVersion.
+ * An event topic qualified by kind.
  */
 export interface QualifiedEventTopic {
   topic: string;
   kind: API_EVENT_KINDS;
-  apiVersion: API_EVENT_APIVERSIONS;
 }
 
 /**
@@ -49,7 +49,7 @@ export class ApiEvent {
   /**
    * Timestamp of the event.
    */
-  @Column('timestamp without time zone', {
+  @Column('timestamp', {
     default: () => 'now()',
   })
   timestamp: Date;
@@ -72,18 +72,6 @@ export class ApiEvent {
   kind: string;
 
   /**
-   * The API Version of an event kind.
-   *
-   * Semantics of a given event kind may vary over time: the apiVersion for a
-   * given kind should be incremented when this happens, so that emitters and
-   * consumers of events can interpret the event's semantics appropriately.
-   */
-  @ApiProperty()
-  @IsEnum(Object.values(API_EVENT_APIVERSIONS))
-  @Column('enum', { name: 'api_version' })
-  apiVersion: string;
-
-  /**
    * Topic of an event; this will typically be the UUID of an entity in the
    * system about which events are emitted.
    */
@@ -92,7 +80,7 @@ export class ApiEvent {
   topic: string;
 
   /**
-   * Data payload of the event. Its semantics depend on kind and apiVersion.
+   * Data payload of the event. Its semantics depend on kind.
    *
    * @debt Right now, we don't use formal schemas: emitters and consumers of
    * events are responsible for the appropriate handling of shared semantics.

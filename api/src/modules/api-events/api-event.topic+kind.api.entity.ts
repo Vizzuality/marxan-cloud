@@ -13,27 +13,20 @@ export class ApiEventByTopicAndKind {
 
   @ApiProperty()
   @IsEnum(Object.values(API_EVENT_KINDS))
-  @PrimaryColumn('enum', { nullable: false })
-  kind: string;
+  @PrimaryColumn('enum')
+  kind: API_EVENT_KINDS;
 
   @ApiProperty()
-  @IsEnum(Object.values(API_EVENT_APIVERSIONS))
-  @Column('enum', { name: 'api_version', nullable: false })
-  apiVersion: string;
-
-  @ApiProperty()
-  @PrimaryColumn('uuid', { nullable: false })
+  @PrimaryColumn('uuid')
   topic: string;
 
   @ApiPropertyOptional()
-  @Column('jsonb', { nullable: false })
-  data: object;
+  @Column('jsonb')
+  data: Record<string, unknown>;
 }
 
-// tslint:disable-next-line: max-classes-per-file
 @Entity('latest_api_event_by_topic_and_kind')
 export class LatestApiEventByTopicAndKind extends ApiEventByTopicAndKind {}
 
-// tslint:disable-next-line: max-classes-per-file
 @Entity('first_api_event_by_topic_and_kind')
 export class FirstApiEventByTopicAndKind extends ApiEventByTopicAndKind {}
