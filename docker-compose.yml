@@ -24,7 +24,8 @@ services:
     depends_on:
       - postgresql-api
       - postgresql-geo-api
-      - redis-api
+      - redis
+
   app:
     build:
       context: ./app
@@ -65,6 +66,7 @@ services:
       - postgresql-geo-api
       - postgresql-api
       - api
+      - redis
   postgresql-api:
     build:
       context: ./postgresql
@@ -91,17 +93,15 @@ services:
       - POSTGRES_PASSWORD=${GEO_POSTGRES_PASSWORD}
       - POSTGRES_USER=${GEO_POSTGRES_USER}
     restart: always
-  redis-api:
+  redis:
     build:
       context: ./redis
       dockerfile: Dockerfile
-    container_name: marxan-redis-api
+    hostname: redis
+    container_name: marxan-redis
+    command: [ "redis-server"]
     ports:
       - "${REDIS_API_SERVICE_PORT}:6379"
-    volumes:
-      - marxan-cloud-redis-api-data:/data
-    environment:
-      - REDIS_REPLICATION_MODE=master
     restart: on-failure
   postgresql-airflow:
     image: postgres
@@ -142,6 +142,18 @@ services:
     depends_on:
       - postgresql-airflow
       - airflow-scheduler
+  # Admin gui for redis
+  redis-commander:
+    image: rediscommander/redis-commander
+    hostname: redis-commander
+    container_name: marxan-redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:localhost:${REDIS_API_SERVICE_PORT}
+    ports:
+      - '9000:8081'
+    depends_on:
+      - redis
 
 volumes:
   marxan-cloud-postgresql-api-data:

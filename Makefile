@@ -35,6 +35,11 @@ psql-api:
 psql-geo:
 	docker-compose exec postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"
 
+redis-api:
+	docker-compose exec redis redis-cli
+
+start-redis-commander:
+	docker-compose up --build redis-commander
 # Stop all containers and remove the postgresql-api container and the named
 # Docker volume used to persists PostgreSQL data
 #
