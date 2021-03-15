@@ -7,6 +7,8 @@ import USERS from 'services/users';
 import {
   UseSaveMeProps,
   SaveMeProps,
+  UseSaveMePasswordProps,
+  SaveMePasswordProps,
   UseDeleteMeProps,
 } from './types';
 
@@ -48,6 +50,38 @@ export function useSaveMe({
   const saveMe = ({ data }: SaveMeProps) => {
     return USERS.request({
       url: '/me',
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveMe, {
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('me');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+// SAVE
+export function useSaveMePassword({
+  requestConfig = {
+    method: 'PATCH',
+  },
+}: UseSaveMePasswordProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveMe = ({ data }: SaveMePasswordProps) => {
+    return USERS.request({
+      url: '/me/password',
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
