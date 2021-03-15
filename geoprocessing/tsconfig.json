@@ -9,9 +9,13 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "incremental": true,
+<<<<<<< HEAD
     "noImplicitAny": true,
+=======
+    "noImplicitAny": false,
+>>>>>>> WIP
     "strictNullChecks": true
   },
   "exclude": ["node_modules", "dist"]
