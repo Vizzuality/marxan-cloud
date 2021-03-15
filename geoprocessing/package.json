@@ -54,8 +54,14 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
+<<<<<<< HEAD
     "typeorm": "0.2.30",
     "uuid": "^8.3.2"
+=======
+    "typeorm": "^0.2.29",
+    "nestjs-base-service": "0.4.2",
+    "zlib": "^1.0.5"
+>>>>>>> next steps mvt scaffolding
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
