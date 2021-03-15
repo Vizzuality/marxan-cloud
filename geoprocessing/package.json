@@ -50,13 +50,14 @@
     "mapshaper": "^0.5.28",
     "nestjs-bullmq": "^0.1.0",
     "lodash": "^4.17.20",
+    "nestjs-base-service": "0.4.2",
     "pg": "^8.5.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
-    "nestjs-base-service": "0.4.2",
     "typeorm": "0.2.30",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
