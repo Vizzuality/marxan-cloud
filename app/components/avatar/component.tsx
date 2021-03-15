@@ -14,7 +14,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 }: AvatarProps) => (
   <div
     className={cx({
-      'relative z-0 hover:z-10 flex items-center justify-center bg-transparent bg-cover bg-no-repeat border-2 border-gray-700 w-10 h-10 rounded-full focus:outline-none': true,
+      'relative z-0 hover:z-10 flex items-center justify-center bg-transparent bg-cover bg-no-repeat bg-center border-2 border-gray-700 w-10 h-10 rounded-full focus:outline-none': true,
       [className]: !!className,
     })}
     style={{
