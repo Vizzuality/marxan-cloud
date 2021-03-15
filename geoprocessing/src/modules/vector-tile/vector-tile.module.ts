@@ -1,15 +1,13 @@
-// import { HttpModule, Module } from '@nestjs/common';
-// //import { TypeOrmModule } from '@nestjs/typeorm'; - when to use typeOrmModule vs HttpModule?
+import { Logger, Module } from '@nestjs/common';
+import { TileServerService } from './vector-tile.service';
 
-// import { TileServer } from './vector-tile.service';
+const logger = new Logger('Vector tile module');
 
-// @Module({
-//   imports: [
-//     HttpModule.register({
-//       maxContentLength: 100000000,
-//     }),
-//   ],
-//   providers: [TileServer],
-//   exports: [TileServer],
-// })
-// export class VectorTileModule {}
+const test = TileServerService;
+logger.debug(test)
+
+@Module({
+  providers: [TileServerService],
+  exports: [TileServerService],
+})
+export class VectorTileModule {}

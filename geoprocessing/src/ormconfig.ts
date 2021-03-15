@@ -1,5 +1,5 @@
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import * as config from 'config';
+import { AppConfig } from 'utils/config.utils';
 
 /**
  * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs
@@ -17,9 +17,10 @@ export const geoprocessingConnections: {
   apiDB: PostgresConnectionOptions;
 } = {
   default: {
+    name: 'default',
     synchronize: false,
     type: 'postgres',
-    url: config.get('postgresGeoApi.url'),
+    url: AppConfig.get('postgresGeoApi.url'),
     ssl: false,
     entities: ['src/modules/**/*.geo.entity.ts'],
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
@@ -29,6 +30,7 @@ export const geoprocessingConnections: {
     logging: ['error'],
     cache: false,
     migrations: ['src/migrations/geoprocessing/**/*.ts'],
+<<<<<<< HEAD
     migrationsRun: true,
     cli: {
       migrationsDir: 'src/migrations/geoprocessing',
@@ -39,6 +41,22 @@ export const geoprocessingConnections: {
     synchronize: false,
     type: 'postgres',
     url: config.get('postgresApi.url'),
+=======
+    migrationsRun:  AppConfig.get<string>(
+      'postgresApi.runMigrationsOnStartup',
+    )?.toLowerCase() !== 'false'
+      ? true
+      : false,
+    cli: {
+      migrationsDir: "src/migrations/geoprocessing"
+    }
+  },
+  apiDB: {
+    name: "apiDB",
+    synchronize: false,
+    type: 'postgres',
+    url: AppConfig.get('postgresApi.url'),
+>>>>>>> WIP
     ssl: false,
     entities: ['src/modules/**/*.api.entity.ts'],
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
@@ -46,6 +64,10 @@ export const geoprocessingConnections: {
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
     // logging.
     logging: ['error'],
+<<<<<<< HEAD
     cache: false,
+=======
+    cache: false
+>>>>>>> WIP
   },
 };
