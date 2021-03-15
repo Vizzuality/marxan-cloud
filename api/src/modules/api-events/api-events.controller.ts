@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -34,6 +35,7 @@ import {
   API_EVENT_KINDS,
   ApiEventResult,
   ApiEvent,
+  QualifiedEventTopic,
 } from './api-event.api.entity';
 import { ApiEventsService } from './api-events.service';
 import { CreateApiEventDTO } from './dto/create.api-event.dto';
@@ -65,7 +67,7 @@ export class ApiEventsController {
   @ApiOperation({ description: 'Find latest event by kind for a given topic' })
   @ApiOkResponse({ type: ApiEvent })
   @Get('kind/:kind/topic/:topic/latest')
-  async findOne(
+  async findLatestEventByKindAndTopic(
     @Param('kind') kind: API_EVENT_KINDS,
     @Param('topic') topic: string,
   ): Promise<ApiEventResult> {
@@ -86,36 +88,15 @@ export class ApiEventsController {
     );
   }
 
-  @Post('purge-all')
-  @ApiOperation({ summary: 'Purge events' })
-  @ApiResponse({ status: 201, description: 'Events invalidated' })
-  @ApiQuery({
-    name: 'topic',
-    type: String,
-    description:
-      'Topic of an event series (topic, kind) whose events should be purged. Both topic and kind must be provided in order to purge events for an event series (i.e. topic of a specific kind). If no event series data is provided, purge all events.',
-    required: false,
+  @ApiOperation({
+    description: 'Delete event series by kind for a given topic',
   })
-  @ApiQuery({
-    name: 'kind',
-    type: String,
-    description:
-      'Kind of an event series (topic, kind) whose events should be purged',
-    required: false,
-  })
-  async purgeAll(
-    @Query('topic') topic: string,
-    @Query('kind') kind: API_EVENT_KINDS,
+  @ApiOkResponse({ type: ApiEvent })
+  @Delete('kind/:kind/topic/:topic')
+  async deleteEventSeriesByKindAndTopic(
+    @Param('kind') kind: API_EVENT_KINDS,
+    @Param('topic') topic: string,
   ): Promise<DeleteResult> {
-    // Poor person's dependent typing
-    if ((topic || kind) && !(topic && kind)) {
-      throw new BadRequestException(
-        `When requesting to purge events for an event series, both topic and kind parameters must be provided. Values in the current request were: topic=${topic}, kind=${kind}`,
-      );
-    }
-    return await this.service.purgeAll({
-      topic,
-      kind,
-    });
+    return await this.service.purgeAll({ kind, topic } as QualifiedEventTopic);
   }
 }
