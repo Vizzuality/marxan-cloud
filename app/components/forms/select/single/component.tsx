@@ -80,9 +80,10 @@ export const SingleSelect: React.FC<SelectProps> = ({
     getItemProps,
     closeMenu,
     reset,
-  } = useSelect({
+  } = useSelect<SelectOptionProps>({
     items: getOptions,
     initialSelectedItem: getInitialSelected,
+    itemToString: (item) => item.label, // How the selected options is announced to screen readers
     stateReducer: (st, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
 
@@ -162,7 +163,12 @@ export const SingleSelect: React.FC<SelectProps> = ({
       {/* Menu */}
       {createPortal(
         <div
-          className="z-50"
+          className={cx({
+            'z-50': true,
+            // The content of `<Menu />` must always be in the DOM so that Downshift can get the ref
+            // to the `<ul />` element through `getMenuProps`
+            invisible: !isOpen,
+          })}
           ref={menuRef}
           style={styles.popper}
           {...attributes.popper}
@@ -174,59 +180,53 @@ export const SingleSelect: React.FC<SelectProps> = ({
             disabled={disabled}
             opened={isOpen}
             attributes={attributes}
-            getMenuProps={getMenuProps}
-            onFocus={onFocus}
-            onBlur={onBlur}
           >
-            {isOpen && (
-              <Toggle
-                options={options}
-                theme={theme}
-                size={size}
-                status={status}
-                prefix={prefix}
-                disabled={disabled}
-                opened={isOpen}
-                selectedItems={selectedItems}
-                placeholder={placeholder}
-                getToggleButtonProps={getToggleButtonProps}
-              />
-            )}
+            <Toggle
+              options={options}
+              theme={theme}
+              size={size}
+              status={status}
+              prefix={prefix}
+              disabled={disabled}
+              opened={isOpen}
+              selectedItems={selectedItems}
+              placeholder={placeholder}
+              getToggleButtonProps={getToggleButtonProps}
+            />
 
-            {isOpen && (
-              <ul
-                className={cx({
-                  'py-1 focus:outline-none overflow-y-auto overflow-x-hidden': true,
-                })}
-                style={{
-                  maxHeight,
-                }}
-              >
-                {getOptions.map((option, index) => (
-                  <li
-                    className={cx({
-                      'px-4 py-1 mt-0.5 cursor-pointer': true,
-                      [THEME[theme].item.base]: highlightedIndex !== index,
-                      [THEME[theme].item.disabled]: option.disabled,
-                      [THEME[theme].item.highlighted]: (
-                        (highlightedIndex === index && !option.disabled)
+            <ul
+              {...getMenuProps({ onFocus, onBlur })}
+              className={cx({
+                'py-1 focus:outline-none overflow-y-auto overflow-x-hidden': true,
+              })}
+              style={{
+                maxHeight,
+              }}
+            >
+              {getOptions.map((option, index) => (
+                <li
+                  className={cx({
+                    'px-4 py-1 mt-0.5 cursor-pointer': true,
+                    [THEME[theme].item.base]: highlightedIndex !== index,
+                    [THEME[theme].item.disabled]: option.disabled,
+                    [THEME[theme].item.highlighted]: (
+                      (highlightedIndex === index && !option.disabled)
                         || isSelected(option, selectedItems)
-                      ),
+                    ),
+                  })}
+                  key={`${option.value}`}
+                  {...getItemProps({ item: option, index, disabled: option.disabled })}
+                >
+                  <span
+                    className={cx({
+                      'ml-6': !!option.checkbox,
                     })}
-                    key={`${option.value}`}
-                    {...getItemProps({ item: option, index, disabled: option.disabled })}
                   >
-                    <span
-                      className={cx({
-                        'ml-6': !!option.checkbox,
-                      })}
-                    >
-                      {option.label}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
+                    {option.label}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </Menu>
         </div>,
         document.body,

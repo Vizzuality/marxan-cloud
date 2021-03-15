@@ -39,21 +39,19 @@ export const MultiSelect: React.FC<SelectProps> = ({
   const triggerRef = useRef();
   const menuRef = useRef();
 
-  const getOptions = useMemo(() => {
+  const getOptions: SelectOptionProps[] = useMemo(() => {
     return [
       ...clearSelectionActive ? [{
         value: null,
         label: clearSelectionLabel,
         checkbox: false,
-        enabled: false,
       }] : [],
       ...batchSelectionActive ? [{
         value: 'batch-selection',
         label: batchSelectionLabel,
         checkbox: false,
-        enabled: false,
       }] : [],
-      ...options.map((o) => ({ ...o, checkbox: true, enabled: true })),
+      ...options.map((o) => ({ ...o, checkbox: true })),
     ];
   }, [
     options,
@@ -64,7 +62,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
   ]);
 
   const getOptionsEnabled = useMemo(() => {
-    return getOptions.filter((op) => !op.disabled && op.enabled);
+    return getOptions.filter((op) => !op.disabled);
   }, [getOptions]);
 
   const getInitialSelected = useMemo(() => {
@@ -112,8 +110,9 @@ export const MultiSelect: React.FC<SelectProps> = ({
     setSelectedItems,
     selectedItems,
     reset,
-  } = useMultipleSelection({
+  } = useMultipleSelection<SelectOptionProps>({
     initialSelectedItems: getInitialSelected,
+    itemToString: (item) => item.label, // How the selected options is announced to screen readers
     stateReducer: (st, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
       if (
@@ -136,8 +135,9 @@ export const MultiSelect: React.FC<SelectProps> = ({
     getMenuProps,
     getItemProps,
     closeMenu,
-  } = useSelect({
+  } = useSelect<SelectOptionProps>({
     items: getOptions,
+    itemToString: (item) => item.label, // How the selected options is announced to screen readers
     stateReducer: (st, actionAndChanges) => {
       const { type, changes } = actionAndChanges;
       const { selectedItem: option } = changes;
@@ -217,7 +217,12 @@ export const MultiSelect: React.FC<SelectProps> = ({
       {/* Menu */}
       {createPortal(
         <div
-          className="z-50"
+          className={cx({
+            'z-50': true,
+            // The content of `<Menu />` must always be in the DOM so that Downshift can get the ref
+            // to the `<ul />` element through `getMenuProps`
+            invisible: !isOpen,
+          })}
           ref={menuRef}
           style={styles.popper}
           {...attributes.popper}
@@ -230,70 +235,64 @@ export const MultiSelect: React.FC<SelectProps> = ({
             multiple
             opened={isOpen}
             attributes={attributes}
-            getMenuProps={getMenuProps}
-            onFocus={onFocus}
-            onBlur={onBlur}
           >
-            {isOpen && (
-              <Toggle
-                options={getOptionsEnabled}
-                theme={theme}
-                size={size}
-                status={status}
-                prefix={prefix}
-                disabled={disabled}
-                multiple={multiple}
-                opened={isOpen}
-                selectedItems={selectedItems}
-                placeholder={placeholder}
-                getToggleButtonProps={getToggleButtonProps}
-                getDropdownProps={getDropdownProps}
-              />
-            )}
+            <Toggle
+              options={getOptionsEnabled}
+              theme={theme}
+              size={size}
+              status={status}
+              prefix={prefix}
+              disabled={disabled}
+              multiple={multiple}
+              opened={isOpen}
+              selectedItems={selectedItems}
+              placeholder={placeholder}
+              getToggleButtonProps={getToggleButtonProps}
+              getDropdownProps={getDropdownProps}
+            />
 
-            {isOpen && (
-              <ul
-                className={cx({
-                  'py-1 focus:outline-none overflow-y-auto overflow-x-hidden': true,
-                })}
-                style={{
-                  maxHeight,
-                }}
-              >
-                {getOptions.map((option, index) => (
-                  <li
+            <ul
+              {...getMenuProps({ onFocus, onBlur })}
+              className={cx({
+                'py-1 focus:outline-none overflow-y-auto overflow-x-hidden': true,
+              })}
+              style={{
+                maxHeight,
+              }}
+            >
+              {getOptions.map((option, index) => (
+                <li
+                  className={cx({
+                    'px-4 py-1 mt-0.5 cursor-pointer relative': true,
+                    [THEME[theme].item.base]: highlightedIndex !== index,
+                    [THEME[theme].item.disabled]: option.disabled,
+                    [THEME[theme].item.highlighted]: (
+                      (highlightedIndex === index && !option.disabled)
+                      || isSelected(option, selectedItems)
+                    ),
+                  })}
+                  key={`${option.value}`}
+                  {...getItemProps({ item: option, index, disabled: option.disabled })}
+                >
+                  <span
                     className={cx({
-                      'px-4 py-1 mt-0.5 cursor-pointer relative': true,
-                      [THEME[theme].item.base]: highlightedIndex !== index,
-                      [THEME[theme].item.disabled]: option.disabled,
-                      [THEME[theme].item.highlighted]: (
-                        (highlightedIndex === index && !option.disabled)
-                        || isSelected(option, selectedItems)
-                      ),
+                      'ml-6': !!option.checkbox,
                     })}
-                    key={`${option.value}`}
-                    {...getItemProps({ item: option, index, disabled: option.disabled })}
                   >
-                    <span
-                      className={cx({
-                        'ml-6': !!option.checkbox,
-                      })}
-                    >
-                      {option.label}
-                    </span>
+                    {option.label}
+                  </span>
 
-                    {option.checkbox && (
-                      <Checkbox
-                        className="absolute bg-opacity-0 left-4 top-1.5"
-                        checked={isSelected(option, selectedItems)}
-                        disabled={option.disabled}
-                        onChange={() => {}}
-                      />
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
+                  {option.checkbox && (
+                    <Checkbox
+                      className="absolute bg-opacity-0 left-4 top-1.5"
+                      checked={isSelected(option, selectedItems)}
+                      disabled={option.disabled}
+                      onChange={() => {}}
+                    />
+                  )}
+                </li>
+              ))}
+            </ul>
           </Menu>
         </div>,
         document.body,
