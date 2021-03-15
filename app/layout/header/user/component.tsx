@@ -32,7 +32,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
 
   if (!user) return null;
 
-  const { displayName } = user;
+  const { displayName, avatarDataUrl } = user;
 
   return (
     <Tooltip
@@ -78,8 +78,8 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
         className="flex items-center justify-start focus:outline-none"
         onClick={handleClick}
       >
-        <Avatar className="text-sm text-white uppercase bg-primary-700">
-          {displayName.slice(0, 2)}
+        <Avatar className="text-sm text-white uppercase bg-primary-700" bgImage={avatarDataUrl}>
+          {!avatarDataUrl && displayName.slice(0, 2)}
         </Avatar>
         <Icon icon={ARROW_DOWN_SVG} className="w-2.5 h-2.5 text-white" />
       </button>

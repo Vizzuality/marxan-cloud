@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
 import Wrapper from 'layout/wrapper';
+import Avatar from 'layout/me/avatar';
 
 import Button from 'components/button';
 import Loading from 'components/loading';
@@ -26,7 +27,7 @@ export interface MeProps {
 
 export const Me: React.FC<MeProps> = () => {
   const [submitting, setSubmitting] = useState(false);
-  const { user, isFetching } = useMe();
+  const { user } = useMe();
   const mutation = useSaveMe({});
   const { addToast } = useToasts();
 
@@ -59,10 +60,7 @@ export const Me: React.FC<MeProps> = () => {
     });
   }, [mutation, addToast]);
 
-  // prevent show anything while session is loading
-  if (!user && isFetching) return null;
-
-  const { displayName, email } = user;
+  const { displayName, email, avatarDataUrl } = user;
 
   return (
     <Wrapper>
@@ -70,6 +68,7 @@ export const Me: React.FC<MeProps> = () => {
         onSubmit={handleSubmit}
         initialValues={{
           displayName,
+          avatarDataUrl,
         }}
       >
         {(props) => (
@@ -83,14 +82,29 @@ export const Me: React.FC<MeProps> = () => {
                 iconClassName="w-10 h-10 text-primary-500"
               />
 
-              {/* DISPLAY NAME */}
+              {/* PHOTO */}
               <div>
+                <FieldRFF
+                  name="avatarDataUrl"
+                  // validate={composeValidators([{ presence: true }])}
+                >
+                  {(fprops) => (
+                    <Field id="profile-avatarDataUrl" {...fprops}>
+                      <Label theme="light" className="mb-3 uppercase">Photo</Label>
+                      <Avatar />
+                    </Field>
+                  )}
+                </FieldRFF>
+              </div>
+
+              {/* DISPLAY NAME */}
+              <div className="mt-5">
                 <FieldRFF
                   name="displayName"
                   validate={composeValidators([{ presence: true }])}
                 >
                   {(fprops) => (
-                    <Field id="login-displayName" {...fprops}>
+                    <Field id="profile-displayName" {...fprops}>
                       <Label theme="light" className="mb-3 uppercase">Name</Label>
                       <Input theme="light" icon={USER_SVG} />
                     </Field>
