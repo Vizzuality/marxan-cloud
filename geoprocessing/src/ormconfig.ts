@@ -30,21 +30,20 @@ export const geoprocessingConnections: {
     logging: ['error'],
     cache: false,
     migrations: ['src/migrations/geoprocessing/**/*.ts'],
-    migrationsRun:
-      AppConfig.get<string>(
-        'postgresApi.runMigrationsOnStartup',
-      )?.toLowerCase() !== 'false'
-        ? true
-        : false,
+    migrationsRun:  AppConfig.get<string>(
+      'postgresApi.runMigrationsOnStartup',
+    )?.toLowerCase() !== 'false'
+      ? true
+      : false,
     cli: {
-      migrationsDir: 'src/migrations/geoprocessing',
-    },
+      migrationsDir: "src/migrations/geoprocessing"
+    }
   },
   apiDB: {
     name: "apiDB",
     synchronize: false,
     type: 'postgres',
-    url: AppConfig.get<string>('postgresApi.url'),
+    url: AppConfig.get('postgresApi.url'),
     ssl: false,
     entities: ['src/modules/**/*.api.entity.ts'],
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
