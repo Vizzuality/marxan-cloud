@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DeleteResult, getRepository, Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 
 import {
   ApiEvent,
@@ -12,7 +12,6 @@ import {
   ApiEventByTopicAndKind,
   LatestApiEventByTopicAndKind,
 } from './api-event.topic+kind.api.entity';
-import { logger } from './api-events.module';
 
 import { isNil } from 'lodash';
 import {
@@ -33,7 +32,13 @@ export class ApiEventsService extends AppBaseService<
   UpdateApiEventDTO,
   AppInfoDTO
 > {
-  constructor(@InjectRepository(ApiEvent) readonly repo: Repository<ApiEvent>) {
+  private readonly logger = new Logger(ApiEventsService.name);
+
+  constructor(
+    @InjectRepository(ApiEvent) readonly repo: Repository<ApiEvent>,
+    @InjectRepository(LatestApiEventByTopicAndKind)
+    readonly latestEventByTopicAndKindRepo: Repository<LatestApiEventByTopicAndKind>,
+  ) {
     super(repo, apiEventResource.name.singular, apiEventResource.name.plural);
   }
   get serializerConfig(): JSONAPISerializerConfig<ApiEvent> {
@@ -53,19 +58,19 @@ export class ApiEventsService extends AppBaseService<
    * queue system.
    */
   public async getLatestEventForTopic(
-    qualifiedTopic?: QualifiedEventTopic,
+    qualifiedTopic: QualifiedEventTopic,
   ): Promise<ApiEventByTopicAndKind | undefined> {
-    try {
-      return getRepository(LatestApiEventByTopicAndKind)
-        .createQueryBuilder('event')
-        .where('event.topic = :topic AND event.kind = :kind', {
-          topic: qualifiedTopic?.topic,
-          kind: qualifiedTopic?.kind,
-        })
-        .getOne();
-    } catch (error) {
-      Logger.error(error);
+    const result = await this.latestEventByTopicAndKindRepo.findOne({
+      topic: qualifiedTopic.topic,
+      kind: qualifiedTopic.kind,
+    });
+    if (!result) {
+      throw new NotFoundException(
+        `No events found for topic ${qualifiedTopic.topic} and kind ${qualifiedTopic.kind}.`,
+      );
     }
+
+    return result;
   }
 
   /**
@@ -76,7 +81,7 @@ export class ApiEventsService extends AppBaseService<
     qualifiedTopic?: QualifiedEventTopic,
   ): Promise<DeleteResult> {
     if (!isNil(qualifiedTopic)) {
-      logger.log(
+      this.logger.log(
         `Purging events for topic ${qualifiedTopic.topic}/${qualifiedTopic.kind}}`,
       );
       return this.repo.delete({
@@ -84,7 +89,7 @@ export class ApiEventsService extends AppBaseService<
         kind: qualifiedTopic.kind,
       });
     } else {
-      Logger.log(`Purging events`);
+      this.logger.log(`Purging events`);
       await this.repo.clear();
       return new DeleteResult();
     }
