@@ -9,6 +9,7 @@ import { UpdateProjectDTO } from './dto/update.project.dto';
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
 import { ScenariosService } from 'modules/scenarios/scenarios.service';
+import { PlanningUnitsService } from 'modules/planning-units/planning-units.service';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -31,6 +32,7 @@ type ProjectFilterKeys = keyof Pick<
 >;
 type ProjectFilters = Record<ProjectFilterKeys, string[]>;
 
+const logger = new Logger('projects');
 @Injectable()
 export class ProjectsService extends AppBaseService<
   Project,
@@ -50,6 +52,8 @@ export class ProjectsService extends AppBaseService<
     protected readonly adminAreasService: AdminAreasService,
     @Inject(CountriesService)
     protected readonly countriesService: CountriesService,
+    @Inject(PlanningUnitsService)
+    private readonly planningUnitsService: PlanningUnitsService,
   ) {
     super(repository, 'project', 'projects');
   }
@@ -185,6 +189,16 @@ export class ProjectsService extends AppBaseService<
       : project.countryId
       ? await this.countriesService.getById(project.countryId)
       : undefined;
-    return planningArea;
+    return planningArea
+  }
+
+  async actionAfterCreate(
+    model: Project,
+    createModel: CreateProjectDTO,
+    info?: AppInfoDTO,
+  ): Promise<void> {
+    logger.debug('test');
+
+    return this.planningUnitsService.create();
   }
 }
