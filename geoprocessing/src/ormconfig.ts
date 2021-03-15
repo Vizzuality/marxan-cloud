@@ -30,17 +30,12 @@ export const geoprocessingConnections: {
     logging: ['error'],
     cache: false,
     migrations: ['src/migrations/geoprocessing/**/*.ts'],
-<<<<<<< HEAD
     migrationsRun:
       AppConfig.get<string>(
         'postgresApi.runMigrationsOnStartup',
       )?.toLowerCase() !== 'false'
         ? true
         : false,
-=======
-<<<<<<< HEAD
-    migrationsRun: true,
->>>>>>> WIP
     cli: {
       migrationsDir: 'src/migrations/geoprocessing',
     },
@@ -49,11 +44,7 @@ export const geoprocessingConnections: {
     name: 'apiDB',
     synchronize: false,
     type: 'postgres',
-<<<<<<< HEAD
     url: AppConfig.get<string>('postgresApi.url'),
-=======
-    url: config.get('postgresApi.url'),
-=======
     migrationsRun:  AppConfig.get<string>(
       'postgresApi.runMigrationsOnStartup',
     )?.toLowerCase() !== 'false'
@@ -62,25 +53,5 @@ export const geoprocessingConnections: {
     cli: {
       migrationsDir: "src/migrations/geoprocessing"
     }
-  },
-  apiDB: {
-    name: "apiDB",
-    synchronize: false,
-    type: 'postgres',
-    url: AppConfig.get('postgresApi.url'),
->>>>>>> WIP
->>>>>>> WIP
-    ssl: false,
-    entities: ['src/modules/**/*.api.entity.ts'],
-    // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
-    // 'query' if needing to see the actual generated SQL statements (this should
-    // be limited to `NODE_ENV=development`). Use 'error' for least verbose
-    // logging.
-    logging: ['error'],
-<<<<<<< HEAD
-    cache: false,
-=======
-    cache: false
->>>>>>> WIP
   },
 };
