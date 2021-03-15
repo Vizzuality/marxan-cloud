@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { useDropzone } from 'react-dropzone';
 import { useMe } from 'hooks/me';
+import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';
@@ -21,6 +22,7 @@ const toBase64 = (file) => new Promise((resolve, reject) => {
 
 export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }:AvatarMeProps) => {
   const { user } = useMe();
+  const { addToast } = useToasts();
   const [preview, setPreview] = useState(value);
 
   const onRemove = (e) => {
@@ -29,11 +31,30 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }:AvatarMePr
     onChange(null);
   };
 
-  const onDrop = async (acceptedFiles) => {
+  const onDropAccepted = async (acceptedFiles) => {
     const f = acceptedFiles[0];
+
     const url = await toBase64(f);
     setPreview(`${url}`);
     onChange(`${url}`);
+  };
+
+  const onDropRejected = (rejectedFiles) => {
+    const r = rejectedFiles[0];
+    const { errors } = r;
+
+    addToast('drop-error', (
+      <>
+        <h2 className="font-medium">Error!</h2>
+        <ul className="text-sm">
+          {errors.map((e) => (
+            <li key={`${e.code}`}>{e.message}</li>
+          ))}
+        </ul>
+      </>
+    ), {
+      level: 'error',
+    });
   };
 
   const { open, getRootProps, getInputProps } = useDropzone({
@@ -41,7 +62,9 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }:AvatarMePr
     multiple: false,
     noClick: true,
     noKeyboard: true,
-    onDrop,
+    maxSize: 500000,
+    onDropAccepted,
+    onDropRejected,
   });
 
   const { displayName } = user;
