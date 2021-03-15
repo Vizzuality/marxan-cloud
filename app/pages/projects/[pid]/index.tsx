@@ -4,6 +4,10 @@ import Head from 'next/head';
 import Header from 'layout/header';
 import Protected from 'layout/protected';
 
+import { withProtection, withUser } from 'hoc/auth';
+
+export const getServerSideProps = withProtection(withUser());
+
 const ShowProjectsPage: React.FC = () => {
   return (
     <Protected>

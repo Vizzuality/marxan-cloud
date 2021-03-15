@@ -9,10 +9,6 @@ export interface ProjectsWelcomeProps {
 
 export const ProjectsWelcome: React.FC<ProjectsWelcomeProps> = () => {
   const { user } = useMe();
-  console.log(user);
-
-  return null;
-
   const { displayName } = user;
 
   return (

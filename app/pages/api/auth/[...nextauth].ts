@@ -1,7 +1,6 @@
 import NextAuth from 'next-auth';
 import Providers from 'next-auth/providers';
 import AUTHENTICATION from 'services/authentication';
-import { SIGN_IN_DEFAULT_REDIRECT } from 'hooks/auth';
 
 /**
  * Takes a token, and returns a new token
@@ -106,7 +105,7 @@ const options = {
     async redirect(callbackUrl) {
       // By default it should be redirect to /projects
       if (callbackUrl.includes('/sign-in') || callbackUrl.includes('/sign-up')) {
-        return SIGN_IN_DEFAULT_REDIRECT;
+        return '/projects';
       }
       return callbackUrl;
     },

@@ -6,6 +6,10 @@ import Protected from 'layout/protected';
 
 import Me from 'layout/me';
 
+import { withProtection, withUser } from 'hoc/auth';
+
+export const getServerSideProps = withProtection(withUser());
+
 const MePage: React.FC = () => {
   return (
     <Protected>

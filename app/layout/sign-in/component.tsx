@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { signIn, useSession } from 'next-auth/client';
+import { signIn } from 'next-auth/client';
 import { useRouter } from 'next/router';
 import Wrapper from 'layout/wrapper';
 import Link from 'next/link';
@@ -16,7 +16,6 @@ import {
 } from 'components/forms/validations';
 
 import { useToasts } from 'hooks/toast';
-import { SIGN_IN_DEFAULT_REDIRECT } from 'hooks/auth';
 
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
@@ -28,7 +27,6 @@ export interface SignInProps {
 export const SignIn: React.FC<SignInProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
-  const [session] = useSession();
   const router = useRouter();
   const { callbackUrl } = router.query;
 
@@ -50,12 +48,6 @@ export const SignIn: React.FC<SignInProps> = () => {
       console.error(err);
     }
   }, [addToast, callbackUrl]);
-
-  // If session is already initialized, redirect to projects page
-  if (session) {
-    router.push(SIGN_IN_DEFAULT_REDIRECT);
-    return null;
-  }
 
   return (
     <Wrapper>

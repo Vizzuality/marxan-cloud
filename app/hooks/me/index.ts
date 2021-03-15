@@ -20,6 +20,8 @@ export function useMe() {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+  }).then((response) => {
+    return response.data;
   }), {
     enabled: !!session && !loading,
   });
@@ -29,9 +31,9 @@ export function useMe() {
   return useMemo(() => {
     return {
       ...query,
-      user: data?.data,
+      user: data,
     };
-  }, [query, data?.data]);
+  }, [query, data]);
 }
 
 // SAVE

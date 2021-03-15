@@ -10,7 +10,7 @@ import Title from 'layout/header/title';
 import Icon from 'components/icon';
 import Button from 'components/button';
 
-import { useSession } from 'next-auth/client';
+import { useMe } from 'hooks/me';
 
 import LOGO_SVG from 'svgs/logo.svg?sprite';
 
@@ -28,7 +28,7 @@ const SIZE = {
 };
 
 export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
-  const [session, loading] = useSession();
+  const { user } = useMe();
 
   return (
     <header
@@ -51,11 +51,9 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
 
           <Title />
 
-          {(session && !loading) && (
-            <User />
-          )}
+          <User />
 
-          {!session && (
+          {!user && (
             <div className="flex items-center gap-4">
               <Link href="/auth/sign-in">
                 <Button theme="secondary-alt" size="s">
