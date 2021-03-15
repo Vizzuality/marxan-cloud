@@ -48,7 +48,6 @@
     "faker": "^5.5.2",
     "jsonapi-serializer": "^3.6.7",
     "mapshaper": "^0.5.28",
-    "nestjs-bullmq": "^0.1.0",
     "lodash": "^4.17.20",
     "nestjs-base-service": "0.4.2",
     "pg": "^8.5.1",
