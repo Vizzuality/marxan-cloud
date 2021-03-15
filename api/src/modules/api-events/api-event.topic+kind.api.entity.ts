@@ -3,7 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-import { API_EVENT_APIVERSIONS, API_EVENT_KINDS } from './api-event.api.entity';
+import { API_EVENT_KINDS } from './api-event.api.entity';
 
 export class ApiEventByTopicAndKind {
   @Column('timestamp without time zone', {
