@@ -103,6 +103,18 @@ services:
     ports:
       - "${REDIS_API_SERVICE_PORT}:6379"
     restart: on-failure
+  # Admin gui for redis
+  redis-commander:
+    image: rediscommander/redis-commander
+    hostname: redis-commander
+    container_name: marxan-redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:marxan-redis:6379
+    ports:
+      - '9000:8081'
+    depends_on:
+      - redis
   postgresql-airflow:
     image: postgres
     container_name: marxan-postgresql-airflow
@@ -142,18 +154,6 @@ services:
     depends_on:
       - postgresql-airflow
       - airflow-scheduler
-  # Admin gui for redis
-  redis-commander:
-    image: rediscommander/redis-commander
-    hostname: redis-commander
-    container_name: marxan-redis-commander
-    restart: always
-    environment:
-      - REDIS_HOSTS=local:localhost:${REDIS_API_SERVICE_PORT}
-    ports:
-      - '9000:8081'
-    depends_on:
-      - redis
 
 volumes:
   marxan-cloud-postgresql-api-data:
