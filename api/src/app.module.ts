@@ -21,6 +21,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from 'filters/all-exceptions.exception.filter';
 import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
 import { ApiEventsModule } from 'modules/api-events/api-events.module';
+import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ApiEventsModule } from 'modules/api-events/api-events.module';
     GeoModule,
     OrganizationsModule,
     ProjectsModule,
+    ProtectedAreasModule,
     ScenariosModule,
     UsersModule,
     AuthenticationModule,
