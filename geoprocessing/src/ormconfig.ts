@@ -1,5 +1,5 @@
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import { AppConfig } from 'src/utils/config.utils';
+import { AppConfig } from 'utils/config.utils';
 
 /**
  * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs
@@ -41,7 +41,7 @@ export const geoprocessingConnections: {
     },
   },
   apiDB: {
-    name: 'apiDB',
+    name: "apiDB",
     synchronize: false,
     type: 'postgres',
     url: AppConfig.get<string>('postgresApi.url'),
@@ -52,6 +52,6 @@ export const geoprocessingConnections: {
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
     // logging.
     logging: ['error'],
-    cache: false,
+    cache: false
   },
 };
