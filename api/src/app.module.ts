@@ -5,6 +5,10 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BullModule } from '@nestjs/bull';
+
+import { AppConfig } from 'utils/config.utils';
+
 import { AuthenticationModule } from 'modules/authentication/authentication.module';
 import { CountriesModule } from 'modules/countries/countries.module';
 import { ScenariosModule } from 'modules/scenarios/scenarios.module';
@@ -32,6 +36,12 @@ import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.mo
     TypeOrmModule.forRoot({
       ...apiConnections.geoprocessingDB,
       keepConnectionAlive: true,
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: 'redis',
+        port: AppConfig.get('redis.port'),
+      },
     }),
     AdminAreasModule,
     ApiEventsModule,
