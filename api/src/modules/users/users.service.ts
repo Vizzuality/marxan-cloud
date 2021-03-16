@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { User, userResource } from './user.api.entity';
 
-import { pick } from 'lodash';
+import { omit } from 'lodash';
 import { CreateUserDTO } from './dto/create.user.dto';
 import { UpdateUserDTO } from './dto/update.user.dto';
 import { AppInfoDTO } from 'dto/info.dto';
@@ -117,18 +117,8 @@ export class UsersService extends AppBaseService<
    *
    * @debt Should be extended to include roles and permissions.
    */
-  static getSanitizedUserMetadata(user: Partial<User>): Partial<User> {
-    const allowedProps: Array<keyof User> = [
-      'id',
-      'displayName',
-      'email',
-      'fname',
-      'lname',
-      'avatarDataUrl',
-      'metadata',
-    ];
-
-    return pick(user, allowedProps);
+  static getSanitizedUserMetadata(user: User): Omit<User, 'passwordHash'> {
+    return omit(user, ['passwordHash']);
   }
 
   /**
