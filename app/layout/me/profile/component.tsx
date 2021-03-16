@@ -115,7 +115,7 @@ export const Profile: React.FC<MeProps> = () => {
               <Input theme="light" type="email" icon={EMAIL_SVG} readOnly value={email} disabled />
             </div>
 
-            <div className="mt-10">
+            <div className="mt-5">
               <Button theme="primary" size="s" type="submit" disabled={submitting}>
                 Save changes
               </Button>

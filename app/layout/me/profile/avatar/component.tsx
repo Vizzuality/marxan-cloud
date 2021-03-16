@@ -79,12 +79,12 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }:AvatarMePr
       >
         <input {...getInputProps()} />
 
-        <div className="relative w-10 h-10">
+        <div className="relative w-16 h-16">
           <button
             type="button"
             onClick={open}
           >
-            <Avatar className="text-sm text-white uppercase bg-primary-700" bgImage={preview}>
+            <Avatar className="w-16 h-16 text-sm text-white uppercase bg-primary-700" bgImage={preview}>
               {!preview && displayName.slice(0, 2)}
             </Avatar>
           </button>
