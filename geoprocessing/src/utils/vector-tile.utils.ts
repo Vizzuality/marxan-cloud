@@ -1,57 +1,48 @@
-// import { GetBaseQuery, IBaseQueryInput } from 'types/tileQuery';
-// import { GetTileQuery, ITileQuery } from 'types/tileQuery';
+import { GetBaseQuery, IBaseQueryInput } from 'types/tileQuery';
+import { GetTileQuery, ITileQuery } from 'types/tileQuery';
 // import zlib from 'zlib';
 
 // /**
 //  * @todo add pyramiding function
 //  */
 
-// /**
-//  * @description The default base query builder
-//  */
-// export const defaultGetBaseQuery: GetBaseQuery = ({
-//   x,
-//   y,
-//   z,
-//   table,
-//   geometry,
-//   maxZoomLevel,
-//   attributes,
-//   query,
-// }: IBaseQueryInput) => `
-// SELECT
-//   ${geometry} AS geom,
-//   ${maxZoomLevel + 1} AS expansionZoom${attributes}
-// FROM ${table}
-// WHERE
-// 	ST_Intersects(TileBBox(${z}, ${x}, ${y}, 3857), ST_Transform(${geometry}, 3857))
-// 	${query.length > 0 ? `AND ${query.join(' AND ')}` : ''}
-// `;
+/**
+ * @description The default base query builder
+ */
+export const defaultGetBaseQuery: GetBaseQuery = ({
+  x,
+  y,
+  z,
+  table,
+  geometry,
+}: // maxZoomLevel,
+// attributes,
+// query,
+IBaseQueryInput) => `
+SELECT
+  ${geometry} AS geom,
+FROM ${table}
+WHERE
+	ST_Intersects(TileBBox(${z}, ${x}, ${y}, 3857), ST_Transform(${geometry}, 3857))
+`;
 
-// /**
-//  * @description The default tile query builder
-//  */
-// export const defaultGetTileQuery: GetTileQuery = ({
-//   x,
-//   y,
-//   z,
-//   table,
-//   geometry,
-//   extent,
-//   // bufferSize,
-//   attributes,
-// }: ITileQuery) => `
-// SELECT
-//   ST_AsMVTGeom(ST_Transform(${geometry}, 3857), TileBBox(${z}, ${x}, ${y}, 3857), ${extent}, false) AS geom,
-//   jsonb_build_object(
-//     'count', size,
-//     'expansionZoom', expansionZoom,
-//     'lng', ST_X(ST_Transform(${geometry}, 4326)),
-//     'lat', ST_Y(ST_Transform(${geometry}, 4326))${attributes}
-//   ) AS attributes
-// FROM ${table}
-// `;
-
+/**
+ * @description The default tile query builder
+ */
+export const defaultGetTileQuery: GetTileQuery = ({
+  x,
+  y,
+  z,
+  table,
+  geometry,
+  extent,
+}: // bufferSize,
+// attributes,
+ITileQuery) => `
+SELECT
+  ST_AsMVTGeom(ST_Transform(${geometry}, 3857), TileBBox(${z}, ${x}, ${y}, 3857), ${extent}, false) AS geom,
+FROM ${table}
+`;
 
 // /**
 //  * @description Data compression
@@ -99,4 +90,3 @@
 //     ? ', ' +
 //       attributes.map((attribute) => `'${attribute}', ${attribute}`).join(', ')
 //     : '';
-
