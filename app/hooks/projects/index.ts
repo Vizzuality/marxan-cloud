@@ -94,6 +94,9 @@ export function useProject(id) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+    params: {
+      include: 'scenarios,users',
+    },
   }), {
     enabled: !!id,
   });

@@ -2,7 +2,10 @@ import React from 'react';
 import Head from 'next/head';
 
 import Header from 'layout/header';
+import Wrapper from 'layout/wrapper';
 import Protected from 'layout/protected';
+
+import ProjectHeader from 'layout/projects/header';
 
 import { withProtection, withUser } from 'hoc/auth';
 
@@ -16,9 +19,23 @@ const ShowProjectsPage: React.FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
+
+        <div className="pt-2.5">
+          <ProjectHeader />
+        </div>
+
+        <div className="md:flex-grow">
+          <Wrapper>
+            <div className="grid h-full grid-cols-1 gap-10 bg-red-500 md:grid-cols-2">
+              {/* <ScenariosSidebar />
+              <ScenariosMap /> */}
+            </div>
+          </Wrapper>
+        </div>
       </main>
+
     </Protected>
   );
 };
