@@ -48,22 +48,28 @@ describe('Sprint s01e02', () => {
      * https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991%3A2265
      */
     describe('Scenario creation - preparation - upload protected area network geometries', () => {
-      let protectedAreaNetworkUploadResult: { id: string, name: string, status: string };
+      let protectedAreaNetworkUploadResult: {
+        id: string;
+        name: string;
+        status: string;
+      };
       test('As a user, I should be able to upload a shapefile containing a project-specific network of protected areas', async () => {
         const response = await request(app.getHttpServer())
-        .post(`/api/v1/protected-areas/`)
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .expect(202);
+          .post(`/api/v1/protected-areas/`)
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(202);
 
         // we should return an UUID for this upload, so that the client can query for the upload status
         protectedAreaNetworkUploadResult = response.body.data;
       });
 
       test('As a user, I should be able to know when a protected area network shapefile is ready to use', async () => {
-        const protectedAreaNetworkUploadStatus = await request(app.getHttpServer())
-        .get(`/api/v1/protected-areas/${protectedAreaNetworkUploadResult.id}`)
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .expect(200);
+        const protectedAreaNetworkUploadStatus = await request(
+          app.getHttpServer(),
+        )
+          .get(`/api/v1/protected-areas/${protectedAreaNetworkUploadResult.id}`)
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(200);
 
         // Check for status, keep checking with exponential backoff until we get
         // a response, or timeout within some sensible timeframe.
@@ -80,87 +86,64 @@ describe('Sprint s01e02', () => {
 
       test('As a user, I should be able to see a list of IUCN protected areas within a given country', async () => {
         const iucnProtectedAreasInCountry = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${country}?type=iucn&omitFields=theGeom&disablePagination=true`)
+          .get(
+            `/api/v1/protected-areas/by-administrative-area/${country}?type=iucn&omitFields=theGeom&disablePagination=true`,
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(200);
       });
 
       test('As a user, I should be able to see a list of project-specific protected areas within a given country', async () => {
-        const projectSpecificProtectedAreasInCountry = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${country}?type=project-specific&omitFields=theGeom&disablePagination=true`)
+        const projectSpecificProtectedAreasInCountry = await request(
+          app.getHttpServer(),
+        )
+          .get(
+            `/api/v1/protected-areas/by-administrative-area/${country}?type=project-specific&omitFields=theGeom&disablePagination=true`,
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(200);
       });
 
       test('As a user, I should be able to see a list of IUCN protected areas within a given level 1 admin area', async () => {
-        const iucnProtectedAreasInL1AdminArea = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${l1AdminArea}?type=iucn&omitFields=theGeom&disablePagination=true`)
+        const iucnProtectedAreasInL1AdminArea = await request(
+          app.getHttpServer(),
+        )
+          .get(
+            `/api/v1/protected-areas/by-administrative-area/${l1AdminArea}?type=iucn&omitFields=theGeom&disablePagination=true`,
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(200);
       });
 
       test('As a user, I should be able to see a list of project-specific protected areas within a given level 1 admin area', async () => {
-        const projectSpecificProtectedAreasInL1AdminArea = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${l1AdminArea}?type=project-specific&omitFields=theGeom&disablePagination=true`)
+        const projectSpecificProtectedAreasInL1AdminArea = await request(
+          app.getHttpServer(),
+        )
+          .get(
+            `/api/v1/protected-areas/by-administrative-area/${l1AdminArea}?type=project-specific&omitFields=theGeom&disablePagination=true`,
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(200);
       });
-    
+
       test('As a user, I should be able to see a list of IUCN protected areas within a given level 2 admin area', async () => {
-        const iucnProtectedAreasInL2AdminArea = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${l2AdminArea}?type=iucn&omitFields=theGeom&disablePagination=true`)
+        const iucnProtectedAreasInL2AdminArea = await request(
+          app.getHttpServer(),
+        )
+          .get(
+            `/api/v1/protected-areas/by-administrative-area/${l2AdminArea}?type=iucn&omitFields=theGeom&disablePagination=true`,
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(200);
       });
 
       test('As a user, I should be able to see a list of project-specific protected areas within a given level 2 admin area', async () => {
-        const projectSpecificProtectedAreasInL2AdminArea = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${l2AdminArea}?type=project-specific&omitFields=theGeom&disablePagination=true`)
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
-      });
-    });
-
-
-    describe('Scenario creation - setting ', () => {
-      test('As a user, I should be able to see a list of IUCN protected areas within a given geometry', async () => {
-        const iucnProtectedAreasInCountry = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-geometry/${country}?type=iucn&omitFields=theGeom&disablePagination=true`)
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
-      });
-
-      test('As a user, I should be able to see a list of project-specific protected areas within a given country', async () => {
-        const projectSpecificProtectedAreasInCountry = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${country}?type=project-specific&omitFields=theGeom&disablePagination=true`)
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
-      });
-
-      test('As a user, I should be able to see a list of IUCN protected areas within a given level 1 admin area', async () => {
-        const iucnProtectedAreasInL1AdminArea = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${l1AdminArea}?type=iucn&omitFields=theGeom&disablePagination=true`)
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
-      });
-
-      test('As a user, I should be able to see a list of project-specific protected areas within a given level 1 admin area', async () => {
-        const projectSpecificProtectedAreasInL1AdminArea = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${l1AdminArea}?type=project-specific&omitFields=theGeom&disablePagination=true`)
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
-      });
-    
-      test('As a user, I should be able to see a list of IUCN protected areas within a given level 2 admin area', async () => {
-        const iucnProtectedAreasInL2AdminArea = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${l2AdminArea}?type=iucn&omitFields=theGeom&disablePagination=true`)
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
-      });
-
-      test('As a user, I should be able to see a list of project-specific protected areas within a given level 2 admin area', async () => {
-        const projectSpecificProtectedAreasInL2AdminArea = await request(app.getHttpServer())
-          .get(`/api/v1/protected-areas/by-administrative-area/${l2AdminArea}?type=project-specific&omitFields=theGeom&disablePagination=true`)
+        const projectSpecificProtectedAreasInL2AdminArea = await request(
+          app.getHttpServer(),
+        )
+          .get(
+            `/api/v1/protected-areas/by-administrative-area/${l2AdminArea}?type=project-specific&omitFields=theGeom&disablePagination=true`,
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(200);
       });
