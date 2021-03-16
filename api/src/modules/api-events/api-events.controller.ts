@@ -48,7 +48,7 @@ export class ApiEventsController {
   constructor(public service: ApiEventsService) {}
 
   @ApiOperation({
-    description: 'Find all countries',
+    description: 'Find all API events',
   })
   @ApiOkResponse({
     type: ApiEventResult,
@@ -64,7 +64,9 @@ export class ApiEventsController {
     return this.service.serialize(results.data, results.metadata);
   }
 
-  @ApiOperation({ description: 'Find latest event by kind for a given topic' })
+  @ApiOperation({
+    description: 'Find latest API event by kind for a given topic',
+  })
   @ApiOkResponse({ type: ApiEvent })
   @Get('kind/:kind/topic/:topic/latest')
   async findLatestEventByKindAndTopic(
@@ -89,7 +91,7 @@ export class ApiEventsController {
   }
 
   @ApiOperation({
-    description: 'Delete event series by kind for a given topic',
+    description: 'Delete API event series by kind for a given topic',
   })
   @ApiOkResponse({ type: ApiEvent })
   @Delete('kind/:kind/topic/:topic')
