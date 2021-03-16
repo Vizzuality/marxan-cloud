@@ -12,10 +12,19 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 
+import { signOut } from 'next-auth/client';
+
 import { useSaveMePassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
+
+export const equalPasswordValidator = (value, allValues) => {
+  const { newPassword } = allValues || {};
+  if (newPassword !== value) return 'Error';
+
+  return undefined;
+};
 
 export interface ChangePasswordProps {
 
@@ -26,8 +35,15 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
   const mutation = useSaveMePassword({});
   const { addToast } = useToasts();
 
-  const handleSubmit = useCallback(async (data) => {
+  const handleSubmit = useCallback(async (values) => {
     setSubmitting(true);
+
+    const { currentPassword, newPassword } = values;
+
+    const data = {
+      currentPassword,
+      newPassword,
+    };
 
     mutation.mutate({ data }, {
       onSuccess: () => {
@@ -40,6 +56,10 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
           level: 'success',
         });
         setSubmitting(false);
+
+        setTimeout(() => {
+          signOut();
+        });
       },
       onError: () => {
         addToast('error-update-password-me', (
@@ -106,7 +126,25 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
               </FieldRFF>
             </div>
 
-            <div className="mt-10">
+            {/* CONFIRM NEW PASSWORD */}
+            <div className="mt-5">
+              <FieldRFF
+                name="confirmPassword"
+                validate={composeValidators([
+                  { presence: true },
+                  equalPasswordValidator,
+                ])}
+              >
+                {(fprops) => (
+                  <Field id="profile-confirm-password" {...fprops}>
+                    <Label theme="light" className="mb-3 uppercase">New password</Label>
+                    <Input theme="light" icon={PASSWORD_SVG} type="password" />
+                  </Field>
+                )}
+              </FieldRFF>
+            </div>
+
+            <div className="mt-5">
               <Button theme="primary" size="s" type="submit" disabled={submitting}>
                 Change password
               </Button>

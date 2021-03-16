@@ -16,7 +16,7 @@ import Checkbox from 'components/forms/checkbox';
 
 import {
   composeValidators,
-  checkboxValidator,
+  booleanValidator,
 } from 'components/forms/validations';
 
 import AUTHENTICATION from 'services/authentication';
@@ -139,7 +139,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
                 <FieldRFF
                   name="checkbox"
                   type="checkbox"
-                  validate={composeValidators([checkboxValidator])}
+                  validate={composeValidators([booleanValidator])}
                 >
                   {(fprops) => (
                     <Field className="flex mt-2" id="form-checkbox" {...fprops}>
