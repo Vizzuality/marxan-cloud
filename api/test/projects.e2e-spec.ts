@@ -40,7 +40,7 @@ describe('ProjectsModule (e2e)', () => {
     await Promise.all([app.close()]);
   });
 
-  describe('Projects', async () => {
+  describe('Projects', () => {
     let anOrganization: { id: string; type: 'organizations' };
     let minimalProject: { id: string; type: 'projects' };
     let completeProject: { id: string; type: 'projects' };
