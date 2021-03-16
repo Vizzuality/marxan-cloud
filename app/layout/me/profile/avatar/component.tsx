@@ -6,7 +6,11 @@ import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';
+
+import { motion } from 'framer-motion';
+
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
+import IMAGE_SVG from 'svgs/ui/image.svg?sprite';
 
 export interface AvatarMeProps {
   value?: string,
@@ -24,6 +28,7 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }:AvatarMePr
   const { user } = useMe();
   const { addToast } = useToasts();
   const [preview, setPreview] = useState(value);
+  const [hover, setHover] = useState(false);
 
   const onRemove = (e) => {
     e.preventDefault();
@@ -82,11 +87,36 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }:AvatarMePr
         <div className="relative w-16 h-16">
           <button
             type="button"
+            className="relative w-16 h-16 overflow-hidden rounded-full"
             onClick={open}
+            onMouseEnter={() => { setHover(true); }}
+            onMouseLeave={() => { setHover(false); }}
           >
-            <Avatar className="w-16 h-16 text-sm text-white uppercase bg-primary-700" bgImage={preview}>
+            <Avatar className="w-16 h-16 text-sm text-white uppercase bg-blue-700" bgImage={preview}>
               {!preview && displayName.slice(0, 2)}
             </Avatar>
+
+            <motion.div
+              className="absolute top-0 bottom-0 left-0 right-0 z-10 flex items-center justify-center w-full h-full bg-blue-600 rounded-full"
+              animate={hover ? 'enter' : 'exit'}
+              initial={{ opacity: 0, y: '50%' }}
+              transition={{
+                duration: 0.2,
+              }}
+              variants={{
+                enter: {
+                  opacity: 1,
+                  y: '0%',
+                },
+                exit: {
+                  opacity: 0,
+                  y: '50%',
+                },
+
+              }}
+            >
+              <Icon icon={IMAGE_SVG} className="w-4 h-4 text-white" />
+            </motion.div>
           </button>
 
           {preview && (
