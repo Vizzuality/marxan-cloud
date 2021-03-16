@@ -16,6 +16,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IssuedAuthnToken } from './issued-authn-token.api.entity';
 import ms = require('ms');
 import { SignUpDto } from './dto/sign-up.dto';
+import { ApiEventsService } from 'modules/api-events/api-events.service';
+import { API_EVENT_KINDS } from 'modules/api-events/api-event.api.entity';
+import { v4 } from 'uuid';
 
 /**
  * Access token for the app: key user data and access token
@@ -62,6 +65,7 @@ export interface JwtDataPayload {
 @Injectable()
 export class AuthenticationService {
   constructor(
+    private readonly apiEventsService: ApiEventsService,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -114,6 +118,15 @@ export class AuthenticationService {
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
+    await this.apiEventsService.create({
+      topic: newUser.id!,
+      kind: API_EVENT_KINDS.user__signedUp__v1alpha1,
+    });
+    await this.apiEventsService.create({
+      topic: newUser.id!,
+      kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+      data: { tokenId: v4(), exp: Date.now() + ms('1d'), sub: newUser.email },
+    });
     return newUser;
   }
 
