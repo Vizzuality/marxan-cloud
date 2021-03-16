@@ -1,6 +1,6 @@
 import { GetBaseQuery, IBaseQueryInput } from 'types/tileQuery';
 import { GetTileQuery, ITileQuery } from 'types/tileQuery';
-// import zlib from 'zlib';
+import zlib from 'zlib';
 
 // /**
 //  * @todo add pyramiding function
@@ -20,10 +20,10 @@ export const defaultGetBaseQuery: GetBaseQuery = ({
 // query,
 IBaseQueryInput) => `
 SELECT
-  ${geometry} AS geom,
+  ${geometry}
 FROM ${table}
 WHERE
-	ST_Intersects(TileBBox(${z}, ${x}, ${y}, 3857), ST_Transform(${geometry}, 3857))
+	ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry})
 `;
 
 /**
@@ -40,25 +40,25 @@ export const defaultGetTileQuery: GetTileQuery = ({
 // attributes,
 ITileQuery) => `
 SELECT
-  ST_AsMVTGeom(ST_Transform(${geometry}, 3857), TileBBox(${z}, ${x}, ${y}, 3857), ${extent}, false) AS geom,
+  ST_AsMVTGeom(ST_Transform(${geometry}, 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, null, false) AS geom
 FROM ${table}
 `;
 
-// /**
-//  * @description Data compression
-//  */
+/**
+ * @description Data compression
+ */
 
-// export function zip(data: any): Promise<Buffer> {
-//   return new Promise<Buffer>((resolve, reject) => {
-//     zlib.gzip(data, (err, result) => {
-//       if (err) {
-//         return reject(err);
-//       }
+export function zip(data: any): Promise<Buffer> {
+  return new Promise<Buffer>((resolve, reject) => {
+    zlib.gzip(data, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
 
-//       resolve(result);
-//     });
-//   });
-// }
+      resolve(result);
+    });
+  });
+}
 
 // // /**
 // //  * @description The dafault implementation of zoom to distance
