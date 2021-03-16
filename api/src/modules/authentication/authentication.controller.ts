@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Post,
   Request,
@@ -76,7 +77,7 @@ export class AuthenticationController {
     await this.authenticationService.createUser(signupDto);
   }
 
-  @Post('validate-account/:sub/:validationToken')
+  @Get('validate-account/:sub/:validationToken')
   @ApiOperation({ description: 'Confirm an activation token for a new user.' })
   @ApiOkResponse()
   async confirm(
