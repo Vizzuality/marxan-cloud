@@ -123,6 +123,9 @@ export class AuthenticationService {
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
+    if (!newUser) {
+      throw new InternalServerErrorException('Error while creating a new user');
+    }
     await this.apiEventsService.create({
       topic: newUser.id,
       kind: API_EVENT_KINDS.user__signedUp__v1alpha1,
