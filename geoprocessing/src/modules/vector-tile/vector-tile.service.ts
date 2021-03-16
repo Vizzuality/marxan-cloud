@@ -1,8 +1,10 @@
 // to-do: work on cache later
 //import { Cache, defaultCacheOptions} from './cache';
 import { Injectable, Logger } from '@nestjs/common';
-import { createQueryForTile } from 'utils/vector-tile-builder';
 import { getConnection } from 'typeorm';
+
+import { createQueryForTile } from 'utils/vector-tile-builder';
+import { zip } from 'utils/vector-tile.utils';
 
 // import { createQueryForTile } from 'utils/vector-tile-builder'
 
@@ -39,17 +41,26 @@ export class TileServerService {
         extent,
       });
 
-      const sql = query;
-      logger.debug('the string query is:', sql);
+      // const sql = query;
+      logger.debug(`Create query for tile: ${query}`);
+
+      //conect to the ddbb - the default one is geoprocessing
+      const connection = getConnection();
+      const queryRunner = connection.createQueryRunner();
+      queryRunner.connect();
+      const result = queryRunner.query(query);
+      logger.debug('Query retrieved');
+
+      // const tile = await zip(result.rows[0].mvt)
     } catch (error) {
-      logger.error('Error getting the query', error);
+      logger.error(`Error getting the query: ${error}`);
     }
-    const connection = getConnection('apiDB');
-    const queryRunner = connection.createQueryRunner();
+    // const connection = getConnection('apiDB');
+    // const queryRunner = connection.createQueryRunner();
     // establish real database connection using our new query runner
-    queryRunner.connect();
+    // queryRunner.connect();
     // now we can execute any queries on a query runner, for example:
-    queryRunner.query('SELECT * FROM users');
+    // queryRunner.query('SELECT * FROM users');
 
     logger.debug('hello world');
 
