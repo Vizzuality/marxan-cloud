@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   forwardRef,
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
@@ -19,6 +21,7 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { ApiEventsService } from 'modules/api-events/api-events.service';
 import { API_EVENT_KINDS } from 'modules/api-events/api-event.api.entity';
 import { v4 } from 'uuid';
+import * as ApiEventsUserData from 'modules/api-events/dto/apiEvents.user.data.dto';
 
 /**
  * Access token for the app: key user data and access token
@@ -64,6 +67,8 @@ export interface JwtDataPayload {
 
 @Injectable()
 export class AuthenticationService {
+  private readonly logger = new Logger(AuthenticationService.name);
+
   constructor(
     private readonly apiEventsService: ApiEventsService,
     @Inject(forwardRef(() => UsersService))
@@ -119,21 +124,34 @@ export class AuthenticationService {
       await this.usersRepository.save(user),
     );
     await this.apiEventsService.create({
-      topic: newUser.id!,
+      topic: newUser.id,
       kind: API_EVENT_KINDS.user__signedUp__v1alpha1,
     });
+    const validationToken = v4();
     await this.apiEventsService.create({
-      topic: newUser.id!,
+      topic: newUser.id,
       kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-      data: { tokenId: v4(), exp: Date.now() + ms('1d'), sub: newUser.email },
+      data: {
+        validationToken: validationToken,
+        exp: Date.now() + ms('1d'),
+        sub: newUser.email,
+      },
     });
+    /**
+     * This is a small aid to help with manual QA :).
+     */
+    if (process.env['NODE_ENV'] === 'development') {
+      this.logger.log(
+        `An account was created for ${newUser.email}. Please validate the account via POST /auth/validate-account/${newUser.id}/${validationToken}.`,
+      );
+    }
     return newUser;
   }
 
   /**
    * Issue a signed JTW token, logging its issuance.
    */
-  async login(user: Partial<User>): Promise<AccessToken> {
+  async login(user: User): Promise<AccessToken> {
     /**
      * Before actually issuing the token, we prepare the data we need to log the
      * soon-to-be-issued token: its expiration timestamp (calculated from the
