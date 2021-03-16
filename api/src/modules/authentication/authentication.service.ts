@@ -149,6 +149,51 @@ export class AuthenticationService {
   }
 
   /**
+   * Validate a user activation token.
+   *
+   * We avoid possible double-spending of an activation token by deleting the
+   * actual token issuance event after it has been validated.
+   */
+  async validateActivationToken(
+    token: Pick<
+      ApiEventsUserData.ActivationTokenGeneratedV1Alpha1,
+      'validationToken' | 'sub'
+    >,
+  ): Promise<true | never> {
+    const invalidOrExpiredActivationTokenMessage =
+      'Invalid or expired activation token.';
+    const event = await this.apiEventsService.getLatestEventForTopic({
+      topic: token.sub,
+      kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+    });
+    if (!event) {
+      throw new BadRequestException(invalidOrExpiredActivationTokenMessage);
+    }
+    const exp = new Date(event?.data?.exp as number);
+    if (
+      new Date() < exp &&
+      event?.topic === token.sub &&
+      event.data.validationToken === token.validationToken
+    ) {
+      await this.apiEventsService.create({
+        topic: event.topic,
+        kind: API_EVENT_KINDS.user__accountActivationSucceeded__v1alpha1,
+      });
+      this.usersRepository.update({ id: event.topic }, { isActive: true });
+      this.apiEventsService.purgeAll({
+        topic: event.topic,
+        kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+      });
+      return true;
+    }
+    this.apiEventsService.create({
+      topic: event.topic,
+      kind: API_EVENT_KINDS.user__accountActivationFailed__v1alpha1,
+    });
+    throw new BadRequestException(invalidOrExpiredActivationTokenMessage);
+  }
+
+  /**
    * Issue a signed JTW token, logging its issuance.
    */
   async login(user: User): Promise<AccessToken> {
