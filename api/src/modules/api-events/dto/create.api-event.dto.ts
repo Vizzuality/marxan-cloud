@@ -24,5 +24,5 @@ export class CreateApiEventDTO {
   @ApiPropertyOptional()
   @IsJSON()
   @IsOptional()
-  data: Record<string, unknown>;
+  data?: Record<string, unknown>;
 }
