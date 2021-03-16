@@ -136,7 +136,11 @@ export class AuthenticationService {
       kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
       data: {
         validationToken: validationToken,
-        exp: Date.now() + ms('1d'),
+        exp:
+          Date.now() +
+          ms(
+            '1d',
+          ) /** @debt The TTL of validation tokens should be set via config. */,
         sub: newUser.email,
       },
     });
