@@ -61,9 +61,14 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
       initialValues={{}}
     >
       {(props) => (
-        <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex justify-center">
+        <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex">
           <div className="w-full max-w-xs">
-            <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Update password</h2>
+            <h2 className="mb-5 text-lg font-medium text-gray-600 font-heading">Change password</h2>
+            <p className="text-sm">
+              Choose a new password. Changing your password will sign you out.
+              {' '}
+              You will need to enter your new password.
+            </p>
 
             <Loading
               visible={submitting}
@@ -102,8 +107,8 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
             </div>
 
             <div className="mt-10">
-              <Button theme="primary" size="lg" type="submit" disabled={submitting} className="w-full">
-                Save
+              <Button theme="primary" size="s" type="submit" disabled={submitting}>
+                Change password
               </Button>
             </div>
           </div>

@@ -49,8 +49,15 @@ export const DeleteAccount: React.FC<DeleteAccountProps> = () => {
   }, [mutation, addToast]);
 
   return (
-    <div className="relative mt-10">
-      <Button theme="primary" size="lg" type="submit" disabled={submitting} className="w-full" onClick={() => setOpen(true)}>
+    <div className="relative">
+      <h2 className="mb-5 text-lg font-medium text-gray-600 font-heading">Delete account</h2>
+
+      <div className="mb-5">
+        <p className="text-sm">If you delete your account, please keep the following in mind:</p>
+        <p className="text-sm">Your profile will be permenantly deleted, including information about projects.</p>
+      </div>
+
+      <Button theme="danger" size="s" type="submit" disabled={submitting} onClick={() => setOpen(true)}>
         Delete account
       </Button>
 
