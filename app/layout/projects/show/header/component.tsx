@@ -4,9 +4,9 @@ import Wrapper from 'layout/wrapper';
 
 import { useRouter } from 'next/router';
 
-import Title from 'layout/projects/header/title';
-import Contributors from 'layout/projects/header/contributors';
-import Toolbar from 'layout/projects/header/toolbar';
+import Title from 'layout/projects/show/header/title';
+import Contributors from 'layout/projects/show/header/contributors';
+import Toolbar from 'layout/projects/show/header/toolbar';
 
 import Breadcrumb from 'components/breadcrumb';
 

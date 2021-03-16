@@ -5,7 +5,9 @@ import Header from 'layout/header';
 import Wrapper from 'layout/wrapper';
 import Protected from 'layout/protected';
 
-import ProjectHeader from 'layout/projects/header';
+import ProjectHeader from 'layout/projects/show/header';
+import ProjectScenarios from 'layout/projects/show/scenarios';
+import ProjectMap from 'layout/projects/show/map';
 
 import { withProtection, withUser } from 'hoc/auth';
 
@@ -26,16 +28,15 @@ const ShowProjectsPage: React.FC = () => {
           <ProjectHeader />
         </div>
 
-        <div className="md:flex-grow">
+        <div className="py-5 md:flex-grow">
           <Wrapper>
-            <div className="grid h-full grid-cols-1 gap-10 bg-red-500 md:grid-cols-2">
-              {/* <ScenariosSidebar />
-              <ScenariosMap /> */}
+            <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
+              <ProjectScenarios />
+              <ProjectMap />
             </div>
           </Wrapper>
         </div>
       </main>
-
     </Protected>
   );
 };
