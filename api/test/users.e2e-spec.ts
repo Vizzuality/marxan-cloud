@@ -127,16 +127,16 @@ describe('UsersModule (e2e)', () => {
        */
       newUser = await usersService.findByEmail(signUpDto.email);
       expect(newUser).toBeDefined();
-      if (!newUser) return;
+
+      if (!newUser) {
+        throw new Error('Cannot retrieve data for newly created user.')
+      };
 
       validationTokenEvent = await apiEventsService.getLatestEventForTopic({
         topic: newUser.id,
         kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
       });
 
-      Logger.debug(
-        `Validating user account via /auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
-      );
       await request(app.getHttpServer())
         .get(
           `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
@@ -145,13 +145,13 @@ describe('UsersModule (e2e)', () => {
     });
 
     test('A user account validation token should not be allowed to be spent more than once', async () => {
-      if (!newUser) return;
-      Logger.debug(
-        `Validating user account via /auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
-      );
+      if (!newUser) {
+        throw new Error('Cannot retrieve data for newly created user.')
+      };
+
       const response = await request(app.getHttpServer())
         .get(
-          `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}?twice`,
+          `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
         )
         .expect(HttpStatus.NOT_FOUND);
     });
