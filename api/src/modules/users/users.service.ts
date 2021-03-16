@@ -84,8 +84,10 @@ export class UsersService extends AppBaseService<
    *
    * @debt Should be extended to include roles and permissions.
    */
-  static getSanitizedUserMetadata(user: User): Omit<User, 'passwordHash'> {
-    return omit(user, ['passwordHash']);
+  static getSanitizedUserMetadata(
+    user: User,
+  ): Omit<User, 'passwordHash' | 'isActive' | 'isDeleted'> {
+    return omit(user, ['passwordHash', 'isActive', 'isDeleted']);
   }
 
   /**
