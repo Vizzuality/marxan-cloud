@@ -51,11 +51,6 @@ export class ApiEventsService extends AppBaseService<
   /**
    * Given a `QualifiedEventTopic` (topic qualified by `kind` and `apiEvent`),
    * return the matching event with latest timestamp.
-   *
-   * @debt We actually only match `topic` and `kind`, via the relevant view, so
-   * the `apiVersion` prop is ignored here. This is enough in practice, until
-   * we actively start supporting different `apiVersion`s in this simple event
-   * queue system.
    */
   public async getLatestEventForTopic(
     qualifiedTopic: QualifiedEventTopic,
