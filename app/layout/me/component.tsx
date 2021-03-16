@@ -12,14 +12,14 @@ export interface MeProps {
 export const Me: React.FC<MeProps> = () => {
   return (
     <Wrapper>
-      <div className="divide-y">
-        <div>
+      <div className="pb-20 divide-y">
+        <div className="py-10 bg-white">
           <Profile />
         </div>
-        <div className="pt-10 mt-10">
+        <div className="py-10 mt-10">
           <ChangePassword />
         </div>
-        <div className="pt-10 mt-10">
+        <div className="py-10 mt-10">
           <DeleteAccount />
         </div>
       </div>
