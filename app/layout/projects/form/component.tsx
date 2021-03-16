@@ -83,7 +83,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
           className="flex flex-col justify-between w-full py-8 pl-8"
         >
           <div>
-            <h1 className="max-w-xs text-white font-heading">
+            <h1 className="max-w-xs text-2xl text-white font-heading">
               Name your project and define a planning area:
             </h1>
 
