@@ -197,8 +197,9 @@ export class ProjectsService extends AppBaseService<
     createModel: CreateProjectDTO,
     info?: AppInfoDTO,
   ): Promise<void> {
-    logger.debug('test');
-
-    return this.planningUnitsService.create();
+    if (createModel.planningUnitAreakm2 && createModel.planningUnitGridShape) {
+      logger.debug('creating planning unit job');
+      return this.planningUnitsService.create(createModel);
+    }
   }
 }

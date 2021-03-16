@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddCountriesView1614256630000
-  implements MigrationInterface {
+export class AddCountriesView1614256630000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
 CREATE VIEW countries AS (

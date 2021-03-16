@@ -39,8 +39,8 @@ import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.mo
     }),
     BullModule.forRoot({
       redis: {
-        host: 'redis',
-        port: AppConfig.get('redis.port'),
+        host: 'marxan-redis',
+        port: 6379,
       },
     }),
     AdminAreasModule,
