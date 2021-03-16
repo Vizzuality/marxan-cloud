@@ -6,9 +6,9 @@ import { withProtection, withUser } from 'hoc/auth';
 import Protected from 'layout/protected';
 import Header from 'layout/header';
 
-import ProjectsWelcome from 'layout/projects/welcome';
-import ProjectsToolbar from 'layout/projects/toolbar';
-import ProjectsList from 'layout/projects/list';
+import ProjectsWelcome from 'layout/projects/all/welcome';
+import ProjectsToolbar from 'layout/projects/all/toolbar';
+import ProjectsList from 'layout/projects/all/list';
 
 export const getServerSideProps = withProtection(withUser());
 
