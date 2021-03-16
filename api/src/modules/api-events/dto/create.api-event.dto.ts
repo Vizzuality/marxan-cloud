@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsJSON, IsOptional, IsUUID } from 'class-validator';
 import { API_EVENT_KINDS } from '../api-event.api.entity';
+import * as ApiEventsUserData from 'modules/api-events/dto/apiEvents.user.data.dto';
 
 export class CreateApiEventDTO {
   /**
@@ -24,5 +25,7 @@ export class CreateApiEventDTO {
   @ApiPropertyOptional()
   @IsJSON()
   @IsOptional()
-  data?: Record<string, unknown>;
+  data?:
+    | Record<string, unknown>
+    | ApiEventsUserData.ActivationTokenGeneratedV1Alpha1;
 }
