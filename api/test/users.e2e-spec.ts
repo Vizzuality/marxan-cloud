@@ -167,7 +167,7 @@ describe('UsersModule (e2e)', () => {
     });
   });
 
-  describe.skip('Users - metadata', () => {
+  describe('Users - metadata', () => {
     it('A user should be able to read their own metadata', async () => {
       const results = await request(app.getHttpServer())
         .get('/api/v1/users/me')
