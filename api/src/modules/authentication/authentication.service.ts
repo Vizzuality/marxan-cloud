@@ -182,14 +182,17 @@ export class AuthenticationService {
         topic: event.topic,
         kind: API_EVENT_KINDS.user__accountActivationSucceeded__v1alpha1,
       });
-      this.usersRepository.update({ id: event.topic }, { isActive: true });
-      this.apiEventsService.purgeAll({
+      await this.usersRepository.update(
+        { id: event.topic },
+        { isActive: true },
+      );
+      await this.apiEventsService.purgeAll({
         topic: event.topic,
         kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
       });
       return true;
     }
-    this.apiEventsService.create({
+    await this.apiEventsService.create({
       topic: event.topic,
       kind: API_EVENT_KINDS.user__accountActivationFailed__v1alpha1,
     });
