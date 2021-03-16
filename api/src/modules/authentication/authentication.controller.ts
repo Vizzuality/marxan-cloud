@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -10,6 +11,7 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -23,6 +25,7 @@ import {
 } from 'modules/authentication/authentication.service';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
+import { UserAccountValidationDTO } from './dto/user-account.validation.dto';
 import { LocalAuthGuard } from './local-auth.guard';
 
 @Controller('/auth')
@@ -71,6 +74,15 @@ export class AuthenticationController {
     @Body(new ValidationPipe()) signupDto: SignUpDto,
   ): Promise<void> {
     await this.authenticationService.createUser(signupDto);
+  }
+
+  @Post('validate-account/:sub/:validationToken')
+  @ApiOperation({ description: 'Confirm an activation token for a new user.' })
+  @ApiOkResponse()
+  async confirm(
+    @Param() activationToken: UserAccountValidationDTO,
+  ): Promise<void> {
+    await this.authenticationService.validateActivationToken(activationToken);
   }
 
   /**
