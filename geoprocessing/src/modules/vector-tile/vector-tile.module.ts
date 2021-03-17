@@ -3,8 +3,8 @@ import { TileServerService } from './vector-tile.service';
 
 const logger = new Logger('Vector tile module');
 
-const test = TileServerService;
-logger.debug(test)
+// const test = TileServerService;
+// logger.debug(test)
 
 @Module({
   providers: [TileServerService],
