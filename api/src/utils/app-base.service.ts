@@ -64,8 +64,8 @@ export abstract class AppBaseService<
 > extends BaseService<Entity, CreateModel, UpdateModel, Info> {
   constructor(
     protected readonly repository: Repository<Entity>,
-    protected alias: string = 'base',
-    protected pluralAlias: string = 'plural base',
+    protected alias: string = 'base_entity',
+    protected pluralAlias: string = 'base_entities',
   ) {
     super(repository, alias);
   }
