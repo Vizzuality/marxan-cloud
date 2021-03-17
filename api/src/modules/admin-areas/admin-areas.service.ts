@@ -172,11 +172,30 @@ export class AdminAreasService extends AppBaseService<
     }
   }
 
+  /**
+   * Check if an admin are id is that of a GADM level 1 area.
+   *
+   * @testsNeeded @unitTests @propBasedTests
+   */
   isLevel1AreaId(areaId: string): boolean {
-    return areaId.match(/\./g)?.length === 1;
+    return AdminAreasService.levelFromId(areaId) === 1;
   }
 
+  /**
+   * Check if an admin are id is that of a GADM level 2 area.
+   *
+   * @testsNeeded @unitTests @propBasedTests
+   */
   isLevel2AreaId(areaId: string): boolean {
-    return areaId.match(/\./g)?.length === 2;
+    return AdminAreasService.levelFromId(areaId) === 2;
+  }
+
+  /**
+   * Given an admin area id, return its level.
+   *
+   * @testsNeeded @unitTests @propBasedTests
+   */
+  static levelFromId(areaId: string): number {
+    return areaId.match(/\./g)?.length ?? 0;
   }
 }
