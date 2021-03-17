@@ -25,7 +25,7 @@ import {
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(protectedAreaResource.className)
-@Controller(`${apiGlobalPrefixes.v1}`)
+@Controller(`${apiGlobalPrefixes.v1}/protected-areas`)
 export class ProtectedAreasController {
   constructor(public readonly service: ProtectedAreasService) {}
 
