@@ -87,19 +87,34 @@ export abstract class AppBaseService<
     return serializer.serialize(entities);
   }
 
-  async findAllPaginated(
+  /**
+   * Curried wrapper for findAllPaginated(), defaulting to requesting raw
+   * results rather than entities.
+   */
+  async findAllPaginatedRaw(
     fetchSpecification: FetchSpecification,
     info?: Info,
     filters?: Record<string, unknown>,
   ): Promise<{
-    data: (Partial<Entity> | undefined)[];
+    data: (Partial<Entity> | object | undefined)[];
     metadata: PaginationMeta | undefined;
   }> {
-    const entitiesAndCount = await this.findAll(
-      fetchSpecification,
-      info,
-      filters,
-    );
+    return this.findAllPaginated(fetchSpecification, info, filters, true);
+  }
+
+  async findAllPaginated(
+    fetchSpecification: FetchSpecification,
+    info?: Info,
+    filters?: Record<string, unknown>,
+    raw: boolean = false,
+  ): Promise<{
+    data: (Partial<Entity> | object | undefined)[];
+    metadata: PaginationMeta | undefined;
+  }> {
+    const entitiesAndCount = await this.findAll(fetchSpecification, info, {
+      ...filters,
+      _raw: raw,
+    });
     const totalItems = entitiesAndCount[1];
     const entities = entitiesAndCount[0];
     const pageSize =
