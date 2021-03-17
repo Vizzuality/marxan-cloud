@@ -7,10 +7,46 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
+import ScenarioItem from 'components/scenarios/item';
 
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 import Link from 'next/link';
+
+// const SCENARIOS = [
+//   {
+//     id: 1,
+//     name: 'Scenario 1',
+//     status: 'running',
+//     progress: 43,
+//     updatedAt: '2019-04-11T10:20:30Z',
+//   },
+//   {
+//     id: 2,
+//     name: 'Scenario 2',
+//     status: 'completed',
+//     updatedAt: '2020-04-11T10:20:30Z',
+//   },
+//   {
+//     id: 3,
+//     name: 'Scenario 3',
+//     status: 'draft',
+//     updatedAt: '2020-12-23T10:20:30Z',
+//   },
+//   {
+//     id: 4,
+//     name: 'Mount Gorongosa',
+//     status: 'draft',
+//     updatedAt: '2020-09-23T10:20:30Z',
+//     warnings: true,
+//   },
+//   {
+//     id: 5,
+//     name: 'Illas Cies',
+//     status: 'draft',
+//     updatedAt: '2020-12-23T10:20:30Z',
+//   },
+// ];
 
 export interface ProjectScenariosProps {
 }
@@ -25,11 +61,11 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     <AnimatePresence>
       {id && !scenarios.length && (
         <motion.div
-          key="project-scenarios"
+          key="project-scenarios-empty"
           initial={{ y: -10 }}
           animate={{ y: 0 }}
           exit={{ y: -10 }}
-          className="flex items-center pl-20 bg-gray-700 bg-right bg-no-repeat rounded-4xl"
+          className="flex items-center pl-20 bg-gray-700 bg-right bg-no-repeat bg-contain rounded-4xl"
           style={{
             backgroundImage: `url(${bgScenariosDashboard})`,
           }}
@@ -51,6 +87,14 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               </Button>
             </Link>
           </div>
+        </motion.div>
+      )}
+
+      {id && !!scenarios.length && (
+        <motion.div key="projects-scenarios">
+          {scenarios.map((s) => {
+            return <ScenarioItem className="mb-3" key={`${s.id}`} {...s} />;
+          })}
         </motion.div>
       )}
     </AnimatePresence>

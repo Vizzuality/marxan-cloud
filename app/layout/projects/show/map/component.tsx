@@ -39,7 +39,9 @@ export const ProjeectMap: React.FC<ProjeectMapProps> = () => {
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
       <Map
-        // bounds={bounds}
+        // bounds={{
+        //   bbox: [-1, 40, 1, 42],
+        // }}
         width="100%"
         height="100%"
         minZoom={minZoom}
