@@ -70,9 +70,9 @@ export const Profile: React.FC<MeProps> = () => {
       }}
     >
       {(props) => (
-        <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex justify-center">
+        <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex">
           <div className="w-full max-w-xs">
-            <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Profile</h2>
+            <h2 className="mb-5 text-5xl font-medium text-gray-600 font-heading">My Profile</h2>
 
             <Loading
               visible={submitting}
@@ -115,9 +115,9 @@ export const Profile: React.FC<MeProps> = () => {
               <Input theme="light" type="email" icon={EMAIL_SVG} readOnly value={email} disabled />
             </div>
 
-            <div className="mt-10">
-              <Button theme="primary" size="lg" type="submit" disabled={submitting} className="w-full">
-                Save
+            <div className="mt-5">
+              <Button theme="primary" size="s" type="submit" disabled={submitting}>
+                Save changes
               </Button>
             </div>
           </div>
