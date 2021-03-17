@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TileServerService } from 'modules/vector-tile/vector-tile.service';
+import { Vectortile } from 'types/tileRenderer';
 
 const logger = new Logger('admin-areas-service');
 
@@ -7,7 +8,7 @@ const logger = new Logger('admin-areas-service');
 export class AdminAreasService {
   constructor(private readonly tileServerService: TileServerService) {}
 
-  public findTile(z: number, x: number, y: number): number {
+  public findTile(z: number, x: number, y: number): Promise<Vectortile> {
     logger.debug('test_execute');
     return this.tileServerService.getTile(z, x, y);
   }

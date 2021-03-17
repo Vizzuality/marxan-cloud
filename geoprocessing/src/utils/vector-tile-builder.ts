@@ -1,7 +1,6 @@
-import { TileRequest } from 'types/tileRequest';
+import { TileRequest, GetBaseQuery, GetTileQuery } from 'types/tileRenderer';
 import { Logger } from '@nestjs/common';
 const logger = new Logger('Vector tile builder');
-import { GetBaseQuery, GetTileQuery } from 'types/tileQuery';
 import { defaultGetBaseQuery, defaultGetTileQuery } from './vector-tile.utils';
 
 //define tile query input for the tile requested

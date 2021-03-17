@@ -1,5 +1,9 @@
-import { GetBaseQuery, IBaseQueryInput } from 'types/tileQuery';
-import { GetTileQuery, ITileQuery } from 'types/tileQuery';
+import {
+  GetBaseQuery,
+  IBaseQueryInput,
+  GetTileQuery,
+  ITileQuery,
+} from 'types/tileRenderer';
 import zlib from 'zlib';
 
 // /**
