@@ -60,15 +60,14 @@ export class TileServerService {
    * @return the vectortile-data as Buffer wrapped in a promise.
    */
   async fetchTileFromDatabase(query: string): Promise<Buffer> {
-    //establish real database connection using our new query runner
     const connection = getConnection();
     const queryRunner = connection.createQueryRunner();
     queryRunner.connect();
     const result = await queryRunner.query(query);
     logger.debug('Query retrieved');
-    logger.debug(result[0]);
-    if (result.rows[0].mvt) {
-      return result.rows[0].mvt;
+    // logger.debug(result[0]);
+    if (result) {
+      return result;
     } else {
       throw new Error("Property 'mvt' does not exist in res.rows[0]");
     }
@@ -97,10 +96,11 @@ export class TileServerService {
     const query = this.buildQuery(z, x, y);
     logger.debug('Query created');
 
-    let data: Buffer | null = null;
+    let data: any | null = null;
     if (query) {
       try {
         data = await this.fetchTileFromDatabase(query);
+        logger.debug('Data succesfully retrieved from database');
       } catch (error) {
         mvt.res = -4;
         mvt.status = `[ERROR] - Database error: ${error.message}`;
@@ -117,63 +117,10 @@ export class TileServerService {
     }
 
     // zip data
-    mvt.data = await zip(data);
-    logger.debug('gzip');
-
+    logger.debug(`uncompressedBytes: ${data[0].mvt.byteLength}`);
+    mvt.data = await zip(data[0].mvt);
+    logger.debug(`compressedBytes: ${mvt.data.byteLength}`);
+    logger.debug('Data compressed');
     return mvt;
   }
-
-  // public getTile(z: number, x: number, y: number): number { // Promise<TileRenderer<T>>
-
-  //   try {
-  //     let query: string;
-  //     z = parseInt(`${z}`, 10);
-  //     if (isNaN(z)) {
-  //       throw new Error('Invalid zoom level');
-  //     }
-
-  //     x = parseInt(`${x}`, 10);
-  //     y = parseInt(`${y}`, 10);
-  //     if (isNaN(x) || isNaN(y)) {
-  //       throw new Error('Invalid tile coordinates');
-  //     }
-  //     const table = 'admin_regions';
-  //     const maxZoomLevel = 12;
-  //     const geometry = 'the_geom';
-  //     const extent = 4096;
-
-  //     //generate the query
-  //     try {
-  //       query = createQueryForTile({
-  //         z,
-  //         x,
-  //         y,
-  //         maxZoomLevel,
-  //         table,
-  //         geometry,
-  //         extent,
-  //       });
-  //       logger.debug(`Create query for tile: ${query}`);
-
-  //       //establish real database connection using our new query runner
-  //       const connection = getConnection();
-  //       const queryRunner = connection.createQueryRunner();
-  //       queryRunner.connect();
-  //       const result = queryRunner.query(query);
-  //       logger.debug('Query retrieved');
-
-  //       // const tile = await zip(result.rows[0].mvt)
-  //       logger.debug('gzip');
-
-  //       // return 0;
-  //     } catch (error) {
-  //       logger.error(`Error getting the query: ${error}`);
-  //     }
-  //     // logger.debug('hello world');
-  //     // return 0;
-  //   } catch (error) {
-  //     logger.debug(`Error in connect: ${error}`);
-  //   }
-  //   return 0;
-  // }
 }
