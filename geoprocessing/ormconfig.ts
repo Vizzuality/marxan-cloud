@@ -1,4 +1,4 @@
-import { geoprocessingConnections } from "ormconfig";
+import { geoprocessingConnections } from "src/ormconfig";
 
 /**
  * We just re-export what we import from the actual ORM configuration file

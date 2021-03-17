@@ -94,7 +94,9 @@ Unreleased
   a whitelisting approach is not desirable/practical.
 - Projects
   - handle planning unit grid shape, planning unit area, L1 and L2 admin area
-    ids [MARXAN-138]
+    ids.
+  - generation of PUs after a project is created.
+- PU Queue and job provider.
 
 ### Changed
 
