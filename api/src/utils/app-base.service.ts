@@ -75,23 +75,16 @@ export abstract class AppBaseService<
    */
   abstract get serializerConfig(): JSONAPISerializerConfig<Entity>;
 
-  async getSerializedData(
-    data: Partial<Entity> | (Partial<Entity> | undefined)[],
-    meta?: PaginationMeta,
-  ) {
-    const serializer = new JSONAPISerializer.Serializer(this.pluralAlias, {
-      ...this.serializerConfig,
-      meta,
-    });
-
-    return serializer.serialize(data);
-  }
-
   async serialize(
     entities: Partial<Entity> | (Partial<Entity> | undefined)[],
     paginationMeta?: PaginationMeta,
   ): Promise<any> {
-    return this.getSerializedData(entities, paginationMeta);
+    const serializer = new JSONAPISerializer.Serializer(this.pluralAlias, {
+      ...this.serializerConfig,
+      paginationMeta,
+    });
+
+    return serializer.serialize(entities);
   }
 
   async findAllPaginated(
