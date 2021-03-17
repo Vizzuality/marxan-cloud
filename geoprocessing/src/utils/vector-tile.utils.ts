@@ -41,11 +41,12 @@ export const defaultGetTileQuery: GetTileQuery = ({
   table,
   geometry,
   extent,
+  buffer,
 }: // bufferSize,
 // attributes,
 ITileQuery) => `
 SELECT
-  ST_AsMVTGeom(ST_Transform(${geometry}, 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, null, false) AS geom
+  ST_AsMVTGeom(ST_Transform(${geometry}, 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, false) AS geom
 FROM ${table}
 `;
 
