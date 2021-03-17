@@ -1,6 +1,6 @@
-// import { TileInput } from './tileInput';
+import { TileInput } from './tileInput';
 
-// /**
-//  * @description This function creates the MVT tiles from the appropriate TileInput
-//  */
-// export type TileRenderer<T> = (args: TileInput<T>) => Promise<ArrayBuffer>;
+/**
+ * @description This function creates the MVT tiles from the appropriate TileInput
+ */
+export type TileRenderer<T> = (args: TileInput<T>) => Promise<ArrayBuffer>;
