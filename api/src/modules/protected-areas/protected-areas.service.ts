@@ -12,6 +12,7 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
+import { isNil } from 'lodash';
 
 export const protectedAreaResource: BaseServiceResource = {
   className: 'ProtectedArea',
@@ -53,9 +54,27 @@ export class ProtectedAreasService extends AppBaseService<
     };
   }
 
+  /**
+   * @todo This is just a stub.
+   */
   async importProtectedAreaShapefile(
     _file: Express.Multer.File,
   ): Promise<ProtectedArea> {
     return new ProtectedArea();
+  }
+
+  /**
+   * List IUCN categories of protected areas.
+   */
+  async listProtectedAreaCategories(): Promise<Array<string | undefined>> {
+    const results = await this.repository
+      .createQueryBuilder(this.alias)
+      .select(`${this.alias}.iucnCategory`, 'iucnCategory')
+      .distinct(true)
+      .getRawMany<ProtectedArea>()
+      .then((results) =>
+        results.map((i) => i.iucnCategory).filter((i) => !isNil(i)),
+      );
+    return results;
   }
 }

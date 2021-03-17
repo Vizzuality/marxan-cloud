@@ -28,4 +28,9 @@ import {
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class ProtectedAreasController {
   constructor(public readonly service: ProtectedAreasService) {}
+
+  @Get('iucn-categories')
+  async listProtectedAreaCategories(): Promise<Array<string | undefined>> {
+    return await this.service.listProtectedAreaCategories();
+  }
 }
