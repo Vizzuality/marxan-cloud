@@ -6,8 +6,8 @@ import Protected from 'layout/protected';
 
 import Wrapper from 'layout/wrapper';
 
-import ProjectMap from 'layout/projects/map';
-import ProjectForm from 'layout/projects/form';
+import ProjectMap from 'layout/projects/new/map';
+import ProjectForm from 'layout/projects/new/form';
 import { withProtection, withUser } from 'hoc/auth';
 
 export const getServerSideProps = withProtection(withUser());

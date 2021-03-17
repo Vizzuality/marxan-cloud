@@ -2,7 +2,8 @@ import React, { ButtonHTMLAttributes } from 'react';
 import cx from 'classnames';
 
 import Icon from 'components/icon';
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-left.svg';
+import ARROW_LEFT_SVG from 'svgs/ui/arrow-left.svg?sprite';
+import FOLDER_SVG from 'svgs/ui/folder.svg?sprite';
 
 export interface BreadcrumProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -25,6 +26,7 @@ export const Breadcrum: React.FC<BreadcrumProps> = ({
     onClick={onClick}
   >
     <Icon className="w-3 h-3" icon={ARROW_LEFT_SVG} />
+    <Icon className="w-5 h-5 ml-1" icon={FOLDER_SVG} />
     <div className="ml-3">{children}</div>
   </button>
 );
