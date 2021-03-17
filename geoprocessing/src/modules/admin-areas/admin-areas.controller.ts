@@ -17,7 +17,6 @@ import {
 export class AdminAreasController {
   constructor(public service: AdminAreasService) {}
 
-  //{z}/{x}/{y}
   @ApiOperation({
     description: 'Get tile for administrative areas within a given country.',
   })
