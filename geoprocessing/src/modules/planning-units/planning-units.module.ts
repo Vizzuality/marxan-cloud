@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { PlanningUnitsProcessor } from './planning-units.worker';
 @Module({

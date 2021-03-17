@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { geoprocessingConnections } from 'src/ormconfig';
-import { createConnection, JoinColumn } from 'typeorm';
+import { createConnection } from 'typeorm';
 
 const logger = new Logger('planning-units-job-processor');
 
@@ -23,7 +23,7 @@ export default async (job: Job<PlanningUnitsJob>) => {
     });
     try {
       let subquery: string;
-      let gridShape = {
+      const gridShape = {
         square: 'ST_SquareGrid',
         hexagon: 'ST_HexagonGrid',
       };
@@ -35,7 +35,7 @@ export default async (job: Job<PlanningUnitsJob>) => {
                               job.data.extent
                             }'), 3857))).* ) grid`;
       } else {
-        let filterSQL: string[] = [];
+        const filterSQL: string[] = [];
         if (job.data.countryId?.length) {
           filterSQL.push(`gid_0 = '${job.data.countryId}'`);
         }
@@ -61,8 +61,8 @@ export default async (job: Job<PlanningUnitsJob>) => {
                         ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO NOTHING;`);
       // now we can execute any queries on a query runner, for example:
       logger.debug(queryResult);
-      await job.updateProgress(42);
-      logger.debug('Transcoding completed');
+      // await job.updateProgress(42);
+      logger.debug('Planning unit creation completed');
     } catch (err) {
       logger.error(err);
       throw err;

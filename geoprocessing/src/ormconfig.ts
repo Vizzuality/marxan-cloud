@@ -1,5 +1,5 @@
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-const config = require('config');
+import * as config from 'config';
 
 /**
  * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs

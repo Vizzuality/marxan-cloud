@@ -2,8 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { CreatePlanningUnitsDTO } from './dto/create.planning-units.dto';
-import { UpdatePlanningUnitsDTO } from './dto/update.planning-units.dto';
 
+/**
+ * @see https://docs.nestjs.com/techniques/queues
+ *
+ * @debt Bullmq is expected to be supported soon in the
+ * nest.js bull wrapper. In the meanwhile we are using Bullmq
+ * in the worker
+ * and bull in the Queue and job publication
+ *
+ * For some reason delayed jobs are not seen by the
+ * geoprocessing service
+ *
+ **/
 @Injectable()
 export class PlanningUnitsService {
   constructor(
@@ -14,6 +25,7 @@ export class PlanningUnitsService {
     await this.planningUnitsQueue.add('transcode', creationOptions,
     {
       attempts: 3,
+      // delay: 3000, // For some reason delayed does not properly work
       timeout: 10000
     });
   }
