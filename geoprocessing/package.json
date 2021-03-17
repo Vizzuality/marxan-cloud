@@ -56,7 +56,8 @@
     "rxjs": "^6.6.3",
     "typeorm": "^0.2.29",
     "nestjs-base-service": "0.4.2",
-    "zlib": "^1.0.5"
+    "typeorm": "0.2.30",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
