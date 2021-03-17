@@ -1,7 +1,7 @@
 # [API and Data engineering] Queues - for events, audit, messages, jobs...
 
-* Date: 10 March 2021
-* Status: proposed
+* Date: 17 March 2021
+* Status: decided
 * Deciders: Alicia Arenzana, Andrea Rota
 
 ## Context and problem statement
@@ -101,12 +101,16 @@ development instances.
 
 ### Message queues
 
-These may not be needed. Potentially Redis with Bull (there is an integration
+These may not be needed. Potentially Redis with BullMQ (there is an integration
 for NestJS), if we ever do need.
 
 ### Job queues
 
+* Apache Airflow.
+
 * Redis. Direct interface or via the API.
+
+* Redis with BullMQ, via the NestJS integration for this.
 
 * graphile/worker (https://github.com/graphile/worker)
 
@@ -114,7 +118,44 @@ for NestJS), if we ever do need.
 
 ## Decision outcome
 
-TBD
+Since the initial draft of this ADR (10 March 2021), we have validated the use
+of Redis+BullMQ for job queues with a first worker written in TypeScript; and we
+have likewise validated a simple PostgreSQL-based event queue module
+(`ApiEventsModule`) adapted from an earlier NestJS project (simplified, and with
+addition of optional typing on event payload).
+
+These proof of concept gave us enough confidence about a sensible balance
+between the functionality we need and minimal operational costs and cognitive
+overhead.
+
+### Event queues
+
+We will be using the PostgreSQL-based `ApiEventsModule` for API events linked to
+data structures we already handle in PostgreSQL, and for event sourcing use
+cases.
+
+### Audit queues
+
+We will revisit this if/when we implement audit queues.
+
+### Message queues
+
+We will revisit this if/when we implement message queues. Redis+BullMQ seems an
+optimal candidate since we are already going to be using this for job queues
+(see below).
+
+### Job queues
+
+We will use Redis + BullMQ.
+
+We are still evaluating whether it will be advisable to stick to this same setup
+for non-TypeScript workers. We will work on a first PoC of the Marxan worker
+using this setup, and reassess then.
+
+For ETL pipelines where non-linear DAGs may be needed, we will consider Apache
+Airflow as optimal candidate for first PoCs, given its extensive support for
+complex DAG runs, combined with our team's existing engineering expertise with
+Airflow.
 
 ## References
 
