@@ -11,8 +11,8 @@ import Slider from 'components/forms/slider';
 import Button from 'components/button';
 import {
   composeValidators,
-  checkboxValidator,
-  checkboxGroupValidator,
+  booleanValidator,
+  arrayValidator,
 } from 'components/forms/validations';
 
 export default {
@@ -120,7 +120,7 @@ export const Form = (): React.ReactNode => {
             <FieldRFF
               name="checkbox"
               type="checkbox"
-              validate={composeValidators([checkboxValidator])}
+              validate={composeValidators([booleanValidator])}
             >
               {(fprops) => (
                 <Field className="flex mt-2" id="form-checkbox" {...fprops}>
@@ -138,7 +138,7 @@ export const Form = (): React.ReactNode => {
               name="checkbox-group"
               type="checkbox"
               value="option-1"
-              validate={composeValidators([checkboxGroupValidator])}
+              validate={composeValidators([arrayValidator])}
             >
               {(fprops) => (
                 <Field
@@ -156,7 +156,7 @@ export const Form = (): React.ReactNode => {
               name="checkbox-group"
               type="checkbox"
               value="option-2"
-              validate={composeValidators([checkboxGroupValidator])}
+              validate={composeValidators([arrayValidator])}
             >
               {(fprops) => (
                 <Field

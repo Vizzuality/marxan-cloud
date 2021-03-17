@@ -22,7 +22,7 @@ const MePage: React.FC = () => {
         <Header size="base" />
 
         <div className="md:flex-grow">
-          <div className="flex items-center justify-center h-full py-10 text-gray-600 bg-white">
+          <div className="flex items-center justify-center h-full text-gray-600 bg-white">
             <Me />
           </div>
         </div>
