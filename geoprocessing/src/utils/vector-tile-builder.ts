@@ -12,6 +12,7 @@ export interface ITileQueryInput extends TileRequest {
   table: string;
   geometry: string;
   extent: number;
+  buffer: number;
   // attributes: string[];
   // query: string[];
   getBaseQuery?: GetBaseQuery;
@@ -27,6 +28,7 @@ export function createQueryForTile({
   table,
   geometry,
   extent,
+  buffer,
   // query,
   getBaseQuery = defaultGetBaseQuery,
   getTileQuery = defaultGetTileQuery,
@@ -40,6 +42,7 @@ export function createQueryForTile({
       table,
       geometry,
       maxZoomLevel,
+      buffer,
       // attributes: attributesToSelect(attributes),
       // query,
     })})`,
@@ -55,6 +58,7 @@ export function createQueryForTile({
       table: parentTable,
       geometry: 'the_geom',
       extent,
+      buffer,
       // attributes: attributesToArray(attributes),
     })})`,
   );

@@ -43,7 +43,21 @@ export class AdminAreasController {
     @Param('z') z: number,
     @Param('x') x: number,
     @Param('y') y: number,
+    @Param('table') table: string,
+    @Param('geometry') geometry: string,
+    @Param('extent') extent: number,
+    @Param('buffer') buffer: number,
+    @Param('maxZoomLevel') maxZoomLevel: number,
   ): Promise<void> {
-    await this.service.findTile(z, x, y);
+    await this.service.findTile(
+      z,
+      x,
+      y,
+      table,
+      geometry,
+      extent,
+      buffer,
+      maxZoomLevel,
+    );
   }
 }
