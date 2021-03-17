@@ -1,6 +1,6 @@
 import { BaseServiceResource } from 'types/resource.interface';
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository } from 'typeorm';
@@ -28,11 +28,13 @@ export class ProtectedAreasService extends AppBaseService<
   UpdateProtectedAreaDTO,
   AppInfoDTO
 > {
+  private readonly logger = new Logger(ProtectedAreasService.name);
+
   constructor(
     @InjectRepository(ProtectedArea, 'geoprocessingDB')
     protected readonly repository: Repository<ProtectedArea>,
   ) {
-    super(repository, 'scenario', 'scenarios');
+    super(repository, 'protected_area', 'protected_areas');
   }
 
   get serializerConfig(): JSONAPISerializerConfig<ProtectedArea> {
