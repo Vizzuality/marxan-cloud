@@ -41,6 +41,7 @@ export interface ITileQuery {
   table: string;
   geometry: string;
   extent: number;
+  buffer: number;
   // attributes: string;
 }
 
@@ -59,6 +60,7 @@ export interface IBaseQueryInput {
   table: string;
   geometry: string;
   maxZoomLevel: number;
+  buffer: number;
   // attributes: string;
   // query: string[];
 }
