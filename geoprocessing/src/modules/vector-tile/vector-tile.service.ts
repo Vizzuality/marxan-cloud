@@ -18,7 +18,16 @@ export class TileServerService {
    * @param y The tile y offset on Mercator Projection
    * @return the resulting string query.
    */
-  buildQuery(z: number, x: number, y: number): string {
+  buildQuery(
+    z: number,
+    x: number,
+    y: number,
+    table: string,
+    geometry: string,
+    extent: number,
+    buffer: number,
+    maxZoomLevel: number,
+  ): string {
     let query: string = '';
 
     z = parseInt(`${z}`, 10);
@@ -31,10 +40,10 @@ export class TileServerService {
     if (isNaN(x) || isNaN(y)) {
       throw new Error('Invalid tile coordinates');
     }
-    const table = 'admin_regions';
-    const maxZoomLevel = 12;
-    const geometry = 'the_geom';
-    const extent = 4096;
+    // const table = 'admin_regions';
+    // const maxZoomLevel = 12;
+    // const geometry = 'the_geom';
+    // const extent = 4096;
 
     try {
       query = createQueryForTile({
@@ -45,6 +54,7 @@ export class TileServerService {
         table,
         geometry,
         extent,
+        buffer,
       });
       logger.debug(`Create query for tile: ${query}`);
     } catch (error) {
@@ -84,16 +94,26 @@ export class TileServerService {
     z: number,
     x: number,
     y: number,
-    // table: string,
-    // geometry: string,
-    // extent: number,
-    // maxZoomLevel: number
+    table: string,
+    geometry: string,
+    extent: number,
+    buffer: number,
+    maxZoomLevel: number,
   ): Promise<Vectortile> {
     const mvt: Vectortile = { res: 0 };
 
     //todo - check for valid tile and for valid data source
 
-    const query = this.buildQuery(z, x, y);
+    const query = this.buildQuery(
+      z,
+      x,
+      y,
+      table,
+      geometry,
+      extent,
+      buffer,
+      maxZoomLevel,
+    );
     logger.debug('Query created');
 
     let data: any | null = null;
