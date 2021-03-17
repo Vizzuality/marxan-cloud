@@ -8,6 +8,9 @@ import Wrapper from 'layout/wrapper';
 
 import ProjectMap from 'layout/projects/map';
 import ProjectForm from 'layout/projects/form';
+import { withProtection, withUser } from 'hoc/auth';
+
+export const getServerSideProps = withProtection(withUser());
 
 const NewProjectsPage: React.FC = () => {
   return (

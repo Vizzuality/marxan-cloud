@@ -2,6 +2,9 @@ import React from 'react';
 import Head from 'next/head';
 
 import Header from 'layout/header';
+import { withUser } from 'hoc/auth';
+
+export const getServerSideProps = withUser();
 
 const About: React.FC = () => {
   return (

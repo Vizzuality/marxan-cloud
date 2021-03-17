@@ -4,23 +4,31 @@ import Head from 'next/head';
 import Header from 'layout/header';
 import Protected from 'layout/protected';
 
+import Me from 'layout/me';
+
 import { withProtection, withUser } from 'hoc/auth';
 
 export const getServerSideProps = withProtection(withUser());
 
-const ShowProjectsPage: React.FC = () => {
+const MePage: React.FC = () => {
   return (
     <Protected>
       <Head>
-        <title>Projects [id]</title>
+        <title>Me</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
+
+        <div className="md:flex-grow">
+          <div className="flex items-center justify-center h-full text-gray-600 bg-white">
+            <Me />
+          </div>
+        </div>
       </main>
     </Protected>
   );
 };
 
-export default ShowProjectsPage;
+export default MePage;
