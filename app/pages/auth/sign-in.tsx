@@ -4,6 +4,10 @@ import Head from 'next/head';
 import Header from 'layout/header';
 import SignIn from 'layout/sign-in';
 
+import { withoutProtection } from 'hoc/auth';
+
+export const getServerSideProps = withoutProtection();
+
 const SignInPage: React.FC = () => {
   return (
     <>

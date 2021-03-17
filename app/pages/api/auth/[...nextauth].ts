@@ -1,43 +1,39 @@
 import NextAuth from 'next-auth';
 import Providers from 'next-auth/providers';
 import AUTHENTICATION from 'services/authentication';
-import USERS from 'services/users';
-import { SIGN_IN_DEFAULT_REDIRECT } from 'hooks/auth';
-
-const SESSION_BUFFER_TIME = 60 * 60 * 1000; // 1 hour
 
 /**
  * Takes a token, and returns a new token
  */
-async function refreshAccessToken(token) {
-  try {
-    const refreshTokenResponse = await AUTHENTICATION.request({
-      url: '/refresh-token',
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token.accessToken}`,
-        'Content-Type': 'application/json',
-      },
-    });
+// async function refreshAccessToken(token) {
+//   try {
+//     const refreshTokenResponse = await AUTHENTICATION.request({
+//       url: '/refresh-token',
+//       method: 'POST',
+//       headers: {
+//         Authorization: `Bearer ${token.accessToken}`,
+//         'Content-Type': 'application/json',
+//       },
+//     });
 
-    const { data, statusText } = refreshTokenResponse;
+//     const { data, statusText } = refreshTokenResponse;
 
-    if (statusText !== 'OK') {
-      throw new Error(data);
-    }
+//     if (statusText !== 'OK') {
+//       throw new Error(data);
+//     }
 
-    return {
-      ...token,
-      accessToken: data.accessToken,
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      ...token,
-      error: 'RefreshAccessTokenError',
-    };
-  }
-}
+//     return {
+//       ...token,
+//       accessToken: data.accessToken,
+//     };
+//   } catch (error) {
+//     console.error(error);
+//     return {
+//       ...token,
+//       error: 'RefreshAccessTokenError',
+//     };
+//   }
+// }
 
 const options = {
   // Defining custom pages
@@ -69,24 +65,10 @@ const options = {
           headers: { 'Content-Type': 'application/json' },
         });
 
-        const { data } = signInRequest;
-        const { accessToken } = data;
+        const { data, status } = signInRequest;
 
-        // After sign-in, request data user to create session with a complete profile
-        const userRequest = await USERS.request({
-          url: '/me',
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        const { data: userData } = userRequest;
-
-        if (userRequest.statusText === 'OK') {
-          const user = { ...userData, ...userData, accessToken };
-          return user;
+        if (status === 201) {
+          return data;
         }
 
         throw new Error(data);
@@ -103,21 +85,19 @@ const options = {
         token.user = rest;
       }
 
-      // Return previous token if the access token has not expired yet
-      const { iat } = token;
-      const tokenCloseToExpire = (Date.now() - SESSION_BUFFER_TIME) < (iat * 1000);
-      if (!tokenCloseToExpire) return token;
+      return token;
 
-      // Refresh token when less than 1 hour left
-      return refreshAccessToken(token);
+      // // Return previous token if the access token has not expired yet
+      // const { iat } = token;
+      // const tokenCloseToExpire = (Date.now() - SESSION_BUFFER_TIME) < (iat * 1000);
+      // if (!tokenCloseToExpire) return token;
+
+      // // Refresh token when less than 1 hour left
+      // return refreshAccessToken(token);
     },
 
     // Extending session object
     async session(session, token) {
-      session.user = {
-        ...session.user,
-        ...token.user,
-      };
       session.accessToken = token.accessToken;
       return session;
     },
@@ -125,7 +105,7 @@ const options = {
     async redirect(callbackUrl) {
       // By default it should be redirect to /projects
       if (callbackUrl.includes('/sign-in') || callbackUrl.includes('/sign-up')) {
-        return SIGN_IN_DEFAULT_REDIRECT;
+        return '/projects';
       }
       return callbackUrl;
     },
