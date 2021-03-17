@@ -4,7 +4,8 @@ import {
   GetTileQuery,
   ITileQuery,
 } from 'types/tileRenderer';
-import zlib from 'zlib';
+const zlib = require('zlib');
+// console.log('ZLIB',zlib)
 
 // /**
 //  * @todo add pyramiding function
