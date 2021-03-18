@@ -83,7 +83,11 @@ Run `make start` to start all the services.
 Run `make notebooks` to start the jupyterlab service.
 
 ### Seed data
-note: Yo need at least 16 gb of Ram and 40gb of disk space in order to fulfill some of the tasks (GADM pipe and WDPA) Also the number of cores will impact the time needed to run the full pipes.
+
+Note: You need at least 16GB of RAM and 40GB of disk space in order to fulfill
+some of these tasks (GADM and WDPA data import pipelines). Also the number of
+CPU cores will impact the time needed to seed a new instance with the complete
+GADM and WDPA datasets.
 
 To seed the geodb database you need to follow the next instructions:
 
@@ -117,7 +121,7 @@ tracker](https://github.com/Vizzuality/marxan-cloud/issues) to report bugs.
 
 ## License
 
-(C) Copyright 2020 Vizzuality.
+(C) Copyright 2020-2021 Vizzuality.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the [MIT License](LICENSE) as included in this repository.
