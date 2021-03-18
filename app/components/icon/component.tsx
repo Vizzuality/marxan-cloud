@@ -7,11 +7,13 @@ export interface IconProps {
     viewBox: string;
   };
   className?: string;
+  style?: any;
 }
 
 export const Icon: React.FC<IconProps> = ({
   icon,
   className = 'w-5 h-5',
+  style,
 }: IconProps) => {
   return (
     <svg
@@ -20,6 +22,7 @@ export const Icon: React.FC<IconProps> = ({
         [className]: className,
       })}
       viewBox={icon?.viewBox || '0 0 32 32'}
+      style={style}
     >
       <use xlinkHref={`#${icon?.id || icon}`} />
     </svg>
