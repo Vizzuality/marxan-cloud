@@ -58,6 +58,12 @@ Unreleased
 
 - New module: ApiEventsModule [MARXAN-124].
 - Support for validation of new accounts, based on API events [MARXAN-214].
+- Queue and job provider in api.
+- Planning Units 
+	- Provides the capability to enqueue the generation of Planning units.
+	- Tests for planning units generation.
+- Projects
+	- Job request for PU generation after project creation
 
 ### Changed
 
@@ -96,7 +102,6 @@ Unreleased
   - handle planning unit grid shape, planning unit area, L1 and L2 admin area
     ids.
   - generation of PUs after a project is created.
-- PU Queue and job provider.
 
 ### Changed
 
