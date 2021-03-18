@@ -41,8 +41,8 @@ export class ProtectedAreasController {
     description:
       'Find unique IUCN categories among protected areas in a single given administrative area.',
   })
-  @ApiParam({
-    name: 'adminAreaId',
+  @ApiQuery({
+    name: 'filter[adminAreaId]',
     description:
       'Only protected areas within the given admin area will be considered.',
     type: String,
@@ -54,16 +54,16 @@ export class ProtectedAreasController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @JSONAPIQueryParams()
-  @Get('iucn-categories/:adminAreaId')
+  @Get('iucn-categories')
   async listIUCNProtectedAreaCategories(
-    @Param('adminAreaId') adminAreaId: string,
+    @Query('filter') filter: Record<string, unknown>,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<IUCNProtectedAreaCategoryResult[]> {
     return await this.service.findAllProtectedAreaCategories(
       fetchSpecification,
       undefined,
       {
-        adminAreaId,
+        adminAreaId: filter?.adminAreaId,
       },
     );
   }
