@@ -1,7 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 
+export type IUCNCategory =
+  | 'Ia'
+  | 'Ib'
+  | 'II'
+  | 'III'
+  | 'IV'
+  | 'V'
+  | 'VI'
+  | 'Not Applicable'
+  | 'Not Assigned'
+  | 'Not Reported';
 @Entity('wdpa')
 export class ProtectedArea {
   @ApiProperty()
@@ -31,7 +41,7 @@ export class ProtectedArea {
    */
   @ApiPropertyOptional()
   @Column('character varying', { name: 'iucn_cat' })
-  iucnCategory?: string;
+  iucnCategory?: IUCNCategory;
 
   /**
    * Total length of the protected area's shape.
