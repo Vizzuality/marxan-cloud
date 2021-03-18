@@ -24,9 +24,9 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
       {data?.name && (
         <motion.div
           key="project-toolbar"
-          initial={{ y: -10 }}
-          animate={{ y: 0 }}
-          exit={{ y: -10 }}
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -10, opacity: 0 }}
         >
           <div className="flex gap-4">
             <Button

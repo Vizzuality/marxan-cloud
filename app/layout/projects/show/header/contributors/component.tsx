@@ -31,9 +31,9 @@ export const Contributors: React.FC<ContributorsProps> = () => {
       {data?.name && (
         <motion.div
           key="project-contributors"
-          initial={{ y: -10 }}
-          animate={{ y: 0 }}
-          exit={{ y: -10 }}
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -10, opacity: 0 }}
         >
           <div className="flex items-center">
             <div className="text-sm">Contributors to this project:</div>

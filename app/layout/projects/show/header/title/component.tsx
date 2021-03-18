@@ -17,9 +17,9 @@ export const Title: React.FC<TitleProps> = () => {
       {data?.name && (
         <motion.div
           key="project-name"
-          initial={{ y: -10 }}
-          animate={{ y: 0 }}
-          exit={{ y: -10 }}
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -10, opacity: 0 }}
         >
           <h1 className="px-0 py-1 text-4xl font-normal font-heading">{data?.name}</h1>
         </motion.div>
