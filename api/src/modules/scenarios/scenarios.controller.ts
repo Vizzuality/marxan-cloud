@@ -10,7 +10,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { ScenarioResult } from './scenario.api.entity';
+import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { ScenariosService } from './scenarios.service';
 import {
   ProcessFetchSpecification,
@@ -32,11 +32,10 @@ import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
-import { organizationResource } from 'modules/organizations/organization.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(organizationResource.className)
+@ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class ScenariosController {
   constructor(public readonly service: ScenariosService) {}
@@ -48,7 +47,7 @@ export class ScenariosController {
     type: ScenarioResult,
   })
   @JSONAPIQueryParams({
-    entitiesAllowedAsIncludes: organizationResource.entitiesAllowedAsIncludes,
+    entitiesAllowedAsIncludes: scenarioResource.entitiesAllowedAsIncludes,
   })
   @Get()
   async findAll(
