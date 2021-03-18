@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 
 import { useRouter } from 'next/router';
 
@@ -32,6 +33,7 @@ const SCENARIO_TYPES = [
       height: 20,
     },
     subtitle: 'Prioritizes for multiple actions simultaneously',
+    disabled: true,
   },
   {
     id: 'marxan-with-connectivity',
@@ -43,6 +45,7 @@ const SCENARIO_TYPES = [
       height: 20,
     },
     subtitle: 'Prioritizes for one action at a time while accounting for ecological processes and flows.',
+    disabled: true,
   },
 ];
 
@@ -60,7 +63,13 @@ export const ProjectScenariosType: React.FC<ProjectScenariosTypeProps> = () => {
       <ul className="grid grid-cols-3 gap-10 my-5 -mx-5">
         {SCENARIO_TYPES.map((s) => {
           return (
-            <li key={`${s.id}`} className="transition-all border-2 border-transparent cursor-pointer group hover:shadow-2xl rounded-3xl hover:border-gray-100">
+            <li
+              key={`${s.id}`}
+              className={cx({
+                'transition-all border-2 border-transparent cursor-pointer group hover:shadow-2xl rounded-3xl hover:border-gray-100': true,
+                'pointer-events-none opacity-25': s.disabled,
+              })}
+            >
               <Link href={`/projects/${pid}${s.href}`}>
                 <div className="h-full p-5">
                   <div className="flex items-center justify-center w-16 h-16 transition-all bg-gray-100 rounded-3xl group-hover:bg-primary-500">
