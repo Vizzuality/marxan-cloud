@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
@@ -7,11 +7,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
+import Modal from 'components/modal';
 import ScenarioItem from 'components/scenarios/item';
+
+import ScenarioTypes from 'layout/projects/show/scenarios/scenario-type';
 
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
-import Link from 'next/link';
 
 // const SCENARIOS = [
 //   {
@@ -52,6 +54,7 @@ export interface ProjectScenariosProps {
 }
 
 export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
+  const [modal, setModal] = useState(false);
   const { query } = useRouter();
   const { pid } = query;
   const { data = {} } = useProject(pid);
@@ -74,18 +77,24 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             <h2 className="text-lg font-medium font-heading">Scenario dashboard</h2>
             <h3 className="mt-1 text-lg font-medium text-gray-300 font-heading">Get started by creating a scenario</h3>
 
-            <Link
-              href={`/projects/${pid}/scenarios/new`}
+            <Button
+              theme="primary"
+              size="lg"
+              className="mt-10"
+              onClick={() => setModal(true)}
             >
-              <Button
-                theme="primary"
-                size="lg"
-                className="mt-10"
-              >
-                <span className="mr-5">Create scenario</span>
-                <Icon icon={PLUS_SVG} className="w-4 h-4" />
-              </Button>
-            </Link>
+              <span className="mr-5">Create scenario</span>
+              <Icon icon={PLUS_SVG} className="w-4 h-4" />
+            </Button>
+
+            <Modal
+              title="Hello"
+              open={modal}
+              size="wide"
+              onDismiss={() => setModal(false)}
+            >
+              <ScenarioTypes />
+            </Modal>
           </div>
         </motion.div>
       )}
