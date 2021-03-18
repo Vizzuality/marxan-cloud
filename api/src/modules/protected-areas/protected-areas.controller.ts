@@ -37,11 +37,6 @@ import { IUCNProtectedAreaCategoryResult } from './dto/iucn-protected-area-categ
 export class ProtectedAreasController {
   constructor(public readonly service: ProtectedAreasService) {}
 
-  @Get('iucn-categories')
-  async listProtectedAreaCategories(): Promise<Array<string | undefined>> {
-    return await this.service.listProtectedAreaCategories();
-  }
-
   @ApiOperation({
     description:
       'Find unique IUCN categories among protected areas in a single given administrative area.',
