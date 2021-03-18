@@ -143,11 +143,6 @@ services:
       - postgresql-airflow
       - airflow-scheduler
 
-networks:
-  default:
-    external:
-      name: marxan-cloud-network
-
 volumes:
   marxan-cloud-postgresql-api-data:
 
