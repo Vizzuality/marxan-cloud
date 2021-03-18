@@ -6,6 +6,7 @@ import { PlanningUnitGridShape } from 'modules/projects/project.api.entity';
 import { JobStatus, ScenarioType } from 'modules/scenarios/scenario.api.entity';
 import { CreateUserDTO } from 'modules/users/dto/create.user.dto';
 import { UpdateUserDTO } from 'modules/users/dto/update.user.dto';
+import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
 
 export const E2E_CONFIG: {
   users: {
@@ -40,6 +41,11 @@ export const E2E_CONFIG: {
       missingRequiredFields: () => Partial<CreateScenarioDTO>;
     };
   };
+  protectedAreas: {
+    categories: {
+      valid: Array<IUCNCategory>;
+    }
+  }
 } = {
   users: {
     basic: {
@@ -130,6 +136,11 @@ export const E2E_CONFIG: {
         name: faker.random.words(3),
         description: faker.lorem.sentence(),
       }),
+    },
+  },
+  protectedAreas: {
+    categories: {
+      valid: ['Ia', 'Ib', 'II', 'III', 'IV', 'V', 'VI', 'Not Applicable', 'Not Assigned', 'Not Reported' ],
     },
   },
 };
