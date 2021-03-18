@@ -53,8 +53,10 @@ start-redis-commander:
 clean-slate: stop
 	docker-compose rm -f postgresql-api
 	docker-compose rm -f postgresql-geo-api
+	docker-compose rm -f redis
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data
+	docker volume rm -f marxan-cloud_marxan-cloud-redis-api-data
 
 seed-dbs: seed-api-with-test-data | seed-geoapi-with-test-data
 
