@@ -23,14 +23,14 @@ export interface ScenariosSidebarNameProps {
 
 export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
   const [submitting, setSubmitting] = useState(false);
-  const { addToast } = useToasts();
   const { query, push } = useRouter();
   const { pid } = query;
+
+  const { addToast } = useToasts();
 
   const mutation = useSaveScenario({
     requestConfig: {
       method: 'POST',
-      url: '/',
     },
   });
 
@@ -38,15 +38,18 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
     setSubmitting(true);
 
     mutation.mutate({
-      ...data,
-      type: 'marxan',
-      projectId: pid,
+      id: null,
+      data: {
+        ...data,
+        type: 'marxan',
+        projectId: pid,
+      },
     }, {
       onSuccess: ({ data: s }) => {
-        addToast('save-scenario-name', (
+        addToast('success-scenario-create', (
           <>
             <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario created</p>
+            <p className="text-sm">{`Scenario "${s.name}" created`}</p>
           </>
         ), {
           level: 'success',
@@ -55,6 +58,15 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
         push(`/projects/${pid}/scenarios/${s.id}/edit`);
       },
       onError: () => {
+        addToast('success-scenario-create', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario not created</p>
+          </>
+        ), {
+          level: 'error',
+        });
+
         setSubmitting(false);
 
         addToast('error-scenario-name', (

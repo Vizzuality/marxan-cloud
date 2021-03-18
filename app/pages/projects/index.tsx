@@ -1,12 +1,16 @@
 import React from 'react';
 import Head from 'next/head';
 
-import Header from 'layout/header';
-import Protected from 'layout/protected';
+import { withProtection, withUser } from 'hoc/auth';
 
-import ProjectsWelcome from 'layout/projects/welcome';
-import ProjectsToolbar from 'layout/projects/toolbar';
-import ProjectsList from 'layout/projects/list';
+import Protected from 'layout/protected';
+import Header from 'layout/header';
+
+import ProjectsWelcome from 'layout/projects/all/welcome';
+import ProjectsToolbar from 'layout/projects/all/toolbar';
+import ProjectsList from 'layout/projects/all/list';
+
+export const getServerSideProps = withProtection(withUser());
 
 const ProjectsPage: React.FC = () => {
   return (

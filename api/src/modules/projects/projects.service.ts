@@ -9,7 +9,10 @@ import { UpdateProjectDTO } from './dto/update.project.dto';
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
 import { ScenariosService } from 'modules/scenarios/scenarios.service';
-import { AppBaseService } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+} from 'utils/app-base.service';
 
 @Injectable()
 export class ProjectsService extends AppBaseService<
@@ -28,9 +31,21 @@ export class ProjectsService extends AppBaseService<
     super(repository, 'project', 'projects');
   }
 
-  get serializerConfig() {
+  get serializerConfig(): JSONAPISerializerConfig<Project> {
     return {
-      attributes: ['name', 'description', 'users'],
+      attributes: [
+        'name',
+        'description',
+        'countryId',
+        'adminAreaLevel1Id',
+        'adminAreaLevel2Id',
+        'planningUnitGridShape',
+        'planningUnitAreakm2',
+        'users',
+        'scenarios',
+        'createdAt',
+        'lastModifiedAt',
+      ],
       keyForAttribute: 'camelCase',
       users: {
         ref: 'id',
@@ -46,8 +61,6 @@ export class ProjectsService extends AppBaseService<
           'name',
           'description',
           'type',
-          'country',
-          'extent',
           'wdpaFilter',
           'wdpaThreshold',
           'adminRegionId',
@@ -55,6 +68,8 @@ export class ProjectsService extends AppBaseService<
           'boundaryLengthModifier',
           'metadata',
           'status',
+          'createdAt',
+          'lastModifiedAt',
         ],
       },
     };

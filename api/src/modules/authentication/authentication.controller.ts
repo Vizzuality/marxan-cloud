@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -10,6 +12,7 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -23,6 +26,7 @@ import {
 } from 'modules/authentication/authentication.service';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
+import { UserAccountValidationDTO } from './dto/user-account.validation.dto';
 import { LocalAuthGuard } from './local-auth.guard';
 
 @Controller('/auth')
@@ -31,6 +35,11 @@ export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @UseGuards(LocalAuthGuard)
+  @ApiOperation({
+    description: 'Sign user in, issuing a JWT token.',
+    summary: 'Sign user in',
+    operationId: 'sign-in',
+  })
   @Post('sign-in')
   @ApiCreatedResponse({
     type: 'AccessToken',
@@ -40,6 +49,20 @@ export class AuthenticationController {
     @Body(new ValidationPipe()) _dto: LoginDto,
   ): Promise<AccessToken> {
     return this.authenticationService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description:
+      'Sign user out of all their current sessions by invalidating all the JWT tokens issued to them',
+    summary: 'Sign user out',
+    operationId: 'sign-out',
+  })
+  @Post('sign-out')
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  async logout(@Request() req: RequestWithAuthenticatedUser): Promise<void> {
+    await this.authenticationService.invalidateAllTokensOfUser(req.user.id);
   }
 
   @Post('sign-up')
@@ -52,6 +75,15 @@ export class AuthenticationController {
     @Body(new ValidationPipe()) signupDto: SignUpDto,
   ): Promise<void> {
     await this.authenticationService.createUser(signupDto);
+  }
+
+  @Get('validate-account/:sub/:validationToken')
+  @ApiOperation({ description: 'Confirm an activation token for a new user.' })
+  @ApiOkResponse()
+  async confirm(
+    @Param() activationToken: UserAccountValidationDTO,
+  ): Promise<void> {
+    await this.authenticationService.validateActivationToken(activationToken);
   }
 
   /**

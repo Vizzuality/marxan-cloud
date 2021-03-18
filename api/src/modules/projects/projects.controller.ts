@@ -8,7 +8,6 @@ import {
   Req,
   UploadedFile,
   UseGuards,
-  ValidationPipe,
 } from '@nestjs/common';
 import { Project, ProjectResult } from './project.api.entity';
 import { ProjectsService } from './projects.service';
@@ -27,23 +26,18 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadOptions } from 'utils/file-uploads.utils';
 
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
-import { BaseServiceResource } from 'types/resource.interface';
+import { projectResource } from './project.api.entity';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
-import { FetchSpecification, Pagination } from 'nestjs-base-service';
-
-const resource: BaseServiceResource = {
-  className: 'Project',
-  name: {
-    singular: 'project',
-    plural: 'projects',
-  },
-};
+import {
+  FetchSpecification,
+  ProcessFetchSpecification,
+} from 'nestjs-base-service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(resource.className)
+@ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectsController {
   constructor(public readonly service: ProjectsService) {}
@@ -69,12 +63,14 @@ export class ProjectsController {
     description: 'Find all projects',
   })
   @ApiOkResponse({ type: ProjectResult })
-  @JSONAPIQueryParams()
+  @JSONAPIQueryParams({
+    entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
+  })
   @Get()
   async findAll(
-    @Pagination() pagination: FetchSpecification,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ProjectResult> {
-    const results = await this.service.findAllPaginated(pagination);
+    const results = await this.service.findAllPaginated(fetchSpecification);
     return await this.service.serialize(results.data, results.metadata);
   }
 
@@ -89,7 +85,7 @@ export class ProjectsController {
   @ApiOkResponse({ type: ProjectResult })
   @Post()
   async create(
-    @Body(new ValidationPipe()) dto: CreateProjectDTO,
+    @Body() dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResult> {
     return await this.service.serialize(
@@ -102,7 +98,7 @@ export class ProjectsController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) dto: UpdateProjectDTO,
+    @Body() dto: UpdateProjectDTO,
   ): Promise<ProjectResult> {
     return await this.service.serialize(await this.service.update(id, dto));
   }

@@ -1,19 +1,21 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { MaxLength } from 'class-validator';
-import { Dictionary } from 'lodash';
+import { IsOptional, MaxLength } from 'class-validator';
 
 export class CreateUserDTO {
   @ApiProperty()
   email: string;
 
   @ApiPropertyOptional()
-  displayName: string | null;
+  @IsOptional()
+  displayName?: string | null;
 
   @ApiPropertyOptional()
-  fname: string | null;
+  @IsOptional()
+  fname?: string | null;
 
   @ApiPropertyOptional()
-  lname: string | null;
+  @IsOptional()
+  lname?: string | null;
 
   @ApiProperty()
   /**
@@ -30,5 +32,12 @@ export class CreateUserDTO {
   password: string;
 
   @ApiPropertyOptional()
-  metadata: Dictionary<string>;
+  @IsOptional()
+  // Limit the data URI of the avatar to a sensible size.
+  @MaxLength(1e5)
+  avatarDataUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  metadata?: Record<string, unknown>;
 }

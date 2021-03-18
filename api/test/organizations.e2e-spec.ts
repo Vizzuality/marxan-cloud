@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
@@ -10,26 +10,33 @@ describe('OrganizationsController (e2e)', () => {
 
   let jwtToken: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
     await app.init();
 
     const response = await request(app.getHttpServer())
       .post('/auth/sign-in')
       .send({
-        username: E2E_CONFIG.users.aa.username,
-        password: E2E_CONFIG.users.aa.password,
+        username: E2E_CONFIG.users.basic.aa.username,
+        password: E2E_CONFIG.users.basic.aa.password,
       })
       .expect(201);
 
     jwtToken = response.body.accessToken;
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await Promise.all([app.close()]);
   });
 
@@ -72,7 +79,7 @@ describe('OrganizationsController (e2e)', () => {
     let aProject: { id: string; type: 'organizations' };
 
     it('Creates a project in the newly created organization', async () => {
-      const createProjectDTO: CreateProjectDTO = {
+      const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.minimal(),
         organizationId: anOrganization.id,
       };

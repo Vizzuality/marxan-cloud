@@ -1,10 +1,20 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
-import { User } from './user.api.entity';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Request,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
+import { User, userResource, UserResult } from './user.api.entity';
 import { UsersService } from './users.service';
 
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -14,20 +24,16 @@ import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { RequestWithAuthenticatedUser } from 'app.controller';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
-import { BaseServiceResource } from 'types/resource.interface';
-import { FetchSpecification, Pagination } from 'nestjs-base-service';
-
-const resource: BaseServiceResource = {
-  className: 'User',
-  name: {
-    singular: 'user',
-    plural: 'users',
-  },
-};
+import {
+  FetchSpecification,
+  ProcessFetchSpecification,
+} from 'nestjs-base-service';
+import { UpdateUserDTO } from './dto/update.user.dto';
+import { UpdateUserPasswordDTO } from './dto/update.user-password';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(resource.className)
+@ApiTags(userResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/users`)
 export class UsersController {
   constructor(public readonly service: UsersService) {}
@@ -45,18 +51,52 @@ export class UsersController {
     description:
       'The current user does not have suitable permissions for this request.',
   })
-  @JSONAPIQueryParams()
+  @JSONAPIQueryParams({
+    entitiesAllowedAsIncludes: userResource.entitiesAllowedAsIncludes,
+  })
   @Get()
-  async findAll(@Pagination() pagination: FetchSpecification): Promise<User[]> {
-    const results = await this.service.findAllPaginated(pagination);
+  async findAll(
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+  ): Promise<User[]> {
+    const results = await this.service.findAllPaginated(fetchSpecification);
     return this.service.serialize(results.data, results.metadata);
+  }
+
+  @ApiOperation({
+    description:
+      'Update the password of a user, if they can present the current one.',
+  })
+  @ApiOkResponse({ type: UserResult })
+  @Patch('me/password')
+  async updateOwnPassword(
+    @Body(new ValidationPipe()) dto: UpdateUserPasswordDTO,
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    return await this.service.updateOwnPassword(req.user.id, dto, {
+      authenticatedUser: req.user,
+    });
+  }
+
+  @ApiOperation({ description: 'Update a user.' })
+  @ApiOkResponse({ type: UserResult })
+  @Patch('me')
+  async update(
+    @Body(new ValidationPipe({ forbidNonWhitelisted: true }))
+    dto: UpdateUserDTO,
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<UserResult> {
+    return this.service.serialize(
+      await this.service.update(req.user.id, dto, {
+        authenticatedUser: req.user,
+      }),
+    );
   }
 
   @ApiOperation({
     description: 'Retrieve attributes of the current user',
   })
   @ApiResponse({
-    type: User,
+    type: UserResult,
   })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized.',
@@ -68,7 +108,20 @@ export class UsersController {
   @Get('me')
   async userMetadata(
     @Request() req: RequestWithAuthenticatedUser,
-  ): Promise<Partial<User>> {
-    return this.service.serialize([await this.service.getById(req.user.id)]);
+  ): Promise<UserResult> {
+    return this.service.serialize(await this.service.getById(req.user.id));
+  }
+
+  @ApiOperation({
+    description: 'Mark user as deleted.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Delete('me')
+  async deleteOwnUser(
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    return this.service.markAsDeleted(req.user.id);
   }
 }

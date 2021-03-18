@@ -12,7 +12,10 @@ import {
 } from '@nestjs/common';
 import { ScenarioResult } from './scenario.api.entity';
 import { ScenariosService } from './scenarios.service';
-import { Pagination, FetchSpecification } from 'nestjs-base-service';
+import {
+  ProcessFetchSpecification,
+  FetchSpecification,
+} from 'nestjs-base-service';
 
 import {
   ApiBearerAuth,
@@ -27,21 +30,13 @@ import { Post } from '@nestjs/common';
 
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
-import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
-
-const resource: BaseServiceResource = {
-  className: 'Scenario',
-  name: {
-    singular: 'scenario',
-    plural: 'scenarios',
-  },
-};
+import { organizationResource } from 'modules/organizations/organization.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(resource.className)
+@ApiTags(organizationResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class ScenariosController {
   constructor(public readonly service: ScenariosService) {}
@@ -52,12 +47,14 @@ export class ScenariosController {
   @ApiOkResponse({
     type: ScenarioResult,
   })
-  @JSONAPIQueryParams()
+  @JSONAPIQueryParams({
+    entitiesAllowedAsIncludes: organizationResource.entitiesAllowedAsIncludes,
+  })
   @Get()
   async findAll(
-    @Pagination() pagination: FetchSpecification,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioResult> {
-    const results = await this.service.findAllPaginated(pagination);
+    const results = await this.service.findAllPaginated(fetchSpecification);
     return this.service.serialize(results.data, results.metadata);
   }
 

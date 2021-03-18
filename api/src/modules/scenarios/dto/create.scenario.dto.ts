@@ -4,18 +4,20 @@ import {
   IsInt,
   IsNumber,
   IsOptional,
+  IsString,
   IsUUID,
   Max,
   Min,
 } from 'class-validator';
-import { Dictionary } from 'lodash';
-import { ScenarioType } from '../scenario.api.entity';
+import { JobStatus, ScenarioType } from '../scenario.api.entity';
 
 export class CreateScenarioDTO {
   @ApiProperty()
+  @IsString()
   name: string;
 
   @ApiPropertyOptional()
+  @IsString()
   @IsOptional()
   description?: string;
 
@@ -51,5 +53,10 @@ export class CreateScenarioDTO {
 
   @ApiPropertyOptional()
   @IsOptional()
-  metadata?: Dictionary<string>;
+  metadata?: Record<string, unknown>;
+
+  @ApiProperty({ enum: JobStatus, enumName: 'JobStatus' })
+  @IsOptional()
+  @IsEnum(Object.values(JobStatus))
+  status?: JobStatus;
 }
