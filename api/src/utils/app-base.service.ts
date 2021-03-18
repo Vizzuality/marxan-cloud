@@ -1,22 +1,14 @@
-import {
-  BaseService,
-  FetchSpecification,
-  PaginationUtils,
-} from 'nestjs-base-service';
+import { BaseService, FetchSpecification } from 'nestjs-base-service';
 
 import JSONAPISerializer = require('jsonapi-serializer');
 import { Repository } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Logger } from '@nestjs/common';
 import { DEFAULT_PAGINATION } from 'nestjs-base-service';
 
 export class PaginationMeta {
   totalPages: number;
-
   totalItems: number;
-
   size: number;
-
   page: number;
 
   constructor(paginationMeta: {
@@ -32,8 +24,40 @@ export class PaginationMeta {
   }
 }
 
+/**
+ * The part of the configuration object for jsonapi-serializer concerned with
+ * serializable properties.
+ *
+ * We handle this separately (while leaving the rest of the config object
+ * loosely typed as Record<string, unknown>) so that we can start to
+ * incrementally make typing stricter where this can be more useful to catch
+ * accidental mistakes (configuring the entity's own serializable properties).
+ */
+export interface JSONAPISerializerAttributesConfig<Entity> {
+  attributes: Array<keyof Entity>;
+  /**
+   * Approximate typing from jsonapi-serializer's documentation
+   * (https://github.com/SeyZ/jsonapi-serializer#available-serialization-option-opts-argument),
+   * but in practice we should only use `camelCase` in this project.
+   */
+  keyForAttribute:
+    | string
+    | (() => string)
+    | 'lisp-case'
+    | 'spinal-case'
+    | 'kebab-case'
+    | 'underscore_case'
+    | 'snake_case'
+    | 'camelCase'
+    | 'CamelCase';
+}
+
+export type JSONAPISerializerConfig<
+  Entity
+> = JSONAPISerializerAttributesConfig<Entity> & Record<string, unknown>;
+
 export abstract class AppBaseService<
-  Entity,
+  Entity extends object,
   CreateModel,
   UpdateModel,
   Info
@@ -49,27 +73,12 @@ export abstract class AppBaseService<
   /**
    * @debt Add proper typing.
    */
-  abstract get serializerConfig(): Record<string, unknown>;
+  abstract get serializerConfig(): JSONAPISerializerConfig<Entity>;
 
-  findAll(
-    fetchSpecification: FetchSpecification,
-    info?: Info,
-    filters: any = null,
-  ): Promise<[Entity[], number]> {
-    Logger.debug(`Finding all ${this.repository.metadata.name}`);
-    let query = this.repository.createQueryBuilder(this.alias);
-    const _i = { ...info, fetchSpecification };
-    query = this.setFilters(query, filters, info);
-    query = PaginationUtils.addPagination(
-      query,
-      this.alias,
-      fetchSpecification,
-    );
-    Logger.debug(query.getQueryAndParameters());
-    return query.getManyAndCount();
-  }
-
-  async getSerializedData(data: Entity | Entity[], meta?: PaginationMeta) {
+  async getSerializedData(
+    data: Partial<Entity> | (Partial<Entity> | undefined)[],
+    meta?: PaginationMeta,
+  ) {
     const serializer = new JSONAPISerializer.Serializer(this.pluralAlias, {
       ...this.serializerConfig,
       meta,
@@ -79,25 +88,37 @@ export abstract class AppBaseService<
   }
 
   async serialize(
-    entities: Entity | Entity[],
+    entities: Partial<Entity> | (Partial<Entity> | undefined)[],
     paginationMeta?: PaginationMeta,
   ): Promise<any> {
     return this.getSerializedData(entities, paginationMeta);
   }
 
   async findAllPaginated(
-    pagination: FetchSpecification,
-  ): Promise<{ data: Entity[]; metadata: PaginationMeta }> {
-    const entitiesAndCount = await this.findAll(pagination);
+    fetchSpecification: FetchSpecification,
+    info?: Info,
+    filters?: Record<string, unknown>,
+  ): Promise<{
+    data: (Partial<Entity> | undefined)[];
+    metadata: PaginationMeta | undefined;
+  }> {
+    const entitiesAndCount = await this.findAll(
+      fetchSpecification,
+      info,
+      filters,
+    );
     const totalItems = entitiesAndCount[1];
     const entities = entitiesAndCount[0];
-    const pageSize = pagination?.pageSize ?? DEFAULT_PAGINATION.pageSize!;
-    const meta = new PaginationMeta({
-      totalPages: Math.ceil(totalItems / pageSize),
-      totalItems,
-      size: pageSize,
-      page: pagination?.pageNumber ?? DEFAULT_PAGINATION.pageNumber!,
-    });
+    const pageSize =
+      fetchSpecification?.pageSize ?? DEFAULT_PAGINATION.pageSize;
+    const meta = fetchSpecification.disablePagination
+      ? undefined
+      : new PaginationMeta({
+          totalPages: Math.ceil(totalItems / pageSize),
+          totalItems,
+          size: pageSize,
+          page: fetchSpecification?.pageNumber ?? DEFAULT_PAGINATION.pageNumber,
+        });
 
     return { data: entities, metadata: meta };
   }

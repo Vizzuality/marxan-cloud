@@ -7,7 +7,7 @@ import { E2E_CONFIG } from './e2e.config';
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -16,7 +16,7 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await Promise.all([app.close()]);
   });
 
@@ -25,8 +25,8 @@ describe('AppController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/auth/sign-in')
         .send({
-          username: E2E_CONFIG.users.aa.username,
-          password: E2E_CONFIG.users.aa.password,
+          username: E2E_CONFIG.users.basic.aa.username,
+          password: E2E_CONFIG.users.basic.aa.password,
         })
         .expect(201);
     });
@@ -34,7 +34,7 @@ describe('AppController (e2e)', () => {
     it('Fails to authenticate a user with an incorrect password', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/sign-in')
-        .send({ email: E2E_CONFIG.users.aa.username, password: 'wrong' })
+        .send({ email: E2E_CONFIG.users.basic.aa.username, password: 'wrong' })
         .expect(401);
 
       expect(response.body.accessToken).not.toBeDefined();

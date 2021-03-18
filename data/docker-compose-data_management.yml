@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  marxan-seed-data:
+    build:
+        context: ./data_download
+        dockerfile: Dockerfile
+    volumes:
+    - './data/seed/gadm_3.6/:/gadm_3.6/data/'
+    - './data/seed/wdpa/:/wdpa/data/'
+    - './data/seed/iucn/:/iucn/data/'
+    - './data/seed/world_terrestrial_ecosystems/:/world_terrestrial_ecosystems/data/'
+    user: "$UID:$GID"
+    command: make
+    env_file:
+        - '../.env'
+
+  marxan-restore-data:
+    build:
+        context: ./data_restore
+        dockerfile: Dockerfile
+    user: "$UID:$GID"
+    command: make
+    env_file:
+        - '../.env'
+networks:
+    default:
+      external:
+        name: marxan-cloud-network

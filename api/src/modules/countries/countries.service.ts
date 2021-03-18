@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository } from 'typeorm';
-import { Country } from './country.api.entity';
+import { Country } from './country.geo.entity';
 import { CreateCountryDTO } from './dto/create.country.dto';
 import { UpdateCountryDTO } from './dto/update.country.dto';
 
 import * as faker from 'faker';
-import { AppBaseService } from 'utils/app-base.service';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+} from 'utils/app-base.service';
 
 @Injectable()
 export class CountriesService extends AppBaseService<
@@ -17,20 +20,17 @@ export class CountriesService extends AppBaseService<
   AppInfoDTO
 > {
   constructor(
-    @InjectRepository(Country)
+    @InjectRepository(Country, 'geoprocessingDB')
     private readonly countriesRepository: Repository<Country>,
   ) {
     super(countriesRepository, 'country', 'countries');
   }
 
-  get serializerConfig() {
+  get serializerConfig(): JSONAPISerializerConfig<Country> {
     return {
-      attributes: ['id', 'name'],
+      transform: (item: Country) => ({ ...item, id: item.gid0 }),
+      attributes: ['gid0', 'name0', 'theGeom'],
       keyForAttribute: 'camelCase',
-      users: {
-        ref: 'id',
-        attributes: ['id', 'name'],
-      },
     };
   }
 
@@ -38,8 +38,10 @@ export class CountriesService extends AppBaseService<
     return this.serialize([
       {
         ...new Country(),
-        alpha2: faker.address.countryCode(),
-        name: faker.address.country(),
+        // faker.address.countryCode() gives alpha2 codes, but we need alpha3
+        // here, so (marginally) better to hardcode something here instead 🤷.
+        gid0: faker.address.countryCode('ESP'),
+        name0: faker.address.country(),
       },
     ]);
   }

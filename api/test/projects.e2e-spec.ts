@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
@@ -10,26 +10,33 @@ describe('ProjectsModule (e2e)', () => {
 
   let jwtToken: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
     await app.init();
 
     const response = await request(app.getHttpServer())
       .post('/auth/sign-in')
       .send({
-        username: E2E_CONFIG.users.aa.username,
-        password: E2E_CONFIG.users.aa.password,
+        username: E2E_CONFIG.users.basic.aa.username,
+        password: E2E_CONFIG.users.basic.aa.password,
       })
       .expect(201);
 
     jwtToken = response.body.accessToken;
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await Promise.all([app.close()]);
   });
 
@@ -59,7 +66,7 @@ describe('ProjectsModule (e2e)', () => {
     });
 
     it('Creating a project with minimum required data should succeed', async () => {
-      const createScenarioDTO: CreateProjectDTO = {
+      const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.minimal(),
         organizationId: anOrganization.id,
       };
@@ -67,7 +74,7 @@ describe('ProjectsModule (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send(createScenarioDTO)
+        .send(createProjectDTO)
         .expect(201);
 
       const resources = response.body.data;
@@ -76,7 +83,7 @@ describe('ProjectsModule (e2e)', () => {
     });
 
     it('Creating a project with complete data should succeed', async () => {
-      const createScenarioDTO: CreateProjectDTO = {
+      const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.complete({ countryCode: 'ESP' }),
         organizationId: anOrganization.id,
       };
@@ -84,7 +91,7 @@ describe('ProjectsModule (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send(createScenarioDTO)
+        .send(createProjectDTO)
         .expect(201);
 
       const resources = response.body.data;
@@ -122,9 +129,9 @@ describe('ProjectsModule (e2e)', () => {
        * Finally, we delete the organization we had created for these projects
        */
       await request(app.getHttpServer())
-      .delete(`/api/v1/organizations/${anOrganization.id}`)
-      .set('Authorization', `Bearer ${jwtToken}`)
-      .expect(200);
+        .delete(`/api/v1/organizations/${anOrganization.id}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
     });
 
     /**

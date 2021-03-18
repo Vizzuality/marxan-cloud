@@ -1,4 +1,11 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { User } from 'modules/users/user.api.entity';
@@ -6,11 +13,15 @@ import { UsersService } from 'modules/users/users.service';
 import { AppConfig } from 'utils/config.utils';
 import { hash, compare } from 'bcrypt';
 
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IssuedAuthnToken } from './issued-authn-token.api.entity';
 import ms = require('ms');
 import { SignUpDto } from './dto/sign-up.dto';
+import { ApiEventsService } from 'modules/api-events/api-events.service';
+import { API_EVENT_KINDS } from 'modules/api-events/api-event.api.entity';
+import { v4 } from 'uuid';
+import * as ApiEventsUserData from 'modules/api-events/dto/apiEvents.user.data.dto';
 
 /**
  * Access token for the app: key user data and access token
@@ -56,7 +67,11 @@ export interface JwtDataPayload {
 
 @Injectable()
 export class AuthenticationService {
+  private readonly logger = new Logger(AuthenticationService.name);
+
   constructor(
+    private readonly apiEventsService: ApiEventsService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     @InjectRepository(IssuedAuthnToken)
@@ -108,13 +123,90 @@ export class AuthenticationService {
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
+    if (!newUser) {
+      throw new InternalServerErrorException('Error while creating a new user');
+    }
+    await this.apiEventsService.create({
+      topic: newUser.id,
+      kind: API_EVENT_KINDS.user__signedUp__v1alpha1,
+    });
+    const validationToken = v4();
+    await this.apiEventsService.create({
+      topic: newUser.id,
+      kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+      data: {
+        validationToken: validationToken,
+        exp:
+          Date.now() +
+          ms(
+            '1d',
+          ) /** @debt The TTL of validation tokens should be set via config. */,
+        sub: newUser.email,
+      },
+    });
+    /**
+     * This is a small aid to help with manual QA :).
+     */
+    if (process.env['NODE_ENV'] === 'development') {
+      this.logger.log(
+        `An account was created for ${newUser.email}. Please validate the account via GET /auth/validate-account/${newUser.id}/${validationToken}.`,
+      );
+    }
     return newUser;
+  }
+
+  /**
+   * Validate a user activation token.
+   *
+   * We avoid possible double-spending of an activation token by deleting the
+   * actual token issuance event after it has been validated.
+   */
+  async validateActivationToken(
+    token: Pick<
+      ApiEventsUserData.ActivationTokenGeneratedV1Alpha1,
+      'validationToken' | 'sub'
+    >,
+  ): Promise<true | never> {
+    const invalidOrExpiredActivationTokenMessage =
+      'Invalid or expired activation token.';
+    const event = await this.apiEventsService.getLatestEventForTopic({
+      topic: token.sub,
+      kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+    });
+    if (!event) {
+      throw new BadRequestException(invalidOrExpiredActivationTokenMessage);
+    }
+    const exp = new Date(event?.data?.exp as number);
+    if (
+      new Date() < exp &&
+      event?.topic === token.sub &&
+      event.data.validationToken === token.validationToken
+    ) {
+      await this.apiEventsService.create({
+        topic: event.topic,
+        kind: API_EVENT_KINDS.user__accountActivationSucceeded__v1alpha1,
+      });
+      await this.usersRepository.update(
+        { id: event.topic },
+        { isActive: true },
+      );
+      await this.apiEventsService.purgeAll({
+        topic: event.topic,
+        kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+      });
+      return true;
+    }
+    await this.apiEventsService.create({
+      topic: event.topic,
+      kind: API_EVENT_KINDS.user__accountActivationFailed__v1alpha1,
+    });
+    throw new BadRequestException(invalidOrExpiredActivationTokenMessage);
   }
 
   /**
    * Issue a signed JTW token, logging its issuance.
    */
-  async login(user: Partial<User>): Promise<AccessToken> {
+  async login(user: User): Promise<AccessToken> {
     /**
      * Before actually issuing the token, we prepare the data we need to log the
      * soon-to-be-issued token: its expiration timestamp (calculated from the
@@ -155,6 +247,8 @@ export class AuthenticationService {
       tokenId: issuedToken.id,
     };
 
+    await this.purgeExpiredIssuedTokens();
+
     return {
       user: UsersService.getSanitizedUserMetadata(user),
       accessToken: this.jwtService.sign(
@@ -173,5 +267,25 @@ export class AuthenticationService {
    */
   async findTokenById(tokenId: string): Promise<IssuedAuthnToken | undefined> {
     return this.issuedAuthnTokensRepository.findOne({ id: tokenId });
+  }
+
+  /**
+   * Invalidate all JWT tokens for a given user.
+   *
+   * We basically delete all the tokens for the given user, which means the
+   * authentication workflow will reject any otherwise valid JWT tokens
+   * presented by an API client, even if their `exp` time is in the future.
+   */
+  async invalidateAllTokensOfUser(userId: string): Promise<void> {
+    await this.issuedAuthnTokensRepository.delete({ userId });
+  }
+
+  /**
+   * Purge all expired JWT tokens
+   */
+  async purgeExpiredIssuedTokens(): Promise<void> {
+    await this.issuedAuthnTokensRepository.delete({
+      exp: LessThan(new Date()),
+    });
   }
 }

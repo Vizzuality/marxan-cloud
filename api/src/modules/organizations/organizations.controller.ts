@@ -7,9 +7,11 @@ import {
   Patch,
   Req,
   UseGuards,
-  ValidationPipe,
 } from '@nestjs/common';
-import { OrganizationResult } from './organization.api.entity';
+import {
+  organizationResource,
+  OrganizationResult,
+} from './organization.api.entity';
 import { OrganizationsService } from './organizations.service';
 
 import {
@@ -27,22 +29,16 @@ import { Post } from '@nestjs/common';
 
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
 import { CreateOrganizationDTO } from './dto/create.organization.dto';
-import { BaseServiceResource } from 'types/resource.interface';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
-import { FetchSpecification, Pagination } from 'nestjs-base-service';
-
-const resource: BaseServiceResource = {
-  className: 'Organization',
-  name: {
-    singular: 'organization',
-    plural: 'organizations',
-  },
-};
+import {
+  FetchSpecification,
+  ProcessFetchSpecification,
+} from 'nestjs-base-service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(resource.className)
+@ApiTags(organizationResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/organizations`)
 export class OrganizationsController {
   constructor(public readonly service: OrganizationsService) {}
@@ -60,12 +56,14 @@ export class OrganizationsController {
     description:
       'The current user does not have suitable permissions for this request.',
   })
-  @JSONAPIQueryParams()
+  @JSONAPIQueryParams({
+    entitiesAllowedAsIncludes: organizationResource.entitiesAllowedAsIncludes,
+  })
   @Get()
   async findAll(
-    @Pagination() pagination: FetchSpecification,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<OrganizationResult> {
-    const results = await this.service.findAllPaginated(pagination);
+    const results = await this.service.findAllPaginated(fetchSpecification);
     return this.service.serialize(results.data, results.metadata);
   }
 
@@ -80,7 +78,7 @@ export class OrganizationsController {
   @ApiCreatedResponse({ type: OrganizationResult })
   @Post()
   async create(
-    @Body(new ValidationPipe()) dto: CreateOrganizationDTO,
+    @Body() dto: CreateOrganizationDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<OrganizationResult> {
     return await this.service.serialize(
@@ -93,7 +91,7 @@ export class OrganizationsController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) dto: UpdateOrganizationDTO,
+    @Body() dto: UpdateOrganizationDTO,
   ): Promise<OrganizationResult> {
     return await this.service.serialize(await this.service.update(id, dto));
   }

@@ -1,5 +1,8 @@
 import React from 'react';
 import cx from 'classnames';
+
+import { AnimatePresence, motion } from 'framer-motion';
+
 import {
   useOverlay,
   usePreventScroll,
@@ -10,17 +13,19 @@ import { useDialog } from '@react-aria/dialog';
 import { FocusScope } from '@react-aria/focus';
 
 import Icon from 'components/icon';
-import CLOSE_SVG from 'svgs/ui/close.svg';
+
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
+
 import { ModalProps } from './types';
 
 const COMMON_CONTENT_CLASSES = 'absolute top-1/2 inset-x-4 sm:left-1/2 max-h-full transform -translate-y-1/2 sm:-translate-x-1/2 outline-none bg-white overflow-auto rounded-3xl py-7 px-8';
 const CONTENT_CLASSES = {
   narrow: `sm:w-4/6 md:w-1/2 lg:w-5/12 xl:w-1/3 ${COMMON_CONTENT_CLASSES}`,
   default: `sm:w-4/5 md:w-2/3 lg:1/2 xl:w-2/5 ${COMMON_CONTENT_CLASSES}`,
-  wide: `sm:w-11/12 md:w-10/12 lg:w-9/12 xl:w-3/5 ${COMMON_CONTENT_CLASSES}`,
+  wide: `sm:w-10/12 md:w-10/12 lg:w-10/12 xl:w-8/12 ${COMMON_CONTENT_CLASSES}`,
 };
 
-const OVERLAY_CLASSES = 'z-10 fixed inset-0 bg-black bg-blur';
+const OVERLAY_CLASSES = 'z-50 fixed inset-0 bg-black bg-blur';
 
 export const Modal: React.FC<ModalProps> = ({
   title,
@@ -44,40 +49,81 @@ export const Modal: React.FC<ModalProps> = ({
   usePreventScroll({ isDisabled: !open });
 
   return (
-    <>
+    <AnimatePresence>
       {open && (
         <OverlayContainer>
-          <div className={cx({ [OVERLAY_CLASSES]: true })}>
+          <motion.div
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+              transition: {
+                delay: 0,
+              },
+            }}
+            exit={{
+              opacity: 0,
+              transition: {
+                delay: 0.125,
+              },
+            }}
+            className={cx({ [OVERLAY_CLASSES]: true })}
+          >
             <FocusScope contain restoreFocus autoFocus>
               <div
                 {...overlayProps}
                 {...dialogProps}
                 {...modalProps}
                 ref={containerRef}
-                className={cx({ [CONTENT_CLASSES[size]]: true, [className]: !!className })}
               >
-                {dismissable && (
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={onDismiss}
-                      className="absolute top-0 right-0 text-sm text-gray-300 focus:text-black hover:text-black"
-                    >
-                      Close
-                      <Icon
-                        icon={CLOSE_SVG}
-                        className="inline-block ml-2 w-4 h-4 text-black"
-                      />
-                    </button>
-                  </div>
-                )}
-                {children}
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    y: '-60%',
+                    x: '-50%',
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: '-50%',
+                    x: '-50%',
+                    transition: {
+                      delay: 0.125,
+                    },
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: '-60%',
+                    x: '-50%',
+                    transition: {
+                      delay: 0,
+                    },
+                  }}
+                  className={cx({ [CONTENT_CLASSES[size]]: true, [className]: !!className })}
+                >
+                  {dismissable && (
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={onDismiss}
+                        className="absolute top-0 right-0 flex items-center text-sm text-gray-300 focus:text-black hover:text-black"
+                      >
+                        <span className="text-xs">Close</span>
+                        <Icon
+                          icon={CLOSE_SVG}
+                          className="inline-block w-3 h-3 ml-2 text-black"
+                        />
+                      </button>
+                    </div>
+                  )}
+                  {children}
+                </motion.div>
               </div>
             </FocusScope>
-          </div>
+          </motion.div>
         </OverlayContainer>
       )}
-    </>
+    </AnimatePresence>
   );
 };
 

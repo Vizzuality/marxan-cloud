@@ -10,7 +10,7 @@ import Title from 'layout/header/title';
 import Icon from 'components/icon';
 import Button from 'components/button';
 
-import { useAuth } from 'hooks/authentication';
+import { useMe } from 'hooks/me';
 
 import LOGO_SVG from 'svgs/logo.svg?sprite';
 
@@ -28,7 +28,7 @@ const SIZE = {
 };
 
 export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
-  const auth = useAuth();
+  const { user } = useMe();
 
   return (
     <header
@@ -51,19 +51,17 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
 
           <Title />
 
-          {auth.user && (
-            <User />
-          )}
+          <User />
 
-          {!auth.user && (
+          {!user && (
             <div className="flex items-center gap-4">
-              <Link href="sign-in">
+              <Link href="/auth/sign-in">
                 <Button theme="secondary-alt" size="s">
                   Sign in
                 </Button>
               </Link>
 
-              <Link href="sign-up">
+              <Link href="/auth/sign-up">
                 <Button theme="primary" size="s">
                   Sign up
                 </Button>

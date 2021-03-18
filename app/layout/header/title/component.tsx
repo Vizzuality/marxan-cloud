@@ -27,7 +27,6 @@ export const Title: React.FC<TitleProps> = () => {
   const saveProjectMutation = useSaveProject({
     requestConfig: {
       method: 'PATCH',
-      url: `/${projectData?.id}`,
     },
   });
 
@@ -42,7 +41,7 @@ export const Title: React.FC<TitleProps> = () => {
       }
     });
 
-    saveProjectMutation.mutate(data, {
+    saveProjectMutation.mutate({ id: projectData.id, data }, {
       onSuccess: ({ data: s }) => {
         addToast('success-project-name', (
           <>
@@ -68,13 +67,12 @@ export const Title: React.FC<TitleProps> = () => {
         console.error('Project name not saved');
       },
     });
-  }, [addToast, saveProjectMutation]);
+  }, [projectData?.id, addToast, saveProjectMutation]);
 
   // Scenario mutation and submit
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
-      url: `/${scenarioData?.id}`,
     },
   });
 
@@ -89,7 +87,7 @@ export const Title: React.FC<TitleProps> = () => {
       }
     });
 
-    saveScenarioMutation.mutate(data, {
+    saveScenarioMutation.mutate({ id: scenarioData.id, data }, {
       onSuccess: ({ data: s }) => {
         addToast('save-scenario-name', (
           <>
@@ -112,7 +110,7 @@ export const Title: React.FC<TitleProps> = () => {
         });
       },
     });
-  }, [addToast, saveScenarioMutation]);
+  }, [scenarioData?.id, addToast, saveScenarioMutation]);
 
   return (
     <AnimatePresence>

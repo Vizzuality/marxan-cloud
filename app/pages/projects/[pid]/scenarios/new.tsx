@@ -13,6 +13,10 @@ import SidebarName from 'layout/scenarios/sidebar/name';
 import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
 
+import { withProtection, withUser } from 'hoc/auth';
+
+export const getServerSideProps = withProtection(withUser());
+
 const NewScenarioPage: React.FC = () => {
   const { query } = useRouter();
   const { pid } = query;
