@@ -38,9 +38,11 @@ const NewProjectsPage: React.FC = () => {
               All projects
             </Breadcrumb>
 
-            <div className="grid h-full grid-cols-1 gap-10 mt-2 bg-gray-700 md:grid-cols-2 rounded-3xl">
-              <ProjectForm />
-              <ProjectMap />
+            <div className="h-full pt-5">
+              <div className="grid h-full grid-cols-1 gap-10 bg-gray-700 md:grid-cols-2 rounded-3xl">
+                <ProjectForm />
+                <ProjectMap />
+              </div>
             </div>
           </Wrapper>
         </div>
