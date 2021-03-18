@@ -1,6 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 
+import Title from 'layout/title/scenario-title';
 import Protected from 'layout/protected';
 import Header from 'layout/header';
 import Wrapper from 'layout/wrapper';
@@ -8,26 +9,16 @@ import Wrapper from 'layout/wrapper';
 import ScenariosSidebar from 'layout/scenarios/sidebar';
 import ScenariosMap from 'layout/scenarios/map';
 
-import { useProject } from 'hooks/projects';
-import { useRouter } from 'next/router';
-
 import { withProtection, withUser } from 'hoc/auth';
 
 export const getServerSideProps = withProtection(withUser());
 
 const NewScenarioPage: React.FC = () => {
-  const { query } = useRouter();
-  const { pid } = query;
-  const { data: projectData } = useProject(pid);
-
   return (
     <Protected>
+      <Title title="New" />
+
       <Head>
-        <title>
-          {projectData?.name}
-          {' '}
-          - New Scenario
-        </title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
