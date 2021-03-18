@@ -11,11 +11,13 @@ import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { ApiEventsModule } from 'modules/api-events/api-events.module';
 
 export const logger = new Logger('Authentication');
 
 @Module({
   imports: [
+    ApiEventsModule,
     forwardRef(() => UsersModule),
     PassportModule,
     JwtModule.register({
