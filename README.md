@@ -74,9 +74,6 @@ The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted
 via a Docker volume.
 
-4. Create a Docker network for the local instance of the Marxan platform:
-   `docker network create marxan-cloud-network`.
-
 ### Running the Marxan Cloud platform
 
 Run `make start` to start all the services.
