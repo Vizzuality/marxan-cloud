@@ -14,6 +14,11 @@ Unreleased
 
 - New module: ApiEventsModule [MARXAN-124].
 - Support for validation of new accounts, based on API events [MARXAN-214].
+- New module: ProtectedAreasModule [MARXAN-210]
+  - list IUCN categories of protected areas in a given admin area [MARXAN-149]
+  - list IUCN categories of protected areas in a given geometry [MARXAN-179]
+  - list protected areas in a given admin area [MARXAN-180]
+  - list protected areas in a given geometry [MARXAN-175]
 
 ### Changed
 
