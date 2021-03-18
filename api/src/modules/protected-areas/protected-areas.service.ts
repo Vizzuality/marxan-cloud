@@ -140,4 +140,37 @@ export class ProtectedAreasService extends AppBaseService<
       );
     return results;
   }
+
+  /**
+   * List IUCN categories of protected areas, serializing to a JSON:API response
+   * payload.
+   */
+  async findAllProtectedAreaCategories(
+    fetchSpecification: FetchSpecification,
+    info?: AppInfoDTO,
+    filters?: Record<string, unknown>,
+  ): Promise<IUCNProtectedAreaCategoryResult[]> {
+    const results = await this.findAllPaginatedRaw(
+      { ...fetchSpecification },
+      undefined,
+      {
+        ...filters,
+        onlyCategories: true,
+      },
+    ).then((results) =>
+      results.data.map((i: IUCNProtectedAreaCategoryDTO) => ({
+        iucnCategory: i?.iucnCategory,
+      })),
+    );
+
+    const serializer = new JSONAPISerializer.Serializer(
+      'iucn_protected_area_categories',
+      {
+        attributes: ['iucnCategory'],
+        keyForAttribute: 'camelCase',
+      },
+    );
+
+    return serializer.serialize(results);
+  }
 }
