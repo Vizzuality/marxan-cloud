@@ -129,8 +129,8 @@ describe('UsersModule (e2e)', () => {
       expect(newUser).toBeDefined();
 
       if (!newUser) {
-        throw new Error('Cannot retrieve data for newly created user.')
-      };
+        throw new Error('Cannot retrieve data for newly created user.');
+      }
 
       validationTokenEvent = await apiEventsService.getLatestEventForTopic({
         topic: newUser.id,
@@ -146,8 +146,8 @@ describe('UsersModule (e2e)', () => {
 
     test('A user account validation token should not be allowed to be spent more than once', async () => {
       if (!newUser) {
-        throw new Error('Cannot retrieve data for newly created user.')
-      };
+        throw new Error('Cannot retrieve data for newly created user.');
+      }
 
       const response = await request(app.getHttpServer())
         .get(

@@ -15,8 +15,9 @@ import * as JSONAPISerializer from 'jsonapi-serializer';
 describe('Protected areas', () => {
   let app: INestApplication;
   let jwtToken: string;
-  const Deserializer = new JSONAPISerializer
-    .Deserializer({ keyForAttribute: 'camelCase' });
+  const Deserializer = new JSONAPISerializer.Deserializer({
+    keyForAttribute: 'camelCase',
+  });
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -97,11 +98,18 @@ describe('Protected areas', () => {
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(200);
 
-        const iucnCategoriesOfProtectedAreasInCountry: IUCNCategory[] = await Deserializer.deserialize(response.body)
-        .then((categories: IUCNProtectedAreaCategoryDTO[]) => categories.map(i => i.iucnCategory));
+        const iucnCategoriesOfProtectedAreasInCountry: IUCNCategory[] = await Deserializer.deserialize(
+          response.body,
+        ).then((categories: IUCNProtectedAreaCategoryDTO[]) =>
+          categories.map((i) => i.iucnCategory),
+        );
 
-        expect(iucnCategoriesOfProtectedAreasInCountry.length).toBeGreaterThan(0);
-        iucnCategoriesOfProtectedAreasInCountry.forEach(i => { expect(E2E_CONFIG.protectedAreas.categories.valid).toContain(i); });
+        expect(iucnCategoriesOfProtectedAreasInCountry.length).toBeGreaterThan(
+          0,
+        );
+        iucnCategoriesOfProtectedAreasInCountry.forEach((i) => {
+          expect(E2E_CONFIG.protectedAreas.categories.valid).toContain(i);
+        });
       });
 
       test.skip('As a user, I should be able to see a list of project-specific protected areas within a given country', async () => {
@@ -122,12 +130,19 @@ describe('Protected areas', () => {
           )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(200);
-        
-        const iucnCategoriesOfProtectedAreasInAdminArea: IUCNCategory[] = await Deserializer.deserialize(response.body)
-        .then((categories: IUCNProtectedAreaCategoryDTO[]) => categories.map(i => i.iucnCategory));
 
-        expect(iucnCategoriesOfProtectedAreasInAdminArea.length).toBeGreaterThan(0);
-        iucnCategoriesOfProtectedAreasInAdminArea.forEach(i => { expect(E2E_CONFIG.protectedAreas.categories.valid).toContain(i); });
+        const iucnCategoriesOfProtectedAreasInAdminArea: IUCNCategory[] = await Deserializer.deserialize(
+          response.body,
+        ).then((categories: IUCNProtectedAreaCategoryDTO[]) =>
+          categories.map((i) => i.iucnCategory),
+        );
+
+        expect(
+          iucnCategoriesOfProtectedAreasInAdminArea.length,
+        ).toBeGreaterThan(0);
+        iucnCategoriesOfProtectedAreasInAdminArea.forEach((i) => {
+          expect(E2E_CONFIG.protectedAreas.categories.valid).toContain(i);
+        });
       });
 
       test.skip('As a user, I should be able to see a list of project-specific protected areas within a given level 1 admin area', async () => {
@@ -148,12 +163,19 @@ describe('Protected areas', () => {
           )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(200);
-        
-          const iucnCategoriesOfProtectedAreasInAdminArea: IUCNCategory[] = await Deserializer.deserialize(response.body)
-          .then((categories: IUCNProtectedAreaCategoryDTO[]) => categories.map(i => i.iucnCategory));
-  
-          expect(iucnCategoriesOfProtectedAreasInAdminArea.length).toBeGreaterThan(0);
-          iucnCategoriesOfProtectedAreasInAdminArea.forEach(i => { expect(E2E_CONFIG.protectedAreas.categories.valid).toContain(i); });
+
+        const iucnCategoriesOfProtectedAreasInAdminArea: IUCNCategory[] = await Deserializer.deserialize(
+          response.body,
+        ).then((categories: IUCNProtectedAreaCategoryDTO[]) =>
+          categories.map((i) => i.iucnCategory),
+        );
+
+        expect(
+          iucnCategoriesOfProtectedAreasInAdminArea.length,
+        ).toBeGreaterThan(0);
+        iucnCategoriesOfProtectedAreasInAdminArea.forEach((i) => {
+          expect(E2E_CONFIG.protectedAreas.categories.valid).toContain(i);
+        });
       });
 
       test.skip('As a user, I should be able to see a list of project-specific protected areas within a given level 2 admin area', async () => {
