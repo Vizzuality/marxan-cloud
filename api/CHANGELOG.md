@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.2]
+## [0.2.0]
 
 Unreleased
 
@@ -19,20 +19,6 @@ Unreleased
   - list IUCN categories of protected areas in a given geometry [MARXAN-179]
   - list protected areas in a given admin area [MARXAN-180]
   - list protected areas in a given geometry [MARXAN-175]
-
-### Changed
-
-### Fixed
-
-### Deprecated
-
-### Removed
-
-
-## [0.0.2]
-
-### Added
-
 - Ability to configure which entities can be requested as included relationships
   in JSON:API responses via `?include=` query param.
 - Configure allowed included entities for some of the key entities.
@@ -40,6 +26,7 @@ Unreleased
 ### Changed
 
 - Include `createdAt` and `lastModifiedAt` in responses for some key entities.
+- Allow deleting projects that contain scenarios (cascade deletion in SQL) [MARXAN-218]
 
 ### Fixed
 
