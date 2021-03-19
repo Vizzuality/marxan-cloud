@@ -7,7 +7,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateProtectedAreaDTO } from './dto/create.protected-area.dto';
 import { UpdateProtectedAreaDTO } from './dto/update.protected-area.dto';
 import { ProtectedArea } from './protected-area.geo.entity';
-import JSONAPISerializer = require('jsonapi-serializer');
+import * as JSONAPISerializer from 'jsonapi-serializer';
 
 import {
   AppBaseService,
