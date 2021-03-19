@@ -170,7 +170,7 @@ export class UsersService extends AppBaseService<
       (await compare(currentAndNewPasswords.currentPassword, user.passwordHash))
     ) {
       user.passwordHash = await hash(currentAndNewPasswords.newPassword, 10);
-      this.repository.save(user);
+      await this.repository.save(user);
       return;
     }
     throw new ForbiddenException(
