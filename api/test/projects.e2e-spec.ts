@@ -6,12 +6,23 @@ import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
 import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
 import { Scenario } from 'modules/scenarios/scenario.api.entity';
-import { pick } from 'lodash';
+import * as JSONAPISerializer from 'jsonapi-serializer';
+import {
+  Project,
+  ProjectResultPlural,
+  ProjectResultSingular,
+} from 'modules/projects/project.api.entity';
+import {
+  Organization,
+  OrganizationResultSingular,
+} from 'modules/organizations/organization.api.entity';
 
 describe('ProjectsModule (e2e)', () => {
   let app: INestApplication;
-
   let jwtToken: string;
+  const Deserializer = new JSONAPISerializer.Deserializer({
+    keyForAttribute: 'camelCase',
+  });
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -44,28 +55,24 @@ describe('ProjectsModule (e2e)', () => {
   });
 
   describe('Projects', () => {
-    let anOrganization: { id: string; type: 'organizations' };
-    let minimalProject: { id: string; type: 'projects' };
-    let completeProject: { id: string; type: 'projects' };
-    let aScenarioInACompleteProject: {
-      id: string;
-      type: 'scenarios';
-      data: Scenario;
-    };
+    let anOrganization: Organization;
+    let minimalProject: Project;
+    let completeProject: Project;
+    let aScenarioInACompleteProject: Scenario;
 
-    it('Creates an organization', async () => {
+    test('Creates an organization', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/organizations')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send(E2E_CONFIG.organizations.valid.minimal())
         .expect(201);
 
-      anOrganization = response.body.data;
-
-      expect(anOrganization.type).toBe('organizations');
+      const jsonAPIResponse: OrganizationResultSingular = response.body;
+      anOrganization = await Deserializer.deserialize(response.body);
+      expect(jsonAPIResponse.data.type).toBe('organizations');
     });
 
-    it('Creating a project with incomplete data should fail', async () => {
+    test('Creating a project with incomplete data should fail', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
@@ -73,7 +80,7 @@ describe('ProjectsModule (e2e)', () => {
         .expect(400);
     });
 
-    it('Creating a project with minimum required data should succeed', async () => {
+    test('Creating a project with minimum required data should succeed', async () => {
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.minimal(),
         organizationId: anOrganization.id,
@@ -85,12 +92,12 @@ describe('ProjectsModule (e2e)', () => {
         .send(createProjectDTO)
         .expect(201);
 
-      const resources = response.body.data;
-      minimalProject = resources;
-      expect(resources.type).toBe('projects');
+      const jsonAPIResponse: ProjectResultSingular = response.body;
+      minimalProject = await Deserializer.deserialize(response.body);
+      expect(jsonAPIResponse.data.type).toBe('projects');
     });
 
-    it('Creating a project with complete data should succeed', async () => {
+    test('Creating a project with complete data should succeed', async () => {
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.complete({ countryCode: 'ESP' }),
         organizationId: anOrganization.id,
@@ -102,9 +109,9 @@ describe('ProjectsModule (e2e)', () => {
         .send(createProjectDTO)
         .expect(201);
 
-      const resources = response.body.data;
-      completeProject = resources;
-      expect(resources.type).toBe('projects');
+      const jsonAPIResponse: ProjectResultSingular = response.body;
+      completeProject = await Deserializer.deserialize(response.body);
+      expect(jsonAPIResponse.data.type).toBe('projects');
 
       const createScenarioDTO: Partial<CreateScenarioDTO> = {
         ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -117,57 +124,63 @@ describe('ProjectsModule (e2e)', () => {
         .send(createScenarioDTO)
         .expect(201);
 
-      aScenarioInACompleteProject = scenarioResponse.body.data;
+      aScenarioInACompleteProject = await Deserializer.deserialize(
+        scenarioResponse.body,
+      );
     });
 
-    it('A user should be able to get a list of projects', async () => {
+    test('A user should be able to get a list of projects', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
 
-      const resources = response.body.data;
+      const jsonAPIResponse: ProjectResultPlural = response.body;
 
-      expect(resources[0].type).toBe('projects');
+      expect(jsonAPIResponse.data[0].type).toBe('projects');
     });
 
-    it('A user should be able to get a list of projects and related scenarios', async () => {
+    test('A user should be able to get a list of projects and related scenarios', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects?disablePagination=true&include=scenarios')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
 
-      const resources = response.body.data;
-
-      expect(resources[0].type).toBe('projects');
-
-      const aKnownProject = resources.find(
-        (i: { id: string }) => (i.id = completeProject.id),
+      const jsonAPIResponse: ProjectResultPlural = response.body;
+      const allProjects: Project[] = await Deserializer.deserialize(
+        response.body,
       );
-      expect(aKnownProject.relationships).toBeDefined();
-      expect(aKnownProject.relationships.scenarios).toBeDefined();
-      expect(aKnownProject.relationships.scenarios.data).toContainEqual(
-        pick(aScenarioInACompleteProject, ['id', 'type']),
+
+      expect(jsonAPIResponse.data[0].type).toBe('projects');
+
+      const aKnownProject: Project | undefined = allProjects.find(
+        (i) => (i.id = completeProject.id),
       );
+      expect(aKnownProject?.scenarios).toBeDefined();
+      expect(
+        aKnownProject?.scenarios.find(
+          (i) => i.id === aScenarioInACompleteProject.id,
+        ),
+      ).toBeDefined();
     });
 
-    it('A user should be get a list of projects without any included relationships if these have not been requested', async () => {
+    test('A user should be get a list of projects without any included relationships if these have not been requested', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
 
-      const resources = response.body.data;
+      const jsonAPIResponse: ProjectResultPlural = response.body;
 
-      expect(resources[0].type).toBe('projects');
+      expect(jsonAPIResponse.data[0].type).toBe('projects');
 
-      const projectsWhichIncludeRelationships = resources.filter(
-        (i: Record<string, unknown>) => i.relationships,
+      const projectsWhichIncludeRelationships = jsonAPIResponse.data.filter(
+        (i) => i.relationships,
       );
       expect(projectsWhichIncludeRelationships).toHaveLength(0);
     });
 
-    it('Deleting existing projects should succeed', async () => {
+    test('Deleting existing projects should succeed', async () => {
       const response1 = await request(app.getHttpServer())
         .delete(`/api/v1/projects/${minimalProject.id}`)
         .set('Authorization', `Bearer ${jwtToken}`)
