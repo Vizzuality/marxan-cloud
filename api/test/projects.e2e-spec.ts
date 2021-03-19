@@ -4,6 +4,9 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
+import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
+import { Scenario } from 'modules/scenarios/scenario.api.entity';
+import { pick } from 'lodash';
 
 describe('ProjectsModule (e2e)', () => {
   let app: INestApplication;
@@ -44,6 +47,11 @@ describe('ProjectsModule (e2e)', () => {
     let anOrganization: { id: string; type: 'organizations' };
     let minimalProject: { id: string; type: 'projects' };
     let completeProject: { id: string; type: 'projects' };
+    let aScenarioInACompleteProject: {
+      id: string;
+      type: 'scenarios';
+      data: Scenario;
+    };
 
     it('Creates an organization', async () => {
       const response = await request(app.getHttpServer())
@@ -97,9 +105,22 @@ describe('ProjectsModule (e2e)', () => {
       const resources = response.body.data;
       completeProject = resources;
       expect(resources.type).toBe('projects');
+
+      const createScenarioDTO: Partial<CreateScenarioDTO> = {
+        ...E2E_CONFIG.scenarios.valid.minimal(),
+        projectId: completeProject.id,
+      };
+
+      const scenarioResponse = await request(app.getHttpServer())
+        .post('/api/v1/scenarios')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(createScenarioDTO)
+        .expect(201);
+
+      aScenarioInACompleteProject = scenarioResponse.body.data;
     });
 
-    it('Gets projects', async () => {
+    it('A user should be able to get a list of projects', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
@@ -108,6 +129,42 @@ describe('ProjectsModule (e2e)', () => {
       const resources = response.body.data;
 
       expect(resources[0].type).toBe('projects');
+    });
+
+    it('A user should be able to get a list of projects and related scenarios', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/v1/projects?disablePagination=true&include=scenarios')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources = response.body.data;
+
+      expect(resources[0].type).toBe('projects');
+
+      const aKnownProject = resources.find(
+        (i: { id: string }) => (i.id = completeProject.id),
+      );
+      expect(aKnownProject.relationships).toBeDefined();
+      expect(aKnownProject.relationships.scenarios).toBeDefined();
+      expect(aKnownProject.relationships.scenarios.data).toContainEqual(
+        pick(aScenarioInACompleteProject, ['id', 'type']),
+      );
+    });
+
+    it('A user should be get a list of projects without any included relationships if these have not been requested', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/v1/projects')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources = response.body.data;
+
+      expect(resources[0].type).toBe('projects');
+
+      const projectsWhichIncludeRelationships = resources.filter(
+        (i: Record<string, unknown>) => i.relationships,
+      );
+      expect(projectsWhichIncludeRelationships).toHaveLength(0);
     });
 
     it('Deleting existing projects should succeed', async () => {
