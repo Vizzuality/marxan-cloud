@@ -9,7 +9,7 @@ import {
 import * as config from 'config';
 import { omit } from 'lodash';
 
-const JSONAPIError = require('jsonapi-serializer').Error;
+import * as JSONAPISerializer from 'jsonapi-serializer';
 
 /**
  * Catch-all exception filter. Output error data to logs, and send it as
@@ -56,7 +56,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
      * these should help frontend devs and other API users report bugs or other
      * issues without having to look at logs.
      */
-    const errorDataForResponse = new JSONAPIError(
+    const errorDataForResponse = new JSONAPISerializer.Error(
       config.util.getEnv('NODE_ENV') !== 'development'
         ? omit(errorData, ['meta.rawError', 'meta.stack'])
         : errorData,

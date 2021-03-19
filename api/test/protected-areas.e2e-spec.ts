@@ -6,7 +6,7 @@ import { E2E_CONFIG } from './e2e.config';
 import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
 import { IUCNProtectedAreaCategoryDTO } from 'modules/protected-areas/dto/iucn-protected-area-category.dto';
 import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
-const JSONAPISerializer = require('jsonapi-serializer');
+import * as JSONAPISerializer from 'jsonapi-serializer';
 
 /**
  * Tests for API contracts to be included in the upcoming sprint (s01e02), aka
