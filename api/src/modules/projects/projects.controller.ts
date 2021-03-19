@@ -9,7 +9,11 @@ import {
   UploadedFile,
   UseGuards,
 } from '@nestjs/common';
-import { Project, ProjectResult } from './project.api.entity';
+import {
+  Project,
+  ProjectResultSingular,
+  ProjectResultPlural,
+} from './project.api.entity';
 import { ProjectsService } from './projects.service';
 
 import {
@@ -62,44 +66,44 @@ export class ProjectsController {
   @ApiOperation({
     description: 'Find all projects',
   })
-  @ApiOkResponse({ type: ProjectResult })
+  @ApiOkResponse({ type: ProjectResultPlural })
   @JSONAPIQueryParams({
     entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
   })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-  ): Promise<ProjectResult> {
+  ): Promise<ProjectResultPlural> {
     const results = await this.service.findAllPaginated(fetchSpecification);
     return await this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find project by id' })
-  @ApiOkResponse({ type: ProjectResult })
+  @ApiOkResponse({ type: ProjectResultSingular })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ProjectResult> {
+  async findOne(@Param('id') id: string): Promise<ProjectResultSingular> {
     return await this.service.serialize(await this.service.getById(id));
   }
 
   @ApiOperation({ description: 'Create project' })
-  @ApiOkResponse({ type: ProjectResult })
+  @ApiOkResponse({ type: ProjectResultSingular })
   @Post()
   async create(
     @Body() dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<ProjectResult> {
+  ): Promise<ProjectResultSingular> {
     return await this.service.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
     );
   }
 
   @ApiOperation({ description: 'Update project' })
-  @ApiOkResponse({ type: ProjectResult })
+  @ApiOkResponse({ type: ProjectResultSingular })
   @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateProjectDTO,
-  ): Promise<ProjectResult> {
+  ): Promise<ProjectResultSingular> {
     return await this.service.serialize(await this.service.update(id, dto));
   }
 
