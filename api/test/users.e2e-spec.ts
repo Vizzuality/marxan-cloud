@@ -22,14 +22,38 @@ import { ApiEventsModule } from 'modules/api-events/api-events.module';
 import { ApiEventsService } from 'modules/api-events/api-events.service';
 import { UsersModule } from 'modules/users/users.module';
 import { UsersService } from 'modules/users/users.service';
+import { LoginDto } from 'modules/authentication/dto/login.dto';
+
+/**
+ * Tests for the UsersModule.
+ *
+ * Given that we create user accounts, update user data, reset passwords, delete
+ * accounts and recreate them, the tests in this file rely on a different setup
+ * than what we use in most other e2e test files.
+ *
+ * Authentication is split off app setup, and is executed in `beforeAll()`
+ * callbacks in individual `describe()` blocks.
+ *
+ * Please be mindful of this when adding new tests or updating existing ones.
+ */
 
 describe('UsersModule (e2e)', () => {
   let app: INestApplication;
-  let jwtToken: string;
   let apiEventsService: ApiEventsService;
   let usersService: UsersService;
 
   const aNewPassword = faker.random.uuid();
+
+  const signUpDto: SignUpDto = {
+    email: `${v4()}@example.com`,
+    password: v4(),
+    displayName: `${faker.name.firstName()} ${faker.name.lastName()}`,
+  };
+
+  const loginDto: LoginDto = {
+    username: signUpDto.email,
+    password: signUpDto.password,
+  };
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -57,19 +81,6 @@ describe('UsersModule (e2e)', () => {
       }),
     );
     await app.init();
-
-    const response = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({
-        // In most tests we use seed user `aa@example.com` but here we use
-        // bb@example.com to avoid messing with the main user we use in e2e
-        // tests.
-        username: E2E_CONFIG.users.basic.bb.username,
-        password: E2E_CONFIG.users.basic.bb.password,
-      })
-      .expect(HttpStatus.CREATED);
-
-    jwtToken = response.body.accessToken;
   });
 
   afterAll(async () => {
@@ -77,12 +88,6 @@ describe('UsersModule (e2e)', () => {
   });
 
   describe('Users - sign up and validation', () => {
-    const signUpDto: SignUpDto = {
-      email: `${v4()}@example.com`,
-      password: v4(),
-      displayName: `${faker.name.firstName()} ${faker.name.lastName()}`,
-    };
-
     let newUser: User | undefined;
     let validationTokenEvent: Omit<ApiEvent, 'id'> | undefined;
 
@@ -111,10 +116,7 @@ describe('UsersModule (e2e)', () => {
     test.skip('A user should not be able to log in until their account has been validated', async () => {
       await request(app.getHttpServer())
         .post('/auth/sign-in')
-        .send({
-          username: signUpDto.email,
-          password: signUpDto.password,
-        })
+        .send(loginDto)
         .expect(HttpStatus.UNAUTHORIZED);
     });
 
@@ -159,16 +161,23 @@ describe('UsersModule (e2e)', () => {
     test('A user should be able to log in once their account has been validated', async () => {
       await request(app.getHttpServer())
         .post('/auth/sign-in')
-        .send({
-          username: signUpDto.email,
-          password: signUpDto.password,
-        })
+        .send(loginDto)
         .expect(HttpStatus.CREATED);
     });
   });
 
   describe('Users - metadata', () => {
-    it('A user should be able to read their own metadata', async () => {
+    let jwtToken: string;
+
+    beforeAll(async () => {
+      jwtToken = await request(app.getHttpServer())
+        .post('/auth/sign-in')
+        .send(loginDto)
+        .expect(HttpStatus.CREATED)
+        .then((response) => response.body.accessToken);
+    });
+
+    test('A user should be able to read their own metadata', async () => {
       const results = await request(app.getHttpServer())
         .get('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
@@ -177,7 +186,7 @@ describe('UsersModule (e2e)', () => {
       expect(results);
     });
 
-    it('A user should be able to update their own metadata', async () => {
+    test('A user should be able to update their own metadata', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
@@ -187,7 +196,17 @@ describe('UsersModule (e2e)', () => {
   });
 
   describe('Users - password updates which should fail', () => {
-    it('A user should not be able to change their password as part of the user update lifecycle', async () => {
+    let jwtToken: string;
+
+    beforeAll(async () => {
+      jwtToken = await request(app.getHttpServer())
+        .post('/auth/sign-in')
+        .send(loginDto)
+        .expect(HttpStatus.CREATED)
+        .then((response) => response.body.accessToken);
+    });
+
+    test('A user should not be able to change their password as part of the user update lifecycle', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/users/me/')
         .set('Authorization', `Bearer ${jwtToken}`)
@@ -198,7 +217,7 @@ describe('UsersModule (e2e)', () => {
         .expect(HttpStatus.FORBIDDEN);
     });
 
-    it('A user should not be able to change their password if they provide an incorrect current password', async () => {
+    test('A user should not be able to change their password if they provide an incorrect current password', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/users/me/password')
         .set('Authorization', `Bearer ${jwtToken}`)
@@ -210,57 +229,116 @@ describe('UsersModule (e2e)', () => {
     });
   });
 
-  describe('Users - password updates which should succeed (1/2)', () => {
-    it('A user should be able to change their password if they provide the correct current password', async () => {
+  describe.skip('Users - password updates which should succeed', () => {
+    let jwtToken: string;
+
+    beforeAll(async () => {
+      jwtToken = await request(app.getHttpServer())
+        .post('/auth/sign-in')
+        .send(loginDto)
+        .expect(HttpStatus.CREATED)
+        .then((response) => response.body.accessToken);
+    });
+
+    test('A user should be able to change their password if they provide the correct current password', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/users/me/password')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send({
-          currentPassword: E2E_CONFIG.users.basic.bb.password,
+          currentPassword: loginDto.password,
           newPassword: aNewPassword,
         })
         .expect(HttpStatus.OK);
     });
-  });
 
-  describe('Users - password updates which should succeed (2/2)', () => {
-    it('A user should be able to change their password if they provide the correct current password (take 2, back to initial password)', async () => {
+    test('A user should be able to change their password if they provide the correct current password (take 2, back to initial password)', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/users/me/password')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send({
           currentPassword: aNewPassword,
-          newPassword: E2E_CONFIG.users.basic.bb.password,
+          newPassword: loginDto.password,
         })
         .expect(HttpStatus.OK);
     });
   });
 
   describe('Users - account deletion', () => {
-    it('A user should be able to delete their own account', async () => {
+    let jwtToken: string;
+
+    beforeAll(async () => {
+      jwtToken = await request(app.getHttpServer())
+        .post('/auth/sign-in')
+        .send(loginDto)
+        .expect(HttpStatus.CREATED)
+        .then((response) => response.body.accessToken);
+      Logger.debug(`jwtToken: ${jwtToken}`);
+    });
+
+    test('A user should be able to delete their own account', async () => {
       await request(app.getHttpServer())
         .delete('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(HttpStatus.OK);
     });
-  });
 
-  describe('Users - locked out after account deletion', () => {
-    it('Once a user account is marked as deleted, the user should be logged out', async () => {
+    test('Once a user account is marked as deleted, the user should be logged out', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(HttpStatus.UNAUTHORIZED);
     });
 
-    it('Once a user account is marked as deleted, the user should not be able to log back in', async () => {
+    test('Once a user account is marked as deleted, the user should not be able to log back in', async () => {
       await request(app.getHttpServer())
         .post('/auth/sign-in')
-        .send({
-          username: E2E_CONFIG.users.basic.bb.username,
-          password: E2E_CONFIG.users.basic.bb.password,
-        })
+        .send(loginDto)
         .expect(HttpStatus.UNAUTHORIZED);
+    });
+  });
+
+  describe('Users - Sign up again', () => {
+    let newUser: User | undefined;
+    let validationTokenEvent: Omit<ApiEvent, 'id'> | undefined;
+
+    test('A user should be able to sign up using the same email address as that of an account that has been deleted', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send(signUpDto)
+        .expect(HttpStatus.CREATED);
+    });
+
+    test('A user should be able to validate their account (within the validity timeframe of the validationToken)', async () => {
+      /**
+       * Here we need to dig into the actual database to retrieve both the id
+       * assigned to the user when their account is created, and the one-time
+       * token that they would normally receive via email as part of the account
+       * validation/email confirmation workflow.
+       */
+      newUser = await usersService.findByEmail(signUpDto.email);
+      expect(newUser).toBeDefined();
+
+      if (!newUser) {
+        throw new Error('Cannot retrieve data for newly created user.');
+      }
+
+      validationTokenEvent = await apiEventsService.getLatestEventForTopic({
+        topic: newUser.id,
+        kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+      });
+
+      await request(app.getHttpServer())
+        .get(
+          `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
+        )
+        .expect(HttpStatus.OK);
+    });
+
+    test('A user should be able to log in once their account has been validated', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/sign-in')
+        .send(loginDto)
+        .expect(HttpStatus.CREATED);
     });
   });
 });
