@@ -26,7 +26,11 @@ Unreleased
 ### Changed
 
 - Include `createdAt` and `lastModifiedAt` in responses for some key entities.
-- Allow deleting projects that contain scenarios (cascade deletion in SQL) [MARXAN-218]
+- Allow deleting projects that contain scenarios (cascade deletion in SQL)
+  [MARXAN-218].
+- When soft-deleting a user, their account's email address is set to a random
+  value so that they can sign up again using the same email address in the
+  future, if so they wish [MARXAN-184].
 
 ### Fixed
 
