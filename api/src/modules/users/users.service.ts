@@ -22,6 +22,7 @@ import {
 import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { compare, hash } from 'bcrypt';
 import { AuthenticationService } from 'modules/authentication/authentication.service';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class UsersService extends AppBaseService<
@@ -131,6 +132,10 @@ export class UsersService extends AppBaseService<
    * the objects (scenarios, etc) to which they are linked, which may not be the
    * desired default behaviour.
    *
+   * When we soft-delete a user, we also set their account's email address to
+   * a random one `@example.com`, so that a new account can be created later
+   * on with the same email address.
+   *
    * @debt We will need to implement hard-deletion later on, so that instance
    * administrators can enforce compliance with relevant data protection
    * regulations.
@@ -138,7 +143,11 @@ export class UsersService extends AppBaseService<
   async markAsDeleted(userId: string): Promise<void> {
     await this.repository.update(
       { id: userId },
-      { isDeleted: true, isActive: false },
+      {
+        isDeleted: true,
+        isActive: false,
+        email: `deleted-account.${v4()}@example.com`,
+      },
     );
     this.authenticationService.invalidateAllTokensOfUser(userId);
   }
