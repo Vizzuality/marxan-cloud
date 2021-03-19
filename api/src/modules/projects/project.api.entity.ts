@@ -137,9 +137,17 @@ export class JSONAPIProjectData {
 
   @ApiProperty()
   attributes: Project;
+
+  @ApiPropertyOptional()
+  relationships: Record<string, unknown>;
 }
 
-export class ProjectResult {
+export class ProjectResultPlural {
+  @ApiProperty()
+  data: JSONAPIProjectData[];
+}
+
+export class ProjectResultSingular {
   @ApiProperty()
   data: JSONAPIProjectData;
 }
