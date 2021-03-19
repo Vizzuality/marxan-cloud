@@ -203,10 +203,5 @@ describe('ProjectsModule (e2e)', () => {
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
     });
-
-    /**
-     * @debt We should test that deleting a project which contains
-     * scenarios must fail.
-     */
   });
 });
