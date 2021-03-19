@@ -45,9 +45,17 @@ export class JSONAPIOrganizationData {
 
   @ApiProperty()
   attributes: Organization;
+
+  @ApiPropertyOptional()
+  relationships: Record<string, unknown>;
 }
 
-export class OrganizationResult {
+export class OrganizationResultSingular {
   @ApiProperty()
   data: JSONAPIOrganizationData;
+}
+
+export class OrganizationResultPlural {
+  @ApiProperty()
+  data: JSONAPIOrganizationData[];
 }
