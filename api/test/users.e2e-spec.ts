@@ -229,7 +229,7 @@ describe('UsersModule (e2e)', () => {
     });
   });
 
-  describe.skip('Users - password updates which should succeed', () => {
+  describe('Users - password updates which should succeed', () => {
     let jwtToken: string;
 
     beforeAll(async () => {
