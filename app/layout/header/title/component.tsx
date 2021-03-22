@@ -33,8 +33,8 @@ export const Title: React.FC<TitleProps> = () => {
   const handleProjectSubmit = useCallback((data, form) => {
     // Blur children
     const $form = document.getElementById('form-title-project');
-    form.getRegisteredFields().forEach((name) => {
-      const element = $form.querySelector(`[name="${name}"]`);
+    form.getRegisteredFields().forEach((n) => {
+      const element = $form.querySelector(`[name="${n}"]`);
 
       if (element instanceof HTMLElement) {
         element.blur();
@@ -126,6 +126,12 @@ export const Title: React.FC<TitleProps> = () => {
           {projectData?.name && (
             <FormRFF
               onSubmit={handleProjectSubmit}
+              mutators={{
+                setTrimName: (args, state, utils) => {
+                  const [name] = args;
+                  utils.changeValue(state, 'name', () => name.trim());
+                },
+              }}
               initialValues={{
                 name: projectData?.name || '',
               }}
@@ -135,6 +141,10 @@ export const Title: React.FC<TitleProps> = () => {
                   <FieldRFF
                     name="name"
                     validate={composeValidators([{ presence: true }])}
+                    beforeSubmit={() => {
+                      const { values } = fprops;
+                      fprops.form.mutators.setTrimName(values.name);
+                    }}
                   >
                     {({ input, meta }) => (
                       <Tooltip
@@ -175,12 +185,22 @@ export const Title: React.FC<TitleProps> = () => {
               initialValues={{
                 name: scenarioData?.name || '',
               }}
+              mutators={{
+                setTrimName: (args, state, utils) => {
+                  const [name] = args;
+                  utils.changeValue(state, 'name', () => name.trim());
+                },
+              }}
             >
               {(fprops) => (
                 <form id="form-title-scenario" onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
                   <FieldRFF
                     name="name"
                     validate={composeValidators([{ presence: true }])}
+                    beforeSubmit={() => {
+                      const { values } = fprops;
+                      fprops.form.mutators.setTrimName(values.name);
+                    }}
                   >
                     {({ input, meta }) => (
                       <Tooltip

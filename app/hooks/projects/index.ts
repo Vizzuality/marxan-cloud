@@ -88,7 +88,7 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
 export function useProject(id) {
   const [session] = useSession();
 
-  const query = useQuery(`projects/${id}`, async () => PROJECTS.request({
+  const query = useQuery(['projects', id], async () => PROJECTS.request({
     method: 'GET',
     url: `/${id}`,
     headers: {
@@ -131,8 +131,10 @@ export function useSaveProject({
   };
 
   return useMutation(saveProject, {
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data: any, variables, context) => {
+      const { id } = data;
       queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['projects', id]);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
