@@ -40,25 +40,21 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
   return useMemo(() => {
     let parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
       const {
-        id, name, description, scenarios,
+        id, name, description, scenarios, lastModifiedAt,
       } = d;
 
-      const lastScenarioCreation = scenarios.reduce((acc, s) => {
-        const { createdAt } = s;
+      const lastUpdate = scenarios.reduce((acc, s) => {
+        const { lastModifiedAt: slastModifiedAt } = s;
 
-        return (createdAt > acc) ? createdAt : acc;
-      }, '');
+        return (slastModifiedAt > acc) ? slastModifiedAt : acc;
+      }, lastModifiedAt);
 
-      const lastScenarioCreationDistance = () => {
-        if (lastScenarioCreation) {
-          return formatDistance(
-            new Date(lastScenarioCreation || null),
-            new Date(),
-            { addSuffix: true },
-          );
-        }
-
-        return null;
+      const lastUpdateDistance = () => {
+        return formatDistance(
+          new Date(lastUpdate || null),
+          new Date(),
+          { addSuffix: true },
+        );
       };
 
       return {
@@ -66,8 +62,8 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
         area: 'Planning area name',
         name,
         description,
-        lastScenarioCreation,
-        lastScenarioCreationDistance: lastScenarioCreationDistance(),
+        lastUpdate,
+        lastUpdateDistance: lastUpdateDistance(),
         contributors: [
           { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
           { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
@@ -99,7 +95,7 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
     }
 
     // Sort
-    parsedData = orderBy(parsedData, ['lastScenarioCreation'], ['desc']);
+    parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
 
     return {
       ...query,

@@ -15,8 +15,8 @@ export interface ItemProps {
   name: string;
   area: string;
   description: string;
-  lastScenarioCreation: string;
-  lastScenarioCreationDistance: string;
+  lastUpdate: string;
+  lastUpdateDistance: string;
   contributors?: Record<string, unknown>[];
   style?: Record<string, unknown>;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -30,7 +30,7 @@ export const Item: React.FC<ItemProps> = ({
   name,
   area,
   description,
-  lastScenarioCreationDistance,
+  lastUpdateDistance,
   contributors = [],
   style,
   onClick,
@@ -144,20 +144,10 @@ export const Item: React.FC<ItemProps> = ({
           </div>
 
           <div className="mb-3 text-sm">
-            {lastScenarioCreationDistance && (
-              <>
-                <span>Last scenario creation:</span>
-                <span className="ml-2 text-primary-500">
-                  {lastScenarioCreationDistance || 'no scenario'}
-                </span>
-              </>
-            )}
-
-            {!lastScenarioCreationDistance && (
-              <>
-                <span>No scenarios created</span>
-              </>
-            )}
+            <span>Last update:</span>
+            <span className="ml-2 text-primary-500">
+              {lastUpdateDistance || 'no scenario'}
+            </span>
           </div>
           <div className="text-sm opacity-50 clamp-2">{description}</div>
         </header>
