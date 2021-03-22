@@ -48,12 +48,22 @@ export class ScenariosController {
   })
   @JSONAPIQueryParams({
     entitiesAllowedAsIncludes: scenarioResource.entitiesAllowedAsIncludes,
+    availableFilters: [
+      { name: 'name' },
+      { name: 'type' },
+      { name: 'projectId' },
+      { name: 'status' },
+    ],
   })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioResult> {
-    const results = await this.service.findAllPaginated(fetchSpecification);
+    const results = await this.service.findAllPaginated(
+      fetchSpecification,
+      {},
+      fetchSpecification.filter,
+    );
     return this.service.serialize(results.data, results.metadata);
   }
 
