@@ -1,43 +1,44 @@
-import { Injectable } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
+import { Logger, Injectable } from '@nestjs/common';
+
+import { Job, Queue, QueueEvents } from 'bullmq';
+import * as config from 'config';
+
 import { CreatePlanningUnitsDTO } from './dto/create.planning-units.dto';
 
 /**
- * @see https://docs.nestjs.com/techniques/queues
+ * @see https://docs.bullmq.io/ && https://docs.nestjs.com/techniques/queues
  *
  * @debt Bullmq is expected to be supported soon in the
  * nest.js bull wrapper. In the meanwhile we are using Bullmq
- * in the worker
- * and bull in the Queue and job publication
  *
- * For some reason delayed jobs are not seen by the
- * geoprocessing service
  *
  **/
 @Injectable()
 export class PlanningUnitsService {
-  constructor(
-    @InjectQueue('planning-units') private readonly planningUnitsQueue: Queue,
-  ) {}
-
-  public async create(creationOptions: CreatePlanningUnitsDTO) {
-    await this.planningUnitsQueue.add('transcode', creationOptions,
-    {
+  private readonly queueName: string = 'planning-units';
+  private readonly logger: Logger = new Logger(
+    `${this.queueName}-queue-publisher`,
+  );
+  private readonly planningUnitsQueue: Queue = new Queue(this.queueName, {
+    ...config.get('redisApi'),
+    defaultJobOptions: {
+      removeOnComplete: 100,
+      removeOnFail: 1000,
       attempts: 3,
-      // delay: 3000, // For some reason delayed does not properly work
-      timeout: 10000
+      timeout: 1 * 60 * 1000,
+    },
+  });
+  private readonly queueEvents: QueueEvents = new QueueEvents(
+    this.queueName,
+    config.get('redisApi'),
+  );
+  constructor() {
+    this.queueEvents.on('completed', (job: Job) => {
+      this.logger.log(`this job ${job.id} for ${this.queueName} is completed`);
     });
   }
 
-  public async isReady() {
-    await this.planningUnitsQueue.on('completed', (job, result) => {
-      console.log(`Job with id ${job.id} is completed with result ${result}`);
-  })
-}
-public async hasFail() {
-  await this.planningUnitsQueue.on('failed', (job, err) => {
-    console.log(`Failed job ${job.id} with ${err}`);
-})
-}
+  public async create(creationOptions: CreatePlanningUnitsDTO): Promise<void> {
+    await this.planningUnitsQueue.add('create-pu', creationOptions, {});
+  }
 }

@@ -5,9 +5,6 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BullModule } from '@nestjs/bull';
-
-import { AppConfig } from 'utils/config.utils';
 
 import { AuthenticationModule } from 'modules/authentication/authentication.module';
 import { CountriesModule } from 'modules/countries/countries.module';
@@ -36,12 +33,6 @@ import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.mo
     TypeOrmModule.forRoot({
       ...apiConnections.geoprocessingDB,
       keepConnectionAlive: true,
-    }),
-    BullModule.forRoot({
-      redis: {
-        host: 'marxan-redis',
-        port: 6379,
-      },
     }),
     AdminAreasModule,
     ApiEventsModule,
