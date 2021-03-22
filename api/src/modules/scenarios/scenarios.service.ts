@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { JobStatus, Scenario, ScenarioType } from './scenario.api.entity';
@@ -12,7 +12,15 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
+import { PickType } from '@nestjs/swagger';
+import { castArray } from 'lodash';
 
+export class ScenarioFilters extends PickType(Scenario, [
+  'name',
+  'type',
+  'projectId',
+  'status',
+] as const) {}
 @Injectable()
 export class ScenariosService extends AppBaseService<
   Scenario,
@@ -85,6 +93,41 @@ export class ScenariosService extends AppBaseService<
       ),
     };
     return scenario;
+  }
+
+  /**
+   * Apply service-specific filters.
+   *
+   * @debt Most of the plain filters for entity properties will be identical
+   * across filters and across services: we should abstract this into an utility
+   * function to avoid boilerplate and error-prone copy-and-paste.
+   */
+  setFilters(
+    query: SelectQueryBuilder<Scenario>,
+    filters: ScenarioFilters,
+    info?: AppInfoDTO,
+  ): SelectQueryBuilder<Scenario> {
+    if (filters?.name?.length) {
+      query.andWhere(`${this.alias}.name IN (:...name)`, {
+        name: castArray(filters.name),
+      });
+    }
+    if (filters?.projectId?.length) {
+      query.andWhere(`${this.alias}.projectId IN (:...projectId)`, {
+        projectId: castArray(filters.projectId),
+      });
+    }
+    if (filters?.type?.length) {
+      query.andWhere(`${this.alias}.type IN (:...type)`, {
+        type: castArray(filters.type),
+      });
+    }
+    if (filters?.status?.length) {
+      query.andWhere(`${this.alias}.status IN (:...status)`, {
+        status: castArray(filters.status),
+      });
+    }
+    return query;
   }
 
   async setDataCreate(
