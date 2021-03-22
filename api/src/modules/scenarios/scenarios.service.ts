@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository } from 'typeorm';
@@ -20,6 +20,8 @@ export class ScenariosService extends AppBaseService<
   UpdateScenarioDTO,
   AppInfoDTO
 > {
+  private readonly logger = new Logger(ScenariosService.name);
+
   constructor(
     @InjectRepository(Scenario)
     protected readonly repository: Repository<Scenario>,
