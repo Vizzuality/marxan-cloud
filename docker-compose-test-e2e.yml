@@ -72,3 +72,13 @@ services:
       - POSTGRES_PASSWORD=${GEO_POSTGRES_PASSWORD}
       - POSTGRES_USER=${GEO_POSTGRES_USER}
     restart: always
+  test-e2e-redis:
+    build:
+      context: ./redis
+      dockerfile: Dockerfile
+    hostname: redis
+    container_name: marxan-test-e2e-redis
+    command: [ "redis-server"]
+    ports:
+      - "${REDIS_API_SERVICE_PORT}:6379"
+    restart: on-failure

@@ -5,14 +5,6 @@
    "postgresGeoApi": {
     "url": "GEO_POSTGRES_URL"
    },
-   "redis":{
-   "queueName": "planning-units",
-   "concurrency":  "1",
-   "connection": {
-     "host": "marxan-redis",
-     "port": "6379"
-    }
-  },
   "network": {
     "cors": {
         "origins_extra": "NETWORK_CORS_ORIGINS"

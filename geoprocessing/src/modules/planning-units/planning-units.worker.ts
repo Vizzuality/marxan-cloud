@@ -1,6 +1,7 @@
 import { Logger, Injectable } from '@nestjs/common';
-import { Worker } from 'bullmq';
+import { Worker, QueueScheduler } from 'bullmq';
 import { join } from 'path';
+import * as config from 'config';
 
 /**
  * @see https://docs.bullmq.io/guide/workers
@@ -8,29 +9,31 @@ import { join } from 'path';
  * @debt Bullmq is expected to be supported soon in the
  * nest.js bull wrapper. In the meanwhile we are using Bullmq
  * in the worker
- * and bull in the Queue and job publication
  *
  **/
 @Injectable()
 export class PlanningUnitsProcessor {
-  private readonly logger: Logger = new Logger('planning-units-worker');
+  private readonly queueName: string = 'planning-units';
+  private readonly logger: Logger = new Logger(PlanningUnitsProcessor.name);
   private readonly worker: Worker = new Worker(
-    'planning-units',
+    this.queueName,
     join(__dirname, '/planning-units.job.ts'),
-    {
-      concurrency: 50,
-      connection: {
-        host: 'marxan-redis',
-        port: 6379,
-      },
-    },
+    config.get('redisApi'),
+  );
+  private scheduler: QueueScheduler = new QueueScheduler(
+    this.queueName,
+    config.get('redisApi'),
   );
   constructor() {
-    this.logger.debug(`${this.worker.name}-worker`);
-    this.worker.on('completed', (job) =>
-      this.logger.debug(
-        `Completed job ${job.id} successfully, sent email to ${job.data}`,
-      ),
-    );
+    this.logger.log('worker');
+    this.worker.on('completed', async (job) => {
+      this.logger.debug(`Job finished ${JSON.stringify(job)}`);
+    });
+  }
+
+  public async onModuleDestroy(): Promise<void> {
+    await this.scheduler.close();
+    await this.worker.close();
+    await this.worker.disconnect();
   }
 }
