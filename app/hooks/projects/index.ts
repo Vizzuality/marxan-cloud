@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
+
+import orderBy from 'lodash/orderBy';
 import { formatDistance } from 'date-fns';
 
 import { ItemProps } from 'components/projects/item/component';
@@ -36,17 +38,36 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
-      const { id, name, description } = d;
+    let parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
+      const {
+        id, name, description, scenarios,
+      } = d;
 
-      const lastUpdate = formatDistance(new Date('2021-03-10T11:22:00'), new Date(), { addSuffix: true });
+      const lastScenarioCreation = scenarios.reduce((acc, s) => {
+        const { createdAt } = s;
+
+        return (createdAt > acc) ? createdAt : acc;
+      }, '');
+
+      const lastScenarioCreationDistance = () => {
+        if (lastScenarioCreation) {
+          return formatDistance(
+            new Date(lastScenarioCreation || null),
+            new Date(),
+            { addSuffix: true },
+          );
+        }
+
+        return null;
+      };
 
       return {
         id,
         area: 'Planning area name',
         name,
         description,
-        lastUpdate,
+        lastScenarioCreation,
+        lastScenarioCreationDistance: lastScenarioCreationDistance(),
         contributors: [
           { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
           { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
@@ -66,21 +87,23 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
       };
     }) : [];
 
-    let filteredData = parsedData;
-
+    // Filter
     if (search) {
       const fuse = new Fuse(parsedData, {
         keys: ['name', 'area'],
         threshold: 0.25,
       });
-      filteredData = fuse.search(search).map((f) => {
+      parsedData = fuse.search(search).map((f) => {
         return f.item;
       });
     }
 
+    // Sort
+    parsedData = orderBy(parsedData, ['lastScenarioCreation'], ['desc']);
+
     return {
       ...query,
-      data: filteredData,
+      data: parsedData,
     };
   }, [query, data?.data, search, push]);
 }
