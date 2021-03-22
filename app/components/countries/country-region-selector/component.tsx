@@ -44,14 +44,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
   }, [selectedRegion]);
 
   return (
-    <div className="mt-6">
-      <Loading
-        visible={(isFetchingCountries && !isFetchedCountries)
-          || (isFetchingRegions && !isFetchedRegions)
-          || (isFetchingSubRegions && !isFetchedSubRegions)}
-        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
-        iconClassName="w-10 h-10 text-primary-500"
-      />
+    <div className="relative mt-6">
       {isFetchedCountries && countriesData?.length > 0 && (
         <div>
           {/* Country selector */}
@@ -61,18 +54,21 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
               validate={composeValidators([{ presence: true }])}
             >
               {(fprops) => (
-                <Select
-                  status="none"
-                  size="base"
-                  theme="dark"
-                  clearSelectionActive
-                  options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
-                  initialSelected={selectedCountry}
-                  onChange={(value: string) => {
-                    setSelectedCountry(value);
-                    fprops.input.onChange(value);
-                  }}
-                />
+                <Field id="countryId" {...fprops}>
+                  <Select
+                    status="none"
+                    size="base"
+                    theme="dark"
+                    placeholder="Select country..."
+                    clearSelectionActive
+                    options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
+                    initialSelected={selectedCountry}
+                    onChange={(value: string) => {
+                      setSelectedCountry(value);
+                      fprops.input.onChange(value);
+                    }}
+                  />
+                </Field>
               )}
             </FieldRFF>
           </div>
@@ -85,15 +81,19 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                 {(fprops) => (
                   <Field id="adminAreaLevel1Id" {...fprops}>
                     <Select
+                      key={selectedCountry}
                       status="none"
                       size="base"
                       theme="dark"
+                      placeholder="Select region (optional)"
                       clearSelectionActive
                       options={regionsData.map((c) => ({ label: c.name, value: c.id }))}
-                      initialSelected={selectedRegion}
                       onChange={(value: string) => {
                         setSelectedRegion(value);
                         fprops.input.onChange(value);
+                      }}
+                      {...selectedSubRegion && {
+                        initialSelected: selectedRegion,
                       }}
                     />
                   </Field>
@@ -110,15 +110,19 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                 {(fprops) => (
                   <Field id="adminAreaLevel2Id" {...fprops}>
                     <Select
+                      key={selectedRegion}
                       status="none"
                       size="base"
                       theme="dark"
                       clearSelectionActive
+                      placeholder="Select subregion (optional)"
                       options={subRegionsData.map((c) => ({ label: c.name, value: c.id }))}
-                      initialSelected={selectedSubRegion}
                       onChange={(value: string) => {
                         setSelectedSubRegion(value);
                         fprops.input.onChange(value);
+                      }}
+                      {...selectedSubRegion && {
+                        initialSelected: selectedSubRegion,
                       }}
                     />
                   </Field>
@@ -128,6 +132,17 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
           )}
         </div>
       )}
+
+      <Loading
+        visible={(isFetchingCountries && !isFetchedCountries)
+          || (isFetchingRegions && !isFetchedRegions)
+          || (isFetchingSubRegions && !isFetchedSubRegions)}
+        className="z-40 flex items-center justify-center w-full h-12 bg-transparent bg-opacity-90"
+        iconClassName="w-5 h-5 text-primary-500"
+        transition={{
+          duration: 0,
+        }}
+      />
     </div>
   );
 };
