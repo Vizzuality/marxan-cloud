@@ -88,16 +88,16 @@ export class AdminAreasService extends AppBaseService<
 
   setFilters(
     query: SelectQueryBuilder<AdminArea>,
-    filters: AdminAreaFilters,
+    filters?: AdminAreaFilters,
     _info?: AppInfoDTO,
   ): SelectQueryBuilder<AdminArea> {
-    if (filters.countryId) {
+    if (filters?.countryId) {
       query.andWhere(`${this.alias}.gid0 = :countryId`, {
         countryId: filters.countryId,
       });
     }
 
-    if (filters.level2AreaByArea1Id) {
+    if (filters?.level2AreaByArea1Id) {
       query.andWhere(
         `${this.alias}.gid1 = :parentLevel1AreaId AND ${this.alias}.gid2 IS NOT NULL`,
         { parentLevel1AreaId: filters.level2AreaByArea1Id },
@@ -162,8 +162,12 @@ export class AdminAreasService extends AppBaseService<
     metadata: PaginationMeta | undefined;
   }> {
     if (this.isLevel1AreaId(parentAreaId)) {
-      return this.findAllPaginated(fetchSpecification, undefined, {
-        level2AreaByArea1Id: parentAreaId,
+      return this.findAllPaginated({
+        ...fetchSpecification,
+        filter: {
+          ...fetchSpecification.filter,
+          level2AreaByArea1Id: parentAreaId,
+        },
       });
     } else {
       throw new BadRequestException(
