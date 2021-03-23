@@ -45,6 +45,10 @@ export const E2E_CONFIG: {
     invalid: {
       missingRequiredFields: () => Partial<CreateScenarioDTO>;
     };
+  planningUnits:{
+    valid: {},
+    invalid: {}
+  }
   };
   protectedAreas: {
     categories: {
@@ -154,6 +158,7 @@ export const E2E_CONFIG: {
       }),
     },
   },
+<<<<<<< HEAD
   protectedAreas: {
     categories: {
       valid: [
@@ -170,4 +175,16 @@ export const E2E_CONFIG: {
       ],
     },
   },
+=======
+  planningUnits:{
+    valid: {
+      customExtent:{},
+      adminRegion:{}
+    },
+    invalid: {
+      customExtent:{},
+      adminRegion:{}
+    }
+  }
+>>>>>>> tests wip
 };
