@@ -1,9 +1,11 @@
 import { BaseService, FetchSpecification } from 'nestjs-base-service';
 
 import * as JSONAPISerializer from 'jsonapi-serializer';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { DEFAULT_PAGINATION } from 'nestjs-base-service';
+import { Logger } from '@nestjs/common';
+import { castArray } from 'lodash';
 
 export class PaginationMeta {
   totalPages: number;
@@ -144,6 +146,32 @@ export abstract class AppBaseService<
         });
 
     return { data: entities, metadata: meta };
+  }
+
+  _processBaseFilters<Filters>(
+    query: SelectQueryBuilder<Entity>,
+    filters: Filters,
+    filterKeys: any,
+  ): SelectQueryBuilder<Entity> {
+    if (filters) {
+      Object.entries(filters)
+        .filter((i) => Array.from(filterKeys).includes(i[0]))
+        .forEach((i) => this._processBaseFilter(query, i));
+    }
+
+    return query;
+  }
+
+  _processBaseFilter(
+    query: SelectQueryBuilder<Entity>,
+    [filterKey, filterValues]: [string, unknown],
+  ): SelectQueryBuilder<Entity> {
+    if (Array.isArray(filterValues) && filterValues.length) {
+      query.andWhere(`${this.alias}.${filterKey} IN (:...${filterKey}Values)`, {
+        [`${filterKey}Values`]: castArray(filterValues),
+      });
+    }
+    return query;
   }
 }
 
