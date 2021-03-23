@@ -22,7 +22,7 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
   getDropdownProps,
 }: SelectToggleProps) => {
   const getEnabledOptions = useMemo(() => {
-    return options.filter((o) => !o.disabled);
+    return options.filter((o) => !o.disabled && o.enabled);
   }, [options]);
 
   const labelDefaultFormatter:() => string = useCallback(() => {

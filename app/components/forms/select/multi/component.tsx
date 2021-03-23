@@ -24,6 +24,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
   status,
   prefix,
   options = [],
+  values,
   initialValues = [],
   disabled = false,
   multiple = true,
@@ -42,16 +43,18 @@ export const MultiSelect: React.FC<SelectProps> = ({
   const getOptions: SelectOptionProps[] = useMemo(() => {
     return [
       ...clearSelectionActive ? [{
-        value: null,
+        value: 'batch-clear-selection',
         label: clearSelectionLabel,
+        enabled: false,
         checkbox: false,
       }] : [],
       ...batchSelectionActive ? [{
         value: 'batch-selection',
         label: batchSelectionLabel,
+        enabled: false,
         checkbox: false,
       }] : [],
-      ...options.map((o) => ({ ...o, checkbox: true })),
+      ...options.map((o) => ({ ...o, checkbox: true, enabled: true })),
     ];
   }, [
     options,
@@ -62,12 +65,12 @@ export const MultiSelect: React.FC<SelectProps> = ({
   ]);
 
   const getOptionsEnabled = useMemo(() => {
-    return getOptions.filter((op) => !op.disabled);
+    return getOptions.filter((op) => !op.disabled && op.enabled);
   }, [getOptions]);
 
-  const getInitialSelected = useMemo(() => {
-    return getOptions.filter((o) => initialValues.includes(`${o.value}`));
-  }, [getOptions, initialValues]);
+  const getInitialSelected = getOptions.filter((o) => initialValues.includes(`${o.value}`));
+
+  const getSelected = values ? getOptions.filter((o) => values.includes(`${o.value}`)) : null;
 
   const isSelected = (selected: SelectOptionProps, selectedItms: SelectOptionProps[]) => (
     selectedItms.some((i) => i.value === selected.value)
@@ -82,7 +85,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
     reset,
   }) => {
     switch (option.value) {
-      case null:
+      case 'batch-clear-selection':
         reset();
         break;
       case 'batch-selection':
@@ -111,7 +114,12 @@ export const MultiSelect: React.FC<SelectProps> = ({
     selectedItems,
     reset,
   } = useMultipleSelection<SelectOptionProps>({
-    initialSelectedItems: getInitialSelected,
+    ...!!getSelected && {
+      selectedItems: getSelected,
+    },
+    ...!!getInitialSelected && {
+      initialSelectedItems: getInitialSelected,
+    },
     itemToString: (item) => item.label, // How the selected options is announced to screen readers
     stateReducer: (st, actionAndChanges) => {
       const { changes, type } = actionAndChanges;

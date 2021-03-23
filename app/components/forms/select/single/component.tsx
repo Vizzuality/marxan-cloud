@@ -25,6 +25,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
   options = [],
   disabled = false,
   placeholder,
+  values,
   initialValues,
   clearSelectionActive,
   clearSelectionLabel = 'Clear selection',
@@ -39,7 +40,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
     return [
       ...clearSelectionActive ? [
         {
-          value: null,
+          value: 'clear-selection',
           label: clearSelectionLabel,
         },
       ] : [],
@@ -55,10 +56,14 @@ export const SingleSelect: React.FC<SelectProps> = ({
     return getOptions.find((o) => o.value === initialValues);
   }, [getOptions, initialValues]);
 
+  const getSelected = useMemo(() => {
+    return getOptions.find((o) => o.value === values);
+  }, [getOptions, values]);
+
   // Events
   const handleSelectedItems = (selected, reset) => {
     switch (selected.value) {
-      case null:
+      case 'clear-selection':
         reset();
         break;
       default:
@@ -82,7 +87,12 @@ export const SingleSelect: React.FC<SelectProps> = ({
     reset,
   } = useSelect<SelectOptionProps>({
     items: getOptions,
-    initialSelectedItem: getInitialSelected,
+    ...!!getSelected && {
+      selectedItem: getSelected,
+    },
+    ...!!getInitialSelected && {
+      initialSelectedItem: getInitialSelected,
+    },
     itemToString: (item) => item.label, // How the selected options is announced to screen readers
     stateReducer: (st, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
