@@ -28,7 +28,10 @@ import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { Post } from '@nestjs/common';
 
-import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import {
+  JSONAPIQueryParams,
+  JSONAPISingleEntityQueryParams,
+} from 'decorators/json-api-parameters.decorator';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
@@ -59,21 +62,21 @@ export class ScenariosController {
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioResult> {
-    const results = await this.service.findAllPaginated(
-      fetchSpecification,
-      {},
-      fetchSpecification.filter,
-    );
+    const results = await this.service.findAllPaginated(fetchSpecification, {});
     return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find scenario by id' })
   @ApiOkResponse({ type: ScenarioResult })
+  @JSONAPISingleEntityQueryParams()
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioResult> {
-    return await this.service.serialize(await this.service.getById(id));
+    return await this.service.serialize(
+      await this.service.getById(id, fetchSpecification),
+    );
   }
 
   @ApiOperation({ description: 'Create scenario' })

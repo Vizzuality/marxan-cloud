@@ -147,16 +147,13 @@ export class ProtectedAreasService extends AppBaseService<
    */
   async findAllProtectedAreaCategories(
     fetchSpecification: FetchSpecification,
-    info?: AppInfoDTO,
-    filters?: Record<string, unknown>,
   ): Promise<IUCNProtectedAreaCategoryResult[]> {
     const results = await this.findAllPaginatedRaw(
-      { ...fetchSpecification },
-      undefined,
       {
-        ...filters,
-        onlyCategories: true,
+        ...fetchSpecification,
+        filter: { ...fetchSpecification.filter, onlyCategories: true },
       },
+      undefined,
     ).then((results) =>
       results.data.map((i: IUCNProtectedAreaCategoryDTO) => ({
         iucnCategory: i?.iucnCategory,

@@ -96,32 +96,22 @@ export abstract class AppBaseService<
   async findAllPaginatedRaw(
     fetchSpecification: FetchSpecification,
     info?: Info,
-    filters?: Record<string, unknown>,
   ): Promise<{
     data: (Partial<Entity> | undefined)[];
     metadata: PaginationMeta | undefined;
   }> {
-    const entitiesAndCount = await this.findAllRaw(
-      fetchSpecification,
-      info,
-      filters,
-    );
+    const entitiesAndCount = await this.findAllRaw(fetchSpecification, info);
     return this._paginate(fetchSpecification, entitiesAndCount);
   }
 
   async findAllPaginated(
     fetchSpecification: FetchSpecification,
     info?: Info,
-    filters?: Record<string, unknown>,
   ): Promise<{
     data: (Partial<Entity> | undefined)[];
     metadata: PaginationMeta | undefined;
   }> {
-    const entitiesAndCount = await this.findAll(
-      fetchSpecification,
-      info,
-      filters,
-    );
+    const entitiesAndCount = await this.findAll(fetchSpecification, info);
     return this._paginate(fetchSpecification, entitiesAndCount);
   }
 
