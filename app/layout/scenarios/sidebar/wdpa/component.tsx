@@ -4,6 +4,7 @@ import Pill from 'layout/pill';
 
 import Button from 'components/button';
 import Loading from 'components/loading';
+import Icon from 'components/icon';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
@@ -19,6 +20,16 @@ import { useRouter } from 'next/router';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
+
+const WDPA_CATEGORIES_OPTIONS = [
+  { label: 'Category 1', value: 'category-1' },
+  { label: 'Category 2', value: 'category-2' },
+  { label: 'Category 3', value: 'category-3' },
+  { label: 'Category 4', value: 'category-4' },
+  { label: 'Category 5', value: 'category-5' },
+];
+
 export interface ScenariosSidebarWDPAProps {
 }
 
@@ -26,32 +37,24 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
   const { query } = useRouter();
-  const { pid, sid } = query;
-
-  const WDPA_CATEGORIES_OPTIONS = [
-    { label: 'Category 1', value: 'category-1' },
-    { label: 'Category 2', value: 'category-2' },
-    { label: 'Category 3', value: 'category-3' },
-    { label: 'Category 4', value: 'category-4' },
-    { label: 'Category 5', value: 'category-5' },
-  ];
+  const { sid } = query;
 
   const { data } = useScenario(sid);
 
   const mutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
-      url: `/${sid}`,
     },
   });
 
-  const handleSubmit = useCallback(async (values) => {
+  const onSubmit = useCallback(async (values) => {
     setSubmitting(true);
 
     mutation.mutate({
-      ...values,
-      type: 'marxan',
-      projectId: pid,
+      id: data.id,
+      data: {
+        ...values,
+      },
     }, {
       onSuccess: () => {
         setSubmitting(false);
@@ -78,20 +81,31 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
         });
       },
     });
-  }, [mutation, pid, addToast]);
+  }, [mutation, addToast, data?.id]);
 
   if (!data) return null;
 
   return (
     <Pill>
       <FormRFF
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
+        mutators={{
+          removeWDPAFilter: (args, state, utils) => {
+            const [id, arr] = args;
+            const i = arr.indexOf(id);
+
+            if (i > -1) {
+              arr.splice(i, 1);
+            }
+            utils.changeValue(state, 'wdpaFilter', () => arr);
+          },
+        }}
         initialValues={{
-          wdpaFilter: data?.wdpaFilter,
+          wdpaFilter: data?.wdpaFilter || [],
         }}
       >
-        {(props) => (
-          <form onSubmit={props.handleSubmit} autoComplete="off" className="relative w-full">
+        {({ form, values, handleSubmit }) => (
+          <form onSubmit={handleSubmit} autoComplete="off" className="relative w-full">
             <h2 className="mb-5 text-lg font-medium font-heading">Protected areas</h2>
             {/* WDPA */}
             <div>
@@ -99,8 +113,8 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
                 name="wdpaFilter"
                 validate={composeValidators([{ presence: true }, arrayValidator])}
               >
-                {(fprops) => (
-                  <Field id="scenario-wdpaFilter" {...fprops}>
+                {(flprops) => (
+                  <Field id="scenario-wdpaFilter" {...flprops}>
                     <Label theme="dark" className="mb-3 uppercase">Choose one or more protected areas categories</Label>
                     <Select
                       theme="dark"
@@ -111,8 +125,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
                       clearSelectionLabel="None protected areas"
                       batchSelectionActive
                       batchSelectionLabel="All protected areas"
-                      initialSelected={data?.wdpaFilter}
-                      initialValues={data?.wdpaFilter}
+                      selected={values.wdpaFilter}
                       options={WDPA_CATEGORIES_OPTIONS}
                     />
                   </Field>
@@ -120,9 +133,39 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
               </FieldRFF>
             </div>
 
+            <div className="mt-10">
+              <h3 className="text-sm">Selected protected areas:</h3>
+
+              <div className="flex flex-wrap mt-2.5">
+                {values.wdpaFilter.map((w) => {
+                  const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
+                  return (
+                    <div
+                      key={`${wdpa.value}`}
+                      className="flex mb-2.5 mr-5"
+                    >
+                      <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
+                        {wdpa.label}
+                      </span>
+
+                      <button
+                        type="button"
+                        className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
+                        onClick={() => {
+                          form.mutators.removeWDPAFilter(wdpa.value, values.wdpaFilter);
+                        }}
+                      >
+                        <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="flex justify-center mt-5">
-              <Button theme="primary" size="lg" type="submit" className="relative px-20" disabled={submitting}>
-                <span>Save</span>
+              <Button theme="secondary-alt" size="lg" type="submit" className="relative px-20" disabled={submitting}>
+                <span>Continue</span>
 
                 <Loading
                   visible={submitting}

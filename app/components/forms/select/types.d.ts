@@ -18,7 +18,9 @@ interface SelectDataProps {
   placeholder?: string;
   prefix?: string;
   initialSelected?: string | string[];
+  selected?: string | string[];
   initialValues?: string | string[];
+  values?: string | string[];
   clearSelectionActive?: boolean;
   clearSelectionLabel?: string;
   batchSelectionActive?: boolean;
@@ -39,6 +41,7 @@ export interface SelectOptionProps {
   label: string;
   value: string | number;
   disabled?: boolean;
+  enabled?: boolean;
   checkbox?: boolean;
 }
 
