@@ -28,7 +28,7 @@ export function useScenarios() {
 export function useScenario(id) {
   const [session] = useSession();
 
-  const query = useQuery(`scenarios/${id}`, async () => SCENARIOS.request({
+  const query = useQuery(['scenarios', id], async () => SCENARIOS.request({
     method: 'GET',
     url: `/${id}`,
     headers: {
@@ -68,8 +68,10 @@ export function useSaveScenario({
   };
 
   return useMutation(saveScenario, {
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data: any, variables, context) => {
+      const { id } = data;
       queryClient.invalidateQueries('scenarios');
+      queryClient.invalidateQueries('scenarios', id);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

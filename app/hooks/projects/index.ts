@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
+
+import orderBy from 'lodash/orderBy';
 import { formatDistance } from 'date-fns';
 
 import { ItemProps } from 'components/projects/item/component';
@@ -36,10 +38,24 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
-      const { id, name, description } = d;
+    let parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
+      const {
+        id, name, description, scenarios, lastModifiedAt,
+      } = d;
 
-      const lastUpdate = formatDistance(new Date('2021-03-10T11:22:00'), new Date(), { addSuffix: true });
+      const lastUpdate = scenarios.reduce((acc, s) => {
+        const { lastModifiedAt: slastModifiedAt } = s;
+
+        return (slastModifiedAt > acc) ? slastModifiedAt : acc;
+      }, lastModifiedAt);
+
+      const lastUpdateDistance = () => {
+        return formatDistance(
+          new Date(lastUpdate || null),
+          new Date(),
+          { addSuffix: true },
+        );
+      };
 
       return {
         id,
@@ -47,6 +63,7 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
         name,
         description,
         lastUpdate,
+        lastUpdateDistance: lastUpdateDistance(),
         contributors: [
           { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
           { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
@@ -66,21 +83,23 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
       };
     }) : [];
 
-    let filteredData = parsedData;
-
+    // Filter
     if (search) {
       const fuse = new Fuse(parsedData, {
         keys: ['name', 'area'],
         threshold: 0.25,
       });
-      filteredData = fuse.search(search).map((f) => {
+      parsedData = fuse.search(search).map((f) => {
         return f.item;
       });
     }
 
+    // Sort
+    parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
+
     return {
       ...query,
-      data: filteredData,
+      data: parsedData,
     };
   }, [query, data?.data, search, push]);
 }
@@ -88,7 +107,7 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
 export function useProject(id) {
   const [session] = useSession();
 
-  const query = useQuery(`projects/${id}`, async () => PROJECTS.request({
+  const query = useQuery(['projects', id], async () => PROJECTS.request({
     method: 'GET',
     url: `/${id}`,
     headers: {
@@ -131,8 +150,10 @@ export function useSaveProject({
   };
 
   return useMutation(saveProject, {
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data: any, variables, context) => {
+      const { id } = data;
       queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['projects', id]);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
