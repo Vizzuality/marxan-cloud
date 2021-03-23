@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Logger, Query, UseGuards } from '@nestjs/common';
 import { ProtectedAreaResult } from './protected-area.geo.entity';
 import {
   ApiBearerAuth,
@@ -48,15 +48,22 @@ export class ProtectedAreasController {
   @JSONAPIQueryParams()
   @Get('iucn-categories')
   async listIUCNProtectedAreaCategories(
-    @Query('filter') filter: Record<string, unknown>,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<IUCNProtectedAreaCategoryResult[]> {
-    return await this.service.findAllProtectedAreaCategories(
-      fetchSpecification,
-      undefined,
-      {
-        adminAreaId: filter?.adminAreaId,
-      },
-    );
+    /**
+     * @debt This reshaping of filters should likely not be here (or at the very
+     * least should be encapsulated in a utility function that abstracts the
+     * implementation details away from the controller handler).
+     * `fetchSpecification.filter.adminAreaId` will be an array, even if we
+     * expect a single value (this is the shape of all the filter values for
+     * each filter key as processed via `FetchSpecificationMiddleware`).
+     */
+    const adminAreaId = Array.isArray(fetchSpecification?.filter?.adminAreaId)
+      ? fetchSpecification.filter!.adminAreaId[0]
+      : undefined;
+    return await this.service.findAllProtectedAreaCategories({
+      ...fetchSpecification,
+      filter: { ...fetchSpecification.filter, adminAreaId },
+    });
   }
 }

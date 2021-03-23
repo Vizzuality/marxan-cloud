@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { adminAreaResource, AdminAreaResult } from './admin-area.geo.entity';
 import { AdminAreaLevel, AdminAreasService } from './admin-areas.service';
 import {
@@ -55,14 +62,10 @@ export class AdminAreasController {
     @Param('countryId') countryId: string,
     @Query() { level }: AdminAreaLevel,
   ): Promise<AdminAreaResult[]> {
-    const results = await this.service.findAllPaginated(
-      fetchSpecification,
-      undefined,
-      {
-        countryId,
-        level,
-      },
-    );
+    const results = await this.service.findAllPaginated({
+      ...fetchSpecification,
+      filter: { ...fetchSpecification.filter, countryId, level },
+    });
     return this.service.serialize(results.data, results.metadata);
   }
 
