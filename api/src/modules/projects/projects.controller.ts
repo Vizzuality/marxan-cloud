@@ -29,7 +29,10 @@ import { UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadOptions } from 'utils/file-uploads.utils';
 
-import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import {
+  JSONAPIQueryParams,
+  JSONAPISingleEntityQueryParams,
+} from 'decorators/json-api-parameters.decorator';
 import { projectResource } from './project.api.entity';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
@@ -69,6 +72,13 @@ export class ProjectsController {
   @ApiOkResponse({ type: ProjectResultPlural })
   @JSONAPIQueryParams({
     entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
+    availableFilters: [
+      { name: 'name' },
+      { name: 'organizationId' },
+      { name: 'countryId' },
+      { name: 'adminAreaLevel1Id' },
+      { name: 'adminAreaLevel21Id' },
+    ],
   })
   @Get()
   async findAll(
@@ -80,6 +90,7 @@ export class ProjectsController {
 
   @ApiOperation({ description: 'Find project by id' })
   @ApiOkResponse({ type: ProjectResultSingular })
+  @JSONAPISingleEntityQueryParams()
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ProjectResultSingular> {
     return await this.service.serialize(await this.service.getById(id));
