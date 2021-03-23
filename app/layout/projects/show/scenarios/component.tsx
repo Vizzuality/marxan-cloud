@@ -65,9 +65,9 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
       {id && !scenarios.length && (
         <motion.div
           key="project-scenarios-empty"
-          initial={{ y: -10 }}
-          animate={{ y: 0 }}
-          exit={{ y: -10 }}
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -10, opacity: 0 }}
           className="flex items-center pl-20 bg-gray-700 bg-right bg-no-repeat bg-contain rounded-4xl"
           style={{
             backgroundImage: `url(${bgScenariosDashboard})`,

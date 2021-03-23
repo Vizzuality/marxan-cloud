@@ -11,6 +11,7 @@ export const Loading: React.FC<LoadingProps> = ({
   visible = false,
   className = 'absolute',
   iconClassName = 'w-5 h-5',
+  transition = {},
 }: LoadingProps) => {
   const variants = {
     initial: { opacity: 0 },
@@ -24,6 +25,7 @@ export const Loading: React.FC<LoadingProps> = ({
         <motion.div
           key="loading"
           {...variants}
+          transition={transition}
           className={cx({
             [className]: !!className,
           })}
