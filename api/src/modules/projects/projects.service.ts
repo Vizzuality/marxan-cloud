@@ -14,6 +14,19 @@ import {
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
 
+const projectFilterKeyNames = [
+  'name',
+  'organizationId',
+  'countryId',
+  'adminAreaLevel1Id',
+  'adminAreaLevel2Id',
+] as const;
+type ProjectFilterKeys = keyof Pick<
+  Project,
+  typeof projectFilterKeyNames[number]
+>;
+type ProjectFilters = Record<ProjectFilterKeys, string[]>;
+
 @Injectable()
 export class ProjectsService extends AppBaseService<
   Project,
@@ -99,6 +112,22 @@ export class ProjectsService extends AppBaseService<
       ),
     };
     return project;
+  }
+
+  /**
+   * Apply service-specific filters.
+   */
+  setFilters(
+    query: SelectQueryBuilder<Project>,
+    filters: ProjectFilters,
+    info?: AppInfoDTO,
+  ): SelectQueryBuilder<Project> {
+    this._processBaseFilters<ProjectFilters>(
+      query,
+      filters,
+      projectFilterKeyNames,
+    );
+    return query;
   }
 
   async setDataCreate(
