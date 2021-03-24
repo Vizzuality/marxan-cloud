@@ -34,15 +34,6 @@ export class ProtectedArea {
    */
   @ApiPropertyOptional()
   @Column('character varying', { name: 'iucn_cat' })
-  fullName?: string;
-
-  /**
-   * IUCN category.
-   *
-   * Only applies to IUCN-defined protected areas.
-   */
-  @ApiPropertyOptional()
-  @Column('character varying', { name: 'iucn_cat' })
   iucnCategory?: IUCNCategory;
 
   /**
