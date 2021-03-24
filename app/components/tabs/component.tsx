@@ -2,13 +2,13 @@ import React from 'react';
 import cx from 'classnames';
 
 export interface TabsProps {
-  items: Array<{
-    id: number;
+  items: {
+    id: number | string;
     name: string;
-    status: 'active' | 'disabled';
-    warning: boolean;
-    requirements: React.ReactNode;
-  }>;
+    status?: 'active' | 'disabled';
+    warning?: boolean;
+    requirements?: React.ReactNode;
+  }[];
   selected: string | number;
   className?: string;
   onSelected?: (selected: string | number) => void | unknown;
@@ -19,7 +19,7 @@ export const Tabs: React.FC<TabsProps> = ({
   selected,
   onSelected,
 }: TabsProps) => (
-  <ul className="flex justify-between flex-grow py-3 font-heading">
+  <ul className="flex justify-between font-heading">
     {items.map((tab) => (
       <li key={tab.id}>
         <button
