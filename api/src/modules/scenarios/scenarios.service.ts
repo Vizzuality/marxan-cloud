@@ -49,6 +49,7 @@ export class ScenariosService extends AppBaseService<
         'boundaryLengthModifier',
         'metadata',
         'status',
+        'projectId',
         'project',
         'users',
         'createdAt',
