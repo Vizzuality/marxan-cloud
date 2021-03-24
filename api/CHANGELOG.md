@@ -16,6 +16,9 @@ Unreleased
 - Ability to configure which entities can be requested as included relationships
   in JSON:API responses via `?include=` query param.
 - Configure allowed included entities for some of the key entities.
+- Scenarios:
+  - Ability to associate WDPA protected areas to a scenario by their IUCN category [MARXAN-217]
+  - Ability to associate project-specific protected areas to a scenario by their id [MARXAN-217] 
 
 ### Changed
 
