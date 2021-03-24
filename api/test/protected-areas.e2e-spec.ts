@@ -77,11 +77,11 @@ describe('ProtectedAreasModule (e2e)', () => {
     await Promise.all([app.close()]);
   });
 
-  describe('Scenarios', () => {
+  describe('Protected areas', () => {
     /**
      * https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991%3A2265
      */
-    describe.skip('Scenario creation - preparation - upload protected area network geometries', () => {
+    describe.skip('Upload protected area network geometries', () => {
       let protectedAreaNetworkUploadResult: {
         id: string;
         name: string;
@@ -113,7 +113,7 @@ describe('ProtectedAreasModule (e2e)', () => {
     /**
      * https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991%3A2146
      */
-    describe('Scenario creation - preparation - protected areas by admin area', () => {
+    describe('Protected areas by admin area', () => {
       const country = 'NAM';
       const l1AdminArea = 'NAM.13_1';
       const l2AdminArea = 'NAM.13.5_1';
@@ -218,29 +218,19 @@ describe('ProtectedAreasModule (e2e)', () => {
       });
     });
 
-    describe.skip('Scenario creation', () => {
-      test('As a user, I should be able to create a scenario within a given project', async () => {
-        const availableProjects = await request(app.getHttpServer())
-          .get('/api/v1/projects?disablePagination=true')
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
-
-        const allProjects = availableProjects.body.data;
-        expect(allProjects[0].type).toBe('projects');
-        const aProject = allProjects[0];
-
+    describe('Protected areas', () => {
+      test('As a user, I should be able to associate WDPA protected areas to a scenario via their IUCN category', async () => {
         const createScenarioDTO: Partial<CreateScenarioDTO> = {
           ...E2E_CONFIG.scenarios.valid.minimal(),
           projectId: aProject.id,
+          wdpaIucnCategories: [IUCNCategory.Ia],
         };
-
-        const newScenario = await request(app.getHttpServer())
-          .post('/api/v1/scenarios')
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .send(createScenarioDTO)
-          .expect(201);
-
-        const aScenario = newScenario.body.data;
+        const scenario: Scenario = await ScenariosTestUtils.createScenario(
+            app,
+            jwtToken,
+            createScenarioDTO,
+          ).then(async (response) => await Deserializer.deserialize(response));
+        expect(scenario.wdpaFilter).not.toBeNull();
       });
     });
   });
