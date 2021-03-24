@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsArray,
   IsEnum,
   IsInt,
   IsNumber,
@@ -9,6 +10,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
+import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
 import { JobStatus, ScenarioType } from '../scenario.api.entity';
 
 export class CreateScenarioDTO {
@@ -31,7 +33,15 @@ export class CreateScenarioDTO {
 
   @ApiPropertyOptional()
   @IsOptional()
-  wdpaFilter?: Record<string, unknown>;
+  @IsArray()
+  @IsEnum(IUCNCategory)
+  wdpaIucnCategories?: IUCNCategory[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsArray()
+  @IsUUID()
+  customProtectedAreaIds?: string[];
 
   @ApiPropertyOptional()
   @IsInt()
