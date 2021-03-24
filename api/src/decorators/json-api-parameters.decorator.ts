@@ -142,7 +142,6 @@ export function JSONAPISingleEntityQueryParams(fetchConfiguration?: {
     descriptor: TypedPropertyDescriptor<unknown>,
   ) {
     includeQueryParam(fetchConfiguration)(target, propertyKey, descriptor);
-    filterQueryParam(fetchConfiguration)(target, propertyKey, descriptor);
     fieldsQueryParam(target, propertyKey, descriptor);
     omitFieldsQueryParam(target, propertyKey, descriptor);
   };
