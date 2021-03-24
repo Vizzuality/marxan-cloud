@@ -1,17 +1,19 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-export type IUCNCategory =
-  | 'Ia'
-  | 'Ib'
-  | 'II'
-  | 'III'
-  | 'IV'
-  | 'V'
-  | 'VI'
-  | 'Not Applicable'
-  | 'Not Assigned'
-  | 'Not Reported';
+export enum IUCNCategory {
+  Ia = 'Ia',
+  Ib = 'Ib',
+  II = 'II',
+  III = 'III',
+  IV = 'IV',
+  V = 'V',
+  VI = 'VI',
+  NotApplicable = 'Not Applicable',
+  NotAssigned = 'Not Assigned',
+  NotReported = 'Not Reported',
+}
+
 @Entity('wdpa')
 export class ProtectedArea {
   @ApiProperty()
