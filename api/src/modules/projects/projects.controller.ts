@@ -90,7 +90,9 @@ export class ProjectsController {
 
   @ApiOperation({ description: 'Find project by id' })
   @ApiOkResponse({ type: ProjectResultSingular })
-  @JSONAPISingleEntityQueryParams()
+  @JSONAPISingleEntityQueryParams({
+    entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
+  })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ProjectResultSingular> {
     return await this.service.serialize(await this.service.getById(id));
