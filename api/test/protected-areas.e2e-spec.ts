@@ -7,17 +7,24 @@ import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
 import { IUCNProtectedAreaCategoryDTO } from 'modules/protected-areas/dto/iucn-protected-area-category.dto';
 import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
 import * as JSONAPISerializer from 'jsonapi-serializer';
+import { Organization } from 'modules/organizations/organization.api.entity';
+import { OrganizationsTestUtils } from './utils/organizations.test.utils';
+import { ProjectsTestUtils } from './utils/projects.test.utils';
+import { Project } from 'modules/projects/project.api.entity';
+import { ScenariosTestUtils } from './utils/scenarios.test.utils';
+import { Scenario } from 'modules/scenarios/scenario.api.entity';
 
 /**
- * Tests for API contracts to be included in the upcoming sprint (s01e02), aka
- * Sprint as Code (SaC).
+ * Tests for API contracts for the management of protected areas within scenarios.
  */
-describe('Protected areas', () => {
+describe('ProtectedAreasModule (e2e)', () => {
   let app: INestApplication;
   let jwtToken: string;
   const Deserializer = new JSONAPISerializer.Deserializer({
     keyForAttribute: 'camelCase',
   });
+  let anOrganization: Organization;
+  let aProject: Project;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -43,9 +50,30 @@ describe('Protected areas', () => {
       .expect(201);
 
     jwtToken = response.body.accessToken;
+
+    anOrganization = await OrganizationsTestUtils.createOrganization(
+      app,
+      jwtToken,
+      E2E_CONFIG.organizations.valid.minimal(),
+    ).then(async (response) => {
+      Logger.debug(response);
+      return await Deserializer.deserialize(response);
+    });
+
+    aProject = await ProjectsTestUtils.createProject(
+      app,
+      jwtToken,
+      {
+        ...E2E_CONFIG.projects.valid.minimal(),
+        organizationId: anOrganization.id,
+      },
+    ).then(async (response) => await Deserializer.deserialize(response));
   });
 
   afterAll(async () => {
+    await ProjectsTestUtils.deleteProject(app, jwtToken, aProject.id);
+    await OrganizationsTestUtils.deleteOrganization(app, jwtToken, anOrganization.id);
+
     await Promise.all([app.close()]);
   });
 
