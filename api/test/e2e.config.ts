@@ -43,7 +43,7 @@ export const E2E_CONFIG: {
   };
   protectedAreas: {
     categories: {
-      valid: Array<IUCNCategory>;
+      valid: IUCNCategory[];
     };
   };
 } = {
@@ -141,16 +141,16 @@ export const E2E_CONFIG: {
   protectedAreas: {
     categories: {
       valid: [
-        'Ia',
-        'Ib',
-        'II',
-        'III',
-        'IV',
-        'V',
-        'VI',
-        'Not Applicable',
-        'Not Assigned',
-        'Not Reported',
+        IUCNCategory.Ia,
+        IUCNCategory.Ib,
+        IUCNCategory.II,
+        IUCNCategory.III,
+        IUCNCategory.IV,
+        IUCNCategory.V,
+        IUCNCategory.VI,
+        IUCNCategory.NotApplicable,
+        IUCNCategory.NotAssigned,
+        IUCNCategory.NotReported,
       ],
     },
   },
