@@ -6,6 +6,7 @@ import ScenariosSidebarWDPAThreshold from 'layout/scenarios/sidebar/wdpa/thresho
 
 import { useRouter } from 'next/router';
 import { useScenario } from 'hooks/scenarios';
+import Steps from 'components/steps';
 
 export interface ScenariosSidebarWDPAProps {
 }
@@ -21,7 +22,10 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
 
   return (
     <Pill>
-      <h2 className="mb-5 text-lg font-medium font-heading">Protected areas</h2>
+      <header className="flex items-baseline gap-4 mb-5">
+        <h2 className="text-lg font-medium font-heading">Protected areas</h2>
+        <Steps step={step + 1} length={2} />
+      </header>
 
       {step === 0 && (
         <ScenariosSidebarWDPACategories
