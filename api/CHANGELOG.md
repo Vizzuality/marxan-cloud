@@ -6,9 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0]
+
+## [0.3.0]
 
 Unreleased
+
+### Added
+
+- Ability to configure which entities can be requested as included relationships
+  in JSON:API responses via `?include=` query param.
+- Configure allowed included entities for some of the key entities.
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+
+## [0.2.0]
+
+2021-03-22
 
 ### Added
 
@@ -19,9 +37,6 @@ Unreleased
   - list IUCN categories of protected areas in a given geometry [MARXAN-179]
   - list protected areas in a given admin area [MARXAN-180]
   - list protected areas in a given geometry [MARXAN-175]
-- Ability to configure which entities can be requested as included relationships
-  in JSON:API responses via `?include=` query param.
-- Configure allowed included entities for some of the key entities.
 
 ### Changed
 
