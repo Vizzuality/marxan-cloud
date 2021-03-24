@@ -51,10 +51,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   const onSubmit = useCallback(async (values) => {
     setSubmitting(true);
 
+    const { wdpaThreshold } = values;
+
     mutation.mutate({
       id: data.id,
       data: {
-        ...values,
+        wdpaThreshold: wdpaThreshold * 100,
       },
     }, {
       onSuccess: () => {
@@ -96,7 +98,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     <FormRFF
       onSubmit={onSubmit}
       initialValues={{
-        wdpaThreshold: wdpaThreshold || 0.75,
+        wdpaThreshold: wdpaThreshold ? wdpaThreshold / 100 : 0.75,
       }}
     >
       {({ values, handleSubmit }) => (
