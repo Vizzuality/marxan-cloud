@@ -18,10 +18,10 @@ import { useRouter } from 'next/router';
 import { useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
-export interface ScenariosSidebarProps {
+export interface ScenariosSidebarNameProps {
 }
 
-export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
+export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { query, push } = useRouter();
   const { pid } = query;
@@ -46,7 +46,7 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
       },
     }, {
       onSuccess: ({ data: s }) => {
-        addToast('success-project-create', (
+        addToast('success-scenario-create', (
           <>
             <h2 className="font-medium">Success!</h2>
             <p className="text-sm">{`Scenario "${s.name}" created`}</p>
@@ -58,7 +58,7 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
         push(`/projects/${pid}/scenarios/${s.id}/edit`);
       },
       onError: () => {
-        addToast('success-project-create', (
+        addToast('success-scenario-create', (
           <>
             <h2 className="font-medium">Error!</h2>
             <p className="text-sm">Scenario not created</p>
@@ -68,12 +68,21 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
         });
 
         setSubmitting(false);
+
+        addToast('error-scenario-name', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario not created</p>
+          </>
+        ), {
+          level: 'error',
+        });
       },
     });
   }, [mutation, pid, push, addToast]);
 
   return (
-    <Pill>
+    <Pill selected>
       <FormRFF
         onSubmit={handleSubmit}
       >
@@ -112,4 +121,4 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = () => {
   );
 };
 
-export default ScenariosSidebar;
+export default ScenariosSidebarName;

@@ -11,6 +11,7 @@ export const Select: React.FC<SelectProps> = (props: SelectProps) => {
     size = 'base',
     placeholder = 'Select...',
     multiple,
+    selected,
     initialSelected,
     onChange,
   } = props;
@@ -25,12 +26,23 @@ export const Select: React.FC<SelectProps> = (props: SelectProps) => {
     return initialSelected;
   }, [multiple, initialSelected]);
 
-  const handleChange = useCallback((selected) => {
-    if (Array.isArray(selected)) {
-      const values = selected.map(({ value }) => value);
-      onChange(values);
+  const values = useMemo(() => {
+    if (typeof selected !== 'undefined') {
+      if (multiple) {
+        if (Array.isArray(selected)) return selected;
+
+        return [selected];
+      }
+    }
+    return selected;
+  }, [multiple, selected]);
+
+  const handleChange = useCallback((s) => {
+    if (Array.isArray(s)) {
+      const vs = s.map(({ value }) => value);
+      onChange(vs);
     } else {
-      const { value } = selected;
+      const { value } = s;
       onChange(value);
     }
   }, [onChange]);
@@ -43,6 +55,7 @@ export const Select: React.FC<SelectProps> = (props: SelectProps) => {
         size={size}
         placeholder={placeholder}
         initialValues={initialValues}
+        values={values}
         onSelect={handleChange}
       />
     );
@@ -55,6 +68,7 @@ export const Select: React.FC<SelectProps> = (props: SelectProps) => {
       size={size}
       placeholder={placeholder}
       initialValues={initialValues}
+      values={values}
       onSelect={handleChange}
     />
   );
