@@ -8,8 +8,8 @@ import {
 import CountryRegionSelector from 'components/countries/country-region-selector';
 import PlanningUnitGrid from 'components/projects/planning-unit-grid';
 import PlanningUnitAreaSize from 'components/projects/planning-unit-area-size';
-import { PlanningArea } from 'types/project-model';
 
+import { PlanningArea } from 'types/project-model';
 import { PlanningAreaSelectorProps } from './types';
 
 export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
