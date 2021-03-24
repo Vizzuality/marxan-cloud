@@ -68,7 +68,9 @@ export class ScenariosController {
 
   @ApiOperation({ description: 'Find scenario by id' })
   @ApiOkResponse({ type: ScenarioResult })
-  @JSONAPISingleEntityQueryParams()
+  @JSONAPISingleEntityQueryParams({
+    entitiesAllowedAsIncludes: scenarioResource.entitiesAllowedAsIncludes,
+  })
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
