@@ -82,7 +82,7 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
   }, [mutation, pid, push, addToast]);
 
   return (
-    <Pill>
+    <Pill selected>
       <FormRFF
         onSubmit={handleSubmit}
       >
