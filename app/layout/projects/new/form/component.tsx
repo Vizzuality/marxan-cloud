@@ -9,8 +9,8 @@ import Label from 'components/forms/label';
 import Input from 'components/forms/input';
 import Textarea from 'components/forms/textarea';
 import Button from 'components/button';
+import InfoButton from 'components/info-button';
 
-import INFO_SVG from 'svgs/project/info.svg?sprite';
 import UPLOAD_SHAPEFILE_SVG from 'svgs/ui/upload.svg?sprite';
 
 import {
@@ -125,14 +125,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
             {/* PLANNING AREA */}
             <div className="flex items-center justify-between mt-6">
               <div className="flex items-center">
-                <Label theme="dark" className="uppercase text-xxs">Planning area</Label>
-                <button
-                  className="w-5 h-5 ml-2"
-                  type="button"
-                  onClick={() => console.info('Planning Area info button click')}
-                >
-                  <Icon icon={INFO_SVG} />
-                </button>
+                <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
+                <InfoButton>
+                  <span>Planning area info button.</span>
+                </InfoButton>
               </div>
               {/* TEMPORARILY HIDDEN, it will be implemented in the future */}
               <div className="hidden">

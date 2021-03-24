@@ -8,7 +8,7 @@ import Arrow from './arrow';
 import { TooltipProps } from './types';
 
 export const Tooltip: React.FC<TooltipProps> = ({
-  children, content, arrow, ...props
+  children, content, arrow, maxWidth, ...props
 }: TooltipProps) => {
   const springConfig: SpringOptions = { damping: 15, stiffness: 300 };
   const opacity = useSpring(0, springConfig);
@@ -35,7 +35,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
     <Tippy
       {...props}
       render={(attrs) => (
-        <motion.div style={{ scale, opacity }} {...attrs}>
+        <motion.div style={{ scale, opacity, maxWidth: maxWidth || 'none' }} {...attrs}>
           <div className="relative">
             {content}
 
