@@ -80,9 +80,8 @@ const options = {
     // Assigning encoded token from API to token created in the session
     async jwt(token, user) {
       if (user) {
-        const { accessToken, ...rest } = user;
+        const { accessToken } = user;
         token.accessToken = accessToken;
-        token.user = rest;
       }
 
       return token;
