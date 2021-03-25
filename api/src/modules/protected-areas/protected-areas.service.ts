@@ -190,4 +190,33 @@ export class ProtectedAreasService extends AppBaseService<
 
     return serializer.serialize(results);
   }
+
+  /**
+   * Find all the WDPA protected areas whose IUCN category is within those
+   * provided, that fall within the given planning area.
+   *
+   * @todo This should be refactored to take into account a planned FK from
+   * protected areas to their upstream database so that we can limit the
+   * selection to records that were added via a specific WDPA upstream release.
+   *
+   * In practice, we don't allow users to set the IUCN category prop when
+   * creating a new protected area record via geometry upload, so a record
+   * having the iucnCategory property set is a reliable proxy of areas whose
+   * source is WDPA (without taking into account WDPA releases, which we don't
+   * currently support).
+   */
+  async findAllWDPAProtectedAreasInPlanningAreaByIUCNCategory(
+    planningAreaId: string,
+    iucnCategories: IUCNCategory[],
+  ): Promise<ProtectedArea[]> {
+    return await this.repository
+      .createQueryBuilder(this.alias)
+      .where(
+        `${this.alias}.iucnCategory IN (:...iucnCategories)
+        AND st_intersects(${this.alias}.the_geom,
+        (select the_geom from admin_regions a WHERE a.id = :planningAreaId));`,
+        { planningAreaId, iucnCategories },
+      )
+      .getMany();
+  }
 }
