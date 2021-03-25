@@ -24,7 +24,7 @@ export class ProtectedArea {
    * WDPA id.
    */
   @ApiProperty()
-  @Column('double precision')
+  @Column('double precision', { name: 'wdpaid' })
   wdpaId?: number;
 
   /**
@@ -63,7 +63,7 @@ export class ProtectedArea {
    * This references the admin_regions.gid_0 column.
    */
   @ApiPropertyOptional()
-  @Column('character varying')
+  @Column('character varying', { name: 'iso3' })
   countryId?: string;
 
   /**

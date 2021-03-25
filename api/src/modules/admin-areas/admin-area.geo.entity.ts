@@ -35,7 +35,7 @@ export class AdminArea extends Country {
    * Level 1 name.
    */
   @ApiProperty()
-  @PrimaryColumn('character varying', { name: 'name_1' })
+  @Column('character varying', { name: 'name_1' })
   name1: string;
 
   /**
