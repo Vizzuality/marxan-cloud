@@ -5,7 +5,10 @@ import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
 import { IUCNProtectedAreaCategoryDTO } from 'modules/protected-areas/dto/iucn-protected-area-category.dto';
-import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
+import {
+  IUCNCategory,
+  ProtectedArea,
+} from 'modules/protected-areas/protected-area.geo.entity';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Organization } from 'modules/organizations/organization.api.entity';
 import { OrganizationsTestUtils } from './utils/organizations.test.utils';
@@ -15,7 +18,8 @@ import { ScenariosTestUtils } from './utils/scenarios.test.utils';
 import { Scenario } from 'modules/scenarios/scenario.api.entity';
 
 /**
- * Tests for API contracts for the management of protected areas within scenarios.
+ * Tests for API contracts for the management of protected areas within
+ * scenarios.
  */
 describe('ProtectedAreasModule (e2e)', () => {
   let app: INestApplication;
