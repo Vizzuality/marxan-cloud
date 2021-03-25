@@ -28,6 +28,13 @@ export class ProtectedArea {
   wdpaId?: number;
 
   /**
+   * Full name of the protected area.
+   */
+  @ApiPropertyOptional()
+  @Column('character varying', { name: 'full_name' })
+  fullName?: string;
+
+  /**
    * IUCN category.
    *
    * Only applies to IUCN-defined protected areas.
