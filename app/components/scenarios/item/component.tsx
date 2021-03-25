@@ -1,12 +1,12 @@
 import React from 'react';
 import cx from 'classnames';
-import { formatDistanceToNow } from 'date-fns';
 
 import Button from 'components/button';
 import ProgressBar from 'components/progress-bar';
 import Icon from 'components/icon';
-import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg';
-import WARNING_SVG from 'svgs/ui/warning.svg';
+
+import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
+import WARNING_SVG from 'svgs/ui/warning.svg?sprite';
 
 const SCENARIO_STATES = {
   running: {
@@ -28,9 +28,10 @@ export interface ItemProps {
   name: string;
   warnings: boolean;
   progress?: number;
-  updatedAt: string;
+  lastUpdate: string;
+  lastUpdateDistance: string;
   className?: string;
-  status: 'running' | 'completed' | 'draft';
+  status?: 'running' | 'completed' | 'draft';
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onView: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onSettings: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -40,16 +41,16 @@ export const Item: React.FC<ItemProps> = ({
   name,
   warnings,
   progress,
-  updatedAt,
+  lastUpdateDistance,
   className,
-  status,
+  status = 'draft',
   onEdit,
   onView,
   onSettings,
 }: ItemProps) => (
   <div
     className={cx({
-      'flex space-x-0.5 bg-transparent h-20': true,
+      'flex space-x-0.5 bg-transparent h-16': true,
       [className]: !!className,
     })}
   >
@@ -64,17 +65,19 @@ export const Item: React.FC<ItemProps> = ({
                   <Icon className="w-10 h-10" icon={WARNING_SVG} />
                 </div>
               )}
-              <div>
+
+              <div className="leading-none">
                 <h2
-                  className="m-0 text-sm font-medium font-heading clamp-1"
+                  className="text-sm font-medium font-heading clamp-1"
                   title={name}
                 >
                   {name}
                 </h2>
+
                 <div className="clamp-1">
                   <span
                     className={cx({
-                      'm-0 text-xs': true,
+                      'm-0 text-xs inline-block': true,
                       [SCENARIO_STATES[status].styles]:
                         status !== SCENARIO_STATES[status].text,
                     })}
@@ -83,14 +86,12 @@ export const Item: React.FC<ItemProps> = ({
                   </span>
                   <span
                     className={cx({
-                      'm-0 text-xs': true,
+                      'ml-1 text-xs inline-block': true,
                       [SCENARIO_STATES[status].styles]:
                         status !== SCENARIO_STATES[status].text,
                     })}
                   >
-                    {formatDistanceToNow(new Date(updatedAt), {
-                      addSuffix: true,
-                    })}
+                    {lastUpdateDistance}
                   </span>
                 </div>
               </div>
@@ -116,12 +117,14 @@ export const Item: React.FC<ItemProps> = ({
       </div>
       {status === 'running' && progress && <ProgressBar progress={progress} />}
     </div>
+
     <button
       type="button"
       onClick={onView}
       disabled={status !== 'completed'}
       className={cx({
-        'flex items-center h-full px-8 bg-gray-700 text-primary-500 flex-column rounded-r-3xl focus:outline-blue': true,
+        'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl focus:outline-blue': true,
+        'text-primary-500': status === 'completed',
         'text-gray-400 pointer-events-none': status !== 'completed',
       })}
     >
