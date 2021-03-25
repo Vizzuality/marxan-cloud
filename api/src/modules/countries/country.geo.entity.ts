@@ -12,9 +12,9 @@ export const countryResource: BaseServiceResource = {
 
 @Entity('countries')
 export class Country {
-  get id() {
-    return this.gid0;
-  }
+  @ApiProperty()
+  @PrimaryColumn()
+  id: string;
 
   /**
    * Country id (ISO 3166-1 alpha-3).
