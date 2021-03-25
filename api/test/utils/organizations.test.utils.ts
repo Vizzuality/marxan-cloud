@@ -13,7 +13,7 @@ import { OrganizationResultSingular } from 'modules/organizations/organization.a
  * here as these utility functions mainly do some work at the edge of what is
  * actually being tested.
  */
- export class OrganizationsTestUtils {
+export class OrganizationsTestUtils {
   static async createOrganization(
     app: INestApplication,
     jwtToken: string,
