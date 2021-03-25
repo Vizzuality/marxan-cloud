@@ -6,7 +6,7 @@ import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateProtectedAreaDTO } from './dto/create.protected-area.dto';
 import { UpdateProtectedAreaDTO } from './dto/update.protected-area.dto';
-import { ProtectedArea } from './protected-area.geo.entity';
+import { IUCNCategory, ProtectedArea } from './protected-area.geo.entity';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 
 import {
@@ -21,6 +21,20 @@ import {
 } from './dto/iucn-protected-area-category.dto';
 import { AdminAreasService } from 'modules/admin-areas/admin-areas.service';
 import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
+
+const protectedAreaFilterKeyNames = [
+  'fullName',
+  'wdpaId',
+  'iucnCategory',
+  'status',
+  'designation',
+  'countryId',
+] as const;
+type ProtectedAreaFilterKeys = keyof Pick<
+  ProtectedArea,
+  typeof protectedAreaFilterKeyNames[number]
+>;
+type ProtectedAreaBaseFilters = Record<ProtectedAreaFilterKeys, string[]>;
 
 export const protectedAreaResource: BaseServiceResource = {
   className: 'ProtectedArea',
@@ -62,8 +76,8 @@ export class ProtectedAreasService extends AppBaseService<
 
   setFilters(
     query: SelectQueryBuilder<ProtectedArea>,
-    filters: ProtectedAreaFilters,
-    info?: AppInfoDTO,
+    filters: ProtectedAreaBaseFilters & ProtectedAreaFilters,
+    _info?: AppInfoDTO,
   ): SelectQueryBuilder<ProtectedArea> {
     /**
      * @debt This is a bit of a hack - here we are bending a wrong abstraction
@@ -97,6 +111,12 @@ export class ProtectedAreasService extends AppBaseService<
       query.andWhere(`st_intersects(the_geom, (select the_geom from admin_regions a
         WHERE ${whereClause}))`);
     }
+
+    query = this._processBaseFilters<ProtectedAreaBaseFilters>(
+      query,
+      filters,
+      protectedAreaFilterKeyNames,
+    );
 
     return query;
   }
