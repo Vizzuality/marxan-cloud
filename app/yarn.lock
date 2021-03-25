@@ -10758,10 +10758,10 @@ nested-error-stacks@^2.0.0, nested-error-stacks@^2.1.0:
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz#0fbdcf3e13fe4994781280524f8b96b0cdff9c61"
   integrity sha512-AO81vsIO1k1sM4Zrd6Hu7regmJN1NSiAja10gc4bX3F0wd+9rQmcuHQaHVQCYIEC8iFXnE+mavh23GOt7wBgug==
 
-next-auth@^3.7.0:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/next-auth/-/next-auth-3.7.0.tgz#29dd88bfeb51e9039642f855bbc4a54977c5683e"
-  integrity sha512-RyvMnnPr1vVt5PXeky537mb6cQCohPyGFIZuukEeXTyNpBhcKz25ws6l8mQQqduPIj/qB3tlQrSu46lyEGwA+g==
+next-auth@^3.13.3:
+  version "3.13.3"
+  resolved "https://registry.yarnpkg.com/next-auth/-/next-auth-3.13.3.tgz#d684f30e91e37416af4b250201dd3e216e493433"
+  integrity sha512-hPt1HlTjnBxWS14ZvWgTjQRCawxOYv+62E/2fUMTllkx/54yx3F2PbSx2aimoTyjybSH62vukkTgq4UId6PRew==
   dependencies:
     crypto-js "^4.0.0"
     futoin-hkdf "^1.3.2"
@@ -10771,7 +10771,7 @@ next-auth@^3.7.0:
     oauth "^0.9.15"
     pkce-challenge "^2.1.0"
     preact "^10.4.1"
-    preact-render-to-string "^5.1.7"
+    preact-render-to-string "^5.1.14"
     querystring "^0.2.0"
     require_optional "^1.0.1"
     typeorm "^0.2.30"
@@ -11966,10 +11966,10 @@ potpack@^1.0.1:
   resolved "https://registry.yarnpkg.com/potpack/-/potpack-1.0.1.tgz#d1b1afd89e4c8f7762865ec30bd112ab767e2ebf"
   integrity sha512-15vItUAbViaYrmaB/Pbw7z6qX2xENbFSTA7Ii4tgbPtasxm5v6ryKhKtL91tpWovDJzTiZqdwzhcFBCwiMVdVw==
 
-preact-render-to-string@^5.1.7:
-  version "5.1.12"
-  resolved "https://registry.yarnpkg.com/preact-render-to-string/-/preact-render-to-string-5.1.12.tgz#3d258a177ef8947f768dd0f2c56629e7fda2dc39"
-  integrity sha512-nXVCOpvepSk9AfPwqS08rf9NDOCs8eeYYlG+7tE85iP5jVyjz+aYb1BYaP5SPdfVWVrzI9L5NzxozUvKaD96tA==
+preact-render-to-string@^5.1.14:
+  version "5.1.16"
+  resolved "https://registry.yarnpkg.com/preact-render-to-string/-/preact-render-to-string-5.1.16.tgz#379db30e51916d45a67c00163ef812ad376aa721"
+  integrity sha512-HvO3W29Sziz9r5FZGwl2e34XJKzyRLvjhouv3cpkCGszNPdnvkO8p4B6CBpe0MT/tzR+QVbmsAKLrMK222UXew==
   dependencies:
     pretty-format "^3.8.0"
 
