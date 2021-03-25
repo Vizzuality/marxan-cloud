@@ -141,7 +141,85 @@ export class ScenariosService extends AppBaseService<
     info?: AppInfoDTO,
   ): Promise<Scenario> {
     const model = await super.setDataCreate(create, info);
+    const wdpaAreaIds = await this.getWDPAAreasWithinProjectByIUCNCategory(
+      create,
+    );
+    model.protectedAreaIds = concat(
+      wdpaAreaIds,
+      create.customProtectedAreaIds,
+    ).filter((i): i is string => !!i);
     model.createdBy = info?.authenticatedUser?.id!;
     return model;
+  }
+
+  async setDataUpdate(
+    model: Scenario,
+    update: UpdateScenarioDTO,
+    _info?: AppInfoDTO,
+  ): Promise<Scenario> {
+    if (update.wdpaIucnCategories || update.customProtectedAreaIds) {
+      const wdpaAreaIds = await this.getWDPAAreasWithinProjectByIUCNCategory(
+        update,
+      );
+      model.protectedAreaIds = concat(
+        wdpaAreaIds,
+        update.customProtectedAreaIds,
+      ).filter((i): i is string => !!i);
+    }
+    return model;
+  }
+
+  /**
+   * Link protected areas to the scenario.
+   */
+  async getWDPAAreasWithinProjectByIUCNCategory(
+    {
+      projectId,
+      wdpaIucnCategories,
+    }:
+      | Pick<CreateScenarioDTO, 'projectId' | 'wdpaIucnCategories'>
+      | Pick<UpdateScenarioDTO, 'projectId' | 'wdpaIucnCategories'>,
+    _info?: AppInfoDTO,
+  ): Promise<string[] | undefined> {
+    /**
+     * If no IUCN categories were supplied, we're done.
+     */
+    if (!wdpaIucnCategories) {
+      return;
+    }
+
+    /**
+     * We need to get the parent project's metadata first
+     */
+    const parentProject = await this.projectRepository.findOneOrFail(projectId);
+
+    /**
+     * We can then check if project boundaries are set (either a GADM admin area
+     * or a custom geometry).
+     *
+     * @todo Custom project planning area geometries are not implemented yet; once
+     * users can upload and select these, we should add selection of protected
+     * areas in custom geometries here. In practice this should all be handled in
+     * Project.getPlanningArea(), but we'll need to check that things work as
+     * expected.
+     */
+    const planningAreaId = await this.projectsService
+      .getPlanningArea(parentProject)
+      .then((r) => r?.id);
+
+    /**
+     * If project boundaries are set, we can then retrieve WDPA protected areas
+     * that intersect the boundaries, via the list of user-supplied IUCN
+     * categories they want to use as selector for protected areas.
+     */
+    const wdpaAreaIdsWithinPlanningArea = planningAreaId
+      ? await this.protectedAreasService
+          .findAllWDPAProtectedAreasInPlanningAreaByIUCNCategory(
+            planningAreaId,
+            wdpaIucnCategories,
+          )
+          .then((r) => r.map((i) => i.id))
+      : undefined;
+    return wdpaAreaIdsWithinPlanningArea;
   }
 }
