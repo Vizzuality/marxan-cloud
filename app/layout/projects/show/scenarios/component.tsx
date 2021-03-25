@@ -14,41 +14,7 @@ import ScenarioTypes from 'layout/projects/show/scenarios/scenario-type';
 
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
-
-// const SCENARIOS = [
-//   {
-//     id: 1,
-//     name: 'Scenario 1',
-//     status: 'running',
-//     progress: 43,
-//     updatedAt: '2019-04-11T10:20:30Z',
-//   },
-//   {
-//     id: 2,
-//     name: 'Scenario 2',
-//     status: 'completed',
-//     updatedAt: '2020-04-11T10:20:30Z',
-//   },
-//   {
-//     id: 3,
-//     name: 'Scenario 3',
-//     status: 'draft',
-//     updatedAt: '2020-12-23T10:20:30Z',
-//   },
-//   {
-//     id: 4,
-//     name: 'Mount Gorongosa',
-//     status: 'draft',
-//     updatedAt: '2020-09-23T10:20:30Z',
-//     warnings: true,
-//   },
-//   {
-//     id: 5,
-//     name: 'Illas Cies',
-//     status: 'draft',
-//     updatedAt: '2020-12-23T10:20:30Z',
-//   },
-// ];
+import { useScenarios } from 'hooks/scenarios';
 
 export interface ProjectScenariosProps {
 }
@@ -57,12 +23,26 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   const [modal, setModal] = useState(false);
   const { query } = useRouter();
   const { pid } = query;
-  const { data = {} } = useProject(pid);
-  const { id, scenarios = [] } = data;
+  const {
+    isFetching: projectIsFetching,
+    isFetched: projectIsFetched,
+  } = useProject(pid);
+
+  const {
+    data: scenariosData = [],
+    isFetching: scenariosAreFetching,
+    isFetched: scenariosAreFetched,
+  } = useScenarios(pid);
+
+  const loading = (
+    projectIsFetching && !projectIsFetched
+  ) || (
+    scenariosAreFetching && !scenariosAreFetched
+  );
 
   return (
     <AnimatePresence>
-      {id && !scenarios.length && (
+      {!loading && !scenariosData.length && (
         <motion.div
           key="project-scenarios-empty"
           initial={{ y: -10, opacity: 0 }}
@@ -86,26 +66,35 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               <span className="mr-5">Create scenario</span>
               <Icon icon={PLUS_SVG} className="w-4 h-4" />
             </Button>
-
-            <Modal
-              title="Hello"
-              open={modal}
-              size="wide"
-              onDismiss={() => setModal(false)}
-            >
-              <ScenarioTypes />
-            </Modal>
           </div>
         </motion.div>
       )}
 
-      {id && !!scenarios.length && (
+      {!loading && !!scenariosData.length && (
         <motion.div key="projects-scenarios">
-          {scenarios.map((s) => {
-            return <ScenarioItem className="mb-3" key={`${s.id}`} {...s} />;
+          {scenariosData.map((s) => {
+            return <ScenarioItem className="mb-3" key={`${s.id}`} {...s} status="draft" />;
           })}
+
+          <button
+            type="button"
+            className="flex items-center justify-center w-full h-16 gap-3 px-8 text-sm bg-gray-700 rounded-3xl text-primary-500"
+            onClick={() => setModal(true)}
+          >
+            <span>Create scenario</span>
+            <Icon icon={PLUS_SVG} className="w-4 h-4" />
+          </button>
         </motion.div>
       )}
+
+      <Modal
+        title="Hello"
+        open={modal}
+        size="wide"
+        onDismiss={() => setModal(false)}
+      >
+        <ScenarioTypes />
+      </Modal>
     </AnimatePresence>
   );
 };
