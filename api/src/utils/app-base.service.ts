@@ -4,7 +4,6 @@ import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { DEFAULT_PAGINATION } from 'nestjs-base-service';
-import { Logger } from '@nestjs/common';
 import { castArray } from 'lodash';
 
 export class PaginationMeta {
@@ -68,8 +67,9 @@ export abstract class AppBaseService<
     protected readonly repository: Repository<Entity>,
     protected alias: string = 'base_entity',
     protected pluralAlias: string = 'base_entities',
+    protected idProperty: string = 'id',
   ) {
-    super(repository, alias);
+    super(repository, alias, idProperty);
   }
 
   /**

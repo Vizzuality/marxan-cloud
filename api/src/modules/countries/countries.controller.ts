@@ -49,8 +49,6 @@ export class CountriesController {
   @JSONAPISingleEntityQueryParams()
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<CountryResult> {
-    return await this.service.serialize(
-      await this.service.getById(id, undefined, undefined, 'gid0'),
-    );
+    return await this.service.serialize(await this.service.getById(id));
   }
 }
