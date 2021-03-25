@@ -122,7 +122,7 @@ export class ProjectsService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<Project>,
     filters: ProjectFilters,
-    info?: AppInfoDTO,
+    _info?: AppInfoDTO,
   ): SelectQueryBuilder<Project> {
     this._processBaseFilters<ProjectFilters>(
       query,

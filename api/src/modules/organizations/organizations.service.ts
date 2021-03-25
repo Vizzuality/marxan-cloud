@@ -81,7 +81,7 @@ export class OrganizationsService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<Organization>,
     filters: OrganizationFilters,
-    info?: AppInfoDTO,
+    _info?: AppInfoDTO,
   ): SelectQueryBuilder<Organization> {
     this._processBaseFilters<OrganizationFilters>(
       query,
