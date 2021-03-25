@@ -94,30 +94,30 @@ export abstract class AppBaseService<
    * results rather than entities.
    */
   async findAllPaginatedRaw(
-    fetchSpecification: FetchSpecification,
+    fetchSpecification?: FetchSpecification,
     info?: Info,
   ): Promise<{
     data: (Partial<Entity> | undefined)[];
     metadata: PaginationMeta | undefined;
   }> {
     const entitiesAndCount = await this.findAllRaw(fetchSpecification, info);
-    return this._paginate(fetchSpecification, entitiesAndCount);
+    return this._paginate(entitiesAndCount, fetchSpecification);
   }
 
   async findAllPaginated(
-    fetchSpecification: FetchSpecification,
+    fetchSpecification?: FetchSpecification,
     info?: Info,
   ): Promise<{
     data: (Partial<Entity> | undefined)[];
     metadata: PaginationMeta | undefined;
   }> {
     const entitiesAndCount = await this.findAll(fetchSpecification, info);
-    return this._paginate(fetchSpecification, entitiesAndCount);
+    return this._paginate(entitiesAndCount, fetchSpecification);
   }
 
   private _paginate(
-    fetchSpecification: FetchSpecification,
     entitiesAndCount: [Partial<Entity>[], number],
+    fetchSpecification?: FetchSpecification,
   ): {
     data: (Partial<Entity> | undefined)[];
     metadata: PaginationMeta | undefined;
@@ -125,14 +125,17 @@ export abstract class AppBaseService<
     const totalItems = entitiesAndCount[1];
     const entities = entitiesAndCount[0];
     const pageSize =
-      fetchSpecification?.pageSize ?? DEFAULT_PAGINATION.pageSize;
-    const meta = fetchSpecification.disablePagination
+      fetchSpecification?.pageSize ?? DEFAULT_PAGINATION.pageSize ?? 25;
+    const page =
+      fetchSpecification?.pageNumber ?? DEFAULT_PAGINATION.pageNumber ?? 1;
+    const disablePagination = fetchSpecification?.disablePagination;
+    const meta = disablePagination
       ? undefined
       : new PaginationMeta({
           totalPages: Math.ceil(totalItems / pageSize),
           totalItems,
           size: pageSize,
-          page: fetchSpecification?.pageNumber ?? DEFAULT_PAGINATION.pageNumber,
+          page,
         });
 
     return { data: entities, metadata: meta };
