@@ -1,4 +1,10 @@
-import { Controller, Get, Logger, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { ProtectedAreaResult } from './protected-area.geo.entity';
 import {
   ApiBearerAuth,
@@ -11,7 +17,10 @@ import {
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
-import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import {
+  JSONAPIQueryParams,
+  JSONAPISingleEntityQueryParams,
+} from 'decorators/json-api-parameters.decorator';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
@@ -28,6 +37,31 @@ import { IUCNProtectedAreaCategoryResult } from './dto/iucn-protected-area-categ
 @Controller(`${apiGlobalPrefixes.v1}/protected-areas`)
 export class ProtectedAreasController {
   constructor(public readonly service: ProtectedAreasService) {}
+
+  @ApiOperation({
+    description: 'Find all protected areas',
+  })
+  @ApiOkResponse({
+    type: ProtectedAreaResult,
+  })
+  @JSONAPIQueryParams({
+    entitiesAllowedAsIncludes: protectedAreaResource.entitiesAllowedAsIncludes,
+    availableFilters: [
+      { name: 'fullName' },
+      { name: 'wdpaId' },
+      { name: 'iucnCategory' },
+      { name: 'status' },
+      { name: 'designation' },
+      { name: 'countryId' },
+    ],
+  })
+  @Get()
+  async findAll(
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+  ): Promise<ProtectedAreaResult> {
+    const results = await this.service.findAllPaginated(fetchSpecification, {});
+    return this.service.serialize(results.data, results.metadata);
+  }
 
   @ApiOperation({
     description:
@@ -65,5 +99,24 @@ export class ProtectedAreasController {
       ...fetchSpecification,
       filter: { ...fetchSpecification.filter, adminAreaId },
     });
+  }
+
+  @ApiOperation({
+    description: 'Get protected area by id',
+  })
+  @ApiOkResponse({
+    type: ProtectedAreaResult,
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @JSONAPISingleEntityQueryParams()
+  @Get(':id')
+  async findOne(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+  ): Promise<ProtectedAreaResult> {
+    return await this.service.serialize(
+      await this.service.getById(id, fetchSpecification),
+    );
   }
 }
