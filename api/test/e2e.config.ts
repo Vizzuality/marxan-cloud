@@ -26,6 +26,9 @@ export const E2E_CONFIG: {
   projects: {
     valid: {
       minimal: () => Partial<CreateProjectDTO>;
+      minimalInGivenCountry: (
+        options?: Record<string, unknown>,
+      ) => Partial<CreateProjectDTO>;
       complete: (options: unknown) => Partial<CreateProjectDTO>;
     };
     invalid: {
@@ -80,6 +83,13 @@ export const E2E_CONFIG: {
       minimal: () => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
+      }),
+      minimalInGivenCountry: (options: {
+        countryCode: string;
+      }): CreateProjectDTO => ({
+        name: faker.random.words(5),
+        organizationId: faker.random.uuid(),
+        countryId: options.countryCode,
       }),
       complete: (options: { countryCode: string }): CreateProjectDTO => ({
         name: faker.random.words(5),
