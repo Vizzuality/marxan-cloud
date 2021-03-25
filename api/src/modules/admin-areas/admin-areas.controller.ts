@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Logger,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { adminAreaResource, AdminAreaResult } from './admin-area.geo.entity';
 import { AdminAreaLevel, AdminAreasService } from './admin-areas.service';
 import {
@@ -86,8 +79,8 @@ export class AdminAreasController {
     @Param('areaId') areaId: string,
   ): Promise<AdminAreaResult[]> {
     const results = await this.service.getChildrenAdminAreas(
-      fetchSpecification,
       areaId,
+      fetchSpecification,
     );
     return await this.service.serialize(results.data, results.metadata);
   }
@@ -101,7 +94,7 @@ export class AdminAreasController {
     @Param('areaId') areaId: string,
   ): Promise<AdminAreaResult> {
     return await this.service.serialize(
-      await this.service.getByLevel1OrLevel2Id(fetchSpecification, areaId),
+      await this.service.getByLevel1OrLevel2Id(areaId, fetchSpecification),
     );
   }
 }

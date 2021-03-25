@@ -124,8 +124,8 @@ export class AdminAreasService extends AppBaseService<
    * level 2 area depending on the pattern of the id provided.
    */
   async getByLevel1OrLevel2Id(
-    fetchSpecification: FetchSpecification,
     areaId: string,
+    fetchSpecification?: FetchSpecification,
   ): Promise<Partial<AdminArea>> {
     const query = this.repository.createQueryBuilder(this.alias);
 
@@ -155,8 +155,8 @@ export class AdminAreasService extends AppBaseService<
   }
 
   async getChildrenAdminAreas(
-    fetchSpecification: FetchSpecification,
     parentAreaId: string,
+    fetchSpecification?: FetchSpecification,
   ): Promise<{
     data: (AdminArea | Partial<AdminArea> | undefined)[];
     metadata: PaginationMeta | undefined;
@@ -165,7 +165,7 @@ export class AdminAreasService extends AppBaseService<
       return this.findAllPaginated({
         ...fetchSpecification,
         filter: {
-          ...fetchSpecification.filter,
+          ...fetchSpecification?.filter,
           level2AreaByArea1Id: parentAreaId,
         },
       });
