@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -13,6 +13,10 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
+import { Country } from 'modules/countries/country.geo.entity';
+import { AdminArea } from 'modules/admin-areas/admin-area.geo.entity';
+import { AdminAreasService } from 'modules/admin-areas/admin-areas.service';
+import { CountriesService } from 'modules/countries/countries.service';
 
 const projectFilterKeyNames = [
   'name',
@@ -39,9 +43,13 @@ export class ProjectsService extends AppBaseService<
   constructor(
     @InjectRepository(Project)
     protected readonly repository: Repository<Project>,
-    @Inject(ScenariosService)
-    private readonly scenariosService: ScenariosService,
-    @Inject(UsersService) private readonly usersService: UsersService,
+    @Inject(forwardRef(() => ScenariosService))
+    protected readonly scenariosService: ScenariosService,
+    @Inject(UsersService) protected readonly usersService: UsersService,
+    @Inject(AdminAreasService)
+    protected readonly adminAreasService: AdminAreasService,
+    @Inject(CountriesService)
+    protected readonly countriesService: CountriesService,
   ) {
     super(repository, 'project', 'projects');
   }
