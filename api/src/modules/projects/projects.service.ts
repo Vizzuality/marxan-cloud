@@ -154,4 +154,37 @@ export class ProjectsService extends AppBaseService<
     project.createdBy = info?.authenticatedUser?.id!;
     return project;
   }
+
+  /**
+   * Look up the planning area for this project.
+   *
+   * In decreasing precedence (i.e. most specific is used):
+   *
+   * * a project-specific protected area (@todo not implemented yet)
+   * * a level 2 admin area
+   * * a level 1 admin area
+   * * a country
+   */
+  async getPlanningArea(
+    project: Partial<Project>,
+  ): Promise<Country | Partial<AdminArea | undefined>> {
+    const planningArea = project.planningAreaGeometryId
+      ? /**
+         * @todo here we should look up the actual custom planning area from
+         * `planningAreaGeometryId`, when we implement this.
+         */
+        new AdminArea()
+      : project.adminAreaLevel2Id
+      ? await this.adminAreasService.getByLevel1OrLevel2Id(
+          project.adminAreaLevel2Id!,
+        )
+      : project.adminAreaLevel1Id
+      ? await this.adminAreasService.getByLevel1OrLevel2Id(
+          project.adminAreaLevel1Id!,
+        )
+      : project.countryId
+      ? await this.countriesService.getById(project.countryId)
+      : undefined;
+    return planningArea;
+  }
 }
