@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -12,6 +12,10 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
+import { Project } from 'modules/projects/project.api.entity';
+import { ProtectedAreasService } from 'modules/protected-areas/protected-areas.service';
+import { ProjectsService } from 'modules/projects/projects.service';
+import { concat } from 'lodash';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
@@ -32,7 +36,13 @@ export class ScenariosService extends AppBaseService<
   constructor(
     @InjectRepository(Scenario)
     protected readonly repository: Repository<Scenario>,
-    @Inject(UsersService) private readonly usersService: UsersService,
+    @InjectRepository(Project)
+    protected readonly projectRepository: Repository<Project>,
+    @Inject(UsersService) protected readonly usersService: UsersService,
+    @Inject(ProtectedAreasService)
+    protected readonly protectedAreasService: ProtectedAreasService,
+    @Inject(forwardRef(() => ProjectsService))
+    protected readonly projectsService: ProjectsService,
   ) {
     super(repository, 'scenario', 'scenarios');
   }
