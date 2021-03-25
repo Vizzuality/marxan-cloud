@@ -126,9 +126,9 @@ export class ScenariosService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<Scenario>,
     filters: ScenarioFilters,
-    info?: AppInfoDTO,
+    _info?: AppInfoDTO,
   ): SelectQueryBuilder<Scenario> {
-    this._processBaseFilters<ScenarioFilters>(
+    query = this._processBaseFilters<ScenarioFilters>(
       query,
       filters,
       scenarioFilterKeyNames,
