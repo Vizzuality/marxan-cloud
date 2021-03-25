@@ -1,45 +1,56 @@
 import NextAuth from 'next-auth';
 import Providers from 'next-auth/providers';
+
 import AUTHENTICATION from 'services/authentication';
+
+import JWT from 'jsonwebtoken';
+
+const MAX_AGE = 2 * 60 * 60; // 2 hours
+const SESSION_BUFFER_TIME = 10 * 60; // 10 minutes
 
 /**
  * Takes a token, and returns a new token
  */
-// async function refreshAccessToken(token) {
-//   try {
-//     const refreshTokenResponse = await AUTHENTICATION.request({
-//       url: '/refresh-token',
-//       method: 'POST',
-//       headers: {
-//         Authorization: `Bearer ${token.accessToken}`,
-//         'Content-Type': 'application/json',
-//       },
-//     });
+async function refreshAccessToken(token) {
+  try {
+    const refreshTokenResponse = await AUTHENTICATION.request({
+      url: '/refresh-token',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
-//     const { data, statusText } = refreshTokenResponse;
+    const { data, status } = refreshTokenResponse;
 
-//     if (statusText !== 'OK') {
-//       throw new Error(data);
-//     }
+    if (status !== 201) {
+      throw new Error(data);
+    }
 
-//     return {
-//       ...token,
-//       accessToken: data.accessToken,
-//     };
-//   } catch (error) {
-//     console.error(error);
-//     return {
-//       ...token,
-//       error: 'RefreshAccessTokenError',
-//     };
-//   }
-// }
+    return {
+      ...token,
+      accessToken: data.accessToken,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
+}
 
 const options = {
   // Defining custom pages
   pages: {
     signIn: '/auth/sign-in',
     error: '/auth/sign-in',
+  },
+
+  session: {
+    jwt: true,
+    maxAge: MAX_AGE,
   },
 
   // Configure one or more authentication providers
@@ -84,15 +95,19 @@ const options = {
         token.accessToken = accessToken;
       }
 
+      // Use custom JWT decode, otherwise "exp date" will be increasing beyond the infinite
+      const { exp } = JWT.decode(token.accessToken);
+
+      const expDate = new Date(exp * 1000);
+
+      // Return previous token if the access token has not expired yet
+      const remainingTime = expDate.getTime() - Date.now();
+      const shouldRefresh = (remainingTime < SESSION_BUFFER_TIME * 1000) && remainingTime > 0;
+
+      // Refresh token
+      if (shouldRefresh) return refreshAccessToken(token);
+
       return token;
-
-      // // Return previous token if the access token has not expired yet
-      // const { iat } = token;
-      // const tokenCloseToExpire = (Date.now() - SESSION_BUFFER_TIME) < (iat * 1000);
-      // if (!tokenCloseToExpire) return token;
-
-      // // Refresh token when less than 1 hour left
-      // return refreshAccessToken(token);
     },
 
     // Extending session object

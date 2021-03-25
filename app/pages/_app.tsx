@@ -27,7 +27,7 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
             session={pageProps.session}
             options={{
               clientMaxAge: 5 * 60, // Re-fetch session if cache is older than 60 seconds
-              keepAlive: 10 * 60, // Send keepAlive message every 5 minutes
+              keepAlive: 10 * 60, // Send keepAlive message every 10 minutes
             }}
           >
             <OverlayProvider>
