@@ -53,7 +53,7 @@ export class ScenariosService extends AppBaseService<
         'name',
         'description',
         'type',
-        'wdpaFilter',
+        'protectedAreaIds',
         'wdpaThreshold',
         'numberOfRuns',
         'boundaryLengthModifier',

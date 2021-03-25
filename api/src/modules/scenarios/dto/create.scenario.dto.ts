@@ -34,13 +34,12 @@ export class CreateScenarioDTO {
   @ApiPropertyOptional()
   @IsOptional()
   @IsArray()
-  @IsEnum(IUCNCategory)
+  @IsEnum(IUCNCategory, { each: true })
   wdpaIucnCategories?: IUCNCategory[];
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsArray()
-  @IsUUID()
+  @IsUUID(4, { each: true })
   customProtectedAreaIds?: string[];
 
   @ApiPropertyOptional()
