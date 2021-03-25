@@ -1,5 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import {
+  HttpStatus,
+  INestApplication,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
@@ -16,6 +21,7 @@ import { ProjectsTestUtils } from './utils/projects.test.utils';
 import { Project } from 'modules/projects/project.api.entity';
 import { ScenariosTestUtils } from './utils/scenarios.test.utils';
 import { Scenario } from 'modules/scenarios/scenario.api.entity';
+import { v4 } from 'uuid';
 
 /**
  * Tests for API contracts for the management of protected areas within
@@ -64,14 +70,16 @@ describe('ProtectedAreasModule (e2e)', () => {
       return await Deserializer.deserialize(response);
     });
 
-    aProject = await ProjectsTestUtils.createProject(
-      app,
-      jwtToken,
-      {
-        ...E2E_CONFIG.projects.valid.minimal(),
-        organizationId: anOrganization.id,
-      },
-    ).then(async (response) => await Deserializer.deserialize(response));
+    /**
+     * Seed test data includes protected areas in (among a handful of other
+     * countries) Namibia, so we create a project in this country.
+     */
+    aProject = await ProjectsTestUtils.createProject(app, jwtToken, {
+      ...E2E_CONFIG.projects.valid.minimalInGivenCountry({
+        countryCode: 'NAM',
+      }),
+      organizationId: anOrganization.id,
+    }).then(async (response) => await Deserializer.deserialize(response));
   });
 
   afterAll(async () => {
