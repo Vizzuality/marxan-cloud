@@ -1,112 +1,125 @@
 // to-do: work on cache later
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
-import { Transform } from 'class-transformer';
-import { IsInt, Max, Min, } from 'class-validator';
-import { TileSpecification } from '../admin-areas/admin-areas.service';
-import { async } from 'rxjs';
-import { query } from 'express';
-import { result } from 'lodash';
+
+/**
+ * @description This function creates the MVT tiles from the appropriate TileInput
+ */
+// export type TileRenderer = (args: TileInput) => Promise<ArrayBuffer>;
+
+export interface Tile {
+  res: number;
+  data?: Buffer;
+  status?: string;
+}
 
 /**
  * @description The specification of the tile request
  */
-export class TileRequest {
+export interface TileRequest {
   /**
    * @description The zoom level ranging from 0 - 20
    */
-  @IsInt()
-  @Min(0)
-  @Max(20)
-  @Transform((i) => Number.parseInt(i))
   z: number;
 
   /**
    * @description The tile x offset on Mercator Projection
    */
-  @IsInt()
-  @Transform((i) => Number.parseInt(i))
   x: number;
 
   /**
    * @description The tile y offset on Mercator Projection
    */
-  @IsInt()
-  @Transform((i) => Number.parseInt(i))
   y: number;
 }
 
 /**
- * @description This function define tile query input for the tile query requested
+ * @description Input interface for the tile query builder
+ */
+export interface ITileQuery {
+  x: number;
+  y: number;
+  z: number;
+  table: string;
+  geometry: string;
+  extent: number;
+  buffer: number;
+  // attributes: string;
+}
+
+/**
+ * @description The tile query builder callback definition
+ */
+export type GetTileQuery = (input: ITileQuery) => string;
+
+/**
+ * @description Input interface for the base query builder
+ */
+export interface IBaseQueryInput {
+  x: number;
+  y: number;
+  z: number;
+  table: string;
+  geometry: string;
+  maxZoomLevel: number;
+  buffer: number;
+  // attributes: string;
+  // query: string[];
+}
+
+/**
+ * @description The base query builder callback definition
+ */
+export type GetBaseQuery = (input: IBaseQueryInput) => string;
+
+/**
+ * @description This function define tile query input for the tile requested
  */
 export interface ITileQueryInput extends TileRequest {
+  z: number;
+  x: number;
+  y: number;
   maxZoomLevel: number;
   table: string;
   geometry: string;
   extent: number;
   buffer: number;
-  customQuery: string;
-  attributes: string;
+  // attributes: string[];
+  // query: string[];
+  getBaseQuery?: GetBaseQuery;
+  getTileQuery?: GetTileQuery;
 }
 
-/**
- * @description The required input values for the tile renderer
- */
-export interface TileInput<T> extends TileRequest {
-  /**
-   * @description The name of the table
-   */
-  table: string;
-  /**
-   * @description The geometry column name, default is "The_geom". This column should be of type Geometry in PostGIS
-   */
-  geometry: string;
-  /**
-   * @description The tile extent is the grid dimension value as specified by ST_AsMVT. The default is 4096.
-   * @see https://postgis.net/docs/ST_AsMVT.html
-   */
-  extent: number;
-  /**
-   * @description Max zoom level for data rendering
-   */
-  maxZoomLevel: number;
-   /**
-   * @description The buffer around the tile extent in the number of grid cells as specified by ST_AsMVT. The default is 256.
-   * @see https://postgis.net/docs/ST_AsMVT.html
-   */
-  buffer: number;
-  /**
-   * @description Custom query for the different entities
-   */
-  customQuery: string,
-  /**
-   * @description attributes to be retrieved from the different entities
-   */
-  attributes: string,
-}
-
-
-/**
- * @description This function creates the MVT tiles from the appropriate TileInput
- */
-export type TileRenderer<T> = (args: TileInput<T>) => Promise<Buffer>;
-
-
-
-/**
- * @todo add generic type
- */
+const logger = new Logger('Vector tile service');
 @Injectable()
-export class TileService<T> {
+export class TileService {
+  // todo . add constructor
+
   /**
-   * @todo add constructor
-   * @todo move generation of specific query for each point to the api. Generate this query with the query builder
-   * @todo fix geometry issue with gid_0 = 'ATA'. Once is fixed, remove this condition from the query.
    * @description The default base query builder
    */
-  private readonly logger: Logger = new Logger(TileService.name);
-  createQueryForTile = ({
+  defaultGetBaseQuery: GetBaseQuery = ({
+    x,
+    y,
+    z,
+    table,
+    geometry,
+  }: // maxZoomLevel,
+  // attributes,
+  // query,
+  IBaseQueryInput) => `
+  SELECT
+    ${geometry}
+  FROM ${table}
+  WHERE
+    ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry})
+  `;
+
+  /**
+   * @description The default tile query builder
+   */
+  defaultGetTileQuery: GetTileQuery = ({
     x,
     y,
     z,
@@ -114,32 +127,67 @@ export class TileService<T> {
     geometry,
     extent,
     buffer,
-    customQuery,
-    attributes,
-  }: ITileQueryInput) => `
-  WITH tile AS (
-    SELECT
-      ${attributes},
-      ST_AsMVTGeom(
-        -- Geometry from table
-        ST_Transform(ST_RemoveRepeatedPoints(${geometry}, 0.1), 3857),
-        -- MVT tile boundary
-        ST_TileEnvelope(${z}, ${x}, ${y}),
-        -- Extent
-        ${extent},
-        -- Buffer
-        ${buffer},
-        -- Clip geom
-        true
-      ) AS mvt_geom
-    FROM ${table}
-    WHERE
-      ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry})
-      and ${customQuery}
-      and not gid_0 ='ATA'
-  )
-  SELECT ST_AsMVT(tile, 'layer0',  ${extent}, 'mvt_geom') AS mvt FROM tile
+  }: // bufferSize,
+  // attributes,
+  ITileQuery) => `
+  SELECT
+    ST_AsMVTGeom(ST_Transform(${geometry}, 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, false) AS geom
+  FROM ${table}
   `;
+  /**
+   * @description Creates the query for tile
+   */
+  createQueryForTile({
+    z,
+    x,
+    y,
+    maxZoomLevel,
+    table,
+    geometry,
+    extent,
+    buffer,
+    // query,
+    getBaseQuery = this.defaultGetBaseQuery,
+    getTileQuery = this.defaultGetTileQuery,
+  }: ITileQueryInput): string {
+    const queryParts: string[] = [];
+    queryParts.push(
+      `WITH base_query AS (${getBaseQuery({
+        x,
+        y,
+        z,
+        table,
+        geometry,
+        maxZoomLevel,
+        buffer,
+        // attributes: attributesToSelect(attributes),
+        // query,
+      })})`,
+    );
+
+    let parentTable = 'base_query';
+
+    queryParts.push(
+      `tile AS (${getTileQuery({
+        x,
+        y,
+        z,
+        table: parentTable,
+        geometry: 'the_geom',
+        extent,
+        buffer,
+        // attributes: attributesToArray(attributes),
+      })})`,
+    );
+
+    const sql: string = `${queryParts.join(
+      ',\n',
+    )}\nSELECT ST_AsMVT(tile, 'geom') AS mvt FROM tile`;
+
+    // logger.debug(`Create query for tile: ${sql}`);
+
+    return sql;
+  }
 
   /**
    * BuilDs tile query.
@@ -148,17 +196,33 @@ export class TileService<T> {
    * @param y The tile y offset on Mercator Projection
    * @return the resulting string query.
    */
+
   buildQuery(
-    { z, x, y }: Pick<TileSpecification, 'z' | 'x' | 'y'>,
+    z: number,
+    x: number,
+    y: number,
     table: string,
     geometry: string,
     extent: number,
     buffer: number,
     maxZoomLevel: number,
-    customQuery: string,
-    attributes: string,
   ): string {
-    let query = '';
+    let query: string = '';
+
+    z = parseInt(`${z}`, 10);
+    if (isNaN(z)) {
+      throw new Error('Invalid zoom level');
+    }
+
+    x = parseInt(`${x}`, 10);
+    y = parseInt(`${y}`, 10);
+    if (isNaN(x) || isNaN(y)) {
+      throw new Error('Invalid tile coordinates');
+    }
+    // const table = 'admin_regions';
+    // const maxZoomLevel = 12;
+    // const geometry = 'the_geom';
+    // const extent = 4096;
 
     try {
       query = this.createQueryForTile({
@@ -170,12 +234,10 @@ export class TileService<T> {
         geometry,
         extent,
         buffer,
-        customQuery,
-        attributes,
       });
-      this.logger.debug(`Create query for tile: ${query}`);
+      logger.debug(`Create query for tile: ${query}`);
     } catch (error) {
-      this.logger.error(`Error getting the query: ${error}`);
+      logger.error(`Error getting the query: ${error}`);
     }
     return query;
   }
@@ -186,12 +248,13 @@ export class TileService<T> {
    * @param query the actual query to be sent to the database engine
    * @return the tile-data as Buffer wrapped in a promise.
    */
-  async fetchTileFromDatabase(query: string): Promise<Record<'mvt', Buffer>[]> {
+  async fetchTileFromDatabase(query: string): Promise<Buffer> {
     const connection = getConnection();
     const queryRunner = connection.createQueryRunner();
     queryRunner.connect();
     const result = await queryRunner.query(query);
-    this.logger.debug('Query retrieved');
+    logger.debug('Query retrieved');
+    // logger.debug(result[0]);
     if (result) {
       return result;
     } else {
@@ -214,59 +277,63 @@ export class TileService<T> {
     });
   }
 
-
   /**
    * The main function that returns a tile in mvt-format.
    * @param z The zoom level ranging from 0 - 20
    * @param x The tile x offset on Mercator Projection
    * @param y The tile y offset on Mercator Projection
    * @return contains the tile-data and some meta-information
-   *
-   * @todo check for valid tile and for valid data source
-   * @todo Add tile server config type to getTile function
-   * @todo add tile render type to promise
    */
-  async getTile({
-    z,
-    x,
-    y,
-    table,
-    geometry,
-    extent,
-    buffer,
-    maxZoomLevel,
-    customQuery,
-    attributes,
-  }:TileInput<T>): Promise<Buffer> {
+  async getTile(
+    z: number,
+    x: number,
+    y: number,
+    table: string,
+    geometry: string,
+    extent: number,
+    buffer: number,
+    maxZoomLevel: number,
+  ): Promise<Tile> {
+    const mvt: Tile = { res: 0 };
+
+    //todo - check for valid tile and for valid data source
+
     const query = this.buildQuery(
-      {
-        z,
-        x,
-        y
-      },
+      z,
+      x,
+      y,
       table,
       geometry,
       extent,
       buffer,
       maxZoomLevel,
-      customQuery,
-      attributes,
     );
-    this.logger.debug('Query created');
-    // return async ({}: TileInput<T>) -- result - const queryResult --tile: wait this.zip(queryResult[0].mvt);
-    let data: Buffer = Buffer.from('');
+    logger.debug('Query created');
+    let data: any | null = null;
     if (query) {
       try {
-        const queryResult: Record<'mvt', Buffer> [] = await this.fetchTileFromDatabase(query);
-        this.logger.debug('Data succesfully retrieved from database');
-        // zip data
-        data = await this.zip(queryResult[0].mvt);
-    this.logger.debug('Data compressed');
+        data = await this.fetchTileFromDatabase(query);
+        logger.debug('Data succesfully retrieved from database');
       } catch (error) {
-        this.logger.error(`Database error: ${error.message}`);
-        return data;
+        mvt.res = -4;
+        mvt.status = `[ERROR] - Database error: ${error.message}`;
+        logger.debug(`Database error: ${error.message}`);
+        return mvt;
       }
+    } else {
+      // Empty query => empty tile
+      const msg = `[INFO] - Empty query for tile '${z}/${x}/${y}'`;
+      logger.debug(msg);
+      mvt.res = 1;
+      mvt.status = msg;
+      data = Buffer.from('');
     }
-    return data;
+    // zip data
+    logger.debug(data[0].mvt);
+    logger.debug(`uncompressedBytes: ${data[0].mvt.byteLength}`);
+    mvt.data = data[0].mvt; //await this.zip(data[0].mvt);
+    // logger.debug(`compressedBytes: ${mvt.data.byteLength}`);
+    logger.debug('Data compressed');
+    return mvt;
   }
 }
