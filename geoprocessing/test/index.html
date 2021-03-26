@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Mapbox GL JS Examples</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+<div id='map'></div>
+<script>
+var hoveredStateId = null;
+
+//QUERY THE DATA:
+// var url = "http://localhost:3040/api/v1/geodata/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt"
+
+var map = new mapboxgl.Map({
+    'container': 'map',
+    'zoom': 5,
+    'center': [14.150390625,
+          0.7031073524364909],
+    "light": {"intensity": 0.2},
+    'style': {
+        'version': 8,
+        'sources': {
+            'postgis-tiles': {
+                'type': 'vector',
+                //'minzoom':11,
+                'maxzoom': 12,
+                'tiles': [
+                "http://localhost:3040/api/v1/geodata/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt",
+                // " https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/{z}/{x}/{y}.vector.pbf?sku=101F7Ml2uephf&access_token=pk.eyJ1IjoibGF5ZXItbWFuYWdlciIsImEiOiJjazA2dTJnMG0zc3lwM251dGM0aXhiYTVxIn0.AaoErQTRezfQshqnEKIg8A"
+                ]
+            },
+            'BASEMAP': {//customised basemap
+                'type': 'raster',
+                'tiles': [
+                    "https://api.mapbox.com/styles/v1/elpamart/ckhdqt87r04z719lk3wyo1vo7/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWxwYW1hcnQiLCJhIjoiY2s2ODRqa21zMDBkYzNwbzMwY3N3aGJocyJ9.7AKSmZkqGwVrTyS3WrsxvQ",
+                ]
+            },
+
+        },
+        // "sprite": "https://openmaptiles.github.io/klokantech-basic-gl-style/sprite",
+        // 'glyphs': "https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf",
+        'layers': [
+          {
+            'id': 'mapbox_monochrome-layer',
+            'type': 'raster',
+            'source': 'BASEMAP',
+            'minzoom': 0,
+            'maxzoom': 22
+        },
+        {
+            'id': 'postgis-tiles-layer',
+            'type': 'fill',
+            'source': 'postgis-tiles',
+            'source-layer': 'layer0',
+            // 'minzoom': 0,
+            // 'maxzoom': 12,
+            'paint': {
+                'fill-color': 'red'
+            }
+        },
+        ]
+    }
+});
+
+// map.on('load', function() {
+//   map.addSource('geoms_test', {
+//     type: 'vector',
+//     maxzoom: 12,
+//     tiles:['http://localhost:3040/api/v1/geodata/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt'],
+//   });
+//   map.addLayer({
+//     id: 'geom_test_mvt',
+//     type: 'fill',
+//     source: 'geoms_test',
+//     'source_layer': 'geoms_test',
+//     paint: {
+//       'fill_color': "#53e033",
+//     }
+//   });
+// });
+
+
+
+// map.addControl(new mapboxgl.NavigationControl());
+// map.on('load', function() {
+    // map.addSource(
+    //     'postgis-geojson_2', {//geojson jus has the commodity and segment - we need to add the other attributes - simple clustering
+    //         type: 'geojson',
+    //         data: "http://0.0.0.0:5100/v1/query?sql=select json_build_object('type', 'FeatureCollection', 'features', json_agg(ST_AsGeoJSON(t.*)::json)) as geojson from (select geom, id, commodity,segment from mgis_poly_centroids union all select geom, id, commodity, segment from mgis_point_data) as t",//"http://0.0.0.0:5100/v1/query?sql=select json_build_object('type', 'FeatureCollection', 'features', json_agg(ST_AsGeoJSON(t.*)::json)) as geojson from mgis_point_data as t&format=geojson",
+    //         cluster: true,
+    //         clusterMaxZoom: 14,
+    //         clusterRadius: 30,
+    //         },
+    //         );
+
+    // map.addSource(
+    //     'postgis-geojson_3', { //geojson jus has the commodity and segment - we need to add the other attributes - donut clustering
+    //         type: 'geojson',
+    //         data: "http://0.0.0.0:5100/v1/query?sql=select json_build_object('type', 'FeatureCollection', 'features', json_agg(ST_AsGeoJSON(t.*)::json)) as geojson from (select geom, id, commodity, year, segment, country_is, country, region, fraction, subsegment, t1_supplie, volume, total_ghg, if_ghg_v, land, if_land_v, withdrawal, if_wdl_v, if_h2o_v, bws, origin_sup from mgis_poly_centroids union all select geom, id, commodity, year, segment, country_is, country, region, fraction, subsegment, t1_supplie, volume, total_ghg, if_ghg_v, land, if_land_v, withdrawal, if_wdl_v, if_h2o_v, bws, origin_sup from mgis_point_data) as t",
+    //         cluster: true,
+    //         clusterMaxZoom: 14,
+    //         clusterRadius: 30,
+    //         clusterProperties: {
+    //         'seg1': ['+', ['case', seg1, 1, 0]],
+    //         'seg2': ['+', ['case', seg2, 1, 0]],
+    //         'seg3': ['+' ,['case', seg3, 1, 0]]
+    //             }
+    //         },
+    //         );
+
+    // map.addSource( // Adds source for the gdam data
+    //     'gdam_vector', {
+    //         'type': 'vector',
+    //         'maxzoom': 12,
+    //         'tiles': ["http://localhost:3040/api/v1/geodata/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt"],
+    //         },
+    //         );
+
+    //  axios.get(url)
+    //  .then(({data})=>{
+    //     const features = data['features']
+
+    //     const reducedData = [];//filter data by year
+        // features.forEach(d =>{
+
+        //     const year = d.properties.year
+        //     const filter_data = year && year == 2018 ? d.properties : null;
+        //     const name_0 = filter_data ? filter_data.country : null;
+        //     if (filter_data != null){
+        //         filter_data['name_0']=name_0 //Adds name_0 to link with gdam but we will replace later with iso
+        //     }
+
+        //     if (filter_data != null) {
+        //         reducedData.push(
+        //             filter_data)
+        //     }
+        // });
+
+        // var expression = ['match', ['get', 'name_0']];
+        // var maxValue = 4584.233695766365;
+        // var meanValue = 264.7127784799982;
+        // reducedData.forEach(function(row) {
+        //     //filter values are calculated by quantiles on the jupyter notebook
+        //     const color = row['sum'] <= 8.565377414879006 ? 'rgba(217,240,163,1)':
+        //     (row['sum'] > 8.565377414879006 && row['sum']<= 85.91179001479341 ? 'rgba(194,230,153,1)':
+        //     (row['sum'] > 85.91179001479341  && row['sum']<= 189.5764430425883 ? 'rgba(120,198,121,1)':
+        //     (row['sum'] >189.5764430425883 && row['sum']<= 264.7127784799982 ?'rgba(49,163,84,1)':'rgba(0,104,55,1)' )));
+
+        // expression.push(row['name_0'], color);
+        // });
+        // expression.push('rgba(204,204,204,1)'); // Last value is the default, used where there is no data
+    //     map.addLayer(
+    //         {
+    //         'id': 'choropleth',
+    //         'type': 'fill',
+    //         'source': 'gdam_vector',
+    //         'source-layer': 'layer0',
+    //         'paint': {
+    //             'fill-color': expression,
+    //             'fill-outline-color':'#f7f7f7'
+    //             }
+    // }
+    // );
+    //  })
+
+    // map.on('mousemove', 'postgis-tiles-layer', function(e) {
+    //     if (e.features.length > 0) {
+    //         console.info(e.features[0])
+    //         console.info(hoveredStateId)
+    //         if (hoveredStateId) {
+    //         map.setFeatureState(
+    //             { source: 'postgis-tiles', sourceLayer: 'layer0',  id: hoveredStateId },
+    //             { hover: false }
+    //         );
+    //         }
+    //         hoveredStateId = e.features[0].id;
+    //         map.setFeatureState(
+    //             { source: 'postgis-tiles', sourceLayer: 'layer0',  id: hoveredStateId },
+    //             { hover: true }
+    //         );
+    //     }
+    // });
+
+//     // When the mouse leaves the state-fill layer, update the feature state of the
+//     // previously hovered feature.
+//     map.on('mouseleave', 'postgis-tiles-layer', function() {
+//     if (hoveredStateId) {
+//     map.setFeatureState(
+//     { source: 'postgis-tiles', sourceLayer: 'layer0',  id: hoveredStateId },
+//     { hover: false }
+//     );
+//     }
+//     hoveredStateId = null;
+//     });
+//     // inspect a cluster on click
+// map.on('click', 'clusters', function(e) {
+// var features = map.queryRenderedFeatures(e.point, {
+// layers: ['clusters']
+// });
+// var clusterId = features[0].properties.cluster_id;
+// map.getSource('postgis-geojson').getClusterExpansionZoom(
+// clusterId,
+// function(err, zoom) {
+//     if (err) return;
+
+//         map.easeTo({
+//         center: features[0].geometry.coordinates,
+//         zoom: zoom
+//         });
+//     });
+// });
+
+// map.on('click', 'unclustered-point', function(e) {
+
+// var coordinates = e.features[0].geometry.coordinates.slice();
+// var mag = e.features[0].properties.segment;
+// while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+// coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+// }
+
+// new mapboxgl.Popup()
+// .setLngLat(coordinates)
+// .setHTML("magnitude: " + mag)
+// .addTo(map);
+// });
+
+// map.on('mouseenter', 'clusters', function() {
+// map.getCanvas().style.cursor = 'pointer';
+// });
+// map.on('mouseleave', 'clusters', function() {
+// map.getCanvas().style.cursor = '';
+// });
+// });
+
+
+</script>
+
+
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title>Mapbox GL JS Examples</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+  <body>
+    <div id="map"></div>
+    <script>
+      // mapboxgl.accessToken =
+      //   '<your access token here>';
+      var map = new mapboxgl.Map({
+        container: 'map',
+        zoom: 7,
+        center: [3.4, 52.2],
+        light: {"intensity": 0.2},
+        style : {
+          'version': 8,
+          'sources': {
+            'BASEMAP': {//customised basemap
+                'type': 'raster',
+                'tiles': [
+                    "https://api.mapbox.com/styles/v1/elpamart/ckhdqt87r04z719lk3wyo1vo7/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWxwYW1hcnQiLCJhIjoiY2s2ODRqa21zMDBkYzNwbzMwY3N3aGJocyJ9.7AKSmZkqGwVrTyS3WrsxvQ",
+                ]
+            },
+          'postgis-tiles': {
+              'type': 'vector',
+              //'minzoom':11,
+              'maxzoom': 12,
+              'tiles': [
+              "http://localhost:3040/api/v1/geodata/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt",
+              ]
+            },
+          }
+        },
+        sprite: "https://openmaptiles.github.io/klokantech-basic-gl-style/sprite",
+        glyphs: "https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf",
+        layers: [{
+          'id': 'mapbox_monochrome-layer',
+          'type': 'raster',
+          'source': 'BASEMAP',
+          'minzoom': 0,
+          'maxzoom': 12
+        },
+        {
+          'id': 'postgis-tiles-layer',
+            'type': 'fill',
+            'source': 'postgis-tiles',
+            'source-layer': 'layer0',
+            'minzoom': 0,
+            'maxzoom': 12,
+            'paint': {
+                'fill-color': "#06cccc"
+            }
+        }
+      ]
+      });
+
+      map.on('load', function() {
+        // Change the source to filter
+        map.addSource('geoms_test', {
+          type: 'vector',
+          maxzoom: 12,
+          tiles: ['http://localhost:3040/api/v1/geodata/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt'],
+        });
+        map.addLayer({
+          id: 'geom_test_mvt',
+          type: 'fill',
+          source: 'geoms_test',
+          'source-layer': 'geoms_test',
+          paint: {
+            'fill-color': "#53e033",
+          }
+
+        });
+
+        map.on('click', function({ point, target }) {
+          const features = target.queryRenderedFeatures(point, { layers: ['geom_test_mvt']});
+          if (features && features.length > 0) {
+            map.flyTo({center: [features[0].properties.lng, features[0].properties.lat]})
+          }
+        });
+      });
+    </script>
+  </body>
+</html> -->
