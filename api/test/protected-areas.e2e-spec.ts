@@ -280,7 +280,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I update a scenario, I should be able to associate WDPA protected areas to it via their IUCN category', async () => {
@@ -293,7 +293,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
 
           const response = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -306,7 +306,7 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             response.body,
           );
-          expect(updatedScenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I create a scenario, I should not be able to set the protectedAreaIds property directly', async () => {
@@ -351,7 +351,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I update a scenario, I should be able to associate custom protected areas to it via their UUID', async () => {
@@ -371,7 +371,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
 
           const responseForUpdate = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -384,7 +384,7 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             responseForUpdate.body,
           );
-          expect(updatedScenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I create a scenario and I try to associate to it protected areas outside of the project boundaries, these areas should not be associated', async () => {
@@ -407,7 +407,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
         });
       });
 
@@ -429,7 +429,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I update a scenario, I should be able to associate WDPA protected areas to it via their IUCN category', async () => {
@@ -442,7 +442,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
 
           const response = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -455,7 +455,7 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             response.body,
           );
-          expect(updatedScenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         /**
@@ -484,7 +484,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I update a scenario, I should be able to associate custom protected areas to it via their UUID', async () => {
@@ -504,7 +504,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
 
           const responseForUpdate = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -517,7 +517,7 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             responseForUpdate.body,
           );
-          expect(updatedScenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I create a scenario and I try to associate to it protected areas outside of the project boundaries, these areas should not be associated', async () => {
@@ -540,7 +540,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
         });
       });
 
@@ -562,7 +562,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I update a scenario, I should be able to associate WDPA protected areas to it via their IUCN category', async () => {
@@ -575,7 +575,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
 
           const response = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -588,7 +588,7 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             response.body,
           );
-          expect(updatedScenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         /**
@@ -617,7 +617,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I update a scenario, I should be able to associate custom protected areas to it via their UUID', async () => {
@@ -637,7 +637,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
 
           const responseForUpdate = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -650,7 +650,7 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             responseForUpdate.body,
           );
-          expect(updatedScenario.protectedAreaIds?.length).toBeGreaterThan(0);
+          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I create a scenario and I try to associate to it protected areas outside of the project boundaries, these areas should not be associated', async () => {
@@ -673,7 +673,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
         });
       });
     });

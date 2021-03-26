@@ -14,6 +14,7 @@ import { User } from 'modules/users/user.api.entity';
 import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 import { BaseServiceResource } from 'types/resource.interface';
+import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
@@ -73,12 +74,27 @@ export class Scenario extends TimeUserEntityMetadata {
   projectId: string;
 
   /**
+   * List of IUCN categories used to select WDPA protected areas for the
+   * scenario's planning area.
+   */
+  @ApiPropertyOptional()
+  @Column('varchar', { name: 'wdpa_iucn_categories', array: true })
+  wdpaIucnCategories?: IUCNCategory[];
+
+  /**
    * List of ids of protected areas associated to the scenario.
    */
   @ApiPropertyOptional()
   @IsOptional()
-  @Column('jsonb', { name: 'wdpa_filter' })
-  protectedAreaIds?: string[];
+  @Column('jsonb', { name: 'protected_area_filter_by_ids' })
+  protectedAreaFilterByIds?: string[];
+
+  /**
+   * UUIDs of project-specific protected areas (stored in the wdpa table)
+   * which should be included in the scenario.
+   */
+  @ApiPropertyOptional()
+  customProtectedAreaIds?: string[];
 
   /**
    * Which portion (%) of a protected area needs to intersect a planning unit
