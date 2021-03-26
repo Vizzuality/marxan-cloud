@@ -22,6 +22,7 @@ import { Project } from 'modules/projects/project.api.entity';
 import { ScenariosTestUtils } from './utils/scenarios.test.utils';
 import { Scenario } from 'modules/scenarios/scenario.api.entity';
 import { v4 } from 'uuid';
+import { difference } from 'lodash';
 
 /**
  * Tests for API contracts for the management of protected areas within
@@ -318,7 +319,67 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             response.body,
           );
-          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
+          expect(
+            updatedScenario.protectedAreaFilterByIds?.length,
+          ).toBeGreaterThan(0);
+        });
+
+        /**
+         * @todo Enable this test once we start supporting user uploads of
+         * protected area geometries. Until then, with the data available in our
+         * seed for tests, the WDPA areas we select pretending that they are
+         * 'project-specific' end up coinciding with the WDPA areas already
+         * selected via their IUCN categories, so the test would fail.
+         */
+        test.skip('As a user, when I update a scenario to which custom protected areas are already associated, these should be preserved if I only add WDPA protected areas to it via their IUCN category', async () => {
+          const protectedAreas: ProtectedArea[] = await request(
+            app.getHttpServer(),
+          )
+            .get(
+              `/api/v1/protected-areas?filter[countryId]=NAM&pageSize=5&pageNumber=1`,
+            )
+            .set('Authorization', `Bearer ${jwtToken}`)
+            .then(
+              async (response) => await Deserializer.deserialize(response.body),
+            );
+
+          const createScenarioDTO: Partial<CreateScenarioDTO> = {
+            ...E2E_CONFIG.scenarios.valid.minimal(),
+            projectId: aProjectWithCountryAsPlanningArea.id,
+            customProtectedAreaIds: protectedAreas.map((i) => i.id),
+          };
+          const scenario: Scenario = await ScenariosTestUtils.createScenario(
+            app,
+            jwtToken,
+            createScenarioDTO,
+          ).then(async (response) => await Deserializer.deserialize(response));
+          expect(scenario.protectedAreaFilterByIds?.length).toBe(
+            protectedAreas.length,
+          );
+
+          const response = await request(app.getHttpServer())
+            .patch(`/api/v1/scenarios/${scenario.id}`)
+            .set('Authorization', `Bearer ${jwtToken}`)
+            .send({
+              ...createScenarioDTO,
+              wdpaIucnCategories: [IUCNCategory.NotReported],
+            })
+            .expect(HttpStatus.OK);
+          const updatedScenario: Scenario = await Deserializer.deserialize(
+            response.body,
+          );
+          /**
+           * Here we want to check (assuming that one or more WDPA protected
+           * areas exist within the planning area boundaries) that the set of
+           * protected areas associated to the project after updating it is a
+           * strict superset of the set of custom protected areas we set when
+           * creating the project.
+           */
+          const newlyAddedProtectedAreaIds = difference(
+            updatedScenario.protectedAreaFilterByIds,
+            protectedAreas.map((i) => i.id),
+          );
+          expect(newlyAddedProtectedAreaIds.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I create a scenario, I should not be able to set the protectedAreaIds property directly', async () => {
