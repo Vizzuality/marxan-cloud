@@ -158,7 +158,6 @@ export const E2E_CONFIG: {
       }),
     },
   },
-<<<<<<< HEAD
   protectedAreas: {
     categories: {
       valid: [
@@ -175,7 +174,6 @@ export const E2E_CONFIG: {
       ],
     },
   },
-=======
   planningUnits:{
     valid: {
       customExtent:{},
@@ -186,5 +184,4 @@ export const E2E_CONFIG: {
       adminRegion:{}
     }
   }
->>>>>>> tests wip
 };

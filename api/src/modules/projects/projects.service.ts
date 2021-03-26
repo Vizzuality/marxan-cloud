@@ -14,7 +14,6 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
-<<<<<<< HEAD
 import { Country } from 'modules/countries/country.geo.entity';
 import { AdminArea } from 'modules/admin-areas/admin-area.geo.entity';
 import { AdminAreasService } from 'modules/admin-areas/admin-areas.service';
@@ -34,8 +33,6 @@ type ProjectFilterKeys = keyof Pick<
 type ProjectFilters = Record<ProjectFilterKeys, string[]>;
 
 const logger = new Logger('projects');
-=======
->>>>>>> reworked how to use bullmq, add redis to test
 @Injectable()
 export class ProjectsService extends AppBaseService<
   Project,
@@ -44,10 +41,6 @@ export class ProjectsService extends AppBaseService<
   AppInfoDTO
 > {
   private readonly logger = new Logger(ProjectsService.name);
-<<<<<<< HEAD
-
-=======
->>>>>>> reworked how to use bullmq, add redis to test
   constructor(
     @InjectRepository(Project)
     protected readonly repository: Repository<Project>,
