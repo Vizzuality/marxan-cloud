@@ -53,7 +53,7 @@ export class ScenariosService extends AppBaseService<
         'name',
         'description',
         'type',
-        'protectedAreaIds',
+        'protectedAreaFilterByIds',
         'wdpaThreshold',
         'numberOfRuns',
         'boundaryLengthModifier',
@@ -144,7 +144,7 @@ export class ScenariosService extends AppBaseService<
     const wdpaAreaIds = await this.getWDPAAreasWithinProjectByIUCNCategory(
       create,
     );
-    model.protectedAreaIds = concat(
+    model.protectedAreaFilterByIds = concat(
       wdpaAreaIds,
       create.customProtectedAreaIds,
     ).filter((i): i is string => !!i);
@@ -161,7 +161,7 @@ export class ScenariosService extends AppBaseService<
       const wdpaAreaIds = await this.getWDPAAreasWithinProjectByIUCNCategory(
         update,
       );
-      model.protectedAreaIds = concat(
+      model.protectedAreaFilterByIds = concat(
         wdpaAreaIds,
         update.customProtectedAreaIds,
       ).filter((i): i is string => !!i);
