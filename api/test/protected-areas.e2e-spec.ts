@@ -127,9 +127,26 @@ describe('ProtectedAreasModule (e2e)', () => {
   });
 
   afterAll(async () => {
-    await ProjectsTestUtils.deleteProject(app, jwtToken, aProject.id);
-    await OrganizationsTestUtils.deleteOrganization(app, jwtToken, anOrganization.id);
-
+    await ProjectsTestUtils.deleteProject(
+      app,
+      jwtToken,
+      aProjectWithALevel2AdminAreaAsPlanningArea.id,
+    );
+    await ProjectsTestUtils.deleteProject(
+      app,
+      jwtToken,
+      aProjectWithALevel1AdminAreaAsPlanningArea.id,
+    );
+    await ProjectsTestUtils.deleteProject(
+      app,
+      jwtToken,
+      aProjectWithCountryAsPlanningArea.id,
+    );
+    await OrganizationsTestUtils.deleteOrganization(
+      app,
+      jwtToken,
+      anOrganization.id,
+    );
     await Promise.all([app.close()]);
   });
 
