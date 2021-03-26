@@ -88,29 +88,41 @@ describe('ProtectedAreasModule (e2e)', () => {
      * aa.gid_0, aa.gid_1, aa.gid_2 from wdpa pa
      * left join admin_regions aa on ST_Intersects(pa.the_geom, aa.the_geom);
      */
-    aProjectWithCountryAsPlanningArea = await ProjectsTestUtils.createProject(app, jwtToken, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: 'NAM',
-      }),
-      organizationId: anOrganization.id,
-    }).then(async (response) => await Deserializer.deserialize(response));
+    aProjectWithCountryAsPlanningArea = await ProjectsTestUtils.createProject(
+      app,
+      jwtToken,
+      {
+        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+          countryCode: 'NAM',
+        }),
+        organizationId: anOrganization.id,
+      },
+    ).then(async (response) => await Deserializer.deserialize(response));
 
-    aProjectWithALevel1AdminAreaAsPlanningArea = await ProjectsTestUtils.createProject(app, jwtToken, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: 'NAM',
-        adminAreaLevel1Id: 'NAM.13_1',
-      }),
-      organizationId: anOrganization.id,
-    }).then(async (response) => await Deserializer.deserialize(response));
+    aProjectWithALevel1AdminAreaAsPlanningArea = await ProjectsTestUtils.createProject(
+      app,
+      jwtToken,
+      {
+        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+          countryCode: 'NAM',
+          adminAreaLevel1Id: 'NAM.13_1',
+        }),
+        organizationId: anOrganization.id,
+      },
+    ).then(async (response) => await Deserializer.deserialize(response));
 
-    aProjectWithALevel2AdminAreaAsPlanningArea = await ProjectsTestUtils.createProject(app, jwtToken, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: 'NAM',
-        adminAreaLevel1Id: 'NAM.13_1',
-        adminAreaLevel2Id: 'NAM.13.5_1',
-      }),
-      organizationId: anOrganization.id,
-    }).then(async (response) => await Deserializer.deserialize(response));
+    aProjectWithALevel2AdminAreaAsPlanningArea = await ProjectsTestUtils.createProject(
+      app,
+      jwtToken,
+      {
+        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+          countryCode: 'NAM',
+          adminAreaLevel1Id: 'NAM.13_1',
+          adminAreaLevel2Id: 'NAM.13.5_1',
+        }),
+        organizationId: anOrganization.id,
+      },
+    ).then(async (response) => await Deserializer.deserialize(response));
   });
 
   afterAll(async () => {
@@ -333,12 +345,16 @@ describe('ProtectedAreasModule (e2e)', () => {
          * protected areas.
          */
         test('As a user, when I create a scenario, I should be able to associate custom protected areas to it via their UUID', async () => {
-          const protectedAreas: ProtectedArea[] = await request(app.getHttpServer())
+          const protectedAreas: ProtectedArea[] = await request(
+            app.getHttpServer(),
+          )
             .get(
               `/api/v1/protected-areas?filter[countryId]=NAM&pageSize=5&pageNumber=1`,
             )
             .set('Authorization', `Bearer ${jwtToken}`)
-            .then(async (response) => await Deserializer.deserialize(response.body));
+            .then(
+              async (response) => await Deserializer.deserialize(response.body),
+            );
 
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -355,12 +371,16 @@ describe('ProtectedAreasModule (e2e)', () => {
         });
 
         test('As a user, when I update a scenario, I should be able to associate custom protected areas to it via their UUID', async () => {
-          const protectedAreas: ProtectedArea[] = await request(app.getHttpServer())
+          const protectedAreas: ProtectedArea[] = await request(
+            app.getHttpServer(),
+          )
             .get(
               `/api/v1/protected-areas?filter[countryId]=NAM&pageSize=5&pageNumber=1`,
             )
             .set('Authorization', `Bearer ${jwtToken}`)
-            .then(async (response) => await Deserializer.deserialize(response.body));
+            .then(
+              async (response) => await Deserializer.deserialize(response.body),
+            );
 
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -384,17 +404,23 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             responseForUpdate.body,
           );
-          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
+          expect(
+            updatedScenario.protectedAreaFilterByIds?.length,
+          ).toBeGreaterThan(0);
         });
 
         test('As a user, when I create a scenario and I try to associate to it protected areas outside of the project boundaries, these areas should not be associated', async () => {
-          const countryOfProtectedAreasOutsideOfProjectBoundaries = 'ESP'
-          const protectedAreas: ProtectedArea[] = await request(app.getHttpServer())
+          const countryOfProtectedAreasOutsideOfProjectBoundaries = 'ESP';
+          const protectedAreas: ProtectedArea[] = await request(
+            app.getHttpServer(),
+          )
             .get(
               `/api/v1/protected-areas?filter[countryId]=${countryOfProtectedAreasOutsideOfProjectBoundaries}&pageSize=5&pageNumber=1`,
             )
             .set('Authorization', `Bearer ${jwtToken}`)
-            .then(async (response) => await Deserializer.deserialize(response.body));
+            .then(
+              async (response) => await Deserializer.deserialize(response.body),
+            );
 
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -418,7 +444,7 @@ describe('ProtectedAreasModule (e2e)', () => {
          * selecting WDPA areas with category NotAssigned within the country of
          * Namibia (NAM) will result in a non-empty set of WDPA protected areas.
          */
-         test('As a user, when I create a scenario, I should be able to associate WDPA protected areas to it via their IUCN category', async () => {
+        test('As a user, when I create a scenario, I should be able to associate WDPA protected areas to it via their IUCN category', async () => {
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
             projectId: aProjectWithALevel1AdminAreaAsPlanningArea.id,
@@ -455,7 +481,9 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             response.body,
           );
-          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
+          expect(
+            updatedScenario.protectedAreaFilterByIds?.length,
+          ).toBeGreaterThan(0);
         });
 
         /**
@@ -466,12 +494,16 @@ describe('ProtectedAreasModule (e2e)', () => {
          * protected areas.
          */
         test('As a user, when I create a scenario, I should be able to associate custom protected areas to it via their UUID', async () => {
-          const protectedAreas: ProtectedArea[] = await request(app.getHttpServer())
+          const protectedAreas: ProtectedArea[] = await request(
+            app.getHttpServer(),
+          )
             .get(
               `/api/v1/protected-areas?filter[countryId]=NAM&pageSize=5&pageNumber=1`,
             )
             .set('Authorization', `Bearer ${jwtToken}`)
-            .then(async (response) => await Deserializer.deserialize(response.body));
+            .then(
+              async (response) => await Deserializer.deserialize(response.body),
+            );
 
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -488,12 +520,16 @@ describe('ProtectedAreasModule (e2e)', () => {
         });
 
         test('As a user, when I update a scenario, I should be able to associate custom protected areas to it via their UUID', async () => {
-          const protectedAreas: ProtectedArea[] = await request(app.getHttpServer())
+          const protectedAreas: ProtectedArea[] = await request(
+            app.getHttpServer(),
+          )
             .get(
               `/api/v1/protected-areas?filter[countryId]=NAM&pageSize=5&pageNumber=1`,
             )
             .set('Authorization', `Bearer ${jwtToken}`)
-            .then(async (response) => await Deserializer.deserialize(response.body));
+            .then(
+              async (response) => await Deserializer.deserialize(response.body),
+            );
 
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -517,17 +553,23 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             responseForUpdate.body,
           );
-          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
+          expect(
+            updatedScenario.protectedAreaFilterByIds?.length,
+          ).toBeGreaterThan(0);
         });
 
         test('As a user, when I create a scenario and I try to associate to it protected areas outside of the project boundaries, these areas should not be associated', async () => {
-          const countryOfProtectedAreasOutsideOfProjectBoundaries = 'ESP'
-          const protectedAreas: ProtectedArea[] = await request(app.getHttpServer())
+          const countryOfProtectedAreasOutsideOfProjectBoundaries = 'ESP';
+          const protectedAreas: ProtectedArea[] = await request(
+            app.getHttpServer(),
+          )
             .get(
               `/api/v1/protected-areas?filter[countryId]=${countryOfProtectedAreasOutsideOfProjectBoundaries}&pageSize=5&pageNumber=1`,
             )
             .set('Authorization', `Bearer ${jwtToken}`)
-            .then(async (response) => await Deserializer.deserialize(response.body));
+            .then(
+              async (response) => await Deserializer.deserialize(response.body),
+            );
 
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -551,7 +593,7 @@ describe('ProtectedAreasModule (e2e)', () => {
          * selecting WDPA areas with category NotAssigned within the country of
          * Namibia (NAM) will result in a non-empty set of WDPA protected areas.
          */
-         test('As a user, when I create a scenario, I should be able to associate WDPA protected areas to it via their IUCN category', async () => {
+        test('As a user, when I create a scenario, I should be able to associate WDPA protected areas to it via their IUCN category', async () => {
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
             projectId: aProjectWithALevel2AdminAreaAsPlanningArea.id,
@@ -588,7 +630,9 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             response.body,
           );
-          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
+          expect(
+            updatedScenario.protectedAreaFilterByIds?.length,
+          ).toBeGreaterThan(0);
         });
 
         /**
@@ -599,12 +643,16 @@ describe('ProtectedAreasModule (e2e)', () => {
          * protected areas.
          */
         test('As a user, when I create a scenario, I should be able to associate custom protected areas to it via their UUID', async () => {
-          const protectedAreas: ProtectedArea[] = await request(app.getHttpServer())
+          const protectedAreas: ProtectedArea[] = await request(
+            app.getHttpServer(),
+          )
             .get(
               `/api/v1/protected-areas?filter[countryId]=NAM&pageSize=5&pageNumber=1`,
             )
             .set('Authorization', `Bearer ${jwtToken}`)
-            .then(async (response) => await Deserializer.deserialize(response.body));
+            .then(
+              async (response) => await Deserializer.deserialize(response.body),
+            );
 
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -621,12 +669,16 @@ describe('ProtectedAreasModule (e2e)', () => {
         });
 
         test('As a user, when I update a scenario, I should be able to associate custom protected areas to it via their UUID', async () => {
-          const protectedAreas: ProtectedArea[] = await request(app.getHttpServer())
+          const protectedAreas: ProtectedArea[] = await request(
+            app.getHttpServer(),
+          )
             .get(
               `/api/v1/protected-areas?filter[countryId]=NAM&pageSize=5&pageNumber=1`,
             )
             .set('Authorization', `Bearer ${jwtToken}`)
-            .then(async (response) => await Deserializer.deserialize(response.body));
+            .then(
+              async (response) => await Deserializer.deserialize(response.body),
+            );
 
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -650,17 +702,23 @@ describe('ProtectedAreasModule (e2e)', () => {
           const updatedScenario: Scenario = await Deserializer.deserialize(
             responseForUpdate.body,
           );
-          expect(updatedScenario.protectedAreaFilterByIds?.length).toBeGreaterThan(0);
+          expect(
+            updatedScenario.protectedAreaFilterByIds?.length,
+          ).toBeGreaterThan(0);
         });
 
         test('As a user, when I create a scenario and I try to associate to it protected areas outside of the project boundaries, these areas should not be associated', async () => {
-          const countryOfProtectedAreasOutsideOfProjectBoundaries = 'ESP'
-          const protectedAreas: ProtectedArea[] = await request(app.getHttpServer())
+          const countryOfProtectedAreasOutsideOfProjectBoundaries = 'ESP';
+          const protectedAreas: ProtectedArea[] = await request(
+            app.getHttpServer(),
+          )
             .get(
               `/api/v1/protected-areas?filter[countryId]=${countryOfProtectedAreasOutsideOfProjectBoundaries}&pageSize=5&pageNumber=1`,
             )
             .set('Authorization', `Bearer ${jwtToken}`)
-            .then(async (response) => await Deserializer.deserialize(response.body));
+            .then(
+              async (response) => await Deserializer.deserialize(response.body),
+            );
 
           const createScenarioDTO: Partial<CreateScenarioDTO> = {
             ...E2E_CONFIG.scenarios.valid.minimal(),
