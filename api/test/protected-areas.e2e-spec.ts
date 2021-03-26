@@ -74,7 +74,19 @@ describe('ProtectedAreasModule (e2e)', () => {
 
     /**
      * Seed test data includes protected areas in (among a handful of other
-     * countries) Namibia, so we create a project in this country.
+     * countries) Namibia, so we create a project in this country, and likewise
+     * for tests related to protected areas in a L1 or L2 admin area below.
+     *
+     * If/when updating seed test data, we need to make sure choices of
+     * country/admin areas, IUCN categories and ids of custom admin areas lead
+     * to protected areas and project planning areas to intersect as intended
+     * for these tests.
+     *
+     * For a quick check, we can use a query like this:
+     *
+     * select pa.id, pa.wdpaid, pa.full_name, pa.iucn_cat, pa.status, pa.desig,
+     * aa.gid_0, aa.gid_1, aa.gid_2 from wdpa pa
+     * left join admin_regions aa on ST_Intersects(pa.the_geom, aa.the_geom);
      */
     aProjectWithCountryAsPlanningArea = await ProjectsTestUtils.createProject(app, jwtToken, {
       ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
@@ -83,9 +95,6 @@ describe('ProtectedAreasModule (e2e)', () => {
       organizationId: anOrganization.id,
     }).then(async (response) => await Deserializer.deserialize(response));
 
-    /**
-     * Likewise for protected areas in an L1 area of Namibia
-     */
     aProjectWithALevel1AdminAreaAsPlanningArea = await ProjectsTestUtils.createProject(app, jwtToken, {
       ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
         countryCode: 'NAM',
@@ -94,9 +103,6 @@ describe('ProtectedAreasModule (e2e)', () => {
       organizationId: anOrganization.id,
     }).then(async (response) => await Deserializer.deserialize(response));
 
-    /**
-     * Likewise for protected areas in an L2 area of Namibia
-     */
     aProjectWithALevel2AdminAreaAsPlanningArea = await ProjectsTestUtils.createProject(app, jwtToken, {
       ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
         countryCode: 'NAM',
