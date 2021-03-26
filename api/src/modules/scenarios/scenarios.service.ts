@@ -143,7 +143,7 @@ export class ScenariosService extends AppBaseService<
     const model = await super.setDataCreate(create, info);
     /**
      * We always compute the list of protected areas to associate to a scenario
-     * from the list of IUCN categories and the list of user-uploaded protected
+     * from the list of IUCN categories and the list of project-specific protected
      * areas supplied in the request. Users should not set the list of actual
      * protected areas directly (and in fact we don't even expose this property
      * in DTOs).
@@ -152,10 +152,13 @@ export class ScenariosService extends AppBaseService<
       const wdpaAreaIds = await this.getWDPAAreasWithinProjectByIUCNCategory(
         create,
       );
-      model.protectedAreaFilterByIds = concat(
-        wdpaAreaIds,
-        create.customProtectedAreaIds,
-      ).filter((i): i is string => !!i);
+      model.protectedAreaFilterByIds = [
+        ...new Set(
+          concat(wdpaAreaIds, create.customProtectedAreaIds).filter(
+            (i): i is string => !!i,
+          ),
+        ),
+      ];
     }
     model.createdBy = info?.authenticatedUser?.id!;
     return model;
@@ -169,7 +172,7 @@ export class ScenariosService extends AppBaseService<
     model = await super.setDataUpdate(model, update, info);
     /**
      * We always compute the list of protected areas to associate to a scenario
-     * from the list of IUCN categories and the list of user-uploaded protected
+     * from the list of IUCN categories and the list of project-specific protected
      * areas supplied in the request. Users should not set the list of actual
      * protected areas directly (and in fact we don't even expose this property
      * in DTOs).
@@ -178,10 +181,13 @@ export class ScenariosService extends AppBaseService<
       const wdpaAreaIds = await this.getWDPAAreasWithinProjectByIUCNCategory(
         update,
       );
-      model.protectedAreaFilterByIds = concat(
-        wdpaAreaIds,
-        update.customProtectedAreaIds,
-      ).filter((i): i is string => !!i);
+      model.protectedAreaFilterByIds = [
+        ...new Set(
+          concat(wdpaAreaIds, update.customProtectedAreaIds).filter(
+            (i): i is string => !!i,
+          ),
+        ),
+      ];
     }
     return model;
   }
