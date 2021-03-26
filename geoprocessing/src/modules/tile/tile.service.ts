@@ -110,10 +110,10 @@ export class TileService {
   // query,
   IBaseQueryInput) => `
   SELECT
-    ${geometry}
+    ${geometry}, gid_0, gid_1, gid_2
   FROM ${table}
   WHERE
-    ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry})
+    ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry}) and level = 'country'
   `;
 
   /**
@@ -130,8 +130,7 @@ export class TileService {
   }: // bufferSize,
   // attributes,
   ITileQuery) => `
-  SELECT
-    ST_AsMVTGeom(ST_Transform(${geometry}, 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, false) AS geom
+  SELECT *,  ST_AsMVTGeom(ST_Transform(${geometry}, 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, false) AS geom
   FROM ${table}
   `;
   /**
@@ -182,7 +181,7 @@ export class TileService {
 
     const sql: string = `${queryParts.join(
       ',\n',
-    )}\nSELECT ST_AsMVT(tile, 'geom') AS mvt FROM tile`;
+    )}\nSELECT ST_AsMVT(tile.*, 'layer0', 4096, 'geom') AS mvt FROM tile`;
 
     // logger.debug(`Create query for tile: ${sql}`);
 
@@ -316,7 +315,7 @@ export class TileService {
       } catch (error) {
         mvt.res = -4;
         mvt.status = `[ERROR] - Database error: ${error.message}`;
-        logger.debug(`Database error: ${error.message}`);
+        logger.error(`Database error: ${error.message}`);
         return mvt;
       }
     } else {
@@ -328,9 +327,9 @@ export class TileService {
       data = Buffer.from('');
     }
     // zip data
-    logger.debug(data[0].mvt);
-    logger.debug(`uncompressedBytes: ${data[0].mvt.byteLength}`);
-    mvt.data = data[0].mvt; //await this.zip(data[0].mvt);
+    // logger.debug(data[0].mvt);
+    // logger.debug(`uncompressedBytes: ${data[0].mvt.byteLength}`);
+    mvt.data = await this.zip(data[0].mvt);
     // logger.debug(`compressedBytes: ${mvt.data.byteLength}`);
     logger.debug('Data compressed');
     return mvt;
