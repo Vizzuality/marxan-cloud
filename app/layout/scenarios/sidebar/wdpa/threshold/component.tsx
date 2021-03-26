@@ -56,7 +56,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     mutation.mutate({
       id: data.id,
       data: {
-        wdpaThreshold: wdpaThreshold * 100,
+        wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
       },
     }, {
       onSuccess: () => {

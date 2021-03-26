@@ -72,7 +72,7 @@ export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
     // Filter
     if (search) {
       const fuse = new Fuse(parsedData, {
-        keys: ['name', 'area'],
+        keys: ['name'],
         threshold: 0.25,
       });
       parsedData = fuse.search(search).map((f) => {
@@ -83,9 +83,12 @@ export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
     // Sort
     parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
 
+    console.log(parsedData);
+
     return {
       ...query,
       data: parsedData,
+      rawData: data?.data,
     };
   }, [query, data?.data, search, push]);
 }
