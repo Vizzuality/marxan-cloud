@@ -1,28 +1,96 @@
+import Fuse from 'fuse.js';
 import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/client';
+import { useRouter } from 'next/router';
+
+import orderBy from 'lodash/orderBy';
+
+import { formatDistanceToNow } from 'date-fns';
+
+import { ItemProps } from 'components/scenarios/item/component';
 
 import SCENARIOS from 'services/scenarios';
 
 import {
+  UseScenariosFiltersProps,
   UseSaveScenarioProps,
   SaveScenarioProps,
   UseDeleteScenarioProps,
   DeleteScenarioProps,
 } from './types';
 
-export function useScenarios() {
+export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
   const [session] = useSession();
+  const { search } = filters;
+  const { push } = useRouter();
 
-  const query = useQuery('scenarios', async () => SCENARIOS.request({
+  const query = useQuery(['scenarios', pId], async () => SCENARIOS.request({
     method: 'GET',
     url: '/',
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+    params: {
+      'filter[projectId]': pId,
+    },
   }));
 
-  return query;
+  const { data } = query;
+
+  return useMemo(() => {
+    let parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
+      const {
+        id, projectId, name, lastModifiedAt,
+      } = d;
+
+      const lastUpdateDistance = () => {
+        return formatDistanceToNow(
+          new Date(lastModifiedAt),
+          { addSuffix: true },
+        );
+      };
+
+      return {
+        id,
+        name,
+        lastUpdate: lastModifiedAt,
+        lastUpdateDistance: lastUpdateDistance(),
+        warnings: false,
+        onEdit: () => {
+          push(`/projects/${projectId}/scenarios/${id}/edit`);
+        },
+        onView: () => {
+          push(`/projects/${projectId}/scenarios/${id}`);
+        },
+        onSettings: () => {
+
+        },
+      };
+    }) : [];
+
+    // Filter
+    if (search) {
+      const fuse = new Fuse(parsedData, {
+        keys: ['name'],
+        threshold: 0.25,
+      });
+      parsedData = fuse.search(search).map((f) => {
+        return f.item;
+      });
+    }
+
+    // Sort
+    parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
+
+    console.log(parsedData);
+
+    return {
+      ...query,
+      data: parsedData,
+      rawData: data?.data,
+    };
+  }, [query, data?.data, search, push]);
 }
 
 export function useScenario(id) {
@@ -69,9 +137,9 @@ export function useSaveScenario({
 
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
-      const { id } = data;
-      queryClient.invalidateQueries('scenarios');
-      queryClient.invalidateQueries('scenarios', id);
+      const { id, projectId } = data;
+      queryClient.invalidateQueries(['scenarios', projectId]);
+      queryClient.invalidateQueries(['scenarios', id]);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

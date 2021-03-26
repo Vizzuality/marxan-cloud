@@ -31,7 +31,7 @@ const ShowProjectsPage: React.FC = () => {
 
         <div className="py-5 md:flex-grow">
           <Wrapper>
-            <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
+            <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-12">
               <ProjectScenarios />
               <ProjectMap />
             </div>

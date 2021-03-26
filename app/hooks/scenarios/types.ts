@@ -1,5 +1,9 @@
 import { AxiosRequestConfig } from 'axios';
 
+export interface UseScenariosFiltersProps {
+  search?: string;
+}
+
 export interface UseSaveScenarioProps {
   requestConfig?: AxiosRequestConfig
 }
