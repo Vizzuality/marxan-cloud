@@ -3111,20 +3111,7 @@ class-utils@^0.3.5:
     define-property "^0.2.5"
     isobject "^3.0.0"
     static-extend "^0.1.1"
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-class-validator@0.13.1:
-=======
-<<<<<<< HEAD
-class-validator@^0.13.1:
-=======
-class-validator@0.13.1:
->>>>>>> next steps mvt scaffolding
->>>>>>> next steps mvt scaffolding
-=======
-class-validator@^0.13.1:
->>>>>>> WIP
+class-validator@0.13.1, class-validator@^0.13.1:
   version "0.13.1"
   resolved "https://registry.yarnpkg.com/class-validator/-/class-validator-0.13.1.tgz#381b2001ee6b9e05afd133671fbdf760da7dec67"
   integrity sha512-zWIeYFhUitvAHBwNhDdCRK09hWx+P0HUwFE8US8/CxFpMVzkUK8RJl7yOIE+BVu2lxyPNgeOaFv78tLE47jBIg==
@@ -5840,11 +5827,6 @@ jsonapi-serializer@^3.6.7:
     inflected "^1.1.6"
     lodash "^4.16.3"
 
-jsonc-parser@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/jsonc-parser/-/jsonc-parser-3.0.0.tgz#abdd785701c7e7eaca8a9ec8cf070ca51a745a22"
-  integrity sha512-fQzRfAbIBnR0IQvftw9FJveWiHp72Fg20giDrHz6TdfB12UH/uue0D3hm57UB5KgAVuniLMCaS8P1IMj9NR7cA==
-
 jsonfile@^6.0.1:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-6.1.0.tgz#bc55b2634793c679ec6403094eb13698a6ec0aae"
@@ -5941,27 +5923,9 @@ levn@~0.3.0:
     type-check "~0.3.2"
 
 libphonenumber-js@^1.9.7:
-<<<<<<< HEAD
-<<<<<<< HEAD
-  version "1.9.12"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.9.12.tgz#2fc4efb88e57c7909d5329ae3a1619a65389dbe6"
-  integrity sha512-UNSBMB+lIn2XJtESlW4qDMxeZWcHhk50n8NlxQOlomrjDMTwNlq7UdD4gOR/ibS54M4Pw0mRFw6geddRBHGHNw==
-=======
-<<<<<<< HEAD
   version "1.9.16"
   resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.9.16.tgz#84fcadf834a1e4234dab3399b5798cf8ff809683"
   integrity sha512-PaHT7nTtnejZ0HHekAaA0olv6BUTKZGtKM4SCQS0yE3XjFuVo/tjePMHUAr32FKwIZfyPky1ExMUuaiBAUmV6w==
-=======
-  version "1.9.12"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.9.12.tgz#2fc4efb88e57c7909d5329ae3a1619a65389dbe6"
-  integrity sha512-UNSBMB+lIn2XJtESlW4qDMxeZWcHhk50n8NlxQOlomrjDMTwNlq7UdD4gOR/ibS54M4Pw0mRFw6geddRBHGHNw==
->>>>>>> next steps mvt scaffolding
->>>>>>> next steps mvt scaffolding
-=======
-  version "1.9.16"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.9.16.tgz#84fcadf834a1e4234dab3399b5798cf8ff809683"
-  integrity sha512-PaHT7nTtnejZ0HHekAaA0olv6BUTKZGtKM4SCQS0yE3XjFuVo/tjePMHUAr32FKwIZfyPky1ExMUuaiBAUmV6w==
->>>>>>> WIP
 
 lineclip@^1.1.5:
   version "1.1.5"
@@ -6057,28 +6021,12 @@ lodash.toarray@^4.4.0:
   resolved "https://registry.yarnpkg.com/lodash.toarray/-/lodash.toarray-4.4.0.tgz#24c4bfcd6b2fba38bfd0594db1179d8e9b656561"
   integrity sha1-JMS/zWsvuji/0FlNsRedjptlZWE=
 
-<<<<<<< HEAD
-lodash.truncate@^4.4.2:
-  version "4.4.2"
-  resolved "https://registry.yarnpkg.com/lodash.truncate/-/lodash.truncate-4.4.2.tgz#5a350da0b1113b837ecfffd5812cbe58d6eae193"
-  integrity sha1-WjUNoLERO4N+z//VgSy+WNbq4ZM=
-
-lodash@4.17.21, lodash@4.x, lodash@^4.16.3, lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.7.0:
-  version "4.17.21"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
-  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
-
-log-symbols@^4.0.0, log-symbols@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-4.1.0.tgz#3fbdbb95b4683ac9fc785111e792e558d4abd503"
-  integrity sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==
-=======
 lodash@4.17.20, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20:
   version "4.17.20"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
-lodash@^4.17.21:
+lodash@^4.16.3, lodash@^4.17.21:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -6087,7 +6035,6 @@ log-symbols@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-4.0.0.tgz#69b3cc46d20f448eccdb75ea1fa733d9e821c920"
   integrity sha512-FN8JBzLx6CzeMrB0tg6pqlGU1wCrXW+ZXGH481kfsBqer0hToTIiHdjH4Mq8xJUbvATujKCvaREGWpGUionraA==
->>>>>>> first steps on mvt scaffolding
   dependencies:
     chalk "^4.1.0"
     is-unicode-supported "^0.1.0"
@@ -6438,13 +6385,6 @@ nestjs-bullmq@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/nestjs-bullmq/-/nestjs-bullmq-0.1.0.tgz#83b721ff8221a07923c5ffe7fe2bd1d0dcc1bb90"
   integrity sha512-9vqYBjWfBcfXwwHShy+BTEDWwUrgUcwn/BWUobQF0F72EQci8NRKWGyhrydPpomSua5cyoA2aHLYQehMTPl00Q==
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> next steps mvt scaffolding
-=======
->>>>>>> WIP
 nestjs-base-service@0.4.2:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.4.2.tgz#b899e32318372443876a81dcdeabcac32c9c1d6a"
@@ -6462,14 +6402,6 @@ nestjs-typeorm-paginate@2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/nestjs-typeorm-paginate/-/nestjs-typeorm-paginate-2.2.6.tgz#83ee2823e2ebcd67f62c58df9e5c6400d833009d"
   integrity sha512-Tm/3fyjfy5j/deTwunWXg5sNKWjZVmTonygdd2A2sgYOr92ItvGiQGmujPgVQDOvW5kVVu/4QxfecHeOOQ/DIA==
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
->>>>>>> next steps mvt scaffolding
->>>>>>> next steps mvt scaffolding
-=======
->>>>>>> WIP
 
 nice-try@^1.0.4:
   version "1.0.5"
@@ -8732,14 +8664,6 @@ typescript@^3.8.3:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.9.tgz#e69905c54bc0681d0518bd4d587cc6f2d0b1a674"
   integrity sha512-kdMjTiekY+z/ubJCATUPlRDl39vXYiMV9iyeMuEuXZh2we6zz80uovNN2WlAxmmdE/Z/YQe+EbOEXB5RHEED3w==
 
-<<<<<<< HEAD
-typescript@^4.0.5:
-  version "4.2.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.4.tgz#8610b59747de028fda898a8aef0e103f156d0961"
-  integrity sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==
-
-=======
->>>>>>> next steps mvt scaffolding
 undefsafe@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/undefsafe/-/undefsafe-2.0.3.tgz#6b166e7094ad46313b2202da7ecc2cd7cc6e7aae"
