@@ -51,7 +51,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
       {id && (
         <motion.div
           key="project-map"
-          className="relative w-full h-full overflow-hidden rounded-4xl"
+          className="relative w-full h-full col-span-5 overflow-hidden rounded-4xl"
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}

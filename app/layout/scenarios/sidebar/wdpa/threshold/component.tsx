@@ -56,7 +56,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     mutation.mutate({
       id: data.id,
       data: {
-        wdpaThreshold: wdpaThreshold * 100,
+        wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
       },
     }, {
       onSuccess: () => {
@@ -90,7 +90,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   if (!data) return null;
 
   const {
-    wdpaFilter,
+    wdpaFilter = [],
     wdpaThreshold,
   } = data;
 
@@ -141,7 +141,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
             <h3 className="text-sm">Selected protected areas:</h3>
 
             <div className="flex flex-wrap mt-2.5">
-              {wdpaFilter.map((w) => {
+              {wdpaFilter && wdpaFilter.map((w) => {
                 const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
                 return (
                   <div
