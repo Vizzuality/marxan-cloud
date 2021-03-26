@@ -1,31 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import * as config from 'config';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 
 import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
-import { Queue, Job } from 'bullmq';
-import { PlanningUnitsModule } from 'modules/planning-units/planning-units.module';
+import { Job, Worker } from 'bullmq';
+import { PlanningUnitsService } from 'modules/planning-units/planning-units.service';
+import { notContains } from 'class-validator';
 
 
 
 describe('PlanningUnitsModule (e2e)', () => {
   let app: INestApplication;
-  let moduleRef: TestingModule;
+  let queueService: PlanningUnitsService = new PlanningUnitsService;
   let jwtToken: string;
 
   beforeAll(async () => {
-
-    moduleRef = await Test.createTestingModule({
-      imports: [ PlanningUnitsModule ],
-    }).compile();
-
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
     app.useGlobalPipes(
       new ValidationPipe({
         transform: true,
@@ -48,32 +46,15 @@ describe('PlanningUnitsModule (e2e)', () => {
   });
 
   afterAll(async () => {
-    await moduleRef.close();
-    await Promise.all([app.close()]);
+    await Promise.all([app.close(), queueService.onModuleDestroy()]);
   });
 
-  describe('Planning units', () => {
+  describe.only('Planning units', () => {
     let anOrganization: { id: string; type: 'organizations' };
     let minimalProject: { id: string; type: 'projects' };
-    let completeProject: { id: string; type: 'projects' };
+    let customAreaProject: { id: string; type: 'projects' };
+    let adminAreaProject: { id: string; type: 'projects' };
 
-    /**
-     * @description
-     * this should describe how the module works
-     */
-    it('should inject the queue with the given name', () => {
-      const queue = moduleRef.get<Queue>('test');
-
-      expect(queue).toBeDefined();
-      expect(queue.name).toEqual('test');
-    });
-
-    it('should generate a job based on partial project expect', () => {
-      const queue = moduleRef.get<Queue>('test');
-
-      expect(queue).toBeDefined();
-      expect(queue.name).toEqual('test');
-    });
     /**
      * @description
      * this should describe how the sinergy between Project creation
@@ -92,11 +73,23 @@ describe('PlanningUnitsModule (e2e)', () => {
       expect(anOrganization.type).toBe('organizations');
     });
 
-    it('Creates a project with minimum required data should succeed', async () => {
+    it('Creates a project with minimum required data should succeed but a job should not ', async () => {
+
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.minimal(),
         organizationId: anOrganization.id,
       };
+
+      let processor = jest.fn().mockImplementation((job: Job) => {
+        expect(job.data.countryId).toBe(createProjectDTO.countryId);
+        expect(job.data.adminAreaLevel1Id).toBe(createProjectDTO.adminAreaLevel1Id);
+        expect(job.data.adminAreaLevel2Id).toBe(createProjectDTO.adminAreaLevel2Id);
+        Promise.resolve();
+        });
+
+      const worker = new Worker(queueService.queueName, processor, config.get('redisApi'));
+
+      await worker.waitUntilReady();
 
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
@@ -107,13 +100,27 @@ describe('PlanningUnitsModule (e2e)', () => {
       const resources = response.body.data;
       minimalProject = resources;
       expect(resources.type).toBe('projects');
+
+      expect(processor).not.toHaveBeenCalled();
+      await worker.close();
     });
 
-    it('Creating a project with complete data should succeed', async () => {
+    it('Creating a project with custom area should succeed and create a job for that adm area', async () => {
+      jest.setTimeout(10 * 1000);
       const createProjectDTO: Partial<CreateProjectDTO> = {
-        ...E2E_CONFIG.projects.valid.complete({ countryCode: 'ESP' }),
+        ...E2E_CONFIG.projects.valid.customArea({ countryCode: 'ESP' }),
         organizationId: anOrganization.id,
       };
+      let processor = jest.fn().mockImplementation((job: Job) => {
+        expect(job.data.countryId).toBe(createProjectDTO.countryId);
+        expect(job.data.adminAreaLevel1Id).toBe(createProjectDTO.adminAreaLevel1Id);
+        expect(job.data.adminAreaLevel2Id).toBe(createProjectDTO.adminAreaLevel2Id);
+        Promise.resolve();
+        });
+
+      const worker = new Worker(queueService.queueName, processor, config.get('redisApi'));
+
+      await worker.waitUntilReady();
 
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
@@ -122,8 +129,47 @@ describe('PlanningUnitsModule (e2e)', () => {
         .expect(201);
 
       const resources = response.body.data;
-      completeProject = resources;
+      customAreaProject = resources;
       expect(resources.type).toBe('projects');
+
+      expect(processor).toHaveBeenCalled();
+
+      await worker.close();
+    });
+
+    it('Creating a project with administrative region data should succeed and create a job for that adm area', async () => {
+      jest.setTimeout(10 * 1000);
+
+      const createProjectDTO: Partial<CreateProjectDTO> = {
+        ...E2E_CONFIG.projects.valid.adminRegion({ countryCode: 'ESP' }),
+        organizationId: anOrganization.id,
+      };
+      let processor = jest.fn().mockImplementation((job: Job) => {
+        expect(job.data.countryId).toBe(createProjectDTO.countryId);
+        expect(job.data.adminAreaLevel1Id).toBe(createProjectDTO.adminAreaLevel1Id);
+        expect(job.data.adminAreaLevel2Id).toBe(createProjectDTO.adminAreaLevel2Id);
+        Promise.resolve();
+        });
+
+      const worker = new Worker(queueService.queueName, processor, config.get('redisApi'));
+
+      await worker.waitUntilReady();
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/projects')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(createProjectDTO)
+        .expect(201);
+
+      const resources = response.body.data;
+      adminAreaProject = resources;
+      expect(resources.type).toBe('projects');
+
+
+      expect(processor).toHaveBeenCalled();
+
+      await worker.close();
+
     });
       /**
        * Finally, we delete the projects we had created to test PU creation
@@ -137,11 +183,18 @@ describe('PlanningUnitsModule (e2e)', () => {
       expect(response1.body.data).toBeUndefined();
 
       const response2 = await request(app.getHttpServer())
-        .delete(`/api/v1/projects/${completeProject.id}`)
+        .delete(`/api/v1/projects/${customAreaProject.id}`)
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
 
       expect(response2.body.data).toBeUndefined();
+
+      const response3 = await request(app.getHttpServer())
+        .delete(`/api/v1/projects/${adminAreaProject.id}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      expect(response3.body.data).toBeUndefined();
 
       /**
        * Finally, we delete the organization we had created for these projects

@@ -17,7 +17,9 @@
       "secret": "API_AUTH_JWT_SECRET"
     }
   },
-  "redis": {
-    "port": "REDIS_API_SERVICE_PORT"
-  }
+  "redisApi": {
+   "connection": {
+     "host": "REDIS_HOST"
+     }
+   }
 }

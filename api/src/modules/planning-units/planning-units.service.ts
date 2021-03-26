@@ -15,7 +15,7 @@ import { CreatePlanningUnitsDTO } from './dto/create.planning-units.dto';
  **/
 @Injectable()
 export class PlanningUnitsService {
-  private readonly queueName: string = 'planning-units';
+  public readonly queueName: string = 'planning-units';
   private readonly logger: Logger = new Logger(
     `${this.queueName}-queue-publisher`,
   );
@@ -33,12 +33,19 @@ export class PlanningUnitsService {
     config.get('redisApi'),
   );
   constructor() {
-    this.queueEvents.on('completed', (job: Job) => {
+      this.queueEvents.on('completed', (job: Job) => {
       this.logger.log(`this job ${job.id} for ${this.queueName} is completed`);
     });
   }
 
   public async create(creationOptions: CreatePlanningUnitsDTO): Promise<void> {
-    await this.planningUnitsQueue.add('create-pu', creationOptions, {});
+    await this.planningUnitsQueue.add('create-pu', creationOptions, { delay: 5000 });
+  }
+
+  public async onModuleDestroy(): Promise<void> {
+    await this.queueEvents.close();
+    await this.queueEvents.disconnect();
+    await this.planningUnitsQueue.close();
+    await this.planningUnitsQueue.disconnect();
   }
 }
