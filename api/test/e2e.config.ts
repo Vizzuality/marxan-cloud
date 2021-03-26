@@ -26,11 +26,11 @@ export const E2E_CONFIG: {
   projects: {
     valid: {
       minimal: () => Partial<CreateProjectDTO>;
-      minimalInGivenAdminArea: (
-        options?: {
-          countryCode: string, adminAreaLevel1Id?: string, adminAreaLevel2Id?: string,
-        },
-      ) => Partial<CreateProjectDTO>;
+      minimalInGivenAdminArea: (options?: {
+        countryCode: string;
+        adminAreaLevel1Id?: string;
+        adminAreaLevel2Id?: string;
+      }) => Partial<CreateProjectDTO>;
       complete: (options: unknown) => Partial<CreateProjectDTO>;
     };
     invalid: {
@@ -87,7 +87,9 @@ export const E2E_CONFIG: {
         organizationId: faker.random.uuid(),
       }),
       minimalInGivenAdminArea: (options: {
-        countryCode: string, adminAreaLevel1Id?: string, adminAreaLevel2Id?: string,
+        countryCode: string;
+        adminAreaLevel1Id?: string;
+        adminAreaLevel2Id?: string;
       }): CreateProjectDTO => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
