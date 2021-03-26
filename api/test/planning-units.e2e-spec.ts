@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import * as config from 'config';
 import * as request from 'supertest';
+import * as IORedis from 'ioredis';
+import { Redis } from 'ioredis';
+
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 
@@ -10,7 +13,42 @@ import { Job, Worker } from 'bullmq';
 import { PlanningUnitsService } from 'modules/planning-units/planning-units.service';
 import { notContains } from 'class-validator';
 
+const logger: Logger = new Logger('test')
 
+function delay(ms: number) {
+  return new Promise(function(resolve) {
+    return setTimeout(resolve, ms);
+  });
+};
+export async function removeAllQueueData(
+  client: Redis,
+  queueName: string,
+  prefix = 'bull',
+) {
+  const pattern = `${prefix}:${queueName}:*`;
+  return new Promise<void>((resolve, reject) => {
+    const stream = client.scanStream({
+      match: pattern,
+    });
+    stream.on('data', (keys: string[]) => {
+      if (keys.length) {
+        const pipeline = client.pipeline();
+        keys.forEach(key => {
+          pipeline.del(key);
+        });
+        pipeline.exec().catch(error => {
+          reject(error);
+        });
+      }
+    });
+    stream.on('end', () => {
+      resolve();
+    });
+    stream.on('error', error => {
+      reject(error);
+    });
+  });
+}
 
 describe('PlanningUnitsModule (e2e)', () => {
   let app: INestApplication;
@@ -45,6 +83,11 @@ describe('PlanningUnitsModule (e2e)', () => {
 
   });
 
+  afterEach(async function() {
+    logger.debug('called')
+    await removeAllQueueData(new IORedis(config.get('redisApi.connection')), queueService.queueName);
+  });
+
   afterAll(async () => {
     await Promise.all([app.close(), queueService.onModuleDestroy()]);
   });
@@ -74,17 +117,16 @@ describe('PlanningUnitsModule (e2e)', () => {
     });
 
     it('Creates a project with minimum required data should succeed but a job should not ', async () => {
-
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.minimal(),
         organizationId: anOrganization.id,
       };
 
-      let processor = jest.fn().mockImplementation((job: Job) => {
+      let processor = jest.fn().mockImplementation(async (job: Job) => {
         expect(job.data.countryId).toBe(createProjectDTO.countryId);
-        expect(job.data.adminAreaLevel1Id).toBe(createProjectDTO.adminAreaLevel1Id);
-        expect(job.data.adminAreaLevel2Id).toBe(createProjectDTO.adminAreaLevel2Id);
-        Promise.resolve();
+        delay(50).then(() => {
+            return 42;
+          });
         });
 
       const worker = new Worker(queueService.queueName, processor, config.get('redisApi'));
@@ -100,75 +142,78 @@ describe('PlanningUnitsModule (e2e)', () => {
       const resources = response.body.data;
       minimalProject = resources;
       expect(resources.type).toBe('projects');
-
+      await processor
       expect(processor).not.toHaveBeenCalled();
       await worker.close();
+      await worker.disconnect();
     });
 
-    it('Creating a project with custom area should succeed and create a job for that adm area', async () => {
-      jest.setTimeout(10 * 1000);
+    it('Creating a project with custom area should succeed and create a job for that area', async () => {
+      // jest.setTimeout(3 * 1000);
       const createProjectDTO: Partial<CreateProjectDTO> = {
-        ...E2E_CONFIG.projects.valid.customArea({ countryCode: 'ESP' }),
+        ...E2E_CONFIG.projects.valid.customArea({ countryCode: 'NAM' }),
         organizationId: anOrganization.id,
       };
-      let processor = jest.fn().mockImplementation((job: Job) => {
-        expect(job.data.countryId).toBe(createProjectDTO.countryId);
-        expect(job.data.adminAreaLevel1Id).toBe(createProjectDTO.adminAreaLevel1Id);
-        expect(job.data.adminAreaLevel2Id).toBe(createProjectDTO.adminAreaLevel2Id);
-        Promise.resolve();
+      let worker: Worker;
+      const promise = new Promise<void>(async (resolve, reject) => {
+          worker = new Worker(queueService.queueName, async (job: Job)=> {
+            try {
+              expect(job.data).toStrictEqual(createProjectDTO);
+            } catch (err) {
+              reject(err);
+            }
+            Promise.resolve();
+          },config.get('redisApi'));
+          const response = await request(app.getHttpServer())
+          .post('/api/v1/projects')
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .send(createProjectDTO)
+          .expect(201);
+
+          const resources = response.body.data;
+          customAreaProject = resources;
+          expect(resources.type).toBe('projects');
+
+          // worker.close()
+          // worker.disconnect()
         });
 
-      const worker = new Worker(queueService.queueName, processor, config.get('redisApi'));
-
-      await worker.waitUntilReady();
-
-      const response = await request(app.getHttpServer())
-        .post('/api/v1/projects')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .send(createProjectDTO)
-        .expect(201);
-
-      const resources = response.body.data;
-      customAreaProject = resources;
-      expect(resources.type).toBe('projects');
-
-      expect(processor).toHaveBeenCalled();
-
-      await worker.close();
+      await promise;
     });
 
     it('Creating a project with administrative region data should succeed and create a job for that adm area', async () => {
-      jest.setTimeout(10 * 1000);
+      // jest.setTimeout(3 * 1000);
 
       const createProjectDTO: Partial<CreateProjectDTO> = {
-        ...E2E_CONFIG.projects.valid.adminRegion({ countryCode: 'ESP' }),
+        ...E2E_CONFIG.projects.valid.adminRegion({ countryCode: 'NAM' }),
         organizationId: anOrganization.id,
       };
-      let processor = jest.fn().mockImplementation((job: Job) => {
-        expect(job.data.countryId).toBe(createProjectDTO.countryId);
-        expect(job.data.adminAreaLevel1Id).toBe(createProjectDTO.adminAreaLevel1Id);
-        expect(job.data.adminAreaLevel2Id).toBe(createProjectDTO.adminAreaLevel2Id);
-        Promise.resolve();
+      let worker: Worker;
+
+      const promise = new Promise<void>(async (resolve, reject) => {
+          worker = new Worker(queueService.queueName, async (job: Job)=> {
+            try {
+              expect(job.data).toStrictEqual(createProjectDTO);
+            } catch (err) {
+              reject(err);
+            }
+            resolve();
+          },config.get('redisApi'));
+          const response = await request(app.getHttpServer())
+          .post('/api/v1/projects')
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .send(createProjectDTO)
+          .expect(201);
+
+          const resources = response.body.data;
+          customAreaProject = resources;
+          expect(resources.type).toBe('projects');
+
+          // worker.close()
+          // worker.disconnect()
         });
 
-      const worker = new Worker(queueService.queueName, processor, config.get('redisApi'));
-
-      await worker.waitUntilReady();
-
-      const response = await request(app.getHttpServer())
-        .post('/api/v1/projects')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .send(createProjectDTO)
-        .expect(201);
-
-      const resources = response.body.data;
-      adminAreaProject = resources;
-      expect(resources.type).toBe('projects');
-
-
-      expect(processor).toHaveBeenCalled();
-
-      await worker.close();
+      await promise;
 
     });
       /**

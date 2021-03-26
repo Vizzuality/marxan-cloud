@@ -33,13 +33,13 @@ export class PlanningUnitsService {
     config.get('redisApi'),
   );
   constructor() {
-      this.queueEvents.on('completed', (job: Job) => {
-      this.logger.log(`this job ${job.id} for ${this.queueName} is completed`);
+      this.queueEvents.on('completed', (job) => {
+      this.logger.log(`this job ${job.jobId} for ${this.queueName} is completed`);
     });
   }
 
   public async create(creationOptions: CreatePlanningUnitsDTO): Promise<void> {
-    await this.planningUnitsQueue.add('create-pu', creationOptions, { delay: 5000 });
+    await this.planningUnitsQueue.add('create-pu', creationOptions);
   }
 
   public async onModuleDestroy(): Promise<void> {
