@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Header } from '@nestjs/common';
+import { Controller, Get, Param, Header, Res } from '@nestjs/common';
 // import { AdminAreasResult } from './admin-areas.geo.entity';
 import { AdminAreasService } from './admin-areas.service';
 import { apiGlobalPrefixes } from 'api.config';
@@ -15,6 +15,7 @@ import {
 
 import { Tile } from 'modules/tile/tile.service';
 import { logger } from 'app.module';
+import { Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class AdminAreasController {
@@ -49,11 +50,12 @@ export class AdminAreasController {
     required: true,
   })
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
-  @Header('Access-Control-Allow-Origin', '*')
   @Header('Content-Type', 'application/x-protobuf')
+  @Header('Content-Disposition', 'attachment')
+  @Header('Access-Control-Allow-Origin', '*')
+  @Header('Content-Encoding', 'gzip')
   // @Header('Content-Encoding', 'gzip')
   // @Header('Content-Type', 'application/vnd.mapbox-vector-tile')
-  // @Header('Content-Disposition', 'attachment')
   async getTile(
     @Param('z') z: number,
     @Param('x') x: number,
@@ -63,9 +65,9 @@ export class AdminAreasController {
     @Param('extent') extent: number,
     @Param('buffer') buffer: number,
     @Param('maxZoomLevel') maxZoomLevel: number,
+    @Res() response: Response,
   ): Promise<any> {
     // Promise<tile>
-    let response;
     const tile: Tile = await this.service.findTile(
       z,
       x,
@@ -76,8 +78,9 @@ export class AdminAreasController {
       buffer,
       maxZoomLevel,
     );
+
     if (tile.res >= 0 && tile.data) {
-      response = tile.data; //.toString('base64')
+      response.send(tile.data); //.toString('base64')
       // {
       //   statusCode: 200,
       //   headers: {
@@ -89,7 +92,7 @@ export class AdminAreasController {
       //   isBase64Encoded: true
       // }
     } else {
-      response = JSON.stringify(tile);
+      response.send(JSON.stringify(tile));
       // {
       //   statusCode: 500,
       //   headers: {
