@@ -34,7 +34,9 @@ describe('ProtectedAreasModule (e2e)', () => {
     keyForAttribute: 'camelCase',
   });
   let anOrganization: Organization;
-  let aProject: Project;
+  let aProjectWithCountryAsPlanningArea: Project;
+  let aProjectWithALevel1AdminAreaAsPlanningArea: Project;
+  let aProjectWithALevel2AdminAreaAsPlanningArea: Project;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -74,9 +76,32 @@ describe('ProtectedAreasModule (e2e)', () => {
      * Seed test data includes protected areas in (among a handful of other
      * countries) Namibia, so we create a project in this country.
      */
-    aProject = await ProjectsTestUtils.createProject(app, jwtToken, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenCountry({
+    aProjectWithCountryAsPlanningArea = await ProjectsTestUtils.createProject(app, jwtToken, {
+      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
         countryCode: 'NAM',
+      }),
+      organizationId: anOrganization.id,
+    }).then(async (response) => await Deserializer.deserialize(response));
+
+    /**
+     * Likewise for protected areas in an L1 area of Namibia
+     */
+    aProjectWithALevel1AdminAreaAsPlanningArea = await ProjectsTestUtils.createProject(app, jwtToken, {
+      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+        countryCode: 'NAM',
+        adminAreaLevel1Id: 'NAM.13_1',
+      }),
+      organizationId: anOrganization.id,
+    }).then(async (response) => await Deserializer.deserialize(response));
+
+    /**
+     * Likewise for protected areas in an L2 area of Namibia
+     */
+    aProjectWithALevel2AdminAreaAsPlanningArea = await ProjectsTestUtils.createProject(app, jwtToken, {
+      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+        countryCode: 'NAM',
+        adminAreaLevel1Id: 'NAM.13_1',
+        adminAreaLevel2Id: 'NAM.13.5_1',
       }),
       organizationId: anOrganization.id,
     }).then(async (response) => await Deserializer.deserialize(response));
