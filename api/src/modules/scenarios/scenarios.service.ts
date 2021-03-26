@@ -141,13 +141,22 @@ export class ScenariosService extends AppBaseService<
     info?: AppInfoDTO,
   ): Promise<Scenario> {
     const model = await super.setDataCreate(create, info);
-    const wdpaAreaIds = await this.getWDPAAreasWithinProjectByIUCNCategory(
-      create,
-    );
-    model.protectedAreaFilterByIds = concat(
-      wdpaAreaIds,
-      create.customProtectedAreaIds,
-    ).filter((i): i is string => !!i);
+    /**
+     * We always compute the list of protected areas to associate to a scenario
+     * from the list of IUCN categories and the list of user-uploaded protected
+     * areas supplied in the request. Users should not set the list of actual
+     * protected areas directly (and in fact we don't even expose this property
+     * in DTOs).
+     */
+    if (create.wdpaIucnCategories || create.customProtectedAreaIds) {
+      const wdpaAreaIds = await this.getWDPAAreasWithinProjectByIUCNCategory(
+        create,
+      );
+      model.protectedAreaFilterByIds = concat(
+        wdpaAreaIds,
+        create.customProtectedAreaIds,
+      ).filter((i): i is string => !!i);
+    }
     model.createdBy = info?.authenticatedUser?.id!;
     return model;
   }
@@ -155,8 +164,16 @@ export class ScenariosService extends AppBaseService<
   async setDataUpdate(
     model: Scenario,
     update: UpdateScenarioDTO,
-    _info?: AppInfoDTO,
+    info?: AppInfoDTO,
   ): Promise<Scenario> {
+    model = await super.setDataUpdate(model, update, info);
+    /**
+     * We always compute the list of protected areas to associate to a scenario
+     * from the list of IUCN categories and the list of user-uploaded protected
+     * areas supplied in the request. Users should not set the list of actual
+     * protected areas directly (and in fact we don't even expose this property
+     * in DTOs).
+     */
     if (update.wdpaIucnCategories || update.customProtectedAreaIds) {
       const wdpaAreaIds = await this.getWDPAAreasWithinProjectByIUCNCategory(
         update,
