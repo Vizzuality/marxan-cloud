@@ -83,8 +83,6 @@ export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
     // Sort
     parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
 
-    console.log(parsedData);
-
     return {
       ...query,
       data: parsedData,

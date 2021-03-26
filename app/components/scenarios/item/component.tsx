@@ -97,14 +97,16 @@ export const Item: React.FC<ItemProps> = ({
               </div>
             </div>
           </section>
+
           <Button
             className="flex-shrink-0"
             size="s"
             theme="secondary"
             onClick={onSettings}
           >
-            View settings
+            Settings
           </Button>
+
           <Button
             className="flex-shrink-0"
             size="s"
