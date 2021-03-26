@@ -305,7 +305,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeUndefined();
 
           const response = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -391,7 +391,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeUndefined();
 
           const responseForUpdate = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -468,7 +468,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeUndefined();
 
           const response = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -540,7 +540,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeUndefined();
 
           const responseForUpdate = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -617,7 +617,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeUndefined();
 
           const response = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
@@ -689,7 +689,7 @@ describe('ProtectedAreasModule (e2e)', () => {
             jwtToken,
             createScenarioDTO,
           ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaFilterByIds?.length).toBe(0);
+          expect(scenario.protectedAreaFilterByIds?.length).toBeUndefined();
 
           const responseForUpdate = await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenario.id}`)
