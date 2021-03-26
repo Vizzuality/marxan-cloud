@@ -23,9 +23,9 @@ var hoveredStateId = null;
 
 var map = new mapboxgl.Map({
     'container': 'map',
-    'zoom': 5,
-    'center': [14.150390625,
-          0.7031073524364909],
+    'zoom': 7,
+    'center': [18.896484375,
+          -19.145168196205297],
     "light": {"intensity": 0.2},
     'style': {
         'version': 8,
@@ -35,7 +35,7 @@ var map = new mapboxgl.Map({
                 //'minzoom':11,
                 'maxzoom': 12,
                 'tiles': [
-                "http://localhost:3040/api/v1/geodata/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt",
+                "http://localhost:3040/api/v1/geodata/administrative-areas/0/preview/tiles/{z}/{x}/{y}.mvt",
                 // " https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/{z}/{x}/{y}.vector.pbf?sku=101F7Ml2uephf&access_token=pk.eyJ1IjoibGF5ZXItbWFuYWdlciIsImEiOiJjazA2dTJnMG0zc3lwM251dGM0aXhiYTVxIn0.AaoErQTRezfQshqnEKIg8A"
                 ]
             },
@@ -65,7 +65,14 @@ var map = new mapboxgl.Map({
             // 'minzoom': 0,
             // 'maxzoom': 12,
             'paint': {
-                'fill-color': 'red'
+                'fill-outline-color': 'red',
+                'fill-color': 'green',
+                'fill-opacity': [
+'case',
+['boolean', ['feature-state', 'hover'], false],
+1,
+0.5
+]
             }
         },
         ]
