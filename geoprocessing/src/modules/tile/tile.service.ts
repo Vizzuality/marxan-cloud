@@ -60,8 +60,8 @@ export interface IBaseQueryInput {
   maxZoomLevel: number;
   buffer: number;
   extent: number;
-  // attributes: string;
-  // query: string[];
+  customQuery: string;
+  attributes: string;
 }
 
 /**
@@ -81,8 +81,8 @@ export interface ITileQueryInput extends TileRequest {
   geometry: string;
   extent: number;
   buffer: number;
-  // attributes: string[];
-  // query: string[];
+  customQuery: string;
+  attributes: string;
   getBaseQuery?: GetBaseQuery;
 }
 
@@ -102,12 +102,14 @@ export class TileService {
     geometry,
     extent,
     buffer,
+    customQuery,
+    attributes,
   }: // maxZoomLevel,
   // attributes,
   // query,
   IBaseQueryInput) => `
   SELECT
-    gid_0, gid_1, gid_2,
+    ${attributes},
     ST_AsMVTGeom(
       -- Geometry from table
       ST_Transform(${geometry}, 3857),
@@ -123,7 +125,7 @@ export class TileService {
   FROM ${table}
   WHERE
     ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry})
-    and gid_0 is not null and gid_1 is null and gid_2 is null
+    and ${customQuery}
   `;
 
   /**
@@ -138,7 +140,8 @@ export class TileService {
     geometry,
     extent,
     buffer,
-    // query,
+    customQuery,
+    attributes,
     getBaseQuery = this.defaultGetBaseQuery,
   }: ITileQueryInput): string {
     const queryParts: string[] = [];
@@ -152,8 +155,8 @@ export class TileService {
         maxZoomLevel,
         buffer,
         extent,
-        // attributes: attributesToSelect(attributes),
-        // query,
+        customQuery,
+        attributes,
       })})`,
     );
 
@@ -182,6 +185,8 @@ export class TileService {
     extent: number,
     buffer: number,
     maxZoomLevel: number,
+    customQuery: string,
+    attributes: string,
   ): string {
     let query: string = '';
 
@@ -206,6 +211,8 @@ export class TileService {
         geometry,
         extent,
         buffer,
+        customQuery,
+        attributes,
       });
       logger.debug(`Create query for tile: ${query}`);
     } catch (error) {
@@ -264,6 +271,8 @@ export class TileService {
     extent: number,
     buffer: number,
     maxZoomLevel: number,
+    customQuery: string,
+    attributes: string,
   ): Promise<Tile> {
     const mvt: Tile = { res: 0 };
 
@@ -278,6 +287,8 @@ export class TileService {
       extent,
       buffer,
       maxZoomLevel,
+      customQuery,
+      attributes,
     );
     logger.debug('Query created');
     let data: any | null = null;
