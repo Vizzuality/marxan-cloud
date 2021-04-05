@@ -19,7 +19,7 @@ export class PlanningUnitsService {
   private readonly logger: Logger = new Logger(
     `${this.queueName}-queue-publisher`,
   );
-  private readonly planningUnitsQueue: Queue = new Queue(this.queueName, {
+  public readonly planningUnitsQueue: Queue = new Queue(this.queueName, {
     ...config.get('redisApi'),
     defaultJobOptions: {
       removeOnComplete: 100,
@@ -33,8 +33,10 @@ export class PlanningUnitsService {
     config.get('redisApi'),
   );
   constructor() {
-      this.queueEvents.on('completed', (job) => {
-      this.logger.log(`this job ${job.jobId} for ${this.queueName} is completed`);
+    this.queueEvents.on('completed', (job) => {
+      this.logger.log(
+        `this job ${job.jobId} for ${this.queueName} is completed`,
+      );
     });
   }
 
