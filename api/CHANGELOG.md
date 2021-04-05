@@ -7,6 +7,21 @@ and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## v0.4.0
+
+Unreleased
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+
 ## [0.3.0]
 
 2021-04-05
@@ -29,6 +44,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - When soft-deleting a user, their account's email address is set to a random
   value so that they can sign up again using the same email address in the
   future, if so they wish [MARXAN-184].
+
 ## [0.2.0]
 
 2021-03-22
