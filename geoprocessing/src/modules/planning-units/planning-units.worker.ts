@@ -28,7 +28,6 @@ export class PlanningUnitsProcessor {
     this.logger.log('worker');
     this.worker.on('completed', async (job) => {
       this.logger.debug(`Job finished ${JSON.stringify(job)}`);
-      await this.worker.pause(true);
     });
   }
 

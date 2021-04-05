@@ -126,6 +126,23 @@ export const E2E_CONFIG: {
           [faker.random.word()]: faker.random.uuid(),
         },
       }),
+<<<<<<< HEAD
+=======
+      adminRegion: (options: { countryCode: string }): CreateProjectDTO => ({
+        name: faker.random.words(5),
+        organizationId: faker.random.uuid(),
+        description: faker.lorem.paragraphs(2),
+        countryId: options.countryCode,
+        adminAreaLevel1Id: faker.random.alphaNumeric(7),
+        adminAreaLevel2Id: faker.random.alphaNumeric(12),
+        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitAreakm2: 10,
+        metadata: {
+          [faker.random.word()]: faker.random.words(3),
+          [faker.random.word()]: faker.random.uuid(),
+        },
+      }),
+>>>>>>> reworked test for jobs in the api, we dont need a worker processor.
     },
     invalid: {
       incomplete: () => ({
@@ -158,6 +175,7 @@ export const E2E_CONFIG: {
       }),
     },
   },
+<<<<<<< HEAD
   protectedAreas: {
     categories: {
       valid: [
@@ -184,4 +202,6 @@ export const E2E_CONFIG: {
       adminRegion:{}
     }
   }
+=======
+>>>>>>> reworked test for jobs in the api, we dont need a worker processor.
 };

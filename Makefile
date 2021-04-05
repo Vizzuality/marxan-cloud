@@ -47,13 +47,12 @@ start-redis-commander:
 # commands is to ignore errors if the container or volume being deleted
 # don't actually exist.
 #
-# @debt We should ideally avoid hardcoding container and volume name so that
+# @debt We should ideally avoid hardcoding volume name so that
 # any changes here or in `docker-compose.yml` will not get things out of sync.
 # Or add a CI test that could catch this.
 clean-slate: stop
-	docker-compose rm -f postgresql-api
-	docker-compose rm -f postgresql-geo-api
-	docker-compose rm -f redis
+	docker-compose down --volumes --remove-orphans
+	docker-compose rm -f -v
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data
 	docker volume rm -f marxan-cloud_marxan-cloud-redis-api-data
