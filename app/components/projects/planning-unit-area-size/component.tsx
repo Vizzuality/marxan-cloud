@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 
-import Icon from 'components/icon';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
-
-import INFO_SVG from 'svgs/project/info.svg?sprite';
+import InfoButton from 'components/info-button';
 
 import { PlanningUnitAreaSizeProps } from './types';
 
@@ -18,14 +16,10 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
   return (
     <div className="mt-6">
       <div className="flex items-center">
-        <Label theme="dark" className="uppercase text-xxs">Planning unit area size</Label>
-        <button
-          className="w-5 h-5 ml-2"
-          type="button"
-          onClick={() => console.info('Planning Unit Area size info button click')}
-        >
-          <Icon icon={INFO_SVG} />
-        </button>
+        <Label theme="dark" className="mr-2 uppercase text-xxs">Planning unit area size</Label>
+        <InfoButton>
+          <span>Planning unit area size info button</span>
+        </InfoButton>
       </div>
       <div className="flex items-baseline mt-4">
         <div className="w-20">
