@@ -3,11 +3,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 
-/**
- * @description This function creates the MVT tiles from the appropriate TileInput
- */
-// export type TileRenderer = (args: TileInput) => Promise<ArrayBuffer>;
-
 export interface Tile {
   res: number;
   data?: Buffer;
@@ -64,6 +59,7 @@ export interface IBaseQueryInput {
   geometry: string;
   maxZoomLevel: number;
   buffer: number;
+  extent: number;
   // attributes: string;
   // query: string[];
 }
@@ -88,7 +84,6 @@ export interface ITileQueryInput extends TileRequest {
   // attributes: string[];
   // query: string[];
   getBaseQuery?: GetBaseQuery;
-  getTileQuery?: GetTileQuery;
 }
 
 const logger = new Logger('Vector tile service');
@@ -105,34 +100,32 @@ export class TileService {
     z,
     table,
     geometry,
+    extent,
+    buffer,
   }: // maxZoomLevel,
   // attributes,
   // query,
   IBaseQueryInput) => `
   SELECT
-    ${geometry}, gid_0, gid_1, gid_2
+    gid_0, gid_1, gid_2,
+    ST_AsMVTGeom(
+      -- Geometry from table
+      ST_Transform(${geometry}, 3857),
+      -- MVT tile boundary
+      ST_TileEnvelope(${z}, ${x}, ${y}),
+      -- Extent
+      ${extent},
+      -- Buffer
+      ${buffer},
+      -- Clip geom
+      true
+    ) AS mvt_geom
   FROM ${table}
   WHERE
-    ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry}) and level = 'country'
+    ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry})
+    and gid_0 is not null and gid_1 is null and gid_2 is null
   `;
 
-  /**
-   * @description The default tile query builder
-   */
-  defaultGetTileQuery: GetTileQuery = ({
-    x,
-    y,
-    z,
-    table,
-    geometry,
-    extent,
-    buffer,
-  }: // bufferSize,
-  // attributes,
-  ITileQuery) => `
-  SELECT *,  ST_AsMVTGeom(ST_Transform(${geometry}, 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, false) AS geom
-  FROM ${table}
-  `;
   /**
    * @description Creates the query for tile
    */
@@ -147,11 +140,10 @@ export class TileService {
     buffer,
     // query,
     getBaseQuery = this.defaultGetBaseQuery,
-    getTileQuery = this.defaultGetTileQuery,
   }: ITileQueryInput): string {
     const queryParts: string[] = [];
     queryParts.push(
-      `WITH base_query AS (${getBaseQuery({
+      `WITH tile AS (${getBaseQuery({
         x,
         y,
         z,
@@ -159,29 +151,15 @@ export class TileService {
         geometry,
         maxZoomLevel,
         buffer,
+        extent,
         // attributes: attributesToSelect(attributes),
         // query,
       })})`,
     );
 
-    let parentTable = 'base_query';
-
-    queryParts.push(
-      `tile AS (${getTileQuery({
-        x,
-        y,
-        z,
-        table: parentTable,
-        geometry: 'the_geom',
-        extent,
-        buffer,
-        // attributes: attributesToArray(attributes),
-      })})`,
-    );
-
     const sql: string = `${queryParts.join(
       ',\n',
-    )}\nSELECT ST_AsMVT(tile.*, 'layer0', 4096, 'geom') AS mvt FROM tile`;
+    )}\nSELECT ST_AsMVT(tile, 'layer0',  ${extent}, 'mvt_geom') AS mvt FROM tile`;
 
     // logger.debug(`Create query for tile: ${sql}`);
 
@@ -218,10 +196,6 @@ export class TileService {
     if (isNaN(x) || isNaN(y)) {
       throw new Error('Invalid tile coordinates');
     }
-    // const table = 'admin_regions';
-    // const maxZoomLevel = 12;
-    // const geometry = 'the_geom';
-    // const extent = 4096;
 
     try {
       query = this.createQueryForTile({
@@ -253,7 +227,6 @@ export class TileService {
     queryRunner.connect();
     const result = await queryRunner.query(query);
     logger.debug('Query retrieved');
-    // logger.debug(result[0]);
     if (result) {
       return result;
     } else {
