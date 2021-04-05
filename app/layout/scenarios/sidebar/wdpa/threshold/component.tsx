@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 
 import Button from 'components/button';
 import Loading from 'components/loading';
+import InfoButton from 'components/info-button';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
@@ -15,6 +16,8 @@ import {
 import { useRouter } from 'next/router';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
+
+import THRESHOLDING_IMG from 'images/img-thresholding.png';
 
 const WDPA_CATEGORIES_OPTIONS = [
   { label: 'Category 1', value: 'category-1' },
@@ -111,7 +114,15 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
             >
               {(flprops) => (
                 <Field id="scenario-wdpaThreshold" {...flprops}>
-                  <Label ref={labelRef} theme="dark" className="mb-3 uppercase">Set the threshold for protected areas</Label>
+                  <div className="flex items-center mb-3">
+                    <Label ref={labelRef} theme="dark" className="mr-3 uppercase">Set the threshold for protected areas</Label>
+                    <InfoButton>
+                      <div>
+                        <h4 className="font-heading text-lg mb-2.5">Thresholding</h4>
+                        <img src={THRESHOLDING_IMG} alt="Thresholding" />
+                      </div>
+                    </InfoButton>
+                  </div>
 
                   <p
                     className="mb-3 text-sm text-gray-400"

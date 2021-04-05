@@ -3,6 +3,7 @@ import React, { useCallback, useState } from 'react';
 import Button from 'components/button';
 import Loading from 'components/loading';
 import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
@@ -115,7 +116,12 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
             >
               {(flprops) => (
                 <Field id="scenario-wdpaFilter" {...flprops}>
-                  <Label theme="dark" className="mb-3 uppercase">Choose one or more protected areas categories</Label>
+                  <div className="flex items-center mb-3">
+                    <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
+                    <InfoButton>
+                      <span>Info about WDPA categories</span>
+                    </InfoButton>
+                  </div>
                   <Select
                     theme="dark"
                     size="base"
