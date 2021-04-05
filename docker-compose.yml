@@ -38,7 +38,6 @@ services:
       - ./app/test:/opt/marxan-app/test
     env_file: .env
     environment:
-      - NODE_PATH=src
       - NODE_ENV=development
   geoprocessing:
     build:
