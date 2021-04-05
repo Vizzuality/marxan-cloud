@@ -149,6 +149,8 @@ export class AdminAreasService {
     extent: number,
     buffer: number,
     maxZoomLevel: number,
+    customQuery: string,
+    attributes: string,
   ): Promise<Tile> {
     logger.debug('test_execute_tile_service');
     return this.tileService.getTile(
@@ -160,6 +162,8 @@ export class AdminAreasService {
       (extent = 4096),
       (buffer = 256),
       (maxZoomLevel = 12),
+      (customQuery = 'gid_1 is not null and gid_2 is null'),
+      (attributes = 'gid_0, gid_1, gid_2'),
     );
   }
 }
