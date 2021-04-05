@@ -65,6 +65,8 @@ export class AdminAreasController {
     @Param('extent') extent: number,
     @Param('buffer') buffer: number,
     @Param('maxZoomLevel') maxZoomLevel: number,
+    @Param('customQuery') customQuery: string,
+    @Param('attributes') attributes: string,
     @Res() response: Response,
   ): Promise<any> {
     // Promise<tile>
@@ -77,6 +79,8 @@ export class AdminAreasController {
       extent,
       buffer,
       maxZoomLevel,
+      customQuery,
+      attributes,
     );
 
     if (tile.res >= 0 && tile.data) {
