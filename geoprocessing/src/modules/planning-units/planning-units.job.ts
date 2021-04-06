@@ -5,17 +5,22 @@ import { createConnection } from 'typeorm';
 
 const logger = new Logger('planning-units-job-processor');
 
+export enum PlanningUnitGridShape {
+  square = 'square',
+  hexagon = 'hexagon',
+  fromShapefile = 'from_shapefile',
+}
 export interface PlanningUnitsJob {
   countryId?: string;
   adminRegionId?: string;
   adminAreaLevel1Id?: string;
   adminAreaLevel2Id?: string;
-  planningUnitGridShape: string;
+  planningUnitGridShape: PlanningUnitGridShape;
   planningUnitAreakm2: number;
   extent?: Record<string, unknown>;
 }
 
-export default async (job: Job<PlanningUnitsJob>) => {
+export default async (job: Job<PlanningUnitsJob> | any) => {
   logger.debug(`Start planning-units processing for ${job.id}...`);
   if (job.name === 'create-pu') {
     const connection = await createConnection(geoprocessingConnections.default);
