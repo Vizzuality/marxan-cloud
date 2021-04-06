@@ -1,19 +1,22 @@
 import * as faker from 'faker';
-import { PlanningUnitsJob, PlanningUnitGridShape } from './../src/modules/planning-units/planning-units.job';
+import {
+  PlanningUnitsJob,
+  PlanningUnitGridShape,
+} from 'src/modules/planning-units/planning-units.job';
 
 export const E2E_CONFIG: {
   planningUnits: {
-    creationJob:{
-      valid:{
-        customArea: (options: unknown) =>  Partial<PlanningUnitsJob>;
+    creationJob: {
+      valid: {
+        customArea: (options: unknown) => Partial<PlanningUnitsJob>;
         adminRegion: (options: unknown) => Partial<PlanningUnitsJob>;
-      }
-    }
-  }
+      };
+    };
+  };
 } = {
   planningUnits: {
-    creationJob:{
-      valid:{
+    creationJob: {
+      valid: {
         customArea: (options: { countryCode: string }): PlanningUnitsJob => ({
           countryId: options.countryCode,
           adminAreaLevel1Id: faker.random.alphaNumeric(7),
@@ -37,10 +40,9 @@ export const E2E_CONFIG: {
           adminAreaLevel1Id: faker.random.alphaNumeric(7),
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
           planningUnitGridShape: PlanningUnitGridShape.hexagon,
-          planningUnitAreakm2: 10
-      }),
-
-      }
-    }
-  }
+          planningUnitAreakm2: 10,
+        }),
+      },
+    },
+  },
 };
