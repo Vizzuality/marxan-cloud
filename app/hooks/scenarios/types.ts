@@ -14,7 +14,7 @@ export interface SaveScenarioProps {
 }
 
 export interface UseDeleteScenarioProps {
-  requestConfig: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig
 }
 
 export interface DeleteScenarioProps {
