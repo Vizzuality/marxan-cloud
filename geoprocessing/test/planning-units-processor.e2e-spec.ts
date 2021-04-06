@@ -10,17 +10,17 @@ function delay(ms: number) {
 }
 
 describe('planning units jobs (e2e)', () => {
-  jest.setTimeout(2*1000)
+  jest.setTimeout(2 * 1000);
   it('executes the child job processor with mock data', async () => {
     const createPlanningUnitsDTO: Partial<Job> = {
       id: '1',
-      name:'create-pu',
+      name: 'create-pu',
       data: E2E_CONFIG.planningUnits.creationJob.valid.customArea({
         countryCode: 'NAM',
       }),
     };
     const value = await defaultExport(createPlanningUnitsDTO);
-    // var foo: child.ChildProcess = child.exec('src/modules/planning-units/planning-units.job');
+
     expect(value).toBeDefined();
     await Promise.all([delay(1 * 1000)]);
   });
