@@ -13,7 +13,7 @@ export const ProjectScenariosToolbar: React.FC<ProjectScenariosToolbarProps> = (
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // setSearch to null whenevere you unmount this component
+    // setSearch to null wheneverer you unmount this component
     return function unmount() {
       dispatch(setSearch(null));
     };
