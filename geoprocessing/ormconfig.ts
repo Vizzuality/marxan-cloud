@@ -1,4 +1,4 @@
-import { geoprocessingConnections } from "src/ormconfig";
+import { geoprocessingConnections } from 'src/ormconfig';
 
 /**
  * We just re-export what we import from the actual ORM configuration file
@@ -12,5 +12,5 @@ import { geoprocessingConnections } from "src/ormconfig";
  */
 module.exports = [
   geoprocessingConnections.default,
-  geoprocessingConnections.apiDB
+  geoprocessingConnections.apiDB,
 ];
