@@ -63,9 +63,6 @@ export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
         onView: () => {
           push(`/projects/${projectId}/scenarios/${id}`);
         },
-        onSettings: () => {
-
-        },
       };
     }) : [];
 
@@ -152,7 +149,6 @@ export function useDeleteScenario({
     method: 'DELETE',
   },
 }: UseDeleteScenarioProps) {
-  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const deleteScenario = ({ id }: DeleteScenarioProps) => {
@@ -168,7 +164,6 @@ export function useDeleteScenario({
 
   return useMutation(deleteScenario, {
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries('scenarios');
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
