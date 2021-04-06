@@ -1,40 +1,27 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { Logger } from '@nestjs/common';
-import { Job, Queue, QueueEvents } from 'bullmq';
-import { v4 } from 'uuid';
-import defaultExport, {
-  PlanningUnitsJob,
-} from '../src/modules/planning-units/planning-units.job';
-import * as child from 'child_process';
+import { Job } from 'bullmq';
+import defaultExport from '../src/modules/planning-units/planning-units.job';
 
 import { E2E_CONFIG } from './e2e.config';
 
-const logger: Logger = new Logger('planning units jobs (e2e)');
+function delay(ms: number) {
+  return new Promise(function (resolve) {
+    return setTimeout(resolve, ms);
+  });
+}
 
 describe('planning units jobs (e2e)', () => {
-  let queue: Queue;
-  let queueEvents: QueueEvents;
-  let queueName: string;
-  beforeEach(async function () {
-    queueName = 'test-' + v4();
-    queue = new Queue(queueName);
-    queueEvents = new QueueEvents(queueName);
-    await queueEvents.waitUntilReady();
-  });
-
-  afterEach(async () => {
-    await queue.close();
-    await queueEvents.close();
-  });
-
-  it('executes the child job processor with mock data', () => {
+  jest.setTimeout(2*1000)
+  it('executes the child job processor with mock data', async () => {
     const createPlanningUnitsDTO: Partial<Job> = {
+      id: '1',
+      name:'create-pu',
       data: E2E_CONFIG.planningUnits.creationJob.valid.customArea({
         countryCode: 'NAM',
       }),
     };
-    const value = defaultExport(createPlanningUnitsDTO);
+    const value = await defaultExport(createPlanningUnitsDTO);
     // var foo: child.ChildProcess = child.exec('src/modules/planning-units/planning-units.job');
-    logger.debug(value);
+    expect(value).toBeDefined();
+    await Promise.all([delay(1 * 1000)]);
   });
 });
