@@ -135,8 +135,8 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             />
 
             <div className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-black" />
-              <div className="h-full py-6 overflow-x-hidden overflow-y-auto">
+              <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-black via-black" />
+              <div className="relative z-0 h-full py-6 overflow-x-hidden overflow-y-auto">
                 {scenariosData.map((s, i) => {
                   return (
                     <ScenarioItem
@@ -153,7 +153,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                   );
                 })}
               </div>
-              <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-black" />
+              <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-black via-black" />
             </div>
 
             <button
