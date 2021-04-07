@@ -175,9 +175,11 @@ export class ProtectedAreasService extends AppBaseService<
       },
       undefined,
     ).then((results) =>
-      results.data.map((i: IUCNProtectedAreaCategoryDTO) => ({
-        iucnCategory: i?.iucnCategory,
-      })),
+      results.data.map(
+        (i: IUCNProtectedAreaCategoryDTO): IUCNProtectedAreaCategoryDTO => ({
+          iucnCategory: i?.iucnCategory,
+        }),
+      ),
     );
 
     const serializer = new JSONAPISerializer.Serializer(
