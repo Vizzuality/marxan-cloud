@@ -29,7 +29,9 @@ export interface PlanningUnitsJob {
   extent?: Record<string, unknown>;
 }
 
-export default async (job: Job<PlanningUnitsJob> | any) => {
+export default async (
+  job: Pick<Job<PlanningUnitsJob>, 'data' | 'id' | 'name'>,
+) => {
   logger.debug(`Start planning-units processing for ${job.id}...`);
   if (job.name === 'create-pu') {
     const connection = await createConnection(geoprocessingConnections.default);
