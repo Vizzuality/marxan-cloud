@@ -13,6 +13,12 @@
      },
    "concurrency": 50
    },
+  "jobOptions":{
+    "removeOnComplete": 100,
+    "removeOnFail": 1000,
+    "attempts": 3,
+    "timeout": 60000
+  },
   "auth": {
     "jwt": {
       "expiresIn": "2h"
