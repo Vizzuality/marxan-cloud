@@ -24,6 +24,7 @@ import { AllExceptionsFilter } from 'filters/all-exceptions.exception.filter';
 import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
 import { ApiEventsModule } from 'modules/api-events/api-events.module';
 import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.module';
+import { ProxyModule } from 'modules/proxy/proxy.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.mo
     ScenariosModule,
     UsersModule,
     AuthenticationModule,
+    ProxyModule,
   ],
   controllers: [AppController, PingController],
   providers: [

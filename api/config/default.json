@@ -23,5 +23,9 @@
     "jwt": {
       "expiresIn": "2h"
     }
+  },
+  "geoprocessing": {
+    "url": "http://0.0.0.0:3040"
   }
 }
+
