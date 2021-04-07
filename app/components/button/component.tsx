@@ -1,7 +1,7 @@
 import React, {
-  ButtonHTMLAttributes, AnchorHTMLAttributes, RefObject,
+  ButtonHTMLAttributes, AnchorHTMLAttributes,
 } from 'react';
-import Link, { LinkProps } from 'next/link';
+import Link from 'next/link';
 import cx from 'classnames';
 
 const THEME = {
@@ -30,47 +30,90 @@ export interface AnchorButtonProps {
   className?: string;
 }
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, AnchorButtonProps {}
+// Button props
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & AnchorButtonProps & {
+  href?: undefined;
+};
 
-export interface AnchorProps extends AnchorHTMLAttributes<HTMLAnchorElement>, AnchorButtonProps {
+// Anchor props
+export type AnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & AnchorButtonProps & {
+  href?: string;
   disabled?: boolean;
+};
+
+// Input/output options
+type Overload = {
+  (props: ButtonProps): JSX.Element;
+  (props: AnchorProps): JSX.Element;
+};
+
+// Guard to check if href exists in props
+const hasHref = (props: ButtonProps | AnchorProps): props is AnchorProps => 'href' in props;
+
+function buildClassName({
+  className,
+  disabled,
+  size,
+  theme,
+}) {
+  return cx({
+    'flex items-center justify-center rounded-4xl focus:outline-blue': true,
+    [THEME[theme]]: true,
+    [SIZE[size]]: true,
+    [className]: !!className,
+    'opacity-50 pointer-events-none': disabled,
+  });
 }
 
-export interface LinkButtonProps extends AnchorButtonProps, LinkProps {
-  children: React.ReactNode;
-  disabled?: boolean;
-  type?: 'reset' | 'button' | 'submit',
-}
-
-export const Anchor: React.FC<AnchorProps> = (
-  {
-    children,
-    theme = 'primary',
-    size = 'base',
-    className,
-    disabled,
-    href,
-    ...restProps
-  }: AnchorProps,
-  ref: RefObject<HTMLAnchorElement>,
-) => (
-  <a
-    href={href}
-    className={cx({
-      'flex items-center justify-center rounded-4xl focus:outline-blue': true,
-      [THEME[theme]]: true,
-      [SIZE[size]]: true,
-      [className]: !!className,
-      'opacity-50 pointer-events-none': disabled,
-    })}
-    ref={ref}
-    {...restProps}
-  >
-    {children}
-  </a>
+export const LinkAnchor: React.FC<AnchorProps> = ({
+  children,
+  theme = 'primary',
+  size = 'base',
+  className,
+  disabled,
+  href,
+  ...restProps
+}: AnchorProps) => (
+  <Link href={href}>
+    <a
+      className={buildClassName({
+        className, disabled, size, theme,
+      })}
+      {...restProps}
+    >
+      {children}
+    </a>
+  </Link>
 );
 
-export const AnchorForward = React.forwardRef<typeof Anchor, AnchorProps>(Anchor);
+export const Anchor: React.FC<AnchorProps> = ({
+  children,
+  theme = 'primary',
+  size = 'base',
+  className,
+  disabled,
+  href,
+  ...restProps
+}: AnchorProps) => {
+  // Anchor element doesn't support disabled attribute
+  // https://www.w3.org/TR/2014/REC-html5-20141028/disabled-elements.html
+  if (disabled) {
+    return (
+      <span {...restProps}>{children}</span>
+    );
+  }
+  return (
+    <a
+      href={href}
+      className={buildClassName({
+        className, disabled, size, theme,
+      })}
+      {...restProps}
+    >
+      {children}
+    </a>
+  );
+};
 
 export const Button: React.FC<ButtonProps> = ({
   children,
@@ -82,12 +125,8 @@ export const Button: React.FC<ButtonProps> = ({
 }: ButtonProps) => (
   <button
     type="button"
-    className={cx({
-      'flex items-center justify-center rounded-4xl focus:outline-blue': true,
-      [THEME[theme]]: true,
-      [SIZE[size]]: true,
-      [className]: !!className,
-      'opacity-50 pointer-events-none': disabled,
+    className={buildClassName({
+      className, disabled, size, theme,
     })}
     disabled={disabled}
     {...restProps}
@@ -96,33 +135,21 @@ export const Button: React.FC<ButtonProps> = ({
   </button>
 );
 
-export const LinkButton = ({
-  href, type, children, ...restProps
-}: LinkButtonProps) => {
+export const LinkButton: Overload = (props: ButtonProps | AnchorProps) => {
   // We consider a link button when href attribute exits
-  if (href) {
-    // href by default is Url object, we need to transform to a string
-    const stHref = href.toString();
-    // External URL should be render using <a>
-    if (stHref.includes('http')) {
-      // Anchor element doesn't support disabled attribute
-      // https://www.w3.org/TR/2014/REC-html5-20141028/disabled-elements.html
-      if (restProps.disabled) {
-        return (
-          <span {...restProps}>{children}</span>
-        );
-      }
-      return (<Anchor href={stHref} {...restProps} />);
+  if (hasHref(props)) {
+    if (props.href.includes('http')) {
+      return (
+        <Anchor {...props} />
+      );
     }
-    // AnchorForward when component is inside Link
-    // https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component
     return (
-      <Link href={href} passHref>
-        <AnchorForward {...restProps}>{children}</AnchorForward>
-      </Link>
+      <LinkAnchor {...props} />
     );
   }
-  return <Button type={type} {...restProps}>{children}</Button>;
+  return (
+    <Button {...props} />
+  );
 };
 
 export default LinkButton;
