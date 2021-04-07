@@ -32,7 +32,6 @@ type ProjectFilterKeys = keyof Pick<
 >;
 type ProjectFilters = Record<ProjectFilterKeys, string[]>;
 
-const logger = new Logger('projects');
 @Injectable()
 export class ProjectsService extends AppBaseService<
   Project,
