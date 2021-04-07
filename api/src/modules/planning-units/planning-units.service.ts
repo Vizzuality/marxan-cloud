@@ -36,7 +36,7 @@ export class PlanningUnitsService {
   }
 
   public async create(creationOptions: CreatePlanningUnitsDTO): Promise<void> {
-    await this.planningUnitsQueue.add('create-pu', creationOptions);
+    await this.planningUnitsQueue.add('create-regular-pu', creationOptions);
   }
 
   public async onModuleDestroy(): Promise<void> {

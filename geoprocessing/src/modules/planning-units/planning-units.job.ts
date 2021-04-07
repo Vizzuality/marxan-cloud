@@ -29,11 +29,15 @@ export interface PlanningUnitsJob {
   extent?: Record<string, unknown>;
 }
 
+/**
+ * @description This function will take care of generating the regular-pu-grids in the area
+ *
+ */
 export default async (
   job: Pick<Job<PlanningUnitsJob>, 'data' | 'id' | 'name'>,
 ) => {
   logger.debug(`Start planning-units processing for ${job.id}...`);
-  if (job.name === 'create-pu') {
+  if (job.name === 'create-regular-pu') {
     const connection = await createConnection(geoprocessingConnections.default);
     try {
       let subquery: string;
