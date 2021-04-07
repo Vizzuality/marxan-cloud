@@ -49,14 +49,12 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     },
   });
 
-  console.log(wdpaData);
-
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
     if (!wdpaData) return [];
 
     return wdpaData.map((w) => ({
       label: w.iucnCategory,
-      value: w.iucnCategory,
+      value: w.id,
     }));
   }, [wdpaData]);
 
