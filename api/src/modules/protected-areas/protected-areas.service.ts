@@ -183,6 +183,16 @@ export class ProtectedAreasService extends AppBaseService<
     const serializer = new JSONAPISerializer.Serializer(
       'iucn_protected_area_categories',
       {
+        /**
+         * We map the id property to `iucnCategory`. It may be more consistent,
+         * in principle, to create an actual `id` prop on
+         * `IUCNProtectedAreaCategoryDTO` with a getter (returning the value of
+         * the `iucnCategory` property) but alas, this [TypeScript
+         * limitation](https://github.com/microsoft/TypeScript/issues/14417)
+         * would make the use of such an implementation even more clumsy than
+         * adding an ad-hoc id mapping here.
+         */
+        id: 'iucnCategory',
         attributes: ['iucnCategory'],
         keyForAttribute: 'camelCase',
       },
