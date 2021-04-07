@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import Button from 'components/button';
 import Loading from 'components/loading';
@@ -22,14 +22,6 @@ import { useToasts } from 'hooks/toast';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import { useProject } from 'hooks/projects';
 import { useWDPACategories } from 'hooks/wdpa';
-
-const WDPA_CATEGORIES_OPTIONS = [
-  { label: 'Category 1', value: 'category-1' },
-  { label: 'Category 2', value: 'category-2' },
-  { label: 'Category 3', value: 'category-3' },
-  { label: 'Category 4', value: 'category-4' },
-  { label: 'Category 5', value: 'category-5' },
-];
 
 export interface WDPACategoriesProps {
   onSuccess: () => void
@@ -57,7 +49,16 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     },
   });
 
-  console.log(projectData, wdpaData);
+  console.log(wdpaData);
+
+  const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
+    if (!wdpaData) return [];
+
+    return wdpaData.map((w) => ({
+      label: w.iucnCategory,
+      value: w.iucnCategory,
+    }));
+  }, [wdpaData]);
 
   const onSubmit = useCallback(async (values) => {
     setSubmitting(true);
@@ -109,11 +110,11 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
           if (i > -1) {
             arr.splice(i, 1);
           }
-          utils.changeValue(state, 'wdpaFilter', () => arr);
+          utils.changeValue(state, 'wdpaIucnCategories', () => arr);
         },
       }}
       initialValues={{
-        wdpaFilter: scenarioData?.wdpaFilter || [],
+        wdpaIucnCategories: scenarioData?.wdpaIucnCategories || [],
       }}
     >
       {({ form, values, handleSubmit }) => (
@@ -121,11 +122,11 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
           {/* WDPA */}
           <div>
             <FieldRFF
-              name="wdpaFilter"
+              name="wdpaIucnCategories"
               validate={composeValidators([{ presence: true }, arrayValidator])}
             >
               {(flprops) => (
-                <Field id="scenario-wdpaFilter" {...flprops}>
+                <Field id="scenario-wdpaIucnCategories" {...flprops}>
                   <div className="flex items-center mb-3">
                     <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
                     <InfoButton>
@@ -141,7 +142,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                     clearSelectionLabel="None protected areas"
                     batchSelectionActive
                     batchSelectionLabel="All protected areas"
-                    selected={values.wdpaFilter}
+                    selected={values.wdpaIucnCategories}
                     options={WDPA_CATEGORIES_OPTIONS}
                   />
                 </Field>
@@ -153,7 +154,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
             <h3 className="text-sm">Selected protected areas:</h3>
 
             <div className="flex flex-wrap mt-2.5">
-              {values.wdpaFilter.map((w) => {
+              {values.wdpaIucnCategories.map((w) => {
                 const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
                 return (
                   <div
@@ -168,7 +169,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                       type="button"
                       className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
                       onClick={() => {
-                        form.mutators.removeWDPAFilter(wdpa.value, values.wdpaFilter);
+                        form.mutators.removeWDPAFilter(wdpa.value, values.wdpaIucnCategories);
                       }}
                     >
                       <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
