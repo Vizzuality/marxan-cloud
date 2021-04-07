@@ -20,6 +20,8 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
+import { useProject } from 'hooks/projects';
+import { useWDPACategories } from 'hooks/wdpa';
 
 const WDPA_CATEGORIES_OPTIONS = [
   { label: 'Category 1', value: 'category-1' },
@@ -39,9 +41,15 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
-  const { data } = useScenario(sid);
+  const { data: projectData } = useProject(pid);
+  const { data: scenarioData } = useScenario(sid);
+  const { data: wdpaData } = useWDPACategories(
+    projectData?.adminAreaLevel2Id
+    || projectData?.adminAreaLevel1Id
+    || projectData?.countryId,
+  );
 
   const mutation = useSaveScenario({
     requestConfig: {
@@ -49,11 +57,13 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     },
   });
 
+  console.log(projectData, wdpaData);
+
   const onSubmit = useCallback(async (values) => {
     setSubmitting(true);
 
     mutation.mutate({
-      id: data.id,
+      id: scenarioData.id,
       data: {
         ...values,
       },
@@ -84,9 +94,9 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         });
       },
     });
-  }, [mutation, addToast, data?.id, onSuccess]);
+  }, [mutation, addToast, scenarioData?.id, onSuccess]);
 
-  if (!data) return null;
+  if (!scenarioData) return null;
 
   return (
     <FormRFF
@@ -103,7 +113,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         },
       }}
       initialValues={{
-        wdpaFilter: data?.wdpaFilter || [],
+        wdpaFilter: scenarioData?.wdpaFilter || [],
       }}
     >
       {({ form, values, handleSubmit }) => (
