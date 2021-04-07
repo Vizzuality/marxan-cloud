@@ -84,7 +84,7 @@ const Template: Story<MapProps> = ({ children, ...args }: MapProps) => {
         maxZoom={maxZoom}
         viewport={viewport}
         mapboxApiAccessToken={process.env.STORYBOOK_MAPBOX_API_TOKEN}
-        mapStyle="mapbox://styles/mapbox/dark-v9"
+        mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
         onMapViewportChange={handleViewportChange}
       >
         {(map) => {
