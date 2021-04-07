@@ -90,13 +90,6 @@ export class Scenario extends TimeUserEntityMetadata {
   protectedAreaFilterByIds?: string[];
 
   /**
-   * UUIDs of project-specific protected areas (stored in the wdpa table)
-   * which should be included in the scenario.
-   */
-  @ApiPropertyOptional()
-  customProtectedAreaIds?: string[];
-
-  /**
    * Which portion (%) of a protected area needs to intersect a planning unit
    * for this to be considered as protected.
    *
