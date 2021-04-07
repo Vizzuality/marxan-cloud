@@ -25,7 +25,11 @@
     }
   },
   "geoprocessing": {
+<<<<<<< HEAD
     "url": "http://geoprocessing:3000"
+=======
+    "url": "http://0.0.0.0:3040"
+>>>>>>> add proxy in api
   }
 }
 

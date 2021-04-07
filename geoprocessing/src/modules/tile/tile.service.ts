@@ -112,7 +112,7 @@ export class TileService {
     ${attributes},
     ST_AsMVTGeom(
       -- Geometry from table
-      ST_Transform(${geometry}, 3857),
+      ST_Transform(ST_RemoveRepeatedPoints(${geometry}, 0.1), 3857),
       -- MVT tile boundary
       ST_TileEnvelope(${z}, ${x}, ${y}),
       -- Extent
@@ -126,6 +126,7 @@ export class TileService {
   WHERE
     ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry})
     and ${customQuery}
+    and not gid_0 ='ATA'
   `;
 
   /**
