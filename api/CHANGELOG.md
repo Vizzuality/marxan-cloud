@@ -12,6 +12,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 Unreleased
 
 ### Added
+- Queue and job provider in api.
+- Planning Units 
+	- Provides the capability to enqueue the generation of Planning units.
+	- Tests for planning units generation.
+- Projects
+	- Job request for PU generation after project creation or update
 
 ### Changed
 
@@ -58,12 +64,6 @@ Unreleased
 
 - New module: ApiEventsModule [MARXAN-124].
 - Support for validation of new accounts, based on API events [MARXAN-214].
-- Queue and job provider in api.
-- Planning Units 
-	- Provides the capability to enqueue the generation of Planning units.
-	- Tests for planning units generation.
-- Projects
-	- Job request for PU generation after project creation
 
 ### Changed
 
