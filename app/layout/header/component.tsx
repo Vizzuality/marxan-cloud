@@ -8,7 +8,7 @@ import User from 'layout/header/user';
 import Title from 'layout/header/title';
 
 import Icon from 'components/icon';
-import Button from 'components/button';
+import LinkButton from 'components/button';
 
 import { useMe } from 'hooks/me';
 
@@ -55,17 +55,13 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
 
           {!user && (
             <div className="flex items-center gap-4">
-              <Link href="/auth/sign-in">
-                <Button theme="secondary-alt" size="s">
-                  Sign in
-                </Button>
-              </Link>
+              <LinkButton href="/auth/sign-in" theme="secondary-alt" size="s">
+                Sign in
+              </LinkButton>
 
-              <Link href="/auth/sign-up">
-                <Button theme="primary" size="s">
-                  Sign up
-                </Button>
-              </Link>
+              <LinkButton href="/auth/sign-up" theme="primary" size="s">
+                Sign up
+              </LinkButton>
             </div>
           )}
         </nav>

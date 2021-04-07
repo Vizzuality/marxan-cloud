@@ -1,4 +1,5 @@
-import React, { ButtonHTMLAttributes } from 'react';
+import React, { ButtonHTMLAttributes, AnchorHTMLAttributes } from 'react';
+import Link from 'next/link';
 import cx from 'classnames';
 
 const THEME = {
@@ -21,12 +22,45 @@ const SIZE = {
   xl: 'text-base px-14 py-3',
 };
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+export interface AnchorButtonProps {
   theme: 'primary' | 'primary-alt' | 'white' | 'secondary' | 'secondary-alt' | 'danger';
   size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, AnchorButtonProps {}
+
+export interface AnchorProps extends AnchorHTMLAttributes<HTMLAnchorElement>, AnchorButtonProps {
+  disabled?: boolean;
+}
+
+export interface LinkButtonProps extends AnchorButtonProps {
+  href?: string;
+  disabled?: boolean;
+  children: React.ReactNode;
+}
+
+export const Anchor: React.FC<AnchorProps> = ({
+  children,
+  theme = 'primary',
+  size = 'base',
+  className,
+  disabled,
+  ...restProps
+}: AnchorProps) => (
+  <a
+    className={cx({
+      'flex items-center justify-center rounded-4xl focus:outline-blue': true,
+      [THEME[theme]]: true,
+      [SIZE[size]]: true,
+      [className]: !!className,
+      'opacity-50 pointer-events-none': disabled,
+    })}
+    {...restProps}
+  >
+    {children}
+  </a>
+);
 
 export const Button: React.FC<ButtonProps> = ({
   children,
@@ -52,4 +86,27 @@ export const Button: React.FC<ButtonProps> = ({
   </button>
 );
 
-export default Button;
+// We consider a link button when href attribute exits
+export const LinkButton = ({ href, ...restProps }: LinkButtonProps) => {
+  if (href) {
+    // External URL should be render using <a>
+    if (href.includes('http')) {
+      // Anchor element doesn't support disabled attribute
+      // https://www.w3.org/TR/2014/REC-html5-20141028/disabled-elements.html
+      if (restProps.disabled) {
+        return (
+          <span {...restProps}>{restProps.children}</span>
+        );
+      }
+      return (<Anchor href={href} {...restProps} />);
+    }
+    return (
+      <Link href={href}>
+        <Anchor {...restProps} />
+      </Link>
+    );
+  }
+  return <Button {...restProps} />;
+};
+
+export default LinkButton;
