@@ -114,7 +114,7 @@ services:
     environment:
       - REDIS_HOSTS=local:marxan-redis:6379
     ports:
-      - '9000:8081'
+      - '${REDIS_COMMANDER_PORT}:8081'
     depends_on:
       - redis
   postgresql-airflow:
