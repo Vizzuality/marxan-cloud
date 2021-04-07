@@ -168,18 +168,19 @@ export class ProtectedAreasService extends AppBaseService<
   async findAllProtectedAreaCategories(
     fetchSpecification: FetchSpecification,
   ): Promise<IUCNProtectedAreaCategoryResult[]> {
-    const results = await this.findAllPaginatedRaw(
-      {
-        ...fetchSpecification,
-        filter: { ...fetchSpecification.filter, onlyCategories: true },
-      },
-      undefined,
-    ).then((results) =>
-      results.data.map(
-        (i: IUCNProtectedAreaCategoryDTO): IUCNProtectedAreaCategoryDTO => ({
+    const results = await this.findAllPaginatedRaw({
+      ...fetchSpecification,
+      filter: { ...fetchSpecification.filter, onlyCategories: true },
+    }).then((results) =>
+      // Transform ProtectedArea into IUCNProtectedAreaCategoryDTO - the latter
+      // is a subset of the former, with the twist that the only property we
+      // are interested in (iucnCategory) *may* be undefined in ProtectedArea
+      // so we need to filter out entities where this property is undefined.
+      results.data
+        .map((i) => ({
           iucnCategory: i?.iucnCategory,
-        }),
-      ),
+        }))
+        .filter((i): i is IUCNProtectedAreaCategoryDTO => !!i.iucnCategory),
     );
 
     const serializer = new JSONAPISerializer.Serializer(

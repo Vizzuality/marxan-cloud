@@ -21,8 +21,8 @@ Unreleased
 
 ### Fixed
 
-- `customProtectedAreaIds` and `wdpaIucnCategories` were not being included in
-  the JSON:API serialization of Scenarios; this has now been fixed [MARXAN-335].
+- The `wdpaIucnCategories` property was not being included in the JSON:API
+  serialization of Scenarios; this has now been fixed [MARXAN-335].
 - The JSON:API serialization settings of IUCN categories did not map the `id`
   property as appropriate, leading to undefined `id` properties being included
   in JSON:API response payloads; this has now been fixed [MARXAN-335].
