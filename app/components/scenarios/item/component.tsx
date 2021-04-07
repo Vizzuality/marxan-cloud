@@ -8,6 +8,8 @@ import Icon from 'components/icon';
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
 import WARNING_SVG from 'svgs/ui/warning.svg?sprite';
 
+import Settings from './settings';
+
 const SCENARIO_STATES = {
   running: {
     text: 'Running Scenario',
@@ -155,46 +157,10 @@ export const Item: React.FC<ItemProps> = ({
       </div>
 
       {settings && (
-        <div className="w-full px-8 py-4 bg-gray-700 rounded-b-3xl">
-          <dl className="flex flex-col gap-2">
-            <div className="flex gap-2 text-sm">
-              <dt>Protected areas</dt>
-              <dd>3</dd>
-            </div>
-            <div className="flex gap-2 text-sm">
-              <dt className="text-sm">Features</dt>
-              <dd>10</dd>
-            </div>
-            <div className="flex gap-2 text-sm">
-              <dt className="text-sm">Runs</dt>
-              <dd>100 Solutions | BLM: 0.1</dd>
-            </div>
-            <div className="flex gap-2 text-sm">
-              <dt className="text-sm">Schedules</dt>
-              <dd>2</dd>
-            </div>
-          </dl>
-
-          <div className="flex justify-end w-full gap-1 mt-2.5">
-            <Button
-              className="flex-shrink-0"
-              size="s"
-              theme="secondary"
-              onClick={onDuplicate}
-            >
-              Duplicate
-            </Button>
-
-            <Button
-              className="flex-shrink-0"
-              size="s"
-              theme="secondary"
-              onClick={onDelete}
-            >
-              Delete
-            </Button>
-          </div>
-        </div>
+        <Settings
+          onDelete={onDelete}
+          onDuplicate={onDuplicate}
+        />
       )}
 
     </div>
