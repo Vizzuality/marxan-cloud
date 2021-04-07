@@ -5,11 +5,20 @@ import { createConnection } from 'typeorm';
 
 const logger = new Logger('planning-units-job-processor');
 
+/**
+ * @todo We have this enum duplicated in the api service
+ * @file api/src/modules/projects/project.api.entity.ts
+ */
 export enum PlanningUnitGridShape {
   square = 'square',
   hexagon = 'hexagon',
   fromShapefile = 'from_shapefile',
 }
+
+/**
+ * @todo We have this interface partially duplicated in the api service
+ * @file api/src/modules/projects/dto/create.project.dto.ts
+ */
 export interface PlanningUnitsJob {
   countryId?: string;
   adminRegionId?: string;
