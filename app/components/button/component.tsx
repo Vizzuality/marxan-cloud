@@ -1,5 +1,7 @@
-import React, { ButtonHTMLAttributes, AnchorHTMLAttributes } from 'react';
-import Link from 'next/link';
+import React, {
+  ButtonHTMLAttributes, AnchorHTMLAttributes, RefObject,
+} from 'react';
+import Link, { LinkProps } from 'next/link';
 import cx from 'classnames';
 
 const THEME = {
@@ -34,21 +36,26 @@ export interface AnchorProps extends AnchorHTMLAttributes<HTMLAnchorElement>, An
   disabled?: boolean;
 }
 
-export interface LinkButtonProps extends AnchorButtonProps {
-  href?: string;
-  disabled?: boolean;
+export interface LinkButtonProps extends AnchorButtonProps, LinkProps {
   children: React.ReactNode;
+  disabled?: boolean;
+  type?: 'reset' | 'button' | 'submit',
 }
 
-export const Anchor: React.FC<AnchorProps> = ({
-  children,
-  theme = 'primary',
-  size = 'base',
-  className,
-  disabled,
-  ...restProps
-}: AnchorProps) => (
+export const Anchor: React.FC<AnchorProps> = (
+  {
+    children,
+    theme = 'primary',
+    size = 'base',
+    className,
+    disabled,
+    href,
+    ...restProps
+  }: AnchorProps,
+  ref: RefObject<HTMLAnchorElement>,
+) => (
   <a
+    href={href}
     className={cx({
       'flex items-center justify-center rounded-4xl focus:outline-blue': true,
       [THEME[theme]]: true,
@@ -56,11 +63,14 @@ export const Anchor: React.FC<AnchorProps> = ({
       [className]: !!className,
       'opacity-50 pointer-events-none': disabled,
     })}
+    ref={ref}
     {...restProps}
   >
     {children}
   </a>
 );
+
+export const AnchorForward = React.forwardRef<typeof Anchor, AnchorProps>(Anchor);
 
 export const Button: React.FC<ButtonProps> = ({
   children,
@@ -86,27 +96,33 @@ export const Button: React.FC<ButtonProps> = ({
   </button>
 );
 
-// We consider a link button when href attribute exits
-export const LinkButton = ({ href, ...restProps }: LinkButtonProps) => {
+export const LinkButton = ({
+  href, type, children, ...restProps
+}: LinkButtonProps) => {
+  // We consider a link button when href attribute exits
   if (href) {
+    // href by default is Url object, we need to transform to a string
+    const stHref = href.toString();
     // External URL should be render using <a>
-    if (href.includes('http')) {
+    if (stHref.includes('http')) {
       // Anchor element doesn't support disabled attribute
       // https://www.w3.org/TR/2014/REC-html5-20141028/disabled-elements.html
       if (restProps.disabled) {
         return (
-          <span {...restProps}>{restProps.children}</span>
+          <span {...restProps}>{children}</span>
         );
       }
-      return (<Anchor href={href} {...restProps} />);
+      return (<Anchor href={stHref} {...restProps} />);
     }
+    // AnchorForward when component is inside Link
+    // https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component
     return (
-      <Link href={href}>
-        <Anchor {...restProps} />
+      <Link href={href} passHref>
+        <AnchorForward {...restProps}>{children}</AnchorForward>
       </Link>
     );
   }
-  return <Button {...restProps} />;
+  return <Button type={type} {...restProps}>{children}</Button>;
 };
 
 export default LinkButton;
