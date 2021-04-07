@@ -29,7 +29,7 @@ const ShowProjectsPage: React.FC = () => {
           <ProjectHeader />
         </div>
 
-        <div className="py-5 md:flex-grow">
+        <div className="py-5 overflow-hidden md:flex-grow">
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-12">
               <ProjectScenarios />

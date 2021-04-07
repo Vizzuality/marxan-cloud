@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import cx from 'classnames';
 
 import { useSelector } from 'react-redux';
 import { useProject } from 'hooks/projects';
@@ -90,7 +91,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
   return (
     <AnimatePresence>
-      <div key="project-scenarios-sidebar" className="h-full col-span-7 overflow-x-hidden overflow-y-auto">
+      <div key="project-scenarios-sidebar" className="col-span-7 overflow-hidden">
         {!loading && !rawScenariosData.length && (
           <motion.div
             key="project-scenarios-empty"
@@ -120,7 +121,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
         )}
 
         {!loading && !!rawScenariosData.length && (
-          <motion.div key="projects-scenarios">
+          <motion.div key="projects-scenarios" className="flex flex-col h-full">
             <ScenarioToolbar />
 
             <ConfirmationPrompt
@@ -133,23 +134,31 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               onDismiss={() => setDelete(null)}
             />
 
-            {scenariosData.map((s) => {
-              return (
-                <ScenarioItem
-                  key={`${s.id}`}
-                  className="mb-3"
-                  {...s}
-                  status="draft"
-                  onDelete={() => {
-                    setDelete(s);
-                  }}
-                />
-              );
-            })}
+            <div className="relative overflow-hidden">
+              <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-black" />
+              <div className="h-full py-6 overflow-x-hidden overflow-y-auto">
+                {scenariosData.map((s, i) => {
+                  return (
+                    <ScenarioItem
+                      key={`${s.id}`}
+                      className={cx({
+                        'mt-3': i !== 0,
+                      })}
+                      {...s}
+                      status="draft"
+                      onDelete={() => {
+                        setDelete(s);
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-black" />
+            </div>
 
             <button
               type="button"
-              className="flex items-center justify-center w-full h-16 gap-3 px-8 text-sm bg-gray-700 rounded-3xl text-primary-500"
+              className="flex items-center justify-center flex-shrink-0 w-full h-16 gap-3 px-8 text-sm bg-gray-700 rounded-3xl text-primary-500"
               onClick={() => setModal(true)}
             >
               <span>Create scenario</span>
