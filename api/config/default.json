@@ -25,7 +25,7 @@
     }
   },
   "geoprocessing": {
-    "url": "http://geoprocessing:3000"
+    "url": "http://0.0.0.0:3040"
   }
 }
 

@@ -162,8 +162,9 @@ export class AdminAreasService {
       (extent = 4096),
       (buffer = 256),
       (maxZoomLevel = 12),
-      (customQuery = 'gid_1 is not null and gid_2 is null'),
+      (customQuery = 'gid_0 is not null and gid_1 is null and gid_2 is null'),
       (attributes = 'gid_0, gid_1, gid_2'),
     );
   }
 }
+
