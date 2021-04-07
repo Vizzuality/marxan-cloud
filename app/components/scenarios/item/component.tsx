@@ -121,10 +121,11 @@ export const Item: React.FC<ItemProps> = ({
               <Button
                 className="flex-shrink-0"
                 size="s"
-                theme="secondary"
+                theme={settings ? 'white' : 'secondary'}
                 onClick={onSettings}
               >
-                Settings
+                {settings && 'Close'}
+                {!settings && 'Settings'}
               </Button>
 
               <Button
