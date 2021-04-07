@@ -55,14 +55,10 @@ export class AdminAreasController {
     @Param('countryId') countryId: string,
     @Query() { level }: AdminAreaLevel,
   ): Promise<AdminAreaResult[]> {
-    const results = await this.service.findAllPaginated(
-      fetchSpecification,
-      undefined,
-      {
-        countryId,
-        level,
-      },
-    );
+    const results = await this.service.findAllPaginated({
+      ...fetchSpecification,
+      filter: { ...fetchSpecification.filter, countryId, level },
+    });
     return this.service.serialize(results.data, results.metadata);
   }
 
@@ -83,8 +79,8 @@ export class AdminAreasController {
     @Param('areaId') areaId: string,
   ): Promise<AdminAreaResult[]> {
     const results = await this.service.getChildrenAdminAreas(
-      fetchSpecification,
       areaId,
+      fetchSpecification,
     );
     return await this.service.serialize(results.data, results.metadata);
   }
@@ -98,7 +94,7 @@ export class AdminAreasController {
     @Param('areaId') areaId: string,
   ): Promise<AdminAreaResult> {
     return await this.service.serialize(
-      await this.service.getByLevel1OrLevel2Id(fetchSpecification, areaId),
+      await this.service.getByLevel1OrLevel2Id(areaId, fetchSpecification),
     );
   }
 }

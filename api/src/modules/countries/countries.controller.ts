@@ -11,7 +11,10 @@ import {
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
-import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import {
+  JSONAPIQueryParams,
+  JSONAPISingleEntityQueryParams,
+} from 'decorators/json-api-parameters.decorator';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
@@ -43,10 +46,9 @@ export class CountriesController {
 
   @ApiOperation({ description: 'Find country by id' })
   @ApiOkResponse({ type: CountryResult })
+  @JSONAPISingleEntityQueryParams()
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<CountryResult> {
-    return await this.service.serialize(
-      await this.service.getById(id, undefined, 'gid0'),
-    );
+    return await this.service.serialize(await this.service.getById(id));
   }
 }

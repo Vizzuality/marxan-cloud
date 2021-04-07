@@ -81,6 +81,20 @@ export class Project extends TimeUserEntityMetadata {
   adminAreaLevel2Id?: string;
 
   /**
+   * Custom geometry for the project.
+   *
+   * If using a custom geometry, this must have been uploaded and associated to
+   * the project.
+   *
+   * @todo Support for custom planning areas is not implemented yet. This is
+   * only a stub so that we can already start referencing this property in other
+   * parts of the code, but it is not linked yet to a db column.
+   */
+  // @ApiPropertyOptional()
+  // @Column()
+  planningAreaGeometryId?: string;
+
+  /**
    * Shape of the planning units.
    *
    * Planning unit grids are generated algorithmically if the shape chosen is
@@ -137,9 +151,17 @@ export class JSONAPIProjectData {
 
   @ApiProperty()
   attributes: Project;
+
+  @ApiPropertyOptional()
+  relationships: Record<string, unknown>;
 }
 
-export class ProjectResult {
+export class ProjectResultPlural {
+  @ApiProperty()
+  data: JSONAPIProjectData[];
+}
+
+export class ProjectResultSingular {
   @ApiProperty()
   data: JSONAPIProjectData;
 }

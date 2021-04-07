@@ -6,6 +6,7 @@ import { PlanningUnitGridShape } from 'modules/projects/project.api.entity';
 import { JobStatus, ScenarioType } from 'modules/scenarios/scenario.api.entity';
 import { CreateUserDTO } from 'modules/users/dto/create.user.dto';
 import { UpdateUserDTO } from 'modules/users/dto/update.user.dto';
+import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
 
 export const E2E_CONFIG: {
   users: {
@@ -25,6 +26,11 @@ export const E2E_CONFIG: {
   projects: {
     valid: {
       minimal: () => Partial<CreateProjectDTO>;
+      minimalInGivenAdminArea: (options?: {
+        countryCode: string;
+        adminAreaLevel1Id?: string;
+        adminAreaLevel2Id?: string;
+      }) => Partial<CreateProjectDTO>;
       complete: (options: unknown) => Partial<CreateProjectDTO>;
     };
     invalid: {
@@ -38,6 +44,11 @@ export const E2E_CONFIG: {
     };
     invalid: {
       missingRequiredFields: () => Partial<CreateScenarioDTO>;
+    };
+  };
+  protectedAreas: {
+    categories: {
+      valid: IUCNCategory[];
     };
   };
 } = {
@@ -74,6 +85,17 @@ export const E2E_CONFIG: {
       minimal: () => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
+      }),
+      minimalInGivenAdminArea: (options: {
+        countryCode: string;
+        adminAreaLevel1Id?: string;
+        adminAreaLevel2Id?: string;
+      }): CreateProjectDTO => ({
+        name: faker.random.words(5),
+        organizationId: faker.random.uuid(),
+        countryId: options.countryCode,
+        adminAreaLevel1Id: options.adminAreaLevel1Id,
+        adminAreaLevel2Id: options.adminAreaLevel2Id,
       }),
       complete: (options: { countryCode: string }): CreateProjectDTO => ({
         name: faker.random.words(5),
@@ -130,6 +152,22 @@ export const E2E_CONFIG: {
         name: faker.random.words(3),
         description: faker.lorem.sentence(),
       }),
+    },
+  },
+  protectedAreas: {
+    categories: {
+      valid: [
+        IUCNCategory.Ia,
+        IUCNCategory.Ib,
+        IUCNCategory.II,
+        IUCNCategory.III,
+        IUCNCategory.IV,
+        IUCNCategory.V,
+        IUCNCategory.VI,
+        IUCNCategory.NotApplicable,
+        IUCNCategory.NotAssigned,
+        IUCNCategory.NotReported,
+      ],
     },
   },
 };

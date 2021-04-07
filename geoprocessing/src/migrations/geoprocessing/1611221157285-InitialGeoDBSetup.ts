@@ -1,7 +1,7 @@
 import { PostgreSQLUtils } from 'src/utils/postgresql.utils';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class initialGeoDBSetup1611221157285 implements MigrationInterface {
+export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
     if (await PostgreSQLUtils.version13Plus()) {

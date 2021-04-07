@@ -10,7 +10,8 @@ import {
 } from '@nestjs/common';
 import {
   organizationResource,
-  OrganizationResult,
+  OrganizationResultSingular,
+  OrganizationResultPlural,
 } from './organization.api.entity';
 import { OrganizationsService } from './organizations.service';
 
@@ -27,7 +28,10 @@ import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { Post } from '@nestjs/common';
 
-import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import {
+  JSONAPIQueryParams,
+  JSONAPISingleEntityQueryParams,
+} from 'decorators/json-api-parameters.decorator';
 import { CreateOrganizationDTO } from './dto/create.organization.dto';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
@@ -47,7 +51,7 @@ export class OrganizationsController {
     description: 'Find all organizations',
   })
   @ApiOkResponse({
-    type: OrganizationResult,
+    type: OrganizationResultPlural,
   })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized.',
@@ -58,41 +62,46 @@ export class OrganizationsController {
   })
   @JSONAPIQueryParams({
     entitiesAllowedAsIncludes: organizationResource.entitiesAllowedAsIncludes,
+    availableFilters: [{ name: 'name' }],
   })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-  ): Promise<OrganizationResult> {
+  ): Promise<OrganizationResultPlural> {
     const results = await this.service.findAllPaginated(fetchSpecification);
     return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find organization by id' })
-  @ApiOkResponse({ type: OrganizationResult })
+  @ApiOkResponse({ type: OrganizationResultSingular })
+  @JSONAPISingleEntityQueryParams({
+    entitiesAllowedAsIncludes: organizationResource.entitiesAllowedAsIncludes,
+    availableFilters: [{ name: 'name' }],
+  })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<OrganizationResult> {
+  async findOne(@Param('id') id: string): Promise<OrganizationResultSingular> {
     return await this.service.serialize(await this.service.getById(id));
   }
 
   @ApiOperation({ description: 'Create organization' })
-  @ApiCreatedResponse({ type: OrganizationResult })
+  @ApiCreatedResponse({ type: OrganizationResultSingular })
   @Post()
   async create(
     @Body() dto: CreateOrganizationDTO,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<OrganizationResult> {
+  ): Promise<OrganizationResultSingular> {
     return await this.service.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
     );
   }
 
   @ApiOperation({ description: 'Update organization' })
-  @ApiOkResponse({ type: OrganizationResult })
+  @ApiOkResponse({ type: OrganizationResultSingular })
   @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateOrganizationDTO,
-  ): Promise<OrganizationResult> {
+  ): Promise<OrganizationResultSingular> {
     return await this.service.serialize(await this.service.update(id, dto));
   }
 

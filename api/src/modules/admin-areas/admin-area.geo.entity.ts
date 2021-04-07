@@ -13,9 +13,9 @@ export const adminAreaResource: BaseServiceResource = {
 
 @Entity('admin_regions')
 export class AdminArea extends Country {
-  get id() {
-    return this.gid0;
-  }
+  @ApiProperty()
+  @PrimaryColumn()
+  id: string;
 
   /**
    * Country id (ISO 3166-1 alpha-3).
@@ -35,7 +35,7 @@ export class AdminArea extends Country {
    * Level 1 name.
    */
   @ApiProperty()
-  @PrimaryColumn('character varying', { name: 'name_1' })
+  @Column('character varying', { name: 'name_1' })
   name1: string;
 
   /**
