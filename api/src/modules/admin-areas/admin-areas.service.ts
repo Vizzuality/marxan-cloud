@@ -88,16 +88,16 @@ export class AdminAreasService extends AppBaseService<
 
   setFilters(
     query: SelectQueryBuilder<AdminArea>,
-    filters: AdminAreaFilters,
+    filters?: AdminAreaFilters,
     _info?: AppInfoDTO,
   ): SelectQueryBuilder<AdminArea> {
-    if (filters.countryId) {
+    if (filters?.countryId) {
       query.andWhere(`${this.alias}.gid0 = :countryId`, {
         countryId: filters.countryId,
       });
     }
 
-    if (filters.level2AreaByArea1Id) {
+    if (filters?.level2AreaByArea1Id) {
       query.andWhere(
         `${this.alias}.gid1 = :parentLevel1AreaId AND ${this.alias}.gid2 IS NOT NULL`,
         { parentLevel1AreaId: filters.level2AreaByArea1Id },
@@ -124,8 +124,8 @@ export class AdminAreasService extends AppBaseService<
    * level 2 area depending on the pattern of the id provided.
    */
   async getByLevel1OrLevel2Id(
-    fetchSpecification: FetchSpecification,
     areaId: string,
+    fetchSpecification?: FetchSpecification,
   ): Promise<Partial<AdminArea>> {
     const query = this.repository.createQueryBuilder(this.alias);
 
@@ -155,15 +155,19 @@ export class AdminAreasService extends AppBaseService<
   }
 
   async getChildrenAdminAreas(
-    fetchSpecification: FetchSpecification,
     parentAreaId: string,
+    fetchSpecification?: FetchSpecification,
   ): Promise<{
     data: (AdminArea | Partial<AdminArea> | undefined)[];
     metadata: PaginationMeta | undefined;
   }> {
     if (this.isLevel1AreaId(parentAreaId)) {
-      return this.findAllPaginated(fetchSpecification, undefined, {
-        level2AreaByArea1Id: parentAreaId,
+      return this.findAllPaginated({
+        ...fetchSpecification,
+        filter: {
+          ...fetchSpecification?.filter,
+          level2AreaByArea1Id: parentAreaId,
+        },
       });
     } else {
       throw new BadRequestException(
@@ -172,11 +176,30 @@ export class AdminAreasService extends AppBaseService<
     }
   }
 
+  /**
+   * Check if an admin are id is that of a GADM level 1 area.
+   *
+   * @testsNeeded @unitTests @propBasedTests
+   */
   isLevel1AreaId(areaId: string): boolean {
-    return areaId.match(/\./g)?.length === 1;
+    return AdminAreasService.levelFromId(areaId) === 1;
   }
 
+  /**
+   * Check if an admin are id is that of a GADM level 2 area.
+   *
+   * @testsNeeded @unitTests @propBasedTests
+   */
   isLevel2AreaId(areaId: string): boolean {
-    return areaId.match(/\./g)?.length === 2;
+    return AdminAreasService.levelFromId(areaId) === 2;
+  }
+
+  /**
+   * Given an admin area id, return its level.
+   *
+   * @testsNeeded @unitTests @propBasedTests
+   */
+  static levelFromId(areaId: string): number {
+    return areaId.match(/\./g)?.length ?? 0;
   }
 }

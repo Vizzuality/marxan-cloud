@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
@@ -13,6 +13,23 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
+import { Country } from 'modules/countries/country.geo.entity';
+import { AdminArea } from 'modules/admin-areas/admin-area.geo.entity';
+import { AdminAreasService } from 'modules/admin-areas/admin-areas.service';
+import { CountriesService } from 'modules/countries/countries.service';
+
+const projectFilterKeyNames = [
+  'name',
+  'organizationId',
+  'countryId',
+  'adminAreaLevel1Id',
+  'adminAreaLevel2Id',
+] as const;
+type ProjectFilterKeys = keyof Pick<
+  Project,
+  typeof projectFilterKeyNames[number]
+>;
+type ProjectFilters = Record<ProjectFilterKeys, string[]>;
 
 @Injectable()
 export class ProjectsService extends AppBaseService<
@@ -21,12 +38,18 @@ export class ProjectsService extends AppBaseService<
   UpdateProjectDTO,
   AppInfoDTO
 > {
+  private readonly logger = new Logger(ProjectsService.name);
+
   constructor(
     @InjectRepository(Project)
     protected readonly repository: Repository<Project>,
-    @Inject(ScenariosService)
-    private readonly scenariosService: ScenariosService,
-    @Inject(UsersService) private readonly usersService: UsersService,
+    @Inject(forwardRef(() => ScenariosService))
+    protected readonly scenariosService: ScenariosService,
+    @Inject(UsersService) protected readonly usersService: UsersService,
+    @Inject(AdminAreasService)
+    protected readonly adminAreasService: AdminAreasService,
+    @Inject(CountriesService)
+    protected readonly countriesService: CountriesService,
   ) {
     super(repository, 'project', 'projects');
   }
@@ -101,6 +124,22 @@ export class ProjectsService extends AppBaseService<
     return project;
   }
 
+  /**
+   * Apply service-specific filters.
+   */
+  setFilters(
+    query: SelectQueryBuilder<Project>,
+    filters: ProjectFilters,
+    _info?: AppInfoDTO,
+  ): SelectQueryBuilder<Project> {
+    this._processBaseFilters<ProjectFilters>(
+      query,
+      filters,
+      projectFilterKeyNames,
+    );
+    return query;
+  }
+
   async setDataCreate(
     create: CreateProjectDTO,
     info?: AppInfoDTO,
@@ -114,5 +153,38 @@ export class ProjectsService extends AppBaseService<
     const project = await super.setDataCreate(create, info);
     project.createdBy = info?.authenticatedUser?.id!;
     return project;
+  }
+
+  /**
+   * Look up the planning area for this project.
+   *
+   * In decreasing precedence (i.e. most specific is used):
+   *
+   * * a project-specific protected area (@todo not implemented yet)
+   * * a level 2 admin area
+   * * a level 1 admin area
+   * * a country
+   */
+  async getPlanningArea(
+    project: Partial<Project>,
+  ): Promise<Country | Partial<AdminArea | undefined>> {
+    const planningArea = project.planningAreaGeometryId
+      ? /**
+         * @todo here we should look up the actual custom planning area from
+         * `planningAreaGeometryId`, when we implement this.
+         */
+        new AdminArea()
+      : project.adminAreaLevel2Id
+      ? await this.adminAreasService.getByLevel1OrLevel2Id(
+          project.adminAreaLevel2Id!,
+        )
+      : project.adminAreaLevel1Id
+      ? await this.adminAreasService.getByLevel1OrLevel2Id(
+          project.adminAreaLevel1Id!,
+        )
+      : project.countryId
+      ? await this.countriesService.getById(project.countryId)
+      : undefined;
+    return planningArea;
   }
 }

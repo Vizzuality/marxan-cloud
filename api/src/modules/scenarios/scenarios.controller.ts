@@ -10,7 +10,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { ScenarioResult } from './scenario.api.entity';
+import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { ScenariosService } from './scenarios.service';
 import {
   ProcessFetchSpecification,
@@ -28,15 +28,17 @@ import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { Post } from '@nestjs/common';
 
-import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import {
+  JSONAPIQueryParams,
+  JSONAPISingleEntityQueryParams,
+} from 'decorators/json-api-parameters.decorator';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
-import { organizationResource } from 'modules/organizations/organization.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(organizationResource.className)
+@ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class ScenariosController {
   constructor(public readonly service: ScenariosService) {}
@@ -48,23 +50,35 @@ export class ScenariosController {
     type: ScenarioResult,
   })
   @JSONAPIQueryParams({
-    entitiesAllowedAsIncludes: organizationResource.entitiesAllowedAsIncludes,
+    entitiesAllowedAsIncludes: scenarioResource.entitiesAllowedAsIncludes,
+    availableFilters: [
+      { name: 'name' },
+      { name: 'type' },
+      { name: 'projectId' },
+      { name: 'status' },
+    ],
   })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioResult> {
-    const results = await this.service.findAllPaginated(fetchSpecification);
+    const results = await this.service.findAllPaginated(fetchSpecification, {});
     return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find scenario by id' })
   @ApiOkResponse({ type: ScenarioResult })
+  @JSONAPISingleEntityQueryParams({
+    entitiesAllowedAsIncludes: scenarioResource.entitiesAllowedAsIncludes,
+  })
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioResult> {
-    return await this.service.serialize(await this.service.getById(id));
+    return await this.service.serialize(
+      await this.service.getById(id, fetchSpecification),
+    );
   }
 
   @ApiOperation({ description: 'Create scenario' })

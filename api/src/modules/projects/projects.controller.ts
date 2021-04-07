@@ -9,7 +9,11 @@ import {
   UploadedFile,
   UseGuards,
 } from '@nestjs/common';
-import { Project, ProjectResult } from './project.api.entity';
+import {
+  Project,
+  ProjectResultSingular,
+  ProjectResultPlural,
+} from './project.api.entity';
 import { ProjectsService } from './projects.service';
 
 import {
@@ -25,7 +29,10 @@ import { UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadOptions } from 'utils/file-uploads.utils';
 
-import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import {
+  JSONAPIQueryParams,
+  JSONAPISingleEntityQueryParams,
+} from 'decorators/json-api-parameters.decorator';
 import { projectResource } from './project.api.entity';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
@@ -62,44 +69,54 @@ export class ProjectsController {
   @ApiOperation({
     description: 'Find all projects',
   })
-  @ApiOkResponse({ type: ProjectResult })
+  @ApiOkResponse({ type: ProjectResultPlural })
   @JSONAPIQueryParams({
     entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
+    availableFilters: [
+      { name: 'name' },
+      { name: 'organizationId' },
+      { name: 'countryId' },
+      { name: 'adminAreaLevel1Id' },
+      { name: 'adminAreaLevel21Id' },
+    ],
   })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-  ): Promise<ProjectResult> {
+  ): Promise<ProjectResultPlural> {
     const results = await this.service.findAllPaginated(fetchSpecification);
     return await this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find project by id' })
-  @ApiOkResponse({ type: ProjectResult })
+  @ApiOkResponse({ type: ProjectResultSingular })
+  @JSONAPISingleEntityQueryParams({
+    entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
+  })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ProjectResult> {
+  async findOne(@Param('id') id: string): Promise<ProjectResultSingular> {
     return await this.service.serialize(await this.service.getById(id));
   }
 
   @ApiOperation({ description: 'Create project' })
-  @ApiOkResponse({ type: ProjectResult })
+  @ApiOkResponse({ type: ProjectResultSingular })
   @Post()
   async create(
     @Body() dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<ProjectResult> {
+  ): Promise<ProjectResultSingular> {
     return await this.service.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
     );
   }
 
   @ApiOperation({ description: 'Update project' })
-  @ApiOkResponse({ type: ProjectResult })
+  @ApiOkResponse({ type: ProjectResultSingular })
   @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateProjectDTO,
-  ): Promise<ProjectResult> {
+  ): Promise<ProjectResultSingular> {
     return await this.service.serialize(await this.service.update(id, dto));
   }
 

@@ -6,31 +6,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.2]
+
+## v0.4.0
 
 Unreleased
 
 ### Added
 
-- New module: ApiEventsModule [MARXAN-124].
-- Support for validation of new accounts, based on API events [MARXAN-214].
-
 ### Changed
-
-### Fixed
 
 ### Deprecated
 
 ### Removed
 
+### Fixed
 
-## [0.0.2]
+
+## [0.3.0]
+
+2021-04-05
 
 ### Added
 
+- New module: ProtectedAreasModule [MARXAN-210]
+  - list IUCN categories of protected areas in a given admin area [MARXAN-149]
 - Ability to configure which entities can be requested as included relationships
   in JSON:API responses via `?include=` query param.
 - Configure allowed included entities for some of the key entities.
+- Scenarios:
+  - Ability to associate WDPA protected areas to a scenario by their IUCN category [MARXAN-217]
+  - Ability to associate project-specific protected areas to a scenario by their id [MARXAN-217] 
+
+# Changed
+
+- Allow deleting projects that contain scenarios (cascade deletion in SQL)
+  [MARXAN-218].
+- When soft-deleting a user, their account's email address is set to a random
+  value so that they can sign up again using the same email address in the
+  future, if so they wish [MARXAN-184].
+
+## [0.2.0]
+
+2021-03-22
+
+### Added
+
+- New module: ApiEventsModule [MARXAN-124].
+- Support for validation of new accounts, based on API events [MARXAN-214].
 
 ### Changed
 

@@ -45,7 +45,7 @@ export const ScenariosMap: React.FC<ProjectMapProps> = () => {
         maxZoom={maxZoom}
         viewport={viewport}
         mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
-        mapStyle="mapbox://styles/mapbox/dark-v9"
+        mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
         onMapViewportChange={handleViewportChange}
       >
         {/* {(map) => {

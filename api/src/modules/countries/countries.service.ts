@@ -23,7 +23,7 @@ export class CountriesService extends AppBaseService<
     @InjectRepository(Country, 'geoprocessingDB')
     private readonly countriesRepository: Repository<Country>,
   ) {
-    super(countriesRepository, 'country', 'countries');
+    super(countriesRepository, 'country', 'countries', 'gid0');
   }
 
   get serializerConfig(): JSONAPISerializerConfig<Country> {

@@ -7,12 +7,14 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from 'modules/users/user.api.entity';
 import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
 import { BaseServiceResource } from 'types/resource.interface';
+import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
@@ -72,26 +74,43 @@ export class Scenario extends TimeUserEntityMetadata {
   projectId: string;
 
   /**
-   * Filter for WDPA data selection.
-   *
-   * @todo Improve description, add examples.
+   * List of IUCN categories used to select WDPA protected areas for the
+   * scenario's planning area.
+   */
+  @ApiPropertyOptional()
+  @Column('varchar', { name: 'wdpa_iucn_categories', array: true })
+  wdpaIucnCategories?: IUCNCategory[];
+
+  /**
+   * List of ids of protected areas associated to the scenario.
    */
   @ApiPropertyOptional()
   @IsOptional()
-  @Column('jsonb', { name: 'wdpa_filter' })
-  wdpaFilter: Record<string, unknown> | null;
+  @Column('jsonb', { name: 'protected_area_filter_by_ids' })
+  protectedAreaFilterByIds?: string[];
 
   /**
-   * Threshold - which portion (%) of a protected area needs to intersect a
-   * planning unit for this to be locked in as protected.
+   * UUIDs of project-specific protected areas (stored in the wdpa table)
+   * which should be included in the scenario.
+   */
+  @ApiPropertyOptional()
+  customProtectedAreaIds?: string[];
+
+  /**
+   * Which portion (%) of a protected area needs to intersect a planning unit
+   * for this to be considered as protected.
    *
-   * @todo Document possible values/range (should this be a [0,1] range
-   * instead), add validator decorators...
+   * Possible values: 0 to 100, in integer steps.
+   *
+   * @debt We should rename this property to something like
+   * `protectedAreaThreshold` as we converge on treating WDPA areas as a
+   * specific subset of protected areas in general in terms of naming things,
+   * but this needs to be coordinated with API consumers.
    */
   @ApiPropertyOptional()
   @Column('integer', { name: 'wdpa_threshold' })
   @IsOptional()
-  wdpaThreshold: number | null;
+  wdpaThreshold?: number | null;
 
   /**
    * Number of runs for Marxan calculations.
@@ -114,7 +133,7 @@ export class Scenario extends TimeUserEntityMetadata {
    */
   @ApiPropertyOptional()
   @Column('jsonb')
-  metadata: Dictionary<string>;
+  metadata?: Dictionary<string>;
 
   /**
    * Status of the scenario calculation job.
@@ -131,6 +150,11 @@ export class Scenario extends TimeUserEntityMetadata {
   @ApiPropertyOptional()
   @IsOptional()
   @Column('uuid', { name: 'parent_id' })
+  parentScenarioId?: string;
+
+  @ApiPropertyOptional()
+  @OneToOne((_type) => Scenario)
+  @JoinColumn({ name: 'parent_id', referencedColumnName: 'id' })
   parentScenario: Scenario;
 
   @ApiProperty({

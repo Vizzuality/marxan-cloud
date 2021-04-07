@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateOrganizationDTO } from './dto/create.organization.dto';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
 import { Organization } from './organization.api.entity';
@@ -13,6 +13,13 @@ import {
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
 
+const organizationFilterKeyNames = ['name'] as const;
+type OrganizationFilterKeys = keyof Pick<
+  Organization,
+  typeof organizationFilterKeyNames[number]
+>;
+type OrganizationFilters = Record<OrganizationFilterKeys, string[]>;
+
 @Injectable()
 export class OrganizationsService extends AppBaseService<
   Organization,
@@ -20,6 +27,8 @@ export class OrganizationsService extends AppBaseService<
   UpdateOrganizationDTO,
   AppInfoDTO
 > {
+  private readonly logger = new Logger(OrganizationsService.name);
+
   constructor(
     @InjectRepository(Organization)
     protected readonly repository: Repository<Organization>,
@@ -64,6 +73,22 @@ export class OrganizationsService extends AppBaseService<
       description: faker.lorem.sentence(),
     };
     return organization;
+  }
+
+  /**
+   * Apply service-specific filters.
+   */
+  setFilters(
+    query: SelectQueryBuilder<Organization>,
+    filters: OrganizationFilters,
+    _info?: AppInfoDTO,
+  ): SelectQueryBuilder<Organization> {
+    this._processBaseFilters<OrganizationFilters>(
+      query,
+      filters,
+      organizationFilterKeyNames,
+    );
+    return query;
   }
 
   async setDataCreate(
