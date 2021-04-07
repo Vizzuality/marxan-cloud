@@ -21,12 +21,7 @@ export class PlanningUnitsService {
   );
   public readonly planningUnitsQueue: Queue = new Queue(this.queueName, {
     ...config.get('redisApi'),
-    defaultJobOptions: {
-      removeOnComplete: 100,
-      removeOnFail: 1000,
-      attempts: 3,
-      timeout: 1 * 60 * 1000,
-    },
+    defaultJobOptions: config.get('jobOptions'),
   });
   private readonly queueEvents: QueueEvents = new QueueEvents(
     this.queueName,
