@@ -41,6 +41,8 @@
     "@turf/turf": "^5.1.6",
     "@types/geojson": "^7946.0.7",
     "bullmq": "^1.14.8",
+    "class-transformer": "^0.4.0",
+    "class-validator": "^0.13.1",
     "config": "^3.3.3",
     "faker": "^5.5.2",
     "mapshaper": "^0.5.28",
