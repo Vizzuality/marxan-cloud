@@ -7,6 +7,8 @@ import ScenariosSidebarWDPAThreshold from 'layout/scenarios/sidebar/wdpa/thresho
 import { useRouter } from 'next/router';
 import { useScenario } from 'hooks/scenarios';
 import Steps from 'components/steps';
+import { useProject } from 'hooks/projects';
+import { useWDPACategories } from 'hooks/wdpa';
 
 export interface ScenariosSidebarWDPAProps {
 }
@@ -14,22 +16,32 @@ export interface ScenariosSidebarWDPAProps {
 export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   const [step, setStep] = useState(0);
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
-  const { data } = useScenario(sid);
+  const { data: projectData } = useProject(pid);
+  const { data: scenarioData } = useScenario(sid);
+  const { data: wdpaData } = useWDPACategories(
+    projectData?.adminAreaLevel2Id
+    || projectData?.adminAreaLevel1Id
+    || projectData?.countryId,
+  );
 
-  if (!data) return null;
+  if (!scenarioData) return null;
 
   return (
     <Pill selected>
       <header className="flex items-baseline gap-4 mb-5">
         <h2 className="text-lg font-medium font-heading">Protected areas</h2>
-        <Steps step={step + 1} length={2} />
+
+        {(wdpaData && !!wdpaData.length) && (
+          <Steps step={step + 1} length={2} />
+        )}
       </header>
 
       {step === 0 && (
         <ScenariosSidebarWDPACategories
           onSuccess={() => setStep(1)}
+          onDismiss={() => console.info('change tab')}
         />
       )}
 
