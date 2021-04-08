@@ -64,7 +64,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     if (!wdpaData) return [];
 
     return wdpaData.map((w) => ({
-      label: w.iucnCategory,
+      label: `IUCN ${w.iucnCategory}`,
       value: w.id,
     }));
   }, [wdpaData]);

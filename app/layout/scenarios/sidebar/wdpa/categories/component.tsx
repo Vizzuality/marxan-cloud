@@ -62,7 +62,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     if (!wdpaData) return [];
 
     return wdpaData.map((w) => ({
-      label: w.iucnCategory,
+      label: `IUCN ${w.iucnCategory}`,
       value: w.id,
     }));
   }, [wdpaData]);
@@ -175,7 +175,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                     multiple
                     placeholder="Select..."
                     clearSelectionActive={false}
-                    batchSelectionActive
+                    batchSelectionActive={WDPA_CATEGORIES_OPTIONS.length > 1}
                     batchSelectionLabel="All protected areas"
                     selected={values.wdpaIucnCategories}
                     options={WDPA_CATEGORIES_OPTIONS}
