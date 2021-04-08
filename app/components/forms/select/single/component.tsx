@@ -57,7 +57,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
   }, [getOptions, initialValues]);
 
   const getSelected = useMemo(() => {
-    return getOptions.find((o) => o.value === values && o.value !== null);
+    return getOptions.find((o) => o.value === values && o.value !== null) || null;
   }, [getOptions, values]);
 
   // Events
@@ -87,10 +87,10 @@ export const SingleSelect: React.FC<SelectProps> = ({
     reset,
   } = useSelect<SelectOptionProps>({
     items: getOptions,
-    ...!!getSelected && {
+    ...typeof values !== 'undefined' && {
       selectedItem: getSelected,
     },
-    ...!!getInitialSelected && {
+    ...typeof initialValues !== 'undefined' && {
       initialSelectedItem: getInitialSelected,
     },
     itemToString: (item) => item.label, // How the selected options is announced to screen readers
