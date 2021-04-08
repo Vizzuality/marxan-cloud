@@ -74,7 +74,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
   }, [scenarioData?.wdpaIucnCategories]);
 
   // Submit
-  const onSubmit = useCallback(async (values) => {
+  const onSubmit = useCallback((values) => {
     setSubmitting(true);
 
     mutation.mutate({
@@ -111,6 +111,43 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     });
   }, [mutation, scenarioData?.id, addToast, onSuccess]);
 
+  const onSkip = useCallback(() => {
+    setSubmitting(true);
+
+    mutation.mutate({
+      id: scenarioData.id,
+      data: {
+        wdpaIucnCategories: null,
+      },
+    }, {
+      onSuccess: () => {
+        setSubmitting(false);
+
+        addToast('save-scenario-wdpa', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Scenario WDPA saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
+        onDismiss();
+      },
+      onError: () => {
+        setSubmitting(false);
+
+        addToast('error-scenario-wdpa', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario WDPA not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [mutation, scenarioData?.id, addToast, onDismiss]);
+
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
     return (
@@ -128,7 +165,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         <div className="text-sm">This planning area doesn&apos;t have any protected areas associated with it. You can go directly to the features tab.</div>
 
         <div className="flex justify-center mt-20">
-          <Button theme="secondary-alt" size="lg" type="button" className="relative px-20" onClick={onDismiss}>
+          <Button theme="secondary-alt" size="lg" type="button" className="relative px-20" onClick={onSkip}>
             <span>Continue to features</span>
           </Button>
         </div>
@@ -249,7 +286,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
               type={values.wdpaIucnCategories.length ? 'submit' : 'button'}
               className="relative px-20"
               disabled={submitting}
-              onClick={!values.wdpaIucnCategories.length ? onDismiss : null}
+              onClick={!values.wdpaIucnCategories.length ? onSkip : null}
             >
               {!!values.wdpaIucnCategories.length && (
                 <span>Continue</span>
