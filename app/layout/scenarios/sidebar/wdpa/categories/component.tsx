@@ -95,7 +95,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     });
   }, [mutation, addToast, scenarioData?.id, onSuccess]);
 
-  if (!scenarioData) return null;
+  if (!scenarioData || !wdpaData) return null;
 
   return (
     <FormRFF
@@ -131,6 +131,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                       <span>Info about WDPA categories</span>
                     </InfoButton>
                   </div>
+
                   <Select
                     theme="dark"
                     size="base"
@@ -154,6 +155,9 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
             <div className="flex flex-wrap mt-2.5">
               {values.wdpaIucnCategories.map((w) => {
                 const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
+
+                if (!wdpa) return null;
+
                 return (
                   <div
                     key={`${wdpa.value}`}
