@@ -27,10 +27,10 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
 
   const labelDefaultFormatter:() => string = useCallback(() => {
     if (!selectedItems.length) return placeholder;
+    if (selectedItems.length === getEnabledOptions.length && multiple) return 'All items selected';
     if (selectedItems.length === 1) return selectedItems[0].label;
-    if (selectedItems.length === getEnabledOptions.length) return 'All items selected';
     return `${selectedItems.length} items selected`;
-  }, [selectedItems, placeholder, getEnabledOptions]);
+  }, [selectedItems, multiple, placeholder, getEnabledOptions]);
 
   return (
     <button
