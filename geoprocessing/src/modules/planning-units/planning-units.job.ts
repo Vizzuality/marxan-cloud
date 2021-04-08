@@ -44,7 +44,7 @@ const createPlanningUnitGridFromJobSpec = async (
          * If user has provided a custom extent we will generate PUs based on it.
          */
         if (Math.sign(job.data.planningUnitAreakm2) < 0) {
-          throw 'Planning unit area Must be a positive number';
+          throw new Error('Planning unit area Must be a positive number');
         }
         subquery = `SELECT (${gridShape[job.data.planningUnitGridShape]}(${
           Math.sqrt(job.data.planningUnitAreakm2) * 1000
@@ -74,7 +74,9 @@ const createPlanningUnitGridFromJobSpec = async (
                     FROM admin_regions a
                     'WHERE ${filterSQL.join(' AND ')}`;
       } else {
-        throw 'Without extent or valid administrative level a regular pu area cannot be created';
+        throw new Error(
+          'Without extent or valid administrative level a regular pu area cannot be created',
+        );
       }
 
       const queryResult = await connection.query(`INSERT INTO planning_units_geom (the_geom, type, size)
