@@ -7,7 +7,7 @@ import WDPA from 'services/wdpa';
 export function useWDPACategories(adminAreaId) {
   const [session] = useSession();
 
-  const query = useQuery('wdpa-categories', async () => WDPA.request({
+  const query = useQuery(['wdpa-categories', adminAreaId], async () => WDPA.request({
     method: 'GET',
     url: '/iucn-categories',
     params: {
