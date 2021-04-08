@@ -17,6 +17,7 @@ import ScenarioItem from 'components/scenarios/item';
 
 import ScenarioTypes from 'layout/projects/show/scenarios/types';
 import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
+import ScenarioSettings from 'layout/projects/show/scenarios/settings';
 
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
@@ -149,6 +150,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                       onDelete={() => {
                         setDelete(s);
                       }}
+                      SettingsC={<ScenarioSettings sid={s.id} />}
                     />
                   );
                 })}
