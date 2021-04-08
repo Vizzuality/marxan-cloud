@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { ReactNode, useCallback, useState } from 'react';
 import cx from 'classnames';
 
 import Button from 'components/button';
@@ -38,6 +38,7 @@ export interface ItemProps {
   onView: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDelete?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDuplicate?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  SettingsC?: ReactNode;
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -45,12 +46,13 @@ export const Item: React.FC<ItemProps> = ({
   warnings,
   progress,
   lastUpdateDistance,
-  status = 'draft',
   className,
+  status = 'draft',
   onEdit,
   onView,
   onDelete,
   onDuplicate,
+  SettingsC,
 }: ItemProps) => {
   const [settings, setSettings] = useState(false);
 
@@ -161,7 +163,9 @@ export const Item: React.FC<ItemProps> = ({
         <Settings
           onDelete={onDelete}
           onDuplicate={onDuplicate}
-        />
+        >
+          {SettingsC}
+        </Settings>
       )}
 
     </div>
