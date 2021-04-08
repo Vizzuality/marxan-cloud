@@ -31,7 +31,6 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
   onSuccess,
 }: WDPACategoriesProps) => {
   const [submitting, setSubmitting] = useState(false);
-  const { addToast } = useToasts();
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -43,12 +42,15 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     || projectData?.countryId,
   );
 
+  const { addToast } = useToasts();
+
   const mutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
     },
   });
 
+  // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
     if (!wdpaData) return [];
 
@@ -58,6 +60,13 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     }));
   }, [wdpaData]);
 
+  const INITIAL_VALUES = useMemo(() => {
+    return {
+      wdpaIucnCategories: scenarioData?.wdpaIucnCategories || [],
+    };
+  }, [scenarioData?.wdpaIucnCategories]);
+
+  // Submit
   const onSubmit = useCallback(async (values) => {
     setSubmitting(true);
 
@@ -93,12 +102,22 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         });
       },
     });
-  }, [mutation, addToast, scenarioData?.id, onSuccess]);
+  }, [mutation, scenarioData?.id, addToast, onSuccess]);
 
-  if (!scenarioData || !wdpaData) return null;
+  // Loading
+  if (!scenarioData || !wdpaData) {
+    return (
+      <Loading
+        visible
+        className="relative flex items-center justify-center w-full h-16"
+        iconClassName="w-5 h-5 text-white"
+      />
+    );
+  }
 
   return (
     <FormRFF
+      key="wdpa-categories-scenarios-form"
       onSubmit={onSubmit}
       mutators={{
         removeWDPAFilter: (args, state, utils) => {
@@ -111,9 +130,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
           utils.changeValue(state, 'wdpaIucnCategories', () => arr);
         },
       }}
-      initialValues={{
-        wdpaIucnCategories: scenarioData?.wdpaIucnCategories || [],
-      }}
+      initialValues={INITIAL_VALUES}
     >
       {({ form, values, handleSubmit }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative w-full">
