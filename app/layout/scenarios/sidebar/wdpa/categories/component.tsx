@@ -169,17 +169,39 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                     </InfoButton>
                   </div>
 
-                  <Select
-                    theme="dark"
-                    size="base"
-                    multiple
-                    placeholder="Select..."
-                    clearSelectionActive={false}
-                    batchSelectionActive={WDPA_CATEGORIES_OPTIONS.length > 1}
-                    batchSelectionLabel="All protected areas"
-                    selected={values.wdpaIucnCategories}
-                    options={WDPA_CATEGORIES_OPTIONS}
-                  />
+                  {WDPA_CATEGORIES_OPTIONS.length === 1 && (
+                    <Select
+                      theme="dark"
+                      size="base"
+                      placeholder="Select..."
+                      clearSelectionActive
+                      selected={values.wdpaIucnCategories.length
+                        ? values.wdpaIucnCategories[0]
+                        : null}
+                      options={WDPA_CATEGORIES_OPTIONS}
+                      onChange={(v) => {
+                        if (v) {
+                          flprops.input.onChange([v]);
+                        } else {
+                          flprops.input.onChange([]);
+                        }
+                      }}
+                    />
+                  )}
+
+                  {WDPA_CATEGORIES_OPTIONS.length > 1 && (
+                    <Select
+                      theme="dark"
+                      size="base"
+                      multiple
+                      placeholder="Select..."
+                      clearSelectionActive={false}
+                      batchSelectionActive
+                      batchSelectionLabel="All protected areas"
+                      selected={values.wdpaIucnCategories}
+                      options={WDPA_CATEGORIES_OPTIONS}
+                    />
+                  )}
                 </Field>
               )}
             </FieldRFF>
