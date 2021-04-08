@@ -24,6 +24,10 @@ const createPlanningUnitGridFromJobSpec = async (
   job: Pick<Job<PlanningUnitsJob>, 'data' | 'id' | 'name'>,
 ) => {
   logger.debug(`Start planning-units processing for ${job.id}...`);
+  /**
+   * @description
+   * we are validating the data before anything is triggered
+   */
   const jobData = plainToClass(PlanningUnitsJob, job.data);
   const errors = await validate(jobData);
   if (errors.length > 0) {
