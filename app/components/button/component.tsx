@@ -1,4 +1,7 @@
-import React, { ButtonHTMLAttributes } from 'react';
+import React, {
+  ButtonHTMLAttributes, AnchorHTMLAttributes,
+} from 'react';
+import Link from 'next/link';
 import cx from 'classnames';
 
 const THEME = {
@@ -21,12 +24,96 @@ const SIZE = {
   xl: 'text-base px-14 py-3',
 };
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+export interface AnchorButtonProps {
   theme: 'primary' | 'primary-alt' | 'white' | 'secondary' | 'secondary-alt' | 'danger';
   size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }
+
+// Button props
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & AnchorButtonProps & {
+  href?: undefined;
+};
+
+// Anchor props
+export type AnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & AnchorButtonProps & {
+  href?: string;
+  disabled?: boolean;
+};
+
+// Input/output options
+type Overload = {
+  (props: ButtonProps): JSX.Element;
+  (props: AnchorProps): JSX.Element;
+};
+
+// Guard to check if href exists in props
+const hasHref = (props: ButtonProps | AnchorProps): props is AnchorProps => 'href' in props;
+
+function buildClassName({
+  className,
+  disabled,
+  size,
+  theme,
+}) {
+  return cx({
+    'flex items-center justify-center rounded-4xl focus:outline-blue': true,
+    [THEME[theme]]: true,
+    [SIZE[size]]: true,
+    [className]: !!className,
+    'opacity-50 pointer-events-none': disabled,
+  });
+}
+
+export const LinkAnchor: React.FC<AnchorProps> = ({
+  children,
+  theme = 'primary',
+  size = 'base',
+  className,
+  disabled,
+  href,
+  ...restProps
+}: AnchorProps) => (
+  <Link href={href}>
+    <a
+      className={buildClassName({
+        className, disabled, size, theme,
+      })}
+      {...restProps}
+    >
+      {children}
+    </a>
+  </Link>
+);
+
+export const Anchor: React.FC<AnchorProps> = ({
+  children,
+  theme = 'primary',
+  size = 'base',
+  className,
+  disabled,
+  href,
+  ...restProps
+}: AnchorProps) => {
+  // Anchor element doesn't support disabled attribute
+  // https://www.w3.org/TR/2014/REC-html5-20141028/disabled-elements.html
+  if (disabled) {
+    return (
+      <span {...restProps}>{children}</span>
+    );
+  }
+  return (
+    <a
+      href={href}
+      className={buildClassName({
+        className, disabled, size, theme,
+      })}
+      {...restProps}
+    >
+      {children}
+    </a>
+  );
+};
 
 export const Button: React.FC<ButtonProps> = ({
   children,
@@ -38,12 +125,8 @@ export const Button: React.FC<ButtonProps> = ({
 }: ButtonProps) => (
   <button
     type="button"
-    className={cx({
-      'flex items-center justify-center rounded-4xl focus:outline-blue': true,
-      [THEME[theme]]: true,
-      [SIZE[size]]: true,
-      [className]: !!className,
-      'opacity-50 pointer-events-none': disabled,
+    className={buildClassName({
+      className, disabled, size, theme,
     })}
     disabled={disabled}
     {...restProps}
@@ -52,4 +135,21 @@ export const Button: React.FC<ButtonProps> = ({
   </button>
 );
 
-export default Button;
+export const LinkButton: Overload = (props: ButtonProps | AnchorProps) => {
+  // We consider a link button when href attribute exits
+  if (hasHref(props)) {
+    if (props.href.includes('http')) {
+      return (
+        <Anchor {...props} />
+      );
+    }
+    return (
+      <LinkAnchor {...props} />
+    );
+  }
+  return (
+    <Button {...props} />
+  );
+};
+
+export default LinkButton;
