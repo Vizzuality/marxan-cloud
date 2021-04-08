@@ -4,9 +4,7 @@ import {
   IsEnum,
   IsPositive,
   ValidateNested,
-  Equals,
 } from 'class-validator';
-import { Type, plainToClass, Transform } from 'class-transformer';
 import { Polygon } from 'geojson';
 
 /**

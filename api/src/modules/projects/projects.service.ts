@@ -195,7 +195,8 @@ export class ProjectsService extends AppBaseService<
     createModel: CreateProjectDTO,
     info?: AppInfoDTO,
   ): Promise<void> {
-    if (createModel.planningUnitAreakm2 && createModel.planningUnitGridShape) {
+    if (createModel.planningUnitAreakm2 && createModel.planningUnitGridShape &&
+      (createModel.countryId || createModel.adminAreaLevel1Id || createModel.adminAreaLevel2Id || createModel.extent)) {
       this.logger.debug('creating planning unit job ');
       return this.planningUnitsService.create(createModel);
     }
