@@ -15,7 +15,7 @@ import * as config from 'config';
 export class PlanningUnitsProcessor {
   private readonly queueName: string = 'planning-units';
   private readonly logger: Logger = new Logger(PlanningUnitsProcessor.name);
-  private readonly worker: Worker = new Worker(
+  public readonly worker: Worker = new Worker(
     this.queueName,
     join(__dirname, '/planning-units.job.ts'),
     config.get('redisApi'),
@@ -25,7 +25,7 @@ export class PlanningUnitsProcessor {
     config.get('redisApi'),
   );
   constructor() {
-    this.logger.log('worker');
+    this.logger.debug('worker');
     this.worker.on('completed', async (job) => {
       this.logger.debug(`Job finished ${JSON.stringify(job)}`);
     });
