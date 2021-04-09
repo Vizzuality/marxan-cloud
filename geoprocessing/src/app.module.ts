@@ -1,12 +1,10 @@
-import { forwardRef, Module, Logger } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { geoprocessingConnections } from './ormconfig';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
-
-export const logger = new Logger('app');
-logger.debug(AdminAreasModule);
+import { AdminAreasModule } from 'src/modules/admin-areas/admin-areas.module';
+import { PlanningUnitsModule } from 'src/modules/planning-units/planning-units.module';
 
 @Module({
   imports: [
@@ -19,6 +17,7 @@ logger.debug(AdminAreasModule);
       keepConnectionAlive: true,
     }),
     AdminAreasModule,
+    PlanningUnitsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

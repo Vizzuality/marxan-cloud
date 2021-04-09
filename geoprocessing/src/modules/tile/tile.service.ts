@@ -40,7 +40,6 @@ export interface ITileQuery {
   geometry: string;
   extent: number;
   buffer: number;
-  // attributes: string;
 }
 
 /**
@@ -86,14 +85,13 @@ export interface ITileQueryInput extends TileRequest {
   getBaseQuery?: GetBaseQuery;
 }
 
-const logger = new Logger('Vector tile service');
 @Injectable()
 export class TileService {
-  // todo . add constructor
-
   /**
+   * @todo add constructor
    * @description The default base query builder
    */
+  private readonly logger: Logger = new Logger(TileService.name);
   defaultGetBaseQuery: GetBaseQuery = ({
     x,
     y,
@@ -104,10 +102,7 @@ export class TileService {
     buffer,
     customQuery,
     attributes,
-  }: // maxZoomLevel,
-  // attributes,
-  // query,
-  IBaseQueryInput) => `
+  }: IBaseQueryInput) => `
   SELECT
     ${attributes},
     ST_AsMVTGeom(
@@ -161,11 +156,9 @@ export class TileService {
       })})`,
     );
 
-    const sql: string = `${queryParts.join(
+    const sql = `${queryParts.join(
       ',\n',
     )}\nSELECT ST_AsMVT(tile, 'layer0',  ${extent}, 'mvt_geom') AS mvt FROM tile`;
-
-    // logger.debug(`Create query for tile: ${sql}`);
 
     return sql;
   }
@@ -177,7 +170,6 @@ export class TileService {
    * @param y The tile y offset on Mercator Projection
    * @return the resulting string query.
    */
-
   buildQuery(
     z: number,
     x: number,
@@ -190,7 +182,7 @@ export class TileService {
     customQuery: string,
     attributes: string,
   ): string {
-    let query: string = '';
+    let query = '';
 
     z = parseInt(`${z}`, 10);
     if (isNaN(z)) {
@@ -216,9 +208,9 @@ export class TileService {
         customQuery,
         attributes,
       });
-      logger.debug(`Create query for tile: ${query}`);
+      this.logger.debug(`Create query for tile: ${query}`);
     } catch (error) {
-      logger.error(`Error getting the query: ${error}`);
+      this.logger.error(`Error getting the query: ${error}`);
     }
     return query;
   }
@@ -234,7 +226,7 @@ export class TileService {
     const queryRunner = connection.createQueryRunner();
     queryRunner.connect();
     const result = await queryRunner.query(query);
-    logger.debug('Query retrieved');
+    this.logger.debug('Query retrieved');
     if (result) {
       return result;
     } else {
@@ -263,6 +255,8 @@ export class TileService {
    * @param x The tile x offset on Mercator Projection
    * @param y The tile y offset on Mercator Projection
    * @return contains the tile-data and some meta-information
+   *
+   * @TODO - check for valid tile and for valid data source
    */
   async getTile(
     z: number,
@@ -277,9 +271,6 @@ export class TileService {
     attributes: string,
   ): Promise<Tile> {
     const mvt: Tile = { res: 0 };
-
-    //todo - check for valid tile and for valid data source
-
     const query = this.buildQuery(
       z,
       x,
@@ -292,32 +283,29 @@ export class TileService {
       customQuery,
       attributes,
     );
-    logger.debug('Query created');
+    this.logger.debug('Query created');
     let data: any | null = null;
     if (query) {
       try {
         data = await this.fetchTileFromDatabase(query);
-        logger.debug('Data succesfully retrieved from database');
+        this.logger.debug('Data succesfully retrieved from database');
       } catch (error) {
         mvt.res = -4;
         mvt.status = `[ERROR] - Database error: ${error.message}`;
-        logger.error(`Database error: ${error.message}`);
+        this.logger.error(`Database error: ${error.message}`);
         return mvt;
       }
     } else {
       // Empty query => empty tile
       const msg = `[INFO] - Empty query for tile '${z}/${x}/${y}'`;
-      logger.debug(msg);
+      this.logger.debug(msg);
       mvt.res = 1;
       mvt.status = msg;
       data = Buffer.from('');
     }
     // zip data
-    // logger.debug(data[0].mvt);
-    // logger.debug(`uncompressedBytes: ${data[0].mvt.byteLength}`);
     mvt.data = await this.zip(data[0].mvt);
-    // logger.debug(`compressedBytes: ${mvt.data.byteLength}`);
-    logger.debug('Data compressed');
+    this.logger.debug('Data compressed');
     return mvt;
   }
 }
