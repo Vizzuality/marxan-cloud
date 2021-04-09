@@ -9,7 +9,10 @@ function delay(ms: number) {
     return setTimeout(resolve, ms);
   });
 }
-
+/**
+ * @TODO
+ * we need to add a couple of test that cath errors on invalid user input.
+ */
 describe('planning units jobs (e2e)', () => {
   jest.setTimeout(2 * 1000);
   it('executes the child job processor with mock data', async () => {

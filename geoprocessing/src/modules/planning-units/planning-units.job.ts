@@ -19,6 +19,7 @@ const logger = new Logger('planning-units-job-processor');
  * * PlanningUnitAreakm2 should be a positive number
  * * This piece will be triggered only if we require to generate a custom regular grid (not user provided PUs)
  * * Better handle the validation, plus check why Polygon validation is not working
+ * make sure we avoid at all costs unescaped user input
  */
 const createPlanningUnitGridFromJobSpec = async (
   job: Pick<Job<PlanningUnitsJob>, 'data' | 'id' | 'name'>,

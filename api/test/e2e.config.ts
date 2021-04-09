@@ -48,10 +48,10 @@ export const E2E_CONFIG: {
       missingRequiredFields: () => Partial<CreateScenarioDTO>;
     };
   };
-  planningUnits:{
-    valid: {},
-    invalid: {}
-    }
+  planningUnits: {
+    valid: {};
+    invalid: {};
+  };
   protectedAreas: {
     categories: {
       valid: IUCNCategory[];
@@ -199,15 +199,15 @@ export const E2E_CONFIG: {
       }),
     },
   },
-  planningUnits:{
+  planningUnits: {
     valid: {
-      customExtent:{},
-      adminRegion:{}
+      customExtent: {},
+      adminRegion: {},
     },
     invalid: {
-      customExtent:{},
-      adminRegion:{}
-    }
+      customExtent: {},
+      adminRegion: {},
+    },
   },
   protectedAreas: {
     categories: {

@@ -187,7 +187,7 @@ export class ProjectsService extends AppBaseService<
       : project.countryId
       ? await this.countriesService.getById(project.countryId)
       : undefined;
-    return planningArea
+    return planningArea;
   }
 
   async actionAfterCreate(
@@ -195,8 +195,14 @@ export class ProjectsService extends AppBaseService<
     createModel: CreateProjectDTO,
     info?: AppInfoDTO,
   ): Promise<void> {
-    if (createModel.planningUnitAreakm2 && createModel.planningUnitGridShape &&
-      (createModel.countryId || createModel.adminAreaLevel1Id || createModel.adminAreaLevel2Id || createModel.extent)) {
+    if (
+      createModel.planningUnitAreakm2 &&
+      createModel.planningUnitGridShape &&
+      (createModel.countryId ||
+        createModel.adminAreaLevel1Id ||
+        createModel.adminAreaLevel2Id ||
+        createModel.extent)
+    ) {
       this.logger.debug('creating planning unit job ');
       return this.planningUnitsService.create(createModel);
     }
@@ -207,8 +213,14 @@ export class ProjectsService extends AppBaseService<
     createModel: UpdateProjectDTO,
     info?: AppInfoDTO,
   ): Promise<void> {
-    if (createModel.planningUnitAreakm2 && createModel.planningUnitGridShape &&
-      (createModel.countryId || createModel.adminAreaLevel1Id || createModel.adminAreaLevel2Id || createModel.extent)) {
+    if (
+      createModel.planningUnitAreakm2 &&
+      createModel.planningUnitGridShape &&
+      (createModel.countryId ||
+        createModel.adminAreaLevel1Id ||
+        createModel.adminAreaLevel2Id ||
+        createModel.extent)
+    ) {
       this.logger.debug('creating planning unit job ');
       return this.planningUnitsService.create(createModel);
     }
