@@ -204,7 +204,7 @@ export class ProjectsService extends AppBaseService<
 
   async actionAfterUpdate(
     model: Project,
-    createModel: CreateProjectDTO,
+    createModel: UpdateProjectDTO,
     info?: AppInfoDTO,
   ): Promise<void> {
     if (createModel.planningUnitAreakm2 && createModel.planningUnitGridShape &&
