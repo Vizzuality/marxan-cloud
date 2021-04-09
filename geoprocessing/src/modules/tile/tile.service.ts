@@ -89,6 +89,8 @@ export interface ITileQueryInput extends TileRequest {
 export class TileService {
   /**
    * @todo add constructor
+   * @todo move generation of specific query for each point to the api. Generate this query with the query builder
+   * @todo fix geometry issue with gid_0 = 'ATA'. Once is fixed, remove this condition from the query.
    * @description The default base query builder
    */
   private readonly logger: Logger = new Logger(TileService.name);
