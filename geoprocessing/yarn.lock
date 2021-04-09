@@ -3146,19 +3146,8 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-class-validator@0.13.1, class-validator@^0.13.1:
-=======
-<<<<<<< HEAD
-class-validator@^0.13.1:
-=======
+
 class-validator@0.13.1:
->>>>>>> next steps mvt scaffolding
->>>>>>> next steps mvt scaffolding
-=======
-class-validator@0.13.1, class-validator@^0.13.1:
->>>>>>> unification of mvt server and testing index html
   version "0.13.1"
   resolved "https://registry.yarnpkg.com/class-validator/-/class-validator-0.13.1.tgz#381b2001ee6b9e05afd133671fbdf760da7dec67"
   integrity sha512-zWIeYFhUitvAHBwNhDdCRK09hWx+P0HUwFE8US8/CxFpMVzkUK8RJl7yOIE+BVu2lxyPNgeOaFv78tLE47jBIg==
@@ -5938,15 +5927,9 @@ levn@~0.3.0:
     type-check "~0.3.2"
 
 libphonenumber-js@^1.9.7:
-<<<<<<< HEAD
-  version "1.9.16"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.9.16.tgz#84fcadf834a1e4234dab3399b5798cf8ff809683"
-  integrity sha512-PaHT7nTtnejZ0HHekAaA0olv6BUTKZGtKM4SCQS0yE3XjFuVo/tjePMHUAr32FKwIZfyPky1ExMUuaiBAUmV6w==
-=======
   version "1.9.12"
   resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.9.12.tgz#2fc4efb88e57c7909d5329ae3a1619a65389dbe6"
   integrity sha512-UNSBMB+lIn2XJtESlW4qDMxeZWcHhk50n8NlxQOlomrjDMTwNlq7UdD4gOR/ibS54M4Pw0mRFw6geddRBHGHNw==
->>>>>>> next steps mvt scaffolding
 
 lineclip@^1.1.5:
   version "1.1.5"
@@ -6056,11 +6039,6 @@ lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20:
   version "4.17.20"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
-
-lodash@^4.16.3, lodash@^4.17.21:
-  version "4.17.21"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
-  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
 log-symbols@^4.0.0:
   version "4.0.0"
@@ -6411,21 +6389,10 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> next steps mvt scaffolding
 nestjs-bullmq@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/nestjs-bullmq/-/nestjs-bullmq-0.1.0.tgz#83b721ff8221a07923c5ffe7fe2bd1d0dcc1bb90"
   integrity sha512-9vqYBjWfBcfXwwHShy+BTEDWwUrgUcwn/BWUobQF0F72EQci8NRKWGyhrydPpomSua5cyoA2aHLYQehMTPl00Q==
-=======
->>>>>>> next steps mvt scaffolding
-=======
->>>>>>> WIP
 nestjs-base-service@0.4.2:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.4.2.tgz#b899e32318372443876a81dcdeabcac32c9c1d6a"
@@ -6443,10 +6410,7 @@ nestjs-typeorm-paginate@2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/nestjs-typeorm-paginate/-/nestjs-typeorm-paginate-2.2.6.tgz#83ee2823e2ebcd67f62c58df9e5c6400d833009d"
   integrity sha512-Tm/3fyjfy5j/deTwunWXg5sNKWjZVmTonygdd2A2sgYOr92ItvGiQGmujPgVQDOvW5kVVu/4QxfecHeOOQ/DIA==
-<<<<<<< HEAD
-=======
->>>>>>> next steps mvt scaffolding
->>>>>>> next steps mvt scaffolding
+
 
 nice-try@^1.0.4:
   version "1.0.5"
@@ -8497,25 +8461,15 @@ tsconfig-paths@3.9.0, tsconfig-paths@^3.4.0, tsconfig-paths@^3.9.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.1.0.tgz#da60860f1c2ecaa5703ab7d39bc05b6bf988b97a"
   integrity sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==
-
-<<<<<<< HEAD
 tslib@2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.0.3.tgz#8e0741ac45fc0c226e58a17bfc3e64b9bc6ca61c"
   integrity sha512-uZtkfKblCEQtZKBF6EBXVZeQNl82yqtDQdv+eck8u7tdPxjLu2/lp5/uPW+um2tpuxINHWy3GhiccY7QgEaVHQ==
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.0.3.tgz#8e0741ac45fc0c226e58a17bfc3e64b9bc6ca61c"
+  integrity sha512-uZtkfKblCEQtZKBF6EBXVZeQNl82yqtDQdv+eck8u7tdPxjLu2/lp5/uPW+um2tpuxINHWy3GhiccY7QgEaVHQ==
 
-=======
-<<<<<<< HEAD
->>>>>>> next steps mvt scaffolding
 tslib@^1.10.0, tslib@^1.13.0, tslib@^1.8.1, tslib@^1.9.0:
-=======
-tslib@2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.0.3.tgz#8e0741ac45fc0c226e58a17bfc3e64b9bc6ca61c"
-  integrity sha512-uZtkfKblCEQtZKBF6EBXVZeQNl82yqtDQdv+eck8u7tdPxjLu2/lp5/uPW+um2tpuxINHWy3GhiccY7QgEaVHQ==
-
-tslib@^1.13.0, tslib@^1.8.1, tslib@^1.9.0:
->>>>>>> next steps mvt scaffolding
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
@@ -8618,15 +8572,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-typeorm@0.2.30:
-=======
 typeorm@0.2.30, typeorm@^0.2.29:
->>>>>>> next steps mvt scaffolding
-=======
-typeorm@0.2.30:
->>>>>>> WIP
   version "0.2.30"
   resolved "https://registry.yarnpkg.com/typeorm/-/typeorm-0.2.30.tgz#a0df2256402cbcdde8049a244437560495ce9b38"
   integrity sha512-qpr8AO3Phi6ZF7qMHOrRdNisVt8jE1KfmW0ooLFcXscA87aJ12aBPyB9cJfxGNjNwd7B3WIK9ZlBveWiqd74QA==
@@ -8778,12 +8724,6 @@ uuid@8.3.1:
   version "8.3.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.1.tgz#2ba2e6ca000da60fce5a196954ab241131e05a31"
   integrity sha512-FOmRr+FmWEIG8uhZv6C2bTgEVXsHk08kE7mPlrBbEe+c3r9pjceVPgupIfNIhc4yx55H69OXANrUaSuu9eInKg==
-
-<<<<<<< HEAD
-uuid@8.3.2, uuid@^8.2.0, uuid@^8.3.0, uuid@^8.3.2:
-=======
-uuid@8.3.2, uuid@^8.3.0, uuid@^8.3.2:
->>>>>>> WIP
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
