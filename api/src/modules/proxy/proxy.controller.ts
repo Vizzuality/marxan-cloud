@@ -1,4 +1,4 @@
-import { Controller, Req, Res, UseGuards,Get } from '@nestjs/common';
+import { Controller, Req, Res, UseGuards, Get } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -16,14 +16,18 @@ import { Request, Response } from 'express';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags('Proxy for vector tiles Controller')
+@ApiTags('AdminArea vector tile proxy')
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class ProxyController {
   constructor(private readonly proxyService: ProxyService) {}
 
   @ApiOperation({
-    description: 'Find administrative areas within a given country.',
+    description:
+      'Find administrative areas within a given country in mvt format.',
   })
+  /**
+   *@todo Change ApiOkResponse mvt type
+   */
   @ApiOkResponse({
     type: 'mvt',
   })
@@ -53,7 +57,11 @@ export class ProxyController {
       'Specific level to filter the administrative areas (0, 1 or 2)',
     type: Number,
     required: true,
+    example: '1',
   })
+  /**
+   *@todo parse level from admin areas entity
+   */
   @Get('/geoprocessing/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
   async proxyTile(@Req() request: Request, @Res() response: Response) {
     return this.proxyService.proxyTileRequest(request, response);
