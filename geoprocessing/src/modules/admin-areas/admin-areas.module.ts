@@ -1,14 +1,8 @@
-import { Logger, Module } from '@nestjs/common';
-// import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module } from '@nestjs/common';
 
 import { AdminAreasController } from './admin-areas.controller';
-//import { AdminArea } from './admin-areas.geo.entity';
 import { AdminAreasService } from './admin-areas.service';
-import { TileModule } from 'modules/tile/tile.module';
-
-const logger = new Logger('admin-areas');
-
-logger.debug(TileModule);
+import { TileModule } from 'src/modules/tile/tile.module';
 
 @Module({
   imports: [TileModule],
