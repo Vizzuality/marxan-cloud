@@ -12,6 +12,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 Unreleased
 
 ### Added
+- Queue and job provider in api.
+- Planning Units 
+	- Provides the capability to enqueue the generation of Planning units.
+	- Tests for planning units generation.
+- Projects
+	- Job request for PU generation after project creation or update
 
 ### Changed
 
@@ -94,7 +100,8 @@ Unreleased
   a whitelisting approach is not desirable/practical.
 - Projects
   - handle planning unit grid shape, planning unit area, L1 and L2 admin area
-    ids [MARXAN-138]
+    ids.
+  - generation of PUs after a project is created.
 
 ### Changed
 

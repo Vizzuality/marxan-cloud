@@ -32,6 +32,8 @@ export const E2E_CONFIG: {
         adminAreaLevel2Id?: string;
       }) => Partial<CreateProjectDTO>;
       complete: (options: unknown) => Partial<CreateProjectDTO>;
+      customArea: (options: unknown) => Partial<CreateProjectDTO>;
+      adminRegion: (options: unknown) => Partial<CreateProjectDTO>;
     };
     invalid: {
       incomplete: () => Partial<CreateProjectDTO>;
@@ -45,6 +47,10 @@ export const E2E_CONFIG: {
     invalid: {
       missingRequiredFields: () => Partial<CreateScenarioDTO>;
     };
+  };
+  planningUnits: {
+    valid: {};
+    invalid: {};
   };
   protectedAreas: {
     categories: {
@@ -122,6 +128,45 @@ export const E2E_CONFIG: {
           [faker.random.word()]: faker.random.uuid(),
         },
       }),
+      customArea: (options: { countryCode: string }): CreateProjectDTO => ({
+        name: faker.random.words(5),
+        organizationId: faker.random.uuid(),
+        description: faker.lorem.paragraphs(2),
+        countryId: options.countryCode,
+        adminAreaLevel1Id: faker.random.alphaNumeric(7),
+        adminAreaLevel2Id: faker.random.alphaNumeric(12),
+        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitAreakm2: 10,
+        extent: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-10.0, -10.0],
+              [10.0, -10.0],
+              [10.0, 10.0],
+              [-10.0, -10.0],
+            ],
+          ],
+        },
+        metadata: {
+          [faker.random.word()]: faker.random.words(3),
+          [faker.random.word()]: faker.random.uuid(),
+        },
+      }),
+      adminRegion: (options: { countryCode: string }): CreateProjectDTO => ({
+        name: faker.random.words(5),
+        organizationId: faker.random.uuid(),
+        description: faker.lorem.paragraphs(2),
+        countryId: options.countryCode,
+        adminAreaLevel1Id: faker.random.alphaNumeric(7),
+        adminAreaLevel2Id: faker.random.alphaNumeric(12),
+        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitAreakm2: 10,
+        metadata: {
+          [faker.random.word()]: faker.random.words(3),
+          [faker.random.word()]: faker.random.uuid(),
+        },
+      }),
     },
     invalid: {
       incomplete: () => ({
@@ -152,6 +197,16 @@ export const E2E_CONFIG: {
         name: faker.random.words(3),
         description: faker.lorem.sentence(),
       }),
+    },
+  },
+  planningUnits: {
+    valid: {
+      customExtent: {},
+      adminRegion: {},
+    },
+    invalid: {
+      customExtent: {},
+      adminRegion: {},
     },
   },
   protectedAreas: {
