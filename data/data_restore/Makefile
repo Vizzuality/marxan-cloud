@@ -13,10 +13,10 @@ restore-geodb: geo_db-2021-03-01.tar.gz
 	mkdir ./$$(basename $< .tar.gz)/
 	tar -xvf ./db_dumps/$< -C ./$$(basename $< .tar.gz)/ && pg_restore -d "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@marxan-postgresql-geo-api:5432/$$GEO_POSTGRES_DB" -Fd -c ./$$(basename $< .tar.gz)
 	rm -rf $$(basename $< .tar.gz)/
+# before this we need to list the az blobs in out instance az storage blob list -c data-ingestion-test-00  --account-name marxancloudtest --auth-mode login
+api_db-2021-04-09.tar.gz:
+	cd ./db_dumps/ && curl -O https://marxancloudtest.blob.core.windows.net/data-ingestion-test-00/dbs-dumps//api_db-2021-04-09.tar.gz
 
-api_db-2021-03-01.tar.gz:
-	cd ./db_dumps/ && curl -O https://marxancloudtest.blob.core.windows.net/data-ingestion-test-00/dbs-dumps/api_db-2021-03-01.tar.gz
-
-geo_db-2021-03-01.tar.gz:
+geo_db-2021-04-09.tar.gz:
 	@ls db_dumps
-	cd ./db_dumps/ && curl -O https://marxancloudtest.blob.core.windows.net/data-ingestion-test-00/dbs-dumps/geo_db-2021-03-01.tar.gz
+	cd ./db_dumps/ && curl -O https://marxancloudtest.blob.core.windows.net/data-ingestion-test-00/dbs-dumps//geo_db-2021-04-09.tar.gz
