@@ -1,5 +1,5 @@
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import { AppConfig } from 'utils/config.utils';
+import { AppConfig } from 'src/utils/config.utils';
 
 /**
  * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs
@@ -45,13 +45,13 @@ export const geoprocessingConnections: {
     synchronize: false,
     type: 'postgres',
     url: AppConfig.get<string>('postgresApi.url'),
-    migrationsRun:  AppConfig.get<string>(
-      'postgresApi.runMigrationsOnStartup',
-    )?.toLowerCase() !== 'false'
-      ? true
-      : false,
-    cli: {
-      migrationsDir: "src/migrations/geoprocessing"
-    }
+    ssl: false,
+    entities: ['src/modules/**/*.api.entity.ts'],
+    // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
+    // 'query' if needing to see the actual generated SQL statements (this should
+    // be limited to `NODE_ENV=development`). Use 'error' for least verbose
+    // logging.
+    logging: ['error'],
+    cache: false,
   },
 };
