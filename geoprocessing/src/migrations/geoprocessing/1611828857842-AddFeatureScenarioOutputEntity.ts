@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { PostgreSQLUtils } from 'utils/postgresql.utils';
+import { PostgreSQLUtils } from 'src/utils/postgresql.utils';
 
 export class AddFeatureScenarioOutputEntity1611828857842
   implements MigrationInterface {
