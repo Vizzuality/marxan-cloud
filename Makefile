@@ -84,7 +84,8 @@ generate-geo-test-data: extract-geo-test-data
 	mv -f -u -Z data/data/processed/test-features.sql api/test/fixtures/test-features.sql
 	rm -rf api/test/fixtures/features && mv -f -u -Z data/data/processed/features api/test/fixtures/features
 
-seed-geodb-data:
+# dont forget to run make clean-slate && make start-api before repopulating the hole db
+seed-geodb-data: seed-api-with-test-data
 	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
 
 test-e2e-api:
@@ -118,10 +119,10 @@ test-e2e-api:
 	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e rm --stop --force
 
 dump-geodb-data:
-	docker-compose exec -T postgresql-geo-api pg_dump -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
+	docker-compose exec -T postgresql-geo-api pg_dump -a -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
 
 dump-api-data:
-	docker-compose exec -T postgresql-api pg_dump -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
+	docker-compose exec -T postgresql-api pg_dump -a -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
 
 upload-dump-data:
 	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps/ -s data/data/processed/db_dumps
