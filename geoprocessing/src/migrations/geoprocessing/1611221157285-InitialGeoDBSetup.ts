@@ -1,4 +1,4 @@
-import { PostgreSQLUtils } from 'utils/postgresql.utils';
+import { PostgreSQLUtils } from 'src/utils/postgresql.utils';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class InitialGeoDBSetup1611221157285 implements MigrationInterface {

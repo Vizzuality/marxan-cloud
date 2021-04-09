@@ -14,14 +14,14 @@ function delay(ms: number) {
  * we need to add a couple of test that cath errors on invalid user input.
  */
 describe('planning units jobs (e2e)', () => {
-  jest.setTimeout(2 * 1000);
+  jest.setTimeout(5 * 1000);
   it('executes the child job processor with mock data', async () => {
     const createPlanningUnitsDTO: Pick<
       Job<PlanningUnitsJob>,
       'data' | 'id' | 'name'
     > = {
       id: '1',
-      name: 'create-pu',
+      name: 'create-regular-pu',
       data: E2E_CONFIG.planningUnits.creationJob.valid.customArea({
         countryCode: 'NAM',
       }),
@@ -31,6 +31,6 @@ describe('planning units jobs (e2e)', () => {
     );
 
     expect(value).toBeDefined();
-    await Promise.all([delay(1 * 1000)]);
+    await Promise.all([delay(4 * 1000)]);
   });
 });
