@@ -1,4 +1,4 @@
-import { Logger, BadRequestException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { geoprocessingConnections } from 'src/ormconfig';
 import { createConnection } from 'typeorm';
@@ -32,6 +32,7 @@ const createPlanningUnitGridFromJobSpec = async (
   const jobData = plainToClass(PlanningUnitsJob, job.data);
   const errors = await validate(jobData);
   if (errors.length > 0) {
+    logger.error(`Validation failed: ${JSON.stringify(errors)}`);
     throw new Error(`Validation failed: ${JSON.stringify(errors)}`);
   }
 
