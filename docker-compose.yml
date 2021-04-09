@@ -21,10 +21,12 @@ services:
       - NODE_ENV=development
       - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
       - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
+      - REDIS_HOST=marxan-redis
     depends_on:
       - postgresql-api
       - postgresql-geo-api
-      - redis-api
+      - redis
+
   app:
     build:
       context: ./app
@@ -61,10 +63,12 @@ services:
       - NODE_ENV=development
       - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
       - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
+      - REDIS_HOST=marxan-redis
     depends_on:
       - postgresql-geo-api
       - postgresql-api
       - api
+      - redis
   postgresql-api:
     build:
       context: ./postgresql
@@ -91,18 +95,28 @@ services:
       - POSTGRES_PASSWORD=${GEO_POSTGRES_PASSWORD}
       - POSTGRES_USER=${GEO_POSTGRES_USER}
     restart: always
-  redis-api:
+  redis:
     build:
       context: ./redis
       dockerfile: Dockerfile
-    container_name: marxan-redis-api
+    hostname: redis
+    container_name: marxan-redis
+    command: [ "redis-server"]
     ports:
       - "${REDIS_API_SERVICE_PORT}:6379"
-    volumes:
-      - marxan-cloud-redis-api-data:/data
-    environment:
-      - REDIS_REPLICATION_MODE=master
     restart: on-failure
+  # Admin gui for redis
+  redis-commander:
+    image: rediscommander/redis-commander
+    hostname: redis-commander
+    container_name: marxan-redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:marxan-redis:6379
+    ports:
+      - '${REDIS_COMMANDER_PORT}:8081'
+    depends_on:
+      - redis
   postgresql-airflow:
     image: postgres
     container_name: marxan-postgresql-airflow

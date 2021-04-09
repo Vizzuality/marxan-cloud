@@ -16,5 +16,10 @@
     "jwt": {
       "secret": "API_AUTH_JWT_SECRET"
     }
-  }
+  },
+  "redisApi": {
+   "connection": {
+     "host": "REDIS_HOST"
+     }
+   }
 }

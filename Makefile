@@ -35,6 +35,11 @@ psql-api:
 psql-geo:
 	docker-compose exec postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"
 
+redis-api:
+	docker-compose exec redis redis-cli
+
+start-redis-commander:
+	docker-compose up --build redis-commander
 # Stop all containers and remove the postgresql-api container and the named
 # Docker volume used to persists PostgreSQL data
 #
@@ -42,14 +47,15 @@ psql-geo:
 # commands is to ignore errors if the container or volume being deleted
 # don't actually exist.
 #
-# @debt We should ideally avoid hardcoding container and volume name so that
+# @debt We should ideally avoid hardcoding volume name so that
 # any changes here or in `docker-compose.yml` will not get things out of sync.
 # Or add a CI test that could catch this.
 clean-slate: stop
-	docker-compose rm -f postgresql-api
-	docker-compose rm -f postgresql-geo-api
+	docker-compose down --volumes --remove-orphans
+	docker-compose rm -f -v
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data
+	docker volume rm -f marxan-cloud_marxan-cloud-redis-api-data
 
 seed-dbs: seed-api-with-test-data | seed-geoapi-with-test-data
 

@@ -8,3 +8,5 @@ services:
     env_file: .env-test-e2e
   test-e2e-postgresql-geo-api:
     env_file: .env-test-e2e
+  test-e2e-redis:
+    env_file: .env-test-e2e

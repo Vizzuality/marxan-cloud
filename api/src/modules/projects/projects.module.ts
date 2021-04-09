@@ -8,6 +8,7 @@ import { UsersModule } from 'modules/users/users.module';
 import { ScenariosModule } from 'modules/scenarios/scenarios.module';
 import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
 import { CountriesModule } from 'modules/countries/countries.module';
+import { PlanningUnitsModule } from 'modules/planning-units/planning-units.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CountriesModule } from 'modules/countries/countries.module';
     forwardRef(() => ScenariosModule),
     TypeOrmModule.forFeature([Project]),
     UsersModule,
+    PlanningUnitsModule,
   ],
   providers: [ProjectsService],
   controllers: [ProjectsController],

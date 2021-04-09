@@ -9,6 +9,7 @@ import { UpdateProjectDTO } from './dto/update.project.dto';
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
 import { ScenariosService } from 'modules/scenarios/scenarios.service';
+import { PlanningUnitsService } from 'modules/planning-units/planning-units.service';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -39,7 +40,6 @@ export class ProjectsService extends AppBaseService<
   AppInfoDTO
 > {
   private readonly logger = new Logger(ProjectsService.name);
-
   constructor(
     @InjectRepository(Project)
     protected readonly repository: Repository<Project>,
@@ -50,6 +50,8 @@ export class ProjectsService extends AppBaseService<
     protected readonly adminAreasService: AdminAreasService,
     @Inject(CountriesService)
     protected readonly countriesService: CountriesService,
+    @Inject(PlanningUnitsService)
+    private readonly planningUnitsService: PlanningUnitsService,
   ) {
     super(repository, 'project', 'projects');
   }
@@ -186,5 +188,41 @@ export class ProjectsService extends AppBaseService<
       ? await this.countriesService.getById(project.countryId)
       : undefined;
     return planningArea;
+  }
+
+  async actionAfterCreate(
+    model: Project,
+    createModel: CreateProjectDTO,
+    info?: AppInfoDTO,
+  ): Promise<void> {
+    if (
+      createModel.planningUnitAreakm2 &&
+      createModel.planningUnitGridShape &&
+      (createModel.countryId ||
+        createModel.adminAreaLevel1Id ||
+        createModel.adminAreaLevel2Id ||
+        createModel.extent)
+    ) {
+      this.logger.debug('creating planning unit job ');
+      return this.planningUnitsService.create(createModel);
+    }
+  }
+
+  async actionAfterUpdate(
+    model: Project,
+    createModel: UpdateProjectDTO,
+    info?: AppInfoDTO,
+  ): Promise<void> {
+    if (
+      createModel.planningUnitAreakm2 &&
+      createModel.planningUnitGridShape &&
+      (createModel.countryId ||
+        createModel.adminAreaLevel1Id ||
+        createModel.adminAreaLevel2Id ||
+        createModel.extent)
+    ) {
+      this.logger.debug('creating planning unit job ');
+      return this.planningUnitsService.create(createModel);
+    }
   }
 }
