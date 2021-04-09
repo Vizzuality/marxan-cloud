@@ -165,3 +165,11 @@ volumes:
   marxan-cloud-redis-api-data:
 
   marxan-airflow-logs:
+# @TODO
+# we are bringing this back until we manage the conections
+# for the services from different services up in different
+# Compose (for data seed) points to the right env variable.
+networks:
+  default:
+    external:
+      name: marxan-cloud-network
