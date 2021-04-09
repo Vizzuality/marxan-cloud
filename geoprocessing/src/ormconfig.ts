@@ -1,5 +1,5 @@
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import { AppConfig } from 'utils/config.utils';
+import { AppConfig } from 'src/utils/config.utils';
 
 /**
  * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs
@@ -30,17 +30,18 @@ export const geoprocessingConnections: {
     logging: ['error'],
     cache: false,
     migrations: ['src/migrations/geoprocessing/**/*.ts'],
-    migrationsRun:  AppConfig.get<string>(
-      'postgresApi.runMigrationsOnStartup',
-    )?.toLowerCase() !== 'false'
-      ? true
-      : false,
+    migrationsRun:
+      AppConfig.get<string>(
+        'postgresApi.runMigrationsOnStartup',
+      )?.toLowerCase() !== 'false'
+        ? true
+        : false,
     cli: {
-      migrationsDir: "src/migrations/geoprocessing"
-    }
+      migrationsDir: 'src/migrations/geoprocessing',
+    },
   },
   apiDB: {
-    name: "apiDB",
+    name: 'apiDB',
     synchronize: false,
     type: 'postgres',
     url: AppConfig.get('postgresApi.url'),
@@ -51,6 +52,6 @@ export const geoprocessingConnections: {
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
     // logging.
     logging: ['error'],
-    cache: false
+    cache: false,
   },
 };
