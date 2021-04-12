@@ -15,8 +15,3 @@ services:
       container_name: marxan-science_jupyter_notebook
       command: "start-notebook.sh \
         --NotebookApp.token=''"
-
-networks:
-    default:
-      external:
-        name: marxan-cloud-network

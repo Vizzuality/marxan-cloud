@@ -9,19 +9,21 @@ API_POSTGRES_DB := $(shell grep -e API_POSTGRES_DB .env | sed 's/^.*=//')
 GEO_POSTGRES_USER := $(shell grep -e GEO_POSTGRES_USER .env | sed 's/^.*=//')
 GEO_POSTGRES_DB := $(shell grep -e GEO_POSTGRES_DB .env | sed 's/^.*=//')
 
+COMPOSE_PROJECT_NAME := "marxan-cloud"
+
 # Start only API and Geoprocessing services
 #
 # Useful when developing on API components only, to avoid spinning up services
 # which may not be needed.
 start-api:
-	docker-compose up --build api geoprocessing
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing
 
 # Start all the services.
 start:
 	docker-compose up --build
 
 notebooks:
-	docker-compose -f ./data/docker-compose.yml up --build
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose.yml up --build
 
 notebooks-stop:
 	docker-compose -f ./data/docker-compose.yml stop
@@ -84,8 +86,11 @@ generate-geo-test-data: extract-geo-test-data
 	mv -f -u -Z data/data/processed/test-features.sql api/test/fixtures/test-features.sql
 	rm -rf api/test/fixtures/features && mv -f -u -Z data/data/processed/features api/test/fixtures/features
 
-seed-geodb-data:
-	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
+# Don't forget to run make clean-slate && make start-api before repopulating the whole db
+# This will delete all existing data and create tables/views/etc. through the migrations that
+# run when starting up the API service.
+seed-geodb-data: seed-api-with-test-data
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
 
 test-e2e-api:
 	# start from clean slate, in case anything was left around from previous runs (mostly relevant locally, not in CI)
@@ -118,16 +123,16 @@ test-e2e-api:
 	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e rm --stop --force
 
 dump-geodb-data:
-	docker-compose exec -T postgresql-geo-api pg_dump -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
+	docker-compose exec -T postgresql-geo-api pg_dump -T migrations -a -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
 
 dump-api-data:
-	docker-compose exec -T postgresql-api pg_dump -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
+	docker-compose exec -T postgresql-api pg_dump -T '(migrations|api_event_kinds)' -a -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
 
 upload-dump-data:
-	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps/ -s data/data/processed/db_dumps
+	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps -s data/data/processed/db_dumps
 
 restore-dumps:
-	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
 
 extract-geo-test-data:
 	#This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
@@ -136,3 +141,6 @@ extract-geo-test-data:
 	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM wdpa WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_wdpa_okavango.csv; \
 	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM features_data WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_features_data_okavango.csv;
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" -c "COPY (SELECT * FROM features) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/api_features_okavango.csv
+
+generate-content-dumps: dump-api-data | dump-geodb-data
+	jq -n --arg dateName $$(date +%Y-%m-%d) '{"metadata":{"latest":{"name":$$dateName}}}' > data/data/processed/db_dumps/content.json

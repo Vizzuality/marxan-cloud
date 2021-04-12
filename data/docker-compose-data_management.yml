@@ -22,7 +22,3 @@ services:
     command: make
     env_file:
         - '../.env'
-networks:
-    default:
-      external:
-        name: marxan-cloud-network
