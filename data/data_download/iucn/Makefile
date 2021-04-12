@@ -40,7 +40,7 @@ data/iucn/out/%: data/iucn/MAMMALS.shp
 		-o $(shell dirname $@)/ format=geojson precision=0.000001
 
 data/iucn/MAMMALS.shp: data/iucn/MAMMALS.zip
-	@unzip -u $< -d data/iucn
+	@unzip -o -u $< -d data/iucn
 
 data/iucn/MAMMALS.zip: data/iucn simp out
 	@cd $< && curl -O https://spatial-data-2020onwards.s3-eu-west-1.amazonaws.com/groups/MAMMALS.zip

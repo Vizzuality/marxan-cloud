@@ -78,24 +78,50 @@ via a Docker volume.
 
 Run `make start` to start all the services.
 
+Run `make start-api` to start api services.
+
 ### Running the notebooks
 
 Run `make notebooks` to start the jupyterlab service.
 
 ### Seed data
 
-Note: You need at least 16GB of RAM and 40GB of disk space in order to fulfill
+To seed the geodb database after a clean state, you need to follow the next instructions:
+
+``` bash
+make seed-geodb-data
+```
+This will populate the metadata DB and will trigger the geo-pipelines to seed the geoDB.  
+Note: Full db set up will require at least 16GB of RAM and 40GB of disk space in order to fulfill
 some of these tasks (GADM and WDPA data import pipelines). Also the number of
 CPU cores will impact the time needed to seed a new instance with the complete
-GADM and WDPA datasets.
+GADM and WDPA datasets.  
+___
 
-To seed the geodb database you need to follow the next instructions:
+or if you only wants to populate the newly fresh instance with a small subset of test data:
 
 ``` bash
 make seed-dbs
 ```
 
-This will populate the metadata DB and will trigger the geo-pipelines to seed the geoDB.
+
+
+We also provide a way to freshly clean the dbs instances(we recommend do it regularly):
+
+``` bash
+make clean-slate
+```
+
+And finally we provided a set of commands to create a new dbs dumps, upload them to an azure instance and restore both dbs
+that is faster that triggering the geodb pipes.
+
+``` bash
+make generate-content-dumps && make upload-dump-data
+```
+
+``` bash
+make restore-dumps
+```
 
 ## Development workflow (TBD)
 
