@@ -116,11 +116,7 @@ And finally we provided a set of commands to create a new dbs dumps, upload them
 that is faster that triggering the geodb pipes.
 
 ``` bash
-make dump-geodb-data && make dump-api-data
-```
-
-``` bash
-make upload-dump-data
+make generate-content-dumps && make upload-dump-data
 ```
 
 ``` bash
