@@ -9,19 +9,21 @@ API_POSTGRES_DB := $(shell grep -e API_POSTGRES_DB .env | sed 's/^.*=//')
 GEO_POSTGRES_USER := $(shell grep -e GEO_POSTGRES_USER .env | sed 's/^.*=//')
 GEO_POSTGRES_DB := $(shell grep -e GEO_POSTGRES_DB .env | sed 's/^.*=//')
 
+COMPOSE_PROJECT_NAME := "marxan-cloud"
+
 # Start only API and Geoprocessing services
 #
 # Useful when developing on API components only, to avoid spinning up services
 # which may not be needed.
 start-api:
-	docker-compose up --build api geoprocessing
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing
 
 # Start all the services.
 start:
 	docker-compose up --build
 
 notebooks:
-	docker-compose -f ./data/docker-compose.yml up --build
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose.yml up --build
 
 notebooks-stop:
 	docker-compose -f ./data/docker-compose.yml stop
@@ -84,9 +86,11 @@ generate-geo-test-data: extract-geo-test-data
 	mv -f -u -Z data/data/processed/test-features.sql api/test/fixtures/test-features.sql
 	rm -rf api/test/fixtures/features && mv -f -u -Z data/data/processed/features api/test/fixtures/features
 
-# dont forget to run make clean-slate && make start-api before repopulating the hole db
+# Don't forget to run make clean-slate && make start-api before repopulating the whole db
+# This will delete all existing data and create tables/views/etc. through the migrations that
+# run when starting up the API service.
 seed-geodb-data: seed-api-with-test-data
-	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
 
 test-e2e-api:
 	# start from clean slate, in case anything was left around from previous runs (mostly relevant locally, not in CI)
@@ -128,7 +132,7 @@ upload-dump-data:
 	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps/ -s data/data/processed/db_dumps
 
 restore-dumps:
-	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
 
 extract-geo-test-data:
 	#This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
