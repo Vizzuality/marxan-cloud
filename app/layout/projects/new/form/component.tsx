@@ -37,7 +37,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     // This should be removed once organizations IDs are handled in the app
     const data = {
       ...values,
-      organizationId: 'bd1689c8-8246-42d5-9005-4aaa8aeb0049',
+      organizationId: '900acc1d-dbaa-4f5f-92ad-65bc9c46213f',
     };
 
     saveProjectMutation.mutate({ data }, {
