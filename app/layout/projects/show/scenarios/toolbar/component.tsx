@@ -20,16 +20,13 @@ export const ProjectScenariosToolbar: React.FC<ProjectScenariosToolbarProps> = (
   }, [dispatch]);
 
   return (
-    <div className="mb-5">
-      <Search
-        defaultValue={search}
-        size="base"
-        placeholder="Search by scenario name..."
-        aria-label="Search"
-        onChange={(value) => { dispatch(setSearch(value)); }}
-      />
-
-    </div>
+    <Search
+      defaultValue={search}
+      size="base"
+      placeholder="Search by scenario name..."
+      aria-label="Search"
+      onChange={(value) => { dispatch(setSearch(value)); }}
+    />
   );
 };
 
