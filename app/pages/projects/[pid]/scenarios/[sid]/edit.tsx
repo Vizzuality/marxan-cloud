@@ -10,6 +10,7 @@ import ScenariosMap from 'layout/scenarios/map';
 
 import ScenariosSidebar from 'layout/scenarios/sidebar';
 import SidebarWDPA from 'layout/scenarios/sidebar/wdpa';
+import SidebarFeatures from 'layout/scenarios/sidebar/features';
 
 import { withProtection, withUser } from 'hoc/auth';
 
@@ -32,6 +33,7 @@ const EditScenarioPage: React.FC = () => {
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
               <ScenariosSidebar>
                 <SidebarWDPA />
+                <SidebarFeatures />
               </ScenariosSidebar>
               <ScenariosMap />
             </div>
