@@ -1,32 +1,15 @@
-import React, { ReactNode, useCallback, useState } from 'react';
+import React, { ReactNode } from 'react';
 import cx from 'classnames';
 
-import Breadcrumb from 'components/breadcrumb';
-import Tabs from 'components/tabs';
+import { AnimatePresence } from 'framer-motion';
 
-import Pill from 'layout/pill';
+import Breadcrumb from 'components/breadcrumb';
+
+import Tabs from 'layout/scenarios/sidebar/tabs';
 
 import { useRouter } from 'next/router';
 import { useProject } from 'hooks/projects';
 
-const TABS = [
-  {
-    id: 'protected-areas',
-    name: 'Protected areas',
-  },
-  {
-    id: 'features',
-    name: 'Features',
-  },
-  {
-    id: 'analysis',
-    name: 'Analysis',
-  },
-  {
-    id: 'Solutions',
-    name: 'Solutions',
-  },
-];
 export interface ScenariosSidebarProps {
   children: ReactNode
 }
@@ -39,13 +22,7 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = ({
   const { pid } = query;
   const { data = {} } = useProject(pid);
 
-  const [tab, setTab] = useState('protected-areas');
-
   const { id, name } = data;
-
-  const onSelectedTab = useCallback((t) => {
-    setTab(t);
-  }, []);
 
   return (
     <div
@@ -63,18 +40,12 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = ({
         &quot;
       </Breadcrumb>
 
-      <div className="mt-2.5">
-        <Pill>
-          <Tabs
-            items={TABS}
-            selected={tab}
-            onSelected={onSelectedTab}
-          />
-        </Pill>
-      </div>
+      <Tabs />
 
       <div className="flex-grow mt-2.5">
-        {children}
+        <AnimatePresence>
+          {children}
+        </AnimatePresence>
       </div>
     </div>
   );
