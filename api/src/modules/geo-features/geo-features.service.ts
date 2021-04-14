@@ -14,17 +14,20 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
+import { FeatureTags, GeoFeature } from './geo-feature.api.entity';
 
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
-  GeoFeatureGeometry,
+  GeoFeature,
   CreateGeoFeatureDTO,
   UpdateGeoFeatureDTO,
   AppInfoDTO
 > {
   constructor(
     @InjectRepository(GeoFeatureGeometry, 'geoprocessingDB')
-    private readonly geoFeaturesRepository: Repository<GeoFeatureGeometry>,
+    private readonly geoFeaturesGeometriesRepository: Repository<GeoFeatureGeometry>,
+    @InjectRepository(GeoFeature)
+    private readonly geoFeaturesRepository: Repository<GeoFeature>,
   ) {
     super(
       geoFeaturesRepository,
@@ -33,18 +36,28 @@ export class GeoFeaturesService extends AppBaseService<
     );
   }
 
-  get serializerConfig(): JSONAPISerializerConfig<GeoFeatureGeometry> {
+  get serializerConfig(): JSONAPISerializerConfig<GeoFeature> {
     return {
-      attributes: [],
+      attributes: [
+        'featureClassName',
+        'alias',
+        'propertyName',
+        'intersection',
+        'tag',
+      ],
       keyForAttribute: 'camelCase',
     };
   }
 
-  async fakeFindOne(_id: string): Promise<GeoFeatureGeometry> {
-    return this.serialize([
-      {
-        ...new GeoFeatureGeometry(),
-      },
-    ]);
+  async fakeFindOne(_id: string): Promise<GeoFeature> {
+    return {
+      ...new GeoFeature(),
+      id: faker.random.uuid(),
+      featureClassName: faker.random.alphaNumeric(15),
+      alias: faker.random.words(8),
+      propertyName: faker.random.words(8),
+      intersection: [...Array(4)].map((_i) => faker.random.uuid()),
+      tag: faker.random.arrayElement(Object.values(FeatureTags)),
+    };
   }
 }

@@ -51,6 +51,6 @@ export class GeoFeaturesController {
   @JSONAPISingleEntityQueryParams()
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<GeoFeatureResult> {
-    return await this.service.serialize(await this.service.getById(id));
+    return await this.service.serialize(await this.service.fakeFindOne(id));
   }
 }
