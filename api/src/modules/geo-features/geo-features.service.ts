@@ -14,7 +14,11 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
-import { FeatureTags, GeoFeature } from './geo-feature.api.entity';
+import {
+  FeatureTags,
+  GeoFeature,
+  GeoFeatureCategory,
+} from './geo-feature.api.entity';
 
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
@@ -44,6 +48,7 @@ export class GeoFeaturesService extends AppBaseService<
         'propertyName',
         'intersection',
         'tag',
+        'categories',
       ],
       keyForAttribute: 'camelCase',
     };
@@ -58,6 +63,14 @@ export class GeoFeaturesService extends AppBaseService<
       propertyName: faker.random.words(8),
       intersection: [...Array(4)].map((_i) => faker.random.uuid()),
       tag: faker.random.arrayElement(Object.values(FeatureTags)),
+      categories: [...Array(6)].map((_i) => this._fakeGeoFeatureCategory()),
+    };
+  }
+
+  private _fakeGeoFeatureCategory(): GeoFeatureCategory {
+    return {
+      key: faker.random.word(),
+      distinctValues: [...Array(8)].map((_i) => faker.random.words(6)),
     };
   }
 }

@@ -16,6 +16,11 @@ export enum FeatureTags {
   species = 'species',
 }
 
+export interface GeoFeatureCategory {
+  key: string;
+  distinctValues: string[];
+}
+
 @Entity('features')
 export class GeoFeature {
   @ApiProperty()
@@ -41,6 +46,9 @@ export class GeoFeature {
   @ApiProperty()
   @Column('varchar')
   tag: FeatureTags;
+
+  @ApiPropertyOptional()
+  categories?: GeoFeatureCategory[];
 }
 
 export class JSONAPIGeoFeaturesData {
