@@ -18,16 +18,16 @@ export interface ItemProps {
   description: string;
   type: 'bioregional' | 'species';
 
-  splitSelected: string;
-  splitOptions: SelectOptionProps[];
-  onSplitSelected: (selected: string) => void;
+  splitSelected?: string;
+  splitOptions?: SelectOptionProps[];
+  onSplitSelected?: (selected: string) => void;
 
-  splitFeaturesSelected: string[];
-  splitFeaturesOptions: Record<string, unknown>[];
-  onSplitFeaturesSelected: (selected: string[]) => void;
+  splitFeaturesSelected?: string[];
+  splitFeaturesOptions?: Record<string, unknown>[];
+  onSplitFeaturesSelected?: (selected: string[]) => void;
 
-  intersectFeaturesSelected: string[];
-  intersectFeaturesOptions: Record<string, unknown>[];
+  intersectFeaturesSelected?: string[];
+  intersectFeaturesOptions?: Record<string, unknown>[];
 }
 
 export const Item: React.FC<ItemProps> = ({
