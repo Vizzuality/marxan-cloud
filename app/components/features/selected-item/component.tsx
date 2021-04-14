@@ -12,7 +12,7 @@ import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 import { SelectOptionProps } from 'components/forms/select/types';
 
 export interface ItemProps {
-  id: string;
+  id: string | number;
   className?: string;
   name: string;
   description: string;
@@ -75,7 +75,7 @@ export const Item: React.FC<ItemProps> = ({
   return (
     <div
       className={cx({
-        'bg-gray-800 text-white': true,
+        'bg-gray-700 text-white': true,
         [className]: !!className,
       })}
     >

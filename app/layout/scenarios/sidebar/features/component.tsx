@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 
 import Pill from 'layout/pill';
 import AddFeatures from 'layout/scenarios/sidebar/features/add';
+import ListFeatures from 'layout/scenarios/sidebar/features/list';
 
 import Steps from 'components/steps';
 import Button from 'components/button';
@@ -62,14 +63,16 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
             </div>
           </div>
 
-          <Button
-            theme="primary"
-            size="lg"
-            onClick={() => setModal(true)}
-          >
-            <span className="mr-3">Add features</span>
-            <Icon icon={PLUS_SVG} className="w-4 h-4" />
-          </Button>
+          {step === 0 && (
+            <Button
+              theme="primary"
+              size="lg"
+              onClick={() => setModal(true)}
+            >
+              <span className="mr-3">Add features</span>
+              <Icon icon={PLUS_SVG} className="w-4 h-4" />
+            </Button>
+          )}
         </header>
 
         <Modal
@@ -82,8 +85,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
         </Modal>
 
         {step === 0 && (
-          ''
-          // 'List features selected'
+          <ListFeatures />
         )}
 
         {step === 1 && (
