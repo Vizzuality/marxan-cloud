@@ -1,5 +1,7 @@
 import React, { useCallback } from 'react';
 
+import { motion } from 'framer-motion';
+
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
@@ -47,7 +49,12 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   if (!sid) return null;
 
   return (
-    <div className="mt-2.5">
+    <motion.div
+      key="scenario-tabs"
+      className="mt-2.5"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
       <Pill>
         <Tabs
           items={TABS}
@@ -55,7 +62,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
           onSelected={onSelectedTab}
         />
       </Pill>
-    </div>
+    </motion.div>
   );
 };
 

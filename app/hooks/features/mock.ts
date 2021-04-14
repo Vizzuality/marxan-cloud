@@ -1,11 +1,3 @@
-import React from 'react';
-import cx from 'classnames';
-
-import Item from 'components/features/selected-item';
-
-import { useRouter } from 'next/router';
-import { useScenario } from 'hooks/scenarios';
-
 const ITEMS = [
   {
     id: 1,
@@ -13,6 +5,9 @@ const ITEMS = [
     type: 'bioregional',
     description:
       'Donec est ad luctus dapibus sociosqu. Imperdiet platea viverra dui congue orci ad. Turpis a, dictumst eget. Justo potenti morbi iaculis habitasse justo aliquam tortor tellus nostra. Accumsan nunc lorem malesuada, eget sed magna habitasse laoreet rutrum non ante suscipit. Adipiscing quisque justo vel, et tellus suscipit purus. Mattis primis curae;, scelerisque parturient libero dictumst ad! Cras elit condimentum molestie sociis mauris. Pharetra tincidunt habitant imperdiet mauris vitae tempor sollicitudin pulvinar feugiat pharetra scelerisque? Purus erat penatibus adipiscing vestibulum fermentum et platea eros quis ad congue. Porta fringilla enim bibendum per tortor natoque ante suscipit. Congue.',
+    tags: [
+      { id: 1, name: 'Bioregional', className: 'text-black bg-green-300' },
+    ],
 
     splitSelected: 'attribute-1',
     splitOptions: [
@@ -20,7 +15,6 @@ const ITEMS = [
       { label: 'Attribute 2', value: 'attribute-2' },
       { label: 'Attribute 3', value: 'attribute-3' },
     ],
-    onSplitSelected: (selected) => console.info(selected),
 
     splitFeaturesSelected: [],
     splitFeaturesOptions: [
@@ -37,7 +31,6 @@ const ITEMS = [
       },
       { label: 'Mangroves', value: 'id-6' },
     ],
-    onSplitFeaturesSelected: (selected) => console.info(selected),
   },
   {
     id: 2,
@@ -45,6 +38,11 @@ const ITEMS = [
     type: 'species',
     description:
       'Donec est ad luctus dapibus sociosqu. Imperdiet platea viverra dui congue orci ad. Turpis a, dictumst eget. Justo potenti morbi iaculis habitasse justo aliquam tortor tellus nostra. Accumsan nunc lorem malesuada, eget sed magna habitasse laoreet rutrum non ante suscipit. Adipiscing quisque justo vel, et tellus suscipit purus. Mattis primis curae;, scelerisque parturient libero dictumst ad! Cras elit condimentum molestie sociis mauris. Pharetra tincidunt habitant imperdiet mauris vitae tempor sollicitudin pulvinar feugiat pharetra scelerisque? Purus erat penatibus adipiscing vestibulum fermentum et platea eros quis ad congue. Porta fringilla enim bibendum per tortor natoque ante suscipit. Congue.',
+    tags: [
+      { id: 3, name: 'Species', className: 'text-black bg-yellow-300' },
+      { id: 2, name: 'Source name' },
+    ],
+
     intersectFeaturesSelected: ['id-1', 'id-2'],
     intersectFeaturesOptions: [
       { label: 'Deserts and Xeric Shrublands', value: 'id-1' },
@@ -60,41 +58,34 @@ const ITEMS = [
     type: 'species',
     description:
       'Donec est ad luctus dapibus sociosqu. Imperdiet platea viverra dui congue orci ad.',
+    tags: [
+      { id: 3, name: 'Species', className: 'text-black bg-yellow-300' },
+      { id: 2, name: 'Source name' },
+    ],
   },
+  {
+    id: 4,
+    name: 'Cheetah',
+    type: 'species',
+    description:
+      'Donec est ad luctus dapibus sociosqu. Imperdiet platea viverra dui congue orci ad.',
+    tags: [
+      { id: 3, name: 'Species', className: 'text-black bg-yellow-300' },
+      { id: 2, name: 'Source name' },
+    ],
+  },
+  {
+    id: 5,
+    name: 'Tigers',
+    type: 'species',
+    description:
+      'Donec est ad luctus dapibus sociosqu. Imperdiet platea viverra dui congue orci ad.',
+    tags: [
+      { id: 3, name: 'Species', className: 'text-black bg-yellow-300' },
+      { id: 2, name: 'Source name' },
+    ],
+  },
+
 ];
 
-export interface ScenariosFeaturesListProps {
-}
-
-export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () => {
-  const { query } = useRouter();
-  const { sid } = query;
-
-  const { data: scenarioData } = useScenario(sid);
-
-  if (!scenarioData) return null;
-
-  return (
-    <div
-      className="mt-5"
-    >
-      {ITEMS.map((item, i) => {
-        return (
-          <div
-            className={cx({
-              'mt-1.5': i !== 0,
-            })}
-            key={`${item.id}`}
-          >
-            <Item
-              {...item}
-            />
-          </div>
-
-        );
-      })}
-    </div>
-  );
-};
-
-export default ScenariosFeaturesList;
+export default ITEMS;

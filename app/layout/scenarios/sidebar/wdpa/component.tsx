@@ -41,7 +41,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
 
   return (
     <motion.div
-      key={tab}
+      key="protected-areas"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
     >
