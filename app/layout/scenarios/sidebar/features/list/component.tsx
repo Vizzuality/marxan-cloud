@@ -28,7 +28,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
 
   return (
     <div
-      className="mt-5"
+      className="relative overflow-hidden"
     >
       {(!selectedFeaturesData || !selectedFeaturesData.length) && (
         <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
@@ -36,25 +36,28 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
         </div>
       )}
 
-      {
-        !!selectedFeaturesData
-        && selectedFeaturesData.length
-        && selectedFeaturesData.map((item, i) => {
-          return (
-            <div
-              className={cx({
-                'mt-1.5': i !== 0,
-              })}
-              key={`${item.id}`}
-            >
-              <Item
-                {...item}
-              />
-            </div>
-
-          );
-        })
-}
+      {!!selectedFeaturesData && selectedFeaturesData.length && (
+        <>
+          <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700" />
+          <div className="relative h-full py-6 overflow-x-hidden overflow-y-auto">
+            {selectedFeaturesData.map((item, i) => {
+              return (
+                <div
+                  className={cx({
+                    'mt-1.5': i !== 0,
+                  })}
+                  key={`${item.id}`}
+                >
+                  <Item
+                    {...item}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-gray-700 via-gray-700" />
+        </>
+      )}
     </div>
   );
 };

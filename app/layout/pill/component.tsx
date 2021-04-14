@@ -10,12 +10,22 @@ export const Pill: React.FC<PillProps> = ({ children, selected }:PillProps) => {
   return (
     <div
       className={cx({
-        'px-10 bg-gray-700 rounded-4xl': true,
-        'py-5': !selected,
-        'ring-1 ring-gray-500 ring-offset-8 ring-inset ring-offset-gray-700 py-10': selected,
+        'bg-gray-700 rounded-4xl': true,
+        'ring-1 ring-gray-500 ring-offset-8 ring-inset ring-offset-gray-700': selected,
+        'h-full overflow-hidden': true,
       })}
     >
-      {children}
+      <div
+        className={cx({
+          'h-full px-10 overflow-hidden': true,
+          'py-10': selected,
+          'py-5': !selected,
+        })}
+      >
+        <div className="flex flex-col h-full overflow-hidden">
+          {children}
+        </div>
+      </div>
     </div>
   );
 };

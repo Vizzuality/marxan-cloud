@@ -27,7 +27,7 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = ({
   return (
     <div
       className={cx({
-        'w-full h-full flex flex-col': true,
+        'w-full h-full overflow-hidden flex flex-col': true,
       })}
     >
       <Breadcrumb
@@ -42,7 +42,7 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = ({
 
       <Tabs />
 
-      <div className="flex-grow mt-2.5">
+      <div className="flex-grow mt-2.5 overflow-hidden h-full">
         <AnimatePresence>
           {children}
         </AnimatePresence>

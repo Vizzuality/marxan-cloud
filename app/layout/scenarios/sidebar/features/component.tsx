@@ -43,6 +43,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   return (
     <motion.div
       key="features"
+      className="h-full overflow-hidden"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
     >
@@ -53,6 +54,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
               <h2 className="text-lg font-medium font-heading">Features</h2>
               <Steps step={step + 1} length={2} />
             </div>
+
             <div className="flex items-center gap-2 mt-2">
               <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
               <div className="text-xs uppercase font-heading">
