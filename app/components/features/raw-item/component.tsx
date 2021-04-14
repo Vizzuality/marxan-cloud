@@ -5,14 +5,14 @@ import Button from 'components/button';
 import Tag from 'components/tag';
 
 export interface ItemProps {
-  id: string;
+  id: string | number;
   className?: string;
   name: string;
-  categories: number;
+  categories?: number;
   description: string;
   tags?: Record<string, unknown>[];
-  selected: boolean;
-  onToggleSelected: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  selected?: boolean;
+  onToggleSelected?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export const Item: React.FC<ItemProps> = ({
