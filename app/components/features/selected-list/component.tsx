@@ -15,7 +15,7 @@ export const List: React.FC<ListProps> = ({
 }: ListProps) => (
   <div
     className={cx({
-      'bg-gray-800': true,
+      'bg-gray-700': true,
       [className]: !!className,
     })}
   >

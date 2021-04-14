@@ -85,10 +85,10 @@ const ITEMS = [
   },
 ];
 
-export interface ScenariosFeaturesSelectionListProps {
+export interface ScenariosFeaturesAddListProps {
 }
 
-export const ScenariosFeaturesSelectionList: React.FC<ScenariosFeaturesSelectionListProps> = () => {
+export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> = () => {
   const { query } = useRouter();
   const { sid } = query;
 
@@ -115,4 +115,4 @@ export const ScenariosFeaturesSelectionList: React.FC<ScenariosFeaturesSelection
   );
 };
 
-export default ScenariosFeaturesSelectionList;
+export default ScenariosFeaturesAddList;
