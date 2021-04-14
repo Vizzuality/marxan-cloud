@@ -160,11 +160,11 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
             <button
               type="button"
-              className="flex items-center justify-center flex-shrink-0 w-full h-16 gap-3 px-8 text-sm bg-gray-700 rounded-3xl text-primary-500"
+              className="flex items-center justify-center flex-shrink-0 w-full h-16 gap-3 px-8 text-sm transition bg-gray-700 rounded-3xl text-primary-500 group hover:bg-gray-800"
               onClick={() => setModal(true)}
             >
               <span>Create scenario</span>
-              <Icon icon={PLUS_SVG} className="w-4 h-4" />
+              <Icon icon={PLUS_SVG} className="w-4 h-4 transition transform group-hover:rotate-90" />
             </button>
           </motion.div>
         )}
