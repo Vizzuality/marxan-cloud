@@ -50,12 +50,12 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
       <Pill selected>
         <header className="flex justify-between">
           <div>
-            <div className="flex items-baseline gap-4">
+            <div className="flex items-baseline space-x-4">
               <h2 className="text-lg font-medium font-heading">Features</h2>
               <Steps step={step + 1} length={2} />
             </div>
 
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center space-x-2 mt-2">
               <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
               <div className="text-xs uppercase font-heading">
                 Features added:

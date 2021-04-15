@@ -46,7 +46,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
       animate={{ opacity: 1, y: 0 }}
     >
       <Pill selected>
-        <header className="flex items-baseline gap-4 mb-5">
+        <header className="flex items-baseline space-x-4 mb-5">
           <h2 className="text-lg font-medium font-heading">Protected areas</h2>
 
           {(wdpaData && !!wdpaData.length) && (

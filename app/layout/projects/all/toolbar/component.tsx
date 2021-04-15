@@ -22,7 +22,7 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
 
   return (
     <Wrapper>
-      <div className="flex items-baseline justify-between gap-20 mb-8">
+      <div className="flex items-baseline justify-between space-x-20 mb-8">
         <div className="flex-grow">
           <Search
             defaultValue={search}
@@ -33,7 +33,7 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
           />
         </div>
 
-        <div className="flex gap-1">
+        <div className="flex space-x-1">
           <Link href="/projects/new" passHref>
             <a
               href="/projects/new"
