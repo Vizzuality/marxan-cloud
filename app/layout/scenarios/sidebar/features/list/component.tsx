@@ -39,7 +39,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
       {!!selectedFeaturesData && selectedFeaturesData.length && (
         <>
           <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700" />
-          <div className="relative h-full py-6 overflow-x-hidden overflow-y-auto">
+          <div className="relative h-full px-0.5 py-6 overflow-x-visible overflow-y-auto">
             {selectedFeaturesData.map((item, i) => {
               return (
                 <div
