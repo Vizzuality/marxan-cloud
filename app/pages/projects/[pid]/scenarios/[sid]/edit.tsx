@@ -28,7 +28,7 @@ const EditScenarioPage: React.FC = () => {
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
 
-        <div className="pt-2.5 pb-10 overflow-hidden md:flex-grow">
+        <div className="flex flex-col h-full pt-2.5 pb-10 overflow-hidden md:flex-grow">
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
               <ScenariosSidebar>
