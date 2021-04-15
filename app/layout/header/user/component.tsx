@@ -55,7 +55,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
           </header>
 
           <nav className="w-full px-8 py-5">
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col space-x-3">
               <li>Manage team</li>
               <li>Language</li>
               <li>Help page</li>

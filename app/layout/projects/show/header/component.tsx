@@ -30,7 +30,7 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
       <div className="flex justify-between mt-5">
         <Title />
 
-        <div className="flex flex-col items-end gap-6">
+        <div className="flex flex-col items-end space-x-6">
           <Contributors />
           <Toolbar />
         </div>
