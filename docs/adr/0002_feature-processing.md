@@ -113,7 +113,7 @@ section above), users can:
   * HabitatType = "Flooded Grasslands and Savannas"
 
   Names of the resulting subsets are generated from the value of the property
-  against which the split is performed. 
+  against which the split is performed.
 
   In the example above, the names of the two new features will be "Deserts and
   Xeric Shrublands" and "Flooded Grasslands and Savannas", respectively.
@@ -135,11 +135,33 @@ section above), users can:
 
 ### Defining the set of features for a scenario
 
+To create or update the specification of the set of features for a scenario:
+
 ```
-POST|PATCH|PUT `/api/v1/scenarios/{sid}/features-set`
+POST|PUT `/api/v1/scenarios/{sid}/features`
 ```
 
-Payload (`CreateGeoFeatureSet` and `UpdateGeoFeatureSet`):
+We only support `POST` and `PUT`: the API always expects the full specification.
+
+Handling `PATCH` requests would significantly increase implementation complexity
+with arguably little benefit.
+
+Processing a specification of the set of features for a scenario should be an
+idempotent operation; moreover, geoprocessing operations are only executed once
+a specification is marked as `created` (as a transition from the initial default
+state of `draft`), and the computationally expensive parts of these operations
+only happening once: i.e. if the results of a given split or intersection
+operation have been computed already for other scenarios, these
+already-calculated results will be used.
+
+This will allow timing side-channel attacks. If avoiding to disclose that a
+specific feature has been already calculated for a given area in some scenario
+in a given MarxanCloud instance is desirable, suitable countermeasures should be
+implemented (such as always performing geoprocessing operations in their
+entirety even if resulting geometries are available, or reusing geometries while
+computing throwaway results in order to simulate constant-time operations).
+
+Payload (`CreateGeoFeatureSetDTO`):
 
 ```typescript
 {
@@ -156,11 +178,10 @@ Payload (`CreateGeoFeatureSet` and `UpdateGeoFeatureSet`):
        * geoprocessing operations will be used, each with their marxanSettings
        * as specified for each of them.
        */
-      
+
       marxanSettings: {
         spf: number,
         fpf: number,
-        target: number,
       },
 
       geoprocessingOperations: [
@@ -207,8 +228,20 @@ Payload (`CreateGeoFeatureSet` and `UpdateGeoFeatureSet`):
 
 ### Retrieving a feature set for a scenario
 
+To retrieve the (raw) specification for the list of features for a scenario:
+
 ```
-GET `/api/v1/scenarios/{sid}/features`
+GET /api/v1/scenarios/{scenarioId}/features/specification
+```
+
+The payload (`CreateGeoFeatureSetDTO`) is identical to what is described in the
+previous section (this is actually stored verbatim, except for ).
+
+To retrieve the list of features for a scenario, including calculated
+properties:
+
+```
+GET /api/v1/scenarios/{scenarioId}/features
 ```
 
 Payload (`GeoFeatureSet`):
@@ -281,50 +314,4 @@ Payload (`GeoFeatureSet`):
     }
   ],
 }
-```
-
-```
-const responseProps = {
-  id: string;
-  scenarioId: string;
-  status: 'draft' | 'processing' | 'completed',
-  features: [
-    {
-      id: string;
-      projectId: string | null;
-      name: string;
-      type: 'bioregional' | 'species';
-      description: string;
-      source: string;
-
-      // SPLIT bioregional
-      splitOptions: [
-        { key, values }
-      ];
-      splitSelected: key;
-      splitFeaturesSelected: [
-        {
-          id: string;
-          SPF: number;
-          FPF: number;
-        }
-      ];
-
-      // INTERSECT species
-      intersectFeaturesSelected: [
-        {
-          id: string;
-          splitSelected: key;
-          splitFeaturesSelected: [
-            {
-              id: string;
-              SPF: number;
-              FPF: number;
-            }
-          ];   
-        }
-      ];
-    }
-  ],
-};
 ```
