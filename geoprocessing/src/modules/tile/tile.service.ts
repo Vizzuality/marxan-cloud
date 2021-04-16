@@ -187,6 +187,9 @@ export class TileService {
     let query = '';
 
     z = parseInt(`${z}`, 10);
+    if (z > 20) {
+      throw new Error('Zoom level should be lower than 20');
+    }
     if (isNaN(z)) {
       throw new Error('Invalid zoom level');
     }
