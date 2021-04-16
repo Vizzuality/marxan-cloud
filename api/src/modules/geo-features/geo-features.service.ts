@@ -7,8 +7,7 @@ import {
   GeoFeaturePropertySet,
   geoFeatureResource,
 } from './geo-feature.geo.entity';
-import { CreateGeoFeatureDTO } from './dto/create.geo-feature.dto';
-import { UpdateGeoFeatureDTO } from './dto/update.geo-feature.dto';
+import { CreateGeoFeatureSetDTO } from './dto/create.geo-feature-set.dto';
 
 import * as faker from 'faker';
 import {
@@ -24,6 +23,10 @@ import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from 'modules/projects/project.api.entity';
 import { apiConnections } from '../../ormconfig';
 import { AppConfig } from 'utils/config.utils';
+import {
+  GeoFeatureSetResult,
+  GeoFeatureSet,
+} from './geo-feature-set.api.entity';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -43,8 +46,8 @@ type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
   GeoFeature,
-  CreateGeoFeatureDTO,
-  UpdateGeoFeatureDTO,
+  CreateGeoFeatureSetDTO,
+  CreateGeoFeatureSetDTO,
   AppInfoDTO
 > {
   constructor(
@@ -234,5 +237,15 @@ export class GeoFeaturesService extends AppBaseService<
     _info?: AppInfoDTO,
   ): Promise<GeoFeature> {
     return entity;
+  }
+
+  /**
+   * Create or replace the set of features linked to a scenario.
+   */
+  async createOrReplaceFeatureSet(
+    id: string,
+    dto: CreateGeoFeatureSetDTO,
+  ): Promise<GeoFeatureSetResult> {
+    return new GeoFeatureSetResult();
   }
 }

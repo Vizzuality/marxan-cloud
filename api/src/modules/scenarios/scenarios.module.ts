@@ -9,9 +9,11 @@ import { Project } from 'modules/projects/project.api.entity';
 import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.module';
 import { ProjectsModule } from 'modules/projects/projects.module';
 import { ScenarioFeaturesModule } from '../scenarios-features';
+import { GeoFeaturesModule } from 'modules/geo-features/geo-features.module';
 
 @Module({
   imports: [
+    GeoFeaturesModule,
     ProtectedAreasModule,
     forwardRef(() => ProjectsModule),
     TypeOrmModule.forFeature([Project, Scenario]),

@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   Req,
   UseGuards,
   ValidationPipe,
@@ -35,6 +36,12 @@ import {
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
+import { CreateGeoFeatureSetDTO } from 'modules/geo-features/dto/create.geo-feature-set.dto';
+import {
+  GeoFeatureSetResult,
+  GeoFeatureSets,
+} from 'modules/geo-features/geo-feature-set.api.entity';
+import { GeoFeaturesService } from 'modules/geo-features/geo-features.service';
 
 import { ScenarioFeaturesService } from '../scenarios-features';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
@@ -47,6 +54,7 @@ export class ScenariosController {
   constructor(
     public readonly service: ScenariosService,
     private readonly scenarioFeatures: ScenarioFeaturesService,
+    private readonly geoFeaturesService: GeoFeaturesService,
   ) {}
 
   @ApiOperation({
@@ -133,5 +141,29 @@ export class ScenariosController {
         })
       )[0],
     );
+  }
+
+  @ApiOperation({
+    description: "Create the specification for a scenario's feature set",
+  })
+  @ApiOkResponse()
+  @Post(':id/features')
+  async createFeatureSetForScenario(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
+  ): Promise<GeoFeatureSetResult> {
+    return await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto);
+  }
+
+  @ApiOperation({
+    description: "Replace the specification for a scenario's feature set",
+  })
+  @ApiOkResponse()
+  @Put(':id/features')
+  async replaceFeatureSetForScenario(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
+  ): Promise<GeoFeatureSetResult> {
+    return await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto);
   }
 }
