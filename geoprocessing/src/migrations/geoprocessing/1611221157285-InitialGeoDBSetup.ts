@@ -159,7 +159,7 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
         USING GIST (the_geom);
 
         CREATE INDEX wdpa_geom_idx
-        ON admin_regions
+        ON wdpa
         USING GIST (the_geom);
 
         CREATE INDEX features_data_geom_idx
