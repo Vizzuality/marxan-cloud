@@ -1,3 +1,6 @@
+/**
+ * @todo We are replicating the same code that we have in the api. If we update something here we should also replicate it in the api side.
+ */
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
@@ -62,20 +65,4 @@ export class AdminArea {
   @ApiProperty()
   @Column('geometry', { name: 'the_geom' })
   theGeom: any;
-}
-
-export class JSONAPIAdministrativeAreasData {
-  @ApiProperty()
-  type = 'administrative-areas';
-
-  @ApiProperty()
-  id: string;
-
-  @ApiProperty()
-  attributes: AdminArea;
-}
-
-export class AdminAreasResult {
-  @ApiProperty()
-  data: JSONAPIAdministrativeAreasData;
 }
