@@ -204,3 +204,127 @@ Payload (`CreateGeoFeatureSet` and `UpdateGeoFeatureSet`):
   ],
 };
 ```
+
+### Retrieving a feature set for a scenario
+
+```
+GET `/api/v1/scenarios/{sid}/features`
+```
+
+Payload (`GeoFeatureSet`):
+
+```typescript
+{
+  scenarioId: string,
+  projectId: string,
+  status: 'draft' | 'created' | 'running' | 'done' | 'failure',
+  features: [
+    {
+      featureId: string;
+      tag: 'bioregional' | 'species',
+      description: string;
+      source: string;
+      /**
+       * If true, this should be displayed in the list of features in step
+       * 2/2 (setting targets and FPF) but not sent as part of a recipe that
+       * is being updated. I think it won't hurt to send it, and the API
+       * can discard it if by mistake any geoprocessingOperations are specified
+       * on it (unless we want to support splits of splits - very likely not).
+       */
+
+      fromGeoprocessing: boolean;
+      status: 'draft' | 'created' | 'running' | 'done' | 'failure';
+      marxanSettings: {
+        spf: number;
+        fpf: number;
+      };
+
+      geoprocessingOperations: [
+        /**
+         * Either one operation of kind split/v1 or one operation of kind
+         * stratification/v1.
+         */
+        {
+          kind: 'split/v1';
+          splitByProperty: string;
+          splits: [
+            {
+              value: string;
+              status: 'draft' | 'created' | 'running' | 'done' | 'failure';
+
+              marxanSettings: {
+                spf: number;
+                fpf: number;
+              };
+            }
+          ]
+        },
+        {
+          kind: 'stratification/v1';
+          intersectWith: {
+            featureId: string;
+          };
+          splitByProperty: string;
+          splits: [
+            {
+              value: string;
+              status: 'draft' | 'created' | 'running' | 'done' | 'failure';
+
+              marxanSettings: {
+                spf: number;
+                fpf: number;
+              };
+            }
+          ];
+        }
+      ];
+    }
+  ],
+}
+```
+
+```
+const responseProps = {
+  id: string;
+  scenarioId: string;
+  status: 'draft' | 'processing' | 'completed',
+  features: [
+    {
+      id: string;
+      projectId: string | null;
+      name: string;
+      type: 'bioregional' | 'species';
+      description: string;
+      source: string;
+
+      // SPLIT bioregional
+      splitOptions: [
+        { key, values }
+      ];
+      splitSelected: key;
+      splitFeaturesSelected: [
+        {
+          id: string;
+          SPF: number;
+          FPF: number;
+        }
+      ];
+
+      // INTERSECT species
+      intersectFeaturesSelected: [
+        {
+          id: string;
+          splitSelected: key;
+          splitFeaturesSelected: [
+            {
+              id: string;
+              SPF: number;
+              FPF: number;
+            }
+          ];   
+        }
+      ];
+    }
+  ],
+};
+```
