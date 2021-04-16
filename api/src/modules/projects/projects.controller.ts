@@ -18,9 +18,11 @@ import { ProjectsService } from './projects.service';
 
 import {
   ApiBearerAuth,
+  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
@@ -41,13 +43,39 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
+import { GeoFeatureResult } from 'modules/geo-features/geo-feature.api.entity';
+import { GeoFeaturesService } from 'modules/geo-features/geo-features.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectsController {
-  constructor(public readonly service: ProjectsService) {}
+  constructor(
+    public readonly service: ProjectsService,
+    private readonly geoFeaturesService: GeoFeaturesService,
+  ) {}
+
+  @ApiOperation({
+    description: 'Find all geo features',
+  })
+  @ApiOkResponse({
+    type: GeoFeatureResult,
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @JSONAPIQueryParams()
+  @Get(':projectId/features')
+  async findAllGeoFeaturesForProject(
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Param() params: { projectId: string },
+  ): Promise<GeoFeatureResult> {
+    const results = await this.geoFeaturesService.findAllPaginated(
+      fetchSpecification,
+      { params },
+    );
+    return this.geoFeaturesService.serialize(results.data, results.metadata);
+  }
 
   /**
    * Import a Marxan legacy project via file upload
