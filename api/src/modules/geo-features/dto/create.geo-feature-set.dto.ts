@@ -5,13 +5,13 @@ import {
 } from '../types/geo-feature.geoprocessing-operations.type';
 import { MarxanSettingsForGeoFeature } from '../types/geo-feature.marxan-settings.type';
 
-interface SpecForPlainGeoFeature {
+class SpecForPlainGeoFeature {
   featureId: string;
   marxanSettings: MarxanSettingsForGeoFeature;
   geoprocessingOperations?: never;
 }
 
-interface SpecForGeoFeatureWithGeoprocessing {
+class SpecForGeoFeatureWithGeoprocessing {
   featureId: string;
   geoprocessingOperations: Array<
     GeoprocessingOpSplitV1 | GeoprocessingOpStratificationV1
@@ -19,7 +19,7 @@ interface SpecForGeoFeatureWithGeoprocessing {
   marxanSettings: never;
 }
 
-export interface CreateGeoFeatureSetDTO {
+export class CreateGeoFeatureSetDTO {
   status: JobStatus.draft | JobStatus.created;
   features: Array<SpecForPlainGeoFeature | SpecForGeoFeatureWithGeoprocessing>;
 }
