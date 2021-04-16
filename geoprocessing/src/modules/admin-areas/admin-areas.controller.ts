@@ -7,7 +7,6 @@ import { ApiOperation, ApiParam } from '@nestjs/swagger';
 //   ProcessFetchSpecification,
 // } from 'nestjs-base-service';
 
-import { Tile } from 'src/modules/tile/tile.service';
 import { Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}`)
@@ -48,48 +47,19 @@ export class AdminAreasController {
   @Header('Content-Disposition', 'attachment')
   @Header('Access-Control-Allow-Origin', '*')
   @Header('Content-Encoding', 'gzip')
-  // @Header('Content-Encoding', 'gzip')
-  // @Header('Content-Type', 'application/vnd.mapbox-vector-tile')
-  // async findAllAdminAReasInGIvenCountry(
-  //   @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-  //   @Param('level') level: AdminAreaLevel,
-  // ): Promise<any> {
-  //   const customQuery = await this.service.findAllPaginated({})
-  //   parse customQuery to the getTile function
-
-  // }
   async getTile(
     @Param('z') z: number,
     @Param('x') x: number,
     @Param('y') y: number,
-    @Param('table') table: string,
-    @Param('geometry') geometry: string,
-    @Param('extent') extent: number,
-    @Param('buffer') buffer: number,
-    @Param('maxZoomLevel') maxZoomLevel: number,
-    @Param('customQuery') customQuery: string,
-    @Param('attributes') attributes: string,
+    @Param('level') level: number,
     @Res() response: Response,
   ): Promise<any> {
-    const tile: Tile = await this.service.findTile(
+    const tile: Buffer = await this.service.findTile(
       z,
       x,
       y,
-      table,
-      geometry,
-      extent,
-      buffer,
-      maxZoomLevel,
-      customQuery,
-      attributes,
+      level,
     );
-
-    if (tile.res >= 0 && tile.data) {
-      response.send(tile.data);
-    }
-    else {
-      response.send(JSON.stringify(tile));
-    }
-    return response;
+    return response.send(tile);
   }
 }
