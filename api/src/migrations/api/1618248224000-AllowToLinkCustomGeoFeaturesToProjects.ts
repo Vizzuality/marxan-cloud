@@ -8,7 +8,7 @@ ALTER TYPE job_status ADD VALUE 'draft';
     `);
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
+  public async down(_queryRunner: QueryRunner): Promise<void> {
     /**
      * Not dropping here the enum value that we add on the up side of the
      * migration. In practice, this will involve just too many steps (altering

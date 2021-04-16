@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryColumn } from 'typeorm';
 import { BaseServiceResource } from 'types/resource.interface';
 
 export const geoFeatureResource: BaseServiceResource = {
