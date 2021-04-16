@@ -11,11 +11,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-<<<<<<< HEAD
     "noImplicitAny": true,
-=======
-    "noImplicitAny": false,
->>>>>>> WIP
     "strictNullChecks": true
   },
   "exclude": ["node_modules", "dist"]
