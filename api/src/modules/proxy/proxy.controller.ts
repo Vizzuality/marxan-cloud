@@ -1,4 +1,4 @@
-import { Controller, Req, Res, UseGuards, Get } from '@nestjs/common';
+import { Controller, Req, Res, UseGuards, Get, Param } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -13,6 +13,7 @@ import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { apiGlobalPrefixes } from 'api.config';
 import { ProxyService } from './proxy.service';
 import { Request, Response } from 'express';
+// import { ProxyAdminAreaLevel  } from 'modules/admin-areas/admin-areas.service'
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -61,9 +62,14 @@ export class ProxyController {
   })
   /**
    *@todo parse level from admin areas entity
+   *@todo add level validation here in proxy service. Duplicated on the geoprocessing api.
    */
-  @Get('/geoprocessing/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
-  async proxyTile(@Req() request: Request, @Res() response: Response) {
+  @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
+  async proxyTile(
+    // @Param() level: ProxyAdminAreaLevel,
+    @Req() request: Request,
+    @Res() response: Response,
+  ) {
     return this.proxyService.proxyTileRequest(request, response);
   }
 }
