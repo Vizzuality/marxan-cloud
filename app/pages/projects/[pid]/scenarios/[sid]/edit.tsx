@@ -32,8 +32,8 @@ const EditScenarioPage: React.FC = () => {
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
               <ScenariosSidebar>
-                <SidebarWDPA />
-                <SidebarFeatures />
+                <SidebarWDPA key="wdpa" />
+                <SidebarFeatures key="features" />
               </ScenariosSidebar>
               <ScenariosMap />
             </div>

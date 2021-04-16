@@ -22,7 +22,7 @@ export const Pill: React.FC<PillProps> = ({ children, selected }:PillProps) => {
           'py-5': !selected,
         })}
       >
-        <div className="flex flex-col h-full overflow-hidden px-0.5">
+        <div className="flex flex-col h-full overflow-hidden py-0.5 px-0.5">
           {children}
         </div>
       </div>

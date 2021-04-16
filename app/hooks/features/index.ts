@@ -74,21 +74,41 @@ export function useSelectedFeatures(filters: UseFeaturesFiltersProps = {}) {
   const [session] = useSession();
   const { search } = filters;
 
-  const query = useQuery(['selected-features'], async () => FEATURES.request({
+  const fetchFeatures = () => FEATURES.request({
     method: 'GET',
     url: '/',
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
-  }));
+  });
+
+  const query = useQuery(['selected-features'], fetchFeatures, { refetchOnWindowFocus: false });
 
   const { data } = query;
 
   return useMemo(() => {
-    let parsedData = Array.isArray(data?.data) ? ITEMS.map((d):SelectedItemProps => {
+    let parsedData = [];
+
+    const {
+      features = ITEMS,
+    } = {};
+
+    parsedData = features.map((d):SelectedItemProps => {
       const {
-        id, name, type, description,
+        id,
+        name,
+        type,
+        description,
+        splitOptions,
+        splitSelected,
+        splitFeaturesSelected,
+        intersectFeaturesSelected,
       } = d;
+
+      const splitFeaturesOptions = splitSelected ? splitOptions
+        .find((s) => s.key === splitSelected).values
+        .map((v) => ({ label: v.id, value: v.value }))
+        : [];
 
       return {
         id,
@@ -97,44 +117,16 @@ export function useSelectedFeatures(filters: UseFeaturesFiltersProps = {}) {
         description,
         // SPLIT
 
-        // splitSelected: 'attribute-1',
-        // splitOptions: [
-        //   { label: 'Attribute 1', value: 'attribute-1' },
-        //   { label: 'Attribute 2', value: 'attribute-2' },
-        //   { label: 'Attribute 3', value: 'attribute-3' },
-        // ],
-        // onSplitSelected: (selected) => console.info(selected),
+        splitOptions,
+        splitSelected,
+        splitFeaturesSelected,
+        splitFeaturesOptions,
 
-        // splitFeaturesSelected: [],
-        // splitFeaturesOptions: [
-        //   { label: 'Deserts and Xeric Shrublands', value: 'id-1' },
-        //   {
-        //     label: 'Tropical and Subtropical Grasslands, Savannas and Shrublands',
-        //     value: 'id-2',
-        //   },
-        //   { label: 'Flooded Grasslands and Savannas', value: 'id-3' },
-        //   { label: 'Montane Grasslands and Shrublands', value: 'id-4' },
-        //   {
-        //     label: 'Tropical and Subtropical Moist, Broadleaf Forests',
-        //     value: 'id-5',
-        //   },
-        //   { label: 'Mangroves', value: 'id-6' },
-        // ],
-        // onSplitFeaturesSelected: (selected) => console.info(selected),
+        // INTERESECTION
 
-        // INTEERESECTION
-
-        // intersectFeaturesSelected: ['id-1', 'id-2'],
-        // intersectFeaturesOptions: [
-        //   { label: 'Deserts and Xeric Shrublands', value: 'id-1' },
-        //   {
-        //     label: 'Tropical and Subtropical Grasslands, Savannas and Shrublands',
-        //     value: 'id-2',
-        //   },
-        // ],
-
+        intersectFeaturesSelected,
       };
-    }) : [];
+    });
 
     // Filter
     if (search) {
