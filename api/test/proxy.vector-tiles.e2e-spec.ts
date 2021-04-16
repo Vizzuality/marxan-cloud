@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 
+// import { ProxyService } from '../src/modules/proxy/proxy.service'
 describe('ProxyVectorTilesModule (e2e)', () => {
   let app: INestApplication;
 
@@ -39,26 +40,16 @@ describe('ProxyVectorTilesModule (e2e)', () => {
     await Promise.all([app.close()]);
   });
 
-<<<<<<< HEAD
   describe('Proxy administrative areas', () => {
     // Make sure we have GADM data for this country in the test data which
     // is used to populate the geodb in CI pipelines.
 
-    it('Should give back a valid request for admin areas', async () => {
-=======
-  describe('Countries', () => {
-    // Make sure we have GADM data for this country in the test data which
-    // is used to populate the geodb in CI pipelines.
-
     it('Should give back a valid mvt tiles for admin areas', async () => {
->>>>>>> example of test for proxy vector tiles admin area.
       const response = await request(app.getHttpServer())
         .get('/api/v1/geoprocessing/administrative-areas/1/preview/tiles/6/30/25.mvt')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
     });
-
-<<<<<<< HEAD
     /**
      * @todo add error respone in main code
      */
@@ -93,8 +84,6 @@ describe('ProxyVectorTilesModule (e2e)', () => {
      * @todo add invalid tile test
      * @todo add mvt format test
      */
-=======
->>>>>>> example of test for proxy vector tiles admin area.
 
   });
 });

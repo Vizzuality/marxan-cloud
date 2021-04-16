@@ -2,6 +2,10 @@ import { Controller, Get, Param, Header, Res } from '@nestjs/common';
 import { AdminAreasService } from './admin-areas.service';
 import { apiGlobalPrefixes } from 'src/api.config';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
+// import {
+//   FetchSpecification,
+//   ProcessFetchSpecification,
+// } from 'nestjs-base-service';
 
 import { Tile } from 'src/modules/tile/tile.service';
 import { Response } from 'express';
@@ -37,6 +41,7 @@ export class AdminAreasController {
       'Specific level to filter the administrative areas (0, 1 or 2)',
     type: Number,
     required: true,
+    example: '1'
   })
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
   @Header('Content-Type', 'application/x-protobuf')
@@ -45,6 +50,14 @@ export class AdminAreasController {
   @Header('Content-Encoding', 'gzip')
   // @Header('Content-Encoding', 'gzip')
   // @Header('Content-Type', 'application/vnd.mapbox-vector-tile')
+  // async findAllAdminAReasInGIvenCountry(
+  //   @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+  //   @Param('level') level: AdminAreaLevel,
+  // ): Promise<any> {
+  //   const customQuery = await this.service.findAllPaginated({})
+  //   parse customQuery to the getTile function
+
+  // }
   async getTile(
     @Param('z') z: number,
     @Param('x') x: number,
@@ -58,7 +71,6 @@ export class AdminAreasController {
     @Param('attributes') attributes: string,
     @Res() response: Response,
   ): Promise<any> {
-    // Promise<tile>
     const tile: Tile = await this.service.findTile(
       z,
       x,
@@ -74,7 +86,8 @@ export class AdminAreasController {
 
     if (tile.res >= 0 && tile.data) {
       response.send(tile.data);
-    } else {
+    }
+    else {
       response.send(JSON.stringify(tile));
     }
     return response;
