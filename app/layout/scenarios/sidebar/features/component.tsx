@@ -55,7 +55,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
               <Steps step={step + 1} length={2} />
             </div>
 
-            <div className="flex items-center space-x-2 mt-2">
+            <div className="flex items-center mt-2 space-x-2">
               <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
               <div className="text-xs uppercase font-heading">
                 Features added:

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import cx from 'classnames';
 
 import Icon from 'components/icon';
@@ -9,7 +9,6 @@ import Checkbox from 'components/forms/checkbox';
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
-import { SelectOptionProps } from 'components/forms/select/types';
 
 export interface ItemProps {
   id: string | number;
@@ -19,7 +18,7 @@ export interface ItemProps {
   type: 'bioregional' | 'species';
 
   splitSelected?: string;
-  splitOptions?: SelectOptionProps[];
+  splitOptions?: { key: string; values: any[]; }[];
   onSplitSelected?: (selected: string) => void;
 
   splitFeaturesSelected?: string[];
@@ -50,7 +49,7 @@ export const Item: React.FC<ItemProps> = ({
   // EVENTS
   const onSplitChanged = useCallback(
     (selected) => {
-      onSplitSelected(selected);
+      if (onSplitSelected) onSplitSelected(selected);
     },
     [onSplitSelected],
   );
@@ -66,10 +65,14 @@ export const Item: React.FC<ItemProps> = ({
         newSplitFeaturesSelected.push(e.currentTarget.value);
       }
 
-      onSplitFeaturesSelected(newSplitFeaturesSelected);
+      if (onSplitFeaturesSelected) onSplitFeaturesSelected(newSplitFeaturesSelected);
     },
     [splitFeaturesSelected, onSplitFeaturesSelected],
   );
+
+  const OPTIONS = useMemo(() => {
+    return splitOptions.map((s) => ({ label: s.key, value: s.key }));
+  }, [splitOptions]);
 
   // RENDER
   return (
@@ -102,15 +105,14 @@ export const Item: React.FC<ItemProps> = ({
               </h4>
             </div>
 
-            {/* TODO: Select from javi!! */}
             <div className="inline-block mt-2">
               <Select
                 theme="dark"
                 size="s"
                 status="none"
                 placeholder="Select..."
-                initialValues={splitSelected}
-                options={splitOptions}
+                selected={splitSelected}
+                options={OPTIONS}
                 onChange={onSplitChanged}
               />
             </div>

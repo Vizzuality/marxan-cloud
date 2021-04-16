@@ -9,28 +9,33 @@ const ITEMS = [
       { id: 1, name: 'Bioregional', className: 'text-black bg-green-300' },
     ],
 
-    splitSelected: 'attribute-1',
     splitOptions: [
-      { label: 'Attribute 1', value: 'attribute-1' },
-      { label: 'Attribute 2', value: 'attribute-2' },
-      { label: 'Attribute 3', value: 'attribute-3' },
-    ],
+      {
+        label: 'Attribute 1',
+        key: 'attribute-1',
+        values: [
+          { id: 'XXX', value: 'XXX' },
+          { id: 'YYY', value: 'YYY' },
+          { id: 'ZZZ', value: 'ZZZ' },
+        ],
+      },
+      {
+        label: 'Attribute 2',
+        key: 'attribute-2',
+        values: [
+          { id: 'AAA', value: 'AAA' },
+          { id: 'BBB', value: 'BBB' },
+          { id: 'CCC', value: 'CCC' },
+          { id: 'DDD', value: 'DDD' },
+          { id: 'EEE', value: 'EEE' },
+          { id: 'FFF', value: 'FFF' },
+        ],
 
-    splitFeaturesSelected: [],
-    splitFeaturesOptions: [
-      { label: 'Deserts and Xeric Shrublands', value: 'id-1' },
-      {
-        label: 'Tropical and Subtropical Grasslands, Savannas and Shrublands',
-        value: 'id-2',
       },
-      { label: 'Flooded Grasslands and Savannas', value: 'id-3' },
-      { label: 'Montane Grasslands and Shrublands', value: 'id-4' },
-      {
-        label: 'Tropical and Subtropical Moist, Broadleaf Forests',
-        value: 'id-5',
-      },
-      { label: 'Mangroves', value: 'id-6' },
+      { label: 'Attribute 3', key: 'attribute-3', values: [] },
     ],
+    splitSelected: null,
+    splitFeaturesSelected: [],
   },
   {
     id: 2,
