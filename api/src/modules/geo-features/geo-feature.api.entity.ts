@@ -49,6 +49,10 @@ export class GeoFeature {
 
   @ApiPropertyOptional()
   categories?: GeoFeatureCategory[];
+
+  @ApiPropertyOptional()
+  @Column('uuid', { name: 'project_id' })
+  projectId?: string;
 }
 
 export class JSONAPIGeoFeaturesData {
