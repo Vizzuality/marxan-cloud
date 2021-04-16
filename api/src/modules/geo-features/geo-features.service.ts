@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import {
   GeoFeatureGeometry,
   geoFeatureResource,
@@ -19,6 +19,7 @@ import {
   GeoFeature,
   GeoFeatureCategory,
 } from './geo-feature.api.entity';
+import { FetchSpecification } from 'nestjs-base-service';
 
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
@@ -72,5 +73,41 @@ export class GeoFeaturesService extends AppBaseService<
       key: faker.random.word(),
       distinctValues: [...Array(8)].map((_i) => faker.random.words(6)),
     };
+  }
+
+  async extendFindAllQuery(
+    query: SelectQueryBuilder<GeoFeature>,
+    fetchSpecification: FetchSpecification,
+    info: AppInfoDTO,
+  ): Promise<SelectQueryBuilder<GeoFeature>> {
+    /**
+     * We should either list only "public" features (i.e. they are not from a
+     * pool of user-uploaded project-specific ones) or, if a `projectId` is
+     * provided, public features plus project-specific ones for the given
+     * project.
+     *
+     * projectId may be coming our way either via info.params.projectId (if this
+     * is added within the API) of via fetchSpeciication.filter.projectId (if it
+     * is supplied as part of a GET query parsed according to the JSON:API
+     * spec), hence the if/else if/else here.
+     */
+    let queryFilteredByPublicOrProjectSpecificFeatures;
+    if (info?.params?.projectId) {
+      queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
+        `${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL`,
+        { projectId: info.params.projectId },
+      );
+    } else if (fetchSpecification?.filter?.projectId) {
+      queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
+        `${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL`,
+        { projectId: fetchSpecification.filter.projectId },
+      );
+    } else {
+      queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
+        `${this.alias}.projectId IS NULL`,
+      );
+    }
+
+    return queryFilteredByPublicOrProjectSpecificFeatures;
   }
 }
