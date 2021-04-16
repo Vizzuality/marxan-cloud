@@ -3,11 +3,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 
-export interface Tile {
-  res: number;
-  data?: Buffer;
-  status?: string;
-}
 
 /**
  * @description The specification of the tile request
@@ -32,10 +27,7 @@ export interface TileRequest {
 /**
  * @description Input interface for the tile query builder
  */
-export interface ITileQuery {
-  x: number;
-  y: number;
-  z: number;
+export interface ITileQuery extends TileRequest{
   table: string;
   geometry: string;
   extent: number;
@@ -50,15 +42,8 @@ export type GetTileQuery = (input: ITileQuery) => string;
 /**
  * @description Input interface for the base query builder
  */
-export interface IBaseQueryInput {
-  x: number;
-  y: number;
-  z: number;
-  table: string;
-  geometry: string;
+export interface IBaseQueryInput extends ITileQuery{
   maxZoomLevel: number;
-  buffer: number;
-  extent: number;
   customQuery: string;
   attributes: string;
 }
@@ -72,9 +57,6 @@ export type GetBaseQuery = (input: IBaseQueryInput) => string;
  * @description This function define tile query input for the tile requested
  */
 export interface ITileQueryInput extends TileRequest {
-  z: number;
-  x: number;
-  y: number;
   maxZoomLevel: number;
   table: string;
   geometry: string;
@@ -274,8 +256,7 @@ export class TileService {
     maxZoomLevel: number,
     customQuery: string,
     attributes: string,
-  ): Promise<Tile> {
-    const mvt: Tile = { res: 0 };
+  ): Promise<Buffer> {
     const query = this.buildQuery(
       z,
       x,
@@ -295,22 +276,17 @@ export class TileService {
         data = await this.fetchTileFromDatabase(query);
         this.logger.debug('Data succesfully retrieved from database');
       } catch (error) {
-        mvt.res = -4;
-        mvt.status = `[ERROR] - Database error: ${error.message}`;
         this.logger.error(`Database error: ${error.message}`);
-        return mvt;
+        return data;
       }
     } else {
       // Empty query => empty tile
-      const msg = `[INFO] - Empty query for tile '${z}/${x}/${y}'`;
-      this.logger.debug(msg);
-      mvt.res = 1;
-      mvt.status = msg;
+      this.logger.debug(`[INFO] - Empty query for tile '${z}/${x}/${y}'`);
       data = Buffer.from('');
     }
     // zip data
-    mvt.data = await this.zip(data[0].mvt);
+    data = await this.zip(data[0].mvt);
     this.logger.debug('Data compressed');
-    return mvt;
+    return data;
   }
 }
