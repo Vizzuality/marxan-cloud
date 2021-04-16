@@ -1,9 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { IsInt, IsOptional, Max, Min } from 'class-validator';
+/**
+ * Supported admin area levels (sub-national): either level 1 or level 2.
+ */
+export class AdminAreaLevel {
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(2)
+  level?: number;
+}
 
-// //to-do - extend to country
 @Entity('admin-regions')
-export class AdminAreas {
+export class AdminArea {
   /**
    * Country id (ISO 3166-1 alpha-3).
    */
@@ -62,7 +72,7 @@ export class JSONAPIAdministrativeAreasData {
   id: string;
 
   @ApiProperty()
-  attributes: AdminAreas;
+  attributes: AdminArea;
 }
 
 export class AdminAreasResult {
