@@ -12,19 +12,19 @@ export class ProxyService {
   private server: Server;
   private readonly logger = new Logger(ProxyService.name);
   constructor() {
-    this.logger.debug(Server)
     this.server = Server.createProxyServer();
   }
+  /**
+   *
+   * @todo refactor to a more general function for the partst that can change for the other proxied URL's
+   */
 
   proxyTileRequest(request: Request, response: Response) {
-    /**
-     * @todo change server name in config url
-     */
     const tileTargetURL: string = AppConfig.get('geoprocessing.url') as string;
     // Use `originalUrl` here, as the `/api/v1/geoprocessing` is otherwise stripped
     // away, but we need this because the backend microservice expects that as
     // part of its routes
-    request.url = request.originalUrl.replace('api/v1/geoprocessing', 'api/v1/geodata');
+    request.url = request.originalUrl.replace('api/v1/', 'api/v1/geodata/');
 
     return this.server.web(
       request,
