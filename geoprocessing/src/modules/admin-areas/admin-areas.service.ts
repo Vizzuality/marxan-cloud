@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TileService, Tile } from 'src/modules/tile/tile.service';
+import { TileService } from 'src/modules/tile/tile.service';
 // import { Repository, SelectQueryBuilder } from 'typeorm';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 // import { AdminArea } from './admin-areas.geo.entity';
@@ -21,9 +21,6 @@ export class AdminAreaLevelFilters {
 }
 
 
-/**
- * @todo extent to the appBaseService
- */
 @Injectable()
 export class AdminAreasService {
   private readonly logger: Logger = new Logger(AdminAreasService.name);
@@ -75,31 +72,38 @@ export class AdminAreasService {
     z: number,
     x: number,
     y: number,
-    table: string,
-    geometry: string,
-    extent: number,
-    buffer: number,
-    maxZoomLevel: number,
-    customQuery: string,
-    attributes: string,
-  ): Promise<Tile> {
+    level: number,
+  ): Promise<Buffer> {
+
     // const customQueryQB = this.getQueryBuilder(
 
     // )
     // console.log('customQueryQB', customQueryQB)
+    const table = 'admin_regions';
+    const geometry = 'the_geom';
+    const extent = 4096;
+    const buffer = 256;
+    const maxZoomLevel = 12;
+    /**
+     * @todo get this query from query builder
+     * @todo use the level to generate the cusom query
+     */
+    const customQuery = 'gid_0 is not null and gid_1 is null and gid_2 is null';
+    const attributes = 'gid_0, gid_1, gid_2';
+
 
     this.logger.debug('test_execute_tile_service');
     return this.tileService.getTile(
       z,
       x,
       y,
-      (table = 'admin_regions'),
-      (geometry = 'the_geom'),
-      (extent = 4096),
-      (buffer = 256),
-      (maxZoomLevel = 12),
-      (customQuery = 'gid_0 is not null and gid_1 is null and gid_2 is null'),
-      (attributes = 'gid_0, gid_1, gid_2'),
+      table,
+      geometry,
+      extent,
+      buffer,
+      maxZoomLevel,
+      customQuery,
+      attributes,
     );
   }
 }

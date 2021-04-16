@@ -16,7 +16,7 @@ export class ProxyService {
   }
   /**
    *
-   * @todo refactor to a more general function for the partst that can change for the other proxied URL's
+   * @todo refactor to a more general function for the parts that can change for the other proxied URL's
    */
 
   proxyTileRequest(request: Request, response: Response) {
