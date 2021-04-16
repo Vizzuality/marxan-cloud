@@ -35,6 +35,7 @@ export enum ScenarioType {
 }
 
 export enum JobStatus {
+  draft = 'draft',
   created = 'created',
   running = 'running',
   done = 'done',
