@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/client';
 
 import orderBy from 'lodash/orderBy';
+import flatten from 'lodash/flatten';
 
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
@@ -111,19 +112,19 @@ export function useSelectedFeatures(filters: UseFeaturesFiltersProps = {}) {
         : [];
 
       return {
+        ...d,
         id,
         name,
         type: type === 'bioregional' ? 'bioregional' : 'species', // TODO: check why this is happening
         description,
-        // SPLIT
 
+        // SPLIT
         splitOptions,
         splitSelected,
         splitFeaturesSelected,
         splitFeaturesOptions,
 
         // INTERESECTION
-
         intersectFeaturesSelected,
       };
     });
@@ -150,6 +151,44 @@ export function useSelectedFeatures(filters: UseFeaturesFiltersProps = {}) {
   }, [query, data?.data, search]);
 }
 
+export function useTargetedFeatures() {
+  const { data, ...rest } = useSelectedFeatures();
+
+  return useMemo(() => {
+    const features = flatten(data.map((s) => {
+      const {
+        id, name, splitSelected, splitOptions, splitFeaturesSelected,
+      } = s;
+      const isSplitted = !!splitSelected;
+
+      if (isSplitted) {
+        const splitFeaturesOptions = splitOptions
+          .find((v) => v.key === splitSelected).values
+          .map((v) => ({ label: v.id, value: v.value }));
+
+        return splitFeaturesSelected.map((sf) => {
+          const { id: sfId } = sf;
+          const { label: sfName } = splitFeaturesOptions.find((v) => v.value === sfId);
+
+          return {
+            ...sf,
+            id: `${id}-${sfId}`,
+            type: 'bioregional',
+            name: `${name} / ${sfName}`,
+            splitted: true,
+          };
+        });
+      }
+
+      return s;
+    }));
+
+    return {
+      ...rest,
+      data: features,
+    };
+  }, [data, rest]);
+}
 export function useFeature(id) {
   const [session] = useSession();
 

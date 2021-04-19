@@ -35,8 +35,8 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
         [className]: !!className,
       })}
     >
-      <div className="flex justify-between pb-4 pr-2">
-        <span className="text-sm">{isAllTargets ? 'Set target and SPF in all features' : name}</span>
+      <div className="flex justify-between pb-2 pr-2">
+        <span className="text-sm font-medium font-heading">{isAllTargets ? 'Set target and SPF in all features' : name}</span>
         {!isAllTargets && (
           <Button
             className="text-xs"

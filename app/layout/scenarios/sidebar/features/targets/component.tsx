@@ -7,7 +7,7 @@ import Button from 'components/button';
 import Loading from 'components/loading';
 import Item from 'components/features/target-spf-item';
 
-import { useSelectedFeatures } from 'hooks/features';
+import { useTargetedFeatures } from 'hooks/features';
 
 export interface ScenariosFeaturesListProps {
   onBack: () => void;
@@ -19,16 +19,16 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   onSuccess,
 }: ScenariosFeaturesListProps) => {
   const {
-    data: selectedFeaturesData,
-    isFetching: selectedFeaturesIsFetching,
-    isFetched: selectedFeaturesIsFetched,
-  } = useSelectedFeatures({});
+    data: targetedFeaturesData,
+    isFetching: targetedFeaturesIsFetching,
+    isFetched: targetedFeaturesIsFetched,
+  } = useTargetedFeatures();
 
   const INITIAL_VALUES = useMemo(() => {
     return {
-      features: selectedFeaturesData || [],
+      features: targetedFeaturesData,
     };
-  }, [selectedFeaturesData]);
+  }, [targetedFeaturesData]);
 
   // Callbacks
   const onChangeTarget = useCallback((id, v, input) => {
@@ -59,6 +59,15 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     onChange(features);
   }, []);
 
+  const onRemove = useCallback((id, input) => {
+    const { value, onChange } = input;
+    const features = [...value];
+
+    const featureIndex = features.findIndex((f) => f.id === id);
+    features.splice(featureIndex, 1);
+    onChange(features);
+  }, []);
+
   const onSubmit = useCallback((values) => {
     console.info(values);
 
@@ -66,7 +75,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   }, [onSuccess]);
 
   // Render
-  if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
+  if (targetedFeaturesIsFetching && !targetedFeaturesIsFetched) {
     return (
       <Loading
         visible
@@ -84,13 +93,13 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     >
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col h-full overflow-hidden">
-          {(!selectedFeaturesData || !selectedFeaturesData.length) && (
+          {(!targetedFeaturesData || !targetedFeaturesData.length) && (
             <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
               No results found
             </div>
           )}
 
-          {!!selectedFeaturesData && selectedFeaturesData.length && (
+          {!!targetedFeaturesData && targetedFeaturesData.length && (
             <div className="relative h-full overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700" />
               <div className="relative h-full px-0.5 py-6 overflow-x-visible overflow-y-auto">
@@ -113,6 +122,9 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                               onChangeFPF={(v) => {
                                 onChangeFPF(item.id, v, input);
                               }}
+                              onRemove={() => {
+                                onRemove(item.id, input);
+                              }}
                             />
                           </div>
                         );
@@ -125,7 +137,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
             </div>
           )}
 
-          {!!selectedFeaturesData && selectedFeaturesData.length && (
+          {!!targetedFeaturesData && targetedFeaturesData.length && (
             <div className="flex justify-center space-x-3">
               <Button
                 type="button"

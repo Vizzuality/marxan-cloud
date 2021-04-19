@@ -21,9 +21,17 @@ export interface ItemProps {
   splitOptions?: { key: string; values: any[]; }[];
   onSplitSelected?: (selected: string) => void;
 
-  splitFeaturesSelected?: string[];
+  splitFeaturesSelected?: {
+    id: string;
+    fpf?: number;
+    target?: number;
+  }[];
   splitFeaturesOptions?: Record<string, unknown>[];
-  onSplitFeaturesSelected?: (selected: string[]) => void;
+  onSplitFeaturesSelected?: (selected: {
+    id: string;
+    fpf?: number;
+    target?: number;
+  }[]) => void;
 
   intersectFeaturesSelected?: string[];
   intersectFeaturesOptions?: Record<string, unknown>[];
@@ -57,12 +65,14 @@ export const Item: React.FC<ItemProps> = ({
   const onSplitFeaturesChanged = useCallback(
     (e) => {
       const newSplitFeaturesSelected = [...splitFeaturesSelected];
-      const index = newSplitFeaturesSelected.indexOf(e.currentTarget.value);
+      const index = newSplitFeaturesSelected.findIndex((s) => s.id === e.currentTarget.value);
 
       if (index > -1) {
         newSplitFeaturesSelected.splice(index, 1);
       } else {
-        newSplitFeaturesSelected.push(e.currentTarget.value);
+        newSplitFeaturesSelected.push({
+          id: e.currentTarget.value,
+        });
       }
 
       if (onSplitFeaturesSelected) onSplitFeaturesSelected(newSplitFeaturesSelected);
@@ -150,7 +160,7 @@ export const Item: React.FC<ItemProps> = ({
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
             const checked = !splitFeaturesSelected.length
-              || splitFeaturesSelected.includes(`${f.value}`);
+              || splitFeaturesSelected.map((s) => s.id).includes(`${f.value}`);
 
             return (
               <li
