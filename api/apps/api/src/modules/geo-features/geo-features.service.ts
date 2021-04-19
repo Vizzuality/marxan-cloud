@@ -295,8 +295,8 @@ export class GeoFeaturesService extends AppBaseService<
    * Create or replace the set of features linked to a scenario.
    */
   async createOrReplaceFeatureSet(
-    id: string,
-    dto: CreateGeoFeatureSetDTO,
+    _id: string,
+    _dto: CreateGeoFeatureSetDTO,
   ): Promise<GeoFeatureSetResult> {
     return new GeoFeatureSetResult();
   }
