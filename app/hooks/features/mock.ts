@@ -38,13 +38,13 @@ const ITEMS = [
     splitFeaturesSelected: [
       {
         id: 'XXX',
-        name: 'XXX',
+        name: 'Deserts and Xeric Shrublands',
         target: 75,
         fpf: 2,
       },
       {
         id: 'YYY',
-        name: 'YYY',
+        name: 'Tropical and Subtropical Grasslands, Savannas and Shrublands',
         target: 67,
         fpf: 5,
       },
@@ -70,13 +70,13 @@ const ITEMS = [
           {
             id: 'XXX',
             name: 'Deserts and Xeric Shrublands',
-            target: 75,
+            target: 21,
             fpf: 2,
           },
           {
             id: 'YYY',
             name: 'Tropical and Subtropical Grasslands, Savannas and Shrublands',
-            target: 67,
+            target: 17,
             fpf: 5,
           },
         ],
