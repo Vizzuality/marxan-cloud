@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Pill from 'layout/pill';
 import AddFeatures from 'layout/scenarios/sidebar/features/add';
 import ListFeatures from 'layout/scenarios/sidebar/features/list';
+import TargetFeatures from 'layout/scenarios/sidebar/features/targets';
 
 import Steps from 'components/steps';
 import Button from 'components/button';
@@ -23,7 +24,7 @@ export interface ScenariosSidebarWDPAProps {
 }
 
 export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const [modal, setModal] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
@@ -35,8 +36,6 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
-
-  console.info(setStep, setTab, dispatch);
 
   if (!scenarioData || tab !== 'features') return null;
 
@@ -87,11 +86,16 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
         </Modal>
 
         {step === 0 && (
-          <ListFeatures />
+          <ListFeatures
+            onSuccess={() => setStep(step + 1)}
+          />
         )}
 
         {step === 1 && (
-          'Set target and fpf'
+          <TargetFeatures
+            onBack={() => setStep(step - 1)}
+            onSuccess={() => dispatch(setTab('analysis'))}
+          />
         )}
       </Pill>
     </motion.div>

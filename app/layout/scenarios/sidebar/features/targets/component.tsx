@@ -5,15 +5,17 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import Button from 'components/button';
 import Loading from 'components/loading';
-import Item from 'components/features/selected-item';
+import Item from 'components/features/target-spf-item';
 
 import { useSelectedFeatures } from 'hooks/features';
 
 export interface ScenariosFeaturesListProps {
-  onSuccess: () => void
+  onBack: () => void;
+  onSuccess: () => void;
 }
 
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
+  onBack,
   onSuccess,
 }: ScenariosFeaturesListProps) => {
   const {
@@ -29,29 +31,21 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   }, [selectedFeaturesData]);
 
   // Callbacks
-  const onSplitSelected = useCallback((id, key, input) => {
+  const onChangeTarget = useCallback((id, v, input) => {
     const { value, onChange } = input;
     const features = [...value];
 
     const feature = features.find((f) => f.id === id);
     const featureIndex = features.findIndex((f) => f.id === id);
 
-    const { splitOptions } = feature;
-    const splitFeaturesOptions = key ? splitOptions
-      .find((s) => s.key === key).values
-      .map((v) => ({ label: v.id, value: v.value }))
-      : [];
-
     features[featureIndex] = {
       ...feature,
-      splitSelected: key,
-      splitFeaturesOptions,
-      splitFeaturesSelected: splitFeaturesOptions.map((s) => s.value),
+      target: v,
     };
     onChange(features);
   }, []);
 
-  const onSplitFeaturesSelected = useCallback((id, key, input) => {
+  const onChangeFPF = useCallback((id, v, input) => {
     const { value, onChange } = input;
     const features = [...value];
 
@@ -60,13 +54,14 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
 
     features[featureIndex] = {
       ...feature,
-      splitFeaturesSelected: key,
+      fpf: v,
     };
     onChange(features);
   }, []);
 
   const onSubmit = useCallback((values) => {
     console.info(values);
+
     onSuccess();
   }, [onSuccess]);
 
@@ -83,7 +78,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
 
   return (
     <FormRFF
-      key="features-add"
+      key="features-target"
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
@@ -112,11 +107,11 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                           >
                             <Item
                               {...item}
-                              onSplitSelected={(s) => {
-                                onSplitSelected(item.id, s, input);
+                              onChangeTarget={(v) => {
+                                onChangeTarget(item.id, v, input);
                               }}
-                              onSplitFeaturesSelected={(s) => {
-                                onSplitFeaturesSelected(item.id, s, input);
+                              onChangeFPF={(v) => {
+                                onChangeFPF(item.id, v, input);
                               }}
                             />
                           </div>
@@ -131,13 +126,24 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           )}
 
           {!!selectedFeaturesData && selectedFeaturesData.length && (
-            <Button
-              type="submit"
-              theme="secondary-alt"
-              size="lg"
-            >
-              Continue
-            </Button>
+            <div className="flex justify-center space-x-3">
+              <Button
+                type="button"
+                theme="secondary"
+                size="lg"
+                onClick={onBack}
+              >
+                Back
+              </Button>
+
+              <Button
+                type="submit"
+                theme="primary"
+                size="lg"
+              >
+                Save
+              </Button>
+            </div>
           )}
         </form>
       )}
