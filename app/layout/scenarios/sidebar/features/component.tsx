@@ -15,6 +15,7 @@ import Modal from 'components/modal';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { useScenario } from 'hooks/scenarios';
+import { useSelectedFeatures } from 'hooks/features';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
@@ -36,6 +37,9 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
+  const {
+    data: selectedFeaturesData,
+  } = useSelectedFeatures({});
 
   if (!scenarioData || tab !== 'features') return null;
 
@@ -55,12 +59,23 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
             </div>
 
             <div className="flex items-center mt-2 space-x-2">
-              <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
-              <div className="text-xs uppercase font-heading">
-                Features added:
-                {' '}
-                <span className="ml-1 text-gray-400">0</span>
-              </div>
+
+              {step === 0 && (
+                <>
+                  <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
+                  <div className="text-xs uppercase font-heading">
+                    Features added:
+                    {' '}
+                    {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
+                  </div>
+                </>
+              )}
+
+              {step === 1 && (
+                <div className="text-xs uppercase font-heading">
+                  Set the minimum targets amount you want to achieve for your features.
+                </div>
+              )}
             </div>
           </div>
 

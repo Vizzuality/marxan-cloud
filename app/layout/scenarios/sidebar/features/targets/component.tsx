@@ -140,6 +140,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           {!!targetedFeaturesData && targetedFeaturesData.length && (
             <div className="flex justify-center space-x-3">
               <Button
+                className="w-full"
                 type="button"
                 theme="secondary"
                 size="lg"
@@ -149,6 +150,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
               </Button>
 
               <Button
+                className="w-full"
                 type="submit"
                 theme="primary"
                 size="lg"

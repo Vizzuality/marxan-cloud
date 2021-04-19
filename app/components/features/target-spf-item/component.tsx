@@ -27,8 +27,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
     <div
       key={id}
       className={cx({
-        'bg-gray-700 text-white text-xs pl-4 py-2 relative border-transparent': true,
-        'border-l-4': !isAllTargets,
+        'bg-gray-700 text-white text-xs pl-5 py-2 relative border-transparent': true,
         [className]: !!className,
       })}
     >
