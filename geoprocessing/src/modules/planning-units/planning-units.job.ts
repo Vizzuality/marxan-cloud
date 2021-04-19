@@ -4,7 +4,10 @@ import { geoprocessingConnections } from 'src/ormconfig';
 import { createConnection } from 'typeorm';
 import { validate } from 'class-validator';
 
-import { PlanningUnitsJob } from './dto/create.regular.planning-units.dto';
+import {
+  PlanningUnitsJob,
+  PlanningUnitGridShape,
+} from './dto/create.regular.planning-units.dto';
 import { plainToClass } from 'class-transformer';
 
 const logger = new Logger('planning-units-job-processor');
@@ -40,7 +43,7 @@ const createPlanningUnitGridFromJobSpec = async (
     const connection = await createConnection(geoprocessingConnections.default);
     try {
       let subquery: string;
-      const gridShape = {
+      const gridShape: { [value in PlanningUnitGridShape]?: string } = {
         square: 'ST_SquareGrid',
         hexagon: 'ST_HexagonGrid',
       };
@@ -52,7 +55,7 @@ const createPlanningUnitGridFromJobSpec = async (
         if (Math.sign(job.data.planningUnitAreakm2) < 0) {
           throw new Error('Planning unit area Must be a positive number');
         }
-        subquery = `SELECT (${gridShape[job.data.planningUnitGridShape]}(${
+        subquery = `SELECT (${gridShape[jobData.planningUnitGridShape]}(${
           Math.sqrt(job.data.planningUnitAreakm2) * 1000
         },
                             ST_Transform(ST_GeomFromGeoJSON('${JSON.stringify(
