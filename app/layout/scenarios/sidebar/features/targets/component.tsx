@@ -45,6 +45,15 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     onChange(features);
   }, []);
 
+  const onChangeTargetAll = useCallback((v, input) => {
+    const { value, onChange } = input;
+    const features = [...value].map((f) => ({
+      ...f,
+      target: v,
+    }));
+    onChange(features);
+  }, []);
+
   const onChangeFPF = useCallback((id, v, input) => {
     const { value, onChange } = input;
     const features = [...value];
@@ -56,6 +65,15 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       ...feature,
       fpf: v,
     };
+    onChange(features);
+  }, []);
+
+  const onChangeFPFAll = useCallback((v, input) => {
+    const { value, onChange } = input;
+    const features = [...value].map((f) => ({
+      ...f,
+      fpf: v,
+    }));
     onChange(features);
   }, []);
 
@@ -106,6 +124,19 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                 <FieldRFF name="features">
                   {({ input }) => (
                     <div>
+                      <Item
+                        id="all-targets"
+                        defaultTarget={50}
+                        defaultFPF={1}
+                        isAllTargets
+                        onChangeTarget={(v) => {
+                          onChangeTargetAll(v, input);
+                        }}
+                        onChangeFPF={(v) => {
+                          onChangeFPFAll(v, input);
+                        }}
+                      />
+
                       {values.features.map((item, i) => {
                         return (
                           <div

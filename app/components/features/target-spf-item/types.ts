@@ -7,8 +7,10 @@ export interface TargetSPFItemProps {
   className?: string;
   isAllTargets: boolean;
   id: string;
-  target: number;
-  fpf: number;
+  defaultTarget?: number;
+  defaultFPF?: number;
+  target?: number;
+  fpf?: number;
   type?: Type;
   surface?: string;
   name?: string;

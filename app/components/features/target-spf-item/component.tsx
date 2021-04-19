@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cx from 'classnames';
 import Button from 'components/button';
 import Slider from 'components/forms/slider';
@@ -12,16 +12,26 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
   isAllTargets,
   type,
   name,
-  target = 50,
-  fpf = 1,
+  defaultTarget = 50,
+  defaultFPF = 1,
+  target,
+  fpf,
   id,
   onRemove,
   onChangeTarget,
   onChangeFPF,
 }: TargetSPFItemProps) => {
-  const [targetValue, setTargetValue] = useState(target / 100);
-  const [FPFValue, setFPFValue] = useState(fpf);
+  const [targetValue, setTargetValue] = useState((target || defaultTarget) / 100);
+  const [FPFValue, setFPFValue] = useState(fpf || defaultFPF);
   const sliderLabelRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof target !== 'undefined') setTargetValue(target / 100);
+  }, [target]);
+
+  useEffect(() => {
+    if (typeof fpf !== 'undefined') setFPFValue(fpf);
+  }, [fpf]);
 
   return (
     <div
@@ -61,7 +71,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
             labelRef={sliderLabelRef}
             minValue={0}
             maxValue={1}
-            defaultValue={targetValue}
+            value={targetValue}
             step={0.01}
             onChange={(sliderValue) => {
               setTargetValue(sliderValue);
@@ -82,6 +92,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
               mode="dashed"
               type="number"
               defaultValue={FPFValue}
+              value={FPFValue}
               onChange={({ target: { value: inputValue } }) => {
                 setFPFValue(Number(inputValue));
                 if (onChangeFPF) onChangeFPF(Number(inputValue));
