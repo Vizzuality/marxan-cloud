@@ -3,20 +3,16 @@ export enum Type {
   SPECIES = 'species',
   BIOREGIONAL_AND_SPECIES = 'bioregional-and-species',
 }
-
-export interface TargetSPF {
+export interface TargetSPFItemProps {
+  className?: string;
   isAllTargets: boolean;
   id: string;
   target: number;
-  spf: number;
+  fpf: number;
   type?: Type;
   surface?: string;
   name?: string;
-}
-
-export interface TargetSPFItemProps {
-  targetSPF: TargetSPF;
-  className?: string;
-  onChange?: (value: TargetSPF) => void;
-  onRemove?: (value: TargetSPF) => void
+  onChangeTarget?: (value) => void;
+  onChangeFPF?: (value) => void;
+  onRemove?: (value) => void
 }

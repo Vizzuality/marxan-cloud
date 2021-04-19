@@ -5,25 +5,29 @@ import Slider from 'components/forms/slider';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
 
-import { TargetSPFItemProps, Type, TargetSPF } from './types';
+import { TargetSPFItemProps, Type } from './types';
 
 export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
   className,
-  targetSPF,
+  isAllTargets,
+  type,
+  name,
+  target = 50,
+  fpf = 1,
+  id,
   onRemove,
-  onChange,
+  onChangeTarget,
+  onChangeFPF,
 }: TargetSPFItemProps) => {
-  const [targetSPFValue, setTargetSPFValue] = useState<TargetSPF>(targetSPF);
+  const [targetValue, setTargetValue] = useState(target / 100);
+  const [FPFValue, setFPFValue] = useState(fpf);
   const sliderLabelRef = useRef(null);
-  const {
-    isAllTargets, type, name, surface, target, spf, id,
-  } = targetSPFValue;
 
   return (
     <div
       key={id}
       className={cx({
-        'bg-gray-800 text-white text-xs pl-4 py-2': true,
+        'bg-gray-700 text-white text-xs pl-4 py-2': true,
         'border-l-4': !isAllTargets,
         'border-green-300': type === Type.BIOREGIONAL,
         'border-yellow-300': type === Type.SPECIES,
@@ -38,7 +42,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
             className="text-xs"
             theme="secondary"
             size="xs"
-            onClick={() => onRemove && onRemove(targetSPFValue)}
+            onClick={() => onRemove && onRemove(id)}
           >
             Remove
           </Button>
@@ -46,9 +50,6 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
       </div>
       <div className="flex">
         <div className="relative flex-col w-full pr-4">
-          <div className="absolute top-0 right-4">
-            {surface}
-          </div>
           <Label ref={sliderLabelRef} className="mb-1 uppercase">
             <span>{isAllTargets ? 'ALL TARGETS' : 'TARGET'}</span>
           </Label>
@@ -56,15 +57,11 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
             labelRef={sliderLabelRef}
             minValue={0}
             maxValue={1}
-            defaultValue={target}
+            defaultValue={targetValue}
             step={0.01}
             onChange={(sliderValue) => {
-              const newValue: TargetSPF = {
-                ...targetSPFValue,
-                target: sliderValue,
-              };
-              setTargetSPFValue(newValue);
-              if (onChange) onChange(newValue);
+              setTargetValue(sliderValue);
+              if (onChangeTarget) onChangeTarget(+(sliderValue * 100).toFixed(0));
             }}
           />
           <div className="flex justify-between w-full text-gray-400">
@@ -79,14 +76,11 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
               className="px-0 py-1"
               theme="dark"
               mode="dashed"
-              defaultValue={spf}
+              type="number"
+              defaultValue={FPFValue}
               onChange={({ target: { value: inputValue } }) => {
-                const newValue: TargetSPF = {
-                  ...targetSPFValue,
-                  spf: Number(inputValue),
-                };
-                setTargetSPFValue(newValue);
-                if (onChange) onChange(newValue);
+                setFPFValue(Number(inputValue));
+                if (onChangeFPF) onChangeFPF(Number(inputValue));
               }}
             />
           </div>
