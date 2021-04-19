@@ -37,10 +37,7 @@ import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
 import { CreateGeoFeatureSetDTO } from 'modules/geo-features/dto/create.geo-feature-set.dto';
-import {
-  GeoFeatureSetResult,
-  GeoFeatureSets,
-} from 'modules/geo-features/geo-feature-set.api.entity';
+import { GeoFeatureSetResult } from 'modules/geo-features/geo-feature-set.api.entity';
 import { GeoFeaturesService } from 'modules/geo-features/geo-features.service';
 
 import { ScenarioFeaturesService } from '../scenarios-features';
