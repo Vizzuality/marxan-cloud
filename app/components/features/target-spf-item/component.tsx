@@ -27,19 +27,24 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
     <div
       key={id}
       className={cx({
-        'bg-gray-700 text-white text-xs pl-4 py-2': true,
+        'bg-gray-700 text-white text-xs pl-4 py-2 relative border-transparent': true,
         'border-l-4': !isAllTargets,
-        'border-green-300': type === Type.BIOREGIONAL,
-        'border-yellow-300': type === Type.SPECIES,
-        'border-indigo': type === Type.BIOREGIONAL_AND_SPECIES, // temporary color
         [className]: !!className,
       })}
     >
-      <div className="flex justify-between pb-2 pr-2">
+      <div
+        className={cx({
+          'absolute left-0 top-0 h-full w-1': true,
+          'bg-green-300': type === Type.BIOREGIONAL,
+          'bg-yellow-300': type === Type.SPECIES,
+          'bg-gradient-to-b from-green-300 to-yellow-300': type === Type.BIOREGIONAL_AND_SPECIES, // temporary color
+        })}
+      />
+      <div className="flex items-start justify-between pb-2 pr-2">
         <span className="text-sm font-medium font-heading">{isAllTargets ? 'Set target and SPF in all features' : name}</span>
         {!isAllTargets && (
           <Button
-            className="text-xs"
+            className="flex-shrink-0 text-xs"
             theme="secondary"
             size="xs"
             onClick={() => onRemove && onRemove(id)}

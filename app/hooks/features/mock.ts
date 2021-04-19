@@ -14,21 +14,21 @@ const ITEMS = [
         label: 'Attribute 1',
         key: 'attribute-1',
         values: [
-          { id: 'XXX', value: 'XXX' },
-          { id: 'YYY', value: 'YYY' },
-          { id: 'ZZZ', value: 'ZZZ' },
+          { id: 'XXX', name: 'Deserts and Xeric Shrublands' },
+          { id: 'YYY', name: 'Tropical and Subtropical Grasslands, Savannas and Shrublands' },
+          { id: 'ZZZ', name: 'Inland water' },
         ],
       },
       {
         label: 'Attribute 2',
         key: 'attribute-2',
         values: [
-          { id: 'AAA', value: 'AAA' },
-          { id: 'BBB', value: 'BBB' },
-          { id: 'CCC', value: 'CCC' },
-          { id: 'DDD', value: 'DDD' },
-          { id: 'EEE', value: 'EEE' },
-          { id: 'FFF', value: 'FFF' },
+          { id: 'AAA', name: 'AAA' },
+          { id: 'BBB', name: 'BBB' },
+          { id: 'CCC', name: 'CCC' },
+          { id: 'DDD', name: 'DDD' },
+          { id: 'EEE', name: 'EEE' },
+          { id: 'FFF', name: 'FFF' },
         ],
 
       },
@@ -38,11 +38,13 @@ const ITEMS = [
     splitFeaturesSelected: [
       {
         id: 'XXX',
+        name: 'XXX',
         target: 75,
         fpf: 2,
       },
       {
         id: 'YYY',
+        name: 'YYY',
         target: 67,
         fpf: 5,
       },
@@ -59,12 +61,25 @@ const ITEMS = [
       { id: 2, name: 'Source name' },
     ],
 
-    intersectFeaturesSelected: ['id-1', 'id-2'],
-    intersectFeaturesOptions: [
-      { label: 'Deserts and Xeric Shrublands', value: 'id-1' },
+    intersectFeaturesSelected: [
       {
-        label: 'Tropical and Subtropical Grasslands, Savannas and Shrublands',
-        value: 'id-2',
+        id: '1',
+        name: 'Ecoregions',
+        splitSelected: 'attribute-2',
+        splitFeaturesSelected: [
+          {
+            id: 'XXX',
+            name: 'Deserts and Xeric Shrublands',
+            target: 75,
+            fpf: 2,
+          },
+          {
+            id: 'YYY',
+            name: 'Tropical and Subtropical Grasslands, Savannas and Shrublands',
+            target: 67,
+            fpf: 5,
+          },
+        ],
       },
     ],
   },

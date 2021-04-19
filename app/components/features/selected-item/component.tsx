@@ -17,10 +17,10 @@ export interface ItemProps {
   description: string;
   type: 'bioregional' | 'species';
 
+  // SPLIT
   splitSelected?: string;
   splitOptions?: { key: string; values: any[]; }[];
   onSplitSelected?: (selected: string) => void;
-
   splitFeaturesSelected?: {
     id: string;
     fpf?: number;
@@ -33,8 +33,23 @@ export interface ItemProps {
     target?: number;
   }[]) => void;
 
-  intersectFeaturesSelected?: string[];
-  intersectFeaturesOptions?: Record<string, unknown>[];
+  // INTERSECT
+  intersectFeaturesSelected?: {
+    id: string;
+    fpf?: number;
+    target?: number;
+    splitSelected?: string;
+    splitFeaturesSelected?: {
+      id: string;
+      name: string;
+      fpf?: number;
+      target?: number;
+    }[];
+  }[];
+  intersectFeaturesOptions?: {
+    label: string;
+    value: string;
+  }[];
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -192,7 +207,7 @@ export const Item: React.FC<ItemProps> = ({
         </ul>
       )}
 
-      {type === 'species' && intersectFeaturesSelected && (
+      {type === 'species' && intersectFeaturesSelected && intersectFeaturesSelected.length && (
         <ul className="pl-3">
           {intersectFeaturesOptions.map((f) => {
             return (
@@ -206,6 +221,7 @@ export const Item: React.FC<ItemProps> = ({
                     {name}
                     {' '}
                     in
+                    {' '}
                     {f.label}
                   </div>
                 </div>
