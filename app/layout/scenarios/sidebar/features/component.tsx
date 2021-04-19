@@ -24,7 +24,7 @@ export interface ScenariosSidebarWDPAProps {
 }
 
 export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [modal, setModal] = useState(false);
   const { query } = useRouter();
   const { sid } = query;

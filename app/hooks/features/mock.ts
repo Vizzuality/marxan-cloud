@@ -34,8 +34,19 @@ const ITEMS = [
       },
       { label: 'Attribute 3', key: 'attribute-3', values: [] },
     ],
-    splitSelected: null,
-    splitFeaturesSelected: [],
+    splitSelected: 'attribute-1',
+    splitFeaturesSelected: [
+      {
+        id: 'XXX',
+        target: 75,
+        fpf: 2,
+      },
+      {
+        id: 'YYY',
+        target: 67,
+        fpf: 5,
+      },
+    ],
   },
   {
     id: 2,
@@ -67,6 +78,8 @@ const ITEMS = [
       { id: 3, name: 'Species', className: 'text-black bg-yellow-300' },
       { id: 2, name: 'Source name' },
     ],
+    target: 75,
+    fpf: 2,
   },
   {
     id: 4,
