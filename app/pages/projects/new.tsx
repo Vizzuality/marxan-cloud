@@ -29,7 +29,7 @@ const NewProjectsPage: React.FC = () => {
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
 
-        <div className="pt-2.5 pb-10 md:flex-grow">
+        <div className="py-2.5 md:flex-grow">
           <Wrapper>
             <Breadcrumb
               onClick={() => {

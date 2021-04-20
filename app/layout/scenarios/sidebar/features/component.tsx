@@ -95,6 +95,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
           title="Hello"
           open={modal}
           size="narrow"
+          className="h-full"
           onDismiss={() => setModal(false)}
         >
           <AddFeatures />
