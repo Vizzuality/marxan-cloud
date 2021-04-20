@@ -88,7 +88,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
 
   return (
     <FormRFF
-      key="features-add"
+      key="features-list"
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
