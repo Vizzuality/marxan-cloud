@@ -117,13 +117,13 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
             </div>
           )}
 
-          {!!targetedFeaturesData && targetedFeaturesData.length && (
+          {!!targetedFeaturesData && !!targetedFeaturesData.length && (
             <div className="relative flex flex-col flex-grow overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700" />
-              <div className="relative h-full px-0.5 py-6 overflow-x-visible overflow-y-auto">
+              <div className="relative h-full px-0.5 overflow-x-visible overflow-y-auto">
                 <FieldRFF name="features">
                   {({ input }) => (
-                    <div>
+                    <div className="py-6">
                       <Item
                         id="all-targets"
                         defaultTarget={50}
@@ -168,8 +168,8 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
             </div>
           )}
 
-          {!!targetedFeaturesData && targetedFeaturesData.length && (
-            <div className="flex justify-center space-x-3">
+          {!!targetedFeaturesData && !!targetedFeaturesData.length && (
+            <div className="flex justify-center flex-shrink-0 space-x-3">
               <Button
                 className="w-full"
                 type="button"

@@ -101,12 +101,12 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           )}
 
           {!!selectedFeaturesData && !!selectedFeaturesData.length && (
-            <div className="relative flex flex-col flex-grow overflow-hidden">
+            <div className="relative flex flex-col flex-grow min-h-0 overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700" />
-              <div className="relative px-0.5 py-6 overflow-x-visible overflow-y-auto">
+              <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
                 <FieldRFF name="features">
                   {({ input }) => (
-                    <div>
+                    <div className="py-6">
                       {values.features.map((item, i) => {
                         return (
                           <div
@@ -140,6 +140,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
               type="submit"
               theme="secondary-alt"
               size="lg"
+              className="flex-shrink-0"
             >
               Continue
             </Button>
