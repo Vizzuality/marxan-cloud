@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import cx from 'classnames';
 
 import Item from 'components/features/raw-item';
@@ -8,16 +8,24 @@ import Loading from 'components/loading';
 
 export interface ScenariosFeaturesAddListProps {
   search?: string;
+  selected: number[] | string[];
+  onToggleSelected: (selected: string | number) => void;
 }
 
 export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> = ({
   search,
+  selected = [],
+  onToggleSelected,
 }: ScenariosFeaturesAddListProps) => {
   const {
     data: allFeaturesData,
     isFetching: allFeaturesIsFetching,
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures({ search });
+
+  const handleToggleSelected = useCallback((id) => {
+    if (onToggleSelected) onToggleSelected(id);
+  }, [onToggleSelected]);
 
   if (allFeaturesIsFetching && !allFeaturesIsFetched) {
     return (
@@ -45,10 +53,15 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
         )}
 
         {allFeaturesData && allFeaturesData.map((item) => {
+          const selectedIndex = selected.findIndex((f) => f === item.id);
           return (
             <div key={`${item.id}`}>
               <Item
                 {...item}
+                selected={selectedIndex !== -1}
+                onToggleSelected={() => {
+                  handleToggleSelected(item.id);
+                }}
               />
             </div>
           );
