@@ -155,4 +155,16 @@ export class GeoFeaturesService extends AppBaseService<
       });
     return [entitiesWithProperties, entitiesAndCount[1]];
   }
+
+  /**
+   * @todo Extend result by adding the feature's property set (see
+   * `extendFindAllResults()` above) for singular queries.
+   */
+  async extendGetByIdResult(
+    entity: GeoFeature,
+    fetchSpecification?: FetchSpecification,
+    info?: AppInfoDTO,
+  ): Promise<GeoFeature> {
+    return entity;
+  }
 }
