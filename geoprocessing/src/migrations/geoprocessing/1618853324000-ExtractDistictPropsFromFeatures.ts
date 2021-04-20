@@ -46,6 +46,9 @@ DROP VIEW feature_properties;
 
 DROP FUNCTION properties_for_feature(input uuid);
 
+DROP INDEX features_data_feature_id;
+DROP INDEX features_data_properties_gin;
+
 ALTER TABLE features_data
   RENAME COLUMN feature_id TO features_id;
     `);
