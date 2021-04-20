@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { BaseServiceResource } from 'types/resource.interface';
 
 export const geoFeatureResource: BaseServiceResource = {
@@ -32,4 +32,18 @@ export class JSONAPIGeoFeaturesGeometryData {
 export class GeoFeatureResult {
   @ApiProperty()
   data: JSONAPIGeoFeaturesGeometryData;
+}
+
+/**
+ * Entity class for the feature_properties view
+ */
+@Entity('feature_properties')
+export class GeoFeaturePropertySet {
+  @ApiProperty()
+  @PrimaryColumn('uuid', { name: 'feature_id' })
+  featureId: string;
+
+  @ApiProperty()
+  @Column('jsonb', { name: 'properties_for_feature' })
+  properties: Record<string, unknown>;
 }
