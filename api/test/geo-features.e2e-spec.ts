@@ -165,7 +165,9 @@ describe('GeoFeaturesModule (e2e)', () => {
         expect(response.body.data[0].type).toBe(geoFeatureResource.name.plural);
       });
 
-      test.todo('As a user, when I upload feature shapefiles, I should see the related features in the list of those available within a project');
+      test.todo(
+        'As a user, when I upload feature shapefiles, I should see the related features in the list of those available within a project',
+      );
     });
   });
 });
