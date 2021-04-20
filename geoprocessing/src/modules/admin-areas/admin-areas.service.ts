@@ -31,7 +31,6 @@ export class AdminAreasService {
    * @todo generate the custom queries using query builder and the entity data.
    * @todo move the string to int transformation to the AdminAreaLevelFilters class
    */
-
   buildAdminAreaQuery(
     level: AdminAreaLevelFilters
   ): string {
@@ -53,7 +52,6 @@ export class AdminAreasService {
    *
    * @todo find another way of parsing the attributes
    */
-
   getAttributes(
     level: AdminAreaLevelFilters
   ): string {
@@ -62,6 +60,8 @@ export class AdminAreasService {
 
   /**
    * @todo get this query from query builder
+   * @todo apply validation on the controller
+   * @todo update the function to include guid apiQuery param
    */
   public findTile(
     z: number,
