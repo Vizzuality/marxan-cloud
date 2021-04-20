@@ -39,14 +39,19 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     const { splitOptions } = feature;
     const splitFeaturesOptions = key ? splitOptions
       .find((s) => s.key === key).values
-      .map((v) => ({ label: v.id, value: v.value }))
+      .map((v) => ({ label: v.name, value: v.id }))
       : [];
 
     features[featureIndex] = {
       ...feature,
       splitSelected: key,
       splitFeaturesOptions,
-      splitFeaturesSelected: splitFeaturesOptions.map((s) => s.value),
+      splitFeaturesSelected: splitFeaturesOptions.map((s) => ({
+        id: s.value,
+        name: s.label,
+        target: 50,
+        fpf: 1,
+      })),
     };
     onChange(features);
   }, []);

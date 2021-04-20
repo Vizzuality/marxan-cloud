@@ -18,7 +18,7 @@ export const ScenarioFeaturesAdd: React.FC<ScenarioFeaturesAddToolbarProps> = ({
   }, [onSearch]);
 
   return (
-    <div>
+    <div className="px-8">
       <Search
         theme="light"
         size="sm"

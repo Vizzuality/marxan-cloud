@@ -30,26 +30,32 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
   }
 
   return (
-    <div
-      className={cx({
-        'bg-white divide-y divide-black divide-dashed divide-opacity-20': true,
-      })}
-    >
-      {(!allFeaturesData || !allFeaturesData.length) && (
-        <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
-          No results found
-        </div>
-      )}
+    <div className="relative h-full overflow-hidden">
+      <div className="absolute left-0 z-10 w-full h-6 -top-1 bg-gradient-to-b from-white via-white" />
 
-      {allFeaturesData && allFeaturesData.map((item) => {
-        return (
-          <div key={`${item.id}`}>
-            <Item
-              {...item}
-            />
+      <div
+        className={cx({
+          'bg-white divide-y divide-black divide-dashed divide-opacity-20 h-full overflow-y-auto overflow-x-hidden px-8': true,
+        })}
+      >
+        {(!allFeaturesData || !allFeaturesData.length) && (
+          <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
+            No results found
           </div>
-        );
-      })}
+        )}
+
+        {allFeaturesData && allFeaturesData.map((item) => {
+          return (
+            <div key={`${item.id}`}>
+              <Item
+                {...item}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="absolute left-0 z-10 w-full h-6 -bottom-1 bg-gradient-to-t from-white via-white" />
     </div>
   );
 };
