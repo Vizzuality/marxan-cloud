@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Header, Res, Query } from '@nestjs/common';
 import { AdminAreasService, AdminAreaLevelFilters } from './admin-areas.service';
 import { apiGlobalPrefixes } from 'src/api.config';
-import { ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 
 import { Response } from 'express';
@@ -39,6 +39,14 @@ export class AdminAreasController {
     required: true,
     example: '1'
   })
+  @ApiQuery({
+    name: 'guid',
+    description:
+      'Parent country of administrative areas in ISO code',
+    type: String,
+    required: false,
+    example: 'BRA.1',
+  })
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
   @Header('Content-Type', 'application/x-protobuf')
   @Header('Content-Disposition', 'attachment')
@@ -49,6 +57,7 @@ export class AdminAreasController {
     @Param('x') x: number,
     @Param('y') y: number,
     @Param('level') level: AdminAreaLevelFilters,
+    @Query('guid') guid: string,
     @Res() response: Response,
   ): Promise<Object> {
     const tile: Buffer = await this.service.findTile(
