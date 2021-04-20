@@ -1,11 +1,8 @@
-import { Controller, Get, Param, Header, Res } from '@nestjs/common';
-import { AdminAreasService } from './admin-areas.service';
+import { Controller, Get, Param, Header, Res, Query } from '@nestjs/common';
+import { AdminAreasService, AdminAreaLevelFilters } from './admin-areas.service';
 import { apiGlobalPrefixes } from 'src/api.config';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
-// import {
-//   FetchSpecification,
-//   ProcessFetchSpecification,
-// } from 'nestjs-base-service';
+
 
 import { Response } from 'express';
 
@@ -51,9 +48,9 @@ export class AdminAreasController {
     @Param('z') z: number,
     @Param('x') x: number,
     @Param('y') y: number,
-    @Param('level') level: number,
+    @Param('level') level: AdminAreaLevelFilters,
     @Res() response: Response,
-  ): Promise<any> {
+  ): Promise<Object> {
     const tile: Buffer = await this.service.findTile(
       z,
       x,
