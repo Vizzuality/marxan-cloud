@@ -27,10 +27,11 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = ({
   return (
     <div
       className={cx({
-        'w-full h-full overflow-hidden flex flex-col': true,
+        'w-full overflow-hidden flex flex-col flex-grow': true,
       })}
     >
       <Breadcrumb
+        className="flex-shrink-0"
         onClick={() => {
           push(`/projects/${id}`);
         }}
@@ -42,7 +43,7 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = ({
 
       <Tabs />
 
-      <div className="flex-grow mt-2.5 overflow-hidden h-full">
+      <div className="flex-grow flex flex-col mt-2.5 overflow-hidden">
         <AnimatePresence>
           {children}
         </AnimatePresence>
