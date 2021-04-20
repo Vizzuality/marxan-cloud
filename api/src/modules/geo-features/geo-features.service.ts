@@ -1,9 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  getConnection,
+  getManager,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import {
   GeoFeatureGeometry,
+  GeoFeaturePropertySet,
   geoFeatureResource,
 } from './geo-feature.geo.entity';
 import { CreateGeoFeatureDTO } from './dto/create.geo-feature.dto';
@@ -31,6 +37,8 @@ export class GeoFeaturesService extends AppBaseService<
   constructor(
     @InjectRepository(GeoFeatureGeometry, 'geoprocessingDB')
     private readonly geoFeaturesGeometriesRepository: Repository<GeoFeatureGeometry>,
+    @InjectRepository(GeoFeaturePropertySet, 'geoprocessingDB')
+    private readonly geoFeaturePropertySetsRepository: Repository<GeoFeaturePropertySet>,
     @InjectRepository(GeoFeature)
     private readonly geoFeaturesRepository: Repository<GeoFeature>,
   ) {
@@ -109,5 +117,42 @@ export class GeoFeaturesService extends AppBaseService<
     }
 
     return queryFilteredByPublicOrProjectSpecificFeatures;
+  }
+
+  /**
+   * Join properties and their unique values across all the features_data rows
+   * in the geodb with the GeoFeatures data fetched so far.
+   *
+   * We do this "join" here as data is split across the api and the geo dbs,
+   * and we are not using FDWs so far.
+   */
+  async extendFindAllResults(
+    entitiesAndCount: [any[], number],
+    fetchSpecification?: FetchSpecification,
+    info?: AppInfoDTO,
+  ): Promise<[any[], number]> {
+    // Short-circuit if there's no result to extend
+    if (!(entitiesAndCount[1] > 0)) {
+      return entitiesAndCount;
+    }
+    const geoFeatureIds = (entitiesAndCount[0] as GeoFeature[]).map(
+      (i) => i.id,
+    );
+    const entitiesWithProperties = await this.geoFeaturePropertySetsRepository
+      .createQueryBuilder('propertySets')
+      .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds })
+      .getMany()
+      .then((results) => {
+        return (entitiesAndCount[0] as GeoFeature[]).map((i) => {
+          const propertySetForFeature = results.find(
+            (propertySet) => propertySet.featureId === i.id,
+          );
+          return {
+            ...i,
+            properties: propertySetForFeature?.properties,
+          };
+        });
+      });
+    return [entitiesWithProperties, entitiesAndCount[1]];
   }
 }
