@@ -93,17 +93,17 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       initialValues={INITIAL_VALUES}
     >
       {({ handleSubmit, values }) => (
-        <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col h-full overflow-hidden">
+        <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow overflow-hidden">
           {(!selectedFeaturesData || !selectedFeaturesData.length) && (
             <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
               No results found
             </div>
           )}
 
-          {!!selectedFeaturesData && selectedFeaturesData.length && (
-            <div className="relative h-full overflow-hidden">
+          {!!selectedFeaturesData && !!selectedFeaturesData.length && (
+            <div className="relative flex flex-col flex-grow overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700" />
-              <div className="relative h-full px-0.5 py-6 overflow-x-visible overflow-y-auto">
+              <div className="relative px-0.5 py-6 overflow-x-visible overflow-y-auto">
                 <FieldRFF name="features">
                   {({ input }) => (
                     <div>
@@ -135,7 +135,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
             </div>
           )}
 
-          {!!selectedFeaturesData && selectedFeaturesData.length && (
+          {!!selectedFeaturesData && !!selectedFeaturesData.length && (
             <Button
               type="submit"
               theme="secondary-alt"

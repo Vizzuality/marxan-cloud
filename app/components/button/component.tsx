@@ -57,7 +57,7 @@ function buildClassName({
   theme,
 }) {
   return cx({
-    'flex items-center justify-center rounded-4xl focus:outline-blue': true,
+    'flex items-center justify-center rounded-4xl focus:outline-none': true,
     [THEME[theme]]: true,
     [SIZE[size]]: true,
     [className]: !!className,

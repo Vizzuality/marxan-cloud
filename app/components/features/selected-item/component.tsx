@@ -136,6 +136,7 @@ export const Item: React.FC<ItemProps> = ({
                 size="s"
                 status="none"
                 placeholder="Select..."
+                clearSelectionActive
                 selected={splitSelected}
                 options={OPTIONS}
                 onChange={onSplitChanged}

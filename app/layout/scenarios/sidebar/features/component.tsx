@@ -46,7 +46,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   return (
     <motion.div
       key="features"
-      className="h-full overflow-hidden"
+      className="flex flex-col min-h-0 overflow-hidden"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
     >
