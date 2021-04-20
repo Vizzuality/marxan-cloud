@@ -51,7 +51,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
       animate={{ opacity: 1, y: 0 }}
     >
       <Pill selected>
-        <header className="flex justify-between">
+        <header className="flex justify-between flex-shrink-0">
           <div>
             <div className="flex items-baseline space-x-4">
               <h2 className="text-lg font-medium font-heading">Features</h2>
