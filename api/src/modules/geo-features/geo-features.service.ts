@@ -131,8 +131,26 @@ export class GeoFeaturesService extends AppBaseService<
     fetchSpecification?: FetchSpecification,
     info?: AppInfoDTO,
   ): Promise<[any[], number]> {
-    // Short-circuit if there's no result to extend
-    if (!(entitiesAndCount[1] > 0)) {
+    /**
+     * Short-circuit if there's no result to extend, or if the API client has
+     * asked to omit specific fields and these do include `properties`.
+     *
+     * The case where the API client explicitly asks for specific fields is
+     * slightly different: since `properties` is not a column of the entity
+     * associated to this service and is only added to the 'result DTO' here,
+     * asking for `?fields=properties` in an API query would result in a SQL
+     * error; nevertheless, we can short-circuit here in any case, assuming that
+     * if the API client is asking only for specific fields, it would be safe to
+     * omit any additional fields which would normally be loaded as part of a
+     * 'result DTO'.
+     */
+    if (
+      !(entitiesAndCount[1] > 0) ||
+      (fetchSpecification?.omitFields &&
+        fetchSpecification.omitFields.includes('properties')) ||
+      (fetchSpecification?.fields &&
+        !fetchSpecification.fields.includes('properties'))
+    ) {
       return entitiesAndCount;
     }
     const geoFeatureIds = (entitiesAndCount[0] as GeoFeature[]).map(
