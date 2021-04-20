@@ -7,6 +7,9 @@ export class ExtractDistictPropsFromFeatures1618853324000
 ALTER TABLE features_data
   RENAME COLUMN features_id TO feature_id;
 
+CREATE INDEX features_data_feature_id ON features_data (feature_id);
+CREATE INDEX features_data_properties_gin ON features_data USING gin (properties);
+
 CREATE OR REPLACE FUNCTION properties_for_feature(input uuid)
   RETURNS jsonb
   LANGUAGE plpgsql AS
