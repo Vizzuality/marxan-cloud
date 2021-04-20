@@ -13,7 +13,6 @@ import { JwtAuthGuard } from 'guards/jwt-auth.guard';
 import { apiGlobalPrefixes } from 'api.config';
 import { ProxyService } from './proxy.service';
 import { Request, Response } from 'express';
-// import { ProxyAdminAreaLevel  } from 'modules/admin-areas/admin-areas.service'
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -65,11 +64,7 @@ export class ProxyController {
    *@todo add level validation here in proxy service. Duplicated on the geoprocessing api.
    */
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
-  async proxyTile(
-    // @Param() level: ProxyAdminAreaLevel,
-    @Req() request: Request,
-    @Res() response: Response,
-  ) {
+  async proxyTile(@Req() request: Request, @Res() response: Response) {
     return this.proxyService.proxyTileRequest(request, response);
   }
 }
