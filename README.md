@@ -50,7 +50,7 @@ orchestrated via Kubernetes (forthcoming).
      PostgreSQL connection (API)
    * `API_POSTGRES_PASSWORD` (string, required): password to be used for the
      PostgreSQL connection (API)
-	 * `API_POSTGRES_DB` (string, required): name of the database to be used for
+   * `API_POSTGRES_DB` (string, required): name of the database to be used for
      the PostgreSQL connection (API)
    * `GEOPROCESSING_SERVICE_PORT` (number, required): the port on which the
      Geoprocessing service should listen on the local machine
@@ -69,6 +69,10 @@ orchestrated via Kubernetes (forthcoming).
      PostgreSQL for Airflow service should listen on the local machine
    * `AIRFLOW_PORT` (number, required): the port on which the
      Airflow service should listen on the local machine
+   * `REDIS_API_SERVICE_PORT` (number, required): the port on which the
+     Redis service should listen on the local machine
+   * `REDIS_COMMANDER_PORT` (number, required): the port on which the
+     Redis Commander service should listen on the local machine
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted

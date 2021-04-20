@@ -33,6 +33,9 @@
       "prettier --ignore-path ./.prettierignore --write"
     ]
   },
+  "engines": {
+    "node": "^14"
+  },
   "dependencies": {
     "@nestjs/common": "^7.6.5",
     "@nestjs/core": "^7.5.1",
