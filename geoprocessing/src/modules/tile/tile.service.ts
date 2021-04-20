@@ -25,35 +25,6 @@ export interface TileRequest {
 }
 
 /**
- * @description Input interface for the tile query builder
- */
-export interface ITileQuery extends TileRequest{
-  table: string;
-  geometry: string;
-  extent: number;
-  buffer: number;
-}
-
-/**
- * @description The tile query builder callback definition
- */
-export type GetTileQuery = (input: ITileQuery) => string;
-
-/**
- * @description Input interface for the base query builder
- */
-export interface IBaseQueryInput extends ITileQuery{
-  maxZoomLevel: number;
-  customQuery: string;
-  attributes: string;
-}
-
-/**
- * @description The base query builder callback definition
- */
-export type GetBaseQuery = (input: IBaseQueryInput) => string;
-
-/**
  * @description This function define tile query input for the tile requested
  */
 export interface ITileQueryInput extends TileRequest {
@@ -64,7 +35,6 @@ export interface ITileQueryInput extends TileRequest {
   buffer: number;
   customQuery: string;
   attributes: string;
-  getBaseQuery?: GetBaseQuery;
 }
 
 @Injectable()
@@ -76,7 +46,7 @@ export class TileService {
    * @description The default base query builder
    */
   private readonly logger: Logger = new Logger(TileService.name);
-  defaultGetBaseQuery: GetBaseQuery = ({
+  createQueryForTile = ({
     x,
     y,
     z,
@@ -86,66 +56,30 @@ export class TileService {
     buffer,
     customQuery,
     attributes,
-  }: IBaseQueryInput) => `
-  SELECT
-    ${attributes},
-    ST_AsMVTGeom(
-      -- Geometry from table
-      ST_Transform(ST_RemoveRepeatedPoints(${geometry}, 0.1), 3857),
-      -- MVT tile boundary
-      ST_TileEnvelope(${z}, ${x}, ${y}),
-      -- Extent
-      ${extent},
-      -- Buffer
-      ${buffer},
-      -- Clip geom
-      true
-    ) AS mvt_geom
-  FROM ${table}
-  WHERE
-    ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry})
-    and ${customQuery}
-    and not gid_0 ='ATA'
+  }: ITileQueryInput) => `
+  WITH tile AS (
+    SELECT
+      ${attributes},
+      ST_AsMVTGeom(
+        -- Geometry from table
+        ST_Transform(ST_RemoveRepeatedPoints(${geometry}, 0.1), 3857),
+        -- MVT tile boundary
+        ST_TileEnvelope(${z}, ${x}, ${y}),
+        -- Extent
+        ${extent},
+        -- Buffer
+        ${buffer},
+        -- Clip geom
+        true
+      ) AS mvt_geom
+    FROM ${table}
+    WHERE
+      ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry})
+      and ${customQuery}
+      and not gid_0 ='ATA'
+  )
+  SELECT ST_AsMVT(tile, 'layer0',  ${extent}, 'mvt_geom') AS mvt FROM tile
   `;
-
-  /**
-   * @description Creates the query for tile
-   */
-  createQueryForTile({
-    z,
-    x,
-    y,
-    maxZoomLevel,
-    table,
-    geometry,
-    extent,
-    buffer,
-    customQuery,
-    attributes,
-    getBaseQuery = this.defaultGetBaseQuery,
-  }: ITileQueryInput): string {
-    const queryParts: string[] = [];
-    queryParts.push(
-      `WITH tile AS (${getBaseQuery({
-        x,
-        y,
-        z,
-        table,
-        geometry,
-        maxZoomLevel,
-        buffer,
-        extent,
-        customQuery,
-        attributes,
-      })})`,
-    );
-
-    const sql = `${queryParts.join(
-      ',\n',
-    )}\nSELECT ST_AsMVT(tile, 'layer0',  ${extent}, 'mvt_geom') AS mvt FROM tile`;
-
-    return sql;
-  }
 
   /**
    * BuilDs tile query.
@@ -168,6 +102,10 @@ export class TileService {
   ): string {
     let query = '';
 
+    /**
+     * @todo apply validation on controller
+     */
+
     z = parseInt(`${z}`, 10);
     if (z > 20) {
       throw new Error('Zoom level should be lower than 20');
@@ -181,7 +119,6 @@ export class TileService {
     if (isNaN(x) || isNaN(y)) {
       throw new Error('Invalid tile coordinates');
     }
-
     try {
       query = this.createQueryForTile({
         z,
@@ -208,7 +145,7 @@ export class TileService {
    * @param query the actual query to be sent to the database engine
    * @return the tile-data as Buffer wrapped in a promise.
    */
-  async fetchTileFromDatabase(query: string): Promise<Buffer> {
+  async fetchTileFromDatabase(query: string): Promise<Record<'mvt', Buffer>[]> {
     const connection = getConnection();
     const queryRunner = connection.createQueryRunner();
     queryRunner.connect();
@@ -270,23 +207,19 @@ export class TileService {
       attributes,
     );
     this.logger.debug('Query created');
-    let data: any | null = null;
+    let data: Buffer = Buffer.from('');
     if (query) {
       try {
-        data = await this.fetchTileFromDatabase(query);
+        const queryResult: Record<'mvt', Buffer> [] = await this.fetchTileFromDatabase(query);
         this.logger.debug('Data succesfully retrieved from database');
+        // zip data
+        data = await this.zip(queryResult[0].mvt);
+    this.logger.debug('Data compressed');
       } catch (error) {
         this.logger.error(`Database error: ${error.message}`);
         return data;
       }
-    } else {
-      // Empty query => empty tile
-      this.logger.debug(`[INFO] - Empty query for tile '${z}/${x}/${y}'`);
-      data = Buffer.from('');
     }
-    // zip data
-    data = await this.zip(data[0].mvt);
-    this.logger.debug('Data compressed');
     return data;
   }
 }

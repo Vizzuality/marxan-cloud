@@ -3,17 +3,17 @@
  */
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { IsInt, IsOptional, Max, Min } from 'class-validator';
+// import { IsInt, IsOptional, Max, Min } from 'class-validator';
 /**
  * Supported admin area levels (sub-national): either level 1 or level 2.
  */
-export class AdminAreaLevel {
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  @Max(2)
-  level?: number;
-}
+// export class AdminAreaLevel {
+//   @IsOptional()
+//   @IsInt()
+//   @Min(0)
+//   @Max(2)
+//   level?: number;
+// }
 
 @Entity('admin-regions')
 export class AdminArea {
