@@ -16,7 +16,7 @@ export enum FeatureTags {
   species = 'species',
 }
 
-export interface GeoFeatureCategory {
+export interface GeoFeatureProperty {
   key: string;
   distinctValues: string[];
 }
@@ -48,7 +48,7 @@ export class GeoFeature {
   tag: FeatureTags;
 
   @ApiPropertyOptional()
-  categories?: GeoFeatureCategory[];
+  properties?: GeoFeatureProperty[];
 
   @ApiPropertyOptional()
   @Column('uuid', { name: 'project_id' })

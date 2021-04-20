@@ -17,7 +17,7 @@ import {
 import {
   FeatureTags,
   GeoFeature,
-  GeoFeatureCategory,
+  GeoFeatureProperty,
 } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 
@@ -49,7 +49,7 @@ export class GeoFeaturesService extends AppBaseService<
         'propertyName',
         'intersection',
         'tag',
-        'categories',
+        'properties',
       ],
       keyForAttribute: 'camelCase',
     };
@@ -64,11 +64,11 @@ export class GeoFeaturesService extends AppBaseService<
       propertyName: faker.random.words(8),
       intersection: [...Array(4)].map((_i) => faker.random.uuid()),
       tag: faker.random.arrayElement(Object.values(FeatureTags)),
-      categories: [...Array(6)].map((_i) => this._fakeGeoFeatureCategory()),
+      properties: [...Array(6)].map((_i) => this._fakeGeoFeatureProperty()),
     };
   }
 
-  private _fakeGeoFeatureCategory(): GeoFeatureCategory {
+  private _fakeGeoFeatureProperty(): GeoFeatureProperty {
     return {
       key: faker.random.word(),
       distinctValues: [...Array(8)].map((_i) => faker.random.words(6)),
