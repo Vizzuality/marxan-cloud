@@ -59,7 +59,15 @@ export class ProxyController {
     required: true,
     example: '1',
   })
+  @ApiQuery({
+    name: 'guid',
+    description: 'Parent country of administrative areas in ISO code',
+    type: String,
+    required: false,
+    example: 'BRA.1',
+  })
   /**
+   *
    *@todo parse level from admin areas entity
    *@todo add level validation here in proxy service. Duplicated on the geoprocessing api.
    */
