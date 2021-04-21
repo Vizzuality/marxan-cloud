@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Project } from 'modules/projects/project.api.entity';
 import { GeoFeature } from './geo-feature.api.entity';
 import {
   GeoFeatureGeometry,
@@ -15,7 +16,7 @@ import { GeoFeaturesService } from './geo-features.service';
       [GeoFeatureGeometry, GeoFeaturePropertySet],
       'geoprocessingDB',
     ),
-    TypeOrmModule.forFeature([GeoFeature]),
+    TypeOrmModule.forFeature([GeoFeature, Project]),
   ],
   providers: [GeoFeaturesService],
   controllers: [GeoFeaturesController],

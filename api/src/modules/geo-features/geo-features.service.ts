@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import {
@@ -26,6 +26,7 @@ import {
   GeoFeatureProperty,
 } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
+import { Project } from 'modules/projects/project.api.entity';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -54,6 +55,8 @@ export class GeoFeaturesService extends AppBaseService<
     private readonly geoFeaturePropertySetsRepository: Repository<GeoFeaturePropertySet>,
     @InjectRepository(GeoFeature)
     private readonly geoFeaturesRepository: Repository<GeoFeature>,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
   ) {
     super(
       geoFeaturesRepository,
@@ -124,20 +127,22 @@ export class GeoFeaturesService extends AppBaseService<
      * project.
      *
      * projectId may be coming our way either via info.params.projectId (if this
-     * is added within the API) of via fetchSpeciication.filter.projectId (if it
-     * is supplied as part of a GET query parsed according to the JSON:API
-     * spec), hence the if/else if/else here.
+     * is added within the API) of via fetchSpecification.filter.projectId (if
+     * it is supplied as part of a GET query parsed according to the JSON:API
+     * spec), and if a projectId is supplied in either way, we first check if
+     * the project exists (if not, we throw a NotFoundException).
      */
     let queryFilteredByPublicOrProjectSpecificFeatures;
-    if (info?.params?.projectId) {
+    const projectId: string =
+      (info?.params?.projectId as string) ??
+      (fetchSpecification?.filter?.projectId as string);
+    if (projectId) {
+      await this.projectRepository.findOneOrFail(projectId).catch((_error) => {
+        throw new NotFoundException(`No project with id ${projectId} exists.`);
+      });
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
         `${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL`,
-        { projectId: info.params.projectId },
-      );
-    } else if (fetchSpecification?.filter?.projectId) {
-      queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
-        `${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL`,
-        { projectId: fetchSpecification.filter.projectId },
+        { projectId },
       );
     } else {
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
