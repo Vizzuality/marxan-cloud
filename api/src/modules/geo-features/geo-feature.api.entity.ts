@@ -33,6 +33,19 @@ export class GeoFeature {
 
   @ApiPropertyOptional()
   @Column('varchar')
+  description?: string;
+
+  @ApiPropertyOptional()
+  /**
+   * @todo Enable mapping of this property to a DB field once this is moved
+   * over from the `features_data` table in the geodb or handled in a different
+   * way (e.g. via https://vizzuality.atlassian.net/browse/MARXAN-344)
+   */
+  // @Column('varchar')
+  source?: string;
+
+  @ApiPropertyOptional()
+  @Column('varchar')
   alias?: string;
 
   @ApiPropertyOptional()

@@ -26,6 +26,8 @@ import { Project } from 'modules/projects/project.api.entity';
 const geoFeatureFilterKeyNames = [
   'featureClassName',
   'alias',
+  'description',
+  'source',
   'propertyName',
   'tag',
   'projectId',
@@ -65,6 +67,8 @@ export class GeoFeaturesService extends AppBaseService<
       attributes: [
         'featureClassName',
         'alias',
+        'description',
+        'source',
         'propertyName',
         'intersection',
         'tag',
