@@ -1,5 +1,5 @@
 // to-do: work on cache later
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 
@@ -25,7 +25,7 @@ export interface TileRequest {
 }
 
 /**
- * @description This function define tile query input for the tile requested
+ * @description This function define tile query input for the tile query requested
  */
 export interface ITileQueryInput extends TileRequest {
   maxZoomLevel: number;
@@ -37,6 +37,72 @@ export interface ITileQueryInput extends TileRequest {
   attributes: string;
 }
 
+/**
+ * @description Configuration options for the tile service
+ * @todo add cache options
+ */
+export interface TileServiceConfig<T> {
+  /**
+   * @description Max zoom level for data rendering
+   */
+  maxZoomLevel: number;
+  /**
+   * @description Custom query for the different entities
+   */
+  customQuery: string;
+  /**
+   * @description attributes to be retrieved from the different entities
+   */
+  attributes: string;
+}
+
+/**
+ * @description The required input values for the tile renderer
+ */
+export interface TileInput<T> extends TileRequest {
+  /**
+   * @description The name of the table
+   */
+  table: string;
+  /**
+   * @description The geometry column name, default is "The_geom". This column should be of type Geometry in PostGIS
+   */
+  geometry?: string;
+  /**
+   * @description The tile extent is the grid dimension value as specified by ST_AsMVT. The default is 4096.
+   * @see https://postgis.net/docs/ST_AsMVT.html
+   */
+  extent?: number;
+  /**
+   * @description Max zoom level for data rendering
+   */
+  maxZoomLevel?: number;
+   /**
+   * @description The buffer around the tile extent in the number of grid cells as specified by ST_AsMVT. The default is 256.
+   * @see https://postgis.net/docs/ST_AsMVT.html
+   */
+  buffer?: number;
+  /**
+   * @description Custom query for the different entities
+   */
+  customQuery: string,
+  /**
+   * @description attributes to be retrieved from the different entities
+   */
+  attributes: string,
+}
+
+
+/**
+ * @description This function creates the MVT tiles from the appropriate TileInput
+ */
+export type TileRenderer<T> = (args: TileInput<T>) => Promise<ArrayBuffer>;
+
+
+
+/**
+ * @todo add generic type
+ */
 @Injectable()
 export class TileService {
   /**
@@ -104,12 +170,13 @@ export class TileService {
 
     /**
      * @todo apply validation on controller
+     * @todo add BadRequestException for zoom level
      */
 
     z = parseInt(`${z}`, 10);
-    if (z > 20) {
-      throw new Error('Zoom level should be lower than 20');
-    }
+    // if (z > 20) {
+    //   throw new BadRequestException('Zoom level should be lower than 20');
+    // }
     if (isNaN(z)) {
       throw new Error('Invalid zoom level');
     }
@@ -173,6 +240,25 @@ export class TileService {
     });
   }
 
+  // getTileService({
+  //   maxZoomLevel = 12,
+  //   customQuery = 'gid_2 is not null',
+  //   attributes = 'gid_2'
+  // }: TileServerConfig<T>): Promise<TileRenderer<T>> {
+  //   return async this.getTile(
+  //     z: number,
+  //     x: number,
+  //     y: number,
+  //     table: string,
+  //     geometry: string,
+  //     extent: number,
+  //     buffer: number,
+  //     maxZoomLevel: number,
+  //     customQuery: string,
+  //     attributes: string,
+  //   )
+  // }
+
   /**
    * The main function that returns a tile in mvt-format.
    * @param z The zoom level ranging from 0 - 20
@@ -180,7 +266,9 @@ export class TileService {
    * @param y The tile y offset on Mercator Projection
    * @return contains the tile-data and some meta-information
    *
-   * @TODO - check for valid tile and for valid data source
+   * @todo check for valid tile and for valid data source
+   * @todo Add tile server config type to getTile function
+   * @todo add tile render type to promise
    */
   async getTile(
     z: number,
