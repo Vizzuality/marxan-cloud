@@ -19,6 +19,7 @@ import { Request, Response } from 'express';
 @ApiTags('AdminArea vector tile proxy')
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class ProxyController {
+
   constructor(private readonly proxyService: ProxyService) {}
 
   @ApiOperation({
