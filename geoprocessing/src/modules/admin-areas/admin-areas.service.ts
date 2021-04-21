@@ -9,9 +9,8 @@ const logger = new Logger('test-interface');
  * @todo check transformation from string to int that doesn't work.
  */
 export class AdminAreaLevelFilters {
-  @Transform((level: string) => parseInt(level))
-  @IsInt()
-  @IsIn([0, 1, 2])
+  // @IsIn([0, 1, 2])
+  // @IsInt()
   @Transform((level: string) => parseInt(level))
   level: number;
 }
@@ -28,7 +27,7 @@ export class AdminAreasService {
    */
   buildAdminAreaQuery(level: AdminAreaLevelFilters): string {
     let customsql: string = '';
-    const adminAreaLevel = parseInt(`${level}`, 10);
+    const adminAreaLevel = parseInt(`${level.level}`, 10);
     if (adminAreaLevel === 0) {
       customsql += `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL`;
     }
@@ -46,7 +45,7 @@ export class AdminAreasService {
    * @todo find another way of parsing the attributes
    */
   getAttributes(level: AdminAreaLevelFilters): string {
-    return `gid_${level}`;
+    return `gid_${level.level}`;
   }
 
   /**
@@ -58,15 +57,15 @@ export class AdminAreasService {
     z: number,
     x: number,
     y: number,
-    level: AdminAreaLevelFilters,
+    level: number,
   ): Promise<Buffer> {
     // if (parseInt(`${level}`, 10) > 2) {
     //   throw new BadRequestException(
     //     'An invalid level may have been provided. Level should be lower or equal to 2'
     //     );
     // }
-    const customQuery = this.buildAdminAreaQuery(level);
-    const attributes = this.getAttributes(level);
+    const customQuery = this.buildAdminAreaQuery({ level });
+    const attributes = this.getAttributes({ level });
     const table = 'admin_regions';
     const geometry = 'the_geom';
     const extent = 4096;
