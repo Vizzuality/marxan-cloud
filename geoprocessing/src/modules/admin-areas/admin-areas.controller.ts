@@ -1,5 +1,19 @@
-import { Controller, Get, Param, Header, Res, Query } from '@nestjs/common';
-import { AdminAreasService, AdminAreaLevelFilters } from './admin-areas.service';
+import {
+  UsePipes,
+  ValidationPipe,
+  Controller,
+  Get,
+  Param,
+  Header,
+  Res,
+  Query,
+  Logger,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  AdminAreasService,
+  AdminAreaLevelFilters,
+} from './admin-areas.service';
 import { apiGlobalPrefixes } from 'src/api.config';
 import {
   ApiOperation,
@@ -8,13 +22,14 @@ import {
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
 
-
 import { Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class AdminAreasController {
+  private readonly logger: Logger = new Logger(AdminAreasController.name);
   constructor(public service: AdminAreasService) {}
 
+  // @UsePipes(new CustomValidationPipe())
   @ApiOperation({
     description: 'Get tile for administrative areas within a given country.',
   })
@@ -42,12 +57,11 @@ export class AdminAreasController {
       'Specific level to filter the administrative areas (0, 1 or 2)',
     type: Number,
     required: true,
-    example: '1'
+    example: '1',
   })
   @ApiQuery({
     name: 'guid',
-    description:
-      'Parent country of administrative areas in ISO code',
+    description: 'Parent country of administrative areas in ISO code',
     type: String,
     required: false,
     example: 'BRA.1',
@@ -59,21 +73,17 @@ export class AdminAreasController {
   @Header('Access-Control-Allow-Origin', '*')
   // @Header('Content-Encoding', 'gzip,deflate')
   @Header('Content-Encoding', 'gzip')
-
   async getTile(
-    @Param('z') z: number,
-    @Param('x') x: number,
-    @Param('y') y: number,
+    @Param('z', ParseIntPipe) z: number,
+    @Param('x', ParseIntPipe) x: number,
+    @Param('y', ParseIntPipe) y: number,
     @Param('level') level: AdminAreaLevelFilters,
     @Query('guid') guid: string,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(
-      z,
-      x,
-      y,
-      level,
-    );
+    this.logger.debug('test');
+    this.logger.debug(typeof level);
+    const tile: Buffer = await this.service.findTile(z, x, y, level);
     return response.send(tile);
   }
 }
