@@ -1,9 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger
+} from '@nestjs/common';
 import { TileService } from 'src/modules/tile/tile.service';
 import { IsInt, Max, Min} from 'class-validator';
 // import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-
 
 /**
  * Supported admin area levels (national and sub-national): either level 0, level 1 or level 2.
@@ -69,6 +72,11 @@ export class AdminAreasService {
     y: number,
     level: AdminAreaLevelFilters,
   ): Promise<Buffer> {
+    // if (parseInt(`${level}`, 10) > 2) {
+    //   throw new BadRequestException(
+    //     'An invalid level may have been provided. Level should be lower or equal to 2'
+    //     );
+    // }
     const customQuery = this.buildAdminAreaQuery(level)
     const attributes = this.getAttributes(level);
     const table = 'admin_regions';
