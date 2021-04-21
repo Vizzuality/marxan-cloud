@@ -77,7 +77,7 @@ export class AdminAreasController {
     @Param('z', ParseIntPipe) z: number,
     @Param('x', ParseIntPipe) x: number,
     @Param('y', ParseIntPipe) y: number,
-    @Param('level') level: AdminAreaLevelFilters,
+    @Param('level') { level }: AdminAreaLevelFilters,
     @Query('guid') guid: string,
     @Res() response: Response,
   ): Promise<Object> {
