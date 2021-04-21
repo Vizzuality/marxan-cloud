@@ -27,6 +27,19 @@ import {
 } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 
+const geoFeatureFilterKeyNames = [
+  'featureClassName',
+  'alias',
+  'propertyName',
+  'tag',
+  'projectId',
+] as const;
+type GeoFeatureFilterKeys = keyof Pick<
+  GeoFeature,
+  typeof geoFeatureFilterKeyNames[number]
+>;
+type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
+
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
   GeoFeature,
@@ -81,6 +94,22 @@ export class GeoFeaturesService extends AppBaseService<
       key: faker.random.word(),
       distinctValues: [...Array(8)].map((_i) => faker.random.words(6)),
     };
+  }
+
+  /**
+   * Apply service-specific filters.
+   */
+  setFilters(
+    query: SelectQueryBuilder<GeoFeature>,
+    filters: GeoFeatureFilters,
+    _info?: AppInfoDTO,
+  ): SelectQueryBuilder<GeoFeature> {
+    this._processBaseFilters<GeoFeatureFilters>(
+      query,
+      filters,
+      geoFeatureFilterKeyNames,
+    );
+    return query;
   }
 
   async extendFindAllQuery(
