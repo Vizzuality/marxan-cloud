@@ -1,12 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
-import {
-  getConnection,
-  getManager,
-  Repository,
-  SelectQueryBuilder,
-} from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import {
   GeoFeatureGeometry,
   GeoFeaturePropertySet,
@@ -163,7 +158,7 @@ export class GeoFeaturesService extends AppBaseService<
   async extendFindAllResults(
     entitiesAndCount: [any[], number],
     fetchSpecification?: FetchSpecification,
-    info?: AppInfoDTO,
+    _info?: AppInfoDTO,
   ): Promise<[any[], number]> {
     /**
      * Short-circuit if there's no result to extend, or if the API client has
@@ -214,8 +209,8 @@ export class GeoFeaturesService extends AppBaseService<
    */
   async extendGetByIdResult(
     entity: GeoFeature,
-    fetchSpecification?: FetchSpecification,
-    info?: AppInfoDTO,
+    _fetchSpecification?: FetchSpecification,
+    _info?: AppInfoDTO,
   ): Promise<GeoFeature> {
     return entity;
   }
