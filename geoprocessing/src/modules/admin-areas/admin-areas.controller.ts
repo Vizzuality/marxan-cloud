@@ -1,7 +1,12 @@
 import { Controller, Get, Param, Header, Res, Query } from '@nestjs/common';
 import { AdminAreasService, AdminAreaLevelFilters } from './admin-areas.service';
 import { apiGlobalPrefixes } from 'src/api.config';
-import { ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiBadRequestResponse,
+} from '@nestjs/swagger';
 
 
 import { Response } from 'express';
@@ -48,10 +53,13 @@ export class AdminAreasController {
     example: 'BRA.1',
   })
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
+  @ApiBadRequestResponse()
   @Header('Content-Type', 'application/x-protobuf')
   @Header('Content-Disposition', 'attachment')
   @Header('Access-Control-Allow-Origin', '*')
+  // @Header('Content-Encoding', 'gzip,deflate')
   @Header('Content-Encoding', 'gzip')
+
   async getTile(
     @Param('z') z: number,
     @Param('x') x: number,
