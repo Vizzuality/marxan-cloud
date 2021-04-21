@@ -46,7 +46,7 @@ describe('AllExceptionFilter class spec (unit)', () => {
     const exception = Object.create(HttpException.prototype);
     const exceptionMock = Object.assign(exception, exceptionObjectMock);
 
-    allExceptionsFilter.catch(exception, hostMock);
+    allExceptionsFilter.catch(exceptionMock, hostMock);
 
     expect(responseMock.status).toHaveBeenCalledWith(exceptionMock.getStatus());
     expect(responseMock.json).toHaveBeenCalled();
