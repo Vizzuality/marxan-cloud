@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TileService, TileRequest } from 'src/modules/tile/tile.service';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsInt,
   Max,
@@ -56,18 +56,9 @@ export class AdminAreasService {
    * @todo update the function to include guid apiQuery param
    */
   public findTile(
-    {
-      z,
-      x,
-      y,
-      level
-    }: {
-      z: number,
-      x: number,
-      y: number,
-      level: number
-    }
+    tileSpecification: TileSpecification
   ): Promise<Buffer> {
+    const { z, x, y, level } = tileSpecification;
     const customQuery = this.buildAdminAreaQuery(level);
     const attributes = this.getAttributes(level);
     const table = 'admin_regions';
@@ -75,7 +66,6 @@ export class AdminAreasService {
     const extent = 4096;
     const buffer = 256;
     const maxZoomLevel = 12;
-    console.log('params', level)
 
     return this.tileService.getTile(
       z,
