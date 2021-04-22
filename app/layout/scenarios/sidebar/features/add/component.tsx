@@ -28,7 +28,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
 
   const {
     isFetched: allFeaturesIsFetched,
-  } = useAllFeatures(pid, { search });
+  } = useAllFeatures(pid);
 
   const INITIAL_VALUES = useMemo(() => {
     if (selectedFeaturesData) {
