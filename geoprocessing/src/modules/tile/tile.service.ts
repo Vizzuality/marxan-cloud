@@ -2,25 +2,35 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
+import { Transform } from 'class-transformer';
+import { IsInt, Max, Min, } from 'class-validator';
 
 
 /**
  * @description The specification of the tile request
  */
-export interface TileRequest {
+export class TileRequest {
   /**
    * @description The zoom level ranging from 0 - 20
    */
+  @IsInt()
+  @Min(0)
+  @Max(20)
+  @Transform((i) => Number.parseInt(i))
   z: number;
 
   /**
    * @description The tile x offset on Mercator Projection
    */
+  @IsInt()
+  @Transform((i) => Number.parseInt(i))
   x: number;
 
   /**
    * @description The tile y offset on Mercator Projection
    */
+  @IsInt()
+  @Transform((i) => Number.parseInt(i))
   y: number;
 }
 
