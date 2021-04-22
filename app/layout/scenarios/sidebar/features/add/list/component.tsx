@@ -1,10 +1,11 @@
 import React, { useCallback } from 'react';
 import cx from 'classnames';
 
+import Loading from 'components/loading';
 import Item from 'components/features/raw-item';
 
 import { useAllFeatures } from 'hooks/features';
-import Loading from 'components/loading';
+import { useRouter } from 'next/router';
 
 export interface ScenariosFeaturesAddListProps {
   search?: string;
@@ -17,11 +18,14 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
   selected = [],
   onToggleSelected,
 }: ScenariosFeaturesAddListProps) => {
+  const { query } = useRouter();
+  const { pid } = query;
+
   const {
     data: allFeaturesData,
     isFetching: allFeaturesIsFetching,
     isFetched: allFeaturesIsFetched,
-  } = useAllFeatures({ search });
+  } = useAllFeatures(pid, { search });
 
   const handleToggleSelected = useCallback((id) => {
     if (onToggleSelected) onToggleSelected(id);

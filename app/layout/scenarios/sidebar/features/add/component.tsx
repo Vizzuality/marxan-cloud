@@ -7,7 +7,8 @@ import Button from 'components/button';
 import Toolbar from 'layout/scenarios/sidebar/features/add/toolbar';
 import List from 'layout/scenarios/sidebar/features/add/list';
 
-import { useSelectedFeatures } from 'hooks/features';
+import { useAllFeatures, useSelectedFeatures } from 'hooks/features';
+import { useRouter } from 'next/router';
 
 export interface ScenariosFeaturesAddProps {
   onSuccess?: () => void;
@@ -18,10 +19,16 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   onDismiss,
 }: ScenariosFeaturesAddProps) => {
   const [search, setSearch] = useState(null);
+  const { query } = useRouter();
+  const { pid } = query;
 
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures({});
+
+  const {
+    isFetched: allFeaturesIsFetched,
+  } = useAllFeatures(pid, { search });
 
   const INITIAL_VALUES = useMemo(() => {
     if (selectedFeaturesData) {
@@ -87,25 +94,27 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
             )}
           </FieldRFF>
 
-          <div className="flex justify-center flex-shrink-0 px-8 space-x-3">
-            <Button
-              className="w-full"
-              theme="secondary"
-              size="lg"
-              onClick={onCancel}
-            >
-              Cancel
-            </Button>
+          {allFeaturesIsFetched && (
+            <div className="flex justify-center flex-shrink-0 px-8 space-x-3">
+              <Button
+                className="w-full"
+                theme="secondary"
+                size="lg"
+                onClick={onCancel}
+              >
+                Cancel
+              </Button>
 
-            <Button
-              type="submit"
-              className="w-full"
-              theme="primary"
-              size="lg"
-            >
-              Save
-            </Button>
-          </div>
+              <Button
+                type="submit"
+                className="w-full"
+                theme="primary"
+                size="lg"
+              >
+                Save
+              </Button>
+            </div>
+          )}
         </form>
       )}
     </FormRFF>

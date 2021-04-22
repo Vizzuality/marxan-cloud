@@ -10,7 +10,8 @@ export interface ItemProps {
   name: string;
   categories?: number;
   description: string;
-  tags?: Record<string, unknown>[];
+  tag?: string;
+  source?: string;
   selected?: boolean;
   onToggleSelected?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
@@ -20,7 +21,8 @@ export const Item: React.FC<ItemProps> = ({
   name,
   categories = 0,
   description,
-  tags = [],
+  tag,
+  source,
   selected,
   onToggleSelected,
 }: ItemProps) => {
@@ -55,26 +57,31 @@ export const Item: React.FC<ItemProps> = ({
         </div>
       </header>
 
-      {!!tags.length && (
-        <div className="flex mt-1">
-          {tags.map((t, i) => (
-            <div
-              key={`${t.id}`}
-              className={cx({
-                'ml-1.5': i !== 0,
-              })}
-            >
-              <Tag
-                className={cx({
-                  [`${t.className}`]: !!t.className,
-                })}
-              >
-                {t.name}
-              </Tag>
-            </div>
-          ))}
+      <div className="flex mt-1">
+        <div>
+          <Tag
+            className={cx({
+              'text-black bg-green-300': tag === 'bioregional',
+              'text-black bg-yellow-300': tag === 'species',
+            })}
+          >
+            {tag === 'bioregional' && 'Bioregional'}
+            {tag === 'species' && 'Species'}
+          </Tag>
         </div>
-      )}
+
+        {source && (
+          <div
+            className={cx({
+              'ml-1.5': true,
+            })}
+          >
+            <Tag>
+              {source}
+            </Tag>
+          </div>
+        )}
+      </div>
 
       <div className="mt-4 text-sm opacity-50 clamp-2">{description}</div>
     </div>
