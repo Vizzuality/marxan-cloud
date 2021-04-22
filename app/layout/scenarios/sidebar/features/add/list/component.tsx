@@ -6,6 +6,7 @@ import Item from 'components/features/raw-item';
 
 import { useAllFeatures } from 'hooks/features';
 import { useRouter } from 'next/router';
+import useBottomScrollListener from 'hooks/scroll';
 
 export interface ScenariosFeaturesAddListProps {
   search?: string;
@@ -14,7 +15,6 @@ export interface ScenariosFeaturesAddListProps {
 }
 
 export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> = ({
-  search,
   selected = [],
   onToggleSelected,
 }: ScenariosFeaturesAddListProps) => {
@@ -23,10 +23,19 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
 
   const {
     data: allFeaturesData,
+    fetchNextPage: allFeaturesfetchNextPage,
     isFetching: allFeaturesIsFetching,
+    isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
-  } = useAllFeatures(pid, { search });
+  } = useAllFeatures(pid);
 
+  const scrollRef = useBottomScrollListener(
+    () => {
+      allFeaturesfetchNextPage();
+    },
+  );
+
+  // Callbacks
   const handleToggleSelected = useCallback((id) => {
     if (onToggleSelected) onToggleSelected(id);
   }, [onToggleSelected]);
@@ -46,6 +55,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
       <div className="absolute left-0 z-10 w-full h-6 -top-1 bg-gradient-to-b from-white via-white" />
 
       <div
+        ref={scrollRef}
         className={cx({
           'bg-white divide-y divide-black divide-dashed divide-opacity-20 overflow-y-auto overflow-x-hidden px-8': true,
         })}
@@ -72,7 +82,17 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
         })}
       </div>
 
-      <div className="absolute left-0 z-10 w-full h-6 -bottom-1 bg-gradient-to-t from-white via-white" />
+      <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-white via-white" />
+
+      <div
+        className={cx({
+          'opacity-100': allFeaturesIsFetchingNextPage,
+          'absolute left-0 z-20 w-full text-xs text-center uppercase bottom-0 font-heading transition opacity-0 pointer-events-none': true,
+        })}
+      >
+        <div className="py-1 bg-gray-200">Loading more...</div>
+        <div className="w-full h-6 bg-white" />
+      </div>
     </div>
   );
 };

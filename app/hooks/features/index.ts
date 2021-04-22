@@ -1,6 +1,8 @@
 import Fuse from 'fuse.js';
 import { useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import {
+  useQuery, useInfiniteQuery, useMutation, useQueryClient,
+} from 'react-query';
 import { useSession } from 'next-auth/client';
 
 import orderBy from 'lodash/orderBy';
@@ -22,55 +24,53 @@ import {
   DeleteFeatureProps,
 } from './types';
 
-export function useAllFeatures(projectId, filters: UseFeaturesFiltersProps = {}) {
+export function useAllFeatures(projectId) {
   const [session] = useSession();
-  const { search } = filters;
 
-  const query = useQuery(['all-features', projectId], async () => PROJECTS.request({
+  const fetchFeatures = ({ pageParam = 1 }) => PROJECTS.request({
     method: 'GET',
     url: `/${projectId}/features`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
-  }));
+    params: {
+      'page[number]': pageParam,
+    },
+  });
+
+  const query = useInfiniteQuery(['all-features', projectId], fetchFeatures, {
+    getNextPageParam: (lastPage, pages) => {
+      return pages.length + 1;
+    },
+  });
 
   const { data } = query;
+  const { pages } = data || {};
 
   return useMemo(() => {
-    let parsedData = Array.isArray(data?.data) ? data?.data.map((d):RawItemProps => {
-      const {
-        id, alias, featureClassName, description, tag, source,
-      } = d;
+    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
+      const { data: pageData } = p;
 
-      return {
-        id,
-        name: alias || featureClassName,
-        description: description || 'Donec est ad luctus dapibus sociosqu. Imperdiet platea viverra dui congue orci ad. Turpis a, dictumst eget. Justo potenti morbi iaculis habitasse justo aliquam tortor tellus nostra. Accumsan nunc lorem malesuada, eget sed magna habitasse laoreet rutrum non ante suscipit. Adipiscing quisque justo vel, et tellus suscipit purus. Mattis primis curae;, scelerisque parturient libero dictumst ad! Cras elit condimentum molestie sociis mauris. Pharetra tincidunt habitant imperdiet mauris vitae tempor sollicitudin pulvinar feugiat pharetra scelerisque? Purus erat penatibus adipiscing vestibulum fermentum et platea eros quis ad congue. Porta fringilla enim bibendum per tortor natoque ante suscipit. Congue.',
-        tag,
-        source,
-      };
-    }) : [];
+      return pageData.map((d):RawItemProps => {
+        const {
+          id, alias, featureClassName, description, tag, source,
+        } = d;
 
-    // Filter
-    if (search) {
-      const fuse = new Fuse(parsedData, {
-        keys: ['name'],
-        threshold: 0.25,
+        return {
+          id,
+          name: alias || featureClassName,
+          description: description || 'Donec est ad luctus dapibus sociosqu. Imperdiet platea viverra dui congue orci ad. Turpis a, dictumst eget. Justo potenti morbi iaculis habitasse justo aliquam tortor tellus nostra. Accumsan nunc lorem malesuada, eget sed magna habitasse laoreet rutrum non ante suscipit. Adipiscing quisque justo vel, et tellus suscipit purus. Mattis primis curae;, scelerisque parturient libero dictumst ad! Cras elit condimentum molestie sociis mauris. Pharetra tincidunt habitant imperdiet mauris vitae tempor sollicitudin pulvinar feugiat pharetra scelerisque? Purus erat penatibus adipiscing vestibulum fermentum et platea eros quis ad congue. Porta fringilla enim bibendum per tortor natoque ante suscipit. Congue.',
+          tag,
+          source,
+        };
       });
-      parsedData = fuse.search(search).map((f) => {
-        return f.item;
-      });
-    }
-
-    // Sort
-    parsedData = orderBy(parsedData, ['name'], ['asc']);
+    })) : [];
 
     return {
       ...query,
       data: parsedData,
-      rawData: data?.data,
     };
-  }, [query, data?.data, search]);
+  }, [query, pages]);
 }
 
 export function useSelectedFeatures(filters: UseFeaturesFiltersProps = {}) {
