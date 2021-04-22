@@ -77,7 +77,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
     >
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
-          <h2 className="flex-shrink-0 px-8 mb-5 text-lg font-heading">Add features to your planning area</h2>
+          <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">Add features to your planning area</h2>
           <Toolbar search={search} onSearch={onSearch} />
 
           <FieldRFF
