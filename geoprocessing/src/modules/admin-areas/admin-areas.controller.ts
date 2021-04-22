@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import {
   AdminAreasService,
-  AdminAreaLevelFilters,
 } from './admin-areas.service';
 import { apiGlobalPrefixes } from 'src/api.config';
 import {
@@ -21,6 +20,7 @@ import {
   ApiQuery,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
+import { TileSpecification } from './admin-areas.service'
 
 import { Response } from 'express';
 
@@ -29,7 +29,6 @@ export class AdminAreasController {
   private readonly logger: Logger = new Logger(AdminAreasController.name);
   constructor(public service: AdminAreasService) {}
 
-  // @UsePipes(new CustomValidationPipe())
   @ApiOperation({
     description: 'Get tile for administrative areas within a given country.',
   })
@@ -74,16 +73,11 @@ export class AdminAreasController {
   // @Header('Content-Encoding', 'gzip,deflate')
   @Header('Content-Encoding', 'gzip')
   async getTile(
-    @Param('z', ParseIntPipe) z: number,
-    @Param('x', ParseIntPipe) x: number,
-    @Param('y', ParseIntPipe) y: number,
-    @Param('level') { level }: AdminAreaLevelFilters,
+    @Param() params: TileSpecification,
     @Query('guid') guid: string,
     @Res() response: Response,
   ): Promise<Object> {
-    this.logger.debug('test');
-    this.logger.debug(typeof level);
-    const tile: Buffer = await this.service.findTile(z, x, y, level);
+    const tile: Buffer = await this.service.findTile(params);
     return response.send(tile);
   }
 }
