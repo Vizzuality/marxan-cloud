@@ -9,7 +9,8 @@ import flatten from 'lodash/flatten';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
 
-import FEATURES from 'services/scenarios';
+import PROJECTS from 'services/projects';
+import SCENARIOS from 'services/scenarios';
 
 import ITEMS from './mock';
 
@@ -21,13 +22,13 @@ import {
   DeleteFeatureProps,
 } from './types';
 
-export function useAllFeatures(filters: UseFeaturesFiltersProps = {}) {
+export function useAllFeatures(projectId, filters: UseFeaturesFiltersProps = {}) {
   const [session] = useSession();
   const { search } = filters;
 
-  const query = useQuery(['all-features'], async () => FEATURES.request({
+  const query = useQuery(['all-features', projectId], async () => PROJECTS.request({
     method: 'GET',
-    url: '/',
+    url: `/${projectId}/features`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
@@ -36,16 +37,17 @@ export function useAllFeatures(filters: UseFeaturesFiltersProps = {}) {
   const { data } = query;
 
   return useMemo(() => {
-    let parsedData = Array.isArray(data?.data) ? ITEMS.map((d):RawItemProps => {
+    let parsedData = Array.isArray(data?.data) ? data?.data.map((d):RawItemProps => {
       const {
-        id, name, description, tags,
+        id, alias, featureClassName, description, tag, source,
       } = d;
 
       return {
         id,
-        name,
-        description,
-        tags,
+        name: alias || featureClassName,
+        description: description || 'Donec est ad luctus dapibus sociosqu. Imperdiet platea viverra dui congue orci ad. Turpis a, dictumst eget. Justo potenti morbi iaculis habitasse justo aliquam tortor tellus nostra. Accumsan nunc lorem malesuada, eget sed magna habitasse laoreet rutrum non ante suscipit. Adipiscing quisque justo vel, et tellus suscipit purus. Mattis primis curae;, scelerisque parturient libero dictumst ad! Cras elit condimentum molestie sociis mauris. Pharetra tincidunt habitant imperdiet mauris vitae tempor sollicitudin pulvinar feugiat pharetra scelerisque? Purus erat penatibus adipiscing vestibulum fermentum et platea eros quis ad congue. Porta fringilla enim bibendum per tortor natoque ante suscipit. Congue.',
+        tag,
+        source,
       };
     }) : [];
 
@@ -75,7 +77,7 @@ export function useSelectedFeatures(filters: UseFeaturesFiltersProps = {}) {
   const [session] = useSession();
   const { search } = filters;
 
-  const fetchFeatures = () => FEATURES.request({
+  const fetchFeatures = () => SCENARIOS.request({
     method: 'GET',
     url: '/',
     headers: {
@@ -248,7 +250,7 @@ export function useTargetedFeatures() {
 export function useFeature(id) {
   const [session] = useSession();
 
-  const query = useQuery(['features', id], async () => FEATURES.request({
+  const query = useQuery(['features', id], async () => SCENARIOS.request({
     method: 'GET',
     url: `/${id}`,
     headers: {
@@ -277,7 +279,7 @@ export function useSaveFeature({
   const [session] = useSession();
 
   const saveFeature = ({ id, data }: SaveFeatureProps) => {
-    return FEATURES.request({
+    return SCENARIOS.request({
       url: id ? `/${id}` : '/',
       data,
       headers: {
@@ -309,7 +311,7 @@ export function useDeleteFeature({
   const [session] = useSession();
 
   const deleteFeature = ({ id }: DeleteFeatureProps) => {
-    return FEATURES.request({
+    return SCENARIOS.request({
       method: 'DELETE',
       url: `/${id}`,
       headers: {
