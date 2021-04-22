@@ -1,6 +1,4 @@
 import {
-  UsePipes,
-  ValidationPipe,
   Controller,
   Get,
   Param,
@@ -8,7 +6,6 @@ import {
   Res,
   Query,
   Logger,
-  ParseIntPipe,
 } from '@nestjs/common';
 import {
   AdminAreasService,
@@ -73,11 +70,11 @@ export class AdminAreasController {
   // @Header('Content-Encoding', 'gzip,deflate')
   @Header('Content-Encoding', 'gzip')
   async getTile(
-    @Param() params: TileSpecification,
+    @Param() TileSpecification: TileSpecification,
     @Query('guid') guid: string,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(params);
+    const tile: Buffer = await this.service.findTile(TileSpecification);
     return response.send(tile);
   }
 }
