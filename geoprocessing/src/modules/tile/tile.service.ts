@@ -4,7 +4,7 @@ import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 import { Transform } from 'class-transformer';
 import { IsInt, Max, Min, } from 'class-validator';
-
+import { TileSpecification } from '../admin-areas/admin-areas.service';
 
 /**
  * @description The specification of the tile request
@@ -165,9 +165,7 @@ export class TileService {
    * @return the resulting string query.
    */
   buildQuery(
-    z: number,
-    x: number,
-    y: number,
+    { z, x, y }: Pick<TileSpecification, 'z' | 'x' | 'y'>,
     table: string,
     geometry: string,
     extent: number,
@@ -178,24 +176,6 @@ export class TileService {
   ): string {
     let query = '';
 
-    /**
-     * @todo apply validation on controller
-     * @todo add BadRequestException for zoom level
-     */
-
-    z = parseInt(`${z}`, 10);
-    // if (z > 20) {
-    //   throw new BadRequestException('Zoom level should be lower than 20');
-    // }
-    if (isNaN(z)) {
-      throw new Error('Invalid zoom level');
-    }
-
-    x = parseInt(`${x}`, 10);
-    y = parseInt(`${y}`, 10);
-    if (isNaN(x) || isNaN(y)) {
-      throw new Error('Invalid tile coordinates');
-    }
     try {
       query = this.createQueryForTile({
         z,
@@ -293,9 +273,11 @@ export class TileService {
     attributes: string,
   ): Promise<Buffer> {
     const query = this.buildQuery(
-      z,
-      x,
-      y,
+      {
+        z,
+        x,
+        y
+      },
       table,
       geometry,
       extent,
