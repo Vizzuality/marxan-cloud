@@ -100,6 +100,20 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       key="features-list"
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
+      initialValuesEqual={(prev, next) => {
+        const { features: prevFeatures } = prev;
+        const { features: nextFeatures } = next;
+
+        const prevIds = prevFeatures.map((f) => f.id);
+        const nextIds = nextFeatures.map((f) => f.id);
+
+        if (prevIds.length !== nextIds.length) return false;
+
+        if (JSON.stringify(prevIds) !== JSON.stringify(nextIds)) {
+          return false;
+        }
+        return true;
+      }}
     >
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow overflow-hidden">
