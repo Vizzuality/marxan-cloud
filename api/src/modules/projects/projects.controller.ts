@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Query,
@@ -69,10 +70,11 @@ export class ProjectsController {
   @Get(':projectId/features')
   async findAllGeoFeaturesForProject(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-    @Param() params: { projectId: string },
+    @Param() params: { projectId: string; filterQuery?: string },
     @Query('q') filterQuery: string,
   ): Promise<GeoFeatureResult> {
-    // params.filterQuery = filterQuery;
+    params.filterQuery = filterQuery;
+    Logger.error(filterQuery);
     const results = await this.geoFeaturesService.findAllPaginated(
       fetchSpecification,
       { params },
