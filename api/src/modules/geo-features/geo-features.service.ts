@@ -149,8 +149,11 @@ export class GeoFeaturesService extends AppBaseService<
       );
     }
 
-    if(info?.params?.filterQuery) {
-      queryFilteredByPublicOrProjectSpecificFeatures.andWhere(`${this.alias}.alias ilike :filterQuery OR ${this.alias}.featureClassName ilike :filterQuery`, { filterQuery: `%${info.params.filterQuery}%`});
+    if (info?.params?.filterQuery) {
+      queryFilteredByPublicOrProjectSpecificFeatures.andWhere(
+        `${this.alias}.alias ilike :filterQuery OR ${this.alias}.featureClassName ilike :filterQuery`,
+        { filterQuery: `%${info.params.filterQuery}%` },
+      );
     }
     return queryFilteredByPublicOrProjectSpecificFeatures;
   }
