@@ -70,6 +70,15 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     onChange(features);
   }, []);
 
+  const onRemove = useCallback((id, input) => {
+    const { value, onChange } = input;
+    const features = [...value];
+
+    const featureIndex = features.findIndex((f) => f.id === id);
+    features.splice(featureIndex, 1);
+    onChange(features);
+  }, []);
+
   const onSubmit = useCallback((values) => {
     console.info(values);
     onSuccess();
@@ -122,6 +131,9 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                               }}
                               onSplitFeaturesSelected={(s) => {
                                 onSplitFeaturesSelected(item.id, s, input);
+                              }}
+                              onRemove={() => {
+                                onRemove(item.id, input);
                               }}
                             />
                           </div>

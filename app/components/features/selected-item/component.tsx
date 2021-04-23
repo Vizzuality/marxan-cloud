@@ -50,11 +50,13 @@ export interface ItemProps {
     label: string;
     value: string;
   }[];
+  onRemove?: (value) => void
 }
 
 export const Item: React.FC<ItemProps> = ({
-  className,
+  id,
   name,
+  className,
   description,
   type,
 
@@ -68,6 +70,7 @@ export const Item: React.FC<ItemProps> = ({
 
   intersectFeaturesSelected,
   intersectFeaturesOptions = [],
+  onRemove,
 }: ItemProps) => {
   // EVENTS
   const onSplitChanged = useCallback(
@@ -114,7 +117,19 @@ export const Item: React.FC<ItemProps> = ({
           'border-yellow-300': type === 'species',
         })}
       >
-        <h2 className="text-sm font-heading">{name}</h2>
+        <div className="flex items-start justify-between">
+          <h2 className="mt-1 text-sm font-heading">{name}</h2>
+
+          <Button
+            className="flex-shrink-0 text-xs"
+            theme="secondary"
+            size="xs"
+            onClick={() => onRemove && onRemove(id)}
+          >
+            Remove
+          </Button>
+
+        </div>
         <div className="mt-2 text-sm opacity-50 clamp-2">{description}</div>
 
         {type === 'bioregional' && (
