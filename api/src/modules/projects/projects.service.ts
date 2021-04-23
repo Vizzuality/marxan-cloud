@@ -193,7 +193,7 @@ export class ProjectsService extends AppBaseService<
   async actionAfterCreate(
     model: Project,
     createModel: CreateProjectDTO,
-    info?: AppInfoDTO,
+    _info?: AppInfoDTO,
   ): Promise<void> {
     if (
       createModel.planningUnitAreakm2 &&
@@ -211,7 +211,7 @@ export class ProjectsService extends AppBaseService<
   async actionAfterUpdate(
     model: Project,
     createModel: UpdateProjectDTO,
-    info?: AppInfoDTO,
+    _info?: AppInfoDTO,
   ): Promise<void> {
     if (
       createModel.planningUnitAreakm2 &&

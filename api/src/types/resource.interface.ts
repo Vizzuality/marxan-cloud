@@ -22,4 +22,15 @@ export interface BaseServiceResource {
    * Entities that can be included in requests
    */
   entitiesAllowedAsIncludes?: string[];
+
+  /**
+   * Controller-specific endpoint URL prefix.
+   *
+   * Most endpoint URLs are assembled from:
+   * - versioned API prefix (e.g. `/api/v1`)
+   * - controller-specific prefix (e.g. `geo-features`)
+   * thus leading to a common prefix for all the endpoints of a controller such
+   * as `/api/v1/geo-features/...`.
+   */
+  moduleControllerPrefix?: string;
 }
