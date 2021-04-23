@@ -60,26 +60,35 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
           'bg-white divide-y divide-black divide-dashed divide-opacity-20 overflow-y-auto overflow-x-hidden px-8': true,
         })}
       >
-        {(!allFeaturesData || !allFeaturesData.length) && (
-          <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
-            No results found
-          </div>
-        )}
-
-        {allFeaturesData && allFeaturesData.map((item) => {
-          const selectedIndex = selected.findIndex((f) => f === item.id);
-          return (
-            <div key={`${item.id}`}>
-              <Item
-                {...item}
-                selected={selectedIndex !== -1}
-                onToggleSelected={() => {
-                  handleToggleSelected(item.id);
-                }}
-              />
+        <div>
+          {(!allFeaturesData || !allFeaturesData.length) && (
+            <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
+              No results found
             </div>
-          );
-        })}
+          )}
+
+          {allFeaturesData && allFeaturesData.map((item, i) => {
+            const selectedIndex = selected.findIndex((f) => f === item.id);
+
+            return (
+              <div
+                key={`${item.id}`}
+                className={cx({
+                  'border-t border-dashed': i !== 0,
+                })}
+              >
+                <Item
+                  {...item}
+                  scrollRoot={scrollRef}
+                  selected={selectedIndex !== -1}
+                  onToggleSelected={() => {
+                    handleToggleSelected(item.id);
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-white via-white" />

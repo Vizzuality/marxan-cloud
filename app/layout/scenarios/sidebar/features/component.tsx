@@ -12,6 +12,7 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
 
+import { useQueryClient } from 'react-query';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { useScenario } from 'hooks/scenarios';
@@ -28,7 +29,9 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   const [step, setStep] = useState(0);
   const [modal, setModal] = useState(false);
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
+
+  const queryClient = useQueryClient();
 
   const scenarioSlice = getScenarioSlice(sid);
   const { setTab } = scenarioSlice.actions;
@@ -95,7 +98,10 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
           title="Hello"
           open={modal}
           size="narrow"
-          onDismiss={() => setModal(false)}
+          onDismiss={() => {
+            setModal(false);
+            queryClient.removeQueries(['all-features', pid], { exact: true });
+          }}
         >
           <AddFeatures />
         </Modal>
