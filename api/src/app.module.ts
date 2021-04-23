@@ -15,6 +15,7 @@ import { PingController } from './modules/ping/ping.controller';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { UsersModule } from './modules/users/users.module';
 import { GeoModule } from 'modules/geo/geo.module';
+import { GeoFeaturesModule } from 'modules/geo-features/geo-features.module';
 import { apiConnections } from './ormconfig';
 import { OrganizationsModule } from 'modules/organizations/organizations.module';
 import { FetchSpecificationMiddleware } from 'nestjs-base-service';
@@ -38,6 +39,7 @@ import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.mo
     ApiEventsModule,
     CountriesModule,
     GeoModule,
+    GeoFeaturesModule,
     OrganizationsModule,
     ProjectsModule,
     ProtectedAreasModule,
