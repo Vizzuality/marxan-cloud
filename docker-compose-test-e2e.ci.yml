@@ -81,4 +81,5 @@ services:
       REDIS_API_SERVICE_PORT: ${REDIS_API_SERVICE_PORT}
 
   test-e2e-redis:
+    environment:
       REDIS_API_SERVICE_PORT: ${REDIS_API_SERVICE_PORT}
