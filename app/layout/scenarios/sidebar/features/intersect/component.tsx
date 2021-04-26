@@ -82,7 +82,7 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
 
   return (
     <FormRFF
-      key="features-list"
+      key="features-intersect"
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
