@@ -95,12 +95,12 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
         </header>
 
         <Modal
-          title="Hello"
+          title="All features"
           open={modal}
           size="narrow"
           onDismiss={() => {
             setModal(false);
-            queryClient.removeQueries(['all-features', pid], { exact: true });
+            queryClient.removeQueries(['all-features', pid]);
           }}
         >
           <AddFeatures />

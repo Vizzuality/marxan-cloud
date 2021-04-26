@@ -1,13 +1,18 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import cx from 'classnames';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import Button from 'components/button';
 import Loading from 'components/loading';
+import Modal from 'components/modal';
 import Item from 'components/features/selected-item';
 
+import IntersectFeatures from 'layout/scenarios/sidebar/features/intersect';
+
+import { useQueryClient } from 'react-query';
 import { useSelectedFeatures } from 'hooks/features';
+import { useRouter } from 'next/router';
 
 export interface ScenariosFeaturesListProps {
   onSuccess: () => void
@@ -16,6 +21,12 @@ export interface ScenariosFeaturesListProps {
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   onSuccess,
 }: ScenariosFeaturesListProps) => {
+  const [intersected, setIntersected] = useState(null);
+  const { query } = useRouter();
+  const { pid } = query;
+
+  const queryClient = useQueryClient();
+
   const {
     data: selectedFeaturesData,
     isFetching: selectedFeaturesIsFetching,
@@ -146,6 +157,9 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                               onSplitFeaturesSelected={(s) => {
                                 onSplitFeaturesSelected(item.id, s, input);
                               }}
+                              onIntersectSelected={(id) => {
+                                setIntersected(id);
+                              }}
                               onRemove={() => {
                                 onRemove(item.id, input);
                               }}
@@ -171,6 +185,19 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
               Continue
             </Button>
           )}
+
+          <Modal
+            title="Bioregional features"
+            open={intersected}
+            size="narrow"
+            onDismiss={() => {
+              setIntersected(null);
+              queryClient.removeQueries(['all-features', pid]);
+            }}
+          >
+            <IntersectFeatures />
+          </Modal>
+
         </form>
       )}
     </FormRFF>

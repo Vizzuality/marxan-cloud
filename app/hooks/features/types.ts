@@ -20,3 +20,9 @@ export interface UseDeleteFeatureProps {
 export interface DeleteFeatureProps {
   id: string
 }
+
+export interface UseFeaturesOptionsProps {
+  search?: string;
+  sort?: string;
+  filters?: Record<string, unknown>
+}
