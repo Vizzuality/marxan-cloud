@@ -38,6 +38,25 @@ describe('ProtectedAreasModule (e2e)', () => {
   let aProjectWithCountryAsPlanningArea: Project;
   let aProjectWithALevel1AdminAreaAsPlanningArea: Project;
   let aProjectWithALevel2AdminAreaAsPlanningArea: Project;
+  /**
+   * Seed test data includes protected areas in (among a handful of other
+   * countries) Namibia, so we create a project in this country, and likewise
+   * for tests related to protected areas in a L1 or L2 admin area below.
+   *
+   * If/when updating seed test data, we need to make sure choices of
+   * country/admin areas, IUCN categories and ids of custom admin areas lead
+   * to protected areas and project planning areas to intersect as intended
+   * for these tests.
+   *
+   * For a quick check, we can use a query like this:
+   *
+   * select pa.id, pa.wdpaid, pa.full_name, pa.iucn_cat, pa.status, pa.desig,
+   * aa.gid_0, aa.gid_1, aa.gid_2 from wdpa pa
+   * left join admin_regions aa on ST_Intersects(pa.the_geom, aa.the_geom);
+   */
+  const country = 'NAM';
+  const l1AdminArea = 'NAM.13_1';
+  const l2AdminArea = 'NAM.13.5_1';
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -73,28 +92,12 @@ describe('ProtectedAreasModule (e2e)', () => {
       return await Deserializer.deserialize(response);
     });
 
-    /**
-     * Seed test data includes protected areas in (among a handful of other
-     * countries) Namibia, so we create a project in this country, and likewise
-     * for tests related to protected areas in a L1 or L2 admin area below.
-     *
-     * If/when updating seed test data, we need to make sure choices of
-     * country/admin areas, IUCN categories and ids of custom admin areas lead
-     * to protected areas and project planning areas to intersect as intended
-     * for these tests.
-     *
-     * For a quick check, we can use a query like this:
-     *
-     * select pa.id, pa.wdpaid, pa.full_name, pa.iucn_cat, pa.status, pa.desig,
-     * aa.gid_0, aa.gid_1, aa.gid_2 from wdpa pa
-     * left join admin_regions aa on ST_Intersects(pa.the_geom, aa.the_geom);
-     */
     aProjectWithCountryAsPlanningArea = await ProjectsTestUtils.createProject(
       app,
       jwtToken,
       {
         ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: 'NAM',
+          countryCode: country,
         }),
         organizationId: anOrganization.id,
       },
@@ -105,8 +108,8 @@ describe('ProtectedAreasModule (e2e)', () => {
       jwtToken,
       {
         ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: 'NAM',
-          adminAreaLevel1Id: 'NAM.13_1',
+          countryCode: country,
+          adminAreaLevel1Id: l1AdminArea,
         }),
         organizationId: anOrganization.id,
       },
@@ -117,9 +120,9 @@ describe('ProtectedAreasModule (e2e)', () => {
       jwtToken,
       {
         ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: 'NAM',
-          adminAreaLevel1Id: 'NAM.13_1',
-          adminAreaLevel2Id: 'NAM.13.5_1',
+          countryCode: country,
+          adminAreaLevel1Id: l1AdminArea,
+          adminAreaLevel2Id: l2AdminArea,
         }),
         organizationId: anOrganization.id,
       },
@@ -187,10 +190,6 @@ describe('ProtectedAreasModule (e2e)', () => {
      * https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991%3A2146
      */
     describe('Protected areas by admin area', () => {
-      const country = 'NAM';
-      const l1AdminArea = 'NAM.13_1';
-      const l2AdminArea = 'NAM.13.5_1';
-
       test('As a user, I should be able to see a list of distinct IUCN categories for protected areas within a given country', async () => {
         const response = await request(app.getHttpServer())
           .get(

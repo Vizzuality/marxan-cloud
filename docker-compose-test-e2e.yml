@@ -12,7 +12,7 @@ services:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-api
     command: test-e2e
-    user: "$UID:$GID"
+    user: "5000:5000"
     volumes:
       - ./api/src:/opt/marxan-api/src
       - ./api/test:/opt/marxan-api/test
@@ -26,6 +26,7 @@ services:
       - test-e2e-postgresql-api
       - test-e2e-postgresql-geo-api
       - test-e2e-redis
+
   geoprocessing:
     build:
       context: ./geoprocessing
@@ -37,7 +38,7 @@ services:
       - "${GEOPROCESSING_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-geoprocessing
     command: test-e2e
-    user: "$UID:$GID"
+    user: "5000:5000"
     volumes:
       - ./geoprocessing/src:/opt/marxan-geoprocessing/src
       - ./geoprocessing/test:/opt/marxan-geoprocessing/test
@@ -52,6 +53,7 @@ services:
       - test-e2e-postgresql-api
       - test-e2e-redis
       - api
+
   test-e2e-postgresql-api:
     build:
       context: ./postgresql
@@ -65,6 +67,7 @@ services:
       - POSTGRES_PASSWORD=${API_POSTGRES_PASSWORD}
       - POSTGRES_USER=${API_POSTGRES_USER}
     restart: on-failure
+
   test-e2e-postgresql-geo-api:
     build:
       context: ./postgresql
@@ -76,13 +79,13 @@ services:
       - POSTGRES_PASSWORD=${GEO_POSTGRES_PASSWORD}
       - POSTGRES_USER=${GEO_POSTGRES_USER}
     restart: always
+
   test-e2e-redis:
     build:
       context: ./redis
       dockerfile: Dockerfile
-    hostname: redis
     container_name: marxan-test-e2e-redis
-    command: [ "redis-server"]
+    command: [ "redis-server" ]
     ports:
       - "${REDIS_API_SERVICE_PORT}:6379"
     restart: on-failure
