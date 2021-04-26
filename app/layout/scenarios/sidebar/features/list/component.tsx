@@ -21,7 +21,7 @@ export interface ScenariosFeaturesListProps {
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   onSuccess,
 }: ScenariosFeaturesListProps) => {
-  const [intersected, setIntersected] = useState(null);
+  const [intersecting, setIntersecting] = useState(null);
   const { query } = useRouter();
   const { pid } = query;
 
@@ -158,7 +158,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                                 onSplitFeaturesSelected(item.id, s, input);
                               }}
                               onIntersectSelected={(id) => {
-                                setIntersected(id);
+                                setIntersecting(id);
                               }}
                               onRemove={() => {
                                 onRemove(item.id, input);
@@ -188,14 +188,14 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
 
           <Modal
             title="Bioregional features"
-            open={intersected}
+            open={intersecting}
             size="narrow"
             onDismiss={() => {
-              setIntersected(null);
+              setIntersecting(null);
               queryClient.removeQueries(['all-features', pid]);
             }}
           >
-            <IntersectFeatures />
+            <IntersectFeatures intersecting={intersecting} />
           </Modal>
 
         </form>

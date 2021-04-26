@@ -11,13 +11,13 @@ import { useAllFeatures, useSelectedFeatures } from 'hooks/features';
 import { useRouter } from 'next/router';
 
 export interface ScenariosFeaturesIntersectProps {
-  intersected: string;
+  intersecting: string;
   onSuccess?: () => void;
   onDismiss?: () => void;
 }
 
 export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProps> = ({
-  intersected,
+  intersecting,
   onSuccess,
   onDismiss,
 }: ScenariosFeaturesIntersectProps) => {
@@ -29,8 +29,8 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
     data: selectedFeaturesData,
   } = useSelectedFeatures({});
 
-  const intersectedCurrent = selectedFeaturesData.find((s) => s.id === intersected);
-  console.info(intersectedCurrent);
+  const intersectingCurrent = selectedFeaturesData.find((s) => s.id === intersecting);
+  console.info(intersectingCurrent);
 
   const {
     isFetched: allFeaturesIsFetched,
