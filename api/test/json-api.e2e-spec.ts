@@ -20,7 +20,11 @@ describe('JSON API Specs (e2e)', () => {
   });
   it('should return a response shaped as JSON:API Error spec', async () => {
     const jsonApiErrorResponse = {
+      id: null,
+      links: null,
       status: null,
+      code: null,
+      source: null,
       title: null,
       meta: {
         timestamp: null,
@@ -35,7 +39,9 @@ describe('JSON API Specs (e2e)', () => {
         password: 'fakePassword',
       });
     response.body.errors.forEach((err: any) => {
-      expect(Object.keys(err)).toEqual(Object.keys(jsonApiErrorResponse));
+      expect(Object.keys(jsonApiErrorResponse)).toEqual(
+        expect.arrayContaining(Object.keys(err)),
+      );
       expect(Object.keys(err.meta)).toEqual(
         expect.arrayContaining(Object.keys(jsonApiErrorResponse.meta)),
       );
