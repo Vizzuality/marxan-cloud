@@ -30,6 +30,8 @@ describe('JSON API Specs (e2e)', () => {
         timestamp: null,
         path: null,
         type: null,
+        rawError: null,
+        stack: null,
       },
     };
     const response = await request(app.getHttpServer())
@@ -42,8 +44,13 @@ describe('JSON API Specs (e2e)', () => {
       expect(Object.keys(jsonApiErrorResponse)).toEqual(
         expect.arrayContaining(Object.keys(err)),
       );
-      expect(Object.keys(err.meta)).toEqual(
-        expect.arrayContaining(Object.keys(jsonApiErrorResponse.meta)),
+      if (process.env.NODE_ENV != 'development') {
+        expect(Object.keys(err)).toEqual(
+          expect.arrayContaining(Object.keys(jsonApiErrorResponse.meta)),
+        );
+      }
+      expect(Object.keys(jsonApiErrorResponse.meta)).toEqual(
+        expect.arrayContaining(Object.keys(err.meta)),
       );
     });
   });
