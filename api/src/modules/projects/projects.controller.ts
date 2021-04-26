@@ -74,7 +74,6 @@ export class ProjectsController {
     @Query('q') filterQuery: string,
   ): Promise<GeoFeatureResult> {
     params.filterQuery = filterQuery;
-    Logger.error(filterQuery);
     const results = await this.geoFeaturesService.findAllPaginated(
       fetchSpecification,
       { params },
