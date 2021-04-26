@@ -27,6 +27,7 @@ import {
   GeoFeature,
   geoFeatureResource,
 } from 'modules/geo-features/geo-feature.api.entity';
+import { JSONAPISerializerConfig } from 'utils/app-base.service';
 
 /**
  * Tests for API contracts for the management of geo features within scenarios.
@@ -49,6 +50,10 @@ describe('GeoFeaturesModule (e2e)', () => {
   const country = 'NAM';
   const l1AdminArea = 'NAM.13_1';
   const l2AdminArea = 'NAM.13.5_1';
+  const geoFeaturesFilters = {
+    cheeta: { featureClassName: 'iucn_acinonyxjubatus', alias: 'cheetah' },
+    partialMatches: { us: 'us' },
+  };
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -168,6 +173,62 @@ describe('GeoFeaturesModule (e2e)', () => {
       test.todo(
         'As a user, when I upload feature shapefiles, I should see the related features in the list of those available within a project',
       );
+
+      test('should return a single result of geo-features which its className matches a given filter', async () => {
+        const response = await request(app.getHttpServer())
+          .get(
+            `/api/v1/projects/${aProjectWithCountryAsPlanningArea.id}/features?q=${geoFeaturesFilters.cheeta.featureClassName}`,
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.OK);
+
+        console.log(response.body.data);
+
+        expect(response.body.data).toHaveLength(1);
+        expect(response.body.data[0].attributes.featureClassName).toEqual(
+          geoFeaturesFilters.cheeta.featureClassName,
+        );
+      });
+
+      test('should return a single result of geo-features which its alias matches a given filter', async () => {
+        const response = await request(app.getHttpServer())
+          .get(
+            `/api/v1/projects/${aProjectWithCountryAsPlanningArea.id}/features?q=${geoFeaturesFilters.cheeta.alias}`,
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.OK);
+
+        console.log(response.body.data);
+
+        expect(response.body.data).toHaveLength(1);
+        expect(response.body.data[0].attributes.alias).toEqual(
+          geoFeaturesFilters.cheeta.alias,
+        );
+      });
+      test('should return a list of geo-features which its alias matches a given filter', async () => {
+        const response = await request(app.getHttpServer())
+          .get(
+            `/api/v1/projects/${aProjectWithCountryAsPlanningArea.id}/features?q=${geoFeaturesFilters.partialMatches.us}`,
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.OK);
+
+        /**
+         * Here we just assert the result length since result match can come either from aliases or
+         * featureClassNames, and we have control over stored test data
+         */
+        expect(response.body.data).toHaveLength(7);
+      });
+      test('should return all available features if query param has no value', async () => {
+        const response = await request(app.getHttpServer())
+          .get(
+            `/api/v1/projects/${aProjectWithCountryAsPlanningArea.id}/features?q=`,
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.OK);
+
+        expect(response.body.data).toHaveLength(9);
+      });
     });
   });
 });
