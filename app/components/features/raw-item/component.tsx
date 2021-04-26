@@ -34,7 +34,9 @@ export const Item: React.FC<ItemProps> = ({
   const { ref, inView } = useInView({
     /* Optional options */
     threshold: 0,
-    root: scrollRoot.current,
+    ...scrollRoot && {
+      root: scrollRoot.current,
+    },
   });
 
   return (
