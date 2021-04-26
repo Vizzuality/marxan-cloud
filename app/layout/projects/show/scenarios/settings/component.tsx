@@ -33,7 +33,7 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
   } = scenarioData;
 
   return (
-    <dl className="flex flex-col space-x-2">
+    <dl className="flex flex-col space-y-2">
       <div className="flex space-x-2 text-sm">
         <dt>Protected areas:</dt>
         <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(wdpaIucnCategories || []).length || '-'}</dd>

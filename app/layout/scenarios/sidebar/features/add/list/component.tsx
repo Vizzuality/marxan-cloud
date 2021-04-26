@@ -15,6 +15,7 @@ export interface ScenariosFeaturesAddListProps {
 }
 
 export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> = ({
+  search,
   selected = [],
   onToggleSelected,
 }: ScenariosFeaturesAddListProps) => {
@@ -27,7 +28,9 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
     isFetching: allFeaturesIsFetching,
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
-  } = useAllFeatures(pid);
+  } = useAllFeatures(pid, {
+    search,
+  });
 
   const scrollRef = useBottomScrollListener(
     () => {

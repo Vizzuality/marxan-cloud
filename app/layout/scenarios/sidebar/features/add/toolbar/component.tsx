@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import Search from 'components/search';
+import { useDebouncedCallback } from 'use-debounce';
 
 export interface ScenarioFeaturesAddToolbarProps {
   search?: string;
@@ -10,6 +11,10 @@ export interface ScenarioFeaturesAddToolbarProps {
 export const ScenarioFeaturesAdd: React.FC<ScenarioFeaturesAddToolbarProps> = ({
   search, onSearch,
 }: ScenarioFeaturesAddToolbarProps) => {
+  const onChangeDebounced = useDebouncedCallback((value) => {
+    onSearch(value);
+  }, 500);
+
   useEffect(() => {
     // setSearch to null wheneverer you unmount this component
     return function unmount() {
@@ -25,7 +30,7 @@ export const ScenarioFeaturesAdd: React.FC<ScenarioFeaturesAddToolbarProps> = ({
         defaultValue={search}
         placeholder="Search by feature name..."
         aria-label="Search"
-        onChange={(value) => { onSearch(value); }}
+        onChange={onChangeDebounced}
       />
     </div>
   );
