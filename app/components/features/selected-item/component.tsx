@@ -50,6 +50,7 @@ export interface ItemProps {
     label: string;
     value: string;
   }[];
+  onIntersectSelected?: (id: string) => void;
   onRemove?: (value) => void
 }
 
@@ -70,6 +71,8 @@ export const Item: React.FC<ItemProps> = ({
 
   intersectFeaturesSelected,
   intersectFeaturesOptions = [],
+
+  onIntersectSelected,
   onRemove,
 }: ItemProps) => {
   // EVENTS
@@ -96,6 +99,13 @@ export const Item: React.FC<ItemProps> = ({
       if (onSplitFeaturesSelected) onSplitFeaturesSelected(newSplitFeaturesSelected);
     },
     [splitFeaturesSelected, onSplitFeaturesSelected],
+  );
+
+  const onIntersectChanged = useCallback(
+    (selected) => {
+      if (onIntersectSelected) onIntersectSelected(selected);
+    },
+    [onIntersectSelected],
   );
 
   const OPTIONS = useMemo(() => {
@@ -175,7 +185,13 @@ export const Item: React.FC<ItemProps> = ({
 
             {/* TODO: Select from javi!! */}
             <div className="inline-block mt-2">
-              <Button theme="secondary-alt" size="s">
+              <Button
+                theme="secondary-alt"
+                size="s"
+                onClick={() => {
+                  onIntersectChanged(id);
+                }}
+              >
                 <div className="flex items-center">
                   <span>Select features</span>
 

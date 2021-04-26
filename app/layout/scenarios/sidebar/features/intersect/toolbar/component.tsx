@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 
 import Search from 'components/search';
 
-export interface ScenarioFeaturesAddToolbarProps {
+export interface ScenarioFeaturesIntersectToolbarProps {
   search?: string;
   onSearch: (selected: string) => void;
 }
 
-export const ScenarioFeaturesAdd: React.FC<ScenarioFeaturesAddToolbarProps> = ({
+export const ScenarioFeaturesIntersectToolbar: React.FC<ScenarioFeaturesIntersectToolbarProps> = ({
   search, onSearch,
-}: ScenarioFeaturesAddToolbarProps) => {
+}: ScenarioFeaturesIntersectToolbarProps) => {
   useEffect(() => {
     // setSearch to null wheneverer you unmount this component
     return function unmount() {
@@ -31,4 +31,4 @@ export const ScenarioFeaturesAdd: React.FC<ScenarioFeaturesAddToolbarProps> = ({
   );
 };
 
-export default ScenarioFeaturesAdd;
+export default ScenarioFeaturesIntersectToolbar;

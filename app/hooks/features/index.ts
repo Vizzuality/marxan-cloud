@@ -18,14 +18,29 @@ import ITEMS from './mock';
 
 import {
   UseFeaturesFiltersProps,
+  UseFeaturesOptionsProps,
   UseSaveFeatureProps,
   SaveFeatureProps,
   UseDeleteFeatureProps,
   DeleteFeatureProps,
 } from './types';
 
-export function useAllFeatures(projectId) {
+export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
   const [session] = useSession();
+
+  const {
+    filters = {},
+    search,
+    sort,
+  } = options;
+
+  const parsedFilters = Object.keys(filters)
+    .reduce((acc, k) => {
+      return {
+        ...acc,
+        [`filter[${k}]`]: filters[k],
+      };
+    }, {});
 
   const fetchFeatures = ({ pageParam = 1 }) => PROJECTS.request({
     method: 'GET',
@@ -35,10 +50,17 @@ export function useAllFeatures(projectId) {
     },
     params: {
       'page[number]': pageParam,
+      ...parsedFilters,
+      ...search && {
+        s: search,
+      },
+      ...sort && {
+        sort,
+      },
     },
   });
 
-  const query = useInfiniteQuery(['all-features', projectId], fetchFeatures, {
+  const query = useInfiniteQuery(['all-features', projectId, JSON.stringify(options)], fetchFeatures, {
     getNextPageParam: (lastPage, pages) => {
       return pages.length + 1;
     },
