@@ -20,7 +20,7 @@ export const Breadcrum: React.FC<BreadcrumProps> = ({
   <button
     type="button"
     className={cx({
-      'flex items-center leading-none text-sm text-primary-500 hover:text-primary-300 focus:outline-none': true,
+      'flex items-center text-sm text-primary-500 hover:text-primary-300 focus:outline-none h-6': true,
       [className]: !!className,
     })}
     onClick={onClick}

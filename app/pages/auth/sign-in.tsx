@@ -19,7 +19,7 @@ const SignInPage: React.FC = () => {
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
 
-        <div className="md:flex-grow">
+        <div className="flex flex-col h-full md:flex-grow">
           <div className="flex items-center justify-center h-full py-10 bg-white">
             <SignIn />
           </div>
