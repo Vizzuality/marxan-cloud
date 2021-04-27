@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { omit } from 'lodash';
 
 describe('JSON API Specs (e2e)', () => {
   let app: INestApplication;
@@ -18,7 +19,8 @@ describe('JSON API Specs (e2e)', () => {
   afterAll(async () => {
     await Promise.all([app.close()]);
   });
-  it('should return a response shaped as JSON:API Error spec', async () => {
+
+  it('should return a response shaped as JSON:API Error spec, including ', async () => {
     const jsonApiErrorResponse = {
       id: null,
       links: null,
@@ -44,14 +46,19 @@ describe('JSON API Specs (e2e)', () => {
       expect(Object.keys(jsonApiErrorResponse)).toEqual(
         expect.arrayContaining(Object.keys(err)),
       );
-      if (process.env.NODE_ENV != 'development') {
-        expect(Object.keys(err)).toEqual(
-          expect.arrayContaining(Object.keys(jsonApiErrorResponse.meta)),
+      /**
+       * Should not include rawError and stack props in meta object if app is running on prod env
+       */
+      if (process.env.NODE_ENV !== 'development') {
+        expect(Object.keys(err.meta)).toEqual(
+          Object.keys(omit(jsonApiErrorResponse.meta, ['rawError', 'stack'])),
         );
       }
-      expect(Object.keys(jsonApiErrorResponse.meta)).toEqual(
-        expect.arrayContaining(Object.keys(err.meta)),
-      );
+      if (process.env.NODE_ENV === 'development') {
+        expect(Object.keys(err.meta)).toEqual(
+          Object.keys(jsonApiErrorResponse.meta),
+        );
+      }
     });
   });
 });
