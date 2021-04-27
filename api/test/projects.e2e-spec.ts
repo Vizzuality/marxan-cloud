@@ -158,7 +158,7 @@ describe('ProjectsModule (e2e)', () => {
       );
       expect(aKnownProject?.scenarios).toBeDefined();
       expect(
-        aKnownProject?.scenarios.find(
+        aKnownProject?.scenarios?.find(
           (i) => i.id === aScenarioInACompleteProject.id,
         ),
       ).toBeDefined();

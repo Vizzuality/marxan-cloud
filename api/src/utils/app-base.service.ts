@@ -173,7 +173,7 @@ export class JSONAPIEntityData {
   type = 'base';
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
   attributes: any;
@@ -181,5 +181,5 @@ export class JSONAPIEntityData {
 
 export class EntityResult {
   @ApiProperty()
-  data: JSONAPIEntityData;
+  data!: JSONAPIEntityData;
 }

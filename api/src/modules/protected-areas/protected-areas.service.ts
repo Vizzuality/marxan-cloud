@@ -51,11 +51,11 @@ class ProtectedAreaFilters {
    */
   @IsOptional()
   @IsBoolean()
-  onlyCategories: boolean;
+  onlyCategories?: boolean;
 
   @IsOptional()
   @IsUUID(4)
-  adminAreaId: string;
+  adminAreaId?: string;
 }
 
 @Injectable()

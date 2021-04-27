@@ -17,23 +17,23 @@ export const organizationResource: BaseServiceResource = {
 export class Organization extends TimeUserEntityMetadata {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @ApiProperty()
   @Column('character varying')
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional()
   @Column('character varying')
-  description: string;
+  description?: string;
 
   @ApiPropertyOptional()
   @Column('jsonb')
-  metadata: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 
   @ApiPropertyOptional({ type: () => Project })
   @OneToMany((_type) => Project, (project) => project.organization)
-  projects: Project[];
+  projects?: Project[];
 }
 
 export class JSONAPIOrganizationData {
@@ -41,21 +41,21 @@ export class JSONAPIOrganizationData {
   type = 'organizations';
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: Organization;
+  attributes!: Organization;
 
   @ApiPropertyOptional()
-  relationships: Record<string, unknown>;
+  relationships?: Record<string, unknown>;
 }
 
 export class OrganizationResultSingular {
   @ApiProperty()
-  data: JSONAPIOrganizationData;
+  data!: JSONAPIOrganizationData;
 }
 
 export class OrganizationResultPlural {
   @ApiProperty()
-  data: JSONAPIOrganizationData[];
+  data!: JSONAPIOrganizationData[];
 }

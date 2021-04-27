@@ -14,7 +14,7 @@ export abstract class TimeUserEntityMetadata {
    */
   @ApiProperty()
   @CreateDateColumn({ name: 'created_at', type: 'timestamp without time zone' })
-  createdAt: Date;
+  createdAt!: Date;
 
   /**
    * User who created the entity
@@ -25,10 +25,10 @@ export abstract class TimeUserEntityMetadata {
     name: 'created_by',
     referencedColumnName: 'id',
   })
-  createdByUser: User;
+  createdByUser!: User;
 
   @Column('uuid', { name: 'created_by' })
-  createdBy: string;
+  createdBy!: string;
 
   /**
    * Time of last edit.
@@ -38,5 +38,5 @@ export abstract class TimeUserEntityMetadata {
     name: 'last_modified_at',
     type: 'timestamp without time zone',
   })
-  lastModifiedAt: Date;
+  lastModifiedAt!: Date;
 }

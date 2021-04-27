@@ -45,19 +45,19 @@ export enum JobStatus {
 export class Scenario extends TimeUserEntityMetadata {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @ApiProperty()
   @Column('character varying')
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional()
   @Column('character varying')
-  description: string;
+  description?: string;
 
   @ApiProperty({ enum: ScenarioType, enumName: 'ScenarioType' })
   @Column('enum')
-  type: ScenarioType;
+  type!: ScenarioType;
 
   /**
    * The project to which this scenario belongs.
@@ -68,10 +68,10 @@ export class Scenario extends TimeUserEntityMetadata {
     name: 'project_id',
     referencedColumnName: 'id',
   })
-  project: Project;
+  project?: Project;
 
   @Column('uuid', { name: 'project_id' })
-  projectId: string;
+  projectId!: string;
 
   /**
    * List of IUCN categories used to select WDPA protected areas for the
@@ -135,7 +135,7 @@ export class Scenario extends TimeUserEntityMetadata {
    */
   @ApiProperty({ enum: JobStatus, enumName: 'JobStatus' })
   @Column('enum')
-  status?: JobStatus;
+  status!: JobStatus;
 
   /**
    * Parent scenario.
@@ -148,7 +148,7 @@ export class Scenario extends TimeUserEntityMetadata {
   @ApiPropertyOptional()
   @OneToOne((_type) => Scenario)
   @JoinColumn({ name: 'parent_id', referencedColumnName: 'id' })
-  parentScenario: Scenario;
+  parentScenario?: Scenario;
 
   @ApiProperty({
     type: () => User,
@@ -156,7 +156,7 @@ export class Scenario extends TimeUserEntityMetadata {
   })
   @IsArray()
   @ManyToMany((_type) => User, (user) => user.scenarios, { eager: true })
-  users: Partial<User>[];
+  users!: Partial<User>[];
 }
 
 export class JSONAPIScenarioData {
@@ -164,13 +164,13 @@ export class JSONAPIScenarioData {
   type = 'scenarios';
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: Scenario;
+  attributes!: Scenario;
 }
 
 export class ScenarioResult {
   @ApiProperty()
-  data: JSONAPIScenarioData;
+  data!: JSONAPIScenarioData;
 }

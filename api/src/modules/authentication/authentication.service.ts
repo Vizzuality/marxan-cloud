@@ -180,7 +180,7 @@ export class AuthenticationService {
     if (
       new Date() < exp &&
       event?.topic === token.sub &&
-      event.data.validationToken === token.validationToken
+      event?.data?.validationToken === token.validationToken
     ) {
       await this.apiEventsService.create({
         topic: event.topic,
