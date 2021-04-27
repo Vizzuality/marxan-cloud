@@ -70,7 +70,7 @@ export class ProjectsController {
   async findAllGeoFeaturesForProject(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Param() params: { projectId: string },
-    @Query('q') queries: { filterQuery: string },
+    @Query('q') queries: { featureAliasFilter: string },
   ): Promise<GeoFeatureResult> {
     const results = await this.geoFeaturesService.findAllPaginated(
       fetchSpecification,
