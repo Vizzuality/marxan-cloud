@@ -198,7 +198,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
             </div>
           </div>
 
-          <div className="flex justify-center gap-4 mt-20">
+          <div className="flex justify-center space-x-4 mt-20">
             <Button theme="secondary" size="lg" type="button" className="relative px-20" disabled={submitting} onClick={onBack}>
               <span>Back</span>
             </Button>

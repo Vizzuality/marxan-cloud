@@ -17,7 +17,7 @@ export const Item: React.FC<ItemSettingsProps> = ({
     <div className="w-full px-8 pt-6 pb-4 bg-gray-700 rounded-b-3xl">
       {children}
 
-      <div className="flex justify-end w-full gap-1 mt-2.5">
+      <div className="flex justify-end w-full space-x-1 mt-2.5">
         <Button
           className="flex-shrink-0"
           size="s"

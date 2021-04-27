@@ -279,7 +279,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
             </div>
           )}
 
-          <div className="flex justify-center gap-2 mt-20">
+          <div className="flex justify-center space-x-2 mt-20">
             <Button
               theme="secondary-alt"
               size="lg"

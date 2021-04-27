@@ -1,44 +1,62 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cx from 'classnames';
 import Button from 'components/button';
 import Slider from 'components/forms/slider';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
 
-import { TargetSPFItemProps, Type, TargetSPF } from './types';
+import { TargetSPFItemProps, Type } from './types';
 
 export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
   className,
-  targetSPF,
+  isAllTargets,
+  type,
+  name,
+  defaultTarget = 50,
+  defaultFPF = 1,
+  target,
+  fpf,
+  id,
   onRemove,
-  onChange,
+  onChangeTarget,
+  onChangeFPF,
 }: TargetSPFItemProps) => {
-  const [targetSPFValue, setTargetSPFValue] = useState<TargetSPF>(targetSPF);
+  const [targetValue, setTargetValue] = useState((target || defaultTarget) / 100);
+  const [FPFValue, setFPFValue] = useState(fpf || defaultFPF);
   const sliderLabelRef = useRef(null);
-  const {
-    isAllTargets, type, name, surface, target, spf, id,
-  } = targetSPFValue;
+
+  useEffect(() => {
+    if (typeof target !== 'undefined') setTargetValue(target / 100);
+  }, [target]);
+
+  useEffect(() => {
+    if (typeof fpf !== 'undefined') setFPFValue(fpf);
+  }, [fpf]);
 
   return (
     <div
       key={id}
       className={cx({
-        'bg-gray-800 text-white text-xs pl-4 py-2': true,
-        'border-l-4': !isAllTargets,
-        'border-green-300': type === Type.BIOREGIONAL,
-        'border-yellow-300': type === Type.SPECIES,
-        'border-indigo': type === Type.BIOREGIONAL_AND_SPECIES, // temporary color
+        'bg-gray-700 text-white text-xs pl-5 py-2 relative border-transparent': true,
         [className]: !!className,
       })}
     >
-      <div className="flex justify-between pb-4 pr-2">
-        <span className="text-sm">{isAllTargets ? 'Set target and SPF in all features' : name}</span>
+      <div
+        className={cx({
+          'absolute left-0 top-0 h-full w-1': true,
+          'bg-green-300': type === Type.BIOREGIONAL,
+          'bg-yellow-300': type === Type.SPECIES,
+          'bg-gradient-to-b from-green-300 to-yellow-300': type === Type.BIOREGIONAL_AND_SPECIES, // temporary color
+        })}
+      />
+      <div className="flex items-start justify-between pb-2 pr-2">
+        <span className="text-sm font-medium font-heading">{isAllTargets ? 'Set target and SPF in all features' : name}</span>
         {!isAllTargets && (
           <Button
-            className="text-xs"
+            className="flex-shrink-0 text-xs"
             theme="secondary"
             size="xs"
-            onClick={() => onRemove && onRemove(targetSPFValue)}
+            onClick={() => onRemove && onRemove(id)}
           >
             Remove
           </Button>
@@ -46,9 +64,6 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
       </div>
       <div className="flex">
         <div className="relative flex-col w-full pr-4">
-          <div className="absolute top-0 right-4">
-            {surface}
-          </div>
           <Label ref={sliderLabelRef} className="mb-1 uppercase">
             <span>{isAllTargets ? 'ALL TARGETS' : 'TARGET'}</span>
           </Label>
@@ -56,15 +71,11 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
             labelRef={sliderLabelRef}
             minValue={0}
             maxValue={1}
-            defaultValue={target}
+            value={targetValue}
             step={0.01}
             onChange={(sliderValue) => {
-              const newValue: TargetSPF = {
-                ...targetSPFValue,
-                target: sliderValue,
-              };
-              setTargetSPFValue(newValue);
-              if (onChange) onChange(newValue);
+              setTargetValue(sliderValue);
+              if (onChangeTarget) onChangeTarget(+(sliderValue * 100).toFixed(0));
             }}
           />
           <div className="flex justify-between w-full text-gray-400">
@@ -79,14 +90,12 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
               className="px-0 py-1"
               theme="dark"
               mode="dashed"
-              defaultValue={spf}
+              type="number"
+              defaultValue={FPFValue}
+              value={FPFValue}
               onChange={({ target: { value: inputValue } }) => {
-                const newValue: TargetSPF = {
-                  ...targetSPFValue,
-                  spf: Number(inputValue),
-                };
-                setTargetSPFValue(newValue);
-                if (onChange) onChange(newValue);
+                setFPFValue(Number(inputValue));
+                if (onChangeFPF) onChangeFPF(Number(inputValue));
               }}
             />
           </div>

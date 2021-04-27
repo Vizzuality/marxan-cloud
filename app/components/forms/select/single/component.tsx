@@ -122,7 +122,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
   });
 
   // 'usePopper'
-  const { styles, attributes } = usePopper(triggerRef.current, menuRef.current, {
+  const { styles, attributes, update } = usePopper(triggerRef.current, menuRef.current, {
     placement: 'bottom',
     // strategy: 'fixed',
     modifiers: [
@@ -140,6 +140,10 @@ export const SingleSelect: React.FC<SelectProps> = ({
       closeMenu();
     }
   }, [referenceHidden, closeMenu]);
+
+  useEffect(() => {
+    if (update) update();
+  }, [isOpen, update]);
 
   const selectedItems = selectedItem ? [selectedItem] : [];
 

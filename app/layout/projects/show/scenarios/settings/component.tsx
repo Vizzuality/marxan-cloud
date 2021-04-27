@@ -33,24 +33,24 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
   } = scenarioData;
 
   return (
-    <dl className="flex flex-col gap-2">
-      <div className="flex gap-2 text-sm">
+    <dl className="flex flex-col space-y-2">
+      <div className="flex space-x-2 text-sm">
         <dt>Protected areas:</dt>
         <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(wdpaIucnCategories || []).length || '-'}</dd>
       </div>
-      <div className="flex gap-2 text-sm">
+      <div className="flex space-x-2 text-sm">
         <dt>Features:</dt>
         <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">-</dd>
       </div>
-      <div className="flex gap-2 text-sm">
+      <div className="flex space-x-2 text-sm">
         <dt>Runs:</dt>
         <dd>{numberOfRuns || '-'}</dd>
       </div>
-      <div className="flex gap-2 text-sm">
+      <div className="flex space-x-2 text-sm">
         <dt>BLM:</dt>
         <dd>{boundaryLengthModifier || '-'}</dd>
       </div>
-      {/* <div className="flex gap-2 text-sm">
+      {/* <div className="flex space-x-2 text-sm">
         <dt>Schedules:</dt>
         <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">2</dd>
       </div> */}
