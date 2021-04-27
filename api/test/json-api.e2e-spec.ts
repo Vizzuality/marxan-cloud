@@ -54,7 +54,10 @@ describe('JSON API Specs (e2e)', () => {
           Object.keys(omit(jsonApiErrorResponse.meta, ['rawError', 'stack'])),
         );
       }
-      if (process.env.NODE_ENV === 'development') {
+      if (
+        process.env.NODE_ENV === 'development' ||
+        process.env.NODE_ENV === 'test'
+      ) {
         expect(Object.keys(err.meta)).toEqual(
           Object.keys(jsonApiErrorResponse.meta),
         );
