@@ -87,7 +87,7 @@ const disablePaginationQueryParam = ApiQuery({
  * - sort (https://jsonapi.org/format/1.0/#fetching-sorting)
  * - page[size] (https://jsonapi.org/format/1.0/#fetching-pagination)
  * - page[number] (https://jsonapi.org/format/1.0/#fetching-pagination)
- * - [TODO] filter (https://jsonapi.org/format/1.0/#fetching-filtering)
+ * - filter (https://jsonapi.org/format/1.0/#fetching-filtering)
  */
 export const JSONAPIQueryParams = (fetchConfiguration?: {
   entitiesAllowedAsIncludes?: string[];
@@ -116,7 +116,6 @@ export const JSONAPIQueryParams = (fetchConfiguration?: {
  * - include (https://jsonapi.org/format/1.0/#fetching-includes)
  * - fields (https://jsonapi.org/format/1.0/#fetching-sparse-fieldsets)
  * - omitFields (not part of the JSON:API specification)
- * - [TODO] filter (https://jsonapi.org/format/1.0/#fetching-filtering)
  */
 export const JSONAPISingleEntityQueryParams = (fetchConfiguration?: {
   entitiesAllowedAsIncludes?: string[];
