@@ -17,21 +17,22 @@ import {
   ApiQuery,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { TileSpecification } from './admin-areas.service'
+import { TileSpecification } from './admin-areas.service';
+
 
 import { Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}`)
-export class AdminAreasController {
+export class AdminAreasController<T> {
   private readonly logger: Logger = new Logger(AdminAreasController.name);
-  constructor(public service: AdminAreasService) {}
+  constructor(public service: AdminAreasService<T>) {}
 
   @ApiOperation({
     description: 'Get tile for administrative areas within a given country.',
   })
   @ApiParam({
     name: 'z',
-    description: 'The zoom level ranging from 0 - 20',
+    description: 'The zoom level ranging from 0 - 12',
     type: Number,
     required: true,
   })

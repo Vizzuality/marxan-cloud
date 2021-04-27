@@ -5,6 +5,9 @@ import * as zlib from 'zlib';
 import { Transform } from 'class-transformer';
 import { IsInt, Max, Min, } from 'class-validator';
 import { TileSpecification } from '../admin-areas/admin-areas.service';
+import { async } from 'rxjs';
+import { query } from 'express';
+import { result } from 'lodash';
 
 /**
  * @description The specification of the tile request
@@ -48,25 +51,6 @@ export interface ITileQueryInput extends TileRequest {
 }
 
 /**
- * @description Configuration options for the tile service
- * @todo add cache options
- */
-export interface TileServiceConfig<T> {
-  /**
-   * @description Max zoom level for data rendering
-   */
-  maxZoomLevel: number;
-  /**
-   * @description Custom query for the different entities
-   */
-  customQuery: string;
-  /**
-   * @description attributes to be retrieved from the different entities
-   */
-  attributes: string;
-}
-
-/**
  * @description The required input values for the tile renderer
  */
 export interface TileInput<T> extends TileRequest {
@@ -77,21 +61,21 @@ export interface TileInput<T> extends TileRequest {
   /**
    * @description The geometry column name, default is "The_geom". This column should be of type Geometry in PostGIS
    */
-  geometry?: string;
+  geometry: string;
   /**
    * @description The tile extent is the grid dimension value as specified by ST_AsMVT. The default is 4096.
    * @see https://postgis.net/docs/ST_AsMVT.html
    */
-  extent?: number;
+  extent: number;
   /**
    * @description Max zoom level for data rendering
    */
-  maxZoomLevel?: number;
+  maxZoomLevel: number;
    /**
    * @description The buffer around the tile extent in the number of grid cells as specified by ST_AsMVT. The default is 256.
    * @see https://postgis.net/docs/ST_AsMVT.html
    */
-  buffer?: number;
+  buffer: number;
   /**
    * @description Custom query for the different entities
    */
@@ -106,7 +90,7 @@ export interface TileInput<T> extends TileRequest {
 /**
  * @description This function creates the MVT tiles from the appropriate TileInput
  */
-export type TileRenderer<T> = (args: TileInput<T>) => Promise<ArrayBuffer>;
+export type TileRenderer<T> = (args: TileInput<T>) => Promise<Buffer>;
 
 
 
@@ -114,7 +98,7 @@ export type TileRenderer<T> = (args: TileInput<T>) => Promise<ArrayBuffer>;
  * @todo add generic type
  */
 @Injectable()
-export class TileService {
+export class TileService<T> {
   /**
    * @todo add constructor
    * @todo move generation of specific query for each point to the api. Generate this query with the query builder
@@ -230,24 +214,6 @@ export class TileService {
     });
   }
 
-  // getTileService({
-  //   maxZoomLevel = 12,
-  //   customQuery = 'gid_2 is not null',
-  //   attributes = 'gid_2'
-  // }: TileServerConfig<T>): Promise<TileRenderer<T>> {
-  //   return async this.getTile(
-  //     z: number,
-  //     x: number,
-  //     y: number,
-  //     table: string,
-  //     geometry: string,
-  //     extent: number,
-  //     buffer: number,
-  //     maxZoomLevel: number,
-  //     customQuery: string,
-  //     attributes: string,
-  //   )
-  // }
 
   /**
    * The main function that returns a tile in mvt-format.
@@ -260,18 +226,18 @@ export class TileService {
    * @todo Add tile server config type to getTile function
    * @todo add tile render type to promise
    */
-  async getTile(
-    z: number,
-    x: number,
-    y: number,
-    table: string,
-    geometry: string,
-    extent: number,
-    buffer: number,
-    maxZoomLevel: number,
-    customQuery: string,
-    attributes: string,
-  ): Promise<Buffer> {
+  async getTile({
+    z,
+    x,
+    y,
+    table,
+    geometry,
+    extent,
+    buffer,
+    maxZoomLevel,
+    customQuery,
+    attributes,
+  }:TileInput<T>): Promise<Buffer> {
     const query = this.buildQuery(
       {
         z,
@@ -287,6 +253,7 @@ export class TileService {
       attributes,
     );
     this.logger.debug('Query created');
+    // return async ({}: TileInput<T>) -- result - const queryResult --tile: wait this.zip(queryResult[0].mvt);
     let data: Buffer = Buffer.from('');
     if (query) {
       try {
