@@ -3,7 +3,7 @@ import { IsOptional, MaxLength } from 'class-validator';
 
 export class CreateUserDTO {
   @ApiProperty()
-  email: string;
+  email!: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -29,7 +29,7 @@ export class CreateUserDTO {
    * byte count of the chosen passphrase is at most 72.
    */
   @MaxLength(18)
-  password: string;
+  password!: string;
 
   @ApiPropertyOptional()
   @IsOptional()

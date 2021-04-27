@@ -10,7 +10,9 @@ import {
   IsUUID,
   Length,
 } from 'class-validator';
+import { Polygon, MultiPolygon } from 'geojson';
 import { PlanningUnitGridShape } from '../project.api.entity';
+
 /**
  * @todo We have this dto partially duplicated in the geoprocessing service
  * @file geoprocessing/src/modules/planning-units/planning-units.job.ts
@@ -18,7 +20,7 @@ import { PlanningUnitGridShape } from '../project.api.entity';
 export class CreateProjectDTO {
   @ApiProperty()
   @IsString()
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -27,7 +29,7 @@ export class CreateProjectDTO {
 
   @ApiProperty()
   @IsUUID()
-  organizationId: string;
+  organizationId!: string;
 
   @ApiPropertyOptional({
     description: 'ISO 3166-1 alpha3 country code (uppercase)',
@@ -54,18 +56,20 @@ export class CreateProjectDTO {
   @IsEnum(Object.values(PlanningUnitGridShape))
   planningUnitGridShape?: PlanningUnitGridShape;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
   planningUnitAreakm2?: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: `Geometry part of GeoJson; MultiPolygon or Polygon`,
+  })
   @IsOptional()
   @IsObject()
-  extent?: Record<string, unknown>;
+  extent?: MultiPolygon | Polygon;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, string>;
 }

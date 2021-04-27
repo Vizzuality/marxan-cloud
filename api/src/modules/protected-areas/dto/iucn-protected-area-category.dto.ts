@@ -5,7 +5,7 @@ export class IUCNProtectedAreaCategoryDTO extends PickType(ProtectedArea, [
   'iucnCategory',
 ]) {
   @ApiProperty()
-  iucnCategory: IUCNCategory;
+  iucnCategory!: IUCNCategory;
 }
 
 export class JSONAPIIUCNProtectedAreaCategoryData {
@@ -13,13 +13,13 @@ export class JSONAPIIUCNProtectedAreaCategoryData {
   type = 'iucn_protected_area_categories';
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: IUCNProtectedAreaCategoryDTO;
+  attributes!: IUCNProtectedAreaCategoryDTO;
 }
 
 export class IUCNProtectedAreaCategoryResult {
   @ApiProperty()
-  data: JSONAPIIUCNProtectedAreaCategoryData;
+  data!: JSONAPIIUCNProtectedAreaCategoryData;
 }

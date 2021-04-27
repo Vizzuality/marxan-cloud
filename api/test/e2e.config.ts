@@ -8,6 +8,10 @@ import { CreateUserDTO } from 'modules/users/dto/create.user.dto';
 import { UpdateUserDTO } from 'modules/users/dto/update.user.dto';
 import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
 
+interface CountryCodeInput {
+  countryCode?: string;
+}
+
 export const E2E_CONFIG: {
   users: {
     basic: {
@@ -26,14 +30,14 @@ export const E2E_CONFIG: {
   projects: {
     valid: {
       minimal: () => Partial<CreateProjectDTO>;
-      minimalInGivenAdminArea: (options?: {
+      minimalInGivenAdminArea: (options: {
         countryCode: string;
         adminAreaLevel1Id?: string;
         adminAreaLevel2Id?: string;
       }) => Partial<CreateProjectDTO>;
-      complete: (options: unknown) => Partial<CreateProjectDTO>;
-      customArea: (options: unknown) => Partial<CreateProjectDTO>;
-      adminRegion: (options: unknown) => Partial<CreateProjectDTO>;
+      complete: (options: CountryCodeInput) => Partial<CreateProjectDTO>;
+      customArea: (options: CountryCodeInput) => Partial<CreateProjectDTO>;
+      adminRegion: (options: CountryCodeInput) => Partial<CreateProjectDTO>;
     };
     invalid: {
       incomplete: () => Partial<CreateProjectDTO>;
@@ -49,8 +53,8 @@ export const E2E_CONFIG: {
     };
   };
   planningUnits: {
-    valid: {};
-    invalid: {};
+    valid: Record<string, unknown>;
+    invalid: Record<string, unknown>;
   };
   protectedAreas: {
     categories: {
@@ -103,7 +107,7 @@ export const E2E_CONFIG: {
         adminAreaLevel1Id: options.adminAreaLevel1Id,
         adminAreaLevel2Id: options.adminAreaLevel2Id,
       }),
-      complete: (options: { countryCode: string }): CreateProjectDTO => ({
+      complete: (options: CountryCodeInput): CreateProjectDTO => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
         description: faker.lorem.paragraphs(2),
@@ -128,7 +132,7 @@ export const E2E_CONFIG: {
           [faker.random.word()]: faker.random.uuid(),
         },
       }),
-      customArea: (options: { countryCode: string }): CreateProjectDTO => ({
+      customArea: (options: CountryCodeInput): CreateProjectDTO => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
         description: faker.lorem.paragraphs(2),
@@ -153,7 +157,7 @@ export const E2E_CONFIG: {
           [faker.random.word()]: faker.random.uuid(),
         },
       }),
-      adminRegion: (options: { countryCode: string }): CreateProjectDTO => ({
+      adminRegion: (options: CountryCodeInput): CreateProjectDTO => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
         description: faker.lorem.paragraphs(2),

@@ -15,7 +15,7 @@ export const geoFeatureResource: BaseServiceResource = {
 export class GeoFeatureGeometry {
   @ApiProperty()
   @PrimaryColumn()
-  id: string;
+  id!: string;
 }
 
 export class JSONAPIGeoFeaturesGeometryData {
@@ -23,15 +23,15 @@ export class JSONAPIGeoFeaturesGeometryData {
   type = geoFeatureResource.name.plural;
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: GeoFeatureGeometry;
+  attributes!: GeoFeatureGeometry;
 }
 
 export class GeoFeatureResult {
   @ApiProperty()
-  data: JSONAPIGeoFeaturesGeometryData;
+  data!: JSONAPIGeoFeaturesGeometryData;
 }
 
 /**
@@ -41,9 +41,9 @@ export class GeoFeatureResult {
 export class GeoFeaturePropertySet {
   @ApiProperty()
   @PrimaryColumn('uuid', { name: 'feature_id' })
-  featureId: string;
+  featureId!: string;
 
   @ApiProperty()
   @Column('jsonb', { name: 'properties_for_feature' })
-  properties: Record<string, unknown>;
+  properties!: Record<string, unknown>;
 }

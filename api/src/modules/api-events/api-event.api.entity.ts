@@ -44,7 +44,7 @@ export class ApiEvent {
    * not used anywhere.
    */
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   /**
    * Timestamp of the event.
@@ -52,7 +52,7 @@ export class ApiEvent {
   @Column('timestamp', {
     default: () => 'now()',
   })
-  timestamp: Date;
+  timestamp!: Date;
 
   /**
    * Each event topic (for example, the UUID of an entity) may be used across
@@ -69,7 +69,7 @@ export class ApiEvent {
   @ApiProperty()
   @IsEnum(Object.values(API_EVENT_KINDS))
   @Column('enum')
-  kind: string;
+  kind!: string;
 
   /**
    * Topic of an event; this will typically be the UUID of an entity in the
@@ -77,7 +77,7 @@ export class ApiEvent {
    */
   @ApiProperty()
   @Column('uuid')
-  topic: string;
+  topic!: string;
 
   /**
    * Data payload of the event. Its semantics depend on kind.
@@ -86,7 +86,7 @@ export class ApiEvent {
    * events are responsible for the appropriate handling of shared semantics.
    */
   @Column('jsonb')
-  data: Record<string, unknown>;
+  data!: Record<string, unknown>;
 }
 
 export class JSONAPIApiEventData {
@@ -94,13 +94,13 @@ export class JSONAPIApiEventData {
   type = 'countries';
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: ApiEvent;
+  attributes!: ApiEvent;
 }
 
 export class ApiEventResult {
   @ApiProperty()
-  data: JSONAPIApiEventData;
+  data!: JSONAPIApiEventData;
 }

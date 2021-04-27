@@ -34,15 +34,15 @@ export enum PlanningUnitGridShape {
 export class Project extends TimeUserEntityMetadata {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @ApiProperty()
   @Column('character varying')
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional()
   @Column('character varying')
-  description: string;
+  description?: string;
 
   /**
    * The organization to which this scenario belongs.
@@ -53,10 +53,10 @@ export class Project extends TimeUserEntityMetadata {
     name: 'organization_id',
     referencedColumnName: 'id',
   })
-  organization: Organization;
+  organization?: Organization;
 
   @Column('uuid', { name: 'organization_id' })
-  organizationId: string;
+  organizationId!: string;
 
   /**
    * The country where this project is located.
@@ -64,7 +64,7 @@ export class Project extends TimeUserEntityMetadata {
    * Uses the gid0 property of the Country entity.
    */
   @Column('character varying', { name: 'country_id' })
-  countryId: string;
+  countryId!: string;
 
   /**
    * Administrative area (level 1) on which this project is focused.
@@ -119,7 +119,7 @@ export class Project extends TimeUserEntityMetadata {
    */
   @ApiPropertyOptional()
   @Column('geometry')
-  extent: Record<string, unknown> | null;
+  extent?: Record<string, unknown> | null;
 
   /**
    * JSONB storage for non-relational attributes
@@ -128,18 +128,18 @@ export class Project extends TimeUserEntityMetadata {
    */
   @ApiPropertyOptional()
   @Column('jsonb')
-  metadata: Dictionary<string>;
+  metadata?: Dictionary<string>;
 
   @ApiPropertyOptional({ type: () => Scenario })
   @OneToMany((_type) => Scenario, (scenario) => scenario.project)
-  scenarios: Scenario[];
+  scenarios?: Scenario[];
 
   @ApiProperty({
     type: () => User,
     isArray: true,
   })
   @ManyToMany((_type) => User, (user) => user.projects, { eager: true })
-  users: Partial<User>[];
+  users?: Partial<User>[];
 }
 
 export class JSONAPIProjectData {
@@ -147,21 +147,21 @@ export class JSONAPIProjectData {
   type = 'projects';
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: Project;
+  attributes!: Project;
 
   @ApiPropertyOptional()
-  relationships: Record<string, unknown>;
+  relationships?: Record<string, unknown>;
 }
 
 export class ProjectResultPlural {
   @ApiProperty()
-  data: JSONAPIProjectData[];
+  data!: JSONAPIProjectData[];
 }
 
 export class ProjectResultSingular {
   @ApiProperty()
-  data: JSONAPIProjectData;
+  data!: JSONAPIProjectData;
 }
