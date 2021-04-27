@@ -149,10 +149,10 @@ export class GeoFeaturesService extends AppBaseService<
       );
     }
 
-    if (info?.params?.filterQuery) {
+    if (info?.queries?.featureAliasFilter) {
       queryFilteredByPublicOrProjectSpecificFeatures.andWhere(
         `${this.alias}.alias ilike :filterQuery OR ${this.alias}.featureClassName ilike :filterQuery`,
-        { filterQuery: `%${info.params.filterQuery}%` },
+        { filterQuery: `%${info.queries.featureAliasFilter}%` },
       );
     }
     return queryFilteredByPublicOrProjectSpecificFeatures;
