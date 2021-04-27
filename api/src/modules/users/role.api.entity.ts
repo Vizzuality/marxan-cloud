@@ -18,5 +18,5 @@ export enum Roles {
 export class Role {
   @PrimaryColumn({ type: 'varchar' })
   @IsEnum(Object.values(Roles))
-  name: string;
+  name!: string;
 }

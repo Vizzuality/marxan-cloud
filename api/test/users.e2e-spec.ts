@@ -23,6 +23,7 @@ import { ApiEventsService } from 'modules/api-events/api-events.service';
 import { UsersModule } from 'modules/users/users.module';
 import { UsersService } from 'modules/users/users.service';
 import { LoginDto } from 'modules/authentication/dto/login.dto';
+import { ApiEventByTopicAndKind } from 'modules/api-events/api-event.topic+kind.api.entity';
 
 /**
  * Tests for the UsersModule.
@@ -89,7 +90,7 @@ describe('UsersModule (e2e)', () => {
 
   describe('Users - sign up and validation', () => {
     let newUser: User | undefined;
-    let validationTokenEvent: Omit<ApiEvent, 'id'> | undefined;
+    let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to create an account using an email address not currently in use', async () => {
       await request(app.getHttpServer())
@@ -299,7 +300,7 @@ describe('UsersModule (e2e)', () => {
 
   describe('Users - Sign up again', () => {
     let newUser: User | undefined;
-    let validationTokenEvent: Omit<ApiEvent, 'id'> | undefined;
+    let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to sign up using the same email address as that of an account that has been deleted', async () => {
       await request(app.getHttpServer())

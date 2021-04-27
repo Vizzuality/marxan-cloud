@@ -30,7 +30,7 @@ export class IssuedAuthnToken {
    * JWT token to link the log of issuance with the issued JWTs.
    */
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   /**
    * The user to which this token has been issued.
@@ -40,7 +40,7 @@ export class IssuedAuthnToken {
     name: 'user_id',
     referencedColumnName: 'id',
   })
-  userId: string;
+  userId!: string;
 
   /**
    * Expiration timestamp of the issued token.
@@ -55,7 +55,7 @@ export class IssuedAuthnToken {
    * here for reference.
    */
   @Column('timestamp')
-  exp: Date;
+  exp!: Date;
 
   /**
    * Creation timestamp. This is the creation timestamp of the actual issuance
@@ -63,5 +63,5 @@ export class IssuedAuthnToken {
    * timestamp included in the JWT itself.
    */
   @Column('timestamp', { name: 'created_at' })
-  createdAt: Date;
+  createdAt!: Date;
 }

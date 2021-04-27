@@ -25,7 +25,7 @@ export interface GeoFeatureProperty {
 export class GeoFeature {
   @ApiProperty()
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @ApiPropertyOptional()
   @Column('varchar', { name: 'feature_class_name' })
@@ -58,7 +58,7 @@ export class GeoFeature {
 
   @ApiProperty()
   @Column('varchar')
-  tag: FeatureTags;
+  tag!: FeatureTags;
 
   @ApiPropertyOptional()
   properties?: GeoFeatureProperty[];
@@ -73,13 +73,13 @@ export class JSONAPIGeoFeaturesData {
   type = geoFeatureResource.name.plural;
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: GeoFeature;
+  attributes!: GeoFeature;
 }
 
 export class GeoFeatureResult {
   @ApiProperty()
-  data: JSONAPIGeoFeaturesData;
+  data!: JSONAPIGeoFeaturesData;
 }
