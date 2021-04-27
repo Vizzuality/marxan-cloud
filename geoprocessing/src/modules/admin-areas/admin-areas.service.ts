@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TileService, TileRequest } from 'src/modules/tile/tile.service';
+import { TileService, TileRequest, TileRenderer } from 'src/modules/tile/tile.service';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsInt,
@@ -19,9 +19,9 @@ export class TileSpecification extends TileRequest{
 
 
 @Injectable()
-export class AdminAreasService {
+export class AdminAreasService<T> {
   private readonly logger: Logger = new Logger(AdminAreasService.name);
-  constructor(private readonly tileService: TileService) {}
+  constructor(private readonly tileService: TileService<T>) {}
 
   /**
    *
@@ -67,7 +67,7 @@ export class AdminAreasService {
     const buffer = 256;
     const maxZoomLevel = 12;
 
-    return this.tileService.getTile(
+    return this.tileService.getTile({
       z,
       x,
       y,
@@ -78,6 +78,6 @@ export class AdminAreasService {
       maxZoomLevel,
       customQuery,
       attributes,
-    );
+    });
   }
 }
