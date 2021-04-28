@@ -4,8 +4,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-
-@Entity('admin-regions')
+@Entity('admin_regions')
 export class AdminArea {
   /**
    * Country id (ISO 3166-1 alpha-3).
@@ -53,6 +52,6 @@ export class AdminArea {
    * Level 2 id.
    */
   @ApiProperty()
-  @Column('geometry', { name: 'the_geom' })
+  @Column('geometry', { name: 'the_geom', select: false })
   theGeom: any;
 }

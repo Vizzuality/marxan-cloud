@@ -3,11 +3,15 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 import { Transform } from 'class-transformer';
+<<<<<<< HEAD
 import { IsInt, Max, Min, } from 'class-validator';
 import { TileSpecification } from '../admin-areas/admin-areas.service';
 import { async } from 'rxjs';
 import { query } from 'express';
 import { result } from 'lodash';
+=======
+import { IsInt, Max, Min } from 'class-validator';
+>>>>>>> fixed way we build the query
 
 /**
  * @description The specification of the tile request
@@ -35,19 +39,6 @@ export class TileRequest {
   @IsInt()
   @Transform((i) => Number.parseInt(i))
   y: number;
-}
-
-/**
- * @description This function define tile query input for the tile query requested
- */
-export interface ITileQueryInput extends TileRequest {
-  maxZoomLevel: number;
-  table: string;
-  geometry: string;
-  extent: number;
-  buffer: number;
-  customQuery: string;
-  attributes: string;
 }
 
 /**
@@ -79,7 +70,11 @@ export interface TileInput<T> extends TileRequest {
   /**
    * @description Custom query for the different entities
    */
+<<<<<<< HEAD
   customQuery: string,
+=======
+  customQuery: T;
+>>>>>>> fixed way we build the query
   /**
    * @description attributes to be retrieved from the different entities
    */
@@ -90,7 +85,7 @@ export interface TileInput<T> extends TileRequest {
 /**
  * @description This function creates the MVT tiles from the appropriate TileInput
  */
-export type TileRenderer<T> = (args: TileInput<T>) => Promise<Buffer>;
+export type TileRenderer<TileInput> = (args: TileInput) => Promise<Buffer>;
 
 
 
@@ -98,7 +93,7 @@ export type TileRenderer<T> = (args: TileInput<T>) => Promise<Buffer>;
  * @todo add generic type
  */
 @Injectable()
-export class TileService<T> {
+export class TileService {
   /**
    * @todo add constructor
    * @todo move generation of specific query for each point to the api. Generate this query with the query builder
@@ -106,48 +101,36 @@ export class TileService<T> {
    * @description The default base query builder
    */
   private readonly logger: Logger = new Logger(TileService.name);
-  createQueryForTile = ({
-    x,
-    y,
-    z,
-    table,
-    geometry,
-    extent,
-    buffer,
-    customQuery,
-    attributes,
-  }: ITileQueryInput) => `
-  WITH tile AS (
+
+  /**
+   * All database interaction is encapsulated in this function. The design-goal is to keep the time where a database-
+   * connection is open to a minimum. This reduces the risk for the database-instance to run out of connections.
+   * @param query the actual query to be sent to the database engine
+   * @return the tile-data as Buffer wrapped in a promise.
+   *  WITH tile AS (
     SELECT
-      ${attributes},
+      ${tileInput.attributes},
       ST_AsMVTGeom(
         -- Geometry from table
-        ST_Transform(ST_RemoveRepeatedPoints(${geometry}, 0.1), 3857),
+        ST_Transform(ST_RemoveRepeatedPoints(${tileInput.geometry}, 0.1), 3857),
         -- MVT tile boundary
-        ST_TileEnvelope(${z}, ${x}, ${y}),
+        ST_TileEnvelope(${tileInput.z}, ${tileInput.x}, ${tileInput.y}),
         -- Extent
-        ${extent},
+        ${tileInput.extent},
         -- Buffer
-        ${buffer},
+        ${tileInput.buffer},
         -- Clip geom
         true
       ) AS mvt_geom
-    FROM ${table}
+    FROM ${tileInput.table}
     WHERE
-      ST_Intersects(ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), ${geometry})
-      and ${customQuery}
+      ST_Intersects(ST_Transform(ST_TileEnvelope(${tileInput.z}, ${tileInput.x}, ${tileInput.y}), 4326), ${tileInput.geometry})
+      and ${tileInput.customQuery}
       and not gid_0 ='ATA'
   )
-  SELECT ST_AsMVT(tile, 'layer0',  ${extent}, 'mvt_geom') AS mvt FROM tile
-  `;
-
-  /**
-   * BuilDs tile query.
-   * @param z The zoom level ranging from 0 - 20
-   * @param x The tile x offset on Mercator Projection
-   * @param y The tile y offset on Mercator Projection
-   * @return the resulting string query.
+  SELECT ST_AsMVT(tile, 'layer0',  ${tileInput.extent}, 'mvt_geom') AS mvt FROM tile
    */
+<<<<<<< HEAD
   buildQuery(
     { z, x, y }: Pick<TileSpecification, 'z' | 'x' | 'y'>,
     table: string,
@@ -179,19 +162,41 @@ export class TileService<T> {
     }
     return query;
   }
+=======
+>>>>>>> fixed way we build the query
 
-  /**
-   * All database interaction is encapsulated in this function. The design-goal is to keep the time where a database-
-   * connection is open to a minimum. This reduces the risk for the database-instance to run out of connections.
-   * @param query the actual query to be sent to the database engine
-   * @return the tile-data as Buffer wrapped in a promise.
-   */
-  async fetchTileFromDatabase(query: string): Promise<Record<'mvt', Buffer>[]> {
+  async fetchTileFromDatabase({
+    z,
+    x,
+    y,
+    table,
+    geometry,
+    extent,
+    buffer,
+    maxZoomLevel,
+    customQuery,
+    attributes,
+  }: TileInput<string>): Promise<Record<'mvt', Buffer>[]> {
     const connection = getConnection();
-    const queryRunner = connection.createQueryRunner();
-    queryRunner.connect();
-    const result = await queryRunner.query(query);
-    this.logger.debug('Query retrieved');
+    const query = connection
+      .createQueryBuilder()
+      .select(`ST_AsMVT(tile, 'layer0', ${extent}, 'mvt_geom')`, 'mvt')
+      .from((subQuery) => {
+        return subQuery
+          .select(
+            `${attributes}, ST_AsMVTGeom(ST_Transform(ST_RemoveRepeatedPoints(${geometry}, 0.1), 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom`,
+          )
+          .from(table, '')
+          .where(
+            `ST_Intersects(ST_Transform(ST_TileEnvelope(:z, :x, :y), 4326), ${geometry} )`,
+            { z, x, y },
+          )
+          .andWhere(customQuery)
+          .andWhere("gid_0 != 'ATA'");
+      }, 'tile');
+    this.logger.debug(query.getSql());
+    const result = await query.getRawMany();
+
     if (result) {
       return result;
     } else {
@@ -217,15 +222,14 @@ export class TileService<T> {
 
   /**
    * The main function that returns a tile in mvt-format.
-   * @param z The zoom level ranging from 0 - 20
-   * @param x The tile x offset on Mercator Projection
-   * @param y The tile y offset on Mercator Projection
+   * @param tileInput tile request input
    * @return contains the tile-data and some meta-information
    *
    * @todo check for valid tile and for valid data source
    * @todo Add tile server config type to getTile function
    * @todo add tile render type to promise
    */
+<<<<<<< HEAD
   async getTile({
     z,
     x,
@@ -266,6 +270,22 @@ export class TileService<T> {
         this.logger.error(`Database error: ${error.message}`);
         return data;
       }
+=======
+  async getTile(tileInput: TileInput<string>): Promise<Buffer> {
+    let data: Buffer = Buffer.from('');
+    try {
+      const queryResult: Record<
+        'mvt',
+        Buffer
+      >[] = await this.fetchTileFromDatabase(tileInput);
+      this.logger.debug('Data succesfully retrieved from database');
+      // zip data
+      data = await this.zip(queryResult[0].mvt);
+      this.logger.debug('Data compressed');
+    } catch (error) {
+      this.logger.error(`Database error: ${error.message}`);
+      throw new BadRequestException(error.message);
+>>>>>>> fixed way we build the query
     }
     return data;
   }
