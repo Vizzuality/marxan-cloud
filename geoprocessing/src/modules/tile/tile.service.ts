@@ -44,21 +44,17 @@ export interface TileInput<T> extends TileRequest {
   /**
    * @description The geometry column name, default is "The_geom". This column should be of type Geometry in PostGIS
    */
-  geometry: string;
+  geometry?: string;
   /**
    * @description The tile extent is the grid dimension value as specified by ST_AsMVT. The default is 4096.
    * @see https://postgis.net/docs/ST_AsMVT.html
    */
-  extent: number;
+  extent?: number;
   /**
-   * @description Max zoom level for data rendering
-   */
-  maxZoomLevel: number;
-   /**
    * @description The buffer around the tile extent in the number of grid cells as specified by ST_AsMVT. The default is 256.
    * @see https://postgis.net/docs/ST_AsMVT.html
    */
-  buffer: number;
+  buffer?: number;
   /**
    * @description Custom query for the different entities
    */
@@ -97,10 +93,9 @@ export class TileService {
     x,
     y,
     table,
-    geometry,
-    extent,
-    buffer,
-    maxZoomLevel,
+    geometry = 'the_geom',
+    extent = 4096,
+    buffer = 256,
     customQuery,
     attributes,
   }: TileInput<string>): Promise<Record<'mvt', Buffer>[]> {
