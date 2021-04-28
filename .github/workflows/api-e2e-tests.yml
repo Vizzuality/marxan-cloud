@@ -23,6 +23,7 @@ env:
 jobs:
   test-api-e2e:
     runs-on: ubuntu-18.04
+    timeout-minutes: 15
     steps:
     - uses: actions/checkout@v2
     - name: Run CI tests via make task
