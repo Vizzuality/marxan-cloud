@@ -41,6 +41,7 @@ export class AdminAreasService {
     if (level === 2) {
       whereQuery = `gid_2 IS NOT NULL`;
     }
+    whereQuery += ` AND gid_0 != 'ATA'`;
     return whereQuery;
   }
 
