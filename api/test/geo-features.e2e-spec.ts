@@ -27,7 +27,6 @@ import {
   GeoFeature,
   geoFeatureResource,
 } from 'modules/geo-features/geo-feature.api.entity';
-import { JSONAPISerializerConfig } from 'utils/app-base.service';
 
 /**
  * Tests for API contracts for the management of geo features within scenarios.
@@ -209,10 +208,6 @@ describe('GeoFeaturesModule (e2e)', () => {
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
 
-        /**
-         * Here we just assert the result length since result match can come either from aliases or
-         * featureClassNames, and we have control over stored test data
-         */
         expect(response.body.data).toHaveLength(6);
       });
       test('should return all available features if query param has no value', async () => {
