@@ -22,20 +22,12 @@ export class ProtectedAreasService {
     const { z, x, y } = tileSpecification;
     const attributes = 'full_name, status, wdpaid';
     const table = this.protectedAreasRepository.metadata.tableName;
-    const geometry = 'the_geom';
-    const extent = 4096;
-    const buffer = 256;
-    const maxZoomLevel = 12;
     const customQuery = undefined;
     return this.tileService.getTile({
       z,
       x,
       y,
       table,
-      geometry,
-      extent,
-      buffer,
-      maxZoomLevel,
       customQuery,
       attributes,
     });
