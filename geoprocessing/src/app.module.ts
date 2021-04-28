@@ -4,6 +4,7 @@ import { geoprocessingConnections } from './ormconfig';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AdminAreasModule } from 'src/modules/admin-areas/admin-areas.module';
+import { ProtectedAreasModule } from 'src/modules/protected-areas/protected-areas.module';
 import { PlanningUnitsModule } from 'src/modules/planning-units/planning-units.module';
 import { TileModule } from './modules/tile/tile.module';
 
@@ -20,6 +21,7 @@ import { TileModule } from './modules/tile/tile.module';
     AdminAreasModule,
     PlanningUnitsModule,
     TileModule,
+    ProtectedAreasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

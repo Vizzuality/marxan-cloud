@@ -62,7 +62,7 @@ export interface TileInput<T> extends TileRequest {
   /**
    * @description Custom query for the different entities
    */
-  customQuery: T;
+  customQuery: T | undefined;
   /**
    * @description attributes to be retrieved from the different entities
    */
@@ -111,23 +111,26 @@ export class TileService {
       .from((subQuery) => {
         if (z > 7) {
           subQuery.select(
-            `${attributes}, ST_AsMVTGeom(ST_Transform(${geometry}, 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom`,
+            `${attributes}, ST_AsMVTGeom(ST_Transform(${geometry}, 3857),
+            ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom`,
           );
         } else {
           subQuery.select(
             `${attributes}, ST_AsMVTGeom(ST_Transform(ST_RemoveRepeatedPoints(${geometry}, ${
-              0.1 / z
+              0.1 / (z * 2)
             }), 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom`,
           );
         }
-        return subQuery
+        subQuery
           .from(table, '')
           .where(
             `ST_Intersects(ST_Transform(ST_TileEnvelope(:z, :x, :y), 4326), ${geometry} )`,
             { z, x, y },
-          )
-          .andWhere(customQuery)
-          .andWhere("gid_0 != 'ATA'");
+          );
+        if (customQuery) {
+          subQuery.andWhere(customQuery);
+        }
+        return subQuery;
       }, 'tile');
     const result = await query.getRawMany();
 
