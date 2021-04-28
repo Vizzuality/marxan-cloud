@@ -20,18 +20,40 @@ var hoveredStateId = null;
 
 var map = new mapboxgl.Map({
     'container': 'map',
-    'zoom': 2,
+    'zoom': 5,
     'center': [10,
           49],
     "light": {"intensity": 0.2},
     'style': {
         'version': 8,
         'sources': {
-            'postgis-tiles': {
+          'postgis-tiles0': {
                 'type': 'vector',
                 'maxzoom': 12,
                 'tiles': [
-                "http://localhost:3040/api/v1/geodata/administrative-areas/0/preview/tiles/{z}/{x}/{y}.mvt",
+                "http://localhost:3040/api/v1/geodata/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt",
+                     ]
+            },
+            'postgis-tiles1': {
+                'type': 'vector',
+                'maxzoom': 12,
+                'tiles': [
+                "http://localhost:3040/api/v1/geodata/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt",
+                     ]
+            },
+            'postgis-tiles2': {
+                'type': 'vector',
+                'maxzoom': 12,
+                'tiles': [
+                "http://localhost:3040/api/v1/geodata/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt",
+                     ]
+            },
+            'postgis-tileswdpa': {
+                'type': 'vector',
+                'minzoom': 1,
+                'maxzoom': 12,
+                'tiles': [
+                "http://localhost:3040/api/v1/geodata/protected-areas/preview/tiles/{z}/{x}/{y}.mvt",
                      ]
             },
             'BASEMAP': {
@@ -47,17 +69,66 @@ var map = new mapboxgl.Map({
             'id': 'mapbox_monochrome-layer',
             'type': 'raster',
             'source': 'BASEMAP',
-            'minzoom': 0,
+            'minzoom': 1,
             'maxzoom': 22
         },
+
         {
             'id': 'postgis-tiles-layer',
             'type': 'fill',
-            'source': 'postgis-tiles',
+            'source': 'postgis-tiles2',
             'source-layer': 'layer0',
             'paint': {
                 'fill-outline-color': 'red',
                 'fill-color': 'green',
+                'fill-opacity': [
+'case',
+['boolean', ['feature-state', 'hover'], false],
+1,
+0.5
+]
+            }
+        },
+        {
+            'id': 'postgis-tiles-layer1',
+            'type': 'fill',
+            'source': 'postgis-tiles1',
+            'source-layer': 'layer0',
+            'paint': {
+                'fill-outline-color': 'blue',
+                'fill-color': 'green',
+                'fill-opacity': [
+'case',
+['boolean', ['feature-state', 'hover'], false],
+1,
+0.5
+]
+            }
+        },
+        {
+            'id': 'postgis-tiles-layer2',
+            'type': 'fill',
+            'source': 'postgis-tiles0',
+            'source-layer': 'layer0',
+            'paint': {
+                'fill-outline-color': 'pink',
+                'fill-color': 'green',
+                'fill-opacity': [
+'case',
+['boolean', ['feature-state', 'hover'], false],
+1,
+0.2
+]
+            }
+        },
+        {
+            'id': 'postgis-tiles-layer-wdpa',
+            'type': 'fill',
+            'source': 'postgis-tileswdpa',
+            'source-layer': 'layer0',
+            'paint': {
+                'fill-outline-color': 'blue',
+                'fill-color': 'orange',
                 'fill-opacity': [
 'case',
 ['boolean', ['feature-state', 'hover'], false],
