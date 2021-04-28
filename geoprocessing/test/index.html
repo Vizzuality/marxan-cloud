@@ -31,14 +31,14 @@ var map = new mapboxgl.Map({
                 'type': 'vector',
                 'maxzoom': 12,
                 'tiles': [
-                "http://localhost:3040/api/v1/geodata/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt",
+                "http://localhost:3040/api/v1/geodata/administrative-areas/0/preview/tiles/{z}/{x}/{y}.mvt",
                      ]
             },
             'postgis-tiles1': {
                 'type': 'vector',
                 'maxzoom': 12,
                 'tiles': [
-                "http://localhost:3040/api/v1/geodata/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt",
+                "http://localhost:3040/api/v1/geodata/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt",
                      ]
             },
             'postgis-tiles2': {
@@ -146,7 +146,45 @@ var map = new mapboxgl.Map({
 //             }
 //         },
         {
-            'id': 'postgis-tiles-layer-features',
+            'id': 'postgis-tiles-layer',
+            'type': 'fill',
+            'source': 'postgis-tiles2',
+            'source-layer': 'layer0',
+            'paint': {
+                'fill-outline-color': 'red',
+                'fill-color': 'green',
+                'fill-opacity': 0.2
+            }
+        },
+        {
+            'id': 'postgis-tiles-layer1',
+            'type': 'fill',
+            'source': 'postgis-tiles1',
+            'source-layer': 'layer0',
+            'paint': {
+                'fill-outline-color': 'blue',
+                'fill-color': 'green',
+                'fill-opacity': 0.2
+            }
+        },
+        {
+            'id': 'postgis-tiles-layer2',
+            'type': 'fill',
+            'source': 'postgis-tiles0',
+            'source-layer': 'layer0',
+            'paint': {
+                'fill-outline-color': 'pink',
+                'fill-color': 'green',
+                'fill-opacity': [
+'case',
+['boolean', ['feature-state', 'hover'], false],
+1,
+0.2
+]
+            }
+        },
+        {
+            'id': 'postgis-tiles-layer-wdpa',
             'type': 'fill',
             'source': 'postgis-tilesfeatures',
             'source-layer': 'layer0',
