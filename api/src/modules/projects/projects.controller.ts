@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Query,
@@ -69,17 +70,17 @@ export class ProjectsController {
   @Get(':projectId/features')
   async findAllGeoFeaturesForProject(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-    @Param() params: { projectId: string; featureClassAndAliasFilter?: string },
+    @Param() params: { projectId: string },
     @Query('q') featureClassAndAliasFilter: string,
   ): Promise<GeoFeatureResult> {
-    /**
-     * @debt Add proper typing in nestjs-base-service to allow adding query parameters in InfoDTO
-     */
-
-    params.featureClassAndAliasFilter = featureClassAndAliasFilter;
     const results = await this.geoFeaturesService.findAllPaginated(
       fetchSpecification,
-      { params },
+      {
+        params: {
+          ...params,
+          featureClassAndAliasFilter: featureClassAndAliasFilter,
+        },
+      },
     );
 
     return this.geoFeaturesService.serialize(results.data, results.metadata);

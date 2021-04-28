@@ -131,6 +131,7 @@ export class GeoFeaturesService extends AppBaseService<
      * spec), and if a projectId is supplied in either way, we first check if
      * the project exists (if not, we throw a NotFoundException).
      */
+
     let queryFilteredByPublicOrProjectSpecificFeatures;
     const projectId: string =
       (info?.params?.projectId as string) ??
