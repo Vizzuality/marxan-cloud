@@ -174,7 +174,7 @@ describe('GeoFeaturesModule (e2e)', () => {
         'As a user, when I upload feature shapefiles, I should see the related features in the list of those available within a project',
       );
 
-      test('should return a single result of geo-features which its className matches a given filter', async () => {
+      test('should return a single result of geo-features whose className property matches a given filter', async () => {
         const response = await request(app.getHttpServer())
           .get(
             `/api/v1/projects/${aProjectWithCountryAsPlanningArea.id}/features?q=${geoFeaturesFilters.cheeta.featureClassName}`,
