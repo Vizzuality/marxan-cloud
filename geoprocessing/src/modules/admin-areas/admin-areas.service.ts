@@ -52,20 +52,12 @@ export class AdminAreasService {
     const { z, x, y, level } = tileSpecification;
     const attributes = 'name_0, name_1, name_2';
     const table = this.adminAreasRepository.metadata.tableName;
-    const geometry = 'the_geom';
-    const extent = 4096;
-    const buffer = 256;
-    const maxZoomLevel = 12;
     const customQuery = this.buildAdminAreaWhereQuery(level);
     return this.tileService.getTile({
       z,
       x,
       y,
       table,
-      geometry,
-      extent,
-      buffer,
-      maxZoomLevel,
       customQuery,
       attributes,
     });
