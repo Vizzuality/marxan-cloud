@@ -133,7 +133,7 @@ export class GeoFeaturesService extends AppBaseService<
      */
 
     let queryFilteredByPublicOrProjectSpecificFeatures;
-    const projectId: string =
+    const projectId: string | undefined =
       (info?.params?.projectId as string) ??
       (fetchSpecification?.filter?.projectId as string);
     if (projectId) {

@@ -6,6 +6,7 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  Post,
   Req,
   UseGuards,
   ValidationPipe,
@@ -13,8 +14,8 @@ import {
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { ScenariosService } from './scenarios.service';
 import {
-  ProcessFetchSpecification,
   FetchSpecification,
+  ProcessFetchSpecification,
 } from 'nestjs-base-service';
 
 import {
@@ -26,7 +27,6 @@ import {
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
-import { Post } from '@nestjs/common';
 
 import {
   JSONAPIQueryParams,
@@ -34,14 +34,19 @@ import {
 } from 'decorators/json-api-parameters.decorator';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
+import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
+import { ScenarioFeaturesService } from '../scenarios-features';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class ScenariosController {
-  constructor(public readonly service: ScenariosService) {}
+  constructor(
+    public readonly service: ScenariosService,
+    private readonly scenarioFeatures: ScenarioFeaturesService,
+  ) {}
 
   @ApiOperation({
     description: 'Find all scenarios',
@@ -108,5 +113,28 @@ export class ScenariosController {
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
     return await this.service.remove(id);
+  }
+
+  // debt: could be a standalone controller not touching scenarios to avoid circular deps.
+  // debt: possibly will need the controller to get the ScenarioEntity via its service (otherwise, scenario-feature would import ScenariosModule, which would result in circular-dependency)
+  @ApiOperation({})
+  @ApiOkResponse({
+    type: ScenarioFeatureResultDto,
+  })
+  @Get(':id/scenarios-features')
+  async getScenarioFeatures(
+    @Param('id') id: string,
+  ): Promise<ScenarioFeatureResultDto> {
+    const features = await this.scenarioFeatures.findAll({
+      filter: {},
+    });
+    // debt: move to standalone mapper service - currently specialized serializer coupled to the entities
+    return {
+      data: {
+        id,
+        type: 'features',
+        attributes: features[0],
+      },
+    };
   }
 }
