@@ -12,8 +12,6 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "incremental": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true
   },
   "exclude": ["node_modules", "dist"]
 }
