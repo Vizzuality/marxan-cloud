@@ -8,9 +8,7 @@ describe('AllExceptionFilter class spec (unit)', () => {
    * Common Mocks
    */
   const responseMock = {
-    status: jest.fn(function () {
-      return this;
-    }),
+    status: jest.fn().mockReturnThis(),
     json: jest.fn(),
     url: 'fakeUrl',
   };
