@@ -25,7 +25,7 @@ import { Response } from 'express';
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class AdminAreasController<T> {
   private readonly logger: Logger = new Logger(AdminAreasController.name);
-  constructor(public service: AdminAreasService<T>) {}
+  constructor(public service: AdminAreasService) {}
 
   @ApiOperation({
     description: 'Get tile for administrative areas within a given country.',

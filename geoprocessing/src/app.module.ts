@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AdminAreasModule } from 'src/modules/admin-areas/admin-areas.module';
 import { PlanningUnitsModule } from 'src/modules/planning-units/planning-units.module';
+import { TileModule } from './modules/tile/tile.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PlanningUnitsModule } from 'src/modules/planning-units/planning-units.m
     }),
     AdminAreasModule,
     PlanningUnitsModule,
+    TileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
