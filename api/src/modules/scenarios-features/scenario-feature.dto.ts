@@ -13,22 +13,27 @@ export class ScenarioFeatureDto {
   tag!: string;
 
   @ApiProperty({
-    description: `0-1 (0-100%) value of target protection coverage of all available species.`,
+    description: `0-100 (%) value of target protection coverage of all available species.`,
   })
   target!: number;
 
   @ApiProperty({
-    description: `Equivalent of \`target\` percentage in covered area in m^2`,
+    description: `Equivalent of \`target\` percentage in covered area, expressed in m^2`,
   })
   targetArea!: number;
 
   @ApiProperty({
-    description: `0-1 (0-100%) value of how many species % is protected currently.`,
+    description: `Total area space, expressed in m^2`,
+  })
+  totalArea!: number;
+
+  @ApiProperty({
+    description: `0-100 (%) value of how many species % is protected currently.`,
   })
   met!: number;
 
   @ApiProperty({
-    description: `Equivalent of \`met\` percentage in covered area in m^2`,
+    description: `Equivalent of \`met\` percentage in covered area, expressed in m^2`,
   })
   metArea!: number;
 
