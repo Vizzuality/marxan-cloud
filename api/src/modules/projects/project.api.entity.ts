@@ -128,7 +128,7 @@ export class Project extends TimeUserEntityMetadata {
    */
   @ApiPropertyOptional()
   @Column('jsonb')
-  metadata?: Dictionary<string>;
+  metadata?: Record<string, unknown>;
 
   @ApiPropertyOptional({ type: () => Scenario })
   @OneToMany((_type) => Scenario, (scenario) => scenario.project)
