@@ -1,16 +1,11 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import {
-  TileService,
-  TileRequest,
-  TileRenderer,
-} from 'src/modules/tile/tile.service';
+import { TileService, TileRequest } from 'src/modules/tile/tile.service';
 import { ApiProperty } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { IsInt, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { AdminArea } from 'src/modules/admin-areas/admin-areas.geo.entity';
-import { inspect } from 'util';
 export class TileSpecification extends TileRequest {
   @ApiProperty()
   @Min(0)
@@ -50,28 +45,17 @@ export class AdminAreasService {
   }
 
   /**
-   * @todo get this query from query builder
-   * @todo apply validation on the controller
-   * @todo update the function to include guid apiQuery param
+   * @todo get attributes from Entity, based on user selection
    */
   public findTile(tileSpecification: TileSpecification): Promise<Buffer> {
     const { z, x, y, level } = tileSpecification;
-    const attributes = 'name_0';
+    const attributes = 'name_0, name_1, name_2';
     const table = this.adminAreasRepository.metadata.tableName;
     const geometry = 'the_geom';
     const extent = 4096;
     const buffer = 256;
     const maxZoomLevel = 12;
     const customQuery = this.buildAdminAreaWhereQuery(level);
-    this.logger.debug(
-      inspect(
-        this.adminAreasRepository.metadata.ownColumns.map((column) => {
-          if (column.isSelect) {
-            return column.entityMetadata.targetName;
-          }
-        }),
-      ),
-    );
     return this.tileService.getTile({
       z,
       x,
