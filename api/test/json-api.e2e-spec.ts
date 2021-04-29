@@ -3,9 +3,11 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { omit } from 'lodash';
+import { E2E_CONFIG } from './e2e.config';
 
 describe('JSON API Specs (e2e)', () => {
   let app: INestApplication;
+  let jwtToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -14,6 +16,16 @@ describe('JSON API Specs (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/sign-in')
+      .send({
+        username: E2E_CONFIG.users.basic.aa.username,
+        password: E2E_CONFIG.users.basic.aa.password,
+      })
+      .expect(201);
+
+    jwtToken = response.body.accessToken;
   });
 
   afterAll(async () => {
@@ -21,6 +33,13 @@ describe('JSON API Specs (e2e)', () => {
   });
 
   it('should return a response shaped as JSON:API Error spec, including ', async () => {
+    /**
+     * Logout user
+     */
+    await request(app.getHttpServer())
+      .post(`/auth/sign-out`)
+      .set('Authorization', `Bearer ${jwtToken}`);
+
     const jsonApiErrorResponse = {
       id: null,
       links: null,
@@ -64,4 +83,6 @@ describe('JSON API Specs (e2e)', () => {
       }
     });
   });
+
+  it('should return a object with a "data" prop as a response to a POST request', async () => {});
 });
