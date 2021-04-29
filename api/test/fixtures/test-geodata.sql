@@ -8,7 +8,7 @@ select st_transform(geom, 4326) as the_geom, 'square' as type, 1 as size from
 
 --- Associate scenario with PU for scenario 1 project 1
 INSERT INTO scenarios_pu_data (pu_geom_id, scenario_id, puid)
-select id as pu_geom_id, '$scenario_id_1' as scenario_id, row_number() over () as puid
+select id as pu_geom_id, '$scenario_id' as scenario_id, row_number() over () as puid
 from planning_units_geom pug
 where type='square' and size = 1;
 
@@ -18,7 +18,7 @@ pu as (
 select spd.id, pug.the_geom
 from scenarios_pu_data spd
 inner join planning_units_geom pug on spd.pu_geom_id = pug.id
-where scenario_id='$scenario_id_1'),
+where scenario_id='$scenario_id'),
 pu_pa as (select pu.id, st_area(st_transform(st_intersection(pu.the_geom, pa.the_geom), 3410)) as pa_pu_area, st_area(st_transform(pu.the_geom, 3410)) as pu_area
           from pu
           left join pa on pu.the_geom && pa.the_geom)
@@ -34,7 +34,7 @@ SET (protected_area, lockin_status) =
 -- Create the conexion between Features and Scenario 1 Project 1.
 INSERT INTO scenario_features_data
 (feature_class_id, scenario_id, created_by, total_area)
-select id, '$scenario_id_1' as scenario_id, '$user_id_1' as created_by,
+select id, '$scenario_id' as scenario_id, '$user_id' as created_by,
 st_area(
   st_transform(
     st_intersection(
@@ -52,7 +52,7 @@ where st_intersects(
 -- Features intersection with wdpa for our scenario to calculate area.
 with features as (select * from scenario_features_data s
             inner join features_data p  on s.feature_class_id = p.id
-            where s.scenario_id = '$scenario_id_1')
+            where s.scenario_id = '$scenario_id')
 select features.id, st_area(
             st_transform(
               st_intersection(
