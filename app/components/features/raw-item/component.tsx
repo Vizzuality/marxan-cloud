@@ -13,7 +13,7 @@ export interface ItemProps {
   name: string;
   categories?: number;
   description: string;
-  tag?: string;
+  tag: 'bioregional' | 'species';
   source?: string;
   scrollRoot?: MutableRefObject<HTMLDivElement | null>;
   selected?: boolean;

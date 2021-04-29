@@ -11,12 +11,13 @@ import useBottomScrollListener from 'hooks/scroll';
 export interface ScenariosFeaturesIntersectListProps {
   search?: string;
   selected: number[] | string[];
-  onToggleSelected: (selected: string | number) => void;
+  onSelected: (selected: string | number) => void;
 }
 
 export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersectListProps> = ({
+  search,
   selected = [],
-  onToggleSelected,
+  onSelected,
 }: ScenariosFeaturesIntersectListProps) => {
   const { query } = useRouter();
   const { pid } = query;
@@ -28,8 +29,9 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
+    search,
     filters: {
-      tag: 'bioregional',
+      // tag: 'bioregional',
     },
   });
 
@@ -40,9 +42,9 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
   );
 
   // Callbacks
-  const handleToggleSelected = useCallback((id) => {
-    if (onToggleSelected) onToggleSelected(id);
-  }, [onToggleSelected]);
+  const handleSelected = useCallback((feature) => {
+    if (onSelected) onSelected(feature);
+  }, [onSelected]);
 
   if (allFeaturesIsFetching && !allFeaturesIsFetched) {
     return (
@@ -75,7 +77,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
           )}
 
           {allFeaturesData && allFeaturesData.map((item, i) => {
-            const selectedIndex = selected.findIndex((f) => f === item.id);
+            const selectedIndex = selected.findIndex((f) => f.id === item.id);
 
             return (
               <div
@@ -88,8 +90,8 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
                   {...item}
                   scrollRoot={scrollRef}
                   selected={selectedIndex !== -1}
-                  onToggleSelected={() => {
-                    handleToggleSelected(item.id);
+                  onSelected={() => {
+                    handleSelected(item);
                   }}
                 />
               </div>

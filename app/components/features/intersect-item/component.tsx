@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { MutableRefObject, useCallback, useMemo } from 'react';
 import cx from 'classnames';
 
 import Icon from 'components/icon';
@@ -7,15 +7,17 @@ import Checkbox from 'components/forms/checkbox';
 
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 
+import { useInView } from 'react-intersection-observer';
+
 export interface ItemProps {
   id: string | number;
   className?: string;
   name: string;
   description: string;
-  type: 'bioregional' | 'species';
+  tag: 'bioregional' | 'species';
 
-  selected: boolean;
-  onSelected: (selected: boolean) => void;
+  selected?: boolean;
+  onSelected?: (selected: boolean) => void;
 
   // SPLIT
   splitSelected?: string;
@@ -50,14 +52,15 @@ export interface ItemProps {
     label: string;
     value: string;
   }[];
-  onRemove?: (value) => void
+  onRemove?: (value) => void;
+  scrollRoot?: MutableRefObject<HTMLDivElement | null>;
 }
 
 export const Item: React.FC<ItemProps> = ({
   id,
   name,
   className,
-  type,
+  tag,
 
   selected,
   onSelected,
@@ -69,7 +72,17 @@ export const Item: React.FC<ItemProps> = ({
   splitFeaturesSelected,
   splitFeaturesOptions = [],
   onSplitFeaturesSelected,
+
+  scrollRoot,
 }: ItemProps) => {
+  const { ref, inView } = useInView({
+    /* Optional options */
+    threshold: 0,
+    ...scrollRoot && {
+      root: scrollRoot.current,
+    },
+  });
+
   // EVENTS
   const onSelectedChanged = useCallback(
     (e) => {
@@ -110,16 +123,16 @@ export const Item: React.FC<ItemProps> = ({
   // RENDER
   return (
     <div
+      ref={ref}
       className={cx({
         'bg-white text-gray-500': true,
         [className]: !!className,
+        invisible: !inView,
       })}
     >
       <header
         className={cx({
-          'px-4 pt-2 pb-4 border-l-4': true,
-          'border-green-300': type === 'bioregional',
-          'border-yellow-300': type === 'species',
+          'px-4 pt-2 pb-4': true,
         })}
       >
         <div className="flex space-x-3">
@@ -134,7 +147,7 @@ export const Item: React.FC<ItemProps> = ({
           <h2 className="mt-1 text-sm font-heading">{name}</h2>
         </div>
 
-        {type === 'bioregional' && selected && (
+        {tag === 'bioregional' && selected && (
           <div>
             <div className="flex items-center mt-3 tracking-wide font-heading">
               <Icon icon={SPLIT_SVG} className="w-5 h-5 text-green-300" />
@@ -163,7 +176,7 @@ export const Item: React.FC<ItemProps> = ({
         )}
       </header>
 
-      {type === 'bioregional' && splitSelected && selected && (
+      {tag === 'bioregional' && splitSelected && selected && (
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
             const checked = !splitFeaturesSelected.length

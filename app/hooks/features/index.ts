@@ -10,6 +10,7 @@ import flatten from 'lodash/flatten';
 
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
+import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
@@ -24,6 +25,8 @@ import {
   UseDeleteFeatureProps,
   DeleteFeatureProps,
 } from './types';
+
+interface AllItemProps extends IntersectItemProps, RawItemProps {}
 
 export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
   const [session] = useSession();
@@ -73,10 +76,23 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
       const { data: pageData } = p;
 
-      return pageData.map((d):RawItemProps => {
+      return pageData.map((d):AllItemProps => {
         const {
-          id, alias, featureClassName, description, tag, source,
+          id,
+          alias,
+          featureClassName,
+          description,
+          tag,
+          source,
+          splitSelected,
+          splitFeaturesSelected,
+          splitOptions,
         } = d;
+
+        const splitFeaturesOptions = splitSelected ? splitOptions
+          .find((s) => s.key === splitSelected).values
+          .map((v) => ({ label: v.name, value: v.id }))
+          : [];
 
         return {
           id,
@@ -84,6 +100,9 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
           description,
           tag,
           source,
+          splitSelected,
+          splitFeaturesSelected,
+          splitFeaturesOptions,
         };
       });
     })) : [];
