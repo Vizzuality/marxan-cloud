@@ -22,10 +22,14 @@ VALUES
 INSERT INTO projects
 (name, organization_id, created_by, description, country_id, planning_unit_grid_shape, planning_unit_area_km2, extent)
 VALUES
-('Example Project 1 Org 1', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com'), 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.','BWA','square', 1, ST_GeomFromGeoJSON('{"type":"Polygon","coordinates":[[[21.654052734375,-20.756113874762068],[23.719482421875,-20.756113874762068],[23.719482421875,-18.802318121688117],[21.654052734375,-18.802318121688117],[21.654052734375,-20.756113874762068]]]}')),
-('Example Project 2 Org 1', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com'), null,null,null, null),
-('Example Project 1 Org 2', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com'), null,null,null, null),
+('Example Project 1 Org 1', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com'), 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.','BWA','square', 1, ST_GeomFromGeoJSON('{"type":"Polygon","coordinates":[[[21.654052734375,-20.756113874762068],[23.719482421875,-20.756113874762068],[23.719482421875,-18.802318121688117],[21.654052734375,-18.802318121688117],[21.654052734375,-20.756113874762068]]]}') ),
 ('Example Project 2 Org 2', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com'), 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.','BWA','hexagon', 100, null);
+
+INSERT INTO projects
+(name, organization_id, created_by, description)
+VALUES
+('Example Project 2 Org 1', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com'), 'Lorem Ipsum'),
+('Example Project 1 Org 2', (SELECT id FROM organizations WHERE name = 'Example Org 1'), (SELECT id FROM users WHERE email = 'aa@example.com'), 'Lorem Ipsum');
 
 INSERT INTO users_organizations
 (user_id, organization_id, role_id)
@@ -50,8 +54,8 @@ VALUES
 INSERT INTO scenarios
 (name, project_id, type, wdpa_threshold, created_by)
 VALUES
-('Example scenario 1 Project 1 Org 1', (select id from projects where name = 'Example Project 1 Org 1'), 'marxan', 30, (SELECT id FROM users WHERE email = 'aa@example.com') )
-('Example scenario 2 Project 1 Org 1', (select id from projects where name = 'Example Project 1 Org 1'), 'marxan', 50, (SELECT id FROM users WHERE email = 'aa@example.com') )
-('Example scenario 1 Project 2 Org 2', (select id from projects where name = 'Example Project 2 Org 2'), 'marxan', 30, (SELECT id FROM users WHERE email = 'aa@example.com') )
-('Example scenario 2 Project 2 Org 2', (select id from projects where name = 'Example Project 2 Org 2'), 'marxan', 50, (SELECT id FROM users WHERE email = 'aa@example.com') )
+('Example scenario 1 Project 1 Org 1', (select id from projects where name = 'Example Project 1 Org 1'), 'marxan', 30, (SELECT id FROM users WHERE email = 'aa@example.com') ),
+('Example scenario 2 Project 1 Org 1', (select id from projects where name = 'Example Project 1 Org 1'), 'marxan', 50, (SELECT id FROM users WHERE email = 'aa@example.com') ),
+('Example scenario 1 Project 2 Org 2', (select id from projects where name = 'Example Project 2 Org 2'), 'marxan', 30, (SELECT id FROM users WHERE email = 'aa@example.com') ),
+('Example scenario 2 Project 2 Org 2', (select id from projects where name = 'Example Project 2 Org 2'), 'marxan', 50, (SELECT id FROM users WHERE email = 'aa@example.com') );
 
