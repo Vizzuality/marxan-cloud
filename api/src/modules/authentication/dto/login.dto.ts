@@ -8,11 +8,11 @@ export class LoginDto {
   @IsDefined()
   @IsString()
   @ApiProperty()
-  username: string;
+  username!: string;
 
   @IsNotEmpty()
   @IsDefined()
   @IsString()
   @ApiProperty()
-  password: string;
+  password!: string;
 }

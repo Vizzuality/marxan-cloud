@@ -14,21 +14,21 @@ export const countryResource: BaseServiceResource = {
 export class Country {
   @ApiProperty()
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   /**
    * Country id (ISO 3166-1 alpha-3).
    */
   @ApiProperty()
   @PrimaryColumn('character varying', { name: 'gid_0' })
-  gid0: string;
+  gid0!: string;
 
   /**
    * Country name
    */
   @ApiProperty()
   @Column('character varying', { name: 'name_0' })
-  name0: string;
+  name0!: string;
 
   /**
    * @todo Add description. Also we can probably do better than using the `any`
@@ -44,13 +44,13 @@ export class JSONAPICountryData {
   type = 'countries';
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: Country;
+  attributes!: Country;
 }
 
 export class CountryResult {
   @ApiProperty()
-  data: JSONAPICountryData;
+  data!: JSONAPICountryData;
 }

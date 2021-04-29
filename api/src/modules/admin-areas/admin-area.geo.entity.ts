@@ -15,28 +15,28 @@ export const adminAreaResource: BaseServiceResource = {
 export class AdminArea extends Country {
   @ApiProperty()
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   /**
    * Country id (ISO 3166-1 alpha-3).
    */
   @ApiProperty()
   @PrimaryColumn('character varying', { name: 'gid_0' })
-  gid0: string;
+  gid0!: string;
 
   /**
    * Level 1 id.
    */
   @ApiProperty()
   @PrimaryColumn('character varying', { name: 'gid_1' })
-  gid1: string;
+  gid1!: string;
 
   /**
    * Level 1 name.
    */
   @ApiProperty()
   @Column('character varying', { name: 'name_1' })
-  name1: string;
+  name1!: string;
 
   /**
    * Level 2 id.
@@ -58,13 +58,13 @@ export class JSONAPIAdminAreaData {
   type = 'administative-areas';
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: AdminArea;
+  attributes!: AdminArea;
 }
 
 export class AdminAreaResult {
   @ApiProperty()
-  data: JSONAPIAdminAreaData;
+  data!: JSONAPIAdminAreaData;
 }

@@ -1,5 +1,6 @@
 import { ApiQuery } from '@nestjs/swagger';
 import { DEFAULT_PAGINATION } from 'nestjs-base-service';
+import { applyDecorators } from '@nestjs/common';
 
 const includeQueryParam = (fetchConfiguration?: {
   entitiesAllowedAsIncludes?: string[];
@@ -14,6 +15,7 @@ const includeQueryParam = (fetchConfiguration?: {
     type: String,
     required: false,
   });
+
 const filterQueryParam = (fetchConfiguration?: {
   availableFilters?: {
     name: string;
@@ -32,6 +34,7 @@ const filterQueryParam = (fetchConfiguration?: {
     isArray: true,
     required: false,
   });
+
 const fieldsQueryParam = ApiQuery({
   name: 'fields',
   description:
@@ -84,35 +87,26 @@ const disablePaginationQueryParam = ApiQuery({
  * - sort (https://jsonapi.org/format/1.0/#fetching-sorting)
  * - page[size] (https://jsonapi.org/format/1.0/#fetching-pagination)
  * - page[number] (https://jsonapi.org/format/1.0/#fetching-pagination)
- * - [TODO] filter (https://jsonapi.org/format/1.0/#fetching-filtering)
+ * - filter (https://jsonapi.org/format/1.0/#fetching-filtering)
  */
-export function JSONAPIQueryParams(fetchConfiguration?: {
+export const JSONAPIQueryParams = (fetchConfiguration?: {
   entitiesAllowedAsIncludes?: string[];
   availableFilters?: {
     name: string;
     description?: string;
     examples?: string[];
   }[];
-}): (
-  target: Object,
-  propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<unknown>,
-) => void {
-  return function (
-    target: Record<string, unknown>,
-    propertyKey: string | symbol,
-    descriptor: TypedPropertyDescriptor<unknown>,
-  ) {
-    includeQueryParam(fetchConfiguration)(target, propertyKey, descriptor);
-    filterQueryParam(fetchConfiguration)(target, propertyKey, descriptor);
-    fieldsQueryParam(target, propertyKey, descriptor);
-    omitFieldsQueryParam(target, propertyKey, descriptor);
-    sortQueryParam(target, propertyKey, descriptor);
-    pageSizeQueryParam(target, propertyKey, descriptor);
-    pageNumberQueryParam(target, propertyKey, descriptor);
-    disablePaginationQueryParam(target, propertyKey, descriptor);
-  };
-}
+}) =>
+  applyDecorators(
+    includeQueryParam(fetchConfiguration),
+    filterQueryParam(fetchConfiguration),
+    fieldsQueryParam,
+    omitFieldsQueryParam,
+    sortQueryParam,
+    pageSizeQueryParam,
+    pageNumberQueryParam,
+    disablePaginationQueryParam,
+  );
 
 /**
  * Method decorator: convenience wrapper for OpenAPI annotations common to most
@@ -122,27 +116,17 @@ export function JSONAPIQueryParams(fetchConfiguration?: {
  * - include (https://jsonapi.org/format/1.0/#fetching-includes)
  * - fields (https://jsonapi.org/format/1.0/#fetching-sparse-fieldsets)
  * - omitFields (not part of the JSON:API specification)
- * - [TODO] filter (https://jsonapi.org/format/1.0/#fetching-filtering)
  */
-export function JSONAPISingleEntityQueryParams(fetchConfiguration?: {
+export const JSONAPISingleEntityQueryParams = (fetchConfiguration?: {
   entitiesAllowedAsIncludes?: string[];
   availableFilters?: {
     name: string;
     description?: string;
     examples?: string[];
   }[];
-}): (
-  target: Object,
-  propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<unknown>,
-) => void {
-  return function (
-    target: Record<string, unknown>,
-    propertyKey: string | symbol,
-    descriptor: TypedPropertyDescriptor<unknown>,
-  ) {
-    includeQueryParam(fetchConfiguration)(target, propertyKey, descriptor);
-    fieldsQueryParam(target, propertyKey, descriptor);
-    omitFieldsQueryParam(target, propertyKey, descriptor);
-  };
-}
+}) =>
+  applyDecorators(
+    includeQueryParam(fetchConfiguration),
+    fieldsQueryParam,
+    omitFieldsQueryParam,
+  );

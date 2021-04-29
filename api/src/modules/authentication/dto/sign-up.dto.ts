@@ -16,18 +16,18 @@ import {
 export class SignUpDto {
   @IsOptional()
   @IsString()
-  displayName: string;
+  displayName?: string;
 
   @IsEmail()
   @IsNotEmpty()
   @IsDefined()
   @IsString()
   @ApiProperty()
-  email: string;
+  email!: string;
 
   @IsNotEmpty()
   @IsDefined()
   @IsString()
   @ApiProperty()
-  password: string;
+  password!: string;
 }

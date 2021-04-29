@@ -18,7 +18,7 @@ export enum IUCNCategory {
 export class ProtectedArea {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   /**
    * WDPA id.
@@ -97,13 +97,13 @@ export class JSONAPIProtectedAreaData {
   type = 'protected_areas';
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: ProtectedArea;
+  attributes!: ProtectedArea;
 }
 
 export class ProtectedAreaResult {
   @ApiProperty()
-  data: JSONAPIProtectedAreaData;
+  data!: JSONAPIProtectedAreaData;
 }
