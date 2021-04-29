@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class AllowToLinkCustomGeoFeaturesToProjects1618248224000
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
+    await queryRunner.query(`
 ALTER TABLE features
   ADD COLUMN project_id uuid references projects(id);
 ALTER TABLE features
@@ -14,7 +14,7 @@ ALTER TABLE features
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
+    await queryRunner.query(`
 ALTER TABLE features
   DROP COLUMN project_id;
 ALTER TABLE features
