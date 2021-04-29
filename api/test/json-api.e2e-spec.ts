@@ -33,13 +33,6 @@ describe('JSON API Specs (e2e)', () => {
   });
 
   it('should return a response shaped as JSON:API Error spec, including ', async () => {
-    /**
-     * Logout user
-     */
-    await request(app.getHttpServer())
-      .post(`/auth/sign-out`)
-      .set('Authorization', `Bearer ${jwtToken}`);
-
     const jsonApiErrorResponse = {
       id: null,
       links: null,
@@ -55,12 +48,10 @@ describe('JSON API Specs (e2e)', () => {
         stack: null,
       },
     };
-    const response = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({
-        username: 'fakeuser@example.com',
-        password: 'fakePassword',
-      });
+    const response = await request(app.getHttpServer()).get(
+      '/api/v1/projects/fakeProject/features?q=fakeFeature',
+    );
+
     response.body.errors.forEach((err: any) => {
       expect(Object.keys(jsonApiErrorResponse)).toEqual(
         expect.arrayContaining(Object.keys(err)),
