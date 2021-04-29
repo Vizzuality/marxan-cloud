@@ -4,7 +4,7 @@ import { IsObject, IsOptional, IsString } from 'class-validator';
 export class CreateOrganizationDTO {
   @ApiProperty()
   @IsString()
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional()
   @IsOptional()

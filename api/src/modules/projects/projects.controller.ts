@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -69,11 +70,18 @@ export class ProjectsController {
   async findAllGeoFeaturesForProject(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Param() params: { projectId: string },
+    @Query('q') featureClassAndAliasFilter: string,
   ): Promise<GeoFeatureResult> {
     const results = await this.geoFeaturesService.findAllPaginated(
       fetchSpecification,
-      { params },
+      {
+        params: {
+          ...params,
+          featureClassAndAliasFilter: featureClassAndAliasFilter,
+        },
+      },
     );
+
     return this.geoFeaturesService.serialize(results.data, results.metadata);
   }
 

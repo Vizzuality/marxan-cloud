@@ -9,7 +9,7 @@ export class CreateApiEventDTO {
    */
   @ApiProperty()
   @IsEnum(Object.values(API_EVENT_KINDS))
-  kind: API_EVENT_KINDS;
+  kind!: API_EVENT_KINDS;
 
   /**
    * Topic of an event; this will typically be the UUID of an entity in the
@@ -17,7 +17,7 @@ export class CreateApiEventDTO {
    */
   @ApiProperty()
   @IsUUID(4)
-  topic: string;
+  topic!: string;
 
   /**
    * Data payload of the event. Its semantics depend on kind.

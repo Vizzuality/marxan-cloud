@@ -25,23 +25,23 @@ export const userResource: BaseServiceResource = {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @ApiProperty()
   @Column('character varying')
-  email: string;
+  email!: string;
 
   @ApiPropertyOptional()
   @Column('character varying', { name: 'display_name' })
-  displayName: string | null;
+  displayName?: string | null;
 
   @ApiPropertyOptional()
   @Column('character varying')
-  fname: string | null;
+  fname?: string | null;
 
   @ApiPropertyOptional()
   @Column('character varying')
-  lname: string | null;
+  lname?: string | null;
 
   /**
    * User avatar, stored as data url.
@@ -53,7 +53,7 @@ export class User {
   avatarDataUrl?: string;
 
   @Column('character varying', { name: 'password_hash' })
-  passwordHash: string;
+  passwordHash!: string;
 
   /**
    * JSONB storage for non-relational attributes (e.g. whether a user has
@@ -70,7 +70,7 @@ export class User {
    */
   @ApiProperty()
   @Column('boolean', { name: 'is_active' })
-  isActive: boolean;
+  isActive!: boolean;
 
   /**
    * Whether the user should be considered as deleted. This is used to implement
@@ -78,7 +78,7 @@ export class User {
    */
   @ApiProperty()
   @Column('boolean', { name: 'is_deleted' })
-  isDeleted: boolean;
+  isDeleted!: boolean;
 
   @ApiProperty({ type: () => Project, isArray: true })
   @ManyToMany((_type) => Project, (project) => project.users, { eager: false })
@@ -93,7 +93,7 @@ export class User {
       referencedColumnName: 'id',
     },
   })
-  projects: Project[];
+  projects!: Project[];
 
   @ApiProperty({ type: () => Scenario, isArray: true })
   @ManyToMany((_type) => Scenario, (scenario) => scenario.users, {
@@ -110,10 +110,10 @@ export class User {
       referencedColumnName: 'id',
     },
   })
-  scenarios: Scenario[];
+  scenarios!: Scenario[];
 
   @OneToMany((_type) => IssuedAuthnToken, (token) => token.userId)
-  issuedAuthnTokens: IssuedAuthnToken[];
+  issuedAuthnTokens?: IssuedAuthnToken[];
 }
 
 export class JSONAPIUserData {
@@ -121,13 +121,13 @@ export class JSONAPIUserData {
   type = userResource.name.plural;
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: User;
+  attributes!: User;
 }
 
 export class UserResult {
   @ApiProperty()
-  data: JSONAPIUserData;
+  data!: JSONAPIUserData;
 }

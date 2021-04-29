@@ -16,7 +16,7 @@ import { JobStatus, ScenarioType } from '../scenario.api.entity';
 export class CreateScenarioDTO {
   @ApiProperty()
   @IsString()
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional()
   @IsString()
@@ -25,11 +25,11 @@ export class CreateScenarioDTO {
 
   @ApiProperty()
   @IsEnum(Object.values(ScenarioType))
-  type: ScenarioType;
+  type!: ScenarioType;
 
   @ApiProperty()
   @IsUUID()
-  projectId: string;
+  projectId!: string;
 
   @ApiPropertyOptional()
   @IsOptional()
