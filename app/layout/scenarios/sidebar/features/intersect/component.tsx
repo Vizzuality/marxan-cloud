@@ -35,34 +35,40 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
   const {
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
+    search,
     filters: {
-      tag: 'bioregional',
+      // tag: 'bioregional',
     },
   });
 
   const INITIAL_VALUES = useMemo(() => {
-    if (selectedFeaturesData) {
+    if (intersectingCurrent) {
       return {
-        selected: selectedFeaturesData.map((s) => s.id),
+        selected: intersectingCurrent.splitFeaturesSelected || [],
       };
     }
 
     return [];
-  }, [selectedFeaturesData]);
+  }, [intersectingCurrent]);
 
-  const onToggleSelected = useCallback((id, input) => {
+  const onSelected = useCallback((feature, input) => {
+    const { id, name } = feature;
     const { value, onChange } = input;
-    const selected = [...value];
+    const intersections = [...value];
 
-    const selectedIndex = selected.findIndex((f) => f === id);
+    const intersectionsIndex = intersections.findIndex((f) => f.id === id);
 
-    if (selectedIndex !== -1) {
-      selected.splice(selectedIndex, 1);
+    if (intersectionsIndex !== -1) {
+      intersections.splice(intersectionsIndex, 1);
     } else {
-      selected.push(id);
+      intersections.push({
+        id,
+        name,
+        splitSelected: null,
+        splitFeaturesSelected: [],
+      });
     }
-
-    onChange(selected);
+    onChange(intersections);
   }, []);
 
   const onSearch = useCallback((s) => {
@@ -104,8 +110,8 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
               <List
                 search={search}
                 selected={values.selected}
-                onToggleSelected={(id) => {
-                  onToggleSelected(id, input);
+                onSelected={(id) => {
+                  onSelected(id, input);
                 }}
               />
             )}

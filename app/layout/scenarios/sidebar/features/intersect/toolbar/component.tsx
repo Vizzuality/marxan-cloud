@@ -1,15 +1,20 @@
 import React, { useEffect } from 'react';
 
 import Search from 'components/search';
+import { useDebouncedCallback } from 'use-debounce';
 
 export interface ScenarioFeaturesIntersectToolbarProps {
   search?: string;
   onSearch: (selected: string) => void;
 }
 
-export const ScenarioFeaturesIntersectToolbar: React.FC<ScenarioFeaturesIntersectToolbarProps> = ({
+export const ScenarioFeaturesIntersect: React.FC<ScenarioFeaturesIntersectToolbarProps> = ({
   search, onSearch,
 }: ScenarioFeaturesIntersectToolbarProps) => {
+  const onChangeDebounced = useDebouncedCallback((value) => {
+    onSearch(value);
+  }, 500);
+
   useEffect(() => {
     // setSearch to null wheneverer you unmount this component
     return function unmount() {
@@ -25,10 +30,10 @@ export const ScenarioFeaturesIntersectToolbar: React.FC<ScenarioFeaturesIntersec
         defaultValue={search}
         placeholder="Search by feature name..."
         aria-label="Search"
-        onChange={(value) => { onSearch(value); }}
+        onChange={onChangeDebounced}
       />
     </div>
   );
 };
 
-export default ScenarioFeaturesIntersectToolbar;
+export default ScenarioFeaturesIntersect;
