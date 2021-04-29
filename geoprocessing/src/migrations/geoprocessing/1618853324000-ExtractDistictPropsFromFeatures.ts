@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class ExtractDistictPropsFromFeatures1618853324000
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
+    await queryRunner.query(`
 ALTER TABLE features_data
   RENAME COLUMN features_id TO feature_id;
 
@@ -41,7 +41,7 @@ CREATE VIEW feature_properties AS
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
+    await queryRunner.query(`
 DROP VIEW feature_properties;
 
 DROP FUNCTION properties_for_feature(input uuid);

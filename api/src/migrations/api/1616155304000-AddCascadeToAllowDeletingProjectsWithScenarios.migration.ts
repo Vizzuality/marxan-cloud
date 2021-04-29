@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class AddCascadeToAllowDeletingProjectsWithScenarios1616155304000
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
+    await queryRunner.query(`
 ALTER TABLE scenarios
   DROP CONSTRAINT scenarios_project_id_fkey,
   ADD CONSTRAINT scenarios_project_id_fkey
@@ -13,7 +13,7 @@ ALTER TABLE scenarios
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
+    await queryRunner.query(`
 ALTER TABLE scenarios
   DROP CONSTRAINT scenarios_project_id_fkey,
   ADD CONSTRAINT scenarios_project_id_fkey
