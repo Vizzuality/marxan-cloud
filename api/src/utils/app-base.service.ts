@@ -83,7 +83,7 @@ export abstract class AppBaseService<
   ): Promise<any> {
     const serializer = new JSONAPISerializer.Serializer(this.pluralAlias, {
       ...this.serializerConfig,
-      paginationMeta,
+      meta: paginationMeta,
     });
 
     return serializer.serialize(entities);
