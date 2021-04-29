@@ -55,7 +55,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
       'page[number]': pageParam,
       ...parsedFilters,
       ...search && {
-        s: search,
+        q: search,
       },
       ...sort && {
         sort,
