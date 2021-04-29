@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddIdToCountriesView1616690947000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
+    await queryRunner.query(`
 DROP VIEW countries;
 
 CREATE VIEW countries AS (
@@ -23,7 +23,7 @@ CREATE VIEW countries AS (
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
+    await queryRunner.query(`
 DROP VIEW countries;
 
 CREATE VIEW countries AS (
