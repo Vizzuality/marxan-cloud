@@ -2,27 +2,19 @@ import { ViewColumn, ViewEntity } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 @ViewEntity({
-  expression: `select scenarios."id"              as id,
-                      features.id                 as featureId,
-                      projects."id"               as projectId,
-                      features.description,
-                      features.tag,
-                      features.feature_class_name as name
-               from scenarios
-                      join projects on (scenarios.project_id = projects."id")
-                      join features on (features.project_id = projects."id")`,
+  name: `scenario_features_view`,
 })
 export class ScenariosFeaturesView {
   @ViewColumn()
   id?: string | null;
 
   @ViewColumn()
-  projectId?: string | null;
+  projectid?: string | null;
 
   // public
   @ApiPropertyOptional()
   @ViewColumn()
-  featureId?: string | null;
+  featureid?: string | null;
 
   @ApiPropertyOptional()
   @ViewColumn()

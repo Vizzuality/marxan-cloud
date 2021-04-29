@@ -1,7 +1,7 @@
-import { In, Repository } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FetchSpecification } from 'nestjs-base-service';
+import { FiltersSpecification } from 'nestjs-base-service';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -9,10 +9,11 @@ import {
 
 import { ScenariosFeaturesView } from './entities/scenarios-features.view.api.entity';
 import { AppInfoDTO } from '../../dto/info.dto';
-import { RemoteScenarioFeaturesData } from './entities/remote-scenario-features-data.geo.entity';
+import {
+  RemoteScenarioFeaturesData,
+  remoteScenarioFeaturesDataViewName,
+} from './entities/remote-scenario-features-data.geo.entity';
 import { remoteConnectionName } from './entities/remote-connection-name';
-
-// TODO view migration
 
 @Injectable()
 export class ScenarioFeaturesService extends AppBaseService<
@@ -27,67 +28,42 @@ export class ScenarioFeaturesService extends AppBaseService<
     @InjectRepository(RemoteScenarioFeaturesData, remoteConnectionName)
     private readonly remoteFeatures: Repository<RemoteScenarioFeaturesData>,
   ) {
-    super(features);
+    super(features, remoteScenarioFeaturesDataViewName);
   }
 
-  async extendGetByIdResult(
-    entity: ScenariosFeaturesView,
-    fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
-  ): Promise<ScenariosFeaturesView> {
-    if (!this.withScenarioId(entity)) {
-      return entity;
-    }
-    const dataToExtend = await this.remoteFeatures.find({
-      where: {
-        scenario_id: entity.id,
-      },
+  setFilters(
+    query: SelectQueryBuilder<ScenariosFeaturesView>,
+    filters?: FiltersSpecification['filter'],
+  ): SelectQueryBuilder<ScenariosFeaturesView> {
+    return query.andWhere(`${this.alias}.id = :scenarioId`, {
+      scenarioId: filters?.scenarioId,
     });
-    return entity;
   }
 
   async extendFindAllResults(
     entitiesAndCount: [any[], number],
-    fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
   ): Promise<[any[], number]> {
     const entities = entitiesAndCount[0] as ScenariosFeaturesView[];
     const scenarioIds = entities
-      .filter(this.withScenarioId)
+      .filter(this.#withScenarioId)
       .map((sfv) => sfv.id);
 
-    const dataToExtend = await this.remoteFeatures.find({
-      where: {
-        scenario_id: In(scenarioIds),
-      },
-    });
+    const dataToExtend =
+      scenarioIds.length === 0
+        ? []
+        : await this.remoteFeatures.find({
+            where: {
+              scenario_id: In(scenarioIds),
+            },
+          });
 
-    // TODO priv method
-    const extended = entities.map((entity) => {
-      const extensionData = dataToExtend.find(
-        (row) => row.scenario_id == entity.id,
-      );
-
-      const metArea = +(extensionData?.current_pa ?? '0');
-      const totalArea = +(extensionData?.total_area ?? '0');
-      const targetPct = (extensionData?.target ?? 0) / 100;
-
-      return {
-        ...entity,
-        target: extensionData?.target,
-        onTarget: metArea >= totalArea * targetPct,
-        met: metArea / totalArea,
-        targetArea: (totalArea * (extensionData?.target ?? 0)) / 100,
-      };
-    });
-
-    return [extended, entitiesAndCount[1]];
+    return [this.#injectMatching(entities, dataToExtend), entitiesAndCount[1]];
   }
 
   get serializerConfig(): JSONAPISerializerConfig<ScenariosFeaturesView> {
     return {
       attributes: [
-        'featureId',
+        'featureid',
         'tag',
         'name',
         'description',
@@ -103,7 +79,35 @@ export class ScenarioFeaturesService extends AppBaseService<
     };
   }
 
-  private withScenarioId = (
+  #injectMatching = (
+    bases: ScenariosFeaturesView[],
+    extensions: RemoteScenarioFeaturesData[],
+  ): ScenariosFeaturesView[] =>
+    bases.map((entity) =>
+      this.#injectNonGeo(
+        entity,
+        extensions.find((row) => row.id == entity.featureid),
+      ),
+    );
+
+  #injectNonGeo = (
+    base: ScenariosFeaturesView,
+    assign?: RemoteScenarioFeaturesData,
+  ): ScenariosFeaturesView => {
+    const metArea = +(assign?.current_pa ?? '0');
+    const totalArea = +(assign?.total_area ?? '0');
+    const targetPct = (assign?.target ?? 0) / 100;
+
+    return {
+      ...base,
+      target: +(assign?.target ?? 0).toFixed(2),
+      onTarget: metArea >= totalArea * targetPct,
+      met: +((metArea / totalArea) * 100).toFixed(2),
+      targetArea: (totalArea * (assign?.target ?? 0)) / 100,
+    };
+  };
+
+  #withScenarioId = (
     scenario: ScenariosFeaturesView,
   ): scenario is ScenariosFeaturesView & { id: string } =>
     scenario.id !== null && scenario.id !== undefined;

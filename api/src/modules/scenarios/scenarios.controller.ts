@@ -115,26 +115,19 @@ export class ScenariosController {
     return await this.service.remove(id);
   }
 
-  // debt: could be a standalone controller not touching scenarios to avoid circular deps.
-  // debt: possibly will need the controller to get the ScenarioEntity via its service (otherwise, scenario-feature would import ScenariosModule, which would result in circular-dependency)
   @ApiOperation({})
   @ApiOkResponse({
     type: ScenarioFeatureResultDto,
   })
   @Get(':id/scenarios-features')
   async getScenarioFeatures(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ScenarioFeatureResultDto> {
     const features = await this.scenarioFeatures.findAll({
-      filter: {},
-    });
-    // debt: move to standalone mapper service - currently specialized serializer coupled to the entities
-    return {
-      data: {
-        id,
-        type: 'features',
-        attributes: features[0],
+      filter: {
+        scenarioId: id,
       },
-    };
+    });
+    return this.scenarioFeatures.serialize(features[0]);
   }
 }

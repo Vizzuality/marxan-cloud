@@ -20,7 +20,7 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(geoFeatureResource.className)
 @Controller(

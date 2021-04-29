@@ -1,6 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('scenario_features_data')
+export const remoteScenarioFeaturesDataViewName = 'scenario_features_view';
+
+@Entity(remoteScenarioFeaturesDataViewName)
 export class RemoteScenarioFeaturesData {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
