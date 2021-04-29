@@ -65,9 +65,8 @@ seed-api-with-test-data:
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 
 seed-geoapi-with-test-data:
-	USERID=$(shell docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from users limit 1"); \
-	sed -e "s/\$$user/$$USERID/g" api/test/fixtures/test-admin-data.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
-	sed -e "s/\$$user/$$USERID/g" api/test/fixtures/test-wdpa-data.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/test/fixtures/test-admin-data.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/test/fixtures/test-wdpa-data.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
 	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-features.sql
 	@for i in api/test/fixtures/features/*.sql; do \
 		table_name=`basename -s .sql "$$i"`; \
@@ -79,8 +78,6 @@ seed-geoapi-with-test-data:
 	USERID=$(shell docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from users limit 1"); \
 	echo "appending data for scenario with id $${SCENARIOID}"; \
 	sed -e "s/\$$user/$$USERID/g" -e "s/\$$scenario/$$SCENARIOID/g" api/test/fixtures/test-geodata.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
-
-
 
 # need notebook service to execute a expecific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
@@ -110,10 +107,8 @@ test-e2e-api:
 	# load test data - API
 	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 	# load test data - geoprocessing db
-	USERID=$(shell docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from users limit 1"); \
-	echo $$USERID; \
-	sed -e "s/\$$user/$$USERID/g" api/test/fixtures/test-admin-data.sql | docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
-	sed -e "s/\$$user/$$USERID/g" api/test/fixtures/test-wdpa-data.sql | docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/test/fixtures/test-admin-data.sql | docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/test/fixtures/test-wdpa-data.sql | docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
 	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-features.sql
 	@for i in api/test/fixtures/features/*.sql; do \
 		table_name=`basename -s .sql "$$i"`; \
