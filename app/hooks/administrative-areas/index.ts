@@ -34,7 +34,7 @@ UseAdministrativeAreasResponse {
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data?.data) ? data?.data : [];
+    const parsedData = Array.isArray(data?.data?.data) ? data?.data?.data : [];
 
     const regions: Region[] = parsedData.map((r) => ({
       name: r.name2,
@@ -46,5 +46,5 @@ UseAdministrativeAreasResponse {
       ...query,
       data: regions,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data?.data]);
 }

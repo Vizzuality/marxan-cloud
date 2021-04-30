@@ -42,7 +42,7 @@ export const Title: React.FC<TitleProps> = () => {
     });
 
     saveProjectMutation.mutate({ id: projectData.id, data }, {
-      onSuccess: ({ data: s }) => {
+      onSuccess: ({ data: { data: s } }) => {
         addToast('success-project-name', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -88,7 +88,7 @@ export const Title: React.FC<TitleProps> = () => {
     });
 
     saveScenarioMutation.mutate({ id: scenarioData.id, data }, {
-      onSuccess: ({ data: s }) => {
+      onSuccess: ({ data: { data: s } }) => {
         addToast('save-scenario-name', (
           <>
             <h2 className="font-medium">Success!</h2>

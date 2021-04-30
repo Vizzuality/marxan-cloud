@@ -41,7 +41,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     };
 
     saveProjectMutation.mutate({ data }, {
-      onSuccess: ({ data: s }) => {
+      onSuccess: ({ data: { data: p } }) => {
         addToast('success-project-creation', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -51,7 +51,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
           level: 'success',
         });
 
-        console.info('Project saved succesfully', s);
+        console.info('Project saved succesfully', p);
         push('/projects');
       },
       onError: () => {

@@ -25,19 +25,20 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
   const {
     data: allFeaturesData,
     fetchNextPage: allFeaturesfetchNextPage,
+    hasNextPage,
     isFetching: allFeaturesIsFetching,
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
     filters: {
-      // tag: 'bioregional',
+      tag: 'bioregional',
     },
   });
 
   const scrollRef = useBottomScrollListener(
     () => {
-      allFeaturesfetchNextPage();
+      if (hasNextPage) allFeaturesfetchNextPage();
     },
   );
 
@@ -46,21 +47,8 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
     if (onSelected) onSelected(feature);
   }, [onSelected]);
 
-  if (allFeaturesIsFetching && !allFeaturesIsFetched) {
-    return (
-      <div className="flex flex-col items-center justify-center h-96">
-        <Loading
-          visible
-          className="z-40 flex items-center justify-center w-full bg-transparent bg-opacity-90"
-          iconClassName="w-5 h-5 text-primary-500"
-        />
-        <div className="mt-5 text-xs uppercase font-heading">Loading features</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="relative flex flex-col flex-grow overflow-hidden">
+    <div className="relative flex flex-col flex-grow overflow-hidden" style={{ minHeight: 200 }}>
       <div className="absolute left-0 z-10 w-full h-6 -top-1 bg-gradient-to-b from-white via-white" />
 
       <div
@@ -69,6 +57,17 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
           'bg-white divide-y divide-black divide-dashed divide-opacity-20 overflow-y-auto overflow-x-hidden px-8': true,
         })}
       >
+        {(allFeaturesIsFetching && !allFeaturesIsFetched) && (
+          <div className="absolute top-0 left-0 z-10 flex flex-col items-center justify-center w-full h-full bg-white bg-opacity-90">
+            <Loading
+              visible
+              className="z-40 flex items-center justify-center w-full "
+              iconClassName="w-5 h-5 text-primary-500"
+            />
+            <div className="mt-5 text-xs uppercase font-heading">Loading features</div>
+          </div>
+        )}
+
         <div>
           {(!allFeaturesData || !allFeaturesData.length) && (
             <div className="flex items-center justify-center w-full h-40 text-sm uppercase">

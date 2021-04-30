@@ -25,7 +25,7 @@ export function useWDPACategories(adminAreaId) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data,
+      data: data?.data?.data,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data?.data]);
 }
