@@ -25,6 +25,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
   const {
     data: allFeaturesData,
     fetchNextPage: allFeaturesfetchNextPage,
+    hasNextPage,
     isFetching: allFeaturesIsFetching,
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
@@ -34,7 +35,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
 
   const scrollRef = useBottomScrollListener(
     () => {
-      allFeaturesfetchNextPage();
+      if (hasNextPage) allFeaturesfetchNextPage();
     },
   );
 

@@ -25,19 +25,20 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
   const {
     data: allFeaturesData,
     fetchNextPage: allFeaturesfetchNextPage,
+    hasNextPage,
     isFetching: allFeaturesIsFetching,
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
     filters: {
-      // tag: 'bioregional',
+      tag: 'bioregional',
     },
   });
 
   const scrollRef = useBottomScrollListener(
     () => {
-      allFeaturesfetchNextPage();
+      if (hasNextPage) allFeaturesfetchNextPage();
     },
   );
 
