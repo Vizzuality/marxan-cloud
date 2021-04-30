@@ -10,6 +10,7 @@ import * as config from 'config';
 import { omit } from 'lodash';
 
 import * as JSONAPISerializer from 'jsonapi-serializer';
+import { Response } from 'express';
 
 /**
  * Catch-all exception filter. Output error data to logs, and send it as
@@ -22,7 +23,7 @@ import * as JSONAPISerializer from 'jsonapi-serializer';
 export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
+    const response: Response = ctx.getResponse();
     const request = ctx.getRequest();
 
     const status =
@@ -62,6 +63,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : errorData,
     );
 
-    response.status(status).json(errorDataForResponse);
+    response
+      .status(status)
+      .header('Content-Type', 'application/json')
+      .header('Content-Disposition', 'inline')
+      .json(errorDataForResponse);
   }
 }
