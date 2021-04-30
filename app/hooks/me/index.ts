@@ -33,9 +33,9 @@ export function useMe() {
   return useMemo(() => {
     return {
       ...query,
-      user: data.data,
+      user: data?.data,
     };
-  }, [query, data]);
+  }, [query, data?.data]);
 }
 
 // SAVE
