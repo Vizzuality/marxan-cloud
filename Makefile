@@ -116,6 +116,9 @@ test-e2e-api:
 		echo "appending data for $${table_name} with id $${featureid}"; \
 		sed -e "s/\$$feature_id/$$featureid/g" api/test/fixtures/features/$${table_name}.sql | docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
 		done;
+	SCENARIOID=$(shell docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
+	echo "appending data for scenario with id $${SCENARIOID}"; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/test/fixtures/test-geodata.sql | docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
 	# run tests
 	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e up --abort-on-container-exit --exit-code-from api api
 	# teardown
