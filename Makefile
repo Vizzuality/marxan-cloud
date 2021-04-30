@@ -74,7 +74,11 @@ seed-geoapi-with-test-data:
 		featureid=`docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
 		echo "appending data for $${table_name} with id $${featureid}"; \
 		sed -e "s/\$$feature_id/$$featureid/g" api/test/fixtures/features/$${table_name}.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
-		done;
+		done; \
+	SCENARIOID=$(shell docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
+	USERID=$(shell docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from users limit 1"); \
+	echo "appending data for scenario with id $${SCENARIOID}"; \
+	sed -e "s/\$$user/$$USERID/g" -e "s/\$$scenario/$$SCENARIOID/g" api/test/fixtures/test-geodata.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
 
 
 

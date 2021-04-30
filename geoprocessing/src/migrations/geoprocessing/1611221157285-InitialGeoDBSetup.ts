@@ -98,11 +98,11 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
           "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
           "feature_class_id" uuid,
           "scenario_id" uuid,
-          "total_area" varchar,
-          "admin_area" timestamp,
-          "current_pa" source_type,
-          "spf" float8,
+          "total_area" float8,
+          "current_pa" float8,
+          "fpf" float8,
           "target" float8,
+          "prop" float8,
           "target2" float8,
           "targetocc" float8,
           "sepnum" float8,
@@ -159,7 +159,7 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
         USING GIST (the_geom);
 
         CREATE INDEX wdpa_geom_idx
-        ON admin_regions
+        ON wdpa
         USING GIST (the_geom);
 
         CREATE INDEX features_data_geom_idx
