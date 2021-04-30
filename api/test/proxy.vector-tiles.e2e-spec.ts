@@ -46,9 +46,8 @@ describe('ProxyVectorTilesModule (e2e)', () => {
 
     it('Should give back a valid request for admin areas', async () => {
       const response = await request(app.getHttpServer())
-        .get(
-          '/api/v1/geoprocessing/administrative-areas/1/preview/tiles/6/30/25.mvt',
-        )
+        .get('/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt')
+        .set('Accept-Encoding', 'gzip, deflate')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
     });
@@ -58,9 +57,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
      */
     it('Should simulate an error', async () => {
       const response = await request(app.getHttpServer())
-        .get(
-          '/api/v1/geoprocessing/administrative-areas/1/preview/tiles/100/60/30.mvt',
-        )
+        .get('/api/v1/administrative-areas/1/preview/tiles/100/60/30.mvt')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(400);
     });
@@ -70,9 +67,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
      */
     it('Should throw a 400 error if filtering by level other than 0, 1 or 2', async () => {
       const response = await request(app.getHttpServer())
-        .get(
-          '/api/v1/geoprocessing/administrative-areas/3/preview/tiles/6/30/25.mvt',
-        )
+        .get('/api/v1/administrative-areas/3/preview/tiles/6/30/25.mvt')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(400);
     });
@@ -82,9 +77,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
      */
     it('Should throw a 400 error if filtering by  z level greater than 20', async () => {
       const response = await request(app.getHttpServer())
-        .get(
-          '/api/v1/geoprocessing/administrative-areas/3/preview/tiles/21/30/25.mvt',
-        )
+        .get('/api/v1/administrative-areas/3/preview/tiles/21/30/25.mvt')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(400);
     });
