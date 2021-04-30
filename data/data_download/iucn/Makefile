@@ -26,9 +26,9 @@ import: data/iucn/simp/%
 	done
 data/iucn/simp/%: data/iucn/out/%
 	@mapshaper-xl 16gb -i $(shell dirname $<)/*.json \
-		-simplify 10% planar keep-shapes \
-		-filter-islands min-vertices=3 \
-		-filter-slivers \
+		-simplify 25% planar keep-shapes \
+		-filter-islands min-vertices=3 min-area=10000m2 remove-empty \
+		-filter-slivers min-area=10000m2 remove-empty \
 		-clean rewind \
 		-o $(shell dirname $@)/ format=geojson precision=0.000001
 

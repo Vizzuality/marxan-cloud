@@ -1,0 +1,432 @@
+Value,Count,World_Lan1,World_Mois,World_Temp,World_Lan2,LF_ClassNa,LC_ClassNa,Temp_Class,Moisture_C,Temp_Moist,W_Ecosystm
+"1",41603050.00000000000,"4","3","6","6",Plains,Sparsley or Non vegetated,Polar,Moist,Polar Moist,Polar Moist Sparsley or Non vegetated on Plains
+"2",96589870.00000000000,"4","3","6","8",Plains,Snow and Ice,Polar,Moist,Polar Moist,Polar Moist Snow and Ice on Plains
+"3",1262986.00000000000,"1","2","6","8",Mountains,Snow and Ice,Polar,Dry,Polar Dry,Polar Dry Snow and Ice on Mountains
+"4",10775926.00000000000,"1","2","6","6",Mountains,Sparsley or Non vegetated,Polar,Dry,Polar Dry,Polar Dry Sparsley or Non vegetated on Mountains
+"5",41915363.00000000000,"1","3","6","6",Mountains,Sparsley or Non vegetated,Polar,Moist,Polar Moist,Polar Moist Sparsley or Non vegetated on Mountains
+"6",14230437.00000000000,"1","3","6","8",Mountains,Snow and Ice,Polar,Moist,Polar Moist,Polar Moist Snow and Ice on Mountains
+"7",1227825.00000000000,"3","2","6","6",Tablelands,Sparsley or Non vegetated,Polar,Dry,Polar Dry,Polar Dry Sparsley or Non vegetated on Tablelands
+"8",6375.00000000000,"3","2","6","8",Tablelands,Snow and Ice,Polar,Dry,Polar Dry,Polar Dry Snow and Ice on Tablelands
+"9",17148.00000000000,"4","2","6","8",Plains,Snow and Ice,Polar,Dry,Polar Dry,Polar Dry Snow and Ice on Plains
+"10",15151477.00000000000,"3","3","6","6",Tablelands,Sparsley or Non vegetated,Polar,Moist,Polar Moist,Polar Moist Sparsley or Non vegetated on Tablelands
+"11",4182414.00000000000,"3","3","6","8",Tablelands,Snow and Ice,Polar,Moist,Polar Moist,Polar Moist Snow and Ice on Tablelands
+"12",3801846.00000000000,"2","2","6","6",Hills,Sparsley or Non vegetated,Polar,Dry,Polar Dry,Polar Dry Sparsley or Non vegetated on Hills
+"13",14377.00000000000,"2","2","6","8",Hills,Snow and Ice,Polar,Dry,Polar Dry,Polar Dry Snow and Ice on Hills
+"14",11027239.00000000000,"4","2","6","6",Plains,Sparsley or Non vegetated,Polar,Dry,Polar Dry,Polar Dry Sparsley or Non vegetated on Plains
+"15",2280770.00000000000,"2","3","6","8",Hills,Snow and Ice,Polar,Moist,Polar Moist,Polar Moist Snow and Ice on Hills
+"16",24292806.00000000000,"2","3","6","6",Hills,Sparsley or Non vegetated,Polar,Moist,Polar Moist,Polar Moist Sparsley or Non vegetated on Hills
+"17",18446844.00000000000,"1","2","6","4",Mountains,Grassland,Polar,Dry,Polar Dry,Polar Dry Grassland on Mountains
+"18",15402565.00000000000,"1","3","6","4",Mountains,Grassland,Polar,Moist,Polar Moist,Polar Moist Grassland on Mountains
+"19",1771826.00000000000,"4","3","6","2",Plains,Shrubland,Polar,Moist,Polar Moist,Polar Moist Shrubland on Plains
+"20",261501.00000000000,"2","3","6","2",Hills,Shrubland,Polar,Moist,Polar Moist,Polar Moist Shrubland on Hills
+"21",1294672.00000000000,"2","3","6","4",Hills,Grassland,Polar,Moist,Polar Moist,Polar Moist Grassland on Hills
+"22",2268722.00000000000,"4","3","6","4",Plains,Grassland,Polar,Moist,Polar Moist,Polar Moist Grassland on Plains
+"23",1144038.00000000000,"2","2","6","4",Hills,Grassland,Polar,Dry,Polar Dry,Polar Dry Grassland on Hills
+"24",178638.00000000000,"3","3","6","2",Tablelands,Shrubland,Polar,Moist,Polar Moist,Polar Moist Shrubland on Tablelands
+"25",4637855.00000000000,"1","3","6","2",Mountains,Shrubland,Polar,Moist,Polar Moist,Polar Moist Shrubland on Mountains
+"26",397776.00000000000,"3","3","6","4",Tablelands,Grassland,Polar,Moist,Polar Moist,Polar Moist Grassland on Tablelands
+"27",526892.00000000000,"4","3","6","3",Plains,Forest,Polar,Moist,Polar Moist,Polar Moist Forest on Plains
+"28",164495.00000000000,"2","3","6","3",Hills,Forest,Polar,Moist,Polar Moist,Polar Moist Forest on Hills
+"29",4434257.00000000000,"1","3","6","3",Mountains,Forest,Polar,Moist,Polar Moist,Polar Moist Forest on Mountains
+"30",77718.00000000000,"3","3","6","3",Tablelands,Forest,Polar,Moist,Polar Moist,Polar Moist Forest on Tablelands
+"31",1387339.00000000000,"4","2","6","4",Plains,Grassland,Polar,Dry,Polar Dry,Polar Dry Grassland on Plains
+"32",158892.00000000000,"2","2","6","2",Hills,Shrubland,Polar,Dry,Polar Dry,Polar Dry Shrubland on Hills
+"33",1657.00000000000,"1","3","6","5",Mountains,Settlement,Polar,Moist,Polar Moist,Polar Moist Settlement on Mountains
+"34",2436767.00000000000,"4","2","6","2",Plains,Shrubland,Polar,Dry,Polar Dry,Polar Dry Shrubland on Plains
+"35",22385.00000000000,"3","2","6","2",Tablelands,Shrubland,Polar,Dry,Polar Dry,Polar Dry Shrubland on Tablelands
+"36",888262.00000000000,"4","2","6","3",Plains,Forest,Polar,Dry,Polar Dry,Polar Dry Forest on Plains
+"37",11560.00000000000,"2","3","6","1",Hills,Cropland,Polar,Moist,Polar Moist,Polar Moist Cropland on Hills
+"38",352824.00000000000,"3","2","6","4",Tablelands,Grassland,Polar,Dry,Polar Dry,Polar Dry Grassland on Tablelands
+"39",1587463.00000000000,"1","3","6","1",Mountains,Cropland,Polar,Moist,Polar Moist,Polar Moist Cropland on Mountains
+"40",14112.00000000000,"4","3","6","1",Plains,Cropland,Polar,Moist,Polar Moist,Polar Moist Cropland on Plains
+"41",1565767.00000000000,"1","2","6","2",Mountains,Shrubland,Polar,Dry,Polar Dry,Polar Dry Shrubland on Mountains
+"42",29462.00000000000,"3","3","6","1",Tablelands,Cropland,Polar,Moist,Polar Moist,Polar Moist Cropland on Tablelands
+"43",17402.00000000000,"2","2","6","3",Hills,Forest,Polar,Dry,Polar Dry,Polar Dry Forest on Hills
+"44",5518.00000000000,"3","2","6","3",Tablelands,Forest,Polar,Dry,Polar Dry,Polar Dry Forest on Tablelands
+"45",33479688.00000000000,"4","3","1","6",Plains,Sparsley or Non vegetated,Boreal,Moist,Boreal Moist,Boreal Moist Sparsley or Non vegetated on Plains
+"46",5681035.00000000000,"4","3","1","4",Plains,Grassland,Boreal,Moist,Boreal Moist,Boreal Moist Grassland on Plains
+"47",15011571.00000000000,"2","3","1","6",Hills,Sparsley or Non vegetated,Boreal,Moist,Boreal Moist,Boreal Moist Sparsley or Non vegetated on Hills
+"48",5191941.00000000000,"2","3","1","4",Hills,Grassland,Boreal,Moist,Boreal Moist,Boreal Moist Grassland on Hills
+"49",10221719.00000000000,"2","3","1","2",Hills,Shrubland,Boreal,Moist,Boreal Moist,Boreal Moist Shrubland on Hills
+"50",69987067.00000000000,"2","3","1","3",Hills,Forest,Boreal,Moist,Boreal Moist,Boreal Moist Forest on Hills
+"51",21548405.00000000000,"1","3","1","6",Mountains,Sparsley or Non vegetated,Boreal,Moist,Boreal Moist,Boreal Moist Sparsley or Non vegetated on Mountains
+"52",36929178.00000000000,"4","3","1","2",Plains,Shrubland,Boreal,Moist,Boreal Moist,Boreal Moist Shrubland on Plains
+"53",93810669.00000000000,"4","3","1","3",Plains,Forest,Boreal,Moist,Boreal Moist,Boreal Moist Forest on Plains
+"54",24442742.00000000000,"1","3","1","2",Mountains,Shrubland,Boreal,Moist,Boreal Moist,Boreal Moist Shrubland on Mountains
+"55",108821462.00000000000,"1","3","1","3",Mountains,Forest,Boreal,Moist,Boreal Moist,Boreal Moist Forest on Mountains
+"56",11790914.00000000000,"1","3","1","4",Mountains,Grassland,Boreal,Moist,Boreal Moist,Boreal Moist Grassland on Mountains
+"57",7363111.00000000000,"3","3","1","6",Tablelands,Sparsley or Non vegetated,Boreal,Moist,Boreal Moist,Boreal Moist Sparsley or Non vegetated on Tablelands
+"58",3741466.00000000000,"3","3","1","2",Tablelands,Shrubland,Boreal,Moist,Boreal Moist,Boreal Moist Shrubland on Tablelands
+"59",1426915.00000000000,"3","3","1","4",Tablelands,Grassland,Boreal,Moist,Boreal Moist,Boreal Moist Grassland on Tablelands
+"60",1052389.00000000000,"2","3","1","1",Hills,Cropland,Boreal,Moist,Boreal Moist,Boreal Moist Cropland on Hills
+"61",41711.00000000000,"4","2","6","1",Plains,Cropland,Polar,Dry,Polar Dry,Polar Dry Cropland on Plains
+"62",1402021.00000000000,"4","3","1","1",Plains,Cropland,Boreal,Moist,Boreal Moist,Boreal Moist Cropland on Plains
+"63",30897409.00000000000,"3","3","1","3",Tablelands,Forest,Boreal,Moist,Boreal Moist,Boreal Moist Forest on Tablelands
+"64",172.00000000000,"4","3","6","5",Plains,Settlement,Polar,Moist,Polar Moist,Polar Moist Settlement on Plains
+"65",755685.00000000000,"1","2","6","3",Mountains,Forest,Polar,Dry,Polar Dry,Polar Dry Forest on Mountains
+"66",8316733.00000000000,"4","2","1","6",Plains,Sparsley or Non vegetated,Boreal,Dry,Boreal Dry,Boreal Dry Sparsley or Non vegetated on Plains
+"67",1472476.00000000000,"1","3","1","1",Mountains,Cropland,Boreal,Moist,Boreal Moist,Boreal Moist Cropland on Mountains
+"68",28083251.00000000000,"4","2","1","3",Plains,Forest,Boreal,Dry,Boreal Dry,Boreal Dry Forest on Plains
+"69",3567522.00000000000,"4","2","1","2",Plains,Shrubland,Boreal,Dry,Boreal Dry,Boreal Dry Shrubland on Plains
+"70",4239442.00000000000,"2","2","1","6",Hills,Sparsley or Non vegetated,Boreal,Dry,Boreal Dry,Boreal Dry Sparsley or Non vegetated on Hills
+"71",978391.00000000000,"2","2","1","2",Hills,Shrubland,Boreal,Dry,Boreal Dry,Boreal Dry Shrubland on Hills
+"72",22377549.00000000000,"2","2","1","3",Hills,Forest,Boreal,Dry,Boreal Dry,Boreal Dry Forest on Hills
+"73",398919.00000000000,"3","3","1","1",Tablelands,Cropland,Boreal,Moist,Boreal Moist,Boreal Moist Cropland on Tablelands
+"74",4094172.00000000000,"2","2","1","4",Hills,Grassland,Boreal,Dry,Boreal Dry,Boreal Dry Grassland on Hills
+"75",3196555.00000000000,"4","2","1","4",Plains,Grassland,Boreal,Dry,Boreal Dry,Boreal Dry Grassland on Plains
+"76",22678.00000000000,"2","2","6","1",Hills,Cropland,Polar,Dry,Polar Dry,Polar Dry Cropland on Hills
+"77",975366.00000000000,"4","2","1","1",Plains,Cropland,Boreal,Dry,Boreal Dry,Boreal Dry Cropland on Plains
+"78",1358614.00000000000,"3","2","1","6",Tablelands,Sparsley or Non vegetated,Boreal,Dry,Boreal Dry,Boreal Dry Sparsley or Non vegetated on Tablelands
+"79",922888.00000000000,"1","2","6","1",Mountains,Cropland,Polar,Dry,Polar Dry,Polar Dry Cropland on Mountains
+"80",6990.00000000000,"3","2","6","1",Tablelands,Cropland,Polar,Dry,Polar Dry,Polar Dry Cropland on Tablelands
+"81",319342.00000000000,"3","2","1","2",Tablelands,Shrubland,Boreal,Dry,Boreal Dry,Boreal Dry Shrubland on Tablelands
+"82",7699503.00000000000,"3","2","1","3",Tablelands,Forest,Boreal,Dry,Boreal Dry,Boreal Dry Forest on Tablelands
+"83",862846.00000000000,"3","2","1","4",Tablelands,Grassland,Boreal,Dry,Boreal Dry,Boreal Dry Grassland on Tablelands
+"84",26786.00000000000,"4","2","1","5",Plains,Settlement,Boreal,Dry,Boreal Dry,Boreal Dry Settlement on Plains
+"85",1362828.00000000000,"2","2","1","1",Hills,Cropland,Boreal,Dry,Boreal Dry,Boreal Dry Cropland on Hills
+"86",42060.00000000000,"4","3","1","5",Plains,Settlement,Boreal,Moist,Boreal Moist,Boreal Moist Settlement on Plains
+"87",28384.00000000000,"2","3","1","5",Hills,Settlement,Boreal,Moist,Boreal Moist,Boreal Moist Settlement on Hills
+"88",8316666.00000000000,"1","2","1","6",Mountains,Sparsley or Non vegetated,Boreal,Dry,Boreal Dry,Boreal Dry Sparsley or Non vegetated on Mountains
+"89",11571226.00000000000,"1","2","1","4",Mountains,Grassland,Boreal,Dry,Boreal Dry,Boreal Dry Grassland on Mountains
+"90",28664632.00000000000,"1","2","1","3",Mountains,Forest,Boreal,Dry,Boreal Dry,Boreal Dry Forest on Mountains
+"91",295975.00000000000,"3","2","1","1",Tablelands,Cropland,Boreal,Dry,Boreal Dry,Boreal Dry Cropland on Tablelands
+"92",3287343.00000000000,"1","2","1","2",Mountains,Shrubland,Boreal,Dry,Boreal Dry,Boreal Dry Shrubland on Mountains
+"93",3050255.00000000000,"1","2","1","1",Mountains,Cropland,Boreal,Dry,Boreal Dry,Boreal Dry Cropland on Mountains
+"94",5107.00000000000,"3","3","1","5",Tablelands,Settlement,Boreal,Moist,Boreal Moist,Boreal Moist Settlement on Tablelands
+"95",138.00000000000,"4","2","6","5",Plains,Settlement,Polar,Dry,Polar Dry,Polar Dry Settlement on Plains
+"96",7334989.00000000000,"1","3","2","2",Mountains,Shrubland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Shrubland on Mountains
+"97",66692749.00000000000,"1","3","2","3",Mountains,Forest,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Forest on Mountains
+"98",3668804.00000000000,"1","3","2","6",Mountains,Sparsley or Non vegetated,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Sparsley or Non vegetated on Mountains
+"99",168026.00000000000,"3","3","2","6",Tablelands,Sparsley or Non vegetated,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Sparsley or Non vegetated on Tablelands
+"100",856843.00000000000,"3","3","2","2",Tablelands,Shrubland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Shrubland on Tablelands
+"101",13683876.00000000000,"3","3","2","3",Tablelands,Forest,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Forest on Tablelands
+"102",6799603.00000000000,"3","3","2","1",Tablelands,Cropland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Cropland on Tablelands
+"103",10239016.00000000000,"1","3","2","1",Mountains,Cropland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Cropland on Mountains
+"104",273543.00000000000,"2","3","2","6",Hills,Sparsley or Non vegetated,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Sparsley or Non vegetated on Hills
+"105",32745889.00000000000,"2","3","2","3",Hills,Forest,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Forest on Hills
+"106",1638763.00000000000,"2","3","2","2",Hills,Shrubland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Shrubland on Hills
+"107",9856909.00000000000,"1","3","2","4",Mountains,Grassland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Grassland on Mountains
+"108",1269548.00000000000,"2","3","2","5",Hills,Settlement,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Settlement on Hills
+"109",1228365.00000000000,"3","3","2","4",Tablelands,Grassland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Grassland on Tablelands
+"110",20500111.00000000000,"2","3","2","1",Hills,Cropland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Cropland on Hills
+"111",56767522.00000000000,"4","3","2","3",Plains,Forest,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Forest on Plains
+"112",467017.00000000000,"4","3","2","6",Plains,Sparsley or Non vegetated,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Sparsley or Non vegetated on Plains
+"113",618440.00000000000,"1","3","2","5",Mountains,Settlement,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Settlement on Mountains
+"114",3408302.00000000000,"2","3","2","4",Hills,Grassland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Grassland on Hills
+"115",4852221.00000000000,"4","3","2","2",Plains,Shrubland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Shrubland on Plains
+"116",46084519.00000000000,"4","3","2","1",Plains,Cropland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Cropland on Plains
+"117",30280.00000000000,"2","2","1","5",Hills,Settlement,Boreal,Dry,Boreal Dry,Boreal Dry Settlement on Hills
+"118",299750.00000000000,"1","3","2","8",Mountains,Snow and Ice,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Snow and Ice on Mountains
+"119",1764.00000000000,"1","2","6","5",Mountains,Settlement,Polar,Dry,Polar Dry,Polar Dry Settlement on Mountains
+"120",2162831.00000000000,"4","3","2","5",Plains,Settlement,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Settlement on Plains
+"121",16159.00000000000,"1","3","1","5",Mountains,Settlement,Boreal,Moist,Boreal Moist,Boreal Moist Settlement on Mountains
+"122",34502.00000000000,"1","2","1","5",Mountains,Settlement,Boreal,Dry,Boreal Dry,Boreal Dry Settlement on Mountains
+"123",3269.00000000000,"3","2","1","5",Tablelands,Settlement,Boreal,Dry,Boreal Dry,Boreal Dry Settlement on Tablelands
+"124",967938.00000000000,"1","3","1","8",Mountains,Snow and Ice,Boreal,Moist,Boreal Moist,Boreal Moist Snow and Ice on Mountains
+"125",5607.00000000000,"2","3","1","8",Hills,Snow and Ice,Boreal,Moist,Boreal Moist,Boreal Moist Snow and Ice on Hills
+"126",17377.00000000000,"4","3","1","8",Plains,Snow and Ice,Boreal,Moist,Boreal Moist,Boreal Moist Snow and Ice on Plains
+"127",87.00000000000,"2","3","6","5",Hills,Settlement,Polar,Moist,Polar Moist,Polar Moist Settlement on Hills
+"128",5939640.00000000000,"4","3","2","4",Plains,Grassland,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Grassland on Plains
+"129",237859.00000000000,"3","3","2","5",Tablelands,Settlement,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Settlement on Tablelands
+"130",26214.00000000000,"1","2","1","8",Mountains,Snow and Ice,Boreal,Dry,Boreal Dry,Boreal Dry Snow and Ice on Mountains
+"131",22967.00000000000,"3","3","1","8",Tablelands,Snow and Ice,Boreal,Moist,Boreal Moist,Boreal Moist Snow and Ice on Tablelands
+"132",6273.00000000000,"4","3","2","8",Plains,Snow and Ice,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Snow and Ice on Plains
+"133",9659.00000000000,"3","3","2","8",Tablelands,Snow and Ice,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Snow and Ice on Tablelands
+"134",41820.00000000000,"2","3","2","8",Hills,Snow and Ice,Cool Temperate,Moist,Cool Temperate Moist,Cool Temperate Moist Snow and Ice on Hills
+"135",15611361.00000000000,"1","2","2","6",Mountains,Sparsley or Non vegetated,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Sparsley or Non vegetated on Mountains
+"136",12450493.00000000000,"1","2","2","2",Mountains,Shrubland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Shrubland on Mountains
+"137",13525348.00000000000,"1","2","2","3",Mountains,Forest,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Forest on Mountains
+"138",2827915.00000000000,"4","2","2","3",Plains,Forest,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Forest on Plains
+"139",1264567.00000000000,"2","2","2","3",Hills,Forest,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Forest on Hills
+"140",1287738.00000000000,"3","2","2","3",Tablelands,Forest,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Forest on Tablelands
+"141",2017610.00000000000,"3","2","2","2",Tablelands,Shrubland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Shrubland on Tablelands
+"142",17213782.00000000000,"1","2","2","4",Mountains,Grassland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Grassland on Mountains
+"143",3148779.00000000000,"2","2","2","2",Hills,Shrubland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Shrubland on Hills
+"144",4886225.00000000000,"4","2","2","2",Plains,Shrubland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Shrubland on Plains
+"145",45210080.00000000000,"4","2","2","1",Plains,Cropland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Cropland on Plains
+"146",14462433.00000000000,"2","2","2","1",Hills,Cropland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Cropland on Hills
+"147",16026019.00000000000,"2","2","2","6",Hills,Sparsley or Non vegetated,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Sparsley or Non vegetated on Hills
+"148",13419819.00000000000,"1","2","2","1",Mountains,Cropland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Cropland on Mountains
+"149",16588233.00000000000,"2","2","2","4",Hills,Grassland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Grassland on Hills
+"150",3693934.00000000000,"3","2","2","1",Tablelands,Cropland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Cropland on Tablelands
+"151",27831655.00000000000,"4","2","2","6",Plains,Sparsley or Non vegetated,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Sparsley or Non vegetated on Plains
+"152",3538568.00000000000,"3","2","2","6",Tablelands,Sparsley or Non vegetated,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Sparsley or Non vegetated on Tablelands
+"153",24249365.00000000000,"4","2","2","4",Plains,Grassland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Grassland on Plains
+"154",267064.00000000000,"2","2","2","5",Hills,Settlement,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Settlement on Hills
+"155",42802.00000000000,"3","2","2","5",Tablelands,Settlement,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Settlement on Tablelands
+"156",3703941.00000000000,"3","2","2","4",Tablelands,Grassland,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Grassland on Tablelands
+"157",500994.00000000000,"4","2","2","5",Plains,Settlement,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Settlement on Plains
+"158",199780.00000000000,"1","2","2","5",Mountains,Settlement,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Settlement on Mountains
+"159",5893517.00000000000,"4","3","3","4",Plains,Grassland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Grassland on Plains
+"160",21057735.00000000000,"4","3","3","1",Plains,Cropland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Cropland on Plains
+"161",1582898.00000000000,"4","3","3","5",Plains,Settlement,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Settlement on Plains
+"162",63747.00000000000,"4","3","3","6",Plains,Sparsley or Non vegetated,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Sparsley or Non vegetated on Plains
+"163",7051184.00000000000,"2","3","3","3",Hills,Forest,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Forest on Hills
+"164",4492674.00000000000,"2","3","3","4",Hills,Grassland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Grassland on Hills
+"165",376639.00000000000,"2","3","3","2",Hills,Shrubland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Shrubland on Hills
+"166",7628034.00000000000,"4","3","3","3",Plains,Forest,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Forest on Plains
+"167",1041618.00000000000,"4","3","3","2",Plains,Shrubland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Shrubland on Plains
+"168",7980992.00000000000,"2","3","3","1",Hills,Cropland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Cropland on Hills
+"169",826951.00000000000,"2","3","3","5",Hills,Settlement,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Settlement on Hills
+"170",37621.00000000000,"2","3","3","6",Hills,Sparsley or Non vegetated,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Sparsley or Non vegetated on Hills
+"171",3469322.00000000000,"1","3","3","4",Mountains,Grassland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Grassland on Mountains
+"172",854167.00000000000,"1","3","3","5",Mountains,Settlement,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Settlement on Mountains
+"173",22792265.00000000000,"1","3","3","1",Mountains,Cropland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Cropland on Mountains
+"174",229591.00000000000,"1","3","3","6",Mountains,Sparsley or Non vegetated,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Sparsley or Non vegetated on Mountains
+"175",2929062.00000000000,"1","3","3","2",Mountains,Shrubland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Shrubland on Mountains
+"176",42091216.00000000000,"1","3","3","3",Mountains,Forest,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Forest on Mountains
+"177",130958.00000000000,"3","3","3","5",Tablelands,Settlement,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Settlement on Tablelands
+"178",2984994.00000000000,"3","3","3","1",Tablelands,Cropland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Cropland on Tablelands
+"179",1409429.00000000000,"3","3","3","4",Tablelands,Grassland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Grassland on Tablelands
+"180",3959557.00000000000,"3","3","3","3",Tablelands,Forest,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Forest on Tablelands
+"181",361680.00000000000,"3","3","3","2",Tablelands,Shrubland,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Shrubland on Tablelands
+"182",13550.00000000000,"3","3","3","6",Tablelands,Sparsley or Non vegetated,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Sparsley or Non vegetated on Tablelands
+"183",19913122.00000000000,"1","2","3","2",Mountains,Shrubland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Shrubland on Mountains
+"184",19952648.00000000000,"1","2","3","1",Mountains,Cropland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Cropland on Mountains
+"185",711729.00000000000,"1","2","3","5",Mountains,Settlement,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Settlement on Mountains
+"186",9027272.00000000000,"1","2","3","4",Mountains,Grassland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Grassland on Mountains
+"187",29158697.00000000000,"4","2","3","1",Plains,Cropland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Cropland on Plains
+"188",1154501.00000000000,"4","2","3","5",Plains,Settlement,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Settlement on Plains
+"189",5831214.00000000000,"4","2","3","4",Plains,Grassland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Grassland on Plains
+"190",10641773.00000000000,"2","2","3","1",Hills,Cropland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Cropland on Hills
+"191",359892.00000000000,"2","2","3","5",Hills,Settlement,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Settlement on Hills
+"192",5104101.00000000000,"2","2","3","4",Hills,Grassland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Grassland on Hills
+"193",9291713.00000000000,"2","2","3","2",Hills,Shrubland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Shrubland on Hills
+"194",10546122.00000000000,"1","2","3","3",Mountains,Forest,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Forest on Mountains
+"195",2740390.00000000000,"4","2","3","3",Plains,Forest,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Forest on Plains
+"196",15256430.00000000000,"4","2","3","2",Plains,Shrubland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Shrubland on Plains
+"197",6444982.00000000000,"2","2","3","6",Hills,Sparsley or Non vegetated,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Sparsley or Non vegetated on Hills
+"198",3242594.00000000000,"3","2","3","1",Tablelands,Cropland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Cropland on Tablelands
+"199",1870418.00000000000,"2","2","3","3",Hills,Forest,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Forest on Hills
+"200",62092.00000000000,"3","2","3","5",Tablelands,Settlement,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Settlement on Tablelands
+"201",20397725.00000000000,"4","2","3","6",Plains,Sparsley or Non vegetated,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Sparsley or Non vegetated on Plains
+"202",1140598.00000000000,"3","2","3","3",Tablelands,Forest,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Forest on Tablelands
+"203",3042494.00000000000,"3","2","3","2",Tablelands,Shrubland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Shrubland on Tablelands
+"204",1422556.00000000000,"3","2","3","4",Tablelands,Grassland,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Grassland on Tablelands
+"205",16025774.00000000000,"1","2","3","6",Mountains,Sparsley or Non vegetated,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Sparsley or Non vegetated on Mountains
+"206",2235887.00000000000,"3","2","3","6",Tablelands,Sparsley or Non vegetated,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Sparsley or Non vegetated on Tablelands
+"207",2307164.00000000000,"4","1","2","6",Plains,Sparsley or Non vegetated,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Sparsley or Non vegetated on Plains
+"208",2778394.00000000000,"2","1","2","6",Hills,Sparsley or Non vegetated,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Sparsley or Non vegetated on Hills
+"209",68917.00000000000,"4","1","2","1",Plains,Cropland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Cropland on Plains
+"210",385185.00000000000,"4","1","2","4",Plains,Grassland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Grassland on Plains
+"211",3294.00000000000,"2","1","2","1",Hills,Cropland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Cropland on Hills
+"212",3090.00000000000,"4","1","2","5",Plains,Settlement,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Settlement on Plains
+"213",1962498.00000000000,"1","1","2","6",Mountains,Sparsley or Non vegetated,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Sparsley or Non vegetated on Mountains
+"214",30939.00000000000,"2","1","2","4",Hills,Grassland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Grassland on Hills
+"215",320.00000000000,"2","1","2","5",Hills,Settlement,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Settlement on Hills
+"216",449550.00000000000,"3","1","2","6",Tablelands,Sparsley or Non vegetated,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Sparsley or Non vegetated on Tablelands
+"217",10898.00000000000,"1","2","2","8",Mountains,Snow and Ice,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Snow and Ice on Mountains
+"218",2388700.00000000000,"2","1","3","6",Hills,Sparsley or Non vegetated,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Sparsley or Non vegetated on Hills
+"219",678334.00000000000,"1","1","2","4",Mountains,Grassland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Grassland on Mountains
+"220",18939.00000000000,"1","1","2","1",Mountains,Cropland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Cropland on Mountains
+"221",6654625.00000000000,"4","1","3","6",Plains,Sparsley or Non vegetated,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Sparsley or Non vegetated on Plains
+"222",819.00000000000,"1","1","2","5",Mountains,Settlement,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Settlement on Mountains
+"223",3624283.00000000000,"1","1","3","6",Mountains,Sparsley or Non vegetated,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Sparsley or Non vegetated on Mountains
+"224",794835.00000000000,"3","1","3","6",Tablelands,Sparsley or Non vegetated,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Sparsley or Non vegetated on Tablelands
+"225",11609.00000000000,"1","1","3","5",Mountains,Settlement,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Settlement on Mountains
+"226",49376.00000000000,"1","1","3","4",Mountains,Grassland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Grassland on Mountains
+"227",23196.00000000000,"1","1","3","1",Mountains,Cropland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Cropland on Mountains
+"228",19707.00000000000,"3","1","2","4",Tablelands,Grassland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Grassland on Tablelands
+"229",318.00000000000,"3","1","2","1",Tablelands,Cropland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Cropland on Tablelands
+"230",33481.00000000000,"2","1","3","4",Hills,Grassland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Grassland on Hills
+"231",473191.00000000000,"4","1","3","4",Plains,Grassland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Grassland on Plains
+"232",16732.00000000000,"2","1","3","1",Hills,Cropland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Cropland on Hills
+"233",619128.00000000000,"4","1","3","1",Plains,Cropland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Cropland on Plains
+"234",5813.00000000000,"4","1","3","5",Plains,Settlement,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Settlement on Plains
+"235",1141.00000000000,"3","1","3","1",Tablelands,Cropland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Cropland on Tablelands
+"236",60045.00000000000,"4","1","3","2",Plains,Shrubland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Shrubland on Plains
+"237",2795.00000000000,"3","1","3","4",Tablelands,Grassland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Grassland on Tablelands
+"238",179.00000000000,"3","1","3","5",Tablelands,Settlement,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Settlement on Tablelands
+"239",4110.00000000000,"2","1","3","2",Hills,Shrubland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Shrubland on Hills
+"240",986.00000000000,"2","1","3","5",Hills,Settlement,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Settlement on Hills
+"241",8623.00000000000,"3","1","3","2",Tablelands,Shrubland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Shrubland on Tablelands
+"242",174.00000000000,"4","1","2","3",Plains,Forest,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Forest on Plains
+"243",415688.00000000000,"1","1","3","2",Mountains,Shrubland,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Shrubland on Mountains
+"244",9598.00000000000,"4","1","2","2",Plains,Shrubland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Shrubland on Plains
+"245",801.00000000000,"2","1","2","2",Hills,Shrubland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Shrubland on Hills
+"246",209787.00000000000,"1","1","2","2",Mountains,Shrubland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Shrubland on Mountains
+"247",15.00000000000,"3","1","2","5",Tablelands,Settlement,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Settlement on Tablelands
+"248",6487.00000000000,"3","1","2","2",Tablelands,Shrubland,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Shrubland on Tablelands
+"249",1838.00000000000,"1","1","3","3",Mountains,Forest,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Forest on Mountains
+"250",11.00000000000,"2","1","3","3",Hills,Forest,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Forest on Hills
+"251",36289.00000000000,"1","1","1","4",Mountains,Grassland,Boreal,Desert,Boreal Desert,Boreal Desert Grassland on Mountains
+"252",31283.00000000000,"1","1","1","6",Mountains,Sparsley or Non vegetated,Boreal,Desert,Boreal Desert,Boreal Desert Sparsley or Non vegetated on Mountains
+"253",1312.00000000000,"1","1","1","1",Mountains,Cropland,Boreal,Desert,Boreal Desert,Boreal Desert Cropland on Mountains
+"254",18619.00000000000,"1","1","6","4",Mountains,Grassland,Polar,Desert,Polar Desert,Polar Desert Grassland on Mountains
+"255",10.00000000000,"4","1","1","4",Plains,Grassland,Boreal,Desert,Boreal Desert,Boreal Desert Grassland on Plains
+"256",3.00000000000,"4","1","1","1",Plains,Cropland,Boreal,Desert,Boreal Desert,Boreal Desert Cropland on Plains
+"257",164.00000000000,"3","1","1","6",Tablelands,Sparsley or Non vegetated,Boreal,Desert,Boreal Desert,Boreal Desert Sparsley or Non vegetated on Tablelands
+"258",2.00000000000,"3","1","1","4",Tablelands,Grassland,Boreal,Desert,Boreal Desert,Boreal Desert Grassland on Tablelands
+"259",238.00000000000,"4","1","3","3",Plains,Forest,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Forest on Plains
+"260",2.00000000000,"2","1","2","3",Hills,Forest,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Forest on Hills
+"261",8901812.00000000000,"1","3","4","2",Mountains,Shrubland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Shrubland on Mountains
+"262",50343886.00000000000,"1","3","4","3",Mountains,Forest,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Forest on Mountains
+"263",236366.00000000000,"2","3","4","5",Hills,Settlement,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Settlement on Hills
+"264",370769.00000000000,"1","3","4","5",Mountains,Settlement,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Settlement on Mountains
+"265",12174.00000000000,"2","3","4","6",Hills,Sparsley or Non vegetated,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Sparsley or Non vegetated on Hills
+"266",172113.00000000000,"1","2","4","5",Mountains,Settlement,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Settlement on Mountains
+"267",12960132.00000000000,"2","3","4","1",Hills,Cropland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Cropland on Hills
+"268",22986213.00000000000,"2","3","4","3",Hills,Forest,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Forest on Hills
+"269",17813108.00000000000,"1","3","4","1",Mountains,Cropland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Cropland on Mountains
+"270",134178.00000000000,"1","3","4","6",Mountains,Sparsley or Non vegetated,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Sparsley or Non vegetated on Mountains
+"271",2186680.00000000000,"1","3","4","4",Mountains,Grassland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Grassland on Mountains
+"272",9597506.00000000000,"1","2","4","1",Mountains,Cropland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Cropland on Mountains
+"273",9894638.00000000000,"1","2","4","6",Mountains,Sparsley or Non vegetated,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Sparsley or Non vegetated on Mountains
+"274",12732017.00000000000,"1","2","4","3",Mountains,Forest,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Forest on Mountains
+"275",4437902.00000000000,"1","2","4","4",Mountains,Grassland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Grassland on Mountains
+"276",338530.00000000000,"4","2","4","5",Plains,Settlement,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Settlement on Plains
+"277",131920.00000000000,"2","2","4","5",Hills,Settlement,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Settlement on Hills
+"278",7573177.00000000000,"2","2","4","1",Hills,Cropland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Cropland on Hills
+"279",4398438.00000000000,"2","2","4","4",Hills,Grassland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Grassland on Hills
+"280",364.00000000000,"1","1","2","3",Mountains,Forest,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Forest on Mountains
+"281",9653446.00000000000,"2","2","4","6",Hills,Sparsley or Non vegetated,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Sparsley or Non vegetated on Hills
+"282",14929930.00000000000,"4","2","4","1",Plains,Cropland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Cropland on Plains
+"283",45616851.00000000000,"4","2","4","6",Plains,Sparsley or Non vegetated,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Sparsley or Non vegetated on Plains
+"284",30645336.00000000000,"4","2","4","2",Plains,Shrubland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Shrubland on Plains
+"285",11294988.00000000000,"2","2","4","2",Hills,Shrubland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Shrubland on Hills
+"286",17370808.00000000000,"1","2","4","2",Mountains,Shrubland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Shrubland on Mountains
+"287",1774381.00000000000,"3","2","4","1",Tablelands,Cropland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Cropland on Tablelands
+"288",13829192.00000000000,"4","2","4","3",Plains,Forest,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Forest on Plains
+"289",19400120.00000000000,"4","2","4","4",Plains,Grassland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Grassland on Plains
+"290",8784801.00000000000,"2","2","4","3",Hills,Forest,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Forest on Hills
+"291",2258876.00000000000,"3","2","4","6",Tablelands,Sparsley or Non vegetated,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Sparsley or Non vegetated on Tablelands
+"292",816.00000000000,"1","1","6","1",Mountains,Cropland,Polar,Desert,Polar Desert,Polar Desert Cropland on Mountains
+"293",3452040.00000000000,"3","2","4","2",Tablelands,Shrubland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Shrubland on Tablelands
+"294",3586184.00000000000,"3","2","4","3",Tablelands,Forest,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Forest on Tablelands
+"295",1499102.00000000000,"2","3","4","4",Hills,Grassland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Grassland on Hills
+"296",18649.00000000000,"3","2","4","5",Tablelands,Settlement,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Settlement on Tablelands
+"297",7457476.00000000000,"4","3","4","1",Plains,Cropland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Cropland on Plains
+"298",814418.00000000000,"3","2","4","4",Tablelands,Grassland,Sub Tropical,Dry,Sub Tropical Dry,Sub Tropical Dry Grassland on Tablelands
+"299",47092.00000000000,"4","3","4","6",Plains,Sparsley or Non vegetated,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Sparsley or Non vegetated on Plains
+"300",3999962.00000000000,"4","3","4","2",Plains,Shrubland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Shrubland on Plains
+"301",11737167.00000000000,"4","3","4","3",Plains,Forest,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Forest on Plains
+"302",6633081.00000000000,"3","3","4","1",Tablelands,Cropland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Cropland on Tablelands
+"303",12672810.00000000000,"3","3","4","3",Tablelands,Forest,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Forest on Tablelands
+"304",609106.00000000000,"3","3","4","4",Tablelands,Grassland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Grassland on Tablelands
+"305",2396171.00000000000,"3","3","4","2",Tablelands,Shrubland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Shrubland on Tablelands
+"306",193851.00000000000,"1","1","6","6",Mountains,Sparsley or Non vegetated,Polar,Desert,Polar Desert,Polar Desert Sparsley or Non vegetated on Mountains
+"307",4406444.00000000000,"2","3","4","2",Hills,Shrubland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Shrubland on Hills
+"308",616136.00000000000,"4","3","4","5",Plains,Settlement,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Settlement on Plains
+"309",523.00000000000,"1","1","6","3",Mountains,Forest,Polar,Desert,Polar Desert,Polar Desert Forest on Mountains
+"310",380194.00000000000,"1","1","4","2",Mountains,Shrubland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Shrubland on Mountains
+"311",2606071.00000000000,"4","3","4","4",Plains,Grassland,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Grassland on Plains
+"312",9013954.00000000000,"1","1","4","6",Mountains,Sparsley or Non vegetated,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Sparsley or Non vegetated on Mountains
+"313",304283.00000000000,"4","1","4","2",Plains,Shrubland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Shrubland on Plains
+"314",48497080.00000000000,"4","1","4","6",Plains,Sparsley or Non vegetated,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Sparsley or Non vegetated on Plains
+"315",19.00000000000,"1","1","2","8",Mountains,Snow and Ice,Cool Temperate,Desert,Cool Temperate Desert,Cool Temperate Desert Snow and Ice on Mountains
+"316",8373.00000000000,"3","3","4","6",Tablelands,Sparsley or Non vegetated,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Sparsley or Non vegetated on Tablelands
+"317",17.00000000000,"1","1","1","3",Mountains,Forest,Boreal,Desert,Boreal Desert,Boreal Desert Forest on Mountains
+"318",124.00000000000,"3","2","6","5",Tablelands,Settlement,Polar,Dry,Polar Dry,Polar Dry Settlement on Tablelands
+"319",37.00000000000,"2","2","6","5",Hills,Settlement,Polar,Dry,Polar Dry,Polar Dry Settlement on Hills
+"320",159779.00000000000,"1","1","4","4",Mountains,Grassland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Grassland on Mountains
+"321",184.00000000000,"1","1","6","8",Mountains,Snow and Ice,Polar,Desert,Polar Desert,Polar Desert Snow and Ice on Mountains
+"322",62584.00000000000,"4","1","4","4",Plains,Grassland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Grassland on Plains
+"323",2.00000000000,"1","1","1","2",Mountains,Shrubland,Boreal,Desert,Boreal Desert,Boreal Desert Shrubland on Mountains
+"324",134900.00000000000,"1","1","6","2",Mountains,Shrubland,Polar,Desert,Polar Desert,Polar Desert Shrubland on Mountains
+"325",8.00000000000,"1","1","1","5",Mountains,Settlement,Boreal,Desert,Boreal Desert,Boreal Desert Settlement on Mountains
+"326",169.00000000000,"4","1","1","6",Plains,Sparsley or Non vegetated,Boreal,Desert,Boreal Desert,Boreal Desert Sparsley or Non vegetated on Plains
+"327",10140.00000000000,"1","1","4","3",Mountains,Forest,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Forest on Mountains
+"328",6680.00000000000,"4","1","4","3",Plains,Forest,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Forest on Plains
+"329",8042.00000000000,"3","1","4","2",Tablelands,Shrubland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Shrubland on Tablelands
+"330",55609.00000000000,"4","1","4","5",Plains,Settlement,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Settlement on Plains
+"331",77935.00000000000,"2","1","4","2",Hills,Shrubland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Shrubland on Hills
+"332",40380906.00000000000,"4","2","5","6",Plains,Sparsley or Non vegetated,Tropical,Dry,Tropical Dry,Tropical Dry Sparsley or Non vegetated on Plains
+"333",46808225.00000000000,"4","2","5","1",Plains,Cropland,Tropical,Dry,Tropical Dry,Tropical Dry Cropland on Plains
+"334",6841106.00000000000,"2","2","5","6",Hills,Sparsley or Non vegetated,Tropical,Dry,Tropical Dry,Tropical Dry Sparsley or Non vegetated on Hills
+"335",11754636.00000000000,"2","2","5","2",Hills,Shrubland,Tropical,Dry,Tropical Dry,Tropical Dry Shrubland on Hills
+"336",13823111.00000000000,"2","2","5","1",Hills,Cropland,Tropical,Dry,Tropical Dry,Tropical Dry Cropland on Hills
+"337",111371.00000000000,"2","2","5","5",Hills,Settlement,Tropical,Dry,Tropical Dry,Tropical Dry Settlement on Hills
+"338",5312998.00000000000,"1","2","5","1",Mountains,Cropland,Tropical,Dry,Tropical Dry,Tropical Dry Cropland on Mountains
+"339",6927030.00000000000,"1","2","5","6",Mountains,Sparsley or Non vegetated,Tropical,Dry,Tropical Dry,Tropical Dry Sparsley or Non vegetated on Mountains
+"340",18514533.00000000000,"2","1","4","6",Hills,Sparsley or Non vegetated,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Sparsley or Non vegetated on Hills
+"341",32069892.00000000000,"4","2","5","2",Plains,Shrubland,Tropical,Dry,Tropical Dry,Tropical Dry Shrubland on Plains
+"342",5143482.00000000000,"1","2","5","2",Mountains,Shrubland,Tropical,Dry,Tropical Dry,Tropical Dry Shrubland on Mountains
+"343",392417.00000000000,"4","2","5","5",Plains,Settlement,Tropical,Dry,Tropical Dry,Tropical Dry Settlement on Plains
+"344",1870344.00000000000,"1","2","5","4",Mountains,Grassland,Tropical,Dry,Tropical Dry,Tropical Dry Grassland on Mountains
+"345",66060.00000000000,"1","2","5","5",Mountains,Settlement,Tropical,Dry,Tropical Dry,Tropical Dry Settlement on Mountains
+"346",919096.00000000000,"4","1","4","1",Plains,Cropland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Cropland on Plains
+"347",4924937.00000000000,"3","1","4","6",Tablelands,Sparsley or Non vegetated,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Sparsley or Non vegetated on Tablelands
+"348",76889.00000000000,"3","3","4","5",Tablelands,Settlement,Sub Tropical,Moist,Sub Tropical Moist,Sub Tropical Moist Settlement on Tablelands
+"349",81238.00000000000,"2","1","4","1",Hills,Cropland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Cropland on Hills
+"350",64615.00000000000,"1","1","4","1",Mountains,Cropland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Cropland on Mountains
+"351",24084.00000000000,"1","1","4","5",Mountains,Settlement,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Settlement on Mountains
+"352",80702.00000000000,"2","1","4","4",Hills,Grassland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Grassland on Hills
+"353",1248.00000000000,"2","1","4","3",Hills,Forest,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Forest on Hills
+"354",11492.00000000000,"2","1","4","5",Hills,Settlement,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Settlement on Hills
+"355",10154.00000000000,"3","1","4","1",Tablelands,Cropland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Cropland on Tablelands
+"356",1530646.00000000000,"3","2","5","6",Tablelands,Sparsley or Non vegetated,Tropical,Dry,Tropical Dry,Tropical Dry Sparsley or Non vegetated on Tablelands
+"357",987.00000000000,"3","1","4","5",Tablelands,Settlement,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Settlement on Tablelands
+"358",1590075.00000000000,"3","2","5","1",Tablelands,Cropland,Tropical,Dry,Tropical Dry,Tropical Dry Cropland on Tablelands
+"359",3536192.00000000000,"2","2","5","4",Hills,Grassland,Tropical,Dry,Tropical Dry,Tropical Dry Grassland on Hills
+"360",16099219.00000000000,"4","2","5","4",Plains,Grassland,Tropical,Dry,Tropical Dry,Tropical Dry Grassland on Plains
+"361",12056643.00000000000,"4","2","5","3",Plains,Forest,Tropical,Dry,Tropical Dry,Tropical Dry Forest on Plains
+"362",71660435.00000000000,"4","1","5","6",Plains,Sparsley or Non vegetated,Tropical,Desert,Tropical Desert,Tropical Desert Sparsley or Non vegetated on Plains
+"363",8891693.00000000000,"2","2","5","3",Hills,Forest,Tropical,Dry,Tropical Dry,Tropical Dry Forest on Hills
+"364",2747486.00000000000,"3","2","5","2",Tablelands,Shrubland,Tropical,Dry,Tropical Dry,Tropical Dry Shrubland on Tablelands
+"365",5105484.00000000000,"1","2","5","3",Mountains,Forest,Tropical,Dry,Tropical Dry,Tropical Dry Forest on Mountains
+"366",17136.00000000000,"3","1","4","4",Tablelands,Grassland,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Grassland on Tablelands
+"367",384345.00000000000,"4","1","5","1",Plains,Cropland,Tropical,Desert,Tropical Desert,Tropical Desert Cropland on Plains
+"368",9658.00000000000,"3","2","5","5",Tablelands,Settlement,Tropical,Dry,Tropical Dry,Tropical Dry Settlement on Tablelands
+"369",6304274.00000000000,"1","1","5","6",Mountains,Sparsley or Non vegetated,Tropical,Desert,Tropical Desert,Tropical Desert Sparsley or Non vegetated on Mountains
+"370",128033.00000000000,"4","1","5","4",Plains,Grassland,Tropical,Desert,Tropical Desert,Tropical Desert Grassland on Plains
+"371",42541.00000000000,"1","1","5","4",Mountains,Grassland,Tropical,Desert,Tropical Desert,Tropical Desert Grassland on Mountains
+"372",76128.00000000000,"1","1","5","1",Mountains,Cropland,Tropical,Desert,Tropical Desert,Tropical Desert Cropland on Mountains
+"373",141766.00000000000,"4","1","5","2",Plains,Shrubland,Tropical,Desert,Tropical Desert,Tropical Desert Shrubland on Plains
+"374",16518668.00000000000,"2","1","5","6",Hills,Sparsley or Non vegetated,Tropical,Desert,Tropical Desert,Tropical Desert Sparsley or Non vegetated on Hills
+"375",2324609.00000000000,"3","1","5","6",Tablelands,Sparsley or Non vegetated,Tropical,Desert,Tropical Desert,Tropical Desert Sparsley or Non vegetated on Tablelands
+"376",165425.00000000000,"1","1","5","2",Mountains,Shrubland,Tropical,Desert,Tropical Desert,Tropical Desert Shrubland on Mountains
+"377",9408.00000000000,"1","1","5","5",Mountains,Settlement,Tropical,Desert,Tropical Desert,Tropical Desert Settlement on Mountains
+"378",51616.00000000000,"4","1","5","5",Plains,Settlement,Tropical,Desert,Tropical Desert,Tropical Desert Settlement on Plains
+"379",16339.00000000000,"4","1","5","3",Plains,Forest,Tropical,Desert,Tropical Desert,Tropical Desert Forest on Plains
+"380",56831.00000000000,"2","1","5","1",Hills,Cropland,Tropical,Desert,Tropical Desert,Tropical Desert Cropland on Hills
+"381",11014.00000000000,"2","1","5","5",Hills,Settlement,Tropical,Desert,Tropical Desert,Tropical Desert Settlement on Hills
+"382",665894.00000000000,"3","2","5","4",Tablelands,Grassland,Tropical,Dry,Tropical Dry,Tropical Dry Grassland on Tablelands
+"383",31420.00000000000,"2","1","5","4",Hills,Grassland,Tropical,Desert,Tropical Desert,Tropical Desert Grassland on Hills
+"384",505.00000000000,"3","1","5","5",Tablelands,Settlement,Tropical,Desert,Tropical Desert,Tropical Desert Settlement on Tablelands
+"385",1550.00000000000,"3","1","5","1",Tablelands,Cropland,Tropical,Desert,Tropical Desert,Tropical Desert Cropland on Tablelands
+"386",68804.00000000000,"2","1","5","2",Hills,Shrubland,Tropical,Desert,Tropical Desert,Tropical Desert Shrubland on Hills
+"387",31574956.00000000000,"4","3","5","1",Plains,Cropland,Tropical,Moist,Tropical Moist,Tropical Moist Cropland on Plains
+"388",616154.00000000000,"4","3","5","5",Plains,Settlement,Tropical,Moist,Tropical Moist,Tropical Moist Settlement on Plains
+"389",73852734.00000000000,"4","3","5","3",Plains,Forest,Tropical,Moist,Tropical Moist,Tropical Moist Forest on Plains
+"390",17407689.00000000000,"2","3","5","1",Hills,Cropland,Tropical,Moist,Tropical Moist,Tropical Moist Cropland on Hills
+"391",15270789.00000000000,"1","3","5","1",Mountains,Cropland,Tropical,Moist,Tropical Moist,Tropical Moist Cropland on Mountains
+"392",33889622.00000000000,"1","3","5","3",Mountains,Forest,Tropical,Moist,Tropical Moist,Tropical Moist Forest on Mountains
+"393",4337541.00000000000,"4","3","5","4",Plains,Grassland,Tropical,Moist,Tropical Moist,Tropical Moist Grassland on Plains
+"394",1349600.00000000000,"3","2","5","3",Tablelands,Forest,Tropical,Dry,Tropical Dry,Tropical Dry Forest on Tablelands
+"395",279267.00000000000,"4","3","5","6",Plains,Sparsley or Non vegetated,Tropical,Moist,Tropical Moist,Tropical Moist Sparsley or Non vegetated on Plains
+"396",10104586.00000000000,"4","3","5","2",Plains,Shrubland,Tropical,Moist,Tropical Moist,Tropical Moist Shrubland on Plains
+"397",13263.00000000000,"3","1","5","4",Tablelands,Grassland,Tropical,Desert,Tropical Desert,Tropical Desert Grassland on Tablelands
+"398",46297613.00000000000,"2","3","5","3",Hills,Forest,Tropical,Moist,Tropical Moist,Tropical Moist Forest on Hills
+"399",174.00000000000,"1","3","3","8",Mountains,Snow and Ice,Warm Temperate,Moist,Warm Temperate Moist,Warm Temperate Moist Snow and Ice on Mountains
+"400",18.00000000000,"3","1","4","3",Tablelands,Forest,Sub Tropical,Desert,Sub Tropical Desert,Sub Tropical Desert Forest on Tablelands
+"401",724485.00000000000,"1","3","5","4",Mountains,Grassland,Tropical,Moist,Tropical Moist,Tropical Moist Grassland on Mountains
+"402",112635.00000000000,"1","3","5","6",Mountains,Sparsley or Non vegetated,Tropical,Moist,Tropical Moist,Tropical Moist Sparsley or Non vegetated on Mountains
+"403",1464048.00000000000,"2","3","5","4",Hills,Grassland,Tropical,Moist,Tropical Moist,Tropical Moist Grassland on Hills
+"404",3341105.00000000000,"1","3","5","2",Mountains,Shrubland,Tropical,Moist,Tropical Moist,Tropical Moist Shrubland on Mountains
+"405",188666.00000000000,"1","3","5","5",Mountains,Settlement,Tropical,Moist,Tropical Moist,Tropical Moist Settlement on Mountains
+"406",7506.00000000000,"2","1","5","3",Hills,Forest,Tropical,Desert,Tropical Desert,Tropical Desert Forest on Hills
+"407",238405.00000000000,"2","3","5","5",Hills,Settlement,Tropical,Moist,Tropical Moist,Tropical Moist Settlement on Hills
+"408",6185946.00000000000,"2","3","5","2",Hills,Shrubland,Tropical,Moist,Tropical Moist,Tropical Moist Shrubland on Hills
+"409",7451512.00000000000,"3","3","5","3",Tablelands,Forest,Tropical,Moist,Tropical Moist,Tropical Moist Forest on Tablelands
+"410",1295328.00000000000,"3","3","5","2",Tablelands,Shrubland,Tropical,Moist,Tropical Moist,Tropical Moist Shrubland on Tablelands
+"411",1841776.00000000000,"3","3","5","1",Tablelands,Cropland,Tropical,Moist,Tropical Moist,Tropical Moist Cropland on Tablelands
+"412",39906.00000000000,"3","1","5","2",Tablelands,Shrubland,Tropical,Desert,Tropical Desert,Tropical Desert Shrubland on Tablelands
+"413",21549.00000000000,"3","3","5","5",Tablelands,Settlement,Tropical,Moist,Tropical Moist,Tropical Moist Settlement on Tablelands
+"414",273880.00000000000,"3","3","5","4",Tablelands,Grassland,Tropical,Moist,Tropical Moist,Tropical Moist Grassland on Tablelands
+"415",52252.00000000000,"2","3","5","6",Hills,Sparsley or Non vegetated,Tropical,Moist,Tropical Moist,Tropical Moist Sparsley or Non vegetated on Hills
+"416",21094.00000000000,"3","3","5","6",Tablelands,Sparsley or Non vegetated,Tropical,Moist,Tropical Moist,Tropical Moist Sparsley or Non vegetated on Tablelands
+"417",9638.00000000000,"1","1","5","3",Mountains,Forest,Tropical,Desert,Tropical Desert,Tropical Desert Forest on Mountains
+"418",4466.00000000000,"3","1","5","3",Tablelands,Forest,Tropical,Desert,Tropical Desert,Tropical Desert Forest on Tablelands
+"419",5.00000000000,"1","2","3","8",Mountains,Snow and Ice,Warm Temperate,Dry,Warm Temperate Dry,Warm Temperate Dry Snow and Ice on Mountains
+"420",3.00000000000,"4","2","2","8",Plains,Snow and Ice,Cool Temperate,Dry,Cool Temperate Dry,Cool Temperate Dry Snow and Ice on Plains
+"421",5627.00000000000,"3","1","6","6",Tablelands,Sparsley or Non vegetated,Polar,Desert,Polar Desert,Polar Desert Sparsley or Non vegetated on Tablelands
+"422",19.00000000000,"3","1","6","5",Tablelands,Settlement,Polar,Desert,Polar Desert,Polar Desert Settlement on Tablelands
+"423",851.00000000000,"3","1","6","2",Tablelands,Shrubland,Polar,Desert,Polar Desert,Polar Desert Shrubland on Tablelands
+"424",2877.00000000000,"4","1","6","6",Plains,Sparsley or Non vegetated,Polar,Desert,Polar Desert,Polar Desert Sparsley or Non vegetated on Plains
+"425",59.00000000000,"4","1","6","2",Plains,Shrubland,Polar,Desert,Polar Desert,Polar Desert Shrubland on Plains
+"426",21.00000000000,"4","1","6","1",Plains,Cropland,Polar,Desert,Polar Desert,Polar Desert Cropland on Plains
+"427",41.00000000000,"4","1","6","3",Plains,Forest,Polar,Desert,Polar Desert,Polar Desert Forest on Plains
+"428",352.00000000000,"1","1","6","5",Mountains,Settlement,Polar,Desert,Polar Desert,Polar Desert Settlement on Mountains
+"429",38.00000000000,"3","1","3","3",Tablelands,Forest,Warm Temperate,Desert,Warm Temperate Desert,Warm Temperate Desert Forest on Tablelands
+"430",4.00000000000,"3","1","6","4",Tablelands,Grassland,Polar,Desert,Polar Desert,Polar Desert Grassland on Tablelands
+"431",19.00000000000,"4","1","6","4",Plains,Grassland,Polar,Desert,Polar Desert,Polar Desert Grassland on Plains

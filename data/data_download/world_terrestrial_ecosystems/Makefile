@@ -24,7 +24,12 @@ import: data/ecosystems/World_Ecosystems_simp.geojson
 
 
 data/ecosystems/World_Ecosystems_simp.geojson: data/ecosystems/World_Ecosystems.geojson
-	mapshaper $< -simplify 10% -filter-islands min-vertices=3 -filter-slivers -clean -o $@ force
+	mapshaper $< -simplify 15% planar keep-shapes \
+	-filter-islands min-vertices=3 remove-empty \
+	-filter-slivers remove-empty \
+	-clean \
+	-join data/ecosystems/categories.csv keys=DN,Value field-types=Value:int fields=W_Ecosystm \
+	-o $@ force
 
 data/ecosystems/World_Ecosystems.geojson: data/ecosystems/World_Ecosystems.tif
 	gdal_polygonize.py $< -f GeoJSONSeq $@
@@ -34,6 +39,7 @@ data/ecosystems/World_Ecosystems.tif: | data/ecosystems
 
 data/ecosystems:
 	mkdir -p $@
+	cp ./categories.csv $@/categories.csv
 
 clean:
 	rm -rf data/
