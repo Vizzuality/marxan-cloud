@@ -1,5 +1,4 @@
 FROM osgeo/gdal:ubuntu-full-3.2.1
-ENV LANG=en_US.UTF-8
 LABEL maintainer="hello@vizzuality.com"
 ENV NODE_OPTIONS=--max_old_space_size=16384
 RUN apt-get update \
