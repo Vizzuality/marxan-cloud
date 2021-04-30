@@ -39,7 +39,7 @@ import { RequestWithAuthenticatedUser } from 'app.controller';
 import { ScenarioFeaturesService } from '../scenarios-features';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
 
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
@@ -120,7 +120,7 @@ export class ScenariosController {
   @ApiOkResponse({
     type: RemoteScenarioFeaturesData,
   })
-  @Get(':id/scenarios-features')
+  @Get(':id/features')
   async getScenarioFeatures(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<Partial<RemoteScenarioFeaturesData>[]> {

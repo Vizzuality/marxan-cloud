@@ -9,6 +9,6 @@ export const WhenUserGetsScenarioGapAnalysis = async (
 ) =>
   (
     await request(app.getHttpServer())
-      .get(`/api/v1/scenarios/${scenarioId}/scenarios-features`)
+      .get(`/api/v1/scenarios/${scenarioId}/features`)
       .set('Authorization', `Bearer ${jwtToken}`)
   ).body;

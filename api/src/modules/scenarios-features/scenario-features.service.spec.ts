@@ -1,102 +1,130 @@
-// import { ScenarioFeaturesService } from './scenario-features.service';
-// import { Repository } from 'typeorm';
-// import { RemoteScenarioFeaturesData } from './entities/remote-scenario-features-data.geo.entity';
-// import { Test } from '@nestjs/testing';
-// import { getRepositoryToken } from '@nestjs/typeorm';
-// import { remoteConnectionName } from './entities/remote-connection-name';
-// import {
-//   getValidNonGeoData,
-//   getValidScenarioFeatures,
-// } from './__mocks__/scenario-features.view-data';
-// import { fakeQueryBuilder } from '../../utils/__mocks__/fake-query-builder';
-//
-// let sut: ScenarioFeaturesService;
-// let nonGeoFeaturesRepoMock: jest.Mocked<Repository<RemoteScenarioFeaturesData>>;
-//
-// let fakeResultResolver: jest.Mock;
-//
-// beforeAll(async () => {
-//   fakeResultResolver = jest.fn();
-//   // const scenariosToken = getRepositoryToken(ScenariosFeaturesView);
-//   const nonGeoToken = getRepositoryToken(
-//     RemoteScenarioFeaturesData,
-//     remoteConnectionName,
-//   );
-//   const sandbox = await Test.createTestingModule({
-//     providers: [
-//       // {
-//       //   provide: scenariosToken,
-//       //   useValue: {
-//       //     metadata: {
-//       //       name: 'required-by-base-service-for-logging',
-//       //     },
-//       //     createQueryBuilder: () => fakeQueryBuilder(fakeResultResolver),
-//       //   },
-//       // },
-//       {
-//         provide: nonGeoToken,
-//         useValue: {
-//           find: jest.fn(),
-//         },
-//       },
-//       ScenarioFeaturesService,
-//     ],
-//   }).compile();
-//
-//   sut = sandbox.get(ScenarioFeaturesService);
-//   nonGeoFeaturesRepoMock = sandbox.get(nonGeoToken);
-// });
-//
-// describe(`when looking for a scenario's features`, () => {
-//   const scenarioId = `scenarioId`;
-//   let result: unknown;
-//   beforeEach(async () => {
-//     // Asset
-//     fakeResultResolver.mockResolvedValue(getValidScenarioFeatures(scenarioId));
-//     nonGeoFeaturesRepoMock.find.mockResolvedValueOnce(
-//       getValidNonGeoData(scenarioId),
-//     );
-//     // Act
-//     result = await sut.findAll({
-//       filter: {
-//         scenarioId,
-//       },
-//     });
-//   });
-//
-//   it(`gets expected output`, () => {
-//     expect(result).toMatchInlineSnapshot(`
-//       Array [
-//         Array [
-//           Object {
-//             "description": "scenario-desc",
-//             "featureid": "feature-uuid-1-criteria-met",
-//             "id": "scenarioId",
-//             "met": 60,
-//             "name": "feature-name",
-//             "onTarget": true,
-//             "projectid": "project-uuid-1",
-//             "tag": "scenario-1-tag",
-//             "target": 50,
-//             "targetArea": 10000,
-//           },
-//           Object {
-//             "description": "scenario-desc",
-//             "featureid": "feature-uuid-2-criteria-failed",
-//             "id": "scenarioId",
-//             "met": 40,
-//             "name": "feature-name",
-//             "onTarget": false,
-//             "projectid": "project-uuid-1",
-//             "tag": "scenario-1-tag",
-//             "target": 50,
-//             "targetArea": 5000,
-//           },
-//         ],
-//         2,
-//       ]
-//     `);
-//   });
-// });
-//
-// // May be useful for other specs
+import { ScenarioFeaturesService } from './scenario-features.service';
+import { Repository } from 'typeorm';
+import { RemoteScenarioFeaturesData } from './entities/remote-scenario-features-data.geo.entity';
+import { Test } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { remoteConnectionName } from './entities/remote-connection-name';
+import { fakeQueryBuilder } from '../../utils/__mocks__/fake-query-builder';
+import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
+import { GeoFeature } from '../geo-features/geo-feature.api.entity';
+import {
+  getValidGeoFeature,
+  getValidNonGeoData,
+  getValidRemoteFeatureData,
+} from './__mocks__/scenario-features.view-data';
+
+let sut: ScenarioFeaturesService;
+let geoFeatureRepoMock: jest.Mocked<Repository<GeoFeature>>;
+let geoRemoteFeaturesRepoMock: jest.Mocked<Repository<RemoteFeaturesData>>;
+
+let fakeResultResolver: jest.Mock;
+
+beforeAll(async () => {
+  fakeResultResolver = jest.fn();
+  const geoFeatureToken = getRepositoryToken(GeoFeature);
+  const geoRemoteScenarioFeaturesRepoToken = getRepositoryToken(
+    RemoteScenarioFeaturesData,
+    remoteConnectionName,
+  );
+  const geoRemoteFeaturesRepoToken = getRepositoryToken(
+    RemoteFeaturesData,
+    remoteConnectionName,
+  );
+  const sandbox = await Test.createTestingModule({
+    providers: [
+      {
+        provide: geoRemoteScenarioFeaturesRepoToken,
+        useValue: {
+          metadata: {
+            name: 'required-by-base-service-for-logging',
+          },
+          createQueryBuilder: () => fakeQueryBuilder(fakeResultResolver),
+        },
+      },
+      {
+        provide: geoFeatureToken,
+        useValue: {
+          find: jest.fn(),
+        },
+      },
+      {
+        provide: geoRemoteFeaturesRepoToken,
+        useValue: {
+          find: jest.fn(),
+        },
+      },
+      ScenarioFeaturesService,
+    ],
+  }).compile();
+
+  sut = sandbox.get(ScenarioFeaturesService);
+  geoFeatureRepoMock = sandbox.get(geoFeatureToken);
+  geoRemoteFeaturesRepoMock = sandbox.get(geoRemoteFeaturesRepoToken);
+});
+
+describe(`when looking for a scenario's features`, () => {
+  const scenarioId = `scenarioId`;
+  let result: unknown;
+  beforeEach(async () => {
+    // Asset
+    fakeResultResolver.mockResolvedValue(getValidNonGeoData(scenarioId));
+    geoFeatureRepoMock.find.mockResolvedValueOnce(getValidGeoFeature());
+    geoRemoteFeaturesRepoMock.find.mockResolvedValueOnce(
+      getValidRemoteFeatureData(),
+    );
+    // Act
+    result = await sut.findAll({
+      filter: {
+        scenarioId,
+      },
+    });
+  });
+
+  it(`gets expected output`, () => {
+    expect(result).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          Object {
+            "coverageTarget": 50,
+            "coverageTargetArea": 10000,
+            "current_pa": "12000",
+            "description": "feature-desc-1",
+            "feature_class_id": "feature-uuid-1-criteria-met",
+            "fpf": 1,
+            "id": "some-id",
+            "met": 60,
+            "metArea": 12000,
+            "name": "feature-alias-1",
+            "onTarget": true,
+            "scenario_id": "scenarioId",
+            "tag": "bioregional",
+            "target": 50,
+            "target2": 0,
+            "totalArea": 20000,
+            "total_area": "20000",
+          },
+          Object {
+            "coverageTarget": 50,
+            "coverageTargetArea": 5000,
+            "current_pa": "4000",
+            "description": "feature-desc-2",
+            "feature_class_id": "feature-uuid-2-criteria-failed",
+            "fpf": 1,
+            "id": "some-another-id",
+            "met": 40,
+            "metArea": 4000,
+            "name": "feature-alias-2",
+            "onTarget": false,
+            "scenario_id": "scenarioId",
+            "tag": "species",
+            "target": 50,
+            "target2": 0,
+            "totalArea": 10000,
+            "total_area": "10000",
+          },
+        ],
+        2,
+      ]
+    `);
+  });
+});
