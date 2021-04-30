@@ -25,11 +25,11 @@ export class FeaturesController<T> {
   constructor(public service: FeatureService) {}
 
   @ApiOperation({
-    description: 'Get tile for administrative areas within a given country.',
+    description: 'Get tile for a feature by id.',
   })
   @ApiParam({
     name: 'z',
-    description: 'The zoom level ranging from 0 - 12',
+    description: 'The zoom level ranging from 0 - 20',
     type: Number,
     required: true,
   })

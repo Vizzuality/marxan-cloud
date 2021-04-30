@@ -25,7 +25,7 @@ export class ProtectedAreasController<T> {
   constructor(public service: ProtectedAreasService) {}
 
   @ApiOperation({
-    description: 'Get tile for administrative areas within a given country.',
+    description: 'Get tile for protected areas.',
   })
   @ApiParam({
     name: 'z',
@@ -47,10 +47,10 @@ export class ProtectedAreasController<T> {
   })
   @ApiQuery({
     name: 'wdpaid',
-    description: 'Parent country of administrative areas in ISO code',
-    type: String,
+    description: 'Id of WDPA area',
+    type: Number,
     required: false,
-    example: 'BRA.1',
+    example: '555569775',
   })
   @Get('/protected-areas/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
