@@ -14,6 +14,7 @@ import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 import { RemoteScenarioFeaturesData } from './entities/remote-scenario-features-data.geo.entity';
 import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 import { UserSearchCriteria } from './search-criteria';
+import { AppConfig } from 'utils/config.utils';
 
 @Injectable()
 export class ScenarioFeaturesService extends AppBaseService<
@@ -30,7 +31,9 @@ export class ScenarioFeaturesService extends AppBaseService<
     @InjectRepository(RemoteScenarioFeaturesData, remoteConnectionName)
     private readonly remoteScenarioFeatures: Repository<RemoteScenarioFeaturesData>,
   ) {
-    super(remoteScenarioFeatures, 'scenario_features', 'scenario_feature');
+    super(remoteScenarioFeatures, 'scenario_features', 'scenario_feature', {
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
 
   setFilters(

@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -18,6 +18,7 @@ import { Country } from 'modules/countries/country.geo.entity';
 import { AdminArea } from 'modules/admin-areas/admin-area.geo.entity';
 import { AdminAreasService } from 'modules/admin-areas/admin-areas.service';
 import { CountriesService } from 'modules/countries/countries.service';
+import { AppConfig } from 'utils/config.utils';
 
 const projectFilterKeyNames = [
   'name',
@@ -39,7 +40,6 @@ export class ProjectsService extends AppBaseService<
   UpdateProjectDTO,
   AppInfoDTO
 > {
-  private readonly logger = new Logger(ProjectsService.name);
   constructor(
     @InjectRepository(Project)
     protected readonly repository: Repository<Project>,
@@ -53,7 +53,9 @@ export class ProjectsService extends AppBaseService<
     @Inject(PlanningUnitsService)
     private readonly planningUnitsService: PlanningUnitsService,
   ) {
-    super(repository, 'project', 'projects');
+    super(repository, 'project', 'projects', {
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
 
   get serializerConfig(): JSONAPISerializerConfig<Project> {

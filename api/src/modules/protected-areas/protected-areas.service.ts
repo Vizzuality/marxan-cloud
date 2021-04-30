@@ -1,6 +1,6 @@
 import { BaseServiceResource } from 'types/resource.interface';
 
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -22,6 +22,7 @@ import {
 import { AdminAreasService } from 'modules/admin-areas/admin-areas.service';
 import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
 import { apiConnections } from '../../ormconfig';
+import { AppConfig } from 'utils/config.utils';
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -66,13 +67,13 @@ export class ProtectedAreasService extends AppBaseService<
   UpdateProtectedAreaDTO,
   AppInfoDTO
 > {
-  private readonly logger = new Logger(ProtectedAreasService.name);
-
   constructor(
     @InjectRepository(ProtectedArea, apiConnections.geoprocessingDB.name)
     protected readonly repository: Repository<ProtectedArea>,
   ) {
-    super(repository, 'protected_area', 'protected_areas');
+    super(repository, 'protected_area', 'protected_areas', {
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
 
   setFilters(

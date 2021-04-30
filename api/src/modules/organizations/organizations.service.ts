@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -12,6 +12,7 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
+import { AppConfig } from 'utils/config.utils';
 
 const organizationFilterKeyNames = ['name'] as const;
 type OrganizationFilterKeys = keyof Pick<
@@ -27,14 +28,14 @@ export class OrganizationsService extends AppBaseService<
   UpdateOrganizationDTO,
   AppInfoDTO
 > {
-  private readonly logger = new Logger(OrganizationsService.name);
-
   constructor(
     @InjectRepository(Organization)
     protected readonly repository: Repository<Organization>,
     @Inject(UsersService) private readonly usersService: UsersService,
   ) {
-    super(repository, 'organization', 'organizations');
+    super(repository, 'organization', 'organizations', {
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
 
   get serializerConfig(): JSONAPISerializerConfig<Organization> {

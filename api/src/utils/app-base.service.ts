@@ -1,4 +1,8 @@
-import { BaseService, FetchSpecification } from 'nestjs-base-service';
+import {
+  BaseService,
+  BaseServiceOptions,
+  FetchSpecification,
+} from 'nestjs-base-service';
 
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -67,9 +71,9 @@ export abstract class AppBaseService<
     protected readonly repository: Repository<Entity>,
     protected alias: string = 'base_entity',
     protected pluralAlias: string = 'base_entities',
-    protected idProperty: string = 'id',
+    protected serviceOptions: BaseServiceOptions,
   ) {
-    super(repository, alias, idProperty);
+    super(repository, alias, serviceOptions);
   }
 
   /**
