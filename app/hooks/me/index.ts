@@ -33,7 +33,7 @@ export function useMe() {
   return useMemo(() => {
     return {
       ...query,
-      user: data,
+      user: data.data,
     };
   }, [query, data]);
 }

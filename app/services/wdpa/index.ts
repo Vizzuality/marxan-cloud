@@ -9,7 +9,10 @@ const WDPA = axios.create({
   transformResponse: (data) => {
     try {
       const parsedData = JSON.parse(data);
-      return dataFormatter.deserialize(parsedData);
+      return {
+        data: dataFormatter.deserialize(parsedData),
+        meta: parsedData.meta,
+      };
     } catch (error) {
       return data;
     }
