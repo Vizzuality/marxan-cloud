@@ -11,10 +11,7 @@ import { AppInfoDTO } from '../../dto/info.dto';
 
 import { remoteConnectionName } from './entities/remote-connection-name';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
-import {
-  RemoteScenarioFeaturesData,
-  remoteScenarioFeaturesDataViewName,
-} from './entities/remote-scenario-features-data.geo.entity';
+import { RemoteScenarioFeaturesData } from './entities/remote-scenario-features-data.geo.entity';
 import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 
 @Injectable()
@@ -39,9 +36,12 @@ export class ScenarioFeaturesService extends AppBaseService<
     query: SelectQueryBuilder<RemoteScenarioFeaturesData>,
     filters?: FiltersSpecification['filter'],
   ): SelectQueryBuilder<RemoteScenarioFeaturesData> {
-    return query.andWhere(`${this.alias}.scenario_id = :scenarioId`, {
-      scenarioId: filters?.scenarioId,
-    });
+    if (filters?.scenarioId) {
+      return query.andWhere(`${this.alias}.scenario_id = :scenarioId`, {
+        scenarioId: filters?.scenarioId,
+      });
+    }
+    return query;
   }
 
   async extendFindAllResults(

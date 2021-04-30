@@ -2,7 +2,6 @@ import { INestApplication } from '@nestjs/common';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { WhenUserGetsScenarioGapAnalysis } from '../steps/when-user-gets-scenario-gap-analysis';
 import { bootstrapApplication } from '../utils/api-application';
-import { RemoteScenarioFeaturesData } from '../../src/modules/scenarios-features/entities/remote-scenario-features-data.geo.entity';
 import { WhenScenarioHasPreGapData } from './steps/when-scenario-has-pre-gap-data';
 
 let app: INestApplication;
@@ -20,12 +19,10 @@ afterAll(async () => {
 describe(`when user is logged in`, () => {
   describe(`when scenario exists`, () => {
     let scenarioId: string;
-    let featuresData: RemoteScenarioFeaturesData[];
 
     beforeEach(async () => {
       const seeds = await WhenScenarioHasPreGapData(app);
       scenarioId = seeds.scenarioId;
-      featuresData = seeds.featuresData;
     });
 
     describe(`when getting scenario's gap analysis`, () => {
