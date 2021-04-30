@@ -16,10 +16,9 @@ import { Request, Response } from 'express';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags('AdminArea vector tile proxy')
+@ApiTags('Vector tile proxy')
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class ProxyController {
-
   constructor(private readonly proxyService: ProxyService) {}
 
   @ApiOperation({
@@ -67,13 +66,98 @@ export class ProxyController {
     required: false,
     example: 'BRA.1',
   })
-  /**
-   *
-   *@todo parse level from admin areas entity
-   *@todo add level validation here in proxy service. Duplicated on the geoprocessing api.
-   */
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
-  async proxyTile(@Req() request: Request, @Res() response: Response) {
+  async proxyAdminAreaTile(@Req() request: Request, @Res() response: Response) {
+    return this.proxyService.proxyTileRequest(request, response);
+  }
+
+  @ApiOperation({
+    description: 'Get tile for protected areas.',
+  })
+  /**
+   *@todo Change ApiOkResponse mvt type
+   */
+  @ApiOkResponse({
+    type: 'mvt',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiQuery({
+    name: 'wdpaid',
+    description: 'Id of WDPA area',
+    type: Number,
+    required: false,
+    example: '5555697751',
+  })
+  @Get('/protected-areas/preview/tiles/:z/:x/:y.mvt')
+  async proxyProtectedAreaTile(
+    @Req() request: Request,
+    @Res() response: Response,
+  ) {
+    return this.proxyService.proxyTileRequest(request, response);
+  }
+
+  @ApiOperation({
+    description: 'Get tile for a feature by id.',
+  })
+  /**
+   *@todo Change ApiOkResponse mvt type
+   */
+  @ApiOkResponse({
+    type: 'mvt',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Specific id of the feature',
+    type: String,
+    required: true,
+  })
+  @ApiQuery({
+    name: 'extentId',
+    description: 'Extent of the project',
+    type: Number,
+    required: false,
+  })
+  @Get('/features/:id/preview/tiles/:z/:x/:y.mvt')
+  async proxyFeaturesTile(@Req() request: Request, @Res() response: Response) {
     return this.proxyService.proxyTileRequest(request, response);
   }
 }
