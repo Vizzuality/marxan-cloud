@@ -73,6 +73,10 @@ orchestrated via Kubernetes (forthcoming).
      Redis service should listen on the local machine
    * `REDIS_COMMANDER_PORT` (number, required): the port on which the
      Redis Commander service should listen on the local machine
+   * `API_LOGGING_MUTE_ALL` (boolean, optional, default is `false`): can be used
+     to mute all logging (for example, in CI pipelines) irrespective of Node
+     environment and other settings that would normally affect the logging
+     verbosity of the API
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted
