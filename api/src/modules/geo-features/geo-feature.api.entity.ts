@@ -33,7 +33,7 @@ export class GeoFeature {
 
   @ApiPropertyOptional()
   @Column('varchar')
-  description?: string;
+  description?: string | null;
 
   @ApiPropertyOptional()
   /**
@@ -46,7 +46,7 @@ export class GeoFeature {
 
   @ApiPropertyOptional()
   @Column('varchar')
-  alias?: string;
+  alias?: string | null;
 
   @ApiPropertyOptional()
   @Column('varchar', { name: 'property_name' })

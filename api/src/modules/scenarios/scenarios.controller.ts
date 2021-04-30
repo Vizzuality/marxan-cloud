@@ -34,11 +34,12 @@ import {
 } from 'decorators/json-api-parameters.decorator';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
-import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
-import { ScenarioFeaturesService } from '../scenarios-features';
 
-@UseGuards(JwtAuthGuard)
+import { ScenarioFeaturesService } from '../scenarios-features';
+import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
+
+// @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
@@ -115,19 +116,22 @@ export class ScenariosController {
     return await this.service.remove(id);
   }
 
-  @ApiOperation({})
+  @ApiOperation({ description: `Resolve scenario's features pre-gap data.` })
   @ApiOkResponse({
-    type: ScenarioFeatureResultDto,
+    type: RemoteScenarioFeaturesData,
   })
   @Get(':id/scenarios-features')
   async getScenarioFeatures(
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ScenarioFeatureResultDto> {
-    const features = await this.scenarioFeatures.findAll({
-      filter: {
-        scenarioId: id,
-      },
-    });
-    return this.scenarioFeatures.serialize(features[0]);
+  ): Promise<Partial<RemoteScenarioFeaturesData>[]> {
+    return this.scenarioFeatures.serialize(
+      (
+        await this.scenarioFeatures.findAll({
+          filter: {
+            scenarioId: id,
+          },
+        })
+      )[0],
+    );
   }
 }

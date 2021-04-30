@@ -1,39 +1,21 @@
-import { ViewColumn, ViewEntity } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-@ViewEntity({
-  name: `scenario_features_view`,
-})
 export class ScenariosFeaturesView {
-  @ViewColumn()
-  id?: string | null;
-
-  @ViewColumn()
-  projectid?: string | null;
-
-  // public
-  @ApiPropertyOptional()
-  @ViewColumn()
-  featureid?: string | null;
+  @ApiProperty()
+  featureId!: string;
 
   @ApiPropertyOptional()
-  @ViewColumn()
   tag?: string | null;
 
   @ApiPropertyOptional({
     description: `Name of the feature, for example \`Lion in Deserts\`.`,
   })
-  @ViewColumn()
   name?: string | null;
 
   @ApiPropertyOptional({
     description: `Description of the feature.`,
   })
-  @ViewColumn()
   description?: string | null;
-
-  // extended by service based on geoprocessing db
-  // ---
 
   @ApiProperty({
     description: `0-100 (%) value of target protection coverage of all available species.`,
