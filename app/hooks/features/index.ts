@@ -69,8 +69,12 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
 
   const query = useInfiniteQuery(['all-features', projectId, JSON.stringify(options)], fetchFeatures, {
     placeholderData: placeholderDataRef.current,
-    getNextPageParam: (lastPage, pages) => {
-      return pages.length + 1;
+    getNextPageParam: (lastPage) => {
+      const { data: { meta } } = lastPage;
+      const { page, totalPages } = meta;
+
+      const nextPage = page + 1 > totalPages ? null : page + 1;
+      return nextPage;
     },
   });
 
@@ -83,7 +87,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
 
   return useMemo(() => {
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: pageData } = p;
+      const { data: { data: pageData } } = p;
 
       return pageData.map((d):AllItemProps => {
         const {

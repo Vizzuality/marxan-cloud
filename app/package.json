@@ -46,7 +46,7 @@
     "final-form": "^4.20.1",
     "framer-motion": "^3.9.1",
     "fuse.js": "^6.4.6",
-    "jsona": "^1.8.0",
+    "jsona": "^1.9.2",
     "jsonwebtoken": "^8.5.1",
     "layer-manager": "3.0.9",
     "lodash": "^4.17.20",
