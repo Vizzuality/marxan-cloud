@@ -38,7 +38,7 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
   const { data } = query;
 
   return useMemo(() => {
-    let parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
+    let parsedData = Array.isArray(data?.data?.data) ? data?.data?.data.map((d):ItemProps => {
       const {
         id, name, description, scenarios, lastModifiedAt,
       } = d;
@@ -101,7 +101,7 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
       ...query,
       data: parsedData,
     };
-  }, [query, data?.data, search, push]);
+  }, [query, data?.data?.data, search, push]);
 }
 
 export function useProject(id) {
@@ -125,9 +125,9 @@ export function useProject(id) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data,
+      data: data?.data?.data,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data?.data]);
 }
 
 export function useSaveProject({

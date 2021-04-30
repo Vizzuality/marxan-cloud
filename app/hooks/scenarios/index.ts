@@ -39,7 +39,7 @@ export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
   const { data } = query;
 
   return useMemo(() => {
-    let parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
+    let parsedData = Array.isArray(data?.data?.data) ? data?.data?.data.map((d):ItemProps => {
       const {
         id, projectId, name, lastModifiedAt,
       } = d;
@@ -83,9 +83,9 @@ export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
     return {
       ...query,
       data: parsedData,
-      rawData: data?.data,
+      rawData: data?.data?.data,
     };
-  }, [query, data?.data, search, push]);
+  }, [query, data?.data?.data, search, push]);
 }
 
 export function useScenario(id) {
@@ -106,9 +106,9 @@ export function useScenario(id) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data,
+      data: data?.data?.data,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data?.data]);
 }
 
 export function useSaveScenario({

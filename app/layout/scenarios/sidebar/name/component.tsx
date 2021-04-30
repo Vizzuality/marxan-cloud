@@ -47,7 +47,7 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
         projectId: pid,
       },
     }, {
-      onSuccess: ({ data: s }) => {
+      onSuccess: ({ data: { data: s } }) => {
         addToast('success-scenario-create', (
           <>
             <h2 className="font-medium">Success!</h2>

@@ -32,7 +32,7 @@ export function useCountries(filters: UseCountriesProps): UseCountriesResponse {
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data?.data) ? data?.data : [];
+    const parsedData = Array.isArray(data?.data?.data) ? data?.data?.data : [];
     const countries: Country[] = parsedData.map((c) => ({
       name: c.name0,
       id: c.gid0,
@@ -42,7 +42,7 @@ export function useCountries(filters: UseCountriesProps): UseCountriesResponse {
       ...query,
       data: countries,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data?.data]);
 }
 
 export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegionsResponse {
@@ -68,7 +68,7 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data?.data) ? data?.data : [];
+    const parsedData = Array.isArray(data?.data?.data) ? data?.data?.data : [];
 
     const regions: Region[] = parsedData.map((r) => ({
       name: r.name1,
@@ -80,5 +80,5 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
       ...query,
       data: regions,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data?.data]);
 }
