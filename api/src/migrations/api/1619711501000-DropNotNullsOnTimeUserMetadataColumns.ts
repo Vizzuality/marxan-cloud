@@ -7,7 +7,7 @@ export class DropNotNullsOnTimeUserMetadataColumns1619711501000
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await Promise.all(
-      this.tablesToAlter.map(table => {
+      this.tablesToAlter.map((table) => {
         queryRunner.query(`
 ALTER TABLE ${table}
   ALTER COLUMN created_at DROP NOT NULL,

@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { DeleteResult, Repository } from 'typeorm';
@@ -21,6 +21,7 @@ import {
 import { CreateApiEventDTO } from './dto/create.api-event.dto';
 import { UpdateApiEventDTO } from './dto/update.api-event.dto';
 import { AppInfoDTO } from 'dto/info.dto';
+import { AppConfig } from 'utils/config.utils';
 
 @Injectable()
 /**
@@ -32,14 +33,14 @@ export class ApiEventsService extends AppBaseService<
   UpdateApiEventDTO,
   AppInfoDTO
 > {
-  private readonly logger = new Logger(ApiEventsService.name);
-
   constructor(
     @InjectRepository(ApiEvent) readonly repo: Repository<ApiEvent>,
     @InjectRepository(LatestApiEventByTopicAndKind)
     readonly latestEventByTopicAndKindRepo: Repository<LatestApiEventByTopicAndKind>,
   ) {
-    super(repo, apiEventResource.name.singular, apiEventResource.name.plural);
+    super(repo, apiEventResource.name.singular, apiEventResource.name.plural, {
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
   get serializerConfig(): JSONAPISerializerConfig<ApiEvent> {
     return {

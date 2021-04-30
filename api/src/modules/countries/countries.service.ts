@@ -12,6 +12,7 @@ import {
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
 import { apiConnections } from '../../ormconfig';
+import { AppConfig } from 'utils/config.utils';
 
 @Injectable()
 export class CountriesService extends AppBaseService<
@@ -24,7 +25,10 @@ export class CountriesService extends AppBaseService<
     @InjectRepository(Country, apiConnections.geoprocessingDB.name)
     private readonly countriesRepository: Repository<Country>,
   ) {
-    super(countriesRepository, 'country', 'countries', 'gid0');
+    super(countriesRepository, 'country', 'countries', {
+      idProperty: 'gid0',
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
 
   get serializerConfig(): JSONAPISerializerConfig<Country> {

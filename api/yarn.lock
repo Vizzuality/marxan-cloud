@@ -879,15 +879,17 @@
   dependencies:
     "@types/node" "*"
 
-"@types/ioredis@^4.16.3":
-  version "4.22.1"
-  resolved "https://registry.yarnpkg.com/@types/ioredis/-/ioredis-4.22.1.tgz#e03b064189ab20c9edc95ccde6228d2bf81f538c"
-  integrity sha512-GxXT828fkvBeThO68ZJg8cD2haqea5ANBJaxA+UZqLranNkEnQ8N7QLPtykwWbN/sRQz75O7kj+PNmCKF4CEKw==
-
 "@types/http-proxy@^1.17.5":
   version "1.17.5"
   resolved "https://registry.yarnpkg.com/@types/http-proxy/-/http-proxy-1.17.5.tgz#c203c5e6e9dc6820d27a40eb1e511c70a220423d"
   integrity sha512-GNkDE7bTv6Sf8JbV2GksknKOsk7OznNYHSdrtvPJXO0qJ9odZig6IZKUi5RFGi6d1bf6dgIAe4uXi3DBc7069Q==
+  dependencies:
+    "@types/node" "*"
+
+"@types/ioredis@^4.16.3":
+  version "4.22.1"
+  resolved "https://registry.yarnpkg.com/@types/ioredis/-/ioredis-4.22.1.tgz#e03b064189ab20c9edc95ccde6228d2bf81f538c"
+  integrity sha512-GxXT828fkvBeThO68ZJg8cD2haqea5ANBJaxA+UZqLranNkEnQ8N7QLPtykwWbN/sRQz75O7kj+PNmCKF4CEKw==
   dependencies:
     "@types/node" "*"
 
@@ -5357,10 +5359,10 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nestjs-base-service@0.5.2:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.5.2.tgz#4d35ec293ad265c18e3c35d38e730ae7164c9973"
-  integrity sha512-LnawCNq/XJfxeOTIi8x8YFNdAF3JC2xpJ10E2w86SL/366u+F4mbOF8u68xr6xlIf0FaLcKtvXsXrQt8hKQtKg==
+nestjs-base-service@0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.6.0.tgz#dac2cfdb987d6f5b44e814459dd69bd770a3c807"
+  integrity sha512-ZxPmUdyyzm9Bf0lfsxL0L3N9OQPHKJ6ZcyaaB1l0kZK0tgoqqWg4HLkvPDViWCmCLAeO3pptrJ3OOcKP9vlWSw==
   dependencies:
     "@nestjs/common" "7.6.5"
     class-validator "0.13.1"

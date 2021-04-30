@@ -16,6 +16,7 @@ import { Project } from 'modules/projects/project.api.entity';
 import { ProtectedAreasService } from 'modules/protected-areas/protected-areas.service';
 import { ProjectsService } from 'modules/projects/projects.service';
 import { concat } from 'lodash';
+import { AppConfig } from 'utils/config.utils';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
@@ -31,8 +32,6 @@ export class ScenariosService extends AppBaseService<
   UpdateScenarioDTO,
   AppInfoDTO
 > {
-  private readonly logger = new Logger(ScenariosService.name);
-
   constructor(
     @InjectRepository(Scenario)
     protected readonly repository: Repository<Scenario>,
@@ -44,7 +43,9 @@ export class ScenariosService extends AppBaseService<
     @Inject(forwardRef(() => ProjectsService))
     protected readonly projectsService: ProjectsService,
   ) {
-    super(repository, 'scenario', 'scenarios');
+    super(repository, 'scenario', 'scenarios', {
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
 
   get serializerConfig(): JSONAPISerializerConfig<Scenario> {
