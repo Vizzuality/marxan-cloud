@@ -135,11 +135,29 @@ describe('JSON API Specs (e2e)', () => {
         organizationId: fakeOrganization.id,
       });
 
-    console.log('MY RESPONSE', response.body);
-
     expect(typeof response.body).toBe('object');
     expect(Object.keys(response.body)).toHaveLength(1);
     expect(response.body.hasOwnProperty('data')).toBe(true);
     expect(typeof response.body.data).toBe('object');
+  });
+
+  it('should include pagination metadata as a paginated response', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${fakeProject.id}/features`)
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .send({
+        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+          countryCode: fakeCountry,
+        }),
+        organizationId: fakeOrganization.id,
+      });
+
+    expect(response.body.hasOwnProperty('meta')).toBe(true);
+    expect(Object.keys(response.body.meta)).toEqual([
+      'totalItems',
+      'totalPages',
+      'size',
+      'page',
+    ]);
   });
 });

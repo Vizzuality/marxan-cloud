@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Query,
@@ -81,6 +82,8 @@ export class ProjectsController {
         },
       },
     );
+
+    Logger.log(results.metadata);
 
     return this.geoFeaturesService.serialize(results.data, results.metadata);
   }

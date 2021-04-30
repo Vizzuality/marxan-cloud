@@ -5,6 +5,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { DEFAULT_PAGINATION } from 'nestjs-base-service';
 import { castArray } from 'lodash';
+import { Logger } from '@nestjs/common';
 
 export class PaginationMeta {
   totalPages: number;
