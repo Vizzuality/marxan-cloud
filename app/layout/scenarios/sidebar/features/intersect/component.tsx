@@ -37,7 +37,7 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
   } = useAllFeatures(pid, {
     search,
     filters: {
-      // tag: 'bioregional',
+      tag: 'bioregional',
     },
   });
 

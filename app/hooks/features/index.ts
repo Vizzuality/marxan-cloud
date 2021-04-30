@@ -1,5 +1,5 @@
 import Fuse from 'fuse.js';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import {
   useQuery, useInfiniteQuery, useMutation, useQueryClient,
 } from 'react-query';
@@ -29,6 +29,10 @@ import {
 interface AllItemProps extends IntersectItemProps, RawItemProps {}
 
 export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
+  const placeholderDataRef = useRef({
+    pages: [],
+    pageParams: [],
+  });
   const [session] = useSession();
 
   const {
@@ -64,17 +68,26 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
   });
 
   const query = useInfiniteQuery(['all-features', projectId, JSON.stringify(options)], fetchFeatures, {
-    getNextPageParam: (lastPage, pages) => {
-      return pages.length + 1;
+    placeholderData: placeholderDataRef.current,
+    getNextPageParam: (lastPage) => {
+      const { data: { meta } } = lastPage;
+      const { page, totalPages } = meta;
+
+      const nextPage = page + 1 > totalPages ? null : page + 1;
+      return nextPage;
     },
   });
 
   const { data } = query;
   const { pages } = data || {};
 
+  if (data) {
+    placeholderDataRef.current = data;
+  }
+
   return useMemo(() => {
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: pageData } = p;
+      const { data: { data: pageData } } = p;
 
       return pageData.map((d):AllItemProps => {
         const {
@@ -215,9 +228,9 @@ export function useSelectedFeatures(filters: UseFeaturesFiltersProps = {}) {
     return {
       ...query,
       data: parsedData,
-      rawData: data?.data,
+      rawData: data?.data?.data,
     };
-  }, [query, data?.data, search]);
+  }, [query, data?.data?.data, search]);
 }
 
 export function useTargetedFeatures() {
@@ -306,9 +319,9 @@ export function useFeature(id) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data,
+      data: data?.data?.data,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data?.data]);
 }
 
 export function useSaveFeature({

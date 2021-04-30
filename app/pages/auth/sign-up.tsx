@@ -1,8 +1,12 @@
 import React from 'react';
 import Head from 'next/head';
 
+import { withUser } from 'hoc/auth';
+
 import Header from 'layout/header';
 import SignUp from 'layout/sign-up';
+
+export const getServerSideProps = withUser();
 
 const SignUpPage: React.FC = () => {
   return (
