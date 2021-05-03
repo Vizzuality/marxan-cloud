@@ -29,14 +29,14 @@ export interface GeoFeatureRecipe
 }
 
 @Entity('feature_sets')
-export class GeoFeatureSets {
+export class GeoFeatureSet {
   @ApiProperty()
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @ApiProperty()
   @Column('varchar')
-  status: JobStatus | 'draft';
+  status!: JobStatus | 'draft';
 
   @ApiPropertyOptional()
   @Column('jsonb', { array: true })
@@ -48,13 +48,13 @@ export class JSONAPIGeoFeatureSetsData {
   type = geoFeatureResource.name.plural;
 
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  attributes: GeoFeatureSets;
+  attributes!: GeoFeatureSet;
 }
 
 export class GeoFeatureSetResult {
   @ApiProperty()
-  data: JSONAPIGeoFeatureSetsData;
+  data!: JSONAPIGeoFeatureSetsData;
 }
