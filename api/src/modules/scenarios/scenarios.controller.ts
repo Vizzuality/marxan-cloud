@@ -9,7 +9,9 @@ import {
   Patch,
   Post,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import {
@@ -40,6 +42,7 @@ import {
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { ScenarioFeaturesService } from '../scenarios-features';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
@@ -105,7 +108,12 @@ export class ScenariosController {
       await this.service.create(dto, { authenticatedUser: req.user }),
     );
   }
-
+  @ApiOperation({ description: 'Upload Lock-In Shapefile' })
+  @Post(':id/geometries/planning-unit-lock-in')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadLockInShapeFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+  }
   @ApiOperation({ description: 'Update scenario' })
   @ApiOkResponse({ type: ScenarioResult })
   @Patch(':id')
