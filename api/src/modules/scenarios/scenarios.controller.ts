@@ -144,7 +144,7 @@ export class ScenariosController {
     description: "Create the specification for a scenario's feature set",
   })
   @ApiOkResponse()
-  @Post(':id/features')
+  @Post(':id/features/specification')
   async createFeatureSetForScenario(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
@@ -156,7 +156,7 @@ export class ScenariosController {
     description: "Replace the specification for a scenario's feature set",
   })
   @ApiOkResponse()
-  @Put(':id/features')
+  @Put(':id/features/specification')
   async replaceFeatureSetForScenario(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
