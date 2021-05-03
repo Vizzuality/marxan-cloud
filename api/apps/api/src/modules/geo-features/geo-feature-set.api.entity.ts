@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { JobStatus } from 'modules/scenarios/scenario.api.entity';
+import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { BaseServiceResource } from 'types/resource.interface';
+import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import { GeoFeature } from './geo-feature.api.entity';
 
 export const geoFeatureResource: BaseServiceResource = {

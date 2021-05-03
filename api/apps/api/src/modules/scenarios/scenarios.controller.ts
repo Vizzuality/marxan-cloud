@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  Put,
   Req,
   Res,
   UploadedFile,
@@ -22,6 +23,9 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
+import { CreateGeoFeatureSetDTO } from '@marxan-api/modules/geo-features/dto/create.geo-feature-set.dto';
+import { GeoFeatureSetResult } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 
 import {
   ApiAcceptedResponse,
@@ -74,7 +78,8 @@ const marxanRunFiles = 'Marxan Run - Files';
 @Controller(basePath)
 export class ScenariosController {
   constructor(
-    private readonly service: ScenariosService,
+    public readonly service: ScenariosService,
+    private readonly geoFeaturesService: GeoFeaturesService,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
@@ -460,5 +465,28 @@ export class ScenariosController {
   ): Promise<void> {
     await this.service.getCostSurfaceCsv(id, res);
     return;
+  }
+
+  @ApiOperation({
+    description: "Create the specification for a scenario's feature set",
+  })
+  @ApiOkResponse()
+  @Post(':id/features/specification')
+  async createFeatureSetForScenario(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
+  ): Promise<GeoFeatureSetResult> {
+    return await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto);
+  }
+  @ApiOperation({
+    description: "Replace the specification for a scenario's feature set",
+  })
+  @ApiOkResponse()
+  @Put(':id/features/specification')
+  async replaceFeatureSetForScenario(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
+  ): Promise<GeoFeatureSetResult> {
+    return await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto);
   }
 }
