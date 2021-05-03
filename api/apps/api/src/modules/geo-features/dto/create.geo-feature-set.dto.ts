@@ -1,4 +1,4 @@
-import { JobStatus } from 'modules/scenarios/scenario.api.entity';
+import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import {
   GeoprocessingOpSplitV1,
   GeoprocessingOpStratificationV1,

@@ -21,8 +21,8 @@ import {
 } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { apiConnections } from '../../ormconfig';
-import { AppConfig } from 'utils/config.utils';
+import { apiConnections } from '@marxan-api/ormconfig';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 import {
   GeoFeatureSetResult,
   GeoFeatureSet,

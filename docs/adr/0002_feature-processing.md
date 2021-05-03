@@ -138,7 +138,7 @@ section above), users can:
 To create or update the specification of the set of features for a scenario:
 
 ```
-POST|PUT `/api/v1/scenarios/{sid}/features`
+POST|PUT `/api/v1/scenarios/{sid}/features/specification`
 ```
 
 We only support `POST` and `PUT`: the API always expects the full specification.
@@ -235,7 +235,8 @@ GET /api/v1/scenarios/{scenarioId}/features/specification
 ```
 
 The payload (`CreateGeoFeatureSetDTO`) is identical to what is described in the
-previous section (this is actually stored verbatim, except for ).
+previous section (this is actually stored verbatim, except for normalization
+through storing the data in a PostgreSQL JSONB column).
 
 To retrieve the list of features for a scenario, including calculated
 properties:
