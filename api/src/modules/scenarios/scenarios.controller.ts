@@ -110,10 +110,28 @@ export class ScenariosController {
   }
   @ApiOperation({ description: 'Upload Lock-In Shapefile' })
   @Post(':id/geometries/planning-unit-lock-in')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadLockInShapeFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
+  @UseInterceptors(FileInterceptor('lockinShapefile'))
+  async uploadLockInShapeFile(
+    @Param('id') scenarioId: string,
+    @UploadedFile() lockinShapefile: Express.Multer.File,
+  ) {
+    console.log('This is the scenario ID', scenarioId);
+    console.log('This is the file', lockinShapefile);
+    return { scenarioId, lockinShapefile };
   }
+
+  @ApiOperation({ description: 'Upload Lock-Out Shapefile' })
+  @Post(':id/geometries/planning-unit-lock-out')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadLockOutShapeFile(
+    @Param('id') scenarioId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log('This is the scenario ID', scenarioId);
+    console.log('This is the file', file);
+    return { scenarioId, file };
+  }
+
   @ApiOperation({ description: 'Update scenario' })
   @ApiOkResponse({ type: ScenarioResult })
   @Patch(':id')
