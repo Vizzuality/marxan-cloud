@@ -26,6 +26,7 @@ import { ApiEventsModule } from 'modules/api-events/api-events.module';
 import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.module';
 import { ProxyModule } from 'modules/proxy/proxy.module';
 import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/scenarios-planning-unit.module';
+import { AnalysisModule } from './modules/analysis/analysis.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/s
     AuthenticationModule,
     ProxyModule,
     ScenariosPlanningUnitModule,
+    AnalysisModule,
   ],
   controllers: [AppController, PingController],
   providers: [
