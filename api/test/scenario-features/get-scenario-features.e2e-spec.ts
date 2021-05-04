@@ -25,7 +25,7 @@ describe(`when user is logged in`, () => {
       scenarioId = seeds.scenarioId;
     });
 
-    describe(`when getting scenario's gap analysis`, () => {
+    describe.skip(`when getting scenario's gap analysis`, () => {
       let scenarioData: unknown;
       beforeEach(async () => {
         scenarioData = await WhenUserGetsScenarioGapAnalysis(
