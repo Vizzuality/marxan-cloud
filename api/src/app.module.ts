@@ -25,6 +25,7 @@ import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
 import { ApiEventsModule } from 'modules/api-events/api-events.module';
 import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.module';
 import { ProxyModule } from 'modules/proxy/proxy.module';
+import { AnalysisModule } from './modules/analysis/analysis.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { ProxyModule } from 'modules/proxy/proxy.module';
     UsersModule,
     AuthenticationModule,
     ProxyModule,
+    AnalysisModule,
   ],
   controllers: [AppController, PingController],
   providers: [
