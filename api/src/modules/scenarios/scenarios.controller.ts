@@ -6,6 +6,7 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  Post,
   Req,
   UseGuards,
   ValidationPipe,
@@ -13,8 +14,8 @@ import {
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { ScenariosService } from './scenarios.service';
 import {
-  ProcessFetchSpecification,
   FetchSpecification,
+  ProcessFetchSpecification,
 } from 'nestjs-base-service';
 
 import {
@@ -26,7 +27,6 @@ import {
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
 import { JwtAuthGuard } from 'guards/jwt-auth.guard';
-import { Post } from '@nestjs/common';
 
 import {
   JSONAPIQueryParams,
@@ -36,12 +36,18 @@ import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
 
-@UseGuards(JwtAuthGuard)
+import { ScenarioFeaturesService } from '../scenarios-features';
+import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
+
+// @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class ScenariosController {
-  constructor(public readonly service: ScenariosService) {}
+  constructor(
+    public readonly service: ScenariosService,
+    private readonly scenarioFeatures: ScenarioFeaturesService,
+  ) {}
 
   @ApiOperation({
     description: 'Find all scenarios',
@@ -108,5 +114,24 @@ export class ScenariosController {
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
     return await this.service.remove(id);
+  }
+
+  @ApiOperation({ description: `Resolve scenario's features pre-gap data.` })
+  @ApiOkResponse({
+    type: RemoteScenarioFeaturesData,
+  })
+  @Get(':id/features')
+  async getScenarioFeatures(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Partial<RemoteScenarioFeaturesData>[]> {
+    return this.scenarioFeatures.serialize(
+      (
+        await this.scenarioFeatures.findAll(undefined, {
+          params: {
+            scenarioId: id,
+          },
+        })
+      )[0],
+    );
   }
 }

@@ -8,6 +8,7 @@ import { UsersModule } from 'modules/users/users.module';
 import { Project } from 'modules/projects/project.api.entity';
 import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.module';
 import { ProjectsModule } from 'modules/projects/projects.module';
+import { ScenarioFeaturesModule } from '../scenarios-features';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ProjectsModule } from 'modules/projects/projects.module';
     forwardRef(() => ProjectsModule),
     TypeOrmModule.forFeature([Project, Scenario]),
     UsersModule,
+    ScenarioFeaturesModule,
   ],
   providers: [ScenariosService],
   controllers: [ScenariosController],
