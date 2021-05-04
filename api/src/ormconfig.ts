@@ -1,5 +1,6 @@
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { AppConfig } from './utils/config.utils';
+import { DbConnections } from './ormconfig.connections';
 
 /**
  * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs
@@ -12,15 +13,15 @@ import { AppConfig } from './utils/config.utils';
 
 // Somehow, without type annotations here, the type checker complains about
 // this data structure not matching that of `AuroraDataApiConnectionOptions`.
-export const apiConnections: {
-  default: PostgresConnectionOptions;
-  geoprocessingDB: PostgresConnectionOptions;
-} = {
-  default: {
+export const apiConnections: Record<
+  DbConnections,
+  PostgresConnectionOptions
+> = {
+  [DbConnections.default]: {
     // Could be named differently for it to be more descriptive, but keeping
     // this as `default` allows to avoid explicitly specifying the connection in
     // `TypeOrmModule.forFeature()`
-    name: 'default',
+    name: DbConnections.default,
     synchronize: false,
     type: 'postgres',
     url: AppConfig.get('postgresApi.url'),
@@ -50,8 +51,8 @@ export const apiConnections: {
       migrationsDir: 'migrations/api',
     },
   },
-  geoprocessingDB: {
-    name: 'geoprocessingDB',
+  [DbConnections.geoprocessingDB]: {
+    name: DbConnections.geoprocessingDB,
     synchronize: false,
     type: 'postgres',
     url: AppConfig.get('postgresGeoApi.url'),

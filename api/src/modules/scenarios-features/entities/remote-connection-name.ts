@@ -1,3 +1,3 @@
-import { apiConnections } from './../../../ormconfig';
+import { DbConnections } from '../../../ormconfig.connections';
 
-export const remoteConnectionName = apiConnections.geoprocessingDB.name;
+export const remoteConnectionName = DbConnections.geoprocessingDB;
