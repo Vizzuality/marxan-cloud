@@ -126,8 +126,8 @@ export class ScenariosController {
   ): Promise<Partial<RemoteScenarioFeaturesData>[]> {
     return this.scenarioFeatures.serialize(
       (
-        await this.scenarioFeatures.findAll({
-          filter: {
+        await this.scenarioFeatures.findAll(undefined, {
+          params: {
             scenarioId: id,
           },
         })

@@ -13,13 +13,14 @@ import { remoteConnectionName } from './entities/remote-connection-name';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 import { RemoteScenarioFeaturesData } from './entities/remote-scenario-features-data.geo.entity';
 import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
+import { UserSearchCriteria } from './search-criteria';
 
 @Injectable()
 export class ScenarioFeaturesService extends AppBaseService<
   RemoteScenarioFeaturesData,
   never,
   never,
-  AppInfoDTO
+  UserSearchCriteria
 > {
   constructor(
     @InjectRepository(GeoFeature)
@@ -35,10 +36,12 @@ export class ScenarioFeaturesService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<RemoteScenarioFeaturesData>,
     filters?: FiltersSpecification['filter'],
+    info?: UserSearchCriteria,
   ): SelectQueryBuilder<RemoteScenarioFeaturesData> {
-    if (filters?.scenarioId) {
+    const scenarioId = info?.params?.scenarioId;
+    if (scenarioId) {
       return query.andWhere(`${this.alias}.scenario_id = :scenarioId`, {
-        scenarioId: filters?.scenarioId,
+        scenarioId,
       });
     }
     return query;
