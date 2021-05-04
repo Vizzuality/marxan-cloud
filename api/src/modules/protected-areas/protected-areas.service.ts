@@ -21,6 +21,7 @@ import {
 } from './dto/iucn-protected-area-category.dto';
 import { AdminAreasService } from 'modules/admin-areas/admin-areas.service';
 import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
+import { apiConnections } from '../../ormconfig';
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -68,7 +69,7 @@ export class ProtectedAreasService extends AppBaseService<
   private readonly logger = new Logger(ProtectedAreasService.name);
 
   constructor(
-    @InjectRepository(ProtectedArea, 'geoprocessingDB')
+    @InjectRepository(ProtectedArea, apiConnections.geoprocessingDB.name)
     protected readonly repository: Repository<ProtectedArea>,
   ) {
     super(repository, 'protected_area', 'protected_areas');
