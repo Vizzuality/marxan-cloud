@@ -2,9 +2,9 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { FeatureTags } from '../../geo-features/geo-feature.api.entity';
 
-export const remoteScenarioFeaturesDataViewName = 'scenario_features_data';
+export const remoteScenarioFeaturesDataName = 'scenario_features_data';
 
-@Entity(remoteScenarioFeaturesDataViewName)
+@Entity(remoteScenarioFeaturesDataName)
 export class RemoteScenarioFeaturesData {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -22,13 +22,13 @@ export class RemoteScenarioFeaturesData {
   /**
    *  total area of the feature in the study area
    */
-  total_area!: string;
+  total_area!: number;
 
   @Column()
   /**
    *  total area of the feature in the study area
    */
-  current_pa!: string;
+  current_pa!: number;
 
   @ApiProperty({
     description: `Feature Penalty Factor for this feature run.`,

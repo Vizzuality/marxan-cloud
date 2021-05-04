@@ -115,8 +115,8 @@ export class ScenarioFeaturesService extends AppBaseService<
     base: RemoteScenarioFeaturesData,
     assign: GeoFeature,
   ): RemoteScenarioFeaturesData => {
-    const metArea = +(base?.current_pa ?? '0');
-    const totalArea = +(base?.total_area ?? '0');
+    const metArea = base?.current_pa ?? 0;
+    const totalArea = base?.total_area ?? 0;
     const targetPct = (base?.target ?? 0) / 100;
 
     return {

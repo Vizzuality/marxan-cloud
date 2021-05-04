@@ -12,7 +12,7 @@ case "$1" in
         ;;
     test-e2e)
         echo "Running e2e Tests"
-        exec yarn test:e2e get-scenario
+        exec yarn test:e2e
         ;;
     run-migrations-for-e2e-tests)
         echo "Running migrations for e2e Tests"
