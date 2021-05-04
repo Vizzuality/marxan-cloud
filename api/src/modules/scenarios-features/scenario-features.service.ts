@@ -49,7 +49,7 @@ export class ScenarioFeaturesService extends AppBaseService<
   ): Promise<[any[], number]> {
     const scenarioFeaturesData = entitiesAndCount[0] as RemoteScenarioFeaturesData[];
     const featuresDataIds = scenarioFeaturesData.map(
-      (rsfd) => rsfd.feature_class_id,
+      (rsfd) => rsfd.featuresDataId,
     );
 
     if (featuresDataIds.length === 0) {
@@ -66,10 +66,10 @@ export class ScenarioFeaturesService extends AppBaseService<
     });
 
     featureData.forEach((fd) => {
-      featureRelations[fd.id] = fd.feature_id;
+      featureRelations[fd.id] = fd.featureId;
     });
 
-    const featureIds = featureData.map((fd) => fd.feature_id);
+    const featureIds = featureData.map((fd) => fd.featureId);
     const features = await this.features.find({
       where: {
         id: In(featureIds),
@@ -80,7 +80,7 @@ export class ScenarioFeaturesService extends AppBaseService<
       scenarioFeaturesData
         .map((sfd) => {
           const relatedFeature = features.find(
-            (f) => f.id === featureRelations[sfd.feature_class_id],
+            (f) => f.id === featureRelations[sfd.featuresDataId],
           );
 
           if (!relatedFeature) {
@@ -115,8 +115,8 @@ export class ScenarioFeaturesService extends AppBaseService<
     base: RemoteScenarioFeaturesData,
     assign: GeoFeature,
   ): RemoteScenarioFeaturesData => {
-    const metArea = base?.current_pa ?? 0;
-    const totalArea = base?.total_area ?? 0;
+    const metArea = base?.currentArea ?? 0;
+    const totalArea = base?.totalArea ?? 0;
     const targetPct = (base?.target ?? 0) / 100;
 
     return {

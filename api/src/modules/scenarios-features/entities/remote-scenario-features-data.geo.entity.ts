@@ -9,26 +9,23 @@ export class RemoteScenarioFeaturesData {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  /**
-   * well, due to how BasicService works, we cannot use @Column({ name: 'feature_class_id'}) and give property different name
-   */
-  @Column()
-  feature_class_id!: string;
+  @Column({ name: 'feature_class_id' })
+  featuresDataId!: string;
 
-  @Column()
-  scenario_id!: string;
+  @Column({ name: 'scenario_id' })
+  scenarioId!: string;
 
-  @Column()
+  @Column({ name: 'total_area' })
   /**
    *  total area of the feature in the study area
    */
-  total_area!: number;
+  totalArea!: number;
 
-  @Column()
+  @Column({ name: 'current_pa' })
   /**
    *  total area of the feature in the study area
    */
-  current_pa!: number;
+  currentArea!: number;
 
   @ApiProperty({
     description: `Feature Penalty Factor for this feature run.`,
@@ -39,6 +36,9 @@ export class RemoteScenarioFeaturesData {
    */
   fpf!: number;
 
+  @ApiProperty({
+    description: `Total area space, expressed in m^2`,
+  })
   @Column()
   /**
    * target to be met for protection
@@ -70,11 +70,6 @@ export class RemoteScenarioFeaturesData {
     description: `Equivalent of \`target\` percentage in covered area, expressed in m^2`,
   })
   coverageTargetArea!: number;
-
-  @ApiProperty({
-    description: `Total area space, expressed in m^2`,
-  })
-  totalArea!: number;
 
   @ApiProperty({
     description: `0-100 (%) value of how many species % is protected currently.`,

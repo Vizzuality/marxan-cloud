@@ -21,12 +21,12 @@ export const WhenScenarioHasPreGapData = async (
   if (rows.length === 0) {
     throw new Error('Missing scenario_features_data seeds!');
   }
-  const scenarioId = rows[0].scenario_id;
+  const scenarioId = rows[0].scenarioId;
   if (!scenarioId) {
     throw new Error(`Missing scenario ID!`);
   }
   return {
-    featuresData: rows.filter((row) => row.scenario_id === scenarioId),
+    featuresData: rows.filter((row) => row.scenarioId === scenarioId),
     scenarioId,
   };
 };

@@ -7,6 +7,6 @@ export class RemoteFeaturesData {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
-  feature_id!: string;
+  @Column({ name: 'feature_id' })
+  featureId!: string;
 }

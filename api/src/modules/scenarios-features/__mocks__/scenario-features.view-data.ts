@@ -15,11 +15,11 @@ type RawRemoteScenarioFeaturesData = Pick<
   RemoteScenarioFeaturesData,
   | 'id'
   | 'target'
-  | 'scenario_id'
+  | 'scenarioId'
   | 'fpf'
-  | 'feature_class_id'
-  | 'total_area'
-  | 'current_pa'
+  | 'featuresDataId'
+  | 'totalArea'
+  | 'currentArea'
   | 'target2'
 >;
 
@@ -30,21 +30,21 @@ export const getValidNonGeoData = (
     {
       id: 'some-id',
       target: 50,
-      scenario_id: scenarioId,
+      scenarioId,
       fpf: 1,
-      feature_class_id: featureIdMet,
-      current_pa: '12000',
-      total_area: '20000',
+      featuresDataId: featureIdMet,
+      currentArea: 12000,
+      totalArea: 20000,
       target2: 0,
     },
     {
       id: 'some-another-id',
       target: 50,
-      scenario_id: scenarioId,
+      scenarioId,
       fpf: 1,
-      feature_class_id: featureIdFailed,
-      current_pa: '4000',
-      total_area: '10000',
+      featuresDataId: featureIdFailed,
+      currentArea: 4000,
+      totalArea: 10000,
       target2: 0,
     },
   ],
@@ -53,11 +53,11 @@ export const getValidNonGeoData = (
 
 export const getValidRemoteFeatureData = (): RemoteFeaturesData[] => [
   {
-    feature_id: metaFeatureIdFailed,
+    featureId: metaFeatureIdFailed,
     id: featureIdFailed,
   },
   {
-    feature_id: metaFeatureIdMet,
+    featureId: metaFeatureIdMet,
     id: featureIdMet,
   },
 ];
