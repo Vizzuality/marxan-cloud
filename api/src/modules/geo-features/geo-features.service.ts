@@ -22,6 +22,7 @@ import {
 } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from 'modules/projects/project.api.entity';
+import { apiConnections } from '../../ormconfig';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -46,9 +47,12 @@ export class GeoFeaturesService extends AppBaseService<
   AppInfoDTO
 > {
   constructor(
-    @InjectRepository(GeoFeatureGeometry, 'geoprocessingDB')
+    @InjectRepository(GeoFeatureGeometry, apiConnections.geoprocessingDB.name)
     private readonly geoFeaturesGeometriesRepository: Repository<GeoFeatureGeometry>,
-    @InjectRepository(GeoFeaturePropertySet, 'geoprocessingDB')
+    @InjectRepository(
+      GeoFeaturePropertySet,
+      apiConnections.geoprocessingDB.name,
+    )
     private readonly geoFeaturePropertySetsRepository: Repository<GeoFeaturePropertySet>,
     @InjectRepository(GeoFeature)
     private readonly geoFeaturesRepository: Repository<GeoFeature>,
@@ -133,7 +137,7 @@ export class GeoFeaturesService extends AppBaseService<
      */
 
     let queryFilteredByPublicOrProjectSpecificFeatures;
-    const projectId: string =
+    const projectId: string | undefined =
       (info?.params?.projectId as string) ??
       (fetchSpecification?.filter?.projectId as string);
     if (projectId) {

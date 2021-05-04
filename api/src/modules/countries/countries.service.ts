@@ -11,6 +11,7 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from 'utils/app-base.service';
+import { apiConnections } from '../../ormconfig';
 
 @Injectable()
 export class CountriesService extends AppBaseService<
@@ -20,7 +21,7 @@ export class CountriesService extends AppBaseService<
   AppInfoDTO
 > {
   constructor(
-    @InjectRepository(Country, 'geoprocessingDB')
+    @InjectRepository(Country, apiConnections.geoprocessingDB.name)
     private readonly countriesRepository: Repository<Country>,
   ) {
     super(countriesRepository, 'country', 'countries', 'gid0');

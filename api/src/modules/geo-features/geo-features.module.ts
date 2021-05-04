@@ -9,12 +9,13 @@ import {
 
 import { GeoFeaturesController } from './geo-features.controller';
 import { GeoFeaturesService } from './geo-features.service';
+import { apiConnections } from '../../ormconfig';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature(
       [GeoFeatureGeometry, GeoFeaturePropertySet],
-      'geoprocessingDB',
+      apiConnections.geoprocessingDB.name,
     ),
     TypeOrmModule.forFeature([GeoFeature, Project]),
   ],
