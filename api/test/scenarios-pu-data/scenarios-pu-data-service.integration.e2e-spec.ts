@@ -2,15 +2,22 @@ import { INestApplication } from '@nestjs/common';
 import { bootstrapApplication } from '../utils/api-application';
 
 import { ScenariosPlanningUnitService } from '../../src/modules/scenarios-planning-unit/scenarios-planning-unit.service';
-import { GivenScenarioPuDataExists } from './steps/given-scenario-pu-data-exists';
 import { LockStatus } from '../../src/modules/scenarios-planning-unit/lock-status.enum';
+import { createWorld, World } from './steps/world';
 
 let app: INestApplication;
 let service: ScenariosPlanningUnitService;
 
+let world: World;
+
 beforeAll(async () => {
   app = await bootstrapApplication();
   service = app.get(ScenariosPlanningUnitService);
+  world = await createWorld(app);
+});
+
+afterAll(async () => {
+  await world.cleanup();
 });
 
 describe(`scenarios-pu-data fetch`, () => {
@@ -19,7 +26,7 @@ describe(`scenarios-pu-data fetch`, () => {
 
   beforeEach(async () => {
     // Asset
-    count = (await GivenScenarioPuDataExists(app)).rows.length;
+    count = (await world.GivenScenarioPuDataExists()).length;
 
     // Act
     result = await service.findAll();
@@ -28,15 +35,9 @@ describe(`scenarios-pu-data fetch`, () => {
   it(`returns valid data`, () => {
     expect(result).toEqual([
       expect.arrayContaining([
-        {
-          lockStatus: LockStatus.LockedOut,
-        },
-        {
-          lockStatus: LockStatus.Unstated,
-        },
-        {
-          lockStatus: LockStatus.LockedIn,
-        },
+        expect.objectContaining({ lockStatus: LockStatus.Unstated }),
+        expect.objectContaining({ lockStatus: LockStatus.LockedOut }),
+        expect.objectContaining({ lockStatus: LockStatus.LockedIn }),
       ]),
       count,
     ]);
