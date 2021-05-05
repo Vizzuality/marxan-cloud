@@ -101,11 +101,11 @@ export class ProxyController {
     required: true,
   })
   @ApiQuery({
-    name: 'wdpaid',
+    name: 'id',
     description: 'Id of WDPA area',
-    type: Number,
+    type: String,
     required: false,
-    example: '5555697751',
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
   @Get('/protected-areas/preview/tiles/:z/:x/:y.mvt')
   async proxyProtectedAreaTile(
@@ -151,10 +151,11 @@ export class ProxyController {
     required: true,
   })
   @ApiQuery({
-    name: 'extentId',
-    description: 'Extent of the project',
-    type: Number,
+    name: 'bbox',
+    description: 'Bounding box of the project',
+    type: Array,
     required: false,
+    example: [-1, 40, 1, 42],
   })
   @Get('/features/:id/preview/tiles/:z/:x/:y.mvt')
   async proxyFeaturesTile(@Req() request: Request, @Res() response: Response) {

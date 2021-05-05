@@ -46,11 +46,11 @@ export class ProtectedAreasController<T> {
     required: true,
   })
   @ApiQuery({
-    name: 'wdpaid',
+    name: 'id',
     description: 'Id of WDPA area',
-    type: Number,
+    type: String,
     required: false,
-    example: '555569775',
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
   @Get('/protected-areas/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
@@ -61,7 +61,7 @@ export class ProtectedAreasController<T> {
   @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() tileRequest: TileRequest,
-    @Query('wdpaid') wdpaid: string,
+    @Query('id') id: string,
     @Res() response: Response,
   ): Promise<Object> {
     const tile: Buffer = await this.service.findTile(tileRequest);
