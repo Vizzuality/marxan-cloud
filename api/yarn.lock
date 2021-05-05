@@ -867,7 +867,7 @@
   resolved "https://registry.yarnpkg.com/@types/faker/-/faker-5.1.5.tgz#f14b015e0100232bb00c6dd7611505efb08709a0"
   integrity sha512-2uEQFb7bsx68rqD4F8q95wZq6LTLOyexjv6BnvJogCO4jStkyc6IDEkODPQcWfovI6g6M3uPQ2/uD/oedJKkNw==
 
-"@types/geojson@7946.0.7":
+"@types/geojson@7946.0.7", "@types/geojson@^7946.0.7":
   version "7946.0.7"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.7.tgz#c8fa532b60a0042219cdf173ca21a975ef0666ad"
   integrity sha512-wE2v81i4C4Ol09RtsWFAqg3BUitWbHSpSlIo+bNdsCJijO9sjme+zm+73ZMCa/qMC8UEERxzGbvmr1cffo2SiQ==
@@ -924,6 +924,11 @@
   version "7.0.6"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.6.tgz#f4c7ec43e81b319a9815115031709f26987891f0"
   integrity sha512-3c+yGKvVP5Y9TYBEibGNR+kLtijnj7mYrXRg+WpFb2X9xm04g/DXYkfg4hmzJQosc9snFNUPkbYIhu+KAm6jJw==
+
+"@types/json-schema@7.0.7":
+  version "7.0.7"
+  resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.7.tgz#98a993516c859eb0d5c4c8f098317a9ea68db9ad"
+  integrity sha512-cxWFQVseBm6O9Gbw1IWb8r6OS4OhSt3hPZLkFApLjM8TEXROBuQGLAH2i2gZpcXdLBIrpXuTDhH7Vbm1iXmNGA==
 
 "@types/json5@^0.0.29":
   version "0.0.29"
@@ -6145,6 +6150,21 @@ pupa@^2.0.1:
   integrity sha512-l1jNAspIBSFqbT+y+5FosojNpVpF94nlI+wDUpqP9enwOTfHx9f0gh5nB96vl+6yTpsJsypeNrwfzPrKuHB41A==
   dependencies:
     escape-goat "^2.0.0"
+
+pure-geojson-validation@0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/pure-geojson-validation/-/pure-geojson-validation-0.3.0.tgz#3f1956ddc863fbd35d84492b6e5752e5c097c971"
+  integrity sha512-qW3YoFBaPjLdSI5rbAYPtMiViQBfrAet20g7ICiyL1MsVClXoIsNfW25NHhXWHiYqqiV8vHbIib5CyRZq58BHg==
+  dependencies:
+    "@types/geojson" "^7946.0.7"
+    purify-ts "^0.16.1"
+
+purify-ts@0.16.2, purify-ts@^0.16.1:
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/purify-ts/-/purify-ts-0.16.2.tgz#9a902414216da4df6f658c58044449d85860b733"
+  integrity sha512-wOqzjuoka1v9VlexcfmPthh5VkaBG4BVsqUQkOZ0s1ctdxsQVtykGAKyeTfY+pfPIuD2efgGhy/eI8K/KGbDYw==
+  dependencies:
+    "@types/json-schema" "7.0.7"
 
 qs@6.7.0:
   version "6.7.0"

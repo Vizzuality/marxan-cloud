@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -38,8 +39,13 @@ import { RequestWithAuthenticatedUser } from 'app.controller';
 
 import { ScenarioFeaturesService } from '../scenarios-features';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
+import {
+  ProcessingState,
+  ProcessingStatusDto,
+} from './dto/processing-status.dto';
+import { PlanningUnitsUpdateDto } from './dto/planning-units-update.dto';
 
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
@@ -114,6 +120,34 @@ export class ScenariosController {
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
     return await this.service.remove(id);
+  }
+
+  @Patch(':id/planning-units')
+  @ApiOkResponse()
+  async changePlanningUnits(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() input: PlanningUnitsUpdateDto,
+  ): Promise<void> {
+    if (!input.exclusiveOptionsMet()) {
+      throw new BadRequestException(
+        'You can only use one of the `byId` or `byGeoJson`',
+      );
+    }
+    // TODO call analysis-module's service
+    return;
+  }
+
+  @Get(':id/planning-units')
+  async planningUnitsStatus(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ProcessingStatusDto> {
+    // TODO call analysis-module's service
+
+    return {
+      status: ProcessingState.Pending,
+    };
   }
 
   @ApiOperation({ description: `Resolve scenario's features pre-gap data.` })
