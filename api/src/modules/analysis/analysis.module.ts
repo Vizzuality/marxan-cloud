@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { PlanningUnitsModule } from '../planning-units/planning-units.module';
+import { ScenarioPuRequestModule } from './scenario-pu-request/scenario-pu-request.module';
+
 import { AnalysisService } from './analysis.service';
 import { ArePuidsAllowed } from './are-puids-allowed';
 
 @Module({
   imports: [
     // Base Service for processing entity config
-    // Module with Base Service for scenarios_pu_data
+    ScenarioPuRequestModule,
     PlanningUnitsModule,
   ],
   providers: [
