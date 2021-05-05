@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import Pill from 'layout/pill';
+import Sections from 'layout/scenarios/sidebar/analysis/sections';
+import GapAnalysis from 'layout/scenarios/sidebar/analysis/gap-analysis';
+import CostSurface from 'layout/scenarios/sidebar/analysis/cost-surface';
+import AdjustPanningUnits from 'layout/scenarios/sidebar/analysis/adjust-planning-units';
 
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
@@ -12,12 +16,18 @@ export interface ScenariosSidebarAnalysisProps {
 }
 
 export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> = () => {
+  const [section, setSection] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const { data: scenarioData } = useScenario(sid);
+
+  // CALLBACKS
+  const onChangeSection = useCallback((s) => {
+    setSection(s);
+  }, []);
 
   if (!scenarioData || tab !== 'analysis') return null;
 
@@ -36,6 +46,36 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
             </div>
           </div>
         </header>
+
+        <AnimatePresence exitBeforeEnter>
+          {!section && (
+            <Sections
+              key="sections"
+              onChangeSection={onChangeSection}
+            />
+          )}
+
+          {section === 'gap-analysis' && (
+            <GapAnalysis
+              key="gap-analysis"
+              onChangeSection={onChangeSection}
+            />
+          )}
+
+          {section === 'cost-surface' && (
+            <CostSurface
+              key="cost-surface"
+              onChangeSection={onChangeSection}
+            />
+          )}
+
+          {section === 'adjust-planning-units' && (
+            <AdjustPanningUnits
+              key="adjust-planning-units"
+              onChangeSection={onChangeSection}
+            />
+          )}
+        </AnimatePresence>
       </Pill>
     </motion.div>
   );
