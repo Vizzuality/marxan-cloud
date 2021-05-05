@@ -32,7 +32,7 @@ describe(`scenarios-pu-data fetch`, () => {
           lockStatus: LockStatus.LockedOut,
         },
         {
-          lockStatus: LockStatus.Unknown,
+          lockStatus: LockStatus.Unstated,
         },
         {
           lockStatus: LockStatus.LockedIn,

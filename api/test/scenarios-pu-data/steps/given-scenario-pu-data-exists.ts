@@ -12,36 +12,33 @@ export const GivenScenarioPuDataExists = async (
   scenarioId = v4(),
 ): Promise<{
   scenarioId: string;
-  projectId: number;
   rows: ScenariosPlanningUnitGeoEntity[];
 }> => {
   const repo: Repository<ScenariosPlanningUnitGeoEntity> = await app.get(
     getRepositoryToken(ScenariosPlanningUnitGeoEntity, remoteConnectionName),
   );
-  const projectId = 1234;
   const rows = await repo.save([
     repo.create({
       scenarioId,
-      lockStatus: LockStatus.Unknown,
+      lockStatus: LockStatus.Unstated,
       puGeometryId: v4(),
-      projectId,
+      planningUnitMarxanId: 1,
     }),
     repo.create({
       scenarioId,
       lockStatus: LockStatus.LockedOut,
       puGeometryId: v4(),
-      projectId,
+      planningUnitMarxanId: 2,
     }),
     repo.create({
       scenarioId,
       lockStatus: LockStatus.LockedIn,
       puGeometryId: v4(),
-      projectId,
+      planningUnitMarxanId: 3,
     }),
   ]);
   return {
     scenarioId,
-    projectId,
     rows,
   };
 };
