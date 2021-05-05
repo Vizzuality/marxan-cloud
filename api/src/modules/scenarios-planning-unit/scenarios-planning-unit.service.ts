@@ -6,6 +6,7 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '../../utils/app-base.service';
+import { AppConfig } from '../../utils/config.utils';
 import { remoteConnectionName } from './entities/remote-connection-name';
 import { ScenariosPlanningUnitGeoEntity } from './entities/scenarios-planning-unit.geo.entity';
 
@@ -20,7 +21,9 @@ export class ScenariosPlanningUnitService extends AppBaseService<
     @InjectRepository(ScenariosPlanningUnitGeoEntity, remoteConnectionName)
     private readonly puData: Repository<ScenariosPlanningUnitGeoEntity>,
   ) {
-    super(puData, 'scenario_planning_unit', 'scenario_planning_units');
+    super(puData, 'scenario_planning_unit', 'scenario_planning_units', {
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
 
   get serializerConfig(): JSONAPISerializerConfig<ScenariosPlanningUnitGeoEntity> {
