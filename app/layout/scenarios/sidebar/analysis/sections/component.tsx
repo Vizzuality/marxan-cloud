@@ -2,6 +2,25 @@ import React from 'react';
 
 import { motion } from 'framer-motion';
 
+import Item from './item';
+
+const SECTIONS = [
+  {
+    id: 'gap-analysis',
+    name: 'Gap analysis',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
+  },
+  {
+    id: 'cost-surface',
+    name: 'Cost surface',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
+  },
+  {
+    id: 'adjust-planning-units',
+    name: 'Adjust planning units (optional)',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
+  },
+];
 export interface ScenariosSidebarAnalysisSectionsProps {
   onChangeSection: (s: string) => void;
 }
@@ -17,38 +36,13 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <button
-        type="button"
-        className="w-full py-5 pr-10 text-left"
-        onClick={() => {
-          onChangeSection('gap-analysis');
-        }}
-      >
-        <h4 className="text-xs uppercase font-heading">Gap analysis</h4>
-        <p className="mt-1 text-sm text-gray-300">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.</p>
-      </button>
-
-      <button
-        type="button"
-        className="w-full py-5 pr-10 text-left"
-        onClick={() => {
-          onChangeSection('cost-surface');
-        }}
-      >
-        <h4 className="text-xs uppercase font-heading">Cost surface</h4>
-        <p className="mt-1 text-sm text-gray-300">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.</p>
-      </button>
-
-      <button
-        type="button"
-        className="w-full py-5 pr-10 text-left"
-        onClick={() => {
-          onChangeSection('adjust-planning-units');
-        }}
-      >
-        <h4 className="text-xs uppercase font-heading">Adjust planning units (optional)</h4>
-        <p className="mt-1 text-sm text-gray-300">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.</p>
-      </button>
+      {SECTIONS.map((s) => (
+        <Item
+          key={s.id}
+          {...s}
+          onChangeSection={onChangeSection}
+        />
+      ))}
     </motion.div>
   );
 };
