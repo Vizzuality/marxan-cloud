@@ -11,7 +11,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { apiGlobalPrefixes } from 'src/api.config';
-import { uploadOptions } from 'src/utils/file-uploads.utils';
+import { uploadOptions, unzipShapefile } from 'src/utils/file.utils';
 
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class PlanningUnitsController {
@@ -25,6 +25,7 @@ export class PlanningUnitsController {
   ) {
     this.logger.log('GEOPROCESSING PLANNING UNITS CONTROLLER');
     this.logger.log(scenarioId);
+    console.log(file);
 
     return true;
   }

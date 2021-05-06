@@ -1,6 +1,15 @@
-import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
+/**
+ * File Utils
+ */
 
+import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
+import fs from 'fs';
+
+/**
+ * ES5 import to avoid TS complaining
+ */
 const multer = require('multer');
+const unzipper = require('unzipper');
 
 /**
  * Options for Multer
@@ -12,14 +21,18 @@ export const uploadOptions: MulterOptions = {
       file: any,
       cb: (error: Error | null, destination: string) => void,
     ) {
-      cb(null, '/../tmp/');
+      cb(null, '/../tmp/uploads');
     },
     filename: function (
       req: any,
       file: any,
       cb: (error: Error | null, fieldname: string) => void,
     ) {
-      cb(null, file.fieldname + '-' + Date.now());
+      cb(null, Date.now() + '-' + file.originalname);
     },
   }),
+};
+
+export const unzipShapefile = (path: string): void => {
+  fs.createReadStream(path).pipe(unzipper.Extract({ path: path }));
 };
