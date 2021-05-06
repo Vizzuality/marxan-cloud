@@ -4,7 +4,6 @@ import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { WhenRequestingStatus } from './steps/WhenRequestingStatus';
 import { WhenChangingPlanningUnitInclusivity } from './steps/WhenChangingPlanningUnitInclusivity';
-import { WhenChangingInclusivityWithInvalidCombination } from './steps/WhenChangingPlanningUnitInclusivityWithInvalidPayload';
 
 let app: INestApplication;
 let jwtToken: string;
@@ -25,18 +24,6 @@ describe(`when requesting to change inclusive options`, () => {
     expect(
       await WhenChangingPlanningUnitInclusivity(app, scenarioId, jwtToken),
     ).toEqual({});
-  });
-
-  it(`denies to request with invalid input`, async () => {
-    const output = await WhenChangingInclusivityWithInvalidCombination(
-      app,
-      scenarioId,
-      jwtToken,
-    );
-    expect(output.status).toEqual(400);
-    expect(output.body.errors[0].title).toMatchInlineSnapshot(
-      `"You can only use one of the \`byId\` or \`byGeoJson\`"`,
-    );
   });
 });
 

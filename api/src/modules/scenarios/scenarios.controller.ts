@@ -128,13 +128,9 @@ export class ScenariosController {
   async changePlanningUnits(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Param('id', ParseUUIDPipe) id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Body() input: PlanningUnitsUpdateDto,
   ): Promise<void> {
-    if (!input.exclusiveOptionsMet()) {
-      throw new BadRequestException(
-        'You can only use one of the `byId` or `byGeoJson`',
-      );
-    }
     // TODO call analysis-module's service
     return;
   }
