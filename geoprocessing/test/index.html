@@ -64,6 +64,14 @@ var map = new mapboxgl.Map({
                 "http://localhost:3040/api/v1/geodata/features/4f66b096-7360-4952-afd6-4982279ccd42/preview/tiles/{z}/{x}/{y}.mvt",
                      ]
             },
+            'postgis-tilesPU': {
+                'type': 'vector',
+                'minzoom': 1,
+                'maxzoom': 12,
+                'tiles': [
+                "http://localhost:3040/api/v1/geodata/planning-units/preview/tiles/{z}/{x}/{y}.mvt",
+                     ]
+            },
             'BASEMAP': {
                 'type': 'raster',
                 'tiles': [
@@ -80,54 +88,65 @@ var map = new mapboxgl.Map({
             'minzoom': 1,
             'maxzoom': 22
         },
+        // {
+        //     'id': 'postgis-tiles-layer-features',
+        //     'type': 'fill',
+        //     'source': 'postgis-tilesfeatures',
+        //     'source-layer': 'layer0',
+        //     'paint': {
+        //         'fill-outline-color': 'red',
+        //         'fill-color': 'blue',
+        //         'fill-opacity': 1
+        //     }
+        // },
+        // {
+        //     'id': 'postgis-tiles-layer',
+        //     'type': 'fill',
+        //     'source': 'postgis-tiles2',
+        //     'source-layer': 'layer0',
+        //     'paint': {
+        //         'fill-outline-color': 'red',
+        //         'fill-color': 'green',
+        //         'fill-opacity': 0.2
+        //     }
+        // },
+        // {
+        //     'id': 'postgis-tiles-layer1',
+        //     'type': 'fill',
+        //     'source': 'postgis-tiles1',
+        //     'source-layer': 'layer0',
+        //     'paint': {
+        //         'fill-outline-color': 'blue',
+        //         'fill-color': 'green',
+        //         'fill-opacity': 0.2
+        //     }
+        // },
+        // {
+        //     'id': 'postgis-tiles-layer2',
+        //     'type': 'fill',
+        //     'source': 'postgis-tiles0',
+        //     'source-layer': 'layer0',
+        //     'paint': {
+        //         'fill-outline-color': 'pink',
+        //         'fill-color': 'green',
+        //         'fill-opacity': 0.2
+        //     }
+        // },
+        // {
+        //     'id': 'postgis-tiles-layer-wdpa',
+        //     'type': 'fill',
+        //     'source': 'postgis-tileswdpa',
+        //     'source-layer': 'layer0',
+        //     'paint': {
+        //         'fill-outline-color': 'yellow',
+        //         'fill-color': 'red',
+        //         'fill-opacity': 0.7
+        //     }
+        // },
         {
-            'id': 'postgis-tiles-layer-features',
+            'id': 'postgis-tiles-layer-PU',
             'type': 'fill',
-            'source': 'postgis-tilesfeatures',
-            'source-layer': 'layer0',
-            'paint': {
-                'fill-outline-color': 'red',
-                'fill-color': 'blue',
-                'fill-opacity': 1
-            }
-        },
-        {
-            'id': 'postgis-tiles-layer',
-            'type': 'fill',
-            'source': 'postgis-tiles2',
-            'source-layer': 'layer0',
-            'paint': {
-                'fill-outline-color': 'red',
-                'fill-color': 'green',
-                'fill-opacity': 0.2
-            }
-        },
-        {
-            'id': 'postgis-tiles-layer1',
-            'type': 'fill',
-            'source': 'postgis-tiles1',
-            'source-layer': 'layer0',
-            'paint': {
-                'fill-outline-color': 'blue',
-                'fill-color': 'green',
-                'fill-opacity': 0.2
-            }
-        },
-        {
-            'id': 'postgis-tiles-layer2',
-            'type': 'fill',
-            'source': 'postgis-tiles0',
-            'source-layer': 'layer0',
-            'paint': {
-                'fill-outline-color': 'pink',
-                'fill-color': 'green',
-                'fill-opacity': 0.2
-            }
-        },
-        {
-            'id': 'postgis-tiles-layer-wdpa',
-            'type': 'fill',
-            'source': 'postgis-tileswdpa',
+            'source': 'postgis-tilesPU',
             'source-layer': 'layer0',
             'paint': {
                 'fill-outline-color': 'yellow',

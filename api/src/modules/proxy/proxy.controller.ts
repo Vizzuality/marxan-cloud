@@ -161,4 +161,60 @@ export class ProxyController {
   async proxyFeaturesTile(@Req() request: Request, @Res() response: Response) {
     return this.proxyService.proxyTileRequest(request, response);
   }
+
+  @ApiOperation({
+    description: 'Get planning unit geometries.',
+  })
+  /**
+   *@todo Change ApiOkResponse mvt type
+   */
+  @ApiOkResponse({
+    type: 'mvt',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiQuery({
+    name: 'bbox',
+    description: 'Bounding box of the project',
+    type: Array,
+    required: false,
+    example: [-1, 40, 1, 42],
+  })
+  @ApiQuery({
+    name: 'planningUnitGridShape',
+    description: 'Planning unit grid shape',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'planningUnitAreakm2',
+    description: 'Planning unit area in km2',
+    type: Number,
+    required: false,
+  })
+  @Get('/planning-units/preview/tiles/:z/:x/:y.mvt')
+  async proxyProtectedAreasTile(
+    @Req() request: Request,
+    @Res() response: Response,
+  ) {
+    return this.proxyService.proxyTileRequest(request, response);
+  }
 }
