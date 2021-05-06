@@ -8,6 +8,7 @@ import { ProtectedAreasModule } from 'src/modules/protected-areas/protected-area
 import { PlanningUnitsModule } from 'src/modules/planning-units/planning-units.module';
 import { TileModule } from './modules/tile/tile.module';
 import { FeaturesModule } from 'src/modules/features/features.module'
+import { PlanningUnitsController } from './src/modules/planning-units/planning-units.controller';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { FeaturesModule } from 'src/modules/features/features.module'
     ProtectedAreasModule,
     FeaturesModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, PlanningUnitsController],
   providers: [AppService],
 })
 export class AppModule {}
