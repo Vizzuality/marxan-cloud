@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := seed-data
 
+
 seed-data: seed-gadm seed-wdpa seed-iucn seed-ecosystems
 
 seed-gadm:
