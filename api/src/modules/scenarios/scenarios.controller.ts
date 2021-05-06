@@ -49,6 +49,7 @@ import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remot
 import { ProcessingStatusDto } from './dto/processing-status.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { uploadOptions } from 'utils/file-uploads.utils';
+import { ProxyService } from 'modules/proxy/proxy.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -57,6 +58,7 @@ import { uploadOptions } from 'utils/file-uploads.utils';
 export class ScenariosController {
   constructor(
     public readonly service: ScenariosService,
+    private readonly proxyService: ProxyService,
     private readonly scenarioFeatures: ScenarioFeaturesService,
   ) {}
 
@@ -114,11 +116,14 @@ export class ScenariosController {
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   async uploadLockInShapeFile(
     @Param('id') scenarioId: string,
-    @UploadedFile() lockinShapefile: Express.Multer.File,
+    @Req() request: Request,
   ) {
-    console.log('This is the scenario ID', scenarioId);
-    console.log('This is the file', lockinShapefile);
-    return { scenarioId, lockinShapefile };
+    const scenario = await this.service.getById(scenarioId);
+    await this.proxyService.proxyUloadShapeFile(request);
+
+    /* console.log('This is the scenario ID', scenarioId);
+    console.log('This is the file', lockinShapefile); */
+    return { scenarioId, scenario };
   }
 
   @ApiOperation({ description: 'Upload Lock-Out Shapefile' })

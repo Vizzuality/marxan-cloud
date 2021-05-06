@@ -40,4 +40,8 @@ export class ProxyService {
       },
     );
   }
+
+  async proxyUloadShapeFile(request: any) {
+    console.log('THIS IS PROXY SERVICE', request.body);
+  }
 }
