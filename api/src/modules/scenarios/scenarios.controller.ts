@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -19,6 +20,7 @@ import {
   scenarioResource,
   ScenarioResult,
 } from './scenario.api.entity';
+import { Request, Response } from 'express';
 import { ScenariosService } from './scenarios.service';
 import {
   FetchSpecification,
@@ -112,29 +114,28 @@ export class ScenariosController {
     );
   }
   @ApiOperation({ description: 'Upload Lock-In Shapefile' })
-  @Post(':id/geometries/planning-unit-lock-in')
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @Post(':id/planning-unit-lock-in')
+  //@UseInterceptors(FileInterceptor('file', uploadOptions))
   async uploadLockInShapeFile(
     @Param('id') scenarioId: string,
     @Req() request: Request,
+    @Res() response: Response,
   ) {
-    const scenario = await this.service.getById(scenarioId);
-    await this.proxyService.proxyUloadShapeFile(request);
-
-    /* console.log('This is the scenario ID', scenarioId);
-    console.log('This is the file', lockinShapefile); */
-    return { scenarioId, scenario };
+    await this.service.getById(scenarioId);
+    const proxyServiceResponse = await this.proxyService.proxyUploadShapeFile(
+      request,
+      response,
+    );
+    return proxyServiceResponse;
   }
 
   @ApiOperation({ description: 'Upload Lock-Out Shapefile' })
-  @Post(':id/geometries/planning-unit-lock-out')
+  @Post(':id/planning-unit-lock-out')
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   async uploadLockOutShapeFile(
     @Param('id') scenarioId: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log('This is the scenario ID', scenarioId);
-    console.log('This is the file', file);
     return { scenarioId, file };
   }
 
