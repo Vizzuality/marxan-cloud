@@ -7,8 +7,7 @@ import { AdminAreasModule } from 'src/modules/admin-areas/admin-areas.module';
 import { ProtectedAreasModule } from 'src/modules/protected-areas/protected-areas.module';
 import { PlanningUnitsModule } from 'src/modules/planning-units/planning-units.module';
 import { TileModule } from './modules/tile/tile.module';
-import { FeaturesModule } from 'src/modules/features/features.module'
-import { PlanningUnitsController } from './src/modules/planning-units/planning-units.controller';
+import { FeaturesModule } from 'src/modules/features/features.module';
 
 @Module({
   imports: [
@@ -24,9 +23,9 @@ import { PlanningUnitsController } from './src/modules/planning-units/planning-u
     PlanningUnitsModule,
     TileModule,
     ProtectedAreasModule,
-    FeaturesModule
+    FeaturesModule,
   ],
-  controllers: [AppController, PlanningUnitsController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
