@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { AsyncJob, JobStatus } from './async-job';
+import { AsyncJob } from './async-job';
 import { ArePuidsAllowedPort } from './are-puids-allowed.port';
 import { RequestJobPort } from './request-job.port';
 
 import { AnalysisInput } from './analysis-input';
+import { JobStatusPort } from './job-status.port';
 
 type Success = true;
 
@@ -13,7 +14,7 @@ export class AnalysisService {
   constructor(
     private readonly puUuidValidator: ArePuidsAllowedPort,
     private readonly jobRequester: RequestJobPort,
-    private readonly jobStatus: JobStatus,
+    private readonly jobStatus: JobStatusPort,
   ) {}
 
   /**
@@ -28,23 +29,24 @@ export class AnalysisService {
       ...(constraints.exclude?.pu ?? []),
     ];
     if (targetPuIds.length > 0) {
-      await this.puUuidValidator.validate(scenarioId, targetPuIds);
+      const { errors } = await this.puUuidValidator.validate(
+        scenarioId,
+        targetPuIds,
+      );
+      if (errors.length > 0) {
+        throw new Error('Given PU ids are not reachable in this context.');
+      }
     }
+
+    await this.jobRequester.queue({
+      scenarioId,
+      ...constraints,
+    });
 
     return true;
   }
 
   async getJobStatus(scenarioId: string): Promise<AsyncJob> {
-    return this.getJobStatus(scenarioId);
-  }
-
-  private async executeCalculations(
-    scenarioId: string,
-    input: AnalysisInput,
-  ): Promise<AsyncJob> {
-    return this.jobRequester.queue({
-      scenarioId,
-      ...input,
-    });
+    return this.jobStatus.scenarioStatus(scenarioId);
   }
 }
