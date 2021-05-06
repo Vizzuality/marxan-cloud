@@ -14,8 +14,8 @@ import: data/ecosystems/World_Ecosystems_simp.geojson
 		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
 		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD" "$<";\
 	feature_id=`psql -X -A -q -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@marxan-postgresql-api:5432/$$API_POSTGRES_DB" \
-		-c "insert into features (feature_class_name, property_name, tag, creation_status, created_by)  \
-		VALUES ('$${table_name}', 'dn', 'bioregional','created','$(MarxanUser)') RETURNING id;"`; \
+		-c "insert into features (feature_class_name, alias, list_property_keys, property_name, tag, creation_status, created_by)  \
+		VALUES ('$${table_name}', 'World terrestrial ecoregions','[\"dn\", \"w_ecosystm\"]'::jsonb,'w_ecosystm', 'bioregional','created','$(MarxanUser)') RETURNING id;"`; \
 	psql "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@marxan-postgresql-geo-api:5432/$$GEO_POSTGRES_DB" \
 	-c "insert into features_data(the_geom, properties, source, feature_id) \
 		(SELECT the_geom, row_to_json(t)::jsonb - '{the_geom}'::text[] as properties, 'ecoregions' as source, '$$feature_id' as feature_id from (select * from \"$${table_name}_feature\") t); \
@@ -24,7 +24,12 @@ import: data/ecosystems/World_Ecosystems_simp.geojson
 
 
 data/ecosystems/World_Ecosystems_simp.geojson: data/ecosystems/World_Ecosystems.geojson
-	mapshaper $< -simplify 10% -filter-islands min-vertices=3 -filter-slivers -clean -o $@ force
+	mapshaper $< -simplify 15% planar keep-shapes \
+	-filter-islands min-vertices=3 remove-empty \
+	-filter-slivers remove-empty \
+	-clean \
+	-join data/ecosystems/categories.csv keys=DN,Value field-types=Value:int fields=W_Ecosystm \
+	-o $@ force
 
 data/ecosystems/World_Ecosystems.geojson: data/ecosystems/World_Ecosystems.tif
 	gdal_polygonize.py $< -f GeoJSONSeq $@
@@ -34,6 +39,7 @@ data/ecosystems/World_Ecosystems.tif: | data/ecosystems
 
 data/ecosystems:
 	mkdir -p $@
+	cp ./categories.csv $@/categories.csv
 
 clean:
 	rm -rf data/
