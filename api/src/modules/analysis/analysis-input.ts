@@ -1,14 +1,14 @@
-import { MultiPolygon } from 'geojson';
+import { GeoJSON } from 'geojson';
 
 export interface AnalysisInput {
   include?: {
     pu?: string[];
-    geo?: MultiPolygon;
-    shape?: MultiPolygon;
+    geo?: GeoJSON[];
+    shape?: GeoJSON[];
   };
   exclude?: {
     pu?: string[];
-    geo?: MultiPolygon;
-    shape?: MultiPolygon;
+    geo?: GeoJSON[];
+    shape?: GeoJSON[];
   };
 }

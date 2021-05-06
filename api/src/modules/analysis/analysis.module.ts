@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PlanningUnitsModule } from '../planning-units/planning-units.module';
+import { AsyncJobsAdapter } from './adapters/async-jobs-adapter';
 import { AnalysisService } from './analysis.service';
-import { ArePuidsAllowed } from './are-puids-allowed';
+import { ArePuidsAllowedPort } from './are-puids-allowed.port';
+import { JobStatusPort } from './job-status.port';
+import { RequestJobPort } from './request-job.port';
 
 @Module({
   imports: [
@@ -11,7 +14,15 @@ import { ArePuidsAllowed } from './are-puids-allowed';
   ],
   providers: [
     {
-      provide: ArePuidsAllowed,
+      provide: RequestJobPort,
+      useClass: AsyncJobsAdapter,
+    },
+    {
+      provide: JobStatusPort,
+      useClass: AsyncJobsAdapter,
+    },
+    {
+      provide: ArePuidsAllowedPort,
       useValue: {}, // replace with useClass of Service extending (BaseService of scenarios_pu_data) with required functionality
     },
     AnalysisService,

@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PlanningUnitsService } from '../planning-units/planning-units.service';
+
 import { AsyncJob, JobStatus } from './async-job';
-import { ArePuidsAllowed } from './are-puids-allowed';
+import { ArePuidsAllowedPort } from './are-puids-allowed.port';
+import { RequestJobPort } from './request-job.port';
+
 import { AnalysisInput } from './analysis-input';
 
 type Success = true;
@@ -9,9 +11,9 @@ type Success = true;
 @Injectable()
 export class AnalysisService {
   constructor(
-    // TODO Inject Base Service for processing entity config
-    private readonly puUuidValidator: ArePuidsAllowed,
-    private readonly jobScheduler: PlanningUnitsService,
+    private readonly puUuidValidator: ArePuidsAllowedPort,
+    private readonly jobRequester: RequestJobPort,
+    private readonly jobStatus: JobStatus,
   ) {}
 
   /**
@@ -29,21 +31,20 @@ export class AnalysisService {
       await this.puUuidValidator.validate(scenarioId, targetPuIds);
     }
 
-    // TODO add processing entity config creation
-
-    // TODO should it trigger the job? (.executeCalculations)
-
     return true;
   }
 
-  async executeCalculations(scenarioId: string): Promise<AsyncJob> {
-    // await this.jobScheduler.create({
-    //   /**??*/
-    // });
+  async getJobStatus(scenarioId: string): Promise<AsyncJob> {
+    return this.getJobStatus(scenarioId);
+  }
 
-    return {
-      id: '0',
-      status: JobStatus.Pending,
-    };
+  private async executeCalculations(
+    scenarioId: string,
+    input: AnalysisInput,
+  ): Promise<AsyncJob> {
+    return this.jobRequester.queue({
+      scenarioId,
+      ...input,
+    });
   }
 }
