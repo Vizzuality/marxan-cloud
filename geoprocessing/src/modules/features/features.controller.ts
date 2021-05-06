@@ -25,11 +25,11 @@ export class FeaturesController<T> {
   constructor(public service: FeatureService) {}
 
   @ApiOperation({
-    description: 'Get tile for administrative areas within a given country.',
+    description: 'Get tile for a feature by id.',
   })
   @ApiParam({
     name: 'z',
-    description: 'The zoom level ranging from 0 - 12',
+    description: 'The zoom level ranging from 0 - 20',
     type: Number,
     required: true,
   })
@@ -53,10 +53,11 @@ export class FeaturesController<T> {
     required: true,
   })
   @ApiQuery({
-    name: 'extentId',
-    description: 'Extent of the project',
-    type: String,
+    name: 'bbox',
+    description: 'Bounding box of the project',
+    type: Array,
     required: false,
+    example: [-1, 40, 1, 42]
   })
   @Get('/features/:id/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
@@ -66,7 +67,7 @@ export class FeaturesController<T> {
   @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() TileSpecification: TileSpecification,
-    @Query('extentId') extentId: string,
+    @Query('bbox') bbox: number[],
     @Res() response: Response,
   ): Promise<Object> {
     const tile: Buffer = await this.service.findTile(TileSpecification);
