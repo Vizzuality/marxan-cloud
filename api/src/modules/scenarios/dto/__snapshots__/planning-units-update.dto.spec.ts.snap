@@ -5,150 +5,160 @@ Array [
   ValidationError {
     "children": Array [],
     "constraints": Object {
-      "IsMultiPolygon": "Value must be a valid Geometry(MultiPolygon)",
+      "IsFeatureCollectionOfPolygons": "Value must be a valid GeoJson of FeatureCollection of (Polygon/MultiPolygon)",
     },
     "property": "exclude",
     "target": PlanningUnitsByGeoJsonUpdateDto {
-      "exclude": Object {
-        "coordinates": Array [
-          Array [
-            Array [
-              Array [
-                102,
-                2,
-              ],
-              Array [
-                104,
-                5,
-              ],
-              Array [
-                103,
-                3,
-              ],
-            ],
-          ],
-        ],
-        "type": "MultiPolygon",
-      },
-      "include": Object {
-        "coordinates": Array [
-          Array [
-            Array [
-              Array [
-                102,
-                2,
-              ],
-              Array [
-                103,
-                2,
-              ],
-              Array [
-                103,
-                3,
-              ],
-              Array [
-                102,
-                3,
-              ],
-              Array [
-                102,
-                2,
-              ],
-            ],
-          ],
-          Array [
-            Array [
-              Array [
-                100,
-                0,
-              ],
-              Array [
-                101,
-                0,
-              ],
-              Array [
-                101,
-                1,
-              ],
-              Array [
-                100,
-                1,
-              ],
-              Array [
-                100,
-                0,
-              ],
-            ],
-            Array [
-              Array [
-                100.2,
-                0.2,
-              ],
-              Array [
-                100.8,
-                0.2,
-              ],
-              Array [
-                100.8,
-                0.8,
-              ],
-              Array [
-                100.2,
-                0.8,
-              ],
-              Array [
-                100.2,
-                0.2,
-              ],
-            ],
-          ],
-        ],
-        "type": "MultiPolygon",
-      },
-    },
-    "value": Object {
-      "coordinates": Array [
-        Array [
-          Array [
-            Array [
-              102,
-              2,
-            ],
-            Array [
-              104,
-              5,
-            ],
-            Array [
-              103,
-              3,
-            ],
-          ],
-        ],
-      ],
-      "type": "MultiPolygon",
-    },
-  },
-]
-`;
-
-exports[`when changing by id when providing invalid uuid should return error 1`] = `
-Array [
-  ValidationError {
-    "children": Array [],
-    "constraints": Object {
-      "isUuid": "each value in include must be an UUID",
-    },
-    "property": "include",
-    "target": PlanningUnitsByIdUpdateDto {
       "exclude": Array [
-        "ab957e1d-0271-4571-b92c-19d2efec0f75",
+        Object {
+          "features": Array [
+            Object {
+              "geometry": Object {
+                "coordinates": Array [
+                  Array [
+                    Array [
+                      Array [
+                        102,
+                        2,
+                      ],
+                      Array [
+                        104,
+                        5,
+                      ],
+                      Array [
+                        103,
+                        3,
+                      ],
+                    ],
+                  ],
+                ],
+                "type": "MultiPolygon",
+              },
+              "properties": Object {},
+              "type": "Feature",
+            },
+          ],
+          "type": "FeatureCollection",
+        },
       ],
       "include": Array [
-        "non-uuid",
+        Object {
+          "features": Array [
+            Object {
+              "geometry": Object {
+                "coordinates": Array [
+                  Array [
+                    Array [
+                      Array [
+                        102,
+                        2,
+                      ],
+                      Array [
+                        103,
+                        2,
+                      ],
+                      Array [
+                        103,
+                        3,
+                      ],
+                      Array [
+                        102,
+                        3,
+                      ],
+                      Array [
+                        102,
+                        2,
+                      ],
+                    ],
+                  ],
+                  Array [
+                    Array [
+                      Array [
+                        100,
+                        0,
+                      ],
+                      Array [
+                        101,
+                        0,
+                      ],
+                      Array [
+                        101,
+                        1,
+                      ],
+                      Array [
+                        100,
+                        1,
+                      ],
+                      Array [
+                        100,
+                        0,
+                      ],
+                    ],
+                    Array [
+                      Array [
+                        100.2,
+                        0.2,
+                      ],
+                      Array [
+                        100.8,
+                        0.2,
+                      ],
+                      Array [
+                        100.8,
+                        0.8,
+                      ],
+                      Array [
+                        100.2,
+                        0.8,
+                      ],
+                      Array [
+                        100.2,
+                        0.2,
+                      ],
+                    ],
+                  ],
+                ],
+                "type": "MultiPolygon",
+              },
+              "properties": Object {},
+              "type": "Feature",
+            },
+          ],
+          "type": "FeatureCollection",
+        },
       ],
     },
     "value": Array [
-      "non-uuid",
+      Object {
+        "features": Array [
+          Object {
+            "geometry": Object {
+              "coordinates": Array [
+                Array [
+                  Array [
+                    Array [
+                      102,
+                      2,
+                    ],
+                    Array [
+                      104,
+                      5,
+                    ],
+                    Array [
+                      103,
+                      3,
+                    ],
+                  ],
+                ],
+              ],
+              "type": "MultiPolygon",
+            },
+            "properties": Object {},
+            "type": "Feature",
+          },
+        ],
+        "type": "FeatureCollection",
+      },
     ],
   },
 ]

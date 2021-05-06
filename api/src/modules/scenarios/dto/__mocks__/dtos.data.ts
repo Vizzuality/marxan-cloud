@@ -25,8 +25,8 @@ export const getDtoWithInvalidUuids = (): PlanningUnitsUpdateDto =>
 export const getDtoWithInvalidMultiPolygon = (): PlanningUnitsUpdateDto => {
   const withInvalidIds: PlanningUnitsUpdateDto = new PlanningUnitsUpdateDto();
   const withOptions = new PlanningUnitsByGeoJsonUpdateDto();
-  withOptions.include = sampleMultiPolygonJson();
-  withOptions.exclude = invalidMultiPolygon();
+  withOptions.include = [sampleMultiPolygonJson()];
+  withOptions.exclude = [invalidMultiPolygon()];
 
   withInvalidIds.byGeoJson = withOptions;
 

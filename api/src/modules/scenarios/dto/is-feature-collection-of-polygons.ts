@@ -1,24 +1,39 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
-import { tryGeometry } from 'pure-geojson-validation';
+import { FeatureCollection } from 'geojson';
+import { tryGeoJSON } from 'pure-geojson-validation';
 
-export const IsMultiPolygon = (
-  validationOptions: ValidationOptions = {
-    message: 'Value must be a valid Geometry(MultiPolygon)',
-  },
+/**
+ * Does not validate nested FeatureCollections
+ * @param validationOptions
+ * @constructor
+ */
+export const IsFeatureCollectionOfPolygons = (
+  validationOptions: ValidationOptions,
 ) => {
   // eslint-disable-next-line @typescript-eslint/ban-types
   return (object: object, propertyName: string) => {
     registerDecorator({
-      name: 'IsMultiPolygon',
+      name: 'IsFeatureCollectionOfPolygons',
       target: object.constructor,
       propertyName,
       constraints: [],
-      options: validationOptions,
+      options: {
+        message:
+          'Value must be a valid GeoJson of FeatureCollection of (Polygon/MultiPolygon)',
+        ...validationOptions,
+      },
       validator: {
         validate(value: any) {
           try {
-            const geometry = tryGeometry(value);
-            return geometry.type === 'MultiPolygon';
+            const geo = tryGeoJSON(value);
+            if (geo.type !== 'FeatureCollection') {
+              return false;
+            }
+            return (geo as FeatureCollection).features.every(
+              (geometry) =>
+                geometry.geometry.type === 'MultiPolygon' ||
+                geometry.geometry.type === 'Polygon',
+            );
           } catch {
             return false;
           }
