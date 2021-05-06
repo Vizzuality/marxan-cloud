@@ -24,7 +24,7 @@ export const ScenariosSidebarAnalysisSection: React.FC<ScenariosSidebarAnalysisS
   return (
     <button
       type="button"
-      className="relative w-full py-5 pr-20 text-left"
+      className="relative w-full py-5 pr-20 text-left focus:outline-none"
       onMouseEnter={() => setAnimate('enter')}
       onMouseLeave={() => setAnimate('leave')}
       onClick={() => onChangeSection(id)}
