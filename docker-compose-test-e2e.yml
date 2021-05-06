@@ -60,7 +60,7 @@ services:
       dockerfile: Dockerfile
     container_name: marxan-test-e2e-postgresql-api
     volumes:
-      - ./api/test/fixtures/test-data.sql:/docker-entrypoint-initdb.d/test-data.sql
+      - "./api/test/fixtures:/opt:ro"
     ports:
       - "${POSTGRES_API_SERVICE_PORT}:5432"
     environment:

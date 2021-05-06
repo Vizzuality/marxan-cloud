@@ -79,7 +79,8 @@ services:
     ports:
       - "${POSTGRES_API_SERVICE_PORT}:5432"
     volumes:
-      - marxan-cloud-postgresql-api-data:/var/lib/postgresql/data
+      - "marxan-cloud-postgresql-api-data:/var/lib/postgresql/data"
+      - "./api/test/fixtures:/opt:ro"
     environment:
       - POSTGRES_PASSWORD=${API_POSTGRES_PASSWORD}
       - POSTGRES_USER=${API_POSTGRES_USER}
