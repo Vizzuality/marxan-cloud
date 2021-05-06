@@ -4,8 +4,9 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { CqrsModule } from '@nestjs/cqrs';
 
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from 'modules/authentication/authentication.module';
 import { CountriesModule } from 'modules/countries/countries.module';
 import { ScenariosModule } from 'modules/scenarios/scenarios.module';
@@ -26,6 +27,7 @@ import { ApiEventsModule } from 'modules/api-events/api-events.module';
 import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.module';
 import { ProxyModule } from 'modules/proxy/proxy.module';
 import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/scenarios-planning-unit.module';
+import { PlanningUnitsProtectionLevelModule } from './modules/planning-units-protection-level/planning-units-protection-level.module';
 
 @Module({
   imports: [
@@ -37,6 +39,7 @@ import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/s
       ...apiConnections.geoprocessingDB,
       keepConnectionAlive: true,
     }),
+    CqrsModule,
     AdminAreasModule,
     ApiEventsModule,
     CountriesModule,
@@ -50,6 +53,7 @@ import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/s
     AuthenticationModule,
     ProxyModule,
     ScenariosPlanningUnitModule,
+    PlanningUnitsProtectionLevelModule,
   ],
   controllers: [AppController, PingController],
   providers: [
