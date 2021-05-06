@@ -77,7 +77,7 @@ seed-geoapi-with-test-data:
 	SCENARIOID=$(shell docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
 	USERID=$(shell docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from users limit 1"); \
 	echo "appending data for scenario with id $${SCENARIOID}"; \
-	sed -e "s/\$$user/$$USERID/g" -e "s/\$$scenario/$$SCENARIOID/g" api/test/fixtures/test-geodata.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/test/fixtures/test-geodata.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
 
 # need notebook service to execute a expecific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
