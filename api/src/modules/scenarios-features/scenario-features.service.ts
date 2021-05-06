@@ -14,7 +14,7 @@ import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 import { RemoteScenarioFeaturesData } from './entities/remote-scenario-features-data.geo.entity';
 import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 import { UserSearchCriteria } from './search-criteria';
-import { AppConfig } from 'utils/config.utils';
+import { AppConfig } from '../../utils/config.utils';
 
 @Injectable()
 export class ScenarioFeaturesService extends AppBaseService<

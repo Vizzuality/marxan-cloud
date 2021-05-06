@@ -1,16 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
-export enum ProcessingState {
-  Pending = 'pending',
-  Succeed = 'succeed',
-  Failed = 'failed',
-}
+import { JobStatus } from '../scenario.api.entity';
 
 export class ProcessingStatusDto {
   @ApiProperty({
-    enum: ProcessingState,
+    enum: JobStatus,
   })
-  status!: ProcessingState;
+  status!: JobStatus;
 
   @ApiPropertyOptional()
   message?: string;

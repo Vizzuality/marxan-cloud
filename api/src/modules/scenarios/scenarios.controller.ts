@@ -12,7 +12,11 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { scenarioResource, ScenarioResult } from './scenario.api.entity';
+import {
+  JobStatus,
+  scenarioResource,
+  ScenarioResult,
+} from './scenario.api.entity';
 import { ScenariosService } from './scenarios.service';
 import {
   FetchSpecification,
@@ -39,10 +43,7 @@ import { RequestWithAuthenticatedUser } from 'app.controller';
 
 import { ScenarioFeaturesService } from '../scenarios-features';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
-import {
-  ProcessingState,
-  ProcessingStatusDto,
-} from './dto/processing-status.dto';
+import { ProcessingStatusDto } from './dto/processing-status.dto';
 import { PlanningUnitsUpdateDto } from './dto/planning-units-update.dto';
 
 @UseGuards(JwtAuthGuard)
@@ -146,7 +147,7 @@ export class ScenariosController {
     // TODO call analysis-module's service
 
     return {
-      status: ProcessingState.Pending,
+      status: JobStatus.running,
     };
   }
 

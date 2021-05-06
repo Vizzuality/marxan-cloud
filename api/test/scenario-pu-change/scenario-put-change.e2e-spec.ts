@@ -43,7 +43,7 @@ describe(`when requesting to change inclusive options`, () => {
 describe(`when requesting status of change`, () => {
   it(`returns relevant status`, async () => {
     expect(await WhenRequestingStatus(app, scenarioId, jwtToken)).toEqual({
-      status: 'pending',
+      status: 'running',
     });
   });
 });
