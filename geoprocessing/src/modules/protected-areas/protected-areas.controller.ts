@@ -25,7 +25,7 @@ export class ProtectedAreasController<T> {
   constructor(public service: ProtectedAreasService) {}
 
   @ApiOperation({
-    description: 'Get tile for administrative areas within a given country.',
+    description: 'Get tile for protected areas.',
   })
   @ApiParam({
     name: 'z',
@@ -46,11 +46,11 @@ export class ProtectedAreasController<T> {
     required: true,
   })
   @ApiQuery({
-    name: 'wdpaid',
-    description: 'Parent country of administrative areas in ISO code',
+    name: 'id',
+    description: 'Id of WDPA area',
     type: String,
     required: false,
-    example: 'BRA.1',
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
   @Get('/protected-areas/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
@@ -61,7 +61,7 @@ export class ProtectedAreasController<T> {
   @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() tileRequest: TileRequest,
-    @Query('wdpaid') wdpaid: string,
+    @Query('id') id: string,
     @Res() response: Response,
   ): Promise<Object> {
     const tile: Buffer = await this.service.findTile(tileRequest);
