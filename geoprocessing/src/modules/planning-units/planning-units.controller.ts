@@ -24,7 +24,8 @@ export class PlanningUnitsController {
     @UploadedFile() file: any,
   ) {
     this.logger.log('GEOPROCESSING PLANNING UNITS CONTROLLER');
-
     console.log(file);
+
+    unzipShapefile('/..' + file.path);
   }
 }
