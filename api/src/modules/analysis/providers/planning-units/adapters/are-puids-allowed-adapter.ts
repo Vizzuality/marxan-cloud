@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ArePuidsAllowedPort } from '../are-puids-allowed.port';
-import { ScenariosPlanningUnitService } from '../../scenarios-planning-unit/scenarios-planning-unit.service';
+
+import { ScenariosPlanningUnitService } from '../../../../scenarios-planning-unit/scenarios-planning-unit.service';
 
 @Injectable()
 export class ArePuidsAllowedAdapter

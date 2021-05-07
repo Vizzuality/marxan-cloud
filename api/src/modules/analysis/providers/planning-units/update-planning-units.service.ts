@@ -1,28 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import { AdjustPlanningUnits } from '../../entry-points/adjust-planning-units';
+import { AdjustPlanningUnitsInput } from '../../entry-points/adjust-planning-units-input';
 
-import { AsyncJob } from './async-job';
 import { ArePuidsAllowedPort } from './are-puids-allowed.port';
 import { RequestJobPort } from './request-job.port';
-
-import { AnalysisInput } from './analysis-input';
-import { JobStatusPort } from './job-status.port';
 
 type Success = true;
 
 @Injectable()
-export class AnalysisService {
+export class UpdatePlanningUnitsService implements AdjustPlanningUnits {
   constructor(
     private readonly puUuidValidator: ArePuidsAllowedPort,
     private readonly jobRequester: RequestJobPort,
-    private readonly jobStatus: JobStatusPort,
   ) {}
 
-  /**
-   * we could use Either from fp-ts as a return value
-   */
   async update(
     scenarioId: string,
-    constraints: AnalysisInput,
+    constraints: AdjustPlanningUnitsInput,
   ): Promise<Success> {
     const targetPuIds = [
       ...(constraints.include?.pu ?? []),
@@ -44,9 +38,5 @@ export class AnalysisService {
     });
 
     return true;
-  }
-
-  async getJobStatus(scenarioId: string): Promise<AsyncJob> {
-    return this.jobStatus.scenarioStatus(scenarioId);
   }
 }

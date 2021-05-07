@@ -1,6 +1,6 @@
 import { GeoJSON } from 'geojson';
 
-export interface AnalysisInput {
+export interface AdjustPlanningUnitsInput {
   include?: {
     pu?: string[];
     geo?: GeoJSON[];

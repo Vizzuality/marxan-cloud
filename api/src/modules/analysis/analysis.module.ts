@@ -1,32 +1,46 @@
 import { Module } from '@nestjs/common';
 import { PlanningUnitsModule } from '../planning-units/planning-units.module';
 import { ScenariosPlanningUnitModule } from '../scenarios-planning-unit/scenarios-planning-unit.module';
-import { ArePuidsAllowedAdapter } from './adapters/are-puids-allowed-adapter';
 
-import { AsyncJobsAdapter } from './adapters/async-jobs-adapter';
-import { AnalysisService } from './analysis.service';
+import { AdjustCostSurface } from './entry-points/adjust-cost-surface';
+import { AdjustPlanningUnits } from './entry-points/adjust-planning-units';
+import { GetScenarioStatus } from './entry-points/get-scenario-status';
 
-import { ArePuidsAllowedPort } from './are-puids-allowed.port';
-import { JobStatusPort } from './job-status.port';
-import { RequestJobPort } from './request-job.port';
+import { UpdateCostSurfaceService } from './providers/cost-surface/update-cost-surface.service';
+import { ArePuidsAllowedAdapter } from './providers/planning-units/adapters/are-puids-allowed-adapter';
+import { ArePuidsAllowedPort } from './providers/planning-units/are-puids-allowed.port';
+import { UpdatePlanningUnitsService } from './providers/planning-units/update-planning-units.service';
+import { ScenarioStatusService } from './providers/status/scenario-status.service';
+import { RequestJobPort } from './providers/planning-units/request-job.port';
+import { AsyncJobsAdapter } from './providers/planning-units/adapters/async-jobs-adapter';
 
 @Module({
   imports: [ScenariosPlanningUnitModule, PlanningUnitsModule],
   providers: [
     {
-      provide: RequestJobPort,
-      useClass: AsyncJobsAdapter,
+      provide: AdjustCostSurface,
+      useClass: UpdateCostSurfaceService,
     },
     {
-      provide: JobStatusPort,
-      useClass: AsyncJobsAdapter,
+      provide: AdjustPlanningUnits,
+      useClass: UpdatePlanningUnitsService,
     },
+    {
+      provide: GetScenarioStatus,
+      useClass: ScenarioStatusService,
+    },
+    UpdatePlanningUnitsService,
+    UpdateCostSurfaceService,
+    // internals
     {
       provide: ArePuidsAllowedPort,
       useClass: ArePuidsAllowedAdapter,
     },
-    AnalysisService,
+    {
+      provide: RequestJobPort,
+      useClass: AsyncJobsAdapter,
+    },
   ],
-  exports: [AnalysisService],
+  exports: [AdjustCostSurface, AdjustPlanningUnits, GetScenarioStatus],
 })
 export class AnalysisModule {}

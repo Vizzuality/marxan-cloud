@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { AsyncJob } from '../async-job';
 import { RequestJobInput, RequestJobPort } from '../request-job.port';
+import { AsyncJob } from '../../../async-job';
 
 @Injectable()
 export class RequestJobPortMock implements RequestJobPort {

@@ -1,8 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Project } from 'modules/projects/project.api.entity';
+import { Project } from '../projects/project.api.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { BaseServiceResource } from 'types/resource.interface';
-import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
+import { BaseServiceResource } from '../../types/resource.interface';
+import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 
 export const organizationResource: BaseServiceResource = {
   className: 'Organization',

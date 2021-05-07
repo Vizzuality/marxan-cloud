@@ -1,8 +1,4 @@
-export enum JobStatus {
-  Pending = 'pending',
-  Completed = 'completed',
-  Failed = 'failed',
-}
+import { JobStatus } from '../scenarios/scenario.api.entity';
 
 export interface AsyncJob {
   id: string;
