@@ -27,4 +27,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run CI tests via make task
-      run: make -f Makefile-ci test-e2e-api
+      run: make run-test-e2e-ci
