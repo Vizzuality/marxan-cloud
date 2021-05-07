@@ -44,12 +44,9 @@ export class ProxyService {
   }
 
   async proxyUploadShapeFile(request: Request, response: Response) {
-    this.logger.log('REACH PROXY SERVICE');
-    this.logger.log(this.geoprocessingServiceUrl);
     request.url = request.originalUrl.replace('api/v1/', 'api/v1/geodata/');
-    this.logger.log(request.url);
-    this.logger.log(request.method);
-    const summin = this.server.web(
+
+    this.server.web(
       request,
       response,
       {

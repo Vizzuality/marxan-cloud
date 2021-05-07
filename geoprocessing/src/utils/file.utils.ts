@@ -33,6 +33,6 @@ export const uploadOptions: MulterOptions = {
   }),
 };
 
-export const unzipShapefile = (path: string): void => {
+export const unzipShapefile = (path: string) => {
   fs.createReadStream(path).pipe(unzipper.Extract({ path: path }));
 };
