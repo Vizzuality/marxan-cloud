@@ -44,7 +44,7 @@ import { RequestWithAuthenticatedUser } from 'app.controller';
 import { ScenarioFeaturesService } from '../scenarios-features';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
 import { ProcessingStatusDto } from './dto/processing-status.dto';
-import { PlanningUnitsUpdateDto } from './dto/planning-units-update.dto';
+import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -129,7 +129,7 @@ export class ScenariosController {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Param('id', ParseUUIDPipe) id: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @Body() input: PlanningUnitsUpdateDto,
+    @Body() input: UpdateScenarioPlanningUnitLockStatusDto,
   ): Promise<void> {
     // TODO call analysis-module's service
     return;

@@ -1,16 +1,16 @@
 import {
   PlanningUnitsByGeoJsonUpdateDto,
   PlanningUnitsByIdUpdateDto,
-  PlanningUnitsUpdateDto,
-} from '../planning-units-update.dto';
+  UpdateScenarioPlanningUnitLockStatusDto,
+} from '../update-scenario-planning-unit-lock-status.dto';
 import { v4 } from 'uuid';
 import { invalidMultiPolygon, sampleMultiPolygonJson } from './geometry';
 
 export const getDtoByIds = (
   include: string[],
   exclude: string[],
-): PlanningUnitsUpdateDto => {
-  const withInvalidIds: PlanningUnitsUpdateDto = new PlanningUnitsUpdateDto();
+): UpdateScenarioPlanningUnitLockStatusDto => {
+  const withInvalidIds: UpdateScenarioPlanningUnitLockStatusDto = new UpdateScenarioPlanningUnitLockStatusDto();
   const withOptions = new PlanningUnitsByIdUpdateDto();
   withOptions.include = include;
   withOptions.exclude = exclude;
@@ -19,11 +19,11 @@ export const getDtoByIds = (
   return withInvalidIds;
 };
 
-export const getDtoWithInvalidUuids = (): PlanningUnitsUpdateDto =>
+export const getDtoWithInvalidUuids = (): UpdateScenarioPlanningUnitLockStatusDto =>
   getDtoByIds(['non-uuid'], [v4()]);
 
-export const getDtoWithInvalidMultiPolygon = (): PlanningUnitsUpdateDto => {
-  const withInvalidIds: PlanningUnitsUpdateDto = new PlanningUnitsUpdateDto();
+export const getDtoWithInvalidMultiPolygon = (): UpdateScenarioPlanningUnitLockStatusDto => {
+  const withInvalidIds: UpdateScenarioPlanningUnitLockStatusDto = new UpdateScenarioPlanningUnitLockStatusDto();
   const withOptions = new PlanningUnitsByGeoJsonUpdateDto();
   withOptions.include = [sampleMultiPolygonJson()];
   withOptions.exclude = [invalidMultiPolygon()];

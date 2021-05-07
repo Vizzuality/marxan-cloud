@@ -28,7 +28,7 @@ export class PlanningUnitsByGeoJsonUpdateDto {
   exclude?: FeatureCollection[];
 }
 
-export class PlanningUnitsUpdateDto {
+export class UpdateScenarioPlanningUnitLockStatusDto {
   @ApiPropertyOptional()
   @ValidateNested()
   @Type(() => PlanningUnitsByIdUpdateDto)
