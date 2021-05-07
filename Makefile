@@ -4,17 +4,18 @@
 # If using the same variables in recipes that need to use a dotenv file other
 # than .env, remember to check that no values from .env are being used
 # inadvertently.
-ENV := $(if $(environment)===test-e2e, .env-test-e2e, .env)
-API_DB_INSTANCE := $(if $(environment)===test-e2e, test-e2e-postgresql-api, postgresql-api)
-API_POSTGRES_USER := $(shell grep -e API_POSTGRES_USER ${ENV} | sed 's/^.*=//')
-API_POSTGRES_DB := $(shell grep -e API_POSTGRES_DB ${ENV} | sed 's/^.*=//')
+ENVFILE := $(if $(environment), .env-test-e2e, .env)
+CIENV := $(if $(filter $(environment), ci), -f docker-compose-test-e2e.ci.yml , -f docker-compose-test-e2e.local.yml)
+API_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-api, postgresql-api)
+API_POSTGRES_USER := $(if $(filter $(environment), ci),${API_POSTGRES_USER},$(shell grep -e API_POSTGRES_USER ${ENVFILE} | sed 's/^.*=//'))
+API_POSTGRES_DB := $(if $(filter $(environment), ci),${API_POSTGRES_DB},$(shell grep -e API_POSTGRES_DB ${ENVFILE} | sed 's/^.*=//'))
 GEO_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-geo-api, postgresql-geo-api)
-GEO_POSTGRES_USER := $(shell grep -e GEO_POSTGRES_USER ${ENV} | sed 's/^.*=//')
-GEO_POSTGRES_DB := $(shell grep -e GEO_POSTGRES_DB ${ENV} | sed 's/^.*=//')
-REDIS_INSTANCE := $(if $(environment)===test-e2e, test-e2e-redis, redis)
+GEO_POSTGRES_USER := $(if $(filter $(environment), ci),${GEO_POSTGRES_USER},$(shell grep -e GEO_POSTGRES_USER ${ENVFILE} | sed 's/^.*=//'))
+GEO_POSTGRES_DB := $(if $(filter $(environment), ci),${GEO_POSTGRES_DB},$(shell grep -e GEO_POSTGRES_DB ${ENVFILE} | sed 's/^.*=//'))
+REDIS_INSTANCE := $(if $(environment), test-e2e-redis, redis)
 
-DOCKER_COMPOSE_FILE := $(if $(environment)===test-e2e, -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml,)
-DOCKER_CLEAN_VOLUMES := $(if $(environment)===test-e2e, , \
+DOCKER_COMPOSE_FILE := $(if $(environment), -f docker-compose-test-e2e.yml $(CIENV), -f docker-compose.yml )
+DOCKER_CLEAN_VOLUMES := $(if $(environment), , \
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data && \
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data && \
 	docker volume rm -f marxan-cloud_marxan-cloud-redis-api-data )
@@ -27,12 +28,18 @@ NC :=\033[0m # No Color
 #
 # Useful when developing on API components only, to avoid spinning up services
 # which may not be needed.
+test-commands:
+	@echo $(ENVFILE)
+	@echo $(DOCKER_COMPOSE_FILE)
+	@echo $(CIENV)
+	@echo $(API_POSTGRES_DB)
+
 start-api:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing
 
 # Start all the services.
 start:
-	docker-compose up --build
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build
 
 notebooks:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose.yml up --build
@@ -106,22 +113,27 @@ seed-geodb-data: seed-api-with-test-data
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
 
 seed-test-dbs-instances:
-	$(MAKE) seed-dbs environment=test-e2e
+	$(MAKE) seed-dbs
 test-clean-slate:
-	$(MAKE) clean-slate environment=test-e2e
+	$(MAKE) clean-slate
 test-start-services: test-clean-slate
 	@echo "$(RED)Mounting docker file:$(NC) docker-compose-test-e2e.yml / docker-compose-test-e2e.local.yml"
 	# start from clean slate, in case anything was left around from previous runs (mostly relevant locally, not in CI) and spin the instances (geoprocessing, api and the DBs)
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --project-name ${COMPOSE_PROJECT_NAME} up -d --build api geoprocessing && \
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml exec -T geoprocessing ./entrypoint.sh run-migrations-for-e2e-tests && \
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml exec -T api ./entrypoint.sh run-migrations-for-e2e-tests
+	docker-compose $(DOCKER_COMPOSE_FILE) --project-name ${COMPOSE_PROJECT_NAME} up -d --build api geoprocessing && \
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./entrypoint.sh run-migrations-for-e2e-tests && \
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./entrypoint.sh run-migrations-for-e2e-tests
 
 test-e2e-api: test-start-services | seed-test-dbs-instances
 	# run tests and remove containers
-	-docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml exec -T api ./entrypoint.sh test-e2e
-	-docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml exec -T geoprocessing ./entrypoint.sh test-e2e
+	-docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./entrypoint.sh test-e2e
+	-docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./entrypoint.sh test-e2e
 	$(MAKE) test-clean-slate
 
+run-test-e2e-local:
+	$(MAKE) test-e2e-api environment=local
+
+run-test-e2e-ci:
+	$(MAKE) test-e2e-api environment=ci
 dump-geodb-data:
 	docker-compose exec -T postgresql-geo-api pg_dump -T migrations -a -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
 
