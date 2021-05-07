@@ -17,7 +17,11 @@ export class CalculatePlanningUnitsProtectionLevelHandler
   async execute(
     command: CalculatePlanningUnitsProtectionLevel,
   ): Promise<CalculatePlanningUnitsProtectionLevelResult> {
-    await this.queueService.queue.add(this.queueService.name, command, {});
+    await this.queueService.queue.add(
+      `calculate-planning-units-protection-level-${command.scenarioId}`,
+      command,
+      {},
+    );
 
     return true;
   }
