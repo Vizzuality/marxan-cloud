@@ -24,9 +24,7 @@ export class PlanningUnitsController {
     @UploadedFile() file: any,
   ) {
     this.logger.log('GEOPROCESSING PLANNING UNITS CONTROLLER');
-    this.logger.log(scenarioId);
-    console.log(file);
 
-    return true;
+    console.log(file);
   }
 }
