@@ -26,5 +26,7 @@ jobs:
     timeout-minutes: 15
     steps:
     - uses: actions/checkout@v2
+    - name: Unit Tests
+      run: npm run test:ci
     - name: Run CI tests via make task
       run: make -f Makefile-ci test-e2e-api
