@@ -11,21 +11,28 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { apiGlobalPrefixes } from 'src/api.config';
-import { uploadOptions, unzipShapefile } from 'src/utils/file.utils';
+import {
+  uploadOptions,
+  unzipShapefile,
+  shapeFileToGeoJson,
+} from 'src/utils/file.utils';
+import { ShapeFileService } from '../shapefiles/shapefiles.service';
 
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class PlanningUnitsController {
   private readonly logger: Logger = new Logger(PlanningUnitsController.name);
-  constructor() {}
+  constructor(public shapefileService: ShapeFileService) {}
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @Post('/:id/planning-unit-lock-in')
   async getShapeFile(
     @Param('id') scenarioId: string,
     @UploadedFile() file: any,
   ) {
-    this.logger.log('GEOPROCESSING PLANNING UNITS CONTROLLER');
-    console.log(file);
+    const geoJson = this.shapefileService.getGeoJson(file);
 
-    unzipShapefile('/..' + file.path);
+    /*  const geoJson = await shapeFileToGeoJson(file.path);
+    console.log(geoJson);
+    return geoJson; */
+    return geoJson;
   }
 }
