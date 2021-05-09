@@ -3,15 +3,17 @@
  */
 
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
-import { createReadStream, mkdirSync } from 'fs';
-import mapshaper from 'mapshaper';
+import { createReadStream, readdirSync } from 'fs';
+
+//import mapshaper from 'mapshaper';
 
 /**
  * ES5 import to avoid TS complaining
  */
 const multer = require('multer');
 const unzipper = require('unzipper');
-
+const mapshaper = require('mapshaper');
+const path = require('path');
 /**
  * Options for Multer
  */
@@ -36,16 +38,38 @@ export const uploadOptions: MulterOptions = {
 
 export const unzipShapefile = async (path: string) => {
   //mkdirSync(path.replace('.zip', ''));
-  console.log('*********** PATH ***********', path);
-  console.log(
-    '*********** REPLACED PATH **********',
-    path.replace('.zip', '.'),
-  );
-  await createReadStream(path).pipe(
+  return await createReadStream(path).pipe(
     unzipper.Extract({ path: '/../tmp/' + path.replace('.zip', '') }),
   );
 };
 
-export const shapeFileToGeoJson = (shapefile: any) => {
-  const geoJson = mapshaper.runCommand();
+export const shapeFileToGeoJson = async (shapeFilePath: any) => {
+  console.log('CURRENT ROUTE', process.cwd());
+  console.log(
+    'PATH TO TMP',
+    readdirSync(
+      path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        '..',
+        'tmp/1620537646923-lockin-shp/layers',
+      ),
+    ),
+  );
+
+  return await mapshaper.applyCommands(
+    '-i ' +
+      path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        '..',
+        'tmp/1620537646923-lockin-shp/layers/POLYGON.shp -o output.geojson',
+      ),
+
+    (err: Error, output: any) => output,
+  );
 };
