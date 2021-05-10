@@ -14,12 +14,12 @@ export class TileSpecification extends TileRequest {
   @Max(2)
   @IsInt()
   @Transform((value) => Number.parseInt(value))
-  level: number;
+  level!: number;
 }
 
 export type AdminAreasFilters = {
   guid: string;
-}
+};
 
 @Injectable()
 export class AdminAreasService {
@@ -31,32 +31,26 @@ export class AdminAreasService {
     private readonly tileService: TileService,
   ) {}
 
-
-  buildAdminAreaWhereQuery(
-    level: number,
-    filters?: AdminAreasFilters): string {
+  buildAdminAreaWhereQuery(level: number, filters?: AdminAreasFilters): string {
     let whereQuery = '';
     if (level === 0) {
       if (filters?.guid) {
-        whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL AND gid_0 = '${filters?.guid}'`
-      }
-      else {
+        whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL AND gid_0 = '${filters?.guid}'`;
+      } else {
         whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL`;
       }
     }
     if (level === 1) {
       if (filters?.guid) {
         whereQuery = `gid_1 IS NOT NULL AND gid_2 IS NULL AND gid_0 = '${filters?.guid}'`;
-      }
-      else {
+      } else {
         whereQuery = `gid_1 IS NOT NULL AND gid_2 IS NULL AND gid_0 != 'ATA'`;
       }
     }
     if (level === 2) {
       if (filters?.guid) {
         whereQuery = `gid_2 IS NOT NULL and  gid_1 = '${filters?.guid}'`;
-      }
-      else {
+      } else {
         whereQuery = `gid_2 IS NOT NULL`;
       }
     }
@@ -68,9 +62,8 @@ export class AdminAreasService {
    */
   public findTile(
     tileSpecification: TileSpecification,
-    filters?: AdminAreasFilters
-    ): Promise<Buffer> {
-
+    filters?: AdminAreasFilters,
+  ): Promise<Buffer> {
     const { z, x, y, level } = tileSpecification;
 
     const attributes = 'name_0, name_1, name_2';
