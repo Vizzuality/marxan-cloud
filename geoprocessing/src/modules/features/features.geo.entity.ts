@@ -8,9 +8,9 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 export class GeoFeatureGeometry {
   @ApiProperty()
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  @Column( 'uuid', { name: 'feature_id' })
-  featuresId: string;
+  @Column('uuid', { name: 'feature_id' })
+  featuresId!: string;
 }

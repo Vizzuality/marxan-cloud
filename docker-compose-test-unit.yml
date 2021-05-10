@@ -1,0 +1,19 @@
+# GH Actions runners on Ubuntu 18.04 require an older (<= 3.6) Compose file version
+version: "3.6"
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      args:
+        UID: 5000
+        GID: 5000
+    container_name: marxan-test-unit-api
+    command: test-unit
+    user: "5000:5000"
+    volumes:
+      - ./api/src:/opt/marxan-api/src
+      - ./api/test:/opt/marxan-api/test
+    environment:
+      - NODE_PATH=src
+      - NODE_ENV=test

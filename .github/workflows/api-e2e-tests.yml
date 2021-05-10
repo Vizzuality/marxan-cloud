@@ -1,4 +1,4 @@
-name: API e2e tests
+name: API tests
 on:
   push:
     paths:
@@ -30,4 +30,12 @@ jobs:
     - name: Checkout envs
       run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
     - name: Run CI tests via make task
-      run: make -f Makefile run-test-e2e-ci
+      run: make run-test-e2e-ci
+  test-api-unit:
+    runs-on: ubuntu-18.04
+    timeout-minutes: 10
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Run API unit Tests
+      run: make test-unit-api

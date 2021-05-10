@@ -3,6 +3,7 @@
  */
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Geometry } from 'geojson';
 
 @Entity('admin_regions')
 export class AdminArea {
@@ -11,47 +12,47 @@ export class AdminArea {
    */
   @ApiProperty()
   @PrimaryColumn('character varying', { name: 'gid_0' })
-  gid0: string;
+  gid0!: string;
 
   /**
    * Country name.
    */
   @ApiProperty()
   @PrimaryColumn('character varying', { name: 'name_0' })
-  name0: string;
+  name0!: string;
 
   /**
    * Level 1 id.
    */
   @ApiProperty()
   @Column('character varying', { name: 'gid_1' })
-  gid1: string;
+  gid1!: string;
 
   /**
    * Level 1 name.
    */
   @ApiProperty()
   @Column('character varying', { name: 'name_1' })
-  name1: string;
+  name1!: string;
 
   /**
    * Level 2 id.
    */
   @ApiProperty()
   @Column('character varying', { name: 'gid_2' })
-  gid2: string;
+  gid2!: string;
 
   /**
    * Level 2 name.
    */
   @ApiProperty()
   @Column('character varying', { name: 'name_2' })
-  name2: string;
+  name2!: string;
 
   /**
    * Level 2 id.
    */
   @ApiProperty()
   @Column('geometry', { name: 'the_geom', select: false })
-  theGeom: any;
+  theGeom!: Geometry;
 }

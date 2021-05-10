@@ -11,7 +11,7 @@ import { omit } from 'lodash';
 
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Response } from 'express';
-import { AppConfig } from 'utils/config.utils';
+import { AppConfig } from '../utils/config.utils';
 
 /**
  * Catch-all exception filter. Output error data to logs, and send it as
