@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 
-import { useDispatch } from 'react-redux';
-
-import { useRouter } from 'next/router';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-
 import Icon from 'components/icon';
 
 import SELECT_PLANNING_UNITS_SVG from 'svgs/ui/planning-units.svg?sprite';
@@ -26,14 +21,6 @@ export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
 }: AnalysisAdjustButtonsProps) => {
   const [selected, setSelected] = useState(null);
 
-  const { query } = useRouter();
-  const { sid } = query;
-
-  const scenarioSlice = getScenarioSlice(sid);
-  const { setDrawing, setDrawingGeo } = scenarioSlice.actions;
-
-  const dispatch = useDispatch();
-
   const BUTTONS = [
     {
       id: 'clicking',
@@ -46,13 +33,6 @@ export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
       name: 'Draw shape on map',
       icon: DRAW_SHAPE_SVG,
       Component: Drawing,
-      onOpen: () => {
-        dispatch(setDrawing('polygon'));
-      },
-      onClose: () => {
-        dispatch(setDrawing(null));
-        dispatch(setDrawingGeo(null));
-      },
     },
     {
       id: 'uploading',
@@ -77,7 +57,6 @@ export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
             })}
             onClick={() => {
               setSelected(b.id);
-              if (b.onOpen) b.onOpen();
             }}
           >
             <header className="relative w-full">
@@ -103,7 +82,6 @@ export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
                   className="absolute right-0 flex items-center justify-center h-5 pl-5 pr-1 transform -translate-y-1/2 border-l border-gray-300 top-1/2 focus:outline-none"
                   onClickCapture={() => {
                     setSelected(null);
-                    if (b.onClose) b.onClose();
                   }}
                 >
                   <Icon
