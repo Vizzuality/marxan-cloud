@@ -19,8 +19,8 @@ services:
       - GEO_POSTGRES_DB
       - POSTGRES_GEO_SERVICE_PORT
       - REDIS_API_SERVICE_PORT
-      - API_POSTGRES_URL=${API_POSTGRES_URL}
-      - GEO_POSTGRES_URL=${GEO_POSTGRES_URL}
+      - API_POSTGRES_URL=$API_POSTGRES_URL
+      - GEO_POSTGRES_URL
 
   geoprocessing:
     environment:
