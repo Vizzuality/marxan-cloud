@@ -5,15 +5,11 @@
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { createReadStream, readdirSync } from 'fs';
 
-//import mapshaper from 'mapshaper';
-
 /**
  * ES5 import to avoid TS complaining
  */
 const multer = require('multer');
-const unzipper = require('unzipper');
-const mapshaper = require('mapshaper');
-const path = require('path');
+
 /**
  * Options for Multer
  */

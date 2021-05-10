@@ -22,13 +22,10 @@ export class PlanningUnitsController {
   @Post('/:id/planning-unit-lock-in')
   async getShapeFile(
     @Param('id') scenarioId: string,
-    @UploadedFile() file: any,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     const geoJson = this.shapefileService.getGeoJson(file);
 
-    /*  const geoJson = await shapeFileToGeoJson(file.path);
-    console.log(geoJson);
-    return geoJson; */
     return geoJson;
   }
 }
