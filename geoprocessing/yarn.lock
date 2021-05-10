@@ -6193,7 +6193,7 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-mapshaper@^0.5.51:
+mapshaper@0.5.51:
   version "0.5.51"
   resolved "https://registry.yarnpkg.com/mapshaper/-/mapshaper-0.5.51.tgz#01992ecbd7fee94a277d04ff253b92e9683e4171"
   integrity sha512-W2f2Qs+yAJ7BR3FJ0q6W6M9G4I53l67Ti4245OL/7vtbSclMbh/KOiOvcAZiAsa5uQkZJMm4LG0DL8nRfD1RYg==
@@ -8290,6 +8290,11 @@ tapable@^2.1.1, tapable@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/tapable/-/tapable-2.2.0.tgz#5c373d281d9c672848213d0e037d1c4165ab426b"
   integrity sha512-FBk4IesMV1rBxX2tfiK8RAmogtWn53puLOQlvO8XuwlgxcYbP4mVPS9Ph4aeamSyyVjOl24aYWAuc8U5kCVwMw==
+
+temp-dir@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/temp-dir/-/temp-dir-2.0.0.tgz#bde92b05bdfeb1516e804c9c00ad45177f31321e"
+  integrity sha512-aoBAniQmmwtcKp/7BzsH8Cxzv8OL736p7v1ihGb5e9DJ9kTwGWHrQrVB5+lfVDzfGrdRzXch+ig7LHaY1JTOrg==
 
 term-size@^2.1.0:
   version "2.2.1"
