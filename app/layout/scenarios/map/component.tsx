@@ -25,6 +25,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
+import { featureStyle, editHandleStyle } from './drawing-styles';
+
 export interface ScenariosMapProps {
 }
 
@@ -59,14 +61,19 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
       EDITOR.deleteFeatures(drawingGeo);
       dispatch(setDrawingGeo(null));
     }
+  }, [drawing, drawingGeo, dispatch, setDrawingGeo]);
+
+  // Delete feature as soon as you unmount this component
+  useEffect(() => {
+    const EDITOR = editorRef?.current;
 
     return () => {
-      if (!drawing && !!EDITOR) {
+      if (EDITOR) {
         EDITOR.deleteFeatures(drawingGeo);
         dispatch(setDrawingGeo(null));
       }
     };
-  }, [drawing, drawingGeo, dispatch, setDrawingGeo]);
+  }, []); // eslint-disable-line
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
@@ -89,14 +96,6 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
 
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
-      <button
-        type="button"
-        onClick={() => {
-
-        }}
-      >
-        Editting
-      </button>
       <Map
         // bounds={bounds}
         width="100%"
@@ -117,11 +116,15 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
                 ))}
               </LayerManager>
 
+              {/* Drawing editor */}
               <Editor
                 ref={editorRef}
                 clickRadius={12}
                 mode={mode}
                 features={drawingGeo}
+                featureStyle={featureStyle}
+                editHandleStyle={editHandleStyle}
+                editHandleShape="circle"
                 onUpdate={(s) => {
                   const { data, editType } = s;
                   const EDITION_TYPES = ['addFeature'];
