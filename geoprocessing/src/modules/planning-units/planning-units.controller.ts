@@ -19,7 +19,7 @@ export class PlanningUnitsController {
   private readonly logger: Logger = new Logger(PlanningUnitsController.name);
   constructor(public shapefileService: ShapeFileService) {}
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @Post('/:id/planning-unit-lock-in')
+  @Post('/:id/planning-unit-shapefile')
   async getShapeFile(
     @Param('id') scenarioId: string,
     @UploadedFile() file: Express.Multer.File,
