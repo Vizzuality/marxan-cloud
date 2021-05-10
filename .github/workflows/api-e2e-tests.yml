@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   test-api-e2e:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     timeout-minutes: 15
     env:
       API_SERVICE_PORT: 3130
@@ -27,8 +27,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-    - name: visualize envs
-      uses: hmarr/debug-action@v2
     - name: Checkout envs
       run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
     - name: Run CI tests via make task
