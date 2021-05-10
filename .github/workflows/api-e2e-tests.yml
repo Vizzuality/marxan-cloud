@@ -28,4 +28,4 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Run CI tests via make task
-      run: make -f Makefile test-commands environment=ci
+      run: make -f Makefile run-test-e2e-ci
