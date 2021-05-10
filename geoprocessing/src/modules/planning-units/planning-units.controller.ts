@@ -11,14 +11,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { apiGlobalPrefixes } from 'src/api.config';
-import {
-  uploadOptions,
-  unzipShapefile,
-  shapeFileToGeoJson,
-} from 'src/utils/file.utils';
+import { uploadOptions } from 'src/utils/file.utils';
 import { ShapeFileService } from '../shapefiles/shapefiles.service';
 
-@Controller(`${apiGlobalPrefixes.v1}/scenarios`)
+@Controller(`${apiGlobalPrefixes.v1}/planning-units`)
 export class PlanningUnitsController {
   private readonly logger: Logger = new Logger(PlanningUnitsController.name);
   constructor(public shapefileService: ShapeFileService) {}
