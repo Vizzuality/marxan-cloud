@@ -31,7 +31,7 @@ import { AsyncJobsAdapter } from './providers/planning-units/adapters/async-jobs
     },
     UpdatePlanningUnitsService,
     UpdateCostSurfaceService,
-    // internals
+    // internals - should be in adapters.module
     {
       provide: ArePuidsAllowedPort,
       useClass: ArePuidsAllowedAdapter,

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { differenceWith } from 'lodash';
 import { ArePuidsAllowedPort } from '../are-puids-allowed.port';
 
 import { ScenariosPlanningUnitService } from '../../../../scenarios-planning-unit/scenarios-planning-unit.service';
@@ -8,12 +9,28 @@ export class ArePuidsAllowedAdapter
   extends ScenariosPlanningUnitService
   implements ArePuidsAllowedPort {
   async validate(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     scenarioId: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     puIds: string[],
   ): Promise<{ errors: unknown[] }> {
-    // TODO real implementation in standalone PR, with e2e-integration test
-    return Promise.resolve({ errors: [] });
+    const allowedFeaturesIds = (
+      await this.findAll(undefined, {
+        params: {
+          scenarioId,
+        },
+      })
+    )[0]
+      .map((scenario) => scenario.puGeometryId)
+      .filter(this.isDefined);
+
+    /**
+     * find those that are present in puIds but not in allowedFeaturesIds
+     */
+    const diff = differenceWith(puIds, allowedFeaturesIds);
+    return {
+      errors: diff.map((missingId) => `Missing ${missingId}`),
+    };
   }
+
+  private isDefined = (value: string | undefined | null): value is string =>
+    value !== undefined && value !== null;
 }
