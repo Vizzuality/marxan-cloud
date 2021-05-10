@@ -10,18 +10,26 @@ export class ShapeFileService {
   constructor() {}
 
   private _unzipShapefile(fileInfo: Express.Multer.File): Promise<string> {
+    console.log(fileInfo);
     return new Promise((resolve, reject) => {
       createReadStream(fileInfo.path)
         .pipe(
           unzipper.Extract({
-            path: fileInfo.destination + fileInfo.filename.replace('.zip', ''),
+            path: `${fileInfo.destination}/${fileInfo.filename.replace(
+              '.zip',
+              '',
+            )}`,
           }),
         )
         .on('close', () =>
           resolve(`${fileInfo.filename} extracted succesfully`),
         )
-        .on('error', () =>
-          reject(new Error(`${fileInfo.filename} could not been extracted`)),
+        .on('error', (error: Error) =>
+          reject(
+            new Error(
+              `${fileInfo.filename} could not been extracted: ` + error,
+            ),
+          ),
         );
     });
   }
