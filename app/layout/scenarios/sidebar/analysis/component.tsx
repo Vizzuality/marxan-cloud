@@ -20,7 +20,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   const { query } = useRouter();
   const { sid } = query;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: scenarioData } = useScenario(sid);
 

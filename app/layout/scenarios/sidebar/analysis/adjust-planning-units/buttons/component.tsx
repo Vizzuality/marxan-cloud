@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 
+import { useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
 import Icon from 'components/icon';
 
 import SELECT_PLANNING_UNITS_SVG from 'svgs/ui/planning-units.svg?sprite';
@@ -12,27 +17,6 @@ import Clicking from './clicking';
 import Drawing from './drawing';
 import Uploading from './uploading';
 
-const BUTTONS = [
-  {
-    id: 'clicking',
-    name: 'Select planning units',
-    icon: SELECT_PLANNING_UNITS_SVG,
-    Component: Clicking,
-  },
-  {
-    id: 'drawing',
-    name: 'Draw shape on map',
-    icon: DRAW_SHAPE_SVG,
-    Component: Drawing,
-  },
-  {
-    id: 'uploading',
-    name: 'Upload shapefile',
-    icon: UPLOAD_SVG,
-    Component: Uploading,
-  },
-];
-
 export interface AnalysisAdjustButtonsProps {
   type: string;
 }
@@ -41,6 +25,42 @@ export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
   type,
 }: AnalysisAdjustButtonsProps) => {
   const [selected, setSelected] = useState(null);
+
+  const { query } = useRouter();
+  const { sid } = query;
+
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setDrawing, setDrawingGeo } = scenarioSlice.actions;
+
+  const dispatch = useDispatch();
+
+  const BUTTONS = [
+    {
+      id: 'clicking',
+      name: 'Select planning units',
+      icon: SELECT_PLANNING_UNITS_SVG,
+      Component: Clicking,
+    },
+    {
+      id: 'drawing',
+      name: 'Draw shape on map',
+      icon: DRAW_SHAPE_SVG,
+      Component: Drawing,
+      onOpen: () => {
+        dispatch(setDrawing('polygon'));
+      },
+      onClose: () => {
+        dispatch(setDrawing(null));
+        dispatch(setDrawingGeo(null));
+      },
+    },
+    {
+      id: 'uploading',
+      name: 'Upload shapefile',
+      icon: UPLOAD_SVG,
+      Component: Uploading,
+    },
+  ];
 
   return (
     <div key={type} className="flex flex-col w-full mt-5 space-y-2">
@@ -55,7 +75,10 @@ export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
               'bg-gray-600 text-gray-200 opacity-50': !active,
               'bg-gray-600 text-white': active,
             })}
-            onClick={() => setSelected(b.id)}
+            onClick={() => {
+              setSelected(b.id);
+              if (b.onOpen) b.onOpen();
+            }}
           >
             <header className="relative w-full">
               <div
@@ -78,7 +101,10 @@ export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
                 <button
                   type="button"
                   className="absolute right-0 flex items-center justify-center h-5 pl-5 pr-1 transform -translate-y-1/2 border-l border-gray-300 top-1/2 focus:outline-none"
-                  onClickCapture={() => setSelected(null)}
+                  onClickCapture={() => {
+                    setSelected(null);
+                    if (b.onClose) b.onClose();
+                  }}
                 >
                   <Icon
                     className="w-3 h-3 text-primary-500"
