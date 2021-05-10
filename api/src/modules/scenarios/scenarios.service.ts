@@ -17,6 +17,7 @@ import { ProtectedAreasService } from 'modules/protected-areas/protected-areas.s
 import { ProjectsService } from 'modules/projects/projects.service';
 import { concat } from 'lodash';
 import { AppConfig } from 'utils/config.utils';
+import { WdpaArenaCalculationService } from './wdpa-arena-calculation.service';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
@@ -42,10 +43,31 @@ export class ScenariosService extends AppBaseService<
     protected readonly protectedAreasService: ProtectedAreasService,
     @Inject(forwardRef(() => ProjectsService))
     protected readonly projectsService: ProjectsService,
+    private readonly wdpaCalculationsDetector: WdpaArenaCalculationService,
   ) {
     super(repository, 'scenario', 'scenarios', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
     });
+  }
+
+  async actionAfterCreate(
+    model: Scenario,
+    createModel: CreateScenarioDTO,
+    _?: AppInfoDTO,
+  ): Promise<void> {
+    if (this.wdpaCalculationsDetector.shouldTrigger(model, createModel)) {
+      // TODO: trigger job - execute command of https://github.com/Vizzuality/marxan-cloud/pull/153/files
+    }
+  }
+
+  async actionAfterUpdate(
+    model: Scenario,
+    updateModel: UpdateScenarioDTO,
+    _?: AppInfoDTO,
+  ): Promise<void> {
+    if (this.wdpaCalculationsDetector.shouldTrigger(model, updateModel)) {
+      // TODO: trigger job - execute command of https://github.com/Vizzuality/marxan-cloud/pull/153/files
+    }
   }
 
   get serializerConfig(): JSONAPISerializerConfig<Scenario> {
