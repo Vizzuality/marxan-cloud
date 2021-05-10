@@ -3,14 +3,19 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ScenarioEditStateProps {
   tab: string,
+  clicking: boolean;
+  clickingValue: string[];
+
   drawing: string;
-  drawingGeo: Record<string, object>
+  drawingValue: Record<string, object>
 }
 
 const initialState = {
   tab: 'protected-areas',
+  clicking: false,
+  clickingValue: [],
   drawing: null,
-  drawingGeo: null,
+  drawingValue: null,
 } as ScenarioEditStateProps;
 
 export function getScenarioSlice(id) {
@@ -24,8 +29,14 @@ export function getScenarioSlice(id) {
       setDrawing: (state, action: PayloadAction<string>) => {
         state.drawing = action.payload;
       },
-      setDrawingGeo: (state, action: PayloadAction<Record<string, object>>) => {
-        state.drawingGeo = action.payload;
+      setDrawingValue: (state, action: PayloadAction<Record<string, object>>) => {
+        state.drawingValue = action.payload;
+      },
+      setClicking: (state, action: PayloadAction<boolean>) => {
+        state.clicking = action.payload;
+      },
+      setClickingValue: (state, action: PayloadAction<string[]>) => {
+        state.clickingValue = action.payload;
       },
     },
   });

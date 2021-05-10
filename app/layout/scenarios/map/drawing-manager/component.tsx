@@ -23,11 +23,11 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
   const editorRef = useRef(null);
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setDrawing, setDrawingGeo } = scenarioSlice.actions;
+  const { setDrawing, setDrawingValue } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
 
-  const { drawing, drawingGeo } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { drawing, drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const mode = useMemo(() => {
     if (drawing === 'editing') return new EditingMode();
@@ -40,10 +40,10 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
     const EDITOR = editorRef?.current;
 
     if (!drawing && !!EDITOR) {
-      EDITOR.deleteFeatures(drawingGeo);
-      dispatch(setDrawingGeo(null));
+      EDITOR.deleteFeatures(drawingValue);
+      dispatch(setDrawingValue(null));
     }
-  }, [drawing, drawingGeo, dispatch, setDrawingGeo]);
+  }, [drawing, drawingValue, dispatch, setDrawingValue]);
 
   // Delete feature as soon as you unmount this component
   useEffect(() => {
@@ -51,8 +51,8 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
 
     return () => {
       if (EDITOR) {
-        EDITOR.deleteFeatures(drawingGeo);
-        dispatch(setDrawingGeo(null));
+        EDITOR.deleteFeatures(drawingValue);
+        dispatch(setDrawingValue(null));
       }
     };
   }, []); // eslint-disable-line
@@ -62,7 +62,7 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
       ref={editorRef}
       clickRadius={12}
       mode={mode}
-      features={drawingGeo}
+      features={drawingValue}
       featureStyle={featureStyle}
       editHandleStyle={editHandleStyle}
       editHandleShape="circle"
@@ -73,11 +73,11 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
 
         if (EDITION_TYPES.includes(editType)) {
           dispatch(setDrawing('editing'));
-          dispatch(setDrawingGeo(data));
+          dispatch(setDrawingValue(data));
         }
 
         if (UPDATE_TYPES.includes(editType)) {
-          dispatch(setDrawingGeo(data));
+          dispatch(setDrawingValue(data));
         }
       }}
     />

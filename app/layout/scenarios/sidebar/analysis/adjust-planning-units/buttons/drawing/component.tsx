@@ -28,16 +28,17 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   const { sid } = query;
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setDrawing, setDrawingGeo } = scenarioSlice.actions;
+  const { setDrawing, setDrawingValue } = scenarioSlice.actions;
+
   const dispatch = useDispatch();
-  const { drawingGeo } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const INITIAL_VALUES = useMemo(() => {
     return {
       type,
-      drawingGeo,
+      drawingValue,
     };
-  }, [type, drawingGeo]);
+  }, [type, drawingValue]);
 
   // Effects
   useEffect(() => {
@@ -47,13 +48,13 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
 
     if (!selected) {
       dispatch(setDrawing(null));
-      dispatch(setDrawingGeo(null));
+      dispatch(setDrawingValue(null));
     }
 
     // Unmount
     return () => {
       dispatch(setDrawing(null));
-      dispatch(setDrawingGeo(null));
+      dispatch(setDrawingValue(null));
     };
   }, [selected]); // eslint-disable-line
 
