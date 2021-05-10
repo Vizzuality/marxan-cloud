@@ -31,7 +31,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   return (
     <motion.div
       key="analysis"
-      className="flex flex-col items-start justify-start min-h-0 overflow-hidden"
+      className="flex flex-col items-start justify-start min-h-0 overflow-hidden divide-y divide-gray-600 divide-opacity-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

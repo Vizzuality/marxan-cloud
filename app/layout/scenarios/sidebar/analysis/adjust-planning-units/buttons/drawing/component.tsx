@@ -5,7 +5,7 @@ import cx from 'classnames';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
-import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { Form as FormRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
@@ -14,11 +14,13 @@ import { getScenarioSlice } from 'store/slices/scenarios/edit';
 import DRAW_SHAPE_SVG from 'svgs/ui/draw.svg?sprite';
 
 export interface AnalysisAdjustDrawingProps {
+  type: string;
   selected: boolean;
   onSelected: (s: string) => void;
 }
 
 export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
+  type,
   selected,
   onSelected,
 }: AnalysisAdjustDrawingProps) => {
@@ -32,9 +34,10 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
 
   const INITIAL_VALUES = useMemo(() => {
     return {
+      type,
       drawingGeo,
     };
-  }, [drawingGeo]);
+  }, [type, drawingGeo]);
 
   // Effects
   useEffect(() => {
@@ -62,18 +65,12 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
 
   return (
     <FormRFF
-      key="features-list"
+      key="drawing-form"
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
       {({ handleSubmit }) => (
         <form onSubmit={handleSubmit} autoComplete="off">
-          <FieldRFF
-            name="drawingGeo"
-          >
-            {({ input }) => (<input type="hidden" {...input} />)}
-          </FieldRFF>
-
           <div
             key="drawing"
             role="presentation"
@@ -139,7 +136,7 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
             {selected && (
               <div className="pt-2">
                 <div className="flex w-full">
-                  <p className="text-sm text-gray-300">Click over the map, and select planning units.</p>
+                  <p className="text-sm text-gray-300">Click over the map and draw a shape.</p>
                 </div>
               </div>
             )}

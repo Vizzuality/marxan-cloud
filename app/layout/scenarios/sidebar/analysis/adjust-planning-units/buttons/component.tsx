@@ -36,7 +36,8 @@ export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
 
         return (
           <Component
-            key={id}
+            key={`${id}-${type}`}
+            type={type}
             selected={active}
             onSelected={(s) => setSelected(s)}
           />

@@ -8,6 +8,7 @@ import Icon from 'components/icon';
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
 export interface AnalysisAdjustUploadingProps {
+  type: string;
   selected: boolean;
   onSelected: (s: string) => void;
 }
