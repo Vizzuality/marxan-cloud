@@ -128,7 +128,9 @@ export class ScenariosController {
       },
     },
   })
-  @ApiOperation({ description: 'Upload Shapefile' })
+  @ApiOperation({
+    description: 'Upload Zip file containing .shp, .dbj, .prj and .shx files',
+  })
   @Post(':id/planning-unit-shapefile')
   //@UseInterceptors(FileInterceptor('file', uploadOptions))
   async uploadLockInShapeFile(
