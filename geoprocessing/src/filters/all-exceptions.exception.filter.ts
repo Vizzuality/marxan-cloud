@@ -67,12 +67,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? omit(errorData, ['meta.rawError', 'meta.stack'])
         : errorData,
     );
-
+  
     response.removeHeader('content-encoding');
     response
       .status(status)
       .header('Content-Type', 'application/json')
-      .header('Content-Disposition', 'inline')
+      .header('content-disposition', 'inline')
       .json(errorDataForResponse);
+    this.logger.error(response.getHeaders());
   }
 }
