@@ -29,6 +29,8 @@ import {
 
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -113,8 +115,22 @@ export class ScenariosController {
       await this.service.create(dto, { authenticatedUser: req.user }),
     );
   }
-  @ApiOperation({ description: 'Upload Lock-In Shapefile' })
-  @Post(':id/planning-unit-lock-in')
+  // TODO wrap in custom decorator
+  // TODO add Validations
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiOperation({ description: 'Upload Shapefile' })
+  @Post(':id/planning-unit-shapefile')
   //@UseInterceptors(FileInterceptor('file', uploadOptions))
   async uploadLockInShapeFile(
     @Param('id') scenarioId: string,
@@ -127,16 +143,6 @@ export class ScenariosController {
       response,
     );
     return proxyServiceResponse;
-  }
-
-  @ApiOperation({ description: 'Upload Lock-Out Shapefile' })
-  @Post(':id/planning-unit-lock-out')
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
-  async uploadLockOutShapeFile(
-    @Param('id') scenarioId: string,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    return { scenarioId, file };
   }
 
   @ApiOperation({ description: 'Update scenario' })

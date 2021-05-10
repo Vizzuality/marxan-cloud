@@ -39,17 +39,18 @@ export class ShapeFileService {
     rmdirSync(path, { recursive: true });
   }
 
-  async getGeoJson(shapeFile: any) {
-    const res = await this._unzipShapefile(shapeFile);
-    this.logger.log(res);
+  async getGeoJson(shapeFile: Express.Multer.File) {
+    try {
+      this.logger.log(await this._unzipShapefile(shapeFile));
+    } catch (err) {
+      this.logger.error(err);
+    }
     const geoJson = await this._shapeFileToGeoJson(shapeFile).then(
       (geoJson) => {
         this.wipeOutFolder(shapeFile.path.replace('.zip', ''));
         return geoJson;
       },
     );
-    this.logger.log(geoJson);
-
-    return { message: 'SHAPEFILE SERVICE RESPONSE', data: geoJson };
+    return { data: geoJson };
   }
 }
