@@ -27,23 +27,15 @@ export class ShapeFileService {
   }
 
   private async _shapeFileToGeoJson(fileInfo: Express.Multer.File) {
-    let geoJson: any;
     const _geoJson = await mapshaper.applyCommands(
-      `-i ${fileInfo.path.replace('.zip', '')}/POLYGON.shp -o format=geojson`,
-      {},
-      (err: Error, output: any) => {
-        this.logger.log(output);
-        geoJson = output;
-        return geoJson;
-      },
+      `-i ${fileInfo.path.replace('.zip', '')}/*.shp -o format=geojson`,
     );
-    this.logger.log(geoJson);
+    this.logger.log(_geoJson);
 
-    return geoJson;
+    return _geoJson;
   }
 
   private wipeOutFolder(path: string): void {
-    console.log('PATH TO DELETE', path);
     rmdirSync(path, { recursive: true });
   }
 
@@ -51,8 +43,7 @@ export class ShapeFileService {
     const res = await this._unzipShapefile(shapeFile);
     this.logger.log(res);
     const geoJson = await this._shapeFileToGeoJson(shapeFile).then(() => {
-      this.logger.log('WIPING OUT FOLDER');
-      this.wipeOutFolder(shapeFile.path.replace('zip', ''));
+      this.wipeOutFolder(shapeFile.path.replace('.zip', ''));
     });
 
     return { message: 'SHAPEFILE SERVICE RESPONSE', data: geoJson };
