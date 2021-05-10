@@ -9,12 +9,13 @@ import { ApiProperty } from '@nestjs/swagger';
 export class TileSpecification extends TileRequest {
   @ApiProperty()
   @IsString()
-  id: string;
+  id!: string;
 }
 
 @Injectable()
 export class FeatureService {
   private readonly logger: Logger = new Logger(FeatureService.name);
+
   constructor(
     @InjectRepository(GeoFeatureGeometry)
     private readonly featuresRepository: Repository<GeoFeatureGeometry>,
@@ -22,22 +23,20 @@ export class FeatureService {
     private readonly tileService: TileService,
   ) {}
 
-   /**
+  /**
    *
    * @todo generate the custom queries using query builder and the entity data.
    * @todo move the string to int transformation to the AdminAreaLevelFilters class
    */
   buildFeaturesWhereQuery(id: string): string {
-    const  whereQuery = `feature_id = '${id}'`;
-    return whereQuery;
+    return `feature_id = '${id}'`;
   }
-
 
   /**
    * @todo get attributes from Entity, based on user selection
    */
   public findTile(tileSpecification: TileSpecification): Promise<Buffer> {
-    const { z, x, y , id} = tileSpecification;
+    const { z, x, y, id } = tileSpecification;
     const attributes = 'feature_id';
     const table = this.featuresRepository.metadata.tableName;
     const customQuery = this.buildFeaturesWhereQuery(id);
