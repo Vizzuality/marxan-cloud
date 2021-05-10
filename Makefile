@@ -33,6 +33,7 @@ test-commands:
 	@echo $(DOCKER_COMPOSE_FILE)
 	@echo $(CIENV)
 	@echo $(API_POSTGRES_DB)
+	@echo $(GEO_POSTGRES_USER)
 
 start-api:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing
