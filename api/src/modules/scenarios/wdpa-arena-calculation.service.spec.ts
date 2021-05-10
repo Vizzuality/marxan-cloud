@@ -1,7 +1,7 @@
 import { WdpaArenaCalculationService } from './wdpa-arena-calculation.service';
 import { Test } from '@nestjs/testing';
 import {
-  scenarioWithAllWatchedEmpty,
+  scenarioWithRequiredWatchedEmpty,
   scenarioWithAllWatchedPresent,
 } from './__mocks__/scenario.data';
 import {
@@ -20,18 +20,6 @@ beforeEach(async () => {
   sut = sandbox.get(WdpaArenaCalculationService);
 });
 
-describe(`when scenario has empty watched data`, () => {
-  test.each([
-    emptyWatchedChangeSet(),
-    fullWatchedChangeSet(),
-    thresholdChangeSet(),
-  ])(`should not tell to trigger calculations`, (input) => {
-    expect(sut.shouldTrigger(scenarioWithAllWatchedEmpty(), input)).toEqual(
-      false,
-    );
-  });
-});
-
 describe(`when scenario has insufficient watched data`, () => {
   test.each([
     emptyWatchedChangeSet(),
@@ -39,13 +27,7 @@ describe(`when scenario has insufficient watched data`, () => {
     thresholdChangeSet(),
   ])(`should not tell to trigger calculations`, (input) => {
     expect(
-      sut.shouldTrigger(
-        {
-          ...scenarioWithAllWatchedEmpty(),
-          wdpaThreshold: 30,
-        },
-        input,
-      ),
+      sut.shouldTrigger(scenarioWithRequiredWatchedEmpty(), input),
     ).toEqual(false);
   });
 });
@@ -62,7 +44,7 @@ describe(`when scenario has complete data`, () => {
     });
   });
 
-  describe(`when input changes contain watched properties`, () => {
+  describe(`when input changes contain watched property`, () => {
     it(`should tell to trigger calculations`, () => {
       expect(
         sut.shouldTrigger(

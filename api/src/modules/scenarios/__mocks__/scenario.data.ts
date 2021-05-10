@@ -13,18 +13,17 @@ const scenarioBase = (): Scenario => ({
   status: JobStatus.done,
   type: ScenarioType.marxan,
   users: [],
-});
-
-export const scenarioWithAllWatchedEmpty = (): Scenario => ({
-  ...scenarioBase(),
   wdpaThreshold: undefined,
   wdpaIucnCategories: undefined,
   protectedAreaFilterByIds: undefined,
 });
 
+export const scenarioWithRequiredWatchedEmpty = (): Scenario => ({
+  ...scenarioBase(),
+  wdpaThreshold: undefined,
+});
+
 export const scenarioWithAllWatchedPresent = (): Scenario => ({
   ...scenarioBase(),
   wdpaThreshold: 40,
-  wdpaIucnCategories: [IUCNCategory.Ia, IUCNCategory.IV],
-  protectedAreaFilterByIds: ['10000000-1000-1000-1000-100000000000'],
 });

@@ -21,22 +21,13 @@ export class WdpaArenaCalculationService {
    * and new entity state consists (i.e. are present) of all of the below
    */
   private readonly requiredToTriggerChange: (keyof Scenario)[] = [
-    'wdpaIucnCategories',
-    'protectedAreaFilterByIds',
     'wdpaThreshold',
   ];
 
   /**
-   * 2º IF (x) has a value
-   * - wdpaIUCNCategories
-   * - customProtectedAreasIds
-   * - wdpaThershold
-   *
-   * we do trigger the next job
-   * @private
+   * Every post update that affects this 3 elements (when threshold is not null)
    */
   shouldTrigger(scenario: Scenario, changeSet: InputChange): boolean {
-    // verify if any of the "wanted" value was provided/changed
     if (!this.intendsToChangeWatchedProperty(changeSet)) {
       return false;
     }
