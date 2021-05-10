@@ -9,8 +9,7 @@ export class ShapeFileService {
   private readonly logger: Logger = new Logger(ShapeFileService.name);
   constructor() {}
 
-  private _unzipShapefile(fileInfo: Express.Multer.File): Promise<string> {
-    console.log(fileInfo);
+  private unzipShapefile(fileInfo: Express.Multer.File): Promise<string> {
     return new Promise((resolve, reject) => {
       createReadStream(fileInfo.path)
         .pipe(
@@ -34,7 +33,7 @@ export class ShapeFileService {
     });
   }
 
-  private async _shapeFileToGeoJson(fileInfo: Express.Multer.File) {
+  private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
     const outputKey = `shapefile-${new Date().getTime()}.geojson`;
 
     const _geoJson = await mapshaper.applyCommands(
@@ -58,16 +57,14 @@ export class ShapeFileService {
 
   async getGeoJson(shapeFile: Express.Multer.File) {
     try {
-      this.logger.log(await this._unzipShapefile(shapeFile));
+      this.logger.log(await this.unzipShapefile(shapeFile));
     } catch (err) {
       this.logger.error(err);
     }
-    const geoJson = await this._shapeFileToGeoJson(shapeFile).then(
-      (geoJson) => {
-        this.deleteShapefileData(shapeFile.path);
-        return geoJson;
-      },
-    );
+    const geoJson = await this.shapeFileToGeoJson(shapeFile).then((geoJson) => {
+      this.deleteShapefileData(shapeFile.path);
+      return geoJson;
+    });
     return { data: geoJson };
   }
 }
