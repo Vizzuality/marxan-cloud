@@ -73,6 +73,5 @@ export class AllExceptionsFilter implements ExceptionFilter {
       .header('Content-Type', 'application/json')
       .header('content-disposition', 'inline')
       .json(errorDataForResponse);
-    this.logger.error(response.getHeaders());
   }
 }
