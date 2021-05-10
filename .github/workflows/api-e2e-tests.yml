@@ -5,26 +5,27 @@ on:
       - 'api/**'
       - 'geoprocessing/**'
   workflow_dispatch:
-env:
-  API_SERVICE_PORT: 3130
-  API_AUTH_JWT_SECRET: ${{ secrets.API_AUTH_JWT_SECRET }}
-  API_RUN_MIGRATIONS_ON_STARTUP: true
-  API_POSTGRES_USER: marxan-api
-  API_POSTGRES_PASSWORD: ${{ secrets.API_POSTGRES_PASSWORD }}
-  API_POSTGRES_DB: marxan-api
-  POSTGRES_API_SERVICE_PORT: 3532
-  GEOPROCESSING_SERVICE_PORT: 3140
-  GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP: true
-  GEO_POSTGRES_USER: marxan-geo-api
-  GEO_POSTGRES_PASSWORD: ${{ secrets.GEO_POSTGRES_PASSWORD }}
-  GEO_POSTGRES_DB: marxan-geo-api
-  POSTGRES_GEO_SERVICE_PORT: 3533
-  REDIS_API_SERVICE_PORT: 3479
 jobs:
   test-api-e2e:
     runs-on: ubuntu-18.04
     timeout-minutes: 15
+    env:
+      API_SERVICE_PORT: 3130
+      API_AUTH_JWT_SECRET: ${{ secrets.API_AUTH_JWT_SECRET }}
+      API_RUN_MIGRATIONS_ON_STARTUP: true
+      API_POSTGRES_USER: marxan-api
+      API_POSTGRES_PASSWORD: ${{ secrets.API_POSTGRES_PASSWORD }}
+      API_POSTGRES_DB: marxan-api
+      POSTGRES_API_SERVICE_PORT: 3532
+      GEOPROCESSING_SERVICE_PORT: 3140
+      GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP: true
+      GEO_POSTGRES_USER: marxan-geo-api
+      GEO_POSTGRES_PASSWORD: ${{ secrets.GEO_POSTGRES_PASSWORD }}
+      GEO_POSTGRES_DB: marxan-geo-api
+      POSTGRES_GEO_SERVICE_PORT: 3533
+      REDIS_API_SERVICE_PORT: 3479
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Run CI tests via make task
-      run: make -f Makefile run-test-e2e-ci
+      run: make -f Makefile test-commands environment=ci
