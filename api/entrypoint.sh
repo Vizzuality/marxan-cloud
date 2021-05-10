@@ -17,6 +17,7 @@ case "$1" in
     run-migrations-for-e2e-tests)
         echo -e "\u001b[44m Running migrations for e2e Tests in Api \u001b[0m"
         echo $GEO_POSTGRES_PASSWORD
+        echo $API_POSTGRES_URL
         yarn typeorm migration:run
         ;;
     start)
