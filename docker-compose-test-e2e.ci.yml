@@ -19,8 +19,6 @@ services:
       - GEO_POSTGRES_DB
       - POSTGRES_GEO_SERVICE_PORT
       - REDIS_API_SERVICE_PORT
-      - API_POSTGRES_URL=postgres://marxan-api:marxan-api@test-e2e-postgresql-api:5432/marxan-api
-      - GEO_POSTGRES_URL=postgres://marxan-geo-api:marxan-geo-api@test-e2e-postgresql-geo-api:5432/marxan-geo-api
 
   geoprocessing:
     environment:
