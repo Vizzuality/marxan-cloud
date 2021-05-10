@@ -1,12 +1,11 @@
 import {
   Controller,
   Logger,
-  Get,
-  Req,
   Param,
   UploadedFile,
   Post,
   UseInterceptors,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation } from '@nestjs/swagger';
@@ -25,7 +24,7 @@ export class PlanningUnitsController {
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @Post('/:id/planning-unit-shapefile')
   async getShapeFile(
-    @Param('id') scenarioId: string,
+    @Param('id', ParseUUIDPipe) scenarioId: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.shapefileService.getGeoJson(file);
