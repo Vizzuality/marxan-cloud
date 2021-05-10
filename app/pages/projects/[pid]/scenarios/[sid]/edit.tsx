@@ -37,6 +37,7 @@ const EditScenarioPage: React.FC = () => {
                 <SidebarFeatures key="features" />
                 <SidebarAnalysis key="analysis" />
               </ScenariosSidebar>
+
               <ScenariosMap />
             </div>
           </Wrapper>
