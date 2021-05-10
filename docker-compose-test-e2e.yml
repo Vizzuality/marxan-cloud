@@ -17,11 +17,11 @@ services:
       - ./api/src:/opt/marxan-api/src
       - ./api/test:/opt/marxan-api/test
     environment:
-      - NODE_PATH=src
-      - NODE_ENV=development
-      - API_POSTGRES_URL=postgres://marxan-api:marxan-api@test-e2e-postgresql-api:5432/marxan-api
-      - GEO_POSTGRES_URL=postgres://marxan-geo-api:marxan-geo-api@test-e2e-postgresql-geo-api:5432/marxan-geo-api
-      - REDIS_HOST=test-e2e-redis
+      NODE_PATH: src
+      NODE_ENV: development
+      API_POSTGRES_URL: postgres://marxan-api:marxan-api@test-e2e-postgresql-api:5432/marxan-api
+      GEO_POSTGRES_URL: postgres://marxan-geo-api:marxan-geo-api@test-e2e-postgresql-geo-api:5432/marxan-geo-api
+      REDIS_HOST: test-e2e-redis
     depends_on:
       - test-e2e-postgresql-api
       - test-e2e-postgresql-geo-api
