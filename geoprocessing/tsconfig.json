@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strict": true,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -10,9 +11,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true
+    "incremental": true
   },
   "exclude": ["node_modules", "dist"]
 }
