@@ -28,7 +28,7 @@ export class UpdatePlanningUnitsService implements AdjustPlanningUnits {
         targetPuIds,
       );
       if (errors.length > 0) {
-        throw new Error('Given PU ids are not reachable in this context.');
+        throw new Error('One or more of the planning units provided for exclusion or inclusion does not match any planning unit of the present scenario.');
       }
     }
 
