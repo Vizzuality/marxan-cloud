@@ -5,6 +5,7 @@
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { Request } from 'express';
 import { diskStorage } from 'multer';
+const tempDirectory = require('temp-dir');
 
 export const uploadOptions: MulterOptions = {
   storage: diskStorage({
@@ -13,7 +14,7 @@ export const uploadOptions: MulterOptions = {
       file: Express.Multer.File,
       cb: (error: Error | null, destination: string) => void,
     ) {
-      cb(null, '/../tmp/');
+      cb(null, tempDirectory);
     },
     filename: function (
       req: Request,
