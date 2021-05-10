@@ -32,8 +32,6 @@ describe(`when requesting update`, () => {
   it(`processes the job`, async () => {
     // we can get the job manually, or beforehand register "processor"
     // up to us how we want to make the interface easy to use
-    console.log(`Pending jobs:`, Object.keys(queue.jobs));
-
     const jobs = Object.values(queue.jobs);
     expect(jobs.length).toEqual(1); // or other check with name regex or data details
 
