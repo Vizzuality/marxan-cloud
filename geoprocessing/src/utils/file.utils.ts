@@ -4,14 +4,10 @@
 
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { Request } from 'express';
-
-/**
- * ES5 import to avoid TS complaining
- */
-const multer = require('multer');
+import { diskStorage } from 'multer';
 
 export const uploadOptions: MulterOptions = {
-  storage: multer.diskStorage({
+  storage: diskStorage({
     destination: function (
       req: Request,
       file: Express.Multer.File,

@@ -27,7 +27,7 @@ export class ShapeFileService {
   }
 
   private async _shapeFileToGeoJson(fileInfo: Express.Multer.File) {
-    const outputKey = `shapefile-${new Date().getTime()}.gejson`;
+    const outputKey = `shapefile-${new Date().getTime()}.geojson`;
 
     const _geoJson = await mapshaper.applyCommands(
       `-i ${fileInfo.path.replace(
@@ -39,9 +39,13 @@ export class ShapeFileService {
     return JSON.parse(_geoJson[outputKey].toString('utf-8'));
   }
 
-  private wipeOutShapefile(path: string): void {
-    unlinkSync(path);
-    rmdirSync(path.replace('.zip', ''), { recursive: true });
+  private deleteShapefileData(path: string): void {
+    if (path.startsWith('/tmp')) {
+      unlinkSync(path);
+      rmdirSync(path.replace('.zip', ''), { recursive: true });
+    } else {
+      throw new Error(`Could not complete deletion: ${path} is not in /tmp`);
+    }
   }
 
   async getGeoJson(shapeFile: Express.Multer.File) {
@@ -52,7 +56,7 @@ export class ShapeFileService {
     }
     const geoJson = await this._shapeFileToGeoJson(shapeFile).then(
       (geoJson) => {
-        this.wipeOutShapefile(shapeFile.path);
+        this.deleteShapefileData(shapeFile.path);
         return geoJson;
       },
     );
