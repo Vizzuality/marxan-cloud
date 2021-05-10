@@ -1,25 +1,15 @@
 import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { JobsOptions, Queue, QueueEvents } from 'bullmq';
-import { QueueNameToken } from './queue.tokens';
-import * as config from 'config';
+import { QueueEventsToken, QueueLoggerToken, QueueToken } from './queue.tokens';
 
 @Injectable()
 export class QueueService<NewJobInput, Opts extends JobsOptions = JobsOptions>
   implements OnModuleDestroy {
-  public readonly name: string;
-  public readonly logger: Logger;
-  public readonly queue: Queue<NewJobInput, Opts>;
-  public readonly events: QueueEvents;
-
-  constructor(@Inject(QueueNameToken) queueName: string) {
-    this.name = queueName;
-    this.logger = new Logger(`${queueName}-queue-publisher`);
-    this.queue = new Queue(queueName, {
-      ...config.get('redisApi'),
-      defaultJobOptions: config.get('jobOptions'),
-    });
-    this.events = new QueueEvents(queueName, config.get('redisApi'));
-  }
+  constructor(
+    @Inject(QueueLoggerToken) public readonly logger: Logger,
+    @Inject(QueueToken) public readonly queue: Queue<NewJobInput, Opts>,
+    @Inject(QueueEventsToken) public readonly events: QueueEvents,
+  ) {}
 
   /**
    * typings arent great...
