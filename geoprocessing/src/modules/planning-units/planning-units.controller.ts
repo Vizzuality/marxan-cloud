@@ -9,6 +9,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiOperation } from '@nestjs/swagger';
 
 import { apiGlobalPrefixes } from 'src/api.config';
 import { uploadOptions } from 'src/utils/file.utils';
@@ -18,14 +19,15 @@ import { ShapeFileService } from '../shapefiles/shapefiles.service';
 export class PlanningUnitsController {
   private readonly logger: Logger = new Logger(PlanningUnitsController.name);
   constructor(public shapefileService: ShapeFileService) {}
+  @ApiOperation({
+    description: 'Upload Shapefile',
+  })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @Post('/:id/planning-unit-shapefile')
   async getShapeFile(
     @Param('id') scenarioId: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const geoJson = this.shapefileService.getGeoJson(file);
-
-    return geoJson;
+    return this.shapefileService.getGeoJson(file);
   }
 }

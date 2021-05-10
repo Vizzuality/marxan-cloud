@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { createReadStream, rmdirSync, readFileSync, unlinkSync } from 'fs';
+import { createReadStream, rmdirSync, unlinkSync } from 'fs';
 const mapshaper = require('mapshaper');
 const unzipper = require('unzipper');
 
