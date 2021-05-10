@@ -17,8 +17,12 @@ export class ShapeFileService {
             path: fileInfo.destination + fileInfo.filename.replace('.zip', ''),
           }),
         )
-        .on('close', () => resolve('File extracted'))
-        .on('error', () => reject(new Error('File could not been extracted')));
+        .on('close', () =>
+          resolve(`${fileInfo.filename} extracted succesfully`),
+        )
+        .on('error', () =>
+          reject(new Error(`${fileInfo.filename} could not been extracted`)),
+        );
     });
   }
 
@@ -26,23 +30,31 @@ export class ShapeFileService {
     let geoJson: any;
     const _geoJson = await mapshaper.applyCommands(
       `-i ${fileInfo.path.replace('.zip', '')}/POLYGON.shp -o format=geojson`,
-      (err: Error, output: any) => (geoJson = output),
+      {},
+      (err: Error, output: any) => {
+        this.logger.log(output);
+        geoJson = output;
+        return geoJson;
+      },
     );
+    this.logger.log(geoJson);
 
     return geoJson;
   }
 
   private wipeOutFolder(path: string): void {
+    console.log('PATH TO DELETE', path);
     rmdirSync(path, { recursive: true });
   }
 
   async getGeoJson(shapeFile: any) {
     const res = await this._unzipShapefile(shapeFile);
     this.logger.log(res);
-    const geoJson = await this._shapeFileToGeoJson(shapeFile).then(() =>
-      this.wipeOutFolder(shapeFile.path),
-    );
+    const geoJson = await this._shapeFileToGeoJson(shapeFile).then(() => {
+      this.logger.log('WIPING OUT FOLDER');
+      this.wipeOutFolder(shapeFile.path.replace('zip', ''));
+    });
 
-    return { message: 'SHAPEFILE SERVICE RESPONSE', file: geoJson };
+    return { message: 'SHAPEFILE SERVICE RESPONSE', data: geoJson };
   }
 }
