@@ -117,8 +117,8 @@ test-start-services: clean-slate
 	@echo "$(RED)Mounting docker file:$(NC) docker-compose-test-e2e.yml / docker-compose-test-e2e.local.yml"
 	# start from clean slate, in case anything was left around from previous runs (mostly relevant locally, not in CI) and spin the instances (geoprocessing, api and the DBs)
 	docker-compose $(DOCKER_COMPOSE_FILE) --project-name ${COMPOSE_PROJECT_NAME} up -d --build api geoprocessing && \
-	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./entrypoint.sh run-migrations-for-e2e-tests && \
-	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./entrypoint.sh run-migrations-for-e2e-tests
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./entrypoint.sh run-migrations-for-e2e-tests && \
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./entrypoint.sh run-migrations-for-e2e-tests
 
 test-e2e-api: test-start-services | seed-dbs
 	# run tests and remove containers
