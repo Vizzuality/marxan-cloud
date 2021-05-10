@@ -8,6 +8,7 @@ import Icon from 'components/icon';
 import SELECT_PLANNING_UNITS_SVG from 'svgs/ui/planning-units.svg?sprite';
 
 export interface AnalysisAdjustClickingProps {
+  type: string;
   selected: boolean;
   onSelected: (s: string) => void;
 }

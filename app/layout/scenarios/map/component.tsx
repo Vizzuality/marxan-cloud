@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback, useState,
 } from 'react';
 
 // Map
@@ -9,71 +9,21 @@ import LAYERS from 'components/map/layers';
 import { LayerManager, Layer } from 'layer-manager/dist/components';
 import { PluginMapboxGl } from 'layer-manager';
 
-import {
-  Editor,
-  EditingMode,
-  DrawPolygonMode,
-} from 'react-map-gl-draw';
-
 // Controls
 import Controls from 'components/map/controls';
 import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 
-import { useSelector, useDispatch } from 'react-redux';
-
-import { useRouter } from 'next/router';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-
-import { featureStyle, editHandleStyle } from './drawing-styles';
+import ScenariosDrawingManager from './drawing-manager';
 
 export interface ScenariosMapProps {
 }
 
 export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
-  const { query } = useRouter();
-  const { sid } = query;
-  const editorRef = useRef(null);
-
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState({});
-
-  const scenarioSlice = getScenarioSlice(sid);
-  const { setDrawing, setDrawingGeo } = scenarioSlice.actions;
-
-  const dispatch = useDispatch();
-
-  const { drawing, drawingGeo } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const mode = useMemo(() => {
-    if (drawing === 'editing') return new EditingMode();
-    if (drawing === 'polygon') return new DrawPolygonMode();
-
-    return null;
-  }, [drawing]);
-
-  useEffect(() => {
-    const EDITOR = editorRef?.current;
-
-    if (!drawing && !!EDITOR) {
-      EDITOR.deleteFeatures(drawingGeo);
-      dispatch(setDrawingGeo(null));
-    }
-  }, [drawing, drawingGeo, dispatch, setDrawingGeo]);
-
-  // Delete feature as soon as you unmount this component
-  useEffect(() => {
-    const EDITOR = editorRef?.current;
-
-    return () => {
-      if (EDITOR) {
-        EDITOR.deleteFeatures(drawingGeo);
-        dispatch(setDrawingGeo(null));
-      }
-    };
-  }, []); // eslint-disable-line
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
@@ -117,29 +67,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
               </LayerManager>
 
               {/* Drawing editor */}
-              <Editor
-                ref={editorRef}
-                clickRadius={12}
-                mode={mode}
-                features={drawingGeo}
-                featureStyle={featureStyle}
-                editHandleStyle={editHandleStyle}
-                editHandleShape="circle"
-                onUpdate={(s) => {
-                  const { data, editType } = s;
-                  const EDITION_TYPES = ['addFeature'];
-                  const UPDATE_TYPES = ['addFeature', 'addPosition', 'movePosition'];
-
-                  if (EDITION_TYPES.includes(editType)) {
-                    dispatch(setDrawing('editing'));
-                    dispatch(setDrawingGeo(data));
-                  }
-
-                  if (UPDATE_TYPES.includes(editType)) {
-                    dispatch(setDrawingGeo(data));
-                  }
-                }}
-              />
+              <ScenariosDrawingManager />
             </>
           );
         }}
