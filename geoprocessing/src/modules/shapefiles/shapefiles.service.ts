@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { createReadStream, rmdirSync, unlinkSync } from 'fs';
+import { Extract } from 'unzipper';
 const mapshaper = require('mapshaper');
-const unzipper = require('unzipper');
 
 @Injectable()
 export class ShapeFileService {
@@ -13,7 +13,7 @@ export class ShapeFileService {
     return new Promise((resolve, reject) => {
       createReadStream(fileInfo.path)
         .pipe(
-          unzipper.Extract({
+          Extract({
             path: `${fileInfo.destination}/${fileInfo.filename.replace(
               '.zip',
               '',
