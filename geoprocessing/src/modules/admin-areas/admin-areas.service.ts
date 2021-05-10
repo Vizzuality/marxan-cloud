@@ -12,7 +12,7 @@ export class TileSpecification extends TileRequest {
   @Max(2)
   @IsInt()
   @Transform((value) => Number.parseInt(value))
-  level: number;
+  level!: number;
 }
 
 @Injectable()
