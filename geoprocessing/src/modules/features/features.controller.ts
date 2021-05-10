@@ -16,8 +16,9 @@ import {
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { TileSpecification, FeaturesFilters } from './features.service';
+import { BBox } from 'geojson';
 
-import { query, Response } from 'express';
+import { Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class FeaturesController<T> {
@@ -54,7 +55,7 @@ export class FeaturesController<T> {
   @ApiQuery({
     name: 'bbox',
     description: 'Bounding box of the project',
-    type: Array,
+    type: [Number],
     required: false,
     example: [-1, 40, 1, 42],
   })
@@ -69,8 +70,12 @@ export class FeaturesController<T> {
     @Query() query: FeaturesFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    console.log('bbox', query);
-    const tile: Buffer = await this.service.findTile(TileSpecification, query);
+    this.logger.debug(`bbox ${query.bbox}`);
+    this.logger.debug(`bbox ${typeof query.bbox}`);
+    const tile: Buffer = await this.service.findTile(
+      TileSpecification,
+      query.bbox as BBox,
+    );
     return response.send(tile);
   }
 }
