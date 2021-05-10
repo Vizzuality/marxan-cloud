@@ -57,11 +57,10 @@ export class ProtectedAreasController<T> {
   @Header('Content-Type', 'application/x-protobuf')
   @Header('Content-Disposition', 'attachment')
   @Header('Access-Control-Allow-Origin', '*')
-  // @Header('Content-Encoding', 'gzip, deflate')
   @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() tileRequest: TileRequest,
-    @Query('id') id: string,
+    @Query() id: string,
     @Res() response: Response,
   ): Promise<Object> {
     const tile: Buffer = await this.service.findTile(tileRequest);

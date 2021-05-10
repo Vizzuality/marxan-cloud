@@ -15,9 +15,9 @@ import {
   ApiQuery,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { TileSpecification } from './features.service';
+import { TileSpecification, FeaturesFilters } from './features.service';
 
-import { Response } from 'express';
+import { query, Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class FeaturesController<T> {
@@ -67,10 +67,11 @@ export class FeaturesController<T> {
   @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() TileSpecification: TileSpecification,
-    @Query('bbox') bbox: number[],
+    @Query() query : FeaturesFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(TileSpecification);
+    console.log('bbox', query)
+    const tile: Buffer = await this.service.findTile(TileSpecification, query);
     return response.send(tile);
   }
 }

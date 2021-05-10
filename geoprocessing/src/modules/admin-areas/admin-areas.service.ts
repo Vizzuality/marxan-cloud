@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { IsInt, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { AdminArea } from 'src/modules/admin-areas/admin-areas.geo.entity';
+import { filter } from 'lodash';
+
 export class TileSpecification extends TileRequest {
   @ApiProperty()
   @Min(0)
@@ -13,6 +15,10 @@ export class TileSpecification extends TileRequest {
   @IsInt()
   @Transform((value) => Number.parseInt(value))
   level: number;
+}
+
+export type AdminAreasFilters = {
+  guid: string;
 }
 
 @Injectable()
@@ -25,34 +31,51 @@ export class AdminAreasService {
     private readonly tileService: TileService,
   ) {}
 
-  /**
-   *
-   * @todo generate the custom queries using query builder and the entity data.
-   * @todo move the string to int transformation to the AdminAreaLevelFilters class
-   */
-  buildAdminAreaWhereQuery(level: number): string {
+
+  buildAdminAreaWhereQuery(
+    level: number,
+    filters?: AdminAreasFilters): string {
     let whereQuery = '';
     if (level === 0) {
-      whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL`;
+      if (filters?.guid) {
+        whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL AND gid_0 = '${filters?.guid}'`
+      }
+      else {
+        whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL`;
+      }
     }
     if (level === 1) {
-      whereQuery = `gid_1 IS NOT NULL AND gid_2 IS NULL`;
+      if (filters?.guid) {
+        whereQuery = `gid_1 IS NOT NULL AND gid_2 IS NULL AND gid_0 = '${filters?.guid}'`;
+      }
+      else {
+        whereQuery = `gid_1 IS NOT NULL AND gid_2 IS NULL AND gid_0 != 'ATA'`;
+      }
     }
     if (level === 2) {
-      whereQuery = `gid_2 IS NOT NULL`;
+      if (filters?.guid) {
+        whereQuery = `gid_2 IS NOT NULL and  gid_1 = '${filters?.guid}'`;
+      }
+      else {
+        whereQuery = `gid_2 IS NOT NULL`;
+      }
     }
-    whereQuery += ` AND gid_0 != 'ATA'`;
     return whereQuery;
   }
 
   /**
    * @todo get attributes from Entity, based on user selection
    */
-  public findTile(tileSpecification: TileSpecification): Promise<Buffer> {
+  public findTile(
+    tileSpecification: TileSpecification,
+    filters?: AdminAreasFilters
+    ): Promise<Buffer> {
+
     const { z, x, y, level } = tileSpecification;
+
     const attributes = 'name_0, name_1, name_2';
     const table = this.adminAreasRepository.metadata.tableName;
-    const customQuery = this.buildAdminAreaWhereQuery(level);
+    const customQuery = this.buildAdminAreaWhereQuery(level, filters);
     return this.tileService.getTile({
       z,
       x,

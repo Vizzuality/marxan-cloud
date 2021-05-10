@@ -17,7 +17,8 @@ import {
   ApiQuery,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { TileSpecification } from './admin-areas.service';
+import { TileSpecification, AdminAreasFilters } from './admin-areas.service';
+
 
 
 import { Response } from 'express';
@@ -61,7 +62,7 @@ export class AdminAreasController<T> {
     description: 'Parent country of administrative areas in ISO code',
     type: String,
     required: false,
-    example: 'BRA.1',
+    example: 'BRA.1_1',
   })
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
@@ -69,12 +70,13 @@ export class AdminAreasController<T> {
   @Header('Content-Disposition', 'attachment')
   @Header('Access-Control-Allow-Origin', '*')
   @Header('Content-Encoding', 'gzip')
+  // @Header('Content-Encoding', 'gzip, deflate')
   async getTile(
     @Param() TileSpecification: TileSpecification,
-    @Query('guid') guid: string,
+    @Query() { guid }: AdminAreasFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(TileSpecification);
+    const tile: Buffer = await this.service.findTile(TileSpecification, { guid });
     return response.send(tile);
   }
 }
