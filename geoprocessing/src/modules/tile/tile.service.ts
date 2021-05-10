@@ -16,21 +16,21 @@ export class TileRequest {
   @Min(0)
   @Max(20)
   @Transform((i) => Number.parseInt(i))
-  z: number;
+  z!: number;
 
   /**
    * @description The tile x offset on Mercator Projection
    */
   @IsInt()
   @Transform((i) => Number.parseInt(i))
-  x: number;
+  x!: number;
 
   /**
    * @description The tile y offset on Mercator Projection
    */
   @IsInt()
   @Transform((i) => Number.parseInt(i))
-  y: number;
+  y!: number;
 }
 
 /**
@@ -62,9 +62,8 @@ export interface TileInput<T> extends TileRequest {
   /**
    * @description attributes to be retrieved from the different entities
    */
-  attributes: string,
+  attributes: string;
 }
-
 
 /**
  * @description This function creates the MVT tiles from the appropriate TileInput
@@ -151,7 +150,6 @@ export class TileService {
       });
     });
   }
-
 
   /**
    * The main function that returns a tile in mvt-format.
