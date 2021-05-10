@@ -61,7 +61,7 @@ var map = new mapboxgl.Map({
                 'minzoom': 1,
                 'maxzoom': 12,
                 'tiles': [
-                "http://localhost:3040/api/v1/geodata/features/4f66b096-7360-4952-afd6-4982279ccd42/preview/tiles/{z}/{x}/{y}.mvt",
+                "http://localhost:3040/api/v1/geodata/features/e49dce8a-df83-4c03-9b8a-a1ea4c28d505/preview/tiles/{z}/{x}/{y}.mvt?bbox=[-1, 40, 1, 42]",
                      ]
             },
             'postgis-tilesPU': {
@@ -88,17 +88,17 @@ var map = new mapboxgl.Map({
             'minzoom': 1,
             'maxzoom': 22
         },
-        // {
-        //     'id': 'postgis-tiles-layer-features',
-        //     'type': 'fill',
-        //     'source': 'postgis-tilesfeatures',
-        //     'source-layer': 'layer0',
-        //     'paint': {
-        //         'fill-outline-color': 'red',
-        //         'fill-color': 'blue',
-        //         'fill-opacity': 1
-        //     }
-        // },
+        {
+            'id': 'postgis-tiles-layer-features',
+            'type': 'fill',
+            'source': 'postgis-tilesfeatures',
+            'source-layer': 'layer0',
+            'paint': {
+                'fill-outline-color': 'red',
+                'fill-color': 'blue',
+                'fill-opacity': 1
+            }
+        },
         // {
         //     'id': 'postgis-tiles-layer',
         //     'type': 'fill',
@@ -143,17 +143,17 @@ var map = new mapboxgl.Map({
         //         'fill-opacity': 0.7
         //     }
         // },
-        {
-            'id': 'postgis-tiles-layer-PU',
-            'type': 'fill',
-            'source': 'postgis-tilesPU',
-            'source-layer': 'layer0',
-            'paint': {
-                'fill-outline-color': 'yellow',
-                'fill-color': 'red',
-                'fill-opacity': 0.7
-            }
-        },
+        // {
+        //     'id': 'postgis-tiles-layer-PU',
+        //     'type': 'fill',
+        //     'source': 'postgis-tilesPU',
+        //     'source-layer': 'layer0',
+        //     'paint': {
+        //         'fill-outline-color': 'yellow',
+        //         'fill-color': 'red',
+        //         'fill-opacity': 0.7
+        //     }
+        // },
 
         ]
     }

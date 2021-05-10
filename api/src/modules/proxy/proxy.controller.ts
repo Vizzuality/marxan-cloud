@@ -64,7 +64,7 @@ export class ProxyController {
     description: 'Parent country of administrative areas in ISO code',
     type: String,
     required: false,
-    example: 'BRA.1',
+    example: 'BRA.1_1',
   })
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
   async proxyAdminAreaTile(@Req() request: Request, @Res() response: Response) {
