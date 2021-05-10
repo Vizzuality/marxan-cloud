@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { createReadStream, rmdirSync } from 'fs';
+import { createReadStream, rmdirSync, readFileSync, unlinkSync } from 'fs';
 const mapshaper = require('mapshaper');
 const unzipper = require('unzipper');
 
@@ -28,15 +28,20 @@ export class ShapeFileService {
 
   private async _shapeFileToGeoJson(fileInfo: Express.Multer.File) {
     const outputKey = `shapefile-${new Date().getTime()}.gejson`;
+
     const _geoJson = await mapshaper.applyCommands(
-      `-i ${fileInfo.path.replace('.zip', '')}/*.shp -o ${outputKey}`,
+      `-i ${fileInfo.path.replace(
+        '.zip',
+        '',
+      )}/*.shp -info -o ${outputKey} -verbose `,
     );
 
     return JSON.parse(_geoJson[outputKey].toString('utf-8'));
   }
 
-  private wipeOutFolder(path: string): void {
-    rmdirSync(path, { recursive: true });
+  private wipeOutShapefile(path: string): void {
+    unlinkSync(path);
+    rmdirSync(path.replace('.zip', ''), { recursive: true });
   }
 
   async getGeoJson(shapeFile: Express.Multer.File) {
@@ -47,7 +52,7 @@ export class ShapeFileService {
     }
     const geoJson = await this._shapeFileToGeoJson(shapeFile).then(
       (geoJson) => {
-        this.wipeOutFolder(shapeFile.path.replace('.zip', ''));
+        this.wipeOutShapefile(shapeFile.path);
         return geoJson;
       },
     );

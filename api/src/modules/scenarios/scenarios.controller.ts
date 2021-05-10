@@ -46,7 +46,6 @@ import {
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from 'app.controller';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 import { ScenarioFeaturesService } from '../scenarios-features';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
