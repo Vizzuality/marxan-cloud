@@ -7,7 +7,7 @@ import {
   Query,
   Logger,
 } from '@nestjs/common';
-import { FeatureService } from './features.service';
+import { AdminAreasService } from './admin-areas.service';
 import { apiGlobalPrefixes } from 'src/api.config';
 import {
   ApiOperation,
@@ -15,21 +15,21 @@ import {
   ApiQuery,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { TileSpecification } from './features.service';
+import { TileSpecification } from './admin-areas.service';
 
 import { Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}`)
-export class FeaturesController<T> {
-  private readonly logger: Logger = new Logger(FeaturesController.name);
-  constructor(public service: FeatureService) {}
+export class AdminAreasController<T> {
+  private readonly logger: Logger = new Logger(AdminAreasController.name);
+  constructor(public service: AdminAreasService) {}
 
   @ApiOperation({
-    description: 'Get tile for a feature by id.',
+    description: 'Get tile for administrative areas within a given country.',
   })
   @ApiParam({
     name: 'z',
-    description: 'The zoom level ranging from 0 - 20',
+    description: 'The zoom level ranging from 0 - 12',
     type: Number,
     required: true,
   })
@@ -46,20 +46,21 @@ export class FeaturesController<T> {
     required: true,
   })
   @ApiParam({
-    name: 'id',
+    name: 'level',
     description:
-      'Specific id of the feature',
-    type: String,
+      'Specific level to filter the administrative areas (0, 1 or 2)',
+    type: Number,
     required: true,
+    example: '1',
   })
   @ApiQuery({
-    name: 'bbox',
-    description: 'Bounding box of the project',
-    type: Array,
+    name: 'guid',
+    description: 'Parent country of administrative areas in ISO code',
+    type: String,
     required: false,
-    example: [-1, 40, 1, 42]
+    example: 'BRA.1',
   })
-  @Get('/features/:id/preview/tiles/:z/:x/:y.mvt')
+  @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
   @Header('Content-Type', 'application/x-protobuf')
   @Header('Content-Disposition', 'attachment')
@@ -67,7 +68,7 @@ export class FeaturesController<T> {
   @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() TileSpecification: TileSpecification,
-    @Query('bbox') bbox: number[],
+    @Query('guid') guid: string,
     @Res() response: Response,
   ): Promise<Object> {
     const tile: Buffer = await this.service.findTile(TileSpecification);
