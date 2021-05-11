@@ -69,6 +69,11 @@ fail.
 * if so, and if queries require JSON:API query features (filtering, sorting,
   sparse fieldsets, includes, pagination), we should base a new service on
   `AppBaseService`
+* if the component needs to interact with distinct services to fulfill its
+  duties but this is an implementation detail that clients should not be
+  concerned with (for example, if it needs to consult different data sources and
+  compute results for API clients from these sources combined), we should
+  consider a façade pattern
 * if the CQRS model may be more appropriate, there's still an option to go
   very lightweight on this by only keeping command and query DTOs fully distinct
 * if CQRS proper is appropriate, it may be the way to go
