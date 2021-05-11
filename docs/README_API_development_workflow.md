@@ -82,3 +82,28 @@ At this stage, we should see all tests pass.
 
 * add tests (e2e or unit as relevant) for edge cases that may emerge through
   use of the API, or for any bugs that we fix, to avoid regressions.
+
+## Agile workflow
+
+Please see the general [Vizzuality agile
+framework](https://vizzuality.github.io/playbook/projects/agile-framework/) for
+reference.
+
+Additionally:
+
+* we have a Jira-GitHub integration set up, so please make sure to use
+  `MARXAN-NNN` labels in branch names and in PR titles; to keep track of where
+  small items of work fit within larger stories, we should aim to always link
+  branches and PRs to Jira stories/tasks
+
+* if splitting up a story or task into smaller items, consider if it is
+  meaningful to split the corresponding Jira story/task into subtasks; for very
+  small subtasks this may be overkill, in which case please link branches/PRs to
+  the main Jira story/task
+
+* to try to keep cognitive overhead low for all the team members while
+  collaborating on tasks/reviews, if the subtasks needed for a story/task are
+  more than what could be easily mapped mentally by a drive-by colleague, please
+  try to describe in the main Jira story how the pieces fit together, and any
+  dependencies/blockers, either via a plain list with checkboxes, or through a
+  sketch
