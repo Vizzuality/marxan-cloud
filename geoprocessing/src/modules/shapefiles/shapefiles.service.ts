@@ -38,10 +38,7 @@ export class ShapeFileService {
     const outputKey = `shapefile-${new Date().getTime()}.geojson`;
 
     const _geoJson = await mapshaper.applyCommands(
-      `-i ${fileInfo.path.replace(
-        '.zip',
-        '',
-      )}/*.shp -info -o ${outputKey} -verbose `,
+      `-i ${fileInfo.path.replace('.zip', '')}/*.shp -info -o ${outputKey}`,
     );
 
     return JSON.parse(_geoJson[outputKey].toString('utf-8'));
