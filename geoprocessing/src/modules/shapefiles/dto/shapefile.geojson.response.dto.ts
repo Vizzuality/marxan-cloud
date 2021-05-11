@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { GeoJsonTypes } from 'geojson';
+import GeoJSON from 'geojson';
 
 export class ShapefileGeoJSONResponseDTO {
   @ApiProperty()
-  data!: GeoJsonTypes;
+  data!: typeof GeoJSON;
 }
