@@ -43,13 +43,16 @@ export class ProxyService {
     );
   }
 
-  async proxyUploadShapeFile(request: Request, response: Response) {
+  async proxyUploadShapeFile(
+    request: Request,
+    response: Response,
+  ): Promise<any> {
     request.url = request.originalUrl.replace(
       'api/v1/scenarios',
       'api/v1/geodata/planning-units',
     );
 
-    this.server.web(
+    return this.server.web(
       request,
       response,
       {
