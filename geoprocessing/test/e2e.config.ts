@@ -4,16 +4,20 @@ import {
   PlanningUnitGridShape,
 } from 'src/modules/planning-units/dto/create.regular.planning-units.dto';
 
+interface OptionsWithCountryCode {
+  countryCode: string;
+}
+
 export const E2E_CONFIG: {
   planningUnits: {
     creationJob: {
       valid: {
-        customArea: (options: unknown) => PlanningUnitsJob;
-        adminRegion: (options: unknown) => PlanningUnitsJob;
+        customArea: (options: OptionsWithCountryCode) => PlanningUnitsJob;
+        adminRegion: (options: OptionsWithCountryCode) => PlanningUnitsJob;
       };
       invalid: {
-        customArea: (options: unknown) => PlanningUnitsJob;
-        adminRegion: (options: unknown) => PlanningUnitsJob;
+        customArea: (options: OptionsWithCountryCode) => PlanningUnitsJob;
+        adminRegion: (options: OptionsWithCountryCode) => PlanningUnitsJob;
       };
     };
   };
@@ -21,7 +25,7 @@ export const E2E_CONFIG: {
   planningUnits: {
     creationJob: {
       valid: {
-        customArea: (options: { countryCode: string }): PlanningUnitsJob => ({
+        customArea: (options: OptionsWithCountryCode): PlanningUnitsJob => ({
           countryId: options.countryCode,
           adminAreaLevel1Id: faker.random.alphaNumeric(7),
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
@@ -39,7 +43,7 @@ export const E2E_CONFIG: {
             ],
           },
         }),
-        adminRegion: (options: { countryCode: string }): PlanningUnitsJob => ({
+        adminRegion: (options: OptionsWithCountryCode): PlanningUnitsJob => ({
           countryId: options.countryCode,
           adminAreaLevel1Id: faker.random.alphaNumeric(7),
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
@@ -48,7 +52,7 @@ export const E2E_CONFIG: {
         }),
       },
       invalid: {
-        customArea: (options: { countryCode: string }): PlanningUnitsJob => ({
+        customArea: (options: OptionsWithCountryCode): PlanningUnitsJob => ({
           countryId: options.countryCode,
           adminAreaLevel1Id: faker.random.alphaNumeric(7),
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
@@ -66,7 +70,7 @@ export const E2E_CONFIG: {
             ],
           },
         }),
-        adminRegion: (options: { countryCode: string }): PlanningUnitsJob => ({
+        adminRegion: (options: OptionsWithCountryCode): PlanningUnitsJob => ({
           countryId: options.countryCode,
           adminAreaLevel1Id: faker.random.alphaNumeric(7),
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
