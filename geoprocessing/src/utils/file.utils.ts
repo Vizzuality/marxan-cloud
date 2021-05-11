@@ -7,7 +7,7 @@ import { Request } from 'express';
 import { diskStorage } from 'multer';
 import * as tempDirectory from 'temp-dir';
 
-export const uploadOptions: MulterOptions = {
+export const uploadOptions: Readonly<MulterOptions> = {
   storage: diskStorage({
     destination: function (
       req: Request,
