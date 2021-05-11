@@ -12,6 +12,6 @@ import { ScenariosPlanningUnitService } from './scenarios-planning-unit.service'
     ),
   ],
   providers: [ScenariosPlanningUnitService],
-  exports: [ScenariosPlanningUnitService],
+  exports: [ScenariosPlanningUnitService, TypeOrmModule],
 })
 export class ScenariosPlanningUnitModule {}
