@@ -26,10 +26,6 @@ export class TileSpecification extends TileRequest {
  */
 export class FeaturesFilters {
   @IsOptional()
-
-  // @ValidateNested({ each: true })
-  // @Type(() => Array)
-  // @IsNumber({}, {each: true})
   @IsArray()
   @IsNumber({}, { each: true })
   @Transform((value: string): BBox => JSON.parse(value))
