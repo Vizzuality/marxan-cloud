@@ -34,6 +34,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
@@ -53,6 +54,7 @@ import { ProcessingStatusDto } from './dto/processing-status.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { uploadOptions } from 'utils/file-uploads.utils';
 import { ProxyService } from 'modules/proxy/proxy.service';
+import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -114,30 +116,31 @@ export class ScenariosController {
       await this.service.create(dto, { authenticatedUser: req.user }),
     );
   }
-  // TODO wrap in custom decorator
+
   // TODO add Validations
+  @ApiOperation({
+    description: 'Upload Zip file containing .shp, .dbj, .prj and .shx files',
+  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
         file: {
-          type: 'string',
+          type: 'Zip file containing .shp, .dbj, .prj and .shx files',
           format: 'binary',
         },
       },
     },
   })
-  @ApiOperation({
-    description: 'Upload Zip file containing .shp, .dbj, .prj and .shx files',
-  })
+  @ApiOkResponse({ type: ShapefileGeoJSONResponseDTO })
   @Post(':id/planning-unit-shapefile')
   //@UseInterceptors(FileInterceptor('file', uploadOptions))
   async uploadLockInShapeFile(
     @Param('id') scenarioId: string,
     @Req() request: Request,
     @Res() response: Response,
-  ) {
+  ): Promise<ShapefileGeoJSONResponseDTO> {
     await this.service.getById(scenarioId);
     const proxyServiceResponse = await this.proxyService.proxyUploadShapeFile(
       request,
