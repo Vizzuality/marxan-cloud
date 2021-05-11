@@ -39,6 +39,26 @@ would do little by now, except validating payload shape.
 * this means that we should create e2e tests that mimic real requests the API
   may receive from API clients, starting from the frontend app
 * e2e tests should use DTOs and types from the previous step
+* e2e tests should cover the space between API consumers/clients and the API
+  itself: we should test up to and including this boundary but not beyond; for
+  example, we should not test that Redis or BullMQ work as intended, as they are
+  covered (or should be) by their own tests upstream
+* the API boundary in this context includes the GeoProcessing service, as the
+  actual API service only acts as a simple API gateway towards the GeoProcessing
+  service: that some requests are handled in practice by the GeoProcessing
+  service should be considered an implementation detail that API consumers
+  should not be concerned with
+* requests whose processing extends beyond the API/GeoProcessing boundary should
+  only be tested up to the point of dispatching requests to external systems
+  (whether via API calls, triggering jobs via message queues, etc.)
+* for example, if e2e-testing a request that involves an asynchronous geospatial
+  calculation handled via BullMQ workers, we should make sure requests from API
+  clients end up adding the appropriate job to the relevant queue
+* we should obviously still test that given relevant job descriptions, an
+  asynchronous worker will try to perform the associated task (or reject the
+  job request, if this is incomplete, malformed, cannot be authorized, etc.),
+  but this may be covered by appropriate unit tests in the GeoProcessing
+  service itself.
 
 At this stage, we should be able to run tests for the new component and see them
 fail.
