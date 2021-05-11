@@ -92,6 +92,9 @@ export class RemoteScenarioFeaturesData {
   })
   tag!: FeatureTags;
 
+  @ApiProperty()
+  featureId!: string;
+
   @ApiPropertyOptional({
     description: `Name of the feature, for example \`Lion in Deserts\`.`,
   })
