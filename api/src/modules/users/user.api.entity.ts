@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IssuedAuthnToken } from 'modules/authentication/issued-authn-token.api.entity';
+import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entity';
 import { Dictionary } from 'lodash';
 import {
   Column,
@@ -9,9 +9,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Project } from 'modules/projects/project.api.entity';
-import { Scenario } from 'modules/scenarios/scenario.api.entity';
-import { BaseServiceResource } from 'types/resource.interface';
+import { Project } from '../projects/project.api.entity';
+import { Scenario } from '../scenarios/scenario.api.entity';
+import { BaseServiceResource } from '../../types/resource.interface';
 
 export const userResource: BaseServiceResource = {
   className: 'User',
