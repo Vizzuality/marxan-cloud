@@ -21,7 +21,7 @@ export const uploadOptions: Readonly<MulterOptions> = {
       file: Express.Multer.File,
       cb: (error: Error | null, fieldname: string) => void,
     ) {
-      cb(null, Date.now() + '-' + file.originalname);
+      cb(null, new Date().getTime() + '-' + file.originalname);
     },
   }),
 };
