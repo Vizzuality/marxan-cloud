@@ -52,7 +52,7 @@ describe(`when PU IDs are not available`, () => {
           pu: ['some-other-uuid'],
         },
       }),
-    ).rejects.toThrow(/not reachable/);
+    ).rejects.toThrow(/does not match any planning unit/);
     expect(puIdValidator.mock.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
         "fake-scenario-id",
