@@ -5,7 +5,7 @@
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { Request } from 'express';
 import { diskStorage } from 'multer';
-const tempDirectory = require('temp-dir');
+import * as tempDirectory from 'temp-dir';
 
 export const uploadOptions: MulterOptions = {
   storage: diskStorage({
