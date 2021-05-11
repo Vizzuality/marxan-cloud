@@ -3,6 +3,7 @@ import { differenceWith } from 'lodash';
 import { ArePuidsAllowedPort } from '../are-puids-allowed.port';
 
 import { ScenariosPlanningUnitService } from '../../../../scenarios-planning-unit/scenarios-planning-unit.service';
+import { isDefined } from '../../../../../utils/is-defined';
 
 @Injectable()
 export class ArePuidsAllowedAdapter
@@ -20,7 +21,7 @@ export class ArePuidsAllowedAdapter
       })
     )[0]
       .map((scenario) => scenario.puGeometryId)
-      .filter(this.isDefined);
+      .filter(isDefined);
 
     /**
      * find those that are present in puIds but not in allowedFeaturesIds
@@ -30,7 +31,4 @@ export class ArePuidsAllowedAdapter
       errors: diff.map((missingId) => `Missing ${missingId}`),
     };
   }
-
-  private isDefined = (value: string | undefined | null): value is string =>
-    value !== undefined && value !== null;
 }
