@@ -55,6 +55,7 @@ import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-p
 import { uploadOptions } from 'utils/file-uploads.utils';
 import { ProxyService } from 'modules/proxy/proxy.service';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
+import { ApiConsumesShapefile } from 'decorators/shapefile.decorator';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -118,22 +119,7 @@ export class ScenariosController {
   }
 
   // TODO add Validations
-  @ApiOperation({
-    description: 'Upload Zip file containing .shp, .dbj, .prj and .shx files',
-  })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'Zip file containing .shp, .dbj, .prj and .shx files',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @ApiOkResponse({ type: ShapefileGeoJSONResponseDTO })
+  @ApiConsumesShapefile()
   @Post(':id/planning-unit-shapefile')
   //@UseInterceptors(FileInterceptor('file', uploadOptions))
   async uploadLockInShapeFile(

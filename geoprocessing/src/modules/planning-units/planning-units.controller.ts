@@ -8,17 +8,19 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
+/* import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
   ApiResponse,
-} from '@nestjs/swagger';
+} from '@nestjs/swagger'; */
 
 import { apiGlobalPrefixes } from 'src/api.config';
 import { uploadOptions } from 'src/utils/file.utils';
-import { ShapefileGeoJSONResponseDTO } from '../shapefiles/dto/shapefile.geojson.response.dto';
+
 import { ShapeFileService } from '../shapefiles/shapefiles.service';
+import { ApiConsumesShapefile } from '../../decoratos/shapefile.decorator';
+import { ShapefileGeoJSONResponseDTO } from '../shapefiles/dto/shapefile.geojson.response.dto';
 
 @Controller(`${apiGlobalPrefixes.v1}/planning-units`)
 export class PlanningUnitsController {
@@ -28,24 +30,7 @@ export class PlanningUnitsController {
   ) {
     this.logger.setContext(PlanningUnitsController.name);
   }
-  @ApiOperation({
-    description: 'Upload Zip file containing .shp, .dbj, .prj and .shx files',
-  })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    type: ShapefileGeoJSONResponseDTO,
-  })
+  @ApiConsumesShapefile()
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @Post('/:id/planning-unit-shapefile')
   async getShapeFile(
