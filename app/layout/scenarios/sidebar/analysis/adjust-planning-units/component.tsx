@@ -26,7 +26,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header className="mb-10">
+      <header className="mb-5">
         <button
           type="button"
           className="flex items-center w-full pt-5 pb-1 space-x-2 text-left focus:outline-none"
@@ -46,9 +46,18 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         onChange={(t) => setType(t)}
       />
 
-      <Buttons
-        type={type}
-      />
+      <div className="relative flex flex-col flex-grow w-full min-h-0 overflow-hidden">
+        <div className="absolute top-0 left-0 z-10 w-full h-3 bg-gradient-to-b from-gray-700 via-gray-700" />
+        <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
+          <div className="py-3">
+            <Buttons
+              type={type}
+            />
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 z-10 w-full h-3 bg-gradient-to-t from-gray-700 via-gray-700" />
+      </div>
+
     </motion.div>
   );
 };

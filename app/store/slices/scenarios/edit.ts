@@ -7,7 +7,10 @@ interface ScenarioEditStateProps {
   clickingValue: string[];
 
   drawing: string;
-  drawingValue: Record<string, object>
+  drawingValue: Record<string, object>;
+
+  uploading: boolean;
+  uploadingValue: Record<string, object>
 }
 
 const initialState = {
@@ -16,6 +19,8 @@ const initialState = {
   clickingValue: [],
   drawing: null,
   drawingValue: null,
+  uploading: false,
+  uploadingValue: null,
 } as ScenarioEditStateProps;
 
 export function getScenarioSlice(id) {
@@ -26,17 +31,25 @@ export function getScenarioSlice(id) {
       setTab: (state, action: PayloadAction<string>) => {
         state.tab = action.payload;
       },
+
+      // ADJUST PLANNING UNITS
+      setClicking: (state, action: PayloadAction<boolean>) => {
+        state.clicking = action.payload;
+      },
+      setClickingValue: (state, action: PayloadAction<string[]>) => {
+        state.clickingValue = action.payload;
+      },
       setDrawing: (state, action: PayloadAction<string>) => {
         state.drawing = action.payload;
       },
       setDrawingValue: (state, action: PayloadAction<Record<string, object>>) => {
         state.drawingValue = action.payload;
       },
-      setClicking: (state, action: PayloadAction<boolean>) => {
-        state.clicking = action.payload;
+      setUploading: (state, action: PayloadAction<boolean>) => {
+        state.uploading = action.payload;
       },
-      setClickingValue: (state, action: PayloadAction<string[]>) => {
-        state.clickingValue = action.payload;
+      setUploadingValue: (state, action: PayloadAction<Record<string, object>>) => {
+        state.uploadingValue = action.payload;
       },
     },
   });
