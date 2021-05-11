@@ -30,7 +30,7 @@ export const ScenariosGapAnalysis: React.FC<ScenariosGapAnalysisProps> = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header className="mb-5">
+      <header>
         <button
           type="button"
           className="flex items-center w-full pt-5 pb-1 space-x-2 text-left focus:outline-none"
@@ -43,7 +43,7 @@ export const ScenariosGapAnalysis: React.FC<ScenariosGapAnalysisProps> = ({
         </button>
       </header>
 
-      <div className="relative flex flex-col flex-grow w-full min-h-0 overflow-hidden">
+      <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden">
         <Toolbar search={search} onSearch={onSearch} />
 
         <List

@@ -26,7 +26,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header className="mb-5">
+      <header>
         <button
           type="button"
           className="flex items-center w-full pt-5 pb-1 space-x-2 text-left focus:outline-none"
@@ -37,8 +37,6 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
           <h4 className="text-xs uppercase font-heading">Adjust planning units</h4>
         </button>
-
-        <p className="text-sm text-gray-300">You can manually exclude some planning units of the run or upload your own shapefile</p>
       </header>
 
       <Tabs
