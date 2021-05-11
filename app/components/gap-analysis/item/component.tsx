@@ -8,6 +8,7 @@ import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
 import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 
 export interface ItemProps {
+  id: string;
   name: string;
   current: {
     percent: number;
@@ -20,11 +21,11 @@ export interface ItemProps {
     unit: string;
   }
   className?: string;
-  onMap: boolean;
-  onToggleOnMap: (onMap: boolean) => void;
-  muted: boolean;
-  onMouseEnter: MouseEventHandler<HTMLDivElement>;
-  onMouseLeave: MouseEventHandler<HTMLDivElement>;
+  onMap?: boolean;
+  onToggleOnMap?: (onMap: boolean) => void;
+  muted?: boolean;
+  onMouseEnter?: MouseEventHandler<HTMLDivElement>;
+  onMouseLeave?: MouseEventHandler<HTMLDivElement>;
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -35,7 +36,7 @@ export const Item: React.FC<ItemProps> = ({
   return (
     <div
       className={classnames({
-        'bg-gray-800 text-white px-4 pt-1 pb-4 border-l-4 border-purple-700 transition-opacity duration-300': true,
+        'text-white px-4 pt-1 pb-4 border-l-4 border-purple-700 transition-opacity duration-300': true,
         'opacity-20': muted,
         [className]: className !== undefined && className !== null,
       })}
