@@ -81,6 +81,14 @@ fail.
   maximises the ability to meaningfully unit-test most functions (avoiding
   mixing computation and side effects, for example)
 
+### Internal interfaces
+
+* where the structure of the stub implementation (previous section) includes
+  interfacing between different modules/services by passing messages or commands
+  (e.g. via BullMQ job queues), we should define the contracts between these
+  modules/services (for example, message payloads, etc.) as well as mapping out
+  the flow of commands and data between them
+
 ### Documentation
 
 Add Swagger documentation where relevant, if not done before.
