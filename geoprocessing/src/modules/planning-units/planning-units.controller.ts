@@ -22,8 +22,12 @@ import { ShapeFileService } from '../shapefiles/shapefiles.service';
 
 @Controller(`${apiGlobalPrefixes.v1}/planning-units`)
 export class PlanningUnitsController {
-  private readonly logger: Logger = new Logger(PlanningUnitsController.name);
-  constructor(public shapefileService: ShapeFileService) {}
+  constructor(
+    public shapefileService: ShapeFileService,
+    private readonly logger: Logger,
+  ) {
+    this.logger.setContext(PlanningUnitsController.name);
+  }
   @ApiOperation({
     description: 'Upload Zip file containing .shp, .dbj, .prj and .shx files',
   })
