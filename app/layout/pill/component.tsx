@@ -19,7 +19,7 @@ export const Pill: React.FC<PillProps> = ({ children, selected }:PillProps) => {
         className={cx({
           'flex flex-col flex-grow px-10 overflow-hidden': true,
           'py-10': selected,
-          'py-5': !selected,
+          'py-3': !selected,
         })}
       >
         <div className="flex flex-col flex-grow overflow-hidden py-0.5 px-0.5">

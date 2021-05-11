@@ -29,7 +29,7 @@ export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
   ];
 
   return (
-    <div key={type} className="flex flex-col w-full mt-5 space-y-2">
+    <div key={type} className="flex flex-col w-full space-y-2">
       {BUTTONS.map((b) => {
         const { id, Component } = b;
         const active = selected === b.id;
