@@ -6,8 +6,9 @@ const mapshaper = require('mapshaper');
 
 @Injectable()
 export class ShapeFileService {
-  private readonly logger: Logger = new Logger(ShapeFileService.name);
-  constructor() {}
+  constructor(private readonly logger: Logger) {
+    this.logger.setContext(ShapeFileService.name);
+  }
 
   private unzipShapefile(fileInfo: Express.Multer.File): Promise<string> {
     return new Promise((resolve, reject) => {
