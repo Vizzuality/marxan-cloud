@@ -11,6 +11,7 @@ describe('AllExceptionFilter class spec (unit)', () => {
     const sandbox = await Test.createTestingModule({
       providers: [AllExceptionsFilter],
     }).compile();
+    sandbox.useLogger(false);
     filter = sandbox.get(AllExceptionsFilter);
     jsonMock = jest.fn();
     argumentMock = mockArgumentsHost(jsonMock);
