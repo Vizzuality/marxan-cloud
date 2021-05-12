@@ -11,8 +11,9 @@ import ReactMapGL, {
   FlyToInterpolator,
   TRANSITION_EVENTS,
   ViewportProps,
-  InteractiveMapProps,
 } from 'react-map-gl';
+import { InteractiveMapProps } from 'react-map-gl/src/components/interactive-map';
+
 import { fitBounds } from '@math.gl/web-mercator';
 
 import { easeCubic } from 'd3-ease';
@@ -71,6 +72,7 @@ export const Map = ({
   doubleClickZoom,
   width = '100%',
   height = '100%',
+  getCursor,
   ...mapboxProps
 }: MapProps) => {
   /**
@@ -226,7 +228,7 @@ export const Map = ({
         onViewportChange={handleViewportChange}
         onResize={handleResize}
         onLoad={handleLoad}
-        getCursor={handleGetCursor}
+        getCursor={getCursor || handleGetCursor}
         transitionInterpolator={new FlyToInterpolator()}
         transitionEasing={easeCubic}
       >

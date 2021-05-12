@@ -14,6 +14,7 @@ const Template: Story<ItemProps> = ({ ...args }) => (
 
 export const Default: Story<ItemProps> = Template.bind({});
 Default.args = {
+  id: 'dfasdfasd',
   name: 'Lion in Deserts and Xeric Shrublands',
   current: {
     percent: 0.05,
@@ -26,8 +27,8 @@ Default.args = {
     unit: 'km²',
   },
   onMap: false,
-  onToggleOnMap: (onMap) => console.log(onMap),
+  onToggleOnMap: (onMap) => console.info(onMap),
   muted: false,
-  onMouseEnter: (e) => console.log(e),
-  onMouseLeave: (e) => console.log(e),
+  onMouseEnter: (e) => console.info(e),
+  onMouseLeave: (e) => console.info(e),
 };

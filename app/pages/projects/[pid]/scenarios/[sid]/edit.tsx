@@ -11,6 +11,7 @@ import ScenariosMap from 'layout/scenarios/map';
 import ScenariosSidebar from 'layout/scenarios/sidebar';
 import SidebarWDPA from 'layout/scenarios/sidebar/wdpa';
 import SidebarFeatures from 'layout/scenarios/sidebar/features';
+import SidebarAnalysis from 'layout/scenarios/sidebar/analysis';
 
 import { withProtection, withUser } from 'hoc/auth';
 
@@ -34,7 +35,9 @@ const EditScenarioPage: React.FC = () => {
               <ScenariosSidebar>
                 <SidebarWDPA key="wdpa" />
                 <SidebarFeatures key="features" />
+                <SidebarAnalysis key="analysis" />
               </ScenariosSidebar>
+
               <ScenariosMap />
             </div>
           </Wrapper>
