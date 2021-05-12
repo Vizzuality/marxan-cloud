@@ -1,39 +1,22 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
+import { FakeQueue } from './utils/queues';
+import { QueueToken } from '../src/modules/queue/queue.tokens';
+import { bootstrapApplication } from './utils/api-application';
+import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+
+let queue: FakeQueue;
 
 describe('ScenariosModule (e2e)', () => {
   let app: INestApplication;
-
   let jwtToken: string;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    );
-    await app.init();
-
-    const response = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({
-        username: E2E_CONFIG.users.basic.aa.username,
-        password: E2E_CONFIG.users.basic.aa.password,
-      })
-      .expect(201);
-
-    jwtToken = response.body.accessToken;
+    app = await bootstrapApplication();
+    jwtToken = await GivenUserIsLoggedIn(app);
+    queue = app.get(QueueToken);
   });
 
   afterAll(async () => {
@@ -77,6 +60,9 @@ describe('ScenariosModule (e2e)', () => {
 
       aScenario = response.body.data;
       expect(aScenario.type).toBe('scenarios');
+
+      // Minimal data - no job submitted
+      expect(Object.values(queue.jobs).length).toEqual(0);
     });
 
     it('Creating a scenario with complete data should succeed', async () => {
@@ -93,6 +79,11 @@ describe('ScenariosModule (e2e)', () => {
 
       aScenario = response.body.data;
       expect(aScenario.type).toBe('scenarios');
+
+      const job = Object.values(queue.jobs)[0];
+      expect(job).toBeDefined();
+      expect(job.name).toMatch(/calculate-planning-units-protection-level/);
+      expect(job.data?.scenarioId).toBeDefined();
     });
 
     it('Gets scenarios', async () => {

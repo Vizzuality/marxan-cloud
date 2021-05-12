@@ -193,6 +193,8 @@ export const E2E_CONFIG: {
         metadata: {},
         numberOfRuns: 100,
         boundaryLengthModifier: 0,
+        wdpaThreshold: 40,
+        wdpaIucnCategories: [IUCNCategory.IV],
         status: JobStatus.created,
       }),
     },

@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CqrsModule } from '@nestjs/cqrs';
 
 import { ScenariosController } from './scenarios.controller';
 import { Scenario } from './scenario.api.entity';
@@ -14,6 +15,7 @@ import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 
 @Module({
   imports: [
+    CqrsModule,
     ProtectedAreasModule,
     forwardRef(() => ProjectsModule),
     TypeOrmModule.forFeature([Project, Scenario]),
