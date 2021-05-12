@@ -66,6 +66,13 @@ export class ProxyController {
     required: false,
     example: 'BRA.1_1',
   })
+  @ApiQuery({
+    name: 'bbox',
+    description: 'Bounding box of the project',
+    type: [Number],
+    required: false,
+    example: [-1, 40, 1, 42],
+  })
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
   async proxyAdminAreaTile(@Req() request: Request, @Res() response: Response) {
     return this.proxyService.proxyTileRequest(request, response);
@@ -191,6 +198,18 @@ export class ProxyController {
     type: Number,
     required: true,
   })
+  @ApiParam({
+    name: 'planningUnitGridShape',
+    description: 'Planning unit grid shape',
+    type: String,
+    required: true,
+  })
+  @ApiParam({
+    name: 'planningUnitAreakm2',
+    description: 'Planning unit area in km2',
+    type: Number,
+    required: true,
+  })
   @ApiQuery({
     name: 'bbox',
     description: 'Bounding box of the project',
@@ -198,19 +217,9 @@ export class ProxyController {
     required: false,
     example: [-1, 40, 1, 42],
   })
-  @ApiQuery({
-    name: 'planningUnitGridShape',
-    description: 'Planning unit grid shape',
-    type: String,
-    required: false,
-  })
-  @ApiQuery({
-    name: 'planningUnitAreakm2',
-    description: 'Planning unit area in km2',
-    type: Number,
-    required: false,
-  })
-  @Get('/planning-units/preview/tiles/:z/:x/:y.mvt')
+  @Get(
+    '/planning-units/preview/regular/:planningUnitGridShape/:planningUnitAreakm2/tiles/:z/:x/:y.mvt',
+  )
   async proxyProtectedAreasTile(
     @Req() request: Request,
     @Res() response: Response,
