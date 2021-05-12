@@ -3,8 +3,8 @@ version: "3.6"
 services:
   api:
     build:
-      context: ./api
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: ./backend.Dockerfile
       args:
         UID: 5000
         GID: 5000
@@ -29,8 +29,8 @@ services:
 
   geoprocessing:
     build:
-      context: ./geoprocessing
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: ./geo.Dockerfile
       args:
         UID: 5000
         GID: 5000
