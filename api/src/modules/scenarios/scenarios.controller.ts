@@ -56,6 +56,7 @@ import { uploadOptions } from 'utils/file-uploads.utils';
 import { ProxyService } from 'modules/proxy/proxy.service';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { ApiConsumesShapefile } from 'decorators/shapefile.decorator';
+import { AdjustPlanningUnits } from '../analysis/entry-points/adjust-planning-units';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -66,6 +67,7 @@ export class ScenariosController {
     public readonly service: ScenariosService,
     private readonly proxyService: ProxyService,
     private readonly scenarioFeatures: ScenarioFeaturesService,
+    private readonly updatePlanningUnits: AdjustPlanningUnits,
   ) {}
 
   @ApiOperation({
@@ -155,12 +157,20 @@ export class ScenariosController {
   @Patch(':id/planning-units')
   @ApiOkResponse()
   async changePlanningUnits(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Param('id', ParseUUIDPipe) id: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Body() input: UpdateScenarioPlanningUnitLockStatusDto,
   ): Promise<void> {
-    // TODO call analysis-module's service
+    // TODO implement more flexible error results to propagate 4xx
+    await this.updatePlanningUnits.update(id, {
+      include: {
+        geo: input.byGeoJson?.include,
+        pu: input.byId?.include,
+      },
+      exclude: {
+        pu: input.byId?.exclude,
+        geo: input.byGeoJson?.exclude,
+      },
+    });
     return;
   }
 
@@ -171,6 +181,7 @@ export class ScenariosController {
   ): Promise<ProcessingStatusDto> {
     // TODO call analysis-module's service
 
+    // TODO where exactly we should look for the status?
     return {
       status: JobStatus.running,
     };

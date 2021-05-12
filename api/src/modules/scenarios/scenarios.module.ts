@@ -11,6 +11,7 @@ import { ProjectsModule } from 'modules/projects/projects.module';
 import { ScenarioFeaturesModule } from '../scenarios-features';
 import { ProxyService } from 'modules/proxy/proxy.service';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
+import { AnalysisModule } from '../analysis/analysis.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
     TypeOrmModule.forFeature([Project, Scenario]),
     UsersModule,
     ScenarioFeaturesModule,
+    AnalysisModule,
   ],
   providers: [ScenariosService, ProxyService, WdpaAreaCalculationService],
   controllers: [ScenariosController],
