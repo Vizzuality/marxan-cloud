@@ -2,20 +2,18 @@ import { Injectable } from '@nestjs/common';
 
 import { RequestJobInput, RequestJobPort } from '../request-job.port';
 import { AsyncJob } from '../../../async-job';
-
-import { PlanningUnitsService } from '../../../../planning-units/planning-units.service';
 import { JobStatus } from '../../../../scenarios/scenario.api.entity';
+import { QueueService } from '../../../../queue/queue.service';
 
 @Injectable()
-export class AsyncJobsAdapter
-  extends PlanningUnitsService
-  implements RequestJobPort {
-  constructor() {
-    super();
-  }
+export class AsyncJobsAdapter implements RequestJobPort {
+  constructor(private readonly queueService: QueueService<RequestJobInput>) {}
 
   async queue(input: RequestJobInput): Promise<AsyncJob> {
-    // TODO push real job
+    await this.queueService.queue.add(
+      `calculate-planning-units-geo-update-${input.scenarioId}`,
+      input,
+    );
     return {
       id: input.scenarioId,
       status: JobStatus.running,
