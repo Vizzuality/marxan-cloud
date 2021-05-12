@@ -3,7 +3,7 @@ services:
   api:
     build:
       context: ./backend
-      dockerfile: ./apps/backend/Dockerfile
+      dockerfile: ./backend.Dockerfile
       args:
         UID: 5000
         GID: 5000
@@ -46,7 +46,7 @@ services:
   geoprocessing:
     build:
       context: ./backend
-      dockerfile: ./apps/geo
+      dockerfile: ./geo.Dockerfile
       args:
         UID: 5000
         GID: 5000

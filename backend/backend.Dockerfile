@@ -15,17 +15,16 @@ RUN chown $USER:$USER $APP_HOME
 
 USER $USER
 
-COPY --chown=$USER:$USER ../../package.json ../../yarn.lock ./
-COPY --chown=$USER:$USER ../../tsconfig.json ../../
+COPY --chown=$USER:$USER ./package.json ./yarn.lock ./nest-cli.json ./
+COPY --chown=$USER:$USER ./tsconfig.json .
 RUN yarn install --frozen-lockfile
 
-COPY --chown=$USER:$USER entrypoint.sh nodemon.json tsconfig.json tsconfig.build.json ormconfig.ts ./
+COPY --chown=$USER:$USER apps/backend/entrypoint.sh apps/backend/tsconfig.build.json ./
+COPY --chown=$USER:$USER apps ./apps
+COPY --chown=$USER:$USER libs ./libs
 COPY --chown=$USER:$USER config ./config
-COPY --chown=$USER:$USER src ./src
-# @debt we should do this only for images used for tests
-COPY --chown=$USER:$USER test ./test
 
-RUN yarn prestart:prod
+RUN yarn prestart:backend
 
 EXPOSE 3000
 ENTRYPOINT ["./entrypoint.sh"]
