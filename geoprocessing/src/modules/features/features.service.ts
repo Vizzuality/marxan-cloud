@@ -3,14 +3,7 @@ import { TileService, TileRequest } from 'src/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GeoFeatureGeometry } from 'src/modules/features/features.geo.entity';
-import {
-  IsArray,
-  IsNumber,
-  IsString,
-  IsOptional,
-  IsEnum,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { BBox } from 'geojson';
@@ -49,12 +42,10 @@ export class FeatureService {
    * @todo move the string to int transformation to the AdminAreaLevelFilters class
    */
   buildFeaturesWhereQuery(id: string, bbox?: BBox): string {
-    this.logger.debug(`BBox ${bbox}`);
     let whereQuery = `feature_id = '${id}'`;
-    // if (filters?.bbox) {
-    //   whereQuery += `AND the_geom && ST_MakeEnvelope(${filters?.bbox[0]}, 4326)`
-    // }
-
+    if (bbox) {
+      whereQuery += `AND the_geom && ST_MakeEnvelope(${bbox}, 4326)`;
+    }
     return whereQuery;
   }
 

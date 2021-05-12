@@ -60,21 +60,28 @@ export class AdminAreasController<T> {
     required: false,
     example: 'BRA.1_1',
   })
+  @ApiQuery({
+    name: 'bbox',
+    description: 'Bounding box of the project',
+    type: [Number],
+    required: false,
+    example: [-1, 40, 1, 42],
+  })
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
   @Header('Content-Type', 'application/x-protobuf')
   @Header('Content-Disposition', 'attachment')
   @Header('Access-Control-Allow-Origin', '*')
   @Header('Content-Encoding', 'gzip')
-  // @Header('Content-Encoding', 'gzip, deflate')
   async getTile(
     @Param() TileSpecification: TileSpecification,
-    @Query() { guid }: AdminAreasFilters,
+    @Query() AdminAreasFilters: AdminAreasFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(TileSpecification, {
-      guid,
-    });
+    const tile: Buffer = await this.service.findTile(
+      TileSpecification,
+      AdminAreasFilters,
+    );
     return response.send(tile);
   }
 }

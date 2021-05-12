@@ -7,7 +7,10 @@ import {
   Query,
   Logger,
 } from '@nestjs/common';
-import { ProtectedAreasService } from './protected-areas.service';
+import {
+  ProtectedAreasService,
+  ProtectedAreasFilters,
+} from './protected-areas.service';
 import { apiGlobalPrefixes } from 'src/api.config';
 import {
   ApiOperation,
@@ -60,10 +63,10 @@ export class ProtectedAreasController<T> {
   @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() tileRequest: TileRequest,
-    @Query() id: string,
+    @Query() { id }: ProtectedAreasFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(tileRequest);
+    const tile: Buffer = await this.service.findTile(tileRequest, { id });
     return response.send(tile);
   }
 }

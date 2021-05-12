@@ -71,8 +71,6 @@ export class FeaturesController<T> {
     @Query() query: FeaturesFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    this.logger.debug(`bbox ${query.bbox}`);
-    this.logger.debug(`bbox ${typeof query.bbox}`);
     const tile: Buffer = await this.service.findTile(
       TileSpecification,
       query.bbox as BBox,
