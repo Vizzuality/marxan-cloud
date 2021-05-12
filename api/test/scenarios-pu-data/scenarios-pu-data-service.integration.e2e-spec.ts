@@ -29,7 +29,11 @@ describe(`scenarios-pu-data fetch`, () => {
     count = (await world.GivenScenarioPuDataExists()).length;
 
     // Act
-    result = await service.findAll();
+    result = await service.findAll(undefined, {
+      params: {
+        scenarioId: world.scenarioId,
+      },
+    });
   });
 
   it(`returns valid data`, () => {
