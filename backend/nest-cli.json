@@ -1,0 +1,39 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/backend/src",
+  "monorepo": true,
+  "root": "apps/backend",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/backend/tsconfig.app.json"
+  },
+  "projects": {
+    "backend": {
+      "type": "application",
+      "root": "apps/backend",
+      "entryFile": "main",
+      "sourceRoot": "apps/backend/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/backend/tsconfig.app.json"
+      }
+    },
+    "geo": {
+      "type": "application",
+      "root": "apps/geo",
+      "entryFile": "main",
+      "sourceRoot": "apps/geo/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/geo/tsconfig.app.json"
+      }
+    },
+    "shared": {
+      "type": "library",
+      "root": "libs/shared",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared/tsconfig.lib.json"
+      }
+    }
+  }
+}

@@ -10,8 +10,15 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "incremental": true,
-  },
-  "exclude": ["node_modules", "dist"]
+    "paths": {
+      "@app/shared": [
+        "libs/shared/src"
+      ],
+      "@app/shared/*": [
+        "libs/shared/src/*"
+      ]
+    }
+  }
 }
