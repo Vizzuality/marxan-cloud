@@ -15,7 +15,8 @@ RUN chown $USER:$USER $APP_HOME
 
 USER $USER
 
-COPY --chown=$USER:$USER package.json yarn.lock ./
+COPY --chown=$USER:$USER ../../package.json ../../yarn.lock ./
+COPY --chown=$USER:$USER ../../tsconfig.json ../../
 RUN yarn install --frozen-lockfile
 
 COPY --chown=$USER:$USER entrypoint.sh nodemon.json tsconfig.json tsconfig.build.json ormconfig.ts ./
