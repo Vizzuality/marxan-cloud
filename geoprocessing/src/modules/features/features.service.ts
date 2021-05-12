@@ -8,8 +8,6 @@ import {
   IsNumber,
   IsString,
   IsOptional,
-  IsEnum,
-  ValidateNested,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
@@ -26,10 +24,6 @@ export class TileSpecification extends TileRequest {
  */
 export class FeaturesFilters {
   @IsOptional()
-
-  // @ValidateNested({ each: true })
-  // @Type(() => Array)
-  // @IsNumber({}, {each: true})
   @IsArray()
   @IsNumber({}, { each: true })
   @Transform((value: string): BBox => JSON.parse(value))
@@ -52,12 +46,10 @@ export class FeatureService {
    * @todo move the string to int transformation to the AdminAreaLevelFilters class
    */
   buildFeaturesWhereQuery(id: string, bbox?: BBox): string {
-    this.logger.debug(`BBox ${bbox}`);
     let whereQuery = `feature_id = '${id}'`;
-    // if (filters?.bbox) {
-    //   whereQuery += `AND the_geom && ST_MakeEnvelope(${filters?.bbox[0]}, 4326)`
-    // }
-
+    if (bbox) {
+      whereQuery += `AND the_geom && ST_MakeEnvelope(${bbox}, 4326)`
+    }
     return whereQuery;
   }
 

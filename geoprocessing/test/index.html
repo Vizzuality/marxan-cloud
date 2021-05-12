@@ -53,7 +53,7 @@ var map = new mapboxgl.Map({
                 'minzoom': 1,
                 'maxzoom': 12,
                 'tiles': [
-                "http://localhost:3040/api/v1/geodata/protected-areas/preview/tiles/{z}/{x}/{y}.mvt",
+                "http://localhost:3040/api/v1/geodata/protected-areas/preview/tiles/{z}/{x}/{y}.mvt?id=b469939b-2cbb-4a66-9507-87ab7270e6b2",
                      ]
             },
             'postgis-tilesfeatures': {
@@ -61,7 +61,7 @@ var map = new mapboxgl.Map({
                 'minzoom': 1,
                 'maxzoom': 12,
                 'tiles': [
-                "http://localhost:3040/api/v1/geodata/features/26e30a8d-07c0-4406-a0a5-37cb53457f19/preview/tiles/{z}/{x}/{y}.mvt",
+                "http://localhost:3040/api/v1/geodata/features/f01903fe-2e41-423e-8b64-176c77f10be6/preview/tiles/{z}/{x}/{y}.mvt?bbox=[0.12084960937499999, 44.11914151643737, 2.2412109375, 44.11914151643737]",
                      ]
             },
             'postgis-tilesPU': {
@@ -99,17 +99,17 @@ var map = new mapboxgl.Map({
                 'fill-opacity': 1
             }
         },
-        // {
-        //     'id': 'postgis-tiles-layer',
-        //     'type': 'fill',
-        //     'source': 'postgis-tiles2',
-        //     'source-layer': 'layer0',
-        //     'paint': {
-        //         'fill-outline-color': 'red',
-        //         'fill-color': 'green',
-        //         'fill-opacity': 0.2
-        //     }
-        // },
+        {
+            'id': 'postgis-tiles-layer',
+            'type': 'fill',
+            'source': 'postgis-tiles2',
+            'source-layer': 'layer0',
+            'paint': {
+                'fill-outline-color': 'red',
+                'fill-color': 'green',
+                'fill-opacity': 0.2
+            }
+        },
         // {
         //     'id': 'postgis-tiles-layer1',
         //     'type': 'fill',
@@ -132,17 +132,17 @@ var map = new mapboxgl.Map({
         //         'fill-opacity': 0.2
         //     }
         // },
-        // {
-        //     'id': 'postgis-tiles-layer-wdpa',
-        //     'type': 'fill',
-        //     'source': 'postgis-tileswdpa',
-        //     'source-layer': 'layer0',
-        //     'paint': {
-        //         'fill-outline-color': 'yellow',
-        //         'fill-color': 'red',
-        //         'fill-opacity': 0.7
-        //     }
-        // },
+        {
+            'id': 'postgis-tiles-layer-wdpa',
+            'type': 'fill',
+            'source': 'postgis-tileswdpa',
+            'source-layer': 'layer0',
+            'paint': {
+                'fill-outline-color': 'yellow',
+                'fill-color': 'red',
+                'fill-opacity': 0.7
+            }
+        },
         // {
         //     'id': 'postgis-tiles-layer-PU',
         //     'type': 'fill',

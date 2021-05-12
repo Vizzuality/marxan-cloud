@@ -3,10 +3,10 @@ import { TileService, TileRequest } from 'src/modules/tile/tile.service';
 import { ApiProperty } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IsInt, Max, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Max, Min, IsArray, IsNumber } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { AdminArea } from 'src/modules/admin-areas/admin-areas.geo.entity';
-import { filter } from 'lodash';
+import { BBox } from 'geojson';
 
 export class TileSpecification extends TileRequest {
   @ApiProperty()
@@ -17,9 +17,20 @@ export class TileSpecification extends TileRequest {
   level!: number;
 }
 
-export type AdminAreasFilters = {
+/**
+ * @todo add validation for bbox
+ */
+export class AdminAreasFilters {
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  @Transform((value: string): BBox => JSON.parse(value))
+  bbox?: BBox;
+
+  @IsOptional()
+  @IsString()
   guid: string;
-};
+}
 
 @Injectable()
 export class AdminAreasService {
@@ -31,27 +42,34 @@ export class AdminAreasService {
     private readonly tileService: TileService,
   ) {}
 
+
   buildAdminAreaWhereQuery(level: number, filters?: AdminAreasFilters): string {
     let whereQuery = '';
     if (level === 0) {
+      whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL`;
       if (filters?.guid) {
-        whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL AND gid_0 = '${filters?.guid}'`;
-      } else {
-        whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL`;
+        whereQuery += ` AND gid_0 = '${filters?.guid}'`;
+      }
+      if (filters?.bbox) {
+        whereQuery += ` AND the_geom && ST_MakeEnvelope(${filters?.bbox}, 4326)`;
       }
     }
     if (level === 1) {
+      whereQuery = `gid_1 IS NOT NULL AND gid_2 IS NULL AND gid_0 != 'ATA'`;
       if (filters?.guid) {
-        whereQuery = `gid_1 IS NOT NULL AND gid_2 IS NULL AND gid_0 = '${filters?.guid}'`;
-      } else {
-        whereQuery = `gid_1 IS NOT NULL AND gid_2 IS NULL AND gid_0 != 'ATA'`;
+        whereQuery += ` AND gid_0 = '${filters?.guid}'`;
+      }
+      if (filters?.bbox) {
+        whereQuery += ` AND the_geom && ST_MakeEnvelope(${filters?.bbox}, 4326)`;
       }
     }
     if (level === 2) {
+      whereQuery = `gid_2 IS NOT NULL`;
       if (filters?.guid) {
-        whereQuery = `gid_2 IS NOT NULL and  gid_1 = '${filters?.guid}'`;
-      } else {
-        whereQuery = `gid_2 IS NOT NULL`;
+        whereQuery += ` AND  gid_1 = '${filters?.guid}'`;
+      }
+      if (filters?.bbox) {
+        whereQuery += ` AND the_geom && ST_MakeEnvelope(${filters?.bbox}, 4326)`;
       }
     }
     return whereQuery;
@@ -65,7 +83,6 @@ export class AdminAreasService {
     filters?: AdminAreasFilters,
   ): Promise<Buffer> {
     const { z, x, y, level } = tileSpecification;
-
     const attributes = 'name_0, name_1, name_2';
     const table = this.adminAreasRepository.metadata.tableName;
     const customQuery = this.buildAdminAreaWhereQuery(level, filters);
