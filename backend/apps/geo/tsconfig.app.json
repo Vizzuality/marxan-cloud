@@ -3,7 +3,15 @@
   "compilerOptions": {
     "declaration": false,
     "outDir": "../../dist/apps/geo",
-    "baseUrl": "."
+    "paths": {
+      "@app/shared": [
+        "libs/shared/src"
+      ],
+      "@app/shared/*": [
+        "libs/shared/src/*"
+      ],
+      "*": ["apps/geo/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
