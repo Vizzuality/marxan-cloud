@@ -89,7 +89,13 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     });
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragAccept,
+    isDragReject,
+  } = useDropzone({
     // accept: 'image/*',
     multiple: false,
     maxSize: 1000000,
@@ -175,7 +181,13 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
             {selected && (
               <div className="pt-2">
                 <div
-                  {...getRootProps({ className: 'dropzone px-5 py-3 w-full border border-dotted hover:bg-gray-500' })}
+                  {...getRootProps()}
+                  className={cx({
+                    'relative px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
+                    'bg-gray-500': isDragActive,
+                    'border-green-800': isDragAccept,
+                    'border-red-800': isDragReject,
+                  })}
                 >
                   <input {...getInputProps()} />
 
