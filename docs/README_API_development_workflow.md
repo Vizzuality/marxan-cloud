@@ -77,9 +77,14 @@ fail.
 * if the CQRS model may be more appropriate, there's still an option to go
   very lightweight on this by only keeping command and query DTOs fully distinct
 * if CQRS proper is appropriate, it may be the way to go
-* at this stage, we should aim for a breakdown of service functions that
-  maximises the ability to meaningfully unit-test most functions (avoiding
-  mixing computation and side effects, for example)
+* irrespective of architectural choices, we should aim for a breakdown of
+  service functions that maximises the ability to meaningfully unit-test most
+  functions (avoiding mixing computation and side effects, for example)
+
+At this stage we should have a stub implementation that could be reviewed for
+feedback on the proposed architecture, and with front components (such as
+controller handlers and job queues) able to receive "commands" (HTTP requests,
+jobs) although there will be no code to process these commands.
 
 ### Internal interfaces
 
@@ -88,6 +93,10 @@ fail.
   (e.g. via BullMQ job queues), we should define the contracts between these
   modules/services (for example, message payloads, etc.) as well as mapping out
   the flow of commands and data between them
+
+At this stage, we should be able to review for feedback all the interfaces
+between internal components, making sure that interfaces are suitable and
+complete, that they don't include unnecessary or unclear data.
 
 ### Documentation
 
