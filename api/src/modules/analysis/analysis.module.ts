@@ -13,9 +13,17 @@ import { UpdatePlanningUnitsService } from './providers/planning-units/update-pl
 import { ScenarioStatusService } from './providers/status/scenario-status.service';
 import { RequestJobPort } from './providers/planning-units/request-job.port';
 import { AsyncJobsAdapter } from './providers/planning-units/adapters/async-jobs-adapter';
+import { QueueModule } from '../queue/queue.module';
+import { queueName } from './queue-name';
 
 @Module({
-  imports: [ScenariosPlanningUnitModule, PlanningUnitsModule],
+  imports: [
+    ScenariosPlanningUnitModule,
+    PlanningUnitsModule,
+    QueueModule.register({
+      name: queueName,
+    }),
+  ],
   providers: [
     {
       provide: AdjustCostSurface,
