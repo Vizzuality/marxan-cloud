@@ -2,8 +2,7 @@ name: API tests
 on:
   push:
     paths:
-      - 'api/**'
-      - 'geoprocessing/**'
+      - 'backend/**'
   workflow_dispatch:
 jobs:
   test-api-e2e:
