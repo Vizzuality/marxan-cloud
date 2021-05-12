@@ -10,7 +10,6 @@ import { AppConfig } from '../../utils/config.utils';
 import { remoteConnectionName } from './entities/remote-connection-name';
 import { ScenariosPlanningUnitGeoEntity } from './entities/scenarios-planning-unit.geo.entity';
 import { UserSearchCriteria } from './search-criteria';
-import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
 import { FiltersSpecification } from 'nestjs-base-service';
 
 @Injectable()
