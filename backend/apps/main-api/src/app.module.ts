@@ -27,6 +27,7 @@ import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.mo
 import { ProxyModule } from 'modules/proxy/proxy.module';
 import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/scenarios-planning-unit.module';
 import { AnalysisModule } from './modules/analysis/analysis.module';
+import { SharedModule } from '@app/shared';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { AnalysisModule } from './modules/analysis/analysis.module';
     ProxyModule,
     ScenariosPlanningUnitModule,
     AnalysisModule,
+    SharedModule,
   ],
   controllers: [AppController, PingController],
   providers: [

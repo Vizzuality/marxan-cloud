@@ -12,14 +12,6 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "incremental": true,
-    "types": [
-      "reflect-metadata",
-      "jest"
-    ],
-    "typeRoots": [
-      "./types",
-      "./node_modules/@types"
-    ],
     "paths": {
       "@app/shared": [
         "libs/shared/src"

@@ -2,7 +2,7 @@ version: "3.8"
 services:
   api:
     build:
-      context: ./api
+      context: ./backend/apps/main-api
       dockerfile: Dockerfile
       args:
         UID: 5000
@@ -13,8 +13,8 @@ services:
     command: develop
     user: "5000:5000"
     volumes:
-      - ./api/src:/opt/marxan-api/src
-      - ./api/test:/opt/marxan-api/test
+      - ./backend/apps/main-api/src:/opt/marxan-api/src
+      - ./backend/apps/main-api/test:/opt/marxan-api/test
     env_file: .env
     environment:
       - NODE_PATH=src
@@ -45,7 +45,7 @@ services:
 
   geoprocessing:
     build:
-      context: ./geoprocessing
+      context: ./backend/apps/geoprocessing
       dockerfile: Dockerfile
       args:
         UID: 5000
@@ -56,8 +56,8 @@ services:
     command: develop
     user: "5000:5000"
     volumes:
-      - ./geoprocessing/src:/opt/marxan-geoprocessing/src
-      - ./geoprocessing/test:/opt/marxan-geoprocessing/test
+      - ./backend/apps/geoprocessing/src:/opt/marxan-geoprocessing/src
+      - ./backend/apps/geoprocessing/test:/opt/marxan-geoprocessing/test
     env_file: .env
     environment:
       - NODE_PATH=src
