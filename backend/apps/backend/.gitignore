@@ -35,3 +35,5 @@ lerna-debug.log*
 
 # typescript-coverage-report output
 coverage-ts
+
+.env
