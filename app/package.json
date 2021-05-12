@@ -15,6 +15,9 @@
     "storybook:build": "yarn storybook:styles:prod && build-storybook -s ./public -c .storybook"
   },
   "dependencies": {
+    "@dnd-kit/core": "^3.0.3",
+    "@dnd-kit/sortable": "^3.0.1",
+    "@dnd-kit/utilities": "^2.0.0",
     "@hapi/iron": "^6.0.0",
     "@math.gl/web-mercator": "^3.3.2",
     "@popperjs/core": "^2.6.0",
