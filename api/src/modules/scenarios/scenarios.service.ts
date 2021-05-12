@@ -17,7 +17,7 @@ import { ProtectedAreasService } from 'modules/protected-areas/protected-areas.s
 import { ProjectsService } from 'modules/projects/projects.service';
 import { concat } from 'lodash';
 import { AppConfig } from 'utils/config.utils';
-import { WdpaArenaCalculationService } from './wdpa-arena-calculation.service';
+import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
@@ -43,7 +43,7 @@ export class ScenariosService extends AppBaseService<
     protected readonly protectedAreasService: ProtectedAreasService,
     @Inject(forwardRef(() => ProjectsService))
     protected readonly projectsService: ProjectsService,
-    private readonly wdpaCalculationsDetector: WdpaArenaCalculationService,
+    private readonly wdpaCalculationsDetector: WdpaAreaCalculationService,
   ) {
     super(repository, 'scenario', 'scenarios', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },

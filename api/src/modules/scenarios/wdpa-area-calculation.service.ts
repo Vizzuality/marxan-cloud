@@ -7,7 +7,7 @@ import { Scenario } from './scenario.api.entity';
 type InputChange = CreateScenarioDTO | UpdateScenarioDTO;
 
 @Injectable()
-export class WdpaArenaCalculationService {
+export class WdpaAreaCalculationService {
   /**
    * if one of those is located within Input Change
    */

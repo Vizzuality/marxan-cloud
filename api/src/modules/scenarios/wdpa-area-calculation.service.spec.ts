@@ -1,4 +1,4 @@
-import { WdpaArenaCalculationService } from './wdpa-arena-calculation.service';
+import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { Test } from '@nestjs/testing';
 import {
   scenarioWithRequiredWatchedEmpty,
@@ -10,14 +10,14 @@ import {
   thresholdChangeSet,
 } from './__mocks__/input-change.data';
 
-let sut: WdpaArenaCalculationService;
+let sut: WdpaAreaCalculationService;
 
 beforeEach(async () => {
   const sandbox = await Test.createTestingModule({
-    providers: [WdpaArenaCalculationService],
+    providers: [WdpaAreaCalculationService],
   }).compile();
 
-  sut = sandbox.get(WdpaArenaCalculationService);
+  sut = sandbox.get(WdpaAreaCalculationService);
 });
 
 describe(`when scenario has insufficient watched data`, () => {
