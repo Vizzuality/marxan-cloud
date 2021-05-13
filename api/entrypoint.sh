@@ -8,15 +8,16 @@ case "$1" in
         ;;
     test-unit)
         echo "Running Unit Tests"
-        exec yarn test:unit
+        exec yarn test:ci
         ;;
     test-e2e)
         echo "Running e2e Tests"
         exec yarn test:e2e
         ;;
     run-migrations-for-e2e-tests)
-        echo "Running migrations for e2e Tests"
-        sleep 15
+        echo "(ESC)[44m Running migrations for e2e Tests in Api (ESC)[0m"
+        echo $GEO_POSTGRES_PASSWORD
+        echo $API_POSTGRES_URL
         yarn typeorm migration:run
         ;;
     start)

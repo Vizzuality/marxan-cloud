@@ -21,6 +21,7 @@ import { omit } from 'lodash';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { apiConnections } from '../../ormconfig';
+import { AppConfig } from 'utils/config.utils';
 
 /**
  * Supported admin area levels (sub-national): either level 1 or level 2.
@@ -60,7 +61,9 @@ export class AdminAreasService extends AppBaseService<
     @InjectRepository(AdminArea, apiConnections.geoprocessingDB.name)
     private readonly adminAreasRepository: Repository<AdminArea>,
   ) {
-    super(adminAreasRepository, 'admin_area', 'admin_areas');
+    super(adminAreasRepository, 'admin_area', 'admin_areas', {
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
 
   get serializerConfig(): JSONAPISerializerConfig<AdminArea> {

@@ -23,6 +23,7 @@ import {
 import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from 'modules/projects/project.api.entity';
 import { apiConnections } from '../../ormconfig';
+import { AppConfig } from 'utils/config.utils';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -63,6 +64,9 @@ export class GeoFeaturesService extends AppBaseService<
       geoFeaturesRepository,
       geoFeatureResource.name.singular,
       geoFeatureResource.name.plural,
+      {
+        logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      },
     );
   }
 

@@ -9,6 +9,8 @@ import { Project } from 'modules/projects/project.api.entity';
 import { ProtectedAreasModule } from 'modules/protected-areas/protected-areas.module';
 import { ProjectsModule } from 'modules/projects/projects.module';
 import { ScenarioFeaturesModule } from '../scenarios-features';
+import { ProxyService } from 'modules/proxy/proxy.service';
+import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { ScenarioFeaturesModule } from '../scenarios-features';
     UsersModule,
     ScenarioFeaturesModule,
   ],
-  providers: [ScenariosService],
+  providers: [ScenariosService, ProxyService, WdpaAreaCalculationService],
   controllers: [ScenariosController],
   exports: [ScenariosService],
 })

@@ -10,6 +10,8 @@ import * as config from 'config';
 import { omit } from 'lodash';
 
 import * as JSONAPISerializer from 'jsonapi-serializer';
+import { Response } from 'express';
+import { AppConfig } from '../utils/config.utils';
 
 /**
  * Catch-all exception filter. Output error data to logs, and send it as
@@ -20,9 +22,11 @@ import * as JSONAPISerializer from 'jsonapi-serializer';
  */
 @Catch(Error)
 export class AllExceptionsFilter implements ExceptionFilter {
+  private readonly logger = new Logger();
+
   catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
+    const response: Response = ctx.getResponse();
     const request = ctx.getRequest();
 
     const status =
@@ -45,7 +49,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
       },
     };
 
-    Logger.error(errorData);
+    if (!AppConfig.get<boolean>('logging.muteAll', false)) {
+      this.logger.error(errorData);
+    }
 
     /**
      * When *not* running in a development environment, we strip off raw error
@@ -62,6 +68,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : errorData,
     );
 
-    response.status(status).json(errorDataForResponse);
+    response
+      .status(status)
+      .header('Content-Type', 'application/json')
+      .header('Content-Disposition', 'inline')
+      .json(errorDataForResponse);
   }
 }

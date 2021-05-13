@@ -11,17 +11,17 @@ services:
     ports:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-api
-    command: test-e2e
+    command: develop
     user: "5000:5000"
     volumes:
       - ./api/src:/opt/marxan-api/src
       - ./api/test:/opt/marxan-api/test
     environment:
-      - NODE_PATH=src
-      - NODE_ENV=development
-      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-test-e2e-postgresql-api:5432/${API_POSTGRES_DB}
-      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-test-e2e-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
-      - REDIS_HOST=marxan-test-e2e-redis
+      NODE_PATH: src
+      NODE_ENV: development
+      API_POSTGRES_URL: postgres://marxan-api:marxan-api@test-e2e-postgresql-api:5432/marxan-api
+      GEO_POSTGRES_URL: postgres://marxan-geo-api:marxan-geo-api@test-e2e-postgresql-geo-api:5432/marxan-geo-api
+      REDIS_HOST: test-e2e-redis
     depends_on:
       - test-e2e-postgresql-api
       - test-e2e-postgresql-geo-api
@@ -37,7 +37,7 @@ services:
     ports:
       - "${GEOPROCESSING_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-geoprocessing
-    command: test-e2e
+    command: develop
     user: "5000:5000"
     volumes:
       - ./geoprocessing/src:/opt/marxan-geoprocessing/src
@@ -45,9 +45,9 @@ services:
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
-      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-test-e2e-postgresql-api:5432/${API_POSTGRES_DB}
-      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-test-e2e-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
-      - REDIS_HOST=marxan-test-e2e-redis
+      - API_POSTGRES_URL=postgres://marxan-api:marxan-api@test-e2e-postgresql-api:5432/marxan-api
+      - GEO_POSTGRES_URL=postgres://marxan-geo-api:marxan-geo-api@test-e2e-postgresql-geo-api:5432/marxan-geo-api
+      - REDIS_HOST=test-e2e-redis
     depends_on:
       - test-e2e-postgresql-geo-api
       - test-e2e-postgresql-api
@@ -60,7 +60,7 @@ services:
       dockerfile: Dockerfile
     container_name: marxan-test-e2e-postgresql-api
     volumes:
-      - ./api/test/fixtures/test-data.sql:/docker-entrypoint-initdb.d/test-data.sql
+      - "./api/test/fixtures:/opt:ro"
     ports:
       - "${POSTGRES_API_SERVICE_PORT}:5432"
     environment:
@@ -78,7 +78,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=${GEO_POSTGRES_PASSWORD}
       - POSTGRES_USER=${GEO_POSTGRES_USER}
-    restart: always
+    restart: on-failure
 
   test-e2e-redis:
     build:

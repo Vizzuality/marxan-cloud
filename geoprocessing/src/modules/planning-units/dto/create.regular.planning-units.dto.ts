@@ -38,11 +38,12 @@ export class PlanningUnitsJob {
   adminAreaLevel2Id?: string;
 
   @IsEnum(PlanningUnitGridShape)
-  planningUnitGridShape: PlanningUnitGridShape;
+  planningUnitGridShape!: PlanningUnitGridShape;
 
   @IsPositive()
-  planningUnitAreakm2: number;
+  planningUnitAreakm2!: number;
 
+  // TODO (debt) there is no validation happening even with decorator
   @ValidateNested()
   extent?: Polygon;
 }

@@ -7,13 +7,12 @@ import {
   JSONAPISerializerConfig,
 } from '../../utils/app-base.service';
 
-import { AppInfoDTO } from '../../dto/info.dto';
-
 import { remoteConnectionName } from './entities/remote-connection-name';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 import { RemoteScenarioFeaturesData } from './entities/remote-scenario-features-data.geo.entity';
 import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 import { UserSearchCriteria } from './search-criteria';
+import { AppConfig } from '../../utils/config.utils';
 
 @Injectable()
 export class ScenarioFeaturesService extends AppBaseService<
@@ -30,7 +29,9 @@ export class ScenarioFeaturesService extends AppBaseService<
     @InjectRepository(RemoteScenarioFeaturesData, remoteConnectionName)
     private readonly remoteScenarioFeatures: Repository<RemoteScenarioFeaturesData>,
   ) {
-    super(remoteScenarioFeatures, 'scenario_features', 'scenario_feature');
+    super(remoteScenarioFeatures, 'scenario_features', 'scenario_feature', {
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
 
   setFilters(
@@ -130,6 +131,7 @@ export class ScenarioFeaturesService extends AppBaseService<
       coverageTarget: +(base?.target ?? 0).toFixed(2),
       coverageTargetArea: (totalArea * (base?.target ?? 0)) / 100,
       totalArea,
+      featureId: assign.id,
       tag: assign.tag,
       name: assign.alias ?? undefined, // `null`
       description: assign.description ?? undefined,

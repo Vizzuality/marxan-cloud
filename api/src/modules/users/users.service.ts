@@ -23,6 +23,7 @@ import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { compare, hash } from 'bcrypt';
 import { AuthenticationService } from 'modules/authentication/authentication.service';
 import { v4 } from 'uuid';
+import { AppConfig } from 'utils/config.utils';
 
 @Injectable()
 export class UsersService extends AppBaseService<
@@ -37,7 +38,9 @@ export class UsersService extends AppBaseService<
     @Inject(forwardRef(() => AuthenticationService))
     private readonly authenticationService: AuthenticationService,
   ) {
-    super(repository, userResource.name.singular, userResource.name.plural);
+    super(repository, userResource.name.singular, userResource.name.plural, {
+      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+    });
   }
 
   get serializerConfig(): JSONAPISerializerConfig<User> {

@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Dictionary } from 'lodash';
-import { User } from 'modules/users/user.api.entity';
-import { Scenario } from 'modules/scenarios/scenario.api.entity';
+import { User } from '../users/user.api.entity';
+import { Scenario } from '../scenarios/scenario.api.entity';
 import {
   Column,
   Entity,
@@ -11,9 +11,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Organization } from 'modules/organizations/organization.api.entity';
-import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
-import { BaseServiceResource } from 'types/resource.interface';
+import { Organization } from '../organizations/organization.api.entity';
+import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
+import { BaseServiceResource } from '../../types/resource.interface';
 
 export const projectResource: BaseServiceResource = {
   className: 'Project',

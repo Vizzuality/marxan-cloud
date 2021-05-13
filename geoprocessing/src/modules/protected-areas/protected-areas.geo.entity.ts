@@ -3,6 +3,7 @@
  */
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Geometry } from 'geojson';
 
 @Entity('wdpa')
 export class ProtectedArea {
@@ -11,26 +12,26 @@ export class ProtectedArea {
    */
   @ApiProperty()
   @PrimaryColumn('uuid', { name: 'id' })
-  id: string;
+  id!: string;
 
   /**
    * wdpa name.
    */
   @ApiProperty()
   @Column('character varying', { name: 'fullName' })
-  fullName: string;
+  fullName!: string;
 
   /**
    * Level 1 id.
    */
   @ApiProperty()
   @Column('character varying', { name: 'status' })
-  status: string;
+  status!: string;
 
   /**
    * geometry column.
    */
   @ApiProperty()
   @Column('geometry', { name: 'the_geom', select: false })
-  theGeom: any;
+  theGeom!: Geometry;
 }

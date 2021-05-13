@@ -9,6 +9,9 @@ import * as Server from 'http-proxy';
 
 @Injectable()
 export class ProxyService {
+  private geoprocessingServiceUrl: string = AppConfig.get(
+    'geoprocessing.url',
+  ) as string;
   private server: Server;
   private readonly logger = new Logger(ProxyService.name);
   constructor() {
@@ -20,7 +23,6 @@ export class ProxyService {
    */
 
   proxyTileRequest(request: Request, response: Response) {
-    const tileTargetURL: string = AppConfig.get('geoprocessing.url') as string;
     // Use `originalUrl` here, as the `/api/v1/geoprocessing` is otherwise stripped
     // away, but we need this because the backend microservice expects that as
     // part of its routes
@@ -29,10 +31,37 @@ export class ProxyService {
     return this.server.web(
       request,
       response,
-      { changeOrigin: true, target: tileTargetURL },
+      { changeOrigin: true, target: this.geoprocessingServiceUrl },
       (error) => {
         this.logger.error(
           `Unexpected exception on proxy to tile service - ${error}`,
+        );
+        return response
+          .status(HttpStatus.BAD_GATEWAY)
+          .send({ message: `Unexpected exception during request - ${error}` });
+      },
+    );
+  }
+
+  async proxyUploadShapeFile(
+    request: Request,
+    response: Response,
+  ): Promise<any> {
+    request.url = request.originalUrl.replace(
+      'api/v1/scenarios',
+      'api/v1/geodata/planning-units',
+    );
+
+    return this.server.web(
+      request,
+      response,
+      {
+        changeOrigin: true,
+        target: this.geoprocessingServiceUrl,
+      },
+      (error) => {
+        this.logger.error(
+          `Unexpected exception on proxy for shapefile upload service - ${error}`,
         );
         return response
           .status(HttpStatus.BAD_GATEWAY)

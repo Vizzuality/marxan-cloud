@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Dictionary } from 'lodash';
-import { Project } from 'modules/projects/project.api.entity';
+import { Project } from '../projects/project.api.entity';
 import {
   Column,
   Entity,
@@ -10,11 +10,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from 'modules/users/user.api.entity';
+import { User } from '../users/user.api.entity';
 import { IsArray, IsOptional } from 'class-validator';
-import { TimeUserEntityMetadata } from 'types/time-user-entity-metadata';
-import { BaseServiceResource } from 'types/resource.interface';
-import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
+import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
+import { BaseServiceResource } from '../../types/resource.interface';
+import { IUCNCategory } from '../protected-areas/protected-area.geo.entity';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',

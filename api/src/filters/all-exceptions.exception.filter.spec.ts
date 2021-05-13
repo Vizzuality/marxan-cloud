@@ -1,65 +1,67 @@
 import { AllExceptionsFilter } from './all-exceptions.exception.filter';
-import { HttpException, ArgumentsHost, HttpStatus } from '@nestjs/common';
+import { ArgumentsHost, NotFoundException } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
 
 describe('AllExceptionFilter class spec (unit)', () => {
-  const allExceptionsFilter = new AllExceptionsFilter();
+  let filter: AllExceptionsFilter;
+  let argumentMock: jest.Mocked<ArgumentsHost>;
+  let jsonMock: jest.Mock;
 
-  /**
-   * Common Mocks
-   */
-  const responseMock = {
-    status: jest.fn().mockReturnThis(),
-    json: jest.fn(),
-    url: 'fakeUrl',
-  };
-
-  const hostMock = {
-    switchToHttp: () => {
-      return {
-        getResponse: () => responseMock,
-        getRequest: () => {
-          return { url: 1 };
-        },
-      };
-    },
-  } as ArgumentsHost;
-  afterEach(() => {
-    jest.clearAllMocks();
+  beforeEach(async () => {
+    const sandbox = await Test.createTestingModule({
+      providers: [AllExceptionsFilter],
+    }).compile();
+    sandbox.useLogger(false);
+    filter = sandbox.get(AllExceptionsFilter);
+    jsonMock = jest.fn();
+    argumentMock = mockArgumentsHost(jsonMock);
   });
 
   it('should be defined', () => {
-    expect(new AllExceptionsFilter()).toBeDefined();
+    expect(filter).toBeDefined();
   });
 
-  it('should get HTTP status through exception Object', () => {
-    const exceptionObjectMock = ({
-      getStatus: jest.fn(() => 404),
-      message: 'Mock Message',
-      stack: 'Fake Error Stack',
-    } as unknown) as HttpException;
-
-    /**
-     * Prototype pollution to mock 'instanceof'
-     */
-    const exception = Object.create(HttpException.prototype);
-    const exceptionMock = Object.assign(exception, exceptionObjectMock);
-
-    allExceptionsFilter.catch(exceptionMock, hostMock);
-
-    expect(responseMock.status).toHaveBeenCalledWith(exceptionMock.getStatus());
-    expect(responseMock.json).toHaveBeenCalled();
-  });
-
-  it('should get HTTP status through HttpStatus', () => {
-    const exceptionMock = ({
-      message: 'Mock Message',
-      stack: 'Fake Error Stack',
-    } as unknown) as Error;
-    allExceptionsFilter.catch(exceptionMock, hostMock);
-
-    expect(responseMock.status).toHaveBeenCalledWith(
-      HttpStatus.INTERNAL_SERVER_ERROR,
+  it(`wraps http error`, async () => {
+    // Act
+    await filter.catch(
+      new NotFoundException('Resource not found'),
+      argumentMock,
     );
-    expect(responseMock.json).toHaveBeenCalled();
+
+    // Asset
+    responseStatus(jsonMock).toEqual(404);
+    responseTitle(jsonMock).toEqual('Resource not found');
+    responseMetaPath(jsonMock).toMatchInlineSnapshot(`"your-url"`);
   });
+});
+
+const responseStatus = (jsonMock: jest.Mock): jest.JestMatchers<any> =>
+  expect(jsonMock.mock.calls[0][0].errors[0].status);
+
+const responseTitle = (jsonMock: jest.Mock): jest.JestMatchers<any> =>
+  expect(jsonMock.mock.calls[0][0].errors[0].title);
+
+const responseMetaPath = (jsonMock: jest.Mock): jest.JestMatchers<any> =>
+  expect(jsonMock.mock.calls[0][0].errors[0].meta.path);
+
+const mockArgumentsHost: (
+  jsonMock: jest.Mock,
+  url?: string,
+) => jest.Mocked<ArgumentsHost> = (jsonMock: jest.Mock, url = 'your-url') => ({
+  switchToHttp: jest.fn().mockReturnValue({
+    getResponse: jest.fn().mockReturnValue({
+      status: jest.fn().mockReturnValue({
+        header: jest.fn().mockReturnThis(),
+        json: jsonMock,
+      }),
+    }),
+    getRequest: jest.fn().mockReturnValue({
+      url,
+    }),
+  }),
+  getArgByIndex: jest.fn(),
+  getArgs: jest.fn(),
+  getType: jest.fn(),
+  switchToRpc: jest.fn(),
+  switchToWs: jest.fn(),
 });
