@@ -22,7 +22,7 @@ import { TileRequest } from 'src/modules/tile/tile.service';
 
 import { Response } from 'express';
 
-@Controller(`${apiGlobalPrefixes.v1}`)
+@Controller(`${apiGlobalPrefixes.v1}/protected-areas`)
 export class ProtectedAreasController<T> {
   private readonly logger: Logger = new Logger(ProtectedAreasController.name);
   constructor(public service: ProtectedAreasService) {}
@@ -55,7 +55,7 @@ export class ProtectedAreasController<T> {
     required: false,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
-  @Get('/protected-areas/preview/tiles/:z/:x/:y.mvt')
+  @Get('/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
   @Header('Content-Type', 'application/x-protobuf')
   @Header('Content-Disposition', 'attachment')

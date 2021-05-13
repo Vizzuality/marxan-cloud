@@ -23,11 +23,6 @@ export class ProxyService {
    */
 
   proxyTileRequest(request: Request, response: Response) {
-    // Use `originalUrl` here, as the `/api/v1/geoprocessing` is otherwise stripped
-    // away, but we need this because the backend microservice expects that as
-    // part of its routes
-    request.url = request.originalUrl.replace('api/v1/', 'api/v1/geodata/');
-
     return this.server.web(
       request,
       response,
@@ -49,7 +44,7 @@ export class ProxyService {
   ): Promise<any> {
     request.url = request.originalUrl.replace(
       'api/v1/scenarios',
-      'api/v1/geodata/planning-units',
+      'api/v1/planning-units',
     );
 
     return this.server.web(
