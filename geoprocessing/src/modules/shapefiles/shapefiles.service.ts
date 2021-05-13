@@ -22,13 +22,11 @@ export class ShapeFileService {
           }),
         )
         .on('close', () =>
-          resolve(`${fileInfo.filename} extracted succesfully`),
+          resolve(`${fileInfo.filename} extracted successfully`),
         )
         .on('error', (error: Error) =>
           reject(
-            new Error(
-              `${fileInfo.filename} could not been extracted: ` + error,
-            ),
+            new Error(`${fileInfo.filename} could not be extracted: ` + error),
           ),
         );
     });
