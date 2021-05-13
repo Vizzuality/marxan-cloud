@@ -1,5 +1,13 @@
-import { UpdateScenarioDTO } from '../dto/update.scenario.dto';
 import { IUCNCategory } from '../../protected-areas/protected-area.geo.entity';
+import { UpdateScenarioDTO } from '../dto/update.scenario.dto';
+import { CreateScenarioDTO } from '../dto/create.scenario.dto';
+import { ScenarioType } from '../scenario.api.entity';
+
+export const minimalScenario = (): CreateScenarioDTO => ({
+  projectId: 'project-id',
+  name: `Scenario Name`,
+  type: ScenarioType.marxan,
+});
 
 export const emptyWatchedChangeSet = (): UpdateScenarioDTO => ({
   customProtectedAreaIds: undefined,

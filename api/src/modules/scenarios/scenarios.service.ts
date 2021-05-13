@@ -55,7 +55,9 @@ export class ScenariosService extends AppBaseService<
     createModel: CreateScenarioDTO,
     _?: AppInfoDTO,
   ): Promise<void> {
-    if (this.wdpaCalculationsDetector.shouldTrigger(model, createModel)) {
+    if (
+      this.wdpaCalculationsDetector.shouldTriggerPostCreate(model, createModel)
+    ) {
       // TODO: trigger job - execute command of https://github.com/Vizzuality/marxan-cloud/pull/153/files
     }
   }
@@ -65,7 +67,9 @@ export class ScenariosService extends AppBaseService<
     updateModel: UpdateScenarioDTO,
     _?: AppInfoDTO,
   ): Promise<void> {
-    if (this.wdpaCalculationsDetector.shouldTrigger(model, updateModel)) {
+    if (
+      this.wdpaCalculationsDetector.shouldTriggerPostUpdate(model, updateModel)
+    ) {
       // TODO: trigger job - execute command of https://github.com/Vizzuality/marxan-cloud/pull/153/files
     }
   }
