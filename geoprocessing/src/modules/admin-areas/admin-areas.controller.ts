@@ -20,7 +20,7 @@ import { TileSpecification, AdminAreasFilters } from './admin-areas.service';
 import { Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}/administrative-areas`)
-export class AdminAreasController<T> {
+export class AdminAreasController {
   private readonly logger: Logger = new Logger(AdminAreasController.name);
   constructor(public service: AdminAreasService) {}
 

@@ -22,7 +22,7 @@ import { BBox } from 'geojson';
 import { Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}/features`)
-export class FeaturesController<T> {
+export class FeaturesController {
   private readonly logger: Logger = new Logger(FeaturesController.name);
   constructor(public service: FeatureService) {}
 
