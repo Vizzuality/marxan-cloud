@@ -14,6 +14,7 @@ import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
+import { useSaveScenarioPUShapefile } from 'hooks/scenarios';
 
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
@@ -45,6 +46,12 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     };
   }, [type, uploadingValue]);
 
+  const saveScenarioPUShapefileMutation = useSaveScenarioPUShapefile({
+    requestConfig: {
+      method: 'POST',
+    },
+  });
+
   // Effects
   useEffect(() => {
     if (selected) {
@@ -66,9 +73,32 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   const onDropAccepted = async (acceptedFiles) => {
     const f = acceptedFiles[0];
     console.info(f);
-    // const url = await toBase64(f);
-    // setPreview(`${url}`);
-    // onChange(`${url}`);
+
+    saveScenarioPUShapefileMutation.mutate({ id: `${sid}`, data: f }, {
+      onSuccess: ({ data: { data: s } }) => {
+        console.log(s);
+        addToast('success-upload-shapefile', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Shapefile uploaded</p>
+          </>
+        ), {
+          level: 'success',
+        });
+        console.info('Shapefile uploaded', s);
+      },
+      onError: () => {
+        console.log('Error');
+        addToast('error-upload-shapefile', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Shapefile could not be uploaded</p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
   };
 
   const onDropRejected = (rejectedFiles) => {
@@ -213,9 +243,9 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
                       {/* eslint-disable max-len */}
                       <ul className="pl-4 mt-2 space-y-1 list-disc list-outside">
-                        <li>
+                        {/* <li>
                           Unzipped: .csv, .json, .geojson, .kml, .kmz (.csv files must contain a geom column of shape data converted to well known text (WKT) format).
-                        </li>
+                        </li> */}
                         <li>Zipped: .shp (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)</li>
                       </ul>
                     </div>

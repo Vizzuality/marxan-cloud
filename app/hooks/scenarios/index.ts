@@ -172,3 +172,33 @@ export function useDeleteScenario({
     },
   });
 }
+
+export function useSaveScenarioPUShapefile({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveScenarioProps) {
+  const [session] = useSession();
+
+  const saveScenarioPUShapefile = ({ id, data }: SaveScenarioProps) => {
+    return SCENARIOS.request({
+      url: `/${id}/planning-unit-shapefile`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveScenarioPUShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
