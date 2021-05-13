@@ -1,37 +1,43 @@
 import React, { ReactNode } from 'react';
-
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import cx from 'classnames';
 
 export interface LegendItemProps {
   id: string;
-  children: ReactNode
+  name: string;
+  description?: string;
+  icon?: ReactNode
 }
 
 export const LegendItem: React.FC<LegendItemProps> = ({
   id,
-  children,
+  name,
+  description,
+  icon,
 }: LegendItemProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
+      key={id}
+      className="p-2.5"
     >
-      {children}
+      <header className="flex">
+        <div
+          className={cx({
+            relative: true,
+            'pl-5': icon,
+          })}
+        >
+          {icon && (
+            <div className="absolute top-0 left-0">
+              {icon}
+            </div>
+          )}
+          <div className="text-sm text-white font-heading">{name}</div>
+        </div>
+      </header>
+
+      <div className="text-sm text-gray-300">
+        {description}
+      </div>
     </div>
   );
 };

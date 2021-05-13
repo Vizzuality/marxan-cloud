@@ -1266,6 +1266,15 @@
     "@dnd-kit/utilities" "^2.0.0"
     tslib "^2.0.0"
 
+"@dnd-kit/modifiers@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@dnd-kit/modifiers/-/modifiers-2.0.0.tgz#0fbba098ae4a608456cbc00d159a2c6c33d438da"
+  integrity sha512-fU7+wzWKUfxtCV3zSSy08r0f1/obDKz3Y0B0Yd5a6ubRVV7qH6TTbtEBPo64zlp803turt889xGlvdEMtvh9FA==
+  dependencies:
+    "@dnd-kit/core" "^3.0.0"
+    "@dnd-kit/utilities" "^2.0.0"
+    tslib "^2.0.0"
+
 "@dnd-kit/sortable@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@dnd-kit/sortable/-/sortable-3.0.1.tgz#a63c2bcecb57c48cd72abcc6364b7c35d3af351f"

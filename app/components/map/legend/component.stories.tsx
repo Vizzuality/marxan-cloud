@@ -2,17 +2,13 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Story } from '@storybook/react/types-6-0';
 
 import Legend, { LegendProps } from './component';
+import LegendItem from './item';
+import ITEMS from './mock';
 
 export default {
   title: 'Components/Map/Legend',
   component: Legend,
 };
-
-const ITEMS = [
-  { id: 'XXX', name: 'XXX' },
-  { id: 'YYY', name: 'YYY' },
-  { id: 'ZZZ', name: 'ZZZ' },
-];
 
 const Template: Story<LegendProps> = (args) => {
   const [sortArray, setSortArray] = useState([]);
@@ -34,12 +30,10 @@ const Template: Story<LegendProps> = (args) => {
       onChangeOrder={onChangeOrder}
     >
       {sortedItems.map((i) => (
-        <div
+        <LegendItem
           key={i.id}
           {...i}
-        >
-          {i.name}
-        </div>
+        />
       ))}
     </Legend>
   );
