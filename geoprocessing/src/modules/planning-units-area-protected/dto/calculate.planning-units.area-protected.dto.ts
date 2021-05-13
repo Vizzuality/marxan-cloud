@@ -1,49 +1,32 @@
 import {
   IsOptional,
-  IsISO31661Alpha3,
   IsEnum,
-  IsPositive,
-  ValidateNested,
+  IsUUID,
+  IsArray,
+  IsInt,
+  Min,
+  Max,
 } from 'class-validator';
-import { Polygon } from 'geojson';
-
-/**
- * @todo We have this enum duplicated in the api service
- * @file api/src/modules/projects/project.api.entity.ts
- */
-export enum PlanningUnitGridShape {
-  square = 'square',
-  hexagon = 'hexagon',
-  fromShapefile = 'from_shapefile',
-}
+import { IUCNCategory } from 'src/modules/protected-areas/protected-areas.geo.entity';
 
 /**
  * @todo We have this interface partially duplicated in the api service
  * @file api/src/modules/projects/dto/create.project.dto.ts
  */
-export class PlanningUnitsJob {
-  @IsOptional()
-  @IsISO31661Alpha3({
-    message: 'Not a valid country id',
-  })
-  countryId?: string;
+export class AreaProtectedForPlanningUnitsJob {
+  @IsUUID(4)
+  scenarioId!: string;
 
   @IsOptional()
-  adminRegionId?: string;
+  @IsArray()
+  @IsEnum(IUCNCategory, { each: true })
+  wdpaIucnCategories!: IUCNCategory[];
 
-  @IsOptional()
-  adminAreaLevel1Id?: string;
+  @IsUUID(4, { each: true })
+  customProtectedAreaIds!: string[];
 
-  @IsOptional()
-  adminAreaLevel2Id?: string;
-
-  @IsEnum(PlanningUnitGridShape)
-  planningUnitGridShape!: PlanningUnitGridShape;
-
-  @IsPositive()
-  planningUnitAreakm2!: number;
-
-  // TODO (debt) there is no validation happening even with decorator
-  @ValidateNested()
-  extent?: Polygon;
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  wdpaThreshold!: number;
 }

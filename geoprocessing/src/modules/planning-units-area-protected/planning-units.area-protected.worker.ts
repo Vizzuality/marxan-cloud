@@ -12,12 +12,14 @@ import * as config from 'config';
  *
  **/
 @Injectable()
-export class PlanningUnitsProcessor {
+export class CalculatePlanningUnitAreaProtectedProcessor {
   private readonly queueName: string = 'planning-units';
-  private readonly logger: Logger = new Logger(PlanningUnitsProcessor.name);
+  private readonly logger: Logger = new Logger(
+    CalculatePlanningUnitAreaProtectedProcessor.name,
+  );
   public readonly worker: Worker = new Worker(
     this.queueName,
-    join(__dirname, '/planning-units.job.ts'),
+    join(__dirname, './planning-units.area-protected.job.ts'),
     config.get('redisApi'),
   );
   private scheduler: QueueScheduler = new QueueScheduler(
