@@ -22,7 +22,7 @@ export const geoprocessingConnections: {
     type: 'postgres',
     url: AppConfig.get('postgresGeoApi.url'),
     ssl: false,
-    entities: ['src/modules/**/*.geo.entity.ts'],
+    // entities: ['src/modules/**/*.geo.entity.ts'],
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
@@ -46,7 +46,7 @@ export const geoprocessingConnections: {
     type: 'postgres',
     url: AppConfig.get('postgresApi.url'),
     ssl: false,
-    entities: ['src/modules/**/*.api.entity.ts'],
+    // entities: ['src/modules/**/*.api.entity.ts'],
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
