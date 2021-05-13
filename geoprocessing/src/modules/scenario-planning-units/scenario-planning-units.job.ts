@@ -44,7 +44,13 @@ const attachPlanningUnitGridToScenarioJobSpec = async (
     try {
       /**
        * @todo
-       * TBD this will also need to trigger if is already defined the calcs for area protection
+       * From the Project
+       * * Get the extent/admin-region used to generate the geometries of the PU
+       * * Get the size and type of the pu
+       * After that Insert into the table scenarios_pu_data.
+       * Need to trigger the calcs for area protection if:
+       * * iucn_cat or wdpaids are seted
+       * * And threshold is defined by user.
        */
       return 0;
     } catch (err) {
