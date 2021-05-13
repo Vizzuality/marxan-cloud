@@ -20,13 +20,13 @@ export class AreaProtectedForPlanningUnitsJob {
   @IsOptional()
   @IsArray()
   @IsEnum(IUCNCategory, { each: true })
-  wdpaIucnCategories!: IUCNCategory[];
+  wdpaIucnCategories?: IUCNCategory[];
 
   @IsUUID(4, { each: true })
-  customProtectedAreaIds!: string[];
+  customProtectedAreaIds?: string[];
 
   @IsInt()
   @Min(0)
   @Max(100)
-  wdpaThreshold!: number;
+  wdpaThreshold?: number;
 }

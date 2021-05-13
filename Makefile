@@ -164,3 +164,8 @@ extract-geo-test-data:
 
 generate-content-dumps: dump-api-data | dump-geodb-data
 	jq -n --arg dateName $$(date +%Y-%m-%d) '{"metadata":{"latest":{"name":$$dateName}}}' > data/data/processed/db_dumps/content.json
+
+generate-export-shpfile:
+	-docker-compose exec -T postgresql-geo-api mkdir testdataoutput
+	-docker-compose exec -T postgresql-geo-api pgsql2shp -f ./testdataoutput/test.shp -h localhost -p 5432 -r -g the_geom -u ${GEO_POSTGRES_USER} ${GEO_POSTGRES_DB} "SELECT the_geom, pug.id as uid, 1 as cost  FROM scenarios_pu_data spd inner join planning_units_geom pug on pug.id = spd.pu_geom_id ";
+	-docker cp marxan-postgresql-geo-api:testdataoutput data/data/processed/
