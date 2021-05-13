@@ -4,13 +4,14 @@ import { geoprocessingConnections } from 'src/ormconfig';
 import { createConnection } from 'typeorm';
 import { validate } from 'class-validator';
 
-import { AreaProtectedForPlanningUnitsJob } from './dto/calculate.planning-units.area-protected.dto';
+import { AreaProtectedForPlanningUnitsJob } from './dto/calculate.planning-units-area-protected.dto';
 import { plainToClass } from 'class-transformer';
 
-const logger = new Logger('planning-units-job-processor');
+const logger = new Logger('planning-units-area-protected-job-processor');
 
 /**
  * @description This function will take care of calculating the area protected within each PU
+ * Also if threshold is set it will take care of calculating initial lockin based on Protection level
  *
  *
  * @TODO

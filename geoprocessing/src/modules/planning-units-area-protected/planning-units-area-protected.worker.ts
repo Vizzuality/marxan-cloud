@@ -19,7 +19,7 @@ export class CalculatePlanningUnitAreaProtectedProcessor {
   );
   public readonly worker: Worker = new Worker(
     this.queueName,
-    join(__dirname, './planning-units.area-protected.job.ts'),
+    join(__dirname, './planning-units-area-protected.job.ts'),
     config.get('redisApi'),
   );
   private scheduler: QueueScheduler = new QueueScheduler(

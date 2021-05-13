@@ -4,10 +4,7 @@ import { geoprocessingConnections } from 'src/ormconfig';
 import { createConnection } from 'typeorm';
 import { validate } from 'class-validator';
 
-import {
-  PlanningUnitsForScenarioJob,
-  PlanningUnitGridShape,
-} from './dto/attach.planning-units.scenario.dto';
+import { PlanningUnitsForScenarioJob } from './dto/attach.planning-units.scenario.dto';
 import { plainToClass } from 'class-transformer';
 
 const logger = new Logger('planning-units-job-processor');
