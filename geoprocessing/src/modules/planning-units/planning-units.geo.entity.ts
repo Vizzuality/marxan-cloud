@@ -11,12 +11,12 @@ export class PlanningUnitsGeom {
    */
   @ApiProperty()
   @PrimaryColumn('uuid', { name: 'id' })
-  id: string;
+  id!: string;
 
   /**
    * geometry column.
    */
   @ApiProperty()
   @Column('geometry', { name: 'the_geom', select: false })
-  theGeom: any;
+  theGeom!: any;
 }

@@ -12,12 +12,12 @@ import { PlanningUnitsGeom } from 'src/modules/planning-units/planning-units.geo
 export class tileSpecification extends TileRequest {
   @ApiProperty()
   @IsString()
-  planningUnitGridShape: PlanningUnitGridShape;
+  planningUnitGridShape!: PlanningUnitGridShape;
 
   @ApiProperty()
   @IsNumber()
   @Transform((value) => Number.parseInt(value))
-  planningUnitAreakm2: number;
+  planningUnitAreakm2!: number;
 }
 export enum PlanningUnitGridShape {
   square = 'square',
