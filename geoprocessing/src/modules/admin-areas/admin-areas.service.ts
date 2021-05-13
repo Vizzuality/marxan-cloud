@@ -37,7 +37,7 @@ export class AdminAreasFilters {
 
   @IsOptional()
   @IsString()
-  guid: string;
+  guid?: string;
 }
 
 @Injectable()
