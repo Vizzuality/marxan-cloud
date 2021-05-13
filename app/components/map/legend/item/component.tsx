@@ -17,7 +17,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   return (
     <div
       key={id}
-      className="p-2.5"
+      className="py-2.5 px-5"
     >
       <header className="flex">
         <div
