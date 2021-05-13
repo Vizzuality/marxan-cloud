@@ -14,10 +14,12 @@ import { FeaturesModule } from 'src/modules/features/features.module';
     TypeOrmModule.forRoot({
       ...geoprocessingConnections.default,
       keepConnectionAlive: true,
+      autoLoadEntities: true,
     }),
     TypeOrmModule.forRoot({
       ...geoprocessingConnections.apiDB,
       keepConnectionAlive: true,
+      autoLoadEntities: true,
     }),
     AdminAreasModule,
     PlanningUnitsModule,

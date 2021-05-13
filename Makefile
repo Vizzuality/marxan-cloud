@@ -81,31 +81,31 @@ seed-dbs: seed-api-with-test-data | seed-geoapi-with-test-data
 
 seed-api-with-test-data:
 	@echo "$(RED)seeding db:$(NC) $(API_DB_INSTANCE)"
-	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < backend/apps/backend/test/fixtures/test-data.sql
 
 seed-geoapi-with-test-data:
 	@echo "$(RED)seeding dbs:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE) and ${REDIS_INSTANCE}"
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/test/fixtures/test-admin-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/test/fixtures/test-wdpa-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
-	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-features.sql
-	@for i in api/test/fixtures/features/*.sql; do \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" backend/apps/backend/test/fixtures/test-admin-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" backend/apps/backend/test/fixtures/test-wdpa-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < backend/apps/backend/test/fixtures/test-features.sql
+	@for i in backend/apps/backend/test/fixtures/features/*.sql; do \
 		table_name=`basename -s .sql "$$i"`; \
 		featureid=`docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
 		echo "appending data for $${table_name} with id $${featureid}"; \
-		sed -e "s/\$$feature_id/$$featureid/g" api/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
+		sed -e "s/\$$feature_id/$$featureid/g" backend/apps/backend/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
 		done; \
 	SCENARIOID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
 	USERID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from users limit 1"); \
 	echo "appending data for scenario with id $${SCENARIOID}"; \
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/test/fixtures/test-geodata.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" backend/apps/backend/test/fixtures/test-geodata.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
 
 # need notebook service to execute a expecific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
 	docker-compose -f ./data/docker-compose.yml exec -T marxan-science-notebooks papermill work/notebooks/Lab/convert_csv_sql.ipynb /dev/null
-	mv -f -u -Z data/data/processed/test-wdpa-data.sql api/test/fixtures/test-wdpa-data.sql
-	mv -f -u -Z data/data/processed/test-admin-data.sql api/test/fixtures/test-admin-data.sql
-	mv -f -u -Z data/data/processed/test-features.sql api/test/fixtures/test-features.sql
-	rm -rf api/test/fixtures/features && mv -f -u -Z data/data/processed/features api/test/fixtures/features
+	mv -f -u -Z data/data/processed/test-wdpa-data.sql backend/apps/backend/test/fixtures/test-wdpa-data.sql
+	mv -f -u -Z data/data/processed/test-admin-data.sql backend/apps/backend/test/fixtures/test-admin-data.sql
+	mv -f -u -Z data/data/processed/test-features.sql backend/apps/backend/test/fixtures/test-features.sql
+	rm -rf backend/apps/backend/test/fixtures/features && mv -f -u -Z data/data/processed/features backend/apps/backend/test/fixtures/features
 
 # Don't forget to run make clean-slate && make start-api before repopulating the whole db
 # This will delete all existing data and create tables/views/etc. through the migrations that
@@ -152,7 +152,7 @@ restore-dumps:
 
 extract-geo-test-data:
 	#This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
-	TEST_GEOMETRY=$(shell cat api/test/fixtures/test-geometry.json | jq 'tostring'); \
+	TEST_GEOMETRY=$(shell cat backend/apps/backend/test/fixtures/test-geometry.json | jq 'tostring'); \
 	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM admin_regions WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_admin_regions_okavango.csv; \
 	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM wdpa WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_wdpa_okavango.csv; \
 	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM features_data WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_features_data_okavango.csv;

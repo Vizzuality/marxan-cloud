@@ -36,10 +36,12 @@ import { SharedModule } from '@app/shared';
     TypeOrmModule.forRoot({
       ...apiConnections.default,
       keepConnectionAlive: true,
+      autoLoadEntities: true,
     }),
     TypeOrmModule.forRoot({
       ...apiConnections.geoprocessingDB,
       keepConnectionAlive: true,
+      autoLoadEntities: true,
     }),
     CqrsModule,
     AdminAreasModule,
