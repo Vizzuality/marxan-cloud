@@ -24,10 +24,21 @@ export class WdpaAreaCalculationService {
     'wdpaThreshold',
   ];
 
-  /**
-   * Every post update that affects this 3 elements (when threshold is not null)
-   */
-  shouldTrigger(scenario: Scenario, changeSet: InputChange): boolean {
+  shouldTriggerPostCreate(
+    scenario: Scenario,
+    changeSet: CreateScenarioDTO,
+  ): boolean {
+    if (!this.intendsToChangeWatchedProperty(changeSet)) {
+      return false;
+    }
+
+    return this.areRequiredFieldsAvailable(scenario);
+  }
+
+  shouldTriggerPostUpdate(
+    scenario: Scenario,
+    changeSet: UpdateScenarioDTO,
+  ): boolean {
     if (!this.intendsToChangeWatchedProperty(changeSet)) {
       return false;
     }

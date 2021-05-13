@@ -1,14 +1,13 @@
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { Test } from '@nestjs/testing';
+import { scenarioWithAllWatchedPresent } from './__mocks__/scenario.data';
 import {
-  scenarioWithRequiredWatchedEmpty,
-  scenarioWithAllWatchedPresent,
-} from './__mocks__/scenario.data';
-import {
-  emptyWatchedChangeSet,
+  minimalScenario,
   fullWatchedChangeSet,
-  thresholdChangeSet,
 } from './__mocks__/input-change.data';
+import { CreateScenarioDTO } from './dto/create.scenario.dto';
+import { Scenario } from './scenario.api.entity';
+import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 
 let sut: WdpaAreaCalculationService;
 
@@ -20,48 +19,32 @@ beforeEach(async () => {
   sut = sandbox.get(WdpaAreaCalculationService);
 });
 
-describe(`when scenario has insufficient watched data`, () => {
-  test.each([
-    emptyWatchedChangeSet(),
+/**
+ * [description, what was provided in dto, Scenario entity after creation, should trigger]
+ */
+
+const postCreateCases: [string, CreateScenarioDTO, Scenario, boolean][] = [
+  [
+    'minimal scenario',
+    minimalScenario(),
+    scenarioWithAllWatchedPresent(),
+    false,
+  ],
+];
+
+const postUpdateCases: [string, UpdateScenarioDTO, Scenario, boolean][] = [
+  [
+    'full everything',
     fullWatchedChangeSet(),
-    thresholdChangeSet(),
-  ])(`should not tell to trigger calculations`, (input) => {
-    expect(
-      sut.shouldTrigger(scenarioWithRequiredWatchedEmpty(), input),
-    ).toEqual(false);
-  });
+    scenarioWithAllWatchedPresent(),
+    true,
+  ],
+];
+
+test.each(postCreateCases)(`%p`, (...[, dto, scenario, result]) => {
+  expect(sut.shouldTriggerPostCreate(scenario, dto)).toEqual(result);
 });
 
-describe(`when scenario has complete data`, () => {
-  describe(`when input changes are empty`, () => {
-    it(`should not tell to trigger calculations`, () => {
-      expect(
-        sut.shouldTrigger(
-          scenarioWithAllWatchedPresent(),
-          emptyWatchedChangeSet(),
-        ),
-      ).toEqual(false);
-    });
-  });
-
-  describe(`when input changes contain watched property`, () => {
-    it(`should tell to trigger calculations`, () => {
-      expect(
-        sut.shouldTrigger(
-          scenarioWithAllWatchedPresent(),
-          thresholdChangeSet(),
-        ),
-      ).toEqual(true);
-    });
-  });
-  describe(`when input changes contain all watched properties`, () => {
-    it(`should tell to trigger calculations`, () => {
-      expect(
-        sut.shouldTrigger(
-          scenarioWithAllWatchedPresent(),
-          fullWatchedChangeSet(),
-        ),
-      ).toEqual(true);
-    });
-  });
+test.each(postUpdateCases)(`%p`, (...[, dto, scenario, result]) => {
+  expect(sut.shouldTriggerPostUpdate(scenario, dto)).toEqual(result);
 });
