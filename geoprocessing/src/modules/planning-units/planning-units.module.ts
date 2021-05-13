@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TileModule } from 'src/modules/tile/tile.module';
@@ -10,7 +10,12 @@ import { PlanningUnitsService } from './planning-units.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PlanningUnitsGeom]), TileModule],
-  providers: [PlanningUnitsProcessor, ShapeFileService, PlanningUnitsService],
+  providers: [
+    PlanningUnitsProcessor,
+    ShapeFileService,
+    PlanningUnitsService,
+    Logger,
+  ],
   controllers: [PlanningUnitsController],
   exports: [PlanningUnitsProcessor, PlanningUnitsService],
 })
