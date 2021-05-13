@@ -9,7 +9,7 @@ import { ProtectedArea } from 'src/modules/protected-areas/protected-areas.geo.e
 export class ProtectedAreasFilters {
   @IsOptional()
   @IsString()
-  id: string;
+  id?: string;
 }
 
 @Injectable()
