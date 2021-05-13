@@ -62,7 +62,7 @@ import {
 } from 'decorators/shapefile.decorator';
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)

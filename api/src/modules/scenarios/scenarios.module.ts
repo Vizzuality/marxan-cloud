@@ -13,6 +13,7 @@ import { ProxyService } from 'modules/proxy/proxy.service';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 import { AnalysisModule } from '../analysis/analysis.module';
+import { ApiEventsModule } from '../api-events/api-events.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AnalysisModule } from '../analysis/analysis.module';
     TypeOrmModule.forFeature([Project, Scenario]),
     UsersModule,
     ScenarioFeaturesModule,
+    ApiEventsModule,
   ],
   providers: [
     ScenariosService,
