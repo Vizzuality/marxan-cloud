@@ -1,31 +1,11 @@
-import React, {
-  Children, cloneElement, isValidElement, useCallback, useMemo, useState,
-} from 'react';
+import React, { useCallback, useState } from 'react';
 import cx from 'classnames';
 
-import {
-  DndContext,
-  DragOverlay,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
+import Icon from 'components/icon';
+import LEGEND_SVG from 'svgs/map/legend.svg?sprite';
+import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-
-import {
-  restrictToVerticalAxis,
-  restrictToWindowEdges,
-} from '@dnd-kit/modifiers';
-
-import SortableItem from './sortable-item';
+import SortableList from './sortable/list';
 
 export interface LegendProps {
   className?: string;
@@ -38,99 +18,46 @@ export const Legend: React.FC<LegendProps> = ({
   className = '',
   onChangeOrder,
 }: LegendProps) => {
-  const [activeId, setActiveId] = useState(null);
+  const [active, setActive] = useState(true);
 
-  const ActiveItem = useMemo(() => {
-    const activeChildArray = Children.map(children, (Child) => {
-      if (isValidElement(Child)) {
-        const { props } = Child;
-        const { id } = props;
-
-        if (id === activeId) {
-          return Child;
-        }
-        return null;
-      }
-      return null;
-    });
-
-    return activeChildArray[0] || null;
-  }, [children, activeId]);
-
-  const itemsIds = useMemo(() => {
-    return Children.map(children, (Child) => {
-      if (isValidElement(Child)) {
-        const { props } = Child;
-        const { id } = props;
-        return id;
-      }
-
-      return null;
-    });
-  }, [children]);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
-  const handleDragStart = useCallback((event) => {
-    const { active } = event;
-    if (!active) return;
-    setActiveId(active.id);
-  }, []);
-
-  const handleDragEnd = useCallback((event) => {
-    const { active, over } = event;
-    setActiveId(null);
-
-    if (active.id !== over.id) {
-      const oldIndex = itemsIds.indexOf(active.id);
-      const newIndex = itemsIds.indexOf(over.id);
-
-      if (onChangeOrder) onChangeOrder(arrayMove(itemsIds, oldIndex, newIndex));
-    }
-  }, [itemsIds, onChangeOrder]);
+  const onToggleActive = useCallback(() => {
+    setActive(!active);
+  }, [active]);
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onDragCancel={() => setActiveId(null)}
+    <div
+      className={cx({
+        'bg-black rounded-3xl': true,
+        [className]: !!className,
+      })}
     >
-      <SortableContext
-        items={itemsIds}
-        strategy={verticalListSortingStrategy}
+      <button
+        type="button"
+        className="relative flex items-center w-full px-5 py-3 space-x-2 text-xs text-white uppercase font-heading focus:outline-none"
+        onClick={onToggleActive}
       >
-        <div
+        <Icon icon={LEGEND_SVG} className="w-4 h-4 text-gray-300" />
+        <span>Legend</span>
+
+        <Icon
+          icon={ARROW_DOWN_SVG}
           className={cx({
-            'w-full': true,
-            [className]: !!className,
+            'absolute w-3 h-3 transition-transform transform -translate-y-1/2 text-primary-500 top-1/2 right-5': true,
+            'rotate-180': active,
           })}
-        >
-          {Children
-            .map(children, (Child) => {
-              if (isValidElement(Child)) {
-                const { props: { id } } = Child;
-                return (
-                  <SortableItem id={id}>
-                    {cloneElement(Child)}
-                  </SortableItem>
-                );
-              }
-              return null;
-            })}
+        />
+      </button>
+
+      {active && (
+        <div className="pb-2.5">
+          <SortableList
+            onChangeOrder={onChangeOrder}
+          >
+            {children}
+          </SortableList>
         </div>
-      </SortableContext>
-      <DragOverlay>
-        {isValidElement(ActiveItem) ? cloneElement(ActiveItem) : null}
-      </DragOverlay>
-    </DndContext>
+      )}
+    </div>
   );
 };
 
