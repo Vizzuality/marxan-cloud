@@ -13,6 +13,7 @@ import { ScenarioFeaturesModule } from '../scenarios-features';
 import { ProxyService } from 'modules/proxy/proxy.service';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { AnalysisModule } from '../analysis/analysis.module';
+import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 
 @Module({
   imports: [
@@ -24,7 +25,12 @@ import { AnalysisModule } from '../analysis/analysis.module';
     ScenarioFeaturesModule,
     AnalysisModule,
   ],
-  providers: [ScenariosService, ProxyService, WdpaAreaCalculationService],
+  providers: [
+    ScenariosService,
+    ProxyService,
+    WdpaAreaCalculationService,
+    CostSurfaceFacade,
+  ],
   controllers: [ScenariosController],
   exports: [ScenariosService],
 })

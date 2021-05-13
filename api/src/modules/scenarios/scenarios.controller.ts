@@ -32,6 +32,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -55,8 +56,12 @@ import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-p
 import { uploadOptions } from 'utils/file-uploads.utils';
 import { ProxyService } from 'modules/proxy/proxy.service';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
-import { ApiConsumesShapefile } from 'decorators/shapefile.decorator';
 import { AdjustPlanningUnits } from '../analysis/entry-points/adjust-planning-units';
+import {
+  ApiConsumesShape,
+  ApiConsumesShapefile,
+} from 'decorators/shapefile.decorator';
+import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -68,6 +73,7 @@ export class ScenariosController {
     private readonly proxyService: ProxyService,
     private readonly scenarioFeatures: ScenarioFeaturesService,
     private readonly updatePlanningUnits: AdjustPlanningUnits,
+    private readonly costSurface: CostSurfaceFacade,
   ) {}
 
   @ApiOperation({
@@ -118,6 +124,24 @@ export class ScenariosController {
     return await this.service.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
     );
+  }
+
+  @ApiConsumesShape()
+  @ApiNoContentResponse()
+  @Post(`:id/cost-surface/shapefile`)
+  async processCostSurfaceShapefile(
+    @Param('id') scenarioId: string,
+    @Req() request: Request,
+  ): Promise<void> {
+    // TODO #1 pre-validate scenarioId
+    /**
+     * Could be via interceptor
+     * (would require to not include @Res() and force-ignore http-proxy needs)
+     * or just ...BaseService
+     */
+
+    this.costSurface.convert(scenarioId, request);
+    return;
   }
 
   // TODO add Validations
