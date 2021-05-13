@@ -23,7 +23,7 @@ import { TileRequest } from 'src/modules/tile/tile.service';
 import { Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}/protected-areas`)
-export class ProtectedAreasController<T> {
+export class ProtectedAreasController {
   private readonly logger: Logger = new Logger(ProtectedAreasController.name);
   constructor(public service: ProtectedAreasService) {}
 

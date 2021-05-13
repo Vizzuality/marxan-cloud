@@ -36,7 +36,7 @@ import { TileRequest } from 'src/modules/tile/tile.service';
 import { Response } from 'express';
 
 @Controller(`${apiGlobalPrefixes.v1}/planning-units`)
-export class PlanningUnitsController<T> {
+export class PlanningUnitsController {
   constructor(
     private service: PlanningUnitsService,
     private shapefileService: ShapeFileService,
