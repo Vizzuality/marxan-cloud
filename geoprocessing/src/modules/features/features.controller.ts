@@ -21,7 +21,7 @@ import { BBox } from 'geojson';
 
 import { Response } from 'express';
 
-@Controller(`${apiGlobalPrefixes.v1}`)
+@Controller(`${apiGlobalPrefixes.v1}/features`)
 export class FeaturesController<T> {
   private readonly logger: Logger = new Logger(FeaturesController.name);
   constructor(public service: FeatureService) {}
@@ -60,7 +60,7 @@ export class FeaturesController<T> {
     required: false,
     example: [-1, 40, 1, 42],
   })
-  @Get('/features/:id/preview/tiles/:z/:x/:y.mvt')
+  @Get('/:id/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
   @Header('Content-Type', 'application/x-protobuf')
   @Header('Content-Disposition', 'attachment')

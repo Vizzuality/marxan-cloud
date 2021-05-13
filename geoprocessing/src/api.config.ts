@@ -5,5 +5,5 @@
  * the relevant controllers.
  */
 export const apiGlobalPrefixes = {
-  v1: '/api/v1/geodata',
+  v1: '/api/v1',
 };

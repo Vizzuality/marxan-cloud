@@ -95,7 +95,7 @@ export class PlanningUnitsController<T> {
     example: [-1, 40, 1, 42],
   })
   @Get(
-    '/planning-units/preview/regular/:planningUnitGridShape/:planningUnitAreakm2/tiles/:z/:x/:y.mvt',
+    '/preview/regular/:planningUnitGridShape/:planningUnitAreakm2/tiles/:z/:x/:y.mvt',
   )
   @ApiBadRequestResponse()
   @Header('Content-Type', 'application/x-protobuf')

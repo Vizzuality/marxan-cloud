@@ -19,7 +19,7 @@ import { TileSpecification, AdminAreasFilters } from './admin-areas.service';
 
 import { Response } from 'express';
 
-@Controller(`${apiGlobalPrefixes.v1}`)
+@Controller(`${apiGlobalPrefixes.v1}/administrative-areas`)
 export class AdminAreasController<T> {
   private readonly logger: Logger = new Logger(AdminAreasController.name);
   constructor(public service: AdminAreasService) {}
@@ -67,7 +67,7 @@ export class AdminAreasController<T> {
     required: false,
     example: [-1, 40, 1, 42],
   })
-  @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
+  @Get('/:level/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
   @Header('Content-Type', 'application/x-protobuf')
   @Header('Content-Disposition', 'attachment')
