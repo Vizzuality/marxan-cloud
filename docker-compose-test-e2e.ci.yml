@@ -18,8 +18,6 @@ services:
       - POSTGRES_GEO_SERVICE_PORT
       - REDIS_API_SERVICE_PORT
       - API_AUTH_X_API_KEY
-      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
-      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
 
   geoprocessing:
     environment:
@@ -39,8 +37,6 @@ services:
       - POSTGRES_GEO_SERVICE_PORT
       - REDIS_API_SERVICE_PORT
       - API_AUTH_X_API_KEY
-      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
-      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
 
   test-e2e-postgresql-api:
     environment:
