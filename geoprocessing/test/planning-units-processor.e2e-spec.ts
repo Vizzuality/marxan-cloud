@@ -4,12 +4,6 @@ import createPlanningUnitGridFromJobSpec from '../src/modules/planning-units/pla
 
 import { E2E_CONFIG } from './e2e.config';
 
-function delay(ms: number) {
-  return new Promise(function (resolve) {
-    return setTimeout(resolve, ms);
-  });
-}
-
 /**
  * @TODO
  * we need to add a couple of test that cath errors on invalid user input.
@@ -35,6 +29,6 @@ describe('planning units jobs (e2e)', () => {
       // TODO do actual verification & cleanup (table: planning_units_geom) after test
       expect(value).toEqual([]);
     },
-    10 * 1000,
+    50 * 1000,
   );
 });
