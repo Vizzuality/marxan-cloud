@@ -24,10 +24,7 @@ COMPOSE_PROJECT_NAME := "marxan-cloud"
 ## some color to give live to the outputs
 RED :=\033[1;32m
 NC :=\033[0m # No Color
-# Start only API and Geoprocessing services
-#
-# Useful when developing on API components only, to avoid spinning up services
-# which may not be needed.
+
 test-commands:
 	@echo $(ENVFILE)
 	@echo $(DOCKER_COMPOSE_FILE)
@@ -35,6 +32,10 @@ test-commands:
 	@echo $(API_POSTGRES_DB)
 	@echo $(GEO_POSTGRES_USER)
 
+# Start only API and Geoprocessing services
+#
+# Useful when developing on API components only, to avoid spinning up services
+# which may not be needed.
 start-api:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing
 
