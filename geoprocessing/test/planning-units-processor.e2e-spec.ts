@@ -4,33 +4,31 @@ import createPlanningUnitGridFromJobSpec from '../src/modules/planning-units/pla
 
 import { E2E_CONFIG } from './e2e.config';
 
-function delay(ms: number) {
-  return new Promise(function (resolve) {
-    return setTimeout(resolve, ms);
-  });
-}
 /**
  * @TODO
  * we need to add a couple of test that cath errors on invalid user input.
  */
 describe('planning units jobs (e2e)', () => {
-  jest.setTimeout(5 * 1000);
-  it('executes the child job processor with mock data', async () => {
-    const createPlanningUnitsDTO: Pick<
-      Job<PlanningUnitsJob>,
-      'data' | 'id' | 'name'
-    > = {
-      id: '1',
-      name: 'create-regular-pu',
-      data: E2E_CONFIG.planningUnits.creationJob.valid.customArea({
-        countryCode: 'NAM',
-      }),
-    };
-    const value = await createPlanningUnitGridFromJobSpec(
-      createPlanningUnitsDTO,
-    );
+  it(
+    'executes the child job processor with mock data',
+    async () => {
+      const createPlanningUnitsDTO: Pick<
+        Job<PlanningUnitsJob>,
+        'data' | 'id' | 'name'
+      > = {
+        id: '1',
+        name: 'create-regular-pu',
+        data: E2E_CONFIG.planningUnits.creationJob.valid.customArea({
+          countryCode: 'NAM',
+        }),
+      };
+      const value = await createPlanningUnitGridFromJobSpec(
+        createPlanningUnitsDTO,
+      );
 
-    expect(value).toBeDefined();
-    await Promise.all([delay(4 * 1000)]);
-  });
+      // TODO do actual verification & cleanup (table: planning_units_geom) after test
+      expect(value).toEqual([]);
+    },
+    50 * 1000,
+  );
 });
