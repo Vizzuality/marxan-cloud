@@ -10,12 +10,14 @@ import SortableList from './sortable/list';
 export interface LegendProps {
   className?: string;
   children: React.ReactNode;
+  maxHeight: string | number;
   onChangeOrder: (id: string[]) => void;
 }
 
 export const Legend: React.FC<LegendProps> = ({
   children,
   className = '',
+  maxHeight,
   onChangeOrder,
 }: LegendProps) => {
   const [active, setActive] = useState(true);
@@ -27,7 +29,7 @@ export const Legend: React.FC<LegendProps> = ({
   return (
     <div
       className={cx({
-        'bg-black rounded-3xl': true,
+        'bg-black rounded-3xl flex flex-col flex-grow overflow-hidden': true,
         [className]: !!className,
       })}
     >
@@ -49,12 +51,23 @@ export const Legend: React.FC<LegendProps> = ({
       </button>
 
       {active && (
-        <div className="pb-2.5">
-          <SortableList
-            onChangeOrder={onChangeOrder}
+        <div
+          className="relative flex flex-col flex-grow"
+          style={{
+            maxHeight,
+          }}
+        >
+          <div className="absolute top-0 left-0 z-10 w-full h-4 pointer-events-none bg-gradient-to-b from-black via-black" />
+          <div
+            className="overflow-x-hidden overflow-y-auto"
           >
-            {children}
-          </SortableList>
+            <SortableList
+              onChangeOrder={onChangeOrder}
+            >
+              {children}
+            </SortableList>
+          </div>
+          <div className="absolute bottom-0 left-0 z-10 w-full h-3 pointer-events-none bg-gradient-to-t from-black via-black" />
         </div>
       )}
     </div>

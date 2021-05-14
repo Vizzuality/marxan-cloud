@@ -32,6 +32,7 @@ const Template: Story<LegendProps> = (args) => {
   return (
     <Legend
       {...args}
+      maxHeight={300}
       onChangeOrder={onChangeOrder}
     >
       {sortedItems.map((i) => {
