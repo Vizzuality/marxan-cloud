@@ -50,7 +50,9 @@ describe(`when submitting a job`, () => {
 
     await delay(1000);
     expect(processor.onFailedMock.mock.calls).toEqual([]);
-    expect(processor.onCompleteMock.mock.calls[0][0]).toEqual(jobInput);
+    expect(processor.onCompleteMock.mock.calls[0][0]).toEqual({
+      inputCopy: jobInput,
+    });
   });
 });
 
@@ -68,8 +70,8 @@ export class ExampleProcessingService {
   onFailedMock = jest.fn();
 
   constructor(private readonly workerService: WorkerService<typeof jobInput>) {
-    this.workerService.registerEventHandler('completed', ({ data }) => {
-      this.onCompleteMock(data);
+    this.workerService.registerEventHandler('completed', ({ returnvalue }) => {
+      this.onCompleteMock(returnvalue);
     });
     this.workerService.registerEventHandler('failed', ({ failedReason }) => {
       this.onFailedMock(failedReason);

@@ -39,7 +39,7 @@ export class WorkerService<JobInput, Opts extends JobsOptions = JobsOptions>
       jobId: string;
       delay?: number;
       data?: string;
-      returnValue?: string;
+      returnvalue?: string;
       failedReason?: string;
     }) => void,
   ) {
