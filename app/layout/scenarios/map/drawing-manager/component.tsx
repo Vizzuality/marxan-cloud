@@ -23,11 +23,13 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
   const editorRef = useRef(null);
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setDrawing, setDrawingValue } = scenarioSlice.actions;
+  const { setDrawing, setDrawingValue, setUploadingValue } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
 
-  const { drawing, drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const {
+    drawing, uploading, drawingValue, uploadingValue,
+  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const mode = useMemo(() => {
     if (drawing === 'editing') return new EditingMode();
@@ -39,11 +41,20 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
   useEffect(() => {
     const EDITOR = editorRef?.current;
 
-    if (!drawing && !!EDITOR) {
-      EDITOR.deleteFeatures(drawingValue);
+    if ((!drawing && !uploading) && !!EDITOR) {
+      EDITOR.deleteFeatures(drawingValue || uploadingValue);
       dispatch(setDrawingValue(null));
+      dispatch(setUploadingValue(null));
     }
-  }, [drawing, drawingValue, dispatch, setDrawingValue]);
+  }, [
+    drawing,
+    uploading,
+    drawingValue,
+    uploadingValue,
+    dispatch,
+    setDrawingValue,
+    setUploadingValue,
+  ]);
 
   // Delete feature as soon as you unmount this component
   useEffect(() => {
@@ -51,7 +62,7 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
 
     return () => {
       if (EDITOR) {
-        EDITOR.deleteFeatures(drawingValue);
+        EDITOR.deleteFeatures(drawingValue || uploadingValue);
         dispatch(setDrawingValue(null));
       }
     };
@@ -62,7 +73,7 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
       ref={editorRef}
       clickRadius={12}
       mode={mode}
-      features={drawingValue}
+      features={drawingValue || uploadingValue}
       featureStyle={featureStyle}
       editHandleStyle={editHandleStyle}
       editHandleShape="circle"

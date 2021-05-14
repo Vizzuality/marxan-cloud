@@ -66,7 +66,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
         )}
 
         <div>
-          {(!allFeaturesData || !allFeaturesData.length) && (
+          {(!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length)) && (
             <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
               No results found
             </div>
