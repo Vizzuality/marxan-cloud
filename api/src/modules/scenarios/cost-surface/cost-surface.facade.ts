@@ -19,16 +19,18 @@ export class CostSurfaceFacade {
   convert(scenarioId: string, request: Request) {
     // TODO #0 Generate & Dispatch Api Event (some wrapping service for /dummy/"terminating" if already running)
 
-    // TODO #1 Call Proxy Service to get GeoJSON
+    // TODO #1 Call Proxy Service to get Planning Units and their surface cost
     // this.proxyService.... - modify this to send back data, not act on Response
 
-    // TODO #2 Call Analysis-module with scenario id & GeoJson from above
+    // TODO #2 Call Analysis-module with scenario id & output from the above
     this.adjustCostSurfaceService
       .update(scenarioId, {
-        geo: {
-          features: [],
-          type: 'FeatureCollection',
-        },
+        planningUnits: [
+          {
+            id: '0',
+            cost: 100,
+          },
+        ],
       })
       .then(() => {
         // dispatch ApiEvent - Done
