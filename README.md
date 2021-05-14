@@ -37,11 +37,18 @@ orchestrated via Kubernetes (forthcoming).
    * `API_AUTH_JWT_SECRET` (string, required): a base64-encoded secret for the
      signing of API JWT tokens; can be generated via a command such as `dd
      if=/dev/urandom bs=1024 count=1 | base64 -w0`
+   * `API_AUTH_X_API_KEY` (string, required): a secret used as API key for
+     requests from the Geoprocessing service to the API; can be generated
+     similarly to `API_AUTH_JWT_SECRET`
    * `API_SERVICE_PORT` (number, required): the port on which the API service should
      listen on the local machine
    * `API_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default is
      `true`): set this to `false` if migrations for the API service should not
      run automatically on startup
+   * `API_LOGGING_MUTE_ALL` (boolean, optional, default is `false`): can be used
+     to mute all logging (for example, in CI pipelines) irrespective of Node
+     environment and other settings that would normally affect the logging
+     verbosity of the API
    * `APP_SERVICE_PORT` (number, required): the port on which the App service should
      listen on the local machine
    * `POSTGRES_API_SERVICE_PORT` (number, required): the port on which the
@@ -73,10 +80,6 @@ orchestrated via Kubernetes (forthcoming).
      Redis service should listen on the local machine
    * `REDIS_COMMANDER_PORT` (number, required): the port on which the
      Redis Commander service should listen on the local machine
-   * `API_LOGGING_MUTE_ALL` (boolean, optional, default is `false`): can be used
-     to mute all logging (for example, in CI pipelines) irrespective of Node
-     environment and other settings that would normally affect the logging
-     verbosity of the API
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted
