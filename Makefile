@@ -134,10 +134,12 @@ run-test-e2e-ci:
 	$(MAKE) test-e2e-api environment=ci
 
 test-unit-api:
-	# build API container
-	docker-compose -f docker-compose-test-unit.yml build api
-	# run tests
-	docker-compose -f docker-compose-test-unit.yml up --abort-on-container-exit --exit-code-from api api
+	# build API and geoprocessing containers
+	docker-compose -f docker-compose-test-unit.yml build api geoprocessing
+	# run unit tests - API
+	-docker-compose -f docker-compose-test-unit.yml up --abort-on-container-exit --exit-code-from api api
+	# run unit tests - geoprocessing
+	-docker-compose -f docker-compose-test-unit.yml up --abort-on-container-exit --exit-code-from geoprocessing geoprocessing
 
 dump-geodb-data:
 	docker-compose exec -T postgresql-geo-api pg_dump -T migrations -a -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz

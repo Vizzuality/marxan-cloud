@@ -17,3 +17,20 @@ services:
     environment:
       - NODE_PATH=src
       - NODE_ENV=test
+
+  geoprocessing:
+    build:
+      context: ./geoprocessing
+      dockerfile: Dockerfile
+      args:
+        UID: 5000
+        GID: 5000
+    container_name: marxan-test-unit-geoprocessing
+    command: test-unit
+    user: "5000:5000"
+    volumes:
+      - ./geoprocessing/src:/opt/marxan-geoprocessing/src
+      - ./geoprocessing/test:/opt/marxan-geoprocessing/test
+    environment:
+      - NODE_PATH=src
+      - NODE_ENV=test
