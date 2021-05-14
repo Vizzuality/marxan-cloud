@@ -205,7 +205,6 @@ export class ProjectsService extends AppBaseService<
         createModel.adminAreaLevel2Id ||
         createModel.extent)
     ) {
-      this.logger.debug('creating planning unit job ');
       return this.planningUnitsService.create(createModel);
     }
   }

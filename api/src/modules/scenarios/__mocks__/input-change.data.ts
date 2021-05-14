@@ -7,6 +7,12 @@ export const emptyWatchedChangeSet = (): UpdateScenarioDTO => ({
   wdpaThreshold: undefined,
 });
 
+export const partialWatchedChangeSet = (): UpdateScenarioDTO => ({
+  customProtectedAreaIds: ['20000000-2000-2000-2000-200000000000'],
+  wdpaIucnCategories: [IUCNCategory.III],
+  wdpaThreshold: undefined,
+});
+
 export const fullWatchedChangeSet = (): UpdateScenarioDTO => ({
   customProtectedAreaIds: ['20000000-2000-2000-2000-200000000000'],
   wdpaIucnCategories: [IUCNCategory.III],
@@ -17,4 +23,10 @@ export const thresholdChangeSet = (): UpdateScenarioDTO => ({
   customProtectedAreaIds: undefined,
   wdpaIucnCategories: undefined,
   wdpaThreshold: 30,
+});
+
+export const sameThresholdChangeSet = (): UpdateScenarioDTO => ({
+  customProtectedAreaIds: undefined,
+  wdpaIucnCategories: undefined,
+  wdpaThreshold: 40,
 });

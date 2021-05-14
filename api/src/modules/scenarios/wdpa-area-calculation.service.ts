@@ -18,9 +18,11 @@ export class WdpaAreaCalculationService {
   ];
 
   /**
-   * and new entity state consists (i.e. are present) of all of the below
+   * and new entity state consists (i.e. are present) of one of the below
    */
   private readonly requiredToTriggerChange: (keyof Scenario)[] = [
+    'protectedAreaFilterByIds',
+    'wdpaIucnCategories',
     'wdpaThreshold',
   ];
 
@@ -28,11 +30,7 @@ export class WdpaAreaCalculationService {
    * Every post update that affects this 3 elements (when threshold is not null)
    */
   shouldTrigger(scenario: Scenario, changeSet: InputChange): boolean {
-    if (!this.intendsToChangeWatchedProperty(changeSet)) {
-      return false;
-    }
-
-    return this.areRequiredFieldsAvailable(scenario);
+    return this.intendsToChangeWatchedProperty(changeSet) && this.areRequiredFieldsAvailable(scenario);
   }
 
   private intendsToChangeWatchedProperty(changeSet: InputChange): boolean {
@@ -42,7 +40,7 @@ export class WdpaAreaCalculationService {
   }
 
   private areRequiredFieldsAvailable(scenario: Scenario): boolean {
-    return Object.entries(pick(scenario, this.requiredToTriggerChange)).every(
+    return Object.entries(pick(scenario, this.requiredToTriggerChange)).some(
       ([, value]) => value,
     );
   }
