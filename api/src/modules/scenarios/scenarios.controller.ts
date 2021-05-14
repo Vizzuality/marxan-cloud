@@ -57,10 +57,7 @@ import { uploadOptions } from 'utils/file-uploads.utils';
 import { ProxyService } from 'modules/proxy/proxy.service';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { AdjustPlanningUnits } from '../analysis/entry-points/adjust-planning-units';
-import {
-  ApiConsumesShape,
-  ApiConsumesShapefile,
-} from 'decorators/shapefile.decorator';
+import { ApiConsumesShapefile } from 'decorators/shapefile.decorator';
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 
 @UseGuards(JwtAuthGuard)
@@ -126,7 +123,7 @@ export class ScenariosController {
     );
   }
 
-  @ApiConsumesShape()
+  @ApiConsumesShapefile(false)
   @ApiNoContentResponse()
   @Post(`:id/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
