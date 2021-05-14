@@ -15,8 +15,8 @@ case "$1" in
         exec yarn test:e2e
         ;;
     run-migrations-for-e2e-tests)
-        echo "(ESC)[44m Running migrations for e2e Tests in Api (ESC)[0m"
-        env
+        echo "(ESC)[44m Running migrations (api db) for e2e Tests in Api (ESC)[0m"
+        env | grep -v SECRET | grep -v PASSWORD | grep -v KEY
         yarn typeorm migration:run
         ;;
     start)
