@@ -82,7 +82,7 @@ describe('JSON API Specs (e2e)', () => {
     };
 
     const response = await request(app.getHttpServer())
-      .get('/api/v1/projects/fakeProject/features?q=fakeFeature')
+      .get(`/api/v1/projects/${fakeProject.id}/features?q=fakeFeature`)
       .set('Authorization', `Bearer ${jwtToken}`);
 
     response.body.errors.forEach((err: any) => {
