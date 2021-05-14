@@ -6,16 +6,23 @@ import { AppConfig } from '../utils/config.utils';
 
 @Injectable()
 export class XApiGuard implements CanActivate {
+  readonly #secret: string;
+
+  constructor() {
+    // throws if not provided
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.#secret = AppConfig.get<string>('auth.xApiKey.secret')!;
+  }
+
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    const secret = AppConfig.get<string>('auth.xApiKey.secret');
 
     // real requests seems to lowercase all headers names
     const value =
       request.headers?.['x-api-key'] ?? request.headers?.['X-Api-Key'];
 
-    return value === secret;
+    return value === this.#secret;
   }
 }
