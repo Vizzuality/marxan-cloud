@@ -16,7 +16,9 @@ case "$1" in
         ;;
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (api db) for e2e Tests in Api (ESC)[0m"
-        echo $GEO_POSTGRES_USER | base64
+        echo $API_POSTGRES_USER | base64
+        echo $API_POSTGRES_PASSWORD | base64
+        echo $API_POSTGRES_DB | base64
         sleep 15
         exec yarn typeorm migration:run
         ;;
