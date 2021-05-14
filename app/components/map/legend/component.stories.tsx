@@ -3,6 +3,11 @@ import { Story } from '@storybook/react/types-6-0';
 
 import Legend, { LegendProps } from './component';
 import LegendItem from './item';
+
+import LegendTypeBasic from './types/basic';
+import LegendTypeChoropleth from './types/choropleth';
+import LegendTypeGradient from './types/gradient';
+
 import ITEMS from './mock';
 
 export default {
@@ -29,12 +34,19 @@ const Template: Story<LegendProps> = (args) => {
       {...args}
       onChangeOrder={onChangeOrder}
     >
-      {sortedItems.map((i) => (
-        <LegendItem
-          key={i.id}
-          {...i}
-        />
-      ))}
+      {sortedItems.map((i) => {
+        const { type, items } = i;
+        return (
+          <LegendItem
+            key={i.id}
+            {...i}
+          >
+            {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
+            {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
+            {type === 'gradient' && <LegendTypeGradient className="text-sm text-gray-300" items={items} />}
+          </LegendItem>
+        );
+      })}
     </Legend>
   );
 };
