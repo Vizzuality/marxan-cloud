@@ -16,7 +16,6 @@ case "$1" in
         ;;
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (geoprocessing db) for e2e Tests(ESC)[0m"
-        env | grep -v SECRET | grep -v PASSWORD | grep -v KEY
         sleep 15
         exec yarn typeorm migration:run
         ;;
