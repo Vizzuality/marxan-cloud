@@ -132,6 +132,8 @@ run-test-e2e-local:
 	$(MAKE) test-e2e-api environment=local
 
 run-test-e2e-ci:
+	echo ${API_POSTGRES_USER}
+	echo ${API_POSTGRES_DB}
 	$(MAKE) test-e2e-api environment=ci
 
 test-unit-api:
