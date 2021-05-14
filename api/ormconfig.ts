@@ -1,4 +1,6 @@
+import { Logger } from "@nestjs/common";
 import { apiConnections } from "ormconfig";
+import { inspect } from "util";
 
 /**
  * We just re-export what we import from the actual ORM configuration file
@@ -14,3 +16,5 @@ module.exports = [
   apiConnections.default,
   apiConnections.geoprocessingDB
 ];
+
+Logger.debug(inspect(module.exports));
