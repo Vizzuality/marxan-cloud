@@ -5,10 +5,8 @@ import {
   Get,
   Param,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -18,8 +16,8 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from 'api.config';
-import { RequestWithAuthenticatedUser } from 'app.controller';
 import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import { XApiGuard } from 'guards/x-api.guard';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
@@ -29,15 +27,15 @@ import { DeleteResult } from 'typeorm';
 
 import {
   API_EVENT_KINDS,
-  ApiEventResult,
   ApiEvent,
+  ApiEventResult,
   QualifiedEventTopic,
 } from './api-event.api.entity';
 import { ApiEventsService } from './api-events.service';
 import { CreateApiEventDTO } from './dto/create.api-event.dto';
 
 @Controller(`${apiGlobalPrefixes.v1}/api-events`)
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(XApiGuard)
 @ApiTags('ApiEvents')
 @ApiBearerAuth()
 export class ApiEventsController {
@@ -77,13 +75,8 @@ export class ApiEventsController {
   @ApiOperation({ description: 'Create an API event' })
   @ApiOkResponse({ type: ApiEvent })
   @Post()
-  async create(
-    @Body() dto: CreateApiEventDTO,
-    @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<ApiEventResult> {
-    return await this.service.serialize(
-      await this.service.create(dto, { authenticatedUser: req.user }),
-    );
+  async create(@Body() dto: CreateApiEventDTO): Promise<ApiEventResult> {
+    return await this.service.serialize(await this.service.create(dto));
   }
 
   @ApiOperation({

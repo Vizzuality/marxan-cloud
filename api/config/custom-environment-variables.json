@@ -18,6 +18,9 @@
   "auth": {
     "jwt": {
       "secret": "API_AUTH_JWT_SECRET"
+    },
+    "xApiKey": {
+      "secret": "API_AUTH_X_API_KEY"
     }
   },
   "redisApi": {
