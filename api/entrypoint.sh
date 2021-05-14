@@ -8,7 +8,7 @@ case "$1" in
         ;;
     test-unit)
         echo "Running Unit Tests"
-        exec yarn test:ci
+        exec yarn test:unit:ci
         ;;
     test-e2e)
         echo "Running e2e Tests"
