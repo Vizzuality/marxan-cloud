@@ -8,6 +8,7 @@ import { ProtectedAreasModule } from 'src/modules/protected-areas/protected-area
 import { PlanningUnitsModule } from 'src/modules/planning-units/planning-units.module';
 import { TileModule } from './modules/tile/tile.module';
 import { FeaturesModule } from 'src/modules/features/features.module';
+import { ApiEventsModule } from './modules/api-events/api-events.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { FeaturesModule } from 'src/modules/features/features.module';
     TileModule,
     ProtectedAreasModule,
     FeaturesModule,
+    ApiEventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
