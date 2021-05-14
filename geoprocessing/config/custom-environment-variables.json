@@ -11,5 +11,10 @@
     "cors": {
         "origins_extra": "NETWORK_CORS_ORIGINS"
     }
+  },
+  "auth": {
+    "xApiKey": {
+      "secret": "API_AUTH_X_API_KEY"
+    }
   }
 }
