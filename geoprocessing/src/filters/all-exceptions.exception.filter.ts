@@ -68,6 +68,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : errorData,
     );
 
+    response.removeHeader('content-encoding');
     response
       .status(status)
       .header('Content-Type', 'application/json')
