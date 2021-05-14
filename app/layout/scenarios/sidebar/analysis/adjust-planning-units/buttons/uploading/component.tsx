@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import cx from 'classnames';
 
@@ -17,6 +19,7 @@ import { useToasts } from 'hooks/toast';
 import { useSaveScenarioPUShapefile } from 'hooks/scenarios';
 
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
+import Loading from 'components/loading';
 
 export interface AnalysisAdjustUploadingProps {
   type: string;
@@ -29,6 +32,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   selected,
   onSelected,
 }: AnalysisAdjustUploadingProps) => {
+  const [loading, setLoading] = useState(false);
   const { addToast } = useToasts();
   const { query } = useRouter();
   const { sid } = query;
@@ -71,12 +75,16 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   }, [selected]); // eslint-disable-line
 
   const onDropAccepted = async (acceptedFiles) => {
+    setLoading(true);
     const f = acceptedFiles[0];
-    console.info(f);
 
-    saveScenarioPUShapefileMutation.mutate({ id: `${sid}`, data: f }, {
-      onSuccess: ({ data: { data: s } }) => {
-        console.log(s);
+    const data = new FormData();
+    data.append('file', f);
+
+    saveScenarioPUShapefileMutation.mutate({ id: `${sid}`, data }, {
+      onSuccess: ({ data: { data: g } }) => {
+        setLoading(false);
+
         addToast('success-upload-shapefile', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -85,10 +93,12 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         ), {
           level: 'success',
         });
-        console.info('Shapefile uploaded', s);
+
+        dispatch(setUploadingValue(g));
+        console.info('Shapefile uploaded', g);
       },
       onError: () => {
-        console.log('Error');
+        setLoading(false);
         addToast('error-upload-shapefile', (
           <>
             <h2 className="font-medium">Error!</h2>
@@ -230,6 +240,12 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
                   </p>
 
                   <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 1 MB'}</p>
+
+                  <Loading
+                    visible={loading}
+                    className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                    iconClassName="w-5 h-5 text-primary-500"
+                  />
                 </div>
 
                 <p className="flex items-center space-x-2 text-xs text-gray-300 mt-2.5">

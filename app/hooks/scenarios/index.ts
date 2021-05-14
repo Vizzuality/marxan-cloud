@@ -11,6 +11,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ItemProps } from 'components/scenarios/item/component';
 
 import SCENARIOS from 'services/scenarios';
+import UPLOADS from 'services/uploads';
 
 import {
   UseScenariosFiltersProps,
@@ -181,8 +182,8 @@ export function useSaveScenarioPUShapefile({
   const [session] = useSession();
 
   const saveScenarioPUShapefile = ({ id, data }: SaveScenarioProps) => {
-    return SCENARIOS.request({
-      url: `/${id}/planning-unit-shapefile`,
+    return UPLOADS.request({
+      url: `/scenarios/${id}/planning-unit-shapefile`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,

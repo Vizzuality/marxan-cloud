@@ -4,10 +4,10 @@ import React, {
 
 // Map
 import Map from 'components/map';
-import LAYERS from 'components/map/layers';
+// import LAYERS from 'components/map/layers';
 
-import { LayerManager, Layer } from 'layer-manager/dist/components';
-import { PluginMapboxGl } from 'layer-manager';
+// import { LayerManager, Layer } from 'layer-manager/dist/components';
+// import { PluginMapboxGl } from 'layer-manager';
 
 // Controls
 import Controls from 'components/map/controls';
@@ -80,14 +80,14 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
         onMapViewportChange={handleViewportChange}
         onClick={handleClick}
       >
-        {(map) => {
+        {() => {
           return (
             <>
-              <LayerManager map={map} plugin={PluginMapboxGl}>
+              {/* <LayerManager map={map} plugin={PluginMapboxGl}>
                 {LAYERS.map((l) => (
                   <Layer key={l.id} {...l} />
                 ))}
-              </LayerManager>
+              </LayerManager> */}
 
               {/* Drawing editor */}
               <ScenariosDrawingManager />
