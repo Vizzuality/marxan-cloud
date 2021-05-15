@@ -134,7 +134,7 @@ run-test-e2e-local:
 	$(MAKE) test-e2e-api environment=local
 
 run-test-e2e-ci:
-	$(MAKE) test-e2e-api environment=ci
+	$(MAKE) -e test-e2e-api environment=ci
 
 test-unit-api:
 	# build API and geoprocessing containers
