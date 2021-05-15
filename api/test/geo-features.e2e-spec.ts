@@ -84,7 +84,6 @@ describe('GeoFeaturesModule (e2e)', () => {
       jwtToken,
       E2E_CONFIG.organizations.valid.minimal(),
     ).then(async (response) => {
-      Logger.debug(response);
       return await Deserializer.deserialize(response);
     });
 
