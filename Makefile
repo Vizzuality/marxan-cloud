@@ -125,8 +125,6 @@ test-start-services: clean-slate
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./entrypoint.sh run-migrations-for-e2e-tests
 
 test-e2e-api: test-start-services | seed-dbs
-	echo ${API_POSTGRES_USER}
-	echo ${API_POSTGRES_DB}
 	# run tests and remove containers
 	-docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./entrypoint.sh test-e2e
 	-docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./entrypoint.sh test-e2e
