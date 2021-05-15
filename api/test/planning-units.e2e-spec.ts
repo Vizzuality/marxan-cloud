@@ -116,7 +116,7 @@ describe('PlanningUnitsModule (e2e)', () => {
       expect(anOrganization.type).toBe('organizations');
     });
 
-    it('Creates a project with minimum required data, it should succeed but a job should not be created', async () => {
+    it.skip('Creates a project with minimum required data, it should succeed but a job should not be created', async () => {
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.minimal(),
         organizationId: anOrganization.id,
@@ -135,7 +135,7 @@ describe('PlanningUnitsModule (e2e)', () => {
       expect(await queueService.planningUnitsQueue.count()).toBe(0);
     });
 
-    it('Creating a project with custom area should succeed and create a job for that area', async () => {
+    it.skip('Creating a project with custom area should succeed and create a job for that area', async () => {
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.customArea({ countryCode: 'NAM' }),
         organizationId: anOrganization.id,
@@ -160,7 +160,7 @@ describe('PlanningUnitsModule (e2e)', () => {
       expect(jobs[0].data).toStrictEqual(createProjectDTO);
     });
 
-    it('Creating a project with administrative region data should succeed and create a job for that adm area', async () => {
+    it.skip('Creating a project with administrative region data should succeed and create a job for that adm area', async () => {
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.adminRegion({ countryCode: 'NAM' }),
         organizationId: anOrganization.id,
