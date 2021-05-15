@@ -273,7 +273,6 @@ describe('UsersModule (e2e)', () => {
         .send(loginDto)
         .expect(HttpStatus.CREATED)
         .then((response) => response.body.accessToken);
-      Logger.debug(`jwtToken: ${jwtToken}`);
     });
 
     test('A user should be able to delete their own account', async () => {
