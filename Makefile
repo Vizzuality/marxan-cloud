@@ -7,12 +7,14 @@
 ENVFILE := $(if $(environment), .env-test-e2e, .env)
 CIENV := $(if $(filter $(environment), ci), -f docker-compose-test-e2e.ci.yml , -f docker-compose-test-e2e.local.yml)
 API_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-api, postgresql-api)
+GEO_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-geo-api, postgresql-geo-api)
+REDIS_INSTANCE := $(if $(environment), test-e2e-redis, redis)
+ifdef $(environment)
 API_POSTGRES_USER := $(if $(filter $(environment), ci),${API_POSTGRES_USER},$(shell grep -e API_POSTGRES_USER ${ENVFILE} | sed 's/^.*=//'))
 API_POSTGRES_DB := $(if $(filter $(environment), ci),${API_POSTGRES_DB},$(shell grep -e API_POSTGRES_DB ${ENVFILE} | sed 's/^.*=//'))
-GEO_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-geo-api, postgresql-geo-api)
 GEO_POSTGRES_USER := $(if $(filter $(environment), ci),${GEO_POSTGRES_USER},$(shell grep -e GEO_POSTGRES_USER ${ENVFILE} | sed 's/^.*=//'))
 GEO_POSTGRES_DB := $(if $(filter $(environment), ci),${GEO_POSTGRES_DB},$(shell grep -e GEO_POSTGRES_DB ${ENVFILE} | sed 's/^.*=//'))
-REDIS_INSTANCE := $(if $(environment), test-e2e-redis, redis)
+endif
 
 DOCKER_COMPOSE_FILE := $(if $(environment), -f docker-compose-test-e2e.yml $(CIENV), -f docker-compose.yml )
 DOCKER_CLEAN_VOLUMES := $(if $(environment), , \
