@@ -12,6 +12,7 @@ case "$1" in
         ;;
     test-e2e)
         echo "Running e2e Tests"
+        export API_LOGGING_MUTE_ALL=true
         exec yarn test:e2e
         ;;
     run-migrations-for-e2e-tests)
