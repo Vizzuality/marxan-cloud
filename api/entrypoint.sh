@@ -13,7 +13,6 @@ case "$1" in
     test-e2e)
         echo "Running e2e Tests"
         # exec yarn test:e2e
-        exec yarn test:e2e auth
         exec yarn test:e2e countries
         exec yarn test:e2e geo-features
         exec yarn test:e2e json-api
