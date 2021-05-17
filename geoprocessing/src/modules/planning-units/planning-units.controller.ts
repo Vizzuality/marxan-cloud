@@ -21,7 +21,7 @@ import {
 import { apiGlobalPrefixes } from 'src/api.config';
 import { uploadOptions } from 'src/utils/file.utils';
 
-import { ShapeFileService } from '../shapefiles/shapefiles.service';
+import { ShapefileService } from '../shapefiles/shapefiles.service';
 import { ApiConsumesShapefile } from '../../decoratos/shapefile.decorator';
 import { ShapefileGeoJSONResponseDTO } from '../shapefiles/dto/shapefile.geojson.response.dto';
 
@@ -39,7 +39,7 @@ import { Response } from 'express';
 export class PlanningUnitsController {
   constructor(
     private service: PlanningUnitsService,
-    private shapefileService: ShapeFileService,
+    private shapefileService: ShapefileService,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(PlanningUnitsController.name);

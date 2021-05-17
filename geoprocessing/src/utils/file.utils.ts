@@ -30,8 +30,7 @@ export const uploadOptions: Readonly<MulterOptions> = {
   }),
 };
 
-@Injectable()
-export class FileSevice {
+export class FileService {
   unzipFile(fileInfo: Express.Multer.File): Promise<string> {
     return new Promise((resolve, reject) => {
       createReadStream(fileInfo.path)
