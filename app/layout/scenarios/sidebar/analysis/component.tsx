@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import cx from 'classnames';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -38,16 +39,16 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <Pill selected>
-        <header className="flex justify-between flex-shrink-0">
-          <div>
-            <div className="flex items-baseline space-x-4">
-              <h2 className="text-lg font-medium font-heading">Analysis</h2>
+      <AnimatePresence>
+        <Pill selected>
+          <header className="flex justify-between flex-shrink-0">
+            <div>
+              <div className="flex items-baseline space-x-4">
+                <h2 className="text-lg font-medium font-heading">Analysis</h2>
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        <AnimatePresence exitBeforeEnter>
           {!section && (
             <Sections
               key="sections"
@@ -75,8 +76,30 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
               onChangeSection={onChangeSection}
             />
           )}
-        </AnimatePresence>
-      </Pill>
+        </Pill>
+
+        {!section && (
+          <motion.div
+            key="run-scenario-button"
+            className="flex justify-center flex-shrink-0 mt-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <button
+              type="button"
+              className={cx({
+                'relative text-white bg-transparent border border-transparent hover:bg-gray-400 active:bg-gray-300 hover:border-transparent active:border-transparent group': true,
+                'text-base': true,
+                'flex items-center justify-center rounded-4xl focus:outline-none': true,
+              })}
+            >
+              <div className="absolute top-0 bottom-0 left-0 right-0 z-0 -m-px rounded-4xl bg-gradient-to-r from-purple-500 to-blue-500" />
+              <div className="relative z-10 px-8 py-3 transition-colors bg-black rounded-4xl group-hover:bg-transparent">Run scenario</div>
+            </button>
+
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
