@@ -18,7 +18,7 @@ case "$1" in
         yarn test:e2e geo-features
         yarn test:e2e json-api
         yarn test:e2e organizations
-        # yarn test:e2e planning-units
+        yarn test:e2e planning-units
         yarn test:e2e plan.s01e02
         yarn test:e2e projects
         yarn test:e2e protected-areas
