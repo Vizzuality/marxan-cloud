@@ -7,12 +7,14 @@ import { PlanningUnitsController } from './planning-units.controller';
 import { ShapefileService } from '../shapefiles/shapefiles.service';
 import { PlanningUnitsGeom } from 'src/modules/planning-units/planning-units.geo.entity';
 import { PlanningUnitsService } from './planning-units.service';
+import { FileService } from 'src/utils/file.utils';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PlanningUnitsGeom]), TileModule],
   providers: [
     PlanningUnitsProcessor,
     ShapefileService,
+    FileService,
     PlanningUnitsService,
     Logger,
   ],
