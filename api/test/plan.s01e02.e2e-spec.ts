@@ -9,7 +9,7 @@ import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
  * Tests for API contracts to be included in the upcoming sprint (s01e02), aka
  * Sprint as Code (SaC).
  */
-describe('Sprint s01e02', () => {
+describe.skip('Sprint s01e02', () => {
   let app: INestApplication;
   let jwtToken: string;
 
