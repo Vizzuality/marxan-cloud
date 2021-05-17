@@ -27,7 +27,7 @@ case "$1" in
         yarn test:e2e proxy.vector-tiles
         yarn test:e2e get-scenario-features
         yarn test:e2e scenario-put-change
-        yarn test:e2e scenarios
+        yarn test:e2e project-scenarios
         yarn test:e2e scenarios-pu-data-service.integration
         yarn test:e2e users
         ;;
