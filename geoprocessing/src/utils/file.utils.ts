@@ -9,6 +9,7 @@ import { diskStorage } from 'multer';
 import * as tempDirectory from 'temp-dir';
 import { createReadStream, rmdirSync, unlinkSync } from 'fs';
 import { Extract } from 'unzipper';
+import * as path from 'path';
 
 export const uploadOptions: Readonly<MulterOptions> = {
   storage: diskStorage({
@@ -36,10 +37,10 @@ export class FileSevice {
       createReadStream(fileInfo.path)
         .pipe(
           Extract({
-            path: `${fileInfo.destination}/${fileInfo.filename.replace(
-              '.zip',
-              '',
-            )}`,
+            path: path.join(
+              fileInfo.destination,
+              path.basename(fileInfo.filename.replace('.zip', '')),
+            ),
           }),
         )
         .on('close', () =>
@@ -53,7 +54,7 @@ export class FileSevice {
     });
   }
 
-  private deleteDataFromFS(path: string): void {
+  deleteDataFromFS(path: string): void {
     if (path.startsWith('/tmp')) {
       unlinkSync(path);
       rmdirSync(path.replace('.zip', ''), { recursive: true });
