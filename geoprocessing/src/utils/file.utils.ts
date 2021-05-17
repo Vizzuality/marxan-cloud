@@ -2,12 +2,12 @@
  * File Utils
  */
 
-import { Injectable } from '@nestjs/common';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { Request } from 'express';
 import { diskStorage } from 'multer';
 import * as tempDirectory from 'temp-dir';
-import { createReadStream, rmdirSync, unlinkSync } from 'fs';
+import { createReadStream } from 'fs';
+import { unlink, rmdir } from 'fs/promises';
 import { Extract } from 'unzipper';
 import * as path from 'path';
 
@@ -55,8 +55,8 @@ export class FileService {
 
   deleteDataFromFS(path: string): void {
     if (path.startsWith('/tmp')) {
-      unlinkSync(path);
-      rmdirSync(path.replace('.zip', ''), { recursive: true });
+      unlink(path);
+      rmdir(path.replace('.zip', ''), { recursive: true });
     } else {
       throw new Error(`Could not complete deletion: ${path} is not in /tmp`);
     }
