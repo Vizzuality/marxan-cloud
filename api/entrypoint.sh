@@ -14,14 +14,14 @@ case "$1" in
         echo "Running e2e Tests"
         export API_LOGGING_MUTE_ALL=true
         # exec yarn test:e2e
-        yarn test:e2e api-events-security
+        # yarn test:e2e api-events-security
         yarn test:e2e auth
         yarn test:e2e example.integration
         yarn test:e2e countries
         yarn test:e2e geo-features
         yarn test:e2e json-api
         yarn test:e2e organizations
-        yarn test:e2e planning-units
+        # yarn test:e2e planning-units
         yarn test:e2e projects
         yarn test:e2e protected-areas
         yarn test:e2e proxy.vector-tiles
