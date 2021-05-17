@@ -72,7 +72,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     response
       .status(status)
       .header('Content-Type', 'application/json')
-      .header('content-disposition', 'inline')
+      .header('Content-Disposition', 'inline')
       .json(errorDataForResponse);
   }
 }
