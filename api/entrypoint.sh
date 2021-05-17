@@ -16,7 +16,7 @@ case "$1" in
         # exec yarn test:e2e
         # yarn test:e2e api-events-security
         yarn test:e2e auth
-        yarn test:e2e example.integration
+        # yarn test:e2e example.integration
         yarn test:e2e countries
         yarn test:e2e geo-features
         yarn test:e2e json-api
