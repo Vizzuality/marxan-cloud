@@ -102,6 +102,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "husky": "^4.3.0",
     "jest": "^26.6.3",
+    "leaked-handles": "5.2.0",
     "lint-staged": "^10.5.2",
     "nodemon": "^2.0.6",
     "prettier": "^2.1.2",

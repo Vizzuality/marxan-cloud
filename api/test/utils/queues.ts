@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 
 @Injectable()
 export class FakeQueue implements Partial<Queue> {
-  public readonly jobs: Record<string, Job> = {};
+  public jobs: Record<string, Job> = {};
   private readonly queueBase = new QueueBase(v4());
 
   async add(
@@ -15,6 +15,10 @@ export class FakeQueue implements Partial<Queue> {
     const job: Job = new Job(this.queueBase, name, data, opts);
     this.jobs[name] = job;
     return job;
+  }
+
+  async clear() {
+    this.jobs = {};
   }
 
   close = jest.fn();

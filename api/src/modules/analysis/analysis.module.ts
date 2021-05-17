@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { PlanningUnitsModule } from '../planning-units/planning-units.module';
 import { ScenariosPlanningUnitModule } from '../scenarios-planning-unit/scenarios-planning-unit.module';
 
 import { AdjustCostSurface } from './entry-points/adjust-cost-surface';
@@ -19,7 +18,6 @@ import { queueName } from './queue-name';
 @Module({
   imports: [
     ScenariosPlanningUnitModule,
-    PlanningUnitsModule,
     QueueModule.register({
       name: queueName,
     }),

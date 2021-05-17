@@ -13,12 +13,14 @@ export const bootstrapApplication = async (): Promise<INestApplication> => {
     .compile();
 
   const app = moduleFixture.createNestApplication();
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
-  return app.init();
+  return app
+    .enableShutdownHooks()
+    .useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    )
+    .init();
 };

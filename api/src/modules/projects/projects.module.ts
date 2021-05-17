@@ -8,8 +8,8 @@ import { UsersModule } from 'modules/users/users.module';
 import { ScenariosModule } from 'modules/scenarios/scenarios.module';
 import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
 import { CountriesModule } from 'modules/countries/countries.module';
-import { PlanningUnitsModule } from 'modules/planning-units/planning-units.module';
 import { GeoFeaturesModule } from 'modules/geo-features/geo-features.module';
+import { QueueModule } from '../queue/queue.module';
 
 @Module({
   imports: [
@@ -19,7 +19,9 @@ import { GeoFeaturesModule } from 'modules/geo-features/geo-features.module';
     forwardRef(() => ScenariosModule),
     TypeOrmModule.forFeature([Project]),
     UsersModule,
-    PlanningUnitsModule,
+    QueueModule.register({
+      name: 'planning-units',
+    }),
   ],
   providers: [ProjectsService],
   controllers: [ProjectsController],

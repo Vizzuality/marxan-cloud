@@ -9,7 +9,6 @@ import { UpdateProjectDTO } from './dto/update.project.dto';
 import * as faker from 'faker';
 import { UsersService } from 'modules/users/users.service';
 import { ScenariosService } from 'modules/scenarios/scenarios.service';
-import { PlanningUnitsService } from 'modules/planning-units/planning-units.service';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -19,6 +18,7 @@ import { AdminArea } from 'modules/admin-areas/admin-area.geo.entity';
 import { AdminAreasService } from 'modules/admin-areas/admin-areas.service';
 import { CountriesService } from 'modules/countries/countries.service';
 import { AppConfig } from 'utils/config.utils';
+import { QueueService } from '../queue/queue.service';
 
 const projectFilterKeyNames = [
   'name',
@@ -50,8 +50,9 @@ export class ProjectsService extends AppBaseService<
     protected readonly adminAreasService: AdminAreasService,
     @Inject(CountriesService)
     protected readonly countriesService: CountriesService,
-    @Inject(PlanningUnitsService)
-    private readonly planningUnitsService: PlanningUnitsService,
+    private readonly queueService: QueueService<
+      CreateProjectDTO | UpdateProjectDTO
+    >,
   ) {
     super(repository, 'project', 'projects', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -206,7 +207,7 @@ export class ProjectsService extends AppBaseService<
         createModel.extent)
     ) {
       this.logger.debug('creating planning unit job ');
-      return this.planningUnitsService.create(createModel);
+      await this.queueService.queue.add(`create-regular-pu`, createModel);
     }
   }
 
@@ -224,7 +225,7 @@ export class ProjectsService extends AppBaseService<
         createModel.extent)
     ) {
       this.logger.debug('creating planning unit job ');
-      return this.planningUnitsService.create(createModel);
+      await this.queueService.queue.add(`create-regular-pu`, createModel);
     }
   }
 }
