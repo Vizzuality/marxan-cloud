@@ -14,9 +14,9 @@ import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
 import { Job } from 'bullmq';
 import { PlanningUnitsService } from 'modules/planning-units/planning-units.service';
 
-const logger: Logger = new Logger('tests-planning-units');
-
 describe('PlanningUnitsModule (e2e)', () => {
+  const logger: Logger = new Logger('tests-planning-units');
+
   let app: INestApplication;
   const queueService: PlanningUnitsService = new PlanningUnitsService();
   let jwtToken: string;

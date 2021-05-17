@@ -19,7 +19,6 @@ export class OrganizationsTestUtils {
     jwtToken: string,
     organizationDTO: Partial<CreateOrganizationDTO>,
   ): Promise<OrganizationResultSingular> {
-    Logger.debug(jwtToken);
     return await request(app.getHttpServer())
       .post('/api/v1/organizations')
       .set('Authorization', `Bearer ${jwtToken}`)

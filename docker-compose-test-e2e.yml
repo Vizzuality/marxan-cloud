@@ -18,9 +18,9 @@ services:
       - ./api/test:/opt/marxan-api/test
     environment:
       - NODE_PATH=src
-      - NODE_ENV=development
-      - API_POSTGRES_URL=postgres://marxan-api:marxan-api@test-e2e-postgresql-api:5432/marxan-api
-      - GEO_POSTGRES_URL=postgres://marxan-geo-api:marxan-geo-api@test-e2e-postgresql-geo-api:5432/marxan-geo-api
+      - NODE_ENV=test
+      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@test-e2e-postgresql-api:5432/${API_POSTGRES_DB}
+      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@test-e2e-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
       - REDIS_HOST=test-e2e-redis
     depends_on:
       - test-e2e-postgresql-api
@@ -44,9 +44,9 @@ services:
       - ./geoprocessing/test:/opt/marxan-geoprocessing/test
     environment:
       - NODE_PATH=src
-      - NODE_ENV=development
-      - API_POSTGRES_URL=postgres://marxan-api:marxan-api@test-e2e-postgresql-api:5432/marxan-api
-      - GEO_POSTGRES_URL=postgres://marxan-geo-api:marxan-geo-api@test-e2e-postgresql-geo-api:5432/marxan-geo-api
+      - NODE_ENV=test
+      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@test-e2e-postgresql-api:5432/${API_POSTGRES_DB}
+      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@test-e2e-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
       - REDIS_HOST=test-e2e-redis
     depends_on:
       - test-e2e-postgresql-geo-api

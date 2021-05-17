@@ -7,12 +7,12 @@
 ENVFILE := $(if $(environment), .env-test-e2e, .env)
 CIENV := $(if $(filter $(environment), ci), -f docker-compose-test-e2e.ci.yml , -f docker-compose-test-e2e.local.yml)
 API_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-api, postgresql-api)
-API_POSTGRES_USER := $(if $(filter $(environment), ci),${API_POSTGRES_USER},$(shell grep -e API_POSTGRES_USER ${ENVFILE} | sed 's/^.*=//'))
-API_POSTGRES_DB := $(if $(filter $(environment), ci),${API_POSTGRES_DB},$(shell grep -e API_POSTGRES_DB ${ENVFILE} | sed 's/^.*=//'))
 GEO_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-geo-api, postgresql-geo-api)
-GEO_POSTGRES_USER := $(if $(filter $(environment), ci),${GEO_POSTGRES_USER},$(shell grep -e GEO_POSTGRES_USER ${ENVFILE} | sed 's/^.*=//'))
-GEO_POSTGRES_DB := $(if $(filter $(environment), ci),${GEO_POSTGRES_DB},$(shell grep -e GEO_POSTGRES_DB ${ENVFILE} | sed 's/^.*=//'))
 REDIS_INSTANCE := $(if $(environment), test-e2e-redis, redis)
+_API_POSTGRES_USER := $(if $(filter $(environment), ci),${API_POSTGRES_USER},$(shell grep -e API_POSTGRES_USER ${ENVFILE} | sed 's/^.*=//'))
+_API_POSTGRES_DB := $(if $(filter $(environment), ci),${API_POSTGRES_DB},$(shell grep -e API_POSTGRES_DB ${ENVFILE} | sed 's/^.*=//'))
+_GEO_POSTGRES_USER := $(if $(filter $(environment), ci),${GEO_POSTGRES_USER},$(shell grep -e GEO_POSTGRES_USER ${ENVFILE} | sed 's/^.*=//'))
+_GEO_POSTGRES_DB := $(if $(filter $(environment), ci),${GEO_POSTGRES_DB},$(shell grep -e GEO_POSTGRES_DB ${ENVFILE} | sed 's/^.*=//'))
 
 DOCKER_COMPOSE_FILE := $(if $(environment), -f docker-compose-test-e2e.yml $(CIENV), -f docker-compose.yml )
 DOCKER_CLEAN_VOLUMES := $(if $(environment), , \
@@ -24,17 +24,18 @@ COMPOSE_PROJECT_NAME := "marxan-cloud"
 ## some color to give live to the outputs
 RED :=\033[1;32m
 NC :=\033[0m # No Color
-# Start only API and Geoprocessing services
-#
-# Useful when developing on API components only, to avoid spinning up services
-# which may not be needed.
+
 test-commands:
 	@echo $(ENVFILE)
 	@echo $(DOCKER_COMPOSE_FILE)
 	@echo $(CIENV)
-	@echo $(API_POSTGRES_DB)
-	@echo $(GEO_POSTGRES_USER)
+	@echo $(_API_POSTGRES_DB)
+	@echo $(_GEO_POSTGRES_USER)
 
+# Start only API and Geoprocessing services
+#
+# Useful when developing on API components only, to avoid spinning up services
+# which may not be needed.
 start-api:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing
 
@@ -52,10 +53,10 @@ stop:
 	docker-compose $(DOCKER_COMPOSE_FILE) stop
 
 psql-api:
-	docker-compose $(DOCKER_COMPOSE_FILE) exec $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}"
+	docker-compose $(DOCKER_COMPOSE_FILE) exec $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}"
 
 psql-geo:
-	docker-compose $(DOCKER_COMPOSE_FILE) exec $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"
+	docker-compose $(DOCKER_COMPOSE_FILE) exec $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}"
 
 redis-api:
 	docker-compose exec redis redis-cli
@@ -82,23 +83,23 @@ seed-dbs: seed-api-with-test-data | seed-geoapi-with-test-data
 
 seed-api-with-test-data:
 	@echo "$(RED)seeding db:$(NC) $(API_DB_INSTANCE)"
-	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
 
 seed-geoapi-with-test-data:
 	@echo "$(RED)seeding dbs:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE) and ${REDIS_INSTANCE}"
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/test/fixtures/test-admin-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/test/fixtures/test-wdpa-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
-	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-features.sql
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/test/fixtures/test-admin-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}"; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/test/fixtures/test-wdpa-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/test/fixtures/test-features.sql
 	@for i in api/test/fixtures/features/*.sql; do \
 		table_name=`basename -s .sql "$$i"`; \
-		featureid=`docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
+		featureid=`docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
 		echo "appending data for $${table_name} with id $${featureid}"; \
-		sed -e "s/\$$feature_id/$$featureid/g" api/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
+		sed -e "s/\$$feature_id/$$featureid/g" api/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}"; \
 		done; \
-	SCENARIOID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
-	USERID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from users limit 1"); \
+	SCENARIOID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
+	USERID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from users limit 1"); \
 	echo "appending data for scenario with id $${SCENARIOID}"; \
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/test/fixtures/test-geodata.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/test/fixtures/test-geodata.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
 
 # need notebook service to execute a expecific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
@@ -142,10 +143,10 @@ test-unit-api:
 	-docker-compose -f docker-compose-test-unit.yml up --abort-on-container-exit --exit-code-from geoprocessing geoprocessing
 
 dump-geodb-data:
-	docker-compose exec -T postgresql-geo-api pg_dump -T migrations -a -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
+	docker-compose exec -T postgresql-geo-api pg_dump -T migrations -a -U "${_GEO_POSTGRES_USER}" -F t ${_GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
 
 dump-api-data:
-	docker-compose exec -T postgresql-api pg_dump -T '(migrations|api_event_kinds)' -a -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
+	docker-compose exec -T postgresql-api pg_dump -T '(migrations|api_event_kinds)' -a -U "${_API_POSTGRES_USER}" -F t ${_API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
 
 upload-dump-data:
 	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps -s data/data/processed/db_dumps
@@ -156,10 +157,10 @@ restore-dumps:
 extract-geo-test-data:
 	#This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
 	TEST_GEOMETRY=$(shell cat api/test/fixtures/test-geometry.json | jq 'tostring'); \
-	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM admin_regions WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_admin_regions_okavango.csv; \
-	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM wdpa WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_wdpa_okavango.csv; \
-	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM features_data WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_features_data_okavango.csv;
-	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" -c "COPY (SELECT * FROM features) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/api_features_okavango.csv
+	docker-compose exec -T postgresql-geo-api psql -U "${_GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM admin_regions WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_admin_regions_okavango.csv; \
+	docker-compose exec -T postgresql-geo-api psql -U "${_GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM wdpa WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_wdpa_okavango.csv; \
+	docker-compose exec -T postgresql-geo-api psql -U "${_GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM features_data WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_features_data_okavango.csv;
+	docker-compose exec -T postgresql-api psql -U "${_API_POSTGRES_USER}" -c "COPY (SELECT * FROM features) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/api_features_okavango.csv
 
 generate-content-dumps: dump-api-data | dump-geodb-data
 	jq -n --arg dateName $$(date +%Y-%m-%d) '{"metadata":{"latest":{"name":$$dateName}}}' > data/data/processed/db_dumps/content.json
