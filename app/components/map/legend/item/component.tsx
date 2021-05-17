@@ -5,7 +5,8 @@ export interface LegendItemProps {
   id: string;
   name: string;
   description?: string;
-  icon?: ReactNode
+  icon?: ReactNode,
+  children?: ReactNode;
 }
 
 export const LegendItem: React.FC<LegendItemProps> = ({
@@ -13,6 +14,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   name,
   description,
   icon,
+  children,
 }: LegendItemProps) => {
   return (
     <div
@@ -38,6 +40,12 @@ export const LegendItem: React.FC<LegendItemProps> = ({
       <div className="text-sm text-gray-300">
         {description}
       </div>
+
+      {children && (
+        <div className="mt-2.5">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
