@@ -25,14 +25,11 @@ export class ShapefileService {
     } catch (err) {
       this.logger.error(err);
     }
-    const geoJson = await this.shapeFileToGeoJson(shapeFile).then(
-      async (geoJson) => {
-        await this.fileService
-          .deleteDataFromFS(shapeFile.path)
-          .catch((error) => error);
-        return geoJson;
-      },
-    );
+    const geoJson = await this.shapeFileToGeoJson(shapeFile);
+    await this.fileService
+      .deleteDataFromFS(shapeFile.path)
+      .catch((error) => this.logger.error(error));
+
     return { data: geoJson };
   }
 }
