@@ -41,19 +41,23 @@ afterAll(async () => {
 });
 
 describe(`when submitting a job`, () => {
-  it(`should process the job by relevant worker`, async () => {
-    // Act - simulate pushing a job to queue
-    const job = await queue.add('test-job', {
-      test: 'data',
-    });
-    expect(job.id).toBeDefined();
+  it(
+    `should process the job by relevant worker`,
+    async () => {
+      // Act - simulate pushing a job to queue
+      const job = await queue.add('test-job', {
+        test: 'data',
+      });
+      expect(job.id).toBeDefined();
 
-    await delay(1000);
-    expect(processor.onFailedMock.mock.calls).toEqual([]);
-    expect(processor.onCompleteMock.mock.calls[0][0]).toEqual({
-      inputCopy: jobInput,
-    });
-  });
+      await delay(1000);
+      expect(processor.onFailedMock.mock.calls).toEqual([]);
+      expect(processor.onCompleteMock.mock.calls[0][0]).toEqual({
+        inputCopy: jobInput,
+      });
+    },
+    10 * 1000,
+  );
 });
 
 const jobInput = Object.freeze({
