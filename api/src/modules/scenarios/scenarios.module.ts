@@ -14,6 +14,10 @@ import { ProxyService } from 'modules/proxy/proxy.service';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { AnalysisModule } from '../analysis/analysis.module';
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
+import { ResolvePuWithCost } from './cost-surface/resolve-pu-with-cost';
+import { CostSurfaceEventsPort } from './cost-surface/cost-surface-events.port';
+import { GeoprocessingCostFromShapefile } from './cost-surface/adapters/geoprocessing-cost-from-shapefile';
+import { CostSurfaceApiEvents } from './cost-surface/adapters/cost-surface-api-events';
 
 @Module({
   imports: [
@@ -30,6 +34,15 @@ import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
     ProxyService,
     WdpaAreaCalculationService,
     CostSurfaceFacade,
+    // internals for cost-surface
+    {
+      provide: ResolvePuWithCost,
+      useClass: GeoprocessingCostFromShapefile,
+    },
+    {
+      provide: CostSurfaceEventsPort,
+      useClass: CostSurfaceApiEvents,
+    },
   ],
   controllers: [ScenariosController],
   exports: [ScenariosService],
