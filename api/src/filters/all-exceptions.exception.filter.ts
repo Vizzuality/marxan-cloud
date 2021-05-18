@@ -62,8 +62,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
      * these should help frontend devs and other API users report bugs or other
      * issues without having to look at logs.
      */
+    const nodeEnv = config.util.getEnv('NODE_ENV');
     const errorDataForResponse = new JSONAPISerializer.Error(
-      config.util.getEnv('NODE_ENV') !== 'development'
+      nodeEnv !== 'development' && nodeEnv !== 'test'
         ? omit(errorData, ['meta.rawError', 'meta.stack'])
         : errorData,
     );
