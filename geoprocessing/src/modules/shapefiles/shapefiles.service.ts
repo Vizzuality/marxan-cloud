@@ -4,10 +4,8 @@ const mapshaper = require('mapshaper');
 
 @Injectable()
 export class ShapefileService {
-  constructor(
-    private readonly logger: Logger,
-    private readonly fileService: FileService,
-  ) {}
+  private readonly logger: Logger = new Logger(ShapefileService.name);
+  constructor(private readonly fileService: FileService) {}
 
   private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
     const outputKey = `shapefile-${new Date().getTime()}.geojson`;
