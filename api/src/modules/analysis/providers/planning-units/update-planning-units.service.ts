@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AdjustPlanningUnits } from '../../entry-points/adjust-planning-units';
 import { AdjustPlanningUnitsInput } from '../../entry-points/adjust-planning-units-input';
 
-import { ArePuidsAllowedPort } from './are-puids-allowed.port';
+import { ArePuidsAllowedPort } from '../shared/are-puids-allowed.port';
 import { RequestJobPort } from './request-job.port';
 
 type Success = true;
@@ -28,7 +28,9 @@ export class UpdatePlanningUnitsService implements AdjustPlanningUnits {
         targetPuIds,
       );
       if (errors.length > 0) {
-        throw new Error('One or more of the planning units provided for exclusion or inclusion does not match any planning unit of the present scenario.');
+        throw new Error(
+          'One or more of the planning units provided for exclusion or inclusion does not match any planning unit of the present scenario.',
+        );
       }
     }
 

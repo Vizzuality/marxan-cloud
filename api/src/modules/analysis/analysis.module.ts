@@ -7,8 +7,8 @@ import { AdjustPlanningUnits } from './entry-points/adjust-planning-units';
 import { GetScenarioStatus } from './entry-points/get-scenario-status';
 
 import { UpdateCostSurfaceService } from './providers/cost-surface/update-cost-surface.service';
-import { ArePuidsAllowedAdapter } from './providers/planning-units/adapters/are-puids-allowed-adapter';
-import { ArePuidsAllowedPort } from './providers/planning-units/are-puids-allowed.port';
+import { ArePuidsAllowedAdapter } from './providers/shared/adapters/are-puids-allowed-adapter';
+import { ArePuidsAllowedPort } from './providers/shared/are-puids-allowed.port';
 import { UpdatePlanningUnitsService } from './providers/planning-units/update-planning-units.service';
 import { ScenarioStatusService } from './providers/status/scenario-status.service';
 import { RequestJobPort } from './providers/planning-units/request-job.port';
