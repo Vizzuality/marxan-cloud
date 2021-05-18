@@ -28,10 +28,17 @@ export class FileService {
     });
   }
 
+<<<<<<< HEAD
   async deleteDataFromFS(path: string): Promise<void> {
     if (path.startsWith('/tmp')) {
       await unlink(path);
       await rmdir(path.replace('.zip', ''), { recursive: true });
+=======
+  deleteDataFromFS(path: string): void {
+    if (path.startsWith('/tmp')) {
+      unlink(path);
+      rmdir(path.replace('.zip', ''), { recursive: true });
+>>>>>>> 9d23a303 (Wrapp FileService in FileModule)
     } else {
       throw new Error(`Could not complete deletion: ${path} is not in /tmp`);
     }

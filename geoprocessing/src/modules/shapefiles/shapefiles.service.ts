@@ -1,11 +1,25 @@
+<<<<<<< HEAD
 import { Injectable, Logger } from '@nestjs/common';
+=======
+import { Inject, Injectable, Logger } from '@nestjs/common';
+>>>>>>> 9d23a303 (Wrapp FileService in FileModule)
 import { FileService } from '../files/files.service';
 const mapshaper = require('mapshaper');
 
 @Injectable()
 export class ShapefileService {
+<<<<<<< HEAD
   private readonly logger: Logger = new Logger(ShapefileService.name);
   constructor(private readonly fileService: FileService) {}
+=======
+  constructor(
+    private readonly logger: Logger,
+    @Inject(FileService)
+    private fileService: FileService,
+  ) {
+    this.logger.setContext(ShapefileService.name);
+  }
+>>>>>>> 9d23a303 (Wrapp FileService in FileModule)
 
   private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
     const outputKey = `shapefile-${new Date().getTime()}.geojson`;
