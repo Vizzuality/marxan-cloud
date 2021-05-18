@@ -15,6 +15,9 @@ export const apiEventResource: BaseServiceResource = {
 /**
  * Available kinds of API Events. See the Event.kind prop documentation below
  * for more information.
+ *
+ * If ever changing this, adjust
+ * @file geoprocessing/src/modules/api-events/events.enum.ts
  */
 export enum API_EVENT_KINDS {
   user__signedUp__v1alpha1 = 'user.signedUp/v1alpha1',

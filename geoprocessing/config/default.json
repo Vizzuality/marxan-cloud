@@ -9,5 +9,8 @@
      "host": "marxan-redis",
      "port": "6379"
      }
-   }
+   },
+  "api": {
+    "url": "http://localhost:3000"
+  }
 }
