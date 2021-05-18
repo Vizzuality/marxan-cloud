@@ -36,7 +36,7 @@ describe(`when creating an event succeed`, () => {
 
   beforeEach(() => {
     axiosMock
-      .onPost('http://localhost:3030/v1/api-events', {
+      .onPost(process.env.API_SERVICE_URL + `/v1/api-events`, {
         kind: 'user.accountActivationTokenGenerated/v1alpha1',
         topic: resourceId,
         data,
