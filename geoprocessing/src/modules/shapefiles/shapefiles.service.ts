@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { FileService } from '../files/files.service';
 const mapshaper = require('mapshaper');
 
@@ -6,11 +6,8 @@ const mapshaper = require('mapshaper');
 export class ShapefileService {
   constructor(
     private readonly logger: Logger,
-    @Inject(FileService)
-    private fileService: FileService,
-  ) {
-    this.logger.setContext(ShapefileService.name);
-  }
+    private readonly fileService: FileService,
+  ) {}
 
   private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
     const outputKey = `shapefile-${new Date().getTime()}.geojson`;
@@ -28,10 +25,14 @@ export class ShapefileService {
     } catch (err) {
       this.logger.error(err);
     }
-    const geoJson = await this.shapeFileToGeoJson(shapeFile).then((geoJson) => {
-      this.fileService.deleteDataFromFS(shapeFile.path);
-      return geoJson;
-    });
+    const geoJson = await this.shapeFileToGeoJson(shapeFile).then(
+      async (geoJson) => {
+        await this.fileService
+          .deleteDataFromFS(shapeFile.path)
+          .catch((error) => error);
+        return geoJson;
+      },
+    );
     return { data: geoJson };
   }
 }

@@ -28,10 +28,10 @@ export class FileService {
     });
   }
 
-  deleteDataFromFS(path: string): void {
+  async deleteDataFromFS(path: string): Promise<void> {
     if (path.startsWith('/tmp')) {
-      unlink(path);
-      rmdir(path.replace('.zip', ''), { recursive: true });
+      await unlink(path);
+      await rmdir(path.replace('.zip', ''), { recursive: true });
     } else {
       throw new Error(`Could not complete deletion: ${path} is not in /tmp`);
     }
