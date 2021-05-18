@@ -13,6 +13,8 @@ import { UpdatePlanningUnitsService } from './providers/planning-units/update-pl
 import { ScenarioStatusService } from './providers/status/scenario-status.service';
 import { RequestJobPort } from './providers/planning-units/request-job.port';
 import { AsyncJobsAdapter } from './providers/planning-units/adapters/async-jobs-adapter';
+import { CostSurfaceRepo } from './providers/cost-surface/cost-surface-repo';
+import { BaseAppCostSurface } from './providers/cost-surface/adapters/base-app-cost-surface';
 import { QueueModule } from '../queue/queue.module';
 import { queueName } from './queue-name';
 
@@ -47,6 +49,10 @@ import { queueName } from './queue-name';
     {
       provide: RequestJobPort,
       useClass: AsyncJobsAdapter,
+    },
+    {
+      provide: CostSurfaceRepo,
+      useClass: BaseAppCostSurface,
     },
   ],
   exports: [AdjustCostSurface, AdjustPlanningUnits, GetScenarioStatus],
