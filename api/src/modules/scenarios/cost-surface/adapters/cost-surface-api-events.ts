@@ -3,11 +3,31 @@ import {
   CostSurfaceEventsPort,
   CostSurfaceState,
 } from '../cost-surface-events.port';
+import { ApiEventsService } from '../../../api-events/api-events.service';
+import { API_EVENT_KINDS } from '../../../api-events/api-event.api.entity';
 
 @Injectable()
-export class CostSurfaceApiEvents implements CostSurfaceEventsPort {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+export class CostSurfaceApiEvents
+  extends ApiEventsService
+  implements CostSurfaceEventsPort {
+  private readonly eventsMap: Record<CostSurfaceState, API_EVENT_KINDS> = {
+    [CostSurfaceState.Submitted]:
+      API_EVENT_KINDS.scenario__costSurface__submitted__v1_alpha1,
+    [CostSurfaceState.ShapefileConverted]:
+      API_EVENT_KINDS.scenario__costSurface__shapeConverted__v1_alpha1,
+    [CostSurfaceState.ShapefileConversionFailed]:
+      API_EVENT_KINDS.scenario__costSurface__shapeConversionFailed__v1_alpha1,
+    [CostSurfaceState.CostUpdateFailed]:
+      API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1,
+    [CostSurfaceState.Finished]:
+      API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1,
+  };
+
   async event(scenarioId: string, state: CostSurfaceState): Promise<void> {
-    //
+    await this.create({
+      data: {},
+      topic: scenarioId,
+      kind: this.eventsMap[state],
+    });
   }
 }
