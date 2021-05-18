@@ -1,17 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
-
-import { FileService } from '../../utils/file.utils';
-
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { FileService } from '../files/files.service';
 const mapshaper = require('mapshaper');
 
 @Injectable()
 export class ShapefileService {
   constructor(
     private readonly logger: Logger,
+    @Inject(FileService)
     private fileService: FileService,
   ) {
     this.logger.setContext(ShapefileService.name);
-    this.fileService = new FileService();
   }
 
   private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
