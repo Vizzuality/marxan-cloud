@@ -31,6 +31,7 @@ case "$1" in
         yarn test:e2e scenarios-pu-data-service.integration
         yarn test:e2e users
         yarn test:e2e project-protected-areas-upload-shapefile
+        yarn test:e2e worker-module-usage
         ;;
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (api db) for e2e Tests in Api (ESC)[0m"
