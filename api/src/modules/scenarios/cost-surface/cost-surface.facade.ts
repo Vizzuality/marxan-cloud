@@ -1,42 +1,44 @@
 import { Injectable } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { AdjustCostSurface } from '../../analysis/entry-points/adjust-cost-surface';
-import { ProxyService } from '../../proxy/proxy.service';
+import { ResolvePuWithCost } from './resolve-pu-with-cost';
+import {
+  CostSurfaceEventsPort,
+  CostSurfaceState,
+} from './cost-surface-events.port';
+import { CostSurfaceInputDto } from '../../analysis/entry-points/adjust-cost-surface-input';
 
 @Injectable()
 export class CostSurfaceFacade {
   constructor(
     private readonly adjustCostSurfaceService: AdjustCostSurface,
-    private readonly proxyService: ProxyService,
+    private readonly shapefileConverter: ResolvePuWithCost,
+    private readonly events: CostSurfaceEventsPort,
   ) {}
 
   /**
    * non blocking - will do job in "background"
-   *
-   * @param scenarioId
-   * @param request
    */
-  convert(scenarioId: string, request: Request) {
-    // TODO #0 Generate & Dispatch Api Event (some wrapping service for /dummy/"terminating" if already running)
+  async convert(scenarioId: string, request: Request) {
+    await this.events.event(scenarioId, CostSurfaceState.Submitted);
+    let costSurface: CostSurfaceInputDto;
 
-    // TODO #1 Call Proxy Service to get Planning Units and their surface cost
-    // this.proxyService.... - modify this to send back data, not act on Response
+    try {
+      costSurface = await this.shapefileConverter.fromShapefile(request.file);
+    } catch (error) {
+      await this.events.event(
+        scenarioId,
+        CostSurfaceState.ShapefileConversionFailed,
+      );
+      return;
+    }
 
-    // TODO #2 Call Analysis-module with scenario id & output from the above
+    await this.events.event(scenarioId, CostSurfaceState.ShapefileConverted);
     this.adjustCostSurfaceService
-      .update(scenarioId, {
-        planningUnits: [
-          {
-            id: '0',
-            cost: 100,
-          },
-        ],
-      })
-      .then(() => {
-        // dispatch ApiEvent - Done
-      })
-      .catch(() => {
-        // dispatch ApiEvent - Failed
+      .update(scenarioId, costSurface)
+      .then(() => this.events.event(scenarioId, CostSurfaceState.Finished))
+      .catch(async () => {
+        await this.events.event(scenarioId, CostSurfaceState.CostUpdateFailed);
       });
   }
 }
