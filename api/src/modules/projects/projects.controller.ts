@@ -20,6 +20,7 @@ import { ProjectsService } from './projects.service';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -46,6 +47,9 @@ import {
 } from 'nestjs-base-service';
 import { GeoFeatureResult } from 'modules/geo-features/geo-feature.api.entity';
 import { GeoFeaturesService } from 'modules/geo-features/geo-features.service';
+import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
+import { Request } from 'express';
+import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -55,6 +59,7 @@ export class ProjectsController {
   constructor(
     public readonly service: ProjectsService,
     private readonly geoFeaturesService: GeoFeaturesService,
+    private readonly protectedAreaShapefile: ProtectedAreasFacade,
   ) {}
 
   @ApiOperation({
@@ -161,5 +166,22 @@ export class ProjectsController {
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
     return await this.service.remove(id);
+  }
+
+  @ApiConsumesShapefile(false)
+  @ApiOperation({
+    description: 'Upload shapefile for project-specific protected areas',
+  })
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiNoContentResponse()
+  @Post(':id/protected-areas/shapefile')
+  async shapefileForProtectedArea(
+    @Param('id') projectId: string,
+    @Req() request: Request,
+  ): Promise<void> {
+    // TODO #1 pre-validate project existence
+
+    this.protectedAreaShapefile.convert(projectId, request.file);
+    return;
   }
 }
