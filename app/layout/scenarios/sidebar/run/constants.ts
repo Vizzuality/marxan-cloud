@@ -4,6 +4,7 @@ export const FIELDS = [
     label: 'Number of Runs',
     description: 'Number of Runs description',
     default: 10,
+    advanced: false,
     input: {
       className: 'text-2xl',
       min: 0,
@@ -27,6 +28,7 @@ export const FIELDS = [
     description: 'Clamping description',
     note: '(Boundary Lenght Modifier)',
     default: 0.0001,
+    advanced: false,
     input: {
       className: 'text-2xl',
       min: 0,
@@ -44,43 +46,50 @@ export const FIELDS = [
       },
     ],
   },
-];
-
-export const DATA = [
   {
-    boundaryLength: 1.43,
-    cost: 1.34,
-    isBlm: false,
-    thumbnail: '/images/avatar.png',
+    id: 'prop',
+    label: 'Prop',
+    description: 'Prop description',
+    default: 0.5,
+    advanced: true,
+    input: {
+      className: 'text-2xl',
+      min: 0,
+      max: 1,
+      type: 'number',
+      step: '.01',
+    },
+    validations: [
+      {
+        presence: true,
+        numericality: {
+          greaterThanOrEqualTo: 0,
+          lessThanOrEqualTo: 1,
+        },
+      },
+    ],
   },
   {
-    boundaryLength: 1.17,
-    cost: 1.35,
-    isBlm: false,
-    thumbnail: null,
-  },
-  {
-    boundaryLength: 0.49,
-    cost: 1.43,
-    isBlm: true,
-    thumbnail: '/images/avatar.png',
-  },
-  {
-    boundaryLength: 0.32,
-    cost: 1.82,
-    isBlm: false,
-    thumbnail: null,
-  },
-  {
-    boundaryLength: 0.31,
-    cost: 2.1,
-    isBlm: false,
-    thumbnail: '/images/avatar.png',
-  },
-  {
-    boundaryLength: 0.29,
-    cost: 2.89,
-    isBlm: false,
-    thumbnail: '/images/avatar.png',
+    id: 'randseed',
+    label: 'Randseed',
+    description: 'Randseed description',
+    default: -1,
+    advanced: true,
+    input: {
+      className: 'text-2xl',
+      min: -1,
+      max: 1,
+      type: 'number',
+      step: '.01',
+    },
+    validations: [
+      {
+        presence: true,
+        numericality: {
+          greaterThanOrEqualTo: -1,
+          lessThanOrEqualTo: 1,
+        },
+      },
+    ],
   },
 ];
