@@ -137,7 +137,9 @@ export class ScenariosController {
      * or just ...BaseService
      */
 
-    this.costSurface.convert(scenarioId, request);
+    this.costSurface.convert(scenarioId, request).then(() => {
+      //
+    });
     return;
   }
 

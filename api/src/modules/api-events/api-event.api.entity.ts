@@ -27,6 +27,11 @@ export enum API_EVENT_KINDS {
   user__passwordResetTokenGenerated__v1alpha1 = 'user.passwordResetTokenGenerated/v1alpha1',
   user__passwordResetSucceeded__v1alpha1 = 'user.passwordResetSucceeded/v1alpha1',
   user__passwordResetFailed__v1alpha1 = 'user.passwordResetFailed/v1alpha1',
+  scenario__costSurface__submitted__v1_alpha1 = 'scenario.costSurface.submitted/v1alpha1',
+  scenario__costSurface__shapeConverted__v1_alpha1 = 'scenario.costSurface.shapeConverted/v1alpha1',
+  scenario__costSurface__shapeConversionFailed__v1_alpha1 = 'scenario.costSurface.shapeConversionFailed/v1alpha1',
+  scenario__costSurface__costUpdateFailed__v1_alpha1 = 'scenario.costSurface.costUpdateFailed/v1alpha1',
+  scenario__costSurface__finished__v1_alpha1 = 'scenario.costSurface.finished/v1alpha1',
 }
 
 /**

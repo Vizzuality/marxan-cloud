@@ -17,11 +17,11 @@ import { isNil } from 'lodash';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
-} from 'utils/app-base.service';
+} from '../../utils/app-base.service';
 import { CreateApiEventDTO } from './dto/create.api-event.dto';
 import { UpdateApiEventDTO } from './dto/update.api-event.dto';
-import { AppInfoDTO } from 'dto/info.dto';
-import { AppConfig } from 'utils/config.utils';
+import { AppInfoDTO } from '../../dto/info.dto';
+import { AppConfig } from '../../utils/config.utils';
 
 @Injectable()
 /**

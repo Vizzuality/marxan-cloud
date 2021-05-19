@@ -21,6 +21,6 @@ export const logger = new Logger('ApiEvents');
   ],
   providers: [ApiEventsService],
   controllers: [ApiEventsController],
-  exports: [ApiEventsService],
+  exports: [ApiEventsService, TypeOrmModule],
 })
 export class ApiEventsModule {}
