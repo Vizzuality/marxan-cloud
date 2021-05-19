@@ -1,5 +1,5 @@
-describe("My First Test", () => {
-  it("Visits the Kitchen Sink", () => {
+describe("MVP Flow", () => {
+  it("Create project", () => {
     cy.visit("https://marxan.vercel.app/");
     cy.contains("Sign in").click();
 

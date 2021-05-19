@@ -5,6 +5,7 @@ on: [ push ]
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+    container: cypress/browsers:node12.18.3-chrome87-ff82
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -17,12 +18,19 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
+          browser: chrome
           working-directory: e2e-product-testing
           start: yarn cypress:ci
       - name: Upload Cypress Screenshots and Videos
         uses: actions/upload-artifact@v2
+        if: failure()
         with:
-          name: cypress-artifacts
+          name: cypress-screenshots
           path: |-
             e2e-product-testing/cypress/screenshots
+      - name: Upload Cypress Screenshots and Videos
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-videos
+          path: |-
             e2e-product-testing/cypress/videos
