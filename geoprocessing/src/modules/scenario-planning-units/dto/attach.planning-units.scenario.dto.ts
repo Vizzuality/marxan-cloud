@@ -9,8 +9,21 @@ import {
 import { Polygon } from 'geojson';
 
 /**
+<<<<<<< HEAD
  * @todo We have this enum duplicated in the api service
  * @file api/src/modules/projects/project.api.entity.ts
+=======
+ * @description
+ * With the scenario, we can easily retrieve the pus so we can attache them to the scenario
+ * Also if wdpaThreshold is in the data shared with the job we should concatenate it with the
+ * calculation of level of protection of the PUs
+ * @todo
+ * We have this dto partially duplicated in the api service in
+ * @file api/src/modules/scenarios/dto/create.scenario.dto.ts
+ *
+ * PlanningUnitsJob dto is a partial copy of the dto in
+ * @file api/src/modules/projects/dto/create.project.dto.ts
+>>>>>>> added reference from where the dto extended came from
  */
 export enum PlanningUnitGridShape {
   square = 'square',
