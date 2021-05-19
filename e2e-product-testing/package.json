@@ -1,0 +1,14 @@
+{
+  "name": "e2e-product-testing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:ci": "cypress run"
+  },
+  "devDependencies": {
+    "cypress": "^7.3.0",
+    "typescript": "^4.2.4"
+  }
+}

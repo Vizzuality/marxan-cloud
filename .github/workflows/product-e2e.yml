@@ -1,0 +1,26 @@
+name: Product e2e Tests
+
+on: [ push ]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 5
+          working-directory: e2e-product-testing
+      - name: Install
+        run: yarn
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          start: yarn cypress:ci
+      - name: Upload Cypress Screenshots and Videos
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-artifacts
+          path: |-
+            e2e-product-testing/cypress/screenshots
+            e2e-product-testing/cypress/videos
