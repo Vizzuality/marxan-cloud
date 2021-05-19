@@ -42,7 +42,6 @@ export class QueueService<NewJobInput, Opts extends JobsOptions = JobsOptions>
   }
 
   async onModuleDestroy(): Promise<void> {
-    console.log(`---- killing queues...`);
     await (await this.events.client).quit();
     await (await this.events.client).disconnect();
     await (await this.queue.client).quit();
