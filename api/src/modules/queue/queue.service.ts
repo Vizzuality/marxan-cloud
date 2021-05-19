@@ -45,6 +45,8 @@ export class QueueService<NewJobInput, Opts extends JobsOptions = JobsOptions>
     console.log(`---- killing queues...`);
     await (await this.events.client).quit();
     await (await this.events.client).disconnect();
+    await (await this.queue.client).quit();
+    await (await this.queue.client).disconnect();
     await this.events.close();
     await this.events.disconnect();
     await this.queue.close();

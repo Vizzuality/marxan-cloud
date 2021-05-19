@@ -35,6 +35,7 @@ describe(`when creating an event succeed`, () => {
   const kind = API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1;
 
   beforeEach(() => {
+    console.log(`---read from CI envs...`, process.env.API_SERVICE_URL);
     axiosMock
       .onPost(process.env.API_SERVICE_URL + `/v1/api-events`, {
         kind: 'user.accountActivationTokenGenerated/v1alpha1',

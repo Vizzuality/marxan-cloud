@@ -14,6 +14,7 @@ export const bootstrapApplication = async (): Promise<INestApplication> => {
 
   return moduleFixture
     .createNestApplication()
+    .enableShutdownHooks()
     .useGlobalPipes(
       new ValidationPipe({
         transform: true,

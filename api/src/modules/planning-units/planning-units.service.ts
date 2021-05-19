@@ -1,4 +1,4 @@
-import { Logger, Injectable } from '@nestjs/common';
+import { Logger, Injectable, OnModuleDestroy } from '@nestjs/common';
 
 import { Queue, QueueEvents } from 'bullmq';
 import * as config from 'config';
@@ -14,7 +14,7 @@ import { CreatePlanningUnitsDTO } from './dto/create.planning-units.dto';
  *
  **/
 @Injectable()
-export class PlanningUnitsService {
+export class PlanningUnitsService implements OnModuleDestroy {
   public readonly queueName: string = 'planning-units';
   private readonly logger: Logger = new Logger(
     `${this.queueName}-queue-publisher`,
@@ -27,6 +27,7 @@ export class PlanningUnitsService {
     this.queueName,
     config.get('redisApi'),
   );
+
   constructor() {
     this.queueEvents.on('completed', (args) => {
       this.logger.log(
@@ -39,6 +40,7 @@ export class PlanningUnitsService {
       );
     });
   }
+
   /** @description A job should only be triggered when:
    * * An area(extent)/region/custom grid is not supplied -> nothing is triggered
    * * A custom extent (area) is supplied, but not a planning unit area type + grid size or user grid -> nothing is triggered
@@ -62,6 +64,10 @@ export class PlanningUnitsService {
   }
 
   public async onModuleDestroy(): Promise<void> {
+    await (await this.queueEvents.client).quit();
+    await (await this.queueEvents.client).disconnect();
+    await (await this.planningUnitsQueue.client).quit();
+    await (await this.planningUnitsQueue.client).disconnect();
     await this.queueEvents.close();
     await this.queueEvents.disconnect();
     await this.planningUnitsQueue.close();
