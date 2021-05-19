@@ -9,6 +9,7 @@ import { PlanningUnitsService } from './planning-units.service';
 import { FileService } from '../files/files.service';
 
 import { WorkerModule } from '../worker/worker.module';
+import { FileService } from 'src/utils/file.utils';
 
 @Module({
   imports: [
