@@ -18,6 +18,7 @@ import { ResolvePuWithCost } from './cost-surface/resolve-pu-with-cost';
 import { CostSurfaceEventsPort } from './cost-surface/cost-surface-events.port';
 import { GeoprocessingCostFromShapefile } from './cost-surface/adapters/geoprocessing-cost-from-shapefile';
 import { CostSurfaceApiEvents } from './cost-surface/adapters/cost-surface-api-events';
+import { ApiEventsModule } from '../api-events/api-events.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CostSurfaceApiEvents } from './cost-surface/adapters/cost-surface-api-e
     UsersModule,
     ScenarioFeaturesModule,
     AnalysisModule,
+    ApiEventsModule,
   ],
   providers: [
     ScenariosService,
