@@ -14,7 +14,7 @@ import * as config from 'config';
  **/
 @Injectable()
 export class AttachPlanningUnitGridToScenarioProcessor {
-  private readonly queueName: string = 'scenario-planning-units';
+  private readonly queueName: string = 'attach-scenario-planning-units';
   private readonly logger: Logger = new Logger(
     AttachPlanningUnitGridToScenarioProcessor.name,
   );

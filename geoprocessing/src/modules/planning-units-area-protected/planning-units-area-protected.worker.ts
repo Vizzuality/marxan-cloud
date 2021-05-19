@@ -13,7 +13,7 @@ import * as config from 'config';
  **/
 @Injectable()
 export class CalculatePlanningUnitAreaProtectedProcessor {
-  private readonly queueName: string = 'planning-units';
+  private readonly queueName: string = 'planning-units-protection-level';
   private readonly logger: Logger = new Logger(
     CalculatePlanningUnitAreaProtectedProcessor.name,
   );
