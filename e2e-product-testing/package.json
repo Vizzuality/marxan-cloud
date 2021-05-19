@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "cypress:open": "cypress open",
-    "cypress:ci": "cypress run"
+    "cypress:ci": "cypress run --headless --browser chrome"
   },
   "devDependencies": {
     "cypress": "^7.3.0",
