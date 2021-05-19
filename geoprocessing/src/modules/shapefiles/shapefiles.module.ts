@@ -4,7 +4,7 @@ import {
   ExtractSurfaceCostFromShapefile,
   ShapefileSurfaceCostService,
 } from './shapefile-surface-cost';
-import { ShapeFileService } from './shapefiles.service';
+import { ShapefileService } from './shapefiles.service';
 
 /**
  * Module purposes:
@@ -20,13 +20,13 @@ import { ShapeFileService } from './shapefiles.service';
       useClass: ShapefileSurfaceCostService,
     },
     // TODO debt - include shapefiles service and change its usage
-    ShapeFileService,
+    ShapefileService,
     // internal
     {
       provide: ExtractCostSurface,
       useClass: SurfaceCostService,
     },
   ],
-  exports: [ShapeFileService, ExtractSurfaceCostFromShapefile],
+  exports: [ShapefileService, ExtractSurfaceCostFromShapefile],
 })
 export class ShapefilesModule {}
