@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - feat/product-e2e
   schedule:
     - cron: '0 7 * * *'
 
