@@ -3,14 +3,14 @@ import { ExtractSurfaceCostFromShapefile } from './ports/extract-surface-cost-fr
 import { PlanningUnitCost } from './ports/planning-unit-cost';
 import { ShapefileSurfaceCostInput } from './ports/shapefile-surface-cost-input';
 
-import { ShapeFileService } from '../shapefiles.service';
+import { ShapefileService } from '../shapefiles.service';
 import { ExtractCostSurface } from '../extract-cost-surface';
 
 @Injectable()
 export class ShapefileSurfaceCostService
   implements ExtractSurfaceCostFromShapefile {
   constructor(
-    private readonly fileConverter: ShapeFileService,
+    private readonly fileConverter: ShapefileService,
     private readonly extractor: ExtractCostSurface,
   ) {}
 
