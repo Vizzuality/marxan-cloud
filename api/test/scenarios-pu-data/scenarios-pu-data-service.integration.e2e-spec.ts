@@ -4,6 +4,7 @@ import { bootstrapApplication } from '../utils/api-application';
 import { ScenariosPlanningUnitService } from '../../src/modules/scenarios-planning-unit/scenarios-planning-unit.service';
 import { LockStatus } from '../../src/modules/scenarios-planning-unit/lock-status.enum';
 import { createWorld, World } from './steps/world';
+import { tearDown } from '../utils/tear-down';
 
 let app: INestApplication;
 let service: ScenariosPlanningUnitService;
@@ -18,6 +19,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await world.cleanup();
+  await tearDown();
 });
 
 describe(`scenarios-pu-data fetch`, () => {

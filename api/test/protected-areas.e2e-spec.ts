@@ -23,6 +23,11 @@ import { ScenariosTestUtils } from './utils/scenarios.test.utils';
 import { Scenario } from 'modules/scenarios/scenario.api.entity';
 import { v4 } from 'uuid';
 import { difference } from 'lodash';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
 
 /**
  * Tests for API contracts for the management of protected areas within

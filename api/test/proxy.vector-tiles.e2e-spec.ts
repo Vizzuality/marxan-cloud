@@ -2,6 +2,11 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
 
 // import { ProxyService } from '../src/modules/proxy/proxy.service'
 describe.skip('ProxyVectorTilesModule (e2e)', () => {

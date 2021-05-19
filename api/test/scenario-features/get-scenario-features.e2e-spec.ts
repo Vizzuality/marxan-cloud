@@ -3,6 +3,7 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { WhenUserGetsScenarioGapAnalysis } from '../steps/when-user-gets-scenario-gap-analysis';
 import { bootstrapApplication } from '../utils/api-application';
 import { WhenScenarioHasPreGapData } from './steps/when-scenario-has-pre-gap-data';
+import { tearDown } from '../utils/tear-down';
 
 let app: INestApplication;
 let jwtToken: string;
@@ -14,6 +15,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await Promise.all([app.close()]);
+  await tearDown();
 });
 
 describe(`when user is logged in`, () => {

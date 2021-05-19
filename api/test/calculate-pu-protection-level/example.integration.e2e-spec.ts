@@ -5,6 +5,7 @@ import { FakeQueue } from '../utils/queues';
 import { QueueToken } from '../../src/modules/queue/queue.tokens';
 import { CalculatePlanningUnitsProtectionLevel } from '../../src/modules/planning-units-protection-level/calculate-planning-units-protection-level.command';
 import { v4 } from 'uuid';
+import { tearDown } from '../utils/tear-down';
 
 let app: INestApplication;
 let queue: FakeQueue;
@@ -18,6 +19,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await app.close();
+  await tearDown();
 });
 
 describe(`when requesting update`, () => {

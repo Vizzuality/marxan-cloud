@@ -13,6 +13,11 @@ import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
 import { Job } from 'bullmq';
 import { PlanningUnitsService } from 'modules/planning-units/planning-units.service';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
 
 describe('PlanningUnitsModule (e2e)', () => {
   const logger: Logger = new Logger('tests-planning-units');

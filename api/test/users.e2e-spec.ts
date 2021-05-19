@@ -24,6 +24,7 @@ import { UsersModule } from 'modules/users/users.module';
 import { UsersService } from 'modules/users/users.service';
 import { LoginDto } from 'modules/authentication/dto/login.dto';
 import { ApiEventByTopicAndKind } from 'modules/api-events/api-event.topic+kind.api.entity';
+import { tearDown } from './utils/tear-down';
 
 /**
  * Tests for the UsersModule.
@@ -37,6 +38,10 @@ import { ApiEventByTopicAndKind } from 'modules/api-events/api-event.topic+kind.
  *
  * Please be mindful of this when adding new tests or updating existing ones.
  */
+
+afterAll(async () => {
+  await tearDown();
+});
 
 describe('UsersModule (e2e)', () => {
   let app: INestApplication;

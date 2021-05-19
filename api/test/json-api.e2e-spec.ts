@@ -9,6 +9,11 @@ import { Organization } from 'modules/organizations/organization.api.entity';
 import { OrganizationsTestUtils } from './utils/organizations.test.utils';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Project } from 'modules/projects/project.api.entity';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
 
 describe('JSON API Specs (e2e)', () => {
   let app: INestApplication;
