@@ -37,6 +37,14 @@ export class Country {
   @ApiProperty()
   @Column('geometry', { name: 'the_geom' })
   theGeom: any;
+
+   /**
+   * Bbox.
+   */
+    @ApiProperty()
+    @Column('character varying', { name: 'bbox' })
+    bbox!: number[];
+
 }
 
 export class JSONAPICountryData {
