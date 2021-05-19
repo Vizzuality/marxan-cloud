@@ -13,9 +13,11 @@ jobs:
           working-directory: e2e-product-testing
       - name: Install
         run: yarn
+        working-directory: e2e-product-testing
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
+          working-directory: e2e-product-testing
           start: yarn cypress:ci
       - name: Upload Cypress Screenshots and Videos
         uses: actions/upload-artifact@v2
