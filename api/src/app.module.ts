@@ -33,11 +33,11 @@ import { AnalysisModule } from './modules/analysis/analysis.module';
   imports: [
     TypeOrmModule.forRoot({
       ...apiConnections.default,
-      keepConnectionAlive: true,
+      // keepConnectionAlive: true,
     }),
     TypeOrmModule.forRoot({
       ...apiConnections.geoprocessingDB,
-      keepConnectionAlive: true,
+      // keepConnectionAlive: true,
     }),
     CqrsModule,
     AdminAreasModule,

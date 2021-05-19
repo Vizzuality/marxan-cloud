@@ -1,13 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
-import { E2E_CONFIG } from './e2e.config';
 import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 
 // import { ProxyService } from '../src/modules/proxy/proxy.service'
-describe('ProxyVectorTilesModule (e2e)', () => {
+describe.skip('ProxyVectorTilesModule (e2e)', () => {
   let app: INestApplication;
 
   let jwtToken: string;

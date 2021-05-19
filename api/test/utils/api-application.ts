@@ -12,13 +12,14 @@ export const bootstrapApplication = async (): Promise<INestApplication> => {
     .useValue(new FakeQueue()) // https://github.com/nestjs/nest/issues/2303#issuecomment-507563175
     .compile();
 
-  const app = moduleFixture.createNestApplication();
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
-  return app.init();
+  return moduleFixture
+    .createNestApplication()
+    .useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    )
+    .init();
 };
