@@ -16,5 +16,3 @@ module.exports = [
   apiConnections.default,
   apiConnections.geoprocessingDB
 ];
-
-Logger.debug(inspect(module.exports));

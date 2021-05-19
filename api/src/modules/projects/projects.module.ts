@@ -10,6 +10,7 @@ import { AdminAreasModule } from 'modules/admin-areas/admin-areas.module';
 import { CountriesModule } from 'modules/countries/countries.module';
 import { PlanningUnitsModule } from 'modules/planning-units/planning-units.module';
 import { GeoFeaturesModule } from 'modules/geo-features/geo-features.module';
+import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { GeoFeaturesModule } from 'modules/geo-features/geo-features.module';
     TypeOrmModule.forFeature([Project]),
     UsersModule,
     PlanningUnitsModule,
+    ProtectedAreasModule,
   ],
   providers: [ProjectsService],
   controllers: [ProjectsController],

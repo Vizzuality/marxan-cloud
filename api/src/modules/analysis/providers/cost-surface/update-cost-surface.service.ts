@@ -12,6 +12,8 @@ export class UpdateCostSurfaceService implements AdjustCostSurface {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     constraints: CostSurfaceInputDto,
   ): Promise<Success> {
+    // TODO 1 validate if pu ids are allowed (probably use existing code from planning-units)
+    // TODO 2 update geoDb
     return true;
   }
 }

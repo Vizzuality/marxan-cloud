@@ -76,6 +76,7 @@
     "@types/unzipper": "^0.10.3",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
+    "axios-mock-adapter": "1.19.0",
     "bunyan": "^1.8.14",
     "eslint": "^7.12.1",
     "eslint-config-prettier": "^6.15.0",

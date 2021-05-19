@@ -24,6 +24,7 @@ export class PlanningUnitsProcessor {
     this.queueName,
     config.get('redisApi'),
   );
+
   constructor() {
     this.logger.debug('worker');
     this.worker.on('completed', async (job) => {
