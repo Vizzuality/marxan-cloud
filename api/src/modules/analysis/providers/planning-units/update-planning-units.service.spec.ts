@@ -1,10 +1,10 @@
 import { UpdatePlanningUnitsService } from './update-planning-units.service';
 import { Test } from '@nestjs/testing';
 
-import { ArePuidsAllowedPort } from './are-puids-allowed.port';
+import { ArePuidsAllowedPort } from '../shared/are-puids-allowed.port';
 import { RequestJobPort } from './request-job.port';
 
-import { ArePuidsAllowedMock } from './__mocks__/are-puuids-allowed.mock';
+import { ArePuidsAllowedMock } from '../shared/__mocks__/are-puuids-allowed.mock';
 import { RequestJobPortMock } from './__mocks__/request-job-port.mock';
 import { validGeoJson } from './__mocks__/geojson';
 
