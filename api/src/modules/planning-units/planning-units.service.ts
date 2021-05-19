@@ -64,10 +64,6 @@ export class PlanningUnitsService implements OnModuleDestroy {
   }
 
   public async onModuleDestroy(): Promise<void> {
-    await (await this.queueEvents.client).quit();
-    await (await this.queueEvents.client).disconnect();
-    await (await this.planningUnitsQueue.client).quit();
-    await (await this.planningUnitsQueue.client).disconnect();
     await this.queueEvents.close();
     await this.queueEvents.disconnect();
     await this.planningUnitsQueue.close();
