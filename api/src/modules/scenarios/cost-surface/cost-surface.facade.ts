@@ -17,9 +17,10 @@ export class CostSurfaceFacade {
   ) {}
 
   /**
-   * non blocking - will do job in "background"
+   * Performs potentially long-lasting operation. No result is returned directly.
+   * The status of the job is handled by another module which aggregates such.
    */
-  async convert(scenarioId: string, request: Request) {
+  async convert(scenarioId: string, request: Request): Promise<void> {
     await this.events.event(scenarioId, CostSurfaceState.Submitted);
     let costSurface: CostSurfaceInputDto;
 
@@ -34,7 +35,7 @@ export class CostSurfaceFacade {
     }
 
     await this.events.event(scenarioId, CostSurfaceState.ShapefileConverted);
-    this.adjustCostSurfaceService
+    return this.adjustCostSurfaceService
       .update(scenarioId, costSurface)
       .then(() => this.events.event(scenarioId, CostSurfaceState.Finished))
       .catch(async () => {
