@@ -111,7 +111,8 @@
     "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^4.2.2",
-    "typescript-coverage-report": "^0.4.0"
+    "typescript-coverage-report": "^0.4.0",
+    "utility-types": "^3.10.0"
   },
   "jest": {
     "moduleFileExtensions": [
