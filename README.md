@@ -42,6 +42,9 @@ orchestrated via Kubernetes (forthcoming).
      similarly to `API_AUTH_JWT_SECRET`
    * `API_SERVICE_PORT` (number, required): the port on which the API service should
      listen on the local machine
+   * `API_SERVICE_URL` (URL, optional, default is http://api:3000): the internal
+     (docker-compose or k8s cluster) where the API service can be reached by
+     other services running in the cluster
    * `API_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default is
      `true`): set this to `false` if migrations for the API service should not
      run automatically on startup
