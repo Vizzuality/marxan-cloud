@@ -3,6 +3,7 @@ services:
   api:
     environment:
       - API_SERVICE_PORT
+      - API_SERVICE_URL
       - API_AUTH_JWT_SECRET
       - API_RUN_MIGRATIONS_ON_STARTUP
       - API_LOGGING_MUTE_ALL
@@ -23,6 +24,7 @@ services:
   geoprocessing:
     environment:
       - API_SERVICE_PORT
+      - API_SERVICE_URL
       - API_AUTH_JWT_SECRET
       - API_RUN_MIGRATIONS_ON_STARTUP
       - API_LOGGING_MUTE_ALL
@@ -43,6 +45,7 @@ services:
   test-e2e-postgresql-api:
     environment:
       - API_SERVICE_PORT
+      - API_SERVICE_URL
       - API_AUTH_JWT_SECRET
       - API_RUN_MIGRATIONS_ON_STARTUP
       - API_POSTGRES_USER
@@ -61,6 +64,7 @@ services:
   test-e2e-postgresql-geo-api:
     environment:
       - API_SERVICE_PORT
+      - API_SERVICE_URL
       - API_AUTH_JWT_SECRET
       - API_RUN_MIGRATIONS_ON_STARTUP
       - API_POSTGRES_USER
