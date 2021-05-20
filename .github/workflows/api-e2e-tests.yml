@@ -11,6 +11,7 @@ jobs:
     timeout-minutes: 15
     env:
       API_SERVICE_PORT: 3130
+      API_SERVICE_URL: http://api:3000
       API_AUTH_JWT_SECRET: ${{ secrets.API_AUTH_JWT_SECRET }}
       API_RUN_MIGRATIONS_ON_STARTUP: "true"
       API_AUTH_X_API_KEY: ${{ secrets.API_AUTH_X_API_KEY }}
