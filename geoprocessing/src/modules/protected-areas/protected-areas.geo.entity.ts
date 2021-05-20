@@ -6,6 +6,19 @@ import { Check, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { MultiPolygon } from 'geojson';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 
+export enum IUCNCategory {
+  Ia = 'Ia',
+  Ib = 'Ib',
+  II = 'II',
+  III = 'III',
+  IV = 'IV',
+  V = 'V',
+  VI = 'VI',
+  NotApplicable = 'Not Applicable',
+  NotAssigned = 'Not Assigned',
+  NotReported = 'Not Reported',
+}
+
 /**
  *  represents spatial data using longitude and latitude coordinates on the Earth's surface as defined in the WGS84 standard, which is also used for the Global Positioning System (GPS)
  */
@@ -43,9 +56,10 @@ export class ProtectedArea extends TimeUserEntityMetadata {
 
   @Column({
     type: 'float8',
+    name: 'wdpaid',
     nullable: true,
   })
-  wdpaid?: number | null;
+  wdpaId?: number | null;
 
   @Column({
     name: 'full_name',
@@ -56,35 +70,45 @@ export class ProtectedArea extends TimeUserEntityMetadata {
 
   @Column({
     type: 'varchar',
+    name: 'iucn_cat',
     nullable: true,
   })
-  iucn_cat?: string | null; //'Not Applicable' | 'Not Reported';
+  iucnCategory?: IUCNCategory | null;
 
   @Column({
     type: 'float8',
+    name: 'shape_leng',
     nullable: true,
   })
-  shape_leng?: number | null;
+  shapeLength?: number | null;
 
   @Column({
     type: 'float8',
+    name: 'shape_area',
     nullable: true,
   })
-  shape_area?: number | null;
+  shapeArea?: number | null;
 
   @Column({
     type: 'text',
+    name: 'desig',
     nullable: true,
   })
-  desig?: string | null;
+  designation?: string | null;
 
+  /**
+   * Country where the protected area is located.
+   *
+   * This references the admin_regions.gid_0 column.
+   */
   @Column({
     type: 'character varying',
+    name: 'iso3',
     length: 3,
     comment: '',
     nullable: true,
   })
-  iso3?: string | null;
+  countryId?: string | null;
 
   @Column({
     type: 'uuid',
