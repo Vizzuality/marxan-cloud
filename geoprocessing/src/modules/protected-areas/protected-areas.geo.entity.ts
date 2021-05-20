@@ -22,7 +22,7 @@ export class ProtectedArea extends TimeUserEntityMetadata {
    */
   @ApiProperty()
   @Column('text', { name: 'status', nullable: true })
-  status!: string;
+  status?: string | null;
 
   /**
    * geometry column.
@@ -85,4 +85,11 @@ export class ProtectedArea extends TimeUserEntityMetadata {
     nullable: true,
   })
   iso3?: string | null;
+
+  @Column({
+    type: 'uuid',
+    nullable: true,
+    name: 'project_id',
+  })
+  projectId?: string | null;
 }
