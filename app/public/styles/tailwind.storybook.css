@@ -18042,7 +18042,6 @@ input[type='search']::-webkit-search-decoration,
 }
 
 .sticky {
-  position: -webkit-sticky;
   position: sticky;
 }
 
@@ -48435,7 +48434,6 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .sm\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -78698,7 +78696,6 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .md\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -108961,7 +108958,6 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .lg\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -139224,7 +139220,6 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .xl\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -169487,7 +169482,6 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .\32xl\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
