@@ -5,6 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Check, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { MultiPolygon } from 'geojson';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
+import { defaultSrid } from '../../types/spatial-data-format';
 
 export enum IUCNCategory {
   Ia = 'Ia',
@@ -18,11 +19,6 @@ export enum IUCNCategory {
   NotAssigned = 'Not Assigned',
   NotReported = 'Not Reported',
 }
-
-/**
- *  represents spatial data using longitude and latitude coordinates on the Earth's surface as defined in the WGS84 standard, which is also used for the Global Positioning System (GPS)
- */
-const srid = 4326;
 
 @Entity('wdpa')
 export class ProtectedArea extends TimeUserEntityMetadata {
@@ -48,7 +44,7 @@ export class ProtectedArea extends TimeUserEntityMetadata {
   @Column('geometry', {
     name: 'the_geom',
     spatialFeatureType: 'MultiPolygon',
-    srid,
+    srid: defaultSrid,
     select: false,
     nullable: true,
   })
