@@ -1,11 +1,13 @@
 import { Job } from 'bullmq';
+import { WorkerProcessor } from '../../src/modules/worker';
 
-const exampleWorkerJobProcessor = async (
-  job: Pick<Job<Record<string, unknown>>, 'data' | 'id' | 'name'>,
-) => {
-  return {
-    inputCopy: job.data,
-  };
-};
-
-export default exampleWorkerJobProcessor;
+export class ExampleWorkerJobProcessor extends WorkerProcessor<
+  Record<string, unknown>,
+  { inputCopy: Record<string, unknown> }
+> {
+  async process(job: Job) {
+    return {
+      inputCopy: job.data,
+    };
+  }
+}

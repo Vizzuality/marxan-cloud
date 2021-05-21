@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
-import { Queue } from 'bullmq';
+import { Injectable } from '@nestjs/common';
+import { Queue, Worker } from 'bullmq';
 import * as config from 'config';
 
-import { WorkerModule } from '../../src/modules/worker/worker.module';
-import { WorkerService } from '../../src/modules/worker/worker.service';
-import exampleWorkerJobProcessor from './bullmq-worker-code';
+import { ExampleWorkerJobProcessor } from './bullmq-worker-code';
+import { WorkerModule, WorkerResolver } from '../../src/modules/worker';
 
 let app: TestingModule;
 let queue: Queue;
@@ -18,12 +17,7 @@ const queueName = 'test-queue';
  */
 beforeAll(async () => {
   const sandbox = await Test.createTestingModule({
-    imports: [
-      WorkerModule.register({
-        name: queueName,
-        worker: exampleWorkerJobProcessor,
-      }),
-    ],
+    imports: [WorkerModule],
     providers: [ExampleProcessingService],
   }).compile();
   app = await sandbox.init();
@@ -66,23 +60,20 @@ const jobInput = Object.freeze({
 
 const delay = (ms = 1000) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Example service which uses WorkerModule;
-// it can decide to post ApiEvents on various job results
 @Injectable()
-export class ExampleProcessingService implements OnModuleDestroy {
+export class ExampleProcessingService {
   onCompleteMock = jest.fn();
   onFailedMock = jest.fn();
 
-  constructor(private readonly workerService: WorkerService<typeof jobInput>) {
-    this.workerService.registerEventHandler('completed', ({ returnvalue }) => {
+  #worker: Worker;
+
+  constructor(private readonly wrapper: WorkerResolver) {
+    this.#worker = wrapper.wrap(queueName, new ExampleWorkerJobProcessor());
+    this.#worker.on('completed', ({ returnvalue }) => {
       this.onCompleteMock(returnvalue);
     });
-    this.workerService.registerEventHandler('failed', ({ failedReason }) => {
+    this.#worker.on('failed', ({ failedReason }) => {
       this.onFailedMock(failedReason);
     });
-  }
-
-  async onModuleDestroy(): Promise<void> {
-    await this.workerService.onModuleDestroy();
   }
 }
