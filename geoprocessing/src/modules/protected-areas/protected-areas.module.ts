@@ -15,6 +15,6 @@ import { ProtectedAreaWorkerModule } from './worker/protected-area-worker.module
   ],
   providers: [ProtectedAreasService],
   controllers: [ProtectedAreasController],
-  exports: [ProtectedAreasService],
+  exports: [ProtectedAreasService, TypeOrmModule],
 })
 export class ProtectedAreasModule {}
