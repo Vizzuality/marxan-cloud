@@ -1,4 +1,12 @@
-import { Controller, Get, Header, Param, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Header,
+  HttpStatus,
+  Param,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import * as express from 'express';
 import {
   ApiAcceptedResponse,
@@ -12,15 +20,17 @@ import { scenarioResource } from './scenario.api.entity';
 import {
   FileNotFound,
   FileNotReady,
-  CostTemplateService,
-} from './cost-template.service';
+  ScenarioCostSurfaceTemplateService,
+} from './scenario-cost-surface-template.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios/:id/cost-surface`)
 export class CostSurfaceTemplateController {
-  constructor(private readonly shapefileTemplates: CostTemplateService) {}
+  constructor(
+    private readonly scenarioCostSurfaceTemplateService: ScenarioCostSurfaceTemplateService,
+  ) {}
 
   @Get('shapefile-template')
   @ApiAcceptedResponse()
@@ -35,19 +45,21 @@ export class CostSurfaceTemplateController {
     @Param('id') id: string,
     @Res() res: express.Response,
   ): Promise<void> {
-    const shapefileStatus = await this.shapefileTemplates.getShapefileCostTemplate(
+    const shapefileStatus = await this.scenarioCostSurfaceTemplateService.getTemplateShapefile(
       id,
       res,
     );
 
     if (shapefileStatus === FileNotReady) {
-      res.status(202).send();
+      res.status(HttpStatus.ACCEPTED).send();
       return;
     }
 
     if (shapefileStatus === FileNotFound) {
-      this.shapefileTemplates.scheduleShapefileCostTemplateCreation(id);
-      res.status(202).send();
+      this.scenarioCostSurfaceTemplateService.scheduleTemplateShapefileCreation(
+        id,
+      );
+      res.status(HttpStatus.ACCEPTED).send();
       return;
     }
   }

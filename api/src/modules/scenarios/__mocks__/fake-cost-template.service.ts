@@ -1,21 +1,21 @@
 import * as stream from 'stream';
 import {
-  CostTemplateService,
+  ScenarioCostSurfaceTemplateService,
   FileNotFound,
   FileNotReady,
   FilePiped,
-} from '../cost-template.service';
+} from '../scenario-cost-surface-template.service';
 
-export class FakeCostTemplateService extends CostTemplateService {
+export class FakeCostTemplateService extends ScenarioCostSurfaceTemplateService {
   scheduledTemplateCreation: string[] = [];
   templatesInProgress: string[] = [];
   availableTemplatesForScenarios: Record<string, string> = {};
 
-  scheduleShapefileCostTemplateCreation(scenarioId: string) {
+  scheduleTemplateShapefileCreation(scenarioId: string) {
     this.scheduledTemplateCreation.push(scenarioId);
   }
 
-  async getShapefileCostTemplate(
+  async getTemplateShapefile(
     scenarioId: string,
     writableStream: stream.Writable,
   ) {

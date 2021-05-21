@@ -4,7 +4,7 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 import { CostSurfaceTemplateController } from './cost-surface-template.controller';
-import { CostTemplateService } from './cost-template.service';
+import { ScenarioCostSurfaceTemplateService } from './scenario-cost-surface-template.service';
 import { FakeCostTemplateService } from './__mocks__/fake-cost-template.service';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
@@ -104,7 +104,7 @@ const getFixtures = async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     providers: [
       {
-        provide: CostTemplateService,
+        provide: ScenarioCostSurfaceTemplateService,
         useClass: FakeCostTemplateService,
       },
     ],
@@ -115,7 +115,7 @@ const getFixtures = async () => {
   await app.init();
 
   const fakeShapefileService: FakeCostTemplateService = app.get(
-    CostTemplateService,
+    ScenarioCostSurfaceTemplateService,
   );
 
   const fixtures = {

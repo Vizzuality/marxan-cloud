@@ -6,10 +6,10 @@ export const FileNotReady = Symbol();
 
 export const FilePiped = Symbol();
 
-export abstract class CostTemplateService {
-  abstract scheduleShapefileCostTemplateCreation(scenarioId: string): void;
+export abstract class ScenarioCostSurfaceTemplateService {
+  abstract scheduleTemplateShapefileCreation(scenarioId: string): void;
 
-  abstract getShapefileCostTemplate(
+  abstract getTemplateShapefile(
     scenarioId: string,
     stream: stream.Writable,
   ): Promise<typeof FileNotFound | typeof FileNotReady | typeof FilePiped>;
