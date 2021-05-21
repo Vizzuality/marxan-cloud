@@ -27,6 +27,11 @@ import {
   GeoFeature,
   geoFeatureResource,
 } from 'modules/geo-features/geo-feature.api.entity';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
 
 /**
  * Tests for API contracts for the management of geo features within scenarios.

@@ -12,7 +12,7 @@ case "$1" in
         ;;
     test-e2e)
         echo "Running e2e Tests"
-        exec yarn test:e2e
+        exec yarn test:e2e --runInBand --ci --detectOpenHandles --forceExit
         ;;
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (geoprocessing db) for e2e Tests(ESC)[0m"

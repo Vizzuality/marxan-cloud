@@ -4,6 +4,11 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
 
 describe('OrganizationsController (e2e)', () => {
   let app: INestApplication;

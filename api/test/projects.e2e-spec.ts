@@ -16,6 +16,11 @@ import {
   Organization,
   OrganizationResultSingular,
 } from 'modules/organizations/organization.api.entity';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
 
 describe('ProjectsModule (e2e)', () => {
   let app: INestApplication;

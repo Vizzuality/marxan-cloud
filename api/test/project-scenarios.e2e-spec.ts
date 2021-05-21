@@ -6,8 +6,13 @@ import { FakeQueue } from './utils/queues';
 import { QueueToken } from '../src/modules/queue/queue.tokens';
 import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+import { tearDown } from './utils/tear-down';
 
 let queue: FakeQueue;
+
+afterAll(async () => {
+  await tearDown();
+});
 
 describe('ScenariosModule (e2e)', () => {
   let app: INestApplication;

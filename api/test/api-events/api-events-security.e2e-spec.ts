@@ -1,6 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { bootstrapApplication } from '../utils/api-application';
 import * as request from 'supertest';
+import { tearDown } from '../utils/tear-down';
 
 let app: INestApplication;
 
@@ -10,6 +11,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await Promise.all([app.close()]);
+  await tearDown();
 });
 
 describe(`when getting events without api-key`, () => {

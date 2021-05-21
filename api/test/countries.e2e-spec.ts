@@ -5,6 +5,11 @@ import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { JSONAPICountryData } from 'modules/countries/country.geo.entity';
 import { JSONAPIAdminAreaData } from 'modules/admin-areas/admin-area.geo.entity';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
 
 describe('CountriesModule (e2e)', () => {
   let app: INestApplication;

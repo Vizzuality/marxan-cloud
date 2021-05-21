@@ -3,6 +3,11 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;

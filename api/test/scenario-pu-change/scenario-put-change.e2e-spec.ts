@@ -9,6 +9,7 @@ import { QueueToken } from '../../src/modules/queue/queue.tokens';
 import { ExpectBadRequest } from './assertions/expect-bad-request';
 import { HasRelevantJobName } from './assertions/has-relevant-job-name';
 import { HasExpectedJobDetails } from './assertions/has-expected-job-details';
+import { tearDown } from '../utils/tear-down';
 
 let app: INestApplication;
 let jwtToken: string;
@@ -27,6 +28,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await world.cleanup();
   await app.close();
+  await tearDown();
 });
 
 describe(`when requesting to change inclusive options`, () => {

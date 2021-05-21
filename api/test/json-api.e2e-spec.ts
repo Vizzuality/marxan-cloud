@@ -9,13 +9,18 @@ import { Organization } from 'modules/organizations/organization.api.entity';
 import { OrganizationsTestUtils } from './utils/organizations.test.utils';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Project } from 'modules/projects/project.api.entity';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
 
 describe('JSON API Specs (e2e)', () => {
   let app: INestApplication;
   let jwtToken: string;
   let fakeOrganization: Organization;
   let fakeProject: Project;
-  const fakeCountry: string = 'ESP';
+  const fakeCountry = 'ESP';
   const Deserializer = new JSONAPISerializer.Deserializer({
     keyForAttribute: 'camelCase',
   });
@@ -82,7 +87,9 @@ describe('JSON API Specs (e2e)', () => {
     };
 
     const response = await request(app.getHttpServer())
-      .get(`/api/v1/projects/invalidProjectIdToTriggerAnError/features?q=fakeFeature`)
+      .get(
+        `/api/v1/projects/invalidProjectIdToTriggerAnError/features?q=fakeFeature`,
+      )
       .set('Authorization', `Bearer ${jwtToken}`);
 
     response.body.errors.forEach((err: any) => {
@@ -92,15 +99,15 @@ describe('JSON API Specs (e2e)', () => {
       /**
        * Should not include rawError and stack props in meta object if app is running on prod env
        */
-      if (process.env.NODE_ENV !== 'development') {
+      // Debt: this test isn't reliable and should be refactored (ideally to out of e2e scope)
+      if (
+        process.env.NODE_ENV !== 'development' &&
+        process.env.NODE_ENV !== 'test'
+      ) {
         expect(Object.keys(err.meta)).toEqual(
           Object.keys(omit(jsonApiErrorResponse.meta, ['rawError', 'stack'])),
         );
-      }
-      if (
-        process.env.NODE_ENV === 'development' ||
-        process.env.NODE_ENV === 'test'
-      ) {
+      } else {
         expect(Object.keys(err.meta)).toEqual(
           Object.keys(jsonApiErrorResponse.meta),
         );

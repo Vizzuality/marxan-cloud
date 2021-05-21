@@ -1,6 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { bootstrapApplication } from '../utils/api-application';
 import { createWorld, World } from './steps/world';
+import { tearDown } from '../utils/tear-down';
 
 let app: INestApplication;
 let world: World;
@@ -13,6 +14,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await world.cleanup();
   await app.close();
+  await tearDown();
 });
 
 describe(`when project is not available`, () => {

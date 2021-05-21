@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import * as config from 'config';
 
@@ -38,22 +38,26 @@ afterAll(async () => {
   await queue.close();
   await queue.disconnect();
   await app.close();
-});
+}, 10 * 1000);
 
 describe(`when submitting a job`, () => {
-  it(`should process the job by relevant worker`, async () => {
-    // Act - simulate pushing a job to queue
-    const job = await queue.add('test-job', {
-      test: 'data',
-    });
-    expect(job.id).toBeDefined();
+  it(
+    `should process the job by relevant worker`,
+    async () => {
+      // Act - simulate pushing a job to queue
+      const job = await queue.add('test-job', {
+        test: 'data',
+      });
+      expect(job.id).toBeDefined();
 
-    await delay(1000);
-    expect(processor.onFailedMock.mock.calls).toEqual([]);
-    expect(processor.onCompleteMock.mock.calls[0][0]).toEqual({
-      inputCopy: jobInput,
-    });
-  });
+      await delay(1000);
+      expect(processor.onFailedMock.mock.calls).toEqual([]);
+      expect(processor.onCompleteMock.mock.calls[0][0]).toEqual({
+        inputCopy: jobInput,
+      });
+    },
+    10 * 1000,
+  );
 });
 
 const jobInput = Object.freeze({
@@ -65,7 +69,7 @@ const delay = (ms = 1000) => new Promise((resolve) => setTimeout(resolve, ms));
 // Example service which uses WorkerModule;
 // it can decide to post ApiEvents on various job results
 @Injectable()
-export class ExampleProcessingService {
+export class ExampleProcessingService implements OnModuleDestroy {
   onCompleteMock = jest.fn();
   onFailedMock = jest.fn();
 
@@ -76,5 +80,9 @@ export class ExampleProcessingService {
     this.workerService.registerEventHandler('failed', ({ failedReason }) => {
       this.onFailedMock(failedReason);
     });
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.workerService.onModuleDestroy();
   }
 }
