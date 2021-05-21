@@ -100,7 +100,7 @@ class ExampleProcessingService {
     this.#worker.on('completed', ({ returnvalue }) => {
       this.onCompleteMock(returnvalue);
     });
-    this.#worker.on('failed', ({ failedReason }) => {
+    this.#worker.on('failed', ({ failedReason }: Job) => {
       this.onFailedMock(failedReason);
     });
   }
