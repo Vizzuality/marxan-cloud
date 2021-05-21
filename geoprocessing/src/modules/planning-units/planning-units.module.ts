@@ -7,16 +7,13 @@ import { ShapefileService } from '../shapefiles/shapefiles.service';
 import { PlanningUnitsGeom } from 'src/modules/planning-units/planning-units.geo.entity';
 import { PlanningUnitsService } from './planning-units.service';
 import { FileService } from '../files/files.service';
-import { WorkerModule } from '../worker/worker.module';
+import { WorkerModule } from '../worker';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([PlanningUnitsGeom]),
     TileModule,
-    WorkerModule.register({
-      name: 'planning-units',
-      worker: __dirname + '/planning-units.job.ts',
-    }),
+    WorkerModule,
   ],
   providers: [
     PlanningUnitsProcessor,
