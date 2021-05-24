@@ -6,12 +6,12 @@ import { WorkerProcessor } from './worker-processor';
 @Injectable({
   scope: Scope.TRANSIENT,
 })
-export class WorkerResolver implements OnModuleDestroy {
+export class WorkerBuilder implements OnModuleDestroy {
   private _worker?: Worker;
 
   constructor(private readonly config: Config) {}
 
-  wrap<Input, Output>(
+  build<Input, Output>(
     queueName: string,
     processor: WorkerProcessor<Input, Output>,
   ): Worker<Input, Output> {
@@ -23,7 +23,7 @@ export class WorkerResolver implements OnModuleDestroy {
       (job: Job) => processor.process(job),
       this.config.redis,
     );
-    return this._worker as Worker<Input, Output>;
+    return this._worker;
   }
 
   async onModuleDestroy(): Promise<void> {

@@ -1,3 +1,3 @@
 export { WorkerModule } from './worker.module';
-export { WorkerResolver } from './worker-resolver';
+export { WorkerBuilder } from './worker-builder';
 export { WorkerProcessor } from './worker-processor';
