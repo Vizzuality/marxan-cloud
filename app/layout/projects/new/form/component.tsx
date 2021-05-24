@@ -32,7 +32,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
 
-  const handleSubmit = (values) => {
+  const onSubmit = (values) => {
     // TEMPORARY!!
     // This should be removed once organizations IDs are handled in the app
     const data = {
@@ -71,14 +71,14 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
   return (
     <FormRFF
-      onSubmit={handleSubmit}
+      onSubmit={onSubmit}
       initialValues={{
         ...DEFAULT_AREA,
       }}
     >
-      {(props) => (
+      {({ handleSubmit }) => (
         <form
-          onSubmit={props.handleSubmit}
+          onSubmit={handleSubmit}
           autoComplete="off"
           className="flex flex-col justify-between w-full py-8 pl-8"
         >
@@ -157,6 +157,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                 onChange={(value) => console.info('Planning area change: ', value)}
               />
             )}
+
             {hasPlanningArea && (
               <Button
                 className="flex w-full mt-4"

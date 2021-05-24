@@ -33,9 +33,11 @@ export function useCountries(filters: UseCountriesProps): UseCountriesResponse {
 
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data?.data) ? data?.data?.data : [];
+
     const countries: Country[] = parsedData.map((c) => ({
       name: c.name0,
       id: c.gid0,
+      bbox: c.bbox,
     }));
 
     return {
@@ -74,6 +76,7 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
       name: r.name1,
       id: r.id,
       level: 1,
+      bbox: r.bbox,
     }));
 
     return {

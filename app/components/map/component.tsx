@@ -142,8 +142,8 @@ export const Map = ({
       width: mapContainerRef.current.offsetWidth,
       height: mapContainerRef.current.offsetHeight,
       bounds: [
-        [bbox[0], bbox[1]],
-        [bbox[2], bbox[3]],
+        [bbox[1], bbox[3]],
+        [bbox[0], bbox[2]],
       ],
       ...options,
     });
@@ -184,7 +184,7 @@ export const Map = ({
   }, [onMapReady]);
 
   useEffect(() => {
-    if (!isEmpty(bounds) && !!bounds.bbox && bounds.bbox.every((b) => !!b)) {
+    if (!isEmpty(bounds) && !!bounds.bbox && bounds.bbox.every((b) => typeof b === 'number')) {
       handleFitBounds();
     }
   }, [bounds, handleFitBounds]);

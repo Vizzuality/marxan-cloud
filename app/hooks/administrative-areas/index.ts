@@ -40,6 +40,7 @@ UseAdministrativeAreasResponse {
       name: r.name2,
       id: r.id,
       level: 2,
+      bbox: r.bbox,
     }));
 
     return {

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 // Map
 import Map from 'components/map';
@@ -8,13 +8,27 @@ import Controls from 'components/map/controls';
 import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 
+import { useSelector } from 'react-redux';
+
 import ProjectMapProps from './types';
 
 export const ScenariosMap: React.FC<ProjectMapProps> = () => {
   const minZoom = 2;
   const maxZoom = 20;
+  const { bbox } = useSelector((state) => state['/projects/new']);
+
   const [viewport, setViewport] = useState({});
-  const [bounds, setBounds] = useState({});
+  const [bounds, setBounds] = useState(null);
+
+  useEffect(() => {
+    if (bbox) {
+      setBounds({
+        bbox,
+      });
+    } else {
+      setBounds(null);
+    }
+  }, [bbox]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
@@ -38,7 +52,7 @@ export const ScenariosMap: React.FC<ProjectMapProps> = () => {
   return (
     <div className="relative w-full h-full overflow-hidden rounded-r-3xl">
       <Map
-        // bounds={bounds}
+        bounds={bounds}
         width="100%"
         height="100%"
         minZoom={minZoom}

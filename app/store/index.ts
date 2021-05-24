@@ -1,13 +1,15 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 import projects from 'store/slices/projects';
-import projectsShow from 'store/slices/projects/detail';
+import projectsDetail from 'store/slices/projects/detail';
+import projectsNew from 'store/slices/projects/new';
 // import scenariosEdit from 'store/slices/scenarios/edit';
 
 // Reducers
 const staticReducers = {
   '/projects': projects,
-  '/projects/[id]': projectsShow,
+  '/projects/[id]': projectsDetail,
+  '/projects/new': projectsNew,
 };
 
 const asyncReducers = {};
