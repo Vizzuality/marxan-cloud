@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { Config } from './config';
-import { WorkerResolver } from './worker-resolver';
+import { WorkerBuilder } from './worker-builder';
 
 @Module({
-  providers: [WorkerResolver, Config],
-  exports: [WorkerResolver],
+  providers: [WorkerBuilder, Config],
+  exports: [WorkerBuilder],
 })
 export class WorkerModule {}

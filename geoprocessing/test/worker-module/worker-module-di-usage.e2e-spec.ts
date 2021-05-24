@@ -5,7 +5,7 @@ import * as config from 'config';
 import {
   WorkerModule,
   WorkerProcessor,
-  WorkerResolver,
+  WorkerBuilder,
 } from '../../src/modules/worker';
 
 let app: TestingModule;
@@ -93,10 +93,10 @@ class ExampleProcessingService {
   #worker: Worker;
 
   constructor(
-    private readonly wrapper: WorkerResolver,
+    private readonly wrapper: WorkerBuilder,
     private readonly processor: JobProcessor,
   ) {
-    this.#worker = wrapper.wrap(queueName, processor);
+    this.#worker = wrapper.build(queueName, processor);
     this.#worker.on('completed', ({ returnvalue }) => {
       this.onCompleteMock(returnvalue);
     });

@@ -4,7 +4,7 @@ import { Queue, Worker } from 'bullmq';
 import * as config from 'config';
 
 import { ExampleWorkerJobProcessor } from './bullmq-worker-code';
-import { WorkerModule, WorkerResolver } from '../../src/modules/worker';
+import { WorkerModule, WorkerBuilder } from '../../src/modules/worker';
 
 let app: TestingModule;
 let queue: Queue;
@@ -67,8 +67,8 @@ export class ExampleProcessingService {
 
   #worker: Worker;
 
-  constructor(private readonly wrapper: WorkerResolver) {
-    this.#worker = wrapper.wrap(queueName, new ExampleWorkerJobProcessor());
+  constructor(private readonly wrapper: WorkerBuilder) {
+    this.#worker = wrapper.build(queueName, new ExampleWorkerJobProcessor());
     this.#worker.on('completed', ({ returnvalue }) => {
       this.onCompleteMock(returnvalue);
     });
