@@ -39,6 +39,7 @@ export class FileService {
     if (path.startsWith('/tmp')) {
       await unlink(path);
       await rmdir(path.replace('.zip', ''), { recursive: true });
+      console.log('DELETING FILE');
     } else {
       throw new Error(`Could not complete deletion: ${path} is not in /tmp`);
     }
