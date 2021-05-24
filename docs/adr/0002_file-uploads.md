@@ -76,6 +76,13 @@ processes it.
 This will require setting up development buckets and related users and ACLs on
 Azure Blob Storage.
 
+We should still use some form of local storage (maybe from the *shared volume*
+strategy below) for local development, to avoid shuttling blobs around from
+local dev env to an Azure data centre and back.
+
+An adaptor may be useful for this, and also to avoid locking the setup to
+specific cloud providers.
+
 * shared volume
 
 API validates and accepts REST request, writes blob to a local path which is
@@ -145,7 +152,8 @@ are eventually deleted from temporary storage on the API service.
 
 It should work rather reliably, is available in Alpine (on top of which the
 Marxan images for API and geoprocessing service are built), but would require a
-new setup for its configuration and monitoring.
+new setup for its configuration and monitoring. And I have never seen it used
+in this context.
 
 ## Decision outcome
 
