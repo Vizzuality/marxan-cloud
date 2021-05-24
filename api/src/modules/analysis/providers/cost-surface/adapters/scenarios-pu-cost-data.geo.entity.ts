@@ -11,7 +11,7 @@ import { ScenariosPlanningUnitGeoEntity } from '../../../../scenarios-planning-u
 @Entity({
   name: 'scenarios_pu_cost_data',
 })
-export class ScenariosPutCostDataGeo {
+export class ScenariosPuCostDataGeo {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -37,6 +37,6 @@ export class ScenariosPutCostDataGeo {
   })
   scenariosPlanningUnit?: ScenariosPlanningUnitGeoEntity | null;
 
-  @RelationId((spud: ScenariosPutCostDataGeo) => spud.scenariosPlanningUnit)
+  @RelationId((spud: ScenariosPuCostDataGeo) => spud.scenariosPlanningUnit)
   scenariosPuDataId!: string;
 }
