@@ -6,6 +6,7 @@ import { ProtectedArea } from '../protected-areas.geo.entity';
 
 import { ProtectedAreaProcessor } from './protected-area-processor';
 import { ProtectedAreaWorkerService } from './protected-area-worker.service';
+import { GeometryExtractor } from './geometry-extractor';
 
 @Module({
   imports: [
@@ -13,6 +14,10 @@ import { ProtectedAreaWorkerService } from './protected-area-worker.service';
     ShapefilesModule,
     TypeOrmModule.forFeature([ProtectedArea]),
   ],
-  providers: [ProtectedAreaProcessor, ProtectedAreaWorkerService],
+  providers: [
+    ProtectedAreaProcessor,
+    ProtectedAreaWorkerService,
+    GeometryExtractor,
+  ],
 })
 export class ProtectedAreaWorkerModule {}

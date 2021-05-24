@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { bootstrapApplication } from '../../utils/geo-application';
 import { ProtectedAreaProcessor } from '../../../src/modules/protected-areas/worker/protected-area-processor';
 import { createWorld } from './steps/shapefile-for-wdpa-world';
-import { file } from './steps/valid-shapefile';
+import { file } from './steps/invalid-shapefile';
 
 let app: INestApplication;
 let sut: ProtectedAreaProcessor;
@@ -17,20 +17,18 @@ beforeAll(async () => {
 describe(`when worker processes the job for known project`, () => {
   beforeAll(async () => {
     await world.GivenWdpaForProjectAlreadyExists(`old-shape-name`);
-    await sut.process(
-      world.WhenNewShapefileIsSubmitted(`test_multiple_features_v2`),
-    );
+    await sut.process(world.WhenNewShapefileIsSubmitted(`new-shape-name`));
     await delay(2000);
   }, 10000);
 
-  it(`pushes new geometries`, async () => {
-    expect(
-      await world.ThenNewEntriesArePublished(`test_multiple_features_v2`),
-    ).toEqual(true);
+  it(`does not push new geometries`, async () => {
+    expect(await world.ThenNewEntriesAreNotPublished(`new-shape-name`)).toEqual(
+      true,
+    );
   });
 
-  it(`removes previous geometries assigned to project`, async () => {
-    expect(await world.ThenOldEntriesAreRemoved(`old-shape-name`)).toEqual(
+  it(`keeps previous geometries assigned to project`, async () => {
+    expect(await world.ThenOldEntriesAreNotRemoved(`old-shape-name`)).toEqual(
       true,
     );
   });

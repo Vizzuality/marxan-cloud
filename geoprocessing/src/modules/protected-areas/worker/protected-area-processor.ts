@@ -1,47 +1,59 @@
-import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Connection } from 'typeorm';
 import { Job } from 'bullmq';
 
 import { WorkerProcessor } from '../../worker';
 import { ProtectedAreasJobInput } from './worker-input';
 import { ShapefileService } from '../../shapefiles/shapefiles.service';
 import { ProtectedArea } from '../protected-areas.geo.entity';
-import { FeatureCollection, MultiPolygon } from 'geojson';
+import { GeoJSON } from 'geojson';
+import { GeometryExtractor } from './geometry-extractor';
 
 @Injectable()
 export class ProtectedAreaProcessor
   implements WorkerProcessor<ProtectedAreasJobInput, void> {
   constructor(
     private readonly shapefileService: ShapefileService,
-    @InjectRepository(ProtectedArea)
-    private readonly protectedAreasRepository: Repository<ProtectedArea>,
+    private readonly geometryExtractor: GeometryExtractor,
+    private connection: Connection,
   ) {}
 
   async process(job: Job<ProtectedAreasJobInput, void>): Promise<void> {
-    const geo = (await this.shapefileService.getGeoJson(job.data.file)).data;
-    console.log(geo);
-    // const polys = geo.features.map((f) => f.geometry);
-    // console.log(`--- polys`, polys);
-    // ST_Multi
-    const res = await this.protectedAreasRepository
-      .update(
-        {
-          projectId: job.data.projectId,
-        },
-        {
-          fullName: job.data.file.filename,
-          theGeom: {
-            type: 'MultiPolygon',
-            coordinates: [],
-          },
-        },
-      )
-      .catch((error) => {
-        console.log(`db error`);
-        throw error;
-      });
+    const geo: GeoJSON = (await this.shapefileService.getGeoJson(job.data.file))
+      .data;
 
-    console.log(new Date(), `db ok..`, res);
+    const geometries = this.geometryExtractor.extract(geo);
+
+    if (geometries.length === 0) {
+      throw new Error(
+        'No supported geometries found. Ensure that file contains FeatureCollection / Multipolygon / Polygon.',
+      );
+    }
+
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.manager.delete(ProtectedArea, {
+        projectId: job.data.projectId,
+      });
+      await queryRunner.manager.insert(
+        ProtectedArea,
+        geometries.map((geometry) => ({
+          projectId: job.data.projectId,
+          fullName: job.data.file.filename,
+          theGeom: () =>
+            `st_multi(ST_GeomFromGeoJSON('${JSON.stringify(geometry)}'))`,
+        })),
+      );
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }
