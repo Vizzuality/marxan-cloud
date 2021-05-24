@@ -23,7 +23,19 @@ export const scenarioWithRequiredWatchedEmpty = (): Scenario => ({
   wdpaThreshold: undefined,
 });
 
+export const scenarioWithwdpaCategoriesWatchedPresent = (): Scenario => ({
+  ...scenarioBase(),
+  wdpaIucnCategories: [],
+});
+
+export const scenarioWithwdpaCategoriesAndCustomWdpaWatchedPresent = (): Scenario => ({
+  ...scenarioBase(),
+  wdpaIucnCategories: [IUCNCategory.III],
+  protectedAreaFilterByIds: ['20000000-2000-2000-2000-200000000000'],
+});
+
 export const scenarioWithAllWatchedPresent = (): Scenario => ({
   ...scenarioBase(),
+  wdpaIucnCategories: [],
   wdpaThreshold: 40,
 });

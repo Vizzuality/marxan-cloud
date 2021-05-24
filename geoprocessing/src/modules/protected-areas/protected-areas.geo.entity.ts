@@ -20,6 +20,22 @@ export enum IUCNCategory {
   NotReported = 'Not Reported',
 }
 
+/**
+ * @todo We have this enum duplicated in the api service
+ * @file api/src/modules/protected-areas/protected-area.geo.entity.ts
+ */
+export enum IUCNCategory {
+  Ia = 'Ia',
+  Ib = 'Ib',
+  II = 'II',
+  III = 'III',
+  IV = 'IV',
+  V = 'V',
+  VI = 'VI',
+  NotApplicable = 'Not Applicable',
+  NotAssigned = 'Not Assigned',
+  NotReported = 'Not Reported',
+}
 @Entity('wdpa')
 export class ProtectedArea extends TimeUserEntityMetadata {
   @ApiProperty()

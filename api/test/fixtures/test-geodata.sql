@@ -76,3 +76,10 @@ left join wdpa
  )
  UPDATE scenario_features_data
 SET (current_pa) = (select current_pa from (select sum(area_protected) current_pa, feature_scen_id from features_wdpa group by feature_scen_id) s where  feature_scen_id = scenario_features_data.id );
+
+-- cost equal area calculation for our scenario.
+
+-- INSERT INTO scenarios_pu_data (pu_geom_id, scenario_id, puid)
+-- select id as pu_geom_id, '$scenario' as scenario_id, row_number() over () as puid
+-- from planning_units_geom pug
+-- where type='square' and size = 1;
