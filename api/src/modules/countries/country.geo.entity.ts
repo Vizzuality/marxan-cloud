@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { BBox, Geometry } from 'geojson';
+import { Column, PrimaryColumn, ViewEntity } from 'typeorm';
 import { BaseServiceResource } from 'types/resource.interface';
 
 export const countryResource: BaseServiceResource = {
@@ -10,7 +11,13 @@ export const countryResource: BaseServiceResource = {
   },
 };
 
-@Entity('countries')
+@ViewEntity('countries', {
+  expression: `
+  SELECT id, gid_0, name_0, the_geom, level, iso3, bbox, created_at, created_by,
+  last_modified_at FROM admin_regions
+  WHERE gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL;
+  `,
+})
 export class Country {
   @ApiProperty()
   @PrimaryColumn()
@@ -36,7 +43,14 @@ export class Country {
    */
   @ApiProperty()
   @Column('geometry', { name: 'the_geom' })
-  theGeom: any;
+  theGeom!: Geometry;
+
+  /**
+   * Bbox.
+   */
+  @ApiProperty()
+  @Column('jsonb', { name: 'bbox' })
+  bbox!: BBox;
 }
 
 export class JSONAPICountryData {

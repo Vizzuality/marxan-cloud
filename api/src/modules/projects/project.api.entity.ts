@@ -14,7 +14,7 @@ import {
 import { Organization } from '../organizations/organization.api.entity';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
-
+import { BBox } from 'geojson';
 export const projectResource: BaseServiceResource = {
   className: 'Project',
   name: {
@@ -115,11 +115,18 @@ export class Project extends TimeUserEntityMetadata {
   planningUnitAreakm2?: number;
 
   /**
-   * Extent of the project
+   * custom extent of the project
    */
   @ApiPropertyOptional()
   @Column('geometry')
   extent?: Record<string, unknown> | null;
+
+  /**
+   * Bbox of the custom extent
+   */
+  @ApiProperty()
+  @Column('jsonb', { name: 'bbox' })
+  bbox!: BBox;
 
   /**
    * JSONB storage for non-relational attributes

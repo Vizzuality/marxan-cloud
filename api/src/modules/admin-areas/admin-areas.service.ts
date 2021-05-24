@@ -77,6 +77,7 @@ export class AdminAreasService extends AppBaseService<
         'gid2',
         'name2',
         'theGeom',
+        'bbox'
       ],
       keyForAttribute: 'camelCase',
     };

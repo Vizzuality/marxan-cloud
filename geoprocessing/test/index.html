@@ -53,17 +53,10 @@ var map = new mapboxgl.Map({
                 'minzoom': 1,
                 'maxzoom': 12,
                 'tiles': [
-                "http://localhost:3040/api/v1/geodata/protected-areas/preview/tiles/{z}/{x}/{y}.mvt?id=b469939b-2cbb-4a66-9507-87ab7270e6b2",
+                "http://localhost:3040/api/v1/geodata/protected-areas/preview/tiles/{z}/{x}/{y}.mvt",
                      ]
             },
-            'postgis-tilesfeatures': {
-                'type': 'vector',
-                'minzoom': 1,
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/features/f01903fe-2e41-423e-8b64-176c77f10be6/preview/tiles/{z}/{x}/{y}.mvt?bbox=[0.12084960937499999, 44.11914151643737, 2.2412109375, 44.11914151643737]",
-                     ]
-            },
+
             'postgis-tilesPU': {
                 'type': 'vector',
                 'minzoom': 1,
@@ -88,17 +81,7 @@ var map = new mapboxgl.Map({
             'minzoom': 1,
             'maxzoom': 22
         },
-        {
-            'id': 'postgis-tiles-layer-features',
-            'type': 'fill',
-            'source': 'postgis-tilesfeatures',
-            'source-layer': 'layer0',
-            'paint': {
-                'fill-outline-color': 'red',
-                'fill-color': 'blue',
-                'fill-opacity': 1
-            }
-        },
+
         {
             'id': 'postgis-tiles-layer',
             'type': 'fill',
