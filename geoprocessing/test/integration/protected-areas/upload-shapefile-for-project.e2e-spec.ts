@@ -35,7 +35,7 @@ describe(`when worker processes the job for known project`, () => {
 });
 
 afterAll(async () => {
-  // await sutWorld.cleanup();
+  await sutWorld.cleanup();
   await app?.close();
 }, 500 * 1000);
 
