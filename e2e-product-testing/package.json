@@ -1,0 +1,19 @@
+{
+  "name": "e2e-product-testing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:ci": "cypress run --headless --browser chrome"
+  },
+  "devDependencies": {
+    "@types/cypress-cucumber-preprocessor": "4.0.0",
+    "cypress": "^7.3.0",
+    "cypress-cucumber-preprocessor": "4.1.0",
+    "typescript": "^4.2.4"
+  },
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": true
+  }
+}
