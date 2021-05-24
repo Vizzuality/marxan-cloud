@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Country } from 'modules/countries/country.geo.entity';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, ViewEntity } from 'typeorm';
 import { BaseServiceResource } from 'types/resource.interface';
 
 export const adminAreaResource: BaseServiceResource = {
@@ -11,7 +11,7 @@ export const adminAreaResource: BaseServiceResource = {
   },
 };
 
-@Entity('admin_regions')
+@ViewEntity('admin_regions')
 export class AdminArea extends Country {
   @ApiProperty()
   @PrimaryColumn()

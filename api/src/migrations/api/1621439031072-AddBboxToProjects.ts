@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddBboxToProjects1621439031072
-  implements MigrationInterface {
+export class AddBboxToProjects1621439031072 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
     -----------------------------------------
@@ -9,7 +8,7 @@ export class AddBboxToProjects1621439031072
     -----------------------------------------
     ALTER TABLE projects ADD COLUMN bbox jsonb;
 
-    UPDATE projects SET bbox = jsonb_build_array(ST_XMax(extent), ST_XMin(extent), ST_YMax(extent), ST_YMin(extent));
+    UPDATE projects SET bbox = jsonb_build_array(ST_XMax(extent), ST_XMin(extent), ST_YMax(extent), ST_YMin(extent)) where extent is not null;
 
     -----------------------------------------
     -- tr_GetBbox()
@@ -39,7 +38,7 @@ export class AddBboxToProjects1621439031072
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-     await queryRunner.query(`
+    await queryRunner.query(`
      DROP TRIGGER IF EXISTS tr_projects_extent ON projects;
      ALTER TABLE projects
      DROP COLUMN bbox;

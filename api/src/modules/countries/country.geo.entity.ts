@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { BBox } from 'geojson';
+import { Column, PrimaryColumn, ViewEntity } from 'typeorm';
 import { BaseServiceResource } from 'types/resource.interface';
 
 export const countryResource: BaseServiceResource = {
@@ -10,7 +11,7 @@ export const countryResource: BaseServiceResource = {
   },
 };
 
-@Entity('countries')
+@ViewEntity('countries')
 export class Country {
   @ApiProperty()
   @PrimaryColumn()
@@ -38,13 +39,12 @@ export class Country {
   @Column('geometry', { name: 'the_geom' })
   theGeom: any;
 
-   /**
+  /**
    * Bbox.
    */
-    @ApiProperty()
-    @Column('character varying', { name: 'bbox' })
-    bbox!: number[];
-
+  @ApiProperty()
+  @Column('jsonb', { name: 'bbox' })
+  bbox!: BBox;
 }
 
 export class JSONAPICountryData {
