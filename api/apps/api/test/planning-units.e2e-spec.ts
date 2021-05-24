@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import * as request from 'supertest';
 
-import { AppModule } from './../src/app.module';
+import { AppModule } from '../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 
 import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';

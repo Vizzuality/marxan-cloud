@@ -22,14 +22,14 @@ export const geoprocessingConnections: {
     type: 'postgres',
     url: AppConfig.get('postgresGeoApi.url'),
     ssl: false,
-    entities: ['src/modules/**/*.geo.entity.ts'],
+    entities: [__dirname + '/modules/**/*.geo.entity.{ts,js}'],
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
     // logging.
     logging: ['error'],
     cache: false,
-    migrations: ['src/migrations/geoprocessing/**/*.ts'],
+    migrations: [__dirname + '/migrations/geoprocessing/**/*.ts'],
     migrationsRun:
       AppConfig.get<string>(
         'postgresApi.runMigrationsOnStartup',
@@ -37,7 +37,7 @@ export const geoprocessingConnections: {
         ? true
         : false,
     cli: {
-      migrationsDir: 'src/migrations/geoprocessing',
+      migrationsDir: 'migrations/geoprocessing',
     },
   },
   apiDB: {
@@ -46,7 +46,7 @@ export const geoprocessingConnections: {
     type: 'postgres',
     url: AppConfig.get('postgresApi.url'),
     ssl: false,
-    entities: ['src/modules/**/*.api.entity.ts'],
+    entities: [__dirname + '/modules/**/*.api.entity.{ts,js}'],
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose

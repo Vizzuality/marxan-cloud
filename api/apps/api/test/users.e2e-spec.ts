@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import * as faker from 'faker';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { AppModule } from '../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { v4 } from 'uuid';
 import { SignUpDto } from 'modules/authentication/dto/sign-up.dto';

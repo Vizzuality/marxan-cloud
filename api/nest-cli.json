@@ -1,4 +1,30 @@
 {
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src"
+  "sourceRoot": "apps/api/src",
+  "monorepo": true,
+  "root": "apps/api",
+  "compilerOptions": {
+    "webpack": false,
+    "tsConfigPath": "apps/api/tsconfig.app.json"
+  },
+  "projects": {
+    "api": {
+      "type": "application",
+      "root": "apps/api",
+      "entryFile": "main",
+      "sourceRoot": "apps/api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api/tsconfig.app.json"
+      }
+    },
+    "geoprocessing": {
+      "type": "application",
+      "root": "apps/geoprocessing",
+      "entryFile": "main",
+      "sourceRoot": "apps/geoprocessing/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/geoprocessing/tsconfig.app.json"
+      }
+    }
+  }
 }

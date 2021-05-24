@@ -18,13 +18,12 @@ USER $USER
 COPY --chown=$USER:$USER package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
-COPY --chown=$USER:$USER entrypoint.sh nodemon.json tsconfig.json tsconfig.build.json ormconfig.ts ./
-COPY --chown=$USER:$USER config ./config
-COPY --chown=$USER:$USER src ./src
+COPY --chown=$USER:$USER nodemon.json tsconfig.json tsconfig.build.json ./
 # @debt we should do this only for images used for tests
-COPY --chown=$USER:$USER test ./test
+COPY --chown=$USER:$USER apps ./apps
+COPY --chown=$USER:$USER libs ./libs
 
 RUN yarn prestart:prod
 
 EXPOSE 3000
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["./apps/api/entrypoint.sh"]
