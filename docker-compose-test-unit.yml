@@ -4,7 +4,7 @@ services:
   api:
     build:
       context: ./api
-      dockerfile: Dockerfile
+      dockerfile: api.Dockerfile
       args:
         UID: 5000
         GID: 5000
@@ -12,16 +12,17 @@ services:
     command: test-unit
     user: "5000:5000"
     volumes:
-      - ./api/src:/opt/marxan-api/src
-      - ./api/test:/opt/marxan-api/test
+      - ./api/apps:/opt/marxan-api/apps
+      - ./api/libs:/opt/marxan-api/libs
     environment:
       - NODE_PATH=src
       - NODE_ENV=test
+      - NODE_CONFIG_DIR=apps/api/config
 
   geoprocessing:
     build:
-      context: ./geoprocessing
-      dockerfile: Dockerfile
+      context: ./api
+      dockerfile: geo.Dockerfile
       args:
         UID: 5000
         GID: 5000
@@ -29,8 +30,9 @@ services:
     command: test-unit
     user: "5000:5000"
     volumes:
-      - ./geoprocessing/src:/opt/marxan-geoprocessing/src
-      - ./geoprocessing/test:/opt/marxan-geoprocessing/test
+      - ./api/apps:/opt/marxan-geoprocessing/apps
+      - ./api/libs:/opt/marxan-geoprocessing/libs
     environment:
       - NODE_PATH=src
       - NODE_ENV=test
+      - NODE_CONFIG_DIR=apps/geoprocessing/config
