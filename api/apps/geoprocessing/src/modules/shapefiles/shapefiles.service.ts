@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { FileService } from '../files/files.service';
+
 const mapshaper = require('mapshaper');
 
 @Injectable()
@@ -8,7 +9,6 @@ export class ShapefileService {
   constructor(private readonly fileService: FileService) {}
 
   private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
-    //try {
     const outputKey = `shapefile-${new Date().getTime()}.geojson`;
 
     const _geoJson = await mapshaper.applyCommands(
@@ -21,11 +21,18 @@ export class ShapefileService {
     return JSON.parse(_geoJson[outputKey].toString('utf-8'));
   }
 
-  isValidGeoJson(geoJson: any) {
-    this.logger.log('IS A VALID GEOJSON?');
-    this.logger.log(geoJson);
-    if (geoJson.type != 'FeatureCollection') throw new Error();
+  isValidGeoJson(geoJson: any): Error | void {
+    if (
+      geoJson.type !== 'FeatureCollection' ||
+      geoJson.features.every(
+        (geom: any) =>
+          geom.geometry.type !== 'Polygon' &&
+          geom.geometry.type !== 'MultiPolygon',
+      )
+    )
+      throw new Error();
   }
+
   async getGeoJson(shapeFile: Express.Multer.File) {
     try {
       this.logger.log(await this.fileService.unzipFile(shapeFile));
