@@ -7,6 +7,7 @@ services:
       args:
         UID: 5000
         GID: 5000
+        UPLOADS_TEMP_DIR: "/tmp/storage"
     ports:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-api
@@ -15,6 +16,7 @@ services:
     volumes:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
+      - marxan-cloud-backend-temp-storage:/tmp/storage
     env_file: .env
     environment:
       - NODE_PATH=src
@@ -59,6 +61,7 @@ services:
     volumes:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs
+      - marxan-cloud-backend-temp-storage:/tmp/storage:ro
     env_file: .env
     environment:
       - NODE_PATH=src
@@ -178,3 +181,5 @@ volumes:
   marxan-cloud-redis-api-data:
 
   marxan-airflow-logs:
+
+  marxan-cloud-backend-temp-storage:
