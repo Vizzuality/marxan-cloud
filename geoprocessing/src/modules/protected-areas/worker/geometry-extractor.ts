@@ -12,13 +12,15 @@ export class GeometryExtractor {
         .filter(this.#isGeometrySupported);
     }
 
-    if (geo.type === 'MultiPolygon' || geo.type === 'Polygon') {
+    if (this.#isGeometrySupported(geo)) {
       geometries.push(geo);
     }
 
     return geometries;
   }
 
-  #isGeometrySupported = (geo: Geometry): geo is MultiPolygon | Polygon =>
+  #isGeometrySupported = (
+    geo: Geometry | GeoJSON,
+  ): geo is MultiPolygon | Polygon =>
     geo.type === 'MultiPolygon' || geo.type === 'Polygon';
 }
