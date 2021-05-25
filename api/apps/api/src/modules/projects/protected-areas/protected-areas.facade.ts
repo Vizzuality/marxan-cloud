@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Express } from 'express';
 import { QueueService } from '../../queue/queue.service';
+import { ApiEventsService } from '../../api-events/api-events.service';
+import { API_EVENT_KINDS } from '../../api-events/api-event.api.entity';
 
 export interface ProtectedAreasJobInput {
   projectId: string;
@@ -11,6 +13,7 @@ export interface ProtectedAreasJobInput {
 export class ProtectedAreasFacade {
   constructor(
     private readonly queueService: QueueService<ProtectedAreasJobInput>,
+    private readonly apiEvents: ApiEventsService,
     private readonly logger: Logger = new Logger(ProtectedAreasFacade.name),
   ) {}
 
@@ -21,14 +24,36 @@ export class ProtectedAreasFacade {
         file,
       })
       .then(() => {
-        // ok
+        return this.apiEvents.create({
+          kind: API_EVENT_KINDS.project__protectedAreas__submitted__v1__alpha,
+          topic: projectId,
+        });
       })
-      .catch((error) => {
-        this.logger.error(
-          `Failed submitting job to queue for ${projectId}`,
-          error,
-        );
-        throw error; // failed submission
+      .catch(async (error) => {
+        await this.markAsFailedSubmission(projectId, error);
+        throw error;
       });
   }
+
+  private markAsFailedSubmission = async (
+    projectId: string,
+    error: unknown,
+  ) => {
+    this.logger.error(
+      `Failed submitting job to queue for ${projectId}`,
+      String(error),
+    );
+    await this.apiEvents.create({
+      kind: API_EVENT_KINDS.project__protectedAreas__submitted__v1__alpha,
+      topic: projectId,
+    });
+    await this.apiEvents.create({
+      kind: API_EVENT_KINDS.project__protectedAreas__failed__v1__alpha,
+      topic: projectId,
+      data: {
+        error: `Failed submission`,
+        message: String(error),
+      },
+    });
+  };
 }

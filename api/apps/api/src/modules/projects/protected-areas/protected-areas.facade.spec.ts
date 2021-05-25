@@ -8,10 +8,13 @@ import { Queue } from 'bullmq';
 
 import { QueueService } from '../../queue/queue.service';
 import { FakeLogger } from '../../../utils/__mocks__/fake-logger';
+import { ApiServiceFake } from './__mocks__/api-service.fake';
+import { ApiEventsService } from '../../api-events/api-events.service';
 
 let sut: ProtectedAreasFacade;
 let logger: FakeLogger;
 let addJobMock: jest.SpyInstance;
+let apiEvents: ApiServiceFake;
 
 const projectId = 'project-id';
 const file: Express.Multer.File = {
@@ -35,11 +38,16 @@ beforeEach(async () => {
         provide: Logger,
         useClass: FakeLogger,
       },
+      {
+        provide: ApiEventsService,
+        useClass: ApiServiceFake,
+      },
     ],
   }).compile();
 
   sut = sandbox.get(ProtectedAreasFacade);
   logger = sandbox.get(Logger);
+  apiEvents = sandbox.get(ApiEventsService);
 });
 
 describe(`when job submits successfully`, () => {
@@ -68,6 +76,20 @@ describe(`when job submits successfully`, () => {
       ]
     `);
   });
+
+  it(`should emit 'submitted' event`, () => {
+    expect(apiEvents.mock.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          Object {
+            "kind": "project.protectedAreas.submitted/v1/alpha",
+            "topic": "project-id",
+          },
+          undefined,
+        ],
+      ]
+    `);
+  });
 });
 
 describe(`when job submission fails`, () => {
@@ -87,7 +109,32 @@ describe(`when job submission fails`, () => {
     expect(logger.error.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
         "Failed submitting job to queue for project-id",
-        [Error: Oups],
+        "Error: Oups",
+      ]
+    `);
+  });
+
+  it(`emits both submitted&failed events`, () => {
+    expect(apiEvents.mock.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          Object {
+            "kind": "project.protectedAreas.submitted/v1/alpha",
+            "topic": "project-id",
+          },
+          undefined,
+        ],
+        Array [
+          Object {
+            "data": Object {
+              "error": "Failed submission",
+              "message": "Error: Oups",
+            },
+            "kind": "project.protectedAreas.failed/v1/alpha",
+            "topic": "project-id",
+          },
+          undefined,
+        ],
       ]
     `);
   });

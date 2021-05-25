@@ -32,6 +32,9 @@ export enum API_EVENT_KINDS {
   scenario__costSurface__shapeConversionFailed__v1_alpha1 = 'scenario.costSurface.shapeConversionFailed/v1alpha1',
   scenario__costSurface__costUpdateFailed__v1_alpha1 = 'scenario.costSurface.costUpdateFailed/v1alpha1',
   scenario__costSurface__finished__v1_alpha1 = 'scenario.costSurface.finished/v1alpha1',
+  project__protectedAreas__submitted__v1__alpha = 'project.protectedAreas.submitted/v1/alpha',
+  project__protectedAreas__finished__v1__alpha = 'project.protectedAreas.finished/v1/alpha',
+  project__protectedAreas__failed__v1__alpha = 'project.protectedAreas.failed/v1/alpha',
 }
 
 /**
