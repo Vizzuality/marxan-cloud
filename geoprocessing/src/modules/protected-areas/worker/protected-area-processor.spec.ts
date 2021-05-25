@@ -55,7 +55,10 @@ describe(`when shapefile returns geometry`, () => {
 
   describe(`when persistence fails`, () => {
     beforeEach(() => {
-      fakeConnection.insertMock.mockRejectedValue(new Error('Engine fail.'));
+      fakeConnection.deleteMock.mockResolvedValue({});
+      fakeConnection.insertMock.mockImplementationOnce(() => {
+        throw new Error('Engine fail.');
+      });
       fakeExtractor.extractMock.mockReturnValue([
         {
           type: 'MultiPolygon',
@@ -73,6 +76,8 @@ describe(`when shapefile returns geometry`, () => {
 
   describe(`when extractor returns at least one Geometry`, () => {
     beforeEach(async () => {
+      fakeConnection.deleteMock.mockResolvedValue({});
+      fakeConnection.insertMock.mockResolvedValue({});
       fakeExtractor.extractMock.mockReturnValue([
         {
           type: 'MultiPolygon',

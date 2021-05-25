@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class FakeConnection {
-  deleteMock = jest.fn();
-  insertMock = jest.fn();
+  deleteMock = jest.fn<any, any>(() => fail());
+  insertMock = jest.fn<any, any>(() => fail());
   startTransactionMock = jest.fn();
   commitMock = jest.fn();
   rollbackMock = jest.fn();
