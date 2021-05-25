@@ -17,14 +17,20 @@ export class ShapefileService {
         '',
       )}/*.shp -clean rewind -info -o ${outputKey}`,
     );
+
     return JSON.parse(_geoJson[outputKey].toString('utf-8'));
   }
 
-  geoJsonHasGeometries(geoJson: any) {}
+  isValidGeoJson(geoJson: any) {
+    this.logger.log('IS A VALID GEOJSON?');
+    this.logger.log(geoJson);
+    if (geoJson.type != 'FeatureCollection') throw new Error();
+  }
   async getGeoJson(shapeFile: Express.Multer.File) {
     try {
       this.logger.log(await this.fileService.unzipFile(shapeFile));
       const geoJson = await this.shapeFileToGeoJson(shapeFile);
+      this.isValidGeoJson(geoJson);
       return { data: geoJson };
     } catch (err) {
       this.logger.error(err);
