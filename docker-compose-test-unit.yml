@@ -8,6 +8,7 @@ services:
       args:
         UID: 5000
         GID: 5000
+        UPLOADS_TEMP_DIR: "/tmp/storage"
     container_name: marxan-test-unit-api
     command: test-unit
     user: "5000:5000"
