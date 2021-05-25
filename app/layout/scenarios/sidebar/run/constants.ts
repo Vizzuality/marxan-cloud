@@ -125,7 +125,7 @@ export const FIELDS = [
     input: {
       className: 'text-2xl',
       min: -1,
-      max: 1,
+      max: 1000,
       type: 'integer',
       step: '1',
     },
@@ -916,7 +916,7 @@ export const FIELDS = [
       id: 'save-files',
       label: 'save files'
     },
-    default: 0,
+    default: 3,
     required: true,
     advanced: true,
     input: {
@@ -949,7 +949,7 @@ export const FIELDS = [
       label: 'save files'
     },
     default: 0,
-    required: true,
+    required: false,
     advanced: true,
     input: {
       className: 'text-2xl',
@@ -981,7 +981,7 @@ export const FIELDS = [
       label: 'save files'
     },
     default: 0,
-    required: true,
+    required: false,
     advanced: true,
     input: {
       className: 'text-2xl',
@@ -1017,7 +1017,7 @@ export const FIELDS = [
       label: 'save files'
     },
     default: 0,
-    required: true,
+    required: false,
     advanced: true,
     input: {
       className: 'text-2xl',
@@ -1087,7 +1087,7 @@ export const FIELDS = [
       id: 'program-control',
       label: 'Program control'
     },
-    default: 1,
+    default: 0,
     required: false,
     advanced: true,
     input: {
