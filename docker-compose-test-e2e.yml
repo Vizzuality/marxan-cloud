@@ -8,6 +8,7 @@ services:
       args:
         UID: 5000
         GID: 5000
+        UPLOADS_TEMP_DIR: "/tmp/storage"
     ports:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-api
