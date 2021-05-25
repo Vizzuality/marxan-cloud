@@ -20,6 +20,16 @@ export class SurfaceCostProcessor
   ) {}
 
   async process(job: Job<CostSurfaceJobInput, true>): Promise<true> {
-    return Promise.resolve(true);
+    const geoJson = await this.shapefileConverter.convert(job.data.shapefile);
+    const surfaceCosts = this.puExtractor.extract(geoJson);
+    const { errors } = await this.puValidator.validate(
+      job.data.scenarioId,
+      surfaceCosts.map((cost) => cost.planningUnitId),
+    );
+    if (errors.length > 0) {
+      throw new Error(errors.join('.'));
+    }
+    await this.repo.save(job.data.scenarioId, surfaceCosts);
+    return true;
   }
 }
