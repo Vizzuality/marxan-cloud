@@ -16,6 +16,7 @@ services:
     volumes:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
+      - marxan-cloud-backend-e2e-temp-storage:/tmp/storage
     environment:
       - NODE_PATH=src
       - NODE_ENV=test
@@ -43,6 +44,7 @@ services:
     volumes:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs
+      - marxan-cloud-backend-e2e-temp-storage:/tmp/storage:ro
     environment:
       - NODE_PATH=src
       - NODE_ENV=test
@@ -91,3 +93,6 @@ services:
     ports:
       - "${REDIS_API_SERVICE_PORT}:6379"
     restart: on-failure
+
+volumes:
+  marxan-cloud-backend-e2e-temp-storage:
