@@ -122,25 +122,37 @@ test-start-services: clean-slate
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./entrypoint.sh run-migrations-for-e2e-tests && \
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./entrypoint.sh run-migrations-for-e2e-tests
 
-test-e2e-api: test-start-services | seed-dbs
-	# run tests and remove containers
-	-docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./entrypoint.sh test-e2e
-	-docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./entrypoint.sh test-e2e
+test-e2e-api:
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./entrypoint.sh test-e2e
+
+test-e2e-geoprocessing:
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./entrypoint.sh test-e2e
+
+test-e2e-backend: test-start-services | seed-dbs test-e2e-api test-e2e-geoprocessing
 	$(MAKE) test-clean-slate
 
 run-test-e2e-local:
-	$(MAKE) test-e2e-api environment=local
+	$(MAKE) --keep-going test-e2e-backend environment=local
 
 run-test-e2e-ci:
-	$(MAKE) test-e2e-api environment=ci
+	$(MAKE) --keep-going test-e2e-backend environment=ci
 
-test-unit-api:
+setup-test-unit-backend:
 	# build API and geoprocessing containers
 	docker-compose -f docker-compose-test-unit.yml build api geoprocessing
+
+test-unit-api:
 	# run unit tests - API
-	-docker-compose -f docker-compose-test-unit.yml up --abort-on-container-exit --exit-code-from api api
+	docker-compose -f docker-compose-test-unit.yml up --abort-on-container-exit --exit-code-from api api
+
+test-unit-geo:
 	# run unit tests - geoprocessing
-	-docker-compose -f docker-compose-test-unit.yml up --abort-on-container-exit --exit-code-from geoprocessing geoprocessing
+	docker-compose -f docker-compose-test-unit.yml up --abort-on-container-exit --exit-code-from geoprocessing geoprocessing
+
+test-unit-backend: setup-test-unit-backend test-unit-api test-unit-geo
+
+run-test-unit:
+	$(MAKE) --keep-going test-unit-backend
 
 dump-geodb-data:
 	docker-compose exec -T postgresql-geo-api pg_dump -T migrations -a -U "${_GEO_POSTGRES_USER}" -F t ${_GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
