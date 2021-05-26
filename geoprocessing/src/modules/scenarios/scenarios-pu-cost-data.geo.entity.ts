@@ -30,13 +30,18 @@ export class ScenariosPutCostDataGeo {
   })
   cost!: number;
 
-  @ManyToOne(() => ScenariosPlanningUnitGeoEntity)
+  @ManyToOne(() => ScenariosPlanningUnitGeoEntity, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({
     referencedColumnName: 'id',
     name: 'scenarios_pu_data_id',
   })
   scenariosPlanningUnit?: ScenariosPlanningUnitGeoEntity | null;
 
+  @Column({
+    name: 'scenarios_pu_data_id',
+  })
   @RelationId((spud: ScenariosPutCostDataGeo) => spud.scenariosPlanningUnit)
   scenariosPuDataId!: string;
 }

@@ -1,10 +1,12 @@
-import { flatten, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { flatten } from 'lodash';
+
 import { CostSurfaceRepo } from '../cost-surface-repo';
 import { CostSurfaceInputDto } from '../../../entry-points/adjust-cost-surface-input';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ScenariosPuCostDataGeo } from './scenarios-pu-cost-data.geo.entity';
 import { DbConnections } from '../../../../../ormconfig.connections';
-import { Repository } from 'typeorm';
 
 type Success = true;
 

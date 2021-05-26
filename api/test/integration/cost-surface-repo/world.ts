@@ -1,11 +1,12 @@
 import { INestApplication } from '@nestjs/common';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { v4 } from 'uuid';
+
 import { ScenariosPlanningUnitGeoEntity } from '../../../src/modules/scenarios-planning-unit/entities/scenarios-planning-unit.geo.entity';
 import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { ScenariosPuCostDataGeo } from '../../../src/modules/analysis/providers/cost-surface/adapters/scenarios-pu-cost-data.geo.entity';
 import { DbConnections } from '../../../src/ormconfig.connections';
-import { In, Repository } from 'typeorm';
-import { v4 } from 'uuid';
 
 export interface CostSurfaceUpdateWorld {
   cleanup: () => Promise<void>;
@@ -40,7 +41,6 @@ export const createWorld = async (
     scenarioId,
   );
 
-  const puDataIds = scenarioPuData.rows.map((row) => row.id);
   const puIds = scenarioPuData.rows.map((row) => row.puGeometryId);
 
   return {
@@ -67,11 +67,6 @@ export const createWorld = async (
     planningUnitsIds: puIds,
     scenarioId,
     cleanup: async () => {
-      await puCostDataRepo.delete({
-        scenariosPlanningUnit: {
-          id: In(puDataIds),
-        },
-      });
       await puDataRepo.delete({
         scenarioId,
       });

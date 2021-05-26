@@ -8,7 +8,7 @@ export class ScenariosPuCostDataId1621847467456 implements MigrationInterface {
       `ALTER TABLE "scenarios_pu_cost_data" ADD "scenarios_pu_data_id" uuid`,
     );
     await queryRunner.query(
-      `ALTER TABLE "scenarios_pu_cost_data" ADD CONSTRAINT "FK_21454fad6e954ba771262974ae7" FOREIGN KEY ("scenarios_pu_data_id") REFERENCES "scenarios_pu_data"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+      `ALTER TABLE "scenarios_pu_cost_data" ADD CONSTRAINT "FK_21454fad6e954ba771262974ae7" FOREIGN KEY ("scenarios_pu_data_id") REFERENCES "scenarios_pu_data"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
     );
   }
 
