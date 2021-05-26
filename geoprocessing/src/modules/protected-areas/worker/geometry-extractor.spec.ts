@@ -1,10 +1,11 @@
 import { GeometryExtractor } from './geometry-extractor';
 import { Test } from '@nestjs/testing';
+
 import {
   featCollectionWithPoint,
   featCollectionWithPointsOnly,
-} from './__mocks__/feature-collection';
-import { multiPolygon, polygon } from './__mocks__/polygons';
+} from '../../../utils/__mocks__/feature-collection';
+import { multiPolygon, polygon } from '../../../utils/__mocks__/polygons';
 
 let sut: GeometryExtractor;
 

@@ -1,10 +1,7 @@
 import { Connection } from 'typeorm';
 import { Test } from '@nestjs/testing';
 import { Job } from 'bullmq';
-import { v4 } from 'uuid';
 
-import { FakeConnection } from './__mocks__/connection';
-import { FakeShapefileService } from './__mocks__/shapefile-service';
 import { FakeGeometryExtractor } from './__mocks__/geometry-extractor';
 import { createJob } from './__mocks__/job';
 
@@ -13,6 +10,9 @@ import { ProtectedAreaProcessor } from './protected-area-processor';
 import { GeometryExtractor } from './geometry-extractor';
 import { ProtectedAreasJobInput } from './worker-input';
 import { ProtectedArea } from '../protected-areas.geo.entity';
+
+import { FakeShapefileService } from '../../../utils/__mocks__/shapefile-service';
+import { FakeConnection } from '../../../utils/__mocks__/connection';
 
 let fakeConnection: FakeConnection;
 let fakeShapefileService: FakeShapefileService;
