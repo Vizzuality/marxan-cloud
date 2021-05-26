@@ -9,6 +9,7 @@ import { PlanningUnitsModule } from 'src/modules/planning-units/planning-units.m
 import { TileModule } from './modules/tile/tile.module';
 import { FeaturesModule } from 'src/modules/features/features.module';
 import { ApiEventsModule } from './modules/api-events/api-events.module';
+import { SurfaceCostModule } from './modules/surface-cost/surface-cost.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ApiEventsModule } from './modules/api-events/api-events.module';
     ProtectedAreasModule,
     FeaturesModule,
     ApiEventsModule,
+    SurfaceCostModule,
   ],
   controllers: [AppController],
   providers: [AppService],

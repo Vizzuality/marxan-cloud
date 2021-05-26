@@ -3,27 +3,24 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { flatten } from 'lodash';
 
-import { CostSurfaceRepo } from '../cost-surface-repo';
-import { CostSurfaceInputDto } from '../../../entry-points/adjust-cost-surface-input';
-import { ScenariosPuCostDataGeo } from './scenarios-pu-cost-data.geo.entity';
-import { DbConnections } from '../../../../../ormconfig.connections';
-
-type Success = true;
+import { CostSurfacePersistencePort } from '../ports/persistence/cost-surface-persistence.port';
+import { PlanningUnitCost } from '../ports/planning-unit-cost';
+import { ScenariosPuCostDataGeo } from '../../scenarios/scenarios-pu-cost-data.geo.entity';
 
 @Injectable()
-export class TypeormCostSurface implements CostSurfaceRepo {
+export class TypeormCostSurface implements CostSurfacePersistencePort {
   constructor(
-    @InjectRepository(ScenariosPuCostDataGeo, DbConnections.geoprocessingDB)
+    @InjectRepository(ScenariosPuCostDataGeo)
     private readonly costs: Repository<ScenariosPuCostDataGeo>,
   ) {
     //
   }
 
-  async applyCostSurface(
-    _: string,
-    values: CostSurfaceInputDto['planningUnits'],
-  ): Promise<Success> {
-    const pairs = values.map<[string, number]>((pair) => [pair.id, pair.cost]);
+  async save(_: string, values: PlanningUnitCost[]): Promise<void> {
+    const pairs = values.map<[string, number]>((pair) => [
+      pair.planningUnitId,
+      pair.cost,
+    ]);
     await this.costs.query(
       `
     UPDATE scenarios_pu_cost_data as spd
@@ -35,7 +32,7 @@ export class TypeormCostSurface implements CostSurfaceRepo {
     `,
       flatten(pairs),
     );
-    return true;
+    return;
   }
 
   /**
