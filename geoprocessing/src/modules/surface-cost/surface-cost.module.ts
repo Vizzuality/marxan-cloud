@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { WorkerModule } from '../worker';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { WorkerModule, WorkerProcessor } from '../worker';
 
 import { SurfaceCostProcessor } from './application/surface-cost-processor';
 import { SurfaceCostWorker } from './application/surface-cost-worker';
@@ -9,14 +10,27 @@ import { PuExtractorPort } from './ports/pu-extractor/pu-extractor.port';
 import { ArePuidsAllowedPort } from './ports/pu-validator/are-puuids-allowed.port';
 import { ShapefileConverterPort } from './ports/shapefile-converter/shapefile-converter.port';
 
+import { TypeormCostSurface } from './adapters/typeorm-cost-surface';
+import { ScenariosPuCostDataGeo } from '../scenarios/scenarios-pu-cost-data.geo.entity';
+import { ScenariosPlanningUnitGeoEntity } from '../scenarios/scenarios-planning-unit.geo.entity';
+
 @Module({
-  imports: [WorkerModule],
+  imports: [
+    WorkerModule,
+    TypeOrmModule.forFeature([
+      ScenariosPuCostDataGeo,
+      ScenariosPlanningUnitGeoEntity, // not used but has to imported somewhere
+    ]),
+  ],
   providers: [
     SurfaceCostWorker,
-    SurfaceCostProcessor,
+    {
+      provide: WorkerProcessor,
+      useClass: SurfaceCostProcessor,
+    },
     {
       provide: CostSurfacePersistencePort,
-      useValue: {},
+      useClass: TypeormCostSurface,
     },
     {
       provide: ArePuidsAllowedPort,

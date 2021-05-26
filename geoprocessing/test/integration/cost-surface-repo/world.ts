@@ -3,10 +3,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { ScenariosPlanningUnitGeoEntity } from '../../../src/modules/scenarios-planning-unit/entities/scenarios-planning-unit.geo.entity';
+import { ScenariosPlanningUnitGeoEntity } from '../../../src/modules/scenarios/scenarios-planning-unit.geo.entity';
 import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
-import { ScenariosPuCostDataGeo } from '../../../src/modules/analysis/providers/cost-surface/adapters/scenarios-pu-cost-data.geo.entity';
-import { DbConnections } from '../../../src/ormconfig.connections';
+import { ScenariosPuCostDataGeo } from '../../../src/modules/scenarios/scenarios-pu-cost-data.geo.entity';
 
 export interface CostSurfaceUpdateWorld {
   cleanup: () => Promise<void>;
@@ -22,14 +21,8 @@ export const createWorld = async (
   app: INestApplication,
 ): Promise<CostSurfaceUpdateWorld> => {
   const scenarioId = v4();
-  const puCostRepoToken = getRepositoryToken(
-    ScenariosPuCostDataGeo,
-    DbConnections.geoprocessingDB,
-  );
-  const puDataRepoToken = getRepositoryToken(
-    ScenariosPlanningUnitGeoEntity,
-    DbConnections.geoprocessingDB,
-  );
+  const puCostRepoToken = getRepositoryToken(ScenariosPuCostDataGeo);
+  const puDataRepoToken = getRepositoryToken(ScenariosPlanningUnitGeoEntity);
   const puDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
     puDataRepoToken,
   );
