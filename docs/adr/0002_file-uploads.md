@@ -118,6 +118,17 @@ flushed, before placing the job that would use the file on a BullMQ queue.
 Alternatively, some form of hashing could be used, though this will increase
 the (disk I/O and computational) cost of these file operations.
 
+* Shared volume (local dev environments) + s3fuse (in Kubernetes clusters)
+
+As above (shared docker volume) in local development environment, while using
+bucket storage mounted locally via s3fuse in Kubernetes clusters, in order to
+keep the same filesystem semantics across development environments and
+Kubernetes clusters.
+
+Given the primary cloud use case (Azure), an S3->Azure proxy (e.g.
+https://github.com/gaul/s3proxy) may be advisable in order to use the S3 API and
+avoid a specific dependence on Azure blob storage.
+
 * HTTP (push)
 
 API validates and accepts REST request, then forwards the file (files? it's
@@ -157,7 +168,7 @@ job request.
 The same limitations noted above for horizontal scalability of deployments
 apply.
 
-* HTTP (pull)
+* HTTP (pull from API)
 
 API validates and accepts REST request, writes file to temporary local storage
 following a path schema that includes a unique id that can then be used to link
@@ -177,6 +188,17 @@ are eventually deleted from temporary storage on the API service.
 Similar concerns as noted above regarding horizontal scalability of deployments
 apply, unless using a combination of PV shared among all the API replicas and
 HTTP (pull), but then just using a shared PV would be simpler.
+
+* HTTP (pull from link)
+
+The Geoprocessing service would pull a file from an URL provided in the job
+payload. It can be a signed link to an Azure bucket, or to another service, or API instance.
+
+If we want to treat geoprocessing only as a processing service, we keep the
+entire file management on the API side, the geoprocessing is not aware of where
+the file comes from, just gets an HTTP link from which it can read the stream.
+Then, we have geoprocessing and file storage decoupled. It all depends on where
+we want to assign the responsibility.
 
 * Syncthing (or similar)
 
