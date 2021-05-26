@@ -5,6 +5,7 @@ import {
   ShapefileSurfaceCostService,
 } from './shapefile-surface-cost';
 import { ShapefileService } from './shapefiles.service';
+import { FilesModule } from '../files/files.module';
 
 /**
  * Module purposes:
@@ -14,6 +15,7 @@ import { ShapefileService } from './shapefiles.service';
  *
  */
 @Module({
+  imports: [FilesModule],
   providers: [
     {
       provide: ExtractSurfaceCostFromShapefile,

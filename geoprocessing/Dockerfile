@@ -24,6 +24,16 @@ COPY --chown=$USER:$USER src ./src
 # @debt we should do this only for images used for tests
 COPY --chown=$USER:$USER test ./test
 
+RUN mkdir -p ./test/integration/protected-areas/steps/new-shape-name
+RUN chown $USER ./test/integration/protected-areas/steps/new-shape-name
+RUN chown $UID ./test/integration/protected-areas/steps/new-shape-name
+
+RUN chown -R $USER:$USER ./test/integration
+RUN chown -R $UID:$UID ./test/integration
+
+
+RUN mkdir -p ./test/integration/protected-areas/steps/test_multiple_features_v2
+
 RUN yarn prestart:prod
 
 EXPOSE 3000
