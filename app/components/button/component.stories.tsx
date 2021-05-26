@@ -15,7 +15,7 @@ export default {
     theme: {
       control: {
         type: 'select',
-        options: ['primary', 'primary-alt', 'secondary', 'secondary-alt'],
+        options: ['primary', 'primary-alt', 'secondary', 'secondary-alt', 'danger', 'run'],
       },
     },
   },
@@ -28,5 +28,6 @@ const Template: Story<ButtonProps> = ({ children, ...args }: ButtonProps) => (
 export const Default = Template.bind({});
 Default.args = {
   children: 'Button',
+  theme: 'none',
   disabled: false,
 };
