@@ -1,4 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback, useMemo, useState,
+} from 'react';
 import cx from 'classnames';
 
 import { Form as FormRFF } from 'react-final-form';

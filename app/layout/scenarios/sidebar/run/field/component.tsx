@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import { Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
@@ -13,7 +13,7 @@ import {
 export interface ScenariosRunFieldProps {
   id: string;
   label: string;
-  description: string;
+  description: string | ReactNode;
   input: any;
   note?: string;
   validations?: any;

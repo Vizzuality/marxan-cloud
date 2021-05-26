@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import Tippy from '@tippyjs/react/headless';
 import { useSpring, motion } from 'framer-motion';
@@ -10,6 +10,7 @@ import { TooltipProps } from './types';
 export const Tooltip: React.FC<TooltipProps> = ({
   children, content, arrow, maxWidth, ...props
 }: TooltipProps) => {
+  const tooltipRef = useRef(null);
   const springConfig: SpringOptions = { damping: 15, stiffness: 300 };
   const opacity = useSpring(0, springConfig);
   const scale = useSpring(0.95, springConfig);
@@ -33,16 +34,26 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   return (
     <Tippy
+      ref={tooltipRef}
       {...props}
-      render={(attrs) => (
-        <motion.div style={{ scale, opacity, maxWidth: maxWidth || 'none' }} {...attrs}>
-          <div className="relative">
-            {content}
+      render={(attrs) => {
+        if (typeof attrs['data-reference-hidden'] !== 'undefined') {
+          tooltipRef.current._tippy.hide(); // eslint-disable-line
+        }
 
-            {arrow && <Arrow data-popper-arrow="" {...attrs} />}
-          </div>
-        </motion.div>
-      )}
+        return (
+          <motion.div
+            style={{ scale, opacity, maxWidth: maxWidth || 'none' }}
+            {...attrs}
+          >
+            <div className="relative">
+              {content}
+
+              {arrow && <Arrow data-popper-arrow="" {...attrs} />}
+            </div>
+          </motion.div>
+        );
+      }}
       animation
       onMount={onMount}
       onHide={onHide}
