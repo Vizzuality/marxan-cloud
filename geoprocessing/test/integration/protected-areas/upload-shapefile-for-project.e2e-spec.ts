@@ -16,7 +16,7 @@ beforeAll(async () => {
   sut = app.get(ProtectedAreaProcessor);
 });
 
-describe(`when worker processes the job for known project`, () => {
+describe.skip(`when worker processes the job for known project`, () => {
   beforeAll(async () => {
     await world.GivenWdpaForProjectAlreadyExists(`old-shape-name`);
     await sut.process(world.WhenNewShapefileIsSubmitted(validShape.filename));
