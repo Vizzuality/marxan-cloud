@@ -92,13 +92,31 @@ Geoprocessing service retrieves job via BullMQ, reads file from shared volume,
 potentially writes it to temporary local (container) filesystem and processes
 it.
 
-Azure Kubernetes Service only supports `ReadWriteOnce` access mode for Azure
-disks (https://docs.microsoft.com/en-us/azure/aks/azure-disks-dynamic-pv).
+Azure Kubernetes Service only supports `ReadWriteOnce` access mode for
+Persistent Volumes (PVs) based on Azure disks
+(https://docs.microsoft.com/en-us/azure/aks/azure-disks-dynamic-pv).
+
+In practice, we have verified through a PoC that *within a single Kubernetes
+node*, more than one pod can mount the same PV in read/write mode, and *at the
+same time* more than one pod can mount the same PV in read-only mode. This does
+not seem to be consistent with the Azure documentation.
+
+To allow pods *scheduled over more than a single node* to share a common PV,
+either PVs based on Azure Files would be needed, or a different strategy should
+be considered.
 
 In development environments, a shared Docker volume could be used.
 
-Producer (API) and consumers (geoprocessing jobs) should use advisory file
-locking to ensure that only fully-written files are used by geoprocessing jobs.
+Some form of cooperation between file producers and consumers will be needed,
+as a form of locking between pods, in order to ensure that files are only read
+once they have been full written to disk.
+
+In its simplest form, this could be handled at the application level, ensuring
+that the file is fully written to disk and that filesystem caches are fully
+flushed, before placing the job that would use the file on a BullMQ queue.
+
+Alternatively, some form of hashing could be used, though this will increase
+the (disk I/O and computational) cost of these file operations.
 
 * HTTP (push)
 
@@ -125,11 +143,19 @@ It also requires to check that a file has been written to disk fully in the
 geoprocessing service before any code that operates on it tries to use it (this
 should be possible with advisory file locks).
 
+This setup may not be suitable for Kubernetes deployments of the Geoprocessing
+service scheduled over more than a single replica, unless by ensuring that the
+file is pushed to all the pods in the deployment (which would be at best
+wasteful and likely brittle).
+
 * HTTP (push after event)
 
 As above, but the API will only push files to the geoprocessing service after
 receiving an `ApiEvent` from the job in the geoprocessing that picks up the
 job request.
+
+The same limitations noted above for horizontal scalability of deployments
+apply.
 
 * HTTP (pull)
 
@@ -148,7 +174,11 @@ cached locally by the API service but not followed by `GET` request by a job on
 the geoprocessing service (because of any errors or timeouts or other issues)
 are eventually deleted from temporary storage on the API service.
 
-* Syncthing
+Similar concerns as noted above regarding horizontal scalability of deployments
+apply, unless using a combination of PV shared among all the API replicas and
+HTTP (pull), but then just using a shared PV would be simpler.
+
+* Syncthing (or similar)
 
 It should work rather reliably, is available in Alpine (on top of which the
 Marxan images for API and geoprocessing service are built), but would require a
