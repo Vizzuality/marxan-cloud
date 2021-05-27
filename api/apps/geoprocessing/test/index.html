@@ -1,151 +1,156 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset='utf-8' />
+  <head>
+    <meta charset="utf-8" />
     <title>Mapbox GL JS Examples</title>
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.css' rel='stylesheet' />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.js"></script>
+    <link
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
     <style>
-        body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
     </style>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-</head>
-<body>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var hoveredStateId = null;
 
-<div id='map'></div>
-<script>
-var hoveredStateId = null;
-
-var map = new mapboxgl.Map({
-    'container': 'map',
-    'zoom': 5,
-    'center': [10,
-          49],
-    "light": {"intensity": 0.2},
-    'style': {
-        'version': 8,
-        'sources': {
-          'postgis-tiles0': {
-                'type': 'vector',
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/administrative-areas/0/preview/tiles/{z}/{x}/{y}.mvt",
-                     ]
+      var map = new mapboxgl.Map({
+        container: 'map',
+        zoom: 5,
+        center: [10, 49],
+        light: { intensity: 0.2 },
+        style: {
+          version: 8,
+          sources: {
+            'postgis-tiles0': {
+              type: 'vector',
+              maxzoom: 12,
+              tiles: [
+                'http://localhost:3040/api/v1/administrative-areas/0/preview/tiles/{z}/{x}/{y}.mvt',
+              ],
             },
             'postgis-tiles1': {
-                'type': 'vector',
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt",
-                     ]
+              type: 'vector',
+              maxzoom: 12,
+              tiles: [
+                'http://localhost:3040/api/v1/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt',
+              ],
             },
             'postgis-tiles2': {
-                'type': 'vector',
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt",
-                     ]
+              type: 'vector',
+              maxzoom: 12,
+              tiles: [
+                'http://localhost:3040/api/v1/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt',
+              ],
             },
             'postgis-tileswdpa': {
-                'type': 'vector',
-                'minzoom': 1,
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/protected-areas/preview/tiles/{z}/{x}/{y}.mvt",
-                     ]
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 12,
+              tiles: [
+                'http://localhost:3040/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt',
+              ],
             },
 
             'postgis-tilesPU': {
-                'type': 'vector',
-                'minzoom': 1,
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/planning-units/preview/tiles/{z}/{x}/{y}.mvt",
-                     ]
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 12,
+              tiles: [
+                'http://localhost:3040/api/v1/planning-units/preview/tiles/{z}/{x}/{y}.mvt',
+              ],
             },
-            'BASEMAP': {
-                'type': 'raster',
-                'tiles': [
-                    "https://api.mapbox.com/styles/v1/elpamart/ckhdqt87r04z719lk3wyo1vo7/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWxwYW1hcnQiLCJhIjoiY2s2ODRqa21zMDBkYzNwbzMwY3N3aGJocyJ9.7AKSmZkqGwVrTyS3WrsxvQ",
-                ]
+            BASEMAP: {
+              type: 'raster',
+              tiles: [
+                'https://api.mapbox.com/styles/v1/elpamart/ckhdqt87r04z719lk3wyo1vo7/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWxwYW1hcnQiLCJhIjoiY2s2ODRqa21zMDBkYzNwbzMwY3N3aGJocyJ9.7AKSmZkqGwVrTyS3WrsxvQ',
+              ],
+            },
+          },
+          layers: [
+            {
+              id: 'mapbox_monochrome-layer',
+              type: 'raster',
+              source: 'BASEMAP',
+              minzoom: 1,
+              maxzoom: 22,
             },
 
-        },
-        'layers': [
-          {
-            'id': 'mapbox_monochrome-layer',
-            'type': 'raster',
-            'source': 'BASEMAP',
-            'minzoom': 1,
-            'maxzoom': 22
-        },
-
-        {
-            'id': 'postgis-tiles-layer',
-            'type': 'fill',
-            'source': 'postgis-tiles2',
-            'source-layer': 'layer0',
-            'paint': {
+            {
+              id: 'postgis-tiles-layer',
+              type: 'fill',
+              source: 'postgis-tiles2',
+              'source-layer': 'layer0',
+              paint: {
                 'fill-outline-color': 'red',
                 'fill-color': 'green',
-                'fill-opacity': 0.2
-            }
-        },
-        // {
-        //     'id': 'postgis-tiles-layer1',
-        //     'type': 'fill',
-        //     'source': 'postgis-tiles1',
-        //     'source-layer': 'layer0',
-        //     'paint': {
-        //         'fill-outline-color': 'blue',
-        //         'fill-color': 'green',
-        //         'fill-opacity': 0.2
-        //     }
-        // },
-        // {
-        //     'id': 'postgis-tiles-layer2',
-        //     'type': 'fill',
-        //     'source': 'postgis-tiles0',
-        //     'source-layer': 'layer0',
-        //     'paint': {
-        //         'fill-outline-color': 'pink',
-        //         'fill-color': 'green',
-        //         'fill-opacity': 0.2
-        //     }
-        // },
-        {
-            'id': 'postgis-tiles-layer-wdpa',
-            'type': 'fill',
-            'source': 'postgis-tileswdpa',
-            'source-layer': 'layer0',
-            'paint': {
+                'fill-opacity': 0.2,
+              },
+            },
+            // {
+            //     'id': 'postgis-tiles-layer1',
+            //     'type': 'fill',
+            //     'source': 'postgis-tiles1',
+            //     'source-layer': 'layer0',
+            //     'paint': {
+            //         'fill-outline-color': 'blue',
+            //         'fill-color': 'green',
+            //         'fill-opacity': 0.2
+            //     }
+            // },
+            // {
+            //     'id': 'postgis-tiles-layer2',
+            //     'type': 'fill',
+            //     'source': 'postgis-tiles0',
+            //     'source-layer': 'layer0',
+            //     'paint': {
+            //         'fill-outline-color': 'pink',
+            //         'fill-color': 'green',
+            //         'fill-opacity': 0.2
+            //     }
+            // },
+            {
+              id: 'postgis-tiles-layer-wdpa',
+              type: 'fill',
+              source: 'postgis-tileswdpa',
+              'source-layer': 'layer0',
+              paint: {
                 'fill-outline-color': 'yellow',
                 'fill-color': 'red',
-                'fill-opacity': 0.7
-            }
+                'fill-opacity': 0.7,
+              },
+            },
+            // {
+            //     'id': 'postgis-tiles-layer-PU',
+            //     'type': 'fill',
+            //     'source': 'postgis-tilesPU',
+            //     'source-layer': 'layer0',
+            //     'paint': {
+            //         'fill-outline-color': 'yellow',
+            //         'fill-color': 'red',
+            //         'fill-opacity': 0.7
+            //     }
+            // },
+          ],
         },
-        // {
-        //     'id': 'postgis-tiles-layer-PU',
-        //     'type': 'fill',
-        //     'source': 'postgis-tilesPU',
-        //     'source-layer': 'layer0',
-        //     'paint': {
-        //         'fill-outline-color': 'yellow',
-        //         'fill-color': 'red',
-        //         'fill-opacity': 0.7
-        //     }
-        // },
-
-        ]
-    }
-});
-
-
-</script>
-
-
-</body>
+      });
+    </script>
+  </body>
 </html>
-

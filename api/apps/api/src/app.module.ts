@@ -28,6 +28,7 @@ import { ProxyModule } from '@marxan-api/modules/proxy/proxy.module';
 import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/scenarios-planning-unit.module';
 import { PlanningUnitsProtectionLevelModule } from './modules/planning-units-protection-level';
 import { AnalysisModule } from './modules/analysis/analysis.module';
+import { PlanningUnitsModule } from 'modules/planning-units/planning-units.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { AnalysisModule } from './modules/analysis/analysis.module';
     ScenariosPlanningUnitModule,
     PlanningUnitsProtectionLevelModule,
     AnalysisModule,
+    PlanningUnitsModule,
   ],
   controllers: [AppController, PingController],
   providers: [

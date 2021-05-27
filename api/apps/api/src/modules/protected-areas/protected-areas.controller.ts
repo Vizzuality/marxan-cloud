@@ -4,6 +4,7 @@ import {
   Param,
   ParseUUIDPipe,
   UseGuards,
+  Req, Res,
 } from '@nestjs/common';
 import { ProtectedAreaResult } from './protected-area.geo.entity';
 import {
@@ -11,6 +12,7 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -30,13 +32,16 @@ import {
   ProtectedAreasService,
 } from './protected-areas.service';
 import { IUCNProtectedAreaCategoryResult } from './dto/iucn-protected-area-category.dto';
+import { Request, Response } from 'express';
+import { ProxyService } from 'modules/proxy/proxy.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(protectedAreaResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/protected-areas`)
 export class ProtectedAreasController {
-  constructor(public readonly service: ProtectedAreasService) {}
+  constructor(public readonly service: ProtectedAreasService,
+    private readonly proxyService: ProxyService) {}
 
   @ApiOperation({
     description: 'Find all protected areas',
@@ -61,6 +66,50 @@ export class ProtectedAreasController {
   ): Promise<ProtectedAreaResult> {
     const results = await this.service.findAllPaginated(fetchSpecification, {});
     return this.service.serialize(results.data, results.metadata);
+  }
+
+  @ApiOperation({
+    description: 'Get tile for protected areas.',
+  })
+  /**
+   *@todo Change ApiOkResponse mvt type
+   */
+  @ApiOkResponse({
+    type: 'mvt',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiQuery({
+    name: 'id',
+    description: 'Id of WDPA area',
+    type: String,
+    required: false,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @Get('/preview/tiles/:z/:x/:y.mvt')
+  async proxyProtectedAreaTile(
+    @Req() request: Request,
+    @Res() response: Response,
+  ) {
+    return this.proxyService.proxyTileRequest(request, response);
   }
 
   @ApiOperation({

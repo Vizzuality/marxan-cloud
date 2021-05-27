@@ -5,6 +5,7 @@ import { ProtectedAreasController } from './protected-areas.controller';
 import { ProtectedArea } from './protected-area.geo.entity';
 import { ProtectedAreasService } from './protected-areas.service';
 import { apiConnections } from '../../ormconfig';
+import { ProxyService } from 'modules/proxy/proxy.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { apiConnections } from '../../ormconfig';
       apiConnections.geoprocessingDB.name,
     ),
   ],
-  providers: [ProtectedAreasService],
+  providers: [ProtectedAreasService, ProxyService],
   controllers: [ProtectedAreasController],
   exports: [ProtectedAreasService],
 })

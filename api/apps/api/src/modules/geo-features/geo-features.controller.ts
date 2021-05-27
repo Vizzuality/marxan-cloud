@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Req, Res, UseGuards } from '@nestjs/common';
 import { geoFeatureResource, GeoFeatureResult } from './geo-feature.geo.entity';
 import { GeoFeaturesService } from './geo-features.service';
 import {
@@ -6,6 +6,8 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -19,15 +21,19 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
+import { Request, Response } from 'express';
+import { ProxyService } from 'modules/proxy/proxy.service';
+import { BBox} from 'geojson';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(geoFeatureResource.className)
 @Controller(
-  `${apiGlobalPrefixes.v1}/${geoFeatureResource.moduleControllerPrefix}`,
+ `${apiGlobalPrefixes.v1}/${geoFeatureResource.moduleControllerPrefix}`,
 )
 export class GeoFeaturesController {
-  constructor(public readonly service: GeoFeaturesService) {}
+  constructor(public readonly service: GeoFeaturesService,
+              private readonly proxyService: ProxyService) {}
 
   @ApiOperation({
     description: 'Find all geo features',
@@ -46,6 +52,53 @@ export class GeoFeaturesController {
     return this.service.serialize(results.data, results.metadata);
   }
 
+  @ApiOperation({
+    description: 'Get tile for a feature by id.',
+  })
+  /**
+   *@todo Change ApiOkResponse mvt type
+   */
+  @ApiOkResponse({
+    type: 'mvt',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Specific id of the feature',
+    type: String,
+    required: true,
+  })
+  @ApiQuery({
+    name: 'bbox',
+    description: 'Bounding box of the project',
+    type: [Number],
+    required: false,
+    example: [-1, 40, 1, 42],
+  })
+  @Get(':id/preview/tiles/:z/:x/:y.mvt')
+  async proxyFeaturesTile(@Req() request: Request, @Res() response: Response) {
+    return this.proxyService.proxyTileRequest(request, response);
+  }
+
   @ApiOperation({ description: 'Find geo feature by id' })
   @ApiOkResponse({ type: GeoFeatureResult })
   @JSONAPISingleEntityQueryParams()
@@ -53,4 +106,6 @@ export class GeoFeaturesController {
   async findOne(@Param('id') id: string): Promise<GeoFeatureResult> {
     return await this.service.serialize(await this.service.fakeFindOne(id));
   }
+
+
 }

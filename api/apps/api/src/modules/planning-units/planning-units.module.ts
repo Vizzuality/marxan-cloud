@@ -1,15 +1,11 @@
 import { Module } from '@nestjs/common';
-import { QueueModule } from '@marxan-api/modules/queue/queue.module';
-
+import { ProxyService } from 'modules/proxy/proxy.service';
+import { PlanningUnitsController } from './planning-units.controller';
 import { PlanningUnitsService } from './planning-units.service';
 
 @Module({
-  imports: [
-    QueueModule.register({
-      name: 'planning-units',
-    }),
-  ],
-  providers: [PlanningUnitsService],
+  providers: [PlanningUnitsService, ProxyService],
   exports: [PlanningUnitsService],
+  controllers: [PlanningUnitsController],
 })
 export class PlanningUnitsModule {}
