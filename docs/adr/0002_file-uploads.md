@@ -73,15 +73,17 @@ bucket, and pushes a job via BullMQ. Geoprocessing service retrieves job via
 BullMQ, requests blob from object storage, writes it to local filesystem and
 processes it.
 
-This will require setting up development buckets and related users and ACLs on
-Azure Blob Storage.
-
 We should still use some form of local storage (maybe from the *shared volume*
 strategy below) for local development, to avoid shuttling blobs around from
 local dev env to an Azure data centre and back.
 
 An adaptor may be useful for this, and also to avoid locking the setup to
 specific cloud providers.
+
+This strategy will require either setting up development buckets and related
+users and ACLs on Azure Blob Storage, or using a development setup that allows
+to access local files via an S3 interface (for example, using an in-cluster
+MinIO service).
 
 * shared volume
 
