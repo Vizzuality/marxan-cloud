@@ -26,6 +26,11 @@
   },
   "geoprocessing": {
     "url": "http://geoprocessing:3000"
+  },
+  "storage": {
+    "sharedFileStorage": {
+      "localPath": "/tmp/storage"
+    }
   }
 }
 

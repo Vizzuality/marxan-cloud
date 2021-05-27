@@ -52,6 +52,13 @@ orchestrated via Kubernetes (forthcoming).
      to mute all logging (for example, in CI pipelines) irrespective of Node
      environment and other settings that would normally affect the logging
      verbosity of the API
+   * `API_SHARED_FILE_STORAGE_LOCAL_PATH` (string, optional, default is
+     `/tmp/storage`): set this to a filesystem path if needing to override the
+     default temporary storage location where shared volumes for files shared
+     from the API to the Geoprocessing service are mounted; configuration of
+     mount point for shared storage (via Docker volumes in development
+     environments and via Persistent Volumes in Kubernetes environments) should
+     be set accordingly
    * `APP_SERVICE_PORT` (number, required): the port on which the App service should
      listen on the local machine
    * `POSTGRES_API_SERVICE_PORT` (number, required): the port on which the
