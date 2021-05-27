@@ -74,7 +74,7 @@
               minzoom: 1,
               maxzoom: 12,
               tiles: [
-                'http://localhost:3040/api/v1/planning-units/preview/tiles/{z}/{x}/{y}.mvt',
+                'http://localhost:3040/api/v1/planning-units/preview/regular/square/1000/tiles/{z}/{x}/{y}.mvt',
               ],
             },
             BASEMAP: {
@@ -137,17 +137,17 @@
                 'fill-opacity': 0.7,
               },
             },
-            // {
-            //     'id': 'postgis-tiles-layer-PU',
-            //     'type': 'fill',
-            //     'source': 'postgis-tilesPU',
-            //     'source-layer': 'layer0',
-            //     'paint': {
-            //         'fill-outline-color': 'yellow',
-            //         'fill-color': 'red',
-            //         'fill-opacity': 0.7
-            //     }
-            // },
+            {
+              id: 'postgis-tiles-layer-PU',
+              type: 'fill',
+              source: 'postgis-tilesPU',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-outline-color': 'yellow',
+                'fill-color': 'red',
+                'fill-opacity': 0.7,
+              },
+            },
           ],
         },
       });

@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IsOptional, IsString, IsArray, IsNumber } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { BBox } from 'geojson';
 import { Transform } from 'class-transformer';
 
@@ -40,7 +40,7 @@ export class PlanningUnitsService {
   private readonly logger: Logger = new Logger(PlanningUnitsService.name);
   constructor(
     @InjectRepository(PlanningUnitsGeom)
-    private readonly protectedAreasRepository: Repository<PlanningUnitsGeom>,
+    private readonly planningUnitsRepository: Repository<PlanningUnitsGeom>,
     @Inject(TileService)
     private readonly tileService: TileService,
   ) {}
@@ -61,18 +61,18 @@ export class PlanningUnitsService {
     planningUnitAreakm2: number,
     filters?: PlanningUnitsFilters,
   ): string {
-    let PlanningUnitGridShape = '';
     let whereQuery = '';
+    let gridShape = 'ST_SquareGrid'
     if (planningUnitGridShape == 'hexagon') {
-      PlanningUnitGridShape = 'ST_HexagonGrid';
+      gridShape = 'ST_HexagonGrid';
     }
     if (planningUnitGridShape == 'square') {
-      PlanningUnitGridShape = 'ST_SquareGrid';
+      gridShape = 'ST_SquareGrid';
     }
     if (filters?.bbox) {
-      whereQuery = `(${PlanningUnitGridShape}(${planningUnitAreakm2} * 1000000, ST_Transform(ST_MakeEnvelope(${filters?.bbox}), 3857)))`;
+      whereQuery = `(${gridShape}(${planningUnitAreakm2} * 1000000, ST_Transform(ST_MakeEnvelope(${filters?.bbox}), 3857)))`;
     } else {
-      whereQuery = `(${PlanningUnitGridShape}(${planningUnitAreakm2} * 1000000, ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), 3857)))`;
+      whereQuery = `(${gridShape}(${planningUnitAreakm2} * 1000000, ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), 3857)))`;
     }
     return whereQuery;
   }
@@ -92,7 +92,7 @@ export class PlanningUnitsService {
       planningUnitAreakm2,
     } = tileSpecification;
     const attributes = 'id';
-    const table = this.protectedAreasRepository.metadata.tableName;
+    const table = this.planningUnitsRepository.metadata.tableName;
     const customQuery = undefined;
     const querytest = this.buildPlanningUnitsWhereQuery(
       z,
@@ -102,6 +102,7 @@ export class PlanningUnitsService {
       planningUnitAreakm2,
       filters,
     );
+    this.logger.debug(querytest)
     return this.tileService.getTile({
       z,
       x,
