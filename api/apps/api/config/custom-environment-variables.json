@@ -27,5 +27,10 @@
    "connection": {
      "host": "REDIS_HOST"
    }
+  },
+  "storage": {
+    "sharedFileStorage": {
+      "localPath": "API_SHARED_FILE_STORAGE_LOCAL_PATH"
+    }
   }
 }

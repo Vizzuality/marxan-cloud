@@ -19,5 +19,10 @@
   },
   "api": {
     "url": "API_SERVICE_URL"
+  },
+  "storage": {
+    "sharedFileStorage": {
+      "localPath": "API_SHARED_FILE_STORAGE_LOCAL_PATH"
+    }
   }
 }
