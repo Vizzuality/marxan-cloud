@@ -20,10 +20,10 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { apiGlobalPrefixes } from 'api.config';
-import { JwtAuthGuard } from 'guards/jwt-auth.guard';
-import { RequestWithAuthenticatedUser } from 'app.controller';
-import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
+import { apiGlobalPrefixes } from '@marxan-api/api.config';
+import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
+import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
+import { JSONAPIQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
 import {
   FetchSpecification,
   ProcessFetchSpecification,

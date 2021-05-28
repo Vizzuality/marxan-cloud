@@ -15,9 +15,9 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { apiGlobalPrefixes } from 'api.config';
-import { JSONAPIQueryParams } from 'decorators/json-api-parameters.decorator';
-import { XApiGuard } from 'guards/x-api.guard';
+import { apiGlobalPrefixes } from '@marxan-api/api.config';
+import { JSONAPIQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
+import { XApiGuard } from '@marxan-api/guards/x-api.guard';
 import {
   FetchSpecification,
   ProcessFetchSpecification,

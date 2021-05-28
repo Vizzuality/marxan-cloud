@@ -1,7 +1,7 @@
 import * as request from 'supertest';
 import { INestApplication, Logger } from '@nestjs/common';
-import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
-import { ScenarioResult } from 'modules/scenarios/scenario.api.entity';
+import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
+import { ScenarioResult } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 /**
  * Utility functions for tests related to Scenarios.

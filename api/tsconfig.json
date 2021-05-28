@@ -13,10 +13,10 @@
     "baseUrl": "./",
     "incremental": true,
     "paths": {
-      "src/*": [
+      "@marxan-geoprocessing/*": [
         "apps/geoprocessing/src/*"
       ],
-      "*": [
+      "@marxan-api/*": [
         "apps/api/src/*"
       ]
     }

@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsJSON, IsOptional, IsUUID } from 'class-validator';
 import { API_EVENT_KINDS } from '../api-event.api.entity';
-import * as ApiEventsUserData from 'modules/api-events/dto/apiEvents.user.data.dto';
+import * as ApiEventsUserData from '@marxan-api/modules/api-events/dto/apiEvents.user.data.dto';
 
 export class CreateApiEventDTO {
   /**

@@ -1,5 +1,8 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { TileService, TileRequest } from 'src/modules/tile/tile.service';
+import {
+  TileService,
+  TileRequest,
+} from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IsOptional, IsString, IsArray, IsNumber } from 'class-validator';
@@ -7,7 +10,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { BBox } from 'geojson';
 import { Transform } from 'class-transformer';
 
-import { PlanningUnitsGeom } from 'src/modules/planning-units/planning-units.geo.entity';
+import { PlanningUnitsGeom } from '@marxan-geoprocessing/modules/planning-units/planning-units.geo.entity';
 
 export class tileSpecification extends TileRequest {
   @ApiProperty()

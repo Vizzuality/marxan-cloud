@@ -1,24 +1,24 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AppInfoDTO } from 'dto/info.dto';
+import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 
 import * as faker from 'faker';
-import { UsersService } from 'modules/users/users.service';
-import { ScenariosService } from 'modules/scenarios/scenarios.service';
-import { PlanningUnitsService } from 'modules/planning-units/planning-units.service';
+import { UsersService } from '@marxan-api/modules/users/users.service';
+import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
+import { PlanningUnitsService } from '@marxan-api/modules/planning-units/planning-units.service';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
-} from 'utils/app-base.service';
-import { Country } from 'modules/countries/country.geo.entity';
-import { AdminArea } from 'modules/admin-areas/admin-area.geo.entity';
-import { AdminAreasService } from 'modules/admin-areas/admin-areas.service';
-import { CountriesService } from 'modules/countries/countries.service';
-import { AppConfig } from 'utils/config.utils';
+} from '@marxan-api/utils/app-base.service';
+import { Country } from '@marxan-api/modules/countries/country.geo.entity';
+import { AdminArea } from '@marxan-api/modules/admin-areas/admin-area.geo.entity';
+import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';
+import { CountriesService } from '@marxan-api/modules/countries/countries.service';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 const projectFilterKeyNames = [
   'name',

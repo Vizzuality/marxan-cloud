@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AppInfoDTO } from 'dto/info.dto';
+import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AdminArea } from './admin-area.geo.entity';
 import { CreateAdminAreaDTO } from './dto/create.admin-area.dto';
@@ -15,13 +15,13 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
   PaginationMeta,
-} from 'utils/app-base.service';
+} from '@marxan-api/utils/app-base.service';
 import { FetchSpecification, FetchUtils } from 'nestjs-base-service';
 import { omit } from 'lodash';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { apiConnections } from '../../ormconfig';
-import { AppConfig } from 'utils/config.utils';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 /**
  * Supported admin area levels (sub-national): either level 1 or level 2.
@@ -77,7 +77,7 @@ export class AdminAreasService extends AppBaseService<
         'gid2',
         'name2',
         'theGeom',
-        'bbox'
+        'bbox',
       ],
       keyForAttribute: 'camelCase',
     };

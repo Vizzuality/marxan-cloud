@@ -26,27 +26,27 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { apiGlobalPrefixes } from 'api.config';
-import { JwtAuthGuard } from 'guards/jwt-auth.guard';
+import { apiGlobalPrefixes } from '@marxan-api/api.config';
+import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { Post } from '@nestjs/common';
 import { UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { uploadOptions } from 'utils/file-uploads.utils';
+import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 
 import {
   JSONAPIQueryParams,
   JSONAPISingleEntityQueryParams,
-} from 'decorators/json-api-parameters.decorator';
+} from '@marxan-api/decorators/json-api-parameters.decorator';
 import { projectResource } from './project.api.entity';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
-import { RequestWithAuthenticatedUser } from 'app.controller';
+import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import { GeoFeatureResult } from 'modules/geo-features/geo-feature.api.entity';
-import { GeoFeaturesService } from 'modules/geo-features/geo-features.service';
+import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import { Request } from 'express';
 import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';

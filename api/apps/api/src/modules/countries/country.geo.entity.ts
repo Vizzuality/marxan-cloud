@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BBox, Geometry } from 'geojson';
 import { Column, PrimaryColumn, ViewEntity } from 'typeorm';
-import { BaseServiceResource } from 'types/resource.interface';
+import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 
 export const countryResource: BaseServiceResource = {
   className: 'Country',

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AppInfoDTO } from 'dto/info.dto';
+import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository } from 'typeorm';
 import { Country } from './country.geo.entity';
 import { CreateCountryDTO } from './dto/create.country.dto';
@@ -10,9 +10,9 @@ import * as faker from 'faker';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
-} from 'utils/app-base.service';
+} from '@marxan-api/utils/app-base.service';
 import { apiConnections } from '../../ormconfig';
-import { AppConfig } from 'utils/config.utils';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 @Injectable()
 export class CountriesService extends AppBaseService<

@@ -24,17 +24,17 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { apiGlobalPrefixes } from 'api.config';
-import { JwtAuthGuard } from 'guards/jwt-auth.guard';
+import { apiGlobalPrefixes } from '@marxan-api/api.config';
+import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { Post } from '@nestjs/common';
 
 import {
   JSONAPIQueryParams,
   JSONAPISingleEntityQueryParams,
-} from 'decorators/json-api-parameters.decorator';
+} from '@marxan-api/decorators/json-api-parameters.decorator';
 import { CreateOrganizationDTO } from './dto/create.organization.dto';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
-import { RequestWithAuthenticatedUser } from 'app.controller';
+import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
