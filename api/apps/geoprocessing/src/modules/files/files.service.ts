@@ -9,23 +9,29 @@ export class FileService {
   unzipFile(fileInfo: Express.Multer.File): Promise<string> {
     return new Promise((resolve, reject) => {
       const stream = createReadStream(fileInfo.path);
-      stream.on('close', () =>
-        resolve(`${fileInfo.filename} extracted successfully`),
-      );
       stream.on('error', (error: Error) =>
         reject(
           new Error(`${fileInfo.filename} could not be extracted: ` + error),
         ),
       );
 
-      stream.pipe(
-        Extract({
-          path: path.join(
-            fileInfo.destination,
-            path.basename(fileInfo.filename.replace('.zip', '')),
+      stream
+        .pipe(
+          Extract({
+            path: path.join(
+              fileInfo.destination,
+              path.basename(fileInfo.filename.replace('.zip', '')),
+            ),
+          }),
+        )
+        .on('error', (error: Error) =>
+          reject(
+            new Error(`${fileInfo.filename} could not be extracted: ` + error),
           ),
-        }),
-      );
+        )
+        .on('close', () =>
+          resolve(`${fileInfo.filename} extracted successfully`),
+        );
     });
   }
 
