@@ -6,7 +6,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 
-import { ShapefileGeoJSONResponseDTO } from '@marxan-api/modules/scenarios/dto/shapefile.geojson.response.dto';
+import { ShapefileGeoJSONResponseDTO } from 'modules/scenarios/dto/shapefile.geojson.response.dto';
 import { isDefined } from '../utils/is-defined';
 
 export function ApiConsumesShapefile(withGeoJsonResponse = true) {

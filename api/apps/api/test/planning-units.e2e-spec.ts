@@ -7,12 +7,12 @@ import {
 } from '@nestjs/common';
 import * as request from 'supertest';
 
-import { AppModule } from '@marxan-api/app.module';
+import { AppModule } from '../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
 
-import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
+import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
 import { Job } from 'bullmq';
-import { PlanningUnitsService } from '@marxan-api/modules/planning-units/planning-units.service';
+import { PlanningUnitsService } from 'modules/planning-units/planning-units.service';
 import { tearDown } from './utils/tear-down';
 
 afterAll(async () => {

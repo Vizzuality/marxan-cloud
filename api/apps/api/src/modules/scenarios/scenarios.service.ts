@@ -1,22 +1,22 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AppInfoDTO } from '@marxan-api/dto/info.dto';
+import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { JobStatus, Scenario, ScenarioType } from './scenario.api.entity';
 
 import * as faker from 'faker';
-import { UsersService } from '@marxan-api/modules/users/users.service';
+import { UsersService } from 'modules/users/users.service';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
-} from '@marxan-api/utils/app-base.service';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { ProtectedAreasService } from '@marxan-api/modules/protected-areas/protected-areas.service';
-import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
+} from 'utils/app-base.service';
+import { Project } from 'modules/projects/project.api.entity';
+import { ProtectedAreasService } from 'modules/protected-areas/protected-areas.service';
+import { ProjectsService } from 'modules/projects/projects.service';
 import { concat } from 'lodash';
-import { AppConfig } from '@marxan-api/utils/config.utils';
+import { AppConfig } from 'utils/config.utils';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { CalculatePlanningUnitsProtectionLevel } from '../planning-units-protection-level';

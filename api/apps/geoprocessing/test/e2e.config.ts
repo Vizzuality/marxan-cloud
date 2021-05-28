@@ -2,7 +2,7 @@ import * as faker from 'faker';
 import {
   PlanningUnitsJob,
   PlanningUnitGridShape,
-} from '@marxan-geoprocessing/modules/planning-units/dto/create.regular.planning-units.dto';
+} from 'src/modules/planning-units/dto/create.regular.planning-units.dto';
 
 interface OptionsWithCountryCode {
   countryCode: string;

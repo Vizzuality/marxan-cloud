@@ -1,18 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AppInfoDTO } from '@marxan-api/dto/info.dto';
+import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateOrganizationDTO } from './dto/create.organization.dto';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
 import { Organization } from './organization.api.entity';
 
 import * as faker from 'faker';
-import { UsersService } from '@marxan-api/modules/users/users.service';
+import { UsersService } from 'modules/users/users.service';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
-} from '@marxan-api/utils/app-base.service';
-import { AppConfig } from '@marxan-api/utils/config.utils';
+} from 'utils/app-base.service';
+import { AppConfig } from 'utils/config.utils';
 
 const organizationFilterKeyNames = ['name'] as const;
 type OrganizationFilterKeys = keyof Pick<

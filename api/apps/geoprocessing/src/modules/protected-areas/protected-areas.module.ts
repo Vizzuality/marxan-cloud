@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProtectedAreasController } from './protected-areas.controller';
 import { ProtectedAreasService } from './protected-areas.service';
-import { TileModule } from '@marxan-geoprocessing/modules/tile/tile.module';
-import { ProtectedArea } from '@marxan-geoprocessing/modules/protected-areas/protected-areas.geo.entity';
+import { TileModule } from 'src/modules/tile/tile.module';
+import { ProtectedArea } from 'src/modules/protected-areas/protected-areas.geo.entity';
 import { ProtectedAreaWorkerModule } from './worker/protected-area-worker.module';
 
 @Module({

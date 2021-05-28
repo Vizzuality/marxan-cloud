@@ -18,8 +18,8 @@ import {
   PlanningUnitsFilters,
   tileSpecification,
 } from './planning-units.service';
-import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
-import { uploadOptions } from '@marxan-geoprocessing/utils/file.utils';
+import { apiGlobalPrefixes } from 'src/api.config';
+import { uploadOptions } from 'src/utils/file.utils';
 
 import { ShapefileService } from '../shapefiles/shapefiles.service';
 import { ApiConsumesShapefile } from '../../decoratos/shapefile.decorator';
@@ -31,7 +31,7 @@ import {
   ApiQuery,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { TileRequest } from '@marxan-geoprocessing/modules/tile/tile.service';
+import { TileRequest } from 'src/modules/tile/tile.service';
 
 import { Response } from 'express';
 

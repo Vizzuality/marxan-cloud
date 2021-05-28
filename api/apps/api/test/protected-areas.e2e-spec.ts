@@ -6,21 +6,21 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@marxan-api/app.module';
+import { AppModule } from '../src/app.module';
 import { E2E_CONFIG } from './e2e.config';
-import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
-import { IUCNProtectedAreaCategoryDTO } from '@marxan-api/modules/protected-areas/dto/iucn-protected-area-category.dto';
+import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
+import { IUCNProtectedAreaCategoryDTO } from 'modules/protected-areas/dto/iucn-protected-area-category.dto';
 import {
   IUCNCategory,
   ProtectedArea,
-} from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
+} from 'modules/protected-areas/protected-area.geo.entity';
 import * as JSONAPISerializer from 'jsonapi-serializer';
-import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
+import { Organization } from 'modules/organizations/organization.api.entity';
 import { OrganizationsTestUtils } from './utils/organizations.test.utils';
 import { ProjectsTestUtils } from './utils/projects.test.utils';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { Project } from 'modules/projects/project.api.entity';
 import { ScenariosTestUtils } from './utils/scenarios.test.utils';
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { Scenario } from 'modules/scenarios/scenario.api.entity';
 import { v4 } from 'uuid';
 import { difference } from 'lodash';
 import { tearDown } from './utils/tear-down';

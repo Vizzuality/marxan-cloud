@@ -1,5 +1,5 @@
 import { getConnection } from 'typeorm';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { DbConnections } from '../../src/ormconfig.connections';
 
 export const tearDown = async () => {
   const connections = Object.values(DbConnections).map((name) =>

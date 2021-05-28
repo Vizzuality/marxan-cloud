@@ -11,14 +11,14 @@ import {
   ProtectedAreasService,
   ProtectedAreasFilters,
 } from './protected-areas.service';
-import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
+import { apiGlobalPrefixes } from 'src/api.config';
 import {
   ApiOperation,
   ApiParam,
   ApiQuery,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { TileRequest } from '@marxan-geoprocessing/modules/tile/tile.service';
+import { TileRequest } from 'src/modules/tile/tile.service';
 
 import { Response } from 'express';
 

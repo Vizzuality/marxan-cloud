@@ -1,11 +1,8 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import {
-  TileService,
-  TileRequest,
-} from '@marxan-geoprocessing/modules/tile/tile.service';
+import { TileService, TileRequest } from 'src/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
+import { GeoFeatureGeometry } from 'src/modules/features/features.geo.entity';
 import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';

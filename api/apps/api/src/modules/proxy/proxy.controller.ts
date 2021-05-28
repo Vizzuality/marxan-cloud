@@ -9,8 +9,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import { apiGlobalPrefixes } from '@marxan-api/api.config';
+import { JwtAuthGuard } from 'guards/jwt-auth.guard';
+import { apiGlobalPrefixes } from 'api.config';
 import { ProxyService } from './proxy.service';
 import { Request, Response } from 'express';
 

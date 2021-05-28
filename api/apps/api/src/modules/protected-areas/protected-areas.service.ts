@@ -1,8 +1,8 @@
-import { BaseServiceResource } from '@marxan-api/types/resource.interface';
+import { BaseServiceResource } from 'types/resource.interface';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AppInfoDTO } from '@marxan-api/dto/info.dto';
+import { AppInfoDTO } from 'dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateProtectedAreaDTO } from './dto/create.protected-area.dto';
 import { UpdateProtectedAreaDTO } from './dto/update.protected-area.dto';
@@ -12,17 +12,17 @@ import * as JSONAPISerializer from 'jsonapi-serializer';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
-} from '@marxan-api/utils/app-base.service';
+} from 'utils/app-base.service';
 import { isNil } from 'lodash';
 import { FetchSpecification } from 'nestjs-base-service';
 import {
   IUCNProtectedAreaCategoryDTO,
   IUCNProtectedAreaCategoryResult,
 } from './dto/iucn-protected-area-category.dto';
-import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';
+import { AdminAreasService } from 'modules/admin-areas/admin-areas.service';
 import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
 import { apiConnections } from '../../ormconfig';
-import { AppConfig } from '@marxan-api/utils/config.utils';
+import { AppConfig } from 'utils/config.utils';
 
 const protectedAreaFilterKeyNames = [
   'fullName',

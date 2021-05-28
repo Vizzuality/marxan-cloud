@@ -4,9 +4,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import * as helmet from 'helmet';
 import { CorsUtils } from './utils/cors.utils';
-import { AppConfig } from '@marxan-api/utils/config.utils';
+import { AppConfig } from 'utils/config.utils';
 import { ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from '@marxan-api/filters/all-exceptions.exception.filter';
+import { AllExceptionsFilter } from 'filters/all-exceptions.exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

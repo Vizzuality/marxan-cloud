@@ -1,5 +1,5 @@
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
+import { AppConfig } from 'src/utils/config.utils';
 
 /**
  * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs

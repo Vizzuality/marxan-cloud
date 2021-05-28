@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { IsEnum } from 'class-validator';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { BaseServiceResource } from '@marxan-api/types/resource.interface';
+import { BaseServiceResource } from 'types/resource.interface';
 
 export const apiEventResource: BaseServiceResource = {
   className: 'ApiEvent',

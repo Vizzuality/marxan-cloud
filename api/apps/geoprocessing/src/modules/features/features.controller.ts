@@ -9,7 +9,7 @@ import {
   ParseArrayPipe,
 } from '@nestjs/common';
 import { FeatureService } from './features.service';
-import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
+import { apiGlobalPrefixes } from 'src/api.config';
 import {
   ApiOperation,
   ApiParam,

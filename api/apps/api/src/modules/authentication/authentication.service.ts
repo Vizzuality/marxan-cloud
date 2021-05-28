@@ -8,9 +8,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { User } from '@marxan-api/modules/users/user.api.entity';
-import { UsersService } from '@marxan-api/modules/users/users.service';
-import { AppConfig } from '@marxan-api/utils/config.utils';
+import { User } from 'modules/users/user.api.entity';
+import { UsersService } from 'modules/users/users.service';
+import { AppConfig } from 'utils/config.utils';
 import { hash, compare } from 'bcrypt';
 
 import { LessThan, Repository } from 'typeorm';
@@ -18,10 +18,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IssuedAuthnToken } from './issued-authn-token.api.entity';
 import ms = require('ms');
 import { SignUpDto } from './dto/sign-up.dto';
-import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
-import { API_EVENT_KINDS } from '@marxan-api/modules/api-events/api-event.api.entity';
+import { ApiEventsService } from 'modules/api-events/api-events.service';
+import { API_EVENT_KINDS } from 'modules/api-events/api-event.api.entity';
 import { v4 } from 'uuid';
-import * as ApiEventsUserData from '@marxan-api/modules/api-events/dto/apiEvents.user.data.dto';
+import * as ApiEventsUserData from 'modules/api-events/dto/apiEvents.user.data.dto';
 
 /**
  * Access token for the app: key user data and access token

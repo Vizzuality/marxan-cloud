@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { E2E_CONFIG } from './e2e.config';
-import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
+import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
 import { FakeQueue } from './utils/queues';
 import { QueueToken } from '../src/modules/queue/queue.tokens';
 import { bootstrapApplication } from './utils/api-application';

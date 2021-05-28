@@ -1,7 +1,7 @@
 import * as request from 'supertest';
 import { INestApplication, Logger } from '@nestjs/common';
-import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
-import { ProjectResultSingular } from '@marxan-api/modules/projects/project.api.entity';
+import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
+import { ProjectResultSingular } from 'modules/projects/project.api.entity';
 
 /**
  * Utility functions for tests related to Projects.

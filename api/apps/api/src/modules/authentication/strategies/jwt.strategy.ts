@@ -4,11 +4,11 @@ import { PassportStrategy } from '@nestjs/passport';
 import {
   AuthenticationService,
   JwtDataPayload,
-} from '@marxan-api/modules/authentication/authentication.service';
+} from 'modules/authentication/authentication.service';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UsersService } from '@marxan-api/modules/users/users.service';
-import { AppConfig } from '@marxan-api/utils/config.utils';
+import { UsersService } from 'modules/users/users.service';
+import { AppConfig } from 'utils/config.utils';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

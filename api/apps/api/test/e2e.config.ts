@@ -1,15 +1,12 @@
 import * as faker from 'faker';
-import { CreateOrganizationDTO } from '@marxan-api/modules/organizations/dto/create.organization.dto';
-import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
-import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
-import { PlanningUnitGridShape } from '@marxan-api/modules/projects/project.api.entity';
-import {
-  JobStatus,
-  ScenarioType,
-} from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { CreateUserDTO } from '@marxan-api/modules/users/dto/create.user.dto';
-import { UpdateUserDTO } from '@marxan-api/modules/users/dto/update.user.dto';
-import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
+import { CreateOrganizationDTO } from 'modules/organizations/dto/create.organization.dto';
+import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
+import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
+import { PlanningUnitGridShape } from 'modules/projects/project.api.entity';
+import { JobStatus, ScenarioType } from 'modules/scenarios/scenario.api.entity';
+import { CreateUserDTO } from 'modules/users/dto/create.user.dto';
+import { UpdateUserDTO } from 'modules/users/dto/update.user.dto';
+import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
 
 interface CountryCodeInput {
   countryCode?: string;

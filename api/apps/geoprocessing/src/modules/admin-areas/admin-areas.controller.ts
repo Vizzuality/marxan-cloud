@@ -8,7 +8,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { AdminAreasService } from './admin-areas.service';
-import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
+import { apiGlobalPrefixes } from 'src/api.config';
 import {
   ApiOperation,
   ApiParam,

@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 
-import { AppConfig } from '@marxan-api/utils/config.utils';
+import { AppConfig } from 'utils/config.utils';
 import { Request, Response } from 'express';
 /**
  * @debt i think this is not properly imported, but it was the only way for it to work

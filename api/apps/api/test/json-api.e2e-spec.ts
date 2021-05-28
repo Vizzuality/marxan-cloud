@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@marxan-api/app.module';
+import { AppModule } from '../src/app.module';
 import { omit } from 'lodash';
 import { E2E_CONFIG } from './e2e.config';
 import { ProjectsTestUtils } from './utils/projects.test.utils';
-import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
+import { Organization } from 'modules/organizations/organization.api.entity';
 import { OrganizationsTestUtils } from './utils/organizations.test.utils';
 import * as JSONAPISerializer from 'jsonapi-serializer';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { Project } from 'modules/projects/project.api.entity';
 import { tearDown } from './utils/tear-down';
 
 afterAll(async () => {

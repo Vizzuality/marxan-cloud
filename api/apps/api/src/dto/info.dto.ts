@@ -1,4 +1,4 @@
 import { InfoDTO } from 'nestjs-base-service';
-import { User } from '@marxan-api/modules/users/user.api.entity';
+import { User } from 'modules/users/user.api.entity';
 
 export type AppInfoDTO = InfoDTO<User>;

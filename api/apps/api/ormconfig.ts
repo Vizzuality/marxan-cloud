@@ -1,4 +1,4 @@
-import { apiConnections } from '@marxan-api/ormconfig';
+import { apiConnections } from './src/ormconfig';
 
 /**
  * We just re-export what we import from the actual ORM configuration file
