@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProjectsController } from './projects.controller';
 import { Project } from './project.api.entity';
-import { ProjectsService } from './projects.service';
+import { ProjectsCrud } from './projects-crud';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { ScenariosModule } from '@marxan-api/modules/scenarios/scenarios.module';
 import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.module';
@@ -11,6 +11,9 @@ import { CountriesModule } from '@marxan-api/modules/countries/countries.module'
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
 import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
 import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
+import { ProjectsRootService } from './projects-root.service';
+import { GeoFeatureMapper } from './dto/geo-feature.mapper';
+import { ProjectMapper } from './dto/project-mapper';
 
 @Module({
   imports: [
@@ -23,8 +26,13 @@ import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
     PlanningUnitsModule,
     ProtectedAreasModule,
   ],
-  providers: [ProjectsService],
+  providers: [
+    ProjectsCrud,
+    ProjectsRootService,
+    GeoFeatureMapper,
+    ProjectMapper,
+  ],
   controllers: [ProjectsController],
-  exports: [ProjectsService],
+  exports: [ProjectsCrud],
 })
 export class ProjectsModule {}

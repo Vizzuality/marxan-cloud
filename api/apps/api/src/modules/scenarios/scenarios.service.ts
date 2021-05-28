@@ -14,7 +14,7 @@ import {
 } from '@marxan-api/utils/app-base.service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { ProtectedAreasService } from '@marxan-api/modules/protected-areas/protected-areas.service';
-import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
+import { ProjectsCrud } from '@marxan-api/modules/projects/projects-crud';
 import { concat } from 'lodash';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
@@ -43,8 +43,8 @@ export class ScenariosService extends AppBaseService<
     @Inject(UsersService) protected readonly usersService: UsersService,
     @Inject(ProtectedAreasService)
     protected readonly protectedAreasService: ProtectedAreasService,
-    @Inject(forwardRef(() => ProjectsService))
-    protected readonly projectsService: ProjectsService,
+    @Inject(forwardRef(() => ProjectsCrud))
+    protected readonly projectsService: ProjectsCrud,
     private readonly wdpaCalculationsDetector: WdpaAreaCalculationService,
     private readonly commandBus: CommandBus,
   ) {

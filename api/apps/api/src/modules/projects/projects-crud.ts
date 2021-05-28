@@ -5,8 +5,6 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
-
-import * as faker from 'faker';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
 import { PlanningUnitsService } from '@marxan-api/modules/planning-units/planning-units.service';
@@ -34,7 +32,7 @@ type ProjectFilterKeys = keyof Pick<
 type ProjectFilters = Record<ProjectFilterKeys, string[]>;
 
 @Injectable()
-export class ProjectsService extends AppBaseService<
+export class ProjectsCrud extends AppBaseService<
   Project,
   CreateProjectDTO,
   UpdateProjectDTO,
@@ -100,32 +98,6 @@ export class ProjectsService extends AppBaseService<
         ],
       },
     };
-  }
-
-  async importLegacyProject(_file: Express.Multer.File): Promise<Project> {
-    return new Project();
-  }
-
-  async fakeFindOne(_id: string): Promise<Project> {
-    const project = {
-      ...new Project(),
-      id: faker.random.uuid(),
-      name: faker.lorem.words(5),
-      description: faker.lorem.sentence(),
-      users: await Promise.all(
-        Array.from({ length: 10 }).map(
-          async (_userId) =>
-            await this.usersService.fakeFindOne(faker.random.uuid()),
-        ),
-      ),
-      attributes: await Promise.all(
-        Array.from({ length: 5 }).map(
-          async (_scenarioId) =>
-            await this.scenariosService.fakeFindOne(faker.random.uuid()),
-        ),
-      ),
-    };
-    return project;
   }
 
   /**
