@@ -61,7 +61,7 @@ services:
     volumes:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs
-      - marxan-cloud-backend-temp-storage:/tmp/storage:ro
+      - marxan-cloud-backend-temp-storage:/tmp/storage
     env_file: .env
     environment:
       - NODE_PATH=src

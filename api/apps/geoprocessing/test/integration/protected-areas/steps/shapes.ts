@@ -1,5 +1,6 @@
 import { Readable } from 'stream';
 import { readFileSync } from 'fs';
+import { AppConfig } from '../../../../src/utils/config.utils';
 
 export const shapes = {
   invalid: () => resolveFile('new-shape-name'),
@@ -18,7 +19,11 @@ export const shapes = {
 const resolveFile = (
   fileName: 'new-shape-name' | 'test_multiple_features_v2',
 ): Express.Multer.File => {
-  const shapePath = __dirname + `/${fileName}.zip`;
+  const baseDir = AppConfig.get<string>(
+    'storage.sharedFileStorage.localPath',
+  ) as string;
+  // TODO copy files?
+  const shapePath = baseDir + `/${fileName}.zip`;
   const shapefile = readFileSync(shapePath);
 
   return {
@@ -26,7 +31,7 @@ const resolveFile = (
     buffer: shapefile,
     mimetype: 'application/zip',
     path: shapePath,
-    destination: __dirname,
+    destination: baseDir,
     fieldname: 'attachment',
     size: shapefile.length,
     originalname: `${fileName}.zip`,

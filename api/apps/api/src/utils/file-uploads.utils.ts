@@ -18,6 +18,7 @@ export const uploadOptions: MulterOptions = {
     ) => {
       cb(null, `${uuidv4()}_${file.originalname}`);
     },
+    destination: AppConfig.get<string>('storage.sharedFileStorage.localPath'),
   }),
   limits: {
     /**
@@ -25,12 +26,7 @@ export const uploadOptions: MulterOptions = {
      * use this as fileSize limit, otherwise fall back to hardcoded default
      * (50MiB).
      */
-    fileSize: (() => {
-      const fileUploadsSizeLimitMebibytes = AppConfig.get<number>(
-        'fileUploads.limits.fileSize',
-        50 * 1024e2,
-      );
-      return fileUploadsSizeLimitMebibytes;
-    })(),
+    fileSize: (() =>
+      AppConfig.get<number>('fileUploads.limits.fileSize', 50 * 1024e2))(),
   },
 };
