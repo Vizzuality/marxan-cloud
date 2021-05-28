@@ -1,7 +1,7 @@
 # [API and Data engineering] File uploads
 
-* Date: 24 May 2021
-* Status: proposed
+* Date: 28 May 2021
+* Status: accepted
 * Deciders: Alicia Arenzana, Kamil Gajowy, Alex Larrañaga, Dominik Ostrowski,
   Andrea Rota
 
@@ -98,10 +98,10 @@ Azure Kubernetes Service only supports `ReadWriteOnce` access mode for
 Persistent Volumes (PVs) based on Azure disks
 (https://docs.microsoft.com/en-us/azure/aks/azure-disks-dynamic-pv).
 
-In practice, we have verified through a PoC that *within a single Kubernetes
-node*, more than one pod can mount the same PV in read/write mode, and *at the
-same time* more than one pod can mount the same PV in read-only mode. This does
-not seem to be consistent with the Azure documentation.
+We have verified through a PoC that indeed as expected *within a single
+Kubernetes node*, more than one pod can mount the same PV in read/write mode,
+and *at the same time* more than one pod can mount the same PV in read-only
+mode.
 
 To allow pods *scheduled over more than a single node* to share a common PV,
 either PVs based on Azure Files would be needed, or a different strategy should
@@ -211,13 +211,48 @@ in this context.
 
 ## Decision outcome
 
+We will be using *shared volumes* to convey uploaded files from the API to the
+Geoprocessing service.
+
+In test/staging/production Kubernetes environments we will use Kubernetes
+PersistentVolumes.
+
+Environments deployed in Azure AKS clusters may use Azure Disk for single-node
+clusters, and Azure Files for multi-node clusters.
+
+Local development environments will use Docker volumes.
+
 ### Positive Consequences
+
+The chosen architecture keeps data as close as possible to the compute
+resources.
+
+Although this does not necessarily imply higher reliability than other
+solutions, it does at least aim for reliability through simplicity and fewer
+moving parts than other solutions.
+
+PoC tests showed adequate performance profiles (~200MBps for disk-based storage
+classes and ~150MBps for network storage-based storage classes). Files on PVs
+are immediately available to all pods, with no additional network overhead as
+may be the case with, for example, object storage.
+
+Ergonomics-wise, the chosen solution allows to use only plain filesystem
+semantics, without additional layers (HTTP or object storage APIs).
+Likewise, there is no need for extra setup in local development environments.
+
+Although the flagship instances will make use of specific storage classes
+available on Azure, the use of Kubernetes PVs makes the solution
+vendor-independent.
 
 ### Negative Consequences
 
-## Pros and Cons of the Options
-
-### [option 1]
+Multi-node Kubernetes setups need to use network storage-based storage classes,
+although the reliability profiles of these is handled transparently by the
+target cloud platforms. This is not a negative consequence per se: only a note
+about a different configuration being needed in multi-node setups, which
+relies on more moving parts behind the scenes.
 
 ## References
 
+[Dynamic Azure disks in Azure Kubernetes Service
+(AKS)](https://docs.microsoft.com/en-us/azure/aks/azure-disks-dynamic-pv)
