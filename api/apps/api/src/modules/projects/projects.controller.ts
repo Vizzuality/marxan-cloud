@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -182,7 +183,10 @@ export class ProjectsController {
     @Param('id') projectId: string,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<void> {
-    this.projectsService.addShapeFor(projectId, file);
+    const outcome = await this.projectsService.addShapeFor(projectId, file);
+    if (outcome) {
+      throw new NotFoundException();
+    }
     return;
   }
 }

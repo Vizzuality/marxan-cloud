@@ -22,41 +22,48 @@ export class ProjectsService {
     fetchSpec: FetchSpecification,
     appInfo?: AppInfoDTO,
   ) {
-    // Resource Locator /ACL/
+    // /ACL slot/
     return this.geoCrud.findAllPaginated(fetchSpec, appInfo);
   }
 
   async findAll(fetchSpec: FetchSpecification, _?: AppInfoDTO) {
-    // Resource Locator /ACL/
+    // /ACL slot/
     return this.projectsCrud.findAllPaginated(fetchSpec);
   }
 
   async findOne(id: string) {
-    // Resource Locator /ACL/
+    // /ACL slot/
     return this.projectsCrud.getById(id);
   }
 
   // TODO debt: shouldn't use API's DTO - avoid relating service to given access layer (Rest)
   async create(input: CreateProjectDTO, info: AppInfoDTO) {
-    // Resource Locator /ACL - can?/
+    // /ACL slot - can?/
     return this.projectsCrud.create(input, info);
   }
 
   async update(projectId: string, input: UpdateProjectDTO) {
-    // Resource Locator /find/
-    // Resource Locator /ACL - can?/
+    // /ACL slot - can?/
     return this.projectsCrud.update(projectId, input);
   }
 
   async remove(projectId: string) {
-    // Resource Locator /find/
-    // Resource Locator /ACL - can?/
+    // /ACL slot - can?/
     return this.projectsCrud.remove(projectId);
   }
 
-  addShapeFor(projectId: string, file: Express.Multer.File) {
-    // Resource Locator /find/
-    // Resource Locator /ACL - can?/
+  async addShapeFor(
+    projectId: string,
+    file: Express.Multer.File,
+  ): Promise<Error | undefined> /** Debt: move to Either<ErrorSymbol,Ok> */ {
+    // /ACL slot - can?/
+    try {
+      // throws HttpException
+      await this.projectsCrud.getById(projectId);
+    } catch {
+      return new Error(`Not Found`);
+    }
+
     this.protectedAreaShapefile.convert(projectId, file);
     return;
   }
