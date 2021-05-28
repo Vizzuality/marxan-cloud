@@ -5,8 +5,5 @@
   "ext": "ts,js,graphql",
   "ignore": [
     "**/*.spec.ts"
-  ],
-  "env": {
-    "NODE_PRESERVE_SYMLINKS": 1
-  }
+  ]
 }

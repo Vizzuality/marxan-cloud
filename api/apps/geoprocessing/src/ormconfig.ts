@@ -41,7 +41,7 @@ export const geoprocessingConnections: {
         ? true
         : false,
     cli: {
-      migrationsDir: 'migrations/geoprocessing',
+      migrationsDir: 'apps/geoprocessing/src/migrations/geoprocessing',
     },
   },
   apiDB: {
