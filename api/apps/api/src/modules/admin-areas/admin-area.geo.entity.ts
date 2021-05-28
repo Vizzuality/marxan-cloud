@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Country } from 'modules/countries/country.geo.entity';
+import { Country } from '@marxan-api/modules/countries/country.geo.entity';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { BaseServiceResource } from 'types/resource.interface';
+import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 
 export const adminAreaResource: BaseServiceResource = {
   className: 'AdminArea',

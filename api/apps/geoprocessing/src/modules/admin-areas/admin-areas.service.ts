@@ -1,5 +1,8 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { TileService, TileRequest } from 'src/modules/tile/tile.service';
+import {
+  TileService,
+  TileRequest,
+} from '@marxan-geoprocessing/modules/tile/tile.service';
 import { ApiProperty } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -13,7 +16,7 @@ import {
   IsNumber,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { AdminArea } from 'src/modules/admin-areas/admin-areas.geo.entity';
+import { AdminArea } from '@marxan-geoprocessing/modules/admin-areas/admin-areas.geo.entity';
 import { BBox } from 'geojson';
 
 export class TileSpecification extends TileRequest {

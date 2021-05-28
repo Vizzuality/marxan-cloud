@@ -1,10 +1,13 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { TileService, TileRequest } from 'src/modules/tile/tile.service';
+import {
+  TileService,
+  TileRequest,
+} from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IsOptional, IsString } from 'class-validator';
 
-import { ProtectedArea } from 'src/modules/protected-areas/protected-areas.geo.entity';
+import { ProtectedArea } from '@marxan-geoprocessing/modules/protected-areas/protected-areas.geo.entity';
 
 export class ProtectedAreasFilters {
   @IsOptional()

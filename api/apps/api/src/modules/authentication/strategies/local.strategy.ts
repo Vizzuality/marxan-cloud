@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
-import { AuthenticationService } from 'modules/authentication/authentication.service';
-import { User } from 'modules/users/user.api.entity';
+import { AuthenticationService } from '@marxan-api/modules/authentication/authentication.service';
+import { User } from '@marxan-api/modules/users/user.api.entity';
 
 import { Strategy } from 'passport-local';
 

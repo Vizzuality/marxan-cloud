@@ -38,26 +38,26 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { apiGlobalPrefixes } from 'api.config';
-import { JwtAuthGuard } from 'guards/jwt-auth.guard';
+import { apiGlobalPrefixes } from '@marxan-api/api.config';
+import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 
 import {
   JSONAPIQueryParams,
   JSONAPISingleEntityQueryParams,
-} from 'decorators/json-api-parameters.decorator';
+} from '@marxan-api/decorators/json-api-parameters.decorator';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
-import { RequestWithAuthenticatedUser } from 'app.controller';
+import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 
 import { ScenarioFeaturesService } from '../scenarios-features';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
 import { ProcessingStatusDto } from './dto/processing-status.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
-import { uploadOptions } from 'utils/file-uploads.utils';
-import { ProxyService } from 'modules/proxy/proxy.service';
+import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { AdjustPlanningUnits } from '../analysis/entry-points/adjust-planning-units';
-import { ApiConsumesShapefile } from 'decorators/shapefile.decorator';
+import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 
 @UseGuards(JwtAuthGuard)

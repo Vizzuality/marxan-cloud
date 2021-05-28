@@ -7,23 +7,23 @@ import {
 } from '@nestjs/common';
 import * as faker from 'faker';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
+import { AppModule } from '@marxan-api/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { v4 } from 'uuid';
-import { SignUpDto } from 'modules/authentication/dto/sign-up.dto';
-import { User } from 'modules/users/user.api.entity';
+import { SignUpDto } from '@marxan-api/modules/authentication/dto/sign-up.dto';
+import { User } from '@marxan-api/modules/users/user.api.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { apiConnections } from 'ormconfig';
+import { apiConnections } from '@marxan-api/ormconfig';
 import {
   ApiEvent,
   API_EVENT_KINDS,
-} from 'modules/api-events/api-event.api.entity';
-import { ApiEventsModule } from 'modules/api-events/api-events.module';
-import { ApiEventsService } from 'modules/api-events/api-events.service';
-import { UsersModule } from 'modules/users/users.module';
-import { UsersService } from 'modules/users/users.service';
-import { LoginDto } from 'modules/authentication/dto/login.dto';
-import { ApiEventByTopicAndKind } from 'modules/api-events/api-event.topic+kind.api.entity';
+} from '@marxan-api/modules/api-events/api-event.api.entity';
+import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
+import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
+import { UsersModule } from '@marxan-api/modules/users/users.module';
+import { UsersService } from '@marxan-api/modules/users/users.service';
+import { LoginDto } from '@marxan-api/modules/authentication/dto/login.dto';
+import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
 import { tearDown } from './utils/tear-down';
 
 /**
