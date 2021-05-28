@@ -1,0 +1,36 @@
+{
+  "logging": {
+    "muteAll": "API_LOGGING_MUTE_ALL"
+  },
+  "postgresApi": {
+    "url": "API_POSTGRES_URL",
+    "runMigrationsOnStartup": "API_RUN_MIGRATIONS_ON_STARTUP"
+   },
+   "postgresGeoApi": {
+    "url": "GEO_POSTGRES_URL",
+    "runMigrationsOnStartup": "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP"
+   },
+  "network": {
+    "cors": {
+      "origins_extra": "NETWORK_CORS_ORIGINS"
+    }
+  },
+  "auth": {
+    "jwt": {
+      "secret": "API_AUTH_JWT_SECRET"
+    },
+    "xApiKey": {
+      "secret": "API_AUTH_X_API_KEY"
+    }
+  },
+  "redisApi": {
+   "connection": {
+     "host": "REDIS_HOST"
+   }
+  },
+  "storage": {
+    "sharedFileStorage": {
+      "localPath": "API_SHARED_FILE_STORAGE_LOCAL_PATH"
+    }
+  }
+}
