@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkerModule, WorkerProcessor } from '../worker';
+import { ShapefilesModule } from '../shapefiles/shapefiles.module';
 
 import { SurfaceCostProcessor } from './application/surface-cost-processor';
 import { SurfaceCostWorker } from './application/surface-cost-worker';
@@ -11,12 +12,14 @@ import { ArePuidsAllowedPort } from './ports/pu-validator/are-puuids-allowed.por
 import { ShapefileConverterPort } from './ports/shapefile-converter/shapefile-converter.port';
 
 import { TypeormCostSurface } from './adapters/typeorm-cost-surface';
+import { ShapefileConverter } from './adapters/shapefile-converter';
 import { ScenariosPuCostDataGeo } from '../scenarios/scenarios-pu-cost-data.geo.entity';
 import { ScenariosPlanningUnitGeoEntity } from '../scenarios/scenarios-planning-unit.geo.entity';
 
 @Module({
   imports: [
     WorkerModule,
+    ShapefilesModule,
     TypeOrmModule.forFeature([
       ScenariosPuCostDataGeo,
       ScenariosPlanningUnitGeoEntity, // not used but has to imported somewhere
@@ -42,7 +45,7 @@ import { ScenariosPlanningUnitGeoEntity } from '../scenarios/scenarios-planning-
     },
     {
       provide: ShapefileConverterPort,
-      useValue: {},
+      useClass: ShapefileConverter,
     },
   ],
 })
