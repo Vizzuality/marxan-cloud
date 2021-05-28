@@ -1,5 +1,5 @@
 import { Readable } from 'stream';
-import { readFileSync } from 'fs';
+import { readFileSync, copyFileSync } from 'fs';
 import { AppConfig } from '../../../../src/utils/config.utils';
 
 export const shapes = {
@@ -22,8 +22,8 @@ const resolveFile = (
   const baseDir = AppConfig.get<string>(
     'storage.sharedFileStorage.localPath',
   ) as string;
-  // TODO copy files?
   const shapePath = baseDir + `/${fileName}.zip`;
+  copyFileSync(__dirname + `/${fileName}.zip`, baseDir + `/${fileName}.zip`);
   const shapefile = readFileSync(shapePath);
 
   return {
