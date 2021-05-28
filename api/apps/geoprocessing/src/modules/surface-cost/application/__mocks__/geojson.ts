@@ -1,4 +1,4 @@
-import { Feature, FeatureCollection, MultiPolygon, Polygon } from 'geojson';
+import { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 import { PlanningUnitCost } from '../../ports/planning-unit-cost';
 
 export const getGeoJson = (): FeatureCollection<
@@ -55,4 +55,9 @@ export const getGeoJsonWithMissingCost = (): FeatureCollection<
       },
     },
   ],
+});
+
+export const getGeometryMultiPolygon = (): MultiPolygon => ({
+  type: 'MultiPolygon',
+  coordinates: [],
 });

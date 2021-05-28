@@ -18,6 +18,12 @@
       ],
       "@marxan-api/*": [
         "apps/api/src/*"
+      ],
+      "@marxan/utils": [
+        "libs/utils/src"
+      ],
+      "@marxan/utils/*": [
+        "libs/utils/src/*"
       ]
     }
   },

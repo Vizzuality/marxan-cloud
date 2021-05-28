@@ -15,6 +15,7 @@ import { TypeormCostSurface } from './adapters/typeorm-cost-surface';
 import { ShapefileConverter } from './adapters/shapefile-converter';
 import { ScenariosPuCostDataGeo } from '../scenarios/scenarios-pu-cost-data.geo.entity';
 import { ScenariosPlanningUnitGeoEntity } from '../scenarios/scenarios-planning-unit.geo.entity';
+import { ExtractPuCost } from './adapters/extract-pu-cost';
 
 @Module({
   imports: [
@@ -41,7 +42,7 @@ import { ScenariosPlanningUnitGeoEntity } from '../scenarios/scenarios-planning-
     },
     {
       provide: PuExtractorPort,
-      useValue: {},
+      useClass: ExtractPuCost,
     },
     {
       provide: ShapefileConverterPort,
