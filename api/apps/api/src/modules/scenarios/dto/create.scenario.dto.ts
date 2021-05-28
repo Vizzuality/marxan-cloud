@@ -10,7 +10,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { IUCNCategory } from 'modules/protected-areas/protected-area.geo.entity';
+import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 import { JobStatus, ScenarioType } from '../scenario.api.entity';
 
 export class CreateScenarioDTO {

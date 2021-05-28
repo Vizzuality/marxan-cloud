@@ -17,13 +17,13 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { RequestWithAuthenticatedUser } from 'app.controller';
-import { JwtAuthGuard } from 'guards/jwt-auth.guard';
+import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
+import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 
 import {
   AccessToken,
   AuthenticationService,
-} from 'modules/authentication/authentication.service';
+} from '@marxan-api/modules/authentication/authentication.service';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UserAccountValidationDTO } from './dto/user-account.validation.dto';

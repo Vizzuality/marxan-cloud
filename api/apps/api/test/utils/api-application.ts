@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { AppModule } from '../../src/app.module';
+import { AppModule } from '@marxan-api/app.module';
 import { QueueToken } from '../../src/modules/queue/queue.tokens';
 import { FakeQueue } from './queues';
 

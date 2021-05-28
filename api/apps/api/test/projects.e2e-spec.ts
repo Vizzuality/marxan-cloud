@@ -1,21 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
+import { AppModule } from '@marxan-api/app.module';
 import { E2E_CONFIG } from './e2e.config';
-import { CreateProjectDTO } from 'modules/projects/dto/create.project.dto';
-import { CreateScenarioDTO } from 'modules/scenarios/dto/create.scenario.dto';
-import { Scenario } from 'modules/scenarios/scenario.api.entity';
+import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
+import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import {
   Project,
   ProjectResultPlural,
   ProjectResultSingular,
-} from 'modules/projects/project.api.entity';
+} from '@marxan-api/modules/projects/project.api.entity';
 import {
   Organization,
   OrganizationResultSingular,
-} from 'modules/organizations/organization.api.entity';
+} from '@marxan-api/modules/organizations/organization.api.entity';
 import { tearDown } from './utils/tear-down';
 
 afterAll(async () => {

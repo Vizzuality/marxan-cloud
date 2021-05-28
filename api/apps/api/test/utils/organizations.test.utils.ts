@@ -1,7 +1,7 @@
 import * as request from 'supertest';
 import { INestApplication, Logger } from '@nestjs/common';
-import { CreateOrganizationDTO } from 'modules/organizations/dto/create.organization.dto';
-import { OrganizationResultSingular } from 'modules/organizations/organization.api.entity';
+import { CreateOrganizationDTO } from '@marxan-api/modules/organizations/dto/create.organization.dto';
+import { OrganizationResultSingular } from '@marxan-api/modules/organizations/organization.api.entity';
 
 /**
  * Utility functions for tests related to Organizations.

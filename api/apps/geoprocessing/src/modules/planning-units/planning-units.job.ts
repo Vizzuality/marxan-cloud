@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { geoprocessingConnections } from 'src/ormconfig';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { createConnection } from 'typeorm';
 import { validate } from 'class-validator';
 

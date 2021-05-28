@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AppInfoDTO } from 'dto/info.dto';
+import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import {
   GeoFeatureGeometry,
@@ -14,16 +14,16 @@ import * as faker from 'faker';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
-} from 'utils/app-base.service';
+} from '@marxan-api/utils/app-base.service';
 import {
   FeatureTags,
   GeoFeature,
   GeoFeatureProperty,
 } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
-import { Project } from 'modules/projects/project.api.entity';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { apiConnections } from '../../ormconfig';
-import { AppConfig } from 'utils/config.utils';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',

@@ -142,6 +142,10 @@
     "roots": [
       "<rootDir>/apps/",
       "<rootDir>/libs/"
-    ]
+    ],
+    "moduleNameMapper": {
+      "@marxan-api/(.*)": "<rootDir>/apps/api/src/$1",
+      "@marxan-geoprocessing/(.*)": "<rootDir>/apps/geoprocessing/src/$1"
+    }
   }
 }
