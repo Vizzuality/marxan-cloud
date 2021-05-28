@@ -48,7 +48,7 @@ export const apiConnections: Record<
         ? true
         : false,
     cli: {
-      migrationsDir: 'migrations/api',
+      migrationsDir: 'apps/api/src/migrations/api',
     },
   },
   [DbConnections.geoprocessingDB]: {
