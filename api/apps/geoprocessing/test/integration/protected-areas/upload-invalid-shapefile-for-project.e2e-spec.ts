@@ -16,7 +16,7 @@ beforeAll(async () => {
   sut = app.get(ProtectedAreaProcessor);
 });
 
-describe.skip(`when worker processes the job for known project`, () => {
+describe(`when worker processes the job for known project`, () => {
   let exception: unknown | undefined;
   beforeAll(async () => {
     await world.GivenWdpaForProjectAlreadyExists(`old-shape-name`);
