@@ -11,7 +11,7 @@ import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 
 @Injectable()
-export class ProjectsRootService {
+export class ProjectsService {
   constructor(
     private readonly geoCrud: GeoFeaturesService,
     private readonly projectsCrud: ProjectsCrud,

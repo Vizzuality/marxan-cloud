@@ -11,7 +11,7 @@ import { CountriesModule } from '@marxan-api/modules/countries/countries.module'
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
 import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
 import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
-import { ProjectsRootService } from './projects-root.service';
+import { ProjectsService } from './projects.service';
 import { GeoFeatureMapper } from './dto/geo-feature.mapper';
 import { ProjectMapper } from './dto/project-mapper';
 
@@ -26,12 +26,7 @@ import { ProjectMapper } from './dto/project-mapper';
     PlanningUnitsModule,
     ProtectedAreasModule,
   ],
-  providers: [
-    ProjectsCrud,
-    ProjectsRootService,
-    GeoFeatureMapper,
-    ProjectMapper,
-  ],
+  providers: [ProjectsCrud, ProjectsService, GeoFeatureMapper, ProjectMapper],
   controllers: [ProjectsController],
   exports: [ProjectsCrud],
 })

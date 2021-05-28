@@ -46,7 +46,7 @@ import {
 } from 'nestjs-base-service';
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
-import { ProjectsRootService } from './projects-root.service';
+import { ProjectsService } from './projects.service';
 import { GeoFeatureMapper } from './dto/geo-feature.mapper';
 import { ProjectMapper } from './dto/project-mapper';
 
@@ -56,7 +56,7 @@ import { ProjectMapper } from './dto/project-mapper';
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectsController {
   constructor(
-    private readonly projectsService: ProjectsRootService,
+    private readonly projectsService: ProjectsService,
     private readonly geoFeatureMapper: GeoFeatureMapper,
     private readonly projectMapper: ProjectMapper,
   ) {}
