@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpService,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -59,18 +61,25 @@ import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dt
 import { AdjustPlanningUnits } from '../analysis/entry-points/adjust-planning-units';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as FormData from 'form-data';
+import { createReadStream } from 'fs';
+import { AppConfig } from 'utils/config.utils';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class ScenariosController {
+  private readonly geoprocessingUrl: string = AppConfig.get(
+    'geoprocessing.url',
+  ) as string;
   constructor(
     public readonly service: ScenariosService,
-    private readonly proxyService: ProxyService,
     private readonly scenarioFeatures: ScenarioFeaturesService,
     private readonly updatePlanningUnits: AdjustPlanningUnits,
     private readonly costSurface: CostSurfaceFacade,
+    private readonly httpService: HttpService,
   ) {}
 
   @ApiOperation({
@@ -144,20 +153,29 @@ export class ScenariosController {
   // TODO add Validations
   @ApiConsumesShapefile()
   @Post(':id/planning-unit-shapefile')
-  //@UseInterceptors(FileInterceptor('file', uploadOptions))
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
   async uploadLockInShapeFile(
-    @Param('id') scenarioId: string,
-    @Req() request: Request,
-    @Res() response: Response,
+    @Param('id', ParseUUIDPipe) scenarioId: string,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<ShapefileGeoJSONResponseDTO> {
     await this.service.getById(scenarioId);
-    const proxyServiceResponse = await this.proxyService.proxyUploadShapeFile(
-      request,
-      response,
-    );
-    return proxyServiceResponse;
+    const bodyFormData = new FormData();
+    bodyFormData.append('file', createReadStream(file.path));
+    try {
+      const {
+        data,
+      } = await this.httpService
+        .post(
+          `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
+          bodyFormData,
+          { headers: bodyFormData.getHeaders() },
+        )
+        .toPromise();
+      return data;
+    } catch (error) {
+      return error.response.data;
+    }
   }
-
   @ApiOperation({ description: 'Update scenario' })
   @ApiOkResponse({ type: ScenarioResult })
   @Patch(':id')
