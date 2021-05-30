@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, Module, HttpModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 
@@ -25,6 +25,7 @@ import { CostSurfaceModule } from './cost-surface/cost-surface.module';
     ScenarioFeaturesModule,
     AnalysisModule,
     CostSurfaceModule,
+    HttpModule,
   ],
   providers: [ScenariosService, ProxyService, WdpaAreaCalculationService],
   controllers: [ScenariosController],

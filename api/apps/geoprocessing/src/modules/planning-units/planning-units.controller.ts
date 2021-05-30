@@ -46,9 +46,8 @@ export class PlanningUnitsController {
   }
   @ApiConsumesShapefile()
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @Post('/:id/planning-unit-shapefile')
+  @Post('/planning-unit-shapefile')
   async getShapeFile(
-    @Param('id', ParseUUIDPipe) scenarioId: string,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ShapefileGeoJSONResponseDTO> {
     return this.shapefileService.getGeoJson(file);
