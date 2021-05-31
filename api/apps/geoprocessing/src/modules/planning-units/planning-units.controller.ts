@@ -4,14 +4,11 @@ import {
   Controller,
   Logger,
   Param,
-  ParseUUIDPipe,
   Post,
   Query,
   Res,
-  UploadedFile,
-  UseInterceptors,
+  Body,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 import {
   PlanningUnitsService,
@@ -19,8 +16,6 @@ import {
   tileSpecification,
 } from './planning-units.service';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
-import { uploadOptions } from '@marxan-geoprocessing/utils/file.utils';
-
 import { ShapefileService } from '../shapefiles/shapefiles.service';
 import { ApiConsumesShapefile } from '../../decoratos/shapefile.decorator';
 import { ShapefileGeoJSONResponseDTO } from '../shapefiles/dto/shapefile.geojson.response.dto';
@@ -45,12 +40,11 @@ export class PlanningUnitsController {
     this.logger.setContext(PlanningUnitsController.name);
   }
   @ApiConsumesShapefile()
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
   @Post('/planning-unit-shapefile')
   async getShapeFile(
-    @UploadedFile() file: Express.Multer.File,
+    @Body() shapefileInfo: Express.Multer.File,
   ): Promise<ShapefileGeoJSONResponseDTO> {
-    return this.shapefileService.getGeoJson(file);
+    return this.shapefileService.getGeoJson(shapefileInfo);
   }
 
   @ApiOperation({
