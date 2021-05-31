@@ -1,5 +1,6 @@
+import * as path from 'path';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import { AppConfig } from './utils/config.utils';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 import { DbConnections } from './ormconfig.connections';
 
 /**
@@ -26,7 +27,10 @@ export const apiConnections: Record<
     type: 'postgres',
     url: AppConfig.get('postgresApi.url'),
     ssl: false,
-    entities: [__dirname + '/modules/**/*.api.entity.{ts,js}'],
+    entities: [
+      path.join(__dirname, '/modules/**/*.api.entity.{ts,js}'),
+      path.join(__dirname, '../../../libs/**/*.api.entity.{ts,js}'),
+    ],
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
@@ -57,7 +61,10 @@ export const apiConnections: Record<
     type: 'postgres',
     url: AppConfig.get('postgresGeoApi.url'),
     ssl: false,
-    entities: [__dirname + '/modules/**/*.geo.entity.{ts,js}'],
+    entities: [
+      path.join(__dirname, '/modules/**/*.geo.entity.{ts,js}'),
+      path.join(__dirname, '../../../libs/**/*.geo.entity.{ts,js}'),
+    ],
     logging: ['error'],
     cache: false,
     // Migrations for this db/data source are handled in the geoprocessing
