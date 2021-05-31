@@ -1,5 +1,5 @@
 import { ScenariosPlanningUnitGeoEntity } from '../../../../scenarios-planning-unit/entities/scenarios-planning-unit.geo.entity';
-import { LockStatus } from '../../../../scenarios-planning-unit/lock-status.enum';
+import { LockStatus } from '@marxan/scenarios-planning-unit';
 import { v4 } from 'uuid';
 
 export const validDataWithGivenPuIds = (

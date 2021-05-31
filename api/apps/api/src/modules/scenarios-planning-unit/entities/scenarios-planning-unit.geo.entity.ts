@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { LockStatus } from '../lock-status.enum';
+import { LockStatus } from '@marxan/scenarios-planning-unit';
 
 export const scenariosPuDataEntityName = 'scenarios_pu_data';
 

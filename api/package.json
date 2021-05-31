@@ -146,7 +146,9 @@
       "@marxan-api/(.*)": "<rootDir>/apps/api/src/$1",
       "@marxan-geoprocessing/(.*)": "<rootDir>/apps/geoprocessing/src/$1",
       "@marxan/utils/(.*)": "<rootDir>/libs/utils/src/$1",
-      "@marxan/utils": "<rootDir>/libs/utils/src"
+      "@marxan/utils": "<rootDir>/libs/utils/src",
+      "@marxan/scenarios-planning-unit/(.*)": "<rootDir>/libs/scenarios-planning-unit/src/$1",
+      "@marxan/scenarios-planning-unit": "<rootDir>/libs/scenarios-planning-unit/src"
     }
   }
 }
