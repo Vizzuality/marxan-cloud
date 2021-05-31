@@ -29,7 +29,7 @@ const NewProjectsPage: React.FC = () => {
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
 
-        <div className="py-2.5 md:flex-grow">
+        <div className="flex flex-col py-2.5 overflow-hidden flex-grow">
           <Wrapper>
             <Breadcrumb
               onClick={() => {
@@ -39,8 +39,8 @@ const NewProjectsPage: React.FC = () => {
               All projects
             </Breadcrumb>
 
-            <div className="h-full pt-5">
-              <div className="grid h-full grid-cols-1 gap-10 bg-gray-700 md:grid-cols-2 rounded-3xl">
+            <div className="flex flex-col flex-grow pt-5 overflow-hidden">
+              <div className="grid h-full grid-cols-1 gap-0 overflow-hidden bg-gray-700 md:grid-cols-2 rounded-3xl">
                 <ProjectForm />
                 <ProjectMap />
               </div>
