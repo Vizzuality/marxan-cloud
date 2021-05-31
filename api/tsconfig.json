@@ -24,6 +24,12 @@
       ],
       "@marxan/utils/*": [
         "libs/utils/src/*"
+      ],
+      "@marxan/scenarios-planning-unit": [
+        "libs/scenarios-planning-unit/src"
+      ],
+      "@marxan/scenarios-planning-unit/*": [
+        "libs/scenarios-planning-unit/src/*"
       ]
     }
   },

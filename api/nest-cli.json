@@ -34,6 +34,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/utils/tsconfig.lib.json"
       }
+    },
+    "scenarios-planning-unit": {
+      "type": "library",
+      "root": "libs/scenarios-planning-unit",
+      "entryFile": "index",
+      "sourceRoot": "libs/scenarios-planning-unit/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/scenarios-planning-unit/tsconfig.lib.json"
+      }
     }
   }
 }

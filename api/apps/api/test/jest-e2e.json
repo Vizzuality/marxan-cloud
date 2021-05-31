@@ -10,6 +10,8 @@
   "moduleNameMapper": {
     "@marxan-api/(.*)": "<rootDir>/../src/$1",
     "^@marxan/utils": ["<rootDir>/../../../libs/utils/src"],
-    "^@marxan/utils/(.*)$": ["<rootDir>/../../..//libs/utils/src/$1"]
+    "^@marxan/utils/(.*)$": ["<rootDir>/../../..//libs/utils/src/$1"],
+    "^@marxan/scenarios-planning-unit": ["<rootDir>/../../../libs/scenarios-planning-unit/src"],
+    "^@marxan/scenarios-planning-unit/(.*)$": ["<rootDir>/../../../libs/scenarios-planning-unit/src/$1"]
   }
 }

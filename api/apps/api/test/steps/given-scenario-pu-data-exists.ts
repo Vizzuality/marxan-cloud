@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { ScenariosPlanningUnitGeoEntity } from '../../src/modules/scenarios-planning-unit/entities/scenarios-planning-unit.geo.entity';
-import { LockStatus } from '../../src/modules/scenarios-planning-unit/lock-status.enum';
+import { LockStatus } from '@marxan/scenarios-planning-unit';
 
 export const GivenScenarioPuDataExists = async (
   repo: Repository<ScenariosPlanningUnitGeoEntity>,
