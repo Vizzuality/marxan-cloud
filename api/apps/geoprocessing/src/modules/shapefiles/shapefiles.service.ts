@@ -1,25 +1,26 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { readdir } from 'fs/promises';
 import { FeatureCollection } from 'geojson';
 import { FileService } from '../files/files.service';
 
 const mapshaper = require('mapshaper');
 
-const MIN_REQUIRED_FILES = ['prj', 'dbf', 'shx', 'shp'];
 @Injectable()
 export class ShapefileService {
   private readonly logger: Logger = new Logger(ShapefileService.name);
+  private readonly minRequiredFiles = ['prj', 'dbf', 'shx', 'shp'];
   constructor(private readonly fileService: FileService) {}
 
   private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
     if (
-      !(await this.fileService.areFilesInFolder(
+      !(await this.areRequireShapefileFilesInFolder(
         fileInfo.path.replace('.zip', ''),
-        MIN_REQUIRED_FILES,
       ))
     ) {
-      throw new Error('Some required file mising');
+      throw new Error(
+        'Shapefile data is not usable: one or more required files are missing.',
+      );
     }
-    console.log('works');
     const outputKey = `shapefile-${new Date().getTime()}.geojson`;
 
     const _geoJson = await mapshaper.applyCommands(
@@ -30,6 +31,14 @@ export class ShapefileService {
     );
 
     return JSON.parse(_geoJson[outputKey].toString('utf-8'));
+  }
+
+  async areRequireShapefileFilesInFolder(path: string): Promise<boolean> {
+    const filesInPath = await readdir(path);
+    const extensions = filesInPath.map((file) => file.split('.').pop());
+    return this.minRequiredFiles.every((ext: string) =>
+      extensions.includes(ext),
+    );
   }
 
   isValidGeoJson(geoJson: FeatureCollection): boolean {
