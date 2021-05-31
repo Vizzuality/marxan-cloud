@@ -69,6 +69,7 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "pg": "^8.5.1",
+    "pg-large-object": "^2.0.0",
     "pure-geojson-validation": "0.3.0",
     "purify-ts": "0.16.2",
     "reflect-metadata": "^0.1.13",
@@ -99,6 +100,7 @@
     "@types/passport-jwt": "^3.0.3",
     "@types/passport-local": "^1.0.33",
     "@types/pbf": "^3.0.2",
+    "@types/pg-large-object": "^2.0.3",
     "@types/supertest": "^2.0.10",
     "@types/unzipper": "^0.10.3",
     "@types/uuid": "8.3.0",
@@ -158,7 +160,9 @@
       "@marxan/api-events/(.*)": "<rootDir>/libs/api-events/src/$1",
       "@marxan/api-events": "<rootDir>/libs/api-events/src",
       "@marxan-jobs/planning-unit-geometry/(.*)": "<rootDir>/libs/planning-unit-geometry/src/$1",
-      "@marxan-jobs/planning-unit-geometry": "<rootDir>/libs/planning-unit-geometry/src"
+      "@marxan-jobs/planning-unit-geometry": "<rootDir>/libs/planning-unit-geometry/src",
+      "@marxan/scenario-cost-surface/(.*)": "<rootDir>/libs/scenario-cost-surface/src/$1",
+      "@marxan/scenario-cost-surface": "<rootDir>/libs/scenario-cost-surface/src"
     }
   }
 }

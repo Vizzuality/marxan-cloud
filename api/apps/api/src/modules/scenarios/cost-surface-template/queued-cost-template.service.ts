@@ -22,11 +22,11 @@ export class QueuedCostTemplateService extends ScenarioCostSurfaceTemplateServic
     scenarioId: string,
     writable: stream.Writable,
   ): Promise<typeof FileNotFound | typeof FileNotReady | typeof FilePiped> {
-    const filestream = this.storage.getStream(scenarioId);
+    const filestream = await this.storage.getStream(scenarioId);
     if (filestream) {
-      return new Promise((resolve) => {
-        filestream.pipe(writable);
-        filestream.on('end', () => {
+      return new Promise((resolve, reject) => {
+        filestream.pipe(writable).on(`error`, reject);
+        writable.on(`finish`, () => {
           resolve(FilePiped);
         });
       });

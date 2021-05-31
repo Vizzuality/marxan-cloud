@@ -70,6 +70,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/planning-unit-geometry/tsconfig.lib.json"
       }
+    },
+    "scenario-cost-surface": {
+      "type": "library",
+      "root": "libs/scenario-cost-surface",
+      "entryFile": "index",
+      "sourceRoot": "libs/scenario-cost-surface/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/scenario-cost-surface/tsconfig.lib.json"
+      }
     }
   }
 }
