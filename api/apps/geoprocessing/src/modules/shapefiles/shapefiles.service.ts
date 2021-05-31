@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { FeatureCollection } from 'geojson';
 import { FileService } from '../files/files.service';
 
 const mapshaper = require('mapshaper');
@@ -15,13 +16,13 @@ export class ShapefileService {
       `-i no-topology snap ${fileInfo.path.replace(
         '.zip',
         '',
-      )}/*.shp -clean rewind -info -o ${outputKey}`,
+      )}/*.shp -proj EPSG:4326 -clean rewind -info -o ${outputKey}`,
     );
 
     return JSON.parse(_geoJson[outputKey].toString('utf-8'));
   }
 
-  isValidGeoJson(geoJson: any): Error | void {
+  isValidGeoJson(geoJson: FeatureCollection): boolean {
     if (
       geoJson.type !== 'FeatureCollection' ||
       geoJson.features.every(
@@ -30,14 +31,23 @@ export class ShapefileService {
           geom.geometry.type !== 'MultiPolygon',
       )
     )
-      throw new Error();
+      return false;
+    return true;
   }
 
   async getGeoJson(shapeFile: Express.Multer.File) {
     try {
-      this.logger.log(await this.fileService.unzipFile(shapeFile));
+      this.logger.log(
+        await this.fileService.unzipFile(
+          shapeFile.path,
+          shapeFile.filename,
+          shapeFile.destination,
+        ),
+      );
       const geoJson = await this.shapeFileToGeoJson(shapeFile);
-      this.isValidGeoJson(geoJson);
+      if (!this.isValidGeoJson(geoJson)) {
+        throw new Error();
+      }
       return { data: geoJson };
     } catch (err) {
       this.logger.error(err);
