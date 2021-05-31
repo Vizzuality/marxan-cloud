@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
+import { UseAdminPreviewLayer, UsePUGridPreviewLayer } from './types';
 
 // AdminPreview
 export function useAdminPreviewLayer({
   bbox, country, region, subregion,
-}) {
+}: UseAdminPreviewLayer) {
   const level = useMemo(() => {
     if (subregion) return 2;
     if (region) return 1;
@@ -39,7 +40,9 @@ export function useAdminPreviewLayer({
 }
 
 // PUGridpreview
-export function usePUGridPreviewLayer({ bbox, planningUnitGridShape, planningUnitAreakm2 }) {
+export function usePUGridPreviewLayer({
+  bbox, planningUnitGridShape, planningUnitAreakm2,
+}: UsePUGridPreviewLayer) {
   return useMemo(() => {
     if (!bbox || !planningUnitGridShape || !planningUnitAreakm2) return null;
 
