@@ -1,0 +1,165 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { AppModule } from '@marxan-api/app.module';
+import { omit } from 'lodash';
+import { E2E_CONFIG } from './e2e.config';
+import { ProjectsTestUtils } from './utils/projects.test.utils';
+import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
+import { OrganizationsTestUtils } from './utils/organizations.test.utils';
+import * as JSONAPISerializer from 'jsonapi-serializer';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { tearDown } from './utils/tear-down';
+
+afterAll(async () => {
+  await tearDown();
+});
+
+describe('JSON API Specs (e2e)', () => {
+  let app: INestApplication;
+  let jwtToken: string;
+  let fakeOrganization: Organization;
+  let fakeProject: Project;
+  const fakeCountry = 'ESP';
+  const Deserializer = new JSONAPISerializer.Deserializer({
+    keyForAttribute: 'camelCase',
+  });
+
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
+
+    /**
+     * Login User
+     */
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/sign-in')
+      .send({
+        username: E2E_CONFIG.users.basic.aa.username,
+        password: E2E_CONFIG.users.basic.aa.password,
+      })
+      .expect(201);
+
+    jwtToken = response.body.accessToken;
+
+    /**
+     * Create Scenario
+     */
+
+    fakeOrganization = await OrganizationsTestUtils.createOrganization(
+      app,
+      jwtToken,
+      E2E_CONFIG.organizations.valid.minimal(),
+    ).then(async (response) => await Deserializer.deserialize(response));
+
+    fakeProject = await ProjectsTestUtils.createProject(app, jwtToken, {
+      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+        countryCode: fakeCountry,
+      }),
+      organizationId: fakeOrganization.id,
+    }).then(async (response) => await Deserializer.deserialize(response));
+  });
+
+  afterAll(async () => {
+    await Promise.all([app.close()]);
+  });
+
+  it('should return a response shaped as JSON:API Error spec, including ', async () => {
+    const jsonApiErrorResponse = {
+      id: null,
+      links: null,
+      status: null,
+      code: null,
+      source: null,
+      title: null,
+      meta: {
+        timestamp: null,
+        path: null,
+        type: null,
+        rawError: null,
+        stack: null,
+      },
+    };
+
+    const response = await request(app.getHttpServer())
+      .get(
+        `/api/v1/projects/invalidProjectIdToTriggerAnError/features?q=fakeFeature`,
+      )
+      .set('Authorization', `Bearer ${jwtToken}`);
+
+    response.body.errors.forEach((err: any) => {
+      expect(Object.keys(jsonApiErrorResponse)).toEqual(
+        expect.arrayContaining(Object.keys(err)),
+      );
+      /**
+       * Should not include rawError and stack props in meta object if app is running on prod env
+       */
+      // Debt: this test isn't reliable and should be refactored (ideally to out of e2e scope)
+      if (
+        process.env.NODE_ENV !== 'development' &&
+        process.env.NODE_ENV !== 'test'
+      ) {
+        expect(Object.keys(err.meta)).toEqual(
+          Object.keys(omit(jsonApiErrorResponse.meta, ['rawError', 'stack'])),
+        );
+      } else {
+        expect(Object.keys(err.meta)).toEqual(
+          Object.keys(jsonApiErrorResponse.meta),
+        );
+      }
+    });
+  });
+
+  it('should return a object with a "data" prop as a response to a POST request', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/api/v1/projects')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .send({
+        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+          countryCode: fakeCountry,
+        }),
+        organizationId: fakeOrganization.id,
+      });
+
+    expect(response.body).toMatchObject({ data: expect.any(Object) });
+  });
+  it('should return a object with a "data" prop as a response to a PATCH request', async () => {
+    const response = await request(app.getHttpServer())
+      .patch(`/api/v1/projects/${fakeProject.id}`)
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .send({
+        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+          countryCode: fakeCountry,
+        }),
+        organizationId: fakeOrganization.id,
+      });
+
+    expect(response.body).toMatchObject({ data: expect.any(Object) });
+  });
+
+  it('should include pagination metadata as a paginated response', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${fakeProject.id}/features`)
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .send({
+        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+          countryCode: fakeCountry,
+        }),
+        organizationId: fakeOrganization.id,
+      });
+
+    expect(response.body).toMatchObject({
+      meta: {
+        totalItems: expect.any(Number),
+        totalPages: expect.any(Number),
+        size: expect.any(Number),
+        page: expect.any(Number),
+      },
+    });
+  });
+});

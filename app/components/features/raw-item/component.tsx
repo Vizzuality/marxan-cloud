@@ -1,18 +1,23 @@
-import React from 'react';
+import React, { MutableRefObject } from 'react';
 import cx from 'classnames';
 
 import Button from 'components/button';
 import Tag from 'components/tag';
+import InfoButton from 'components/info-button';
+
+import { useInView } from 'react-intersection-observer';
 
 export interface ItemProps {
-  id: string;
+  id: string | number;
   className?: string;
   name: string;
-  categories: number;
+  categories?: number;
   description: string;
-  tags?: Record<string, unknown>[];
-  selected: boolean;
-  onToggleSelected: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  tag: 'bioregional' | 'species';
+  source?: string;
+  scrollRoot?: MutableRefObject<HTMLDivElement | null>;
+  selected?: boolean;
+  onToggleSelected?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -20,20 +25,42 @@ export const Item: React.FC<ItemProps> = ({
   name,
   categories = 0,
   description,
-  tags = [],
+  tag,
+  source,
+  scrollRoot,
   selected,
   onToggleSelected,
 }: ItemProps) => {
+  const { ref, inView } = useInView({
+    /* Optional options */
+    threshold: 0,
+    ...scrollRoot && {
+      root: scrollRoot.current,
+    },
+  });
+
   return (
     <div
+      ref={ref}
       className={cx({
         'bg-white px-0 py-6 text-black': true,
         [className]: !!className,
+        invisible: !inView,
       })}
     >
       <header className="flex items-baseline justify-between">
-        <div className="flex divide-x">
+        <div className="flex space-x-2">
           <h2 className="text-sm font-medium font-heading">{name}</h2>
+
+          {description && (
+            <InfoButton
+              theme="secondary"
+            >
+              <div className="text-sm opacity-50">
+                {description}
+              </div>
+            </InfoButton>
+          )}
 
           {!!categories && (
             <div className="pl-2 ml-2 text-sm underline">
@@ -55,28 +82,31 @@ export const Item: React.FC<ItemProps> = ({
         </div>
       </header>
 
-      {!!tags.length && (
-        <div className="flex mt-1">
-          {tags.map((t, i) => (
-            <div
-              key={`${t.id}`}
-              className={cx({
-                'ml-1.5': i !== 0,
-              })}
-            >
-              <Tag
-                className={cx({
-                  [`${t.className}`]: !!t.className,
-                })}
-              >
-                {t.name}
-              </Tag>
-            </div>
-          ))}
+      <div className="flex mt-1">
+        <div>
+          <Tag
+            className={cx({
+              'text-black bg-green-300': tag === 'bioregional',
+              'text-black bg-yellow-300': tag === 'species',
+            })}
+          >
+            {tag === 'bioregional' && 'Bioregional'}
+            {tag === 'species' && 'Species'}
+          </Tag>
         </div>
-      )}
 
-      <div className="mt-4 text-sm opacity-50 clamp-2">{description}</div>
+        {source && (
+          <div
+            className={cx({
+              'ml-1.5': true,
+            })}
+          >
+            <Tag>
+              {source}
+            </Tag>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

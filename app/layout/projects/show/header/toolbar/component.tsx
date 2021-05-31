@@ -28,7 +28,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
         >
-          <div className="flex gap-4">
+          <div className="flex space-x-4">
             <Button
               theme="secondary"
               size="base"

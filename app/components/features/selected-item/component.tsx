@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import cx from 'classnames';
 
 import Icon from 'components/icon';
@@ -9,30 +9,55 @@ import Checkbox from 'components/forms/checkbox';
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
-import { SelectOptionProps } from 'components/forms/select/types';
 
 export interface ItemProps {
-  id: string;
+  id: string | number;
   className?: string;
   name: string;
   description: string;
   type: 'bioregional' | 'species';
 
-  splitSelected: string;
-  splitOptions: SelectOptionProps[];
-  onSplitSelected: (selected: string) => void;
+  // SPLIT
+  splitSelected?: string;
+  splitOptions?: { key: string; values: any[]; }[];
+  onSplitSelected?: (selected: string) => void;
+  splitFeaturesSelected?: {
+    id: string;
+    fpf?: number;
+    target?: number;
+  }[];
+  splitFeaturesOptions?: Record<string, unknown>[];
+  onSplitFeaturesSelected?: (selected: {
+    id: string;
+    fpf?: number;
+    target?: number;
+  }[]) => void;
 
-  splitFeaturesSelected: string[];
-  splitFeaturesOptions: Record<string, unknown>[];
-  onSplitFeaturesSelected: (selected: string[]) => void;
-
-  intersectFeaturesSelected: string[];
-  intersectFeaturesOptions: Record<string, unknown>[];
+  // INTERSECT
+  intersectFeaturesSelected?: {
+    id: string;
+    fpf?: number;
+    target?: number;
+    splitSelected?: string;
+    splitFeaturesSelected?: {
+      id: string;
+      name: string;
+      fpf?: number;
+      target?: number;
+    }[];
+  }[];
+  intersectFeaturesOptions?: {
+    label: string;
+    value: string;
+  }[];
+  onIntersectSelected?: (id: string) => void;
+  onRemove?: (value) => void
 }
 
 export const Item: React.FC<ItemProps> = ({
-  className,
+  id,
   name,
+  className,
   description,
   type,
 
@@ -46,11 +71,14 @@ export const Item: React.FC<ItemProps> = ({
 
   intersectFeaturesSelected,
   intersectFeaturesOptions = [],
+
+  onIntersectSelected,
+  onRemove,
 }: ItemProps) => {
   // EVENTS
   const onSplitChanged = useCallback(
     (selected) => {
-      onSplitSelected(selected);
+      if (onSplitSelected) onSplitSelected(selected);
     },
     [onSplitSelected],
   );
@@ -58,24 +86,37 @@ export const Item: React.FC<ItemProps> = ({
   const onSplitFeaturesChanged = useCallback(
     (e) => {
       const newSplitFeaturesSelected = [...splitFeaturesSelected];
-      const index = newSplitFeaturesSelected.indexOf(e.currentTarget.value);
+      const index = newSplitFeaturesSelected.findIndex((s) => s.id === e.currentTarget.value);
 
       if (index > -1) {
         newSplitFeaturesSelected.splice(index, 1);
       } else {
-        newSplitFeaturesSelected.push(e.currentTarget.value);
+        newSplitFeaturesSelected.push({
+          id: e.currentTarget.value,
+        });
       }
 
-      onSplitFeaturesSelected(newSplitFeaturesSelected);
+      if (onSplitFeaturesSelected) onSplitFeaturesSelected(newSplitFeaturesSelected);
     },
     [splitFeaturesSelected, onSplitFeaturesSelected],
   );
+
+  const onIntersectChanged = useCallback(
+    (selected) => {
+      if (onIntersectSelected) onIntersectSelected(selected);
+    },
+    [onIntersectSelected],
+  );
+
+  const OPTIONS = useMemo(() => {
+    return splitOptions.map((s) => ({ label: s.key, value: s.key }));
+  }, [splitOptions]);
 
   // RENDER
   return (
     <div
       className={cx({
-        'bg-gray-800 text-white': true,
+        'bg-gray-700 text-white': true,
         [className]: !!className,
       })}
     >
@@ -86,7 +127,19 @@ export const Item: React.FC<ItemProps> = ({
           'border-yellow-300': type === 'species',
         })}
       >
-        <h2 className="text-sm font-heading">{name}</h2>
+        <div className="flex items-start justify-between">
+          <h2 className="mt-1 text-sm font-heading">{name}</h2>
+
+          <Button
+            className="flex-shrink-0 text-xs"
+            theme="secondary"
+            size="xs"
+            onClick={() => onRemove && onRemove(id)}
+          >
+            Remove
+          </Button>
+
+        </div>
         <div className="mt-2 text-sm opacity-50 clamp-2">{description}</div>
 
         {type === 'bioregional' && (
@@ -102,15 +155,15 @@ export const Item: React.FC<ItemProps> = ({
               </h4>
             </div>
 
-            {/* TODO: Select from javi!! */}
             <div className="inline-block mt-2">
               <Select
                 theme="dark"
                 size="s"
                 status="none"
                 placeholder="Select..."
-                initialValues={splitSelected}
-                options={splitOptions}
+                clearSelectionActive
+                selected={splitSelected}
+                options={OPTIONS}
                 onChange={onSplitChanged}
               />
             </div>
@@ -132,7 +185,13 @@ export const Item: React.FC<ItemProps> = ({
 
             {/* TODO: Select from javi!! */}
             <div className="inline-block mt-2">
-              <Button theme="secondary-alt" size="s">
+              <Button
+                theme="secondary-alt"
+                size="s"
+                onClick={() => {
+                  onIntersectChanged(id);
+                }}
+              >
                 <div className="flex items-center">
                   <span>Select features</span>
 
@@ -148,7 +207,7 @@ export const Item: React.FC<ItemProps> = ({
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
             const checked = !splitFeaturesSelected.length
-              || splitFeaturesSelected.includes(`${f.value}`);
+              || splitFeaturesSelected.map((s) => s.id).includes(`${f.value}`);
 
             return (
               <li
@@ -180,7 +239,7 @@ export const Item: React.FC<ItemProps> = ({
         </ul>
       )}
 
-      {type === 'species' && intersectFeaturesSelected && (
+      {type === 'species' && intersectFeaturesSelected && intersectFeaturesSelected.length && (
         <ul className="pl-3">
           {intersectFeaturesOptions.map((f) => {
             return (
@@ -194,6 +253,7 @@ export const Item: React.FC<ItemProps> = ({
                     {name}
                     {' '}
                     in
+                    {' '}
                     {f.label}
                   </div>
                 </div>

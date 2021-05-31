@@ -1,5 +1,9 @@
 .DEFAULT_GOAL := seed-data
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 seed-data: seed-gadm seed-wdpa seed-iucn seed-ecosystems
 
 seed-gadm:

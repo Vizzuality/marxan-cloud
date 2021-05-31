@@ -40,7 +40,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
     return [
       ...clearSelectionActive ? [
         {
-          value: 'clear-selection',
+          value: null,
           label: clearSelectionLabel,
         },
       ] : [],
@@ -53,17 +53,17 @@ export const SingleSelect: React.FC<SelectProps> = ({
   ]);
 
   const getInitialSelected = useMemo(() => {
-    return getOptions.find((o) => o.value === initialValues);
+    return getOptions.find((o) => o.value === initialValues && o.value !== null);
   }, [getOptions, initialValues]);
 
   const getSelected = useMemo(() => {
-    return getOptions.find((o) => o.value === values);
+    return getOptions.find((o) => o.value === values && o.value !== null) || null;
   }, [getOptions, values]);
 
   // Events
   const handleSelectedItems = (selected, reset) => {
     switch (selected.value) {
-      case 'clear-selection':
+      case null:
         reset();
         break;
       default:
@@ -87,10 +87,10 @@ export const SingleSelect: React.FC<SelectProps> = ({
     reset,
   } = useSelect<SelectOptionProps>({
     items: getOptions,
-    ...!!getSelected && {
+    ...typeof values !== 'undefined' && {
       selectedItem: getSelected,
     },
-    ...!!getInitialSelected && {
+    ...typeof initialValues !== 'undefined' && {
       initialSelectedItem: getInitialSelected,
     },
     itemToString: (item) => item.label, // How the selected options is announced to screen readers
@@ -122,7 +122,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
   });
 
   // 'usePopper'
-  const { styles, attributes } = usePopper(triggerRef.current, menuRef.current, {
+  const { styles, attributes, update } = usePopper(triggerRef.current, menuRef.current, {
     placement: 'bottom',
     // strategy: 'fixed',
     modifiers: [
@@ -140,6 +140,10 @@ export const SingleSelect: React.FC<SelectProps> = ({
       closeMenu();
     }
   }, [referenceHidden, closeMenu]);
+
+  useEffect(() => {
+    if (update) update();
+  }, [isOpen, update]);
 
   const selectedItems = selectedItem ? [selectedItem] : [];
 

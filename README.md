@@ -37,11 +37,36 @@ orchestrated via Kubernetes (forthcoming).
    * `API_AUTH_JWT_SECRET` (string, required): a base64-encoded secret for the
      signing of API JWT tokens; can be generated via a command such as `dd
      if=/dev/urandom bs=1024 count=1 | base64 -w0`
+<<<<<<< HEAD
    * `API_SERVICE_PORT` (number, required): the port on which the API service should
      listen on the local machine
    * `API_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default is
      `true`): set this to `false` if migrations for the API service should not
      run automatically on startup
+=======
+   * `API_AUTH_X_API_KEY` (string, required): a secret used as API key for
+     requests from the Geoprocessing service to the API; can be generated
+     similarly to `API_AUTH_JWT_SECRET`
+   * `API_SERVICE_PORT` (number, required): the port on which the API service should
+     listen on the local machine
+   * `API_SERVICE_URL` (URL, optional, default is http://api:3000): the internal
+     (docker-compose or k8s cluster) where the API service can be reached by
+     other services running in the cluster
+   * `API_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default is
+     `true`): set this to `false` if migrations for the API service should not
+     run automatically on startup
+   * `API_LOGGING_MUTE_ALL` (boolean, optional, default is `false`): can be used
+     to mute all logging (for example, in CI pipelines) irrespective of Node
+     environment and other settings that would normally affect the logging
+     verbosity of the API
+   * `API_SHARED_FILE_STORAGE_LOCAL_PATH` (string, optional, default is
+     `/tmp/storage`): set this to a filesystem path if needing to override the
+     default temporary storage location where shared volumes for files shared
+     from the API to the Geoprocessing service are mounted; configuration of
+     mount point for shared storage (via Docker volumes in development
+     environments and via Persistent Volumes in Kubernetes environments) should
+     be set accordingly
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
    * `APP_SERVICE_PORT` (number, required): the port on which the App service should
      listen on the local machine
    * `POSTGRES_API_SERVICE_PORT` (number, required): the port on which the
@@ -50,7 +75,11 @@ orchestrated via Kubernetes (forthcoming).
      PostgreSQL connection (API)
    * `API_POSTGRES_PASSWORD` (string, required): password to be used for the
      PostgreSQL connection (API)
+<<<<<<< HEAD
 	 * `API_POSTGRES_DB` (string, required): name of the database to be used for
+=======
+   * `API_POSTGRES_DB` (string, required): name of the database to be used for
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
      the PostgreSQL connection (API)
    * `GEOPROCESSING_SERVICE_PORT` (number, required): the port on which the
      Geoprocessing service should listen on the local machine
@@ -69,32 +98,85 @@ orchestrated via Kubernetes (forthcoming).
      PostgreSQL for Airflow service should listen on the local machine
    * `AIRFLOW_PORT` (number, required): the port on which the
      Airflow service should listen on the local machine
+<<<<<<< HEAD
+=======
+   * `REDIS_API_SERVICE_PORT` (number, required): the port on which the
+     Redis service should listen on the local machine
+   * `REDIS_COMMANDER_PORT` (number, required): the port on which the
+     Redis Commander service should listen on the local machine
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted
 via a Docker volume.
 
+<<<<<<< HEAD
 4. Create a Docker network for the local instance of the Marxan platform:
    `docker network create marxan-cloud-network`.
 
+=======
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 ### Running the Marxan Cloud platform
 
 Run `make start` to start all the services.
 
+<<<<<<< HEAD
+=======
+Run `make start-api` to start api services.
+
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 ### Running the notebooks
 
 Run `make notebooks` to start the jupyterlab service.
 
 ### Seed data
+<<<<<<< HEAD
 note: Yo need at least 16 gb of Ram and 40gb of disk space in order to fulfill some of the tasks (GADM pipe and WDPA) Also the number of cores will impact the time needed to run the full pipes.
 
 To seed the geodb database you need to follow the next instructions:
+=======
+
+To seed the geodb database after a clean state, you need to follow the next instructions:
+
+``` bash
+make seed-geodb-data
+```
+This will populate the metadata DB and will trigger the geo-pipelines to seed the geoDB.  
+Note: Full db set up will require at least 16GB of RAM and 40GB of disk space in order to fulfill
+some of these tasks (GADM and WDPA data import pipelines). Also the number of
+CPU cores will impact the time needed to seed a new instance with the complete
+GADM and WDPA datasets.  
+___
+
+or if you only wants to populate the newly fresh instance with a small subset of test data:
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 
 ``` bash
 make seed-dbs
 ```
 
+<<<<<<< HEAD
 This will populate the metadata DB and will trigger the geo-pipelines to seed the geoDB.
+=======
+
+
+We also provide a way to freshly clean the dbs instances(we recommend do it regularly):
+
+``` bash
+make clean-slate
+```
+
+And finally we provided a set of commands to create a new dbs dumps, upload them to an azure instance and restore both dbs
+that is faster that triggering the geodb pipes.
+
+``` bash
+make generate-content-dumps && make upload-dump-data
+```
+
+``` bash
+make restore-dumps
+```
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 
 ## Development workflow (TBD)
 
@@ -120,7 +202,11 @@ tracker](https://github.com/Vizzuality/marxan-cloud/issues) to report bugs.
 
 ## License
 
+<<<<<<< HEAD
 (C) Copyright 2020 Vizzuality.
+=======
+(C) Copyright 2020-2021 Vizzuality.
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the [MIT License](LICENSE) as included in this repository.

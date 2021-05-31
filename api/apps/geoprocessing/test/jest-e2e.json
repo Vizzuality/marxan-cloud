@@ -1,0 +1,14 @@
+{
+  "modulePaths": ["./"],
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "moduleDirectories": ["node_modules"],
+  "rootDir": "../",
+  "testEnvironment": "node",
+  "testRegex": "/test/.*.e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "@marxan-geoprocessing/(.*)": "<rootDir>/src/$1"
+  }
+}

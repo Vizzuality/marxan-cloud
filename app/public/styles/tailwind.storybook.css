@@ -18042,7 +18042,6 @@ input[type='search']::-webkit-search-decoration,
 }
 
 .sticky {
-  position: -webkit-sticky;
   position: sticky;
 }
 
@@ -28575,6 +28574,74 @@ input[type='search']::-webkit-search-decoration,
 }
 
 .focus\:-rotate-1:focus {
+  --tw-rotate: -1deg;
+}
+
+.group:hover .group-hover\:rotate-0 {
+  --tw-rotate: 0deg;
+}
+
+.group:hover .group-hover\:rotate-1 {
+  --tw-rotate: 1deg;
+}
+
+.group:hover .group-hover\:rotate-2 {
+  --tw-rotate: 2deg;
+}
+
+.group:hover .group-hover\:rotate-3 {
+  --tw-rotate: 3deg;
+}
+
+.group:hover .group-hover\:rotate-6 {
+  --tw-rotate: 6deg;
+}
+
+.group:hover .group-hover\:rotate-12 {
+  --tw-rotate: 12deg;
+}
+
+.group:hover .group-hover\:rotate-45 {
+  --tw-rotate: 45deg;
+}
+
+.group:hover .group-hover\:rotate-90 {
+  --tw-rotate: 90deg;
+}
+
+.group:hover .group-hover\:rotate-180 {
+  --tw-rotate: 180deg;
+}
+
+.group:hover .group-hover\:-rotate-180 {
+  --tw-rotate: -180deg;
+}
+
+.group:hover .group-hover\:-rotate-90 {
+  --tw-rotate: -90deg;
+}
+
+.group:hover .group-hover\:-rotate-45 {
+  --tw-rotate: -45deg;
+}
+
+.group:hover .group-hover\:-rotate-12 {
+  --tw-rotate: -12deg;
+}
+
+.group:hover .group-hover\:-rotate-6 {
+  --tw-rotate: -6deg;
+}
+
+.group:hover .group-hover\:-rotate-3 {
+  --tw-rotate: -3deg;
+}
+
+.group:hover .group-hover\:-rotate-2 {
+  --tw-rotate: -2deg;
+}
+
+.group:hover .group-hover\:-rotate-1 {
   --tw-rotate: -1deg;
 }
 
@@ -48367,7 +48434,6 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .sm\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -58887,6 +58953,74 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .sm\:focus\:-rotate-1:focus {
+    --tw-rotate: -1deg;
+  }
+
+  .group:hover .sm\:group-hover\:rotate-0 {
+    --tw-rotate: 0deg;
+  }
+
+  .group:hover .sm\:group-hover\:rotate-1 {
+    --tw-rotate: 1deg;
+  }
+
+  .group:hover .sm\:group-hover\:rotate-2 {
+    --tw-rotate: 2deg;
+  }
+
+  .group:hover .sm\:group-hover\:rotate-3 {
+    --tw-rotate: 3deg;
+  }
+
+  .group:hover .sm\:group-hover\:rotate-6 {
+    --tw-rotate: 6deg;
+  }
+
+  .group:hover .sm\:group-hover\:rotate-12 {
+    --tw-rotate: 12deg;
+  }
+
+  .group:hover .sm\:group-hover\:rotate-45 {
+    --tw-rotate: 45deg;
+  }
+
+  .group:hover .sm\:group-hover\:rotate-90 {
+    --tw-rotate: 90deg;
+  }
+
+  .group:hover .sm\:group-hover\:rotate-180 {
+    --tw-rotate: 180deg;
+  }
+
+  .group:hover .sm\:group-hover\:-rotate-180 {
+    --tw-rotate: -180deg;
+  }
+
+  .group:hover .sm\:group-hover\:-rotate-90 {
+    --tw-rotate: -90deg;
+  }
+
+  .group:hover .sm\:group-hover\:-rotate-45 {
+    --tw-rotate: -45deg;
+  }
+
+  .group:hover .sm\:group-hover\:-rotate-12 {
+    --tw-rotate: -12deg;
+  }
+
+  .group:hover .sm\:group-hover\:-rotate-6 {
+    --tw-rotate: -6deg;
+  }
+
+  .group:hover .sm\:group-hover\:-rotate-3 {
+    --tw-rotate: -3deg;
+  }
+
+  .group:hover .sm\:group-hover\:-rotate-2 {
+    --tw-rotate: -2deg;
+  }
+
+  .group:hover .sm\:group-hover\:-rotate-1 {
     --tw-rotate: -1deg;
   }
 
@@ -78562,7 +78696,6 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .md\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -89082,6 +89215,74 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .md\:focus\:-rotate-1:focus {
+    --tw-rotate: -1deg;
+  }
+
+  .group:hover .md\:group-hover\:rotate-0 {
+    --tw-rotate: 0deg;
+  }
+
+  .group:hover .md\:group-hover\:rotate-1 {
+    --tw-rotate: 1deg;
+  }
+
+  .group:hover .md\:group-hover\:rotate-2 {
+    --tw-rotate: 2deg;
+  }
+
+  .group:hover .md\:group-hover\:rotate-3 {
+    --tw-rotate: 3deg;
+  }
+
+  .group:hover .md\:group-hover\:rotate-6 {
+    --tw-rotate: 6deg;
+  }
+
+  .group:hover .md\:group-hover\:rotate-12 {
+    --tw-rotate: 12deg;
+  }
+
+  .group:hover .md\:group-hover\:rotate-45 {
+    --tw-rotate: 45deg;
+  }
+
+  .group:hover .md\:group-hover\:rotate-90 {
+    --tw-rotate: 90deg;
+  }
+
+  .group:hover .md\:group-hover\:rotate-180 {
+    --tw-rotate: 180deg;
+  }
+
+  .group:hover .md\:group-hover\:-rotate-180 {
+    --tw-rotate: -180deg;
+  }
+
+  .group:hover .md\:group-hover\:-rotate-90 {
+    --tw-rotate: -90deg;
+  }
+
+  .group:hover .md\:group-hover\:-rotate-45 {
+    --tw-rotate: -45deg;
+  }
+
+  .group:hover .md\:group-hover\:-rotate-12 {
+    --tw-rotate: -12deg;
+  }
+
+  .group:hover .md\:group-hover\:-rotate-6 {
+    --tw-rotate: -6deg;
+  }
+
+  .group:hover .md\:group-hover\:-rotate-3 {
+    --tw-rotate: -3deg;
+  }
+
+  .group:hover .md\:group-hover\:-rotate-2 {
+    --tw-rotate: -2deg;
+  }
+
+  .group:hover .md\:group-hover\:-rotate-1 {
     --tw-rotate: -1deg;
   }
 
@@ -108757,7 +108958,6 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .lg\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -119277,6 +119477,74 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .lg\:focus\:-rotate-1:focus {
+    --tw-rotate: -1deg;
+  }
+
+  .group:hover .lg\:group-hover\:rotate-0 {
+    --tw-rotate: 0deg;
+  }
+
+  .group:hover .lg\:group-hover\:rotate-1 {
+    --tw-rotate: 1deg;
+  }
+
+  .group:hover .lg\:group-hover\:rotate-2 {
+    --tw-rotate: 2deg;
+  }
+
+  .group:hover .lg\:group-hover\:rotate-3 {
+    --tw-rotate: 3deg;
+  }
+
+  .group:hover .lg\:group-hover\:rotate-6 {
+    --tw-rotate: 6deg;
+  }
+
+  .group:hover .lg\:group-hover\:rotate-12 {
+    --tw-rotate: 12deg;
+  }
+
+  .group:hover .lg\:group-hover\:rotate-45 {
+    --tw-rotate: 45deg;
+  }
+
+  .group:hover .lg\:group-hover\:rotate-90 {
+    --tw-rotate: 90deg;
+  }
+
+  .group:hover .lg\:group-hover\:rotate-180 {
+    --tw-rotate: 180deg;
+  }
+
+  .group:hover .lg\:group-hover\:-rotate-180 {
+    --tw-rotate: -180deg;
+  }
+
+  .group:hover .lg\:group-hover\:-rotate-90 {
+    --tw-rotate: -90deg;
+  }
+
+  .group:hover .lg\:group-hover\:-rotate-45 {
+    --tw-rotate: -45deg;
+  }
+
+  .group:hover .lg\:group-hover\:-rotate-12 {
+    --tw-rotate: -12deg;
+  }
+
+  .group:hover .lg\:group-hover\:-rotate-6 {
+    --tw-rotate: -6deg;
+  }
+
+  .group:hover .lg\:group-hover\:-rotate-3 {
+    --tw-rotate: -3deg;
+  }
+
+  .group:hover .lg\:group-hover\:-rotate-2 {
+    --tw-rotate: -2deg;
+  }
+
+  .group:hover .lg\:group-hover\:-rotate-1 {
     --tw-rotate: -1deg;
   }
 
@@ -138952,7 +139220,6 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .xl\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -149472,6 +149739,74 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .xl\:focus\:-rotate-1:focus {
+    --tw-rotate: -1deg;
+  }
+
+  .group:hover .xl\:group-hover\:rotate-0 {
+    --tw-rotate: 0deg;
+  }
+
+  .group:hover .xl\:group-hover\:rotate-1 {
+    --tw-rotate: 1deg;
+  }
+
+  .group:hover .xl\:group-hover\:rotate-2 {
+    --tw-rotate: 2deg;
+  }
+
+  .group:hover .xl\:group-hover\:rotate-3 {
+    --tw-rotate: 3deg;
+  }
+
+  .group:hover .xl\:group-hover\:rotate-6 {
+    --tw-rotate: 6deg;
+  }
+
+  .group:hover .xl\:group-hover\:rotate-12 {
+    --tw-rotate: 12deg;
+  }
+
+  .group:hover .xl\:group-hover\:rotate-45 {
+    --tw-rotate: 45deg;
+  }
+
+  .group:hover .xl\:group-hover\:rotate-90 {
+    --tw-rotate: 90deg;
+  }
+
+  .group:hover .xl\:group-hover\:rotate-180 {
+    --tw-rotate: 180deg;
+  }
+
+  .group:hover .xl\:group-hover\:-rotate-180 {
+    --tw-rotate: -180deg;
+  }
+
+  .group:hover .xl\:group-hover\:-rotate-90 {
+    --tw-rotate: -90deg;
+  }
+
+  .group:hover .xl\:group-hover\:-rotate-45 {
+    --tw-rotate: -45deg;
+  }
+
+  .group:hover .xl\:group-hover\:-rotate-12 {
+    --tw-rotate: -12deg;
+  }
+
+  .group:hover .xl\:group-hover\:-rotate-6 {
+    --tw-rotate: -6deg;
+  }
+
+  .group:hover .xl\:group-hover\:-rotate-3 {
+    --tw-rotate: -3deg;
+  }
+
+  .group:hover .xl\:group-hover\:-rotate-2 {
+    --tw-rotate: -2deg;
+  }
+
+  .group:hover .xl\:group-hover\:-rotate-1 {
     --tw-rotate: -1deg;
   }
 
@@ -169147,7 +169482,6 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .\32xl\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -179667,6 +180001,74 @@ input[type='search']::-webkit-search-decoration,
   }
 
   .\32xl\:focus\:-rotate-1:focus {
+    --tw-rotate: -1deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:rotate-0 {
+    --tw-rotate: 0deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:rotate-1 {
+    --tw-rotate: 1deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:rotate-2 {
+    --tw-rotate: 2deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:rotate-3 {
+    --tw-rotate: 3deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:rotate-6 {
+    --tw-rotate: 6deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:rotate-12 {
+    --tw-rotate: 12deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:rotate-45 {
+    --tw-rotate: 45deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:rotate-90 {
+    --tw-rotate: 90deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:rotate-180 {
+    --tw-rotate: 180deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:-rotate-180 {
+    --tw-rotate: -180deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:-rotate-90 {
+    --tw-rotate: -90deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:-rotate-45 {
+    --tw-rotate: -45deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:-rotate-12 {
+    --tw-rotate: -12deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:-rotate-6 {
+    --tw-rotate: -6deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:-rotate-3 {
+    --tw-rotate: -3deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:-rotate-2 {
+    --tw-rotate: -2deg;
+  }
+
+  .group:hover .\32xl\:group-hover\:-rotate-1 {
     --tw-rotate: -1deg;
   }
 

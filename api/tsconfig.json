@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+<<<<<<< HEAD
+=======
+    "strict": true,
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -9,10 +13,28 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
+<<<<<<< HEAD
     "baseUrl": "./src",
     "incremental": true,
     "noImplicitAny": true,
     "strictNullChecks": true
   },
   "exclude": ["node_modules", "dist"]
+=======
+    "baseUrl": "./",
+    "incremental": true,
+    "paths": {
+      "@marxan-geoprocessing/*": [
+        "apps/geoprocessing/src/*"
+      ],
+      "@marxan-api/*": [
+        "apps/api/src/*"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 }

@@ -13,23 +13,20 @@ export const ProjectScenariosToolbar: React.FC<ProjectScenariosToolbarProps> = (
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // setSearch to null whenevere you unmount this component
+    // setSearch to null wheneverer you unmount this component
     return function unmount() {
       dispatch(setSearch(null));
     };
   }, [dispatch]);
 
   return (
-    <div className="mb-5">
-      <Search
-        defaultValue={search}
-        size="base"
-        placeholder="Search by scenario name..."
-        aria-label="Search"
-        onChange={(value) => { dispatch(setSearch(value)); }}
-      />
-
-    </div>
+    <Search
+      defaultValue={search}
+      size="base"
+      placeholder="Search by scenario name..."
+      aria-label="Search"
+      onChange={(value) => { dispatch(setSearch(value)); }}
+    />
   );
 };
 

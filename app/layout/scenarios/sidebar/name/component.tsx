@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
+import { motion } from 'framer-motion';
+
 import Pill from 'layout/pill';
 
 import Button from 'components/button';
@@ -45,7 +47,7 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
         projectId: pid,
       },
     }, {
-      onSuccess: ({ data: s }) => {
+      onSuccess: ({ data: { data: s } }) => {
         addToast('success-scenario-create', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -82,42 +84,48 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
   }, [mutation, pid, push, addToast]);
 
   return (
-    <Pill selected>
-      <FormRFF
-        onSubmit={handleSubmit}
-      >
-        {(props) => (
-          <form onSubmit={props.handleSubmit} autoComplete="off" className="relative w-full">
-            {/* NAME */}
-            <div>
-              <FieldRFF
-                name="name"
-                validate={composeValidators([{ presence: true }])}
-              >
-                {(fprops) => (
-                  <Field id="scenario-name" {...fprops}>
-                    <Label theme="dark" className="mb-3 uppercase">Name the scenario</Label>
-                    <Input theme="dark" type="text" placeholder="Write scenario name..." />
-                  </Field>
-                )}
-              </FieldRFF>
-            </div>
+    <motion.div
+      key="name"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      <Pill selected>
+        <FormRFF
+          onSubmit={handleSubmit}
+        >
+          {(props) => (
+            <form onSubmit={props.handleSubmit} autoComplete="off" className="relative w-full">
+              {/* NAME */}
+              <div>
+                <FieldRFF
+                  name="name"
+                  validate={composeValidators([{ presence: true }])}
+                >
+                  {(fprops) => (
+                    <Field id="scenario-name" {...fprops}>
+                      <Label theme="dark" className="mb-3 uppercase">Name the scenario</Label>
+                      <Input theme="dark" type="text" placeholder="Write scenario name..." />
+                    </Field>
+                  )}
+                </FieldRFF>
+              </div>
 
-            <div className="flex justify-center mt-5">
-              <Button theme="primary" size="lg" type="submit" className="relative px-20" disabled={submitting}>
-                <span>Save</span>
+              <div className="flex justify-center mt-5">
+                <Button theme="primary" size="lg" type="submit" className="relative px-20" disabled={submitting}>
+                  <span>Save</span>
 
-                <Loading
-                  visible={submitting}
-                  className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full"
-                  iconClassName="w-5 h-5 text-white"
-                />
-              </Button>
-            </div>
-          </form>
-        )}
-      </FormRFF>
-    </Pill>
+                  <Loading
+                    visible={submitting}
+                    className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full"
+                    iconClassName="w-5 h-5 text-white"
+                  />
+                </Button>
+              </div>
+            </form>
+          )}
+        </FormRFF>
+      </Pill>
+    </motion.div>
   );
 };
 

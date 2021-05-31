@@ -11,6 +11,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ItemProps } from 'components/scenarios/item/component';
 
 import SCENARIOS from 'services/scenarios';
+import UPLOADS from 'services/uploads';
 
 import {
   UseScenariosFiltersProps,
@@ -39,7 +40,7 @@ export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
   const { data } = query;
 
   return useMemo(() => {
-    let parsedData = Array.isArray(data?.data) ? data?.data.map((d):ItemProps => {
+    let parsedData = Array.isArray(data?.data?.data) ? data?.data?.data.map((d):ItemProps => {
       const {
         id, projectId, name, lastModifiedAt,
       } = d;
@@ -63,9 +64,6 @@ export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
         onView: () => {
           push(`/projects/${projectId}/scenarios/${id}`);
         },
-        onSettings: () => {
-
-        },
       };
     }) : [];
 
@@ -86,9 +84,9 @@ export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
     return {
       ...query,
       data: parsedData,
-      rawData: data?.data,
+      rawData: data?.data?.data,
     };
-  }, [query, data?.data, search, push]);
+  }, [query, data?.data?.data, search, push]);
 }
 
 export function useScenario(id) {
@@ -109,9 +107,9 @@ export function useScenario(id) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data,
+      data: data?.data?.data,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data?.data]);
 }
 
 export function useSaveScenario({
@@ -152,7 +150,6 @@ export function useDeleteScenario({
     method: 'DELETE',
   },
 }: UseDeleteScenarioProps) {
-  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const deleteScenario = ({ id }: DeleteScenarioProps) => {
@@ -168,7 +165,36 @@ export function useDeleteScenario({
 
   return useMutation(deleteScenario, {
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries('scenarios');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useSaveScenarioPUShapefile({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveScenarioProps) {
+  const [session] = useSession();
+
+  const saveScenarioPUShapefile = ({ id, data }: SaveScenarioProps) => {
+    return UPLOADS.request({
+      url: `/scenarios/${id}/planning-unit-shapefile`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveScenarioPUShapefile, {
+    onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

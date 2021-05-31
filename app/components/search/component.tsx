@@ -19,8 +19,8 @@ const THEME = {
 };
 
 const SIZES = {
-  sm: 'text-sm',
-  base: 'text-base',
+  sm: 'text-sm h-10',
+  base: 'text-base h-12',
 };
 
 export interface SearchProps extends AriaSearchFieldProps {
@@ -46,7 +46,7 @@ export const Search: React.FC<SearchProps> = ({
   return (
     <div
       className={cx(
-        'flex w-full relative border-b border-gray-400 py-3 px-4',
+        'flex w-full relative border-b border-gray-400 px-4',
         {
           [THEME[theme]]: true,
           [SIZES[size]]: true,

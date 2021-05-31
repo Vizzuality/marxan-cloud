@@ -42,7 +42,7 @@ export const Title: React.FC<TitleProps> = () => {
     });
 
     saveProjectMutation.mutate({ id: projectData.id, data }, {
-      onSuccess: ({ data: s }) => {
+      onSuccess: ({ data: { data: s } }) => {
         addToast('success-project-name', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -88,7 +88,7 @@ export const Title: React.FC<TitleProps> = () => {
     });
 
     saveScenarioMutation.mutate({ id: scenarioData.id, data }, {
-      onSuccess: ({ data: s }) => {
+      onSuccess: ({ data: { data: s } }) => {
         addToast('save-scenario-name', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -160,7 +160,7 @@ export const Title: React.FC<TitleProps> = () => {
                         <div className="relative h-6">
                           <input
                             {...input}
-                            className="absolute top-0 left-0 w-full h-full px-1 py-1 font-normal leading-4 bg-transparent border-none font-heading overflow-ellipsis focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
+                            className="absolute top-0 left-0 w-full h-full px-1 font-normal leading-4 bg-transparent border-none font-heading overflow-ellipsis focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();
@@ -168,7 +168,7 @@ export const Title: React.FC<TitleProps> = () => {
                             }}
                           />
 
-                          <h1 className="invisible px-1.5 py-1 font-heading font-normal leading-4">{input.value}</h1>
+                          <h1 className="invisible h-full px-1.5 font-heading font-normal leading-4">{input.value}</h1>
                         </div>
                       </Tooltip>
                     )}
@@ -217,14 +217,14 @@ export const Title: React.FC<TitleProps> = () => {
                           <input
                             {...input}
                             id="form-scenario-name"
-                            className="absolute top-0 left-0 w-full h-full px-1 py-1 font-sans font-normal leading-4 bg-transparent border-none overflow-ellipsis focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
+                            className="absolute top-0 left-0 w-full h-full px-1 font-sans font-normal leading-4 bg-transparent border-none overflow-ellipsis focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();
                               fprops.handleSubmit();
                             }}
                           />
-                          <h1 className="invisible px-1.5 py-1 font-sans font-normal leading-4">{input.value}</h1>
+                          <h1 className="invisible px-1.5 h-full font-sans font-normal leading-4">{input.value}</h1>
                         </div>
                       </Tooltip>
 

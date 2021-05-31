@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import Button from 'components/button';
 import Loading from 'components/loading';
+import InfoButton from 'components/info-button';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
@@ -14,15 +15,11 @@ import {
 
 import { useRouter } from 'next/router';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useProject } from 'hooks/projects';
+import { useWDPACategories } from 'hooks/wdpa';
 import { useToasts } from 'hooks/toast';
 
-const WDPA_CATEGORIES_OPTIONS = [
-  { label: 'Category 1', value: 'category-1' },
-  { label: 'Category 2', value: 'category-2' },
-  { label: 'Category 3', value: 'category-3' },
-  { label: 'Category 4', value: 'category-4' },
-  { label: 'Category 5', value: 'category-5' },
-];
+import THRESHOLDING_IMG from 'images/img-thresholding.png';
 
 export interface WDPAThresholdCategories {
   onSuccess: () => void;
@@ -36,10 +33,25 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
-  const { data } = useScenario(sid);
+  const { data: projectData } = useProject(pid);
 
+  const {
+    data: scenarioData,
+    isFetching: scenarioIsFetching,
+    isFetched: scenarioIsFetched,
+  } = useScenario(sid);
+
+  const {
+    data: wdpaData,
+    isFetching: wdpaIsFetching,
+    isFetched: wdpaIsFetched,
+  } = useWDPACategories(
+    projectData?.adminAreaLevel2Id
+    || projectData?.adminAreaLevel1Id
+    || projectData?.countryId,
+  );
   const mutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
@@ -48,13 +60,31 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const labelRef = React.useRef(null);
 
+  const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
+    if (!wdpaData) return [];
+
+    return wdpaData.map((w) => ({
+      label: `IUCN ${w.iucnCategory}`,
+      value: w.id,
+    }));
+  }, [wdpaData]);
+
+  const INITIAL_VALUES = useMemo(() => {
+    const { wdpaThreshold, wdpaIucnCategories } = scenarioData;
+
+    return {
+      wdpaThreshold: wdpaThreshold ? wdpaThreshold / 100 : 0.75,
+      wdpaIucnCategories: wdpaIucnCategories || [],
+    };
+  }, [scenarioData]);
+
   const onSubmit = useCallback(async (values) => {
     setSubmitting(true);
 
     const { wdpaThreshold } = values;
 
     mutation.mutate({
-      id: data.id,
+      id: scenarioData.id,
       data: {
         wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
       },
@@ -85,21 +115,23 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         });
       },
     });
-  }, [mutation, addToast, data?.id, onSuccess]);
+  }, [mutation, scenarioData?.id, addToast, onSuccess]);
 
-  if (!data) return null;
-
-  const {
-    wdpaFilter = [],
-    wdpaThreshold,
-  } = data;
+  // Loading
+  if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
+    return (
+      <Loading
+        visible
+        className="relative flex items-center justify-center w-full h-16"
+        iconClassName="w-5 h-5 text-white"
+      />
+    );
+  }
 
   return (
     <FormRFF
       onSubmit={onSubmit}
-      initialValues={{
-        wdpaThreshold: wdpaThreshold ? wdpaThreshold / 100 : 0.75,
-      }}
+      initialValues={INITIAL_VALUES}
     >
       {({ values, handleSubmit }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative w-full">
@@ -111,7 +143,15 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
             >
               {(flprops) => (
                 <Field id="scenario-wdpaThreshold" {...flprops}>
-                  <Label ref={labelRef} theme="dark" className="mb-3 uppercase">Set the threshold for protected areas</Label>
+                  <div className="flex items-center mb-3">
+                    <Label ref={labelRef} theme="dark" className="mr-3 uppercase">Set the threshold for protected areas</Label>
+                    <InfoButton>
+                      <div>
+                        <h4 className="font-heading text-lg mb-2.5">Thresholding</h4>
+                        <img src={THRESHOLDING_IMG} alt="Thresholding" />
+                      </div>
+                    </InfoButton>
+                  </div>
 
                   <p
                     className="mb-3 text-sm text-gray-400"
@@ -141,8 +181,9 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
             <h3 className="text-sm">Selected protected areas:</h3>
 
             <div className="flex flex-wrap mt-2.5">
-              {wdpaFilter && wdpaFilter.map((w) => {
+              {INITIAL_VALUES.wdpaIucnCategories && INITIAL_VALUES.wdpaIucnCategories.map((w) => {
                 const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
+
                 return (
                   <div
                     key={`${wdpa.value}`}
@@ -157,7 +198,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
             </div>
           </div>
 
-          <div className="flex justify-center gap-4 mt-20">
+          <div className="flex justify-center space-x-4 mt-20">
             <Button theme="secondary" size="lg" type="button" className="relative px-20" disabled={submitting} onClick={onBack}>
               <span>Back</span>
             </Button>
