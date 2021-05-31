@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WorkerModule, WorkerProcessor } from '../worker';
-import { ShapefilesModule } from '../shapefiles/shapefiles.module';
+import { CqrsModule } from '@nestjs/cqrs';
+import {
+  WorkerModule,
+  WorkerProcessor,
+} from '@marxan-geoprocessing/modules/worker';
+import { ShapefilesModule } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.module';
 
 import { SurfaceCostProcessor } from './application/surface-cost-processor';
 import { SurfaceCostWorker } from './application/surface-cost-worker';
@@ -21,6 +25,7 @@ import { PuCostExtractor } from './adapters/pu-cost-extractor';
   imports: [
     WorkerModule,
     ShapefilesModule,
+    CqrsModule,
     TypeOrmModule.forFeature([
       ScenariosPuCostDataGeo,
       ScenariosPlanningUnitGeoEntity, // not used but has to imported somewhere
