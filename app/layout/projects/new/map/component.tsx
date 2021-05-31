@@ -24,6 +24,9 @@ export const ScenariosMap: React.FC<ProjectMapProps> = () => {
     if (bbox) {
       setBounds({
         bbox,
+        options: {
+          padding: 50,
+        },
         viewportOptions: {
           transitionDuration: 1000,
         },

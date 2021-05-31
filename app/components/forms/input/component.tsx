@@ -8,7 +8,7 @@ const THEME = {
       'w-full leading-tight text-white bg-gray-800 bg-opacity-0 focus:outline-none focus:bg-gray-700',
     status: {
       none: 'border-gray-500',
-      // valid: 'border-green-500',
+      valid: 'border-gray-500',
       error: 'border-red-500',
       disabled: 'border-gray-500 opacity-50',
     },
@@ -23,7 +23,7 @@ const THEME = {
       'w-full leading-tight text-gray-800 bg-white focus:outline-none focus:bg-gray-100',
     status: {
       none: 'border-gray-800',
-      // valid: 'border-green-500',
+      valid: 'border-gray-800',
       error: 'border-red-500',
       disabled: 'border-gray-800 opacity-50',
     },

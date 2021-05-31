@@ -72,8 +72,11 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                     options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
                     initialSelected={selectedCountry}
                     onChange={(value: string) => {
+                      const DEFAULT = {
+                        bbox: [179, -179, 89, -89],
+                      };
                       const COUNTRY = countriesData.find((c) => c.id === value);
-                      const { bbox } = COUNTRY || {};
+                      const { bbox } = COUNTRY || DEFAULT || {};
                       dispatch(setBbox(bbox));
 
                       setSelectedCountry(value);
