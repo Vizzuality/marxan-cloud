@@ -161,20 +161,17 @@ export class ScenariosController {
     await this.service.getById(scenarioId);
     const bodyFormData = new FormData();
     bodyFormData.append('file', createReadStream(file.path));
-    try {
-      const {
-        data,
-      } = await this.httpService
-        .post(
-          `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
-          bodyFormData,
-          { headers: bodyFormData.getHeaders() },
-        )
-        .toPromise();
-      return data;
-    } catch (error) {
-      return error.response.data;
-    }
+    const { data } = await this.httpService
+      .post(
+        `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
+        bodyFormData,
+        {
+          headers: bodyFormData.getHeaders(),
+          validateStatus: (status) => status <= 499,
+        },
+      )
+      .toPromise();
+    return data;
   }
   @ApiOperation({ description: 'Update scenario' })
   @ApiOkResponse({ type: ScenarioResult })
