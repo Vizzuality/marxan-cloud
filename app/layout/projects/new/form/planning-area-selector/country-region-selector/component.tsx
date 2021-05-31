@@ -73,7 +73,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                     initialSelected={selectedCountry}
                     onChange={(value: string) => {
                       const COUNTRY = countriesData.find((c) => c.id === value);
-                      const { bbox } = COUNTRY;
+                      const { bbox } = COUNTRY || {};
                       dispatch(setBbox(bbox));
 
                       setSelectedCountry(value);
@@ -102,9 +102,9 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                       clearSelectionActive
                       options={regionsData.map((c) => ({ label: c.name, value: c.id }))}
                       onChange={(value: string) => {
+                        const COUNTRY = countriesData.find((c) => c.id === country);
                         const REGION = regionsData.find((c) => c.id === value);
-                        const { bbox } = REGION;
-                        console.log(bbox);
+                        const { bbox } = REGION || COUNTRY || {};
                         dispatch(setBbox(bbox));
 
                         setSelectedRegion(value);
@@ -136,9 +136,9 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                       placeholder="Select subregion (optional)"
                       options={subRegionsData.map((c) => ({ label: c.name, value: c.id }))}
                       onChange={(value: string) => {
+                        const REGION = regionsData.find((c) => c.id === region);
                         const SUBREGION = subRegionsData.find((c) => c.id === value);
-                        const { bbox } = SUBREGION;
-                        console.log(bbox);
+                        const { bbox } = SUBREGION || REGION || {};
                         dispatch(setBbox(bbox));
 
                         setSelectedSubRegion(value);

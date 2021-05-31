@@ -76,7 +76,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
         ...DEFAULT_AREA,
       }}
     >
-      {({ handleSubmit }) => (
+      {({ handleSubmit, values }) => (
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
@@ -154,6 +154,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
             {!hasPlanningArea && (
               <PlanningAreaSelector
                 area={DEFAULT_AREA}
+                values={values}
                 onChange={(value) => console.info('Planning area change: ', value)}
               />
             )}
