@@ -1,17 +1,14 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpService,
-  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
   Req,
-  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -22,7 +19,7 @@ import {
   scenarioResource,
   ScenarioResult,
 } from './scenario.api.entity';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { ScenariosService } from './scenarios.service';
 import {
   FetchSpecification,
@@ -31,13 +28,10 @@ import {
 
 import {
   ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
@@ -56,7 +50,6 @@ import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remot
 import { ProcessingStatusDto } from './dto/processing-status.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
-import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { AdjustPlanningUnits } from '../analysis/entry-points/adjust-planning-units';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
@@ -64,7 +57,7 @@ import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as FormData from 'form-data';
 import { createReadStream } from 'fs';
-import { AppConfig } from 'utils/config.utils';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -159,14 +152,12 @@ export class ScenariosController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ShapefileGeoJSONResponseDTO> {
     await this.service.getById(scenarioId);
-    const bodyFormData = new FormData();
-    bodyFormData.append('file', createReadStream(file.path));
     const { data } = await this.httpService
       .post(
         `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
-        bodyFormData,
+        file,
         {
-          headers: bodyFormData.getHeaders(),
+          headers: { 'Content-Type': 'application/json' },
           validateStatus: (status) => status <= 499,
         },
       )
