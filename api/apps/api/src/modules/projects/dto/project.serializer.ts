@@ -4,7 +4,7 @@ import { ProjectsCrudService } from '../projects-crud.service';
 import { Project } from '../project.api.entity';
 
 @Injectable()
-export class ProjectMapper {
+export class ProjectSerializer {
   constructor(private readonly projectsCrud: ProjectsCrudService) {}
 
   async serialize(

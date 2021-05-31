@@ -4,7 +4,7 @@ import { PaginationMeta } from '../../../utils/app-base.service';
 import { GeoFeature } from '../../geo-features/geo-feature.api.entity';
 
 @Injectable()
-export class GeoFeatureMapper {
+export class GeoFeatureSerializer {
   constructor(private readonly geoFeaturesService: GeoFeaturesService) {}
 
   async serialize(

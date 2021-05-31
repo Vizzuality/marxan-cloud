@@ -12,8 +12,8 @@ import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning
 import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
 import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
 import { ProjectsService } from './projects.service';
-import { GeoFeatureMapper } from './dto/geo-feature.mapper';
-import { ProjectMapper } from './dto/project-mapper';
+import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
+import { ProjectSerializer } from './dto/project.serializer';
 
 @Module({
   imports: [
@@ -29,8 +29,8 @@ import { ProjectMapper } from './dto/project-mapper';
   providers: [
     ProjectsCrudService,
     ProjectsService,
-    GeoFeatureMapper,
-    ProjectMapper,
+    GeoFeatureSerializer,
+    ProjectSerializer,
   ],
   controllers: [ProjectsController],
   exports: [ProjectsCrudService],

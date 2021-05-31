@@ -48,8 +48,8 @@ import {
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import { ProjectsService } from './projects.service';
-import { GeoFeatureMapper } from './dto/geo-feature.mapper';
-import { ProjectMapper } from './dto/project-mapper';
+import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
+import { ProjectSerializer } from './dto/project.serializer';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -58,8 +58,8 @@ import { ProjectMapper } from './dto/project-mapper';
 export class ProjectsController {
   constructor(
     private readonly projectsService: ProjectsService,
-    private readonly geoFeatureMapper: GeoFeatureMapper,
-    private readonly projectMapper: ProjectMapper,
+    private readonly geoFeatureSerializer: GeoFeatureSerializer,
+    private readonly projectSerializer: ProjectSerializer,
   ) {}
 
   @ApiOperation({
@@ -87,7 +87,7 @@ export class ProjectsController {
       },
     );
 
-    return this.geoFeatureMapper.serialize(data, metadata);
+    return this.geoFeatureSerializer.serialize(data, metadata);
   }
 
   /**
@@ -126,7 +126,7 @@ export class ProjectsController {
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ProjectResultPlural> {
     const results = await this.projectsService.findAll(fetchSpecification);
-    return this.projectMapper.serialize(results.data, results.metadata);
+    return this.projectSerializer.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find project by id' })
@@ -136,7 +136,7 @@ export class ProjectsController {
   })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ProjectResultSingular> {
-    return await this.projectMapper.serialize(
+    return await this.projectSerializer.serialize(
       await this.projectsService.findOne(id),
     );
   }
@@ -148,7 +148,7 @@ export class ProjectsController {
     @Body() dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResultSingular> {
-    return await this.projectMapper.serialize(
+    return await this.projectSerializer.serialize(
       await this.projectsService.create(dto, { authenticatedUser: req.user }),
     );
   }
@@ -160,7 +160,7 @@ export class ProjectsController {
     @Param('id') id: string,
     @Body() dto: UpdateProjectDTO,
   ): Promise<ProjectResultSingular> {
-    return await this.projectMapper.serialize(
+    return await this.projectSerializer.serialize(
       await this.projectsService.update(id, dto),
     );
   }
