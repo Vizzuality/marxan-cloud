@@ -5,12 +5,12 @@ import { SurfaceCostProcessor } from './surface-cost-processor';
 
 import { CostSurfacePersistencePort } from '../ports/persistence/cost-surface-persistence.port';
 import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
-import { ArePuidsAllowedPort } from '../ports/pu-validator/are-puuids-allowed.port';
+import { GetAvailablePlanningUnits } from '../ports/available-planning-units/get-available-planning-units';
 import { ShapefileConverterPort } from '../ports/shapefile-converter/shapefile-converter.port';
 
 import { ShapefileConverterFake } from './__mocks__/shapefile-converter.fake';
 import { PuExtractorFake } from './__mocks__/pu-extractor.fake';
-import { ArePuidsAllowedFake } from './__mocks__/are-puids-allowed.fake';
+import { GetAvailablePuidsFake } from './__mocks__/get-available-puids.fake';
 import { CostSurfaceRepoFake } from './__mocks__/cost-surface-repo.fake';
 
 import { getJob } from './__mocks__/job.data';
@@ -21,8 +21,11 @@ let sut: SurfaceCostProcessor;
 
 let fileConverter: ShapefileConverterFake;
 let puExtractor: PuExtractorFake;
-let puValidator: ArePuidsAllowedFake;
+let puRepo: GetAvailablePuidsFake;
 let repo: CostSurfaceRepoFake;
+
+const availablePlanningUnitIds = ['1', '2', '3'];
+const missingPlanningUnitIds = ['1', '4'];
 
 beforeEach(async () => {
   const sandbox = await Test.createTestingModule({
@@ -37,8 +40,8 @@ beforeEach(async () => {
         useClass: PuExtractorFake,
       },
       {
-        provide: ArePuidsAllowedPort,
-        useClass: ArePuidsAllowedFake,
+        provide: GetAvailablePlanningUnits,
+        useClass: GetAvailablePuidsFake,
       },
       {
         provide: ShapefileConverterPort,
@@ -50,7 +53,7 @@ beforeEach(async () => {
   sut = sandbox.get(SurfaceCostProcessor);
   fileConverter = sandbox.get(ShapefileConverterPort);
   puExtractor = sandbox.get(PuExtractorPort);
-  puValidator = sandbox.get(ArePuidsAllowedPort);
+  puRepo = sandbox.get(GetAvailablePlanningUnits);
   repo = sandbox.get(CostSurfacePersistencePort);
 });
 
@@ -70,7 +73,7 @@ describe(`when shapefile couldn't be converted`, () => {
 
 describe(`when shapefile was converted to geojson`, () => {
   beforeEach(() => {
-    fileConverter.mock.mockResolvedValue(getGeoJson());
+    fileConverter.mock.mockResolvedValue(getGeoJson(availablePlanningUnitIds));
   });
 
   describe(`when cost is missing in properties`, () => {
@@ -82,43 +85,43 @@ describe(`when shapefile was converted to geojson`, () => {
 
     it(`should throw`, async () => {
       await expect(sut.process(getJob(scenarioId))).rejects.toThrow(/Missing/);
-      expect(puExtractor.mock).toHaveBeenCalledWith(getGeoJson());
+      expect(puExtractor.mock).toHaveBeenCalledWith(
+        getGeoJson(availablePlanningUnitIds),
+      );
     });
   });
 
   describe(`when cost was resolved`, () => {
+    const cost = getCost(availablePlanningUnitIds);
     beforeEach(() => {
-      puExtractor.mock.mockReturnValue(getCost());
+      puExtractor.mock.mockReturnValue(cost);
     });
 
     describe(`when provided PUs do not belong to given scenario`, () => {
       beforeEach(() => {
-        puValidator.mock.mockResolvedValue({
-          errors: ['You shall not pass!'],
+        puRepo.mock.mockResolvedValue({
+          ids: missingPlanningUnitIds,
         });
       });
 
       it(`should throw`, async () => {
         await expect(sut.process(getJob(scenarioId))).rejects.toThrow(
-          /shall not/,
+          /Missing/,
         );
-        expect(puValidator.mock).toHaveBeenCalledWith(
-          scenarioId,
-          getCost().map((c) => c.planningUnitId),
-        );
+        expect(puRepo.mock).toHaveBeenCalledWith(scenarioId);
       });
     });
 
     describe(`when provided PUs belong to given scenario`, () => {
       beforeEach(() => {
-        puValidator.mock.mockResolvedValue({
-          errors: [],
+        puRepo.mock.mockResolvedValue({
+          ids: availablePlanningUnitIds,
         });
       });
 
       it(`should persist the results`, async () => {
         expect(await sut.process(getJob(scenarioId))).toEqual(true);
-        expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, getCost());
+        expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, cost);
       });
     });
   });
