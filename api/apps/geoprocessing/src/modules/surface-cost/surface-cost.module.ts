@@ -6,6 +6,7 @@ import {
   WorkerProcessor,
 } from '@marxan-geoprocessing/modules/worker';
 import { ShapefilesModule } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.module';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 
 import { SurfaceCostProcessor } from './application/surface-cost-processor';
 import { SurfaceCostWorker } from './application/surface-cost-worker';
@@ -18,7 +19,6 @@ import { ShapefileConverterPort } from './ports/shapefile-converter/shapefile-co
 import { TypeormCostSurface } from './adapters/typeorm-cost-surface';
 import { ShapefileConverter } from './adapters/shapefile-converter';
 import { ScenariosPuCostDataGeo } from '../scenarios/scenarios-pu-cost-data.geo.entity';
-import { ScenariosPlanningUnitGeoEntity } from '../scenarios/scenarios-planning-unit.geo.entity';
 import { PuCostExtractor } from './adapters/pu-cost-extractor';
 
 @Module({
