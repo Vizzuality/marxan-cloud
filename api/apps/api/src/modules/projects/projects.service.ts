@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
-import { AppInfoDTO } from '../../dto/info.dto';
+import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
-import { GeoFeaturesService } from '../geo-features/geo-features.service';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 
 import { ProjectsCrudService } from './projects-crud.service';
 import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { GeoFeaturesService } from '../../geo-features/geo-features.service';
-import { PaginationMeta } from '../../../utils/app-base.service';
-import { GeoFeature } from '../../geo-features/geo-feature.api.entity';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
+import { PaginationMeta } from '@marxan-api/utils/app-base.service';
 
 @Injectable()
 export class GeoFeatureSerializer {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PaginationMeta } from '../../../utils/app-base.service';
+import { PaginationMeta } from '@marxan-api/utils/app-base.service';
 import { ProjectsCrudService } from '../projects-crud.service';
 import { Project } from '../project.api.entity';
 
