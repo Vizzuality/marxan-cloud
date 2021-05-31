@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { LockStatus } from '@marxan/scenarios-planning-unit';
+import { LockStatus } from './lock-status.enum';
 
-export const scenariosPuDataEntityName = 'scenarios_pu_data';
+const scenariosPuDataEntityName = 'scenarios_pu_data';
 
 const toLockEnum: Record<0 | 1 | 2, LockStatus> = Object.freeze({
   0: LockStatus.Unstated,
