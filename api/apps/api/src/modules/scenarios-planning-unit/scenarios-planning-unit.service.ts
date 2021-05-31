@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { FiltersSpecification } from 'nestjs-base-service';
 
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '../../utils/app-base.service';
 import { AppConfig } from '../../utils/config.utils';
-import { remoteConnectionName } from './entities/remote-connection-name';
-import { ScenariosPlanningUnitGeoEntity } from './entities/scenarios-planning-unit.geo.entity';
 import { UserSearchCriteria } from './search-criteria';
-import { FiltersSpecification } from 'nestjs-base-service';
 
 @Injectable()
 export class ScenariosPlanningUnitService extends AppBaseService<
@@ -20,7 +21,10 @@ export class ScenariosPlanningUnitService extends AppBaseService<
   UserSearchCriteria
 > {
   constructor(
-    @InjectRepository(ScenariosPlanningUnitGeoEntity, remoteConnectionName)
+    @InjectRepository(
+      ScenariosPlanningUnitGeoEntity,
+      DbConnections.geoprocessingDB,
+    )
     private readonly puData: Repository<ScenariosPlanningUnitGeoEntity>,
   ) {
     super(puData, 'scenario_planning_unit', 'scenario_planning_units', {
