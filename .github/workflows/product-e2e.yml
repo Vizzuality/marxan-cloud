@@ -6,7 +6,7 @@ on:
       - develop
   schedule:
     - cron: '0 7 * * *'
-
+  workflow_dispatch:
 
 jobs:
   cypress-run:
