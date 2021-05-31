@@ -12,7 +12,7 @@ import { ShapefileConverterPort } from './ports/shapefile-converter/shapefile-co
 
 import { TypeormCostSurface } from './adapters/typeorm-cost-surface';
 import { ScenariosPuCostDataGeo } from '../scenarios/scenarios-pu-cost-data.geo.entity';
-import { ScenariosPlanningUnitGeoEntity } from '../scenarios/scenarios-planning-unit.geo.entity';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 
 @Module({
   imports: [

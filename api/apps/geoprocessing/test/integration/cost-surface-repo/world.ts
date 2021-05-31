@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { ScenariosPlanningUnitGeoEntity } from '../../../src/modules/scenarios/scenarios-planning-unit.geo.entity';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
 import { ScenariosPuCostDataGeo } from '../../../src/modules/scenarios/scenarios-pu-cost-data.geo.entity';
 
