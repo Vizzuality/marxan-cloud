@@ -4,12 +4,22 @@ import { FileService } from '../files/files.service';
 
 const mapshaper = require('mapshaper');
 
+const MIN_REQUIRED_FILES = ['prj', 'dbf', 'shx', 'shp'];
 @Injectable()
 export class ShapefileService {
   private readonly logger: Logger = new Logger(ShapefileService.name);
   constructor(private readonly fileService: FileService) {}
 
   private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
+    if (
+      !(await this.fileService.areFilesInFolder(
+        fileInfo.path.replace('.zip', ''),
+        MIN_REQUIRED_FILES,
+      ))
+    ) {
+      throw new Error('Some required file mising');
+    }
+    console.log('works');
     const outputKey = `shapefile-${new Date().getTime()}.geojson`;
 
     const _geoJson = await mapshaper.applyCommands(

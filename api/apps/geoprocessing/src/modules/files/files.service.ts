@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { createReadStream } from 'fs';
 import { Extract } from 'unzipper';
 import * as path from 'path';
-import { unlink, rmdir } from 'fs/promises';
+import { unlink, rmdir, readdir } from 'fs/promises';
 
 @Injectable()
 export class FileService {
@@ -30,6 +30,18 @@ export class FileService {
     });
   }
 
+<<<<<<< HEAD:api/apps/geoprocessing/src/modules/files/files.service.ts
+=======
+  async areFilesInFolder(
+    path: string,
+    fileExtensions: Array<string>,
+  ): Promise<boolean> {
+    const filesInPath = await readdir(path);
+    const extensions = filesInPath.map((file) => file.split('.').pop());
+    return fileExtensions.every((ext: string) => extensions.includes(ext));
+  }
+
+>>>>>>> 1304e566 (Validate given extensions are present in given path):geoprocessing/src/modules/files/files.service.ts
   async deleteDataFromFS(path: string): Promise<void> {
     if (path.startsWith('/tmp')) {
       await unlink(path);
