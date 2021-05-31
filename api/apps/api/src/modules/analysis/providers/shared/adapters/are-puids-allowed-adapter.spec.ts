@@ -2,11 +2,11 @@ import { ArePuidsAllowedAdapter } from './are-puids-allowed-adapter';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
-import { remoteConnectionName } from '../../../../scenarios-features/entities/remote-connection-name';
-import { ScenariosPlanningUnitGeoEntity } from '../../../../scenarios-planning-unit/entities/scenarios-planning-unit.geo.entity';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 
 import { fakeQueryBuilder } from '../../../../../utils/__mocks__/fake-query-builder';
 import { validDataWithGivenPuIds } from '../__mocks__/scenario-planning-unit-geo.data';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 const existingPuids = ['one', 'two', 'three'];
 const scenarioId = 'scenario-0000-fake-uuid';
@@ -16,7 +16,7 @@ let sut: ArePuidsAllowedAdapter;
 beforeEach(async () => {
   const geoRepoToken = getRepositoryToken(
     ScenariosPlanningUnitGeoEntity,
-    remoteConnectionName,
+    DbConnections.geoprocessingDB,
   );
   const sandbox = await Test.createTestingModule({
     providers: [

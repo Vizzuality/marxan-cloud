@@ -4,10 +4,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { v4 } from 'uuid';
 
 import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
-import { ScenariosPlanningUnitGeoEntity } from '../../../src/modules/scenarios-planning-unit/entities/scenarios-planning-unit.geo.entity';
-import { remoteConnectionName } from '../../../src/modules/scenarios-planning-unit/entities/remote-connection-name';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 
 import { WhenChangingPlanningUnitInclusivity } from './WhenChangingPlanningUnitInclusivity';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 export interface World {
   scenarioId: string;
@@ -24,7 +24,10 @@ export interface World {
 export const createWorld = async (app: INestApplication): Promise<World> => {
   const scenarioId = v4();
   const scenariosPuData: Repository<ScenariosPlanningUnitGeoEntity> = await app.get(
-    getRepositoryToken(ScenariosPlanningUnitGeoEntity, remoteConnectionName),
+    getRepositoryToken(
+      ScenariosPlanningUnitGeoEntity,
+      DbConnections.geoprocessingDB,
+    ),
   );
 
   return {
