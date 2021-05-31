@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProjectsController } from './projects.controller';
 import { Project } from './project.api.entity';
-import { ProjectsCrud } from './projects-crud';
+import { ProjectsCrudService } from './projects-crud.service';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { ScenariosModule } from '@marxan-api/modules/scenarios/scenarios.module';
 import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.module';
@@ -26,8 +26,13 @@ import { ProjectMapper } from './dto/project-mapper';
     PlanningUnitsModule,
     ProtectedAreasModule,
   ],
-  providers: [ProjectsCrud, ProjectsService, GeoFeatureMapper, ProjectMapper],
+  providers: [
+    ProjectsCrudService,
+    ProjectsService,
+    GeoFeatureMapper,
+    ProjectMapper,
+  ],
   controllers: [ProjectsController],
-  exports: [ProjectsCrud],
+  exports: [ProjectsCrudService],
 })
 export class ProjectsModule {}

@@ -32,7 +32,7 @@ type ProjectFilterKeys = keyof Pick<
 type ProjectFilters = Record<ProjectFilterKeys, string[]>;
 
 @Injectable()
-export class ProjectsCrud extends AppBaseService<
+export class ProjectsCrudService extends AppBaseService<
   Project,
   CreateProjectDTO,
   UpdateProjectDTO,

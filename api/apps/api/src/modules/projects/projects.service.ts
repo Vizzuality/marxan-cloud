@@ -4,7 +4,7 @@ import { AppInfoDTO } from '../../dto/info.dto';
 
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 
-import { ProjectsCrud } from './projects-crud';
+import { ProjectsCrudService } from './projects-crud.service';
 import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
@@ -14,7 +14,7 @@ import { UpdateProjectDTO } from './dto/update.project.dto';
 export class ProjectsService {
   constructor(
     private readonly geoCrud: GeoFeaturesService,
-    private readonly projectsCrud: ProjectsCrud,
+    private readonly projectsCrud: ProjectsCrudService,
     private readonly protectedAreaShapefile: ProtectedAreasFacade,
   ) {}
 

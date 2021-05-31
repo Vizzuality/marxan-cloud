@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PaginationMeta } from '../../../utils/app-base.service';
-import { ProjectsCrud } from '../projects-crud';
+import { ProjectsCrudService } from '../projects-crud.service';
 import { Project } from '../project.api.entity';
 
 @Injectable()
 export class ProjectMapper {
-  constructor(private readonly projectsCrud: ProjectsCrud) {}
+  constructor(private readonly projectsCrud: ProjectsCrudService) {}
 
   async serialize(
     entities: Partial<Project> | (Partial<Project> | undefined)[],
