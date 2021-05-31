@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { ScenariosPlanningUnitGeoEntity } from '../../src/modules/scenarios/scenarios-planning-unit.geo.entity';
-import { LockStatus } from '../../src/modules/scenarios/lock-status.enum';
+import { LockStatus } from '@marxan/scenarios-planning-unit';
 
 // TODO monorepo - copy of api-step
 export const GivenScenarioPuDataExists = async (

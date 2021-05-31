@@ -9,6 +9,8 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "moduleNameMapper": {
-    "@marxan-geoprocessing/(.*)": "<rootDir>/src/$1"
+    "@marxan-geoprocessing/(.*)": "<rootDir>/src/$1",
+    "^@marxan/scenarios-planning-unit": ["<rootDir>/../../libs/scenarios-planning-unit/src"],
+    "^@marxan/scenarios-planning-unit/(.*)$": ["<rootDir>/../../libs/scenarios-planning-unit/src/$1"]
   }
 }

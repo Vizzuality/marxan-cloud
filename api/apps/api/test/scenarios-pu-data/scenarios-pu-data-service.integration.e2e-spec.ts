@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { bootstrapApplication } from '../utils/api-application';
 
 import { ScenariosPlanningUnitService } from '../../src/modules/scenarios-planning-unit/scenarios-planning-unit.service';
-import { LockStatus } from '../../src/modules/scenarios-planning-unit/lock-status.enum';
+import { LockStatus } from '@marxan/scenarios-planning-unit';
 import { createWorld, World } from './steps/world';
 import { tearDown } from '../utils/tear-down';
 
