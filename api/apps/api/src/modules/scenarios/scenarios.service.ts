@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -14,7 +14,7 @@ import {
 } from '@marxan-api/utils/app-base.service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { ProtectedAreasService } from '@marxan-api/modules/protected-areas/protected-areas.service';
-import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
+import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.service';
 import { concat } from 'lodash';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
@@ -43,8 +43,8 @@ export class ScenariosService extends AppBaseService<
     @Inject(UsersService) protected readonly usersService: UsersService,
     @Inject(ProtectedAreasService)
     protected readonly protectedAreasService: ProtectedAreasService,
-    @Inject(forwardRef(() => ProjectsService))
-    protected readonly projectsService: ProjectsService,
+    @Inject(forwardRef(() => ProjectsCrudService))
+    protected readonly projectsService: ProjectsCrudService,
     private readonly wdpaCalculationsDetector: WdpaAreaCalculationService,
     private readonly commandBus: CommandBus,
   ) {
