@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Job } from 'bullmq';
 
-import { WorkerProcessor } from '../../worker';
+import { canPlanningUnitsBeLocked } from '@marxan/scenarios-planning-unit';
+import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
+
 import { CostSurfaceJobInput } from '../cost-surface-job-input';
 
 import { CostSurfacePersistencePort } from '../ports/persistence/cost-surface-persistence.port';
 import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
 import { GetAvailablePlanningUnits } from '../ports/available-planning-units/get-available-planning-units';
 import { ShapefileConverterPort } from '../ports/shapefile-converter/shapefile-converter.port';
-import { lockPlanningUnits } from '@marxan/scenarios-planning-unit';
 
 @Injectable()
 export class SurfaceCostProcessor
@@ -27,7 +28,7 @@ export class SurfaceCostProcessor
       await this.availablePlanningUnits.get(job.data.scenarioId)
     ).ids;
 
-    const { errors } = lockPlanningUnits(
+    const { errors } = canPlanningUnitsBeLocked(
       surfaceCosts.map((cost) => cost.planningUnitId),
       planningUnitsIds,
     );
