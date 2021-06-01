@@ -152,6 +152,10 @@ export class ScenariosController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ShapefileGeoJSONResponseDTO> {
     await this.service.getById(scenarioId);
+    /**
+     * @validateStatus is required for HttpService to not reject and wrap geoprocessing's response
+     * in case a shapefile is not validated and a status 4xx is sent back.
+     */
     const { data } = await this.httpService
       .post(
         `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,

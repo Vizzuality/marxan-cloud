@@ -13,7 +13,7 @@ export class ShapefileService {
 
   private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
     if (
-      !(await this.areRequireShapefileFilesInFolder(
+      !(await this.areRequiredShapefileFilesInFolder(
         fileInfo.path.replace('.zip', ''),
       ))
     ) {
@@ -33,7 +33,7 @@ export class ShapefileService {
     return JSON.parse(_geoJson[outputKey].toString('utf-8'));
   }
 
-  async areRequireShapefileFilesInFolder(path: string): Promise<boolean> {
+  async areRequiredShapefileFilesInFolder(path: string): Promise<boolean> {
     const filesInPath = await readdir(path);
     const extensions = filesInPath.map((file) => file.split('.').pop());
     return this.minRequiredFiles.every((ext: string) =>
