@@ -79,7 +79,6 @@
     "unzipper": "^0.10.11",
     "uuid": "8.3.2",
     "swagger-ui-express": "^4.1.6"
-
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
@@ -145,7 +144,9 @@
     ],
     "moduleNameMapper": {
       "@marxan-api/(.*)": "<rootDir>/apps/api/src/$1",
-      "@marxan-geoprocessing/(.*)": "<rootDir>/apps/geoprocessing/src/$1"
+      "@marxan-geoprocessing/(.*)": "<rootDir>/apps/geoprocessing/src/$1",
+      "@marxan/utils/(.*)": "<rootDir>/libs/utils/src/$1",
+      "@marxan/utils": "<rootDir>/libs/utils/src"
     }
   }
 }

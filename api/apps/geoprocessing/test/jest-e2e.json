@@ -9,6 +9,8 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "moduleNameMapper": {
-    "@marxan-geoprocessing/(.*)": "<rootDir>/src/$1"
+    "@marxan-geoprocessing/(.*)": "<rootDir>/src/$1",
+    "^@marxan/utils": ["<rootDir>/../../libs/utils/src"],
+    "^@marxan/utils/(.*)$": ["<rootDir>/../..//libs/utils/src/$1"]
   }
 }
