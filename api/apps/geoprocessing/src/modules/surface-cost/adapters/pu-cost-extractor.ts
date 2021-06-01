@@ -11,7 +11,7 @@ type Properties = {
 
 type MaybeCost = MaybeProperties<Properties>;
 
-export class ExtractPuCost implements PuExtractorPort {
+export class PuCostExtractor implements PuExtractorPort {
   extract(geo: GeoJSON): PlanningUnitCost[] {
     if (!this.isFeatureCollection(geo)) {
       throw new Error('Only FeatureCollection is supported.');

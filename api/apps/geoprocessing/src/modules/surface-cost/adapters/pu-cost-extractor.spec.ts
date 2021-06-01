@@ -5,9 +5,9 @@ import {
   getGeoJsonWithMissingCost,
   getGeometryMultiPolygon,
 } from '../application/__mocks__/geojson';
-import { ExtractPuCost } from './extract-pu-cost';
+import { PuCostExtractor } from './pu-cost-extractor';
 
-let sut: ExtractPuCost;
+let sut: PuCostExtractor;
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
 beforeEach(async () => {
@@ -50,11 +50,11 @@ describe(`when given GeoJson has pu costs`, () => {
 
 const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
-    providers: [ExtractPuCost],
+    providers: [PuCostExtractor],
   }).compile();
 
   return {
-    getService: () => sandbox.get(ExtractPuCost),
+    getService: () => sandbox.get(PuCostExtractor),
     geoFeaturesWithoutCost: () => getGeoJsonWithMissingCost(),
     geoFeaturesWithData: () => getGeoJson(),
     simpleGeometry: () => getGeometryMultiPolygon(),
