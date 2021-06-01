@@ -24,13 +24,13 @@ export class SurfaceCostProcessor
   async process(job: Job<CostSurfaceJobInput, true>): Promise<true> {
     const geoJson = await this.shapefileConverter.convert(job.data.shapefile);
     const surfaceCosts = this.puExtractor.extract(geoJson);
-    const planningUnitsIds = (
+    const scenarioPlanningUnitIds = (
       await this.availablePlanningUnits.get(job.data.scenarioId)
     ).ids;
 
     const { errors } = canPlanningUnitsBeLocked(
       surfaceCosts.map((cost) => cost.planningUnitId),
-      planningUnitsIds,
+      scenarioPlanningUnitIds,
     );
     if (errors.length > 0) {
       throw new Error(errors.join('.'));
