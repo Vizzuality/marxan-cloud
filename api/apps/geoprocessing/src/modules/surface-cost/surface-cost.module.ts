@@ -20,7 +20,7 @@ import { TypeormCostSurface } from './adapters/typeorm-cost-surface';
 import { ShapefileConverter } from './adapters/shapefile-converter';
 import { ScenariosPuCostDataGeo } from '../scenarios/scenarios-pu-cost-data.geo.entity';
 import { PuCostExtractor } from './adapters/pu-cost-extractor';
-import { TypeormAvailablePlanningUnits } from './adapters/typeorm-available-planning-units';
+import { AvailablePlanningUnitsRepository } from './adapters/available-planning-units-repository';
 
 @Module({
   imports: [
@@ -44,7 +44,7 @@ import { TypeormAvailablePlanningUnits } from './adapters/typeorm-available-plan
     },
     {
       provide: GetAvailablePlanningUnits,
-      useClass: TypeormAvailablePlanningUnits,
+      useClass: AvailablePlanningUnitsRepository,
     },
     {
       provide: PuExtractorPort,
