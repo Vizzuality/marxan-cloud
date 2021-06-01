@@ -3,17 +3,15 @@ import { EventBus } from '@nestjs/cqrs';
 import { Job, Worker } from 'bullmq';
 
 import {
-  ApiEvent,
   API_EVENT_KINDS,
+  ApiEvent,
 } from '@marxan-geoprocessing/modules/api-events';
-import {
-  WorkerBuilder,
-  WorkerProcessor,
-} from '@marxan-geoprocessing/modules/worker';
+import { WorkerBuilder } from '@marxan-geoprocessing/modules/worker';
 
 import { CostSurfaceJobInput } from '../cost-surface-job-input';
 
 import { queueName } from './queue-name';
+import { SurfaceCostProcessor } from './surface-cost-processor';
 
 @Injectable()
 export class SurfaceCostWorker {
@@ -21,7 +19,7 @@ export class SurfaceCostWorker {
 
   constructor(
     private readonly wrapper: WorkerBuilder,
-    private readonly processor: WorkerProcessor<CostSurfaceJobInput, true>,
+    private readonly processor: SurfaceCostProcessor,
     private readonly eventBus: EventBus,
   ) {
     this.#worker = wrapper.build(queueName, processor);

@@ -4,12 +4,7 @@ import { FeatureCollection, GeoJSON, Geometry } from 'geojson';
 import { PlanningUnitCost } from '../ports/planning-unit-cost';
 import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
 
-type Properties = {
-  cost: number;
-  planningUnitId: string;
-};
-
-type MaybeCost = MaybeProperties<Properties>;
+type MaybeCost = MaybeProperties<PlanningUnitCost>;
 
 export class PuCostExtractor implements PuExtractorPort {
   extract(geo: GeoJSON): PlanningUnitCost[] {
@@ -29,7 +24,7 @@ export class PuCostExtractor implements PuExtractorPort {
     }
 
     return puCosts.map((puCost) => ({
-      planningUnitId: puCost.planningUnitId,
+      puId: puCost.puId,
       cost: puCost.cost,
     }));
   }
@@ -38,11 +33,11 @@ export class PuCostExtractor implements PuExtractorPort {
     return geo.type === 'FeatureCollection';
   }
 
-  private hasCostValues(properties: MaybeCost): properties is Properties {
+  private hasCostValues(properties: MaybeCost): properties is PlanningUnitCost {
     return (
       isDefined(properties) &&
       isDefined(properties.cost) &&
-      isDefined(properties.planningUnitId)
+      isDefined(properties.puId)
     );
   }
 }

@@ -29,7 +29,7 @@ export class SurfaceCostProcessor
     ).ids;
 
     const { errors } = canPlanningUnitsBeLocked(
-      surfaceCosts.map((cost) => cost.planningUnitId),
+      surfaceCosts.map((cost) => cost.puId),
       scenarioPlanningUnitIds,
     );
     if (errors.length > 0) {

@@ -8,7 +8,7 @@ export const getGeoJson = (
   features: planningUnitsIds.map((id) => ({
     properties: {
       cost: 200,
-      planningUnitId: id,
+      puId: id,
     },
     type: 'Feature',
     geometry: {
