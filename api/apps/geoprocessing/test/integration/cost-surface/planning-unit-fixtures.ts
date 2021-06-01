@@ -3,23 +3,12 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
+import { ScenariosPuCostDataGeo } from '@marxan-geoprocessing/modules/scenarios/scenarios-pu-cost-data.geo.entity';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+
 import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
-import { ScenariosPuCostDataGeo } from '../../../src/modules/scenarios/scenarios-pu-cost-data.geo.entity';
 
-export interface CostSurfaceUpdateWorld {
-  cleanup: () => Promise<void>;
-  scenarioId: string;
-  planningUnitsIds: string[];
-  GivenPuCostDataExists: () => Promise<string[]>;
-  GetPuCostsData: (
-    scenarioId: string,
-  ) => Promise<{ scenario_id: string; cost: number; pu_id: string }[]>;
-}
-
-export const createWorld = async (
-  app: INestApplication,
-): Promise<CostSurfaceUpdateWorld> => {
+export const getFixtures = async (app: INestApplication) => {
   const scenarioId = v4();
   const puCostRepoToken = getRepositoryToken(ScenariosPuCostDataGeo);
   const puDataRepoToken = getRepositoryToken(ScenariosPlanningUnitGeoEntity);
@@ -37,6 +26,11 @@ export const createWorld = async (
   const puIds = scenarioPuData.rows.map((row) => row.puGeometryId);
 
   return {
+    planningUnitDataRepo: scenarioPuData,
+    planningUnitCostDataRepo: puCostDataRepo,
+    scenarioId,
+    planningUnitsIds: puIds,
+    scenarioPlanningUnitsGeometry: scenarioPuData,
     GetPuCostsData: async (
       scenarioId: string,
     ): Promise<{ scenario_id: string; cost: number; pu_id: string }[]> =>
@@ -57,8 +51,6 @@ export const createWorld = async (
           ),
         )
         .then((rows) => rows.map((row) => row.planningUnitId)),
-    planningUnitsIds: puIds,
-    scenarioId,
     cleanup: async () => {
       await puDataRepo.delete({
         scenarioId,

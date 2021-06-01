@@ -34,10 +34,7 @@ import { AvailablePlanningUnitsRepository } from './adapters/available-planning-
   ],
   providers: [
     SurfaceCostWorker,
-    {
-      provide: WorkerProcessor,
-      useClass: SurfaceCostProcessor,
-    },
+    SurfaceCostProcessor,
     {
       provide: CostSurfacePersistencePort,
       useClass: TypeormCostSurface,

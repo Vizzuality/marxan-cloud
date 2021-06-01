@@ -22,7 +22,7 @@ export class AvailablePlanningUnitsRepository
         },
       })
       .then((rows) => ({
-        ids: rows.map((row) => row.id),
+        ids: rows.map((row) => row.puGeometryId),
       }));
   }
 }

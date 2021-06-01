@@ -1,16 +1,19 @@
 import { INestApplication } from '@nestjs/common';
-import { TypeormCostSurface } from '../../../src/modules/surface-cost/adapters/typeorm-cost-surface';
-import { bootstrapApplication } from '../../utils/geo-application';
-import { CostSurfaceUpdateWorld, createWorld } from './world';
-import { CostSurfacePersistencePort } from '../../../src/modules/surface-cost/ports/persistence/cost-surface-persistence.port';
+import { PromiseType } from 'utility-types';
+
+import { TypeormCostSurface } from '../../../../src/modules/surface-cost/adapters/typeorm-cost-surface';
+import { CostSurfacePersistencePort } from '../../../../src/modules/surface-cost/ports/persistence/cost-surface-persistence.port';
+
+import { bootstrapApplication } from '../../../utils';
+import { getFixtures } from '../planning-unit-fixtures';
 
 let app: INestApplication;
 let sut: TypeormCostSurface;
-let world: CostSurfaceUpdateWorld;
+let world: PromiseType<ReturnType<typeof getFixtures>>;
 
 beforeAll(async () => {
   app = await bootstrapApplication();
-  world = await createWorld(app);
+  world = await getFixtures(app);
   sut = app.get(CostSurfacePersistencePort);
 });
 
@@ -33,11 +36,11 @@ describe(`when updating some of the costs`, () => {
     await sut.save(world.scenarioId, [
       {
         cost: 9999,
-        planningUnitId: costOf9999Id,
+        puId: costOf9999Id,
       },
       {
         cost: 1,
-        planningUnitId: costOf1Id,
+        puId: costOf1Id,
       },
     ]);
 
