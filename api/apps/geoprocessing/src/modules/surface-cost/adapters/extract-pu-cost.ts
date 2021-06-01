@@ -1,4 +1,5 @@
 import { isDefined } from '@marxan/utils';
+import { MaybeProperties } from '@marxan/utils/types';
 import { FeatureCollection, GeoJSON, Geometry } from 'geojson';
 import { PlanningUnitCost } from '../ports/planning-unit-cost';
 import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
@@ -7,14 +8,15 @@ type Properties = {
   cost: number;
   planningUnitId: string;
 };
-type MaybeProperties = Partial<Properties> | undefined | null;
+
+type MaybeCost = MaybeProperties<Properties>;
 
 export class ExtractPuCost implements PuExtractorPort {
   extract(geo: GeoJSON): PlanningUnitCost[] {
     if (!this.isFeatureCollection(geo)) {
       throw new Error('Only FeatureCollection is supported.');
     }
-    const input: FeatureCollection<Geometry, MaybeProperties> = geo;
+    const input: FeatureCollection<Geometry, MaybeCost> = geo;
 
     const puCosts = input.features
       .map((feature) => feature.properties)
@@ -36,7 +38,7 @@ export class ExtractPuCost implements PuExtractorPort {
     return geo.type === 'FeatureCollection';
   }
 
-  private hasCostValues(properties: MaybeProperties): properties is Properties {
+  private hasCostValues(properties: MaybeCost): properties is Properties {
     return (
       isDefined(properties) &&
       isDefined(properties.cost) &&

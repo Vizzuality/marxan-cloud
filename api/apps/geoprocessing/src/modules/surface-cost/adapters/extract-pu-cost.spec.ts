@@ -26,13 +26,13 @@ describe(`when features miss cost`, () => {
 describe(`when given GeoJson isn't a FeatureCollection`, () => {
   it(`throws exception`, () => {
     expect(() => sut.extract(fixtures.simpleGeometry())).toThrow(
-      /is supported/,
+      /Only FeatureCollection is supported/,
     );
   });
 });
 
 describe(`when given GeoJson has pu costs`, () => {
-  it(`throws exception`, () => {
+  it(`resolves them`, () => {
     expect(sut.extract(fixtures.geoFeaturesWithData())).toMatchInlineSnapshot(`
       Array [
         Object {
