@@ -15,7 +15,7 @@ import { CostSurfaceRepoFake } from './__mocks__/cost-surface-repo.fake';
 
 import { getJob } from './__mocks__/job.data';
 import { getGeoJson } from './__mocks__/geojson';
-import { getCost } from './__mocks__/cost';
+import { getCostByPlanningUnit } from './__mocks__/cost';
 
 let sut: SurfaceCostProcessor;
 
@@ -92,7 +92,7 @@ describe(`when shapefile was converted to geojson`, () => {
   });
 
   describe(`when cost was resolved`, () => {
-    const cost = getCost(availablePlanningUnitIds);
+    const cost = getCostByPlanningUnit(availablePlanningUnitIds);
     beforeEach(() => {
       puExtractor.mock.mockReturnValue(cost);
     });

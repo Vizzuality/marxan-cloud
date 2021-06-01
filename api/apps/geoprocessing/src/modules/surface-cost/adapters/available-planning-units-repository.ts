@@ -7,7 +7,7 @@ import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit'
 import { GetAvailablePlanningUnits } from '../ports/available-planning-units/get-available-planning-units';
 
 @Injectable()
-export class TypeormAvailablePlanningUnits
+export class AvailablePlanningUnitsRepository
   implements GetAvailablePlanningUnits {
   constructor(
     @InjectRepository(ScenariosPlanningUnitGeoEntity)
