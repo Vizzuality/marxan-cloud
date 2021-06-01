@@ -1,1 +1,1 @@
-export { lockPlanningUnits } from './lock-planning-units';
+export { canPlanningUnitsBeLocked } from './can-planning-units-be-locked';
