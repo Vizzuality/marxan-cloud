@@ -1,45 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { Request } from 'express';
-import { AdjustCostSurface } from '../../analysis/entry-points/adjust-cost-surface';
-import { ResolvePuWithCost } from './resolve-pu-with-cost';
+import { Injectable, Logger } from '@nestjs/common';
+import { QueueService } from '@marxan-api/modules/queue/queue.service';
 import {
   CostSurfaceEventsPort,
   CostSurfaceState,
 } from './cost-surface-events.port';
-import { CostSurfaceInputDto } from '../../analysis/entry-points/adjust-cost-surface-input';
+import { CostSurfaceJobInput } from './job-input';
 
 @Injectable()
 export class CostSurfaceFacade {
   constructor(
-    private readonly adjustCostSurfaceService: AdjustCostSurface,
-    private readonly shapefileConverter: ResolvePuWithCost,
     private readonly events: CostSurfaceEventsPort,
+    private readonly queueService: QueueService<CostSurfaceJobInput>,
+    private readonly logger: Logger = new Logger(CostSurfaceFacade.name),
   ) {}
 
-  /**
-   * Performs potentially long-lasting operation. No result is returned directly.
-   * The status of the job is handled by another module which aggregates such.
-   */
-  async convert(scenarioId: string, request: Request): Promise<void> {
-    await this.events.event(scenarioId, CostSurfaceState.Submitted);
-    let costSurface: CostSurfaceInputDto;
-
-    try {
-      costSurface = await this.shapefileConverter.fromShapefile(request.file);
-    } catch (error) {
-      await this.events.event(
+  convert(scenarioId: string, file: Express.Multer.File): void {
+    this.queueService.queue
+      .add(`cost-surface-for-${scenarioId}`, {
         scenarioId,
-        CostSurfaceState.ShapefileConversionFailed,
-      );
-      return;
-    }
-
-    await this.events.event(scenarioId, CostSurfaceState.ShapefileConverted);
-    return this.adjustCostSurfaceService
-      .update(scenarioId, costSurface)
-      .then(() => this.events.event(scenarioId, CostSurfaceState.Finished))
-      .catch(async () => {
-        await this.events.event(scenarioId, CostSurfaceState.CostUpdateFailed);
+        shapefile: file,
+      })
+      .then(() => this.events.event(scenarioId, CostSurfaceState.Submitted))
+      .catch(async (error) => {
+        await this.markAsFailedSubmission(scenarioId, error);
+        throw error;
       });
   }
+
+  private markAsFailedSubmission = async (
+    scenarioId: string,
+    error: unknown,
+  ) => {
+    this.logger.error(
+      `Failed submitting job to queue for ${scenarioId}`,
+      String(error),
+    );
+    await this.events.event(scenarioId, CostSurfaceState.Submitted);
+    await this.events.event(scenarioId, CostSurfaceState.CostUpdateFailed, {
+      error,
+    });
+  };
 }

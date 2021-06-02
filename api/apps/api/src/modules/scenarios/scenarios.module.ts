@@ -13,12 +13,7 @@ import { ScenarioFeaturesModule } from '../scenarios-features';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { AnalysisModule } from '../analysis/analysis.module';
-import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
-import { ResolvePuWithCost } from './cost-surface/resolve-pu-with-cost';
-import { CostSurfaceEventsPort } from './cost-surface/cost-surface-events.port';
-import { GeoprocessingCostFromShapefile } from './cost-surface/adapters/geoprocessing-cost-from-shapefile';
-import { CostSurfaceApiEvents } from './cost-surface/adapters/cost-surface-api-events';
-import { ApiEventsModule } from '../api-events/api-events.module';
+import { CostSurfaceModule } from './cost-surface/cost-surface.module';
 
 @Module({
   imports: [
@@ -29,23 +24,9 @@ import { ApiEventsModule } from '../api-events/api-events.module';
     UsersModule,
     ScenarioFeaturesModule,
     AnalysisModule,
-    ApiEventsModule,
+    CostSurfaceModule,
   ],
-  providers: [
-    ScenariosService,
-    ProxyService,
-    WdpaAreaCalculationService,
-    CostSurfaceFacade,
-    // internals for cost-surface
-    {
-      provide: ResolvePuWithCost,
-      useClass: GeoprocessingCostFromShapefile,
-    },
-    {
-      provide: CostSurfaceEventsPort,
-      useClass: CostSurfaceApiEvents,
-    },
-  ],
+  providers: [ScenariosService, ProxyService, WdpaAreaCalculationService],
   controllers: [ScenariosController],
   exports: [ScenariosService],
 })
