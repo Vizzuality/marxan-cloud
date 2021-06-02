@@ -43,6 +43,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/scenarios-planning-unit/tsconfig.lib.json"
       }
+    },
+    "admin-regions": {
+      "type": "library",
+      "root": "libs/admin-regions",
+      "entryFile": "index",
+      "sourceRoot": "libs/admin-regions/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/admin-regions/tsconfig.lib.json"
+      }
     }
   }
 }

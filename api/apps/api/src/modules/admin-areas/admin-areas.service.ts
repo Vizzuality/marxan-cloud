@@ -6,7 +6,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { AdminArea } from './admin-area.geo.entity';
 import { CreateAdminAreaDTO } from './dto/create.admin-area.dto';
 import { UpdateAdminAreaDTO } from './dto/update.admin-area.dto';
 
@@ -22,6 +21,7 @@ import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { apiConnections } from '../../ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { AdminArea } from '@marxan/admin-regions';
 
 /**
  * Supported admin area levels (sub-national): either level 1 or level 2.

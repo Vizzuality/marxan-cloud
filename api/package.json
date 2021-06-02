@@ -148,7 +148,9 @@
       "@marxan/utils/(.*)": "<rootDir>/libs/utils/src/$1",
       "@marxan/utils": "<rootDir>/libs/utils/src",
       "@marxan/scenarios-planning-unit/(.*)": "<rootDir>/libs/scenarios-planning-unit/src/$1",
-      "@marxan/scenarios-planning-unit": "<rootDir>/libs/scenarios-planning-unit/src"
+      "@marxan/scenarios-planning-unit": "<rootDir>/libs/scenarios-planning-unit/src",
+      "@marxan/admin-regions/(.*)": "<rootDir>/libs/admin-regions/src/$1",
+      "@marxan/admin-regions": "<rootDir>/libs/admin-regions/src"
     }
   }
 }

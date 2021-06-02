@@ -13,10 +13,10 @@ import {
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
 import { Country } from '@marxan-api/modules/countries/country.geo.entity';
-import { AdminArea } from '@marxan-api/modules/admin-areas/admin-area.geo.entity';
 import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';
 import { CountriesService } from '@marxan-api/modules/countries/countries.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { AdminArea } from '@marxan/admin-regions';
 
 const projectFilterKeyNames = [
   'name',
