@@ -184,10 +184,10 @@ export const Map = ({
   }, [onMapReady]);
 
   useEffect(() => {
-    if (!isEmpty(bounds) && !!bounds.bbox && bounds.bbox.every((b) => typeof b === 'number')) {
+    if (ready && !isEmpty(bounds) && !!bounds.bbox && bounds.bbox.every((b) => typeof b === 'number')) {
       handleFitBounds();
     }
-  }, [bounds, handleFitBounds]);
+  }, [ready, bounds, handleFitBounds]);
 
   useEffect(() => {
     setViewport((prevViewportState) => ({
