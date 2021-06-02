@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { LayerManager, Layer } from 'layer-manager/dist/components';
+import { PluginMapboxGl } from 'layer-manager';
+
 // Map
 import Map from 'components/map';
 
@@ -9,16 +12,37 @@ import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 
 import { useSelector } from 'react-redux';
+import { useSession } from 'next-auth/client';
+import { useAdminPreviewLayer, usePUGridPreviewLayer } from 'hooks/map';
 
 import ProjectMapProps from './types';
 
-export const ScenariosMap: React.FC<ProjectMapProps> = () => {
+export const ProjectNewMap: React.FC<ProjectMapProps> = ({
+  country,
+  region,
+  subregion,
+  planningUnitAreakm2,
+  planningUnitGridShape,
+}: ProjectMapProps) => {
   const minZoom = 2;
   const maxZoom = 20;
   const { bbox } = useSelector((state) => state['/projects/new']);
 
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
+
+  const [session] = useSession();
+
+  const LAYERS = [
+    useAdminPreviewLayer({
+      country, region, subregion,
+    }),
+    usePUGridPreviewLayer({
+      bbox,
+      planningUnitGridShape,
+      planningUnitAreakm2,
+    }),
+  ].filter((l) => !!l);
 
   useEffect(() => {
     if (bbox) {
@@ -55,6 +79,19 @@ export const ScenariosMap: React.FC<ProjectMapProps> = () => {
     setBounds(b);
   }, []);
 
+  const handleTransformRequest = (url) => {
+    if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
+      return {
+        url,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      };
+    }
+
+    return null;
+  };
+
   return (
     <div className="relative w-full h-full overflow-hidden rounded-r-3xl">
       <Map
@@ -67,8 +104,9 @@ export const ScenariosMap: React.FC<ProjectMapProps> = () => {
         mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
         mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
         onMapViewportChange={handleViewportChange}
+        transformRequest={handleTransformRequest}
       >
-        {/* {(map) => {
+        {(map) => {
           return (
             <LayerManager map={map} plugin={PluginMapboxGl}>
               {LAYERS.map((l) => (
@@ -76,7 +114,7 @@ export const ScenariosMap: React.FC<ProjectMapProps> = () => {
               ))}
             </LayerManager>
           );
-        }} */}
+        }}
       </Map>
 
       <Controls>
@@ -103,4 +141,4 @@ export const ScenariosMap: React.FC<ProjectMapProps> = () => {
   );
 };
 
-export default ScenariosMap;
+export default ProjectNewMap;

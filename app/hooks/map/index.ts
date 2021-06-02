@@ -3,7 +3,7 @@ import { UseAdminPreviewLayer, UsePUGridPreviewLayer } from './types';
 
 // AdminPreview
 export function useAdminPreviewLayer({
-  bbox, country, region, subregion,
+  country, region, subregion,
 }: UseAdminPreviewLayer) {
   const level = useMemo(() => {
     if (subregion) return 2;
@@ -19,24 +19,26 @@ export function useAdminPreviewLayer({
     if (typeof level === 'undefined' || !guid) return null;
 
     return {
-      id: 'admin-preview-layer',
+      id: `admin-preview-layer-${guid}`,
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`/api/v1/administrative-areas/${level}/preview/tiles/{z}/{x}/{y}.mvt?bbox=${bbox}&guid=${guid}`],
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/administrative-areas/${level}/preview/tiles/{z}/{x}/{y}.mvt?guid=${guid}`],
       },
       render: {
         layers: [
           {
             type: 'line',
+            'source-layer': 'layer0',
             paint: {
-              'line-color': '#000',
+              'line-color': '#FFF',
+              'line-width': 3,
             },
           },
         ],
       },
     };
-  }, [bbox, level, guid]);
+  }, [level, guid]);
 }
 
 // PUGridpreview
@@ -51,12 +53,13 @@ export function usePUGridPreviewLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`/api/v1/planning-units/preview/regular/${planningUnitGridShape}/${planningUnitAreakm2}/tiles/{z}/{x}/{y}.mvt?bbox=${bbox}`],
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/planning-units/preview/regular/${planningUnitGridShape}/${planningUnitAreakm2}/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
       },
       render: {
         layers: [
           {
             type: 'line',
+            'source-layer': 'layer0',
             paint: {
               'line-color': '#000',
             },

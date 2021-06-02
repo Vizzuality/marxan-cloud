@@ -7,8 +7,7 @@ import Protected from 'layout/protected';
 
 import Wrapper from 'layout/wrapper';
 
-import ProjectMap from 'layout/projects/new/map';
-import ProjectForm from 'layout/projects/new/form';
+import ProjectNewForm from 'layout/projects/new/form';
 import Breadcrumb from 'components/breadcrumb';
 
 import { withProtection, withUser } from 'hoc/auth';
@@ -40,10 +39,7 @@ const NewProjectsPage: React.FC = () => {
             </Breadcrumb>
 
             <div className="flex flex-col flex-grow pt-5 overflow-hidden">
-              <div className="grid h-full grid-cols-1 gap-0 overflow-hidden bg-gray-700 md:grid-cols-2 rounded-3xl">
-                <ProjectForm />
-                <ProjectMap />
-              </div>
+              <ProjectNewForm />
             </div>
           </Wrapper>
         </div>
