@@ -84,17 +84,16 @@ export class PlanningUnitsService {
     planningUnitAreakm2: number,
     filters?: PlanningUnitsFilters,
   ): string {
-    this.logger.debug('tile')
     const gridShape = this.regularFuncionGridSelector(planningUnitGridShape)
     const gridSize = this.calculateGridSize(planningUnitGridShape,
       planningUnitAreakm2)
-
+    const ratioPixelExtent = (gridSize / (156412/(2**z)))
     let Query = `( SELECT row_number() over() as id, (${gridShape}(${gridSize}, \
                     ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom as the_geom)`;
     // 156412 references to m per pixel at z level 0 at the equator in EPSG:3857
-    // (so we are checking that the pixel ration is < 1)
+    // (so we are checking that the pixel ration is < 8 px)
     // If so the shape we are getting is down the optimal to visualize it
-    if ((gridSize / (156412/(2**z))) < 1){
+    if ( ratioPixelExtent < 8){
       Query = `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
         ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom)`;
     }

@@ -42,44 +42,46 @@
         style: {
           version: 8,
           sources: {
-            'postgis-tiles0': {
-              type: 'vector',
-              maxzoom: 12,
-              tiles: [
-                'http://localhost:3040/api/v1/administrative-areas/0/preview/tiles/{z}/{x}/{y}.mvt',
-              ],
-            },
-            'postgis-tiles1': {
-              type: 'vector',
-              maxzoom: 12,
-              tiles: [
-                'http://localhost:3040/api/v1/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt',
-              ],
-            },
-            'postgis-tiles2': {
-              type: 'vector',
-              maxzoom: 12,
-              tiles: [
-                'http://localhost:3040/api/v1/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt',
-              ],
-            },
-            'postgis-tileswdpa': {
-              type: 'vector',
-              minzoom: 1,
-              maxzoom: 12,
-              tiles: [
-                'http://localhost:3040/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt',
-              ],
-            },
+            // 'postgis-tiles0': {
+            //   type: 'vector',
+            //   maxzoom: 12,
+            //   tiles: [
+            //     'http://localhost:3040/api/v1/administrative-areas/0/preview/tiles/{z}/{x}/{y}.mvt',
+            //   ],
+            // },
+            // 'postgis-tiles1': {
+            //   type: 'vector',
+            //   maxzoom: 12,
+            //   tiles: [
+            //     'http://localhost:3040/api/v1/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt',
+            //   ],
+            // },
+            // 'postgis-tiles2': {
+            //   type: 'vector',
+            //   maxzoom: 12,
+            //   tiles: [
+            //     'http://localhost:3040/api/v1/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt',
+            //   ],
+            // },
+            // 'postgis-tileswdpa': {
+            //   type: 'vector',
+            //   minzoom: 1,
+            //   maxzoom: 12,
+            //   tiles: [
+            //     'http://localhost:3040/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt',
+            //   ],
+            // },
 
             'postgis-tilesPU': {
               type: 'vector',
               minzoom: 1,
-              maxzoom: 12,
+              maxzoom: 20,
               tiles: [
-                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/100/tiles/{z}/{x}/{y}.mvt',
+                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/10/tiles/{z}/{x}/{y}.mvt',
               ],
             },
+
+
             BASEMAP: {
               type: 'raster',
               tiles: [
@@ -96,17 +98,17 @@
               maxzoom: 22,
             },
 
-            {
-              id: 'postgis-tiles-layer',
-              type: 'fill',
-              source: 'postgis-tiles2',
-              'source-layer': 'layer0',
-              paint: {
-                'fill-outline-color': 'red',
-                'fill-color': 'green',
-                'fill-opacity': 0.2,
-              },
-            },
+            // {
+            //   id: 'postgis-tiles-layer',
+            //   type: 'fill',
+            //   source: 'postgis-tiles2',
+            //   'source-layer': 'layer0',
+            //   paint: {
+            //     'fill-outline-color': 'red',
+            //     'fill-color': 'green',
+            //     'fill-opacity': 0.2,
+            //   },
+            // },
             // {
             //     'id': 'postgis-tiles-layer1',
             //     'type': 'fill',
@@ -129,23 +131,23 @@
             //         'fill-opacity': 0.2
             //     }
             // },
-            {
-              id: 'postgis-tiles-layer-wdpa',
-              type: 'fill',
-              source: 'postgis-tileswdpa',
-              'source-layer': 'layer0',
-              paint: {
-                'fill-outline-color': 'yellow',
-                'fill-color': 'red',
-                'fill-opacity': 0.7,
-              },
-            },
+            // {
+            //   id: 'postgis-tiles-layer-wdpa',
+            //   type: 'fill',
+            //   source: 'postgis-tileswdpa',
+            //   'source-layer': 'layer0',
+            //   paint: {
+            //     'fill-outline-color': 'yellow',
+            //     'fill-color': 'red',
+            //     'fill-opacity': 0.7,
+            //   },
+            // },
             {
               id: 'postgis-tiles-layer-PU',
               type: 'fill',
               source: 'postgis-tilesPU',
               'source-layer': 'layer0',
-              minzoom:7,
+
               paint: {
                 'fill-outline-color': 'yellow',
                 'fill-color': 'red',
@@ -156,13 +158,13 @@
               id: 'postgis-tiles-layer-PU-points',
               type: 'circle',
               source: 'postgis-tilesPU',
-              maxzoom: 7,
+
               'source-layer': 'layer0',
               paint: {
-                'circle-color': '#11b4da',
+                'circle-color': 'yellow',
                 'circle-radius': 1,
                 'circle-stroke-width': 1,
-                'circle-stroke-color': '#11b4da'
+                'circle-stroke-color': 'yellow'
               },
             },
           ],
