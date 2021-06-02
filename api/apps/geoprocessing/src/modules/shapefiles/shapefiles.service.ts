@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { readdir } from 'fs/promises';
-import { FeatureCollection } from 'geojson';
+import { GeoJSON } from 'geojson';
 import { FileService } from '../files/files.service';
 
 const mapshaper = require('mapshaper');
@@ -41,17 +41,15 @@ export class ShapefileService {
     );
   }
 
-  isValidGeoJson(geoJson: FeatureCollection): boolean {
-    if (
+  isGeoJsonTypeSupported(geoJson: GeoJSON): boolean {
+    return !(
       geoJson.type !== 'FeatureCollection' ||
       geoJson.features.every(
         (geom: any) =>
           geom.geometry.type !== 'Polygon' &&
           geom.geometry.type !== 'MultiPolygon',
       )
-    )
-      return false;
-    return true;
+    );
   }
 
   async getGeoJson(shapeFile: Express.Multer.File) {
@@ -64,8 +62,8 @@ export class ShapefileService {
         ),
       );
       const geoJson = await this.shapeFileToGeoJson(shapeFile);
-      if (!this.isValidGeoJson(geoJson)) {
-        throw new Error();
+      if (!this.isGeoJsonTypeSupported(geoJson)) {
+        throw new Error('Types not supported');
       }
       return { data: geoJson };
     } catch (err) {
