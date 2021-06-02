@@ -137,9 +137,7 @@ export class ScenariosController {
      * or just ...BaseService
      */
 
-    this.costSurface.convert(scenarioId, request).then(() => {
-      //
-    });
+    this.costSurface.convert(scenarioId, request.file);
     return;
   }
 
