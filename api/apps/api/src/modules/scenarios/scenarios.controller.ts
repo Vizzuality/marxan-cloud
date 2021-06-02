@@ -55,8 +55,6 @@ import { AdjustPlanningUnits } from '../analysis/entry-points/adjust-planning-un
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as FormData from 'form-data';
-import { createReadStream } from 'fs';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 
 @UseGuards(JwtAuthGuard)
@@ -143,7 +141,6 @@ export class ScenariosController {
     return;
   }
 
-  // TODO add Validations
   @ApiConsumesShapefile()
   @Post(':id/planning-unit-shapefile')
   @UseInterceptors(FileInterceptor('file', uploadOptions))
@@ -156,7 +153,7 @@ export class ScenariosController {
      * @validateStatus is required for HttpService to not reject and wrap geoprocessing's response
      * in case a shapefile is not validated and a status 4xx is sent back.
      */
-    const { data } = await this.httpService
+    const { data: geoJson } = await this.httpService
       .post(
         `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
         file,
@@ -166,7 +163,7 @@ export class ScenariosController {
         },
       )
       .toPromise();
-    return data;
+    return geoJson;
   }
   @ApiOperation({ description: 'Update scenario' })
   @ApiOkResponse({ type: ScenarioResult })
