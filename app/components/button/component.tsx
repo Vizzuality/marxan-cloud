@@ -1,7 +1,7 @@
 import React, {
-  ButtonHTMLAttributes, AnchorHTMLAttributes,
+  ButtonHTMLAttributes, AnchorHTMLAttributes, FC,
 } from 'react';
-import Link from 'next/link';
+import Link, { LinkProps } from 'next/link';
 import cx from 'classnames';
 
 const THEME = {
@@ -39,6 +39,7 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & AnchorButton
 export type AnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & AnchorButtonProps & {
   href?: string;
   disabled?: boolean;
+  anchorLinkProps?: LinkProps
 };
 
 // Input/output options
@@ -65,16 +66,17 @@ function buildClassName({
   });
 }
 
-export const LinkAnchor: React.FC<AnchorProps> = ({
+export const LinkAnchor: FC<AnchorProps> = ({
   children,
   theme = 'primary',
   size = 'base',
   className,
   disabled,
   href,
+  anchorLinkProps,
   ...restProps
 }: AnchorProps) => (
-  <Link href={href}>
+  <Link href={href} {...anchorLinkProps}>
     <a
       className={buildClassName({
         className, disabled, size, theme,
@@ -86,7 +88,7 @@ export const LinkAnchor: React.FC<AnchorProps> = ({
   </Link>
 );
 
-export const Anchor: React.FC<AnchorProps> = ({
+export const Anchor: FC<AnchorProps> = ({
   children,
   theme = 'primary',
   size = 'base',
@@ -115,7 +117,7 @@ export const Anchor: React.FC<AnchorProps> = ({
   );
 };
 
-export const Button: React.FC<ButtonProps> = ({
+export const Button: FC<ButtonProps> = ({
   children,
   theme = 'primary',
   size = 'base',
@@ -138,7 +140,7 @@ export const Button: React.FC<ButtonProps> = ({
 export const LinkButton: Overload = (props: ButtonProps | AnchorProps) => {
   // We consider a link button when href attribute exits
   if (hasHref(props)) {
-    if (props.href.includes('http')) {
+    if (props.href.startsWith('http')) {
       return (
         <Anchor {...props} />
       );
