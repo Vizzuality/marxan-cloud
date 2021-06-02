@@ -58,7 +58,12 @@ export interface TileInput<T> extends TileRequest {
   /**
    * @description Custom query for the different entities
    */
-  customQuery: T | undefined;
+  customQuery?: T | undefined;
+
+  /**
+   * @description Input projection, by default 4326
+   */
+  inputProjection?: number;
   /**
    * @description attributes to be retrieved from the different entities
    */
@@ -80,6 +85,11 @@ export class TileService {
    */
   private readonly logger: Logger = new Logger(TileService.name);
 
+  simplification(z:number, geometry: string): string {
+    return (z > 7) ? `${geometry}` : `ST_RemoveRepeatedPoints(${geometry}, ${
+      0.1 / (z * 2)
+    })`
+  }
   /**
    * All database interaction is encapsulated in this function. The design-goal is to keep the time where a database-
    * connection is open to a minimum. This reduces the risk for the database-instance to run out of connections.
@@ -95,7 +105,8 @@ export class TileService {
     geometry = 'the_geom',
     extent = 4096,
     buffer = 256,
-    customQuery,
+    customQuery = undefined,
+    inputProjection = 4326,
     attributes,
   }: TileInput<string>): Promise<Record<'mvt', Buffer>[]> {
     const connection = getConnection();
@@ -103,30 +114,22 @@ export class TileService {
       .createQueryBuilder()
       .select(`ST_AsMVT(tile, 'layer0', ${extent}, 'mvt_geom')`, 'mvt')
       .from((subQuery) => {
-        if (z > 7) {
+
           subQuery.select(
-            `${attributes}, ST_AsMVTGeom(ST_Transform(${geometry}, 3857),
+            `${attributes}, ST_AsMVTGeom(ST_Transform(${this.simplification(z, geometry)}, 3857),
             ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom`,
           );
-        } else {
-          subQuery.select(
-            `${attributes}, ST_AsMVTGeom(ST_Transform(ST_RemoveRepeatedPoints(${geometry}, ${
-              0.1 / (z * 2)
-            }), 3857), ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom`,
-          );
-        }
-        subQuery
-          .from(table, '')
-          .where(
-            `ST_Intersects(ST_Transform(ST_TileEnvelope(:z, :x, :y), 4326), ${geometry} )`,
+
+          subQuery.from(table, '').where(
+          `ST_Intersects(ST_Transform(ST_TileEnvelope(:z, :x, :y), ${inputProjection}), ${geometry} )`,
             { z, x, y },
-          );
+            );
         if (customQuery) {
           subQuery.andWhere(customQuery);
         }
         return subQuery;
       }, 'tile');
-    const result = await query.getRawMany();
+    const result = await query.printSql().getRawMany();
 
     if (result) {
       return result;

@@ -46,13 +46,68 @@ export class PlanningUnitsService {
   ) {}
 
   /**
-   * @param bbox boundingbox of the area where the grids would be generated
    * @param planningUnitGridShape the grid shape that would be use for generating the grid. This grid shape
    * can be square or hexagon. If any grid shape is provided, square would be the default.
    * @param planningUnitAreakm2 area in km2 of the individual grid that would be generated.
    * If any value is not provided, 4000 would be the default.
    */
+  regularFuncionGridSelector(
+    planningUnitGridShape: PlanningUnitGridShape
+  ): string {
+    const functEquivalence: { [key in keyof typeof PlanningUnitGridShape]: string} = {
+    hexagon: 'ST_HexagonGrid',
+    square: 'ST_SquareGrid',
+    }
 
+    return functEquivalence[planningUnitGridShape]
+  }
+
+  calculateGridSize(
+    planningUnitGridShape: PlanningUnitGridShape,
+    planningUnitAreakm2: number
+    ): number {
+
+    return Math.sqrt(planningUnitAreakm2) * 1000
+  }
+  /**
+   * @param bbox bounding box of the area where the grids would be generated
+   * @param planningUnitGridShape the grid shape that would be use for generating the grid. This grid shape
+   * can be square or hexagon. If any grid shape is provided, square would be the default.
+   * @param planningUnitAreakm2 area in km2 of the individual grid that would be generated.
+   * If any value is not provided, 4000 would be the default.
+   */
+  buildPlanningUnitsCustomQuery(
+    x: number,
+    y: number,
+    z: number,
+    planningUnitGridShape: PlanningUnitGridShape,
+    planningUnitAreakm2: number,
+    filters?: PlanningUnitsFilters,
+  ): string {
+    this.logger.debug('tile')
+    const gridShape = this.regularFuncionGridSelector(planningUnitGridShape)
+    const gridSize = this.calculateGridSize(planningUnitGridShape,
+      planningUnitAreakm2)
+
+    let Query = `( SELECT row_number() over() as id, (${gridShape}(${gridSize}, \
+                    ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom as the_geom)`;
+    // 156412 references to m per pixel at z level 0 at the equator in EPSG:3857
+    // (so we are checking that the pixel ration is < 1)
+    // If so the shape we are getting is down the optimal to visualize it
+    if ((gridSize / (156412/(2**z))) < 1){
+      Query = `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
+        ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom)`;
+    }
+
+    return Query;
+}
+  /**
+   * @param bbox bounding box of the area where the grids would be generated
+   * @param planningUnitGridShape the grid shape that would be use for generating the grid. This grid shape
+   * can be square or hexagon. If any grid shape is provided, square would be the default.
+   * @param planningUnitAreakm2 area in km2 of the individual grid that would be generated.
+   * If any value is not provided, 4000 would be the default.
+   */
   buildPlanningUnitsWhereQuery(
     x: number,
     y: number,
@@ -61,18 +116,10 @@ export class PlanningUnitsService {
     planningUnitAreakm2: number,
     filters?: PlanningUnitsFilters,
   ): string {
-    let whereQuery = '';
-    let gridShape = 'ST_SquareGrid'
-    if (planningUnitGridShape == 'hexagon') {
-      gridShape = 'ST_HexagonGrid';
-    }
-    if (planningUnitGridShape == 'square') {
-      gridShape = 'ST_SquareGrid';
-    }
+    let whereQuery = `st_intersects(the_geom, ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), 3857)))`;
+
     if (filters?.bbox) {
-      whereQuery = `(${gridShape}(${planningUnitAreakm2} * 1000000, ST_Transform(ST_MakeEnvelope(${filters?.bbox}), 3857)))`;
-    } else {
-      whereQuery = `(${gridShape}(${planningUnitAreakm2} * 1000000, ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), 3857)))`;
+      whereQuery += ` && ST_Transform(ST_MakeEnvelope(${filters.bbox}), 3857))`;
     }
     return whereQuery;
   }
@@ -80,7 +127,7 @@ export class PlanningUnitsService {
   /**
    * @todo get attributes from Entity, based on user selection
    */
-  public findTile(
+  public findPreviewTile(
     tileSpecification: tileSpecification,
     filters?: PlanningUnitsFilters,
   ): Promise<Buffer> {
@@ -91,25 +138,26 @@ export class PlanningUnitsService {
       planningUnitGridShape,
       planningUnitAreakm2,
     } = tileSpecification;
+
+    const inputProjection = 3857
+
     const attributes = 'id';
-    const table = this.planningUnitsRepository.metadata.tableName;
-    const customQuery = undefined;
-    const querytest = this.buildPlanningUnitsWhereQuery(
-      z,
+    const table = this.buildPlanningUnitsCustomQuery(
       x,
       y,
+      z,
       planningUnitGridShape,
       planningUnitAreakm2,
-      filters,
-    );
-    this.logger.debug(querytest)
+      filters
+      );
+
     return this.tileService.getTile({
       z,
       x,
       y,
       table,
-      customQuery,
       attributes,
+      inputProjection
     });
   }
 }
