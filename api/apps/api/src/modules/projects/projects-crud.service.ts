@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -143,7 +148,7 @@ export class ProjectsCrudService extends AppBaseService<
    */
   async getPlanningArea(
     project: Partial<Project>,
-  ): Promise<Country | Partial<AdminArea | undefined>> {
+  ): Promise<Partial<AdminArea | undefined>> {
     const planningArea = project.planningAreaGeometryId
       ? /**
          * @todo here we should look up the actual custom planning area from
@@ -199,4 +204,57 @@ export class ProjectsCrudService extends AppBaseService<
       return this.planningUnitsService.create(createModel);
     }
   }
+
+  async validateBeforeCreate(
+    createModel: CreateProjectDTO,
+    info?: AppInfoDTO,
+  ): Promise<void> {
+    if (this.shouldManuallySetBbox(createModel)) {
+      const derivedSubmittedAdminArea = await this.getPlanningArea({
+        ...createModel,
+        extent: undefined,
+      });
+
+      if (!derivedSubmittedAdminArea) {
+        // due to current usage, hard to get around it with coupling and throw errors to controller
+        throw new BadRequestException('...');
+      }
+
+      if (
+        derivedSubmittedAdminArea.gid0 !== createModel.countryId ||
+        derivedSubmittedAdminArea.gid1 !== createModel.adminAreaLevel1Id ||
+        derivedSubmittedAdminArea.gid2 !== createModel.adminAreaLevel2Id
+      ) {
+        throw new BadRequestException('...');
+      }
+
+      if (derivedSubmittedAdminArea.bbox) {
+        createModel.extent = {
+          bbox: derivedSubmittedAdminArea.bbox,
+          type: 'Polygon',
+          coordinates: [],
+        };
+      }
+
+      // otherwise, is it our error?
+    }
+
+    return;
+  }
+
+  async validateBeforeUpdate(
+    projectId: string,
+    updateModel: UpdateProjectDTO,
+    info?: AppInfoDTO,
+  ): Promise<void> {
+    //
+    return;
+  }
+
+  private shouldManuallySetBbox = (createModel: CreateProjectDTO): boolean =>
+    Boolean(
+      createModel.adminAreaLevel1Id ||
+        createModel.adminAreaLevel2Id ||
+        createModel.countryId,
+    );
 }
