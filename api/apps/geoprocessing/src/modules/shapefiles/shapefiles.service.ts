@@ -2,13 +2,14 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { readdir } from 'fs/promises';
 import { GeoJSON } from 'geojson';
 import { FileService } from '../files/files.service';
+import * as path from 'path';
 
 const mapshaper = require('mapshaper');
 
 @Injectable()
 export class ShapefileService {
   private readonly logger: Logger = new Logger(ShapefileService.name);
-  private readonly minRequiredFiles = ['prj', 'dbf', 'shx', 'shp'];
+  private readonly minRequiredFiles = ['.prj', '.dbf', '.shx', '.shp'];
   constructor(private readonly fileService: FileService) {}
 
   private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
@@ -33,9 +34,9 @@ export class ShapefileService {
     return JSON.parse(_geoJson[outputKey].toString('utf-8'));
   }
 
-  async areRequiredShapefileFilesInFolder(path: string): Promise<boolean> {
-    const filesInPath = await readdir(path);
-    const extensions = filesInPath.map((file) => file.split('.').pop());
+  async areRequiredShapefileFilesInFolder(filePath: string): Promise<boolean> {
+    const filesInPath = await readdir(filePath);
+    const extensions = filesInPath.map((file) => path.extname(file));
     return this.minRequiredFiles.every((ext: string) =>
       extensions.includes(ext),
     );
