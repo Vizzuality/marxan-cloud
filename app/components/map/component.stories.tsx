@@ -81,7 +81,6 @@ const Template: Story<MapProps> = ({ children, ...args }: MapProps) => {
   return (
     <div className="relative w-full h-96">
       <Map
-        {...args}
         bounds={bounds}
         minZoom={minZoom}
         maxZoom={maxZoom}
