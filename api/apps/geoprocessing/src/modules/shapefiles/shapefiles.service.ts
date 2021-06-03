@@ -3,7 +3,8 @@ import { readdir } from 'fs/promises';
 import { Feature, FeatureCollection, GeoJSON } from 'geojson';
 import { FileService } from '../files/files.service';
 import * as path from 'path';
-import { AllGeoJSON } from '@turf/helpers';
+import { Either } from 'purify-ts';
+import { geojsonType } from '@turf/turf';
 
 const mapshaper = require('mapshaper');
 
@@ -43,10 +44,10 @@ export class ShapefileService {
     );
   }
 
-  isGeoJsonTypeSupported(geoJson: FeatureCollection): boolean {
+  isGeoJsonTypeSupported(geoJson: GeoJSON): boolean {
     return !(
-      !['FeatureCollection', 'Feature'].includes(geoJson.type) ||
-      geoJson.features.every(
+      geoJson.type != 'FeatureCollection' ||
+      geoJson.features?.every(
         (geom: any) =>
           geom.geometry?.type !== 'Polygon' &&
           geom.geometry?.type !== 'MultiPolygon',
