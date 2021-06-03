@@ -69,7 +69,7 @@ export class ShapefileService {
       return { data: geoJson };
     } catch (err) {
       this.logger.error(err);
-      throw new BadRequestException('Invalid Shapefile');
+      throw new Error('Invalid Shapefile');
     } finally {
       await this.fileService
         .deleteDataFromFS(shapeFile.path)

@@ -8,6 +8,8 @@ import {
   Query,
   Res,
   Body,
+  BadRequestException,
+  HttpStatus,
 } from '@nestjs/common';
 
 import {
@@ -29,6 +31,7 @@ import {
 import { TileRequest } from '@marxan-geoprocessing/modules/tile/tile.service';
 
 import { Response } from 'express';
+import { Either } from 'purify-ts';
 
 @Controller(`${apiGlobalPrefixes.v1}/planning-units`)
 export class PlanningUnitsController {
@@ -43,8 +46,12 @@ export class PlanningUnitsController {
   @Post('/planning-unit-shapefile')
   async getShapeFile(
     @Body() shapefileInfo: Express.Multer.File,
-  ): Promise<ShapefileGeoJSONResponseDTO> {
-    return this.shapefileService.getGeoJson(shapefileInfo);
+  ): Promise<ShapefileGeoJSONResponseDTO | BadRequestException> {
+    try {
+      return await this.shapefileService.getGeoJson(shapefileInfo);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   @ApiOperation({
