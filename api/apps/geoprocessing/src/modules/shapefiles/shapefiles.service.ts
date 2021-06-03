@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { readdir } from 'fs/promises';
-import { GeoJSON } from 'geojson';
+import { Feature, FeatureCollection, GeoJSON } from 'geojson';
 import { FileService } from '../files/files.service';
 import * as path from 'path';
+import { AllGeoJSON } from '@turf/helpers';
 
 const mapshaper = require('mapshaper');
 
@@ -42,13 +43,13 @@ export class ShapefileService {
     );
   }
 
-  isGeoJsonTypeSupported(geoJson: GeoJSON): boolean {
+  isGeoJsonTypeSupported(geoJson: FeatureCollection): boolean {
     return !(
-      geoJson.type !== 'FeatureCollection' ||
+      !['FeatureCollection', 'Feature'].includes(geoJson.type) ||
       geoJson.features.every(
         (geom: any) =>
-          geom.geometry.type !== 'Polygon' &&
-          geom.geometry.type !== 'MultiPolygon',
+          geom.geometry?.type !== 'Polygon' &&
+          geom.geometry?.type !== 'MultiPolygon',
       )
     );
   }
