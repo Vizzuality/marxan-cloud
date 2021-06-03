@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { readdir } from 'fs/promises';
 import { GeoJSON } from 'geojson';
 import { FileService } from '../files/files.service';
@@ -69,7 +69,7 @@ export class ShapefileService {
       return { data: geoJson };
     } catch (err) {
       this.logger.error(err);
-      throw new Error('Invalid Shapefile');
+      throw new Error(`Invalid Shapefile: ${err}`);
     } finally {
       await this.fileService
         .deleteDataFromFS(shapeFile.path)
