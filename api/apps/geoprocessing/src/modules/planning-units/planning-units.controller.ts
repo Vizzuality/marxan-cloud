@@ -9,7 +9,6 @@ import {
   Res,
   Body,
   BadRequestException,
-  HttpStatus,
 } from '@nestjs/common';
 
 import {
@@ -31,7 +30,6 @@ import {
 import { TileRequest } from '@marxan-geoprocessing/modules/tile/tile.service';
 
 import { Response } from 'express';
-import { Either } from 'purify-ts';
 
 @Controller(`${apiGlobalPrefixes.v1}/planning-units`)
 export class PlanningUnitsController {
