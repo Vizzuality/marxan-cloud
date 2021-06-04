@@ -13,6 +13,8 @@ import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area
 
 interface CountryCodeInput {
   countryCode?: string;
+  adminLevel1?: string;
+  adminLevel2?: string;
 }
 
 export const E2E_CONFIG: {
@@ -114,9 +116,9 @@ export const E2E_CONFIG: {
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
         description: faker.lorem.paragraphs(2),
-        countryId: options.countryCode ?? 'NAM',
-        adminAreaLevel1Id: 'NAM.8_1',
-        adminAreaLevel2Id: 'NAM.8.6_1',
+        countryId: options.countryCode,
+        adminAreaLevel1Id: options.adminLevel1,
+        adminAreaLevel2Id: options.adminLevel2,
         planningUnitGridShape: PlanningUnitGridShape.hexagon,
         planningUnitAreakm2: 10,
         extent: {
