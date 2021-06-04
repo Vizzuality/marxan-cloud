@@ -28,6 +28,6 @@ const Template: Story<ButtonProps> = ({ children, ...args }: ButtonProps) => (
 export const Default = Template.bind({});
 Default.args = {
   children: 'Button',
-  theme: 'none',
+  theme: 'spacial',
   disabled: false,
 };

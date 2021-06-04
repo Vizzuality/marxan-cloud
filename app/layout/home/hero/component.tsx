@@ -27,7 +27,7 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
         <div className="flex items-center justify-center mt-10 space-x-4">
           <Button
             className="w-40"
-            theme="primary"
+            theme="spacial"
             size="lg"
             href="/projects"
           >
