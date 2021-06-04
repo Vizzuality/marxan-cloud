@@ -1,1 +1,1 @@
-export { CostSurfaceTemplateController } from './cost-surface-template.controller';
+export { CostSurfaceTemplateModule } from './cost-surface-template.module';

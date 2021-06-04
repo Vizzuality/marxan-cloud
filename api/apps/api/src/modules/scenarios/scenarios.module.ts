@@ -17,6 +17,7 @@ import { CostSurfaceModule } from './cost-surface/cost-surface.module';
 import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
+import { CostSurfaceTemplateModule } from './cost-surface-template';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
     AnalysisModule,
     CostSurfaceModule,
     HttpModule,
+    CostSurfaceTemplateModule,
   ],
   providers: [
     ScenariosService,
