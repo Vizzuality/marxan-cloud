@@ -81,38 +81,6 @@ describe('ProjectsModule (e2e)', () => {
       expect(jsonAPIResponse.data.type).toBe('projects');
     });
 
-    test('Creating a project with complete data should succeed', async () => {
-      const createProjectDTO: Partial<CreateProjectDTO> = {
-        ...E2E_CONFIG.projects.valid.complete({}),
-        organizationId: anOrganization.id,
-      };
-
-      const response = await request(app.getHttpServer())
-        .post('/api/v1/projects')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .send(createProjectDTO)
-        .expect(201);
-
-      const jsonAPIResponse: ProjectResultSingular = response.body;
-      completeProject = await Deserializer.deserialize(response.body);
-      expect(jsonAPIResponse.data.type).toBe('projects');
-
-      const createScenarioDTO: Partial<CreateScenarioDTO> = {
-        ...E2E_CONFIG.scenarios.valid.minimal(),
-        projectId: completeProject.id,
-      };
-
-      const scenarioResponse = await request(app.getHttpServer())
-        .post('/api/v1/scenarios')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .send(createScenarioDTO)
-        .expect(201);
-
-      aScenarioInACompleteProject = await Deserializer.deserialize(
-        scenarioResponse.body,
-      );
-    });
-
     test('A user should be able to get a list of projects', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
