@@ -4,8 +4,12 @@ import { v4 } from 'uuid';
 
 @Injectable()
 export class FakeQueue implements Partial<Queue> {
-  public readonly jobs: Record<string, Job> = {};
+  public jobs: Record<string, Job> = {};
   private readonly queueBase = new QueueBase(v4());
+
+  disposeFakeJobs() {
+    this.jobs = {};
+  }
 
   async add(
     name: string,
