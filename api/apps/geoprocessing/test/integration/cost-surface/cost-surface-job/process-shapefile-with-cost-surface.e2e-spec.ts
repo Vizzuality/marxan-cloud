@@ -27,6 +27,6 @@ describe(`given scenario has some planning units`, () => {
     await sut.process(world.getShapefileWithCost());
     await delay(1000);
     const costs = (await world.GetPuCostsData()).map((pu) => pu.cost);
-    expect(costs.every((cost) => cost === world.newCost)).toBeTruthy();
+    costs.forEach((cost, index) => expect(cost).toEqual(world.newCost[index]));
   }, 10000);
 });
