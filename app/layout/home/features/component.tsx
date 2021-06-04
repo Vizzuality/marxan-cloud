@@ -17,13 +17,13 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
         <div className="grid max-w-5xl grid-cols-1 gap-20 mx-auto sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((F) => {
             const {
-              id, name, description, icon,
+              id, name, description, icon, iconClassName,
             } = F;
 
             return (
               <div key={`${id}`}>
                 <div className="flex items-center justify-center w-16 h-16 bg-gray-500 rounded-full">
-                  <Icon icon={icon} className="w-6 h-6" />
+                  <Icon icon={icon} className={iconClassName} />
                 </div>
                 <h2 className="mt-8 mb-10 text-2xl font-medium font-heading">{name}</h2>
                 <p className="text-gray-400">{description}</p>

@@ -1,16 +1,16 @@
 <svg width="24" height="23" viewBox="0 0 24 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M14.2481 11.5H10.1641" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M10.1641 11.5H14.2481" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M8.125 8L10.166 4.5H14.25L16.291 8" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M16.291 15L14.25 18.5H10.166L8.125 15" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M4.041 8L2 4.5" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M8.125 1L10.166 4.5" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M14.25 4.5L16.291 1" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M22.416 4.5L20.375 8" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M20.375 15L22.416 18.5" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M16.291 22L14.25 18.5" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M10.166 18.5L8.125 22" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M2 18.5L4.041 15" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M8.125 15H4.041L2 11.5L4.041 8H8.125L10.166 11.5L8.125 15Z" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M16.291 15H20.375L22.416 11.5L20.375 8H16.291L14.25 11.5L16.291 15Z" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M14.2481 11.5H10.1641" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M10.1641 11.5H14.2481" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M8.125 8L10.166 4.5H14.25L16.291 8" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M16.291 15L14.25 18.5H10.166L8.125 15" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M4.041 8L2 4.5" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M8.125 1L10.166 4.5" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M14.25 4.5L16.291 1" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M22.416 4.5L20.375 8" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M20.375 15L22.416 18.5" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M16.291 22L14.25 18.5" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M10.166 18.5L8.125 22" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M2 18.5L4.041 15" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M8.125 15H4.041L2 11.5L4.041 8H8.125L10.166 11.5L8.125 15Z" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M16.291 15H20.375L22.416 11.5L20.375 8H16.291L14.25 11.5L16.291 15Z" stroke-width="2" stroke-miterlimit="10"/>
 </svg>
