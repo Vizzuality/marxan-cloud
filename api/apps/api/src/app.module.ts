@@ -29,11 +29,9 @@ import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/s
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
 import { AnalysisModule } from '@marxan-api/modules/analysis/analysis.module';
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
-import { ScenarioCostSurfaceModule } from '@marxan/scenario-cost-surface';
 
 @Module({
   imports: [
-    ScenarioCostSurfaceModule.for(apiConnections.default.name),
     TypeOrmModule.forRoot({
       ...apiConnections.default,
       keepConnectionAlive: true,
