@@ -1,12 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import {
-  HttpStatus,
-  INestApplication,
-  Logger,
-  ValidationPipe,
-} from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@marxan-api/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
 import { IUCNProtectedAreaCategoryDTO } from '@marxan-api/modules/protected-areas/dto/iucn-protected-area-category.dto';
@@ -24,6 +17,8 @@ import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { v4 } from 'uuid';
 import { difference } from 'lodash';
 import { tearDown } from './utils/tear-down';
+import { bootstrapApplication } from './utils/api-application';
+import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 
 afterAll(async () => {
   await tearDown();
@@ -64,29 +59,8 @@ describe('ProtectedAreasModule (e2e)', () => {
   const l2AdminArea = 'NAM.13.5_1';
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    );
-    await app.init();
-
-    const response = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({
-        username: E2E_CONFIG.users.basic.aa.username,
-        password: E2E_CONFIG.users.basic.aa.password,
-      })
-      .expect(201);
-
-    jwtToken = response.body.accessToken;
+    app = await bootstrapApplication();
+    jwtToken = await GivenUserIsLoggedIn(app);
 
     anOrganization = await OrganizationsTestUtils.createOrganization(
       app,
@@ -158,38 +132,6 @@ describe('ProtectedAreasModule (e2e)', () => {
   });
 
   describe('Protected areas', () => {
-    /**
-     * https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991%3A2265
-     */
-    describe.skip('Upload protected area network geometries', () => {
-      let protectedAreaNetworkUploadResult: {
-        id: string;
-        name: string;
-        status: string;
-      };
-      test('As a user, I should be able to upload a shapefile containing a project-specific network of protected areas', async () => {
-        const response = await request(app.getHttpServer())
-          .post(`/api/v1/protected-areas/`)
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(202);
-
-        // we should return an UUID for this upload, so that the client can query for the upload status
-        protectedAreaNetworkUploadResult = response.body.data;
-      });
-
-      test('As a user, I should be able to know when a protected area network shapefile is ready to use', async () => {
-        const protectedAreaNetworkUploadStatus = await request(
-          app.getHttpServer(),
-        )
-          .get(`/api/v1/protected-areas/${protectedAreaNetworkUploadResult.id}`)
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
-
-        // Check for status, keep checking with exponential backoff until we get
-        // a response, or timeout within some sensible timeframe.
-      });
-    });
-
     /**
      * https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991%3A2146
      */
