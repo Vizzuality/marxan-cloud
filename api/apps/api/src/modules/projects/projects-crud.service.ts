@@ -3,6 +3,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -17,11 +18,12 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
-import { Country } from '@marxan-api/modules/countries/country.geo.entity';
 import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';
 import { CountriesService } from '@marxan-api/modules/countries/countries.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { AdminArea } from '@marxan/admin-regions';
+import { BboxResolver } from './bbox/bbox-resolver';
+import { Polygon } from 'geojson';
 
 const projectFilterKeyNames = [
   'name',
@@ -55,6 +57,7 @@ export class ProjectsCrudService extends AppBaseService<
     protected readonly countriesService: CountriesService,
     @Inject(PlanningUnitsService)
     private readonly planningUnitsService: PlanningUnitsService,
+    private readonly bboxResolver: BboxResolver,
   ) {
     super(repository, 'project', 'projects', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -133,6 +136,12 @@ export class ProjectsCrudService extends AppBaseService<
      */
     const project = await super.setDataCreate(create, info);
     project.createdBy = info?.authenticatedUser?.id!;
+
+    const geometry = await this.resolveBBoxFromAdminArea(create, info);
+    if (geometry?.bbox) {
+      project.bbox = geometry.bbox;
+    }
+
     return project;
   }
 
@@ -205,56 +214,50 @@ export class ProjectsCrudService extends AppBaseService<
     }
   }
 
-  async validateBeforeCreate(
-    createModel: CreateProjectDTO,
-    info?: AppInfoDTO,
-  ): Promise<void> {
-    if (this.shouldManuallySetBbox(createModel)) {
-      const derivedSubmittedAdminArea = await this.getPlanningArea({
-        ...createModel,
-        extent: undefined,
-      });
+  async setDataUpdate(
+    model: Project,
+    update: UpdateProjectDTO,
+    _?: AppInfoDTO,
+  ): Promise<Project> {
+    const geometry = await this.resolveBBoxFromAdminArea(update, _);
+    if (geometry?.bbox) {
+      const modelWithBbox = await super.setDataUpdate(model, update, _);
+      modelWithBbox.bbox = geometry.bbox;
+      return modelWithBbox;
+    }
+    return model;
+  }
 
-      if (!derivedSubmittedAdminArea) {
-        // due to current usage, hard to get around it with coupling and throw errors to controller
-        throw new BadRequestException('...');
-      }
+  private async resolveBBoxFromAdminArea(
+    model: CreateProjectDTO | UpdateProjectDTO,
+    _?: AppInfoDTO,
+  ): Promise<Polygon | undefined> {
+    if (!this.bboxResolver.shouldResolveBbox(model)) {
+      return;
+    }
+    const derivedSubmittedAdminArea = await this.getPlanningArea({
+      ...model,
+      extent: undefined,
+    });
 
-      if (
-        derivedSubmittedAdminArea.gid0 !== createModel.countryId ||
-        derivedSubmittedAdminArea.gid1 !== createModel.adminAreaLevel1Id ||
-        derivedSubmittedAdminArea.gid2 !== createModel.adminAreaLevel2Id
-      ) {
-        throw new BadRequestException('...');
-      }
+    let geometry;
 
-      if (derivedSubmittedAdminArea.bbox) {
-        createModel.extent = {
-          bbox: derivedSubmittedAdminArea.bbox,
-          type: 'Polygon',
-          coordinates: [],
-        };
-      }
-
-      // otherwise, is it our error?
+    try {
+      geometry = this.bboxResolver.resolveBBox(
+        model,
+        derivedSubmittedAdminArea,
+      );
+    } catch (error) {
+      // currently no easy way to propagate specific error to controller, thus throwing Http error already
+      throw new BadRequestException(error);
     }
 
-    return;
+    if (geometry) {
+      return geometry;
+    } else {
+      throw new InternalServerErrorException(
+        `Missing bbox for given admin region.`,
+      );
+    }
   }
-
-  async validateBeforeUpdate(
-    projectId: string,
-    updateModel: UpdateProjectDTO,
-    info?: AppInfoDTO,
-  ): Promise<void> {
-    //
-    return;
-  }
-
-  private shouldManuallySetBbox = (createModel: CreateProjectDTO): boolean =>
-    Boolean(
-      createModel.adminAreaLevel1Id ||
-        createModel.adminAreaLevel2Id ||
-        createModel.countryId,
-    );
 }

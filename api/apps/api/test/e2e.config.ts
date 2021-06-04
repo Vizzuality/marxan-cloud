@@ -114,9 +114,9 @@ export const E2E_CONFIG: {
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
         description: faker.lorem.paragraphs(2),
-        countryId: options.countryCode,
-        adminAreaLevel1Id: faker.random.alphaNumeric(7),
-        adminAreaLevel2Id: faker.random.alphaNumeric(12),
+        countryId: options.countryCode ?? 'NAM',
+        adminAreaLevel1Id: 'NAM.8_1',
+        adminAreaLevel2Id: 'NAM.8.6_1',
         planningUnitGridShape: PlanningUnitGridShape.hexagon,
         planningUnitAreakm2: 10,
         extent: {
