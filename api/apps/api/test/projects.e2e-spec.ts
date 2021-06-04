@@ -1,7 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@marxan-api/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
@@ -17,6 +15,8 @@ import {
   OrganizationResultSingular,
 } from '@marxan-api/modules/organizations/organization.api.entity';
 import { tearDown } from './utils/tear-down';
+import { bootstrapApplication } from './utils/api-application';
+import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 
 afterAll(async () => {
   await tearDown();
@@ -30,29 +30,8 @@ describe('ProjectsModule (e2e)', () => {
   });
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    );
-    await app.init();
-
-    const response = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({
-        username: E2E_CONFIG.users.basic.aa.username,
-        password: E2E_CONFIG.users.basic.aa.password,
-      })
-      .expect(201);
-
-    jwtToken = response.body.accessToken;
+    app = await bootstrapApplication();
+    jwtToken = await GivenUserIsLoggedIn(app);
   });
 
   afterAll(async () => {
@@ -104,7 +83,7 @@ describe('ProjectsModule (e2e)', () => {
 
     test('Creating a project with complete data should succeed', async () => {
       const createProjectDTO: Partial<CreateProjectDTO> = {
-        ...E2E_CONFIG.projects.valid.complete({ countryCode: 'ESP' }),
+        ...E2E_CONFIG.projects.valid.complete({}),
         organizationId: anOrganization.id,
       };
 

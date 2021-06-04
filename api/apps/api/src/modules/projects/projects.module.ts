@@ -14,6 +14,7 @@ import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
 import { ProjectsService } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
+import { BboxResolver } from './bbox/bbox-resolver';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ProjectSerializer } from './dto/project.serializer';
     ProjectsService,
     GeoFeatureSerializer,
     ProjectSerializer,
+    BboxResolver,
   ],
   controllers: [ProjectsController],
   exports: [ProjectsCrudService],
