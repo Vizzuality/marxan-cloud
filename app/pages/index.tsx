@@ -2,6 +2,10 @@ import React from 'react';
 import Head from 'next/head';
 
 import Header from 'layout/header';
+import Footer from 'layout/footer';
+
+import Hero from 'layout/home/hero';
+import Features from 'layout/home/features';
 import { withUser } from 'hoc/auth';
 
 export const getServerSideProps = withUser();
@@ -16,6 +20,9 @@ const Home: React.FC = () => {
 
       <main>
         <Header size="lg" />
+        <Hero />
+        <Features />
+        <Footer />
       </main>
     </>
   );
