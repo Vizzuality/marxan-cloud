@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { EntityManager, QueryRunner, Repository } from 'typeorm';
-import { InjectEntityManager } from '@nestjs/typeorm';
 import { LargeObjectManager } from 'pg-large-object';
 import { Client } from 'pg';
 import { PostgresQueryRunner } from 'typeorm/driver/postgres/PostgresQueryRunner';
@@ -20,7 +19,7 @@ export class ErrorWithSymbol extends Error {
   }
 }
 export const StreamPiped = Symbol('stream piped');
-
+export const EntityManagerToken = Symbol();
 @Injectable()
 export class ScenarioCostSurfaceRepository {
   /**
@@ -29,7 +28,7 @@ export class ScenarioCostSurfaceRepository {
   readonly #bufferSize = 8 * 2048;
 
   constructor(
-    @InjectEntityManager()
+    @Inject(EntityManagerToken)
     private readonly entityManager: EntityManager,
   ) {}
 
