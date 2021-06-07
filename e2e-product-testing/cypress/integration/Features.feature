@@ -25,3 +25,56 @@ Feature: Add features modal
         Given the user is on Add features modal (Marxan 06b)
         When the user uses the search bar and types a keyword that does not matches any feature
         Then no features are shown
+
+Feature: Split
+    Scenario: Split output
+        Given the user is in Features tab 1/2
+        And the user has added at least one Split layer (bioregional type)
+        And the user selects the bioregional layer and a category to split by
+        And the user selects the unique sub-categories he/she wants to keep
+        When the features are processed (Continue)
+        Then each sub-category appears as a new separate feature in Features tab 1/2
+
+Feature: Intersection
+    Scenario: Open intersection modal
+        Given the user is in Features tab 1/2
+        And the user has added at least one Intersection layer (species type)
+        When The user clicks on 'Select features +'
+        Then the Intersection modal opens
+   
+   Scenario: Intersection species with bioregional
+        Given the user is in the Intersection modal
+        And the user has selected a bioregional layer
+        And the user has selected a category 
+        And the user has selected sub-categories
+        And the user has saved
+        When the features are processed (Continue)
+        Then each intersection of species with sub-category appears as a new separate feature in Features tab 1/2
+
+Feature: Set targets
+    Scenario: Set individual target
+        Given the user is in Features tab 2/2
+        When the user changes the value of the target of one feature
+        Then the new target is displayed for that feature
+
+    Scenario: Set block target
+        Given the user is in Features tab 2/2
+        When the user changes the value in the section 'ALL TARGETS'
+        Then the target of all the features display the new value
+    
+Feature: Set FPF
+    Scenario: Set individual FPF
+        Given the user is in Features tab 2/2
+        When the user changes the value of the FPF of one feature
+        Then the new FPF is displayed for that feature
+
+    Scenario: Set block FPF
+        Given the user is in Features tab 2/2
+        When the user changes the value in the section 'ALL FPF'
+        Then the FPF of all the features display the new value
+
+Feature: Feature processing
+    Scenario: Feature processing
+        Given the user is in Feature tab 2/2
+        When the user cliks 'Continue'
+        Then the user is sent to the Project dashboard to view the status of the Scenario
