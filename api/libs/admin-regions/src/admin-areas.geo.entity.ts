@@ -15,7 +15,7 @@ import { defaultSrid } from '@marxan/utils/geo';
 export enum AdminLevel {
   Country = 'country',
   Adm1 = 'adm_1',
-  Amd2 = 'adm_',
+  Amd2 = 'adm_2',
 }
 
 // property names, not db names in indexes: https://github.com/typeorm/typeorm/issues/930
