@@ -7,9 +7,9 @@ import { Feature, Polygon } from 'geojson';
 import { Job } from 'bullmq';
 
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
-import { defaultSrid } from '@marxan-geoprocessing/types/spatial-data-format';
 import { PlanningUnitCost } from '@marxan-geoprocessing/modules/surface-cost/ports/planning-unit-cost';
 import { CostSurfaceJobInput } from '@marxan-geoprocessing/modules/surface-cost/cost-surface-job-input';
+import { defaultSrid } from '@marxan/utils/geo/spatial-data-format';
 
 import { getFixtures } from '../../planning-unit-fixtures';
 
