@@ -11,7 +11,7 @@ import { omit } from 'lodash';
 
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Response } from 'express';
-import { AppConfig } from 'src/utils/config.utils';
+import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 /**
  * Catch-all exception filter. Output error data to logs, and send it as
@@ -67,7 +67,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? omit(errorData, ['meta.rawError', 'meta.stack'])
         : errorData,
     );
-  
+
     response.removeHeader('content-encoding');
     response
       .status(status)

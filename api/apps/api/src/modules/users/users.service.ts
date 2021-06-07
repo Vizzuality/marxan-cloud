@@ -12,18 +12,18 @@ import { User, userResource } from './user.api.entity';
 import { omit } from 'lodash';
 import { CreateUserDTO } from './dto/create.user.dto';
 import { UpdateUserDTO } from './dto/update.user.dto';
-import { AppInfoDTO } from 'dto/info.dto';
+import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
 import * as faker from 'faker';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
-} from 'utils/app-base.service';
+} from '@marxan-api/utils/app-base.service';
 import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { compare, hash } from 'bcrypt';
-import { AuthenticationService } from 'modules/authentication/authentication.service';
+import { AuthenticationService } from '@marxan-api/modules/authentication/authentication.service';
 import { v4 } from 'uuid';
-import { AppConfig } from 'utils/config.utils';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 @Injectable()
 export class UsersService extends AppBaseService<

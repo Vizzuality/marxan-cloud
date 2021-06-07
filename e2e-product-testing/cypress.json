@@ -1,3 +1,5 @@
 {
-  "testFiles": "**/*.{feature,features}"
+  "testFiles": "**/*.{feature,features}",
+  "screenshotOnRunFailure": true,
+  "videoUploadOnPasses": false
 }

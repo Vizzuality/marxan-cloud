@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { PostgreSQLUtils } from 'utils/postgresql.utils';
+import { PostgreSQLUtils } from '@marxan-api/utils/postgresql.utils';
 
 export class AddSupportForAuthentication1610395720000
   implements MigrationInterface {

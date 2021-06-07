@@ -1,3 +1,4 @@
+import { isDefined } from '@marxan/utils';
 import { applyDecorators } from '@nestjs/common';
 import {
   ApiBody,
@@ -6,8 +7,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 
-import { ShapefileGeoJSONResponseDTO } from 'modules/scenarios/dto/shapefile.geojson.response.dto';
-import { isDefined } from '../utils/is-defined';
+import { ShapefileGeoJSONResponseDTO } from '@marxan-api/modules/scenarios/dto/shapefile.geojson.response.dto';
 
 export function ApiConsumesShapefile(withGeoJsonResponse = true) {
   return applyDecorators(

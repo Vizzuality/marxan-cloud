@@ -4,8 +4,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Check, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { MultiPolygon } from 'geojson';
+import { defaultSrid } from '@marxan/utils/geo';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
-import { defaultSrid } from '../../types/spatial-data-format';
 
 export enum IUCNCategory {
   Ia = 'Ia',

@@ -18,7 +18,7 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
 
   async save(_: string, values: PlanningUnitCost[]): Promise<void> {
     const pairs = values.map<[string, number]>((pair) => [
-      pair.planningUnitId,
+      pair.puId,
       pair.cost,
     ]);
     await this.costs.query(

@@ -48,8 +48,8 @@
     "@nestjs/platform-express": "^7.5.1",
     "@nestjs/swagger": "^4.7.9",
     "@nestjs/typeorm": "^7.1.5",
-    "bcrypt": "^5.0.0",
     "@turf/turf": "^5.1.6",
+    "bcrypt": "^5.0.0",
     "bullmq": "^1.15.1",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
@@ -61,8 +61,8 @@
     "http-proxy": "^1.18.1",
     "jsonapi-serializer": "^3.6.7",
     "lodash": "^4.17.20",
+    "mapshaper": "0.5.57",
     "ms": "^2.1.3",
-    "mapshaper": "0.5.51",
     "multer": "^1.4.2",
     "nestjs-base-service": "0.6.0",
     "passport": "^0.4.1",
@@ -74,12 +74,11 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
+    "swagger-ui-express": "^4.1.6",
     "temp-dir": "^2.0.0",
     "typeorm": "0.2.30",
     "unzipper": "^0.10.11",
-    "uuid": "8.3.2",
-    "swagger-ui-express": "^4.1.6"
-
+    "uuid": "8.3.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
@@ -109,6 +108,7 @@
     "eslint": "^7.12.1",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "geojson2shp": "0.4.0",
     "husky": "^4.3.0",
     "jest": "^26.6.3",
     "lint-staged": "^10.5.2",
@@ -142,6 +142,16 @@
     "roots": [
       "<rootDir>/apps/",
       "<rootDir>/libs/"
-    ]
+    ],
+    "moduleNameMapper": {
+      "@marxan-api/(.*)": "<rootDir>/apps/api/src/$1",
+      "@marxan-geoprocessing/(.*)": "<rootDir>/apps/geoprocessing/src/$1",
+      "@marxan/utils/(.*)": "<rootDir>/libs/utils/src/$1",
+      "@marxan/utils": "<rootDir>/libs/utils/src",
+      "@marxan/scenarios-planning-unit/(.*)": "<rootDir>/libs/scenarios-planning-unit/src/$1",
+      "@marxan/scenarios-planning-unit": "<rootDir>/libs/scenarios-planning-unit/src",
+      "@marxan/admin-regions/(.*)": "<rootDir>/libs/admin-regions/src/$1",
+      "@marxan/admin-regions": "<rootDir>/libs/admin-regions/src"
+    }
   }
 }

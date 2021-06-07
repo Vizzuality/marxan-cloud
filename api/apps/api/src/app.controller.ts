@@ -1,5 +1,5 @@
 import { Controller, Request } from '@nestjs/common';
-import { User } from 'modules/users/user.api.entity';
+import { User } from '@marxan-api/modules/users/user.api.entity';
 import { AppService } from './app.service';
 
 // Request object augmented with user data

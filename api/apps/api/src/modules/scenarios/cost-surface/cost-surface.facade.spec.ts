@@ -1,141 +1,133 @@
-import { CostSurfaceFacade } from './cost-surface.facade';
 import { Test } from '@nestjs/testing';
-import { Request } from 'express';
-import { AdjustCostSurface } from '../../analysis/entry-points/adjust-cost-surface';
-import { AdjustCostServiceFake } from './__mocks__/adjust-cost-service-fake';
-import { ResolvePuWithCost } from './resolve-pu-with-cost';
-import { ShapefileConverterFake } from './__mocks__/shapefile-converter-fake';
+import { Logger } from '@nestjs/common';
+import { Queue } from 'bullmq';
+
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { QueueService } from '@marxan-api/modules/queue/queue.service';
+
+import { CostSurfaceFacade } from './cost-surface.facade';
+import { CostSurfaceJobInput } from './job-input';
 import { CostSurfaceEventsPort } from './cost-surface-events.port';
+
 import { CostSurfaceEventsFake } from './__mocks__/cost-surface-events-fake';
-import { getValidSurfaceCost } from './__mocks__/surface-cost.data';
 
 let sut: CostSurfaceFacade;
+let logger: FakeLogger;
+let addJobMock: jest.SpyInstance;
+let eventsService: CostSurfaceEventsFake;
 
-let costService: AdjustCostServiceFake;
-let fileConverter: ShapefileConverterFake;
-let events: CostSurfaceEventsFake;
+const scenarioId = 'scenarioId-id';
+const file: Express.Multer.File = {
+  filename: 'file-name',
+} as Express.Multer.File;
 
 beforeEach(async () => {
+  addJobMock = jest.fn();
   const sandbox = await Test.createTestingModule({
     providers: [
+      CostSurfaceFacade,
       {
-        provide: AdjustCostSurface,
-        useClass: AdjustCostServiceFake,
+        provide: QueueService,
+        useValue: ({
+          queue: ({
+            add: addJobMock,
+          } as unknown) as Queue,
+        } as unknown) as QueueService<CostSurfaceJobInput>,
       },
       {
-        provide: ResolvePuWithCost,
-        useClass: ShapefileConverterFake,
+        provide: Logger,
+        useClass: FakeLogger,
       },
       {
         provide: CostSurfaceEventsPort,
         useClass: CostSurfaceEventsFake,
       },
-      CostSurfaceFacade,
     ],
   }).compile();
 
   sut = sandbox.get(CostSurfaceFacade);
-  costService = sandbox.get(AdjustCostSurface);
-  fileConverter = sandbox.get(ResolvePuWithCost);
-  events = sandbox.get(CostSurfaceEventsPort);
+  logger = sandbox.get(Logger);
+  eventsService = sandbox.get(CostSurfaceEventsPort);
 });
 
-const scenarioId = 'scenarioId';
-const request: Request = Object.freeze({
-  file: ({ fakeFile: 1 } as unknown) as Express.Multer.File,
-} as unknown) as Request;
-
-describe(`when file couldn't be converted`, () => {
-  beforeEach(async () => {
-    fileConverter.mock.mockRejectedValue(new Error('Not a shapefile.'));
-
+describe(`when job submits successfully`, () => {
+  let result: unknown;
+  beforeEach(() => {
+    // Asset
+    addJobMock.mockResolvedValue({ job: { id: 1 } });
     // Act
-    await sut.convert(scenarioId, request);
+    result = sut.convert(scenarioId, file);
   });
 
-  it(`should emit relevant events`, () => {
-    expect(events.events).toMatchInlineSnapshot(`
+  it(`should return`, () => {
+    expect(result).toEqual(undefined);
+  });
+
+  it(`should put job to queue`, () => {
+    expect(addJobMock.mock.calls[0]).toMatchInlineSnapshot(`
+      Array [
+        "cost-surface-for-scenarioId-id",
+        Object {
+          "scenarioId": "scenarioId-id",
+          "shapefile": Object {
+            "filename": "file-name",
+          },
+        },
+      ]
+    `);
+  });
+
+  it(`should emit 'submitted' event`, () => {
+    expect(eventsService.mock.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
-          "scenarioId",
+          "scenarioId-id",
           "submitted",
-        ],
-        Array [
-          "scenarioId",
-          "shapefile-conversion-failed",
+          undefined,
         ],
       ]
     `);
   });
 });
 
-describe(`when file can be converted`, () => {
+describe(`when job submission fails`, () => {
+  let result: unknown;
   beforeEach(() => {
-    fileConverter.mock.mockResolvedValue(getValidSurfaceCost());
+    // Asset
+    addJobMock.mockRejectedValue(new Error('Oups'));
+    // Act
+    result = sut.convert(scenarioId, file);
   });
 
-  describe(`when cost couldn't be adjusted`, () => {
-    beforeEach(async () => {
-      costService.mock.mockRejectedValue(new Error('SQL Error'));
-
-      // Act
-      await sut.convert(scenarioId, request);
-    });
-
-    it(`should emit relevant events`, () => {
-      expect(events.events).toMatchInlineSnapshot(`
-        Array [
-          Array [
-            "scenarioId",
-            "submitted",
-          ],
-          Array [
-            "scenarioId",
-            "shapefile-converted",
-          ],
-          Array [
-            "scenarioId",
-            "cost-update-failed",
-          ],
-        ]
-      `);
-    });
+  it(`should return`, () => {
+    expect(result).toEqual(undefined);
   });
 
-  describe(`when cost can be adjusted`, () => {
-    beforeEach(async () => {
-      costService.mock.mockResolvedValue(undefined);
+  it(`should log the error`, () => {
+    expect(logger.error.mock.calls[0]).toMatchInlineSnapshot(`
+      Array [
+        "Failed submitting job to queue for scenarioId-id",
+        "Error: Oups",
+      ]
+    `);
+  });
 
-      // Act
-      await sut.convert(scenarioId, request);
-    });
-
-    it(`proxies file to port`, () => {
-      expect(fileConverter.mock.mock.calls[0][0]).toEqual(request.file);
-    });
-
-    it(`proxies port output to update service`, () => {
-      expect(costService.mock.mock.calls[0][0]).toEqual(scenarioId);
-      expect(costService.mock.mock.calls[0][1]).toEqual(getValidSurfaceCost());
-    });
-
-    it(`emits valid events chain`, () => {
-      expect(events.events).toMatchInlineSnapshot(`
+  it(`emits both submitted&failed events`, () => {
+    expect(eventsService.mock.mock.calls).toMatchInlineSnapshot(`
+      Array [
         Array [
-          Array [
-            "scenarioId",
-            "submitted",
-          ],
-          Array [
-            "scenarioId",
-            "shapefile-converted",
-          ],
-          Array [
-            "scenarioId",
-            "finished",
-          ],
-        ]
-      `);
-    });
+          "scenarioId-id",
+          "submitted",
+          undefined,
+        ],
+        Array [
+          "scenarioId-id",
+          "cost-update-failed",
+          Object {
+            "error": [Error: Oups],
+          },
+        ],
+      ]
+    `);
   });
 });

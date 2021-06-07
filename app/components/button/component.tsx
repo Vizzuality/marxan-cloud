@@ -14,6 +14,8 @@ const THEME = {
   white: 'text-gray-700 bg-white hover:text-white hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
 
   danger: 'text-red-700 bg-transparent hover:text-white hover:bg-red-700 active:bg-red-600 border border-red-700 hover:border-red-600 active:border-red-500',
+
+  spacial: 'text-white bg-transparent hover:bg-gray-400 active:bg-gray-300 flex items-center justify-center rounded-4xl focus:outline-none',
 };
 
 const SIZE = {
@@ -25,7 +27,7 @@ const SIZE = {
 };
 
 export interface AnchorButtonProps {
-  theme: 'primary' | 'primary-alt' | 'white' | 'secondary' | 'secondary-alt' | 'danger';
+  theme: 'primary' | 'primary-alt' | 'white' | 'secondary' | 'secondary-alt' | 'danger' | 'spacial';
   size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }
@@ -58,12 +60,31 @@ function buildClassName({
   theme,
 }) {
   return cx({
-    'flex items-center justify-center rounded-4xl focus:outline-none': true,
+    'group relative flex items-center justify-center rounded-4xl focus:outline-none': true,
     [THEME[theme]]: true,
     [SIZE[size]]: true,
     [className]: !!className,
     'opacity-50 pointer-events-none': disabled,
   });
+}
+
+function buildChildren({
+  theme,
+  children,
+}) {
+  if (theme === 'spacial') {
+    return (
+      <>
+        <div className="absolute top-0 bottom-0 left-0 right-0 z-0 rounded-4xl bg-gradient-to-r from-purple-500 to-blue-500">
+          <div className="relative w-full h-full border-2 border-transparent">
+            <div className="absolute w-full h-full transition-colors bg-black rounded-4xl group-hover:bg-transparent" />
+          </div>
+        </div>
+        <div className="relative z-20">{children}</div>
+      </>
+    );
+  }
+  return children;
 }
 
 export const LinkAnchor: FC<AnchorProps> = ({
@@ -83,7 +104,7 @@ export const LinkAnchor: FC<AnchorProps> = ({
       })}
       {...restProps}
     >
-      {children}
+      {buildChildren({ children, theme })}
     </a>
   </Link>
 );
@@ -101,7 +122,9 @@ export const Anchor: FC<AnchorProps> = ({
   // https://www.w3.org/TR/2014/REC-html5-20141028/disabled-elements.html
   if (disabled) {
     return (
-      <span {...restProps}>{children}</span>
+      <span {...restProps}>
+        {buildChildren({ children, theme })}
+      </span>
     );
   }
   return (
@@ -112,7 +135,7 @@ export const Anchor: FC<AnchorProps> = ({
       })}
       {...restProps}
     >
-      {children}
+      {buildChildren({ children, theme })}
     </a>
   );
 };
@@ -133,7 +156,7 @@ export const Button: FC<ButtonProps> = ({
     disabled={disabled}
     {...restProps}
   >
-    {children}
+    {buildChildren({ children, theme })}
   </button>
 );
 
