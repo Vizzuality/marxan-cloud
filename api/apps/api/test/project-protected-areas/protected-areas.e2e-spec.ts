@@ -1,6 +1,6 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { E2E_CONFIG } from './e2e.config';
+import { E2E_CONFIG } from '../e2e.config';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
 import { IUCNProtectedAreaCategoryDTO } from '@marxan-api/modules/protected-areas/dto/iucn-protected-area-category.dto';
 import {
@@ -9,16 +9,15 @@ import {
 } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
-import { OrganizationsTestUtils } from './utils/organizations.test.utils';
-import { ProjectsTestUtils } from './utils/projects.test.utils';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { ScenariosTestUtils } from './utils/scenarios.test.utils';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { v4 } from 'uuid';
-import { difference } from 'lodash';
-import { tearDown } from './utils/tear-down';
-import { bootstrapApplication } from './utils/api-application';
-import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+import { tearDown } from '../utils/tear-down';
+import { bootstrapApplication } from '../utils/api-application';
+import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
+import { ProjectsTestUtils } from '../utils/projects.test.utils';
+import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
+import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 
 afterAll(async () => {
   await tearDown();
@@ -28,7 +27,7 @@ afterAll(async () => {
  * Tests for API contracts for the management of protected areas within
  * scenarios.
  */
-describe('ProtectedAreasModule (e2e)', () => {
+describe.skip('ProtectedAreasModule (e2e)', () => {
   let app: INestApplication;
   let jwtToken: string;
   const Deserializer = new JSONAPISerializer.Deserializer({
@@ -62,13 +61,16 @@ describe('ProtectedAreasModule (e2e)', () => {
     app = await bootstrapApplication();
     jwtToken = await GivenUserIsLoggedIn(app);
 
-    anOrganization = await OrganizationsTestUtils.createOrganization(
-      app,
-      jwtToken,
-      E2E_CONFIG.organizations.valid.minimal(),
-    ).then(async (response) => {
-      return await Deserializer.deserialize(response);
-    });
+    // TODO refactors
+    // TODO world
+    // TODO error handling
+    anOrganization = Deserializer.deserialize(
+      await OrganizationsTestUtils.createOrganization(
+        app,
+        jwtToken,
+        E2E_CONFIG.organizations.valid.minimal(),
+      ),
+    );
 
     aProjectWithCountryAsPlanningArea = await ProjectsTestUtils.createProject(
       app,
@@ -158,17 +160,6 @@ describe('ProtectedAreasModule (e2e)', () => {
         });
       });
 
-      test.skip('As a user, I should be able to see a list of project-specific protected areas within a given country', async () => {
-        const projectSpecificProtectedAreasInCountry = await request(
-          app.getHttpServer(),
-        )
-          .get(
-            `/api/v1/protected-areas/by-administrative-area/${country}?type=project-specific&omitFields=theGeom&disablePagination=true`,
-          )
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
-      });
-
       test('As a user, I should be able to see a list of distinct IUCN categories for protected areas within a given level 1 admin area', async () => {
         const response = await request(app.getHttpServer())
           .get(
@@ -191,17 +182,6 @@ describe('ProtectedAreasModule (e2e)', () => {
         });
       });
 
-      test.skip('As a user, I should be able to see a list of project-specific protected areas within a given level 1 admin area', async () => {
-        const projectSpecificProtectedAreasInL1AdminArea = await request(
-          app.getHttpServer(),
-        )
-          .get(
-            `/api/v1/protected-areas/by-administrative-area/${l1AdminArea}?type=project-specific&omitFields=theGeom&disablePagination=true`,
-          )
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
-      });
-
       test('As a user, I should be able to see a list of distinct IUCN categories for protected areas within a given level 2 admin area', async () => {
         const response = await request(app.getHttpServer())
           .get(
@@ -222,17 +202,6 @@ describe('ProtectedAreasModule (e2e)', () => {
         iucnCategoriesOfProtectedAreasInAdminArea.forEach((i) => {
           expect(E2E_CONFIG.protectedAreas.categories.valid).toContain(i);
         });
-      });
-
-      test.skip('As a user, I should be able to see a list of project-specific protected areas within a given level 2 admin area', async () => {
-        const projectSpecificProtectedAreasInL2AdminArea = await request(
-          app.getHttpServer(),
-        )
-          .get(
-            `/api/v1/protected-areas/by-administrative-area/${l2AdminArea}?type=project-specific&omitFields=theGeom&disablePagination=true`,
-          )
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(200);
       });
     });
 
@@ -284,64 +253,6 @@ describe('ProtectedAreasModule (e2e)', () => {
           expect(
             updatedScenario.protectedAreaFilterByIds?.length,
           ).toBeGreaterThan(0);
-        });
-
-        /**
-         * @todo Enable this test once we start supporting user uploads of
-         * protected area geometries. Until then, with the data available in our
-         * seed for tests, the WDPA areas we select pretending that they are
-         * 'project-specific' end up coinciding with the WDPA areas already
-         * selected via their IUCN categories, so the test would fail.
-         */
-        test.skip('As a user, when I update a scenario to which custom protected areas are already associated, these should be preserved if I only add WDPA protected areas to it via their IUCN category', async () => {
-          const protectedAreas: ProtectedArea[] = await request(
-            app.getHttpServer(),
-          )
-            .get(
-              `/api/v1/protected-areas?filter[countryId]=NAM&pageSize=5&pageNumber=1`,
-            )
-            .set('Authorization', `Bearer ${jwtToken}`)
-            .then(
-              async (response) => await Deserializer.deserialize(response.body),
-            );
-
-          const createScenarioDTO: Partial<CreateScenarioDTO> = {
-            ...E2E_CONFIG.scenarios.valid.minimal(),
-            projectId: aProjectWithCountryAsPlanningArea.id,
-            customProtectedAreaIds: protectedAreas.map((i) => i.id),
-          };
-          const scenario: Scenario = await ScenariosTestUtils.createScenario(
-            app,
-            jwtToken,
-            createScenarioDTO,
-          ).then(async (response) => await Deserializer.deserialize(response));
-          expect(scenario.protectedAreaFilterByIds?.length).toBe(
-            protectedAreas.length,
-          );
-
-          const response = await request(app.getHttpServer())
-            .patch(`/api/v1/scenarios/${scenario.id}`)
-            .set('Authorization', `Bearer ${jwtToken}`)
-            .send({
-              ...createScenarioDTO,
-              wdpaIucnCategories: [IUCNCategory.NotReported],
-            })
-            .expect(HttpStatus.OK);
-          const updatedScenario: Scenario = await Deserializer.deserialize(
-            response.body,
-          );
-          /**
-           * Here we want to check (assuming that one or more WDPA protected
-           * areas exist within the planning area boundaries) that the set of
-           * protected areas associated to the project after updating it is a
-           * strict superset of the set of custom protected areas we set when
-           * creating the project.
-           */
-          const newlyAddedProtectedAreaIds = difference(
-            updatedScenario.protectedAreaFilterByIds,
-            protectedAreas.map((i) => i.id),
-          );
-          expect(newlyAddedProtectedAreaIds.length).toBeGreaterThan(0);
         });
 
         test('As a user, when I create a scenario, I should not be able to set the protectedAreaIds property directly', async () => {

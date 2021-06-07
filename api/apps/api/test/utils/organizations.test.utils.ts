@@ -26,6 +26,7 @@ export class OrganizationsTestUtils {
       .then((response) => response.body)
       .catch((error) => {
         Logger.error(error);
+        throw new Error(`[step] Could not create organization`);
       });
   }
 

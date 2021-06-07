@@ -2,8 +2,6 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
-import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import {
   Project,
@@ -41,8 +39,6 @@ describe('ProjectsModule (e2e)', () => {
   describe('Projects', () => {
     let anOrganization: Organization;
     let minimalProject: Project;
-    let completeProject: Project;
-    let aScenarioInACompleteProject: Scenario;
 
     test('Creates an organization', async () => {
       const response = await request(app.getHttpServer())
@@ -92,30 +88,6 @@ describe('ProjectsModule (e2e)', () => {
       expect(jsonAPIResponse.data[0].type).toBe('projects');
     });
 
-    test.skip('A user should be able to get a list of projects and related scenarios', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/api/v1/projects?disablePagination=true&include=scenarios')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .expect(200);
-
-      const jsonAPIResponse: ProjectResultPlural = response.body;
-      const allProjects: Project[] = await Deserializer.deserialize(
-        response.body,
-      );
-
-      expect(jsonAPIResponse.data[0].type).toBe('projects');
-
-      const aKnownProject: Project | undefined = allProjects.find(
-        (i) => (i.id = completeProject.id),
-      );
-      expect(aKnownProject?.scenarios).toBeDefined();
-      expect(
-        aKnownProject?.scenarios?.find(
-          (i) => i.id === aScenarioInACompleteProject.id,
-        ),
-      ).toBeDefined();
-    });
-
     test('A user should be get a list of projects without any included relationships if these have not been requested', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
@@ -139,13 +111,6 @@ describe('ProjectsModule (e2e)', () => {
         .expect(200);
 
       expect(response1.body.data).toBeUndefined();
-
-      const response2 = await request(app.getHttpServer())
-        .delete(`/api/v1/projects/${completeProject.id}`)
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .expect(200);
-
-      expect(response2.body.data).toBeUndefined();
 
       /**
        * Finally, we delete the organization we had created for these projects
