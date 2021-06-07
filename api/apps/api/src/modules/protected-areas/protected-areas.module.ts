@@ -5,7 +5,7 @@ import { ProtectedAreasController } from './protected-areas.controller';
 import { ProtectedArea } from './protected-area.geo.entity';
 import { ProtectedAreasService } from './protected-areas.service';
 import { apiConnections } from '../../ormconfig';
-import { ProxyService } from 'modules/proxy/proxy.service';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 
 @Module({
   imports: [

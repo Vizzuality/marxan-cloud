@@ -33,7 +33,7 @@ import {
 } from './protected-areas.service';
 import { IUCNProtectedAreaCategoryResult } from './dto/iucn-protected-area-category.dto';
 import { Request, Response } from 'express';
-import { ProxyService } from 'modules/proxy/proxy.service';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
