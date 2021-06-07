@@ -15,6 +15,8 @@ import {
 import { tearDown } from './utils/tear-down';
 import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
 
 afterAll(async () => {
   await tearDown();
@@ -27,6 +29,11 @@ describe('ProjectsModule (e2e)', () => {
     keyForAttribute: 'camelCase',
   });
 
+  let anOrganization: Organization;
+  let minimalProject: Project;
+  let completeProject: Project;
+  let aScenarioInACompleteProject: Scenario;
+
   beforeAll(async () => {
     app = await bootstrapApplication();
     jwtToken = await GivenUserIsLoggedIn(app);
@@ -37,9 +44,6 @@ describe('ProjectsModule (e2e)', () => {
   });
 
   describe('Projects', () => {
-    let anOrganization: Organization;
-    let minimalProject: Project;
-
     test('Creates an organization', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/organizations')
@@ -77,6 +81,38 @@ describe('ProjectsModule (e2e)', () => {
       expect(jsonAPIResponse.data.type).toBe('projects');
     });
 
+    test('Creating a project with complete data should succeed', async () => {
+      const createProjectDTO: Partial<CreateProjectDTO> = {
+        ...E2E_CONFIG.projects.valid.complete({ countryCode: 'NAM' }),
+        organizationId: anOrganization.id,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/projects')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(createProjectDTO)
+        .expect(201);
+
+      const jsonAPIResponse: ProjectResultSingular = response.body;
+      completeProject = await Deserializer.deserialize(response.body);
+      expect(jsonAPIResponse.data.type).toBe('projects');
+
+      const createScenarioDTO: Partial<CreateScenarioDTO> = {
+        ...E2E_CONFIG.scenarios.valid.minimal(),
+        projectId: completeProject.id,
+      };
+
+      const scenarioResponse = await request(app.getHttpServer())
+        .post('/api/v1/scenarios')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(createScenarioDTO)
+        .expect(201);
+
+      aScenarioInACompleteProject = await Deserializer.deserialize(
+        scenarioResponse.body,
+      );
+    });
+
     test('A user should be able to get a list of projects', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
@@ -112,6 +148,13 @@ describe('ProjectsModule (e2e)', () => {
 
       expect(response1.body.data).toBeUndefined();
 
+      const response2 = await request(app.getHttpServer())
+        .delete(`/api/v1/projects/${completeProject.id}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      expect(response2.body.data).toBeUndefined();
+
       /**
        * Finally, we delete the organization we had created for these projects
        */
@@ -120,5 +163,29 @@ describe('ProjectsModule (e2e)', () => {
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
     });
+  });
+
+  test.skip('A user should be able to get a list of projects and related scenarios', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/v1/projects?disablePagination=true&include=scenarios')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(200);
+
+    const jsonAPIResponse: ProjectResultPlural = response.body;
+    const allProjects: Project[] = await Deserializer.deserialize(
+      response.body,
+    );
+
+    expect(jsonAPIResponse.data[0].type).toBe('projects');
+
+    const aKnownProject: Project | undefined = allProjects.find(
+      (i) => (i.id = completeProject.id),
+    );
+    expect(aKnownProject?.scenarios).toBeDefined();
+    expect(
+      aKnownProject?.scenarios?.find(
+        (i) => i.id === aScenarioInACompleteProject.id,
+      ),
+    ).toBeDefined();
   });
 });
