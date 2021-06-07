@@ -16,6 +16,7 @@ import { AnalysisModule } from '../analysis/analysis.module';
 import { CostSurfaceModule } from './cost-surface/cost-surface.module';
 import { ScenarioService } from './scenario.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
+import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ScenarioSerializer } from './dto/scenario.serializer';
     ProxyService,
     WdpaAreaCalculationService,
     ScenarioSerializer,
+    ScenarioFeatureSerializer,
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenarioService],
