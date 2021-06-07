@@ -7,12 +7,12 @@ import USERS from 'services/users';
 export function withProtection(getServerSidePropsFunc?: Function) {
   return async (context: any) => {
     const session = await getSession(context);
-    const { req } = context;
+    const { resolvedUrl } = context;
 
     if (!session) {
       return {
         redirect: {
-          destination: `/auth/sign-in?callbackUrl=${req.url}`, // referer url, path from node
+          destination: `/auth/sign-in?callbackUrl=${resolvedUrl}`,
           permanent: false,
         },
       };
