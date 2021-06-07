@@ -31,10 +31,12 @@ import { OutputFilesModule } from './output-files/output-files.module';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
 import { InputFilesModule } from './input-files';
 import { MarxanRunModule } from './marxan-run';
+import { GeoFeaturesModule } from '../geo-features/geo-features.module';
 
 @Module({
   imports: [
     CqrsModule,
+    GeoFeaturesModule,
     ProtectedAreasModule,
     forwardRef(() => ProjectsModule),
     TypeOrmModule.forFeature([
