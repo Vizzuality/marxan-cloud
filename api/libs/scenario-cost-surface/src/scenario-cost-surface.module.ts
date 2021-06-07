@@ -1,7 +1,10 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { CostSurfaceFileCache } from './cost-surface-file-cache.api.entity';
-import { ScenarioCostSurfaceRepository } from './scenario-cost-surface.repository';
+import {
+  EntityManagerToken,
+  ScenarioCostSurfaceRepository,
+} from './scenario-cost-surface.repository';
 
 @Module({})
 export class ScenarioCostSurfaceModule {
@@ -11,7 +14,13 @@ export class ScenarioCostSurfaceModule {
       imports: [
         TypeOrmModule.forFeature([CostSurfaceFileCache], connectionName),
       ],
-      providers: [ScenarioCostSurfaceRepository],
+      providers: [
+        ScenarioCostSurfaceRepository,
+        {
+          provide: EntityManagerToken,
+          useExisting: getEntityManagerToken(connectionName),
+        },
+      ],
       exports: [ScenarioCostSurfaceRepository],
     };
   }
