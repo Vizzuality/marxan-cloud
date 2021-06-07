@@ -20,7 +20,7 @@ describe('JSON API Specs (e2e)', () => {
   let jwtToken: string;
   let fakeOrganization: Organization;
   let fakeProject: Project;
-  const fakeCountry = 'ESP';
+
   const Deserializer = new JSONAPISerializer.Deserializer({
     keyForAttribute: 'camelCase',
   });
