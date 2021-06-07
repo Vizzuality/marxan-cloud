@@ -32,10 +32,12 @@ import {
 } from './input-parameter-file.provider';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
+import { GeoFeaturesModule } from '../geo-features/geo-features.module';
 
 @Module({
   imports: [
     CqrsModule,
+    GeoFeaturesModule,
     ProtectedAreasModule,
     forwardRef(() => ProjectsModule),
     TypeOrmModule.forFeature([Project, Scenario]),
