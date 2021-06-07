@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import cx from 'classnames';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
+import Button from 'components/button';
 import Modal from 'components/modal';
 
 import Pill from 'layout/pill';
@@ -91,19 +91,13 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <button
-              type="button"
-              className={cx({
-                'relative text-white bg-transparent hover:bg-gray-400 active:bg-gray-300 group p-0.5': true,
-                'text-base': true,
-                'flex items-center justify-center rounded-4xl focus:outline-none': true,
-              })}
+            <Button
+              theme="spacial"
+              size="lg"
               onClick={() => setRunOpen(true)}
             >
-              <div className="absolute top-0 bottom-0 left-0 right-0 z-0 rounded-4xl bg-gradient-to-r from-purple-500 to-blue-500" />
-              <div className="relative z-10 px-8 py-3 transition-colors bg-black rounded-4xl group-hover:bg-transparent">Run scenario</div>
-            </button>
-
+              Run scenario
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>
