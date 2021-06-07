@@ -1,10 +1,10 @@
 import React from 'react';
-import cx from 'classnames';
 
 import Link from 'next/link';
 
 import Wrapper from 'layout/wrapper';
 import User from 'layout/header/user';
+import MyProjects from 'layout/header/my-projects';
 import Title from 'layout/header/title';
 
 import Icon from 'components/icon';
@@ -20,10 +20,16 @@ export interface HeaderProps {
 
 const SIZE = {
   base: {
-    logo: 'h-12 w-28',
+    logo: {
+      width: 116,
+      height: 47,
+    },
   },
   lg: {
-    logo: 'h-20 w-36',
+    logo: {
+      width: 148,
+      height: 60,
+    },
   },
 };
 
@@ -35,23 +41,32 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
       className="w-full row-auto"
     >
       <Wrapper>
-        <nav className="relative flex flex-wrap items-center justify-between py-1 bg-black navbar-expand-lg">
+        <nav className="relative flex flex-wrap items-center justify-between bg-black navbar-expand-lg">
           <Link
             href="/"
           >
             <a href="/">
               <Icon
                 icon={LOGO_SVG}
-                className={cx({
-                  [`${SIZE[size].logo}`]: true,
-                })}
+                style={SIZE[size].logo}
               />
             </a>
           </Link>
 
           <Title />
 
-          <User />
+          <div
+            className="flex items-center space-x-5 divide-x divide-gray-500"
+            style={{
+              height: SIZE[size].logo.height + 10,
+            }}
+          >
+            <MyProjects />
+
+            <div className="flex items-center h-full pl-5">
+              <User />
+            </div>
+          </div>
 
           {!user && (
             <div className="flex items-center space-x-4">
