@@ -27,8 +27,8 @@ export class BboxResolver {
 
     if (
       relatedArea.gid0 !== adminAreas.countryId ||
-      relatedArea.gid1 !== adminAreas.adminAreaLevel1Id ||
-      relatedArea.gid2 !== adminAreas.adminAreaLevel2Id
+      (relatedArea.gid1 && relatedArea.gid1 !== adminAreas.adminAreaLevel1Id) ||
+      (relatedArea.gid2 && relatedArea.gid2 !== adminAreas.adminAreaLevel2Id)
     ) {
       throw new Error(`Resolved Admin Area does not match given levels.`);
     }

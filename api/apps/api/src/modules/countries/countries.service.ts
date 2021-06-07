@@ -31,6 +31,12 @@ export class CountriesService extends AppBaseService<
     });
   }
 
+  async getByGid0(country: string): Promise<Country | undefined> {
+    const query = this.repository.createQueryBuilder(this.alias);
+    query.where(`${this.alias}.gid0 = :country`, { country });
+    return await query.getOne();
+  }
+
   get serializerConfig(): JSONAPISerializerConfig<Country> {
     return {
       transform: (item: Country) => ({ ...item, id: item.gid0 }),
