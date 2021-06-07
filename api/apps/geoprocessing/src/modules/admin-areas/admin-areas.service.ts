@@ -16,8 +16,8 @@ import {
   IsNumber,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { AdminArea } from '@marxan-geoprocessing/modules/admin-areas/admin-areas.geo.entity';
 import { BBox } from 'geojson';
+import { AdminArea } from '@marxan/admin-regions';
 
 export class TileSpecification extends TileRequest {
   @ApiProperty()

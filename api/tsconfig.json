@@ -30,6 +30,12 @@
       ],
       "@marxan/scenarios-planning-unit/*": [
         "libs/scenarios-planning-unit/src/*"
+      ],
+      "@marxan/admin-regions": [
+        "libs/admin-regions/src"
+      ],
+      "@marxan/admin-regions/*": [
+        "libs/admin-regions/src/*"
       ]
     }
   },
