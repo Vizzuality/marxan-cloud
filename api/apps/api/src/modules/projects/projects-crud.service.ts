@@ -173,7 +173,7 @@ export class ProjectsCrudService extends AppBaseService<
           project.adminAreaLevel1Id!,
         )
       : project.countryId
-      ? await this.countriesService.getById(project.countryId)
+      ? await this.countriesService.getByGid0(project.countryId)
       : undefined;
     return planningArea;
   }
