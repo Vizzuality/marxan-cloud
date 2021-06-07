@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ProxyService } from 'modules/proxy/proxy.service';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { PlanningUnitsController } from './planning-units.controller';
 import { PlanningUnitsService } from './planning-units.service';
 

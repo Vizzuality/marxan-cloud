@@ -5,7 +5,7 @@ import { AdminArea } from '@marxan/admin-regions';
 import { AdminAreasController } from './admin-areas.controller';
 import { AdminAreasService } from './admin-areas.service';
 import { apiConnections } from '../../ormconfig';
-import { ProxyService } from 'modules/proxy/proxy.service';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 
 @Module({
   imports: [

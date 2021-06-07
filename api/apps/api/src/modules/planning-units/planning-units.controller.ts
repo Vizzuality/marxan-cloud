@@ -1,8 +1,8 @@
 import { Controller, UseGuards,Req, Res, Get} from "@nestjs/common";
 import { ApiBearerAuth, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
-import { apiGlobalPrefixes } from "api.config";
-import { JwtAuthGuard } from "guards/jwt-auth.guard";
-import { ProxyService } from "modules/proxy/proxy.service";
+import { apiGlobalPrefixes } from "@marxan-api/api.config";
+import { JwtAuthGuard } from "@marxan-api/guards/jwt-auth.guard";
+import { ProxyService } from "@marxan-api/modules/proxy/proxy.service";
 import { Request, Response } from 'express';
 
 @UseGuards(JwtAuthGuard)

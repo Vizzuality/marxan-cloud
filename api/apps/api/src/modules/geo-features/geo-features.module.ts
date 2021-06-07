@@ -10,7 +10,7 @@ import {
 import { GeoFeaturesController } from './geo-features.controller';
 import { GeoFeaturesService } from './geo-features.service';
 import { apiConnections } from '../../ormconfig';
-import { ProxyService } from 'modules/proxy/proxy.service';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 
 @Module({
   imports: [

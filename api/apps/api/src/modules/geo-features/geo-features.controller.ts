@@ -22,7 +22,7 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 import { Request, Response } from 'express';
-import { ProxyService } from 'modules/proxy/proxy.service';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { BBox} from 'geojson';
 
 @UseGuards(JwtAuthGuard)

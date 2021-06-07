@@ -18,7 +18,7 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import { ProxyService } from 'modules/proxy/proxy.service';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { Request, Response } from 'express';
 
 @UseGuards(JwtAuthGuard)
