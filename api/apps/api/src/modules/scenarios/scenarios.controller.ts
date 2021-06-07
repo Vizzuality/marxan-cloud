@@ -20,7 +20,7 @@ import {
   ScenarioResult,
 } from './scenario.api.entity';
 import { Request } from 'express';
-import { ScenariosService } from './scenarios.service';
+import { ScenariosCrudService } from './scenarios-crud.service';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
@@ -56,22 +56,14 @@ import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { ScenarioService } from '@marxan-api/modules/scenarios/scenario.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class ScenariosController {
-  private readonly geoprocessingUrl: string = AppConfig.get(
-    'geoprocessing.url',
-  ) as string;
-  constructor(
-    public readonly service: ScenariosService,
-    private readonly scenarioFeatures: ScenarioFeaturesService,
-    private readonly updatePlanningUnits: AdjustPlanningUnits,
-    private readonly costSurface: CostSurfaceFacade,
-    private readonly httpService: HttpService,
-  ) {}
+  constructor(private readonly scenariosService: ScenarioService) {}
 
   @ApiOperation({
     description: 'Find all scenarios',
@@ -165,6 +157,7 @@ export class ScenariosController {
       .toPromise();
     return geoJson;
   }
+
   @ApiOperation({ description: 'Update scenario' })
   @ApiOkResponse({ type: ScenarioResult })
   @Patch(':id')

@@ -6,7 +6,7 @@ import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { UsersService } from '@marxan-api/modules/users/users.service';
-import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
+import { ScenariosCrudService } from '@marxan-api/modules/scenarios/scenarios-crud.service';
 import { PlanningUnitsService } from '@marxan-api/modules/planning-units/planning-units.service';
 import {
   AppBaseService,
@@ -41,8 +41,8 @@ export class ProjectsCrudService extends AppBaseService<
   constructor(
     @InjectRepository(Project)
     protected readonly repository: Repository<Project>,
-    @Inject(forwardRef(() => ScenariosService))
-    protected readonly scenariosService: ScenariosService,
+    @Inject(forwardRef(() => ScenariosCrudService))
+    protected readonly scenariosService: ScenariosCrudService,
     @Inject(UsersService) protected readonly usersService: UsersService,
     @Inject(AdminAreasService)
     protected readonly adminAreasService: AdminAreasService,

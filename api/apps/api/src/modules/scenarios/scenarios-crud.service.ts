@@ -29,7 +29,7 @@ type ScenarioFilterKeys = keyof Pick<
 type ScenarioFilters = Record<ScenarioFilterKeys, string[]>;
 
 @Injectable()
-export class ScenariosService extends AppBaseService<
+export class ScenariosCrudService extends AppBaseService<
   Scenario,
   CreateScenarioDTO,
   UpdateScenarioDTO,
