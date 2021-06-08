@@ -11,6 +11,8 @@ import { RequestJobPort } from './providers/planning-units/request-job.port';
 import { AsyncJobsAdapter } from './providers/planning-units/adapters/async-jobs-adapter';
 import { QueueModule } from '../queue/queue.module';
 import { queueName } from './queue-name';
+import { UpdatePlanningUnitsApiEvents } from './providers/planning-units/adapters/update-planning-units-api-events';
+import { UpdatePlanningUnitsEventsPort } from './providers/planning-units/update-planning-units-events.port';
 
 @Module({
   imports: [
@@ -28,6 +30,10 @@ import { queueName } from './queue-name';
     },
     UpdatePlanningUnitsService,
     // internals - should be in adapters.module
+    {
+      provide: UpdatePlanningUnitsEventsPort,
+      useClass: UpdatePlanningUnitsApiEvents,
+    },
     {
       provide: ArePuidsAllowedPort,
       useClass: ArePuidsAllowedAdapter,
