@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpService,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -20,7 +19,6 @@ import {
   ScenarioResult,
 } from './scenario.api.entity';
 import { Request } from 'express';
-import { ScenariosService } from './scenarios.service';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
@@ -44,33 +42,26 @@ import {
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-
-import { ScenarioFeaturesService } from '../scenarios-features';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
 import { ProcessingStatusDto } from './dto/processing-status.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
-import { AdjustPlanningUnits } from '../analysis/entry-points/adjust-planning-units';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
-import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AppConfig } from '@marxan-api/utils/config.utils';
+import { ScenariosService } from './scenarios.service';
+import { ScenarioSerializer } from './dto/scenario.serializer';
+import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class ScenariosController {
-  private readonly geoprocessingUrl: string = AppConfig.get(
-    'geoprocessing.url',
-  ) as string;
   constructor(
-    public readonly service: ScenariosService,
-    private readonly scenarioFeatures: ScenarioFeaturesService,
-    private readonly updatePlanningUnits: AdjustPlanningUnits,
-    private readonly costSurface: CostSurfaceFacade,
-    private readonly httpService: HttpService,
+    private readonly service: ScenariosService,
+    private readonly scenarioSerializer: ScenarioSerializer,
+    private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
   ) {}
 
   @ApiOperation({
@@ -92,8 +83,8 @@ export class ScenariosController {
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioResult> {
-    const results = await this.service.findAllPaginated(fetchSpecification, {});
-    return this.service.serialize(results.data, results.metadata);
+    const results = await this.service.findAllPaginated(fetchSpecification);
+    return this.scenarioSerializer.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find scenario by id' })
@@ -106,7 +97,7 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioResult> {
-    return await this.service.serialize(
+    return await this.scenarioSerializer.serialize(
       await this.service.getById(id, fetchSpecification),
     );
   }
@@ -118,7 +109,7 @@ export class ScenariosController {
     @Body(new ValidationPipe()) dto: CreateScenarioDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ScenarioResult> {
-    return await this.service.serialize(
+    return await this.scenarioSerializer.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
     );
   }
@@ -130,15 +121,7 @@ export class ScenariosController {
     @Param('id') scenarioId: string,
     @Req() request: Request,
   ): Promise<void> {
-    // TODO #1 pre-validate scenarioId
-    /**
-     * Could be via interceptor
-     * (would require to not include @Res() and force-ignore http-proxy needs)
-     * or just ...BaseService
-     */
-
-    this.costSurface.convert(scenarioId, request.file);
-    return;
+    this.service.processCostSurfaceShapefile(scenarioId, request.file);
   }
 
   @ApiConsumesShapefile()
@@ -148,23 +131,9 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) scenarioId: string,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ShapefileGeoJSONResponseDTO> {
-    await this.service.getById(scenarioId);
-    /**
-     * @validateStatus is required for HttpService to not reject and wrap geoprocessing's response
-     * in case a shapefile is not validated and a status 4xx is sent back.
-     */
-    const { data: geoJson } = await this.httpService
-      .post(
-        `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
-        file,
-        {
-          headers: { 'Content-Type': 'application/json' },
-          validateStatus: (status) => status <= 499,
-        },
-      )
-      .toPromise();
-    return geoJson;
+    return this.service.uploadLockInShapeFile(scenarioId, file);
   }
+
   @ApiOperation({ description: 'Update scenario' })
   @ApiOkResponse({ type: ScenarioResult })
   @Patch(':id')
@@ -172,7 +141,9 @@ export class ScenariosController {
     @Param('id') id: string,
     @Body(new ValidationPipe()) dto: UpdateScenarioDTO,
   ): Promise<ScenarioResult> {
-    return await this.service.serialize(await this.service.update(id, dto));
+    return await this.scenarioSerializer.serialize(
+      await this.service.update(id, dto),
+    );
   }
 
   @ApiOperation({ description: 'Delete scenario' })
@@ -188,31 +159,15 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateScenarioPlanningUnitLockStatusDto,
   ): Promise<void> {
-    // TODO implement more flexible error results to propagate 4xx
-    await this.updatePlanningUnits.update(id, {
-      include: {
-        geo: input.byGeoJson?.include,
-        pu: input.byId?.include,
-      },
-      exclude: {
-        pu: input.byId?.exclude,
-        geo: input.byGeoJson?.exclude,
-      },
-    });
+    await this.service.changeLockStatus(id, input);
     return;
   }
 
   @Get(':id/planning-units')
   async planningUnitsStatus(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ProcessingStatusDto> {
-    // TODO call analysis-module's service
-
-    // TODO where exactly we should look for the status?
-    return {
-      status: JobStatus.running,
-    };
+    return this.service.getPendingJobs(id);
   }
 
   @ApiOperation({ description: `Resolve scenario's features pre-gap data.` })
@@ -223,14 +178,8 @@ export class ScenariosController {
   async getScenarioFeatures(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<Partial<RemoteScenarioFeaturesData>[]> {
-    return this.scenarioFeatures.serialize(
-      (
-        await this.scenarioFeatures.findAll(undefined, {
-          params: {
-            scenarioId: id,
-          },
-        })
-      )[0],
+    return this.scenarioFeatureSerializer.serialize(
+      await this.service.getFeatures(id),
     );
   }
 }
