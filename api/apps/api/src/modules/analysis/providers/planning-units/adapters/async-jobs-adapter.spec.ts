@@ -35,10 +35,7 @@ describe(`when requesting job`, () => {
       },
     });
 
-    expect(outcome).toEqual({
-      id: 'scenarioId',
-      status: 'running',
-    });
+    expect(outcome).toEqual(undefined);
 
     expect(addJobMock.mock.calls).toMatchInlineSnapshot(`
       Array [

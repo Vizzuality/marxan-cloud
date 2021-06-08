@@ -13,11 +13,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import {
-  JobStatus,
-  scenarioResource,
-  ScenarioResult,
-} from './scenario.api.entity';
+import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request } from 'express';
 import {
   FetchSpecification,
@@ -43,7 +39,6 @@ import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
-import { ProcessingStatusDto } from './dto/processing-status.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
@@ -161,13 +156,6 @@ export class ScenariosController {
   ): Promise<void> {
     await this.service.changeLockStatus(id, input);
     return;
-  }
-
-  @Get(':id/planning-units')
-  async planningUnitsStatus(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ProcessingStatusDto> {
-    return this.service.getPendingJobs(id);
   }
 
   @ApiOperation({ description: `Resolve scenario's features pre-gap data.` })

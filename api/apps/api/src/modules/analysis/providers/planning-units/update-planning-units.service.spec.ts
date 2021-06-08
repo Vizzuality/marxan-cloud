@@ -81,7 +81,7 @@ describe(`when PU IDs are available`, () => {
   });
 
   it(`requests the job to start`, async () => {
-    expect(await sut.update(scenarioId, payload)).toEqual(true);
+    expect(await sut.update(scenarioId, payload)).toEqual(undefined);
 
     expect(jobRequester.mock.mock.calls[0]).toEqual([
       {
