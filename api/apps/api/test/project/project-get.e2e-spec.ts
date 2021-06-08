@@ -75,7 +75,12 @@ describe(`When getting a single project`, () => {
       Object {
         "adminAreaLevel1Id": "NAM.13_1",
         "adminAreaLevel2Id": "NAM.13.5_1",
-        "bbox": null,
+        "bbox": Array [
+          24.100931167602596,
+          23.295501708984375,
+          -17.76286506652832,
+          -18.50404930114746,
+        ],
         "countryId": "NAM",
         "description": null,
         "planningAreaId": "NAM.13.5_1",
