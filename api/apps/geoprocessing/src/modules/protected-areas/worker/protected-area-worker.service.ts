@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { Job, Worker } from 'bullmq';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 import { WorkerBuilder } from '../../worker';
 import { ProtectedAreaProcessor } from './protected-area-processor';
 import { queueName } from './queue-name';
-import { ApiEvent } from '../../api-events';
+import { ApiEvent } from '@marxan-geoprocessing/modules/api-events';
 import { ProtectedAreasJobInput } from './worker-input';
-import { API_EVENT_KINDS } from '../../api-events/events.enum';
 
 @Injectable()
 export class ProtectedAreaWorkerService {

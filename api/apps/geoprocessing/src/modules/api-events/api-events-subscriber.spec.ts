@@ -1,8 +1,8 @@
 import { ApiEventsSubscriber } from './api-events-subscriber';
 import { CqrsModule, EventBus } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiEventsService } from './api-events.service';
-import { API_EVENT_KINDS } from './events.enum';
 import { ApiEvent } from './api.event';
 
 let eventForwarder: FakeForwarder;

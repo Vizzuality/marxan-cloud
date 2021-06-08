@@ -36,6 +36,12 @@
       ],
       "@marxan/admin-regions/*": [
         "libs/admin-regions/src/*"
+      ],
+      "@marxan/api-events": [
+        "libs/api-events/src"
+      ],
+      "@marxan/api-events/*": [
+        "libs/api-events/src/*"
       ]
     }
   },

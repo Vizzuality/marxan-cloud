@@ -106,7 +106,7 @@ describe(`when shapefile was converted to geojson`, () => {
 
       it(`should throw`, async () => {
         await expect(sut.process(getJob(scenarioId))).rejects.toThrow(
-          /Missing/,
+          /is not a part of this project/,
         );
         expect(puRepo.mock).toHaveBeenCalledWith(scenarioId);
       });

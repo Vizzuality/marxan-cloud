@@ -1,9 +1,8 @@
+import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { IsEnum } from 'class-validator';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-
-import { API_EVENT_KINDS } from './api-event.api.entity';
 
 export class ApiEventByTopicAndKind {
   @Column('timestamp without time zone', {

@@ -26,13 +26,13 @@ import {
 import { DeleteResult } from 'typeorm';
 
 import {
-  API_EVENT_KINDS,
   ApiEvent,
   ApiEventResult,
   QualifiedEventTopic,
 } from './api-event.api.entity';
 import { ApiEventsService } from './api-events.service';
 import { CreateApiEventDTO } from './dto/create.api-event.dto';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 
 @Controller(`${apiGlobalPrefixes.v1}/api-events`)
 @UseGuards(XApiGuard)
