@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { UseAdminPreviewLayer, UsePUGridPreviewLayer } from './types';
+import { UseAdminPreviewLayer, UsePUGridPreviewLayer, UseWDPAPreviewLayer } from './types';
 
 // AdminPreview
 export function useAdminPreviewLayer({
@@ -68,4 +68,42 @@ export function usePUGridPreviewLayer({
       },
     };
   }, [bbox, planningUnitGridShape, planningUnitAreakm2]);
+}
+
+// PUGridpreview
+export function useWDPAPreviewLayer({
+  bbox, wdpaIucnCategories,
+}: UseWDPAPreviewLayer) {
+  return useMemo(() => {
+    if (!bbox) return null;
+
+    console.log(wdpaIucnCategories);
+
+    return {
+      id: 'wdpa-preview-layer',
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'fill',
+            'source-layer': 'layer0',
+            paint: {
+              'fill-color': '#00BFFF',
+            },
+          },
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-color': '#000',
+            },
+          },
+        ],
+      },
+    };
+  }, [bbox, wdpaIucnCategories]);
 }

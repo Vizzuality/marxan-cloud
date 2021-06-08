@@ -20,7 +20,11 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
-  const [bounds, setBounds] = useState({});
+  const [bounds, setBounds] = useState({
+    bbox: [-0.72675204, -2.50003099, 43.31418991, 41.90989685],
+    options: { padding: 50 },
+    viewportOptions: { transitionDuration: 0 },
+  });
 
   const { query } = useRouter();
   const { pid } = query;
@@ -57,9 +61,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           exit={{ y: -10, opacity: 0 }}
         >
           <Map
-            // bounds={{
-            //   bbox: [-1, 40, 1, 42],
-            // }}
+            bounds={bounds}
             width="100%"
             height="100%"
             minZoom={minZoom}
