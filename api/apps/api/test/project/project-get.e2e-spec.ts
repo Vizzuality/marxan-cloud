@@ -26,9 +26,8 @@ describe(`When getting all projects`, () => {
       world.projectWithGid1,
       world.projectWithGid2,
     ];
-    console.log(`currentProjects`, currentProjects);
     const response = await request(app.getHttpServer())
-      .get(`/api/v1/projects`)
+      .get(`/api/v1/projects?disablePagination=true`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .expect(200);
 
@@ -76,6 +75,7 @@ describe(`When getting a single project`, () => {
       Object {
         "adminAreaLevel1Id": "NAM.13_1",
         "adminAreaLevel2Id": "NAM.13.5_1",
+        "bbox": null,
         "countryId": "NAM",
         "description": null,
         "planningAreaId": "NAM.13.5_1",
