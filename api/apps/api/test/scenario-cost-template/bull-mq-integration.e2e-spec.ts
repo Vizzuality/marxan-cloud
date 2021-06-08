@@ -96,6 +96,7 @@ const getFixtures = async () => {
     },
     async cleanup() {
       await Promise.all(addedJobIds.map((id) => queue.remove(id)));
+      await queue.drain();
       await Promise.all(workers.map((worker) => worker.disconnect()));
     },
     getBullmqQueue() {

@@ -32,7 +32,7 @@ export class ScenarioCostSurfaceRepository {
     private readonly entityManager: EntityManager,
   ) {}
 
-  async create(
+  async save(
     entityToSave: Pick<
       CostSurfaceFileCache,
       typeof createCostSurfaceFileCacheFields[number]
@@ -102,6 +102,29 @@ export class ScenarioCostSurfaceRepository {
       await new Promise((resolve, reject) => {
         artifactStream.on('end', resolve).on('error', reject).pipe(output);
       });
+    });
+  }
+
+  async remove(scenarioId: string, artifactType: ArtifactType): Promise<void> {
+    await this.entityManager.transaction(async (transactionalEntityManager) => {
+      const repository = transactionalEntityManager.getRepository(
+        CostSurfaceFileCache,
+      );
+      const cacheEntity = await repository.findOne({
+        scenarioId,
+        artifactType,
+      });
+      if (!cacheEntity) {
+        return;
+      }
+      const artifactOid = cacheEntity.artifact;
+      if (isDefined(artifactOid)) {
+        const largeObjectManager = await this.createLargeObjectManager(
+          transactionalEntityManager,
+        );
+        await largeObjectManager.unlinkAsync(artifactOid);
+      }
+      await repository.delete(cacheEntity.id);
     });
   }
 

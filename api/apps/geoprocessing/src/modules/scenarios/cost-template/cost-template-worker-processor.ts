@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   WorkerBuilder,
   WorkerProcessor,
@@ -6,6 +6,8 @@ import {
 import { Job, Worker } from 'bullmq';
 import { CostTemplateGenerator } from './cost-template-generator';
 import { assertDefined } from '@marxan/utils';
+import { IsUUID, validate } from 'class-validator';
+import { plainToClass } from 'class-transformer';
 
 export const queueName = 'cost-surface-template-creation';
 
@@ -13,6 +15,7 @@ export const queueName = 'cost-surface-template-creation';
 export class CostTemplateWorkerProcessor
   implements WorkerProcessor<void, void> {
   private readonly worker: Worker;
+  private readonly logger = new Logger(this.constructor.name);
 
   constructor(
     private readonly costTemplateGenerator: CostTemplateGenerator,
@@ -23,7 +26,30 @@ export class CostTemplateWorkerProcessor
 
   async process(job: Job<void, void>): Promise<void> {
     const jobId = job.id;
+    new Logger().log({ got: jobId });
     assertDefined(jobId);
-    await this.costTemplateGenerator.createTemplateShapefile(jobId);
+    await this.validateJob(job);
+    await this.costTemplateGenerator
+      .createTemplateShapefile(jobId)
+      .catch(console.log);
   }
+
+  private async validateJob(job: Job<void, void>) {
+    const jobClass = plainToClass(JobValidator, {
+      id: job.id,
+    });
+    const errors = await validate(jobClass);
+    if (errors.length > 0) {
+      this.logger.warn({
+        message: `invalid job`,
+        job,
+      });
+      throw new Error(`invalid job ${jobClass.id}`);
+    }
+  }
+}
+
+class JobValidator {
+  @IsUUID()
+  id!: string;
 }
