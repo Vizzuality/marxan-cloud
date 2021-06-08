@@ -10,6 +10,7 @@ import { TileModule } from './modules/tile/tile.module';
 import { FeaturesModule } from '@marxan-geoprocessing/modules/features/features.module';
 import { ApiEventsModule } from './modules/api-events/api-events.module';
 import { SurfaceCostModule } from './modules/surface-cost/surface-cost.module';
+import { ScenarioPlanningUnitsInclusionModule } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/scenario-planning-units-inclusion.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SurfaceCostModule } from './modules/surface-cost/surface-cost.module';
     FeaturesModule,
     ApiEventsModule,
     SurfaceCostModule,
+    ScenarioPlanningUnitsInclusionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
