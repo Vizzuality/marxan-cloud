@@ -11,7 +11,7 @@ import { FeaturesModule } from '@marxan-geoprocessing/modules/features/features.
 import { ApiEventsModule } from './modules/api-events/api-events.module';
 import { SurfaceCostModule } from './modules/surface-cost/surface-cost.module';
 import { ScenarioPlanningUnitsInclusionModule } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/scenario-planning-units-inclusion.module';
-import { CostTemplateModule } from './modules/scenarios/cost-template/cost-template.module';
+import { CostTemplateModule } from '@marxan-geoprocessing/modules/scenarios';
 
 @Module({
   imports: [
