@@ -24,6 +24,7 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { AdminArea } from '@marxan/admin-regions';
 import { BboxResolver } from './bbox/bbox-resolver';
 import { Polygon } from 'geojson';
+import { FetchSpecification } from 'nestjs-base-service';
 
 const projectFilterKeyNames = [
   'name',
@@ -78,6 +79,8 @@ export class ProjectsCrudService extends AppBaseService<
         'scenarios',
         'createdAt',
         'lastModifiedAt',
+        'planningAreaId',
+        'planningAreaName',
       ],
       keyForAttribute: 'camelCase',
       users: {
@@ -259,5 +262,37 @@ export class ProjectsCrudService extends AppBaseService<
         `Missing bbox for given admin region.`,
       );
     }
+  }
+
+  async extendGetByIdResult(
+    entity: Project,
+    _fetchSpecification?: FetchSpecification,
+    _info?: AppInfoDTO,
+  ): Promise<Project> {
+    const relatedAdminArea = await this.getPlanningArea(entity);
+    if (relatedAdminArea) {
+      entity.planningAreaId =
+        relatedAdminArea.gid2 ||
+        relatedAdminArea.gid1 ||
+        relatedAdminArea.gid0 ||
+        undefined;
+      entity.planningAreaName =
+        relatedAdminArea.name2 ||
+        relatedAdminArea.name1 ||
+        relatedAdminArea.name0 ||
+        undefined;
+    }
+    return entity;
+  }
+
+  async extendFindAllResults(
+    entitiesAndCount: [Project[], number],
+    _fetchSpecification?: FetchSpecification,
+    _info?: AppInfoDTO,
+  ): Promise<[Project[], number]> {
+    const extendedEntities: Promise<Project>[] = entitiesAndCount[0].map(
+      (entity) => this.extendGetByIdResult(entity),
+    );
+    return [await Promise.all(extendedEntities), entitiesAndCount[1]];
   }
 }

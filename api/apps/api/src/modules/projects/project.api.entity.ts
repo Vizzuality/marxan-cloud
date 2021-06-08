@@ -15,6 +15,7 @@ import { Organization } from '../organizations/organization.api.entity';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { BBox } from 'geojson';
+
 export const projectResource: BaseServiceResource = {
   className: 'Project',
   name: {
@@ -147,6 +148,18 @@ export class Project extends TimeUserEntityMetadata {
   })
   @ManyToMany((_type) => User, (user) => user.projects, { eager: true })
   users?: Partial<User>[];
+
+  // Non Entity
+
+  @ApiPropertyOptional({
+    description: "ID of Country / Gid1 / Gid2 of project's area",
+  })
+  planningAreaId?: string;
+
+  @ApiPropertyOptional({
+    description: "Display name of Country / Gid1 / Gid2 of project's area",
+  })
+  planningAreaName?: string;
 }
 
 export class JSONAPIProjectData {

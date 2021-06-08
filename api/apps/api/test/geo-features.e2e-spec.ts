@@ -1,11 +1,6 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { PromiseType } from 'utility-types';
-
-import { E2E_CONFIG } from './e2e.config';
-
-import { OrganizationsTestUtils } from './utils/organizations.test.utils';
-import { ProjectsTestUtils } from './utils/projects.test.utils';
 import {
   GeoFeature,
   geoFeatureResource,
@@ -13,6 +8,8 @@ import {
 import { tearDown } from './utils/tear-down';
 import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+
+import { createWorld } from './project/projects-world';
 
 afterAll(async () => {
   await tearDown();
@@ -114,68 +111,3 @@ describe('GeoFeaturesModule (e2e)', () => {
     });
   });
 });
-
-/**
- * See note about the choice of country and admin area codes for the
- * following project creation operations in `protected-areas.e2e-spec.ts`.
- */
-const country = 'NAM';
-const l1AdminArea = 'NAM.13_1';
-const l2AdminArea = 'NAM.13.5_1';
-
-const createWorld = async (app: INestApplication, jwtToken: string) => {
-  const organizationId = (
-    await OrganizationsTestUtils.createOrganization(
-      app,
-      jwtToken,
-      E2E_CONFIG.organizations.valid.minimal(),
-    )
-  ).data.id;
-
-  const projectWithCountry = (
-    await ProjectsTestUtils.createProject(app, jwtToken, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: country,
-      }),
-      organizationId,
-    })
-  ).data.id;
-
-  const projectWithGid1 = (
-    await ProjectsTestUtils.createProject(app, jwtToken, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: country,
-        adminAreaLevel1Id: l1AdminArea,
-      }),
-      organizationId,
-    })
-  ).data.id;
-
-  const projectWithGid2 = (
-    await ProjectsTestUtils.createProject(app, jwtToken, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: country,
-        adminAreaLevel1Id: l1AdminArea,
-        adminAreaLevel2Id: l2AdminArea,
-      }),
-      organizationId,
-    })
-  ).data.id;
-
-  return {
-    organizationId,
-    projectWithCountry,
-    projectWithGid1,
-    projectWithGid2,
-    cleanup: async () => {
-      await ProjectsTestUtils.deleteProject(app, jwtToken, projectWithGid2);
-      await ProjectsTestUtils.deleteProject(app, jwtToken, projectWithGid1);
-      await ProjectsTestUtils.deleteProject(app, jwtToken, projectWithCountry);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        jwtToken,
-        organizationId,
-      );
-    },
-  };
-};
