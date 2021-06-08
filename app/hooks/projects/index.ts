@@ -40,7 +40,7 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
   return useMemo(() => {
     let parsedData = Array.isArray(data?.data?.data) ? data?.data?.data.map((d):ItemProps => {
       const {
-        id, name, description, scenarios, lastModifiedAt,
+        id, name, description, lastModifiedAt, scenarios, planningAreaName,
       } = d;
 
       const lastUpdate = scenarios.reduce((acc, s) => {
@@ -59,7 +59,7 @@ export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
 
       return {
         id,
-        area: 'Planning area name',
+        area: planningAreaName || 'Custom area name',
         name,
         description,
         lastUpdate,

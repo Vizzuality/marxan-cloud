@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -20,16 +20,20 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
-  const [bounds, setBounds] = useState({
-    bbox: [-0.72675204, -2.50003099, 43.31418991, 41.90989685],
-    options: { padding: 50 },
-    viewportOptions: { transitionDuration: 0 },
-  });
+  const [bounds, setBounds] = useState(null);
 
   const { query } = useRouter();
   const { pid } = query;
   const { data = {} } = useProject(pid);
-  const { id } = data;
+  const { id, bbox } = data;
+
+  useEffect(() => {
+    setBounds({
+      bbox,
+      options: { padding: 50 },
+      viewportOptions: { transitionDuration: 0 },
+    });
+  }, [bbox]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);

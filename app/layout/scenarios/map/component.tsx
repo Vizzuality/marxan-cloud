@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useState,
+  useCallback, useEffect, useState,
 } from 'react';
 
 // Map
@@ -18,8 +18,9 @@ import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
-
+import { useProject } from 'hooks/projects';
 import { useWDPAPreviewLayer } from 'hooks/map';
+
 import ScenariosDrawingManager from './drawing-manager';
 
 export interface ScenariosMapProps {
@@ -29,7 +30,10 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const [session] = useSession();
 
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
+
+  const { data = {} } = useProject(pid);
+  const { bbox } = data;
 
   const scenarioSlice = getScenarioSlice(sid);
   const { setClickingValue } = scenarioSlice.actions;
@@ -41,11 +45,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
-  const [bounds, setBounds] = useState({
-    bbox: [-0.72675204, -2.50003099, 43.31418991, 41.90989685],
-    options: { padding: 50 },
-    viewportOptions: { transitionDuration: 0 },
-  });
+  const [bounds, setBounds] = useState(null);
 
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
@@ -54,6 +54,14 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   });
 
   const LAYERS = [WDPApreviewLayer];
+
+  useEffect(() => {
+    setBounds({
+      bbox,
+      options: { padding: 50 },
+      viewportOptions: { transitionDuration: 0 },
+    });
+  }, [bbox]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
