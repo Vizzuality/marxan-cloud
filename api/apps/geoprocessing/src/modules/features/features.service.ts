@@ -10,6 +10,7 @@ import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { BBox } from 'geojson';
+import { BboxUtils } from '@marxan-geoprocessing/utils/bbox.utils';
 
 export class TileSpecification extends TileRequest {
   @ApiProperty()
@@ -37,6 +38,8 @@ export class FeatureService {
     private readonly featuresRepository: Repository<GeoFeatureGeometry>,
     @Inject(TileService)
     private readonly tileService: TileService,
+    @Inject(BboxUtils)
+    private readonly bboxUtils: BboxUtils,
   ) {}
 
   /**
@@ -44,10 +47,12 @@ export class FeatureService {
    * @todo generate the custom queries using query builder and the entity data.
    * @todo move the string to int transformation to the AdminAreaLevelFilters class
    */
+
   buildFeaturesWhereQuery(id: string, bbox?: BBox): string {
     let whereQuery = `feature_id = '${id}'`;
+
     if (bbox) {
-      whereQuery += `AND the_geom && ST_MakeEnvelope(${bbox}, 4326)`;
+      whereQuery += `AND st_intersects(ST_MakeEnvelope(${this.bboxUtils.nominatim2bbox(bbox)}, 4326), the_geom)`;
     }
     return whereQuery;
   }

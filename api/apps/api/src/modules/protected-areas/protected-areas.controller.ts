@@ -75,7 +75,8 @@ export class ProtectedAreasController {
    *@todo Change ApiOkResponse mvt type
    */
   @ApiOkResponse({
-    type: 'mvt',
+    description: 'Binary protobuffer mvt tile',
+    type: String,
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()

@@ -23,8 +23,8 @@ export class PlanningUnitsController {
    *@reference https://docs.ogc.org/per/19-069.html#_openapi_example_for_vector_tiles
    */
   @ApiOkResponse({
-    description: 'Binary tile succesful retrieve',
-    type: String
+    description: 'Binary protobuffer mvt tile',
+    type: String,
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
@@ -33,30 +33,35 @@ export class PlanningUnitsController {
     description: 'The zoom level ranging from 0 - 20',
     type: Number,
     required: true,
+    example: '5'
   })
   @ApiParam({
     name: 'x',
     description: 'The tile x offset on Mercator Projection',
     type: Number,
     required: true,
+    example: '5'
   })
   @ApiParam({
     name: 'y',
     description: 'The tile y offset on Mercator Projection',
     type: Number,
     required: true,
+    example: '5'
   })
   @ApiParam({
     name: 'planningUnitGridShape',
     description: 'Planning unit grid shape',
     type: String,
     required: true,
+    example: 'square'
   })
   @ApiParam({
     name: 'planningUnitAreakm2',
     description: 'Planning unit area in km2',
     type: Number,
     required: true,
+    example: 100
   })
   @ApiQuery({
     name: 'bbox',

@@ -11,6 +11,7 @@ import { BBox } from 'geojson';
 import { Transform } from 'class-transformer';
 
 import { PlanningUnitsGeom } from '@marxan-geoprocessing/modules/planning-units/planning-units.geo.entity';
+import { BboxUtils } from '@marxan-geoprocessing/utils/bbox.utils';
 
 export class tileSpecification extends TileRequest {
   @ApiProperty()
@@ -43,6 +44,8 @@ export class PlanningUnitsService {
     private readonly planningUnitsRepository: Repository<PlanningUnitsGeom>,
     @Inject(TileService)
     private readonly tileService: TileService,
+    @Inject(BboxUtils)
+    private readonly bboxUtils: BboxUtils,
   ) {}
 
   /**
@@ -95,7 +98,7 @@ export class PlanningUnitsService {
     // If so the shape we are getting is down the optimal to visualize it
     if ( ratioPixelExtent < 8){
       Query = `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
-        ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom)`;
+        ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom )`;
     }
 
     return Query;
@@ -108,17 +111,13 @@ export class PlanningUnitsService {
    * If any value is not provided, 4000 would be the default.
    */
   buildPlanningUnitsWhereQuery(
-    x: number,
-    y: number,
-    z: number,
-    planningUnitGridShape: PlanningUnitGridShape,
-    planningUnitAreakm2: number,
     filters?: PlanningUnitsFilters,
   ): string {
-    let whereQuery = `st_intersects(the_geom, ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 4326), 3857)))`;
+    let whereQuery = ``;
 
     if (filters?.bbox) {
-      whereQuery += ` && ST_Transform(ST_MakeEnvelope(${filters.bbox}), 3857))`;
+      this.logger.debug('Im a bbox')
+      whereQuery =`st_intersects(ST_Transform(ST_MakeEnvelope(${this.bboxUtils.nominatim2bbox(filters.bbox)}, 4326), 3857) ,the_geom)`;
     }
     return whereQuery;
   }
@@ -149,6 +148,9 @@ export class PlanningUnitsService {
       planningUnitAreakm2,
       filters
       );
+    const customQuery = this.buildPlanningUnitsWhereQuery(
+      filters
+    )
 
     return this.tileService.getTile({
       z,
@@ -156,7 +158,8 @@ export class PlanningUnitsService {
       y,
       table,
       attributes,
-      inputProjection
+      inputProjection,
+      customQuery
     });
   }
 }

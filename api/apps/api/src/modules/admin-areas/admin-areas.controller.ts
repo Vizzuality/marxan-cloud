@@ -73,7 +73,8 @@ export class AdminAreasController {
    *@todo Change ApiOkResponse mvt type
    */
   @ApiOkResponse({
-    type: 'mvt',
+    description: 'Binary protobuffer mvt tile',
+    type: String,
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
@@ -105,7 +106,7 @@ export class AdminAreasController {
   })
   @ApiQuery({
     name: 'guid',
-    description: 'Parent country of administrative areas in ISO code',
+    description: 'Parent country of administrative areas in guid code',
     type: String,
     required: false,
     example: 'BRA.1_1',

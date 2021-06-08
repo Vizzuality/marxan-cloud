@@ -23,7 +23,6 @@ import {
 } from 'nestjs-base-service';
 import { Request, Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
-import { BBox} from 'geojson';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -59,7 +58,8 @@ export class GeoFeaturesController {
    *@todo Change ApiOkResponse mvt type
    */
   @ApiOkResponse({
-    type: 'mvt',
+    description: 'Binary protobuffer mvt tile',
+    type: String,
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()

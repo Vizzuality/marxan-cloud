@@ -5,14 +5,22 @@ import {
 } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { ProtectedArea } from '@marxan-geoprocessing/modules/protected-areas/protected-areas.geo.entity';
+import { BBox } from 'geojson';
+import { Transform } from 'class-transformer';
+import { BboxUtils } from '@marxan-geoprocessing/utils/bbox.utils';
 
 export class ProtectedAreasFilters {
   @IsOptional()
   @IsString()
   id?: string;
+
+  @IsOptional()
+  @IsNumber({}, { each: true })
+  @Transform((value: string): BBox => JSON.parse(value))
+  bbox?: BBox;
 }
 
 @Injectable()
@@ -23,7 +31,24 @@ export class ProtectedAreasService {
     private readonly protectedAreasRepository: Repository<ProtectedArea>,
     @Inject(TileService)
     private readonly tileService: TileService,
+    @Inject(BboxUtils)
+    private readonly bboxUtils: BboxUtils,
   ) {}
+
+  /**
+   * @param filters bounding box of the area where the grids would be generated
+   */
+   buildProtectedAreasWhereQuery(
+    filters?: ProtectedAreasFilters,
+  ): string | undefined {
+    let whereQuery = undefined;
+    whereQuery = filters?.id ? ` id = '${filters?.id}'` : undefined;
+    if (filters?.bbox) {
+      const bboxIntersect =`st_intersects(ST_MakeEnvelope(${this.bboxUtils.nominatim2bbox(filters.bbox)}, 4326), the_geom)`;
+      whereQuery = whereQuery ? `${whereQuery} and ${bboxIntersect}`: bboxIntersect;
+    }
+    return whereQuery;
+  }
 
   /**
    * @todo get attributes from Entity, based on user selection
@@ -33,16 +58,16 @@ export class ProtectedAreasService {
     filters?: ProtectedAreasFilters,
   ): Promise<Buffer> {
     const { z, x, y } = tileSpecification;
-    const attributes = 'full_name, status, wdpaid';
+    const attributes = 'full_name, status, wdpaid, iucn_cat';
     const table = this.protectedAreasRepository.metadata.tableName;
-    const customQuery = filters?.id ? ` id = '${filters?.id}'` : undefined;
+    const customQuery = this.buildProtectedAreasWhereQuery(filters);
     return this.tileService.getTile({
       z,
       x,
       y,
       table,
-      customQuery,
       attributes,
+      customQuery,
     });
   }
 }

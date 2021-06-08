@@ -120,16 +120,18 @@ export class TileService {
             ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom`,
           );
 
-          subQuery.from(table, '').where(
+          subQuery.from(table, 'data').where(
           `ST_Intersects(ST_Transform(ST_TileEnvelope(:z, :x, :y), ${inputProjection}), ${geometry} )`,
             { z, x, y },
             );
+        this.logger.debug(customQuery)
         if (customQuery) {
           subQuery.andWhere(customQuery);
         }
         return subQuery;
       }, 'tile');
-    const result = await query.printSql().getRawMany();
+      this.logger.debug(query.getSql())
+    const result = await query.getRawMany();
 
     if (result) {
       return result;

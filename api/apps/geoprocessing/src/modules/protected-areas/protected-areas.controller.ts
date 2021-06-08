@@ -17,6 +17,7 @@ import {
   ApiParam,
   ApiQuery,
   ApiBadRequestResponse,
+  ApiOkResponse,
 } from '@nestjs/swagger';
 import { TileRequest } from '@marxan-geoprocessing/modules/tile/tile.service';
 
@@ -55,7 +56,18 @@ export class ProtectedAreasController {
     required: false,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
+  @ApiQuery({
+    name: 'bbox',
+    description: 'Bounding box of the project [xMin, xMax, yMin, yMax]',
+    type: [Number],
+    required: false,
+    example: [-1, 40, 1, 42],
+  })
   @Get('/preview/tiles/:z/:x/:y.mvt')
+  @ApiOkResponse({
+    description: 'Binary protobuffer mvt tile',
+    type: String,
+  })
   @ApiBadRequestResponse()
   @Header('Content-Type', 'application/x-protobuf')
   @Header('Content-Disposition', 'attachment')
@@ -63,10 +75,10 @@ export class ProtectedAreasController {
   @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() tileRequest: TileRequest,
-    @Query() { id }: ProtectedAreasFilters,
+    @Query() protectedAreasFilters: ProtectedAreasFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(tileRequest, { id });
+    const tile: Buffer = await this.service.findTile(tileRequest, protectedAreasFilters);
     return response.send(tile);
   }
 }
