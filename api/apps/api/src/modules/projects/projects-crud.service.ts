@@ -81,7 +81,7 @@ export class ProjectsCrudService extends AppBaseService<
         'lastModifiedAt',
         'planningAreaId',
         'planningAreaName',
-        'bbox'
+        'bbox',
       ],
       keyForAttribute: 'camelCase',
       users: {
