@@ -4,6 +4,8 @@ import { apiGlobalPrefixes } from "@marxan-api/api.config";
 import { JwtAuthGuard } from "@marxan-api/guards/jwt-auth.guard";
 import { ProxyService } from "@marxan-api/modules/proxy/proxy.service";
 import { Request, Response } from 'express';
+import { Binary } from "typeorm";
+import { string } from "purify-ts";
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -18,10 +20,11 @@ export class PlanningUnitsController {
     description: 'Get planning unit geometries.',
   })
   /**
-   *@todo Change ApiOkResponse mvt type
+   *@reference https://docs.ogc.org/per/19-069.html#_openapi_example_for_vector_tiles
    */
   @ApiOkResponse({
-    type: 'mvt',
+    description: 'Binary tile succesful retrieve',
+    type: String
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
