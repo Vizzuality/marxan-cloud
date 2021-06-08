@@ -10,11 +10,13 @@ import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.mo
 import { CountriesModule } from '@marxan-api/modules/countries/countries.module';
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
 import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
+import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
 import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
 import { ProjectsService } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
 import { BboxResolver } from './bbox/bbox-resolver';
+import { JobStatusService } from './job-status/job-status.service';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { BboxResolver } from './bbox/bbox-resolver';
     UsersModule,
     PlanningUnitsModule,
     ProtectedAreasModule,
+    ApiEventsModule,
   ],
   providers: [
     ProjectsCrudService,
@@ -33,6 +36,7 @@ import { BboxResolver } from './bbox/bbox-resolver';
     GeoFeatureSerializer,
     ProjectSerializer,
     BboxResolver,
+    JobStatusService,
   ],
   controllers: [ProjectsController],
   exports: [ProjectsCrudService],

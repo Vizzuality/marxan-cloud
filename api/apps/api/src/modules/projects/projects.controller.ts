@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   NotFoundException,
+  NotImplementedException,
   Param,
   Patch,
   Post,
@@ -50,6 +51,9 @@ import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import { ProjectsService } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
+import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
+import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { JobType } from './job-status/jobs.enum';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -170,6 +174,38 @@ export class ProjectsController {
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
     return await this.projectsService.remove(id);
+  }
+
+  @ApiOperation({
+    description: `Find running jobs for each scenario under given project`,
+  })
+  @ApiOkResponse({ type: ProjectJobsStatusDto })
+  @Get(`:id/scenarios/status`)
+  async getJobsForProjectScenarios(
+    @Param('id') projectId: string,
+  ): Promise<ProjectJobsStatusDto> {
+    // TODO add JobStatus DTO
+    // TODO add serializer
+    return {
+      data: {
+        id: projectId,
+        type: 'project-jobs',
+        attributes: {
+          scenarios: [
+            {
+              id: projectId,
+              status: JobStatus.running,
+              jobs: [
+                {
+                  kind: JobType.CostSurface,
+                  status: JobStatus.running,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    };
   }
 
   @ApiConsumesShapefile(false)
