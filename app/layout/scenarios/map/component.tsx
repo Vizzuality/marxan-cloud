@@ -6,8 +6,8 @@ import React, {
 import Map from 'components/map';
 // import LAYERS from 'components/map/layers';
 
-import { LayerManager, Layer } from 'layer-manager/dist/components';
-import { PluginMapboxGl } from 'layer-manager';
+import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 
 // Controls
 import Controls from 'components/map/controls';
