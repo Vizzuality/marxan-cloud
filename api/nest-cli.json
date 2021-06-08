@@ -61,6 +61,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/api-events/tsconfig.lib.json"
       }
+    },
+    "planning-unit-geometry": {
+      "type": "library",
+      "root": "libs/planning-unit-geometry",
+      "entryFile": "index",
+      "sourceRoot": "libs/planning-unit-geometry/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/planning-unit-geometry/tsconfig.lib.json"
+      }
     }
   }
 }
