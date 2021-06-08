@@ -52,6 +52,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/admin-regions/tsconfig.lib.json"
       }
+    },
+    "api-events": {
+      "type": "library",
+      "root": "libs/api-events",
+      "entryFile": "index",
+      "sourceRoot": "libs/api-events/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/api-events/tsconfig.lib.json"
+      }
     }
   }
 }

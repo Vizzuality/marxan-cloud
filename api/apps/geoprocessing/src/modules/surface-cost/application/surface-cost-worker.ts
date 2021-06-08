@@ -2,10 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { Job, Worker } from 'bullmq';
 
-import {
-  API_EVENT_KINDS,
-  ApiEvent,
-} from '@marxan-geoprocessing/modules/api-events';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ApiEvent } from '@marxan-geoprocessing/modules/api-events';
 import { WorkerBuilder } from '@marxan-geoprocessing/modules/worker';
 
 import { CostSurfaceJobInput } from '../cost-surface-job-input';

@@ -1,9 +1,9 @@
 import { Test } from '@nestjs/testing';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import Axios from 'axios';
 import { HttpService } from '@nestjs/common';
 import { ApiEventsService } from '../src/modules/api-events/api-events.service';
-import { API_EVENT_KINDS } from '../src/modules/api-events/events.enum';
 import * as config from 'config';
 
 let sut: ApiEventsService;

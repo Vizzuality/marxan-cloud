@@ -1,7 +1,3 @@
-/**
- * duplicated
- * @file api/src/modules/api-events/api-event.topic+kind.api.entity.ts
- */
 export enum API_EVENT_KINDS {
   user__signedUp__v1alpha1 = 'user.signedUp/v1alpha1',
   user__accountActivationTokenGenerated__v1alpha1 = 'user.accountActivationTokenGenerated/v1alpha1',

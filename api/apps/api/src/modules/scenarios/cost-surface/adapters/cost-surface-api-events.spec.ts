@@ -1,11 +1,8 @@
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test } from '@nestjs/testing';
 import { Repository } from 'typeorm';
-
-import {
-  API_EVENT_KINDS,
-  ApiEvent,
-} from '../../../api-events/api-event.api.entity';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ApiEvent } from '@marxan-api/modules/api-events/api-event.api.entity';
 
 import { CostSurfaceApiEvents } from './cost-surface-api-events';
 import { CostSurfaceState } from '../cost-surface-events.port';

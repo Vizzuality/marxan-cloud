@@ -19,9 +19,9 @@ import { IssuedAuthnToken } from './issued-authn-token.api.entity';
 import ms = require('ms');
 import { SignUpDto } from './dto/sign-up.dto';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
-import { API_EVENT_KINDS } from '@marxan-api/modules/api-events/api-event.api.entity';
 import { v4 } from 'uuid';
 import * as ApiEventsUserData from '@marxan-api/modules/api-events/dto/apiEvents.user.data.dto';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 
 /**
  * Access token for the app: key user data and access token

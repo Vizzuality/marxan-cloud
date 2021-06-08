@@ -14,10 +14,7 @@ import { SignUpDto } from '@marxan-api/modules/authentication/dto/sign-up.dto';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
-import {
-  ApiEvent,
-  API_EVENT_KINDS,
-} from '@marxan-api/modules/api-events/api-event.api.entity';
+import { ApiEvent } from '@marxan-api/modules/api-events/api-event.api.entity';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
@@ -25,6 +22,7 @@ import { UsersService } from '@marxan-api/modules/users/users.service';
 import { LoginDto } from '@marxan-api/modules/authentication/dto/login.dto';
 import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
 import { tearDown } from './utils/tear-down';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 
 /**
  * Tests for the UsersModule.

@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Express } from 'express';
 import { QueueService } from '../../queue/queue.service';
 import { ApiEventsService } from '../../api-events/api-events.service';
-import { API_EVENT_KINDS } from '../../api-events/api-event.api.entity';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 
 export interface ProtectedAreasJobInput {
   projectId: string;
