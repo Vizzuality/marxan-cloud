@@ -9,7 +9,6 @@ import { apiGlobalPrefixes } from '@marxan-api/api.config';
 
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 import { ScenariosCrudService } from './scenarios-crud.service';
-import { JobStatus } from './scenario.api.entity';
 
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
@@ -62,18 +61,11 @@ export class ScenariosService {
     )[0];
   }
 
-  async getPendingJobs(_scenarioId: string) {
-    return {
-      status: JobStatus.running,
-    };
-  }
-
   async changeLockStatus(
     scenarioId: string,
     input: UpdateScenarioPlanningUnitLockStatusDto,
   ) {
     await this.assertScenario(scenarioId);
-    // TODO implement more flexible error results to propagate 4xx
     await this.updatePlanningUnits.update(scenarioId, {
       include: {
         geo: input.byGeoJson?.include,

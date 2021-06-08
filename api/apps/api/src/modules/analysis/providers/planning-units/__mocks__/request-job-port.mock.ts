@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { RequestJobInput, RequestJobPort } from '../request-job.port';
-import { AsyncJob } from '../../../async-job';
 
 @Injectable()
 export class RequestJobPortMock implements RequestJobPort {
-  mock: jest.Mock<Promise<AsyncJob>, [RequestJobInput]> = jest.fn();
+  mock: jest.Mock<Promise<void>, [RequestJobInput]> = jest.fn();
 
-  async queue(input: RequestJobInput): Promise<AsyncJob> {
+  async queue(input: RequestJobInput): Promise<void> {
     return this.mock(input);
   }
 }
