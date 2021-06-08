@@ -14,7 +14,7 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { AnalysisModule } from '../analysis/analysis.module';
 import { CostSurfaceModule } from './cost-surface/cost-surface.module';
-import { ScenarioService } from './scenario.service';
+import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 
@@ -31,7 +31,7 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
     HttpModule,
   ],
   providers: [
-    ScenarioService,
+    ScenariosService,
     ScenariosCrudService,
     ProxyService,
     WdpaAreaCalculationService,
@@ -39,6 +39,6 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
     ScenarioFeatureSerializer,
   ],
   controllers: [ScenariosController],
-  exports: [ScenariosCrudService, ScenarioService],
+  exports: [ScenariosCrudService, ScenariosService],
 })
 export class ScenariosModule {}

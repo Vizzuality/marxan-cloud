@@ -49,7 +49,7 @@ import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ScenarioService } from './scenario.service';
+import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 
@@ -59,7 +59,7 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 @Controller(`${apiGlobalPrefixes.v1}/scenarios`)
 export class ScenariosController {
   constructor(
-    private readonly service: ScenarioService,
+    private readonly service: ScenariosService,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
   ) {}
@@ -83,7 +83,7 @@ export class ScenariosController {
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioResult> {
-    const results = await this.service.findAll(fetchSpecification);
+    const results = await this.service.findAllPaginated(fetchSpecification);
     return this.scenarioSerializer.serialize(results.data, results.metadata);
   }
 

@@ -16,7 +16,7 @@ import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 
 @Injectable()
-export class ScenarioService {
+export class ScenariosService {
   private readonly geoprocessingUrl: string = AppConfig.get(
     'geoprocessing.url',
   ) as string;
@@ -29,7 +29,7 @@ export class ScenarioService {
     private readonly httpService: HttpService,
   ) {}
 
-  async findAll(fetchSpecification: FetchSpecification) {
+  async findAllPaginated(fetchSpecification: FetchSpecification) {
     return this.crudService.findAllPaginated(fetchSpecification);
   }
 
