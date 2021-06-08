@@ -104,6 +104,13 @@ export class ProtectedAreasController {
     required: false,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
+  @ApiQuery({
+    name: 'bbox',
+    description: 'Bounding box of the project [xMin, xMax, yMin, yMax]',
+    type: [Number],
+    required: false,
+    example: [-1, 40, 1, 42],
+  })
   @Get('/preview/tiles/:z/:x/:y.mvt')
   async proxyProtectedAreaTile(
     @Req() request: Request,

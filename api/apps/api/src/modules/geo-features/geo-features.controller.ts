@@ -89,7 +89,7 @@ export class GeoFeaturesController {
   })
   @ApiQuery({
     name: 'bbox',
-    description: 'Bounding box of the project',
+    description: 'Bounding box of the project [xMin, xMax, yMin, yMax]',
     type: [Number],
     required: false,
     example: [-1, 40, 1, 42],
