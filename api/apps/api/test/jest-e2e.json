@@ -16,6 +16,8 @@
     "^@marxan/admin-regions": ["<rootDir>/../../../libs/admin-regions/src"],
     "^@marxan/admin-regions/(.*)$": ["<rootDir>/../../../libs/admin-regions/src/$1"],
     "^@marxan/api-events": ["<rootDir>/../../../libs/api-events/src"],
-    "^@marxan/api-events/(.*)$": ["<rootDir>/../../../libs/api-events/src/$1"]
+    "^@marxan/api-events/(.*)$": ["<rootDir>/../../../libs/api-events/src/$1"],
+    "^@marxan-jobs/planning-unit-geometry": ["<rootDir>/../../../libs/planning-unit-geometry/src"],
+    "^@marxan-jobs/planning-unit-geometry/(.*)$": ["<rootDir>/../../../libs/planning-unit-geometry/src/$1"]
   }
 }

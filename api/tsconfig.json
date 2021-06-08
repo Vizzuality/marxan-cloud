@@ -42,6 +42,12 @@
       ],
       "@marxan/api-events/*": [
         "libs/api-events/src/*"
+      ],
+      "@marxan-jobs/planning-unit-geometry": [
+        "libs/planning-unit-geometry/src"
+      ],
+      "@marxan-jobs/planning-unit-geometry/*": [
+        "libs/planning-unit-geometry/src/*"
       ]
     }
   },
