@@ -7,6 +7,7 @@ import { CorsUtils } from './utils/cors.utils';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from '@marxan-api/filters/all-exceptions.exception.filter';
+import {writeFileSync} from "fs";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -32,12 +33,13 @@ async function bootstrap() {
     .setDescription('MarxanCloud is a conservation planning platform.')
     .setVersion(process.env.npm_package_version || 'development')
     .addBearerAuth({
-      type: 'apiKey',
-      in: 'header',
-      name: 'Authorization',
-    })
+      type: 'http',
+    }, 'BearerAuth')
     .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);
+
+  writeFileSync("./swagger.json", JSON.stringify(swaggerDocument));
+
   SwaggerModule.setup('/swagger', app, swaggerDocument);
 
   app.useGlobalPipes(
