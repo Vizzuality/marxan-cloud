@@ -10,7 +10,7 @@ import { IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator'
 import { ProtectedArea } from '@marxan-geoprocessing/modules/protected-areas/protected-areas.geo.entity';
 import { BBox } from 'geojson';
 import { Transform } from 'class-transformer';
-import { BboxUtils } from '@marxan-geoprocessing/utils/bbox.utils';
+import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 
 export class ProtectedAreasFilters {
   @IsOptional()
@@ -31,8 +31,6 @@ export class ProtectedAreasService {
     private readonly protectedAreasRepository: Repository<ProtectedArea>,
     @Inject(TileService)
     private readonly tileService: TileService,
-    @Inject(BboxUtils)
-    private readonly bboxUtils: BboxUtils,
   ) {}
 
   /**
@@ -44,7 +42,7 @@ export class ProtectedAreasService {
     let whereQuery = undefined;
     whereQuery = filters?.id ? ` id = '${filters?.id}'` : undefined;
     if (filters?.bbox) {
-      const bboxIntersect =`st_intersects(ST_MakeEnvelope(${this.bboxUtils.nominatim2bbox(filters.bbox)}, 4326), the_geom)`;
+      const bboxIntersect =`st_intersects(ST_MakeEnvelope(${nominatim2bbox(filters.bbox)}, 4326), the_geom)`;
       whereQuery = whereQuery ? `${whereQuery} and ${bboxIntersect}`: bboxIntersect;
     }
     return whereQuery;

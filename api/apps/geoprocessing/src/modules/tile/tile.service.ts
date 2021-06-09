@@ -1,5 +1,5 @@
 // to-do: work on cache later
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 import { Transform } from 'class-transformer';
@@ -124,20 +124,18 @@ export class TileService {
           `ST_Intersects(ST_Transform(ST_TileEnvelope(:z, :x, :y), ${inputProjection}), ${geometry} )`,
             { z, x, y },
             );
-        this.logger.debug(customQuery)
         if (customQuery) {
           subQuery.andWhere(customQuery);
         }
         return subQuery;
       }, 'tile');
-      this.logger.debug(query.getSql())
     const result = await query.getRawMany();
 
     if (result) {
       return result;
     } else {
-      this.logger.debug(query.getSql());
-      throw new Error("Property 'mvt' does not exist in res.rows[0]");
+      this.logger.error(query.getSql());
+      throw new NotFoundException("Property 'mvt' does not exist in res.rows[0]");
     }
   }
 
@@ -174,7 +172,7 @@ export class TileService {
       >[] = await this.fetchTileFromDatabase(tileInput);
       // zip data
       data = await this.zip(queryResult[0].mvt);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Database error: ${error.message}`);
       throw new BadRequestException(error.message);
     }

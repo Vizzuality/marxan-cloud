@@ -11,7 +11,7 @@ import { BBox } from 'geojson';
 import { Transform } from 'class-transformer';
 
 import { PlanningUnitsGeom } from '@marxan-geoprocessing/modules/planning-units/planning-units.geo.entity';
-import { BboxUtils } from '@marxan-geoprocessing/utils/bbox.utils';
+import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 
 export class tileSpecification extends TileRequest {
   @ApiProperty()
@@ -44,8 +44,6 @@ export class PlanningUnitsService {
     private readonly planningUnitsRepository: Repository<PlanningUnitsGeom>,
     @Inject(TileService)
     private readonly tileService: TileService,
-    @Inject(BboxUtils)
-    private readonly bboxUtils: BboxUtils,
   ) {}
 
   /**
@@ -116,8 +114,7 @@ export class PlanningUnitsService {
     let whereQuery = ``;
 
     if (filters?.bbox) {
-      this.logger.debug('Im a bbox')
-      whereQuery =`st_intersects(ST_Transform(ST_MakeEnvelope(${this.bboxUtils.nominatim2bbox(filters.bbox)}, 4326), 3857) ,the_geom)`;
+      whereQuery =`st_intersects(ST_Transform(ST_MakeEnvelope(${nominatim2bbox(filters.bbox)}, 4326), 3857) ,the_geom)`;
     }
     return whereQuery;
   }

@@ -18,7 +18,7 @@ import {
 import { Transform } from 'class-transformer';
 import { BBox } from 'geojson';
 import { AdminArea } from '@marxan/admin-regions';
-import { BboxUtils } from '@marxan-geoprocessing/utils/bbox.utils';
+import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 
 export class TileSpecification extends TileRequest {
   @ApiProperty()
@@ -52,8 +52,6 @@ export class AdminAreasService {
     private readonly adminAreasRepository: Repository<AdminArea>,
     @Inject(TileService)
     private readonly tileService: TileService,
-    @Inject(BboxUtils)
-    private readonly bboxUtils: BboxUtils,
   ) {}
 
   buildAdminAreaWhereQuery(level: number, filters?: AdminAreasFilters): string {
@@ -74,7 +72,7 @@ export class AdminAreasService {
       whereQuery += ` AND gid_${level-1} = '${filters?.guid}'`;
     }
     if (filters?.bbox) {
-      whereQuery += ` AND the_geom && ST_MakeEnvelope(${this.bboxUtils.nominatim2bbox(filters?.bbox)}, 4326)`;
+      whereQuery += ` AND the_geom && ST_MakeEnvelope(${nominatim2bbox(filters?.bbox)}, 4326)`;
     }
 
     return whereQuery;
