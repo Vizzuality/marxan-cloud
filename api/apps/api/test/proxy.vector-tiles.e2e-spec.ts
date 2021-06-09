@@ -13,6 +13,8 @@ import { OrganizationsTestUtils } from './utils/organizations.test.utils';
 import { ProjectsTestUtils } from './utils/projects.test.utils';
 import { ScenariosTestUtils } from './utils/scenarios.test.utils';
 import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
+import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+import { bootstrapApplication } from 'apps/geoprocessing/test/utils';
 
 const logger = new Logger('test-vtiles')
 
@@ -44,28 +46,9 @@ describe('ProxyVectorTilesModule (e2e)', () => {
   };
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    );
-    await app.init();
+    app = await bootstrapApplication();
 
-    const response = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({
-        username: E2E_CONFIG.users.basic.aa.username,
-        password: E2E_CONFIG.users.basic.aa.password,
-      })
-      .expect(201);
-
-    jwtToken = response.body.accessToken;
+    jwtToken = await GivenUserIsLoggedIn(app);
 
     anOrganization = await OrganizationsTestUtils.createOrganization(
       app,
