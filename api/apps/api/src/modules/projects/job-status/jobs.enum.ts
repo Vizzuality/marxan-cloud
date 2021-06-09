@@ -5,4 +5,5 @@
  */
 export enum JobType {
   CostSurface = 'scenario.costSurface',
+  PlanningUnitInclusion = 'scenario.planningUnitsInclusion',
 }
