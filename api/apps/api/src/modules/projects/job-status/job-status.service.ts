@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
-import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
 import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
 import { JobStatus as Status } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { JobType } from './jobs.enum';
+
 export { Status };
 
 export interface Job {
   kind: JobType;
-  status: Job;
+  status: Status;
 }
 
 export interface Scenario {
@@ -22,21 +22,16 @@ export class JobStatusService {
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly scenariosService: ScenariosService,
-    private readonly projectsService: ProjectsService,
   ) {}
 
   /**
    * @throws NotFoundException
    */
-  async getJobStatusFor(projectId: string): Promise<Scenario[]> {
-    await this.projectsService.findOne(projectId);
+  async getJobStatusFor(_projectId: string): Promise<Scenario[]> {
     return [];
     // get status of project job(s) ?
-
     // get all scenarios for given project
-
     // for each scenario, find its jobs and relevant statuses
-
     /**
      *
      * Draft of SQL
