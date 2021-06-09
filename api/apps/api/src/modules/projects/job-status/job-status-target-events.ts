@@ -1,4 +1,4 @@
-import { API_EVENT_KINDS } from '@marxan-api/modules/api-events/api-event.api.entity';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 import { JobType } from './jobs.enum';
 
 /**
