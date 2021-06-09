@@ -5,23 +5,31 @@ import Field from 'components/forms/field';
 import {
   composeValidators,
 } from 'components/forms/validations';
-import CountryRegionSelector from 'components/countries/country-region-selector';
-import PlanningUnitGrid from 'components/projects/planning-unit-grid';
-import PlanningUnitAreaSize from 'components/projects/planning-unit-area-size';
 
 import { PlanningArea } from 'types/project-model';
 import { PlanningAreaSelectorProps } from './types';
 
+import CountryRegionSelector from './country-region-selector';
+import PlanningUnitGrid from './planning-unit-grid';
+import PlanningUnitAreaSize from './planning-unit-area-size';
+
 export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
   area,
+  values,
   onChange,
 }: PlanningAreaSelectorProps) => {
   const [data, setData] = useState<PlanningArea>(area);
   const { planningUnitAreakm2, planningUnitGridShape } = data;
 
+  const { countryId, adminAreaLevel1Id, adminAreaLevel2Id } = values;
+
   return (
     <div>
-      <CountryRegionSelector />
+      <CountryRegionSelector
+        country={countryId}
+        region={adminAreaLevel1Id}
+        subRegion={adminAreaLevel2Id}
+      />
 
       <div className="flex">
         <div className="flex w-1/2">

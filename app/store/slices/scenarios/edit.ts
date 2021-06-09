@@ -3,6 +3,11 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ScenarioEditStateProps {
   tab: string,
+
+  // WDPA
+  wdpaCategories: Record<string, any>;
+
+  // ADJUST PLANNING UNITS
   clicking: boolean;
   clickingValue: string[];
 
@@ -15,6 +20,11 @@ interface ScenarioEditStateProps {
 
 const initialState = {
   tab: 'protected-areas',
+
+  // WDPA
+  wdpaCategories: {},
+
+  // ADJUST PLANNING UNITS
   clicking: false,
   clickingValue: [],
   drawing: null,
@@ -30,6 +40,11 @@ export function getScenarioSlice(id) {
     reducers: {
       setTab: (state, action: PayloadAction<string>) => {
         state.tab = action.payload;
+      },
+
+      // WDPA
+      setWDPACategories: (state, action: PayloadAction<Record<string, object>>) => {
+        state.wdpaCategories = action.payload;
       },
 
       // ADJUST PLANNING UNITS

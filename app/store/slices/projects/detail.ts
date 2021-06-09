@@ -6,7 +6,7 @@ interface ProjectShowStateProps {
 
 const initialState = { search: '' } as ProjectShowStateProps;
 
-const projectsSlice = createSlice({
+const projectsDetailSlice = createSlice({
   name: '/projects/[id]',
   initialState,
   reducers: {
@@ -16,5 +16,5 @@ const projectsSlice = createSlice({
   },
 });
 
-export const { setSearch } = projectsSlice.actions;
-export default projectsSlice.reducer;
+export const { setSearch } = projectsDetailSlice.actions;
+export default projectsDetailSlice.reducer;

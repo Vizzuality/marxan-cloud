@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
@@ -11,8 +11,6 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
   onChange,
   ...rest
 }: PlanningUnitAreaSizeProps) => {
-  const [selectedSize, setSelectedSize] = useState<number>(size);
-
   return (
     <div className="mt-6">
       <div className="flex items-center">
@@ -26,11 +24,10 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
           <Input
             {...rest}
             className="text-2xl"
-            defaultValue={selectedSize}
             type="number"
             onChange={(event) => {
               const newSize = Number(event.target.value);
-              setSelectedSize(newSize);
+
               if (onChange) {
                 onChange(newSize);
               }
