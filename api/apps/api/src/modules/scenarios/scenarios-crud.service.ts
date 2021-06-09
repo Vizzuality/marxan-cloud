@@ -80,6 +80,7 @@ export class ScenariosCrudService extends AppBaseService<
   get serializerConfig(): JSONAPISerializerConfig<Scenario> {
     return {
       attributes: [
+        'id',
         'name',
         'description',
         'type',
