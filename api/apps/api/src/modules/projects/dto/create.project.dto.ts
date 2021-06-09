@@ -61,13 +61,6 @@ export class CreateProjectDTO {
   @IsNumber()
   planningUnitAreakm2?: number;
 
-  @ApiPropertyOptional({
-    description: `Geometry part of GeoJson; MultiPolygon or Polygon`,
-  })
-  @IsOptional()
-  @IsObject()
-  extent?: MultiPolygon | Polygon;
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsObject()

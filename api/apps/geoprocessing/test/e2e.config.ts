@@ -31,17 +31,6 @@ export const E2E_CONFIG: {
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
           planningUnitGridShape: PlanningUnitGridShape.hexagon,
           planningUnitAreakm2: 100,
-          extent: {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [-10.0, -10.0],
-                [10.0, -10.0],
-                [10.0, 10.0],
-                [-10.0, -10.0],
-              ],
-            ],
-          },
         }),
         adminRegion: (options: OptionsWithCountryCode): PlanningUnitsJob => ({
           countryId: options.countryCode,
@@ -58,17 +47,6 @@ export const E2E_CONFIG: {
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
           planningUnitGridShape: PlanningUnitGridShape.hexagon,
           planningUnitAreakm2: -100,
-          extent: {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [-10.0, -10.0],
-                [10.0, -10.0],
-                [10.0, 10.0],
-                [-10.0, -10.0],
-              ],
-            ],
-          },
         }),
         adminRegion: (options: OptionsWithCountryCode): PlanningUnitsJob => ({
           countryId: options.countryCode,
