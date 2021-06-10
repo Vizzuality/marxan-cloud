@@ -21,10 +21,12 @@ export const createWorld = async (app: INestApplication) => {
   );
   const scenarios: string[] = [];
   let scenarioIdWithPendingJob: string | undefined;
+  let scenarioIdWithCostSurfaceFinished: string | undefined;
 
   return {
     projectId,
     scenarioIdWithPendingJob: () => scenarioIdWithPendingJob,
+    scenarioIdWithCostSurfaceFinished: () => scenarioIdWithCostSurfaceFinished,
     GivenScenarioPlanningInclusionInProgress: async () => {
       const scenario = await GivenScenarioExists(app, projectId, token);
       scenarios.push(scenario.id);
@@ -38,6 +40,7 @@ export const createWorld = async (app: INestApplication) => {
     GivenCostSurfaceFinished: async () => {
       const scenario = await GivenScenarioExists(app, projectId, token);
       scenarios.push(scenario.id);
+      scenarioIdWithCostSurfaceFinished = scenario.id;
       await GivenApiEvent(
         app,
         scenario.id,
