@@ -22,13 +22,6 @@ export class ScenarioStatus {
   id!: string;
 
   @ApiProperty({
-    description: `Computed value across each job. Will either result in \`${JobStatus.running}\` or \`${JobStatus.done}\` or \`${JobStatus.failure}\``,
-    example: JobStatus.running,
-    enum: JobStatus,
-  })
-  status!: JobStatus;
-
-  @ApiProperty({
     isArray: true,
     type: ScenarioJobStatus,
   })

@@ -14,7 +14,6 @@ export class JobStatusSerializer {
         id: projectId,
         attributes: {
           scenarios: scenarioWithJobs.map((scenario) => ({
-            status: scenario.status,
             id: scenario.scenarioId,
             jobs: scenario.jobs,
           })),
