@@ -160,7 +160,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
       });
     });
     describe('Feature layer previews', () => {
-      test('Should give back a valid request for a feature preview', async () => {
+      test.skip('Should give back a valid request for a feature preview', async () => {
         const response = await request(app.getHttpServer())
           .get('/api/v1/administrative-areas/3/preview/tiles/21/30/25.mvt')
           .set('Authorization', `Bearer ${jwtToken}`);
@@ -170,7 +170,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
       });
     });
     describe('PUs layer previews', () => {
-      test('Should give back a valid request for a PUs preview', async () => {
+      test.skip('Should give back a valid request for a PUs preview', async () => {
         const response = await request(app.getHttpServer())
           .get('/api/v1/administrative-areas/3/preview/tiles/21/30/25.mvt')
           .set('Authorization', `Bearer ${jwtToken}`)
