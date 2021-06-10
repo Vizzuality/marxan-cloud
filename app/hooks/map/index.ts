@@ -77,20 +77,21 @@ export function useWDPAPreviewLayer({
   return useMemo(() => {
     if (!bbox) return null;
 
-    console.log(wdpaIucnCategories);
-
     return {
       id: 'wdpa-preview-layer',
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt`],
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
       },
       render: {
         layers: [
           {
             type: 'fill',
             'source-layer': 'layer0',
+            filter: ['all',
+              ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
+            ],
             paint: {
               'fill-color': '#00BFFF',
             },
@@ -98,6 +99,9 @@ export function useWDPAPreviewLayer({
           {
             type: 'line',
             'source-layer': 'layer0',
+            filter: ['all',
+              ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
+            ],
             paint: {
               'line-color': '#000',
             },

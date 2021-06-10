@@ -57,6 +57,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     isFetched: allScenariosIsFetched,
   } = useScenarios(pid, {
     search,
+    sort: '-lastModifiedAt',
   });
 
   const scrollRef = useBottomScrollListener(
