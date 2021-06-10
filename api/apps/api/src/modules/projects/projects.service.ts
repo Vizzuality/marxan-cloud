@@ -5,7 +5,7 @@ import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 
 import { ProjectsCrudService } from './projects-crud.service';
-import { JobStatusService } from './job-status/job-status.service';
+import { JobStatusService } from './job-status';
 import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
