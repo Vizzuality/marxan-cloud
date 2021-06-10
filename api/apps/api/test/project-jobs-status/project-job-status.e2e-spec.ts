@@ -33,7 +33,6 @@ describe(`Given scenario has some jobs running`, () => {
     expect(result.body.data.attributes.scenarios).toEqual([
       {
         id: world.scenarioIdWithPendingJob(),
-        status: 'running',
         jobs: [
           {
             kind: 'scenario.costSurface',
