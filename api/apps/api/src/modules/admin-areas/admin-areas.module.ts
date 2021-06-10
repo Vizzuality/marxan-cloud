@@ -10,7 +10,6 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([AdminArea], apiConnections.geoprocessingDB.name),
-
   ],
   providers: [AdminAreasService, ProxyService],
   controllers: [AdminAreasController],

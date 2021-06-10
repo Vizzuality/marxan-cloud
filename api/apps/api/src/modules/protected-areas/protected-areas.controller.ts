@@ -4,7 +4,8 @@ import {
   Param,
   ParseUUIDPipe,
   UseGuards,
-  Req, Res,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { ProtectedAreaResult } from './protected-area.geo.entity';
 import {
@@ -40,8 +41,10 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 @ApiTags(protectedAreaResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/protected-areas`)
 export class ProtectedAreasController {
-  constructor(public readonly service: ProtectedAreasService,
-    private readonly proxyService: ProxyService) {}
+  constructor(
+    public readonly service: ProtectedAreasService,
+    private readonly proxyService: ProxyService,
+  ) {}
 
   @ApiOperation({
     description: 'Find all protected areas',

@@ -5,7 +5,12 @@ import {
 } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 import { ProtectedArea } from '@marxan-geoprocessing/modules/protected-areas/protected-areas.geo.entity';
 import { BBox } from 'geojson';
@@ -36,14 +41,18 @@ export class ProtectedAreasService {
   /**
    * @param filters bounding box of the area where the grids would be generated
    */
-   buildProtectedAreasWhereQuery(
+  buildProtectedAreasWhereQuery(
     filters?: ProtectedAreasFilters,
   ): string | undefined {
     let whereQuery = undefined;
     whereQuery = filters?.id ? ` id = '${filters?.id}'` : undefined;
     if (filters?.bbox) {
-      const bboxIntersect =`st_intersects(ST_MakeEnvelope(${nominatim2bbox(filters.bbox)}, 4326), the_geom)`;
-      whereQuery = whereQuery ? `${whereQuery} and ${bboxIntersect}`: bboxIntersect;
+      const bboxIntersect = `st_intersects(ST_MakeEnvelope(${nominatim2bbox(
+        filters.bbox,
+      )}, 4326), the_geom)`;
+      whereQuery = whereQuery
+        ? `${whereQuery} and ${bboxIntersect}`
+        : bboxIntersect;
     }
     return whereQuery;
   }

@@ -78,7 +78,10 @@ export class ProtectedAreasController {
     @Query() protectedAreasFilters: ProtectedAreasFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(tileRequest, protectedAreasFilters);
+    const tile: Buffer = await this.service.findTile(
+      tileRequest,
+      protectedAreasFilters,
+    );
     return response.send(tile);
   }
 }

@@ -1,5 +1,10 @@
 // to-do: work on cache later
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 import { Transform } from 'class-transformer';
@@ -85,10 +90,10 @@ export class TileService {
    */
   private readonly logger: Logger = new Logger(TileService.name);
 
-  simplification(z:number, geometry: string): string {
-    return (z > 7) ? `${geometry}` : `ST_RemoveRepeatedPoints(${geometry}, ${
-      0.1 / (z * 2)
-    })`
+  simplification(z: number, geometry: string): string {
+    return z > 7
+      ? `${geometry}`
+      : `ST_RemoveRepeatedPoints(${geometry}, ${0.1 / (z * 2)})`;
   }
   /**
    * All database interaction is encapsulated in this function. The design-goal is to keep the time where a database-
@@ -114,16 +119,20 @@ export class TileService {
       .createQueryBuilder()
       .select(`ST_AsMVT(tile, 'layer0', ${extent}, 'mvt_geom')`, 'mvt')
       .from((subQuery) => {
-
-          subQuery.select(
-            `${attributes}, ST_AsMVTGeom(ST_Transform(${this.simplification(z, geometry)}, 3857),
+        subQuery.select(
+          `${attributes}, ST_AsMVTGeom(ST_Transform(${this.simplification(
+            z,
+            geometry,
+          )}, 3857),
             ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom`,
-          );
+        );
 
-          subQuery.from(table, 'data').where(
-          `ST_Intersects(ST_Transform(ST_TileEnvelope(:z, :x, :y), ${inputProjection}), ${geometry} )`,
+        subQuery
+          .from(table, 'data')
+          .where(
+            `ST_Intersects(ST_Transform(ST_TileEnvelope(:z, :x, :y), ${inputProjection}), ${geometry} )`,
             { z, x, y },
-            );
+          );
         if (customQuery) {
           subQuery.andWhere(customQuery);
         }
@@ -135,7 +144,9 @@ export class TileService {
       return result;
     } else {
       this.logger.error(query.getSql());
-      throw new NotFoundException("Property 'mvt' does not exist in res.rows[0]");
+      throw new NotFoundException(
+        "Property 'mvt' does not exist in res.rows[0]",
+      );
     }
   }
 

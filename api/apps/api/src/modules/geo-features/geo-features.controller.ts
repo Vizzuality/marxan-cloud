@@ -28,11 +28,13 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 @ApiBearerAuth()
 @ApiTags(geoFeatureResource.className)
 @Controller(
- `${apiGlobalPrefixes.v1}/${geoFeatureResource.moduleControllerPrefix}`,
+  `${apiGlobalPrefixes.v1}/${geoFeatureResource.moduleControllerPrefix}`,
 )
 export class GeoFeaturesController {
-  constructor(public readonly service: GeoFeaturesService,
-              private readonly proxyService: ProxyService) {}
+  constructor(
+    public readonly service: GeoFeaturesService,
+    private readonly proxyService: ProxyService,
+  ) {}
 
   @ApiOperation({
     description: 'Find all geo features',
@@ -106,6 +108,4 @@ export class GeoFeaturesController {
   async findOne(@Param('id') id: string): Promise<GeoFeatureResult> {
     return await this.service.serialize(await this.service.fakeFindOne(id));
   }
-
-
 }

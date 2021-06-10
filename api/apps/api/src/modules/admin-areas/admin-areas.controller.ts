@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Query, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { adminAreaResource, AdminAreaResult } from './admin-area.geo.entity';
 import { AdminAreaLevel, AdminAreasService } from './admin-areas.service';
 import {
@@ -26,8 +34,10 @@ import { Request, Response } from 'express';
 @ApiTags(adminAreaResource.className)
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class AdminAreasController {
-  constructor(public readonly service: AdminAreasService,
-              private readonly proxyService: ProxyService) {}
+  constructor(
+    public readonly service: AdminAreasService,
+    private readonly proxyService: ProxyService,
+  ) {}
 
   @ApiOperation({
     description: 'Find administrative areas within a given country.',

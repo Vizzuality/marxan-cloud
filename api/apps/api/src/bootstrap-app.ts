@@ -32,9 +32,7 @@ export async function bootstrapSetUp() {
     }),
   );
 
-  return app
-
-
+  return app;
 
   //await app.listen(3000);
 }

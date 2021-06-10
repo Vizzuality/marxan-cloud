@@ -50,7 +50,9 @@ export class FeatureService {
     let whereQuery = `feature_id = '${id}'`;
 
     if (bbox) {
-      whereQuery += `AND st_intersects(ST_MakeEnvelope(${nominatim2bbox(bbox)}, 4326), the_geom)`;
+      whereQuery += `AND st_intersects(ST_MakeEnvelope(${nominatim2bbox(
+        bbox,
+      )}, 4326), the_geom)`;
     }
     return whereQuery;
   }
