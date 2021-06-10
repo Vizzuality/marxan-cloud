@@ -1,10 +1,10 @@
-import Fuse from 'fuse.js';
-import { useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import flatten from 'lodash/flatten';
+import { useMemo, useRef } from 'react';
+import {
+  useQuery, useInfiniteQuery, useMutation, useQueryClient,
+} from 'react-query';
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
-
-import orderBy from 'lodash/orderBy';
 
 import { formatDistanceToNow } from 'date-fns';
 
@@ -14,79 +14,109 @@ import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
 
 import {
-  UseScenariosFiltersProps,
+  UseScenariosOptionsProps,
   UseSaveScenarioProps,
   SaveScenarioProps,
   UseDeleteScenarioProps,
   DeleteScenarioProps,
 } from './types';
 
-export function useScenarios(pId, filters: UseScenariosFiltersProps = {}) {
+export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const [session] = useSession();
-  const { search } = filters;
   const { push } = useRouter();
 
-  const query = useQuery(['scenarios', pId], async () => SCENARIOS.request({
+  const placeholderDataRef = useRef({
+    pages: [],
+    pageParams: [],
+  });
+
+  const {
+    filters = {},
+    search,
+    sort,
+  } = options;
+
+  const parsedFilters = Object.keys(filters)
+    .reduce((acc, k) => {
+      return {
+        ...acc,
+        [`filter[${k}]`]: filters[k],
+      };
+    }, {});
+
+  const fetchScenarios = ({ pageParam = 1 }) => SCENARIOS.request({
     method: 'GET',
     url: '/',
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
     params: {
-      'filter[projectId]': pId,
+      'page[number]': pageParam,
+      ...parsedFilters,
+      ...search && {
+        q: search,
+      },
+      ...sort && {
+        sort,
+      },
     },
-  }));
+  });
+
+  const query = useInfiniteQuery(['scenarios', pId, JSON.stringify(options)], fetchScenarios, {
+    placeholderData: placeholderDataRef.current,
+    getNextPageParam: (lastPage) => {
+      const { data: { meta } } = lastPage;
+      const { page, totalPages } = meta;
+
+      const nextPage = page + 1 > totalPages ? null : page + 1;
+      return nextPage;
+    },
+  });
 
   const { data } = query;
+  const { pages } = data || {};
+
+  if (data) {
+    placeholderDataRef.current = data;
+  }
 
   return useMemo(() => {
-    let parsedData = Array.isArray(data?.data?.data) ? data?.data?.data.map((d):ItemProps => {
-      const {
-        id, projectId, name, lastModifiedAt,
-      } = d;
+    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
+      const { data: { data: pageData } } = p;
 
-      const lastUpdateDistance = () => {
-        return formatDistanceToNow(
-          new Date(lastModifiedAt),
-          { addSuffix: true },
-        );
-      };
+      return pageData.map((d):ItemProps => {
+        const {
+          id, projectId, name, lastModifiedAt,
+        } = d;
 
-      return {
-        id,
-        name,
-        lastUpdate: lastModifiedAt,
-        lastUpdateDistance: lastUpdateDistance(),
-        warnings: false,
-        onEdit: () => {
-          push(`/projects/${projectId}/scenarios/${id}/edit`);
-        },
-        onView: () => {
-          push(`/projects/${projectId}/scenarios/${id}`);
-        },
-      };
-    }) : [];
+        const lastUpdateDistance = () => {
+          return formatDistanceToNow(
+            new Date(lastModifiedAt),
+            { addSuffix: true },
+          );
+        };
 
-    // Filter
-    if (search) {
-      const fuse = new Fuse(parsedData, {
-        keys: ['name'],
-        threshold: 0.25,
+        return {
+          id,
+          name,
+          lastUpdate: lastModifiedAt,
+          lastUpdateDistance: lastUpdateDistance(),
+          warnings: false,
+          onEdit: () => {
+            push(`/projects/${projectId}/scenarios/${id}/edit`);
+          },
+          onView: () => {
+            push(`/projects/${projectId}/scenarios/${id}`);
+          },
+        };
       });
-      parsedData = fuse.search(search).map((f) => {
-        return f.item;
-      });
-    }
-
-    // Sort
-    parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
+    })) : [];
 
     return {
       ...query,
       data: parsedData,
-      rawData: data?.data?.data,
     };
-  }, [query, data?.data?.data, search, push]);
+  }, [query, pages, push]);
 }
 
 export function useScenario(id) {

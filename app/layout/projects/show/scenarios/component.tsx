@@ -1,17 +1,20 @@
 import React, { useCallback, useState } from 'react';
 import cx from 'classnames';
 
+import { useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
 import { useDeleteScenario, useScenarios } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
+import useBottomScrollListener from 'hooks/scroll';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
+import Loading from 'components/loading';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import ScenarioItem from 'components/scenarios/item';
 
@@ -22,7 +25,6 @@ import ScenarioSettings from 'layout/projects/show/scenarios/settings';
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
-import { useQueryClient } from 'react-query';
 
 export interface ProjectScenariosProps {
 }
@@ -41,17 +43,30 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   } = useProject(pid);
 
   const {
-    data: scenariosData = [],
-    rawData: rawScenariosData = [],
-    isFetching: scenariosAreFetching,
-    isFetched: scenariosAreFetched,
-  } = useScenarios(pid, { search });
+    data: rawScenariosData,
+    isFetching: rawScenariosIsFetching,
+    isFetched: rawScenariosIsFetched,
+  } = useScenarios(pid);
 
-  const loading = (
-    projectIsFetching && !projectIsFetched
-  ) || (
-    scenariosAreFetching && !scenariosAreFetched
+  const {
+    data: allScenariosData,
+    fetchNextPage: allScenariosfetchNextPage,
+    hasNextPage,
+    isFetching: allScenariosIsFetching,
+    isFetchingNextPage: allScenariosIsFetchingNextPage,
+    isFetched: allScenariosIsFetched,
+  } = useScenarios(pid, {
+    search,
+  });
+
+  const scrollRef = useBottomScrollListener(
+    () => {
+      if (hasNextPage) allScenariosfetchNextPage();
+    },
   );
+
+  const loading = (projectIsFetching && !projectIsFetched)
+    || (rawScenariosIsFetching && !rawScenariosIsFetched);
 
   const deleteMutation = useDeleteScenario({});
   const queryClient = useQueryClient();
@@ -122,8 +137,14 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
         )}
 
         {!loading && !!rawScenariosData.length && (
-          <motion.div key="projects-scenarios" className="flex flex-col h-full">
+          <motion.div key="projects-scenarios" className="relative flex flex-col">
             <ScenarioToolbar />
+
+            <Loading
+              visible={allScenariosIsFetching && !allScenariosIsFetched}
+              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+              iconClassName="w-10 h-10 text-primary-500"
+            />
 
             <ConfirmationPrompt
               title={`Are you sure you want to delete "${deleteScenario?.name}"?`}
@@ -137,8 +158,8 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
             <div className="relative overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-black via-black" />
-              <div className="relative z-0 h-full py-6 overflow-x-hidden overflow-y-auto">
-                {scenariosData.map((s, i) => {
+              <div ref={scrollRef} className="relative z-0 h-full py-6 overflow-x-hidden overflow-y-auto">
+                {allScenariosData.map((s, i) => {
                   return (
                     <ScenarioItem
                       key={`${s.id}`}
@@ -156,11 +177,20 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                 })}
               </div>
               <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-black via-black" />
+              <div
+                className={cx({
+                  'opacity-100': allScenariosIsFetchingNextPage,
+                  'absolute left-0 z-20 w-full text-xs text-center uppercase bottom-0 font-heading transition opacity-0 pointer-events-none': true,
+                })}
+              >
+                <div className="py-1 bg-gray-200">Loading more...</div>
+                <div className="w-full h-6 bg-white" />
+              </div>
             </div>
 
             <button
               type="button"
-              className="flex items-center justify-center flex-shrink-0 w-full h-16 space-x-3 px-8 text-sm transition bg-gray-700 rounded-3xl text-primary-500 group hover:bg-gray-800"
+              className="flex items-center justify-center flex-shrink-0 w-full h-16 px-8 space-x-3 text-sm transition bg-gray-700 rounded-3xl text-primary-500 group hover:bg-gray-800"
               onClick={() => setModal(true)}
             >
               <span>Create scenario</span>

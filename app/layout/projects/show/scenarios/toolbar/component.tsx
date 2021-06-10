@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 
+import { useDebouncedCallback } from 'use-debounce';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSearch } from 'store/slices/projects/detail';
 
@@ -12,6 +13,10 @@ export const ProjectScenariosToolbar: React.FC<ProjectScenariosToolbarProps> = (
   const { search } = useSelector((state) => state['/projects/[id]']);
   const dispatch = useDispatch();
 
+  const onChangeDebounced = useDebouncedCallback((value) => {
+    dispatch(setSearch(value));
+  }, 500);
+
   useEffect(() => {
     // setSearch to null wheneverer you unmount this component
     return function unmount() {
@@ -21,11 +26,11 @@ export const ProjectScenariosToolbar: React.FC<ProjectScenariosToolbarProps> = (
 
   return (
     <Search
-      defaultValue={search}
       size="base"
+      defaultValue={search}
       placeholder="Search by scenario name..."
       aria-label="Search"
-      onChange={(value) => { dispatch(setSearch(value)); }}
+      onChange={onChangeDebounced}
     />
   );
 };
