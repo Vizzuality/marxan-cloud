@@ -22,7 +22,9 @@ export function ApiConsumesShapefile(withGeoJsonResponse = true) {
           type: 'object',
           properties: {
             file: {
-              type: 'Zip file containing .shp, .dbj, .prj and .shx files',
+              description:
+                'Zip file containing .shp, .dbj, .prj and .shx files',
+              type: 'string',
               format: 'binary',
             },
           },

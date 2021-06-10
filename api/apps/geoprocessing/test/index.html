@@ -1,151 +1,245 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset='utf-8' />
+  <head>
+    <meta charset="utf-8" />
     <title>Mapbox GL JS Examples</title>
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.css' rel='stylesheet' />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.js"></script>
+    <link
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.9.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
     <style>
-        body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
     </style>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-</head>
-<body>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var hoveredStateId = null;
 
-<div id='map'></div>
-<script>
-var hoveredStateId = null;
-
-var map = new mapboxgl.Map({
-    'container': 'map',
-    'zoom': 5,
-    'center': [10,
-          49],
-    "light": {"intensity": 0.2},
-    'style': {
-        'version': 8,
-        'sources': {
-          'postgis-tiles0': {
-                'type': 'vector',
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/administrative-areas/0/preview/tiles/{z}/{x}/{y}.mvt",
-                     ]
+      var map = new mapboxgl.Map({
+        container: 'map',
+        zoom: 7,
+        center: [
+          22.686767578125,
+          -19.072501451715087
+        ],
+        light: { intensity: 0.2 },
+        style: {
+          version: 8,
+          sources: {
+            'postgis-tiles0': {
+              type: 'vector',
+              maxzoom: 12,
+              tiles: [
+                'http://localhost:3040/api/v1/administrative-areas/0/preview/tiles/{z}/{x}/{y}.mvt',
+              ],
             },
             'postgis-tiles1': {
-                'type': 'vector',
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt",
-                     ]
+              type: 'vector',
+              maxzoom: 12,
+              tiles: [
+                'http://localhost:3040/api/v1/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt?guid=BWA',
+              ],
             },
             'postgis-tiles2': {
-                'type': 'vector',
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt",
-                     ]
+              type: 'vector',
+              maxzoom: 12,
+              tiles: [
+                'http://localhost:3040/api/v1/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt?guid=BWA.12_1&bbox=[21.14044189453125,-19.202241064923044,22.980651855468746,-18.22935133838667]',
+              ],
             },
             'postgis-tileswdpa': {
-                'type': 'vector',
-                'minzoom': 1,
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/protected-areas/preview/tiles/{z}/{x}/{y}.mvt",
-                     ]
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 12,
+              tiles: [
+                'http://localhost:3040/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt',
+              ],
             },
 
             'postgis-tilesPU': {
-                'type': 'vector',
-                'minzoom': 1,
-                'maxzoom': 12,
-                'tiles': [
-                "http://localhost:3040/api/v1/geodata/planning-units/preview/tiles/{z}/{x}/{y}.mvt",
-                     ]
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 20,
+              tiles: [
+                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/100/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,-19.202241064923044,22.980651855468746,-18.22935133838667]',
+              ],
             },
-            'BASEMAP': {
-                'type': 'raster',
-                'tiles': [
-                    "https://api.mapbox.com/styles/v1/elpamart/ckhdqt87r04z719lk3wyo1vo7/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWxwYW1hcnQiLCJhIjoiY2s2ODRqa21zMDBkYzNwbzMwY3N3aGJocyJ9.7AKSmZkqGwVrTyS3WrsxvQ",
-                ]
+            'postgis-tilesPU2': {
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 20,
+              tiles: [
+                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/100/tiles/{z}/{x}/{y}.mvt',
+              ],
+            },
+            'postgis-tilesFeatures': {
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 20,
+              tiles: [
+                'http://localhost:3040/api/v1/geo-features/127a5016-c697-4a6c-ae2a-4fa29a2729be/preview/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,-19.202241064923044,22.980651855468746,-18.22935133838667]',
+              ],
             },
 
-        },
-        'layers': [
-          {
-            'id': 'mapbox_monochrome-layer',
-            'type': 'raster',
-            'source': 'BASEMAP',
-            'minzoom': 1,
-            'maxzoom': 22
-        },
 
-        {
-            'id': 'postgis-tiles-layer',
-            'type': 'fill',
-            'source': 'postgis-tiles2',
-            'source-layer': 'layer0',
-            'paint': {
-                'fill-outline-color': 'red',
-                'fill-color': 'green',
-                'fill-opacity': 0.2
-            }
-        },
-        // {
-        //     'id': 'postgis-tiles-layer1',
-        //     'type': 'fill',
-        //     'source': 'postgis-tiles1',
-        //     'source-layer': 'layer0',
-        //     'paint': {
-        //         'fill-outline-color': 'blue',
-        //         'fill-color': 'green',
-        //         'fill-opacity': 0.2
-        //     }
-        // },
-        // {
-        //     'id': 'postgis-tiles-layer2',
-        //     'type': 'fill',
-        //     'source': 'postgis-tiles0',
-        //     'source-layer': 'layer0',
-        //     'paint': {
-        //         'fill-outline-color': 'pink',
-        //         'fill-color': 'green',
-        //         'fill-opacity': 0.2
-        //     }
-        // },
-        {
-            'id': 'postgis-tiles-layer-wdpa',
-            'type': 'fill',
-            'source': 'postgis-tileswdpa',
-            'source-layer': 'layer0',
-            'paint': {
+            BASEMAP: {
+              type: 'raster',
+              tiles: [
+                'https://api.mapbox.com/styles/v1/elpamart/ckhdqt87r04z719lk3wyo1vo7/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZWxwYW1hcnQiLCJhIjoiY2s2ODRqa21zMDBkYzNwbzMwY3N3aGJocyJ9.7AKSmZkqGwVrTyS3WrsxvQ',
+              ],
+            },
+          },
+          layers: [
+            {
+              id: 'mapbox_monochrome-layer',
+              type: 'raster',
+              source: 'BASEMAP',
+              minzoom: 1,
+              maxzoom: 22,
+            },
+
+            {
+              id: 'postgis-tiles-layer',
+              type: 'fill',
+              source: 'postgis-tiles2',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-outline-color': 'purple',
+                'fill-color': 'purple',
+                'fill-opacity': 0.1,
+              },
+            },
+            {
+                'id': 'postgis-tiles-layer1',
+                'type': 'fill',
+                'source': 'postgis-tiles1',
+                'source-layer': 'layer0',
+                'paint': {
+                    'fill-outline-color': 'green',
+                    'fill-color': 'green',
+                    'fill-opacity': 0.1
+                }
+            },
+            {
+                'id': 'postgis-tiles-layer2',
+                'type': 'fill',
+                'source': 'postgis-tiles0',
+                'source-layer': 'layer0',
+                'paint': {
+                    'fill-outline-color': 'red',
+                    'fill-color': 'red',
+                    'fill-opacity': 0.1
+                }
+            },
+            {
+              id: 'postgis-tiles-layer-wdpa',
+              type: 'fill',
+              source: 'postgis-tileswdpa',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-outline-color': 'blue',
+                'fill-color': 'blue',
+                'fill-opacity': 0.3,
+              },
+            },
+            {
+            id: 'postgis-tiles-layer-features',
+              type: 'fill',
+              source: 'postgis-tilesFeatures',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-outline-color': 'pink',
+                'fill-color': 'pink',
+                'fill-opacity': 0.3,
+              },
+            },
+            {
+              id: 'postgis-tiles-layer-PU',
+              type: 'fill',
+              source: 'postgis-tilesPU',
+              'source-layer': 'layer0',
+
+              paint: {
                 'fill-outline-color': 'yellow',
                 'fill-color': 'red',
-                'fill-opacity': 0.7
-            }
+                'fill-opacity': 0.1,
+              },
+            },
+            {
+              id: 'postgis-tiles-layer-PU-points',
+              type: 'circle',
+              source: 'postgis-tilesPU2',
+              'source-layer': 'layer0',
+              paint: {
+                'circle-color': 'blue',
+                'circle-opacity':[
+                        'interpolate',
+                        // Set the exponential rate of change to 0.5
+                        ['exponential', 0.5],
+                        ['zoom'],
+                        // When zoom is 15, buildings will be beige.
+                        5,
+                        1,
+                        // When zoom is 18 or higher, buildings will be yellow.
+                        12,
+                        0
+                        ],
+                        'circle-stroke-opacity':[
+                        'interpolate',
+                        // Set the exponential rate of change to 0.5
+                        ['exponential', 0.5],
+                        ['zoom'],
+                        // When zoom is 15, buildings will be beige.
+                        2,
+                        1,
+                        // When zoom is 18 or higher, buildings will be yellow.
+                        7,
+                        0
+                        ],
+                'circle-radius': 1,
+                'circle-stroke-width': 1,
+                'circle-stroke-color': 'blue'
+              },
+            },
+          ],
         },
-        // {
-        //     'id': 'postgis-tiles-layer-PU',
-        //     'type': 'fill',
-        //     'source': 'postgis-tilesPU',
-        //     'source-layer': 'layer0',
-        //     'paint': {
-        //         'fill-outline-color': 'yellow',
-        //         'fill-color': 'red',
-        //         'fill-opacity': 0.7
-        //     }
-        // },
+      });
+      map.on('load', function () {
+        map.on('click', 'postgis-tiles-layer', function (e) {
+        console.log(e.features[0].properties)
+        });
+        map.on('click', 'postgis-tiles-layer1', function (e) {
+        console.log(e.features[0].properties)
+        });
+        map.on('click', 'postgis-tiles-layer2', function (e) {
+        console.log(e.features[0].properties)
+        });
+        // Change the cursor to a pointer when the mouse is over the places layer.
+        map.on('mouseenter', 'postgis-tiles-layer', function () {
+        map.getCanvas().style.cursor = 'pointer';
+        });
 
-        ]
-    }
-});
-
-
-</script>
-
-
-</body>
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'postgis-tiles-layer', function () {
+        map.getCanvas().style.cursor = '';
+        });
+    });
+    </script>
+  </body>
 </html>
-
