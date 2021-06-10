@@ -32,10 +32,19 @@ describe(`Given scenario has some jobs running`, () => {
   it(`should contain only pending job`, () => {
     expect(result.body.data.attributes.scenarios).toEqual([
       {
+        id: world.scenarioIdWithCostSurfaceFinished(),
+        jobs: [
+          {
+            kind: 'costSurface',
+            status: 'done',
+          },
+        ],
+      },
+      {
         id: world.scenarioIdWithPendingJob(),
         jobs: [
           {
-            kind: 'scenario.costSurface',
+            kind: 'planningUnitsInclusion',
             status: 'running',
           },
         ],

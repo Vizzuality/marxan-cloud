@@ -1,7 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
-import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
+import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { JobStatus as Status } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { assertDefined } from '@marxan/utils';
+import { ScenarioJobStatus } from './job-status.view.api.entity';
 import { JobType } from './jobs.enum';
 
 export { Status };
@@ -13,33 +15,35 @@ export interface Job {
 
 export interface Scenario {
   scenarioId: string;
-  status: Status;
   jobs: Job[];
 }
 
 @Injectable()
 export class JobStatusService {
   constructor(
-    private readonly apiEvents: ApiEventsService,
-    private readonly scenariosService: ScenariosService,
+    @InjectRepository(ScenarioJobStatus)
+    private readonly statusRepository: Repository<ScenarioJobStatus>,
   ) {}
 
-  /**
-   * @throws NotFoundException
-   */
-  async getJobStatusFor(_projectId: string): Promise<Scenario[]> {
-    return [];
-    // get status of project job(s) ?
-    // get all scenarios for given project
-    // for each scenario, find its jobs and relevant statuses
-    /**
-     *
-     * Draft of SQL
-     *
-     * SELECT kind, topic, MAX(timestamp) from api_events where
-     --topic in ('03fb678e-689b-473c-af80-6915685a53a8', 'ce2069ee-2925-4c73-a328-882447e6c84d') and
-     ( kind like 'project.protectedAreas%' or kind like 'user.account%' )
-     group by kind, topic
-     */
+  async getJobStatusFor(projectId: string): Promise<Scenario[]> {
+    const statuses = await this.statusRepository.find({
+      projectId,
+    });
+    type ScenarioId = string;
+    const groupedStatuses: Record<ScenarioId, Scenario> = {};
+    for (const status of statuses) {
+      groupedStatuses[status.scenarioId] ??= {
+        scenarioId: status.scenarioId,
+        jobs: [],
+      };
+      const jobStatus = status.jobStatus;
+      assertDefined(jobStatus);
+      groupedStatuses[status.scenarioId].jobs.push({
+        kind: status.jobType,
+        status: jobStatus,
+      });
+    }
+
+    return Object.values(groupedStatuses);
   }
 }
