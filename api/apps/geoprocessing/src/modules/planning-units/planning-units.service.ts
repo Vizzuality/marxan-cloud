@@ -49,30 +49,29 @@ export class PlanningUnitsService {
   /**
    * @param planningUnitGridShape the grid shape that would be use for generating the grid. This grid shape
    * can be square or hexagon. If any grid shape is provided, square would be the default.
-   * @param planningUnitAreakm2 area in km2 of the individual grid that would be generated.
-   * If any value is not provided, 4000 would be the default.
    */
-  regularFuncionGridSelector(
+  regularFunctionGridSelector(
     planningUnitGridShape: PlanningUnitGridShape,
   ): string {
-    const functEquivalence: {
+    const functionEquivalence: {
       [key in keyof typeof PlanningUnitGridShape]: string;
     } = {
       hexagon: 'ST_HexagonGrid',
       square: 'ST_SquareGrid',
     };
 
-    return functEquivalence[planningUnitGridShape];
+    return functionEquivalence[planningUnitGridShape];
   }
 
   calculateGridSize(
-    planningUnitGridShape: PlanningUnitGridShape,
     planningUnitAreakm2: number,
   ): number {
     return Math.sqrt(planningUnitAreakm2) * 1000;
   }
   /**
-   * @param bbox bounding box of the area where the grids would be generated
+   * @param x bounding box of the area where the grids would be generated
+   * @param y bounding box of the area where the grids would be generated
+   * @param z bounding box of the area where the grids would be generated
    * @param planningUnitGridShape the grid shape that would be use for generating the grid. This grid shape
    * can be square or hexagon. If any grid shape is provided, square would be the default.
    * @param planningUnitAreakm2 area in km2 of the individual grid that would be generated.
@@ -84,11 +83,9 @@ export class PlanningUnitsService {
     z: number,
     planningUnitGridShape: PlanningUnitGridShape,
     planningUnitAreakm2: number,
-    filters?: PlanningUnitsFilters,
   ): string {
-    const gridShape = this.regularFuncionGridSelector(planningUnitGridShape);
+    const gridShape = this.regularFunctionGridSelector(planningUnitGridShape);
     const gridSize = this.calculateGridSize(
-      planningUnitGridShape,
       planningUnitAreakm2,
     );
     const ratioPixelExtent = gridSize / (156412 / 2 ** z);
@@ -146,7 +143,6 @@ export class PlanningUnitsService {
       z,
       planningUnitGridShape,
       planningUnitAreakm2,
-      filters,
     );
     const customQuery = this.buildPlanningUnitsWhereQuery(filters);
 
