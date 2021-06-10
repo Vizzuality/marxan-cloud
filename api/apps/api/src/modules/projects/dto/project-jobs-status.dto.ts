@@ -47,7 +47,7 @@ export class JSONAPIProjectJobStatusData {
   @ApiProperty({
     type: String,
   })
-  type = 'project-jobs';
+  type: 'project-jobs' = 'project-jobs';
 
   @ApiProperty()
   id!: string;
