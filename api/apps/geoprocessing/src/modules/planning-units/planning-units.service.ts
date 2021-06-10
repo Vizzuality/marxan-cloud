@@ -53,7 +53,7 @@ export class PlanningUnitsService {
    * @param filters so far only bbox is accepted
    * @returns vector tile
    */
-   public findPreviewTile(
+  public findPreviewTile(
     tileSpecification: tileSpecification,
     filters?: PlanningUnitsFilters,
   ): Promise<Buffer> {
@@ -104,21 +104,19 @@ export class PlanningUnitsService {
     planningUnitAreakm2: number,
   ): string {
     const gridShape = this.regularFunctionGridSelector(planningUnitGridShape);
-    const gridSize = this.calculateGridSize(
-      planningUnitAreakm2,
-    );
+    const gridSize = this.calculateGridSize(planningUnitAreakm2);
     // 156412 references to m per pixel at z level 0 at the equator in EPSG:3857
     const ratioPixelExtent = gridSize / (156412 / 2 ** z);
-    let Query = `( SELECT row_number() over() as id, (${gridShape}(${gridSize}, \
+    let query = `( SELECT row_number() over() as id, (${gridShape}(${gridSize}, \
                     ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom as the_geom)`;
     // (so we are checking that the pixel ration is < 8 px)
     // If so the shape we are getting is down the optimal to visualize it
     if (ratioPixelExtent < 8) {
-      Query = `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
+      query = `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
         ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom )`;
     }
 
-    return Query;
+    return query;
   }
   /**
    * @param filters including only bounding box of the area where the grids would be generated
@@ -133,7 +131,6 @@ export class PlanningUnitsService {
     }
     return whereQuery;
   }
-
 
   /**
    * @param planningUnitGridShape the grid shape that would be use for generating the grid. This grid shape
@@ -156,9 +153,7 @@ export class PlanningUnitsService {
    * @param planningUnitAreakm2
    * @returns grid h size in m
    */
-  private calculateGridSize(
-    planningUnitAreakm2: number,
-  ): number {
+  private calculateGridSize(planningUnitAreakm2: number): number {
     return Math.sqrt(planningUnitAreakm2) * 1000;
   }
 }

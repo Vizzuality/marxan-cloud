@@ -90,7 +90,13 @@ export class TileService {
    */
   private readonly logger: Logger = new Logger(TileService.name);
 
-  simplification(z: number, geometry: string): string {
+  /**
+   * Simplification based in zoom level
+   * @param z
+   * @param geometry
+   * @returns
+   */
+  geometrySimplification(z: number, geometry: string): string {
     return z > 7
       ? `${geometry}`
       : `ST_RemoveRepeatedPoints(${geometry}, ${0.1 / (z * 2)})`;
@@ -120,7 +126,7 @@ export class TileService {
       .select(`ST_AsMVT(tile, 'layer0', ${extent}, 'mvt_geom')`, 'mvt')
       .from((subQuery) => {
         subQuery.select(
-          `${attributes}, ST_AsMVTGeom(ST_Transform(${this.simplification(
+          `${attributes}, ST_AsMVTGeom(ST_Transform(${this.geometrySimplification(
             z,
             geometry,
           )}, 3857),
