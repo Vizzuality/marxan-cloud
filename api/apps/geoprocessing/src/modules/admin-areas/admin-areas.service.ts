@@ -68,8 +68,8 @@ export class AdminAreasService {
     if (level === 2) {
       whereQuery = `gid_2 IS NOT NULL`;
     }
-    if (filters?.guid && level > 0) {
-      whereQuery += ` AND gid_${level - 1} = '${filters?.guid}'`;
+    if (filters?.guid) {
+      whereQuery += ` AND gid_${level} = '${filters?.guid}'`;
     }
     if (filters?.bbox) {
       whereQuery += ` AND the_geom && ST_MakeEnvelope(${nominatim2bbox(
