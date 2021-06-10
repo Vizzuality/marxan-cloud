@@ -15,6 +15,7 @@ import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
 import { ProjectsService } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
+import { JobStatusSerializer } from './dto/job-status.serializer';
 import { BboxResolver } from './bbox/bbox-resolver';
 import { JobStatusService } from './job-status/job-status.service';
 
@@ -37,6 +38,7 @@ import { JobStatusService } from './job-status/job-status.service';
     ProjectSerializer,
     BboxResolver,
     JobStatusService,
+    JobStatusSerializer,
   ],
   controllers: [ProjectsController],
   exports: [ProjectsCrudService],
