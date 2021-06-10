@@ -1,25 +1,21 @@
 import {
   HttpStatus,
   INestApplication,
-  ValidationPipe,
   Logger,
 } from '@nestjs/common';
 import * as request from 'supertest';
 import * as JSONAPISerializer from 'jsonapi-serializer';
-import PBF from 'pbf';
 import { tearDown } from './utils/tear-down';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { AppModule } from '@marxan-api/app.module';
-import { Test, TestingModule } from '@nestjs/testing';
 import { E2E_CONFIG } from './e2e.config';
 import { OrganizationsTestUtils } from './utils/organizations.test.utils';
 import { ProjectsTestUtils } from './utils/projects.test.utils';
 import { ScenariosTestUtils } from './utils/scenarios.test.utils';
 import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
-import { bootstrapApplication } from 'apps/geoprocessing/test/utils';
+import { bootstrapApplication } from './utils/api-application';
 
 const logger = new Logger('test-vtiles');
 
