@@ -1,6 +1,3 @@
-/**
- * @todo move the planningUnitsGeom entity to the api
- */
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Geometry } from 'geojson';

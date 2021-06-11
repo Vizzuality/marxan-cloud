@@ -10,8 +10,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { BBox } from 'geojson';
 import { Transform } from 'class-transformer';
 
-import { PlanningUnitsGeom } from '@marxan-geoprocessing/modules/planning-units/planning-units.geo.entity';
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
+import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 
 export class tileSpecification extends TileRequest {
   @ApiProperty()

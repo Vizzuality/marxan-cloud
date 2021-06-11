@@ -5,10 +5,6 @@ import { v4 } from 'uuid';
 import { Feature, MultiPolygon, Polygon } from 'geojson';
 
 import {
-  PlanningUnitsGeom,
-  ShapeType,
-} from '@marxan-geoprocessing/modules/planning-units/planning-units.geo.entity';
-import {
   LockStatus,
   ScenariosPlanningUnitGeoEntity,
 } from '@marxan/scenarios-planning-unit';
@@ -16,6 +12,10 @@ import {
   AreaUnitSampleGeometry,
   AreaUnitSampleGeometryProps,
 } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/__mocks__/include-sample';
+import {
+  PlanningUnitsGeom,
+  ShapeType,
+} from '@marxan-jobs/planning-unit-geometry';
 
 export const createWorld = async (app: INestApplication) => {
   const scenarioId = v4();

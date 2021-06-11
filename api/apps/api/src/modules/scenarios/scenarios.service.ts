@@ -1,5 +1,6 @@
 import { HttpService, Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
+import * as stream from 'stream';
 
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { AppConfig } from '@marxan-api/utils/config.utils';
@@ -14,6 +15,7 @@ import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
+import { CostSurfaceViewService } from '@marxan-api/modules/scenarios/cost-surface-readmodel/cost-surface-view.service';
 
 @Injectable()
 export class ScenariosService {
@@ -28,6 +30,7 @@ export class ScenariosService {
     private readonly costSurface: CostSurfaceFacade,
     private readonly httpService: HttpService,
     private readonly solutionsCrudService: SolutionResultCrudService,
+    private readonly costSurfaceView: CostSurfaceViewService,
   ) {}
 
   async findAllPaginated(fetchSpecification: FetchSpecification) {
@@ -112,6 +115,14 @@ export class ScenariosService {
   ) {
     await this.assertScenario(scenarioId);
     return this.solutionsCrudService.findAll(fetchSpecification);
+  }
+
+  async getCostSurfaceCsv(
+    scenarioId: string,
+    stream: stream.Writable,
+  ): Promise<void> {
+    await this.assertScenario(scenarioId);
+    await this.costSurfaceView.read(scenarioId, stream);
   }
 
   private async assertScenario(scenarioId: string) {

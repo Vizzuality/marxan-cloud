@@ -22,6 +22,7 @@ import { SolutionResultCrudService } from './solutions-result/solution-result-cr
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
+import { CostSurfaceViewModule } from './cost-surface-readmodel/cost-surface-view.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
     CostSurfaceModule,
     HttpModule,
     CostSurfaceTemplateModule,
+    CostSurfaceViewModule,
   ],
   providers: [
     ScenariosService,
