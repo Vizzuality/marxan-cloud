@@ -115,7 +115,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
   return (
     <AnimatePresence>
-      <div key="project-scenarios-sidebar" className="col-span-7 overflow-hidden">
+      <div key="project-scenarios-sidebar" className="flex flex-col flex-grow col-span-7 overflow-hidden">
         {!loading && !rawScenariosData.length && (
           <motion.div
             key="project-scenarios-empty"
@@ -145,7 +145,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
         )}
 
         {!loading && !!rawScenariosData.length && (
-          <motion.div key="projects-scenarios" className="relative flex flex-col">
+          <motion.div key="projects-scenarios" className="relative flex flex-col flex-grow overflow-hidden">
             <ScenarioToolbar />
 
             <Loading
@@ -166,7 +166,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
             <div className="relative overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-black via-black" />
-              <div ref={scrollRef} className="relative z-0 h-full py-6 overflow-x-hidden overflow-y-auto">
+              <div ref={scrollRef} className="relative z-0 flex flex-col flex-grow h-full py-6 overflow-x-hidden overflow-y-auto">
                 {allScenariosData.map((s, i) => {
                   return (
                     <ScenarioItem
