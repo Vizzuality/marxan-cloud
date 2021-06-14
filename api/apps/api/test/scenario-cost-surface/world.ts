@@ -3,9 +3,12 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import * as request from 'supertest';
 import { In, Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import {
+  LockStatus,
+  ScenariosPlanningUnitGeoEntity,
+  ScenariosPuCostDataGeo,
+} from '@marxan/scenarios-planning-unit';
 import { Polygon } from 'geojson';
-import { v4 } from 'uuid';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import {
   PlanningUnitsGeom,
@@ -14,6 +17,7 @@ import {
 import { GivenProjectExists } from '../steps/given-project';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { v4 } from 'uuid';
 
 export const createWorld = async () => {
   const app = await bootstrapApplication();
@@ -30,6 +34,7 @@ export const createWorld = async () => {
     })
   ).data.id;
   const geometries: string[] = [];
+  const scenariosPuData: string[] = [];
 
   const puGeometryRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
@@ -40,11 +45,17 @@ export const createWorld = async () => {
       DbConnections.geoprocessingDB,
     ),
   );
+  const scenarioPuDataCostRepo: Repository<ScenariosPuCostDataGeo> = app.get(
+    getRepositoryToken(ScenariosPuCostDataGeo, DbConnections.geoprocessingDB),
+  );
 
   return {
     cleanup: async () => {
       await ScenariosTestUtils.deleteScenario(app, jwt, scenarioId);
       await projectCleanup();
+      await scenarioPuDataCostRepo.delete({
+        scenariosPuDataId: In(scenariosPuData),
+      });
       await puGeometryRepo.delete({
         id: In(geometries),
       });
@@ -77,14 +88,29 @@ export const createWorld = async () => {
       ).identifiers;
 
       geometries.push(...geoRows.map((geo) => geo.id));
-      await scenarioPuDataRepo.save(
+      const scenarioPuData = await scenarioPuDataRepo.save(
         geometries.map((id, index) =>
           scenarioPuDataRepo.create({
             puGeometryId: id,
             scenarioId,
             planningUnitMarxanId: index,
+            lockStatus:
+              index === 0
+                ? LockStatus.Unstated
+                : index === 1
+                ? LockStatus.LockedIn
+                : LockStatus.LockedOut,
           }),
         ),
+      );
+      scenariosPuData.push(...scenarioPuData.map((spud) => spud.id));
+      await scenarioPuDataCostRepo.save(
+        scenarioPuData.map((spud, index) => ({
+          cost: (index + 1) * 200,
+          scenariosPuDataId: spud.id,
+          scenariosPlanningUnit: spud,
+          planningUnitId: v4(),
+        })),
       );
     },
     WhenGettingMarxanData: async () =>

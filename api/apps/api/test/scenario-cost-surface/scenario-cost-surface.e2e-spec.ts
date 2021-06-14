@@ -14,12 +14,16 @@ describe(`When scenario has PUs with cost and lock status`, () => {
 
   it(`returns relevant data`, async () => {
     const result = await world.WhenGettingMarxanData();
-    expect(result).toMatchInlineSnapshot(`
-      "id	cost	status
-      0
-      1
-      2
-      3		"
+    const [headers, ...costAndStatus] = result.split('\n');
+
+    expect(headers).toEqual('id\tcost\tstatus');
+    expect(costAndStatus).toMatchInlineSnapshot(`
+      Array [
+        "0	200	",
+        "1	400	1",
+        "2	600	2",
+        "3	800	2",
+      ]
     `);
   });
 });

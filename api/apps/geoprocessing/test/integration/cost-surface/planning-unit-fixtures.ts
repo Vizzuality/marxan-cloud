@@ -3,8 +3,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { ScenariosPuCostDataGeo } from '@marxan-geoprocessing/modules/scenarios/scenarios-pu-cost-data.geo.entity';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import {
+  ScenariosPlanningUnitGeoEntity,
+  ScenariosPuCostDataGeo,
+} from '@marxan/scenarios-planning-unit';
 
 import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
 

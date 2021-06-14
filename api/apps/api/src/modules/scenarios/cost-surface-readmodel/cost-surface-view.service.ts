@@ -7,6 +7,8 @@ import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit'
 
 @Injectable()
 export class CostSurfaceViewService {
+  readonly #separator = '\t';
+
   constructor(
     @InjectRepository(
       ScenariosPlanningUnitGeoEntity,
@@ -15,11 +17,12 @@ export class CostSurfaceViewService {
     private readonly spuDataRepo: Repository<ScenariosPlanningUnitGeoEntity>,
   ) {}
 
-  async read(scenarioId: string, stream: stream.Writable): Promise<void> {
-    stream.write('id\tcost\tstatus');
+  async read(
+    scenarioId: string,
+    responseStream: stream.Writable,
+  ): Promise<void> {
+    responseStream.write([`id`, `cost`, `status`].join(this.#separator));
 
-    // TODO make some changes upon lockin_status
-    // TODO add _costs rows
     const query = await this.spuDataRepo
       .createQueryBuilder('spu')
       .select(['spu.puid', 'spu.lockin_status', 'spucd.cost'])
@@ -31,34 +34,24 @@ export class CostSurfaceViewService {
       .where(`spu.scenario_id = :scenarioId`, { scenarioId });
 
     const queryStream = await query.stream();
-    // typeorm query runner/builder -> stream
-
-    queryStream.on('data', (data) => {
-      const row = (data as unknown) as {
+    // "pipe" does not seem to trigger
+    queryStream.on(
+      'data',
+      (data: {
         puid: number;
         lockin_status: number | null;
-        cost: number | null;
-      };
-      const tsvRow = [row.puid, row.lockin_status, row.cost].join('\t');
-      stream.write(`\n`);
-      stream.write(tsvRow);
-    });
-    queryStream.on('result', (data) => {
-      console.log(`-result`, data);
-    });
-    queryStream.on('end', () => {
-      // queryRunner.release();
-      stream.end();
-      console.log(`-end`);
-    });
-    queryStream.on('error', (error) => {
-      // queryRunner.release();
-      stream.destroy(error);
-      console.log(`-error`, error);
-    });
+        spucd_cost: number | null;
+      }) => {
+        const tsvRow = [data.puid, data.spucd_cost, data.lockin_status].join(
+          this.#separator,
+        );
+        responseStream.write(`\n`);
+        responseStream.write(tsvRow);
+      },
+    );
 
-    stream.on(`finish`, () => {
-      console.log(`finished?`);
+    queryStream.on('end', () => {
+      responseStream.end();
     });
   }
 }
