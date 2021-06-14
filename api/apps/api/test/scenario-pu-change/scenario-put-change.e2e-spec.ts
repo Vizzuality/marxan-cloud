@@ -1,9 +1,10 @@
 import { INestApplication } from '@nestjs/common';
+import { PromiseType } from 'utility-types';
 import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { WhenRequestingStatus } from './steps/WhenRequestingStatus';
 
-import { createWorld, World } from './steps/world';
+import { WhenRequestingStatus } from './steps/WhenRequestingStatus';
+import { createWorld } from './steps/world';
 import { FakeQueue } from '../utils/queues';
 import { QueueToken } from '../../src/modules/queue/queue.tokens';
 import { ExpectBadRequest } from './assertions/expect-bad-request';
@@ -13,15 +14,15 @@ import { tearDown } from '../utils/tear-down';
 
 let app: INestApplication;
 let jwtToken: string;
-let scenarioId: string;
 let queue: FakeQueue;
 
-let world: World;
+let world: PromiseType<ReturnType<typeof createWorld>>;
 
 beforeAll(async () => {
   app = await bootstrapApplication();
   jwtToken = await GivenUserIsLoggedIn(app);
-  world = await createWorld(app);
+  world = await createWorld(app, jwtToken);
+  await world.GivenScenarioPuDataExists();
   queue = app.get(QueueToken);
 });
 
@@ -34,13 +35,13 @@ afterAll(async () => {
 describe(`when requesting to change inclusive options`, () => {
   it(`denies to request with valid input`, async () => {
     ExpectBadRequest(
-      await world.WhenChangingPlanningUnitInclusivityForRandomPu(jwtToken),
+      await world.WhenChangingPlanningUnitInclusivityForRandomPu(),
     );
   });
 
   describe(`when desired PU ids are available`, () => {
     it(`triggers the job`, async () => {
-      await world.WhenChangingPlanningUnitInclusivityWithExistingPu(jwtToken);
+      await world.WhenChangingPlanningUnitInclusivityWithExistingPu();
       const job = Object.values(queue.jobs)[0];
       HasExpectedJobDetails(job);
       HasRelevantJobName(job, world.scenarioId);
@@ -52,7 +53,7 @@ describe.skip(`when requesting status of change`, () => {
   let outcome: unknown;
 
   beforeAll(async () => {
-    outcome = await WhenRequestingStatus(app, scenarioId, jwtToken);
+    outcome = await WhenRequestingStatus(app, world.scenarioId, jwtToken);
   });
 
   it(`returns relevant status`, async () => {

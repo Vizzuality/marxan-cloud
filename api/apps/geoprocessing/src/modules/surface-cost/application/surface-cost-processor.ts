@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Job } from 'bullmq';
 
-import { WorkerProcessor } from '../../worker';
+import { canPlanningUnitsBeLocked } from '@marxan/scenarios-planning-unit';
+import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
+
 import { CostSurfaceJobInput } from '../cost-surface-job-input';
 
 import { CostSurfacePersistencePort } from '../ports/persistence/cost-surface-persistence.port';
 import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
-import { ArePuidsAllowedPort } from '../ports/pu-validator/are-puuids-allowed.port';
+import { GetAvailablePlanningUnits } from '../ports/available-planning-units/get-available-planning-units';
 import { ShapefileConverterPort } from '../ports/shapefile-converter/shapefile-converter.port';
 
 @Injectable()
@@ -15,16 +17,20 @@ export class SurfaceCostProcessor
   constructor(
     private readonly repo: CostSurfacePersistencePort,
     private readonly puExtractor: PuExtractorPort,
-    private readonly puValidator: ArePuidsAllowedPort,
+    private readonly availablePlanningUnits: GetAvailablePlanningUnits,
     private readonly shapefileConverter: ShapefileConverterPort,
   ) {}
 
   async process(job: Job<CostSurfaceJobInput, true>): Promise<true> {
     const geoJson = await this.shapefileConverter.convert(job.data.shapefile);
     const surfaceCosts = this.puExtractor.extract(geoJson);
-    const { errors } = await this.puValidator.validate(
-      job.data.scenarioId,
-      surfaceCosts.map((cost) => cost.planningUnitId),
+    const scenarioPlanningUnitIds = (
+      await this.availablePlanningUnits.get(job.data.scenarioId)
+    ).ids;
+
+    const { errors } = canPlanningUnitsBeLocked(
+      surfaceCosts.map((cost) => cost.puId),
+      scenarioPlanningUnitIds,
     );
     if (errors.length > 0) {
       throw new Error(errors.join('.'));

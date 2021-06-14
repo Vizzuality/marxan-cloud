@@ -3,19 +3,23 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
+  NotImplementedException,
   Param,
   Patch,
+  Post,
   Query,
   Req,
   UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   Project,
-  ProjectResultSingular,
+  projectResource,
   ProjectResultPlural,
+  ProjectResultSingular,
 } from './project.api.entity';
-import { ProjectsService } from './projects.service';
 
 import {
   ApiBearerAuth,
@@ -28,8 +32,6 @@ import {
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import { Post } from '@nestjs/common';
-import { UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 
@@ -37,7 +39,6 @@ import {
   JSONAPIQueryParams,
   JSONAPISingleEntityQueryParams,
 } from '@marxan-api/decorators/json-api-parameters.decorator';
-import { projectResource } from './project.api.entity';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
@@ -46,10 +47,13 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
-import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
-import { Request } from 'express';
-import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
+import { ProjectsService } from './projects.service';
+import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
+import { ProjectSerializer } from './dto/project.serializer';
+import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
+import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { JobType } from './job-status/jobs.enum';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -57,9 +61,9 @@ import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectsController {
   constructor(
-    public readonly service: ProjectsService,
-    private readonly geoFeaturesService: GeoFeaturesService,
-    private readonly protectedAreaShapefile: ProtectedAreasFacade,
+    private readonly projectsService: ProjectsService,
+    private readonly geoFeatureSerializer: GeoFeatureSerializer,
+    private readonly projectSerializer: ProjectSerializer,
   ) {}
 
   @ApiOperation({
@@ -77,7 +81,7 @@ export class ProjectsController {
     @Param() params: { projectId: string },
     @Query('q') featureClassAndAliasFilter: string,
   ): Promise<GeoFeatureResult> {
-    const results = await this.geoFeaturesService.findAllPaginated(
+    const { data, metadata } = await this.projectsService.findAllGeoFeatures(
       fetchSpecification,
       {
         params: {
@@ -87,7 +91,7 @@ export class ProjectsController {
       },
     );
 
-    return this.geoFeaturesService.serialize(results.data, results.metadata);
+    return this.geoFeatureSerializer.serialize(data, metadata);
   }
 
   /**
@@ -104,7 +108,7 @@ export class ProjectsController {
   async importLegacyProject(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Project> {
-    return this.service.importLegacyProject(file);
+    return this.projectsService.importLegacyProject(file);
   }
 
   @ApiOperation({
@@ -125,8 +129,8 @@ export class ProjectsController {
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ProjectResultPlural> {
-    const results = await this.service.findAllPaginated(fetchSpecification);
-    return await this.service.serialize(results.data, results.metadata);
+    const results = await this.projectsService.findAll(fetchSpecification);
+    return this.projectSerializer.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find project by id' })
@@ -136,7 +140,9 @@ export class ProjectsController {
   })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ProjectResultSingular> {
-    return await this.service.serialize(await this.service.getById(id));
+    return await this.projectSerializer.serialize(
+      await this.projectsService.findOne(id),
+    );
   }
 
   @ApiOperation({ description: 'Create project' })
@@ -146,8 +152,8 @@ export class ProjectsController {
     @Body() dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResultSingular> {
-    return await this.service.serialize(
-      await this.service.create(dto, { authenticatedUser: req.user }),
+    return await this.projectSerializer.serialize(
+      await this.projectsService.create(dto, { authenticatedUser: req.user }),
     );
   }
 
@@ -158,14 +164,48 @@ export class ProjectsController {
     @Param('id') id: string,
     @Body() dto: UpdateProjectDTO,
   ): Promise<ProjectResultSingular> {
-    return await this.service.serialize(await this.service.update(id, dto));
+    return await this.projectSerializer.serialize(
+      await this.projectsService.update(id, dto),
+    );
   }
 
   @ApiOperation({ description: 'Delete project' })
   @ApiOkResponse()
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
-    return await this.service.remove(id);
+    return await this.projectsService.remove(id);
+  }
+
+  @ApiOperation({
+    description: `Find running jobs for each scenario under given project`,
+  })
+  @ApiOkResponse({ type: ProjectJobsStatusDto })
+  @Get(`:id/scenarios/status`)
+  async getJobsForProjectScenarios(
+    @Param('id') projectId: string,
+  ): Promise<ProjectJobsStatusDto> {
+    // TODO add JobStatus DTO
+    // TODO add serializer
+    return {
+      data: {
+        id: projectId,
+        type: 'project-jobs',
+        attributes: {
+          scenarios: [
+            {
+              id: projectId,
+              status: JobStatus.running,
+              jobs: [
+                {
+                  kind: JobType.CostSurface,
+                  status: JobStatus.running,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    };
   }
 
   @ApiConsumesShapefile(false)
@@ -177,11 +217,12 @@ export class ProjectsController {
   @Post(':id/protected-areas/shapefile')
   async shapefileForProtectedArea(
     @Param('id') projectId: string,
-    @Req() request: Request,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<void> {
-    // TODO #1 pre-validate project existence
-
-    this.protectedAreaShapefile.convert(projectId, request.file);
+    const outcome = await this.projectsService.addShapeFor(projectId, file);
+    if (outcome) {
+      throw new NotFoundException();
+    }
     return;
   }
 }

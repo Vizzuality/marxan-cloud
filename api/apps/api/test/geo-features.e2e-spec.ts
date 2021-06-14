@@ -1,37 +1,21 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import {
-  HttpStatus,
-  INestApplication,
-  Logger,
-  ValidationPipe,
-} from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@marxan-api/app.module';
-import { E2E_CONFIG } from './e2e.config';
-import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
-import { IUCNProtectedAreaCategoryDTO } from '@marxan-api/modules/protected-areas/dto/iucn-protected-area-category.dto';
-import {
-  IUCNCategory,
-  ProtectedArea,
-} from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
-import * as JSONAPISerializer from 'jsonapi-serializer';
-import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
-import { OrganizationsTestUtils } from './utils/organizations.test.utils';
-import { ProjectsTestUtils } from './utils/projects.test.utils';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { ScenariosTestUtils } from './utils/scenarios.test.utils';
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { v4 } from 'uuid';
-import { difference } from 'lodash';
+import { PromiseType } from 'utility-types';
 import {
   GeoFeature,
   geoFeatureResource,
 } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { tearDown } from './utils/tear-down';
+import { bootstrapApplication } from './utils/api-application';
+import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+
+import { createWorld } from './project/projects-world';
 
 afterAll(async () => {
   await tearDown();
 });
+
+let world: PromiseType<ReturnType<typeof createWorld>>;
 
 /**
  * Tests for API contracts for the management of geo features within scenarios.
@@ -39,118 +23,24 @@ afterAll(async () => {
 describe('GeoFeaturesModule (e2e)', () => {
   let app: INestApplication;
   let jwtToken: string;
-  const Deserializer = new JSONAPISerializer.Deserializer({
-    keyForAttribute: 'camelCase',
-  });
-  let anOrganization: Organization;
-  let aProjectWithCountryAsPlanningArea: Project;
-  let aProjectWithALevel1AdminAreaAsPlanningArea: Project;
-  let aProjectWithALevel2AdminAreaAsPlanningArea: Project;
 
-  /**
-   * See note about the choice of country and admin area codes for the
-   * following project creation operations in `protected-areas.e2e-spec.ts`.
-   */
-  const country = 'NAM';
-  const l1AdminArea = 'NAM.13_1';
-  const l2AdminArea = 'NAM.13.5_1';
   const geoFeaturesFilters = {
     cheeta: { featureClassName: 'iucn_acinonyxjubatus', alias: 'cheetah' },
     partialMatches: { us: 'us' },
   };
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    );
-    await app.init();
-
-    const response = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({
-        username: E2E_CONFIG.users.basic.aa.username,
-        password: E2E_CONFIG.users.basic.aa.password,
-      })
-      .expect(201);
-
-    jwtToken = response.body.accessToken;
-
-    anOrganization = await OrganizationsTestUtils.createOrganization(
-      app,
-      jwtToken,
-      E2E_CONFIG.organizations.valid.minimal(),
-    ).then(async (response) => {
-      return await Deserializer.deserialize(response);
-    });
-
-    aProjectWithCountryAsPlanningArea = await ProjectsTestUtils.createProject(
-      app,
-      jwtToken,
-      {
-        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: country,
-        }),
-        organizationId: anOrganization.id,
-      },
-    ).then(async (response) => await Deserializer.deserialize(response));
-
-    aProjectWithALevel1AdminAreaAsPlanningArea = await ProjectsTestUtils.createProject(
-      app,
-      jwtToken,
-      {
-        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: country,
-          adminAreaLevel1Id: l1AdminArea,
-        }),
-        organizationId: anOrganization.id,
-      },
-    ).then(async (response) => await Deserializer.deserialize(response));
-
-    aProjectWithALevel2AdminAreaAsPlanningArea = await ProjectsTestUtils.createProject(
-      app,
-      jwtToken,
-      {
-        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: country,
-          adminAreaLevel1Id: l1AdminArea,
-          adminAreaLevel2Id: l2AdminArea,
-        }),
-        organizationId: anOrganization.id,
-      },
-    ).then(async (response) => await Deserializer.deserialize(response));
+    app = await bootstrapApplication();
+    jwtToken = await GivenUserIsLoggedIn(app);
+    world = await createWorld(app, jwtToken);
+    if (!world) {
+      throw new Error('Could not create fixtures');
+    }
   });
 
   afterAll(async () => {
-    await ProjectsTestUtils.deleteProject(
-      app,
-      jwtToken,
-      aProjectWithALevel2AdminAreaAsPlanningArea.id,
-    );
-    await ProjectsTestUtils.deleteProject(
-      app,
-      jwtToken,
-      aProjectWithALevel1AdminAreaAsPlanningArea.id,
-    );
-    await ProjectsTestUtils.deleteProject(
-      app,
-      jwtToken,
-      aProjectWithCountryAsPlanningArea.id,
-    );
-    await OrganizationsTestUtils.deleteOrganization(
-      app,
-      jwtToken,
-      anOrganization.id,
-    );
-    await Promise.all([app.close()]);
+    await world?.cleanup();
+    await app.close();
   });
 
   describe('GeoFeatures', () => {
@@ -160,15 +50,11 @@ describe('GeoFeaturesModule (e2e)', () => {
     describe('Listing GeoFeatures', () => {
       test('As a user, I should be able to retrieve a list of features available within a project', async () => {
         const response = await request(app.getHttpServer())
-          .get(
-            `/api/v1/projects/${aProjectWithCountryAsPlanningArea.id}/features`,
-          )
+          .get(`/api/v1/projects/${world.projectWithCountry}/features`)
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
 
-        const geoFeaturesForProject: GeoFeature[] = await Deserializer.deserialize(
-          response.body,
-        );
+        const geoFeaturesForProject: GeoFeature[] = response.body.data;
         expect(geoFeaturesForProject.length).toBeGreaterThan(0);
         expect(response.body.data[0].type).toBe(geoFeatureResource.name.plural);
       });
@@ -180,7 +66,7 @@ describe('GeoFeaturesModule (e2e)', () => {
       test('should return a single result of geo-features whose className property matches a given filter', async () => {
         const response = await request(app.getHttpServer())
           .get(
-            `/api/v1/projects/${aProjectWithCountryAsPlanningArea.id}/features?q=${geoFeaturesFilters.cheeta.featureClassName}`,
+            `/api/v1/projects/${world.projectWithCountry}/features?q=${geoFeaturesFilters.cheeta.featureClassName}`,
           )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
@@ -194,7 +80,7 @@ describe('GeoFeaturesModule (e2e)', () => {
       test.skip('should return a single result of geo-features whose alias property matches a given filter', async () => {
         const response = await request(app.getHttpServer())
           .get(
-            `/api/v1/projects/${aProjectWithCountryAsPlanningArea.id}/features?q=${geoFeaturesFilters.cheeta.alias}`,
+            `/api/v1/projects/${world.projectWithCountry}/features?q=${geoFeaturesFilters.cheeta.alias}`,
           )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
@@ -207,7 +93,7 @@ describe('GeoFeaturesModule (e2e)', () => {
       test('should return a list of geo-features whose featureClassName property match a given substring', async () => {
         const response = await request(app.getHttpServer())
           .get(
-            `/api/v1/projects/${aProjectWithCountryAsPlanningArea.id}/features?q=${geoFeaturesFilters.partialMatches.us}`,
+            `/api/v1/projects/${world.projectWithCountry}/features?q=${geoFeaturesFilters.partialMatches.us}`,
           )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
@@ -216,9 +102,7 @@ describe('GeoFeaturesModule (e2e)', () => {
       });
       test('should return all available features if query param has no value', async () => {
         const response = await request(app.getHttpServer())
-          .get(
-            `/api/v1/projects/${aProjectWithCountryAsPlanningArea.id}/features?q=`,
-          )
+          .get(`/api/v1/projects/${world.projectWithCountry}/features?q=`)
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
 

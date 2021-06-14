@@ -7,7 +7,7 @@ const lineClamp = require('./styles/line-clamp');
 module.exports = {
   purge: {
     enabled: process.env.NODE_ENV !== 'development',
-    content: ['./**/*.tsx'],
+    content: ['./**/*.ts', './**/*.tsx'],
   },
   presets: [],
   darkMode: false, // or 'media' or 'class'

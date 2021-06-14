@@ -1,35 +1,21 @@
-import { Feature, FeatureCollection, MultiPolygon, Polygon } from 'geojson';
+import { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 import { PlanningUnitCost } from '../../ports/planning-unit-cost';
 
-export const getGeoJson = (): FeatureCollection<
-  MultiPolygon | Polygon,
-  PlanningUnitCost
-> => ({
+export const getGeoJson = (
+  planningUnitsIds: string[],
+): FeatureCollection<MultiPolygon | Polygon, PlanningUnitCost> => ({
   type: 'FeatureCollection',
-  features: [
-    {
-      properties: {
-        cost: 200,
-        planningUnitId: 'uuid-1',
-      },
-      type: 'Feature',
-      geometry: {
-        type: 'MultiPolygon',
-        coordinates: [],
-      },
+  features: planningUnitsIds.map((id) => ({
+    properties: {
+      cost: 200,
+      puId: id,
     },
-    {
-      properties: {
-        cost: 100,
-        planningUnitId: 'uuid-2',
-      },
-      type: 'Feature',
-      geometry: {
-        type: 'Polygon',
-        coordinates: [],
-      },
+    type: 'Feature',
+    geometry: {
+      type: 'MultiPolygon',
+      coordinates: [],
     },
-  ],
+  })),
 });
 
 export const getGeoJsonWithMissingCost = (): FeatureCollection<
@@ -55,4 +41,9 @@ export const getGeoJsonWithMissingCost = (): FeatureCollection<
       },
     },
   ],
+});
+
+export const getGeometryMultiPolygon = (): MultiPolygon => ({
+  type: 'MultiPolygon',
+  coordinates: [],
 });

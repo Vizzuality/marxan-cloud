@@ -1,24 +1,22 @@
 import { Module } from '@nestjs/common';
-import { PlanningUnitsModule } from '../planning-units/planning-units.module';
-
-import { ScenariosPlanningUnitModule } from '../scenarios-planning-unit/scenarios-planning-unit.module';
-import { AdjustCostSurface } from './entry-points/adjust-cost-surface';
+import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
+import { queueName } from '@marxan-jobs/planning-unit-geometry';
+import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
+import { ScenariosPlanningUnitModule } from '@marxan-api/modules/scenarios-planning-unit/scenarios-planning-unit.module';
 
 import { AdjustPlanningUnits } from './entry-points/adjust-planning-units';
-import { GetScenarioStatus } from './entry-points/get-scenario-status';
-import { UpdateCostSurfaceService } from './providers/cost-surface/update-cost-surface.service';
 import { ArePuidsAllowedAdapter } from './providers/shared/adapters/are-puids-allowed-adapter';
 import { ArePuidsAllowedPort } from './providers/shared/are-puids-allowed.port';
 import { UpdatePlanningUnitsService } from './providers/planning-units/update-planning-units.service';
-import { ScenarioStatusService } from './providers/status/scenario-status.service';
 import { RequestJobPort } from './providers/planning-units/request-job.port';
 import { AsyncJobsAdapter } from './providers/planning-units/adapters/async-jobs-adapter';
-import { CostSurfaceRepo } from './providers/cost-surface/cost-surface-repo';
 import { QueueModule } from '../queue/queue.module';
-import { queueName } from './queue-name';
+import { UpdatePlanningUnitsApiEvents } from './providers/planning-units/adapters/update-planning-units-api-events';
+import { UpdatePlanningUnitsEventsPort } from './providers/planning-units/update-planning-units-events.port';
 
 @Module({
   imports: [
+    ApiEventsModule,
     ScenariosPlanningUnitModule,
     PlanningUnitsModule,
     QueueModule.register({
@@ -27,20 +25,15 @@ import { queueName } from './queue-name';
   ],
   providers: [
     {
-      provide: AdjustCostSurface,
-      useClass: UpdateCostSurfaceService,
-    },
-    {
       provide: AdjustPlanningUnits,
       useClass: UpdatePlanningUnitsService,
     },
-    {
-      provide: GetScenarioStatus,
-      useClass: ScenarioStatusService,
-    },
     UpdatePlanningUnitsService,
-    UpdateCostSurfaceService,
     // internals - should be in adapters.module
+    {
+      provide: UpdatePlanningUnitsEventsPort,
+      useClass: UpdatePlanningUnitsApiEvents,
+    },
     {
       provide: ArePuidsAllowedPort,
       useClass: ArePuidsAllowedAdapter,
@@ -49,11 +42,7 @@ import { queueName } from './queue-name';
       provide: RequestJobPort,
       useClass: AsyncJobsAdapter,
     },
-    {
-      provide: CostSurfaceRepo,
-      useValue: {},
-    },
   ],
-  exports: [AdjustCostSurface, AdjustPlanningUnits, GetScenarioStatus],
+  exports: [AdjustPlanningUnits],
 })
 export class AnalysisModule {}

@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { bootstrapApplication } from '../utils/api-application';
 import { createWorld, World } from './steps/world';
 import { tearDown } from '../utils/tear-down';
+import { v4 } from 'uuid';
 
 let app: INestApplication;
 let world: World;
@@ -18,8 +19,8 @@ afterAll(async () => {
 });
 
 describe(`when project is not available`, () => {
-  it.skip(`should fail`, () => {
-    // TODO once implemented
+  it(`should fail`, async () => {
+    expect((await world.WhenSubmittingShapefileFor(v4())).status).toEqual(404);
   });
 });
 

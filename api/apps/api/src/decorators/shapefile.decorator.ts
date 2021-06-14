@@ -1,3 +1,4 @@
+import { isDefined } from '@marxan/utils';
 import { applyDecorators } from '@nestjs/common';
 import {
   ApiBody,
@@ -7,7 +8,6 @@ import {
 } from '@nestjs/swagger';
 
 import { ShapefileGeoJSONResponseDTO } from '@marxan-api/modules/scenarios/dto/shapefile.geojson.response.dto';
-import { isDefined } from '../utils/is-defined';
 
 export function ApiConsumesShapefile(withGeoJsonResponse = true) {
   return applyDecorators(
@@ -22,7 +22,9 @@ export function ApiConsumesShapefile(withGeoJsonResponse = true) {
           type: 'object',
           properties: {
             file: {
-              type: 'Zip file containing .shp, .dbj, .prj and .shx files',
+              description:
+                'Zip file containing .shp, .dbj, .prj and .shx files',
+              type: 'string',
               format: 'binary',
             },
           },

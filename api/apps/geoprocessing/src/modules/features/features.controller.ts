@@ -21,7 +21,7 @@ import { BBox } from 'geojson';
 
 import { Response } from 'express';
 
-@Controller(`${apiGlobalPrefixes.v1}/features`)
+@Controller(`${apiGlobalPrefixes.v1}/geo-features`)
 export class FeaturesController {
   private readonly logger: Logger = new Logger(FeaturesController.name);
   constructor(public service: FeatureService) {}

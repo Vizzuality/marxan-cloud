@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AdminArea } from '@marxan/admin-regions';
 
-import { AdminArea } from '@marxan-api/modules/admin-areas/admin-area.geo.entity';
 import { apiConnections } from '../../ormconfig';
 
 @Module({

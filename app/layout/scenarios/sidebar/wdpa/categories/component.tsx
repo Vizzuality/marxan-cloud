@@ -5,7 +5,7 @@ import Loading from 'components/loading';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
-import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Select from 'components/forms/select';
@@ -13,10 +13,12 @@ import Select from 'components/forms/select';
 import { useRouter } from 'next/router';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
-
-import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import { useProject } from 'hooks/projects';
 import { useWDPACategories } from 'hooks/wdpa';
+import { useDispatch } from 'react-redux';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface WDPACategoriesProps {
   onSuccess: () => void,
@@ -30,6 +32,10 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
   const { pid, sid } = query;
+
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setWDPACategories } = scenarioSlice.actions;
+  const dispatch = useDispatch();
 
   const { data: projectData } = useProject(pid);
 
@@ -180,18 +186,21 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       mutators={{
         removeWDPAFilter: (args, state, utils) => {
           const [id, arr] = args;
-          const i = arr.indexOf(id);
+          const newArr = [...arr];
+          const i = newArr.indexOf(id);
 
           if (i > -1) {
-            arr.splice(i, 1);
+            newArr.splice(i, 1);
           }
-          utils.changeValue(state, 'wdpaIucnCategories', () => arr);
+          utils.changeValue(state, 'wdpaIucnCategories', () => newArr);
         },
       }}
       initialValues={INITIAL_VALUES}
     >
       {({ form, values, handleSubmit }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative w-full">
+          <FormSpyRFF onChange={(state) => dispatch(setWDPACategories(state.values))} />
+
           {/* WDPA */}
           <div>
             <FieldRFF
@@ -279,7 +288,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
             </div>
           )}
 
-          <div className="flex justify-center space-x-2 mt-20">
+          <div className="flex justify-center mt-20 space-x-2">
             <Button
               theme="secondary-alt"
               size="lg"

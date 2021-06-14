@@ -1,8 +1,5 @@
-import { AdjustPlanningUnitsInput } from '../../entry-points/adjust-planning-units-input';
-import { AsyncJob } from '../../async-job';
-
-export type RequestJobInput = AdjustPlanningUnitsInput & { scenarioId: string };
+import { JobInput } from '@marxan-jobs/planning-unit-geometry';
 
 export abstract class RequestJobPort {
-  abstract queue(input: RequestJobInput): Promise<AsyncJob>;
+  abstract queue(input: JobInput): Promise<void>;
 }

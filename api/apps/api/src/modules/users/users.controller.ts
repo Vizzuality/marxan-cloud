@@ -16,7 +16,6 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -41,7 +40,7 @@ export class UsersController {
   @ApiOperation({
     description: 'Find all users',
   })
-  @ApiResponse({
+  @ApiOkResponse({
     type: User,
   })
   @ApiUnauthorizedResponse({
@@ -95,7 +94,7 @@ export class UsersController {
   @ApiOperation({
     description: 'Retrieve attributes of the current user',
   })
-  @ApiResponse({
+  @ApiOkResponse({
     type: UserResult,
   })
   @ApiUnauthorizedResponse({

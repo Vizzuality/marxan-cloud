@@ -1,10 +1,10 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, Module, HttpModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { ScenariosController } from './scenarios.controller';
 import { Scenario } from './scenario.api.entity';
-import { ScenariosService } from './scenarios.service';
+import { ScenariosCrudService } from './scenarios-crud.service';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { ProtectedAreasModule } from '@marxan-api/modules/protected-areas/protected-areas.module';
@@ -13,12 +13,11 @@ import { ScenarioFeaturesModule } from '../scenarios-features';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { AnalysisModule } from '../analysis/analysis.module';
-import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
-import { ResolvePuWithCost } from './cost-surface/resolve-pu-with-cost';
-import { CostSurfaceEventsPort } from './cost-surface/cost-surface-events.port';
-import { GeoprocessingCostFromShapefile } from './cost-surface/adapters/geoprocessing-cost-from-shapefile';
-import { CostSurfaceApiEvents } from './cost-surface/adapters/cost-surface-api-events';
-import { ApiEventsModule } from '../api-events/api-events.module';
+import { CostSurfaceModule } from './cost-surface/cost-surface.module';
+import { ScenariosService } from './scenarios.service';
+import { ScenarioSerializer } from './dto/scenario.serializer';
+import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
+import { CostSurfaceTemplateModule } from './cost-surface-template';
 
 @Module({
   imports: [
@@ -29,24 +28,19 @@ import { ApiEventsModule } from '../api-events/api-events.module';
     UsersModule,
     ScenarioFeaturesModule,
     AnalysisModule,
-    ApiEventsModule,
+    CostSurfaceModule,
+    HttpModule,
+    CostSurfaceTemplateModule,
   ],
   providers: [
     ScenariosService,
+    ScenariosCrudService,
     ProxyService,
     WdpaAreaCalculationService,
-    CostSurfaceFacade,
-    // internals for cost-surface
-    {
-      provide: ResolvePuWithCost,
-      useClass: GeoprocessingCostFromShapefile,
-    },
-    {
-      provide: CostSurfaceEventsPort,
-      useClass: CostSurfaceApiEvents,
-    },
+    ScenarioSerializer,
+    ScenarioFeatureSerializer,
   ],
   controllers: [ScenariosController],
-  exports: [ScenariosService],
+  exports: [ScenariosCrudService, ScenariosService],
 })
 export class ScenariosModule {}

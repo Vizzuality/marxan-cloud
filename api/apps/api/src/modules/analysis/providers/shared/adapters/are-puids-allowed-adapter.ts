@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { isDefined } from '@marxan/utils';
 import { differenceWith } from 'lodash';
 import { ArePuidsAllowedPort } from '../are-puids-allowed.port';
 
 import { ScenariosPlanningUnitService } from '../../../../scenarios-planning-unit/scenarios-planning-unit.service';
-import { isDefined } from '../../../../../utils/is-defined';
 
 @Injectable()
 export class ArePuidsAllowedAdapter

@@ -16,8 +16,9 @@ import {
   IsNumber,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { AdminArea } from '@marxan-geoprocessing/modules/admin-areas/admin-areas.geo.entity';
 import { BBox } from 'geojson';
+import { AdminArea } from '@marxan/admin-regions';
+import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 
 export class TileSpecification extends TileRequest {
   @ApiProperty()
@@ -54,34 +55,28 @@ export class AdminAreasService {
   ) {}
 
   buildAdminAreaWhereQuery(level: number, filters?: AdminAreasFilters): string {
+    /**
+     * @todo this generation query is a bit...
+     */
     let whereQuery = '';
     if (level === 0) {
-      whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL`;
-      if (filters?.guid) {
-        whereQuery += ` AND gid_0 = '${filters?.guid}'`;
-      }
-      if (filters?.bbox) {
-        whereQuery += ` AND the_geom && ST_MakeEnvelope(${filters?.bbox}, 4326)`;
-      }
+      whereQuery = `gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL AND gid_0 != 'ATA'`;
     }
     if (level === 1) {
-      whereQuery = `gid_1 IS NOT NULL AND gid_2 IS NULL AND gid_0 != 'ATA'`;
-      if (filters?.guid) {
-        whereQuery += ` AND gid_0 = '${filters?.guid}'`;
-      }
-      if (filters?.bbox) {
-        whereQuery += ` AND the_geom && ST_MakeEnvelope(${filters?.bbox}, 4326)`;
-      }
+      whereQuery = `gid_1 IS NOT NULL AND gid_2 IS NULL`;
     }
     if (level === 2) {
       whereQuery = `gid_2 IS NOT NULL`;
-      if (filters?.guid) {
-        whereQuery += ` AND  gid_1 = '${filters?.guid}'`;
-      }
-      if (filters?.bbox) {
-        whereQuery += ` AND the_geom && ST_MakeEnvelope(${filters?.bbox}, 4326)`;
-      }
     }
+    if (filters?.guid) {
+      whereQuery += ` AND gid_${level} = '${filters?.guid}'`;
+    }
+    if (filters?.bbox) {
+      whereQuery += ` AND the_geom && ST_MakeEnvelope(${nominatim2bbox(
+        filters?.bbox,
+      )}, 4326)`;
+    }
+
     return whereQuery;
   }
 
@@ -93,7 +88,7 @@ export class AdminAreasService {
     filters?: AdminAreasFilters,
   ): Promise<Buffer> {
     const { z, x, y, level } = tileSpecification;
-    const attributes = 'name_0, name_1, name_2';
+    const attributes = 'name_0, name_1, name_2, gid_0, gid_1, gid_2';
     const table = this.adminAreasRepository.metadata.tableName;
     const customQuery = this.buildAdminAreaWhereQuery(level, filters);
     return this.tileService.getTile({

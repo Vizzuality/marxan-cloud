@@ -38,10 +38,10 @@ export default {
   states: {
     none: '',
     error: 'ring-red-500',
-    valid: 'ring-green-500',
+    valid: '',
   },
   sizes: {
     base: 'pl-4 pr-10 py-3 text-sm',
-    s: 'pl-4 pr-10 py-1.5 text-sm',
+    s: 'pl-4 pr-10 py-1 text-sm',
   },
 };

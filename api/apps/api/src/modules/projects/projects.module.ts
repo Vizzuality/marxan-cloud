@@ -3,14 +3,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProjectsController } from './projects.controller';
 import { Project } from './project.api.entity';
-import { ProjectsService } from './projects.service';
+import { ProjectsCrudService } from './projects-crud.service';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { ScenariosModule } from '@marxan-api/modules/scenarios/scenarios.module';
 import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.module';
 import { CountriesModule } from '@marxan-api/modules/countries/countries.module';
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
 import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
+import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
 import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
+import { ProjectsService } from './projects.service';
+import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
+import { ProjectSerializer } from './dto/project.serializer';
+import { BboxResolver } from './bbox/bbox-resolver';
+import { JobStatusService } from './job-status/job-status.service';
 
 @Module({
   imports: [
@@ -22,9 +28,17 @@ import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
     UsersModule,
     PlanningUnitsModule,
     ProtectedAreasModule,
+    ApiEventsModule,
   ],
-  providers: [ProjectsService],
+  providers: [
+    ProjectsCrudService,
+    ProjectsService,
+    GeoFeatureSerializer,
+    ProjectSerializer,
+    BboxResolver,
+    JobStatusService,
+  ],
   controllers: [ProjectsController],
-  exports: [ProjectsService],
+  exports: [ProjectsCrudService],
 })
 export class ProjectsModule {}

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { remoteConnectionName } from './entities/remote-connection-name';
-import { ScenariosPlanningUnitGeoEntity } from './entities/scenarios-planning-unit.geo.entity';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ScenariosPlanningUnitService } from './scenarios-planning-unit.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature(
       [ScenariosPlanningUnitGeoEntity],
-      remoteConnectionName,
+      DbConnections.geoprocessingDB,
     ),
   ],
   providers: [ScenariosPlanningUnitService],

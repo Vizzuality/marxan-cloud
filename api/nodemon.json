@@ -1,22 +1,9 @@
 {
   "watch": [
-<<<<<<< HEAD
-    "src"
-  ],
-  "ext": "ts,js,graphql",
-  "ignore": [
-    "src/**/*.spec.ts"
-  ],
-  "exec": "ts-node --files --project tsconfig.json -r tsconfig-paths/register src/main.ts"
-=======
     "apps", "libs"
   ],
   "ext": "ts,js,graphql",
   "ignore": [
     "**/*.spec.ts"
-  ],
-  "env": {
-    "NODE_PRESERVE_SYMLINKS": 1
-  }
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
+  ]
 }

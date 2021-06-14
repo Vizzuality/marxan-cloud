@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Injectable } from '@nestjs/common';
-import { Queue, Worker } from 'bullmq';
+import { Job, Queue, Worker } from 'bullmq';
 import * as config from 'config';
 
 import { ExampleWorkerJobProcessor } from './bullmq-worker-code';
@@ -72,7 +72,7 @@ export class ExampleProcessingService {
     this.#worker.on('completed', ({ returnvalue }) => {
       this.onCompleteMock(returnvalue);
     });
-    this.#worker.on('failed', ({ failedReason }) => {
+    this.#worker.on('failed', ({ failedReason }: Job) => {
       this.onFailedMock(failedReason);
     });
   }

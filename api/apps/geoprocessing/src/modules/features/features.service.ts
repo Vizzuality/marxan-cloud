@@ -10,6 +10,7 @@ import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { BBox } from 'geojson';
+import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 
 export class TileSpecification extends TileRequest {
   @ApiProperty()
@@ -44,10 +45,14 @@ export class FeatureService {
    * @todo generate the custom queries using query builder and the entity data.
    * @todo move the string to int transformation to the AdminAreaLevelFilters class
    */
+
   buildFeaturesWhereQuery(id: string, bbox?: BBox): string {
     let whereQuery = `feature_id = '${id}'`;
+
     if (bbox) {
-      whereQuery += `AND the_geom && ST_MakeEnvelope(${bbox}, 4326)`;
+      whereQuery += `AND st_intersects(ST_MakeEnvelope(${nominatim2bbox(
+        bbox,
+      )}, 4326), the_geom)`;
     }
     return whereQuery;
   }

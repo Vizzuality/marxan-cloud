@@ -4,14 +4,12 @@ import {
   Controller,
   Logger,
   Param,
-  ParseUUIDPipe,
   Post,
   Query,
   Res,
-  UploadedFile,
-  UseInterceptors,
+  Body,
+  BadRequestException,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 import {
   PlanningUnitsService,
@@ -19,8 +17,6 @@ import {
   tileSpecification,
 } from './planning-units.service';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
-import { uploadOptions } from '@marxan-geoprocessing/utils/file.utils';
-
 import { ShapefileService } from '../shapefiles/shapefiles.service';
 import { ApiConsumesShapefile } from '../../decoratos/shapefile.decorator';
 import { ShapefileGeoJSONResponseDTO } from '../shapefiles/dto/shapefile.geojson.response.dto';
@@ -45,13 +41,15 @@ export class PlanningUnitsController {
     this.logger.setContext(PlanningUnitsController.name);
   }
   @ApiConsumesShapefile()
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @Post('/:id/planning-unit-shapefile')
+  @Post('/planning-unit-shapefile')
   async getShapeFile(
-    @Param('id', ParseUUIDPipe) scenarioId: string,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<ShapefileGeoJSONResponseDTO> {
-    return this.shapefileService.getGeoJson(file);
+    @Body() shapefileInfo: Express.Multer.File,
+  ): Promise<ShapefileGeoJSONResponseDTO | BadRequestException> {
+    try {
+      return await this.shapefileService.getGeoJson(shapefileInfo);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   @ApiOperation({
@@ -107,7 +105,7 @@ export class PlanningUnitsController {
     @Query() PlanningUnitsFilters: PlanningUnitsFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(
+    const tile: Buffer = await this.service.findPreviewTile(
       tileSpecification,
       PlanningUnitsFilters,
     );

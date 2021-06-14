@@ -3,7 +3,7 @@ import { readFileSync, copyFileSync } from 'fs';
 import { AppConfig } from '../../../../src/utils/config.utils';
 
 export const shapes = {
-  invalid: () => resolveFile('new-shape-name'),
+  invalid: () => resolveFile('invalid_coordinates'),
   valid: () => resolveFile('test_multiple_features_v2'),
 };
 
@@ -17,7 +17,7 @@ export const shapes = {
  *
  */
 const resolveFile = (
-  fileName: 'new-shape-name' | 'test_multiple_features_v2',
+  fileName: 'invalid_coordinates' | 'test_multiple_features_v2',
 ): Express.Multer.File => {
   const baseDir = AppConfig.get<string>(
     'storage.sharedFileStorage.localPath',

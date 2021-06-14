@@ -13,6 +13,8 @@ import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area
 
 interface CountryCodeInput {
   countryCode?: string;
+  adminLevel1?: string;
+  adminLevel2?: string;
 }
 
 export const E2E_CONFIG: {
@@ -33,8 +35,8 @@ export const E2E_CONFIG: {
   projects: {
     valid: {
       minimal: () => Partial<CreateProjectDTO>;
-      minimalInGivenAdminArea: (options: {
-        countryCode: string;
+      minimalInGivenAdminArea: (options?: {
+        countryCode?: string;
         adminAreaLevel1Id?: string;
         adminAreaLevel2Id?: string;
       }) => Partial<CreateProjectDTO>;
@@ -99,37 +101,26 @@ export const E2E_CONFIG: {
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
       }),
-      minimalInGivenAdminArea: (options: {
-        countryCode: string;
+      minimalInGivenAdminArea: (options?: {
+        countryCode?: string;
         adminAreaLevel1Id?: string;
         adminAreaLevel2Id?: string;
       }): CreateProjectDTO => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
-        countryId: options.countryCode,
-        adminAreaLevel1Id: options.adminAreaLevel1Id,
-        adminAreaLevel2Id: options.adminAreaLevel2Id,
+        countryId: options?.countryCode,
+        adminAreaLevel1Id: options?.adminAreaLevel1Id,
+        adminAreaLevel2Id: options?.adminAreaLevel2Id,
       }),
       complete: (options: CountryCodeInput): CreateProjectDTO => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
         description: faker.lorem.paragraphs(2),
         countryId: options.countryCode,
-        adminAreaLevel1Id: faker.random.alphaNumeric(7),
-        adminAreaLevel2Id: faker.random.alphaNumeric(12),
+        adminAreaLevel1Id: options.adminLevel1,
+        adminAreaLevel2Id: options.adminLevel2,
         planningUnitGridShape: PlanningUnitGridShape.hexagon,
         planningUnitAreakm2: 10,
-        extent: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [-10.0, -10.0],
-              [10.0, -10.0],
-              [10.0, 10.0],
-              [-10.0, -10.0],
-            ],
-          ],
-        },
         metadata: {
           [faker.random.word()]: faker.random.words(3),
           [faker.random.word()]: faker.random.uuid(),
@@ -144,17 +135,6 @@ export const E2E_CONFIG: {
         adminAreaLevel2Id: faker.random.alphaNumeric(12),
         planningUnitGridShape: PlanningUnitGridShape.hexagon,
         planningUnitAreakm2: 10,
-        extent: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [-10.0, -10.0],
-              [10.0, -10.0],
-              [10.0, 10.0],
-              [-10.0, -10.0],
-            ],
-          ],
-        },
         metadata: {
           [faker.random.word()]: faker.random.words(3),
           [faker.random.word()]: faker.random.uuid(),

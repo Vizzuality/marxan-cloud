@@ -28,6 +28,60 @@
       "compilerOptions": {
         "tsConfigPath": "apps/geoprocessing/tsconfig.app.json"
       }
+    },
+    "utils": {
+      "type": "library",
+      "root": "libs/utils",
+      "entryFile": "index",
+      "sourceRoot": "libs/utils/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/utils/tsconfig.lib.json"
+      }
+    },
+    "scenarios-planning-unit": {
+      "type": "library",
+      "root": "libs/scenarios-planning-unit",
+      "entryFile": "index",
+      "sourceRoot": "libs/scenarios-planning-unit/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/scenarios-planning-unit/tsconfig.lib.json"
+      }
+    },
+    "admin-regions": {
+      "type": "library",
+      "root": "libs/admin-regions",
+      "entryFile": "index",
+      "sourceRoot": "libs/admin-regions/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/admin-regions/tsconfig.lib.json"
+      }
+    },
+    "api-events": {
+      "type": "library",
+      "root": "libs/api-events",
+      "entryFile": "index",
+      "sourceRoot": "libs/api-events/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/api-events/tsconfig.lib.json"
+      }
+    },
+    "planning-unit-geometry": {
+      "type": "library",
+      "root": "libs/planning-unit-geometry",
+      "entryFile": "index",
+      "sourceRoot": "libs/planning-unit-geometry/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/planning-unit-geometry/tsconfig.lib.json"
+      }
+    },
+    "scenario-cost-surface": {
+      "type": "library",
+      "root": "libs/scenario-cost-surface",
+      "entryFile": "index",
+      "sourceRoot": "libs/scenario-cost-surface/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/scenario-cost-surface/tsconfig.lib.json"
+      }
     }
   }
 >>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149

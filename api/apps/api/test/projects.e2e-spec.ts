@@ -1,11 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@marxan-api/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
-import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import {
   Project,
@@ -17,6 +13,10 @@ import {
   OrganizationResultSingular,
 } from '@marxan-api/modules/organizations/organization.api.entity';
 import { tearDown } from './utils/tear-down';
+import { bootstrapApplication } from './utils/api-application';
+import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
 
 afterAll(async () => {
   await tearDown();
@@ -29,30 +29,14 @@ describe('ProjectsModule (e2e)', () => {
     keyForAttribute: 'camelCase',
   });
 
+  let anOrganization: Organization;
+  let minimalProject: Project;
+  let completeProject: Project;
+  let aScenarioInACompleteProject: Scenario;
+
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    );
-    await app.init();
-
-    const response = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({
-        username: E2E_CONFIG.users.basic.aa.username,
-        password: E2E_CONFIG.users.basic.aa.password,
-      })
-      .expect(201);
-
-    jwtToken = response.body.accessToken;
+    app = await bootstrapApplication();
+    jwtToken = await GivenUserIsLoggedIn(app);
   });
 
   afterAll(async () => {
@@ -60,11 +44,6 @@ describe('ProjectsModule (e2e)', () => {
   });
 
   describe('Projects', () => {
-    let anOrganization: Organization;
-    let minimalProject: Project;
-    let completeProject: Project;
-    let aScenarioInACompleteProject: Scenario;
-
     test('Creates an organization', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/organizations')
@@ -104,7 +83,7 @@ describe('ProjectsModule (e2e)', () => {
 
     test('Creating a project with complete data should succeed', async () => {
       const createProjectDTO: Partial<CreateProjectDTO> = {
-        ...E2E_CONFIG.projects.valid.complete({ countryCode: 'ESP' }),
+        ...E2E_CONFIG.projects.valid.complete({ countryCode: 'NAM' }),
         organizationId: anOrganization.id,
       };
 
@@ -143,30 +122,6 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultPlural = response.body;
 
       expect(jsonAPIResponse.data[0].type).toBe('projects');
-    });
-
-    test.skip('A user should be able to get a list of projects and related scenarios', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/api/v1/projects?disablePagination=true&include=scenarios')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .expect(200);
-
-      const jsonAPIResponse: ProjectResultPlural = response.body;
-      const allProjects: Project[] = await Deserializer.deserialize(
-        response.body,
-      );
-
-      expect(jsonAPIResponse.data[0].type).toBe('projects');
-
-      const aKnownProject: Project | undefined = allProjects.find(
-        (i) => (i.id = completeProject.id),
-      );
-      expect(aKnownProject?.scenarios).toBeDefined();
-      expect(
-        aKnownProject?.scenarios?.find(
-          (i) => i.id === aScenarioInACompleteProject.id,
-        ),
-      ).toBeDefined();
     });
 
     test('A user should be get a list of projects without any included relationships if these have not been requested', async () => {
@@ -208,5 +163,29 @@ describe('ProjectsModule (e2e)', () => {
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
     });
+  });
+
+  test.skip('A user should be able to get a list of projects and related scenarios', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/v1/projects?disablePagination=true&include=scenarios')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(200);
+
+    const jsonAPIResponse: ProjectResultPlural = response.body;
+    const allProjects: Project[] = await Deserializer.deserialize(
+      response.body,
+    );
+
+    expect(jsonAPIResponse.data[0].type).toBe('projects');
+
+    const aKnownProject: Project | undefined = allProjects.find(
+      (i) => (i.id = completeProject.id),
+    );
+    expect(aKnownProject?.scenarios).toBeDefined();
+    expect(
+      aKnownProject?.scenarios?.find(
+        (i) => i.id === aScenarioInACompleteProject.id,
+      ),
+    ).toBeDefined();
   });
 });

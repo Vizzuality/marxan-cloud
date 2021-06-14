@@ -1,7 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@marxan-api/app.module';
 import { omit } from 'lodash';
 import { E2E_CONFIG } from './e2e.config';
 import { ProjectsTestUtils } from './utils/projects.test.utils';
@@ -10,6 +8,8 @@ import { OrganizationsTestUtils } from './utils/organizations.test.utils';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { tearDown } from './utils/tear-down';
+import { bootstrapApplication } from './utils/api-application';
+import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 
 afterAll(async () => {
   await tearDown();
@@ -20,32 +20,14 @@ describe('JSON API Specs (e2e)', () => {
   let jwtToken: string;
   let fakeOrganization: Organization;
   let fakeProject: Project;
-  const fakeCountry = 'ESP';
+
   const Deserializer = new JSONAPISerializer.Deserializer({
     keyForAttribute: 'camelCase',
   });
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
-
-    /**
-     * Login User
-     */
-
-    const response = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({
-        username: E2E_CONFIG.users.basic.aa.username,
-        password: E2E_CONFIG.users.basic.aa.password,
-      })
-      .expect(201);
-
-    jwtToken = response.body.accessToken;
+    app = await bootstrapApplication();
+    jwtToken = await GivenUserIsLoggedIn(app);
 
     /**
      * Create Scenario
@@ -58,9 +40,7 @@ describe('JSON API Specs (e2e)', () => {
     ).then(async (response) => await Deserializer.deserialize(response));
 
     fakeProject = await ProjectsTestUtils.createProject(app, jwtToken, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: fakeCountry,
-      }),
+      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea(),
       organizationId: fakeOrganization.id,
     }).then(async (response) => await Deserializer.deserialize(response));
   });
@@ -115,41 +95,12 @@ describe('JSON API Specs (e2e)', () => {
     });
   });
 
-  it('should return a object with a "data" prop as a response to a POST request', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/api/v1/projects')
-      .set('Authorization', `Bearer ${jwtToken}`)
-      .send({
-        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: fakeCountry,
-        }),
-        organizationId: fakeOrganization.id,
-      });
-
-    expect(response.body).toMatchObject({ data: expect.any(Object) });
-  });
-  it('should return a object with a "data" prop as a response to a PATCH request', async () => {
-    const response = await request(app.getHttpServer())
-      .patch(`/api/v1/projects/${fakeProject.id}`)
-      .set('Authorization', `Bearer ${jwtToken}`)
-      .send({
-        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: fakeCountry,
-        }),
-        organizationId: fakeOrganization.id,
-      });
-
-    expect(response.body).toMatchObject({ data: expect.any(Object) });
-  });
-
   it('should include pagination metadata as a paginated response', async () => {
     const response = await request(app.getHttpServer())
       .get(`/api/v1/projects/${fakeProject.id}/features`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .send({
-        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: fakeCountry,
-        }),
+        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea(),
         organizationId: fakeOrganization.id,
       });
 
