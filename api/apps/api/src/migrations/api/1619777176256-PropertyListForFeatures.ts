@@ -10,7 +10,7 @@ export class PropertyListForFeatures1619777176256
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-     await queryRunner.query(`
+    await queryRunner.query(`
      ALTER TABLE features
      DROP COLUMN list_property_keys;
      `);

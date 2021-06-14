@@ -105,7 +105,7 @@ export class PlanningUnitsController {
     @Query() PlanningUnitsFilters: PlanningUnitsFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(
+    const tile: Buffer = await this.service.findPreviewTile(
       tileSpecification,
       PlanningUnitsFilters,
     );

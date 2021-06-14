@@ -61,6 +61,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/api-events/tsconfig.lib.json"
       }
+    },
+    "planning-unit-geometry": {
+      "type": "library",
+      "root": "libs/planning-unit-geometry",
+      "entryFile": "index",
+      "sourceRoot": "libs/planning-unit-geometry/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/planning-unit-geometry/tsconfig.lib.json"
+      }
+    },
+    "scenario-cost-surface": {
+      "type": "library",
+      "root": "libs/scenario-cost-surface",
+      "entryFile": "index",
+      "sourceRoot": "libs/scenario-cost-surface/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/scenario-cost-surface/tsconfig.lib.json"
+      }
     }
   }
 }

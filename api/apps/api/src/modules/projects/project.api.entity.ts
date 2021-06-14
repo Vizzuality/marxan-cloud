@@ -116,13 +116,6 @@ export class Project extends TimeUserEntityMetadata {
   planningUnitAreakm2?: number;
 
   /**
-   * custom extent of the project
-   */
-  @ApiPropertyOptional()
-  @Column('geometry')
-  extent?: Record<string, unknown> | null;
-
-  /**
    * Bbox of the custom extent
    */
   @ApiProperty()

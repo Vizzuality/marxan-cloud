@@ -121,17 +121,6 @@ export const E2E_CONFIG: {
         adminAreaLevel2Id: options.adminLevel2,
         planningUnitGridShape: PlanningUnitGridShape.hexagon,
         planningUnitAreakm2: 10,
-        extent: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [-10.0, -10.0],
-              [10.0, -10.0],
-              [10.0, 10.0],
-              [-10.0, -10.0],
-            ],
-          ],
-        },
         metadata: {
           [faker.random.word()]: faker.random.words(3),
           [faker.random.word()]: faker.random.uuid(),
@@ -146,17 +135,6 @@ export const E2E_CONFIG: {
         adminAreaLevel2Id: faker.random.alphaNumeric(12),
         planningUnitGridShape: PlanningUnitGridShape.hexagon,
         planningUnitAreakm2: 10,
-        extent: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [-10.0, -10.0],
-              [10.0, -10.0],
-              [10.0, 10.0],
-              [-10.0, -10.0],
-            ],
-          ],
-        },
         metadata: {
           [faker.random.word()]: faker.random.words(3),
           [faker.random.word()]: faker.random.uuid(),

@@ -47,21 +47,7 @@ const createPlanningUnitGridFromJobSpec = async (
         square: 'ST_SquareGrid',
         hexagon: 'ST_HexagonGrid',
       };
-      if (job.data.extent) {
-        /**
-         * @description
-         * If user has provided a custom extent we will generate PUs based on it.
-         */
-        if (Math.sign(job.data.planningUnitAreakm2) < 0) {
-          throw new Error('Planning unit area Must be a positive number');
-        }
-        subquery = `SELECT (${gridShape[jobData.planningUnitGridShape]}(${
-          Math.sqrt(job.data.planningUnitAreakm2) * 1000
-        },
-                            ST_Transform(ST_GeomFromGeoJSON('${JSON.stringify(
-                              job.data.extent,
-                            )}'), 3857))).*`;
-      } else if (
+      if (
         job.data.countryId ||
         job.data.adminAreaLevel1Id ||
         job.data.adminAreaLevel2Id
@@ -76,15 +62,15 @@ const createPlanningUnitGridFromJobSpec = async (
         if (job.data.adminAreaLevel2Id?.length) {
           filterSQL.push(`gid_2 = '${job.data.adminAreaLevel2Id}'`);
         }
-        subquery = `(SELECT ${gridShape[job.data.planningUnitGridShape]}(${
+        subquery = `SELECT (${gridShape[job.data.planningUnitGridShape]}(${
           Math.sqrt(job.data.planningUnitAreakm2) * 1000
         },
                             ST_Transform(a.the_geom, 3857))).*
                     FROM admin_regions a
-                    'WHERE ${filterSQL.join(' AND ')}`;
+                    WHERE ${filterSQL.join(' AND ')}`;
       } else {
         throw new Error(
-          'Without extent or valid administrative level a regular pu area cannot be created',
+          'Without valid administrative level a regular pu area cannot be created',
         );
       }
 

@@ -192,8 +192,7 @@ export class ProjectsCrudService extends AppBaseService<
       createModel.planningUnitGridShape &&
       (createModel.countryId ||
         createModel.adminAreaLevel1Id ||
-        createModel.adminAreaLevel2Id ||
-        createModel.extent)
+        createModel.adminAreaLevel2Id)
     ) {
       this.logger.debug('creating planning unit job ');
       return this.planningUnitsService.create(createModel);
@@ -210,8 +209,7 @@ export class ProjectsCrudService extends AppBaseService<
       createModel.planningUnitGridShape &&
       (createModel.countryId ||
         createModel.adminAreaLevel1Id ||
-        createModel.adminAreaLevel2Id ||
-        createModel.extent)
+        createModel.adminAreaLevel2Id)
     ) {
       this.logger.debug('creating planning unit job ');
       return this.planningUnitsService.create(createModel);
@@ -241,7 +239,6 @@ export class ProjectsCrudService extends AppBaseService<
     }
     const derivedSubmittedAdminArea = await this.getPlanningArea({
       ...model,
-      extent: undefined,
     });
 
     let geometry;

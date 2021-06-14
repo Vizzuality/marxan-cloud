@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { adminAreaResource, AdminAreaResult } from './admin-area.geo.entity';
 import { AdminAreaLevel, AdminAreasService } from './admin-areas.service';
 import {
@@ -18,13 +26,18 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
+import { Request, Response } from 'express';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(adminAreaResource.className)
 @Controller(`${apiGlobalPrefixes.v1}`)
 export class AdminAreasController {
-  constructor(public readonly service: AdminAreasService) {}
+  constructor(
+    public readonly service: AdminAreasService,
+    private readonly proxyService: ProxyService,
+  ) {}
 
   @ApiOperation({
     description: 'Find administrative areas within a given country.',
@@ -60,6 +73,64 @@ export class AdminAreasController {
       filter: { ...fetchSpecification.filter, countryId, level },
     });
     return this.service.serialize(results.data, results.metadata);
+  }
+
+  @ApiOperation({
+    description:
+      'Find administrative areas within a given country in mvt format.',
+  })
+  /**
+   *@todo Change ApiOkResponse mvt type
+   */
+  @ApiOkResponse({
+    description: 'Binary protobuffer mvt tile',
+    type: String,
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'level',
+    description:
+      'Specific level to filter the administrative areas (0, 1 or 2)',
+    type: Number,
+    required: true,
+    example: '1',
+  })
+  @ApiQuery({
+    name: 'guid',
+    description: 'Parent country of administrative areas in guid code',
+    type: String,
+    required: false,
+    example: 'BRA.1_1',
+  })
+  @ApiQuery({
+    name: 'bbox',
+    description: 'Bounding box of the project [xMin, xMax, yMin, yMax]',
+    type: [Number],
+    required: false,
+    example: [-1, 40, 1, 42],
+  })
+  @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
+  async proxyAdminAreaTile(@Req() request: Request, @Res() response: Response) {
+    return this.proxyService.proxyTileRequest(request, response);
   }
 
   @ApiOperation({

@@ -134,7 +134,6 @@ export class ScenariosCrudService extends AppBaseService<
       name: faker.lorem.words(5),
       description: faker.lorem.sentence(),
       type: ScenarioType.marxan,
-      extent: {},
       wdpaFilter: {},
       wdpaThreshold: faker.random.number(100),
       adminRegionId: faker.random.uuid(),

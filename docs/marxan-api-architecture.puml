@@ -27,52 +27,50 @@ Container(bastion, "Bastion host", "Linux / VM", "")
 System_Boundary(c1, "Backend") {
   System_Boundary(c2, "API") {
     Container(api, "API Service", "Typescript, NestJS", "Main API and gateway to backend data/metadata/processing")
-    Container(geoprocessing, "Geoprocessing Service", "Typescript, NestJS", "Core geoprocessing service")
-    Container(tilesService, "Tile Service", "Typescript, NestJS", "Tile processing (storage and caching via blob storage and CDN)")
+    System_Boundary(c3, "ETL pipelines and solver workers") {
+      Container(geoprocessing, "Geoprocessing Service", "Typescript, NestJS", "Core geoprocessing service")
+      System_Boundary(c4, "Geoprocessing service workers") {
+        Container(shapefileProcessor, "Shapefile worker", "Shapefile processing", "Importing and exporting of shapefiles...")
+        Container(marxanExec, "Marxan solver worker", "Marxan CLI", "Marxan calculations")
+        Container(worker1, "ETL worker", "Isolated BullMQ job processors...", "Other data processing jobs")
+        Container(worker2, "ETL worker", "In-Process BullMQ job processors...", "Other data processing jobs")
+      }
+    }
+    ' Container(tilesService, "Tile Service", "Typescript, NestJS", "Tile processing (storage and caching via blob storage and CDN)")
     ContainerDb(redis, "Pub/Sub and async job queues", "Redis", "Pub/Sub messaging, job queues, k/v caching", "redis" )
     ContainerDb(postgresDB, "Database", "Postgres 13 + Postgis 3", "Stores user/project/scenario data", "postgresql" )
     ContainerDb(postgresGeoDB, "GeoDatabase", "Postgres 13 + Postgis 3", "Stores geo data, performs geoprocessing tasks", "postgresql" )
   }
-  System_Boundary(c3, "Data pipes") {
-    System_Boundary(c4, "Airflow workers") {
-      Container(marxanExec, "Marxan executer Service", "Marxan CLI", "Executer for Marxan calculations")
-      Container(worker1, "Airflow worker", "TypeScript or Python or R or binary, etc", "Other data processing jobs")
-      Container(worker2, "Airflow worker", "TypeScript or Python or R or binary, etc", "Other data processing jobs")
-    }
-    Container(Airflow, "Airflow", "Apache Airflow", "Orchestration of calculation and data processing jobs","apache")
-
-  }
-
 }
 Lay_R(api, geoprocessing)
 Lay_L(bastion, app)
 Lay_U(c1, app)
 
+Rel(Admin, bastion, "Can access kubernetes clusters via bastion host")
+Rel(bastion, c1, "Provides secure access to kubernetes clusters")
+
 Rel(User, app, "Uses", "HTTPS")
 
-Rel(Admin, c1, "Can access kubernetes clusters", "Backend")
 
 Rel_R(app, api, "Manages project and scenario state", "async, JSON/HTTPS")
 Rel_L(api, app, "Sends events to", "WebSocket")
 
-Rel(api, redis, "Reads/Writes")
 Rel(api, postgresDB, "Reads/Writes")
 Rel(api, postgresGeoDB, "Reads/Writes")
 
 Rel(api, geoprocessing, "")
 Rel(geoprocessing, postgresGeoDB, "Reads/Writes")
-Rel(api, tilesService, "")
-Rel(tilesService, postgresGeoDB, "Reads tiles")
 Rel(postgresDB, postgresGeoDB, "Reads/Writes")
-Rel(api, marxanExec, "")
 
-' Probably not needed if we use Redis as source of truth for queues
-' Rel(api, Airflow, "Reads/Writes")
+Rel(geoprocessing, marxanExec, "")
+Rel(geoprocessing, shapefileProcessor, "")
+Rel(geoprocessing, worker1, "")
+Rel(geoprocessing, worker2, "")
 
 Rel(worker2, postgresGeoDB, "Reads/Writes")
 Rel(worker1, postgresDB, "Reads/Writes")
 
-Rel(Airflow, redis, "Polls for available jobs")
-Rel(Airflow, redis, "Updates job status")
+Rel(api, redis, "Pushes jobs to queues")
+Rel(geoprocessing, redis, "Fetches jobs from queues and posts progress status")
 
 @enduml

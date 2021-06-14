@@ -16,7 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import { scenarioResource } from './scenario.api.entity';
+import { scenarioResource } from '../scenario.api.entity';
 import {
   FileNotFound,
   FileNotReady,
