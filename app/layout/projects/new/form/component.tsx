@@ -19,6 +19,7 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 
+import { useOrganizations } from 'hooks/organizations';
 import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
@@ -30,16 +31,17 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const [hasPlanningArea, setHasPlanningArea] = useState(false);
   const { addToast } = useToasts();
   const { push } = useRouter();
+  const { data: organizationsData } = useOrganizations();
 
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
 
   const onSubmit = (values) => {
     // TEMPORARY!!
-    // This should be removed once organizations IDs are handled in the app
+    // This should be removed once organizations IDs are handled in the user
     const data = {
       ...values,
-      organizationId: '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
+      organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
     };
 
     saveProjectMutation.mutate({ data }, {
