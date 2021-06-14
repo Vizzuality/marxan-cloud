@@ -126,6 +126,31 @@ describe('ScenariosModule (e2e)', () => {
       expect(resources.length).toBeGreaterThanOrEqual(1);
     });
 
+    it(`Gets scenarios with a free search`, async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/api/v1/scenarios?q=oRG%202`)
+        .set(`Authorization`, `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources = response.body.data;
+      expect(resources).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'scenarios',
+            attributes: expect.objectContaining({
+              name: 'Example scenario 1 Project 2 Org 2',
+            }),
+          }),
+          expect.objectContaining({
+            type: 'scenarios',
+            attributes: expect.objectContaining({
+              name: 'Example scenario 2 Project 2 Org 2',
+            }),
+          }),
+        ]),
+      );
+    });
+
     it('Deletes the newly created scenario', async () => {
       const response = await request(app.getHttpServer())
         .delete('/api/v1/scenarios/' + aScenario.id)

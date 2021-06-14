@@ -86,11 +86,19 @@ export class ScenariosController {
       { name: 'status' },
     ],
   })
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    description: `A free search over name and description`,
+  })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Query('q') nameAndDescriptionFilter?: string,
   ): Promise<ScenarioResult> {
-    const results = await this.service.findAllPaginated(fetchSpecification);
+    const results = await this.service.findAllPaginated(fetchSpecification, {
+      params: { nameAndDescriptionFilter },
+    });
     return this.scenarioSerializer.serialize(results.data, results.metadata);
   }
 
