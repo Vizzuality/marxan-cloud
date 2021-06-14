@@ -46,7 +46,11 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     data: rawScenariosData,
     isFetching: rawScenariosIsFetching,
     isFetched: rawScenariosIsFetched,
-  } = useScenarios(pid);
+  } = useScenarios(pid, {
+    filters: {
+      projectId: pid,
+    },
+  });
 
   const {
     data: allScenariosData,
@@ -57,6 +61,9 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     isFetched: allScenariosIsFetched,
   } = useScenarios(pid, {
     search,
+    filters: {
+      projectId: pid,
+    },
     sort: '-lastModifiedAt',
   });
 

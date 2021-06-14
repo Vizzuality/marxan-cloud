@@ -1,4 +1,5 @@
 export interface UseAdminPreviewLayer {
+  active?: boolean;
   bbox?: number[];
   country?: string;
   region?: string;
@@ -7,12 +8,14 @@ export interface UseAdminPreviewLayer {
 }
 
 export interface UsePUGridPreviewLayer {
+  active?: boolean;
   bbox?: number[] | unknown;
   planningUnitGridShape?: string;
   planningUnitAreakm2?: number;
 }
 
 export interface UseWDPAPreviewLayer {
+  active?: boolean;
   bbox?: number[] | unknown;
   wdpaIucnCategories?: string[];
 }

@@ -35,9 +35,13 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
 
   const LAYERS = [
     useAdminPreviewLayer({
-      country, region, subregion,
+      active: true,
+      country,
+      region,
+      subregion,
     }),
     usePUGridPreviewLayer({
+      active: true,
       bbox,
       planningUnitGridShape,
       planningUnitAreakm2,

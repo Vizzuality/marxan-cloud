@@ -3,7 +3,7 @@ import { UseAdminPreviewLayer, UsePUGridPreviewLayer, UseWDPAPreviewLayer } from
 
 // AdminPreview
 export function useAdminPreviewLayer({
-  country, region, subregion,
+  active, country, region, subregion,
 }: UseAdminPreviewLayer) {
   const level = useMemo(() => {
     if (subregion) return 2;
@@ -16,7 +16,7 @@ export function useAdminPreviewLayer({
   const guid = subregion || region || country;
 
   return useMemo(() => {
-    if (typeof level === 'undefined' || !guid) return null;
+    if (!active || typeof level === 'undefined' || !guid) return null;
 
     return {
       id: `admin-preview-layer-${guid}`,
@@ -38,15 +38,15 @@ export function useAdminPreviewLayer({
         ],
       },
     };
-  }, [level, guid]);
+  }, [active, level, guid]);
 }
 
 // PUGridpreview
 export function usePUGridPreviewLayer({
-  bbox, planningUnitGridShape, planningUnitAreakm2,
+  active, bbox, planningUnitGridShape, planningUnitAreakm2,
 }: UsePUGridPreviewLayer) {
   return useMemo(() => {
-    if (!bbox || !planningUnitGridShape || !planningUnitAreakm2) return null;
+    if (!active || !bbox || !planningUnitGridShape || !planningUnitAreakm2) return null;
 
     return {
       id: 'pu-grid-preview-layer',
@@ -67,15 +67,15 @@ export function usePUGridPreviewLayer({
         ],
       },
     };
-  }, [bbox, planningUnitGridShape, planningUnitAreakm2]);
+  }, [active, bbox, planningUnitGridShape, planningUnitAreakm2]);
 }
 
 // PUGridpreview
 export function useWDPAPreviewLayer({
-  bbox, wdpaIucnCategories,
+  active, bbox, wdpaIucnCategories,
 }: UseWDPAPreviewLayer) {
   return useMemo(() => {
-    if (!bbox) return null;
+    if (!active || !bbox) return null;
 
     return {
       id: 'wdpa-preview-layer',
@@ -109,5 +109,5 @@ export function useWDPAPreviewLayer({
         ],
       },
     };
-  }, [bbox, wdpaIucnCategories]);
+  }, [active, bbox, wdpaIucnCategories]);
 }
