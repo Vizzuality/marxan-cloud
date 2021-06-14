@@ -4,9 +4,11 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -47,6 +49,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
+import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
+import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
+import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
+import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -57,6 +63,7 @@ export class ScenariosController {
     private readonly service: ScenariosService,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
+    private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
   ) {}
 
   @ApiOperation({
@@ -168,6 +175,55 @@ export class ScenariosController {
   ): Promise<Partial<RemoteScenarioFeaturesData>[]> {
     return this.scenarioFeatureSerializer.serialize(
       await this.service.getFeatures(id),
+    );
+  }
+
+  @ApiOkResponse({
+    type: ScenarioSolutionResultDto,
+  })
+  @ApiImplicitQuery({
+    name: 'best',
+    required: false,
+    type: Boolean,
+  })
+  @ApiImplicitQuery({
+    name: 'most-different',
+    required: false,
+    type: Boolean,
+  })
+  @JSONAPIQueryParams()
+  @Get(`:id/marxan/run/:runId/solutions`)
+  async getScenarioRunSolutions(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('runId', ParseUUIDPipe) runId: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Query('best', ParseBoolPipe) selectOnlyBest?: boolean,
+    @Query('most-different', ParseBoolPipe) selectMostDifferent?: boolean,
+  ): Promise<ScenarioFeatureResultDto> {
+    if (selectOnlyBest) {
+      return this.scenarioSolutionSerializer.serialize(
+        await this.service.getBestSolution(id, runId),
+      );
+    }
+    if (selectMostDifferent) {
+      const result = await this.service.getMostDifferentSolutions(
+        id,
+        runId,
+        fetchSpecification,
+      );
+      return this.scenarioSolutionSerializer.serialize(
+        result.data,
+        result.metadata,
+      );
+    }
+    const result = await this.service.findAllSolutionsPaginated(
+      id,
+      runId,
+      fetchSpecification,
+    );
+    return this.scenarioSolutionSerializer.serialize(
+      result.data,
+      result.metadata,
     );
   }
 }
