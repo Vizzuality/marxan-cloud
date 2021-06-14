@@ -8,7 +8,10 @@ import { AdjustPlanningUnits } from '@marxan-api/modules/analysis/entry-points/a
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
-import { ScenariosCrudService } from './scenarios-crud.service';
+import {
+  ScenarioInfoDTO,
+  ScenariosCrudService,
+} from './scenarios-crud.service';
 
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
@@ -28,8 +31,11 @@ export class ScenariosService {
     private readonly httpService: HttpService,
   ) {}
 
-  async findAllPaginated(fetchSpecification: FetchSpecification) {
-    return this.crudService.findAllPaginated(fetchSpecification);
+  async findAllPaginated(
+    fetchSpecification: FetchSpecification,
+    appInfo?: ScenarioInfoDTO,
+  ) {
+    return this.crudService.findAllPaginated(fetchSpecification, appInfo);
   }
 
   async getById(scenarioId: string, fetchSpecification?: FetchSpecification) {

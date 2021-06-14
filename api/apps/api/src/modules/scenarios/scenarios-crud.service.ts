@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FetchSpecification } from 'nestjs-base-service';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
@@ -28,12 +29,18 @@ type ScenarioFilterKeys = keyof Pick<
 >;
 type ScenarioFilters = Record<ScenarioFilterKeys, string[]>;
 
+export type ScenarioInfoDTO = AppInfoDTO & {
+  params?: {
+    nameAndDescriptionFilter?: string;
+  };
+};
+
 @Injectable()
 export class ScenariosCrudService extends AppBaseService<
   Scenario,
   CreateScenarioDTO,
   UpdateScenarioDTO,
-  AppInfoDTO
+  ScenarioInfoDTO
 > {
   constructor(
     @InjectRepository(Scenario)
@@ -275,5 +282,22 @@ export class ScenariosCrudService extends AppBaseService<
           .then((r) => r.map((i) => i.id))
       : undefined;
     return wdpaAreaIdsWithinPlanningArea;
+  }
+
+  async extendFindAllQuery(
+    query: SelectQueryBuilder<Scenario>,
+    fetchSpecification: FetchSpecification,
+    info?: ScenarioInfoDTO,
+  ): Promise<SelectQueryBuilder<Scenario>> {
+    const nameAndDescriptionFilter = info?.params?.nameAndDescriptionFilter;
+    if (nameAndDescriptionFilter) {
+      const nameAndDescriptionFilterField = 'nameAndDescriptionFilter' as const;
+      query.andWhere(
+        `(${this.alias}.name ||' '|| COALESCE(${this.alias}.description, '')) ILIKE :${nameAndDescriptionFilterField}`,
+        { [nameAndDescriptionFilterField]: `%${nameAndDescriptionFilter}%` },
+      );
+    }
+
+    return query;
   }
 }
