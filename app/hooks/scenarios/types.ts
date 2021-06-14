@@ -1,7 +1,9 @@
 import { AxiosRequestConfig } from 'axios';
 
-export interface UseScenariosFiltersProps {
+export interface UseScenariosOptionsProps {
   search?: string;
+  sort?: string;
+  filters?: Record<string, unknown>
 }
 
 export interface UseSaveScenarioProps {

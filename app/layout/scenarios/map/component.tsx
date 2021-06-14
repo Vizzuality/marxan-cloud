@@ -50,10 +50,10 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
     active: tab === 'protected-areas',
-    bbox: [-0.72675204, -2.50003099, 43.31418991, 41.90989685],
+    bbox,
   });
 
-  const LAYERS = [WDPApreviewLayer];
+  const LAYERS = [WDPApreviewLayer].filter((l) => !!l);
 
   useEffect(() => {
     setBounds({

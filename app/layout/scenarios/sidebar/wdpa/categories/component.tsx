@@ -186,12 +186,13 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       mutators={{
         removeWDPAFilter: (args, state, utils) => {
           const [id, arr] = args;
-          const i = arr.indexOf(id);
+          const newArr = [...arr];
+          const i = newArr.indexOf(id);
 
           if (i > -1) {
-            arr.splice(i, 1);
+            newArr.splice(i, 1);
           }
-          utils.changeValue(state, 'wdpaIucnCategories', () => arr);
+          utils.changeValue(state, 'wdpaIucnCategories', () => newArr);
         },
       }}
       initialValues={INITIAL_VALUES}

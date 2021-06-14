@@ -3,7 +3,7 @@ import { UseAdminPreviewLayer, UsePUGridPreviewLayer, UseWDPAPreviewLayer } from
 
 // AdminPreview
 export function useAdminPreviewLayer({
-  country, region, subregion,
+  active, country, region, subregion,
 }: UseAdminPreviewLayer) {
   const level = useMemo(() => {
     if (subregion) return 2;
@@ -16,7 +16,7 @@ export function useAdminPreviewLayer({
   const guid = subregion || region || country;
 
   return useMemo(() => {
-    if (typeof level === 'undefined' || !guid) return null;
+    if (!active || typeof level === 'undefined' || !guid) return null;
 
     return {
       id: `admin-preview-layer-${guid}`,
@@ -38,15 +38,15 @@ export function useAdminPreviewLayer({
         ],
       },
     };
-  }, [level, guid]);
+  }, [active, level, guid]);
 }
 
 // PUGridpreview
 export function usePUGridPreviewLayer({
-  bbox, planningUnitGridShape, planningUnitAreakm2,
+  active, bbox, planningUnitGridShape, planningUnitAreakm2,
 }: UsePUGridPreviewLayer) {
   return useMemo(() => {
-    if (!bbox || !planningUnitGridShape || !planningUnitAreakm2) return null;
+    if (!active || !bbox || !planningUnitGridShape || !planningUnitAreakm2) return null;
 
     return {
       id: 'pu-grid-preview-layer',
@@ -67,30 +67,31 @@ export function usePUGridPreviewLayer({
         ],
       },
     };
-  }, [bbox, planningUnitGridShape, planningUnitAreakm2]);
+  }, [active, bbox, planningUnitGridShape, planningUnitAreakm2]);
 }
 
 // PUGridpreview
 export function useWDPAPreviewLayer({
-  bbox, wdpaIucnCategories,
+  active, bbox, wdpaIucnCategories,
 }: UseWDPAPreviewLayer) {
   return useMemo(() => {
-    if (!bbox) return null;
-
-    console.log(wdpaIucnCategories);
+    if (!active || !bbox) return null;
 
     return {
       id: 'wdpa-preview-layer',
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt`],
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
       },
       render: {
         layers: [
           {
             type: 'fill',
             'source-layer': 'layer0',
+            filter: ['all',
+              ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
+            ],
             paint: {
               'fill-color': '#00BFFF',
             },
@@ -98,6 +99,9 @@ export function useWDPAPreviewLayer({
           {
             type: 'line',
             'source-layer': 'layer0',
+            filter: ['all',
+              ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
+            ],
             paint: {
               'line-color': '#000',
             },
@@ -105,5 +109,5 @@ export function useWDPAPreviewLayer({
         ],
       },
     };
-  }, [bbox, wdpaIucnCategories]);
+  }, [active, bbox, wdpaIucnCategories]);
 }
