@@ -61,7 +61,8 @@ export function usePUGridPreviewLayer({
             type: 'line',
             'source-layer': 'layer0',
             paint: {
-              'line-color': '#000',
+              'line-color': '#00BFFF',
+              'line-opacity': 0.5,
             },
           },
         ],
