@@ -28,6 +28,7 @@ import {
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
@@ -51,7 +52,6 @@ import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
 import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
-import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 
 @UseGuards(JwtAuthGuard)
@@ -181,12 +181,12 @@ export class ScenariosController {
   @ApiOkResponse({
     type: ScenarioSolutionResultDto,
   })
-  @ApiImplicitQuery({
+  @ApiQuery({
     name: 'best',
     required: false,
     type: Boolean,
   })
-  @ApiImplicitQuery({
+  @ApiQuery({
     name: 'most-different',
     required: false,
     type: Boolean,
