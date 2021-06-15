@@ -39,15 +39,15 @@ export const createWorld = async (app: INestApplication) => {
     GivenPlanningUnitsExist: async (
       planningUnits: AreaUnitSampleGeometry,
     ): Promise<void> => {
-      const toInclude = await puGeometryFromGeoJson(
+      const toInclude = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
         planningUnits.features.filter((f) => f.properties.shouldBeIncluded),
       );
-      const toExclude = await puGeometryFromGeoJson(
+      const toExclude = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
         planningUnits.features.filter((f) => f.properties.shouldBeExcluded),
       );
-      const untouched = await puGeometryFromGeoJson(
+      const untouched = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
         planningUnits.features.filter(
           (f) =>
@@ -114,7 +114,7 @@ export const createWorld = async (app: INestApplication) => {
   };
 };
 
-const puGeometryFromGeoJson = async (
+const insertPuGeometryFromGeoJson = async (
   repo: Repository<PlanningUnitsGeom>,
   features: Feature<Polygon | MultiPolygon, AreaUnitSampleGeometryProps>[],
 ): Promise<string[]> => {

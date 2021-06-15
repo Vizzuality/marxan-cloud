@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { PromiseType } from 'utility-types';
 import { createWorld } from './world';
-import { bootstrapApplication, delay } from '../../utils';
+import { bootstrapApplication } from '../../utils';
 
 import { ScenarioPlanningUnitsInclusionProcessor } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/scenario-planning-units-inclusion-processor';
 import { JobInput } from '@marxan-jobs/planning-unit-geometry';
