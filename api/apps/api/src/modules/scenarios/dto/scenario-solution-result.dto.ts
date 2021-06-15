@@ -1,11 +1,5 @@
-import {
-  ApiExtraModels,
-  ApiProperty,
-  getSchemaPath,
-  refs,
-} from '@nestjs/swagger';
+import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
-import { oneOf } from 'purify-ts';
 
 class ScenarioSolutionsDataDto {
   @ApiProperty()
