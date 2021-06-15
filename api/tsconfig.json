@@ -54,6 +54,12 @@
       ],
       "@marxan/scenario-cost-surface/*": [
         "libs/scenario-cost-surface/src/*"
+      ],
+      "@marxan/marxan-input": [
+        "libs/marxan-input/src"
+      ],
+      "@marxan/marxan-input/*": [
+        "libs/marxan-input/src/*"
       ]
     }
   },
