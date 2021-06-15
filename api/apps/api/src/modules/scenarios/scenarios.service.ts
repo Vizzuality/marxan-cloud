@@ -1,6 +1,8 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpService, Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
+import { classToClass } from 'class-transformer';
 
+import { MarxanInput, MarxanParameters } from '@marxan/marxan-input';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ScenarioFeaturesService } from '@marxan-api/modules/scenarios-features';
@@ -26,6 +28,7 @@ export class ScenariosService {
     private readonly updatePlanningUnits: AdjustPlanningUnits,
     private readonly costSurface: CostSurfaceFacade,
     private readonly httpService: HttpService,
+    private readonly marxanInputValidator: MarxanInput,
   ) {}
 
   async findAllPaginated(fetchSpecification: FetchSpecification) {
@@ -42,12 +45,14 @@ export class ScenariosService {
   }
 
   async create(input: CreateScenarioDTO, info: AppInfoDTO) {
-    return this.crudService.create(input, info);
+    const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
+    return this.crudService.create(validatedMetadata, info);
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
     await this.assertScenario(scenarioId);
-    return this.crudService.update(scenarioId, input);
+    const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
+    return this.crudService.update(scenarioId, validatedMetadata);
   }
 
   async getFeatures(scenarioId: string) {
@@ -105,5 +110,31 @@ export class ScenariosService {
 
   private async assertScenario(scenarioId: string) {
     await this.crudService.getById(scenarioId);
+  }
+
+  /**
+   * Throws
+   * @param input
+   * @private
+   */
+  private getPayloadWithValidatedMetadata<
+    T extends CreateScenarioDTO | UpdateScenarioDTO
+  >(input: T): T {
+    let marxanInput: MarxanParameters | undefined;
+    if (input.metadata?.marxanInputParameterFile) {
+      try {
+        marxanInput = this.marxanInputValidator.from(
+          input.metadata.marxanInputParameterFile,
+        );
+      } catch (errors) {
+        // TODO debt: shouldn't throw HttpException
+        throw new BadRequestException(errors);
+      }
+    }
+    const withValidatedMetadata: T = classToClass<T>(input);
+    if (withValidatedMetadata.metadata) {
+      withValidatedMetadata.metadata.marxanInputParameterFile = marxanInput;
+    }
+    return withValidatedMetadata;
   }
 }
