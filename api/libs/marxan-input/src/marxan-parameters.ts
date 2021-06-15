@@ -1,4 +1,4 @@
-import { Allow, IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 export enum RunMode {
   SimulatedAnnealingFollowedByHeuristic = 0,
