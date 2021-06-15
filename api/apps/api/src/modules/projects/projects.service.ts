@@ -11,9 +11,13 @@ import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 @Injectable()
 export class ProjectsService {
+  private readonly geoprocessingUrl: string = AppConfig.get(
+    'geoprocessing.url',
+  ) as string;
   constructor(
     private readonly geoCrud: GeoFeaturesService,
     private readonly projectsCrud: ProjectsCrudService,
