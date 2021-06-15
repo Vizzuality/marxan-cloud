@@ -79,6 +79,38 @@ describe('CountriesModule (e2e)', () => {
       expect(resources.length).toBeGreaterThanOrEqual(1);
     });
 
+    it('Should return a administrative area in expected form', async () => {
+      const response = await request(app.getHttpServer())
+        .get(
+          `/api/v1/countries/${countryCodeForTests}/administrative-areas?page[size]=1`,
+        )
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources = response.body.data;
+      expect(resources).toEqual([
+        {
+          attributes: {
+            bbox: [
+              24.08211708,
+              11.66874886,
+              -4.372591018676758,
+              -18.042081832885742,
+            ],
+            gid0: 'AGO',
+            gid1: null,
+            gid2: null,
+            maxPuAreaSize: 1252297915852.3235,
+            minPuAreaSize: 2123172.1934887753,
+            name0: 'Angola',
+            name1: null,
+            name2: null,
+          },
+          type: 'admin_areas',
+        },
+      ]);
+    });
+
     it('Should throw a 400 error if filtering by level other than 1 or 2', async () => {
       await request(app.getHttpServer())
         .get(
