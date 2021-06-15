@@ -2,6 +2,7 @@ import { forwardRef, Module, HttpModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 
+import { MarxanInput } from '@marxan/marxan-input/marxan-input';
 import { ScenariosController } from './scenarios.controller';
 import { Scenario } from './scenario.api.entity';
 import { ScenariosCrudService } from './scenarios-crud.service';
@@ -51,6 +52,7 @@ import { CostSurfaceViewModule } from './cost-surface-readmodel/cost-surface-vie
     ScenarioFeatureSerializer,
     SolutionResultCrudService,
     ScenarioSolutionSerializer,
+    MarxanInput,
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],
