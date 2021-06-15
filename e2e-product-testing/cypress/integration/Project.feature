@@ -1,5 +1,5 @@
-Feature: Project dashboard
-    Scenario: See my projects
+Feature: Project dashboard actions
+    Scenario: See user's projects
         Given the user has logged-in succesfuly
         When the user is redirected to his/her project dashboard
         Then the user sees all his/her projects
@@ -19,6 +19,22 @@ Feature: Project dashboard
         Given the user is in his/her project dashboard
         When the user creates a new project
         Then the user is taken to the New Project Landing page
+    Scenario: Duplicate a project
+        Given the user is in his/her project dashboard
+        When the user duplicates a project  
+        Then a new project appears in the dashboard 
+    Scenario: Download a project
+        Given the user is in his/her project dashboard
+        When the user downloads a project  
+        Then the user receives a bundle zip with all the input + output + planning unit files in his/her local machine 
+    Scenario: Upload a project with correct files
+        Given the user is in his/her project dashboard
+        When the user uploads a project with correct files
+        Then a new project appears in the dashboard
+    Scenario: Upload a project with incorrect files
+        Given the user is in his/her project dashboard
+        When the user uploads a project with incorrect files
+        Then the user receives a message on screen where to find instructions  
 
 Feature: Share projects
     Scenario: Share a project with contributors with Marxan profile
