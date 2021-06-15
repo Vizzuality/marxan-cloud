@@ -206,4 +206,15 @@ export class ProjectsController {
     }
     return;
   }
+
+  @ApiConsumesShapefile(false)
+  @ApiOperation({
+    description: 'Upload shapefile with project planning-area',
+  })
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiNoContentResponse()
+  @Post(':id/planning-area/shapefile')
+  async shapefileWithProjectPlanningArea(@Param('id') projectId: string) {
+    return;
+  }
 }
