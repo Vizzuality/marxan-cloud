@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, In, Repository, WhereExpression } from 'typeorm';
 import { MultiPolygon, Polygon } from 'geojson';
-import { flatten } from 'lodash';
+import { flatMap } from 'lodash';
 import { Job } from 'bullmq';
 
 import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
@@ -29,9 +29,10 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const geometriesIdsToExclude: string[] = [];
 
     if (includeGeo) {
-      const targetGeometries = flatten(
-        includeGeo.map((collection) => collection.features),
-      ).map((feature) => feature.geometry);
+      const targetGeometries = flatMap(includeGeo, (collection) =>
+        collection.features.map((feature) => feature.geometry),
+      );
+
       geometriesIdsToInclude.push(
         ...(
           await this.getIntersectedGeometriesFor(scenarioId, targetGeometries)
@@ -40,9 +41,9 @@ export class ScenarioPlanningUnitsInclusionProcessor
     }
 
     if (excludeGeo) {
-      const targetGeometries = flatten(
-        excludeGeo.map((collection) => collection.features),
-      ).map((feature) => feature.geometry);
+      const targetGeometries = flatMap(excludeGeo, (collection) =>
+        collection.features.map((feature) => feature.geometry),
+      );
       geometriesIdsToExclude.push(
         ...(
           await this.getIntersectedGeometriesFor(scenarioId, targetGeometries)
