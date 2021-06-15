@@ -147,6 +147,7 @@ export class Project extends TimeUserEntityMetadata {
   @ApiPropertyOptional({
     description: "ID of Country / Gid1 / Gid2 of project's area",
   })
+  @Column('uuid')
   planningAreaId?: string;
 
   @ApiPropertyOptional({
