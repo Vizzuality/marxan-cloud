@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -6,7 +6,7 @@ import Button from 'components/button';
 
 import Pill from 'layout/pill';
 
-// import Sections from 'layout/scenarios/sidebar/analysis/sections';
+import Sections from 'layout/scenarios/sidebar/solutions/sections';
 // import GapAnalysis from 'layout/scenarios/sidebar/analysis/gap-analysis';
 // import CostSurface from 'layout/scenarios/sidebar/analysis/cost-surface';
 // import AdjustPanningUnits from 'layout/scenarios/sidebar/analysis/adjust-planning-units';
@@ -18,7 +18,7 @@ import { useScenario } from 'hooks/scenarios';
 import { ScenariosSidebarSolutionsProps } from './types';
 
 export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarSolutionsProps> = () => {
-  // const [section, setSection] = useState(null);
+  const [section, setSection] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
 
@@ -27,9 +27,9 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarSolutionsProps> 
   const { data: scenarioData } = useScenario(sid);
 
   // CALLBACKS
-  // const onChangeSection = useCallback((s) => {
-  //   setSection(s);
-  // }, []);
+  const onChangeSection = useCallback((s) => {
+    setSection(s);
+  }, []);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.SOLUTIONS) return null;
 
@@ -50,14 +50,14 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarSolutionsProps> 
             </div>
           </header>
 
-          {/* {!section && (
+          {!section && (
             <Sections
               key="sections"
               onChangeSection={onChangeSection}
             />
           )}
 
-          {section === 'gap-analysis' && (
+          {/* {section === 'gap-analysis' && (
             <GapAnalysis
               key="gap-analysis"
               onChangeSection={onChangeSection}
