@@ -161,5 +161,28 @@ describe('ScenariosModule (e2e)', () => {
 
       expect(resources).toBeUndefined();
     });
+
+    it('should not allow to create scenario with invalid marxan properties', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/scenarios')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send({
+          ...E2E_CONFIG.scenarios.valid.minimal(),
+          metadata: {
+            marxanInputParameterFile: {
+              HEURTYPE: 99999999213231,
+            },
+          },
+        })
+        // .expect(400)
+        .then((response) => {
+          console.log(response.body);
+          console.log(response.text);
+          expect(
+            response.body.errors[0].meta.rawError.response.message[0]
+              .constraints.isEnum,
+          ).toMatchInlineSnapshot(`"HEURTYPE must be a valid enum value"`);
+        });
+    });
   });
 });
