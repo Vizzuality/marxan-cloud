@@ -79,6 +79,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/scenario-cost-surface/tsconfig.lib.json"
       }
+    },
+    "marxan-input": {
+      "type": "library",
+      "root": "libs/marxan-input",
+      "entryFile": "index",
+      "sourceRoot": "libs/marxan-input/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/marxan-input/tsconfig.lib.json"
+      }
     }
   }
 }
