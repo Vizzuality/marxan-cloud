@@ -10,12 +10,14 @@ import useBottomScrollListener from 'hooks/scroll';
 
 export interface ScenariosFeaturesAddListProps {
   search?: string;
+  filters?: Record<string, any>;
   selected: number[] | string[];
   onToggleSelected: (selected: string | number) => void;
 }
 
 export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> = ({
   search,
+  filters,
   selected = [],
   onToggleSelected,
 }: ScenariosFeaturesAddListProps) => {
@@ -31,6 +33,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
+    filters,
   });
 
   const scrollRef = useBottomScrollListener(
