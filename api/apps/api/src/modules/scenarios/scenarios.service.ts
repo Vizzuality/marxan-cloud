@@ -15,7 +15,7 @@ import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
-import { CostSurfaceViewService } from '@marxan-api/modules/scenarios/cost-surface-readmodel/cost-surface-view.service';
+import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
 
 @Injectable()
 export class ScenariosService {
