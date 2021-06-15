@@ -42,7 +42,7 @@ Feature: Intersection
         When The user clicks on 'Select features +'
         Then the Intersection modal opens
    
-   Scenario: Intersection species with bioregional
+   Scenario: Intersection species with bioregional layer
         Given the user is in the Intersection modal
         And the user has selected a bioregional layer
         And the user has selected a category 

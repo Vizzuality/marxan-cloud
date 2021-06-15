@@ -1,7 +1,6 @@
 Feature: View pre-run gap Analysis
     Scenario: Open gap analysis (default view all features)
         Given the user is in Analysis tab
-
         When the user opens the 'View gap Analysis' modal
         Then the gap analysis displays all the features as a bar graph and on map
 
