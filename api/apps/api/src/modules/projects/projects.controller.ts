@@ -206,15 +206,18 @@ export class ProjectsController {
     }
     return;
   }
-
+  // TODO: create interface extending ProtectedAreasJobInput interface
   @ApiConsumesShapefile(false)
   @ApiOperation({
     description: 'Upload shapefile with project planning-area',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @ApiNoContentResponse()
-  @Post(':id/planning-area/shapefile')
-  async shapefileWithProjectPlanningArea(@Param('id') projectId: string) {
-    return;
+  @Post('planning-area/shapefile')
+  async shapefileWithProjectPlanningArea(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<any> {
+    const res = await this.projectsService.getPlanningAreaFromShapefile(file);
+    return { msg: 'alright', res };
   }
 }

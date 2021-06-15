@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpService, Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
@@ -10,6 +10,7 @@ import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
+import { apiGlobalPrefixes } from '@marxan-api/api.config';
 
 @Injectable()
 export class ProjectsService {
@@ -18,6 +19,7 @@ export class ProjectsService {
     private readonly projectsCrud: ProjectsCrudService,
     private readonly protectedAreaShapefile: ProtectedAreasFacade,
     private readonly jobStatusService: JobStatusService,
+    private readonly httpService: HttpService,
   ) {}
 
   async findAllGeoFeatures(
@@ -77,5 +79,24 @@ export class ProjectsService {
 
   async importLegacyProject(_: Express.Multer.File) {
     return new Project();
+  }
+
+  async getPlanningAreaFromShapefile(file: Express.Multer.File) {
+    /**
+     * @validateStatus is required for HttpService to not reject and wrap geoprocessing's response
+     * in case a shapefile is not validated and a status 4xx is sent back.
+     */
+    // TODO: Add proper url to proper controller in geoservice
+    const { data: geoJson } = await this.httpService
+      .post(
+        `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
+        file,
+        {
+          headers: { 'Content-Type': 'application/json' },
+          validateStatus: (status) => status <= 499,
+        },
+      )
+      .toPromise();
+    return geoJson;
   }
 }
