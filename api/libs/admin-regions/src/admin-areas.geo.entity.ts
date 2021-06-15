@@ -116,6 +116,26 @@ export class AdminArea {
   @Column('uuid', { name: 'created_by', nullable: true })
   createdBy?: string | null;
 
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+  })
+  @Column('double precision', {
+    name: 'min_pu_area_size',
+    nullable: true,
+  })
+  minPuAreaSize?: number | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+  })
+  @Column('double precision', {
+    name: 'max_pu_area_size',
+    nullable: true,
+  })
+  maxPuAreaSize?: number | null;
+
   @UpdateDateColumn({
     name: 'last_modified_at',
     type: 'timestamp without time zone',
