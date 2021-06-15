@@ -29,9 +29,10 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const geometriesIdsToExclude: string[] = [];
 
     if (includeGeo) {
-      const targetGeometries = flatMap(includeGeo, (collection) =>
-        collection.features.map((feature) => feature.geometry),
-      );
+      const targetGeometries = flatMap(
+        includeGeo,
+        (collection) => collection.features,
+      ).map((feature) => feature.geometry);
 
       geometriesIdsToInclude.push(
         ...(
@@ -41,9 +42,10 @@ export class ScenarioPlanningUnitsInclusionProcessor
     }
 
     if (excludeGeo) {
-      const targetGeometries = flatMap(excludeGeo, (collection) =>
-        collection.features.map((feature) => feature.geometry),
-      );
+      const targetGeometries = flatMap(
+        excludeGeo,
+        (collection) => collection.features,
+      ).map((feature) => feature.geometry);
       geometriesIdsToExclude.push(
         ...(
           await this.getIntersectedGeometriesFor(scenarioId, targetGeometries)
