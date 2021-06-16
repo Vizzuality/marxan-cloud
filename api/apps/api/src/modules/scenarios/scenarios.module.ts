@@ -20,7 +20,13 @@ import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { CostSurfaceTemplateModule } from './cost-surface-template';
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
-import { InputParameterFileProvider } from './input-parameter-file.provider';
+import {
+  InputParameterFileProvider,
+  IoSettings,
+  ioSettingsToken,
+} from './input-parameter-file.provider';
+import { AppConfig } from '@marxan-api/utils/config.utils';
+import { assertDefined } from '@marxan/utils';
 
 @Module({
   imports: [
@@ -45,6 +51,16 @@ import { InputParameterFileProvider } from './input-parameter-file.provider';
     ScenarioFeatureSerializer,
     MarxanInput,
     InputParameterFileProvider,
+    {
+      provide: ioSettingsToken,
+      useFactory: () => {
+        const config = AppConfig.get<IoSettings>(
+          'marxan.inputFiles.inputDat.ioSettings',
+        );
+        assertDefined(config);
+        return config;
+      },
+    },
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],
