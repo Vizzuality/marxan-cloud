@@ -19,6 +19,7 @@ import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { CostSurfaceTemplateModule } from './cost-surface-template';
+import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
 import { InputParameterFileProvider } from './input-parameter-file.provider';
 
 @Module({
@@ -33,6 +34,7 @@ import { InputParameterFileProvider } from './input-parameter-file.provider';
     CostSurfaceModule,
     HttpModule,
     CostSurfaceTemplateModule,
+    PlanningUnitsProtectionLevelModule,
   ],
   providers: [
     ScenariosService,
