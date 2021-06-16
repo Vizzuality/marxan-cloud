@@ -3,8 +3,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { copySync } from 'fs-extra';
 
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
-import { AppModule } from '@marxan-geoprocessing/app.module';
 import { InputFiles } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/input-files';
+import { AppModule } from '@marxan-geoprocessing/app.module';
+import { v4 } from 'uuid';
 
 let app: INestApplication;
 let sut: MarxanSandboxRunnerService;
@@ -21,17 +22,10 @@ beforeAll(async () => {
 
 describe(`when...`, () => {
   it(`then werks!`, async () => {
-    await sut.run('asdf');
-
-    // TODO ugh, verify some outputs?
-  }, 20000);
+    // TODO steps for creating all the data required for processing for given scenario
+    await sut.run(v4());
+  }, 30000);
 });
-
-/**
- * for the output files we will want to first run a small script in python that will do some calcs we need to do for the 5 most different solutions; and later we will need to save in the db prior a transformation the next files: output_sum.csv, outputmv_xxxx.csv and outputr_xxxx.csv
- * the other files are derived from this 3 plus the output_log and some summary of the input in the output_sen
- *
- */
 
 // TODO: later it may be disposed and use "real" implementation
 // for now, as we don't know yet the values/inputs, we simply

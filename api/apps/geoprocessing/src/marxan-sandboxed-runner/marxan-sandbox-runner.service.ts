@@ -1,69 +1,54 @@
 import { Injectable } from '@nestjs/common';
-import { spawn } from 'child_process';
 
 import { InputFiles } from './ports/input-files';
 import { SolutionsRepository } from './ports/solutions-repository';
 import { Workspace } from './ports/workspace';
-import { MarxanRunner } from './ports/marxan-runner';
+
+import { MarxanRun } from './marxan-run';
 
 @Injectable()
 export class MarxanSandboxRunnerService {
   constructor(
     private readonly workspaceService: Workspace,
     private readonly inputFilesProvider: InputFiles,
-    private readonly marxanRunner: MarxanRunner,
+    private readonly marxanRunner: MarxanRun,
     private readonly solutionsRepository: SolutionsRepository,
   ) {}
 
-  async run(forScenarioId: string): Promise<unknown> {
+  async run(forScenarioId: string): Promise<void> {
     const {
       cleanup,
       marxanBinaryPath,
       workingDirectory,
     } = await this.workspaceService.get();
-
-    // TODO remove
+    // useful to check output within docker, during development - needs `cleanup()` to be commented out
     console.log(`doing things in..`, workingDirectory);
 
     await this.inputFilesProvider.include(forScenarioId, workingDirectory);
-    const {
-      exitCode: _code,
-      stdError: _errors,
-      stdOut: _stdout,
-    } = await this.marxanRunner.execute(marxanBinaryPath, workingDirectory);
-    await this.solutionsRepository.saveFrom(workingDirectory, forScenarioId);
 
-    // TODO: finally
-    // await cleanup();
-
-    // TODO wrap in another class
     return new Promise((resolve, reject) => {
-      const stdError: string[] = [];
-      const stdOut: string[] = [];
-      console.log(`marxanBinaryPath`, marxanBinaryPath);
-      const sub = spawn(marxanBinaryPath, {
-        cwd: workingDirectory,
-      });
-      sub.stderr.on('data', (chunk) => {
-        stdError.push(chunk.toString());
-      });
-      sub.stdout.on('data', (chunk) => {
-        console.log(`::stdout`, chunk.toString());
-        stdOut.push(chunk.toString());
+      this.marxanRunner.on(`pid`, (_pid: number) => {
+        // we will need PID for canceling the job
       });
 
-      sub.on(`finish`, (f) => {
-        console.log(`finished`, f);
+      this.marxanRunner.on(
+        'error',
+        async (result: { code: number; stdError: string[] }) => {
+          await cleanup();
+          reject(result);
+        },
+      );
+      this.marxanRunner.on('finished', async () => {
+        await this.solutionsRepository.saveFrom(
+          workingDirectory,
+          forScenarioId,
+        );
+        await cleanup();
+
+        resolve();
       });
 
-      sub.on('exit', (code) => {
-        console.log(`exit`, code);
-        if (code !== 0) {
-          return reject(stdError);
-        }
-        return resolve(1);
-      });
-      return;
+      this.marxanRunner.execute(marxanBinaryPath, workingDirectory);
     });
   }
 }
