@@ -20,6 +20,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
 }: ScenariosFeaturesAddProps) => {
   const [search, setSearch] = useState(null);
   const [filters, setFilters] = useState({});
+  const [sort, setSort] = useState(null);
   const { query } = useRouter();
   const { pid } = query;
 
@@ -32,6 +33,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   } = useAllFeatures(pid, {
     search,
     filters,
+    sort,
   });
 
   const INITIAL_VALUES = useMemo(() => {
@@ -67,6 +69,10 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
     setFilters(f);
   }, []);
 
+  const onSort = useCallback((s) => {
+    setSort(s);
+  }, []);
+
   const onSubmit = useCallback((values) => {
     // Save current features then dismiss the modal
     console.info(values);
@@ -89,8 +95,10 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
           <Toolbar
             search={search}
             filters={filters}
+            sort={sort}
             onSearch={onSearch}
             onFilters={onFilters}
+            onSort={onSort}
           />
 
           <FieldRFF
@@ -100,6 +108,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
               <List
                 search={search}
                 filters={filters}
+                sort={sort}
                 selected={values.selected}
                 onToggleSelected={(id) => {
                   onToggleSelected(id, input);

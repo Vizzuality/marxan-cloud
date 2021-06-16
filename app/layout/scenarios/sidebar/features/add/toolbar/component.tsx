@@ -18,10 +18,18 @@ export interface ScenarioFeaturesAddToolbarProps {
 
   filters?: Record<string, any>;
   onFilters?: (filters: Record<string, unknown>) => void;
+
+  sort?: string;
+  onSort?: (sort: string) => void;
 }
 
 export const ScenarioFeaturesAddToolbar: React.FC<ScenarioFeaturesAddToolbarProps> = ({
-  search, onSearch, filters = {}, onFilters,
+  search,
+  onSearch,
+  filters = {},
+  onFilters,
+  sort,
+  onSort,
 }: ScenarioFeaturesAddToolbarProps) => {
   const [open, setOpen] = useState(false);
   const FILTERS_LENGTH = useMemo(() => {
@@ -91,6 +99,8 @@ export const ScenarioFeaturesAddToolbar: React.FC<ScenarioFeaturesAddToolbarProp
           <Filters
             filters={filters}
             onChangeFilters={onFilters}
+            sort={sort}
+            onChangeSort={onSort}
           />
         </Modal>
       </div>

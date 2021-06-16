@@ -11,6 +11,7 @@ import useBottomScrollListener from 'hooks/scroll';
 export interface ScenariosFeaturesAddListProps {
   search?: string;
   filters?: Record<string, any>;
+  sort?: string;
   selected: number[] | string[];
   onToggleSelected: (selected: string | number) => void;
 }
@@ -18,6 +19,7 @@ export interface ScenariosFeaturesAddListProps {
 export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> = ({
   search,
   filters,
+  sort,
   selected = [],
   onToggleSelected,
 }: ScenariosFeaturesAddListProps) => {
@@ -34,6 +36,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
   } = useAllFeatures(pid, {
     search,
     filters,
+    sort,
   });
 
   const scrollRef = useBottomScrollListener(
