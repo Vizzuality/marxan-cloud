@@ -25,7 +25,13 @@ import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { CostSurfaceViewModule } from './cost-surface-readmodel/cost-surface-view.module';
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
-import { InputParameterFileProvider } from './input-parameter-file.provider';
+import {
+  InputParameterFileProvider,
+  IoSettings,
+  ioSettingsToken,
+} from './input-parameter-file.provider';
+import { AppConfig } from '@marxan-api/utils/config.utils';
+import { assertDefined } from '@marxan/utils';
 
 @Module({
   imports: [
@@ -57,6 +63,16 @@ import { InputParameterFileProvider } from './input-parameter-file.provider';
     ScenarioSolutionSerializer,
     MarxanInput,
     InputParameterFileProvider,
+    {
+      provide: ioSettingsToken,
+      useFactory: () => {
+        const config = AppConfig.get<IoSettings>(
+          'marxan.inputFiles.inputDat.ioSettings',
+        );
+        assertDefined(config);
+        return config;
+      },
+    },
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],

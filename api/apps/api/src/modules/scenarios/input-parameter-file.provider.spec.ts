@@ -1,6 +1,9 @@
 import { PromiseType } from 'utility-types';
 import { Test } from '@nestjs/testing';
-import { InputParameterFileProvider } from './input-parameter-file.provider';
+import {
+  InputParameterFileProvider,
+  ioSettingsToken,
+} from './input-parameter-file.provider';
 import { JobStatus, Scenario, ScenarioType } from './scenario.api.entity';
 import { ScenariosCrudService } from './scenarios-crud.service';
 
@@ -38,7 +41,13 @@ describe(`when a full scenario available`, () => {
 NUMREPS 100
 MARXANRUNKEY1 value1
 MARXANRUNKEY2 value2
-MARXANRUNKEY3 3`);
+MARXANRUNKEY3 3
+INPUTDIR input
+PUNAME pu.dat
+SPECNAME spec.dat
+PUVSPRNAME puvspr.dat
+BOUNDNAME bound.dat
+OUTPUTDIR output`);
   });
 });
 
@@ -63,7 +72,13 @@ describe(`when a full scenario with duplicated BLM & NUMREPS available`, () => {
 NUMREPS 100
 MARXANRUNKEY1 value1
 MARXANRUNKEY2 value2
-MARXANRUNKEY3 3`);
+MARXANRUNKEY3 3
+INPUTDIR input
+PUNAME pu.dat
+SPECNAME spec.dat
+PUVSPRNAME puvspr.dat
+BOUNDNAME bound.dat
+OUTPUTDIR output`);
   });
 });
 describe(`when a scenario without parameters`, () => {
@@ -79,8 +94,13 @@ describe(`when a scenario without parameters`, () => {
   });
 
   // then
-  it(`should return an empty file`, () => {
-    expect(parameterFile).toEqual(``);
+  it(`should return a file with only io settings`, () => {
+    expect(parameterFile).toEqual(`INPUTDIR input
+PUNAME pu.dat
+SPECNAME spec.dat
+PUVSPRNAME puvspr.dat
+BOUNDNAME bound.dat
+OUTPUTDIR output`);
   });
 });
 
@@ -100,6 +120,17 @@ async function getFixtures() {
       {
         provide: ScenariosCrudService,
         useClass: FakeScenario,
+      },
+      {
+        provide: ioSettingsToken,
+        useValue: {
+          INPUTDIR: 'input',
+          PUNAME: 'pu.dat',
+          SPECNAME: 'spec.dat',
+          PUVSPRNAME: 'puvspr.dat',
+          BOUNDNAME: 'bound.dat',
+          OUTPUTDIR: 'output',
+        },
       },
     ],
   }).compile();
