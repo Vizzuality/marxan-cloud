@@ -7,17 +7,16 @@ import Button from 'components/button';
 import Pill from 'layout/pill';
 
 import Sections from 'layout/scenarios/sidebar/solutions/sections';
-// import GapAnalysis from 'layout/scenarios/sidebar/analysis/gap-analysis';
-// import CostSurface from 'layout/scenarios/sidebar/analysis/cost-surface';
-// import AdjustPanningUnits from 'layout/scenarios/sidebar/analysis/adjust-planning-units';
+import SolutionsDetails from 'layout/scenarios/sidebar/solutions/details';
 import { ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
 
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { useScenario } from 'hooks/scenarios';
 import { ScenariosSidebarSolutionsProps } from './types';
+import { SolutionsSections } from './sections/types';
 
-export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarSolutionsProps> = () => {
+export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps> = () => {
   const [section, setSection] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
@@ -57,26 +56,15 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarSolutionsProps> 
             />
           )}
 
-          {/* {section === 'gap-analysis' && (
-            <GapAnalysis
-              key="gap-analysis"
+          {section === SolutionsSections.DETAILS && (
+            <SolutionsDetails
+              key={SolutionsSections.DETAILS}
               onChangeSection={onChangeSection}
+              onScheduleScenario={() => console.info('Schedule scenario - solutions')}
+              onViewSolutionsTable={() => console.info('View solutions table - solutions')}
+              numberOfSchedules={2}
             />
           )}
-
-          {section === 'cost-surface' && (
-            <CostSurface
-              key="cost-surface"
-              onChangeSection={onChangeSection}
-            />
-          )}
-
-          {section === 'adjust-planning-units' && (
-            <AdjustPanningUnits
-              key="adjust-planning-units"
-              onChangeSection={onChangeSection}
-            />
-          )} */}
         </Pill>
 
         {!section && (
@@ -89,6 +77,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarSolutionsProps> 
             <Button
               theme="spacial"
               size="lg"
+              onClick={() => console.info('Re-Run scenario - solutions')}
             >
               Re-Run scenario
             </Button>
@@ -96,8 +85,9 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarSolutionsProps> 
               className="ml-4"
               theme="primary"
               size="lg"
+              onClick={() => console.info('Save scenario - solutions')}
             >
-              Save scenario
+              Save Scenario
             </Button>
           </motion.div>
         )}
@@ -106,4 +96,4 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarSolutionsProps> 
   );
 };
 
-export default ScenariosSidebarAnalysis;
+export default ScenariosSidebarSolutions;

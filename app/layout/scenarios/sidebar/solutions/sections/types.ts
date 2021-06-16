@@ -3,6 +3,7 @@ export interface ScenariosSidebarSolutionsSectionsProps {
 }
 
 export enum SolutionsSections {
-  SOLUTIONS = 'solutions',
+  DETAILS = 'details',
   GAP_ANALYSIS = 'gap-analysis',
+  SOLUTIONS = 'solutions',
 }

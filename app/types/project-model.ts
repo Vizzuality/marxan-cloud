@@ -27,3 +27,12 @@ export interface Area {
   planningUnitAreakm2: number;
   countryId: string;
 }
+
+export interface Solution {
+  id: string;
+  run: number;
+  score: number;
+  cost: number;
+  planningUnits: number;
+  missingValues: number;
+}
