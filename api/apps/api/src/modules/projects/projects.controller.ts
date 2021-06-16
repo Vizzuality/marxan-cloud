@@ -217,7 +217,6 @@ export class ProjectsController {
   async shapefileWithProjectPlanningArea(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<any> {
-    const res = await this.projectsService.getPlanningAreaFromShapefile(file);
-    return { msg: 'alright', res };
+    return await this.projectsService.getPlanningAreaFromShapefile(file);
   }
 }
