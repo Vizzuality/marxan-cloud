@@ -34,15 +34,15 @@ export const ScenarioFeaturesAddToolbar: React.FC<ScenarioFeaturesAddToolbarProp
   const [open, setOpen] = useState(false);
   const FILTERS_LENGTH = useMemo(() => {
     return Object.keys(filters)
-      .map((k) => {
+      .reduce((acc, k) => {
+        if (typeof filters[k] === 'undefined') return acc;
+
         if (filters[k] && Array.isArray(filters[k])) {
-          return !!filters[k].length;
+          return acc + filters[k].length;
         }
 
-        return filters[k];
-      })
-      .filter(((f) => !!f))
-      .length;
+        return acc + 1;
+      }, 0);
   }, [filters]);
 
   const onChangeOpen = useCallback(() => {

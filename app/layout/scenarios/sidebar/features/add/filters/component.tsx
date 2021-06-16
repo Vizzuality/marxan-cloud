@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo } from 'react';
 
-import cx from 'classnames';
-
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Button from 'components/button';
+import Checkbox from 'components/forms/checkbox';
+import Label from 'components/forms/label';
+import Radio from 'components/forms/radio';
 
 export interface ScenarioFeaturesAddFiltersProps {
   filters?: Record<string, any>;
@@ -59,85 +60,59 @@ export const ScenarioFeaturesAddFilters: React.FC<ScenarioFeaturesAddFiltersProp
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
-      {({ handleSubmit, values }) => (
+      {({ handleSubmit }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
-          <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">Filters</h2>
+          <h2 className="pl-8 mb-5 text-lg pr-28 font-heading">Filters</h2>
 
-          <div className="flex flex-col space-y-5">
+          <div className="flex flex-col px-8 space-y-5">
+            <div>
+              <h3 className="flex-shrink-0 mb-2 text-sm pr-28 font-heading">Filter by type</h3>
+              <div className="flex flex-col space-y-2">
+                {TAGS.map(({ id, label }) => {
+                  return (
+                    <FieldRFF
+                      key={id}
+                      name="tag"
+                      type="checkbox"
+                      value={id}
+                    >
+                      {(fprops) => (
+                        <div className="flex space-x-2">
+                          <Checkbox theme="light" id={`tag-${id}`} {...fprops.input} />
+                          <Label theme="light" id={`tag-${id}`} className="ml-2">{label}</Label>
+                        </div>
+                      )}
+                    </FieldRFF>
+                  );
+                })}
+              </div>
+            </div>
 
-            <FieldRFF
-              name="tag"
-            >
-              {({ input }) => (
-                <div>
-                  <h3 className="flex-shrink-0 pl-8 mb-2 text-sm pr-28 font-heading">Filter by type</h3>
-                  <div className="grid grid-cols-3 gap-2 px-8">
-                    {TAGS.map(({ id, label }) => {
-                      const activeTypes = values.tag || [];
-
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          className={cx({
-                            'w-full py-2 border border-gray-500 rounded-4xl text-sm': true,
-                            'bg-gray-500 text-white': activeTypes.includes(id),
-                          })}
-                          onClick={() => {
-                            const newArr = [...activeTypes];
-                            const i = newArr.indexOf(id);
-
-                            if (i > -1) {
-                              newArr.splice(i, 1);
-                            } else {
-                              newArr.push(id);
-                            }
-
-                            input.onChange(newArr);
-                          }}
-                        >
-                          {label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </FieldRFF>
-
-            <FieldRFF
-              name="sort"
-            >
-              {({ input }) => (
-                <div>
-                  <h3 className="flex-shrink-0 pl-8 mb-2 text-sm pr-28 font-heading">Order by</h3>
-                  <div className="grid grid-cols-3 gap-2 px-8">
-                    {SORT.map(({ id, label }) => {
-                      const activeSort = values.sort || 'alias';
-
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          className={cx({
-                            'w-full py-2 border border-gray-500 rounded-4xl text-sm': true,
-                            'bg-gray-500 text-white': activeSort === id,
-                          })}
-                          onClick={() => {
-                            input.onChange(id);
-                          }}
-                        >
-                          {label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </FieldRFF>
-
+            <div>
+              <h3 className="flex-shrink-0 mb-2 text-sm pr-28 font-heading">Order by</h3>
+              <div className="flex flex-col space-y-2">
+                {SORT.map(({ id, label }) => {
+                  return (
+                    <FieldRFF
+                      key={id}
+                      name="sort"
+                      type="radio"
+                      value={id}
+                    >
+                      {(fprops) => (
+                        <div className="flex space-x-2">
+                          <Radio theme="light" id={`tag-${id}`} {...fprops.input} />
+                          <Label theme="light" id={`tag-${id}`} className="ml-2">{label}</Label>
+                        </div>
+                      )}
+                    </FieldRFF>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-          <div className="flex justify-center flex-shrink-0 px-8 mt-20 space-x-3">
+
+          <div className="flex justify-center flex-shrink-0 px-8 mt-10 space-x-3">
             <Button
               className="w-full"
               theme="secondary"
