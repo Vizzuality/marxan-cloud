@@ -13,6 +13,7 @@ import { SurfaceCostModule } from './modules/surface-cost/surface-cost.module';
 import { ScenarioPlanningUnitsInclusionModule } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/scenario-planning-units-inclusion.module';
 import { CostTemplateModule } from '@marxan-geoprocessing/modules/scenarios';
 import { PlanningAreaModule } from '@marxan-geoprocessing/modules/planning-area/planning-area.module';
+import { MarxanSandboxedRunnerModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandboxed-runner.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PlanningAreaModule } from '@marxan-geoprocessing/modules/planning-area/
     SurfaceCostModule,
     ScenarioPlanningUnitsInclusionModule,
     PlanningAreaModule,
+    MarxanSandboxedRunnerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
