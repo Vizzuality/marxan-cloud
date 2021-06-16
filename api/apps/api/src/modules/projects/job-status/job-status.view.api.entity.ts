@@ -2,13 +2,15 @@ import { ViewColumn, ViewEntity } from 'typeorm';
 import { JobType } from '@marxan-api/modules/projects/job-status/jobs.enum';
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ScenarioEvents } from '@marxan/api-events/api-event-kinds.enum';
+import { ValuesType } from 'utility-types';
 
 @ViewEntity({
   expression: `
     SELECT
-      DISTINCT ON ("jobType", topic) "jobType",
-      api_events.topic AS "scenarioId",
-      projects.id AS "projectId",
+      DISTINCT ON (job_type, topic) job_type,
+      api_events.topic AS scenario_id,
+      projects.id AS project_id,
       api_events.kind
     FROM
       api_events
@@ -18,39 +20,39 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
         api_events.kind
         FROM
           'scenario.#"[^.]*#"%' FOR '#'
-      ) AS "jobType"
+      ) AS job_type
     ORDER BY
-      "jobType",
+      job_type,
       api_events.topic,
       api_events.timestamp DESC;
   `,
 })
 export class ScenarioJobStatus {
-  @ViewColumn()
+  @ViewColumn({
+    name: 'job_type',
+  })
   jobType!: JobType;
 
   @ViewColumn()
-  kind!: API_EVENT_KINDS;
+  kind!: Extract<API_EVENT_KINDS, `scenario.${string}`>;
 
   get jobStatus(): JobStatus | undefined {
     // I didn't use CASE ... THEN in the SQL as I wanted to enforce the compiler check on the mapping
     return eventToJobStatusMapping[this.kind];
   }
 
-  @ViewColumn()
+  @ViewColumn({
+    name: 'scenario_id',
+  })
   scenarioId!: string;
 
-  @ViewColumn()
+  @ViewColumn({
+    name: 'project_id',
+  })
   projectId!: string;
 }
 
-const eventToJobStatusMapping: Record<
-  API_EVENT_KINDS,
-  JobStatus | undefined
-> = {
-  [API_EVENT_KINDS.project__protectedAreas__failed__v1__alpha]: undefined,
-  [API_EVENT_KINDS.project__protectedAreas__finished__v1__alpha]: undefined,
-  [API_EVENT_KINDS.project__protectedAreas__submitted__v1__alpha]: undefined,
+const eventToJobStatusMapping: Record<ValuesType<ScenarioEvents>, JobStatus> = {
   [API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1]:
     JobStatus.failure,
   [API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1]: JobStatus.done,
@@ -66,11 +68,4 @@ const eventToJobStatusMapping: Record<
     JobStatus.done,
   [API_EVENT_KINDS.scenario__planningUnitsInclusion__submitted__v1__alpha1]:
     JobStatus.running,
-  [API_EVENT_KINDS.user__accountActivationFailed__v1alpha1]: undefined,
-  [API_EVENT_KINDS.user__accountActivationSucceeded__v1alpha1]: undefined,
-  [API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1]: undefined,
-  [API_EVENT_KINDS.user__passwordResetFailed__v1alpha1]: undefined,
-  [API_EVENT_KINDS.user__passwordResetSucceeded__v1alpha1]: undefined,
-  [API_EVENT_KINDS.user__passwordResetTokenGenerated__v1alpha1]: undefined,
-  [API_EVENT_KINDS.user__signedUp__v1alpha1]: undefined,
 };
