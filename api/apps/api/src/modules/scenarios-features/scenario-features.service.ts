@@ -127,10 +127,10 @@ export class ScenarioFeaturesService extends AppBaseService<
       ...base,
       onTarget: metArea >= totalArea * targetPct,
       met: +((metArea / totalArea) * 100).toFixed(2),
-      metArea,
+      metArea: +metArea.toFixed(2),
       coverageTarget: +(base?.target ?? 0).toFixed(2),
-      coverageTargetArea: (totalArea * (base?.target ?? 0)) / 100,
-      totalArea,
+      coverageTargetArea: +((totalArea * (base?.target ?? 0)) / 100).toFixed(2),
+      totalArea: +totalArea.toFixed(2),
       featureId: assign.id,
       tag: assign.tag,
       name: assign.alias ?? undefined, // `null`
