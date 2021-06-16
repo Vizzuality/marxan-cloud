@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import {forwardRef, HttpModule, Module} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProjectsController } from './projects.controller';
@@ -31,6 +31,7 @@ import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
     PlanningUnitsModule,
     ProtectedAreasModule,
     ApiEventsModule,
+    HttpModule
   ],
   providers: [
     ProjectsCrudService,
