@@ -2,30 +2,21 @@ import { Module } from '@nestjs/common';
 
 import { MarxanConfig } from './marxan-config';
 import { MarxanSandboxRunnerService } from './marxan-sandbox-runner.service';
+import { MarxanRunner } from './ports/marxan-runner';
 
-import { TemporaryDirectory } from './ports/temporary-directory';
-import { LinkMarxan } from './ports/link-marxan';
-import { InputFiles } from './ports/input-files';
-
-import { SharedStorage } from './adapters/shared-storage';
-import { SymlinkBinary } from './adapters/symlink-binary';
-import { CreateInputFiles } from './adapters/create-input-files';
+import { DeriveScenarioDataModule } from './adapters/scenario-data/derive-scenario-data.module';
+import { SolutionOutputModule } from './adapters/solutions-output/solution-output.module';
+import { MarxanSubprocess } from './adapters/marxan-subprocess';
+import { WorkspaceModule } from './adapters/workspace/workspace.module';
 
 @Module({
+  imports: [DeriveScenarioDataModule, SolutionOutputModule, WorkspaceModule],
   providers: [
     MarxanConfig,
     MarxanSandboxRunnerService,
     {
-      provide: TemporaryDirectory,
-      useClass: SharedStorage,
-    },
-    {
-      provide: LinkMarxan,
-      useClass: SymlinkBinary,
-    },
-    {
-      provide: InputFiles,
-      useClass: CreateInputFiles,
+      provide: MarxanRunner,
+      useClass: MarxanSubprocess,
     },
   ],
   exports: [MarxanSandboxRunnerService],

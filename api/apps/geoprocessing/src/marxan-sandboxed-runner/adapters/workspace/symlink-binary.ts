@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { symlinkSync } from 'fs';
-import { LinkMarxan } from '../ports/link-marxan';
+import { LinkMarxan } from './ports/link-marxan';
 
 @Injectable()
 export class SymlinkBinary implements LinkMarxan {

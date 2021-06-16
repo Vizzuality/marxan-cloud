@@ -6,7 +6,7 @@ import { resolve } from 'path';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
 
-import { TemporaryDirectory } from '../ports/temporary-directory';
+import { TemporaryDirectory } from './ports/temporary-directory';
 
 @Injectable()
 export class SharedStorage implements TemporaryDirectory {
