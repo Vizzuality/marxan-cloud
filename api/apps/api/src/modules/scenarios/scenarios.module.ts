@@ -24,6 +24,7 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { CostSurfaceViewModule } from './cost-surface-readmodel/cost-surface-view.module';
+import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
 import { InputParameterFileProvider } from './input-parameter-file.provider';
 
 @Module({
@@ -43,6 +44,7 @@ import { InputParameterFileProvider } from './input-parameter-file.provider';
     HttpModule,
     CostSurfaceTemplateModule,
     CostSurfaceViewModule,
+    PlanningUnitsProtectionLevelModule,
   ],
   providers: [
     ScenariosService,
