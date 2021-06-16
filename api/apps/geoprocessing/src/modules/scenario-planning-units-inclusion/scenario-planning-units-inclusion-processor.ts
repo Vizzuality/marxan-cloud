@@ -36,7 +36,10 @@ export class ScenarioPlanningUnitsInclusionProcessor
 
       geometriesIdsToInclude.push(
         ...(
-          await this.getIntersectedGeometriesFor(scenarioId, targetGeometries)
+          await this.getPlanningUnitsIntersectingGeometriesFor(
+            scenarioId,
+            targetGeometries,
+          )
         ).map(({ pu_geom_id }) => pu_geom_id),
       );
     }
@@ -48,7 +51,10 @@ export class ScenarioPlanningUnitsInclusionProcessor
       ).map((feature) => feature.geometry);
       geometriesIdsToExclude.push(
         ...(
-          await this.getIntersectedGeometriesFor(scenarioId, targetGeometries)
+          await this.getPlanningUnitsIntersectingGeometriesFor(
+            scenarioId,
+            targetGeometries,
+          )
         ).map(({ pu_geom_id }) => pu_geom_id),
       );
     }
@@ -84,26 +90,35 @@ export class ScenarioPlanningUnitsInclusionProcessor
     return true;
   }
 
-  private async getIntersectedGeometriesFor(
+  private async getPlanningUnitsIntersectingGeometriesFor(
     scenarioId: string,
     geometries: (Polygon | MultiPolygon)[],
   ): Promise<Array<{ pu_geom_id: string }>> {
+    /**
+     * {
+     *   geom1 = '<GeoJson>>',
+     *   ...
+     * }
+     */
+    const geometriesParameters = geometries.reduce<Record<string, string>>(
+      (previousValue, currentValue, index) => {
+        previousValue[`geom${index}`] = JSON.stringify(currentValue);
+        return previousValue;
+      },
+      {},
+    );
+    const geometriesUnion = geometries
+      .map((_, index) => `ST_GeomFromGeoJSON(:geom${index})`)
+      .join(',');
+
     const queryBuilder = this.scenarioPlanningUnitsRepo
       .createQueryBuilder(`spd`)
       .select(['spd.scenario_id', 'spd.pu_geom_id', 'spd.id'])
       .leftJoin(`planning_units_geom`, `pug`, `pug.id = spd.pu_geom_id`)
       .where(`spd.scenario_id = :scenarioId`, { scenarioId })
       .andWhere(
-        new Brackets((qb) =>
-          geometries.reduce<WhereExpression>(
-            (queryBuilder, geom, index) =>
-              qb.orWhere(
-                `st_intersects(ST_GeomFromGeoJSON(:geom${index}),pug.the_geom)`,
-                { [`geom${index}`]: JSON.stringify(geom) },
-              ),
-            qb,
-          ),
-        ),
+        `st_intersects(st_union(${geometriesUnion}), pug.the_geom)`,
+        geometriesParameters,
       );
 
     return await queryBuilder.getRawMany();
