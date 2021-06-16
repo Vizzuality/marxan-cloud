@@ -5,9 +5,9 @@ export class AddJobStatusView1623311716713 implements MigrationInterface {
     await queryRunner.query(`
       CREATE VIEW "scenario_job_status" AS
         SELECT
-          DISTINCT ON ("jobType", topic) "jobType",
-          api_events.topic AS "scenarioId",
-          projects.id AS "projectId",
+          DISTINCT ON (job_type, topic) job_type,
+          api_events.topic AS scenario_id,
+          projects.id AS project_id,
           api_events.kind
         FROM
           api_events
@@ -17,9 +17,9 @@ export class AddJobStatusView1623311716713 implements MigrationInterface {
             api_events.kind
             FROM
               'scenario.#"[^.]*#"%' FOR '#'
-          ) AS "jobType"
+          ) AS job_type
         ORDER BY
-          "jobType",
+          job_type,
           api_events.topic,
           api_events.timestamp DESC;
       `);
