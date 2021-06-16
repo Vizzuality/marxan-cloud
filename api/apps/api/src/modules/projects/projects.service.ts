@@ -93,7 +93,7 @@ export class ProjectsService {
     // TODO: Add proper url to proper controller in geoservice
     const { data: geoJson } = await this.httpService
       .post(
-        `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
+        `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-area/shapefile`,
         file,
         {
           headers: { 'Content-Type': 'application/json' },
@@ -101,6 +101,8 @@ export class ProjectsService {
         },
       )
       .toPromise();
+    console.log('REACHING HERE')
+    console.log('URL IS', `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-area/shapefile`)
     return geoJson;
   }
 }
