@@ -15,6 +15,7 @@ import { ScenariosCrudService } from './scenarios-crud.service';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
+import { InputParameterFileProvider } from './input-parameter-file.provider';
 
 @Injectable()
 export class ScenariosService {
@@ -29,6 +30,7 @@ export class ScenariosService {
     private readonly costSurface: CostSurfaceFacade,
     private readonly httpService: HttpService,
     private readonly marxanInputValidator: MarxanInput,
+    private readonly inputParameterFileProvider: InputParameterFileProvider,
   ) {}
 
   async findAllPaginated(fetchSpecification: FetchSpecification) {
@@ -64,6 +66,10 @@ export class ScenariosService {
         },
       })
     )[0];
+  }
+
+  async getInputParameterFile(scenarioId: string): Promise<string> {
+    return this.inputParameterFileProvider.getInputParameterFile(scenarioId);
   }
 
   async changeLockStatus(

@@ -19,6 +19,7 @@ import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { CostSurfaceTemplateModule } from './cost-surface-template';
+import { InputParameterFileProvider } from './input-parameter-file.provider';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { CostSurfaceTemplateModule } from './cost-surface-template';
     ScenarioSerializer,
     ScenarioFeatureSerializer,
     MarxanInput,
+    InputParameterFileProvider,
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -26,6 +27,7 @@ import {
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiProduces,
   ApiTags,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
@@ -169,5 +171,15 @@ export class ScenariosController {
     return this.scenarioFeatureSerializer.serialize(
       await this.service.getFeatures(id),
     );
+  }
+
+  @ApiOperation({ description: `Resolve scenario's input parameter file.` })
+  @Get(':id/marxan/dat/input.dat')
+  @ApiProduces('text/plain')
+  @Header('Content-Type', 'text/plain')
+  async getInputParameterFile(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<string> {
+    return await this.service.getInputParameterFile(id);
   }
 }
