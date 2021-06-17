@@ -18,6 +18,10 @@ import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { CostSurfaceTemplateModule } from './cost-surface-template';
+import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
+import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 
 @Module({
   imports: [
@@ -25,6 +29,10 @@ import { CostSurfaceTemplateModule } from './cost-surface-template';
     ProtectedAreasModule,
     forwardRef(() => ProjectsModule),
     TypeOrmModule.forFeature([Project, Scenario]),
+    TypeOrmModule.forFeature(
+      [ScenariosOutputResultsGeoEntity],
+      DbConnections.geoprocessingDB,
+    ),
     UsersModule,
     ScenarioFeaturesModule,
     AnalysisModule,
@@ -39,6 +47,8 @@ import { CostSurfaceTemplateModule } from './cost-surface-template';
     WdpaAreaCalculationService,
     ScenarioSerializer,
     ScenarioFeatureSerializer,
+    SolutionResultCrudService,
+    ScenarioSolutionSerializer,
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],

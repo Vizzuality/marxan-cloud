@@ -13,6 +13,7 @@ import { ScenariosCrudService } from './scenarios-crud.service';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
+import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 
 @Injectable()
 export class ScenariosService {
@@ -26,6 +27,7 @@ export class ScenariosService {
     private readonly updatePlanningUnits: AdjustPlanningUnits,
     private readonly costSurface: CostSurfaceFacade,
     private readonly httpService: HttpService,
+    private readonly solutionsCrudService: SolutionResultCrudService,
   ) {}
 
   async findAllPaginated(fetchSpecification: FetchSpecification) {
@@ -103,7 +105,42 @@ export class ScenariosService {
     return geoJson;
   }
 
+  async findScenarioResults(
+    scenarioId: string,
+    runId: string,
+    fetchSpecification: FetchSpecification,
+  ) {
+    await this.assertScenario(scenarioId);
+    return this.solutionsCrudService.findAll(fetchSpecification);
+  }
+
   private async assertScenario(scenarioId: string) {
     await this.crudService.getById(scenarioId);
+  }
+
+  async getBestSolution(scenarioId: string, runId: string) {
+    await this.assertScenario(scenarioId);
+    // TODO correct implementation
+    return this.solutionsCrudService.getById(runId);
+  }
+
+  async getMostDifferentSolutions(
+    scenarioId: string,
+    runId: string,
+    fetchSpecification: FetchSpecification,
+  ) {
+    await this.assertScenario(scenarioId);
+    // TODO correct implementation
+    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+  }
+
+  async findAllSolutionsPaginated(
+    scenarioId: string,
+    runId: string,
+    fetchSpecification: FetchSpecification,
+  ) {
+    await this.assertScenario(scenarioId);
+    // TODO correct implementation
+    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
   }
 }
