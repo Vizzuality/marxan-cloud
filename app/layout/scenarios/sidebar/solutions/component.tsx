@@ -8,6 +8,8 @@ import Pill from 'layout/pill';
 
 import Sections from 'layout/scenarios/sidebar/solutions/sections';
 import SolutionsDetails from 'layout/scenarios/sidebar/solutions/details';
+import SolutionsGapAnalysis from 'layout/scenarios/sidebar/solutions/gap-analysis';
+import SolutionsList from 'layout/scenarios/sidebar/solutions/list';
 import { ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
 
 import { useSelector } from 'react-redux';
@@ -65,6 +67,21 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
               numberOfSchedules={2}
             />
           )}
+
+          {section === SolutionsSections.GAP_ANALYSIS && (
+            <SolutionsGapAnalysis
+              key={SolutionsSections.GAP_ANALYSIS}
+              onChangeSection={onChangeSection}
+            />
+          )}
+
+          {section === SolutionsSections.SOLUTIONS && (
+            <SolutionsList
+              key={SolutionsSections.SOLUTIONS}
+              onChangeSection={onChangeSection}
+            />
+          )}
+
         </Pill>
 
         {!section && (
