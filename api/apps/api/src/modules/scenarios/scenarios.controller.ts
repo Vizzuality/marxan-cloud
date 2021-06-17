@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
   ParseBoolPipe,
   ParseUUIDPipe,
@@ -10,13 +11,14 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
@@ -259,5 +261,23 @@ export class ScenariosController {
       result.data,
       result.metadata,
     );
+  }
+
+  @Header('Content-Type', 'text/csv')
+  @ApiOkResponse({
+    schema: {
+      type: 'string',
+    },
+  })
+  @ApiOperation({
+    description: `Uploaded cost surface data`,
+  })
+  @Get(`:id/marxan/dat/pu.dat`)
+  async getScenarioCostSurface(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.service.getCostSurfaceCsv(id, res);
+    return;
   }
 }
