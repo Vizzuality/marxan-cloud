@@ -111,6 +111,32 @@ describe('CountriesModule (e2e)', () => {
       ]);
     });
 
+    it('Should return a country in expected form', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/api/v1/countries/${countryCodeForTests}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources = response.body.data;
+      expect(resources).toEqual({
+        attributes: {
+          bbox: [
+            24.08211708,
+            11.66874886,
+            -4.372591018676758,
+            -18.042081832885742,
+          ],
+          gid0: 'AGO',
+          maxPuAreaSize: 1252297915852.3235,
+          minPuAreaSize: 2123172.1934887753,
+          name0: 'Angola',
+          theGeom: expect.any(Object),
+        },
+        id: 'AGO',
+        type: 'countries',
+      });
+    });
+
     it('Should throw a 400 error if filtering by level other than 1 or 2', async () => {
       await request(app.getHttpServer())
         .get(
