@@ -33,7 +33,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   const [modal, setModal] = useState(false);
   const [deleteScenario, setDelete] = useState(null);
 
-  const { search } = useSelector((state) => state['/projects/[id]']);
+  const { search, filters, sort } = useSelector((state) => state['/projects/[id]']);
 
   const { query } = useRouter();
   const { pid } = query;
@@ -63,8 +63,9 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     search,
     filters: {
       projectId: pid,
+      ...filters,
     },
-    sort: '-lastModifiedAt',
+    sort,
   });
 
   const scrollRef = useBottomScrollListener(
@@ -150,7 +151,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
             <Loading
               visible={allScenariosIsFetching && !allScenariosIsFetched}
-              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
               iconClassName="w-10 h-10 text-primary-500"
             />
 
@@ -167,7 +168,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             <div className="relative overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-black via-black" />
               <div ref={scrollRef} className="relative z-0 flex flex-col flex-grow h-full py-6 overflow-x-hidden overflow-y-auto">
-                {allScenariosData.map((s, i) => {
+                {!!allScenariosData.length && allScenariosData.map((s, i) => {
                   return (
                     <ScenarioItem
                       key={`${s.id}`}
@@ -183,6 +184,12 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                     />
                   );
                 })}
+
+                {!allScenariosData.length && (
+                  <div>
+                    No results found
+                  </div>
+                )}
               </div>
               <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-black via-black" />
               <div

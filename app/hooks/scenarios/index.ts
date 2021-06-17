@@ -40,7 +40,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     .reduce((acc, k) => {
       return {
         ...acc,
-        [`filter[${k}]`]: filters[k],
+        [`filter[${k}]`]: filters[k].toString(),
       };
     }, {});
 
@@ -63,6 +63,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   });
 
   const query = useInfiniteQuery(['scenarios', pId, JSON.stringify(options)], fetchScenarios, {
+    retry: false,
     placeholderData: placeholderDataRef.current,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
@@ -73,10 +74,10 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     },
   });
 
-  const { data } = query;
+  const { data, error } = query;
   const { pages } = data || {};
 
-  if (data) {
+  if (data || error) {
     placeholderDataRef.current = data;
   }
 

@@ -6,7 +6,7 @@ import Checkbox from 'components/forms/checkbox';
 import Label from 'components/forms/label';
 import Radio from 'components/forms/radio';
 
-export interface ScenarioFeaturesAddFiltersProps {
+export interface ProjectScenariosFiltersProps {
   filters?: Record<string, any>;
   onChangeFilters: (filters: Record<string, any>) => void;
   sort?: string;
@@ -14,25 +14,26 @@ export interface ScenarioFeaturesAddFiltersProps {
   onDismiss?: () => void;
 }
 
-const TAGS = [
-  { id: 'species', label: 'species' },
-  { id: 'bioregional', label: 'bioregional' },
+const STATUS = [
+  { id: 'created', label: 'created' },
+  { id: 'running', label: 'running' },
+  { id: 'completed', label: 'completed' },
 ];
 
 const SORT = [
-  { id: 'alias', label: 'Alphabetical' },
-  { id: '-alias', label: '-Alphabetical' },
-  { id: 'featureClassName', label: 'Classname' },
-  { id: '-featureClassName', label: '-Classname' },
+  { id: '-lastModifiedAt', label: 'Most recent' },
+  { id: 'lastModifiedAt', label: 'First created' },
+  { id: 'name', label: 'Name' },
+  { id: '-name', label: '-Name' },
 ];
 
-export const ScenarioFeaturesAddFilters: React.FC<ScenarioFeaturesAddFiltersProps> = ({
+export const ProjectScenariosFilters: React.FC<ProjectScenariosFiltersProps> = ({
   filters = {},
   onChangeFilters,
   sort,
   onChangeSort,
   onDismiss,
-}: ScenarioFeaturesAddFiltersProps) => {
+}: ProjectScenariosFiltersProps) => {
   const INITIAL_VALUES = useMemo(() => {
     return {
       ...filters,
@@ -68,18 +69,18 @@ export const ScenarioFeaturesAddFilters: React.FC<ScenarioFeaturesAddFiltersProp
             <div>
               <h3 className="flex-shrink-0 mb-2 text-sm pr-28 font-heading">Filter by type</h3>
               <div className="flex flex-col space-y-2">
-                {TAGS.map(({ id, label }) => {
+                {STATUS.map(({ id, label }) => {
                   return (
                     <FieldRFF
                       key={id}
-                      name="tag"
+                      name="status"
                       type="checkbox"
                       value={id}
                     >
                       {(fprops) => (
                         <div className="flex space-x-2">
-                          <Checkbox theme="light" id={`tag-${id}`} {...fprops.input} />
-                          <Label theme="light" id={`tag-${id}`} className="ml-2">{label}</Label>
+                          <Checkbox theme="light" id={`status-${id}`} {...fprops.input} />
+                          <Label theme="light" id={`status-${id}`} className="ml-2">{label}</Label>
                         </div>
                       )}
                     </FieldRFF>
@@ -101,8 +102,8 @@ export const ScenarioFeaturesAddFilters: React.FC<ScenarioFeaturesAddFiltersProp
                     >
                       {(fprops) => (
                         <div className="flex space-x-2">
-                          <Radio theme="light" id={`tag-${id}`} {...fprops.input} />
-                          <Label theme="light" id={`tag-${id}`} className="ml-2">{label}</Label>
+                          <Radio theme="light" id={`sort-${id}`} {...fprops.input} />
+                          <Label theme="light" id={`sort-${id}`} className="ml-2">{label}</Label>
                         </div>
                       )}
                     </FieldRFF>
@@ -137,4 +138,4 @@ export const ScenarioFeaturesAddFilters: React.FC<ScenarioFeaturesAddFiltersProp
   );
 };
 
-export default ScenarioFeaturesAddFilters;
+export default ProjectScenariosFilters;
