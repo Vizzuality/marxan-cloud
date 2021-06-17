@@ -37,7 +37,7 @@ export const ProjectScenariosFilters: React.FC<ProjectScenariosFiltersProps> = (
   const INITIAL_VALUES = useMemo(() => {
     return {
       ...filters,
-      sort: sort || 'alias',
+      sort: sort || SORT[0].id,
     };
   }, [filters, sort]);
 
