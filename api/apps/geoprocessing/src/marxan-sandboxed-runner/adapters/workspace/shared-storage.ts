@@ -33,6 +33,8 @@ export class SharedStorage implements TemporaryDirectory {
     const directory = v4();
     const fullPath = resolve(this.#tempDirectory, directory);
     await promises.mkdir(resolve(this.#tempDirectory, directory));
+    // TODO replace output with the name from params
+    await promises.mkdir(resolve(this.#tempDirectory, directory, 'output'));
     return fullPath;
   }
 }
