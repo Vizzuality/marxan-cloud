@@ -54,7 +54,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
       animate={{ opacity: 1, y: 0 }}
     >
       <Pill selected>
-        <header className="flex justify-between flex-shrink-0">
+        <header className="flex items-start justify-between flex-shrink-0">
           <div>
             <div className="flex items-baseline space-x-4">
               <h2 className="text-lg font-medium font-heading">Features</h2>
@@ -85,7 +85,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
           {step === 0 && (
             <Button
               theme="primary"
-              size="lg"
+              size="base"
               onClick={() => setModal(true)}
             >
               <span className="mr-3">Add features</span>

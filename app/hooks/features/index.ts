@@ -45,7 +45,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
     .reduce((acc, k) => {
       return {
         ...acc,
-        [`filter[${k}]`]: filters[k],
+        [`filter[${k}]`]: filters[k].toString(),
       };
     }, {});
 
