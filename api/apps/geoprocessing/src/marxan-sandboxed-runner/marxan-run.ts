@@ -18,12 +18,14 @@ export class MarxanRun extends EventEmitter {
     this.emit(`pid`, sub.pid);
 
     sub.stderr.on('data', (chunk) => {
+      console.log(chunk.toString());
       this.#stdError.push(chunk.toString());
     });
 
     sub.stdout.on('data', (chunk) => {
       // TODO place for "progress update" parsing and emitting to consumer
       this.#stdOut.push(chunk.toString());
+      console.log(chunk.toString());
     });
 
     sub.on('exit', (code) => {
