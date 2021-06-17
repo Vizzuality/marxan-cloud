@@ -32,6 +32,7 @@ export class SolutionsOutputFacade implements SolutionsRepository {
   async saveFrom(rootDirectory: string, scenarioId: string): Promise<void> {
     console.log(await promises.readdir(rootDirectory));
     console.log(await promises.readdir(rootDirectory + '/output'));
+    console.log(await promises.lstat(rootDirectory + '/marxan'));
     // just a sample for brevity, ideally should stream into db tables & use csv streamer
     const runsSummary = (
       await promises.readFile(rootDirectory + `/output/output_sum.csv`)

@@ -30,7 +30,6 @@ RUN chown $UID ./test/integration/protected-areas/steps/new-shape-name
 RUN chown -R $USER:$USER ./test/integration
 RUN chown -R $UID:$UID ./test/integration
 
-
 RUN mkdir -p ./test/integration/protected-areas/steps/test_multiple_features_v2
 
 RUN yarn prestart:prod
