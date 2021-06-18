@@ -74,6 +74,8 @@ export class PlanningUnitsService {
       z,
       planningUnitGridShape,
       planningUnitAreakm2,
+      filters
+
     );
     const customQuery = this.buildPlanningUnitsWhereQuery(filters);
 
@@ -102,6 +104,7 @@ export class PlanningUnitsService {
     z: number,
     planningUnitGridShape: PlanningUnitGridShape,
     planningUnitAreakm2: number,
+    filters?:PlanningUnitsFilters
   ): string {
     const gridShape = this.regularFunctionGridSelector(planningUnitGridShape);
     const gridSize = this.calculateGridSize(planningUnitAreakm2);
@@ -111,7 +114,7 @@ export class PlanningUnitsService {
                     ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom as the_geom)`;
     // (so we are checking that the pixel ration is < 8 px)
     // If so the shape we are getting is down the optimal to visualize it
-    if (ratioPixelExtent < 8) {
+    if (ratioPixelExtent < 8 && !filters?.bbox) {
       query = `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
         ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom )`;
     }
