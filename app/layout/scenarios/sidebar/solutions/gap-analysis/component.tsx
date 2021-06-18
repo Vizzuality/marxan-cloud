@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { motion } from 'framer-motion';
 
 import Icon from 'components/icon';
 import Button from 'components/button';
+import List from 'layout/scenarios/sidebar/analysis/gap-analysis/list';
+import Toolbar from 'layout/scenarios/sidebar/analysis/gap-analysis/toolbar';
 
 // Icons
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-left-3.svg?sprite';
-import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right-3.svg?sprite';
+import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import INFO_SVG from 'svgs/ui/info.svg?sprite';
 
 import { ScenariosSolutionsGapAnalysisProps } from './types';
@@ -15,6 +16,12 @@ import { ScenariosSolutionsGapAnalysisProps } from './types';
 export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalysisProps> = ({
   onChangeSection,
 }: ScenariosSolutionsGapAnalysisProps) => {
+  const [search, setSearch] = useState(null);
+
+  const onSearch = useCallback((s) => {
+    setSearch(s);
+  }, []);
+
   return (
     <motion.div
       key="details"
@@ -56,20 +63,12 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
             Download
           </Button>
         </div>
-        <Button
-          theme="primary-alt"
-          size="base"
-          className="relative h-12 mt-4"
-          onClick={() => console.info('View run gap analysis')}
-        >
-          View run gap analysis
-          <div className="absolute right-12">
-            <div className="relative">
-              <Icon icon={ARROW_LEFT_SVG} className="absolute bottom-0 w-4 h-4" />
-              <Icon icon={ARROW_RIGHT_SVG} className="absolute top-0 w-4 h-4" />
-            </div>
-          </div>
-        </Button>
+        <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden">
+          <Toolbar search={search} onSearch={onSearch} />
+          <List
+            search={search}
+          />
+        </div>
       </div>
     </motion.div>
   );
