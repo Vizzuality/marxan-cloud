@@ -1,4 +1,4 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
@@ -10,20 +10,17 @@ import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
-import { apiGlobalPrefixes } from '@marxan-api/api.config';
-import { AppConfig } from '@marxan-api/utils/config.utils';
+import { PlanningAreaUploader } from './planning-area-uploader';
+export { validationFailed } from './planning-area-uploader';
 
 @Injectable()
 export class ProjectsService {
-  private readonly geoprocessingUrl: string = AppConfig.get(
-    'geoprocessing.url',
-  ) as string;
   constructor(
     private readonly geoCrud: GeoFeaturesService,
     private readonly projectsCrud: ProjectsCrudService,
     private readonly protectedAreaShapefile: ProtectedAreasFacade,
     private readonly jobStatusService: JobStatusService,
-    private readonly httpService: HttpService,
+    private readonly planningAreaUploader: PlanningAreaUploader,
   ) {}
 
   async findAllGeoFeatures(
@@ -85,22 +82,7 @@ export class ProjectsService {
     return new Project();
   }
 
-  async getPlanningAreaFromShapefile(file: Express.Multer.File) {
-    /**
-     * @validateStatus is required for HttpService to not reject and wrap geoprocessing's response
-     * in case a shapefile is not validated and a status 4xx is sent back.
-     */
-    // TODO: Add proper url to proper controller in geoservice
-    const { data: geoJson } = await this.httpService
-      .post(
-        `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-area/shapefile`,
-        file,
-        {
-          headers: { 'Content-Type': 'application/json' },
-          validateStatus: (status) => status <= 499,
-        },
-      )
-      .toPromise();
-    return geoJson;
-  }
+  savePlanningAreaFromShapefile = this.planningAreaUploader.savePlanningAreaFromShapefile.bind(
+    this.planningAreaUploader,
+  );
 }
