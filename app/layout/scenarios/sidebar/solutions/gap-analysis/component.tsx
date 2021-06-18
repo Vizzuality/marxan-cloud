@@ -8,7 +8,7 @@ import Button from 'components/button';
 // Icons
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-left-3.svg?sprite';
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right-3.svg?sprite';
-import INFO_SVG from 'svgs/ui/info-2.svg?sprite';
+import INFO_SVG from 'svgs/ui/info.svg?sprite';
 
 import { ScenariosSolutionsGapAnalysisProps } from './types';
 
@@ -43,10 +43,10 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
           <h5 className="mr-2 text-xs uppercase">RUN GAP ANALYSIS</h5>
           <button
             type="button"
-            className="mr-4 opacity-50"
+            className="p-0.5 mr-4 bg-blue-500 rounded-full opacity-50"
             onClick={() => console.info('Info - Gap Analysis')}
           >
-            <Icon icon={INFO_SVG} className="w-5 h-5" />
+            <Icon icon={INFO_SVG} className="w-4 h-4 text-gray-700" />
           </button>
           <Button
             theme="secondary"
