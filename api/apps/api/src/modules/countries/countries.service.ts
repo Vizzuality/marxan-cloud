@@ -11,7 +11,6 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
-import { FetchSpecification} from 'nestjs-base-service';
 import { apiConnections } from '../../ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 
@@ -63,41 +62,5 @@ export class CountriesService extends AppBaseService<
         name0: faker.address.country(),
       },
     ]);
-  }
-  async extendGetByIdResult(
-    entity: Country,
-    _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
-  ): Promise<Country> {
-    this.logger.debug(entity)
-
-    if (entity.minPuAreaSize){
-      entity.minPuAreaSize = this.m2toKm2(entity.minPuAreaSize)
-    }
-    if (entity.maxPuAreaSize){
-      entity.maxPuAreaSize = this.m2toKm2(entity.maxPuAreaSize)
-    }
-    this.logger.debug(entity.maxPuAreaSize)
-
-    return entity;
-  }
-
-  async extendFindAllResults(
-    entitiesAndCount: [Country[], number],
-    _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
-  ): Promise<[Country[], number]> {
-    const extendedEntities: Promise<Country>[] = entitiesAndCount[0].map(
-      (entity) => this.extendGetByIdResult(entity),
-    );
-    return [await Promise.all(extendedEntities), entitiesAndCount[1]];
-  }
-  /**
-   * Given an m2 area it will convert it into Km2.
-   *
-   * @testsNeeded @unitTests @propBasedTests @generalization needed so can be the source of truth for area to size
-   */
-   m2toKm2(area: number): number {
-    return Math.ceil(area / 1000000)
   }
 }

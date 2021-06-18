@@ -92,34 +92,6 @@ export class AdminAreasService extends AppBaseService<
       name1: faker.address.state(),
     });
   }
-  async extendGetByIdResult(
-    entity: AdminArea,
-    _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
-  ): Promise<AdminArea> {
-    this.logger.debug(entity)
-
-    if (entity.minPuAreaSize){
-      entity.minPuAreaSize = this.m2toKm2(entity.minPuAreaSize)
-    }
-    if (entity.maxPuAreaSize){
-      entity.maxPuAreaSize = this.m2toKm2(entity.maxPuAreaSize)
-    }
-    this.logger.debug(entity.maxPuAreaSize)
-
-    return entity;
-  }
-
-  async extendFindAllResults(
-    entitiesAndCount: [AdminArea[], number],
-    _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
-  ): Promise<[AdminArea[], number]> {
-    const extendedEntities: Promise<AdminArea>[] = entitiesAndCount[0].map(
-      (entity) => this.extendGetByIdResult(entity),
-    );
-    return [await Promise.all(extendedEntities), entitiesAndCount[1]];
-  }
 
   setFilters(
     query: SelectQueryBuilder<AdminArea>,
@@ -236,14 +208,5 @@ export class AdminAreasService extends AppBaseService<
    */
   static levelFromId(areaId: string): number {
     return areaId.match(/\./g)?.length ?? 0;
-  }
-
-  /**
-   * Given an m2 area it will convert it into square l size in Km.
-   *
-   * @testsNeeded @unitTests @propBasedTests @generalization needed so can be the source of truth for area to size
-   */
-   private m2toKm2(area: number): number {
-    return Math.ceil(area / 1000000)
   }
 }
