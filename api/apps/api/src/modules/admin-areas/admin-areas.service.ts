@@ -100,10 +100,10 @@ export class AdminAreasService extends AppBaseService<
     this.logger.debug(entity)
 
     if (entity.minPuAreaSize){
-      entity.minPuAreaSize = this.m2toKm(entity.minPuAreaSize)
+      entity.minPuAreaSize = this.m2toKm2(entity.minPuAreaSize)
     }
     if (entity.maxPuAreaSize){
-      entity.maxPuAreaSize = this.m2toKm(entity.maxPuAreaSize)
+      entity.maxPuAreaSize = this.m2toKm2(entity.maxPuAreaSize)
     }
     this.logger.debug(entity.maxPuAreaSize)
 
@@ -243,7 +243,7 @@ export class AdminAreasService extends AppBaseService<
    *
    * @testsNeeded @unitTests @propBasedTests @generalization needed so can be the source of truth for area to size
    */
-  m2toKm(area: number): number {
-    return Math.ceil(Math.sqrt(area) / 1000)
+   private m2toKm2(area: number): number {
+    return Math.ceil(area / 1000000)
   }
 }
