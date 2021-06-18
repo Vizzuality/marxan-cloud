@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -47,7 +48,7 @@ import {
 } from 'nestjs-base-service';
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
-import { ProjectsService } from './projects.service';
+import { ProjectsService, validationFailed } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
@@ -206,17 +207,28 @@ export class ProjectsController {
     }
     return;
   }
-  // TODO: create interface extending ProtectedAreasJobInput interface
-  @ApiConsumesShapefile(false)
+
+  @ApiConsumesShapefile(true)
   @ApiOperation({
     description: 'Upload shapefile with project planning-area',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiNoContentResponse()
   @Post('planning-area/shapefile')
   async shapefileWithProjectPlanningArea(
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<any> {
-    return await this.projectsService.getPlanningAreaFromShapefile(file);
+  ) {
+    const result = await this.projectsService.savePlanningAreaFromShapefile(
+      file,
+    );
+    if (result.isLeft()) {
+      const mapping: Record<ReturnType<typeof result.extract>, () => never> = {
+        [validationFailed]: () => {
+          throw new BadRequestException();
+        },
+      };
+      mapping[result.extract()]();
+    }
+
+    return result.extract();
   }
 }

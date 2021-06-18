@@ -1,4 +1,4 @@
-import {forwardRef, HttpModule, Module} from '@nestjs/common';
+import { forwardRef, HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProjectsController } from './projects.controller';
@@ -19,6 +19,10 @@ import { JobStatusSerializer } from './dto/job-status.serializer';
 import { BboxResolver } from './bbox/bbox-resolver';
 import { JobStatusService } from './job-status/job-status.service';
 import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
+import {
+  geoprocessingUrlProvider,
+  PlanningAreaUploader,
+} from './planning-area-uploader';
 
 @Module({
   imports: [
@@ -31,7 +35,7 @@ import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
     PlanningUnitsModule,
     ProtectedAreasModule,
     ApiEventsModule,
-    HttpModule
+    HttpModule,
   ],
   providers: [
     ProjectsCrudService,
@@ -41,6 +45,8 @@ import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
     BboxResolver,
     JobStatusService,
     JobStatusSerializer,
+    geoprocessingUrlProvider,
+    PlanningAreaUploader,
   ],
   controllers: [ProjectsController],
   exports: [ProjectsCrudService],
