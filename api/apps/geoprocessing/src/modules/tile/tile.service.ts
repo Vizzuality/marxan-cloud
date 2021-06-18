@@ -1,4 +1,5 @@
 // to-do: work on cache later
+import { RedisOptions } from 'ioredis'
 import {
   BadRequestException,
   Injectable,
@@ -9,6 +10,8 @@ import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 import { Transform } from 'class-transformer';
 import { IsInt, Max, Min } from 'class-validator';
+
+const Redis = require('ioredis');
 
 /**
  * @description The specification of the tile request
@@ -37,6 +40,25 @@ export class TileRequest {
   @Transform((i) => Number.parseInt(i))
   y!: number;
 }
+
+export interface TileCacheOptions {
+  /**
+   * @description Flag which indicate if the cache should be enabled. Default is true.
+   */
+  enabled?: boolean;
+  /**
+   * @description Redis connect options
+   */
+  redisOptions?: RedisOptions & {
+    /**
+     * @description The time to live in seconds. Default is 86400 (1 day)
+     */
+    ttl?: number;
+  };
+}
+
+export type TTtl = (zoomLevel: number) => number;
+
 
 /**
  * @description The required input values for the tile renderer
@@ -181,18 +203,51 @@ export class TileService {
    * @todo add tile render type to promise
    */
   async getTile(tileInput: TileInput<string>): Promise<Buffer> {
-    let data: Buffer = Buffer.from('');
     try {
-      const queryResult: Record<
-        'mvt',
-        Buffer
-      >[] = await this.fetchTileFromDatabase(tileInput);
-      // zip data
-      data = await this.zip(queryResult[0].mvt);
+      const {table, z, x, y , customQuery} = tileInput;
+      const filters = !!customQuery ? customQuery : [];
+      const cacheOptions: TileCacheOptions = {
+        enabled: true,
+        redisOptions: {
+          ttl: 86400, // 24 hours
+          host: process.env.REDIS_HOST,
+        },
+      };
+
+      const  redisCache = new Redis(cacheOptions.redisOptions);
+      const cacheKey = `${table}-${z}-${x}-${y}-${filters}`
+      try {
+        const value = await redisCache.getBuffer(cacheKey);
+        if (value) {
+          return value;
+        }
+      } catch (error: any) {
+        // In case the cache get fail, we continue to generate the tile
+        this.logger.error(`Cache failed: ${error.message}`);
+      }
+      let data: Buffer = Buffer.from('');
+      try {
+
+        const queryResult: Record<
+          'mvt',
+          Buffer
+        >[] = await this.fetchTileFromDatabase(tileInput);
+        // zip data
+        data = await this.zip(queryResult[0].mvt);
+        try {
+          await redisCache.set(cacheKey, data, 'EX', cacheOptions.redisOptions?.ttl)
+        } catch (error: any) {
+          //In case the cache set fails, we should return the generated tile
+          this.logger.error(`Set cache error: ${error.message}`);
+        }
+        return data;
+      } catch (error: any) {
+        this.logger.error(`Database error: ${error.message}`);
+        throw new BadRequestException(error.message);
+      }
     } catch (error: any) {
       this.logger.error(`Database error: ${error.message}`);
       throw new BadRequestException(error.message);
     }
-    return data;
-  }
+  };
 }
