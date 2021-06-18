@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 import ProjectNewMap from 'layout/projects/new/map';
 
@@ -19,6 +18,7 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 
+import { useRouter } from 'next/router';
 import { useOrganizations } from 'hooks/organizations';
 import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
@@ -156,11 +156,9 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   </div>
 
                   {!hasPlanningArea && (
-                  <PlanningAreaSelector
-                    area={DEFAULT_AREA}
-                    values={values}
-                    onChange={(value) => console.info('Planning area change: ', value)}
-                  />
+                    <PlanningAreaSelector
+                      values={values}
+                    />
                   )}
 
                   {hasPlanningArea && (
