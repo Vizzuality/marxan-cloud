@@ -19,7 +19,10 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
   useEffect(() => {
     if (minPuAreaSize) {
       const newSize = +parseInt(minPuAreaSize, 10);
-      input.onChange(newSize);
+
+      requestAnimationFrame(() => {
+        input.onChange(newSize);
+      });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [minPuAreaSize]);
