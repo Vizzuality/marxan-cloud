@@ -14,6 +14,7 @@ import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { IUCNCategory } from '../protected-areas/protected-area.geo.entity';
+import { GeoFeatureSet } from '../geo-features/geo-feature-set.api.entity';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
