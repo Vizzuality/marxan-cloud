@@ -116,7 +116,7 @@ export const Item: React.FC<ItemProps> = ({
             />
 
             <motion.h2
-              className="mt-3 mb-10 text-lg font-medium font-heading"
+              className="mt-3 mb-10 text-lg font-medium break-words font-heading"
               initial={{
                 x: 0,
               }}
