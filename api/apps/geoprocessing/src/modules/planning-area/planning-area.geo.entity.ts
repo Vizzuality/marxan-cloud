@@ -1,10 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Check, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Check,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BBox, MultiPolygon } from 'geojson';
 import { defaultSrid } from '@marxan/utils/geo';
-import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 
-@Entity('planning-area')
+@Entity('planning_area')
 export class PlanningArea {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -17,7 +22,7 @@ export class PlanningArea {
   projectId?: string | null;
 
   @ApiProperty()
-  @Check('wdpa_geometry_valid_check', 'ST_IsValid(the_geom)')
+  @Check('planning_area_the_geom_check', 'ST_IsValid(the_geom)')
   @Column('geometry', {
     name: 'the_geom',
     spatialFeatureType: 'MultiPolygon',
@@ -30,6 +35,9 @@ export class PlanningArea {
   @Column('jsonb', { name: 'bbox' })
   bbox!: BBox;
 
-  @Column('timestamp', { name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp without time zone',
+  })
   createdAt!: Date;
 }
