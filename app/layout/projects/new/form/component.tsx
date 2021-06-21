@@ -102,7 +102,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
           <div className="grid h-full grid-cols-1 gap-0 overflow-hidden bg-gray-700 md:grid-cols-2 rounded-3xl">
             <div className="flex flex-col flex-grow overflow-hidden">
               <div className="relative flex flex-col flex-grow min-h-0">
-                <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700" />
+                <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
                 <div className="flex flex-col flex-grow p-8 overflow-auto">
                   <h1 className="max-w-xs text-2xl text-white font-heading">
@@ -190,7 +190,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   </Button>
                   )}
                 </div>
-                <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-gray-700 via-gray-700" />
+                <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
               </div>
 
               {/* BUTTON BAR */}

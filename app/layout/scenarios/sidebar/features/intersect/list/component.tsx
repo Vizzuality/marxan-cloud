@@ -49,7 +49,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
 
   return (
     <div className="relative flex flex-col flex-grow overflow-hidden" style={{ minHeight: 200 }}>
-      <div className="absolute left-0 z-10 w-full h-6 -top-1 bg-gradient-to-b from-white via-white" />
+      <div className="absolute left-0 z-10 w-full h-6 -top-1 bg-gradient-to-b from-white via-white pointer-events-none" />
 
       <div
         ref={scrollRef}
@@ -99,7 +99,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-white via-white" />
+      <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-white via-white pointer-events-none" />
 
       <div
         className={cx({
