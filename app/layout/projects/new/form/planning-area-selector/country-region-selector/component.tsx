@@ -13,7 +13,7 @@ import { useDispatch } from 'react-redux';
 import { useCountries, useCountryRegions } from 'hooks/countries';
 import { useAdministrativeAreas } from 'hooks/administrative-areas';
 
-import { setBbox } from 'store/slices/projects/new';
+import { setBbox, setMinPuAreaSize, setMaxPuAreaSize } from 'store/slices/projects/new';
 
 import Loading from 'components/loading';
 import Select from 'components/forms/select';
@@ -72,12 +72,11 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                     options={countriesData.map((c) => ({ label: c.name, value: c.id }))}
                     initialSelected={selectedCountry}
                     onChange={(value: string) => {
-                      const DEFAULT = {
-                        bbox: [179, -179, 89, -89],
-                      };
                       const COUNTRY = countriesData.find((c) => c.id === value);
-                      const { bbox } = COUNTRY || DEFAULT || {};
+                      const { bbox, minPuAreaSize, maxPuAreaSize } = COUNTRY || {};
                       dispatch(setBbox(bbox));
+                      dispatch(setMinPuAreaSize(minPuAreaSize));
+                      dispatch(setMaxPuAreaSize(maxPuAreaSize));
 
                       setSelectedCountry(value);
                       fprops.input.onChange(value);
@@ -107,8 +106,11 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                       onChange={(value: string) => {
                         const COUNTRY = countriesData.find((c) => c.id === country);
                         const REGION = regionsData.find((c) => c.id === value);
-                        const { bbox } = REGION || COUNTRY || {};
+
+                        const { bbox, minPuAreaSize, maxPuAreaSize } = REGION || COUNTRY || {};
                         dispatch(setBbox(bbox));
+                        dispatch(setMinPuAreaSize(minPuAreaSize));
+                        dispatch(setMaxPuAreaSize(maxPuAreaSize));
 
                         setSelectedRegion(value);
                         fprops.input.onChange(value);
@@ -141,8 +143,10 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                       onChange={(value: string) => {
                         const REGION = regionsData.find((c) => c.id === region);
                         const SUBREGION = subRegionsData.find((c) => c.id === value);
-                        const { bbox } = SUBREGION || REGION || {};
+                        const { bbox, minPuAreaSize, maxPuAreaSize } = SUBREGION || REGION || {};
                         dispatch(setBbox(bbox));
+                        dispatch(setMinPuAreaSize(minPuAreaSize));
+                        dispatch(setMaxPuAreaSize(maxPuAreaSize));
 
                         setSelectedSubRegion(value);
                         fprops.input.onChange(value);
