@@ -10,8 +10,7 @@ import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 import { Transform } from 'class-transformer';
 import { IsInt, Max, Min } from 'class-validator';
-
-const Redis = require('ioredis');
+import * as Redis from 'ioredis';
 
 /**
  * @description The specification of the tile request
@@ -56,9 +55,6 @@ export interface TileCacheOptions {
     ttl?: number;
   };
 }
-
-export type TTtl = (zoomLevel: number) => number;
-
 
 /**
  * @description The required input values for the tile renderer
@@ -204,8 +200,8 @@ export class TileService {
    */
   async getTile(tileInput: TileInput<string>): Promise<Buffer> {
     try {
-      const {table, z, x, y , customQuery} = tileInput;
-      const filters = !!customQuery ? customQuery : [];
+      const {table, z, x, y , customQuery } = tileInput;
+      const filters = !!customQuery ? customQuery : '';
       const cacheOptions: TileCacheOptions = {
         enabled: true,
         redisOptions: {
