@@ -25,7 +25,6 @@ import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import {
   GeoFeatureSetResult,
-  GeoFeatureSet,
 } from './geo-feature-set.api.entity';
 
 const geoFeatureFilterKeyNames = [
