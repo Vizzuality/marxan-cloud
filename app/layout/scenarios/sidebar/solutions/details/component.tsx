@@ -5,11 +5,14 @@ import { motion } from 'framer-motion';
 import Icon from 'components/icon';
 import Button from 'components/button';
 import Modal from 'components/modal';
+import Checkbox from 'components/forms/checkbox';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOCK_SVG from 'svgs/ui/clock.svg?sprite';
 import TABLE_SVG from 'svgs/ui/table.svg?sprite';
+import INFO_SVG from 'svgs/ui/info.svg?sprite';
 
+import Label from 'components/forms/label';
 import { ScenariosSolutionsDetailsProps } from './types';
 import SolutionsTable from '../table';
 
@@ -19,6 +22,42 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   numberOfSchedules,
 }: ScenariosSolutionsDetailsProps) => {
   const [showTable, setShowTable] = useState<boolean>(false);
+
+  const body = [
+    {
+      run: 1,
+      score: 170,
+      cost: 168,
+      'view-on-map': false,
+      best: false,
+      id: 'row1',
+    },
+    {
+      run: 2,
+      score: 150,
+      cost: 48,
+      'view-on-map': false,
+      best: false,
+      id: 'row2',
+    },
+    {
+      run: 3,
+      score: 110,
+      cost: 18,
+      'view-on-map': false,
+      best: true,
+      id: 'row3',
+    },
+    {
+      run: 4,
+      score: 140,
+      cost: 188,
+      'view-on-map': false,
+      best: false,
+      id: 'row4',
+    },
+  ];
+
   return (
     <motion.div
       key="details"
@@ -73,10 +112,24 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           size="default"
           dismissable
           onDismiss={() => setShowTable(false)}
+          className="text-gray-800"
         >
-          <p>Hola</p>
+          <div className="px-8 pb-8">
+            <div className="flex items-center">
+              <Checkbox
+                theme="light"
+                id="checkbox-5-dif-solutions"
+                className="block w-4 h-4 mt-1.5 text-green-300 form-checkbox-dark"
+                onChange={() => console.info('click - 5 most different solutions')}
+              />
+              <Label>
+                View 5 most different solutions
+              </Label>
+              <Icon icon={INFO_SVG} />
+            </div>
+          </div>
           <SolutionsTable
-            body={[]}
+            body={body}
           />
         </Modal>
       </div>
