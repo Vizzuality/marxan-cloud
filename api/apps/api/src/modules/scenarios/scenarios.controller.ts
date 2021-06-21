@@ -17,6 +17,7 @@ import {
   UseGuards,
   UseInterceptors,
   ValidationPipe,
+  Logger,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -60,6 +61,7 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
 import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
+import { CreateScenarioFeatureSetDTO } from './dto/create.scenario-feature-set.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/run/:runId/solutions`;
@@ -133,6 +135,17 @@ export class ScenariosController {
     return await this.scenarioSerializer.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
     );
+  }
+
+  @ApiOperation({ description: 'Create feature set for scenario' })
+  @ApiCreatedResponse({ type: ScenarioResult })
+  @Post(':id/features/specification')
+  async createFeatureSetFor(
+    @Body(new ValidationPipe()) dto: CreateScenarioFeatureSetDTO,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<any> {
+    Logger.debug(`Creating feature specification with dto: ${dto}`);
+    return dto;
   }
 
   @ApiConsumesShapefile(false)
