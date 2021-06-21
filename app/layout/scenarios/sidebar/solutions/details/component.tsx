@@ -1,22 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { motion } from 'framer-motion';
 
 import Icon from 'components/icon';
 import Button from 'components/button';
+import Modal from 'components/modal';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOCK_SVG from 'svgs/ui/clock.svg?sprite';
 import TABLE_SVG from 'svgs/ui/table.svg?sprite';
 
+import Table from 'components/table';
 import { ScenariosSolutionsDetailsProps } from './types';
 
 export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps> = ({
   onChangeSection,
   onScheduleScenario,
-  onViewSolutionsTable,
   numberOfSchedules,
 }: ScenariosSolutionsDetailsProps) => {
+  const [showTable, setShowTable] = useState<boolean>(false);
   return (
     <motion.div
       key="details"
@@ -44,7 +46,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           theme="primary"
           size="base"
           className="flex h-12 mb-4"
-          onClick={() => onViewSolutionsTable()}
+          onClick={() => setShowTable(true)}
         >
           View solutions table
           <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
@@ -65,6 +67,19 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           </div>
           <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
         </Button>
+        <Modal
+          open={showTable}
+          title="Solutions table"
+          size="default"
+          dismissable
+          onDismiss={() => setShowTable(false)}
+        >
+          <p>Hola</p>
+          <Table
+            headers={[]}
+            body={[]}
+          />
+        </Modal>
       </div>
     </motion.div>
   );
