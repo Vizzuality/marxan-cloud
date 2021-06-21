@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Dictionary } from 'lodash';
 import { User } from '../users/user.api.entity';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import {
@@ -86,13 +85,12 @@ export class Project extends TimeUserEntityMetadata {
    *
    * If using a custom geometry, this must have been uploaded and associated to
    * the project.
-   *
-   * @todo Support for custom planning areas is not implemented yet. This is
-   * only a stub so that we can already start referencing this property in other
-   * parts of the code, but it is not linked yet to a db column.
    */
-  // @ApiPropertyOptional()
-  // @Column()
+  @ApiPropertyOptional()
+  @Column('uuid', {
+    name: 'planning_area_geometry_id',
+    nullable: true,
+  })
   planningAreaGeometryId?: string;
 
   /**
@@ -147,7 +145,6 @@ export class Project extends TimeUserEntityMetadata {
   @ApiPropertyOptional({
     description: "ID of Country / Gid1 / Gid2 of project's area",
   })
-  @Column('uuid')
   planningAreaId?: string;
 
   @ApiPropertyOptional({
