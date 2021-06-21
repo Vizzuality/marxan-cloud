@@ -1,5 +1,5 @@
 import Fuse from 'fuse.js';
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import {
   useQuery, useInfiniteQuery, useMutation, useQueryClient,
 } from 'react-query';
@@ -29,10 +29,6 @@ import {
 interface AllItemProps extends IntersectItemProps, RawItemProps {}
 
 export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
-  const placeholderDataRef = useRef({
-    pages: [],
-    pageParams: [],
-  });
   const [session] = useSession();
 
   const {
@@ -69,7 +65,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
 
   const query = useInfiniteQuery(['all-features', projectId, JSON.stringify(options)], fetchFeatures, {
     retry: false,
-    placeholderData: placeholderDataRef.current,
+    keepPreviousData: true,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
       const { page, totalPages } = meta;
@@ -79,12 +75,8 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
     },
   });
 
-  const { data, error } = query;
+  const { data } = query;
   const { pages } = data || {};
-
-  if (data || error) {
-    placeholderDataRef.current = data;
-  }
 
   return useMemo(() => {
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
