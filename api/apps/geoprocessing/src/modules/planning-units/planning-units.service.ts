@@ -74,6 +74,8 @@ export class PlanningUnitsService {
       z,
       planningUnitGridShape,
       planningUnitAreakm2,
+      filters
+
     );
     const customQuery = this.buildPlanningUnitsWhereQuery(filters);
 
@@ -102,19 +104,23 @@ export class PlanningUnitsService {
     z: number,
     planningUnitGridShape: PlanningUnitGridShape,
     planningUnitAreakm2: number,
+    filters?:PlanningUnitsFilters
   ): string {
     const gridShape = this.regularFunctionGridSelector(planningUnitGridShape);
     const gridSize = this.calculateGridSize(planningUnitAreakm2);
     // 156412 references to m per pixel at z level 0 at the equator in EPSG:3857
     const ratioPixelExtent = gridSize / (156412 / 2 ** z);
-    let query = `( SELECT row_number() over() as id, (${gridShape}(${gridSize}, \
+    /**
+     * We are checking that the pixel ration is < 8 px and bbox is not present
+     * Because we want to reduce the overhead for the db if an uncontroled area requests
+     * a large area.
+     * If so the shape we are getting is down the optimal to visualize it as points
+     */
+    const query = (ratioPixelExtent < 8 && !filters?.bbox) ?
+  `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
+        ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom )` :
+  `( SELECT row_number() over() as id, (${gridShape}(${gridSize}, \
                     ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom as the_geom)`;
-    // (so we are checking that the pixel ration is < 8 px)
-    // If so the shape we are getting is down the optimal to visualize it
-    if (ratioPixelExtent < 8) {
-      query = `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
-        ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom )`;
-    }
 
     return query;
   }
