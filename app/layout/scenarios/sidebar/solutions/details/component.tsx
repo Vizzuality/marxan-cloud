@@ -10,8 +10,8 @@ import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOCK_SVG from 'svgs/ui/clock.svg?sprite';
 import TABLE_SVG from 'svgs/ui/table.svg?sprite';
 
-import Table from 'components/table';
 import { ScenariosSolutionsDetailsProps } from './types';
+import SolutionsTable from '../table';
 
 export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps> = ({
   onChangeSection,
@@ -75,8 +75,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           onDismiss={() => setShowTable(false)}
         >
           <p>Hola</p>
-          <Table
-            headers={[]}
+          <SolutionsTable
             body={[]}
           />
         </Modal>
