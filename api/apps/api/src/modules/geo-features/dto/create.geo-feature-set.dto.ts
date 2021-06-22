@@ -36,8 +36,8 @@ export class SpecForGeoFeatureWithGeoprocessing extends SpecForGeofeature {
       subTypes: [
         { value: GeoprocessingOpSplitV1, name: 'split/v1' },
         { value: GeoprocessingOpStratificationV1, name: 'stratification/v1' },
-      ]
-    }
+      ],
+    },
   })
   @ApiPropertyOptional()
   geoprocessingOperations?: Array<
@@ -59,9 +59,12 @@ export class CreateGeoFeatureSetDTO {
       property: 'kind',
       subTypes: [
         { value: SpecForPlainGeoFeature, name: 'plain' },
-        { value: SpecForGeoFeatureWithGeoprocessing, name: 'withGeoprocessing' },
-      ]
-    }
+        {
+          value: SpecForGeoFeatureWithGeoprocessing,
+          name: 'withGeoprocessing',
+        },
+      ],
+    },
   })
   features!: Array<SpecForPlainGeoFeature | SpecForGeoFeatureWithGeoprocessing>;
 }

@@ -1,4 +1,4 @@
-import { IsNumber } from "class-validator";
+import { IsNumber } from 'class-validator';
 
 /**
  * Marxan settings for a GeoFeature.

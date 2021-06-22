@@ -24,7 +24,7 @@ export class GeoprocessingOpSplitV1 extends GeoprocessingOp {
   splitByProperty!: string;
 
   @ValidateNested({ each: true })
-  @Type(()=> SplitV1Settings)
+  @Type(() => SplitV1Settings)
   splits!: SplitV1Settings[];
 }
 
@@ -40,6 +40,6 @@ export class GeoprocessingOpStratificationV1 extends GeoprocessingOp {
   splitByProperty!: string;
 
   @ValidateNested({ each: true })
-  @Type(()=> SplitV1Settings)
+  @Type(() => SplitV1Settings)
   splits!: SplitV1Settings[];
 }

@@ -4,7 +4,10 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import { GeoFeature } from './geo-feature.api.entity';
 import { IsNumber, IsUUID, ValidateNested } from 'class-validator';
-import { SpecForGeoFeatureWithGeoprocessing, SpecForPlainGeoFeature } from './dto/create.geo-feature-set.dto';
+import {
+  SpecForGeoFeatureWithGeoprocessing,
+  SpecForPlainGeoFeature,
+} from './dto/create.geo-feature-set.dto';
 
 export const geoFeatureResource: BaseServiceResource = {
   className: 'GeoFeature',

@@ -1,8 +1,4 @@
-import {
-  HttpStatus,
-  INestApplication,
-  Logger,
-} from '@nestjs/common';
+import { HttpStatus, INestApplication, Logger } from '@nestjs/common';
 import * as request from 'supertest';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { tearDown } from './utils/tear-down';
