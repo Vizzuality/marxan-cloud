@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import cx from 'classnames';
 
 import Joyride from 'react-joyride';
@@ -10,28 +10,43 @@ import HELP_SVG from 'svgs/ui/help.svg?sprite';
 
 import { useRouter } from 'next/router';
 
+import HelpTooltip from './tooltip';
 import GUIDES from './guides';
 
 export const Help = () => {
   const [run, setRun] = useState(false);
   const { pathname } = useRouter();
-  const { STEPS } = GUIDES[pathname];
+  const { STEPS } = useMemo(() => {
+    return GUIDES[pathname];
+  }, [pathname]);
 
-  const onToggleActive = useCallback(() => {
+  const onToggleRun = useCallback((e) => {
+    e.preventDefault();
     setRun(!run);
   }, [run]);
 
   return (
     <div>
       <Joyride
-        steps={STEPS}
-        run={run}
         continuous
-        showProgress
-        showSkipButton
+        scrollToFirstStep
+        run={run}
+        steps={STEPS}
         styles={{
           options: {
             overlayColor: 'rgba(0,0,0,0.85)',
+          },
+        }}
+        floaterProps={{
+          styles: {
+            arrow: {
+              color: '#fff',
+              display: 'inline-flex',
+              length: 8,
+              margin: 16,
+              position: 'absolute',
+              spread: 16,
+            },
           },
         }}
         callback={(state) => {
@@ -41,6 +56,7 @@ export const Help = () => {
             setRun(false);
           }
         }}
+        tooltipComponent={HelpTooltip}
       />
 
       <div
@@ -55,7 +71,7 @@ export const Help = () => {
             style={{
               boxShadow: '2px 1px 3px 0px rgba(0,0,0,0.5) inset',
             }}
-            onClick={onToggleActive}
+            onClick={onToggleRun}
           >
             <div
               className={cx({
