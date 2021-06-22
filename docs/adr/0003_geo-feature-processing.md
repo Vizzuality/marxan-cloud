@@ -172,13 +172,16 @@ Payload (`CreateGeoFeatureSetDTO`):
 
       /**
        * We can either have marxanSettings *or* geoprocessingOperations.
-       * If marxanSettings is present, the feature should be used as is
-       * i.e. (no splits/intersections), with the given settings.
-       * If geoprocessingOperations is present, the features generated via
-       * geoprocessing operations will be used, each with their marxanSettings
-       * as specified for each of them.
+       * If marxanSettings is present (*but* we also need to set `kind: 'plain'`
+       * because of limitations on the way we can describe union types),
+       * the feature should be used as is (i.e. no splits/intersections),
+       * with the given settings.
+       *
+       * If geoprocessingOperations is present (and `kind: 'withGeoprocessing'`,
+       * see above), the features generated via geoprocessing operations will be
+       * used, each with their marxanSettings as specified for each of them.
        */
-
+      kind: 'plain' | 'withGeoprocessing';
       marxanSettings: {
         spf: number,
         fpf: number,
