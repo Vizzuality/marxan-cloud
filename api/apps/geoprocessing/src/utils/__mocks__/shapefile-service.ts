@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { ShapefileService } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.service';
 
 @Injectable()
-export class FakeShapefileService {
-  getGeoJsonMock = jest.fn();
+export class FakeShapefileService
+  implements Pick<ShapefileService, 'transformToGeoJson'> {
+  transformToGeoJsonMock = jest.fn();
 
-  async getGeoJson(shapeFile: Express.Multer.File): Promise<{ data: any }> {
-    return this.getGeoJsonMock(shapeFile);
+  async transformToGeoJson(
+    shapeFile: Express.Multer.File,
+  ): Promise<{ data: any }> {
+    return this.transformToGeoJsonMock(shapeFile);
   }
 }

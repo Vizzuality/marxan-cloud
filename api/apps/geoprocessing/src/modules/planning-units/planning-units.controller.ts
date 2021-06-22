@@ -46,7 +46,7 @@ export class PlanningUnitsController {
     @Body() shapefileInfo: Express.Multer.File,
   ): Promise<ShapefileGeoJSONResponseDTO | BadRequestException> {
     try {
-      return await this.shapefileService.getGeoJson(shapefileInfo);
+      return await this.shapefileService.transformToGeoJson(shapefileInfo);
     } catch (error) {
       throw new BadRequestException(error);
     }

@@ -10,6 +10,6 @@ export class ShapefileConverter implements ShapefileConverterPort {
   constructor(private readonly converter: ShapefileService) {}
 
   async convert(file: CostSurfaceJobInput['shapefile']): Promise<GeoJSON> {
-    return (await this.converter.getGeoJson(file)).data;
+    return (await this.converter.transformToGeoJson(file)).data;
   }
 }

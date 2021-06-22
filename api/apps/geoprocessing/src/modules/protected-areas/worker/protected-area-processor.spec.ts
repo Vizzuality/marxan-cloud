@@ -48,7 +48,7 @@ beforeEach(async () => {
 
 describe(`when shapefile returns geometry`, () => {
   beforeEach(() => {
-    fakeShapefileService.getGeoJsonMock.mockResolvedValue({
+    fakeShapefileService.transformToGeoJsonMock.mockResolvedValue({
       geo: `ok`,
     });
   });
