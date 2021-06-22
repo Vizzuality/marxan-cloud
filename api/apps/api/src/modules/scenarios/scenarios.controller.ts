@@ -61,7 +61,6 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
 import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
-import { CreateScenarioFeatureSetDTO } from './dto/create.scenario-feature-set.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/run/:runId/solutions`;
@@ -141,7 +140,7 @@ export class ScenariosController {
   @ApiCreatedResponse({ type: ScenarioResult })
   @Post(':id/features/specification')
   async createFeatureSetFor(
-    @Body(new ValidationPipe()) dto: CreateScenarioFeatureSetDTO,
+    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<any> {
     Logger.debug(`Creating feature specification with dto: ${dto}`);

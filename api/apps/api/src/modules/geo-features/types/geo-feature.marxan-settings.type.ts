@@ -1,17 +1,21 @@
+import { IsNumber } from "class-validator";
+
 /**
  * Marxan settings for a GeoFeature.
  *
  * @todo Only properties manageable via the main UI user flow are currently
  * defined: advanced settings will need to be added.
  */
-export interface MarxanSettingsForGeoFeature {
+export class MarxanSettingsForGeoFeature {
   /**
    * Species penalty factor.
    */
-  spf: number;
+  @IsNumber()
+  spf!: number;
 
   /**
    * Feature penalty factor.
    */
-  fpf: number;
+  @IsNumber()
+  fpf!: number;
 }

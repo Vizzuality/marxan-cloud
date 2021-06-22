@@ -1,21 +1,45 @@
+import { Type } from 'class-transformer';
+import { IsObject, IsString, ValidateNested } from 'class-validator';
+import { SpecForGeofeature } from '../dto/create.geo-feature-set.dto';
 import { MarxanSettingsForGeoFeature } from './geo-feature.marxan-settings.type';
 
-interface SplitV1Settings {
-  value: string;
-  marxanSettings: MarxanSettingsForGeoFeature;
+export abstract class GeoprocessingOp {
+  kind!: 'split/v1' | 'stratification/v1';
 }
 
-export interface GeoprocessingOpSplitV1 {
-  kind: 'split/v1';
-  splitByProperty: string;
-  splits: SplitV1Settings[];
+class SplitV1Settings {
+  @IsString()
+  value!: string;
+
+  @ValidateNested()
+  @Type(() => MarxanSettingsForGeoFeature)
+  marxanSettings!: MarxanSettingsForGeoFeature;
 }
 
-export interface GeoprocessingOpStratificationV1 {
-  kind: 'stratification/v1';
-  intersectWith: {
-    featureId: string;
-  };
-  splitByProperty: string;
-  splits: SplitV1Settings[];
+export class GeoprocessingOpSplitV1 extends GeoprocessingOp {
+  @IsString()
+  kind!: 'split/v1';
+
+  @IsString()
+  splitByProperty!: string;
+
+  @ValidateNested({ each: true })
+  @Type(()=> SplitV1Settings)
+  splits!: SplitV1Settings[];
+}
+
+export class GeoprocessingOpStratificationV1 extends GeoprocessingOp {
+  @IsString()
+  kind!: 'stratification/v1';
+
+  @IsObject()
+  @Type(() => SpecForGeofeature)
+  intersectWith!: SpecForGeofeature;
+
+  @IsString()
+  splitByProperty!: string;
+
+  @ValidateNested({ each: true })
+  @Type(()=> SplitV1Settings)
+  splits!: SplitV1Settings[];
 }
