@@ -4,11 +4,13 @@ import { ShapefilesModule } from '@marxan-geoprocessing/modules/shapefiles/shape
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { PlanningAreaService } from './planning-area.service';
 import { PlanningAreaController } from './planning-area.controller';
+import { ProtectedAreasGcModule } from './gc';
 
 @Module({
   imports: [
     PlanningAreaRepositoryModule.for(geoprocessingConnections.default.name),
     ShapefilesModule,
+    ProtectedAreasGcModule,
   ],
   providers: [PlanningAreaService],
   controllers: [PlanningAreaController],
