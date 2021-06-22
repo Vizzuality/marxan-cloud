@@ -127,17 +127,9 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           <div className="px-8 pb-8">
             <div className="flex items-center justify-start pb-6">
               <Button
-                theme="secondary-alt"
-                size="base"
-                className="pl-4 pr-4 text-xs"
-                onClick={() => console.info('click - order by')}
-              >
-                ORDER BY:
-              </Button>
-              <Button
                 theme="secondary"
                 size="base"
-                className="flex items-center justify-between pl-4 pr-4 ml-4"
+                className="flex items-center justify-between pl-4 pr-4"
                 onClick={() => console.info('click - download solutions')}
               >
                 Download solutions
