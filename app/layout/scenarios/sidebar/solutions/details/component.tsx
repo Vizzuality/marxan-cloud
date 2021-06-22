@@ -51,7 +51,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
       score: 110,
       cost: 18,
       'view-on-map': false,
-      best: true,
+      best: false,
       id: 'row3',
       planningUnits: 168,
       missingValues: 2,
@@ -129,7 +129,8 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
               <Button
                 theme="secondary-alt"
                 size="base"
-                className="pl-4 pr-4"
+                className="pl-4 pr-4 text-xs"
+                onClick={() => console.info('click - order by')}
               >
                 ORDER BY:
               </Button>
@@ -137,6 +138,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
                 theme="secondary"
                 size="base"
                 className="flex items-center justify-between pl-4 pr-4 ml-4"
+                onClick={() => console.info('click - download solutions')}
               >
                 Download solutions
                 <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8" />
@@ -162,6 +164,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           </div>
           <SolutionsTable
             body={body}
+            onSelectSolution={(solution) => console.info('solution selected', solution)}
           />
           <div className="flex items-center justify-center w-full pt-8">
             <Button

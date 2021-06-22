@@ -9,6 +9,7 @@ import { SolutionsTableProps } from './types';
 
 export const SolutionsTable: React.FC<SolutionsTableProps> = ({
   body,
+  onSelectSolution,
 }: SolutionsTableProps) => {
   const [selectedRowId, setSelectedRowId] = useState<string>(null);
 
@@ -22,6 +23,7 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
         className="flex justify-center w-full"
         onClick={() => {
           setSelectedRowId(row.id);
+          onSelectSolution(row);
         }}
       >
         {isSelected ? 'Selected' : 'Select solution'}

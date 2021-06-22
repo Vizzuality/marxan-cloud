@@ -8,4 +8,5 @@ export interface SolutionRow extends TableRow, Solution {
 
 export interface SolutionsTableProps {
   body: SolutionRow[];
+  onSelectSolution: (s: Solution) => void;
 }
