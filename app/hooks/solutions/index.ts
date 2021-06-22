@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import {
   useInfiniteQuery,
 } from 'react-query';
@@ -19,10 +19,6 @@ import ITEMS from './mock';
 // interface AllItemProps extends RawItemProps {}
 
 export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) {
-  const placeholderDataRef = useRef({
-    pages: [],
-    pageParams: [],
-  });
   const [session] = useSession();
 
   const {
@@ -58,7 +54,7 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
   });
 
   const query = useInfiniteQuery(['solutions', projectId, JSON.stringify(options)], fetchSolutions, {
-    placeholderData: placeholderDataRef.current,
+    keepPreviousData: true,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
       const { page, totalPages } = meta;
@@ -70,10 +66,6 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
 
   const { data } = query;
   const { pages } = data || {};
-
-  if (data) {
-    placeholderDataRef.current = data;
-  }
 
   return useMemo(() => {
     const parsedData = Array.isArray(pages) ? flatten(pages.map(() => {
