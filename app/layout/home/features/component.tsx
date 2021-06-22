@@ -13,7 +13,7 @@ export interface HomeFeaturesProps {
 export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
   return (
     <Wrapper>
-      <div className="w-full py-32">
+      <div className="w-full pb-32">
         <div className="grid max-w-5xl grid-cols-1 gap-20 mx-auto sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((F) => {
             const {
@@ -26,7 +26,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
                   <Icon icon={icon} className={iconClassName} />
                 </div>
                 <h2 className="mt-8 mb-10 text-2xl font-medium font-heading">{name}</h2>
-                <p className="text-gray-400">{description}</p>
+                <p className="text-gray-300">{description}</p>
               </div>
             );
           })}
