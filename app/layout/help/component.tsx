@@ -47,6 +47,9 @@ export const Help = () => {
               position: 'absolute',
               spread: 16,
             },
+            floaterWithAnimation: {
+              transition: 'opacity 0.3s',
+            },
           },
         }}
         callback={(state) => {

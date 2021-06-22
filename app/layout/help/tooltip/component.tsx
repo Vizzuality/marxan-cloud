@@ -4,6 +4,7 @@ import cx from 'classnames';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-left.svg?sprite';
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
 import HELP_2_SVG from 'svgs/ui/help-2.svg?sprite';
@@ -19,11 +20,13 @@ interface HelpTooltipProps extends TooltipRenderProps {
 
 export const HelpTooltip = ({
   index,
+  size,
   step,
   backProps,
   primaryProps,
   skipProps,
   tooltipProps,
+  isLastStep,
 }: HelpTooltipProps) => {
   const { title, subtitle, content } = step;
 
@@ -61,7 +64,8 @@ export const HelpTooltip = ({
             className="flex items-center justify-center bg-gray-100 rounded hover:bg-primary-500 w-7 h-7 focus:outline-none"
             {...primaryProps}
           >
-            <Icon icon={ARROW_RIGHT_SVG} className="w-3 h-3" />
+            {!isLastStep && (<Icon icon={ARROW_RIGHT_SVG} className="w-3 h-3" />)}
+            {isLastStep && (<Icon icon={CLOSE_SVG} className="w-3 h-3" />)}
           </button>
 
         </div>
@@ -71,7 +75,7 @@ export const HelpTooltip = ({
         {content}
       </div>
 
-      <div className="mt-5">
+      <footer className="flex items-baseline justify-between mt-5">
         <Button
           type="button"
           theme="secondary"
@@ -80,7 +84,12 @@ export const HelpTooltip = ({
         >
           Skip
         </Button>
-      </div>
+
+        <div className="text-xs font-heading">
+          {`${index + 1}/${size}`}
+        </div>
+
+      </footer>
     </div>
   );
 };
