@@ -138,6 +138,9 @@ export class GeoFeaturesService extends AppBaseService<
      * it is supplied as part of a GET query parsed according to the JSON:API
      * spec), and if a projectId is supplied in either way, we first check if
      * the project exists (if not, we throw a NotFoundException).
+     *
+     * In any case, when we have a projectId, we also limit the selection of
+     * features to those that intersect the project's bbox.
      */
 
     let queryFilteredByPublicOrProjectSpecificFeatures;
@@ -145,12 +148,38 @@ export class GeoFeaturesService extends AppBaseService<
       (info?.params?.projectId as string) ??
       (fetchSpecification?.filter?.projectId as string);
     if (projectId) {
-      await this.projectRepository.findOneOrFail(projectId).catch((_error) => {
-        throw new NotFoundException(`No project with id ${projectId} exists.`);
-      });
+      const project = await this.projectRepository
+        .findOneOrFail(projectId)
+        .then((project) => project)
+        .catch((_error) => {
+          throw new NotFoundException(
+            `No project with id ${projectId} exists.`,
+          );
+        });
+      const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
+        .createQueryBuilder('geoFeatureGeometries')
+        .where(
+          `st_intersects(
+        st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
+        "geoFeatureGeometries".the_geom
+      )`,
+          {
+            xmin: project.bbox[0],
+            ymin: project.bbox[1],
+            xmax: project.bbox[2],
+            ymax: project.bbox[3],
+          },
+        )
+        .getMany()
+        .then((result) => result.map((i) => i.id))
+        .catch((error) => {
+          throw new Error(error);
+        });
+
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
-        `${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL`,
-        { projectId },
+        `${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL
+        AND ${this.alias}.id IN (:...geoFeaturesWithinProjectBbox)`,
+        { projectId, geoFeaturesWithinProjectBbox },
       );
     } else {
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
