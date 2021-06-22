@@ -11,6 +11,7 @@ import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOCK_SVG from 'svgs/ui/clock.svg?sprite';
 import TABLE_SVG from 'svgs/ui/table.svg?sprite';
 import INFO_SVG from 'svgs/ui/info.svg?sprite';
+import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
 import Label from 'components/forms/label';
 import { ScenariosSolutionsDetailsProps } from './types';
@@ -114,9 +115,23 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           onDismiss={() => setShowTable(false)}
           className="text-gray-800"
         >
-          <div className="px-8 pb-8 ">
-            <div>
-              
+          <div className="px-8 pb-8">
+            <div className="flex items-center justify-start pb-6">
+              <Button
+                theme="secondary-alt"
+                size="base"
+                className="pl-4 pr-4"
+              >
+                ORDER BY:
+              </Button>
+              <Button
+                theme="secondary"
+                size="base"
+                className="flex items-center justify-between pl-4 pr-4 ml-4"
+              >
+                Download solutions
+                <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8" />
+              </Button>
             </div>
             <div className="flex items-center">
               <Checkbox
@@ -139,6 +154,15 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           <SolutionsTable
             body={body}
           />
+          <div className="flex items-center justify-center w-full pt-8">
+            <Button
+              theme="primary"
+              size="lg"
+              onClick={() => setShowTable(false)}
+            >
+              Done
+            </Button>
+          </div>
         </Modal>
       </div>
     </motion.div>
