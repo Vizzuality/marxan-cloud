@@ -16,6 +16,7 @@ import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 import Label from 'components/forms/label';
 import { ScenariosSolutionsDetailsProps } from './types';
 import SolutionsTable from '../table';
+import { SolutionRow } from '../table/types';
 
 export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps> = ({
   onChangeSection,
@@ -24,7 +25,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
 }: ScenariosSolutionsDetailsProps) => {
   const [showTable, setShowTable] = useState<boolean>(false);
 
-  const body = [
+  const body: SolutionRow[] = [
     {
       run: 1,
       score: 170,
@@ -32,14 +33,18 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
       'view-on-map': false,
       best: false,
       id: 'row1',
+      planningUnits: 168,
+      missingValues: 2,
     },
     {
       run: 2,
       score: 150,
       cost: 48,
       'view-on-map': false,
-      best: false,
+      best: true,
       id: 'row2',
+      planningUnits: 168,
+      missingValues: 2,
     },
     {
       run: 3,
@@ -48,6 +53,8 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
       'view-on-map': false,
       best: true,
       id: 'row3',
+      planningUnits: 168,
+      missingValues: 2,
     },
     {
       run: 4,
@@ -56,6 +63,8 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
       'view-on-map': false,
       best: false,
       id: 'row4',
+      planningUnits: 168,
+      missingValues: 2,
     },
   ];
 

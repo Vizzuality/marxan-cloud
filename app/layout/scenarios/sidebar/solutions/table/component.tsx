@@ -17,7 +17,7 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
 
     return (
       <Button
-        theme="secondary-alt"
+        theme={isSelected ? 'secondary' : 'secondary-alt'}
         size="s"
         className="flex justify-center w-full"
         onClick={() => {
@@ -46,6 +46,14 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
     {
       label: 'Cost',
       id: 'cost',
+    },
+    {
+      label: 'Planning Units',
+      id: 'planningUnits',
+    },
+    {
+      label: 'Missing Values',
+      id: 'missingValues',
     },
     {
       label: 'View on map',
