@@ -22,8 +22,8 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
 
   return (
     <Wrapper>
-      <div className="flex items-baseline justify-between space-x-20 mb-8">
-        <div className="flex-grow">
+      <div className="flex items-baseline justify-between mb-8 space-x-20">
+        <div id="projects-search" className="flex-grow">
           <Search
             defaultValue={search}
             size="base"
@@ -36,6 +36,7 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
         <div className="flex space-x-1">
           <Link href="/projects/new" passHref>
             <a
+              id="projects-new"
               href="/projects/new"
             >
               <Button theme="primary" size="base">
