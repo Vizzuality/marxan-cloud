@@ -114,18 +114,26 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           onDismiss={() => setShowTable(false)}
           className="text-gray-800"
         >
-          <div className="px-8 pb-8">
+          <div className="px-8 pb-8 ">
+            <div>
+              
+            </div>
             <div className="flex items-center">
               <Checkbox
                 theme="light"
                 id="checkbox-5-dif-solutions"
-                className="block w-4 h-4 mt-1.5 text-green-300 form-checkbox-dark"
+                className="block w-4 h-4 text-green-300 form-checkbox-dark"
                 onChange={() => console.info('click - 5 most different solutions')}
               />
-              <Label>
+              <Label className="ml-2 text-gray-700">
                 View 5 most different solutions
               </Label>
-              <Icon icon={INFO_SVG} />
+              <button
+                className="ml-3 bg-gray-500 rounded-full opacity-80 p-0.5"
+                type="button"
+              >
+                <Icon icon={INFO_SVG} className="w-4 h-4 text-white" />
+              </button>
             </div>
           </div>
           <SolutionsTable
