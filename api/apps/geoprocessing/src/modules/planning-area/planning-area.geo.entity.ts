@@ -9,7 +9,7 @@ import {
 import { BBox, MultiPolygon } from 'geojson';
 import { defaultSrid } from '@marxan/utils/geo';
 
-@Entity('planning_area')
+@Entity('planning_areas')
 export class PlanningArea {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

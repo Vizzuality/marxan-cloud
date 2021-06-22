@@ -4,7 +4,7 @@ export class PlanningArea1624194725375 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `
-CREATE TABLE planning_area (
+CREATE TABLE planning_areas (
   id uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
   created_at TIMESTAMP DEFAULT now(),
   project_id uuid,
@@ -23,7 +23,7 @@ CREATE TABLE planning_area (
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-DROP TABLE planning_area;
+DROP TABLE planning_areas;
 `);
   }
 }
