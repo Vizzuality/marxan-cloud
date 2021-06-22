@@ -42,6 +42,15 @@ export enum JobStatus {
   failure = 'failure',
 }
 
+/**
+ * A simple job status, usable to represent jobs that can be be only in the
+ * draft or created status.
+ */
+export enum SimpleJobStatus {
+  draft = 'draft',
+  created = 'created',
+}
+
 @Entity('scenarios')
 export class Scenario extends TimeUserEntityMetadata {
   @ApiProperty()
