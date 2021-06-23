@@ -56,7 +56,6 @@ export function useGapAnalysis(projectId, options: UseFeaturesOptionsProps = {})
   });
 
   const query = useInfiniteQuery(['gap-analysis', projectId, JSON.stringify(options)], fetchFeatures, {
-    retry: false,
     placeholderData: placeholderDataRef.current,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
@@ -67,10 +66,10 @@ export function useGapAnalysis(projectId, options: UseFeaturesOptionsProps = {})
     },
   });
 
-  const { data, error } = query;
+  const { data } = query;
   const { pages } = data || {};
 
-  if (data || error) {
+  if (data) {
     placeholderDataRef.current = data;
   }
 
