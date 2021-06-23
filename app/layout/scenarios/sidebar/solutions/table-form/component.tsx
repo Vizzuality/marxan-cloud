@@ -22,11 +22,11 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   onSave,
 }: SolutionsTableFormProps) => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { sid } = query;
 
-  const { data, isFetching, isFetched } = useSolutions(pid);
+  const { data, isFetching, isFetched } = useSolutions(sid);
 
-  console.log('data', data, 'isFetching', isFetching, 'isFetched', isFetched);
+  console.log('sid', sid, 'data', data, 'isFetching', isFetching, 'isFetched', isFetched);
 
   const body: SolutionRow[] = [
     {

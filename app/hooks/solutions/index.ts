@@ -8,7 +8,7 @@ import flatten from 'lodash/flatten';
 
 // import { ItemProps as RawItemProps } from 'components/gap-analysis/item/component';
 
-import PROJECTS from 'services/projects';
+import SCENARIOS from 'services/scenarios';
 
 import {
   UseSolutionsOptionsProps,
@@ -18,7 +18,7 @@ import ITEMS from './mock';
 
 // interface AllItemProps extends RawItemProps {}
 
-export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) {
+export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {}) {
   const [session] = useSession();
 
   const {
@@ -35,9 +35,9 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
       };
     }, {});
 
-  const fetchSolutions = ({ pageParam = 1 }) => PROJECTS.request({
+  const fetchSolutions = ({ pageParam = 1 }) => SCENARIOS.request({
     method: 'GET',
-    url: `/${projectId}/solutions`,
+    url: `/${scenarioId}/solutions`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
@@ -53,7 +53,7 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
     },
   });
 
-  const query = useInfiniteQuery(['solutions', projectId, JSON.stringify(options)], fetchSolutions, {
+  const query = useInfiniteQuery(['solutions', scenarioId, JSON.stringify(options)], fetchSolutions, {
     keepPreviousData: true,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
