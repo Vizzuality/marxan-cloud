@@ -6,10 +6,10 @@ import Icon from 'components/icon';
 import Button from 'components/button';
 import List from 'layout/scenarios/sidebar/analysis/gap-analysis/list';
 import Toolbar from 'layout/scenarios/sidebar/analysis/gap-analysis/toolbar';
+import InfoButton from 'components/info-button';
 
 // Icons
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
-import INFO_SVG from 'svgs/ui/info.svg?sprite';
 
 import { ScenariosSolutionsGapAnalysisProps } from './types';
 
@@ -41,13 +41,13 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
           <Icon icon={ARROW_RIGHT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
           <h4 className="text-xs uppercase font-heading">GAP ANALYSIS</h4>
         </button>
-        <button
-          type="button"
-          className="ml-2 p-0.5 bg-blue-500 rounded-full opacity-50"
-          onClick={() => console.info('Info - Gap Analysis')}
+        <InfoButton
+          theme="primary"
         >
-          <Icon icon={INFO_SVG} className="w-4 h-4 text-gray-700" />
-        </button>
+          <div className="text-sm opacity-50">
+            This is the description from the info button.
+          </div>
+        </InfoButton>
         <Button
           theme="secondary"
           size="xs"
