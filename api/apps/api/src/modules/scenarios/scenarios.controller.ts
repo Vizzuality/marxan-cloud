@@ -3,18 +3,22 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
+  ParseBoolPipe,
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
@@ -26,6 +30,8 @@ import {
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
+  ApiProduces,
   ApiTags,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
@@ -47,16 +53,23 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
+import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
+import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
+import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
+
+const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
+const solutionsSubPath = `:id/marxan/run/:runId/solutions`;
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
-@Controller(`${apiGlobalPrefixes.v1}/scenarios`)
+@Controller(basePath)
 export class ScenariosController {
   constructor(
     private readonly service: ScenariosService,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
+    private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
   ) {}
 
   @ApiOperation({
@@ -74,11 +87,19 @@ export class ScenariosController {
       { name: 'status' },
     ],
   })
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    description: `A free search over name and description`,
+  })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Query('q') nameAndDescriptionFilter?: string,
   ): Promise<ScenarioResult> {
-    const results = await this.service.findAllPaginated(fetchSpecification);
+    const results = await this.service.findAllPaginated(fetchSpecification, {
+      params: { nameAndDescriptionFilter },
+    });
     return this.scenarioSerializer.serialize(results.data, results.metadata);
   }
 
@@ -169,5 +190,113 @@ export class ScenariosController {
     return this.scenarioFeatureSerializer.serialize(
       await this.service.getFeatures(id),
     );
+  }
+
+  @ApiOperation({ description: `Resolve scenario's input parameter file.` })
+  @Get(':id/marxan/dat/input.dat')
+  @ApiProduces('text/plain')
+  @Header('Content-Type', 'text/plain')
+  async getInputParameterFile(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<string> {
+    return await this.service.getInputParameterFile(id);
+  }
+
+  @ApiOkResponse({
+    type: ScenarioSolutionResultDto,
+  })
+  @ApiQuery({
+    name: 'best',
+    required: false,
+    type: Boolean,
+  })
+  @ApiQuery({
+    name: 'most-different',
+    required: false,
+    type: Boolean,
+  })
+  @JSONAPIQueryParams()
+  @Get(solutionsSubPath)
+  async getScenarioRunSolutions(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('runId', ParseUUIDPipe) runId: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Query('best', ParseBoolPipe) selectOnlyBest?: boolean,
+    @Query('most-different', ParseBoolPipe) selectMostDifferent?: boolean,
+  ): Promise<ScenarioFeatureResultDto> {
+    if (selectOnlyBest) {
+      return this.getScenarioRunBestSolutions(id, runId);
+    }
+
+    if (selectMostDifferent) {
+      return this.getScenarioRunMostDifferentSolutions(
+        id,
+        runId,
+        fetchSpecification,
+      );
+    }
+
+    const result = await this.service.findAllSolutionsPaginated(
+      id,
+      runId,
+      fetchSpecification,
+    );
+    return this.scenarioSolutionSerializer.serialize(
+      result.data,
+      result.metadata,
+    );
+  }
+
+  @ApiOkResponse({
+    type: ScenarioSolutionResultDto,
+  })
+  @JSONAPIQueryParams()
+  @Get(`${solutionsSubPath}/best`)
+  async getScenarioRunBestSolutions(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('runId', ParseUUIDPipe) runId: string,
+  ): Promise<ScenarioFeatureResultDto> {
+    return this.scenarioSolutionSerializer.serialize(
+      await this.service.getBestSolution(id, runId),
+    );
+  }
+
+  @ApiOkResponse({
+    type: ScenarioSolutionResultDto,
+  })
+  @JSONAPIQueryParams()
+  @Get(`${solutionsSubPath}/most-different`)
+  async getScenarioRunMostDifferentSolutions(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('runId', ParseUUIDPipe) runId: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+  ): Promise<ScenarioFeatureResultDto> {
+    const result = await this.service.getMostDifferentSolutions(
+      id,
+      runId,
+      fetchSpecification,
+    );
+    return this.scenarioSolutionSerializer.serialize(
+      result.data,
+      result.metadata,
+    );
+  }
+
+  @Header('Content-Type', 'text/csv')
+  @ApiOkResponse({
+    schema: {
+      type: 'string',
+    },
+  })
+  @ApiOperation({
+    description: `Uploaded cost surface data`,
+  })
+  @Get(`:id/marxan/dat/pu.dat`)
+  async getScenarioCostSurface(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.service.getCostSurfaceCsv(id, res);
+    return;
   }
 }

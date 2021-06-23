@@ -19,6 +19,8 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   onDismiss,
 }: ScenariosFeaturesAddProps) => {
   const [search, setSearch] = useState(null);
+  const [filters, setFilters] = useState({});
+  const [sort, setSort] = useState(null);
   const { query } = useRouter();
   const { pid } = query;
 
@@ -30,6 +32,8 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
+    filters,
+    sort,
   });
 
   const INITIAL_VALUES = useMemo(() => {
@@ -61,6 +65,14 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
     setSearch(s);
   }, []);
 
+  const onFilters = useCallback((f) => {
+    setFilters(f);
+  }, []);
+
+  const onSort = useCallback((s) => {
+    setSort(s);
+  }, []);
+
   const onSubmit = useCallback((values) => {
     // Save current features then dismiss the modal
     console.info(values);
@@ -80,7 +92,14 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
           <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">Add features to your planning area</h2>
-          <Toolbar search={search} onSearch={onSearch} />
+          <Toolbar
+            search={search}
+            filters={filters}
+            sort={sort}
+            onSearch={onSearch}
+            onFilters={onFilters}
+            onSort={onSort}
+          />
 
           <FieldRFF
             name="selected"
@@ -88,6 +107,8 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
             {({ input }) => (
               <List
                 search={search}
+                filters={filters}
+                sort={sort}
                 selected={values.selected}
                 onToggleSelected={(id) => {
                   onToggleSelected(id, input);

@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   NotFoundException,
-  NotImplementedException,
   Param,
   Patch,
   Post,
@@ -54,6 +53,7 @@ import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { JobType } from './job-status/jobs.enum';
+import { JobStatusSerializer } from './dto/job-status.serializer';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -64,6 +64,7 @@ export class ProjectsController {
     private readonly projectsService: ProjectsService,
     private readonly geoFeatureSerializer: GeoFeatureSerializer,
     private readonly projectSerializer: ProjectSerializer,
+    private readonly jobsStatusSerizalizer: JobStatusSerializer,
   ) {}
 
   @ApiOperation({
@@ -184,28 +185,8 @@ export class ProjectsController {
   async getJobsForProjectScenarios(
     @Param('id') projectId: string,
   ): Promise<ProjectJobsStatusDto> {
-    // TODO add JobStatus DTO
-    // TODO add serializer
-    return {
-      data: {
-        id: projectId,
-        type: 'project-jobs',
-        attributes: {
-          scenarios: [
-            {
-              id: projectId,
-              status: JobStatus.running,
-              jobs: [
-                {
-                  kind: JobType.CostSurface,
-                  status: JobStatus.running,
-                },
-              ],
-            },
-          ],
-        },
-      },
-    };
+    const scenarios = await this.projectsService.getJobStatusFor(projectId);
+    return this.jobsStatusSerizalizer.serialize(projectId, scenarios);
   }
 
   @ApiConsumesShapefile(false)

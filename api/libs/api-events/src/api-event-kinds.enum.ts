@@ -18,3 +18,8 @@ export enum API_EVENT_KINDS {
   project__protectedAreas__finished__v1__alpha = 'project.protectedAreas.finished/v1/alpha',
   project__protectedAreas__failed__v1__alpha = 'project.protectedAreas.failed/v1/alpha',
 }
+
+export type ScenarioEvents = Pick<
+  typeof API_EVENT_KINDS,
+  Extract<keyof typeof API_EVENT_KINDS, `scenario__${string}`>
+>;

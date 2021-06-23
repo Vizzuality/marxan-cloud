@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BBox, Geometry } from 'geojson';
-import { Column, PrimaryColumn, ViewEntity } from 'typeorm';
+import { Column, PrimaryColumn, ViewColumn, ViewEntity } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 
 export const countryResource: BaseServiceResource = {
@@ -13,9 +13,21 @@ export const countryResource: BaseServiceResource = {
 
 @ViewEntity('countries', {
   expression: `
-  SELECT id, gid_0, name_0, the_geom, level, iso3, bbox, created_at, created_by,
-  last_modified_at FROM admin_regions
-  WHERE gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL;
+    SELECT
+      id,
+      gid_0,
+      name_0,
+      the_geom,
+      level,
+      iso3,
+      created_at,
+      created_by,
+      last_modified_at,
+      bbox,
+      max_pu_area_size,
+      min_pu_area_size
+    FROM admin_regions
+    WHERE gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL
   `,
 })
 export class Country {
@@ -51,6 +63,14 @@ export class Country {
   @ApiProperty()
   @Column('jsonb', { name: 'bbox' })
   bbox!: BBox;
+
+  @ApiProperty()
+  @ViewColumn({ name: 'max_pu_area_size' })
+  maxPuAreaSize!: number;
+
+  @ApiProperty()
+  @ViewColumn({ name: 'min_pu_area_size' })
+  minPuAreaSize!: number;
 }
 
 export class JSONAPICountryData {

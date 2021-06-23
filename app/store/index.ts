@@ -1,7 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 import projects from 'store/slices/projects';
-import projectsDetail from 'store/slices/projects/detail';
+import projectsDetail from 'store/slices/projects/[id]';
 import projectsNew from 'store/slices/projects/new';
 // import scenariosEdit from 'store/slices/scenarios/edit';
 

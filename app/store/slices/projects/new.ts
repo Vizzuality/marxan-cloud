@@ -1,10 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ProjectShowStateProps {
-  bbox: number[]
+  bbox: number[];
+  minPuAreaSize: number;
+  maxPuAreaSize: number;
 }
 
-const initialState = { bbox: null } as ProjectShowStateProps;
+const initialState = {
+  bbox: null,
+  minPuAreaSize: 0,
+  maxPuAreaSize: 100,
+} as ProjectShowStateProps;
 
 const projectsNewSlice = createSlice({
   name: '/projects/new',
@@ -13,8 +19,14 @@ const projectsNewSlice = createSlice({
     setBbox: (state, action: PayloadAction<number[]>) => {
       state.bbox = action.payload;
     },
+    setMinPuAreaSize: (state, action: PayloadAction<number>) => {
+      state.minPuAreaSize = action.payload;
+    },
+    setMaxPuAreaSize: (state, action: PayloadAction<number>) => {
+      state.maxPuAreaSize = action.payload;
+    },
   },
 });
 
-export const { setBbox } = projectsNewSlice.actions;
+export const { setBbox, setMinPuAreaSize, setMaxPuAreaSize } = projectsNewSlice.actions;
 export default projectsNewSlice.reducer;

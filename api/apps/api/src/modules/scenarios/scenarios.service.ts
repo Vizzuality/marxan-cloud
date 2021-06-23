@@ -1,6 +1,9 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpService, Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
+import { classToClass } from 'class-transformer';
+import * as stream from 'stream';
 
+import { MarxanInput, MarxanParameters } from '@marxan/marxan-input';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ScenarioFeaturesService } from '@marxan-api/modules/scenarios-features';
@@ -8,11 +11,17 @@ import { AdjustPlanningUnits } from '@marxan-api/modules/analysis/entry-points/a
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 
 import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
-import { ScenariosCrudService } from './scenarios-crud.service';
+import {
+  ScenarioInfoDTO,
+  ScenariosCrudService,
+} from './scenarios-crud.service';
 
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
+import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
+import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
+import { InputParameterFileProvider } from './input-parameter-file.provider';
 
 @Injectable()
 export class ScenariosService {
@@ -26,10 +35,17 @@ export class ScenariosService {
     private readonly updatePlanningUnits: AdjustPlanningUnits,
     private readonly costSurface: CostSurfaceFacade,
     private readonly httpService: HttpService,
+    private readonly solutionsCrudService: SolutionResultCrudService,
+    private readonly costSurfaceView: CostSurfaceViewService,
+    private readonly marxanInputValidator: MarxanInput,
+    private readonly inputParameterFileProvider: InputParameterFileProvider,
   ) {}
 
-  async findAllPaginated(fetchSpecification: FetchSpecification) {
-    return this.crudService.findAllPaginated(fetchSpecification);
+  async findAllPaginated(
+    fetchSpecification: FetchSpecification,
+    appInfo?: ScenarioInfoDTO,
+  ) {
+    return this.crudService.findAllPaginated(fetchSpecification, appInfo);
   }
 
   async getById(scenarioId: string, fetchSpecification?: FetchSpecification) {
@@ -42,12 +58,14 @@ export class ScenariosService {
   }
 
   async create(input: CreateScenarioDTO, info: AppInfoDTO) {
-    return this.crudService.create(input, info);
+    const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
+    return this.crudService.create(validatedMetadata, info);
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
     await this.assertScenario(scenarioId);
-    return this.crudService.update(scenarioId, input);
+    const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
+    return this.crudService.update(scenarioId, validatedMetadata);
   }
 
   async getFeatures(scenarioId: string) {
@@ -59,6 +77,10 @@ export class ScenariosService {
         },
       })
     )[0];
+  }
+
+  async getInputParameterFile(scenarioId: string): Promise<string> {
+    return this.inputParameterFileProvider.getInputParameterFile(scenarioId);
   }
 
   async changeLockStatus(
@@ -103,7 +125,76 @@ export class ScenariosService {
     return geoJson;
   }
 
+  async findScenarioResults(
+    scenarioId: string,
+    runId: string,
+    fetchSpecification: FetchSpecification,
+  ) {
+    await this.assertScenario(scenarioId);
+    return this.solutionsCrudService.findAll(fetchSpecification);
+  }
+
+  async getCostSurfaceCsv(
+    scenarioId: string,
+    stream: stream.Writable,
+  ): Promise<void> {
+    await this.assertScenario(scenarioId);
+    await this.costSurfaceView.read(scenarioId, stream);
+  }
+
   private async assertScenario(scenarioId: string) {
     await this.crudService.getById(scenarioId);
+  }
+
+  async getBestSolution(scenarioId: string, runId: string) {
+    await this.assertScenario(scenarioId);
+    // TODO correct implementation
+    return this.solutionsCrudService.getById(runId);
+  }
+
+  async getMostDifferentSolutions(
+    scenarioId: string,
+    runId: string,
+    fetchSpecification: FetchSpecification,
+  ) {
+    await this.assertScenario(scenarioId);
+    // TODO correct implementation
+    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+  }
+
+  async findAllSolutionsPaginated(
+    scenarioId: string,
+    runId: string,
+    fetchSpecification: FetchSpecification,
+  ) {
+    await this.assertScenario(scenarioId);
+    // TODO correct implementation
+    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+  }
+
+  /**
+   * Throws
+   * @param input
+   * @private
+   */
+  private getPayloadWithValidatedMetadata<
+    T extends CreateScenarioDTO | UpdateScenarioDTO
+  >(input: T): T {
+    let marxanInput: MarxanParameters | undefined;
+    if (input.metadata?.marxanInputParameterFile) {
+      try {
+        marxanInput = this.marxanInputValidator.from(
+          input.metadata.marxanInputParameterFile,
+        );
+      } catch (errors) {
+        // TODO debt: shouldn't throw HttpException
+        throw new BadRequestException(errors);
+      }
+    }
+    const withValidatedMetadata: T = classToClass<T>(input);
+    if (withValidatedMetadata.metadata) {
+      withValidatedMetadata.metadata.marxanInputParameterFile = marxanInput;
+    }
+    return withValidatedMetadata;
   }
 }
