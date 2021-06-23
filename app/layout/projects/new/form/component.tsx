@@ -100,7 +100,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
           className="flex flex-col justify-between flex-grow w-full overflow-hidden"
         >
           <div className="grid h-full grid-cols-1 gap-0 overflow-hidden bg-gray-700 md:grid-cols-2 rounded-3xl">
-            <div className="flex flex-col flex-grow overflow-hidden">
+            <div id="project-new-form" className="flex flex-col flex-grow overflow-hidden">
               <div className="relative flex flex-col flex-grow min-h-0">
                 <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
