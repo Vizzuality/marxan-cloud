@@ -40,7 +40,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     },
   );
 
-  console.log('data', data, 'isFetching', isFetching);
+  console.log('data', data, 'isFetching', isFetching, 'isFetchingNextPage', isFetchingNextPage, 'isFetched', isFetched);
 
   return (
     <div className="text-gray-800">
@@ -93,10 +93,12 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             No results found
           </div>
         )}
-        <SolutionsTable
-          body={data}
-          onSelectSolution={(solution) => console.info('solution selected', solution)}
-        />
+        {!isFetching && data && data.length > 0 && (
+          <SolutionsTable
+            body={data}
+            onSelectSolution={(solution) => console.info('solution selected', solution)}
+          />
+        )}
         <LoadingMore visible={isFetchingNextPage} />
       </div>
       <div className="flex items-center justify-center w-full pt-8">
