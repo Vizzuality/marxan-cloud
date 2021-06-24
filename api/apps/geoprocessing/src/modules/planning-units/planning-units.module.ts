@@ -1,10 +1,10 @@
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TileModule } from '@marxan-geoprocessing/modules/tile/tile.module';
+import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 import { PlanningUnitsProcessor } from './planning-units.worker';
 import { PlanningUnitsController } from './planning-units.controller';
 import { ShapefileService } from '../shapefiles/shapefiles.service';
-import { PlanningUnitsGeom } from '@marxan-geoprocessing/modules/planning-units/planning-units.geo.entity';
 import { PlanningUnitsService } from './planning-units.service';
 import { FileService } from '../files/files.service';
 import { WorkerModule } from '../worker';

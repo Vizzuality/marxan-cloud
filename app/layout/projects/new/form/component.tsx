@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 import ProjectNewMap from 'layout/projects/new/map';
 
@@ -19,9 +18,13 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 
+import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
 import { useOrganizations } from 'hooks/organizations';
 import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
+
+import { setBbox, setMaxPuAreaSize, setMinPuAreaSize } from 'store/slices/projects/new';
 
 import PlanningAreaSelector from './planning-area-selector';
 import ProjectFormProps from './types';
@@ -33,8 +36,18 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const { push } = useRouter();
   const { data: organizationsData } = useOrganizations();
 
+  const dispatch = useDispatch();
+
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
+
+  useEffect(() => {
+    return () => {
+      dispatch(setBbox(null));
+      dispatch(setMinPuAreaSize(null));
+      dispatch(setMaxPuAreaSize(null));
+    };
+  }, [dispatch]);
 
   const onSubmit = (values) => {
     // TEMPORARY!!
@@ -89,7 +102,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
           <div className="grid h-full grid-cols-1 gap-0 overflow-hidden bg-gray-700 md:grid-cols-2 rounded-3xl">
             <div className="flex flex-col flex-grow overflow-hidden">
               <div className="relative flex flex-col flex-grow min-h-0">
-                <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700" />
+                <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
                 <div className="flex flex-col flex-grow p-8 overflow-auto">
                   <h1 className="max-w-xs text-2xl text-white font-heading">
@@ -156,11 +169,9 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   </div>
 
                   {!hasPlanningArea && (
-                  <PlanningAreaSelector
-                    area={DEFAULT_AREA}
-                    values={values}
-                    onChange={(value) => console.info('Planning area change: ', value)}
-                  />
+                    <PlanningAreaSelector
+                      values={values}
+                    />
                   )}
 
                   {hasPlanningArea && (
@@ -179,7 +190,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   </Button>
                   )}
                 </div>
-                <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-gray-700 via-gray-700" />
+                <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
               </div>
 
               {/* BUTTON BAR */}

@@ -136,7 +136,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
 
           {!!selectedFeaturesData && !!selectedFeaturesData.length && (
             <div className="relative flex flex-col flex-grow min-h-0 overflow-hidden">
-              <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700" />
+              <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700 pointer-events-none" />
               <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
                 <FieldRFF name="features">
                   {({ input }) => (
@@ -171,7 +171,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                   )}
                 </FieldRFF>
               </div>
-              <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-gray-700 via-gray-700" />
+              <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-gray-700 via-gray-700 pointer-events-none" />
             </div>
           )}
 

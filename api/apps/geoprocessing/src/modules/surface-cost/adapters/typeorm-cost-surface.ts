@@ -5,7 +5,7 @@ import { flatten } from 'lodash';
 
 import { CostSurfacePersistencePort } from '../ports/persistence/cost-surface-persistence.port';
 import { PlanningUnitCost } from '../ports/planning-unit-cost';
-import { ScenariosPuCostDataGeo } from '../../scenarios/scenarios-pu-cost-data.geo.entity';
+import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
 
 @Injectable()
 export class TypeormCostSurface implements CostSurfacePersistencePort {

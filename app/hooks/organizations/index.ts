@@ -56,6 +56,7 @@ export function useOrganizations(options: UseOrganizationsOptionsProps = {}) {
   });
 
   const query = useInfiniteQuery(['organizations', JSON.stringify(options)], fetchOrganizations, {
+    retry: false,
     placeholderData: placeholderDataRef.current,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
@@ -66,10 +67,10 @@ export function useOrganizations(options: UseOrganizationsOptionsProps = {}) {
     },
   });
 
-  const { data } = query;
+  const { data, error } = query;
   const { pages } = data || {};
 
-  if (data) {
+  if (data || error) {
     placeholderDataRef.current = data;
   }
 

@@ -1,5 +1,5 @@
 import flatten from 'lodash/flatten';
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import {
   useQuery, useInfiniteQuery, useMutation, useQueryClient,
 } from 'react-query';
@@ -25,11 +25,6 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const [session] = useSession();
   const { push } = useRouter();
 
-  const placeholderDataRef = useRef({
-    pages: [],
-    pageParams: [],
-  });
-
   const {
     filters = {},
     search,
@@ -40,7 +35,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     .reduce((acc, k) => {
       return {
         ...acc,
-        [`filter[${k}]`]: filters[k],
+        [`filter[${k}]`]: filters[k].toString(),
       };
     }, {});
 
@@ -63,7 +58,8 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   });
 
   const query = useInfiniteQuery(['scenarios', pId, JSON.stringify(options)], fetchScenarios, {
-    placeholderData: placeholderDataRef.current,
+    retry: false,
+    keepPreviousData: true,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
       const { page, totalPages } = meta;
@@ -75,10 +71,6 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 
   const { data } = query;
   const { pages } = data || {};
-
-  if (data) {
-    placeholderDataRef.current = data;
-  }
 
   return useMemo(() => {
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {

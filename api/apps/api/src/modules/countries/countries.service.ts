@@ -40,7 +40,14 @@ export class CountriesService extends AppBaseService<
   get serializerConfig(): JSONAPISerializerConfig<Country> {
     return {
       transform: (item: Country) => ({ ...item, id: item.gid0 }),
-      attributes: ['gid0', 'name0', 'theGeom', 'bbox'],
+      attributes: [
+        'gid0',
+        'name0',
+        'theGeom',
+        'bbox',
+        'minPuAreaSize',
+        'maxPuAreaSize',
+      ],
       keyForAttribute: 'camelCase',
     };
   }

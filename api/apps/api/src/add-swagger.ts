@@ -6,12 +6,9 @@ export function addSwagger(app: INestApplication): OpenAPIObject {
     .setTitle('MarxanCloud API')
     .setDescription('MarxanCloud is a conservation planning platform.')
     .setVersion(process.env.npm_package_version || 'development')
-    .addBearerAuth(
-      {
-        type: 'http',
-      },
-      'BearerAuth',
-    )
+    .addBearerAuth({
+      type: 'http',
+    })
     .build();
 
   return SwaggerModule.createDocument(app, swaggerOptions);
