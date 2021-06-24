@@ -10,6 +10,7 @@ import { usePopper } from 'react-popper';
 
 import Tooltip from 'components/tooltip';
 import HelpTooltip from 'layout/help/tooltip';
+import HelpSpotlight from 'layout/help/spotlight';
 
 export interface HelpBeaconProps {
   title: string;
@@ -34,9 +35,15 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   });
 
   // 'usePopper'
+  const flipModifier = {
+    name: 'flip',
+    enabled: false,
+  };
+
   const { styles, attributes, update } = usePopper(childrenRef.current, beaconRef, {
     placement: 'top-start',
     modifiers: [
+      flipModifier,
     ],
   });
 
@@ -51,10 +58,8 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
         placement="bottom"
         visible={visible && active}
         maxWidth={350}
-        onClickOutside={(i, e) => {
-          if (!beaconRef.contains(e.target)) {
-            setVisible(false);
-          }
+        onClickOutside={() => {
+          setVisible(false);
         }}
         content={(
           <HelpTooltip
@@ -67,7 +72,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
         {CHILDREN}
       </Tooltip>
 
-      {typeof window !== 'undefined' && active && createPortal(
+      {typeof window !== 'undefined' && active && !visible && createPortal(
         <div
           ref={((el) => setBeaconRef(el))}
           className={cx({
@@ -91,6 +96,13 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
             <div className="absolute top-0 bottom-0 left-0 right-0 border-2 rounded-full pointer-events-none animate-pulse border-primary-500" />
           </button>
         </div>,
+        document.body,
+      )}
+
+      {typeof window !== 'undefined' && active && visible && createPortal(
+        <HelpSpotlight
+          childrenRef={childrenRef}
+        />,
         document.body,
       )}
     </>
