@@ -1,67 +1,24 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import cx from 'classnames';
 
-import Joyride from 'react-joyride';
 import Icon from 'components/icon';
 
 import { motion } from 'framer-motion';
 
+import { useHelp } from 'hooks/help';
+
 import HELP_SVG from 'svgs/ui/help.svg?sprite';
 
-import { useRouter } from 'next/router';
+export const HelpButton = () => {
+  const { active, onActive } = useHelp();
 
-import HelpTooltip from './tooltip';
-import GUIDES from './guides';
-
-export const Help = () => {
-  const [run, setRun] = useState(false);
-  const { pathname } = useRouter();
-  const { STEPS } = useMemo(() => {
-    return GUIDES[pathname];
-  }, [pathname]);
-
-  const onToggleRun = useCallback((e) => {
+  const onToggleActive = useCallback((e) => {
     e.preventDefault();
-    setRun(!run);
-  }, [run]);
+    onActive(!active);
+  }, [active, onActive]);
 
   return (
     <div>
-      <Joyride
-        continuous
-        scrollToFirstStep
-        run={run}
-        steps={STEPS}
-        styles={{
-          options: {
-            overlayColor: 'rgba(0,0,0,0.85)',
-          },
-        }}
-        floaterProps={{
-          styles: {
-            arrow: {
-              color: '#fff',
-              display: 'inline-flex',
-              length: 8,
-              margin: 16,
-              position: 'absolute',
-              spread: 16,
-            },
-            floaterWithAnimation: {
-              transition: 'opacity 0.3s',
-            },
-          },
-        }}
-        callback={(state) => {
-          const { action } = state;
-
-          if (action === 'reset') {
-            setRun(false);
-          }
-        }}
-        tooltipComponent={HelpTooltip}
-      />
-
       <div
         className="fixed bottom-0 right-0 z-50 p-2"
       >
@@ -74,13 +31,13 @@ export const Help = () => {
             style={{
               boxShadow: '2px 1px 3px 0px rgba(0,0,0,0.5) inset',
             }}
-            onClick={onToggleRun}
+            onClick={onToggleActive}
           >
             <div
               className={cx({
                 'absolute z-10 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 rounded-4xl transition-colors w-full h-full': true,
-                'bg-gray-500': !run,
-                'bg-primary-500': run,
+                'bg-gray-500': !active,
+                'bg-primary-500': active,
               })}
             />
             <motion.div
@@ -89,7 +46,7 @@ export const Help = () => {
                 width: 'calc(100% + 7px)',
                 height: 'calc(100% + 7px)',
               }}
-              animate={run ? 'enter' : 'exit'}
+              animate={active ? 'enter' : 'exit'}
               transition={{
                 duration: 0.2,
               }}
@@ -108,7 +65,7 @@ export const Help = () => {
             <div className="relative z-20 w-full h-full">
               <motion.span
                 className="absolute flex items-center justify-center w-6 h-6 transform bg-white rounded-full shadow left-1/2"
-                animate={run ? 'enter' : 'exit'}
+                animate={active ? 'enter' : 'exit'}
                 transition={{
                   duration: 0.2,
                 }}
@@ -141,4 +98,4 @@ export const Help = () => {
   );
 };
 
-export default Help;
+export default HelpButton;

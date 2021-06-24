@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { useSelector } from 'react-redux';
 
 import Wrapper from 'layout/wrapper';
+import HelpBeacon from 'layout/help/beacon';
 
 import Loading from 'components/loading';
 import ConfirmationPrompt from 'components/confirmation-prompt';
@@ -70,35 +71,48 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
         />
 
         {isFetched && !!data.length && (
-          <div
-            id="projects-list"
-            className={cx({
-              'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4': true,
-            })}
+          <HelpBeacon
+            title="Project list"
+            subtitle="project list"
+            content={(
+              <div>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Beatae ratione cumque in nobis fugiat,
+                neque ullam aliquam, commodi dolorem unde inventore eaque,
+                dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
+              </div>
+            )}
           >
-            {data.map((d) => {
-              return (
-                <Item
-                  key={`${d.id}`}
-                  {...d}
-                  onDelete={() => {
-                    setDelete(d);
-                  }}
-                />
-              );
-            })}
+            <div
+              id="projects-list"
+              className={cx({
+                'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4': true,
+              })}
+            >
+              {data.map((d) => {
+                return (
+                  <Item
+                    key={`${d.id}`}
+                    {...d}
+                    onDelete={() => {
+                      setDelete(d);
+                    }}
+                  />
+                );
+              })}
 
-            <ConfirmationPrompt
-              title={`Are you sure you want to delete "${deleteProject?.name}"?`}
-              description="The action cannot be reverted. All the scenarios created will be removed too."
-              icon={DELETE_WARNING_SVG}
-              open={!!deleteProject}
-              onAccept={onDelete}
-              onRefuse={() => setDelete(null)}
-              onDismiss={() => setDelete(null)}
-            />
+              <ConfirmationPrompt
+                title={`Are you sure you want to delete "${deleteProject?.name}"?`}
+                description="The action cannot be reverted. All the scenarios created will be removed too."
+                icon={DELETE_WARNING_SVG}
+                open={!!deleteProject}
+                onAccept={onDelete}
+                onRefuse={() => setDelete(null)}
+                onDismiss={() => setDelete(null)}
+              />
 
-          </div>
+            </div>
+          </HelpBeacon>
         )}
 
         {isFetched && !data.length && (

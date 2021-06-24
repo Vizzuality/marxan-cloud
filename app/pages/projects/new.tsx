@@ -6,7 +6,7 @@ import Header from 'layout/header';
 import Protected from 'layout/protected';
 
 import Wrapper from 'layout/wrapper';
-import Help from 'layout/help';
+import Help from 'layout/help/button';
 
 import ProjectNewForm from 'layout/projects/new/form';
 import Breadcrumb from 'components/breadcrumb';

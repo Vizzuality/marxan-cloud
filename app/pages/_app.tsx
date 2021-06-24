@@ -6,6 +6,7 @@ import { Hydrate } from 'react-query/hydration';
 import { OverlayProvider } from '@react-aria/overlays';
 import { Provider as AuthenticationProvider } from 'next-auth/client';
 import { ToastProvider } from 'hooks/toast';
+import { HelpProvider } from 'hooks/help';
 
 import type { AppProps } from 'next/app';
 
@@ -36,9 +37,11 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
                 defaultAutoDismiss
                 defaultAutoDismissTime={5000}
               >
-                <div className="bg-black">
-                  <Component {...pageProps} />
-                </div>
+                <HelpProvider>
+                  <div className="bg-black">
+                    <Component {...pageProps} />
+                  </div>
+                </HelpProvider>
               </ToastProvider>
             </OverlayProvider>
           </AuthenticationProvider>

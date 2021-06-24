@@ -1,39 +1,26 @@
-import React from 'react';
-import cx from 'classnames';
+import React, { ReactNode } from 'react';
 
-import Button from 'components/button';
 import Icon from 'components/icon';
 
-import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-left.svg?sprite';
-import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
 import HELP_2_SVG from 'svgs/ui/help-2.svg?sprite';
 
-import { Step, TooltipRenderProps } from 'react-joyride';
-
-interface HelpTooltipProps extends TooltipRenderProps {
-  index: number;
-  step: Step & {
-    subtitle: string;
-  },
+interface HelpTooltipProps {
+  title: string;
+  subtitle: string;
+  content: ReactNode,
 }
 
 export const HelpTooltip = ({
-  index,
-  size,
-  step,
-  backProps,
-  primaryProps,
-  skipProps,
-  tooltipProps,
-  isLastStep,
+  title,
+  subtitle,
+  content,
 }: HelpTooltipProps) => {
-  const { title, subtitle, content } = step;
-
   return (
     <div
       className="px-6 py-5 text-gray-500 bg-white rounded-3xl"
-      {...tooltipProps}
+      style={{
+        boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+      }}
     >
       <header className="flex items-center space-x-4">
         <div className="p-2.5 shadow-lg rounded-lg">
@@ -44,52 +31,11 @@ export const HelpTooltip = ({
           <h3 className="text-xs tracking-wider uppercase font-heading">{title}</h3>
           <h4 className="text-sm">{subtitle}</h4>
         </div>
-
-        <div className="flex pl-10 space-x-1">
-          <button
-            type="button"
-            className={cx({
-              'flex items-center justify-center bg-gray-100 rounded w-7 h-7 focus:outline-none': true,
-              'opacity-50 cursor-default': index === 0,
-              'hover:bg-primary-500': index !== 0,
-            })}
-            disabled={index === 0}
-            {...backProps}
-          >
-            <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3" />
-          </button>
-
-          <button
-            type="button"
-            className="flex items-center justify-center bg-gray-100 rounded hover:bg-primary-500 w-7 h-7 focus:outline-none"
-            {...primaryProps}
-          >
-            {!isLastStep && (<Icon icon={ARROW_RIGHT_SVG} className="w-3 h-3" />)}
-            {isLastStep && (<Icon icon={CLOSE_SVG} className="w-3 h-3" />)}
-          </button>
-
-        </div>
       </header>
 
       <div className="mt-5 text-sm text-gray-400" style={{ maxWidth: 330 }}>
         {content}
       </div>
-
-      <footer className="flex items-baseline justify-between mt-5">
-        <Button
-          type="button"
-          theme="secondary"
-          size="s"
-          {...skipProps}
-        >
-          Skip
-        </Button>
-
-        <div className="text-xs font-heading">
-          {`${index + 1}/${size}`}
-        </div>
-
-      </footer>
     </div>
   );
 };
