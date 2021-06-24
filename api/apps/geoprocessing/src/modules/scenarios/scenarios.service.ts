@@ -48,11 +48,13 @@ export class ScenariosService {
     filters?: ScenariosPUFilters,
   ): Promise<Buffer> {
     const {id, z, x, y } = tileSpecification;
-    const attributes = 'test_pu_geom_id, test_pu_geom_id,test_puid, test_lockin_status, test_protected_area';
+    const attributes = 'test_pu_geom_id, test_pu_geom_id, test_puid,\
+                           test_lockin_status, test_protected_area';
 
     /**
      * @todo: avoid sql injection in the scenario Id.
      * @todo: provide features id array
+     * @todo: provide results/output data
      */
     const sql = this.ScenariosPlanningUnitGeoEntityRepository
       .createQueryBuilder('test')

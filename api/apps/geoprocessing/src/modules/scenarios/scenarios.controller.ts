@@ -59,13 +59,6 @@ export class ScenariosController {
     required: true,
     example: 10,
   })
-  @ApiQuery({
-    name: 'bbox',
-    description: 'Bounding box of the project [xMin, xMax, yMin, yMax]',
-    type: [Number],
-    required: false,
-    example: [-1, 40, 1, 42],
-  })
   @Get('/:id/planning-units/tiles/:z/:x/:y.mvt')
   @ApiOkResponse({
     description: 'Binary protobuffer mvt tile',

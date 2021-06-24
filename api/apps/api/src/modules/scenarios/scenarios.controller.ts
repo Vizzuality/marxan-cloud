@@ -33,6 +33,9 @@ import {
   ApiQuery,
   ApiProduces,
   ApiTags,
+  ApiUnauthorizedResponse,
+  ApiForbiddenResponse,
+  ApiParam,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
@@ -56,6 +59,7 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
 import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/run/:runId/solutions`;
@@ -70,6 +74,7 @@ export class ScenariosController {
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
+    private readonly proxyService: ProxyService,
   ) {}
 
   @ApiOperation({
@@ -101,6 +106,54 @@ export class ScenariosController {
       params: { nameAndDescriptionFilter },
     });
     return this.scenarioSerializer.serialize(results.data, results.metadata);
+  }
+
+  @ApiOperation({
+    description: 'Get planning unit tiles for selected scenario.',
+  })
+  /**
+   *@todo Change ApiOkResponse mvt type
+   */
+  @ApiOkResponse({
+    description: 'Binary protobuffer mvt tile',
+    type: String,
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiParam({
+    name: 'id',
+    description: 'Scenario id',
+    type: String,
+    required: false,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+    example: 6,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+    example: 35,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+    example: 35,
+  })
+  @Get(':id/planning-units/tiles/:z/:x/:y.mvt')
+  async proxyProtectedAreaTile(
+    @Req() request: Request,
+    @Res() response: Response,
+  ) {
+    return this.proxyService.proxyTileRequest(request, response);
   }
 
   @ApiOperation({ description: 'Find scenario by id' })
