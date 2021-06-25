@@ -84,11 +84,9 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
         >
           <button
             type="button"
-            aria-label={title}
             className={cx({
               'beacon flex z-50 items-center justify-center w-6 h-6 bg-primary-500 border-2 border-gray-700 transition rounded-full focus:outline-none transform translate-x-1/2 translate-y-1/2': true,
             })}
-            data-beacon="true"
             onClick={() => {
               setVisible(!visible);
             }}
@@ -96,14 +94,14 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
             <div className="absolute top-0 bottom-0 left-0 right-0 border-2 rounded-full pointer-events-none animate-pulse border-primary-500" />
           </button>
         </div>,
-        document.body,
+        document?.body,
       )}
 
       {typeof window !== 'undefined' && active && visible && createPortal(
         <HelpSpotlight
           childrenRef={childrenRef}
         />,
-        document.body,
+        document?.body,
       )}
     </>
   );

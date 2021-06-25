@@ -33,25 +33,23 @@ export const HelpSpotlight = ({
         top, left, width, height,
       } = reference.current.getBoundingClientRect();
 
-      const h = height < canvasheight / 2 ? canvasheight / 2 : height * 1.5;
-
       const gradient = CTX.createRadialGradient(
         left + width / 2,
         top + height / 2,
-        h,
+        width,
         left + width / 2,
         top + height / 2,
-        h / 2,
+        height,
       );
 
       // Add three color stops
-      gradient.addColorStop(0, 'rgba(0,0,0,1)');
-      gradient.addColorStop(0.75, 'rgba(0,0,0,0.75)');
+      gradient.addColorStop(0, 'rgba(0,0,0,0.75)');
       gradient.addColorStop(1, 'rgba(0,0,0,0)');
       CTX.clearRect(0, 0, canvaswidth, canvasheight);
 
       CTX.beginPath();
       CTX.rect(0, 0, canvaswidth, canvasheight);
+      // CTX.fillStyle = 'rgba(0,0,0,0.75)';
       CTX.fillStyle = gradient;
       CTX.fill();
     }

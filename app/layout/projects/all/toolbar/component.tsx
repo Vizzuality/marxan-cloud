@@ -39,6 +39,7 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
         >
           <div className="flex-grow">
             <Search
+              id="project-search"
               defaultValue={search}
               size="base"
               placeholder="Search by project name, planning area name..."
