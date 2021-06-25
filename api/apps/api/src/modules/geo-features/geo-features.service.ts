@@ -23,9 +23,7 @@ import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import {
-  GeoFeatureSetResult,
-} from './geo-feature-set.api.entity';
+import { GeoFeatureSetResult } from './geo-feature-set.api.entity';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
