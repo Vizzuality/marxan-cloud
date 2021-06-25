@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { Button } from 'components/button/component';
@@ -22,6 +22,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   onCancel,
   onSave,
 }: SolutionsTableFormProps) => {
+  const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
   const { query } = useRouter();
   const { pid } = query;
 
@@ -32,7 +33,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     isFetching,
     isFetchingNextPage,
     isFetched,
-  } = useSolutions(pid);
+  } = useSolutions(pid, { filters: { 'most-different': mostDifSolutions } });
 
   const scrollRef = useBottomScrollListener(
     () => {
@@ -40,7 +41,8 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     },
   );
 
-  console.log('data', data, 'isFetching', isFetching, 'isFetchingNextPage', isFetchingNextPage, 'isFetched', isFetched);
+  // console.log('data', data, 'isFetching', isFetching,
+  // 'isFetchingNextPage', isFetchingNextPage, 'isFetched', isFetched);
 
   return (
     <div className="text-gray-800">
@@ -61,9 +63,9 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             theme="light"
             id="checkbox-5-dif-solutions"
             className="block w-4 h-4 text-green-300 form-checkbox-dark"
-            onChange={() => console.info('click - 5 most different solutions')}
+            onChange={(event) => setMostDifSolutions(event.target.checked)}
           />
-          <Label className="ml-2 text-gray-700">
+          <Label className="mx-2 text-gray-700">
             View 5 most different solutions
           </Label>
           <InfoButton
