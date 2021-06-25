@@ -48,6 +48,13 @@ export class CustomPlanningAreasService
     };
   }
 
+  async assignProject(
+    planningAreaGeometryId: string,
+    projectId: string,
+  ): Promise<void> {
+    await this.repository.assignProject(planningAreaGeometryId, projectId);
+  }
+
   async locatePlanningAreaEntity(
     ids: MultiplePlanningAreaIds,
   ): Promise<PlanningAreaLocation> {

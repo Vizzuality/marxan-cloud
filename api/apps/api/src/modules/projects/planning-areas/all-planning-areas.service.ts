@@ -22,15 +22,16 @@ import {
 import { CustomPlanningAreasService } from './custom-planning-areas.service';
 import { AdminPlanningAreasService } from './admin-planning-areas.service';
 import { CountryPlanningAreasService } from './country-planning-areas.service';
+import { isDefined } from '@marxan/utils';
 
 @Injectable()
 export class AllPlanningAreasService {
   private readonly services: AbstractPlanningAreasService[];
 
   constructor(
-    customPlanningAreaService: CustomPlanningAreasService,
-    adminPlanningAreaService: AdminPlanningAreasService,
-    countryPlanningAreaService: CountryPlanningAreasService,
+    private readonly customPlanningAreaService: CustomPlanningAreasService,
+    private readonly adminPlanningAreaService: AdminPlanningAreasService,
+    private readonly countryPlanningAreaService: CountryPlanningAreasService,
   ) {
     this.services = [
       customPlanningAreaService,
@@ -102,6 +103,17 @@ export class AllPlanningAreasService {
     if (result === notFound)
       throw new NotFoundException(`There is no area relevant for given input.`);
     return result.bbox;
+  }
+
+  async assignProject(ids: {
+    planningAreaGeometryId?: string;
+    projectId: string;
+  }): Promise<void> {
+    if (!isDefined(ids.planningAreaGeometryId)) return;
+    await this.customPlanningAreaService.assignProject(
+      ids.planningAreaGeometryId,
+      ids.projectId,
+    );
   }
 
   private async iterateForBBoxes(

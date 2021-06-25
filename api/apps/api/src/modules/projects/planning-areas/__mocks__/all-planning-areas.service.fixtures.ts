@@ -1,6 +1,6 @@
 import { CustomPlanningAreaRepository } from '@marxan/planning-area-repository';
 import { BBox } from 'geojson';
-import { assertDefined } from '@marxan/utils';
+import { assertDefined, isDefined } from '@marxan/utils';
 import { Test } from '@nestjs/testing';
 import { HttpModule } from '@nestjs/common';
 import { AdminArea } from '@marxan/admin-regions';
@@ -20,10 +20,10 @@ export async function getFixtures() {
 
   class FakeCustomPlanningAreaRepository
     implements FieldsOf<CustomPlanningAreaRepository> {
-    db: Record<string, BBox> = {};
+    db: Record<string, { bbox: BBox; projectId?: string }> = {};
 
     async getBBox(id: string) {
-      return this.db[id];
+      return this.db[id]?.bbox;
     }
 
     async has(id: string) {
@@ -32,6 +32,11 @@ export async function getFixtures() {
 
     saveGeoJson(): never {
       throw new Error('not implemented');
+    }
+
+    async assignProject(id: string, projectId: string): Promise<void> {
+      const entity = this.db[id];
+      if (isDefined(entity)) entity.projectId = projectId;
     }
   }
 
@@ -117,8 +122,9 @@ export async function getFixtures() {
     },
     customPlanningAreaBBox: randomBbox(),
     customPlanningAreaAvailable(planningAreaGeometryId: string) {
-      fakeCustomPlanningAreaRepository.db[planningAreaGeometryId] =
-        fixtures.customPlanningAreaBBox;
+      fakeCustomPlanningAreaRepository.db[planningAreaGeometryId] = {
+        bbox: fixtures.customPlanningAreaBBox,
+      };
     },
     get ids() {
       return {
@@ -180,6 +186,11 @@ export async function getFixtures() {
       const country = fixtures.country1;
       assertDefined(country.gid0);
       fakeCountriesService.db[country.gid0] = country;
+    },
+    customPlanningAreaAssignedTo(id: string, projectId: string) {
+      expect(fakeCustomPlanningAreaRepository.db[id].projectId).toStrictEqual(
+        projectId,
+      );
     },
   };
   return fixtures;

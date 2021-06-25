@@ -158,10 +158,19 @@ export class ProjectsCrudService extends AppBaseService<
       createModel.planningUnitGridShape &&
       (createModel.countryId ||
         createModel.adminAreaLevel1Id ||
-        createModel.adminAreaLevel2Id)
+        createModel.adminAreaLevel2Id ||
+        createModel.planningAreaId)
     ) {
-      this.logger.debug('creating planning unit job ');
-      return this.planningUnitsService.create(createModel);
+      this.logger.debug(
+        'creating planning unit job and assigning project to area',
+      );
+      await Promise.all([
+        this.planningUnitsService.create(createModel),
+        this.planningAreasService.assignProject({
+          projectId: model.id,
+          planningAreaGeometryId: createModel.planningAreaId,
+        }),
+      ]);
     }
   }
 
@@ -175,10 +184,19 @@ export class ProjectsCrudService extends AppBaseService<
       createModel.planningUnitGridShape &&
       (createModel.countryId ||
         createModel.adminAreaLevel1Id ||
-        createModel.adminAreaLevel2Id)
+        createModel.adminAreaLevel2Id ||
+        createModel.planningAreaId)
     ) {
-      this.logger.debug('creating planning unit job ');
-      return this.planningUnitsService.create(createModel);
+      this.logger.debug(
+        'creating planning unit job and assigning project to area',
+      );
+      await Promise.all([
+        this.planningUnitsService.create(createModel),
+        this.planningAreasService.assignProject({
+          projectId: model.id,
+          planningAreaGeometryId: createModel.planningAreaId,
+        }),
+      ]);
     }
   }
 
