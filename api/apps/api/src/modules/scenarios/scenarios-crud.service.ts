@@ -265,19 +265,20 @@ export class ScenariosCrudService extends AppBaseService<
      * Project.getPlanningArea(), but we'll need to check that things work as
      * expected.
      */
-    const planningAreaId = await this.projectsService
-      .getPlanningArea(parentProject)
-      .then((r) => r?.id);
+    const planningAreaLocation = await this.projectsService.locatePlanningAreaEntity(
+      parentProject,
+    );
 
     /**
      * If project boundaries are set, we can then retrieve WDPA protected areas
      * that intersect the boundaries, via the list of user-supplied IUCN
      * categories they want to use as selector for protected areas.
      */
-    const wdpaAreaIdsWithinPlanningArea = planningAreaId
+    const wdpaAreaIdsWithinPlanningArea = planningAreaLocation
       ? await this.protectedAreasService
           .findAllWDPAProtectedAreasInPlanningAreaByIUCNCategory(
-            planningAreaId,
+            planningAreaLocation.id,
+            planningAreaLocation.tableName,
             wdpaIucnCategories,
           )
           .then((r) => r.map((i) => i.id))

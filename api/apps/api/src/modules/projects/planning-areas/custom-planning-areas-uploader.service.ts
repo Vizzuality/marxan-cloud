@@ -16,7 +16,7 @@ export const geoprocessingUrlProvider: FactoryProvider<string> = {
 };
 
 @Injectable()
-export class PlanningAreaUploader {
+export class CustomPlanningAreasUploader {
   constructor(
     private readonly httpService: HttpService,
     @Inject(geoprocessingUrlToken)
