@@ -79,6 +79,7 @@
     "react-popper": "^2.2.4",
     "react-query": "^3.6.0",
     "react-redux": "^7.2.2",
+    "react-resize-detector": "^6.7.3",
     "storybook-addon-next-router": "^2.0.4",
     "tailwindcss": "^2.0.2",
     "use-debounce": "^6.0.1",

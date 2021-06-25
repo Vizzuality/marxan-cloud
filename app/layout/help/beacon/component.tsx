@@ -1,5 +1,8 @@
 import React, {
-  ReactNode, ReactElement, useRef, cloneElement, useEffect, useState,
+  ReactNode, ReactElement, cloneElement, useState,
+  useEffect,
+  useCallback,
+  useRef,
 } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -7,12 +10,25 @@ import cx from 'classnames';
 
 import { useHelp } from 'hooks/help';
 import { usePopper } from 'react-popper';
+import { useResizeDetector } from 'react-resize-detector';
+
+import { AnimatePresence } from 'framer-motion';
 
 import Tooltip from 'components/tooltip';
 import HelpTooltip from 'layout/help/tooltip';
 import HelpSpotlight from 'layout/help/spotlight';
 
+const flipModifier = {
+  name: 'flip',
+  enabled: false,
+};
+
+const hideModifier = {
+  name: 'hide',
+  enabled: true,
+};
 export interface HelpBeaconProps {
+  id: string;
   title: string;
   subtitle: string;
   content: ReactNode;
@@ -20,12 +36,13 @@ export interface HelpBeaconProps {
 }
 
 export const HelpBeacon: React.FC<HelpBeaconProps> = ({
+  id,
   title,
   subtitle,
   content,
   children,
 }: HelpBeaconProps) => {
-  const { active } = useHelp();
+  const { active, beacons, addBeacon } = useHelp();
   const [visible, setVisible] = useState(false);
   const childrenRef = useRef(null);
   const [beaconRef, setBeaconRef] = useState(null);
@@ -34,22 +51,36 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
     ref: childrenRef,
   });
 
-  // 'usePopper'
-  const flipModifier = {
-    name: 'flip',
-    enabled: false,
-  };
+  const onResize = useCallback(() => {
+    Object.keys(beacons).forEach((k) => {
+      const b = beacons[k];
+      if (b.update) b.update();
+    });
+  }, [beacons]);
 
-  const { styles, attributes, update } = usePopper(childrenRef.current, beaconRef, {
+  // 'usePopper'
+  const {
+    styles, attributes, state, update,
+  } = usePopper(childrenRef.current, beaconRef, {
     placement: 'top-start',
     modifiers: [
       flipModifier,
+      hideModifier,
     ],
   });
 
+  useResizeDetector({
+    targetRef: childrenRef,
+    onResize,
+  });
+
   useEffect(() => {
-    if (update) update();
-  }, [update]);
+    addBeacon({
+      id,
+      state,
+      update,
+    });
+  }, [active, addBeacon, id, state, update, childrenRef, beaconRef]);
 
   return (
     <>
@@ -76,8 +107,9 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
         <div
           ref={((el) => setBeaconRef(el))}
           className={cx({
+            'z-50': true,
             'visible pointer-events-auto': active,
-            'invisible pointer-events-none': !active,
+            'invisible pointer-events-none': !active || attributes?.popper?.['data-popper-reference-hidden'] || attributes?.popper?.['data-popper-escaped'],
           })}
           style={styles.popper}
           {...attributes.popper}
@@ -85,7 +117,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
           <button
             type="button"
             className={cx({
-              'beacon flex z-50 items-center justify-center w-6 h-6 bg-primary-500 border-2 border-gray-700 transition rounded-full focus:outline-none transform translate-x-1/2 translate-y-1/2': true,
+              'relative beacon flex items-center justify-center w-6 h-6 bg-primary-500 border-2 border-gray-700 transition rounded-full focus:outline-none transform translate-x-1/2 translate-y-1/2': true,
             })}
             onClick={() => {
               setVisible(!visible);
@@ -97,10 +129,14 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
         document?.body,
       )}
 
-      {typeof window !== 'undefined' && active && visible && createPortal(
-        <HelpSpotlight
-          childrenRef={childrenRef}
-        />,
+      {typeof window !== 'undefined' && active && createPortal(
+        <AnimatePresence>
+          {visible && (
+            <HelpSpotlight
+              childrenRef={childrenRef}
+            />
+          )}
+        </AnimatePresence>,
         document?.body,
       )}
     </>

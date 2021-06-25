@@ -72,6 +72,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
 
         {isFetched && !!data.length && (
           <HelpBeacon
+            id="project-list"
             title="Project list"
             subtitle="project list"
             content={(

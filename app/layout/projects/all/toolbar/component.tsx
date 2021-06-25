@@ -26,6 +26,7 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
     <Wrapper>
       <div className="flex items-baseline justify-between mb-8 space-x-20">
         <HelpBeacon
+          id="project-search"
           title="Quick search"
           subtitle="Project list"
           content={(
@@ -51,6 +52,7 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
 
         <div className="flex space-x-4">
           <HelpBeacon
+            id="project-new"
             title="Create new project"
             subtitle="Project list"
             content={(
@@ -77,6 +79,7 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
           </HelpBeacon>
 
           <HelpBeacon
+            id="project-upload"
             title="Upload project"
             subtitle="Project list"
             content={(

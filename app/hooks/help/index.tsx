@@ -2,11 +2,14 @@ import React, {
   createContext, useCallback, useContext, useState,
 } from 'react';
 
-import { HelpContextProps, HelpProviderProps } from './types';
+import { BeaconProps, HelpContextProps, HelpProviderProps } from './types';
 
 const HelpContext = createContext<HelpContextProps>({
   active: false,
   onActive: (active) => { console.info(active); },
+  beacons: {},
+  addBeacon: (beacon) => { console.info(beacon); },
+  removeBeacon: (beacon) => { console.info(beacon); },
 });
 
 // Hook for child components to get the toast object ...
@@ -23,6 +26,9 @@ export const useHelp = () => {
   return {
     active: ctx.active,
     onActive: ctx.onActive,
+    beacons: ctx.beacons,
+    addBeacon: ctx.addBeacon,
+    removeBeacon: ctx.removeBeacon,
   };
 };
 
@@ -32,16 +38,38 @@ export function HelpProvider({
   children,
 }: HelpProviderProps) {
   const [active, setActive] = useState(false);
+  const [beacons, setBeacons] = useState<Record<string, BeaconProps>>({});
 
   const onActive = useCallback((a: boolean) => {
     return setActive(a);
   }, [setActive]);
+
+  const addBeacon = useCallback(({ id, state, update }) => {
+    setBeacons((prevBeacons) => {
+      return {
+        ...prevBeacons,
+        [id]: {
+          id,
+          state,
+          update,
+        },
+      };
+    });
+  }, []);
+
+  const removeBeacon = useCallback((id: string) => {
+    const { [id]: omitted, ...rest } = beacons;
+    setBeacons(rest);
+  }, [beacons]);
 
   return (
     <HelpContext.Provider
       value={{
         active,
         onActive,
+        beacons,
+        addBeacon,
+        removeBeacon,
       }}
     >
       {children}

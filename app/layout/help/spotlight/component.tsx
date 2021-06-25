@@ -3,6 +3,8 @@ import React, {
   useCallback,
 } from 'react';
 
+import { motion } from 'framer-motion';
+
 interface HelpSpotlightProps {
   childrenRef: MutableRefObject<HTMLDivElement | null>;
 }
@@ -94,7 +96,10 @@ export const HelpSpotlight = ({
   }, [updateCanvas]);
 
   return (
-    <canvas
+    <motion.canvas
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       ref={canvasRef}
       width={canvasSize.width}
       height={canvasSize.height}
