@@ -167,10 +167,10 @@ export class GeoFeaturesService extends AppBaseService<
         "geoFeatureGeometries".the_geom
       )`,
           {
-            xmin: project.bbox[0],
-            ymin: project.bbox[1],
-            xmax: project.bbox[2],
-            ymax: project.bbox[3],
+            xmin: project.bbox[1],
+            ymin: project.bbox[3],
+            xmax: project.bbox[0],
+            ymax: project.bbox[2],
           },
         )
         .getMany()
