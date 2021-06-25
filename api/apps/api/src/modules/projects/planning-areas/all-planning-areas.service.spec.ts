@@ -337,3 +337,24 @@ describe(`locating entity when no entities available`, () => {
     );
   });
 });
+
+describe(`when assigning project`, () => {
+  test(`assigning custom planning area`, async () => {
+    // given
+    fixtures.customPlanningAreaAvailable('planningAreaGeometryId');
+    // when
+    await planningAreaService.assignProject({
+      planningAreaGeometryId: 'planningAreaGeometryId',
+      projectId: '1234',
+    });
+    // then
+    fixtures.customPlanningAreaAssignedTo('planningAreaGeometryId', '1234');
+  });
+
+  test(`assigning not custom planning area`, async () => {
+    // when
+    const result = planningAreaService.assignProject({ projectId: '1234' });
+    // then
+    await expect(result).resolves.toBe(void 0);
+  });
+});

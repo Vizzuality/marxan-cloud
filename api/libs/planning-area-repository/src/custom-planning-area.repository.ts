@@ -43,4 +43,15 @@ INSERT INTO "planning_areas"("the_geom")
       | undefined = await this.planningAreas.findOne(id, { select: ['id'] });
     return isDefined(selectedId?.id);
   }
+
+  async assignProject(id: string, projectId: string): Promise<void> {
+    await this.planningAreas.update(
+      {
+        id: id,
+      },
+      {
+        projectId,
+      },
+    );
+  }
 }

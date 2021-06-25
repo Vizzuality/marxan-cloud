@@ -24,4 +24,8 @@ export class PlanningAreasFacade {
   getPlanningAreaBBox = this.allPlanningAreaService.getPlanningAreaBBox.bind(
     this.allPlanningAreaService,
   );
+
+  assignProject = this.allPlanningAreaService.assignProject.bind(
+    this.allPlanningAreaService,
+  );
 }
