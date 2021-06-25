@@ -40,9 +40,7 @@ describe('JSON API Specs (e2e)', () => {
     ).then(async (response) => await Deserializer.deserialize(response));
 
     fakeProject = await ProjectsTestUtils.createProject(app, jwtToken, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: 'NAM',
-      }),
+      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({ countryCode: 'NAM', adminAreaLevel1Id: 'NAM.12_1', adminAreaLevel2Id: 'NAM.12.7_1' }),
       organizationId: fakeOrganization.id,
     }).then(async (response) => await Deserializer.deserialize(response));
   });
