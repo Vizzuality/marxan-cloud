@@ -1,5 +1,9 @@
 import { SimpleJobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsEnum, IsUUID, ValidateNested } from 'class-validator';
 import {
@@ -39,7 +43,12 @@ export class SpecForGeoFeatureWithGeoprocessing extends SpecForGeofeature {
       ],
     },
   })
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    oneOf: [
+      { $ref: getSchemaPath(GeoprocessingOpSplitV1) },
+      { $ref: getSchemaPath(GeoprocessingOpStratificationV1) },
+    ],
+  })
   geoprocessingOperations?: Array<
     GeoprocessingOpSplitV1 | GeoprocessingOpStratificationV1
   >;
@@ -52,7 +61,12 @@ export class CreateGeoFeatureSetDTO {
   @IsEnum(Object.keys(SimpleJobStatus))
   status!: SimpleJobStatus;
 
-  @ApiProperty()
+  @ApiProperty({
+    oneOf: [
+      { $ref: getSchemaPath(SpecForPlainGeoFeature) },
+      { $ref: getSchemaPath(SpecForGeoFeatureWithGeoprocessing) },
+    ],
+  })
   @ValidateNested({ each: true })
   @Type(() => SpecForGeofeature, {
     discriminator: {
