@@ -19,7 +19,7 @@ export class PlanningAreaService {
     const { data } = await this.shapefileService.transformToGeoJson(shapefile);
     const result = await this.planningAreas.query(
       `
-INSERT INTO "planning_area"("the_geom")
+INSERT INTO "planning_areas"("the_geom")
   SELECT ST_SetSRID(
     ST_Collect(
       ST_GeomFromGeoJSON(features->>'geometry')
