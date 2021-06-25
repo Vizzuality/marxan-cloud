@@ -49,7 +49,7 @@ describe('JSON API Specs (e2e)', () => {
     await Promise.all([app.close()]);
   });
 
-  it('should return a response shaped as JSON:API Error spec, including ', async () => {
+  it('should return a response shaped as JSON:API Error spec, including raw error data', async () => {
     const jsonApiErrorResponse = {
       id: null,
       links: null,
