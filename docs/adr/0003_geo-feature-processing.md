@@ -161,7 +161,9 @@ implemented (such as always performing geoprocessing operations in their
 entirety even if resulting geometries are available, or reusing geometries while
 computing throwaway results in order to simulate constant-time operations).
 
-Payload (`CreateGeoFeatureSetDTO`):
+#### Payload
+
+`CreateGeoFeatureSetDTO` or `UpdateGeoFeatureSetDTO`
 
 ```typescript
 {
@@ -228,6 +230,84 @@ Payload (`CreateGeoFeatureSetDTO`):
   ],
 };
 ```
+
+#### Recipe definition/confirmation flow
+
+For simplicity's sake, we assume a recipe will be created as `draft` initially.
+
+The intent here is not to describe all the possible flow paths but the key
+points, so this simplification will not affect the description of the process.
+
+* Recipe is created (`POST`) with `status: 'draft'`
+
+  * for each feature
+
+    * check that `featureId` matches an existing feature: if not, throw an error
+
+    * if this is a `withGeoprocessing` feature
+
+      * check that all the traits of the geoprocessing operations are valid
+        (properties exist, intersected feature exists, etc.)
+
+      * if validation fails, throw an error
+
+  * persist the recipe as JSONB (this will reduce it to canonical form), linked
+    to the parent scenario, and fetching the canonicalized form via `RETURNING`
+
+  * send the canonicalized recipe as response
+
+* Recipe is replaced (`PUT`) with `status: 'draft'`
+
+Identical flow as above.
+
+* Recipe is replaced (`PUT`) with `status: 'created'`
+
+  * as above for each feature (checks)
+
+  * as above for persistence in canonical form
+
+  * for each `withGeoprocessing` feature
+
+    * extract recipe for the *resulting* feature (basically discard *other
+      splits* than the current one and `marxanSettings` data for the resulting
+      features); see example below for a `stratification/v1` operation:
+      `split/v1` will be almost identical, but without the `intersectWith`
+      property
+
+```typescript
+{
+  featureId: string;
+  geoprocessingOperations: [
+    {
+      kind: 'stratification/v1';
+      intersectWith: {
+        featureId: string;
+      },
+      splitByProperty: string,
+      splits: [
+        {
+          value: string,
+        }
+      ]
+    }
+  ]
+}
+```
+
+    * persist the extracted recipe in `features_from_geoprocessing`:
+
+```sql
+create table features_from_geoprocessing(
+  id uuid not null default uuid_generate_v4(),
+  feature_id uuid null, -- will be null if the feature from this recipe hasn't been calculated yet
+  geoprocessing_ops jsonb not null,
+  geoprocessing_ops_hash text generated always as (digest(geoprocessing_ops::text, 'sha256')) stored,
+  name text -- e.g. <Species> in <ecoregion>
+);
+```
+
+    * `feature_id` will be the id of the "split" feature for `split/v1`
+      operations (because )
 
 ### Retrieving a feature set for a scenario
 
