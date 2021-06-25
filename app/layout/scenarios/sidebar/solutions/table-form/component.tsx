@@ -41,9 +41,6 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     },
   );
 
-  // console.log('data', data, 'isFetching', isFetching,
-  // 'isFetchingNextPage', isFetchingNextPage, 'isFetched', isFetched);
-
   return (
     <div className="text-gray-800">
       <div className="px-8 pb-8">
@@ -77,10 +74,11 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
       </div>
       <div
         ref={scrollRef}
-        className="relative min-h-full"
+        className="relative overflow-x-hidden overflow-y-auto"
+        style={{ height: '400px' }}
       >
         {(isFetching && !isFetched) && (
-          <div className="absolute top-0 left-0 z-10 flex flex-col items-center justify-center w-full h-full">
+          <div className="absolute top-0 left-0 z-30 flex flex-col items-center justify-center w-full h-full">
             <Loading
               visible
               className="z-40 flex items-center justify-center w-full "
@@ -95,7 +93,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             No results found
           </div>
         )}
-        {!isFetching && data && data.length > 0 && (
+        {(!isFetching || isFetchingNextPage) && data && data.length > 0 && (
           <SolutionsTable
             body={data}
             onSelectSolution={(solution) => console.info('solution selected', solution)}

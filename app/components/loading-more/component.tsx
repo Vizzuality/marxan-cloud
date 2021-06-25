@@ -14,7 +14,8 @@ export const LoadingMore: React.FC<LoadingMoreProps> = ({
         key="loading"
         className={cx({
           'opacity-100': visible,
-          'absolute left-0 z-20 w-full text-xs text-center uppercase bottom-0 font-heading transition opacity-0 pointer-events-none': true,
+          'opacity-0': !visible,
+          'absolute left-0 z-20 w-full text-xs text-center uppercase bottom-0 font-heading transition pointer-events-none bg-gray-400': true,
         })}
       >
         <div className="py-1">Loading more...</div>
