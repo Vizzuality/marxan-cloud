@@ -181,9 +181,8 @@ export class GeoFeaturesService extends AppBaseService<
         });
 
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
-        `${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL
-        AND ${this.alias}.id IN (:...geoFeaturesWithinProjectBbox)`,
-        { projectId, geoFeaturesWithinProjectBbox },
+        `${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL`,
+        { projectId },
       );
     } else {
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
