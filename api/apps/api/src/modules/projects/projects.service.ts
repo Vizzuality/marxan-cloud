@@ -10,8 +10,9 @@ import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
-import { PlanningAreaUploader } from './planning-area-uploader';
-export { validationFailed } from './planning-area-uploader';
+import { PlanningAreasService } from './planning-areas';
+
+export { validationFailed } from './planning-areas';
 
 @Injectable()
 export class ProjectsService {
@@ -20,7 +21,7 @@ export class ProjectsService {
     private readonly projectsCrud: ProjectsCrudService,
     private readonly protectedAreaShapefile: ProtectedAreasFacade,
     private readonly jobStatusService: JobStatusService,
-    private readonly planningAreaUploader: PlanningAreaUploader,
+    private readonly planningAreaService: PlanningAreasService,
   ) {}
 
   async findAllGeoFeatures(
@@ -82,7 +83,7 @@ export class ProjectsService {
     return new Project();
   }
 
-  savePlanningAreaFromShapefile = this.planningAreaUploader.savePlanningAreaFromShapefile.bind(
-    this.planningAreaUploader,
+  savePlanningAreaFromShapefile = this.planningAreaService.savePlanningAreaFromShapefile.bind(
+    this.planningAreaService,
   );
 }
