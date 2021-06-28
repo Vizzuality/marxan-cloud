@@ -4,8 +4,9 @@ import {
   JoinColumn,
   OneToOne,
 } from 'typeorm';
-import { ScenariosPlanningUnitGeoEntity, ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
-import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry/planning-units.geo.entity';
+import { ScenariosPlanningUnitGeoEntity} from './scenarios-planning-unit.geo.entity';
+import { ScenariosPuCostDataGeo } from './scenarios-pu-cost-data.geo.entity';
+import { PlanningUnitsGeom } from '../../planning-unit-geometry/src/planning-units.geo.entity';
 
 @Entity({
   name: 'scenarios_pu_data',

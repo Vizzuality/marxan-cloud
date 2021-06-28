@@ -14,7 +14,7 @@ import { ScenarioPlanningUnitsInclusionModule } from '@marxan-geoprocessing/modu
 import { CostTemplateModule } from '@marxan-geoprocessing/modules/scenarios';
 import { PlanningAreaModule } from '@marxan-geoprocessing/modules/planning-area/planning-area.module';
 import { MarxanSandboxedRunnerModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandboxed-runner.module';
-import { ScenariosModule } from './modules/scenarios/scenarios.module';
+import { ScenariosModule } from '@marxan-geoprocessing/modules/scenarios/scenarios.module';
 
 @Module({
   imports: [
