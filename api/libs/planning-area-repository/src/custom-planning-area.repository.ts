@@ -1,6 +1,6 @@
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import { BBox, MultiPolygon } from 'geojson';
+import { BBox, GeoJSON } from 'geojson';
 import { isDefined } from '@marxan/utils';
 import { PlanningArea } from './planning-area.geo.entity';
 
@@ -15,7 +15,13 @@ export class CustomPlanningAreaRepository {
     private readonly planningAreas: Repository<PlanningArea>,
   ) {}
 
-  async saveGeoJson(data: MultiPolygon) {
+  async saveGeoJson(
+    data: GeoJSON,
+  ): Promise<
+    {
+      id: string;
+    }[]
+  > {
     const result = await this.planningAreas.query(
       `
 INSERT INTO "planning_areas"("the_geom")
@@ -53,5 +59,17 @@ INSERT INTO "planning_areas"("the_geom")
         projectId,
       },
     );
+  }
+
+  async deleteUnassignedOldEntries(
+    maxAgeInMs: number,
+    now: Date = new Date(),
+  ): Promise<{
+    affected?: number | null;
+  }> {
+    return await this.planningAreas.delete({
+      projectId: null,
+      createdAt: LessThan(new Date(+now - maxAgeInMs)),
+    });
   }
 }
