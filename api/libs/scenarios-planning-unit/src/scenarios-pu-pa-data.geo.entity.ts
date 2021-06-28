@@ -2,10 +2,7 @@ import {
   Column,
   Entity,
   JoinColumn,
-  ManyToOne,
   OneToOne,
-  PrimaryGeneratedColumn,
-  RelationId,
 } from 'typeorm';
 import { ScenariosPlanningUnitGeoEntity, ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
 import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry/planning-units.geo.entity';
