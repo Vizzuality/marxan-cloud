@@ -106,9 +106,9 @@ describe('ProxyVectorTilesModule (e2e)', () => {
      */
     describe('Admin-areas layers', () => {
 
-      test.todo('We should test that the response is a valid mvt');
-      test.todo('We should add test for user upload planning units');
-      test.todo('We should add test for irregular planning units');
+      test.todo('The response is a valid mvt');
+      test.todo('User upload planning units vector tiles');
+      test.todo('Irregular planning units vector tiles');
 
       test('Should give back a valid request for preview', async () => {
         const response = await request(app.getHttpServer())
@@ -118,19 +118,19 @@ describe('ProxyVectorTilesModule (e2e)', () => {
           .expect(HttpStatus.OK);
       });
       describe('Filter by guid', () => {
-        test('guid country level', async () => {
+        test('guid country level should be visible', async () => {
           const response = await request(app.getHttpServer())
             .get('/api/v1/administrative-areas/0/preview/tiles/6/30/25.mvt')
             .set('Authorization', `Bearer ${jwtToken}`)
             .expect(HttpStatus.OK);
         });
-        test('guid adm1 level', async () => {
+        test('guid adm1 level should be visible', async () => {
           const response = await request(app.getHttpServer())
             .get('/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt')
             .set('Authorization', `Bearer ${jwtToken}`)
             .expect(HttpStatus.OK);
         });
-        test('guid adm2 level', async () => {
+        test('guid adm2 level should be visible', async () => {
           const response = await request(app.getHttpServer())
             .get('/api/v1/administrative-areas/2/preview/tiles/6/30/25.mvt')
             .set('Authorization', `Bearer ${jwtToken}`)
@@ -143,7 +143,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
             .expect(HttpStatus.BAD_REQUEST);
         });
       });
-      test('Filter by bbox', async () => {
+      test('User should be able to filter by bbox', async () => {
         const response = await request(app.getHttpServer())
           .get('/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt?bbox=[10,10,5,5]')
           .set('Authorization', `Bearer ${jwtToken}`)
@@ -163,7 +163,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
-      test('Filter by bbox', async () => {
+      test('User should be able to filter by bbox', async () => {
         const response = await request(app.getHttpServer())
           .get('/api/v1/protected-areas/preview/tiles/6/30/25.mvt?bbox=[10,10,5,5]')
           .set('Authorization', `Bearer ${jwtToken}`)
