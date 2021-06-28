@@ -17,5 +17,8 @@
     "sharedFileStorage": {
       "localPath": "/tmp/storage"
     }
+  },
+  "marxan": {
+    "bin": "/opt/marxan-geoprocessing/apps/geoprocessing/src/marxan/marxan-linux-4-0-6"
   }
 }

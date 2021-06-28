@@ -12,6 +12,9 @@
       "origins_extra": "NETWORK_CORS_ORIGINS"
     }
   },
+  "marxan": {
+    "bin": "MARXAN_BIN_PATH"
+  },
   "auth": {
     "xApiKey": {
       "secret": "API_AUTH_X_API_KEY"
