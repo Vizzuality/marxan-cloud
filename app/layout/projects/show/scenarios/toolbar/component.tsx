@@ -61,7 +61,7 @@ export const ProjectScenariosToolbar: React.FC<ProjectScenariosToolbarProps> = (
   }, [dispatch]);
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center" id="scenarios-search">
       <Search
         size="base"
         defaultValue={search}

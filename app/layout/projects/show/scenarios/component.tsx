@@ -25,6 +25,7 @@ import ScenarioSettings from 'layout/projects/show/scenarios/settings';
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
+import HelpBeacon from 'layout/help/beacon';
 
 export interface ProjectScenariosProps {
 }
@@ -165,23 +166,40 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               onDismiss={() => setDelete(null)}
             />
 
-            <div className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-black via-black" />
+            <div className="relative overflow-hidden" id="scenarios-list">
+              <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-black via-black" />
               <div ref={scrollRef} className="relative z-0 flex flex-col flex-grow h-full py-6 overflow-x-hidden overflow-y-auto">
                 {!!allScenariosData.length && allScenariosData.map((s, i) => {
                   return (
-                    <ScenarioItem
+                    <HelpBeacon
                       key={`${s.id}`}
-                      className={cx({
-                        'mt-3': i !== 0,
-                      })}
-                      {...s}
-                      status="draft"
-                      onDelete={() => {
-                        setDelete(s);
-                      }}
-                      SettingsC={<ScenarioSettings sid={s.id} />}
-                    />
+                      id={`${s.id}`}
+                      title="Scenarios list"
+                      subtitle="project detail"
+                      content={(
+                        <div>
+                          Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                          Beatae ratione cumque in nobis fugiat,
+                          neque ullam aliquam, commodi dolorem unde inventore eaque,
+                          dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
+                        </div>
+                      )}
+                    >
+                      <div
+                        className={cx({
+                          'mt-3': i !== 0,
+                        })}
+                      >
+                        <ScenarioItem
+                          {...s}
+                          status="draft"
+                          onDelete={() => {
+                            setDelete(s);
+                          }}
+                          SettingsC={<ScenarioSettings sid={s.id} />}
+                        />
+                      </div>
+                    </HelpBeacon>
                   );
                 })}
 
@@ -191,7 +209,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                   </div>
                 )}
               </div>
-              <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-black via-black" />
+              <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-black via-black" />
               <div
                 className={cx({
                   'opacity-100': allScenariosIsFetchingNextPage,

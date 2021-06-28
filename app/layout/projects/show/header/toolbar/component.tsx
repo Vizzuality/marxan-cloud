@@ -30,6 +30,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
         >
           <div className="flex space-x-4">
             <Button
+              id="scenarios-upload"
               theme="secondary"
               size="base"
             >
@@ -38,6 +39,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
             </Button>
 
             <Button
+              id="scenarios-download"
               theme="secondary"
               size="base"
             >

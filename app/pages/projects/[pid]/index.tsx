@@ -5,6 +5,7 @@ import Title from 'layout/title/project-title';
 import Header from 'layout/header';
 import Wrapper from 'layout/wrapper';
 import Protected from 'layout/protected';
+import Help from 'layout/help/button';
 
 import ProjectHeader from 'layout/projects/show/header';
 import ProjectScenarios from 'layout/projects/show/scenarios';
@@ -24,6 +25,8 @@ const ShowProjectsPage: React.FC = () => {
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
+
+        <Help />
 
         <div className="pt-2.5">
           <ProjectHeader />
