@@ -21,9 +21,7 @@
   "fileUploads": {
     "projects": {
       "planningAreas": {
-        "maxAgeForOrphanUploads": "2d",
-        "gcOn": 0,
-        "cronExpression": "5 4 * * *"
+        "maxAgeForOrphanUploads": "2d"
       }
     }
   },

@@ -31,9 +31,7 @@
   "fileUploads": {
     "projects": {
       "planningAreas": {
-        "maxAgeForOrphanUploads": "UPLOADS_PLANNING_AREAS_MAX_AGE",
-        "gcOn": "UPLOADS_PLANNING_AREAS_GC_ON",
-        "cronExpression": "UPLOADS_PLANNING_AREAS_GC_CRON_EXPRESSION"
+        "maxAgeForOrphanUploads": "UPLOADS_PLANNING_AREAS_MAX_AGE"
       }
     }
   }
