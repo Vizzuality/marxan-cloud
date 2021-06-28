@@ -29,16 +29,6 @@ export class ScenariosService {
     private readonly tileService: TileService,
   ) {}
 
-  /**
-   * @param filters bounding box of the area where the grids would be generated
-   */
-   buildScenarioPuWhereQuery(
-    filters?: ScenariosPUFilters,
-  ): string | undefined {
-    let whereQuery = undefined;
-
-    return whereQuery;
-  }
 
   /**
    * @todo get attributes from Entity, based on user selection
@@ -48,8 +38,13 @@ export class ScenariosService {
     filters?: ScenariosPUFilters,
   ): Promise<Buffer> {
     const {id, z, x, y } = tileSpecification;
-    const attributes = 'test_pu_geom_id, test_pu_geom_id, test_puid,\
-                           test_lockin_status, test_protected_area';
+    /**
+     * @todo: rework the way columns are being named.
+     */
+    const attributes = 'test_pu_geom_id as puGeomId,\
+                        test_puid as puid,\
+                        test_lockin_status as lockinStatus, \
+                        test_protected_area as protectedArea';
 
     /**
      * @todo: avoid sql injection in the scenario Id.
@@ -58,21 +53,20 @@ export class ScenariosService {
      */
     const sql = this.ScenariosPlanningUnitGeoEntityRepository
       .createQueryBuilder('test')
-      .leftJoinAndSelect("test.planning", "plan")
-      .leftJoinAndSelect("test.cost", "cost")
+      .leftJoinAndSelect("test.planningUnitGeom", "plan")
+      .leftJoinAndSelect("test.costData", "cost")
       .addSelect("plan.the_geom")
       .addSelect("cost.cost")
       .where(`scenario_id = '${id}'`)
 
     const table = `(${sql.getSql()})`;
-    const customQuery = this.buildScenarioPuWhereQuery(filters);
+
     return this.tileService.getTile({
       z,
       x,
       y,
       table,
       attributes,
-      customQuery,
     });
   }
 }

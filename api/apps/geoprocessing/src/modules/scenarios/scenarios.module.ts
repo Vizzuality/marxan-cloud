@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ScenariosController } from './scenarios.controller';
@@ -9,7 +9,7 @@ import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit/scenarios-
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ScenariosPuPaDataGeo]),
+    forwardRef(() =>TypeOrmModule.forFeature([ScenariosPuPaDataGeo])),
     TileModule,
   ],
   providers: [ScenariosService],

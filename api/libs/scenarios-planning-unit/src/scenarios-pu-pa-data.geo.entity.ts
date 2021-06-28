@@ -29,7 +29,7 @@ export class ScenariosPuPaDataGeo extends ScenariosPlanningUnitGeoEntity {
     name: 'pu_geom_id',
     referencedColumnName: 'id',
   })
-  planning?: PlanningUnitsGeom | null;
+  planningUnitGeom?: PlanningUnitsGeom | null;
 
   @OneToOne(() => ScenariosPuCostDataGeo, ScenariosPuCostDataGeo => ScenariosPuCostDataGeo.id, {
     onDelete: 'CASCADE',
@@ -38,6 +38,6 @@ export class ScenariosPuPaDataGeo extends ScenariosPlanningUnitGeoEntity {
     name: 'pu_geom_id',
     referencedColumnName: 'id',
   })
-  cost?: PlanningUnitsGeom | null;
+  costData?: ScenariosPuCostDataGeo | null;
 
 }
