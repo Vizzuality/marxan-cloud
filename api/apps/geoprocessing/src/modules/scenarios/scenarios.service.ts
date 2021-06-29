@@ -5,14 +5,11 @@ import {
 } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  IsString,
-} from 'class-validator';
+import { IsString } from 'class-validator';
 
-import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit/scenarios-pu-pa-data.geo.entity';
+import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 
-export class ScenariosPUFilters {
-}
+export class ScenariosPUFilters {}
 
 export class ScenariosTileRequest extends TileRequest {
   @IsString()
@@ -29,7 +26,6 @@ export class ScenariosService {
     private readonly tileService: TileService,
   ) {}
 
-
   /**
    * @todo get attributes from Entity, based on user selection
    */
@@ -37,11 +33,12 @@ export class ScenariosService {
     tileSpecification: ScenariosTileRequest,
     filters?: ScenariosPUFilters,
   ): Promise<Buffer> {
-    const {id, z, x, y } = tileSpecification;
+    const { id, z, x, y } = tileSpecification;
     /**
      * @todo: rework the way columns are being named.
      */
-    const attributes = 'test_pu_geom_id as puGeomId,\
+    const attributes =
+      'test_pu_geom_id as puGeomId,\
                         test_puid as puid,\
                         test_lockin_status as lockinStatus, \
                         test_protected_area as protectedArea';
@@ -51,13 +48,14 @@ export class ScenariosService {
      * @todo: provide features id array
      * @todo: provide results/output data
      */
-    const sql = this.ScenariosPlanningUnitGeoEntityRepository
-      .createQueryBuilder('test')
-      .leftJoinAndSelect("test.planningUnitGeom", "plan")
-      .leftJoinAndSelect("test.costData", "cost")
-      .addSelect("plan.the_geom")
-      .addSelect("cost.cost")
-      .where(`scenario_id = '${id}'`)
+    const sql = this.ScenariosPlanningUnitGeoEntityRepository.createQueryBuilder(
+      'test',
+    )
+      .leftJoinAndSelect('test.planningUnitGeom', 'plan')
+      .leftJoinAndSelect('test.costData', 'cost')
+      .addSelect('plan.the_geom')
+      .addSelect('cost.cost')
+      .where(`scenario_id = '${id}'`);
 
     const table = `(${sql.getSql()})`;
 
