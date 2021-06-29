@@ -5,6 +5,8 @@ import { Meta } from '@storybook/addon-docs/blocks';
 # Intro
 Welcome to `Marxan web`
 
+## Get started
+
 - [Install](?path=/docs/docs-install--page)
 
 - [Deploy](?path=/docs/docs-deploy--page)
@@ -16,3 +18,40 @@ Welcome to `Marxan web`
 - [Media](?path=/docs/docs-media--page)
 
 - [Tests](?path=/docs/docs-tests--page)
+
+## What is Marxan?
+Marxan is a tool to guide systematic multi-objective planning. It is the most widely used conservation planning tool globally. Developed by the University of Queensland in Australia, it supports spatial decision-making about the design of terrestrial, marine, and/or aquatic reserves and management areas. Using Marxan, planners can identify a network of sites that collectively includes a suite of biodiversity features with minimal displacement of human interests . The tool produces objective, transparent, and repeatable results that can facilitate smart decision-making that takes into account a broad range of considerations, stakeholders, and tradeoffs in an inclusive, iterative fashion.
+
+## What does the tool do?
+
+Marxan was designed to address the general problem of how to meet user-defined “targets” for the minimum “cost”. Targets are the amount of each feature that the program is instructed to select (e.g., 15% of each climatic zone should be included in the reserve network). Costs are flexible, and can defined in terms of land value, resource harvest value, cultural value, spiritual value, cumulative impact, etc. However, costs must be represented in the same unit, combined as an index, or run independently under separate Marxan scenarios. High costs are applied to areas that should be avoided for reserve placement. Other options that Marxan provides include the ability to determine the degree of compactness of selected areas (i.e., creating few large or many small reserves), and control over the emphasis on meeting each feature target versus avoiding areas important for economic, social, and/or cultural uses.
+
+## Where does Marxan fit into a network planning process?
+
+Decision support tools can be useful in a variety of capacities. Marxan was designed primarily to help inform selection of new conservation areas, while considering the contributions of existing management designations. It produces multiple reserve network configurations that meet project objectives, thus increasing the chance of finding a solution that maximizes conservation interests while minimizing economic, social, or cultural impacts. Marxan also has the flexibility to support participatory planning processes and to help identify outcomes acceptable to multiple stakeholders. Marxan helps users evaluate how well different reserve system options meet conservation and socio-economic objectives, highlight the places that occur in a large number of solutions, and help set priorities for implementation. As with other decision support software, Marxan’s role is to support decision-making. It will not produce a final network of reserves, and results must be fine-tuned to consider the full range of political, socio-economic and practical factors. Marxan can enhance the rigor, transparency and repeatability of decisions that are inherently complex and potentially subjective.
+
+## Why is it important to protect a network of sites?
+
+Managing various spatial activities requires a spatial solution that is efficient and fair, while meeting stated conservation, socio-economic, and management objectives. No single site, or even a small group of sites, is likely to fill all of the objectives. In order to address a complex multi-criteria problem, several sites will be required since many criteria are often mutually exclusive (e.g., rare species are often not found in biodiverse areas).
+
+## What are some advantages of using Marxan?
+
+Marxan requires upfront consideration of critical issues. Planners must determine which spatial features will be considered, how much of each feature is to be conserved, and how data gaps and current limitations will be addressed. Using Marxan also requires involved parties to agree on quantitative conservation targets (or ranges of targets) and which socio-economic data to include early in the process in a transparent and explicit manner. Such decisions can also be altered iteratively after analysis. One of the most substantial advantages of Marxan from a user perspective is its ability to return multiple good solutions. Thus, the tool can help focus on key issues in a process, assist with decision documentation, and facilitate exploration of different combinations and scenarios.
+
+## How does the software work?
+
+Marxan relies upon a mathematical equation (not a model) to meet constraints with a number of good solutions. The algorithm answers the minimum set problem, which captures a minimum representation of features for the least cost (as opposed to, for example, the maximum coverage problem of capturing as much representation of features as possible with a fixed budget). The Marxan objective is to minimize the total cost of the reserve network (user-defined layer) and the total boundary (perimeter) of the network, while meeting all targets (i.e., minimizing penalties for not adequately representing features).
+The equation that Marxan uses is:
+
+Combined planning unit cost (efficiency) + BLM * combined boundary length (clumping) + SPF * combined target shortfall (penalty for not achieving conservation targets) = Score,
+where BLM is the boundary length modifier and SPF is the species penalty factor, both of which control the weighting of terms in the Marxan equation. The solution with the lowest score is the one the Marxan selects as the “best” solution.
+
+## What are the steps in a Marxan analysis?
+1. Identify goals and objectives;
+2. Identify features, map best available data;
+3. Divide the area into planning units;
+4. Tally amount of each feature in each planning unit;
+5. Set targets for each feature;
+6. Run Marxan analysis, calibrate parameters;
+7. Map outputs from desired scenarios;
+8. Reiterate analysis with new/updated data and/or constraints at any step.
