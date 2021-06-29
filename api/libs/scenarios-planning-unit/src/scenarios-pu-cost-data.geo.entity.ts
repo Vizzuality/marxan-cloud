@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   RelationId,
 } from 'typeorm';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosPlanningUnitGeoEntity } from './scenarios-planning-unit.geo.entity';
 
 @Entity({
   name: 'scenarios_pu_cost_data',

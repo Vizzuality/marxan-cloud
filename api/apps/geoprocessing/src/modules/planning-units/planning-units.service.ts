@@ -3,15 +3,12 @@ import {
   TileService,
   TileRequest,
 } from '@marxan-geoprocessing/modules/tile/tile.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { IsOptional, IsString, IsArray, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { BBox } from 'geojson';
 import { Transform } from 'class-transformer';
 
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
-import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 
 export class tileSpecification extends TileRequest {
   @ApiProperty()
@@ -40,8 +37,6 @@ export class PlanningUnitsFilters {
 export class PlanningUnitsService {
   private readonly logger: Logger = new Logger(PlanningUnitsService.name);
   constructor(
-    @InjectRepository(PlanningUnitsGeom)
-    private readonly planningUnitsRepository: Repository<PlanningUnitsGeom>,
     @Inject(TileService)
     private readonly tileService: TileService,
   ) {}
@@ -53,7 +48,7 @@ export class PlanningUnitsService {
    * @param filters so far only bbox is accepted
    * @returns vector tile
    */
-  public findPreviewTile(
+  public findTile(
     tileSpecification: tileSpecification,
     filters?: PlanningUnitsFilters,
   ): Promise<Buffer> {

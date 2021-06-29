@@ -97,6 +97,15 @@
               ],
             },
 
+            'postgis-tilesScenarioPu': {
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 20,
+              tiles: [
+                'http://localhost:3040/api/v1/scenarios/923eb5ae-f615-4563-b6ae-21008feeaa4b/planning-units/tiles/{z}/{x}/{y}.mvt',
+              ],
+            },
+
 
             BASEMAP: {
               type: 'raster',
@@ -112,6 +121,19 @@
               source: 'BASEMAP',
               minzoom: 1,
               maxzoom: 22,
+            },
+
+            {
+              id: 'postgis-tiles-layer-ScenarioPU',
+              type: 'fill',
+              source: 'postgis-tilesScenarioPu',
+              'source-layer': 'layer0',
+
+              paint: {
+                'fill-outline-color': 'yellow',
+                'fill-color': 'red',
+                'fill-opacity': 0.1,
+              },
             },
 
             {
@@ -228,6 +250,9 @@
         console.log(e.features[0].properties)
         });
         map.on('click', 'postgis-tiles-layer2', function (e) {
+        console.log(e.features[0].properties)
+        });
+        map.on('click', 'postgis-tiles-layer-ScenarioPU', function (e) {
         console.log(e.features[0].properties)
         });
         // Change the cursor to a pointer when the mouse is over the places layer.
