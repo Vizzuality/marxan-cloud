@@ -90,6 +90,14 @@ export const SignIn: React.FC<SignInProps> = () => {
                     <Field id="login-password" {...fprops}>
                       <Label theme="light" className="mb-3 uppercase">Password</Label>
                       <Input theme="light" type="password" icon={PASSWORD_SVG} />
+
+                      <Link
+                        href="/auth/forgot-password"
+                      >
+                        <a href="/auth/forgot-password" className="inline-block mt-2 text-sm text-gray-500 underline">
+                          Forgot password?
+                        </a>
+                      </Link>
                     </Field>
                   )}
                 </FieldRFF>
