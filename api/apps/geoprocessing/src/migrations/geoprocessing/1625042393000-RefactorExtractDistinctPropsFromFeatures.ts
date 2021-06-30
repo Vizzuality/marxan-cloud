@@ -8,22 +8,22 @@ DROP VIEW
  feature_properties;
 DROP FUNCTION properties_for_feature(input uuid);
 
-create table feature_properties (
+CREATE TABLE feature_properties (
   feature_id uuid,
-  feature_data_id uuid references features_data(id) on update cascade on delete cascade,
+  feature_data_id uuid REFERENCES features_data(id) ON UPDATE CASCADE ON DELETE CASCADE,
   key text,
   value jsonb,
   bbox geometry,
-  unique (feature_data_id, key, value)
+  UNIQUE (feature_data_id, key, value)
 );
 
-create index idx_feature_properties_feature_id on feature_properties(feature_id);
-create index idx_feature_properties_feature_data_id on feature_properties(feature_data_id);
-create index idx_feature_properties_key on feature_properties(key);
+CREATE INDEX idx_feature_properties_feature_id ON feature_properties(feature_id);
+CREATE INDEX idx_feature_properties_feature_data_id ON feature_properties(feature_data_id);
+CREATE INDEX idx_feature_properties_key ON feature_properties(key);
 -- @todo add index to speed up filtering by geo intersection
 
-insert into feature_properties
-select feature_id, id, (jsonb_each(properties)).key, (jsonb_each(properties)).value, st_envelope(the_geom) from features_data;
+INSERT INTO feature_properties
+SELECT feature_id, id, (jsonb_each(properties)).key, (jsonb_each(properties)).value, ST_Envelope(the_geom) FROM features_data;
 
     `);
   }
