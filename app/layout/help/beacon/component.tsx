@@ -12,11 +12,13 @@ import { useHelp } from 'hooks/help';
 import { usePopper } from 'react-popper';
 import { useResizeDetector } from 'react-resize-detector';
 
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import Tooltip from 'components/tooltip';
 import HelpTooltip from 'layout/help/tooltip';
 import HelpSpotlight from 'layout/help/spotlight';
+
+import type { Placement } from '@popperjs/core';
 
 const flipModifier = {
   name: 'flip',
@@ -33,6 +35,7 @@ export interface HelpBeaconProps {
   subtitle: string;
   content: ReactNode;
   children: ReactElement;
+  placement?: Placement;
 }
 
 export const HelpBeacon: React.FC<HelpBeaconProps> = ({
@@ -41,6 +44,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   subtitle,
   content,
   children,
+  placement = 'top-start',
 }: HelpBeaconProps) => {
   const { active, beacons, addBeacon } = useHelp();
   const [visible, setVisible] = useState(false);
@@ -62,7 +66,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   const {
     styles, attributes, state, update,
   } = usePopper(childrenRef.current, beaconRef, {
-    placement: 'top-start',
+    placement,
     modifiers: [
       flipModifier,
       hideModifier,
@@ -103,35 +107,42 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
         {CHILDREN}
       </Tooltip>
 
-      {typeof window !== 'undefined' && active && !visible && createPortal(
-        <div
-          ref={((el) => setBeaconRef(el))}
-          className={cx({
-            'z-50': true,
-            'visible pointer-events-auto': active,
-            'invisible pointer-events-none': !active || attributes?.popper?.['data-popper-reference-hidden'] || attributes?.popper?.['data-popper-escaped'],
-          })}
-          style={styles.popper}
-          {...attributes.popper}
-        >
-          <button
-            type="button"
-            className={cx({
-              'relative beacon flex items-center justify-center w-6 h-6 bg-primary-500 border-2 border-gray-700 transition rounded-full focus:outline-none transform translate-x-1/2 translate-y-1/2': true,
-            })}
-            onClick={() => {
-              setVisible(!visible);
-            }}
-          >
-            <div className="absolute top-0 bottom-0 left-0 right-0 border-2 rounded-full pointer-events-none animate-pulse border-primary-500" />
-          </button>
-        </div>,
+      {typeof window !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {!visible && active && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              ref={((el) => setBeaconRef(el))}
+              className={cx({
+                'z-50': true,
+                'visible pointer-events-auto': active,
+                'invisible pointer-events-none': !active || attributes?.popper?.['data-popper-reference-hidden'] || attributes?.popper?.['data-popper-escaped'],
+              })}
+              style={styles.popper}
+              {...attributes.popper}
+            >
+              <button
+                type="button"
+                className={cx({
+                  'relative beacon flex items-center justify-center w-6 h-6 bg-primary-500 border-2 border-gray-700 transition rounded-full focus:outline-none transform translate-x-1/2 translate-y-1/2': true,
+                })}
+                onClick={() => {
+                  setVisible(!visible);
+                }}
+              >
+                <div className="absolute top-0 bottom-0 left-0 right-0 border-2 rounded-full pointer-events-none animate-pulse border-primary-500" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>,
         document?.body,
       )}
 
-      {typeof window !== 'undefined' && active && createPortal(
+      {typeof window !== 'undefined' && createPortal(
         <AnimatePresence>
-          {visible && (
+          {visible && active && (
             <HelpSpotlight
               childrenRef={childrenRef}
             />
