@@ -1,6 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 
+import Contact from 'layout/explore/contact';
 import Header from 'layout/header';
 import Hero from 'layout/explore/hero';
 import Footer from 'layout/footer';
@@ -28,6 +29,7 @@ const About: React.FC = () => {
           All supported by lorem ipsum dolor sit amet, consectetur adipiscing elit,
           sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>"
         />
+        <Contact />
         <Footer />
       </main>
     </>
