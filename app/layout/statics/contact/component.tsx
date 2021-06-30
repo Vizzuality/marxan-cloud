@@ -19,7 +19,7 @@ export const StaticContact: React.FC<StaticContactProps> = () => {
             Help us strengthen Marxan.
           </p>
           <div className="w-44">
-            <Button theme="primary" size="lg" type="submit" className="w-full">
+            <Button theme="transparent-black" size="lg" type="submit" className="w-full">
               Contact Us
             </Button>
           </div>

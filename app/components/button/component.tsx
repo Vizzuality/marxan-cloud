@@ -5,11 +5,13 @@ import Link, { LinkProps } from 'next/link';
 import cx from 'classnames';
 
 const THEME = {
-  primary: 'text-black bg-primary-500 hover:bg-primary-400 active:bg-primary-300 border border-black hover:border-primary-400 active:border-primary-300',
+  primary: 'text-black bg-primary-500 hover:bg-primary-400 active:bg-primary-300 border border-primary-500 hover:border-primary-400 active:border-primary-300',
   'primary-alt': 'text-primary-500 bg-transparent hover:bg-transparent active:bg-transparent border border-primary-500 hover:border-primary-400 active:border-primary-300',
 
   secondary: 'text-white bg-gray-500 hover:bg-gray-400 active:bg-gray-300 border border-gray-500 hover:border-gray-400 active:border-gray-300',
   'secondary-alt': 'text-gray-300 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
+
+  'transparent-black': 'text-black bg-transparent hover:bg-primary-400 active:bg-primary-300 border border-black hover:bg-black hover:text-white active:border-primary-300',
 
   white: 'text-gray-700 bg-white hover:text-white hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
 
@@ -27,7 +29,7 @@ const SIZE = {
 };
 
 export interface AnchorButtonProps {
-  theme: 'primary' | 'primary-alt' | 'white' | 'secondary' | 'secondary-alt' | 'danger' | 'spacial';
+  theme: 'primary' | 'primary-alt' | 'transparent-black' | 'white'| 'secondary' | 'secondary-alt' | 'danger' | 'spacial';
   size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }
