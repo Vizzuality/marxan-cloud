@@ -44,6 +44,11 @@ CREATE TRIGGER tr_precompute_feature_property_list
   AFTER INSERT OR UPDATE ON features_data
   FOR EACH ROW EXECUTE
   PROCEDURE precompute_feature_property_list();
+
+CREATE VIEW feature_properties AS
+  SELECT feature_id, key, array_agg(distinct value) as value, bbox
+  FROM feature_properties_kv
+  GROUP BY feature_id, key, bbox;
     `);
   }
 
