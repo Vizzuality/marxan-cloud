@@ -10382,6 +10382,10 @@ input[type='search']::-webkit-search-decoration,
   border-left-width: 0px;
 }
 
+.border-t-1 {
+  border-top-width: 1px;
+}
+
 .border-t-2 {
   border-top-width: 2px;
 }
