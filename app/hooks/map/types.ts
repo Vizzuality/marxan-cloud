@@ -19,3 +19,8 @@ export interface UseWDPAPreviewLayer {
   bbox?: number[] | unknown;
   wdpaIucnCategories?: string[];
 }
+
+export interface UsePUGridLayer {
+  sid?: string;
+  active?: boolean;
+}
