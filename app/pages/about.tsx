@@ -22,12 +22,8 @@ const About: React.FC = () => {
         <Header size="base" />
         <Hero
           section="About"
-          title="Marxan introductory and short sentence."
-          description="<p>Marxan exists to improve lorem ipsum dolor sit amet, consectetur adipiscing elit,
-          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-          veniam, quis nostrud exercitation.<br/><br/>
-          All supported by lorem ipsum dolor sit amet, consectetur adipiscing elit,
-          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>"
+          title="Spatial conservation planning with Marxan."
+          description="Marxan is a suite of open-source decision-support tools that help structure, design and evaluate spatial planning projects for land, freshwater and ocean conservation. Marxan helps decision-making by balancing objectives such as protecting biodiversity and the benefits it provides to people, with socio-economic, cultural and political realities. As the analytic engine behind major planning projects, such as the Great Barrier Reef’s Rezoning Plan and Mongolia’s National Protected Area portfolio, Marxan leads the world in providing robust and flexible systematic decision-support to governments, practitioners and planners around the world"
         />
         <Contact />
         <Footer />
