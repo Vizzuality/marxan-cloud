@@ -34,6 +34,9 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
 import { SpecDatModule } from './input-files/spec.dat.module';
 
+import { MarxanRunService } from './marxan-run/marxan-run.service';
+import { MarxanRunController } from './marxan-run/marxan-run.controller';
+
 @Module({
   imports: [
     CqrsModule,
@@ -65,6 +68,7 @@ import { SpecDatModule } from './input-files/spec.dat.module';
     ScenarioSolutionSerializer,
     MarxanInput,
     InputParameterFileProvider,
+    MarxanRunService,
     {
       provide: ioSettingsToken,
       useFactory: () => {
@@ -76,7 +80,7 @@ import { SpecDatModule } from './input-files/spec.dat.module';
       },
     },
   ],
-  controllers: [ScenariosController],
+  controllers: [ScenariosController, MarxanRunController],
   exports: [ScenariosCrudService, ScenariosService],
 })
 export class ScenariosModule {}
