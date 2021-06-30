@@ -8,7 +8,7 @@ DROP VIEW
  feature_properties;
 DROP FUNCTION properties_for_feature(input uuid);
 
-CREATE TABLE feature_properties (
+CREATE TABLE feature_properties_kv (
   feature_id uuid,
   feature_data_id uuid REFERENCES features_data(id) ON UPDATE CASCADE ON DELETE CASCADE,
   key text,
@@ -17,21 +17,21 @@ CREATE TABLE feature_properties (
   UNIQUE (feature_data_id, key, value)
 );
 
-CREATE INDEX idx_feature_properties_feature_id ON feature_properties(feature_id);
-CREATE INDEX idx_feature_properties_feature_data_id ON feature_properties(feature_data_id);
-CREATE INDEX idx_feature_properties_key ON feature_properties(key);
+CREATE INDEX idx_feature_properties_kv_feature_id ON feature_properties_kv(feature_id);
+CREATE INDEX idx_feature_properties_kv_feature_data_id ON feature_properties_kv(feature_data_id);
+CREATE INDEX idx_feature_properties_kv_key ON feature_properties_kv(key);
 -- @todo add index to speed up filtering by geo intersection
 
-INSERT INTO feature_properties
+INSERT INTO feature_properties_kv
 SELECT feature_id, id, (jsonb_each(properties)).key, (jsonb_each(properties)).value, ST_Envelope(the_geom) FROM features_data;
 
 CREATE OR REPLACE FUNCTION precompute_feature_property_list()
   RETURNS TRIGGER AS $BODY$
   BEGIN
-    DELETE FROM feature_properties
+    DELETE FROM feature_properties_kv
       WHERE feature_data_id = NEW.id;
 
-    INSERT INTO feature_properties
+    INSERT INTO feature_properties_kv
       SELECT feature_id, id, (jsonb_each(properties)).key, (jsonb_each(properties)).value, ST_Envelope(the_geom)
       FROM features_data
       WHERE id = NEW.id;
