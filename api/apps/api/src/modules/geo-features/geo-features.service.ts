@@ -259,12 +259,17 @@ export class GeoFeaturesService extends AppBaseService<
 
     const entitiesWithProperties = await query.getMany().then((results) => {
       return (entitiesAndCount[0] as GeoFeature[]).map((i) => {
-        const propertySetForFeature = results.find(
+        const propertySetForFeature = results.filter(
           (propertySet) => propertySet.featureId === i.id,
         );
         return {
           ...i,
-          properties: propertySetForFeature?.properties,
+          properties: propertySetForFeature.reduce((acc, cur) => {
+            return {
+              ...acc,
+              [cur.key]: [...(acc[cur.key] || []), cur.value[0]],
+            };
+          }, {} as Record<string, Array<string | number>>),
         };
       });
     });
