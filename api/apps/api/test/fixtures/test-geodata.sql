@@ -76,3 +76,33 @@ left join wdpa
  )
  UPDATE scenario_features_data
 SET (current_pa) = (select current_pa from (select sum(area_protected) current_pa, feature_scen_id from features_wdpa group by feature_scen_id) s where  feature_scen_id = scenario_features_data.id );
+
+-- Cost equal area calculation project 1 scenario 1
+INSERT INTO scenarios_pu_cost_data
+(scenarios_pu_data_id, cost)
+select id, 1 as cost  from scenarios_pu_data where scenario_id = '$scenario';
+
+----Fake outputs
+--- Fake output_scenarios_pu_data
+WITH RECURSIVE nums (n) AS (
+    SELECT 1
+  UNION ALL
+    SELECT n+1 FROM nums WHERE n+1 <= 10
+)
+INSERT INTO output_scenarios_pu_data
+(run_id, scenario_pu_id, value)
+SELECT n as run_id, scenarios_pu_data.id, round(random()) as value
+FROM nums, scenarios_pu_data
+where scenarios_pu_data.scenario_id='$scenario';
+
+--- Fake output_scenarios_features_data
+WITH RECURSIVE nums (n) AS (
+    SELECT 1
+  UNION ALL
+    SELECT n+1 FROM nums WHERE n+1 <= 10
+)
+INSERT INTO output_scenarios_features_data
+(run_id, feature_scenario_id, amount, occurrences, separation, target, mpm)
+SELECT n as run_id, scenario_features_data.id, round(random()*53592) amount, round(random()*100) occurrences, 0 as separation, true as target,1 as mpm
+FROM nums, scenario_features_data
+where scenario_features_data.scenario_id='$scenario';
