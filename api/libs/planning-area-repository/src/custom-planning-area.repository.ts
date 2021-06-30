@@ -53,6 +53,14 @@ INSERT INTO "planning_areas"("the_geom")
   async assignProject(id: string, projectId: string): Promise<void> {
     await this.planningAreas.update(
       {
+        projectId,
+      },
+      {
+        projectId: null,
+      },
+    );
+    await this.planningAreas.update(
+      {
         id: id,
       },
       {

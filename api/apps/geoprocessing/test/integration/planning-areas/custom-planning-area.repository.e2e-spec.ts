@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { PromiseType } from 'utility-types';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { assertDefined } from '@marxan/utils';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { CustomPlanningAreaRepository } from '@marxan/planning-area-repository';
 import { bootstrapApplication } from '../../utils';
@@ -56,6 +57,36 @@ it(`should deny existence of unknown entity`, async () => {
 
   // then
   expect(hasResult).toBe(false);
+});
+
+it(`should replace planning area assignment`, async () => {
+  // given
+  const { id: firstId } = (
+    await repository.saveGeoJson(fixtures.sampleGeoJSON)
+  )[0];
+  fixtures.createdEntities.push(firstId);
+  // and
+  const { id: secondId } = (
+    await repository.saveGeoJson(fixtures.sampleGeoJSON)
+  )[0];
+  fixtures.createdEntities.push(secondId);
+  // and
+  await repository.assignProject(
+    firstId,
+    '32ce1a52-51cb-4f50-ab41-92c4c5a71f31',
+  );
+  // when
+  await repository.assignProject(
+    secondId,
+    '32ce1a52-51cb-4f50-ab41-92c4c5a71f31',
+  );
+  // then
+  await fixtures.areaShouldBeAssignedTo(firstId, null);
+  // and
+  await fixtures.areaShouldBeAssignedTo(
+    secondId,
+    '32ce1a52-51cb-4f50-ab41-92c4c5a71f31',
+  );
 });
 
 describe(`when there is an entity created in 2021-03-03T12:00:00Z and gc time is 5000ms`, () => {
@@ -158,6 +189,11 @@ async function getFixtures() {
         },
       );
       return id;
+    },
+    async areaShouldBeAssignedTo(id: string, projectId: string | null) {
+      const area = await fixtures.getTypeormRepository().findOne(id);
+      assertDefined(area);
+      expect(area.projectId).toStrictEqual(projectId);
     },
   };
   return fixtures;
