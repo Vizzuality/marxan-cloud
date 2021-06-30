@@ -1,115 +1,118 @@
-import { INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
-import AxiosMockAdapter from 'axios-mock-adapter';
-import Axios from 'axios';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { PromiseType } from 'utility-types';
+import { Repository } from 'typeorm';
+import { readFileSync } from 'fs';
+import * as nock from 'nock';
+import { v4 } from 'uuid';
 
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
-import { AppModule } from '@marxan-geoprocessing/app.module';
-import { v4 } from 'uuid';
-import { Repository } from 'typeorm';
 import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { readFileSync } from 'fs';
 
-let app: INestApplication;
-let sut: MarxanSandboxRunnerService;
+import { bootstrapApplication } from '../../utils';
 
-let axiosMock: AxiosMockAdapter;
-const axios = Axios.create();
-
-let tempRepoReference: Repository<ScenariosOutputResultsGeoEntity>;
-
-const scenarioId = v4();
+let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
 beforeAll(async () => {
-  axiosMock = new AxiosMockAdapter(axios, {
-    onNoMatch: 'throwException',
-  });
-  const moduleFixture: TestingModule = await Test.createTestingModule({
-    imports: [AppModule],
-  })
-    .overrideProvider(`AXIOS_INSTANCE_TOKEN`)
-    .useValue(axios)
-    .compile();
-  app = await moduleFixture.createNestApplication().init();
-  tempRepoReference = app.get(
-    getRepositoryToken(ScenariosOutputResultsGeoEntity),
-  );
-  sut = app.get(MarxanSandboxRunnerService);
+  fixtures = await getFixtures();
 });
 
-describe(`when input data is available`, () => {
+describe(`given input data is available`, () => {
   beforeEach(() => {
-    resources.forEach((resource) =>
-      axiosMock
-        .onGet(resource.assetUrl)
-        .replyOnce(
-          200,
-          readFileSync(
-            process.cwd() +
-              `/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/${resource.targetRelativeDestination}`,
-          ),
-          {
-            'content-type': 'plain/text',
-          },
-        ),
-    );
+    fixtures.GivenInputFilesAreAvailable();
   });
 
   test(`marxan run`, async () => {
-    await sut.run(
-      scenarioId,
-      resources.map((resource) => ({
-        url: resource.assetUrl,
-        relativeDestination: resource.targetRelativeDestination,
-      })),
-    );
+    await fixtures.WhenRunningMarxan();
 
-    expect(
+    expect(await fixtures.ThenExecutionOutput()).toBeGreaterThan(0);
+  }, 30000);
+});
+
+afterAll(async () => {
+  await fixtures.cleanup();
+});
+
+const getFixtures = async () => {
+  const scenarioId = v4();
+
+  nock.disableNetConnect();
+
+  const app = await bootstrapApplication();
+  const sut: MarxanSandboxRunnerService = app.get(MarxanSandboxRunnerService);
+  const tempRepoReference: Repository<ScenariosOutputResultsGeoEntity> = app.get(
+    getRepositoryToken(ScenariosOutputResultsGeoEntity),
+  );
+
+  const nockScope = nock(host);
+  return {
+    cleanup: async () => {
+      nockScope.done();
+      nock.enableNetConnect();
+      await tempRepoReference.delete({
+        scenarioId,
+      });
+    },
+    WhenRunningMarxan: async () =>
+      await sut.run(
+        scenarioId,
+        resources.map((resource) => ({
+          url: host + resource.assetUrl,
+          relativeDestination: resource.targetRelativeDestination,
+        })),
+      ),
+    ThenExecutionOutput: async () =>
       await tempRepoReference.count({
         where: {
           scenarioId,
         },
       }),
-    ).toBeGreaterThan(0);
-  }, 30000);
-});
+    GivenInputFilesAreAvailable: () =>
+      resources.forEach((resource) => {
+        nockScope
+          .get(resource.assetUrl)
+          .reply(200, resourceResponse(resource.targetRelativeDestination), {
+            'content-type': 'plain/text',
+          });
+      }),
+  };
+};
 
-afterAll(async () => {
-  await tempRepoReference.delete({
-    scenarioId,
-  });
-});
-
+const host = `http://localhost:3000`;
 const resources = [
   {
     name: `input.dat`,
-    assetUrl: `http://localhost:3000/input.dat`,
+    assetUrl: `/input.dat`,
     targetRelativeDestination: `input.dat`,
   },
   {
     name: `pu.dat`,
-    assetUrl: `http://localhost:3000/pu.dat`,
+    assetUrl: `/pu.dat`,
     targetRelativeDestination: `input/pu.dat`,
   },
   {
     name: `spec.dat`,
-    assetUrl: `http://localhost:3000/spec.dat`,
+    assetUrl: `/spec.dat`,
     targetRelativeDestination: `input/spec.dat`,
   },
   {
     name: `puvsp.dat`,
-    assetUrl: `http://localhost:3000/puvsp.dat`,
+    assetUrl: `/puvsp.dat`,
     targetRelativeDestination: `input/puvsp.dat`,
   },
   {
     name: `puvsp_sporder.dat`,
-    assetUrl: `http://localhost:3000/puvsp_sporder.dat`,
+    assetUrl: `/puvsp_sporder.dat`,
     targetRelativeDestination: `input/puvsp_sporder.dat`,
   },
   {
     name: `bound.dat`,
-    assetUrl: `http://localhost:3000/bound.dat`,
+    assetUrl: `/bound.dat`,
     targetRelativeDestination: `input/bound.dat`,
   },
 ];
+
+const resourceResponse = (resourceAddress: string) =>
+  readFileSync(
+    process.cwd() +
+      `/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/${resourceAddress}`,
+  );

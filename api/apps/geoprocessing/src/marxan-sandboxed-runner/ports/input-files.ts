@@ -6,9 +6,8 @@ export interface Settings {
 }
 
 export type Assets = {
-  // asset: keyof Settings;
   url: string;
-  relativeDestination: string; // this
+  relativeDestination: string;
 }[];
 
 /**
