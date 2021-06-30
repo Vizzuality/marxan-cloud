@@ -19,6 +19,8 @@ import {
   SaveScenarioProps,
   UseDeleteScenarioProps,
   DeleteScenarioProps,
+  UseDownloadScenarioCostSurfaceProps,
+  DownloadScenarioCostSurfaceProps,
 } from './types';
 
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
@@ -217,6 +219,46 @@ export function useSaveScenarioPUShapefile({
 
   return useMutation(saveScenarioPUShapefile, {
     onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDownloadCostSurface({
+  requestConfig = {
+    method: 'GET',
+  },
+}: UseDownloadScenarioCostSurfaceProps) {
+  const [session] = useSession();
+
+  const saveScenarioPUShapefile = ({ id }: DownloadScenarioCostSurfaceProps) => {
+    return UPLOADS.request({
+      url: `/scenarios/${id}/cost-surface/shapefile-template`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveScenarioPUShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      const { data: blob } = data;
+      const { id } = variables;
+
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `cost-surface-${id}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

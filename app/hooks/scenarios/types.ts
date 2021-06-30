@@ -22,3 +22,11 @@ export interface UseDeleteScenarioProps {
 export interface DeleteScenarioProps {
   id: string
 }
+
+export interface UseDownloadScenarioCostSurfaceProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface DownloadScenarioCostSurfaceProps {
+  id?: string,
+}

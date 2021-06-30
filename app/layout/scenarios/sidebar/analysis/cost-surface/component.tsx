@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import cx from 'classnames';
 
 import { motion } from 'framer-motion';
@@ -8,6 +8,8 @@ import Button from 'components/button';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
+import { useRouter } from 'next/router';
+import { useDownloadCostSurface } from 'hooks/scenarios';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -19,6 +21,30 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
   onChangeSection,
 }: ScenariosCostSurfaceProps) => {
   const { addToast } = useToasts();
+  const { query } = useRouter();
+  const { sid } = query;
+
+  const downloadMutation = useDownloadCostSurface({});
+
+  const onDownload = useCallback(() => {
+    downloadMutation.mutate({ id: `${sid}` }, {
+      onSuccess: () => {
+
+      },
+      onError: () => {
+        addToast('download-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <ul className="text-sm">
+              Template not downloaded
+            </ul>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [sid, downloadMutation, addToast]);
 
   const onDropAccepted = async (acceptedFiles) => {
     const f = acceptedFiles[0];
@@ -83,6 +109,8 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
           <Button
             theme="primary-alt"
             size="s"
+            className="w-full"
+            onClick={onDownload}
           >
             Template
           </Button>
