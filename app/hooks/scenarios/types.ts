@@ -23,10 +23,27 @@ export interface DeleteScenarioProps {
   id: string
 }
 
+export interface UseUploadScenarioPUProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface UploadScenarioPUProps {
+  id?: string,
+  data: any,
+}
 export interface UseDownloadScenarioCostSurfaceProps {
   requestConfig?: AxiosRequestConfig
 }
 
 export interface DownloadScenarioCostSurfaceProps {
   id?: string,
+}
+
+export interface UseUploadScenarioCostSurfaceProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface UploadScenarioCostSurfaceProps {
+  id?: string,
+  data: any,
 }
