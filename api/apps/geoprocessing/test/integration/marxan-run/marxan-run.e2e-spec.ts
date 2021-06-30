@@ -9,6 +9,7 @@ import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandbox
 import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
 
 import { bootstrapApplication } from '../../utils';
+import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -43,7 +44,12 @@ const getFixtures = async () => {
     getRepositoryToken(ScenariosOutputResultsGeoEntity),
   );
 
-  const nockScope = nock(host);
+  const nockScope = nock(host, {
+    reqheaders: {
+      'x-api-key':
+        process.env.API_AUTH_X_API_KEY ?? 'sure it is valid in envs?',
+    },
+  });
   return {
     cleanup: async () => {
       nockScope.done();

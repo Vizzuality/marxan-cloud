@@ -1,11 +1,12 @@
-import { resolve, dirname } from 'path';
+import { dirname, resolve } from 'path';
 import { createWriteStream, promises } from 'fs';
-import { HttpService, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Assets, InputFiles } from '../../ports/input-files';
+import { AssetFetcher } from './asset-fetcher';
 
 @Injectable()
 export class DeriveScenarioFacade implements InputFiles {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(private readonly fetchService: AssetFetcher) {}
 
   async include(directory: string, assets: Assets): Promise<void> {
     assets.forEach((asset) => this.validateInput(asset.relativeDestination));
@@ -24,18 +25,8 @@ export class DeriveScenarioFacade implements InputFiles {
       const writer = createWriteStream(dest);
       writer.on('finish', resolve);
       writer.on('error', reject);
-      // "stream" seems to be broken, does not return stream but data itself
-      // https://github.com/nestjs/nest/issues/4144 - not really working
-      this.httpService
-        .get(sourceUri, {
-          // responseType: 'stream',
-        })
-        .toPromise()
-        .then((response) => {
-          writer.write(response.data);
-          writer.end();
-        })
-        .catch(reject);
+
+      this.fetchService.fetch(sourceUri, writer);
     });
   }
 
