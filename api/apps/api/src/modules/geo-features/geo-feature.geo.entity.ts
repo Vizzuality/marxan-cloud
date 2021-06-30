@@ -18,7 +18,7 @@ export class GeoFeatureGeometry {
   id!: string;
 
   @ApiProperty()
-  @Column('uuid', { name: 'feature_id'})
+  @Column('uuid', { name: 'feature_id' })
   featureId?: string;
 }
 
