@@ -15,7 +15,7 @@ export const StaticHero: React.FC<StaticHeroProps> = ({
 }: StaticHeroProps) => {
   return (
     <Wrapper>
-      <div className="w-full max-w-5xl py-32 mx-auto">
+      <div className="w-full max-w-5xl mx-auto py-28">
         <h1 className="max-w-3xl text-lg font-semibold opacity-40">
           {section}
         </h1>
