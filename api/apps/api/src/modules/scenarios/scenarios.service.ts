@@ -80,7 +80,7 @@ export class ScenariosService {
   }
 
   async getInputParameterFile(scenarioId: string): Promise<string> {
-    //await this.assertScenario(scenarioId);
+    await this.assertScenario(scenarioId);
     return this.inputParameterFileProvider.getInputParameterFile(scenarioId);
   }
 
