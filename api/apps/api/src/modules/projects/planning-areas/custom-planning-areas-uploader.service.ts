@@ -4,9 +4,10 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { Either, Left, Right } from 'purify-ts/Either';
+import { Either, left, right } from 'fp-ts/Either';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
+import { GeoJSON } from 'geojson';
 
 export const validationFailed = Symbol('validation failed');
 export const geoprocessingUrlToken = Symbol('geoprocessing url token');
@@ -25,8 +26,16 @@ export class CustomPlanningAreasUploader {
 
   async savePlanningAreaFromShapefile(
     file: Express.Multer.File,
-  ): Promise<Either<typeof validationFailed, unknown>> {
-    const { data: geoJson, status } = await this.httpService
+  ): Promise<
+    Either<
+      typeof validationFailed,
+      {
+        id: string;
+        data: GeoJSON;
+      }
+    >
+  > {
+    const { data, status } = await this.httpService
       .post(
         `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/projects/planning-area/shapefile`,
         file,
@@ -38,8 +47,8 @@ export class CustomPlanningAreasUploader {
       )
       .toPromise();
     if (status >= 400) {
-      return Left(validationFailed);
+      return left(validationFailed);
     }
-    return Right(geoJson);
+    return right(data);
   }
 }

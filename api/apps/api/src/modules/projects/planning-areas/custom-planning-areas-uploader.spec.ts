@@ -1,7 +1,7 @@
 import * as nock from 'nock';
 import { isEqual } from 'lodash';
 import { PromiseType } from 'utility-types';
-import { Either, Left, Right } from 'purify-ts/Either';
+import { Either, left, right } from 'fp-ts/Either';
 import { Test } from '@nestjs/testing';
 import { HttpModule } from '@nestjs/common';
 import {
@@ -30,7 +30,7 @@ describe(`when file validated successfully`, () => {
 
   // then
   it(`should pass the response`, () => {
-    expect(result).toEqual(Right(fixtures.validResponse));
+    expect(result).toEqual(right(fixtures.validResponse));
   });
 });
 
@@ -46,7 +46,7 @@ describe(`when file validation failed`, () => {
 
   // then
   it(`should return validation failed`, () => {
-    expect(result).toStrictEqual(Left(validationFailed));
+    expect(result).toStrictEqual(left(validationFailed));
   });
 });
 
