@@ -8,7 +8,8 @@ export class DeriveScenarioFacade implements InputFiles {
   constructor(private readonly httpService: HttpService) {}
 
   async include(directory: string, assets: Assets): Promise<void> {
-    // TODO security: ensure that none of the target filename starts with either `/` or `.` (tree traversing)
+    assets.forEach((asset) => this.validateInput(asset.relativeDestination));
+
     await Promise.all(
       assets.map((asset) =>
         this.download(asset.url, resolve(directory, asset.relativeDestination)),
@@ -27,7 +28,7 @@ export class DeriveScenarioFacade implements InputFiles {
       // https://github.com/nestjs/nest/issues/4144 - not really working
       this.httpService
         .get(sourceUri, {
-          responseType: 'stream',
+          // responseType: 'stream',
         })
         .toPromise()
         .then((response) => {
@@ -44,5 +45,14 @@ export class DeriveScenarioFacade implements InputFiles {
     // if directory does not exists, it will silently "success" downloading the file while it won't be there
     const desiredDirectory = dirname(fileDestination);
     await promises.mkdir(desiredDirectory, { recursive: true });
+  }
+
+  private validateInput(assetTargetPath: string) {
+    if (
+      assetTargetPath.indexOf('\0') !== -1 ||
+      assetTargetPath.includes('..')
+    ) {
+      throw new Error('Hacking is not allowed.');
+    }
   }
 }
