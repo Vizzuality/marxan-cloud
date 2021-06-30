@@ -26,7 +26,9 @@ export const ExploreHero: React.FC<ExploreHeroProps> = ({
           {title}
         </h1>
 
-        <div className="text-lg leading-8 text-justify max-w-max" dangerouslySetInnerHTML={{ __html: description }} />
+        <div className="text-lg leading-8 text-justify max-w-max">
+          {description}
+        </div>
         <div className={cx({ 'h-px w-full opacity-20 bg-white mt-24': true })} />
       </div>
     </Wrapper>
