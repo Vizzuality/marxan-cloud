@@ -16,6 +16,10 @@ export class GeoFeatureGeometry {
   @ApiProperty()
   @PrimaryColumn()
   id!: string;
+
+  @ApiProperty()
+  @Column('uuid', { name: 'feature_id'})
+  featureId?: string;
 }
 
 export class JSONAPIGeoFeaturesGeometryData {
