@@ -5,7 +5,7 @@ import Link, { LinkProps } from 'next/link';
 import cx from 'classnames';
 
 const THEME = {
-  primary: 'text-black bg-primary-500 hover:bg-primary-400 active:bg-primary-300 border border-primary-500 hover:border-primary-400 active:border-primary-300',
+  primary: 'text-black bg-primary-500 hover:bg-primary-400 active:bg-primary-300 border border-black hover:border-primary-400 active:border-primary-300',
   'primary-alt': 'text-primary-500 bg-transparent hover:bg-transparent active:bg-transparent border border-primary-500 hover:border-primary-400 active:border-primary-300',
 
   secondary: 'text-white bg-gray-500 hover:bg-gray-400 active:bg-gray-300 border border-gray-500 hover:border-gray-400 active:border-gray-300',
