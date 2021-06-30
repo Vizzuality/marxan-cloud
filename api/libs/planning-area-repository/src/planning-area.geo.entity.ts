@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
@@ -21,6 +22,7 @@ export class PlanningArea {
     nullable: true,
     name: 'project_id',
   })
+  @Index()
   projectId?: string | null;
 
   @ApiProperty()
@@ -41,5 +43,6 @@ export class PlanningArea {
     name: 'created_at',
     type: 'timestamp without time zone',
   })
+  @Index()
   createdAt!: Date;
 }
