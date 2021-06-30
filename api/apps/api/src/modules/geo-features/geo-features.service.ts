@@ -239,13 +239,14 @@ export class GeoFeaturesService extends AppBaseService<
     );
     const query = this.geoFeaturePropertySetsRepository
       .createQueryBuilder('propertySets')
+      .distinct(true)
       .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds });
 
     if (this.forProject) {
       query.andWhere(
         `st_intersects(
         st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
-        "geoFeatureGeometries".the_geom
+        "propertySets".bbox
       )`,
         {
           xmin: this.forProject.bbox[1],
