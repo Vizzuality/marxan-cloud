@@ -17,9 +17,9 @@ CREATE TABLE feature_properties_kv (
   UNIQUE (feature_data_id, key, value)
 );
 
-CREATE INDEX idx_feature_properties_kv_feature_id ON feature_properties_kv(feature_id);
-CREATE INDEX idx_feature_properties_kv_feature_data_id ON feature_properties_kv(feature_data_id);
-CREATE INDEX idx_feature_properties_kv_key ON feature_properties_kv(key);
+CREATE INDEX feature_properties_kv_feature_id__idx ON feature_properties_kv(feature_id);
+CREATE INDEX feature_properties_kv_feature_data_id__idx ON feature_properties_kv(feature_data_id);
+CREATE INDEX feature_properties_kv_key__idx ON feature_properties_kv(key);
 -- @todo add index to speed up filtering by geo intersection
 
 INSERT INTO feature_properties_kv
