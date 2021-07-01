@@ -1,11 +1,24 @@
 import { Injectable, Scope } from '@nestjs/common';
 import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
+import TypedEmitter from 'typed-emitter';
+
+interface MessageEvents {
+  pid(pid: number): void;
+  error(error: {
+    signal?: 'SIGSEGV';
+    code?: number | null | NodeJS.Signals;
+    stdError: string[];
+  }): void;
+  finished(): void;
+}
+
+const MarxanRunEmitter: new () => TypedEmitter<MessageEvents> = EventEmitter;
 
 @Injectable({
   scope: Scope.TRANSIENT,
 })
-export class MarxanRun extends EventEmitter {
+export class MarxanRun extends MarxanRunEmitter {
   #processId?: number;
   #stdOut: string[] = [];
   #stdError: string[] = [];
