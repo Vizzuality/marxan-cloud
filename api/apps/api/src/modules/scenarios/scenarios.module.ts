@@ -32,6 +32,7 @@ import {
 } from './input-parameter-file.provider';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
+import { SpecDatModule } from './input-files/spec.dat.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { assertDefined } from '@marxan/utils';
     HttpModule,
     CostSurfaceTemplateModule,
     CostSurfaceViewModule,
+    SpecDatModule,
     PlanningUnitsProtectionLevelModule,
   ],
   providers: [

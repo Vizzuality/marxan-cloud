@@ -22,6 +22,7 @@ import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-p
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
 import { InputParameterFileProvider } from './input-parameter-file.provider';
+import { SpecDatService } from './input-files/spec.dat.service';
 
 @Injectable()
 export class ScenariosService {
@@ -39,6 +40,7 @@ export class ScenariosService {
     private readonly costSurfaceView: CostSurfaceViewService,
     private readonly marxanInputValidator: MarxanInput,
     private readonly inputParameterFileProvider: InputParameterFileProvider,
+    private readonly specDatService: SpecDatService,
   ) {}
 
   async findAllPaginated(
@@ -142,6 +144,11 @@ export class ScenariosService {
     await this.costSurfaceView.read(scenarioId, stream);
   }
 
+  async getSpecDatCsv(scenarioId: string): Promise<string> {
+    await this.assertScenario(scenarioId);
+    return this.specDatService.getSpecDatContent(scenarioId);
+  }
+
   private async assertScenario(scenarioId: string) {
     await this.crudService.getById(scenarioId);
   }
@@ -190,11 +197,11 @@ export class ScenariosService {
         // TODO debt: shouldn't throw HttpException
         throw new BadRequestException(errors);
       }
+    } else {
+      marxanInput = this.marxanInputValidator.from({});
     }
     const withValidatedMetadata: T = classToClass<T>(input);
-    if (withValidatedMetadata.metadata) {
-      withValidatedMetadata.metadata.marxanInputParameterFile = marxanInput;
-    }
+    (withValidatedMetadata.metadata ??= {}).marxanInputParameterFile = marxanInput;
     return withValidatedMetadata;
   }
 }
