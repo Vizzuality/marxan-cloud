@@ -37,7 +37,9 @@ export const getFixtures = async (app: INestApplication) => {
       scenarioId: string,
     ): Promise<{ scenario_id: string; cost: number; pu_id: string }[]> =>
       puCostDataRepo.query(`
-      select spud.scenario_id, spucd."cost", spucd.output_results_data_id as pu_id from scenarios_pu_data as spud join scenarios_pu_cost_data as spucd on (spud."id" = spucd.scenarios_pu_data_id)
+      select spud.scenario_id, spucd."cost", spucd.scenarios_pu_data_id as pu_id
+      from scenarios_pu_data as spud
+      join scenarios_pu_cost_data as spucd on (spud."id" = spucd.scenarios_pu_data_id)
       where spud.scenario_id = '${scenarioId}'
 `),
     GivenPuCostDataExists: async () =>
