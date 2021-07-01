@@ -13,7 +13,7 @@ export const AboutValues: React.FC<AboutValuesProps> = () => {
     <div className="bg-white">
       <Wrapper>
         <div className="w-full max-w-5xl mx-auto py-28">
-          <h1 className="max-w-3xl text-lg font-semibold text-black opacity-40">
+          <h1 className="max-w-3xl mb-6 text-lg font-semibold text-black opacity-40">
             Our Values
           </h1>
           <h2 className="mt-3 mb-10 text-4xl leading-tight text-left text-black font-heading max-w-max bg-clip-text">
@@ -34,15 +34,15 @@ export const AboutValues: React.FC<AboutValuesProps> = () => {
             {Children.toArray(
               VALUES.map((v) => (
                 <div className="flex flex-col" key={v.order}>
-                  <h3 className="mb-5 text-lg font-semibold text-black">
+                  <h3 className="mb-5 text-base font-semibold text-black">
                     {v.order}
                     {' '}
                     {v.title}
                   </h3>
-                  <p className="mb-5 text-lg text-black">
+                  <p className="mb-5 text-sm text-black">
                     {v.description}
                   </p>
-                  <a className="text-lg text-black underline" href={v.hyperlink}>{v.hypertext}</a>
+                  <a className="text-base text-black underline" href={v.hyperlink}>{v.hypertext}</a>
                 </div>
               )),
             )}
