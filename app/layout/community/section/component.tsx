@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Button from 'components/button';
+import Column from 'layout/statics/column';
 import Wrapper from 'layout/wrapper';
 
 export interface CommunitySectionProps {
@@ -10,6 +11,22 @@ export interface CommunitySectionProps {
 export const CommunitySection: React.FC<CommunitySectionProps> = () => {
   return (
     <Wrapper>
+      <div className="grid w-full max-w-5xl grid-cols-2 py-16 mx-auto gap-x-36 ">
+        <Column
+          title="Explore the projects shared by the community"
+          subtitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
+          description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."
+          caption="Explore projects"
+          href="/"
+        />
+        <Column
+          title="Join the community and stay updated"
+          subtitle="Receive the latest Marxan updates and connect with other users to mobilize for action."
+          description="Have questions about Marxan or suggestions for how to strengthen the platform? How about an idea for a bold new partnership around data use? We want to hear from you. Join us in the movement to build a more sustainable future."
+          caption="Learn more"
+          href="/"
+        />
+      </div>
       <div className="flex flex-col items-center w-full max-w-5xl py-16 mx-auto gap-x-36 ">
         <div className="flex flex-col border-white border-opacity-20 w-96">
           <h4 className="mb-2">Reach out with comments or suggestions.</h4>
