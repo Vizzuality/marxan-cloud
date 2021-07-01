@@ -1,17 +1,19 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 
 import { MarxanConfig } from './marxan-config';
 import { MarxanSandboxRunnerService } from './marxan-sandbox-runner.service';
 
-import { DeriveScenarioDataModule } from './adapters/scenario-data/derive-scenario-data.module';
-import { SolutionOutputModule } from './adapters/solutions-output/solution-output.module';
 import { WorkspaceModule } from './adapters/workspace/workspace.module';
-
-import { MarxanRun } from './marxan-run';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
 
 @Module({
-  imports: [DeriveScenarioDataModule, SolutionOutputModule, WorkspaceModule],
-  providers: [MarxanConfig, MarxanSandboxRunnerService, MarxanRun],
+  imports: [
+    HttpModule,
+    WorkspaceModule,
+    TypeOrmModule.forFeature([ScenariosOutputResultsGeoEntity]),
+  ],
+  providers: [MarxanConfig, MarxanSandboxRunnerService],
   exports: [MarxanSandboxRunnerService],
 })
 export class MarxanSandboxedRunnerModule {}

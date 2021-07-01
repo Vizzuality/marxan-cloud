@@ -1,57 +1,76 @@
 import { Injectable } from '@nestjs/common';
-
-import { InputFiles, Assets } from './ports/input-files';
-import { SolutionsRepository } from './ports/solutions-repository';
-import { Workspace } from './ports/workspace';
+import { ModuleRef } from '@nestjs/core';
+import AbortController from 'abort-controller';
 
 import { MarxanRun } from './marxan-run';
+import { WorkspaceBuilder } from './ports/workspace-builder';
+import { Cancellable } from './ports/cancellable';
+import { Assets, InputFilesFs } from './adapters/scenario-data/input-files-fs';
+import { SolutionsOutput } from './adapters/solutions-output/solutions-output';
 
 @Injectable()
 export class MarxanSandboxRunnerService {
+  readonly #runs: Record<string, Record<string, Cancellable[]>> = {};
+  readonly #controllers: Record<string, AbortController> = {};
+
   constructor(
-    private readonly workspaceService: Workspace,
-    private readonly inputFilesProvider: InputFiles,
-    private readonly marxanRunner: MarxanRun,
-    private readonly solutionsRepository: SolutionsRepository,
+    private readonly workspaceService: WorkspaceBuilder,
+    private readonly moduleRef: ModuleRef,
   ) {}
 
+  kill(ofScenarioId: string): void {
+    this.#controllers[ofScenarioId]?.abort();
+  }
+
   async run(forScenarioId: string, assets: Assets): Promise<void> {
-    const {
-      cleanup,
-      marxanBinaryPath,
-      workingDirectory,
-    } = await this.workspaceService.get();
-    // useful to check output within docker, during development - needs `cleanup()` to be commented out
-    console.log(`doing things in..`, workingDirectory);
+    const workspace = await this.workspaceService.get();
+    const cancellables: Cancellable[] = [];
+    const controller = (this.#controllers[
+      forScenarioId
+    ] ??= new AbortController());
+    const inputFiles = await this.moduleRef.create(InputFilesFs);
+    const outputFilesRepository = await this.moduleRef.create(SolutionsOutput);
+    const marxanRun = new MarxanRun();
+    cancellables.push(inputFiles);
+    cancellables.push(outputFilesRepository);
+    cancellables.push(marxanRun);
 
-    await this.inputFilesProvider.include(workingDirectory, assets);
+    controller.signal.addEventListener('abort', () => {
+      cancellables.forEach((killMe) => killMe.cancel());
+    });
+    if (controller.signal.aborted) {
+      await workspace.cleanup();
+      throw {
+        stdError: [],
+        signal: 'SIGTERM',
+      };
+    }
+    await inputFiles.include(workspace, assets);
 
-    return new Promise((resolve, reject) => {
-      this.marxanRunner.on(`pid`, (_pid: number) => {
-        // we will need PID for canceling the job
+    return new Promise(async (resolve, reject) => {
+      const interruptIfKilled = async () => {
+        if (controller.signal.aborted) {
+          await workspace.cleanup();
+          return reject({
+            stdError: [],
+            signal: 'SIGTERM',
+          });
+        }
+      };
+
+      marxanRun.on('error', async (result) => {
+        await workspace.cleanup();
+        reject(result);
       });
-
-      this.marxanRunner.on(
-        'error',
-        async (result: {
-          code: number | NodeJS.Signals;
-          stdError: string[];
-        }) => {
-          await cleanup();
-          reject(result);
-        },
-      );
-      this.marxanRunner.on('finished', async () => {
-        await this.solutionsRepository.saveFrom(
-          workingDirectory,
-          forScenarioId,
-        );
-        await cleanup();
-
+      marxanRun.on('finished', async () => {
+        await interruptIfKilled();
+        await outputFilesRepository.saveFrom(workspace, forScenarioId);
+        await workspace.cleanup();
         resolve();
       });
 
-      this.marxanRunner.execute(marxanBinaryPath, workingDirectory);
+      await interruptIfKilled();
+      marxanRun.executeIn(workspace);
     });
   }
 }

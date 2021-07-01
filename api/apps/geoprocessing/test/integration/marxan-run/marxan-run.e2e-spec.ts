@@ -8,7 +8,7 @@ import { v4 } from 'uuid';
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
 import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
 
-import { bootstrapApplication } from '../../utils';
+import { bootstrapApplication, delay } from '../../utils';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
@@ -26,6 +26,23 @@ describe(`given input data is available`, () => {
     await fixtures.WhenRunningMarxan();
 
     expect(await fixtures.ThenExecutionOutput()).toBeGreaterThan(0);
+  }, 30000);
+
+  test(`cancellable marxan run`, async (done) => {
+    expect.assertions(1);
+
+    fixtures
+      .WhenRunningMarxan()
+      .then(() => {
+        done(`Shouldn't finish Marxan run.`);
+      })
+      .catch((error) => {
+        expect(error.signal).toEqual('SIGTERM');
+        done();
+      });
+
+    await delay(1000);
+    fixtures.WhenKillingMarxanRun();
   }, 30000);
 });
 
@@ -66,6 +83,7 @@ const getFixtures = async () => {
           relativeDestination: resource.targetRelativeDestination,
         })),
       ),
+    WhenKillingMarxanRun: () => sut.kill(scenarioId),
     ThenExecutionOutput: async () =>
       await tempRepoReference.count({
         where: {
