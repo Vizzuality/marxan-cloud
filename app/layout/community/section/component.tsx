@@ -11,7 +11,7 @@ export interface CommunitySectionProps {
 export const CommunitySection: React.FC<CommunitySectionProps> = () => {
   return (
     <Wrapper>
-      <div className="grid w-full max-w-5xl grid-cols-2 py-16 mx-auto gap-x-36 ">
+      <div className="grid w-full max-w-5xl grid-cols-2 py-16 mx-auto border-t border-white gap-x-36 border-opacity-20">
         <Column
           title="Explore the projects shared by the community"
           subtitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."

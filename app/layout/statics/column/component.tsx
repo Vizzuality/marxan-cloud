@@ -19,7 +19,7 @@ export const StaticColumn: React.FC<StaticColumnProps> = ({
 }: StaticColumnProps) => {
   return (
     <div>
-      <h2 className="pb-10 text-4xl leading-relaxed text-transparent font-heading max-w-max bg-gradient-to-r from-blue-600 to-green-400 bg-clip-text">
+      <h2 className="pb-10 text-4xl leading-relaxed text-transparent font-heading max-w-max bg-gradient-to-r from-blue-700 via-blue-400 to-green-300 bg-clip-text">
         {title}
       </h2>
       {subtitle && (
