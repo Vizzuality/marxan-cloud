@@ -12,7 +12,7 @@ export const StaticContact: React.FC<StaticContactProps> = () => {
     <div className="bg-primary-500">
       <Wrapper>
         <div className="w-full max-w-5xl py-32 mx-auto">
-          <p className="max-w-3xl mb-2 text-4xl text-black font-heading">
+          <p className="max-w-3xl mb-4 text-4xl text-black font-heading">
             Questions, comments, or feedback?
           </p>
           <p className="max-w-3xl text-4xl text-black mb-14 font-heading">
