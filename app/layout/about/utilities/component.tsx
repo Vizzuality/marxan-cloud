@@ -1,6 +1,6 @@
 import React, { Children } from 'react';
 
-import Button from 'layout/statics/button';
+import ButtonLink from 'layout/statics/button-link';
 import Wrapper from 'layout/wrapper';
 
 import { UTILITIES } from './constants';
@@ -19,12 +19,12 @@ export const AboutUtilities: React.FC<AboutUtilitiesProps> = () => {
             <br />
             Marxan planning platform?
           </h2>
-          <p className="mb-12 text-lg leading-8 text-justify max-w-max font-heading">
+          <p className="mb-12 text-lg leading-8 max-w-max font-heading">
             This platform hosts the Marxan software suite which includes Marxan, Marxan with Zones,
             and Marxan with Connectivity on a stable Azure cloud environment.
             You can use this platform to:
           </p>
-          <Button />
+          <ButtonLink />
         </div>
         <div className="flex flex-col items-start gap-10">
           {Children.toArray(
