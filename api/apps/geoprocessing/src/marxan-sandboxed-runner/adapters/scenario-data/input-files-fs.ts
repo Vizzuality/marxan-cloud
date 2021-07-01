@@ -1,18 +1,34 @@
-import { resolve, dirname } from 'path';
+import { dirname, resolve } from 'path';
 import { createWriteStream, promises } from 'fs';
 import { HttpService, Injectable } from '@nestjs/common';
-import { Assets, InputFiles } from '../../ports/input-files';
+import { Workspace } from '../../ports/workspace';
+import { Cancellable } from '../../ports/cancellable';
+
+export interface Settings {
+  PUNAME: string;
+  SPECNAME: string;
+  PUVSPRNAME: string;
+  BOUNDNAME: string;
+}
+
+export type Assets = {
+  url: string;
+  relativeDestination: string;
+}[];
 
 @Injectable()
-export class DeriveScenarioFacade implements InputFiles {
+export class InputFilesFs implements Cancellable {
   constructor(private readonly httpService: HttpService) {}
 
-  async include(directory: string, assets: Assets): Promise<void> {
+  async include(workspace: Workspace, assets: Assets): Promise<void> {
     assets.forEach((asset) => this.validateInput(asset.relativeDestination));
 
     await Promise.all(
       assets.map((asset) =>
-        this.download(asset.url, resolve(directory, asset.relativeDestination)),
+        this.download(
+          asset.url,
+          resolve(workspace.workingDirectory, asset.relativeDestination),
+        ),
       ),
     );
     return;
@@ -54,5 +70,9 @@ export class DeriveScenarioFacade implements InputFiles {
     ) {
       throw new Error('Hacking is not allowed.');
     }
+  }
+
+  cancel(): Promise<void> {
+    return Promise.resolve(undefined);
   }
 }

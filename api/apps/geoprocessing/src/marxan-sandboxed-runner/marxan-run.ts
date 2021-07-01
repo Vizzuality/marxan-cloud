@@ -1,48 +1,58 @@
-import { Injectable, Scope } from '@nestjs/common';
-import { spawn } from 'child_process';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import TypedEmitter from 'typed-emitter';
+import { assertDefined } from '@marxan/utils';
+
+import { Workspace } from './ports/workspace';
+import { Cancellable } from './ports/cancellable';
 
 interface MessageEvents {
-  pid(pid: number): void;
   error(error: {
-    signal?: 'SIGSEGV';
-    code?: number | null | NodeJS.Signals;
+    signal?: NodeJS.Signals | null;
+    code?: number | null;
     stdError: string[];
   }): void;
+
   finished(): void;
 }
 
 const MarxanRunEmitter: new () => TypedEmitter<MessageEvents> = EventEmitter;
 
-@Injectable({
-  scope: Scope.TRANSIENT,
-})
-export class MarxanRun extends MarxanRunEmitter {
-  #processId?: number;
+// @Injectable({
+//   scope: Scope.TRANSIENT,
+// })
+export class MarxanRun extends MarxanRunEmitter implements Cancellable {
+  #process?: ChildProcessWithoutNullStreams;
   #stdOut: string[] = [];
   #stdError: string[] = [];
 
-  execute(bin: string, workingDirectory: string): void {
-    const sub = spawn(bin, {
-      cwd: workingDirectory,
+  async cancel(): Promise<void> {
+    this.#process?.kill('SIGTERM');
+    return;
+  }
+
+  executeIn(
+    workspace: Pick<Workspace, 'workingDirectory' | 'marxanBinaryPath'>,
+  ): void {
+    this.#process = spawn(workspace.marxanBinaryPath, {
+      cwd: workspace.workingDirectory,
     });
 
-    this.emit(`pid`, sub.pid);
+    assertDefined(this.#process);
 
-    sub.stderr.on('data', (chunk) => {
+    this.#process.stderr.on('data', (chunk) => {
       console.log(chunk.toString());
       this.#stdError.push(chunk.toString());
     });
 
-    sub.stdout.on('data', (chunk) => {
+    this.#process.stdout.on('data', (chunk) => {
       // TODO place for "progress update" parsing and emitting to consumer
       this.#stdOut.push(chunk.toString());
-      console.log(chunk.toString());
+      // console.log(chunk.toString());
     });
 
-    sub.on('exit', (code, signal) => {
-      if (signal === 'SIGSEGV') {
+    this.#process.on('exit', (code, signal) => {
+      if (signal) {
         this.emit('error', {
           signal,
           stdError: this.#stdError,
@@ -58,10 +68,6 @@ export class MarxanRun extends MarxanRunEmitter {
       }
       this.emit('finished');
     });
-  }
-
-  get processId() {
-    return this.#processId;
   }
 
   get stdOut() {
