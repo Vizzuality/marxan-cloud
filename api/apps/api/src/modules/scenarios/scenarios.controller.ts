@@ -255,6 +255,16 @@ export class ScenariosController {
     return await this.service.getInputParameterFile(id);
   }
 
+  @ApiOperation({ description: `Resolve scenario's spec file.` })
+  @Get(':id/marxan/dat/spec.dat')
+  @ApiProduces('text/plain')
+  @Header('Content-Type', 'text/plain')
+  async getSpecDatFile(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<string> {
+    return await this.service.getSpecDatCsv(id);
+  }
+
   @ApiOkResponse({
     type: ScenarioSolutionResultDto,
   })

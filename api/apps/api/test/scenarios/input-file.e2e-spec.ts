@@ -30,7 +30,7 @@ describe(`when a user updates scenario with input data`, () => {
   let scenarioId: string;
   beforeEach(async () => {
     // given
-    scenarioId = await fixtures.GivenScenarioExists();
+    scenarioId = (await fixtures.GivenScenarioExists()).id;
 
     // when
     await fixtures.WhenUpdatesScenarioWithInput(
@@ -52,7 +52,7 @@ describe(`when a user updates scenario with input data with verbosity`, () => {
   let scenarioId: string;
   beforeEach(async () => {
     // given
-    scenarioId = await fixtures.GivenScenarioExists();
+    scenarioId = (await fixtures.GivenScenarioExists()).id;
 
     // when
     await fixtures.WhenUpdatesScenarioWithInput(
@@ -74,7 +74,7 @@ describe(`when a user updates scenario with input data with input keys`, () => {
   let scenarioId: string;
   beforeEach(async () => {
     // given
-    scenarioId = await fixtures.GivenScenarioExists();
+    scenarioId = (await fixtures.GivenScenarioExists()).id;
 
     // when
     await fixtures.WhenUpdatesScenarioWithInput(
@@ -94,11 +94,13 @@ describe(`when a user updates scenario with input data with input keys`, () => {
 
 describe(`when a user updates scenario with invalid input data`, () => {
   let scenarioId: string;
+  let originalMedatadata: Record<string, unknown> | undefined;
   let result: request.Response;
   beforeEach(async () => {
     // given
-    scenarioId = await fixtures.GivenScenarioExists();
-
+    const scenarioData = await fixtures.GivenScenarioExists();
+    scenarioId = scenarioData.id;
+    originalMedatadata = scenarioData.attributes.metadata;
     // when
     result = await fixtures.WhenUpdatesScenarioWithInput(
       scenarioId,
@@ -109,7 +111,7 @@ describe(`when a user updates scenario with invalid input data`, () => {
   // then
   it(`should return not changed metadata to user`, async () => {
     await fixtures.ThenScenarioHasMetadata(scenarioId, {
-      metadata: null,
+      metadata: originalMedatadata,
     });
   });
 
@@ -134,7 +136,7 @@ async function getFixtures() {
         projectId,
       });
       cleanups.push(() => scenarios.delete(scenario.data.id));
-      return scenario.data.id;
+      return scenario.data;
     },
     async cleanup() {
       for (const cleanup of cleanups.reverse()) {
