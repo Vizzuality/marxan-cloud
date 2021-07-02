@@ -17,7 +17,7 @@ export const CommunitySection: React.FC<CommunitySectionProps> = () => {
           subtitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
           description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."
           caption="Explore projects"
-          href="/"
+          href="community/projects"
         />
         <Column
           title="Join the community and stay updated"
