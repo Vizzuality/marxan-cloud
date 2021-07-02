@@ -2,6 +2,8 @@ import React from 'react';
 
 import Wrapper from 'layout/wrapper';
 
+import { FOUNDING_LOGOS/* , SUPPORTING_LOGOS */ } from './constants';
+
 export interface PartnersListProps {
 
 }
@@ -15,7 +17,9 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
             Founding partners:
           </h2>
           <div className="grid w-full grid-cols-3 gap-x-56">
-            Images
+            {FOUNDING_LOGOS.map((fl) => (
+              <img alt={fl.alt} key={fl.id} src={fl.src} />
+            ))}
           </div>
         </div>
       </Wrapper>
