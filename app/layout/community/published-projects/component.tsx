@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Link from 'next/link';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Search from 'components/search';
@@ -45,28 +47,30 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
               </th>
             </tr>
           </thead>
-          <tr className="border-b border-white border-opacity-20">
-            <td className="pb-10">
-              <p className="font-semibold">Kenya Project</p>
-              <p className="text-base leading-normal text-gray-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
-            </td>
-            <td>
-              <p className="text-sm">Kenya</p>
-            </td>
-            <td>
-              <p className="text-sm">Tamara Huete</p>
-              <p className="text-sm">Andrea Rota</p>
-            </td>
-            <td>
-              <div className="flex flex-row justify-between pl-10">
-                <p className="text-sm">120K</p>
-                <Button size="s" theme="transparent-white" className="px-6 group">
-                  Duplicate
-                  <Icon icon={DOWNLOAD_SVG} className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black" />
-                </Button>
-              </div>
-            </td>
-          </tr>
+          <Link href="projects/1">
+            <tr className="border-b border-white border-opacity-20">
+              <td className="pb-10">
+                <p className="font-semibold">Kenya Project</p>
+                <p className="text-base leading-normal text-gray-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
+              </td>
+              <td>
+                <p className="text-sm">Kenya</p>
+              </td>
+              <td>
+                <p className="text-sm">Tamara Huete</p>
+                <p className="text-sm">Andrea Rota</p>
+              </td>
+              <td>
+                <div className="flex flex-row justify-between pl-10">
+                  <p className="text-sm">120K</p>
+                  <Button size="s" theme="transparent-white" className="px-6 group">
+                    Duplicate
+                    <Icon icon={DOWNLOAD_SVG} className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black" />
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          </Link>
         </table>
       </div>
     </Wrapper>
