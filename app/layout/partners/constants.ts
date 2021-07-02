@@ -1,67 +1,58 @@
-import Microsoft from 'images/partners/microsoft_logo.png';
-import TheNatureConservancy from 'images/partners/theNatureConservancy_logo.png';
-import UniversityOfQueensland from 'images/partners/queenslandUniversity_logo.png';
-import EuropeanUnion from 'images/partners/eu_logo.png';
-import Biopama from 'images/partners/biopama_logo.png';
-import Vizzuality from 'images/partners/vizzuality_logo.png';
-import UNEnvironment from 'images/partners/unEnvironmentWCMC_logo.png';
-import Mapbox from 'images/partners/mapbox_logo.png';
-import PacMARA from 'images/partners/pacMARA_logo.png';
+import MICROSOFT_SVG from 'svgs/partners/microsoft_logo.svg?sprite';
+import THE_NATURE_CONSERVANCY_SVG from 'svgs/partners/the-nature-conservancy_logo.svg?sprite';
+import UNIVERSITY_QUEENSLAND_SVG from 'svgs/partners/university-queensland_logo.svg?sprite';
+import EU_SVG from 'svgs/partners/eu_logo.svg?sprite';
+import BIOPAMA_SVG from 'svgs/partners/biopama_logo.svg?sprite';
+import VIZZUALITY_SVG from 'svgs/partners/vizzuality_logo.svg?sprite';
+import UN_SVG from 'svgs/partners/un-environment_logo.svg?sprite';
+import MAPBOX_SVG from 'svgs/partners/mapbox_logo.svg?sprite';
+import PACMARA_SVG from 'svgs/partners/pacmara_logo.svg?sprite';
 
 export const FOUNDING_LOGOS = [
   {
     id: 1,
-    alt: 'Microsoft logo',
-    src: Microsoft,
+    icon: MICROSOFT_SVG,
     hyperlink: '',
   },
   {
     id: 2,
-    alt: 'The Nature Conservancy logo',
-    src: TheNatureConservancy,
+    icon: THE_NATURE_CONSERVANCY_SVG,
     hyperlink: '',
   },
   {
     id: 3,
-    alt: 'The University Of Queensland logo',
-    src: UniversityOfQueensland,
+    icon: UNIVERSITY_QUEENSLAND_SVG,
     hyperlink: '',
   },
   {
     id: 4,
-    alt: 'European Union logo',
-    src: EuropeanUnion,
+    icon: EU_SVG,
     hyperlink: '',
   },
   {
     id: 5,
-    alt: 'Biopama logo',
-    src: Biopama,
+    icon: BIOPAMA_SVG,
     hyperlink: '',
   }];
 
 export const SUPPORTING_LOGOS = [
   {
     id: 6,
-    alt: 'Vizzuality logo',
-    src: Vizzuality,
+    icon: VIZZUALITY_SVG,
     hyperlink: '',
   },
   {
     id: 7,
-    alt: 'UN Environment WCMC logo',
-    src: UNEnvironment,
+    icon: UN_SVG,
     hyperlink: '',
   },
   {
     id: 8,
-    alt: 'Mapbox logo',
-    src: Mapbox,
+    icon: MAPBOX_SVG,
     hyperlink: '',
   },
   {
     id: 9,
-    alt: 'PacMARA logo',
-    src: PacMARA,
+    icon: PACMARA_SVG,
     hyperlink: '',
   }];

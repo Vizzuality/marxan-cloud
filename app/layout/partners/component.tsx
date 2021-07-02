@@ -1,5 +1,6 @@
 import React from 'react';
 
+import Icon from 'components/icon';
 import Wrapper from 'layout/wrapper';
 
 import { FOUNDING_LOGOS, SUPPORTING_LOGOS } from './constants';
@@ -16,9 +17,9 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
           <h2 className="pb-20 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
             Founding partners:
           </h2>
-          <div className="grid w-full grid-cols-3 gap-x-56 gap-y-20">
+          <div className="grid w-full grid-cols-3 py-10 gap-x-56 gap-y-24">
             {FOUNDING_LOGOS.map((fl) => (
-              <img alt={fl.alt} key={fl.id} src={fl.src} className="place-self-center" />
+              <Icon key={fl.id} icon={fl.icon} className="place-self-center" />
             ))}
           </div>
         </div>
@@ -28,9 +29,9 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
               Supporting partners:
             </h2>
           </div>
-          <div className="grid w-full grid-cols-3 gap-x-56 gap-y-20">
+          <div className="grid w-full grid-cols-3 py-10 gap-x-56 gap-y-24">
             {SUPPORTING_LOGOS.map((sl) => (
-              <img alt={sl.alt} key={sl.id} src={sl.src} className="place-self-center" />
+              <Icon key={sl.id} icon={sl.icon} className="place-self-center" />
             ))}
           </div>
         </div>
