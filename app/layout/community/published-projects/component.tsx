@@ -48,7 +48,7 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
             </tr>
           </thead>
           <Link href="projects/1">
-            <tr className="border-b border-white border-opacity-20">
+            <tr className="border-b border-white cursor-pointer border-opacity-20">
               <td className="pb-10">
                 <p className="font-semibold">Kenya Project</p>
                 <p className="text-base leading-normal text-gray-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>

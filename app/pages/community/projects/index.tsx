@@ -25,7 +25,7 @@ const CommunityProjects: React.FC = () => {
           section="Community"
           title="Explore public projects and take them to your account."
           description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-          back
+          backlink="/community"
         />
         <PublishedProjects />
         <Contact />
