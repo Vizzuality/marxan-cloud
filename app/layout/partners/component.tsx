@@ -18,7 +18,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
           </h2>
           <div className="grid w-full grid-cols-3 gap-x-56 gap-y-20">
             {FOUNDING_LOGOS.map((fl) => (
-              <img alt={fl.alt} key={fl.id} src={fl.src} />
+              <img alt={fl.alt} key={fl.id} src={fl.src} className="place-self-center" />
             ))}
           </div>
         </div>
@@ -30,7 +30,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
           </div>
           <div className="grid w-full grid-cols-3 gap-x-56 gap-y-20">
             {SUPPORTING_LOGOS.map((sl) => (
-              <img alt={sl.alt} key={sl.id} src={sl.src} />
+              <img alt={sl.alt} key={sl.id} src={sl.src} className="place-self-center" />
             ))}
           </div>
         </div>
