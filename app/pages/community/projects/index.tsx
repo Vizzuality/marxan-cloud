@@ -5,6 +5,7 @@ import Contact from 'layout/statics/contact';
 import Header from 'layout/header';
 import Hero from 'layout/statics/hero';
 import Footer from 'layout/footer';
+import ProjectsList from 'layout/community/projects';
 
 import { withUser } from 'hoc/auth';
 
@@ -26,6 +27,7 @@ const CommunityProjects: React.FC = () => {
           description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
           back
         />
+        <ProjectsList />
         <Contact />
         <Footer />
       </main>

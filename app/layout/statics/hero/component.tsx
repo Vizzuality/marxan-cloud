@@ -20,7 +20,7 @@ export const StaticHero: React.FC<StaticHeroProps> = ({
 }: StaticHeroProps) => {
   return (
     <Wrapper>
-      <div className="w-full max-w-5xl mx-auto py-28">
+      <div className="w-full max-w-5xl mx-auto py-18">
         {back && (
           <a href="/community" className="flex items-center fle-row">
             <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 mr-1 text-blue-500" />
