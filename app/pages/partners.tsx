@@ -5,6 +5,7 @@ import Contact from 'layout/statics/contact';
 import Header from 'layout/header';
 import Hero from 'layout/statics/hero';
 import Footer from 'layout/footer';
+import PartnersList from 'layout/partners';
 
 import { withUser } from 'hoc/auth';
 
@@ -25,6 +26,7 @@ const Partners: React.FC = () => {
           title="Let’s grow the platform together lorem ipsum."
           description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
         />
+        <PartnersList />
         <Contact />
         <Footer />
       </main>
