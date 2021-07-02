@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import React from 'react';
 
 import Wrapper from 'layout/wrapper';
 
@@ -31,21 +31,19 @@ export const AboutValues: React.FC<AboutValuesProps> = () => {
             adaptation and mitigation for the next decade of conservation planning.
           </p>
           <div className="grid grid-cols-2 gap-x-36 gap-y-20">
-            {Children.toArray(
-              VALUES.map((v) => (
-                <div className="flex flex-col" key={v.order}>
-                  <h3 className="mb-5 text-base font-semibold text-black">
-                    {v.order}
-                    {' '}
-                    {v.title}
-                  </h3>
-                  <p className="mb-5 text-sm text-black">
-                    {v.description}
-                  </p>
-                  <a className="text-base text-black underline" href={v.hyperlink}>{v.hypertext}</a>
-                </div>
-              )),
-            )}
+            {VALUES.map((v) => (
+              <div className="flex flex-col" key={v.order}>
+                <h3 className="mb-5 text-base font-semibold text-black">
+                  {v.order}
+                  {' '}
+                  {v.title}
+                </h3>
+                <p className="mb-5 text-sm text-black">
+                  {v.description}
+                </p>
+                <a className="text-base text-black underline" href={v.hyperlink}>{v.hypertext}</a>
+              </div>
+            ))}
           </div>
         </div>
       </Wrapper>
