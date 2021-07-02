@@ -15,7 +15,7 @@ export interface CommunityProjectsListProps {
 export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () => {
   return (
     <Wrapper>
-      <div className="w-full max-w-5xl mx-auto py-28">
+      <div className="w-full max-w-5xl mx-auto py-18">
         <Search
           id="project-search"
           // defaultValue={search}
