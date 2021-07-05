@@ -1,5 +1,6 @@
 import { dirname, resolve } from 'path';
 import { createWriteStream, promises } from 'fs';
+import axios, { CancelTokenSource } from 'axios';
 import { HttpService, Injectable } from '@nestjs/common';
 import { Workspace } from '../../ports/workspace';
 import { Cancellable } from '../../ports/cancellable';
@@ -18,7 +19,11 @@ export type Assets = {
 
 @Injectable()
 export class InputFilesFs implements Cancellable {
-  constructor(private readonly httpService: HttpService) {}
+  #cancelTokenSource: CancelTokenSource;
+
+  constructor(private readonly httpService: HttpService) {
+    this.#cancelTokenSource = axios.CancelToken.source();
+  }
 
   async include(workspace: Workspace, assets: Assets): Promise<void> {
     assets.forEach((asset) => this.validateInput(asset.relativeDestination));
@@ -45,13 +50,19 @@ export class InputFilesFs implements Cancellable {
       this.httpService
         .get(sourceUri, {
           // responseType: 'stream',
+          cancelToken: this.#cancelTokenSource.token,
         })
         .toPromise()
         .then((response) => {
           writer.write(response.data);
           writer.end();
         })
-        .catch(reject);
+        .catch((error) => {
+          if (axios.isCancel(error)) {
+            return resolve(void 0);
+          }
+          return reject(error);
+        });
     });
   }
 
@@ -73,6 +84,7 @@ export class InputFilesFs implements Cancellable {
   }
 
   cancel(): Promise<void> {
-    return Promise.resolve(undefined);
+    this.#cancelTokenSource.cancel();
+    return Promise.resolve();
   }
 }

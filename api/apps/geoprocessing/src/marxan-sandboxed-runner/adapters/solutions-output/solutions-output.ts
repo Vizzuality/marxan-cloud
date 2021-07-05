@@ -73,6 +73,7 @@ export class SolutionsOutput implements Cancellable {
   }
 
   cancel(): Promise<void> {
+    // TODO if streaming will be involved, can be interrupted
     return Promise.resolve(undefined);
   }
 }

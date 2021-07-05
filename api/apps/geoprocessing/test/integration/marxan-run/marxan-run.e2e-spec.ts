@@ -12,15 +12,37 @@ import { bootstrapApplication, delay } from '../../utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   fixtures = await getFixtures();
+});
+
+describe(`given input data is delayed`, () => {
+  beforeEach(() => {
+    fixtures.GivenInputFilesAreAvailable(5000);
+  });
+
+  test(`cancellable slow marxan run`, async (done) => {
+    expect.assertions(1);
+
+    fixtures
+      .WhenRunningMarxan()
+      .then(() => {
+        done(`Shouldn't finish Marxan run.`);
+      })
+      .catch((error) => {
+        expect(error.signal).toEqual('SIGTERM');
+        done();
+      });
+
+    await delay(1000);
+    fixtures.WhenKillingMarxanRun();
+  }, 30000);
 });
 
 describe(`given input data is available`, () => {
   beforeEach(() => {
     fixtures.GivenInputFilesAreAvailable();
   });
-
   test(`marxan run`, async () => {
     await fixtures.WhenRunningMarxan();
 
@@ -45,7 +67,7 @@ describe(`given input data is available`, () => {
   }, 30000);
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await fixtures.cleanup();
 });
 
@@ -84,10 +106,11 @@ const getFixtures = async () => {
           scenarioId,
         },
       }),
-    GivenInputFilesAreAvailable: () =>
+    GivenInputFilesAreAvailable: (delayMs = 0) =>
       resources.forEach((resource) => {
         nockScope
           .get(resource.assetUrl)
+          .delay(delayMs)
           .reply(200, resourceResponse(resource.targetRelativeDestination), {
             'content-type': 'plain/text',
           });
