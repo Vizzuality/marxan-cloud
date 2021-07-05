@@ -17,6 +17,7 @@ export abstract class SpecForGeofeature {
 
 export class SpecForPlainGeoFeature extends SpecForGeofeature {
   @ValidateNested()
+  @Type(() => MarxanSettingsForGeoFeature)
   @ApiProperty()
   marxanSettings!: MarxanSettingsForGeoFeature;
 
