@@ -40,7 +40,9 @@ describe('JSON API Specs (e2e)', () => {
     ).then(async (response) => await Deserializer.deserialize(response));
 
     fakeProject = await ProjectsTestUtils.createProject(app, jwtToken, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea(),
+      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+        countryCode: 'NAM',
+      }),
       organizationId: fakeOrganization.id,
     }).then(async (response) => await Deserializer.deserialize(response));
   });
@@ -100,7 +102,9 @@ describe('JSON API Specs (e2e)', () => {
       .get(`/api/v1/projects/${fakeProject.id}/features`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .send({
-        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea(),
+        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+          countryCode: 'NAM',
+        }),
         organizationId: fakeOrganization.id,
       });
 
