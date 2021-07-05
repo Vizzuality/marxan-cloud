@@ -2,11 +2,13 @@ import {
   BadRequestException,
   HttpService,
   Injectable,
-  NotImplementedException,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
+import { isLeft } from 'fp-ts/Either';
 
 import { MarxanInput, MarxanParameters } from '@marxan/marxan-input';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -31,6 +33,7 @@ import { SpecDatService } from './input-files/spec.dat.service';
 import { PuvsprDatService } from './input-files/puvspr.dat.service';
 import { OutputFilesService } from './output-files/output-files.service';
 import { BoundDatService } from './input-files/bound.dat.service';
+import { notFound, RunService } from './run.service';
 
 @Injectable()
 export class ScenariosService {
@@ -48,6 +51,7 @@ export class ScenariosService {
     private readonly costSurfaceView: CostSurfaceViewService,
     private readonly marxanInputValidator: MarxanInput,
     private readonly inputParameterFileProvider: InputParameterFileProvider,
+    private readonly runService: RunService,
     private readonly specDatService: SpecDatService,
     private readonly puvsprDatService: PuvsprDatService,
     private readonly boundDatService: BoundDatService,
@@ -167,15 +171,20 @@ export class ScenariosService {
 
   async run(scenarioId: string, _blm?: number): Promise<void> {
     await this.assertScenario(scenarioId);
-    // TODO ensure not running yet
-    // TODO submit
-    throw new NotImplementedException();
+    await this.runService.run(scenarioId);
   }
 
   async cancel(scenarioId: string): Promise<void> {
     await this.assertScenario(scenarioId);
-    // TODO ensure it is running
-    throw new NotImplementedException();
+    const result = await this.runService.cancel(scenarioId);
+    if (isLeft(result)) {
+      const mapping: Record<typeof result.left, () => never> = {
+        [notFound]: () => {
+          throw new NotFoundException();
+        },
+      };
+      mapping[result.left]();
+    }
   }
 
   private async assertScenario(scenarioId: string) {

@@ -178,6 +178,7 @@ async function getFixtures() {
         status: JobStatus.done,
         type: ScenarioType.marxanWithZones,
         users: [],
+        ranAtLeastOnce: false,
       };
     },
     withInputParameters() {

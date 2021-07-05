@@ -158,6 +158,13 @@ export class Scenario extends TimeUserEntityMetadata {
   @IsArray()
   @ManyToMany((_type) => User, (user) => user.scenarios, { eager: true })
   users!: Partial<User>[];
+
+  @ApiProperty()
+  @Column({
+    name: 'ran_at_least_once',
+    default: false,
+  })
+  ranAtLeastOnce!: boolean;
 }
 
 export class JSONAPIScenarioData {

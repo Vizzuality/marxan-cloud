@@ -33,10 +33,17 @@ import {
   IoSettings,
   ioSettingsToken,
 } from './input-parameter-file.provider';
-import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
+import { AppConfig } from '@marxan-api/utils/config.utils';
+import { QueueModule } from '@marxan-api/modules/queue/queue.module';
+import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
 import { SpecDatModule } from './input-files/spec.dat.module';
 import { PuvsprDatModule } from './input-files/puvspr.dat.module';
+import {
+  runQueueEventsProvider,
+  runQueueProvider,
+  RunService,
+} from './run.service';
 
 import { MarxanRunService } from './marxan-run/marxan-run.service';
 import { MarxanRunController } from './marxan-run/marxan-run.controller';
@@ -70,8 +77,13 @@ import { BoundDatModule } from './input-files/bound.dat.module';
     BoundDatModule,
     PlanningUnitsProtectionLevelModule,
     OutputFilesModule,
+    QueueModule.register(),
+    ApiEventsModule,
   ],
   providers: [
+    runQueueProvider,
+    runQueueEventsProvider,
+    RunService,
     ScenariosService,
     ScenariosCrudService,
     ProxyService,
