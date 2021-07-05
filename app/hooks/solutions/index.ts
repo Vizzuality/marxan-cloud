@@ -6,17 +6,11 @@ import { useSession } from 'next-auth/client';
 
 import flatten from 'lodash/flatten';
 
-// import { ItemProps as RawItemProps } from 'components/gap-analysis/item/component';
-
 import PROJECTS from 'services/projects';
 
 import {
   UseSolutionsOptionsProps,
 } from './types';
-
-import ITEMS from './mock';
-
-// interface AllItemProps extends RawItemProps {}
 
 export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) {
   const [session] = useSession();
@@ -35,9 +29,9 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
       };
     }, {});
 
-  const fetchSolutions = ({ pageParam = 1 }) => PROJECTS.request({
+  const fetchFeatures = ({ pageParam = 1 }) => PROJECTS.request({
     method: 'GET',
-    url: `/${projectId}/solutions`,
+    url: `/${projectId}/features`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
@@ -53,7 +47,7 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
     },
   });
 
-  const query = useInfiniteQuery(['solutions', projectId, JSON.stringify(options)], fetchSolutions, {
+  const query = useInfiniteQuery(['solutions', projectId, JSON.stringify(options)], fetchFeatures, {
     keepPreviousData: true,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
@@ -68,11 +62,26 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
   const { pages } = data || {};
 
   return useMemo(() => {
-    const parsedData = Array.isArray(pages) ? flatten(pages.map(() => {
-      // const { data: { data: pageData } } = p;
+    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
+      const { data: { data: pageData } } = p;
 
-      // Temporary mock data
-      return ITEMS;
+      return pageData.map((d) => {
+        const {
+          id,
+          alias,
+          featureClassName,
+        } = d;
+
+        return {
+          id,
+          name: alias || featureClassName,
+          run: Math.round(Math.random() * 100),
+          score: Math.round(Math.random() * 200),
+          cost: Math.round(Math.random() * 300),
+          planningUnits: Math.round(Math.random() * 20),
+          missingValues: Math.round(Math.random() * 10),
+        };
+      });
     })) : [];
 
     return {
