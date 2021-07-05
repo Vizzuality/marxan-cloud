@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import React from 'react';
 
 import ButtonLink from 'layout/statics/button-link';
 import Wrapper from 'layout/wrapper';
@@ -27,14 +27,12 @@ export const AboutUtilities: React.FC<AboutUtilitiesProps> = () => {
           <ButtonLink />
         </div>
         <div className="flex flex-col items-start gap-10">
-          {Children.toArray(
-            UTILITIES.map((u) => (
-              <div className="flex flex-row gap-16" key={u.order}>
-                <p className="text-2xl font-semibold text-gray-600">{u.order}</p>
-                <p className="text-lg font-heading">{u.description}</p>
-              </div>
-            )),
-          )}
+          {UTILITIES.map((u) => (
+            <div className="flex flex-row gap-16" key={u.order}>
+              <p className="text-2xl font-semibold text-gray-600">{u.order}</p>
+              <p className="text-lg font-heading">{u.description}</p>
+            </div>
+          ))}
         </div>
       </div>
     </Wrapper>
