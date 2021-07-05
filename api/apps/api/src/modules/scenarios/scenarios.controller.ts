@@ -36,6 +36,7 @@ import {
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
   ApiParam,
+  ApiAcceptedResponse,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
@@ -63,6 +64,9 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/run/:runId/solutions`;
+
+const marxanRunTag = 'Marxan Run';
+const marxanFilesTag = 'Marxan Run - Files';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -245,6 +249,7 @@ export class ScenariosController {
     );
   }
 
+  @ApiTags(marxanFilesTag)
   @ApiOperation({ description: `Resolve scenario's input parameter file.` })
   @Get(':id/marxan/dat/input.dat')
   @ApiProduces('text/plain')
@@ -255,6 +260,7 @@ export class ScenariosController {
     return await this.service.getInputParameterFile(id);
   }
 
+  @ApiTags(marxanFilesTag)
   @ApiOperation({ description: `Resolve scenario's spec file.` })
   @Get(':id/marxan/dat/spec.dat')
   @ApiProduces('text/plain')
@@ -310,6 +316,41 @@ export class ScenariosController {
     );
   }
 
+  @ApiOperation({
+    description: `Request start of the Marxan execution.`,
+    summary: `Request start of the Marxan execution.`,
+  })
+  @ApiTags(marxanRunTag)
+  @ApiQuery({
+    name: `blm`,
+    required: false,
+    type: Number,
+  })
+  @ApiAcceptedResponse({
+    description: `No content.`,
+  })
+  @Post(`:id/marxan`)
+  async executeMarxanRun(
+    @Param(`id`, ParseUUIDPipe) id: string,
+    @Query(`blm`) blm?: number,
+  ) {
+    await this.service.run(id, blm);
+  }
+
+  @ApiOperation({
+    description: `Cancel running Marxan execution.`,
+    summary: `Cancel running Marxan execution.`,
+  })
+  @ApiTags(marxanRunTag)
+  @ApiAcceptedResponse({
+    description: `No content.`,
+  })
+  @Delete(`:id/marxan`)
+  async cancelMaraxnRun(@Param(`id`, ParseUUIDPipe) id: string) {
+    await this.service.cancel(id);
+  }
+
+  @ApiTags(marxanRunTag)
   @ApiOkResponse({
     type: ScenarioSolutionResultDto,
   })
@@ -324,6 +365,7 @@ export class ScenariosController {
     );
   }
 
+  @ApiTags(marxanRunTag)
   @ApiOkResponse({
     type: ScenarioSolutionResultDto,
   })
@@ -345,6 +387,7 @@ export class ScenariosController {
     );
   }
 
+  @ApiTags(marxanFilesTag)
   @Header('Content-Type', 'text/csv')
   @ApiOkResponse({
     schema: {
