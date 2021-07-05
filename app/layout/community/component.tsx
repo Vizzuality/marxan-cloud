@@ -4,11 +4,11 @@ import Button from 'components/button';
 import Column from 'layout/statics/column';
 import Wrapper from 'layout/wrapper';
 
-export interface CommunitySectionProps {
+export interface CommunityInfoProps {
 
 }
 
-export const CommunitySection: React.FC<CommunitySectionProps> = () => {
+export const CommunityInfo: React.FC<CommunityInfoProps> = () => {
   return (
     <Wrapper>
       <div className="grid w-full max-w-5xl grid-cols-2 py-16 mx-auto border-t border-white gap-x-36 border-opacity-20">
@@ -53,4 +53,4 @@ export const CommunitySection: React.FC<CommunitySectionProps> = () => {
   );
 };
 
-export default CommunitySection;
+export default CommunityInfo;
