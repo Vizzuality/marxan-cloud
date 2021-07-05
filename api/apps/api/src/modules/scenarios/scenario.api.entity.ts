@@ -15,6 +15,7 @@ import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { IUCNCategory } from '../protected-areas/protected-area.geo.entity';
 import { GeoFeatureSet } from '../geo-features/geo-feature-set.api.entity';
+import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
@@ -114,6 +115,10 @@ export class Scenario extends TimeUserEntityMetadata {
   @Column('integer', { name: 'wdpa_threshold' })
   @IsOptional()
   wdpaThreshold?: number | null;
+
+  @Column('jsonb', { name: 'feature_set' })
+  @IsOptional()
+  featureSet?: CreateGeoFeatureSetDTO;
 
   /**
    * Number of runs for Marxan calculations.
