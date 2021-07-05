@@ -15,6 +15,7 @@ const scenarioBase = (): Scenario => ({
   wdpaThreshold: undefined,
   wdpaIucnCategories: undefined,
   protectedAreaFilterByIds: undefined,
+  ranAtLeastOnce: false,
 });
 
 export const scenarioWithRequiredWatchedEmpty = (): Scenario => ({
