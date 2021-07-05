@@ -490,27 +490,4 @@ export class ScenariosController {
     await this.service.getCostSurfaceCsv(id, res);
     return;
   }
-
-  @ApiOperation({
-    description: "Create the specification for a scenario's feature set",
-  })
-  @ApiOkResponse()
-  @Post(':id/features/specification')
-  async createFeatureSetForScenario(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
-  ): Promise<GeoFeatureSetResult> {
-    return await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto);
-  }
-  @ApiOperation({
-    description: "Replace the specification for a scenario's feature set",
-  })
-  @ApiOkResponse()
-  @Put(':id/features/specification')
-  async replaceFeatureSetForScenario(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
-  ): Promise<GeoFeatureSetResult> {
-    return await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto);
-  }
 }
