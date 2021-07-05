@@ -66,7 +66,7 @@ import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
-import { UpdateGeoFeatureSetDTO } from '../geo-features/dto/update.geo-feature-set.dto';
+import { GeoFeatureSetSerializer } from '../geo-features/geo-feature-set.serializer';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -82,6 +82,7 @@ export class ScenariosController {
   constructor(
     public readonly service: ScenariosService,
     private readonly geoFeaturesService: GeoFeaturesService,
+    private readonly geoFeatureSetSerializer: GeoFeatureSetSerializer,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
@@ -200,21 +201,34 @@ export class ScenariosController {
   @Post(':id/features/specification')
   async createFeatureSetFor(
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
-    @Req() req: RequestWithAuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<any> {
-    Logger.debug(`Creating feature specification with dto: ${dto}`);
-    return dto;
+    return await this.geoFeatureSetSerializer.serialize(
+      [await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto)]
+    )
   }
 
   @ApiOperation({ description: 'Update feature set for scenario' })
   @ApiOkResponse({ type: ScenarioResult })
-  @Post(':id/features/specification')
+  @Put(':id/features/specification')
   async updateFeatureSetFor(
-    @Body(new ValidationPipe()) dto: UpdateGeoFeatureSetDTO,
-    @Req() req: RequestWithAuthenticatedUser,
+    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<any> {
-    Logger.debug(`Creating feature specification with dto: ${dto}`);
-    return dto;
+    return await this.geoFeatureSetSerializer.serialize(
+    [await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto)]
+    )
+  }
+
+  @ApiOperation({ description: 'Get feature set for scenario' })
+  @ApiOkResponse({ type: GeoFeatureSetResult })
+  @Get(':id/features/specification')
+  async getFeatureSetFor(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<any> {
+    return await this.geoFeatureSetSerializer.serialize(
+      [await this.service.getFeatureSetForScenario(id)]
+    );
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
