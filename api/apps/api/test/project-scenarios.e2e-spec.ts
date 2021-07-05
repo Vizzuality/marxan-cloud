@@ -3,10 +3,10 @@ import * as request from 'supertest';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
 import { FakeQueue } from './utils/queues';
-import { QueueToken } from '../src/modules/queue/queue.tokens';
 import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 import { tearDown } from './utils/tear-down';
+import { queueName } from '@marxan-api/modules/planning-units-protection-level/queue.name';
 
 let queue: FakeQueue;
 
@@ -21,7 +21,7 @@ describe('ScenariosModule (e2e)', () => {
   beforeAll(async () => {
     app = await bootstrapApplication();
     jwtToken = await GivenUserIsLoggedIn(app);
-    queue = app.get(QueueToken);
+    queue = FakeQueue.getByName(queueName);
   });
 
   afterAll(async () => {
