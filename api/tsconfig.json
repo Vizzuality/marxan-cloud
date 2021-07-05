@@ -60,6 +60,12 @@
       ],
       "@marxan/marxan-input/*": [
         "libs/marxan-input/src/*"
+      ],
+      "@marxan/marxan-output": [
+        "libs/marxan-output/src"
+      ],
+      "@marxan/marxan-output/*": [
+        "libs/marxan-output/src/*"
       ]
     }
   },
