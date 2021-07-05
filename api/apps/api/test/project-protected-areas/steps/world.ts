@@ -2,11 +2,12 @@ import { INestApplication } from '@nestjs/common';
 import supertest from 'supertest';
 import { Job } from 'bullmq';
 
-import { QueueToken } from '../../../src/modules/queue/queue.tokens';
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../../steps/given-project';
 
 import { SubmitsProjectsPaShapefile } from './submits-projects-pa-shapefile';
+import { FakeQueue } from '../../utils/queues';
+import { queueName } from '@marxan-api/modules/projects/protected-areas/queue-name';
 
 export interface World {
   cleanup: () => Promise<void>;
@@ -18,7 +19,7 @@ export interface World {
 
 export const createWorld = async (app: INestApplication): Promise<World> => {
   const jwtToken = await GivenUserIsLoggedIn(app);
-  const queue = app.get(QueueToken);
+  const queue = FakeQueue.getByName(queueName);
   const {
     projectId,
     cleanup: projectCleanup,

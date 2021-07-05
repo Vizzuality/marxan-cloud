@@ -1,6 +1,5 @@
 import { PromiseType } from 'utility-types';
 import { INestApplication } from '@nestjs/common';
-import { QueueToken } from '@marxan-api/modules/queue/queue.tokens';
 
 import { bootstrapApplication } from '../utils/api-application';
 import { FakeQueue } from '../utils/queues';
@@ -15,7 +14,7 @@ beforeAll(async () => {
   app = await bootstrapApplication();
   world = await createWorld(app);
 
-  queue = app.get(QueueToken);
+  queue = FakeQueue.getByName('planning-units');
 });
 
 afterAll(async () => {

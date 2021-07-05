@@ -1,13 +1,10 @@
-import { DynamicModule, Logger, Module } from '@nestjs/common';
-import { Queue, QueueEvents } from 'bullmq';
-import * as config from 'config';
+import { DynamicModule, Module } from '@nestjs/common';
+import { isDefined } from '@marxan/utils';
 import { QueueService } from './queue.service';
-import {
-  QueueEventsToken,
-  QueueLoggerToken,
-  QueueNameToken,
-  QueueToken,
-} from './queue.tokens';
+import { QueueNameToken, QueueToken } from './queue.tokens';
+import { QueueBuilder } from './queue.builder';
+import { QueueEventsBuilder } from './queue-events.builder';
+import { queueOptionsProvider } from './queue-options.provider';
 
 export interface QueueConfig {
   name: string;
@@ -15,40 +12,51 @@ export interface QueueConfig {
 
 @Module({})
 export class QueueModule {
-  static register(options: QueueConfig): DynamicModule {
+  static register(): DynamicModule;
+  /**
+   * @deprecated
+   */
+  static register(options: QueueConfig): DynamicModule;
+  static register(options?: QueueConfig): DynamicModule {
     return {
       module: QueueModule,
       providers: [
-        QueueService,
-        {
-          provide: QueueNameToken,
-          useValue: options.name,
-        },
-        {
-          provide: QueueToken,
-          useFactory: () =>
-            new Queue(options.name, {
-              ...config.get('redisApi'),
-              defaultJobOptions: config.get('jobOptions'),
-            }),
-        },
-        {
-          provide: QueueEventsToken,
-          useFactory: () =>
-            new QueueEvents(options.name, config.get('redisApi')),
-        },
-        {
-          provide: QueueLoggerToken,
-          useValue: new Logger(`${options.name}-queue-publisher`),
-        },
+        ...this.providersForOptions(options),
+        queueOptionsProvider,
+        QueueBuilder,
+        QueueEventsBuilder,
       ],
       exports: [
-        QueueService,
-        QueueNameToken,
-        QueueToken,
-        QueueEventsToken,
-        QueueLoggerToken,
+        ...this.exportsForOptions(options),
+        QueueBuilder,
+        QueueEventsBuilder,
       ],
     };
+  }
+
+  private static exportsForOptions(options: QueueConfig | undefined) {
+    return isDefined(options) ? [QueueNameToken, QueueService, QueueToken] : [];
+  }
+
+  private static providersForOptions(options: QueueConfig | undefined) {
+    return isDefined(options)
+      ? [
+          {
+            provide: QueueNameToken,
+            useValue: options.name,
+          },
+          {
+            provide: QueueToken,
+            useFactory: (
+              builder: QueueBuilder<unknown, unknown>,
+              name: string,
+            ) => {
+              return builder.buildQueue(name);
+            },
+            inject: [QueueBuilder, QueueNameToken],
+          },
+          QueueService,
+        ]
+      : [];
   }
 }

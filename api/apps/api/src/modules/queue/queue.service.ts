@@ -1,15 +1,25 @@
-import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JobsOptions, Queue, QueueEvents } from 'bullmq';
-import { QueueEventsToken, QueueLoggerToken, QueueToken } from './queue.tokens';
+import { QueueNameToken } from './queue.tokens';
+import { QueueBuilder } from './queue.builder';
+import { QueueEventsBuilder } from './queue-events.builder';
 
+/**
+ * @deprecated
+ */
 @Injectable()
-export class QueueService<NewJobInput, Opts extends JobsOptions = JobsOptions>
-  implements OnModuleDestroy {
+export class QueueService<NewJobInput, Opts extends JobsOptions = JobsOptions> {
+  public readonly queue: Queue<NewJobInput, Opts>;
+  public readonly events: QueueEvents;
+
   constructor(
-    @Inject(QueueLoggerToken) public readonly logger: Logger,
-    @Inject(QueueToken) public readonly queue: Queue<NewJobInput, Opts>,
-    @Inject(QueueEventsToken) public readonly events: QueueEvents,
-  ) {}
+    @Inject(QueueNameToken) queueName: string,
+    queueBuilder: QueueBuilder<NewJobInput, Opts>,
+    eventsBuilder: QueueEventsBuilder,
+  ) {
+    this.queue = queueBuilder.buildQueue(queueName);
+    this.events = eventsBuilder.buildQueueEvents(queueName);
+  }
 
   /**
    * typings arent great...
@@ -39,12 +49,5 @@ export class QueueService<NewJobInput, Opts extends JobsOptions = JobsOptions>
     }) => void,
   ) {
     this.events.on(event, listener);
-  }
-
-  async onModuleDestroy(): Promise<void> {
-    await this.events.close();
-    await this.events.disconnect();
-    await this.queue.close();
-    await this.queue.disconnect();
   }
 }

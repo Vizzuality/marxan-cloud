@@ -1,9 +1,9 @@
 import { INestApplication } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import { queueName } from '@marxan-api/modules/planning-units-protection-level/queue.name';
 import { bootstrapApplication } from '../utils/api-application';
 import { FakeQueue } from '../utils/queues';
-import { QueueToken } from '../../src/modules/queue/queue.tokens';
-import { CalculatePlanningUnitsProtectionLevel } from '../../src/modules/planning-units-protection-level/calculate-planning-units-protection-level.command';
+import { CalculatePlanningUnitsProtectionLevel } from '@marxan-api/modules/planning-units-protection-level';
 import { v4 } from 'uuid';
 import { tearDown } from '../utils/tear-down';
 
@@ -13,7 +13,7 @@ let commandBus: CommandBus;
 
 beforeAll(async () => {
   app = await bootstrapApplication();
-  queue = app.get(QueueToken);
+  queue = FakeQueue.getByName(queueName);
   commandBus = app.get(CommandBus);
 });
 
