@@ -1,4 +1,9 @@
-import { BadRequestException, HttpService, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpService,
+  Injectable,
+  NotImplementedException,
+} from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
@@ -148,6 +153,19 @@ export class ScenariosService {
   async getSpecDatCsv(scenarioId: string): Promise<string> {
     await this.assertScenario(scenarioId);
     return this.specDatService.getSpecDatContent(scenarioId);
+  }
+
+  async run(scenarioId: string, _blm?: number): Promise<void> {
+    await this.assertScenario(scenarioId);
+    // TODO ensure not running yet
+    // TODO submit
+    throw new NotImplementedException();
+  }
+
+  async cancel(scenarioId: string): Promise<void> {
+    await this.assertScenario(scenarioId);
+    // TODO ensure it is running
+    throw new NotImplementedException();
   }
 
   private async assertScenario(scenarioId: string) {
