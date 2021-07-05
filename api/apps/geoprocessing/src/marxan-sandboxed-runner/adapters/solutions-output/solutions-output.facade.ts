@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SolutionsRepository } from '../../ports/solutions-repository';
 
-import { promises } from 'fs';
+import { promises, existsSync } from 'fs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
@@ -30,9 +30,10 @@ export class SolutionsOutputFacade implements SolutionsRepository {
    *
    */
   async saveFrom(rootDirectory: string, scenarioId: string): Promise<void> {
-    console.log(await promises.readdir(rootDirectory));
-    console.log(await promises.readdir(rootDirectory + '/output'));
-    console.log(await promises.lstat(rootDirectory + '/marxan'));
+    if (!existsSync(rootDirectory + `/output/output_sum.csv`)) {
+      throw new Error(`Output is missing from the marxan run.`);
+    }
+
     // just a sample for brevity, ideally should stream into db tables & use csv streamer
     const runsSummary = (
       await promises.readFile(rootDirectory + `/output/output_sum.csv`)

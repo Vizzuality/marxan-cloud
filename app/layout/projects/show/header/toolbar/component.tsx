@@ -8,6 +8,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
+import HelpBeacon from 'layout/help/beacon';
+
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
@@ -29,14 +31,30 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
           exit={{ y: -10, opacity: 0 }}
         >
           <div className="flex space-x-4">
-            <Button
-              id="scenarios-upload"
-              theme="secondary"
-              size="base"
+            <HelpBeacon
+              id="project-upload"
+              title="Quick search"
+              subtitle="Project list"
+              content={(
+                <div>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Beatae ratione cumque in nobis fugiat,
+                  neque ullam aliquam, commodi dolorem unde inventore eaque,
+                  dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
+                </div>
+              )}
             >
-              <span className="mr-2.5">Upload new Scenario</span>
-              <Icon icon={UPLOAD_SVG} />
-            </Button>
+              <div>
+                <Button
+                  id="scenarios-upload"
+                  theme="secondary"
+                  size="base"
+                >
+                  <span className="mr-2.5">Upload new Scenario</span>
+                  <Icon icon={UPLOAD_SVG} />
+                </Button>
+              </div>
+            </HelpBeacon>
 
             <Button
               id="scenarios-download"

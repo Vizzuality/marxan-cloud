@@ -30,7 +30,7 @@ describe(`when a user updates scenario with input data`, () => {
   let scenarioId: string;
   beforeEach(async () => {
     // given
-    scenarioId = await fixtures.GivenScenarioExists();
+    scenarioId = (await fixtures.GivenScenarioExists()).id;
 
     // when
     await fixtures.WhenUpdatesScenarioWithInput(
@@ -46,13 +46,40 @@ describe(`when a user updates scenario with input data`, () => {
       fixtures.scenarioMetadata,
     );
   });
+
+  it(`should return the same metadata when accessing with x-api-key`, async () => {
+    expect(await fixtures.ThenScenarioHasMetadataForMarxan(scenarioId))
+      .toMatchInlineSnapshot(`
+      "PROP 1.5
+      COOLFAC 5
+      NUMITNS 1000003
+      NUMTEMP 10006
+      RUNMODE 5
+      HEURTYPE 1
+      RANDSEED -1.5
+      BESTSCORE 2
+      CLUMPTYPE 3
+      ITIMPTYPE 3
+      MISSLEVEL 11
+      STARTTEMP 1000004
+      COSTTHRESH 7
+      THRESHPEN1 8
+      THRESHPEN2 9
+      INPUTDIR input
+      PUNAME pu.dat
+      SPECNAME spec.dat
+      PUVSPRNAME puvspr.dat
+      BOUNDNAME bound.dat
+      OUTPUTDIR output"
+    `);
+  });
 });
 
 describe(`when a user updates scenario with input data with verbosity`, () => {
   let scenarioId: string;
   beforeEach(async () => {
     // given
-    scenarioId = await fixtures.GivenScenarioExists();
+    scenarioId = (await fixtures.GivenScenarioExists()).id;
 
     // when
     await fixtures.WhenUpdatesScenarioWithInput(
@@ -74,7 +101,7 @@ describe(`when a user updates scenario with input data with input keys`, () => {
   let scenarioId: string;
   beforeEach(async () => {
     // given
-    scenarioId = await fixtures.GivenScenarioExists();
+    scenarioId = (await fixtures.GivenScenarioExists()).id;
 
     // when
     await fixtures.WhenUpdatesScenarioWithInput(
@@ -94,11 +121,13 @@ describe(`when a user updates scenario with input data with input keys`, () => {
 
 describe(`when a user updates scenario with invalid input data`, () => {
   let scenarioId: string;
+  let originalMedatadata: Record<string, unknown> | undefined;
   let result: request.Response;
   beforeEach(async () => {
     // given
-    scenarioId = await fixtures.GivenScenarioExists();
-
+    const scenarioData = await fixtures.GivenScenarioExists();
+    scenarioId = scenarioData.id;
+    originalMedatadata = scenarioData.attributes.metadata;
     // when
     result = await fixtures.WhenUpdatesScenarioWithInput(
       scenarioId,
@@ -109,7 +138,7 @@ describe(`when a user updates scenario with invalid input data`, () => {
   // then
   it(`should return not changed metadata to user`, async () => {
     await fixtures.ThenScenarioHasMetadata(scenarioId, {
-      metadata: null,
+      metadata: originalMedatadata,
     });
   });
 
@@ -134,7 +163,7 @@ async function getFixtures() {
         projectId,
       });
       cleanups.push(() => scenarios.delete(scenario.data.id));
-      return scenario.data.id;
+      return scenario.data;
     },
     async cleanup() {
       for (const cleanup of cleanups.reverse()) {
@@ -202,6 +231,16 @@ async function getFixtures() {
         .patch(`/api/v1/scenarios/${id}`)
         .set('Authorization', `Bearer ${jwtToken}`)
         .send(input);
+    },
+    async ThenScenarioHasMetadataForMarxan(id: string) {
+      return await request(app.getHttpServer())
+        .get(`/api/v1/marxan-run/scenarios/${id}/marxan/dat/input.dat`)
+        .set(
+          'X-Api-Key',
+          process.env.API_AUTH_X_API_KEY ?? 'sure it is valid in envs?',
+        )
+        .send()
+        .then((response) => response.text);
     },
     async ThenScenarioHasMetadata(id: string, metadata: any) {
       const result = await request(app.getHttpServer())

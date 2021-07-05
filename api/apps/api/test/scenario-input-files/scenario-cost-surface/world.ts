@@ -1,5 +1,5 @@
-import { bootstrapApplication } from '../utils/api-application';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
+import { bootstrapApplication } from '../../utils/api-application';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import * as request from 'supertest';
 import { In, Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -14,8 +14,8 @@ import {
   PlanningUnitsGeom,
   ShapeType,
 } from '@marxan-jobs/planning-unit-geometry';
-import { GivenProjectExists } from '../steps/given-project';
-import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
+import { GivenProjectExists } from '../../steps/given-project';
+import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { v4 } from 'uuid';
 

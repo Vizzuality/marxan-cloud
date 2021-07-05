@@ -12,6 +12,7 @@ import { ItemProps } from 'components/scenarios/item/component';
 
 import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
+import DOWNLOADS from 'services/downloads';
 
 import {
   UseScenariosOptionsProps,
@@ -19,6 +20,12 @@ import {
   SaveScenarioProps,
   UseDeleteScenarioProps,
   DeleteScenarioProps,
+  UseDownloadScenarioCostSurfaceProps,
+  DownloadScenarioCostSurfaceProps,
+  UseUploadScenarioCostSurfaceProps,
+  UploadScenarioCostSurfaceProps,
+  UseUploadScenarioPUProps,
+  UploadScenarioPUProps,
 } from './types';
 
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
@@ -196,14 +203,14 @@ export function useDeleteScenario({
   });
 }
 
-export function useSaveScenarioPUShapefile({
+export function useUploadScenarioPU({
   requestConfig = {
     method: 'POST',
   },
-}: UseSaveScenarioProps) {
+}: UseUploadScenarioPUProps) {
   const [session] = useSession();
 
-  const saveScenarioPUShapefile = ({ id, data }: SaveScenarioProps) => {
+  const uploadScenarioPUShapefile = ({ id, data }: UploadScenarioPUProps) => {
     return UPLOADS.request({
       url: `/scenarios/${id}/planning-unit-shapefile`,
       data,
@@ -215,7 +222,76 @@ export function useSaveScenarioPUShapefile({
     });
   };
 
-  return useMutation(saveScenarioPUShapefile, {
+  return useMutation(uploadScenarioPUShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDownloadCostSurface({
+  requestConfig = {
+    method: 'GET',
+  },
+}: UseDownloadScenarioCostSurfaceProps) {
+  const [session] = useSession();
+
+  const downloadScenarioCostSurface = ({ id }: DownloadScenarioCostSurfaceProps) => {
+    return DOWNLOADS.request({
+      url: `/scenarios/${id}/cost-surface/shapefile-template`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(downloadScenarioCostSurface, {
+    onSuccess: (data: any, variables, context) => {
+      const { data: blob } = data;
+      const { id } = variables;
+
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `cost-surface-${id}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUploadCostSurface({
+  requestConfig = {
+    method: 'GET',
+  },
+}: UseUploadScenarioCostSurfaceProps) {
+  const [session] = useSession();
+
+  const uploadScenarioCostSurface = ({ id }: UploadScenarioCostSurfaceProps) => {
+    return UPLOADS.request({
+      url: `/scenarios/${id}/cost-surface/shapefile`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadScenarioCostSurface, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
     },
