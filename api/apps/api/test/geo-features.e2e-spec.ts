@@ -106,7 +106,7 @@ describe('GeoFeaturesModule (e2e)', () => {
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
 
-        expect(response.body.data).toHaveLength(9);
+        expect(response.body.data).toHaveLength(7);
       });
     });
   });
