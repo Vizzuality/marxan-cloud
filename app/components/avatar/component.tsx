@@ -10,7 +10,7 @@ export interface AvatarProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
   className?: string;
   bgImage?: string;
-  size: 's' | 'base';
+  size?: 's' | 'base';
 }
 
 export const Avatar: React.FC<AvatarProps> = ({

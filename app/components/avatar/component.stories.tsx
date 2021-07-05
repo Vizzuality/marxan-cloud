@@ -19,7 +19,6 @@ export const Default = Template.bind({});
 Default.args = {
   // children: <Icon icon={HELP_SVG} className="w-5 h-5" />,
   bgImage: '/images/avatar.png',
-  size: 'base',
 };
 
 export const Groups = () => {
@@ -28,31 +27,26 @@ export const Groups = () => {
       <li>
         <Avatar
           bgImage="/images/avatar.png"
-          size="base"
         />
       </li>
       <li className="-ml-3">
         <Avatar
           bgImage="/images/avatar.png"
-          size="base"
         />
       </li>
       <li className="-ml-3">
         <Avatar
           bgImage="/images/avatar.png"
-          size="base"
         />
       </li>
       <li className="-ml-3">
         <Avatar
           bgImage="/images/avatar.png"
-          size="base"
         />
       </li>
       <li className="ml-3">
         <Avatar
           className="bg-white"
-          size="base"
         >
           <Icon icon={HELP_SVG} className="w-5 h-5" />
         </Avatar>
