@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 import cx from 'classnames';
 
 import { useQueryClient } from 'react-query';
@@ -170,8 +170,10 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-black via-black" />
               <div ref={scrollRef} className="relative z-0 flex flex-col flex-grow h-full py-6 overflow-x-hidden overflow-y-auto">
                 {!!allScenariosData.length && allScenariosData.map((s, i) => {
+                  const TAG = i === 0 ? HelpBeacon : Fragment;
+
                   return (
-                    <HelpBeacon
+                    <TAG
                       key={`${s.id}`}
                       id={`${s.id}`}
                       title="Scenarios list"
@@ -199,7 +201,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                           SettingsC={<ScenarioSettings sid={s.id} />}
                         />
                       </div>
-                    </HelpBeacon>
+                    </TAG>
                   );
                 })}
 

@@ -228,6 +228,14 @@ export class ScenariosCrudService extends AppBaseService<
         ),
       ];
     }
+
+    if (model.metadata?.marxanInputParameterFile) {
+      model.metadata.marxanInputParameterFile = Object.assign(
+        model.metadata.marxanInputParameterFile,
+        update.metadata?.marxanInputParameterFile,
+      );
+    }
+
     return model;
   }
 
