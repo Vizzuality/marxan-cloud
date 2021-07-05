@@ -18,8 +18,7 @@ const Partners: React.FC = () => {
         <title>Partners</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <main>
+      <main className="flex flex-col h-full md:flex-grow">
         <Header size="base" />
         <Hero
           section="Partners"
