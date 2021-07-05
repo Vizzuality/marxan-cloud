@@ -11,6 +11,9 @@ import { GeoFeaturesController } from './geo-features.controller';
 import { GeoFeaturesService } from './geo-features.service';
 import { apiConnections } from '../../ormconfig';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
+import { Scenario } from '../scenarios/scenario.api.entity';
+import { GeoFeatureSetSerializer } from './geo-feature-set.serializer';
+import { GeoFeatureSetService } from './geo-feature-set.service';
 
 @Module({
   imports: [
@@ -18,10 +21,10 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
       [GeoFeatureGeometry, GeoFeaturePropertySet],
       apiConnections.geoprocessingDB.name,
     ),
-    TypeOrmModule.forFeature([GeoFeature, Project]),
+    TypeOrmModule.forFeature([GeoFeature, Project, Scenario]),
   ],
-  providers: [GeoFeaturesService, ProxyService],
+  providers: [GeoFeaturesService, GeoFeatureSetSerializer, GeoFeatureSetService, ProxyService],
   controllers: [GeoFeaturesController],
-  exports: [GeoFeaturesService],
+  exports: [GeoFeaturesService, GeoFeatureSetSerializer],
 })
 export class GeoFeaturesModule {}
