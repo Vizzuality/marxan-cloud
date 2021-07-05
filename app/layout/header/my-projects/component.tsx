@@ -44,7 +44,7 @@ export const HeaderMyProjects: React.FC<HeaderMyProjectsProps> = () => {
             'w-0': !hover && !active,
           })}
         />
-        My projects
+        <p className="text-xs md:text-sm">My projects</p>
       </a>
     </Link>
   );
