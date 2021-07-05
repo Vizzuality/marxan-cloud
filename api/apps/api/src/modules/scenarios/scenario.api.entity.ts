@@ -44,7 +44,7 @@ export enum JobStatus {
 }
 
 /**
- * A simple job status, usable to represent jobs that can be be only in the
+ * A simple job status, usable to represent jobs that can be only in the
  * draft or created status.
  */
 export enum SimpleJobStatus {
