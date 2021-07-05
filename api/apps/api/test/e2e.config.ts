@@ -35,8 +35,8 @@ export const E2E_CONFIG: {
   projects: {
     valid: {
       minimal: () => Partial<CreateProjectDTO>;
-      minimalInGivenAdminArea: (options?: {
-        countryCode?: string;
+      minimalInGivenAdminArea: (options: {
+        countryCode: string;
         adminAreaLevel1Id?: string;
         adminAreaLevel2Id?: string;
       }) => Partial<CreateProjectDTO>;
