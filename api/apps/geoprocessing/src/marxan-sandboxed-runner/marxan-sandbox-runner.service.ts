@@ -10,7 +10,6 @@ import { SolutionsOutput } from './adapters/solutions-output/solutions-output';
 
 @Injectable()
 export class MarxanSandboxRunnerService {
-  readonly #runs: Record<string, Record<string, Cancellable[]>> = {};
   readonly #controllers: Record<string, AbortController> = {};
 
   constructor(
@@ -19,58 +18,88 @@ export class MarxanSandboxRunnerService {
   ) {}
 
   kill(ofScenarioId: string): void {
-    this.#controllers[ofScenarioId]?.abort();
+    const controller = this.#controllers[ofScenarioId];
+    if (controller && !controller.signal.aborted) {
+      controller.abort();
+    }
   }
 
   async run(forScenarioId: string, assets: Assets): Promise<void> {
     const workspace = await this.workspaceService.get();
-    const cancellables: Cancellable[] = [];
-    const controller = (this.#controllers[
-      forScenarioId
-    ] ??= new AbortController());
     const inputFiles = await this.moduleRef.create(InputFilesFs);
     const outputFilesRepository = await this.moduleRef.create(SolutionsOutput);
     const marxanRun = new MarxanRun();
-    cancellables.push(inputFiles);
-    cancellables.push(outputFilesRepository);
-    cancellables.push(marxanRun);
+
+    const cancellables: Cancellable[] = [
+      inputFiles,
+      outputFilesRepository,
+      marxanRun,
+    ];
+
+    const controller = this.getAbortControllerForRun(
+      forScenarioId,
+      cancellables,
+    );
+
+    const interruptIfKilled = async () => {
+      if (controller.signal.aborted) {
+        await workspace.cleanup();
+        this.clearAbortController(forScenarioId);
+        throw {
+          stdError: [],
+          signal: 'SIGTERM',
+        };
+      }
+    };
+
+    await interruptIfKilled();
+    await inputFiles.include(workspace, assets);
+
+    return new Promise(async (resolve, reject) => {
+      marxanRun.on('error', async (result) => {
+        await workspace.cleanup();
+        this.clearAbortController(forScenarioId);
+        reject(result);
+      });
+      marxanRun.on('finished', async () => {
+        try {
+          await interruptIfKilled();
+          await outputFilesRepository.saveFrom(workspace, forScenarioId);
+          await workspace.cleanup();
+          resolve();
+        } catch (error) {
+          reject(error);
+        } finally {
+          this.clearAbortController(forScenarioId);
+        }
+      });
+
+      try {
+        await interruptIfKilled();
+        marxanRun.executeIn(workspace);
+      } catch (error) {
+        this.clearAbortController(forScenarioId);
+        reject(error);
+      }
+    });
+  }
+
+  private clearAbortController(ofScenarioId: string) {
+    delete this.#controllers[ofScenarioId];
+  }
+
+  private getAbortControllerForRun(
+    scenarioId: string,
+    cancellables: Cancellable[],
+  ) {
+    const controller = (this.#controllers[
+      scenarioId
+    ] ??= new AbortController());
 
     controller.signal.addEventListener('abort', () => {
       cancellables.forEach((killMe) => killMe.cancel());
     });
-    if (controller.signal.aborted) {
-      await workspace.cleanup();
-      throw {
-        stdError: [],
-        signal: 'SIGTERM',
-      };
-    }
-    await inputFiles.include(workspace, assets);
 
-    return new Promise(async (resolve, reject) => {
-      const interruptIfKilled = async () => {
-        if (controller.signal.aborted) {
-          await workspace.cleanup();
-          return reject({
-            stdError: [],
-            signal: 'SIGTERM',
-          });
-        }
-      };
-
-      marxanRun.on('error', async (result) => {
-        await workspace.cleanup();
-        reject(result);
-      });
-      marxanRun.on('finished', async () => {
-        await interruptIfKilled();
-        await outputFilesRepository.saveFrom(workspace, forScenarioId);
-        await workspace.cleanup();
-        resolve();
-      });
-
-      await interruptIfKilled();
-      marxanRun.executeIn(workspace);
-    });
+    return controller;
   }
 }

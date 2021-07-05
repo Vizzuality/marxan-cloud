@@ -18,9 +18,6 @@ interface MessageEvents {
 
 const MarxanRunEmitter: new () => TypedEmitter<MessageEvents> = EventEmitter;
 
-// @Injectable({
-//   scope: Scope.TRANSIENT,
-// })
 export class MarxanRun extends MarxanRunEmitter implements Cancellable {
   #process?: ChildProcessWithoutNullStreams;
   #stdOut: string[] = [];
@@ -41,14 +38,12 @@ export class MarxanRun extends MarxanRunEmitter implements Cancellable {
     assertDefined(this.#process);
 
     this.#process.stderr.on('data', (chunk) => {
-      console.log(chunk.toString());
       this.#stdError.push(chunk.toString());
     });
 
     this.#process.stdout.on('data', (chunk) => {
       // TODO place for "progress update" parsing and emitting to consumer
       this.#stdOut.push(chunk.toString());
-      // console.log(chunk.toString());
     });
 
     this.#process.on('exit', (code, signal) => {

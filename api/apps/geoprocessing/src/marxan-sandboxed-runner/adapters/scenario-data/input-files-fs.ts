@@ -63,7 +63,7 @@ export class InputFilesFs implements Cancellable {
     }
   }
 
-  cancel(): Promise<void> {
-    return Promise.resolve(undefined);
+  async cancel(): Promise<void> {
+    this.fetchService.cancel();
   }
 }
