@@ -21,7 +21,9 @@ CREATE INDEX feature_properties_kv_feature_id__idx ON feature_properties_kv(feat
 CREATE INDEX feature_properties_kv_feature_data_id__idx ON feature_properties_kv(feature_data_id);
 CREATE INDEX feature_properties_kv_key__idx ON feature_properties_kv(key);
 -- @todo add index to speed up filtering by geo intersection
+`);
 
+    await queryRunner.query(`
 INSERT INTO feature_properties_kv
 SELECT feature_id, id, (jsonb_each(properties)).key, (jsonb_each(properties)).value, ST_Envelope(the_geom) FROM features_data;
 
