@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -23,7 +23,10 @@ import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { GeoFeatureSetResult } from './geo-feature-set.api.entity';
+import { GeoFeatureSet, GeoFeatureSetResult } from './geo-feature-set.api.entity';
+import { ScenariosService } from '../scenarios/scenarios.service';
+import { Scenario } from '../scenarios/scenario.api.entity';
+import { assertDefined } from '@marxan/utils';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -59,6 +62,8 @@ export class GeoFeaturesService extends AppBaseService<
     private readonly geoFeaturesRepository: Repository<GeoFeature>,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
+    @InjectRepository(Scenario)
+    private readonly scenarioRepository: Repository<Scenario>,
   ) {
     super(
       geoFeaturesRepository,
@@ -292,9 +297,12 @@ export class GeoFeaturesService extends AppBaseService<
    * Create or replace the set of features linked to a scenario.
    */
   async createOrReplaceFeatureSet(
-    _id: string,
-    _dto: CreateGeoFeatureSetDTO,
-  ): Promise<GeoFeatureSetResult> {
-    return new GeoFeatureSetResult();
+    id: string,
+    dto: CreateGeoFeatureSetDTO,
+  ): Promise<CreateGeoFeatureSetDTO | undefined> {
+    const scenario = await this.scenarioRepository.findOneOrFail(id);
+    await this.scenarioRepository.update(id, { featureSet: dto })
+    return this.scenarioRepository.findOneOrFail(id)
+      .then(result => result.featureSet);
   }
 }
