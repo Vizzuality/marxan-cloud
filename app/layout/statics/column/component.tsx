@@ -8,6 +8,7 @@ export interface StaticColumnProps {
   description?: string;
   caption: string;
   href: string,
+  internal?: boolean,
 }
 
 export const StaticColumn: React.FC<StaticColumnProps> = ({
@@ -16,6 +17,7 @@ export const StaticColumn: React.FC<StaticColumnProps> = ({
   description,
   caption,
   href,
+  internal = false,
 }: StaticColumnProps) => {
   return (
     <div className="">
@@ -32,7 +34,7 @@ export const StaticColumn: React.FC<StaticColumnProps> = ({
           {description}
         </p>
       )}
-      <ButtonLink caption={caption} href={href} />
+      <ButtonLink caption={caption} href={href} internal={internal} />
     </div>
   );
 };
