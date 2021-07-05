@@ -6,6 +6,11 @@ import { E2E_CONFIG } from '../e2e.config';
 export const GivenProjectExists = async (
   app: INestApplication,
   jwt: string,
+  adminArea?: {
+    countryCode?: string;
+    adminAreaLevel1Id?: string;
+    adminAreaLevel2Id?: string;
+  },
 ): Promise<{
   projectId: string;
   organizationId: string;
@@ -20,7 +25,7 @@ export const GivenProjectExists = async (
   ).data.id;
   const projectId = (
     await ProjectsTestUtils.createProject(app, jwt, {
-      ...E2E_CONFIG.projects.valid.minimal(),
+      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea(adminArea),
       organizationId,
     })
   ).data.id;

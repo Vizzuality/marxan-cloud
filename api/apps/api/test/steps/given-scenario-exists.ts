@@ -7,9 +7,11 @@ export const GivenScenarioExists = async (
   app: INestApplication,
   projectId: string,
   jwtToken: string,
+  options?: Partial<CreateScenarioDTO>,
 ) => {
   const createScenarioDTO: Partial<CreateScenarioDTO> = {
     ...E2E_CONFIG.scenarios.valid.minimal(),
+    ...options,
     projectId,
   };
   return (
