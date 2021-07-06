@@ -1,4 +1,4 @@
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsOptional, Max, Min } from 'class-validator';
 
 /**
  * Marxan settings for a GeoFeature.
@@ -8,14 +8,32 @@ import { IsNumber } from 'class-validator';
  */
 export class MarxanSettingsForGeoFeature {
   /**
-   * Species penalty factor.
+   * Protection target for this feature, as proportion of the conservation
+   * feature to be included in the reserve system.
+   *
+   * Use [0, 1] range (for 0% to 100%).
    */
   @IsNumber()
-  spf!: number;
+  @IsOptional()
+  @Min(0)
+  @Max(1)
+  prop?: number;
+
+  /**
+   * Protection target for this feature, expressed in the same unit as in
+   * puvspr.dat.
+   *
+   * For example, number of individuals or hectares, depending on context.
+   */
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  target?: number;
 
   /**
    * Feature penalty factor.
    */
   @IsNumber()
-  fpf!: number;
+  @IsOptional()
+  fpf?: number;
 }
