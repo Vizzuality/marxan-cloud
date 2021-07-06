@@ -43,6 +43,13 @@ export class RemoteScenarioFeaturesData {
   fpf!: number;
 
   @ApiProperty({
+    description:
+      'Protection target for this feature, as proportion of the conservation feature to be included in the reserve system.',
+  })
+  @Column()
+  prop?: number;
+
+  @ApiProperty({
     description: `Total area space, expressed in m^2`,
   })
   @Column()
