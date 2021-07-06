@@ -185,7 +185,7 @@ computing throwaway results in order to simulate constant-time operations).
        */
       kind: 'plain' | 'withGeoprocessing';
       marxanSettings: {
-        spf: number,
+        prop: number,
         fpf: number,
       },
 
@@ -202,7 +202,7 @@ computing throwaway results in order to simulate constant-time operations).
               value: string,
 
               marxanSettings: {
-                spf: number,
+                prop: number,
                 fpf: number,
               }
             }
@@ -219,7 +219,7 @@ computing throwaway results in order to simulate constant-time operations).
               value: string,
 
               marxanSettings: {
-                spf: number,
+                prop: number,
                 fpf: number,
               }
             }
