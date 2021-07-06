@@ -1,9 +1,8 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class M2ToKm2PUAreaSize1624025983610 implements MigrationInterface {
-
-    public async up(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
         DROP VIEW countries;
 
         ALTER TABLE admin_regions drop COLUMN max_pu_area_size;
@@ -32,10 +31,10 @@ export class M2ToKm2PUAreaSize1624025983610 implements MigrationInterface {
           WHERE gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL
         );
       `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
 
         DROP VIEW countries;
 
@@ -65,6 +64,5 @@ export class M2ToKm2PUAreaSize1624025983610 implements MigrationInterface {
           WHERE gid_0 IS NOT NULL AND gid_1 IS NULL AND gid_2 IS NULL
         );
       `);
-    }
-
+  }
 }

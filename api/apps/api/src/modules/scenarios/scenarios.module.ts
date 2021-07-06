@@ -32,6 +32,10 @@ import {
 } from './input-parameter-file.provider';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
+import { SpecDatModule } from './input-files/spec.dat.module';
+
+import { MarxanRunService } from './marxan-run/marxan-run.service';
+import { MarxanRunController } from './marxan-run/marxan-run.controller';
 
 @Module({
   imports: [
@@ -50,6 +54,7 @@ import { assertDefined } from '@marxan/utils';
     HttpModule,
     CostSurfaceTemplateModule,
     CostSurfaceViewModule,
+    SpecDatModule,
     PlanningUnitsProtectionLevelModule,
   ],
   providers: [
@@ -63,6 +68,7 @@ import { assertDefined } from '@marxan/utils';
     ScenarioSolutionSerializer,
     MarxanInput,
     InputParameterFileProvider,
+    MarxanRunService,
     {
       provide: ioSettingsToken,
       useFactory: () => {
@@ -74,7 +80,7 @@ import { assertDefined } from '@marxan/utils';
       },
     },
   ],
-  controllers: [ScenariosController],
+  controllers: [ScenariosController, MarxanRunController],
   exports: [ScenariosCrudService, ScenariosService],
 })
 export class ScenariosModule {}

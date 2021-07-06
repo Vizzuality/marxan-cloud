@@ -52,8 +52,6 @@ import { ProjectsService, validationFailed } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
-import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { JobType } from './job-status/jobs.enum';
 import { JobStatusSerializer } from './dto/job-status.serializer';
 
 @UseGuards(JwtAuthGuard)

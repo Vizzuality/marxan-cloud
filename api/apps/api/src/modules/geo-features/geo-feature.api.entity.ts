@@ -18,7 +18,7 @@ export enum FeatureTags {
 
 export interface GeoFeatureProperty {
   key: string;
-  distinctValues: string[];
+  distinctValues: Array<string | number>;
 }
 
 @Entity('features')

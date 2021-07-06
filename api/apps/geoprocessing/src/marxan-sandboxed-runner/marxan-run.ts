@@ -28,12 +28,20 @@ export class MarxanRun extends EventEmitter {
       console.log(chunk.toString());
     });
 
-    sub.on('exit', (code) => {
+    sub.on('exit', (code, signal) => {
+      if (signal === 'SIGSEGV') {
+        this.emit('error', {
+          signal,
+          stdError: this.#stdError,
+        });
+        return;
+      }
       if (code !== 0) {
         this.emit('error', {
           code,
           stdError: this.#stdError,
         });
+        return;
       }
       this.emit('finished');
     });

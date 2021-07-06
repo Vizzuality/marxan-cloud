@@ -222,6 +222,7 @@ export class ProtectedAreasService extends AppBaseService<
    */
   async findAllWDPAProtectedAreasInPlanningAreaByIUCNCategory(
     planningAreaId: string,
+    planningAreaTableName: string,
     iucnCategories: IUCNCategory[],
   ): Promise<ProtectedArea[]> {
     return await this.repository
@@ -229,7 +230,7 @@ export class ProtectedAreasService extends AppBaseService<
       .where(
         `${this.alias}.iucnCategory IN (:...iucnCategories)
         AND st_intersects(${this.alias}.the_geom,
-        (select the_geom from admin_regions a WHERE a.id = :planningAreaId));`,
+        (select the_geom from ${planningAreaTableName} pa WHERE pa.id = :planningAreaId));`,
         { planningAreaId, iucnCategories },
       )
       .getMany();

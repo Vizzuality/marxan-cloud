@@ -8,10 +8,7 @@ import { FileService } from '../files/files.service';
 import { WorkerModule } from '../worker';
 
 @Module({
-  imports: [
-    TileModule,
-    WorkerModule,
-  ],
+  imports: [TileModule, WorkerModule],
   providers: [
     PlanningUnitsProcessor,
     ShapefileService,

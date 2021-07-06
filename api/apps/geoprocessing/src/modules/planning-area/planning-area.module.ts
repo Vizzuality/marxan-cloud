@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { PlanningAreaRepositoryModule } from '@marxan/planning-area-repository';
 import { ShapefilesModule } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.module';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { PlanningAreaService } from './planning-area.service';
 import { PlanningAreaController } from './planning-area.controller';
-import { PlanningArea } from './planning-area.geo.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PlanningArea]), ShapefilesModule],
+  imports: [
+    PlanningAreaRepositoryModule.for(geoprocessingConnections.default.name),
+    ShapefilesModule,
+  ],
   providers: [PlanningAreaService],
   controllers: [PlanningAreaController],
 })

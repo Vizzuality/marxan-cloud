@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import {
   Check,
   Column,
@@ -6,10 +5,13 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 import { BBox, MultiPolygon } from 'geojson';
 import { defaultSrid } from '@marxan/utils/geo';
 
-@Entity('planning_areas')
+export const planningAreaTableName = 'planning_areas' as const;
+
+@Entity(planningAreaTableName)
 export class PlanningArea {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
