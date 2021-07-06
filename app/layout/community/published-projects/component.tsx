@@ -2,7 +2,7 @@ import React from 'react';
 
 import Link from 'next/link';
 
-import { kFormatter } from 'utils/k-formatter';
+import { format } from 'd3';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -80,7 +80,7 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
                     </td>
                     <td>
                       <div className="flex flex-row justify-between pl-10">
-                        <p className="text-sm">{kFormatter(120000)}</p>
+                        <p className="text-sm">{format('~s')(120000)}</p>
                         <Button size="s" theme="transparent-white" className="px-6 group">
                           Duplicate
                           <Icon icon={DOWNLOAD_SVG} className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black" />
