@@ -26,3 +26,10 @@ export interface UseDeleteProjectProps {
 export interface DeleteProjectProps {
   id: string
 }
+
+// usePublicProjects
+export interface UsePublishedProjectsProps {
+  search?: string;
+  sort?: string,
+  filters?: Record<string, unknown>
+}

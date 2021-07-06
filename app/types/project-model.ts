@@ -1,8 +1,11 @@
 export interface Project {
+  id: string;
   name: string;
-  description: string;
-  hasCustomArea: boolean;
-  area: PlanningArea;
+  area?: string;
+  description?: string;
+  lastUpdate: string;
+  lastUpdateDistance: string;
+  contributors?: Record<string, unknown>[];
 }
 
 export interface PlanningArea {

@@ -1,15 +1,20 @@
+import flatten from 'lodash/flatten';
 import Fuse from 'fuse.js';
 import { useMemo } from 'react';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {
+  useInfiniteQuery, useMutation, useQuery, useQueryClient,
+} from 'react-query';
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
 
 import orderBy from 'lodash/orderBy';
-import { formatDistance } from 'date-fns';
+import { formatDistance, formatDistanceToNow } from 'date-fns';
 
 import { ItemProps } from 'components/projects/item/component';
+import { PublishedItemProps } from 'components/projects/published-item/component';
 
 import PROJECTS from 'services/projects';
+
 import {
   UseProjectsProps,
   UseProjectsResponse,
@@ -17,6 +22,7 @@ import {
   SaveProjectProps,
   UseDeleteProjectProps,
   DeleteProjectProps,
+  UsePublishedProjectsProps,
 } from './types';
 
 export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
@@ -192,4 +198,88 @@ export function useDeleteProject({
       console.info('Error', error, variables, context);
     },
   });
+}
+
+export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
+  const [session] = useSession();
+
+  const {
+    search,
+    filters = {},
+    sort,
+  } = options;
+
+  const parsedFilters = Object.keys(filters)
+    .reduce((acc, k) => {
+      return {
+        ...acc,
+        [`filter[${k}]`]: filters[k].toString(),
+      };
+    }, {});
+
+  const fetchPublishedProjects = ({ pageParam = 1 }) => PROJECTS.request({
+    method: 'GET',
+    url: '/',
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    params: {
+      'page[number]': pageParam,
+      ...parsedFilters,
+      ...search && {
+        q: search,
+      },
+      ...sort && {
+        sort,
+      },
+    },
+  });
+
+  const query = useInfiniteQuery(['published-projects', JSON.stringify(options)], fetchPublishedProjects, {
+    retry: false,
+    keepPreviousData: true,
+    getNextPageParam: (lastPage) => {
+      const { data: { meta } } = lastPage;
+      const { page, totalPages } = meta;
+
+      const nextPage = page + 1 > totalPages ? null : page + 1;
+      return nextPage;
+    },
+  });
+
+  const { data } = query;
+  const { pages } = data || {};
+
+  return useMemo(() => {
+    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
+      const { data: { data: pageData } } = p;
+
+      return pageData.map((d):PublishedItemProps => {
+        const {
+          id, name, lastModifiedAt,
+        } = d;
+
+        const lastUpdateDistance = () => {
+          return formatDistanceToNow(
+            new Date(lastModifiedAt),
+            { addSuffix: true },
+          );
+        };
+
+        return {
+          id,
+          name,
+          // area,
+          // description,
+          lastUpdate: lastModifiedAt,
+          lastUpdateDistance: lastUpdateDistance(),
+        };
+      });
+    })) : [];
+
+    return {
+      ...query,
+      data: parsedData,
+    };
+  }, [query, pages]);
 }

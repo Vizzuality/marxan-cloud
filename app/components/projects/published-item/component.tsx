@@ -11,16 +11,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
-export interface ItemProps extends Project {
+export interface PublishedItemProps extends Project {
   className?: string;
   style?: Record<string, unknown>;
-  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  onDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const Item: React.FC<ItemProps> = ({
+export const Item: React.FC<PublishedItemProps> = ({
   className,
   name,
   area,
@@ -28,11 +24,7 @@ export const Item: React.FC<ItemProps> = ({
   lastUpdateDistance,
   contributors = [],
   style,
-  onClick,
-  onDownload,
-  onDuplicate,
-  onDelete,
-}: ItemProps) => {
+}: PublishedItemProps) => {
   const [animate, setAnimate] = useState('leave');
 
   const handleMouseEnter = useCallback(() => {
@@ -42,26 +34,6 @@ export const Item: React.FC<ItemProps> = ({
   const handleMouseLeave = useCallback(() => {
     setAnimate('leave');
   }, [setAnimate]);
-
-  const handleClick = useCallback((e) => {
-    e.stopPropagation();
-    onClick(e);
-  }, [onClick]);
-
-  const handleDownload = useCallback((e) => {
-    e.stopPropagation();
-    onDownload(e);
-  }, [onDownload]);
-
-  const handleDuplicate = useCallback((e) => {
-    e.stopPropagation();
-    onDuplicate(e);
-  }, [onDuplicate]);
-
-  const handleDelete = useCallback((e) => {
-    e.stopPropagation();
-    onDelete(e);
-  }, [onDelete]);
 
   return (
     <AnimatePresence>
@@ -74,7 +46,6 @@ export const Item: React.FC<ItemProps> = ({
         })}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onClick={handleClick}
       >
         <header className="flex-1 pr-5">
           <h3 className="text-xs font-medium tracking-widest uppercase font-heading">
@@ -171,30 +142,11 @@ export const Item: React.FC<ItemProps> = ({
         <footer className="mt-7">
           <div className="flex">
             <Button
-              className=""
-              theme="secondary"
-              size="xs"
-              onClick={handleDownload}
-            >
-              Download
-            </Button>
-
-            <Button
               className="ml-3"
               theme="secondary"
               size="xs"
-              onClick={handleDuplicate}
             >
               Duplicate
-            </Button>
-
-            <Button
-              className="ml-3"
-              theme="secondary"
-              size="xs"
-              onClick={handleDelete}
-            >
-              Delete
             </Button>
           </div>
         </footer>
