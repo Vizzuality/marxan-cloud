@@ -204,8 +204,8 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<any> {
     return await this.geoFeatureSetSerializer.serialize(
-      await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto)
-    )
+      await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto),
+    );
   }
 
   @ApiOperation({ description: 'Update feature set for scenario' })
@@ -216,18 +216,16 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<any> {
     return await this.geoFeatureSetSerializer.serialize(
-      await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto)
-    )
+      await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto),
+    );
   }
 
   @ApiOperation({ description: 'Get feature set for scenario' })
   @ApiOkResponse({ type: GeoFeatureSetResult })
   @Get(':id/features/specification')
-  async getFeatureSetFor(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<any> {
+  async getFeatureSetFor(@Param('id', ParseUUIDPipe) id: string): Promise<any> {
     return await this.geoFeatureSetSerializer.serialize(
-      await this.service.getFeatureSetForScenario(id)
+      await this.service.getFeatureSetForScenario(id),
     );
   }
 

@@ -259,12 +259,19 @@ export class ScenariosService {
    * Get geofeatures recipe for a scenario. This is part of the scenario itself,
    * but exposed via a separate endpoint.
    */
-   async getFeatureSetForScenario(scenarioId: string): Promise<CreateGeoFeatureSetDTO | undefined> {
-    return await this.crudService.getById(scenarioId)
-      .then(result => {
-        return result.featureSet
+  async getFeatureSetForScenario(
+    scenarioId: string,
+  ): Promise<CreateGeoFeatureSetDTO | undefined> {
+    return await this.crudService
+      .getById(scenarioId)
+      .then((result) => {
+        return result.featureSet;
       })
-      .then(result => result ? this.geoFeaturesService.extendGeoFeatureProcessingRecipe(result) : undefined);
+      .then((result) =>
+        result
+          ? this.geoFeaturesService.extendGeoFeatureProcessingRecipe(result)
+          : undefined,
+      );
   }
 
   async getMarxanExecutionOutputArchive(scenarioId: string) {

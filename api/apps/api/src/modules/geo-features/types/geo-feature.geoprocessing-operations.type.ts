@@ -1,5 +1,10 @@
 import { Type } from 'class-transformer';
-import { IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { SpecForGeofeature } from '../dto/create.geo-feature-set.dto';
 import { MarxanSettingsForGeoFeature } from './geo-feature.marxan-settings.type';
 

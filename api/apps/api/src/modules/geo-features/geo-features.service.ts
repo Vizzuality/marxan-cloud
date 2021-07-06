@@ -123,7 +123,7 @@ export class GeoFeaturesService extends AppBaseService<
       filters,
       geoFeatureFilterKeyNames,
     );
-    if(Array.isArray(info?.params?.ids) && info?.params?.ids.length) {
+    if (Array.isArray(info?.params?.ids) && info?.params?.ids.length) {
       query.andWhere('id in (:...ids)', { ids: info?.params?.ids });
     }
     return query;
@@ -296,13 +296,26 @@ export class GeoFeaturesService extends AppBaseService<
   /**
    * Add feature metadata to features in a geofeatures processing recipe.
    */
-  async extendGeoFeatureProcessingRecipe(recipe: CreateGeoFeatureSetDTO): Promise<any> {
-    const featuresInRecipe = recipe.features.map(feature => feature.featureId);
-    const metadataForFeaturesInRecipe = await this.findAll(undefined, { params: { ids: featuresInRecipe }})
-    .then(result => result[0]);
-    return { status: recipe.status, features: recipe.features.map(feature => {
-      return { ...feature, metadata: metadataForFeaturesInRecipe.find(f => f.id === feature.featureId)}
-    })}
+  async extendGeoFeatureProcessingRecipe(
+    recipe: CreateGeoFeatureSetDTO,
+  ): Promise<any> {
+    const featuresInRecipe = recipe.features.map(
+      (feature) => feature.featureId,
+    );
+    const metadataForFeaturesInRecipe = await this.findAll(undefined, {
+      params: { ids: featuresInRecipe },
+    }).then((result) => result[0]);
+    return {
+      status: recipe.status,
+      features: recipe.features.map((feature) => {
+        return {
+          ...feature,
+          metadata: metadataForFeaturesInRecipe.find(
+            (f) => f.id === feature.featureId,
+          ),
+        };
+      }),
+    };
   }
 
   /**
@@ -313,7 +326,7 @@ export class GeoFeaturesService extends AppBaseService<
     dto: CreateGeoFeatureSetDTO,
   ): Promise<CreateGeoFeatureSetDTO | undefined> {
     const scenario = await this.scenarioRepository.findOneOrFail(id);
-    await this.scenarioRepository.update(id, { featureSet: dto })
+    await this.scenarioRepository.update(id, { featureSet: dto });
     return await this.extendGeoFeatureProcessingRecipe(dto);
   }
 }
