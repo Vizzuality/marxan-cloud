@@ -28,13 +28,13 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
   return (
     <>
       {internal && (
-        <a className="flex flex-row items-center" href={href}>
+        <a className="flex flex-row items-center cursor-pointer" href={href}>
           {children}
         </a>
       )}
       {!internal && (
         <Link href={href}>
-          <div className="flex flex-row items-center">
+          <div className="flex flex-row items-center cursor-pointer">
             {children}
           </div>
         </Link>
