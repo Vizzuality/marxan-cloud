@@ -8,7 +8,10 @@ export class GeoFeatureSetSerializer {
   constructor(private readonly geoFeatureSetsService: GeoFeatureSetService) {}
 
   async serialize(
-    entities: Partial<CreateGeoFeatureSetDTO> | undefined | (Partial<CreateGeoFeatureSetDTO> | undefined)[],
+    entities:
+      | Partial<CreateGeoFeatureSetDTO>
+      | undefined
+      | (Partial<CreateGeoFeatureSetDTO> | undefined)[],
     paginationMeta?: PaginationMeta,
   ): Promise<any> {
     return this.geoFeatureSetsService.serialize(entities, paginationMeta);

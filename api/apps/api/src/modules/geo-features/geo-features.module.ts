@@ -23,7 +23,12 @@ import { GeoFeatureSetService } from './geo-feature-set.service';
     ),
     TypeOrmModule.forFeature([GeoFeature, Project, Scenario]),
   ],
-  providers: [GeoFeaturesService, GeoFeatureSetSerializer, GeoFeatureSetService, ProxyService],
+  providers: [
+    GeoFeaturesService,
+    GeoFeatureSetSerializer,
+    GeoFeatureSetService,
+    ProxyService,
+  ],
   controllers: [GeoFeaturesController],
   exports: [GeoFeaturesService, GeoFeatureSetSerializer],
 })
