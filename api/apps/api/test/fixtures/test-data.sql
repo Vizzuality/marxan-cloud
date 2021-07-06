@@ -62,9 +62,9 @@ VALUES
 -- Fake summary outputs
 WITH RECURSIVE nums (n) AS (
     SELECT 1
-  UNION ALL
-    SELECT n+1 FROM nums WHERE n+1 <= 10
-)
+      UNION ALL
+      SELECT n+1 FROM nums WHERE n+1 <= 10
+  )
 INSERT INTO output_scenarios_summaries
 (run_id, scenario_id, score, "cost", planning_units, connectivity, connectivity_total,
 mpm, penalty, shortfall, missing_values, best,	distinct_five)

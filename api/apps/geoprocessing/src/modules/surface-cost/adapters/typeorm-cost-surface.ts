@@ -27,8 +27,8 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
     set "cost" = pucd.new_cost
     from (values
         ${this.generateParametrizedValues(pairs)}
-    ) as pucd(output_results_data_id, new_cost)
-    where pucd.output_results_data_id = spd.output_results_data_id
+    ) as pucd(id, new_cost)
+    where pucd.id = spd.id
     `,
       flatten(pairs),
     );

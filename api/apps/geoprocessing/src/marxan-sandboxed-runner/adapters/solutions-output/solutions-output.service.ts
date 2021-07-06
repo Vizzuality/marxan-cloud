@@ -3,11 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { existsSync, promises } from 'fs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
 import { Workspace } from '../../ports/workspace';
 import { Cancellable } from '../../ports/cancellable';
 
 import { MarxanExecutionMetadataRepository } from './metadata';
+import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 @Injectable()
 export class SolutionsOutputService implements Cancellable {
@@ -17,8 +18,11 @@ export class SolutionsOutputService implements Cancellable {
    * ...
    */
   constructor(
-    @InjectRepository(ScenariosOutputResultsGeoEntity)
-    private readonly resultsRepo: Repository<ScenariosOutputResultsGeoEntity>,
+    @InjectRepository(
+      ScenariosOutputResultsApiEntity,
+      geoprocessingConnections.apiDB.name,
+    )
+    private readonly resultsRepo: Repository<ScenariosOutputResultsApiEntity>,
     private readonly metadataRepository: MarxanExecutionMetadataRepository,
   ) {
     //
@@ -31,6 +35,7 @@ export class SolutionsOutputService implements Cancellable {
    *
    * @Kgajowy notes:
    * Treat this class as coordinator
+   * ScenariosPuOutputGeoEntity
    *
    */
   async saveFrom(

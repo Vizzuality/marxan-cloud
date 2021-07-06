@@ -49,12 +49,11 @@ export const getFixtures = async (app: INestApplication) => {
             puCostDataRepo.create({
               scenariosPuDataId: scenarioPuData.id,
               cost: 300,
-              planningUnitId: scenarioPuData.puGeometryId,
               scenariosPlanningUnit: scenarioPuData,
             }),
           ),
         )
-        .then((rows) => rows.map((row) => row.planningUnitId)),
+        .then((rows) => rows.map((row) => row.scenariosPlanningUnit)),
     cleanup: async () => {
       await puDataRepo.delete({
         scenarioId,

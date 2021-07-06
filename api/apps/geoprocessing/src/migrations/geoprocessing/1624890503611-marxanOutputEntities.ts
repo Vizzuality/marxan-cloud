@@ -18,6 +18,8 @@ export class marxanOutputEntities1624890503611 implements MigrationInterface {
             REFERENCES features_data (id)
             ON DELETE CASCADE;
 
+      CREATE INDEX scenarios_pu_data_index ON scenarios_pu_data (puid asc, scenario_id);
+
       -- Drop error on cost data table
       ALTER TABLE scenarios_pu_cost_data
         DROP COLUMN output_results_data_id;
@@ -64,6 +66,8 @@ export class marxanOutputEntities1624890503611 implements MigrationInterface {
 	          REFERENCES scenario_features_data(id)
             ON DELETE CASCADE
         );
+
+      CREATE INDEX scenario_features_data_index ON scenario_features_data (feature_id asc, scenario_id);
       `,);
     }
 
