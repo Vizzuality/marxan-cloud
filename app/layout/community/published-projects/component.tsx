@@ -37,7 +37,11 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
           aria-label="Search"
           // onChange={(value) => { dispatch(setSearch(value)); }}
         />
-        <h3 className="pt-10 text-2xl font-heading">Projects published (56)</h3>
+        <h3 className="pt-10 text-2xl font-heading">
+          Projects published (
+          {publishedProjectsData.length}
+          )
+        </h3>
         <table>
           <thead className="h-32">
             <tr>
@@ -62,25 +66,26 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
           {publishedProjectsData && publishedProjectsIsFetched && (
             <tbody>
               {publishedProjectsData.map((pp) => {
-                const { id, name } = pp;
+                const {
+                  id, name, description, planningArea, timesDuplicated, users,
+                } = pp;
                 return (
                   <tr key={id} className="border-b border-white cursor-pointer border-opacity-20">
                     <Link href="projects/1">
                       <td className="pb-10">
                         <p className="font-semibold hover:underline">{name}</p>
-                        <p className="text-base leading-normal text-gray-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
+                        <p className="text-base leading-normal text-gray-400">{description}</p>
                       </td>
                     </Link>
                     <td>
-                      <p className="text-sm">Kenya</p>
+                      <p className="text-sm">{planningArea}</p>
                     </td>
                     <td>
-                      <p className="text-sm">Tamara Huete</p>
-                      <p className="text-sm">Andrea Rota</p>
+                      {users?.map((u) => <p key={u.id} className="text-sm">{u.name}</p>)}
                     </td>
                     <td>
                       <div className="flex flex-row justify-between pl-10">
-                        <p className="text-sm">{format('.3s')(121452)}</p>
+                        <p className="w-6 text-sm">{timesDuplicated && (format('.3s')(timesDuplicated))}</p>
                         <Button size="s" theme="transparent-white" className="px-6 group">
                           Duplicate
                           <Icon icon={DOWNLOAD_SVG} className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black" />
