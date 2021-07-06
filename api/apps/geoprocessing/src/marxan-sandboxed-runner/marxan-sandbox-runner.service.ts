@@ -6,7 +6,7 @@ import { MarxanRun } from './marxan-run';
 import { WorkspaceBuilder } from './ports/workspace-builder';
 import { Cancellable } from './ports/cancellable';
 import { Assets, InputFilesFs } from './adapters/scenario-data/input-files-fs';
-import { SolutionsOutput } from './adapters/solutions-output/solutions-output';
+import { SolutionsOutputService } from './adapters/solutions-output/solutions-output.service';
 
 @Injectable()
 export class MarxanSandboxRunnerService {
@@ -27,7 +27,9 @@ export class MarxanSandboxRunnerService {
   async run(forScenarioId: string, assets: Assets): Promise<void> {
     const workspace = await this.workspaceService.get();
     const inputFiles = await this.moduleRef.create(InputFilesFs);
-    const outputFilesRepository = await this.moduleRef.create(SolutionsOutput);
+    const outputFilesRepository = await this.moduleRef.create(
+      SolutionsOutputService,
+    );
     const marxanRun = new MarxanRun();
 
     const cancellables: Cancellable[] = [
@@ -64,7 +66,12 @@ export class MarxanSandboxRunnerService {
       marxanRun.on('finished', async () => {
         try {
           await interruptIfKilled();
-          await outputFilesRepository.saveFrom(workspace, forScenarioId);
+          await outputFilesRepository.saveFrom(
+            workspace,
+            forScenarioId,
+            marxanRun.stdOut,
+            [],
+          );
           await workspace.cleanup();
           resolve();
         } catch (error) {

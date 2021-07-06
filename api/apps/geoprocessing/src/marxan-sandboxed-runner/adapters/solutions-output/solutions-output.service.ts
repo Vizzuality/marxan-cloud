@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 
-import { promises, existsSync } from 'fs';
+import { existsSync, promises } from 'fs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
 import { Workspace } from '../../ports/workspace';
 import { Cancellable } from '../../ports/cancellable';
 
+import { MarxanExecutionMetadataRepository } from './metadata';
+
 @Injectable()
-export class SolutionsOutput implements Cancellable {
+export class SolutionsOutputService implements Cancellable {
   /**
    * load entities
    * file streamers
@@ -17,6 +19,7 @@ export class SolutionsOutput implements Cancellable {
   constructor(
     @InjectRepository(ScenariosOutputResultsGeoEntity)
     private readonly resultsRepo: Repository<ScenariosOutputResultsGeoEntity>,
+    private readonly metadataRepository: MarxanExecutionMetadataRepository,
   ) {
     //
   }
@@ -30,10 +33,19 @@ export class SolutionsOutput implements Cancellable {
    * Treat this class as coordinator
    *
    */
-  async saveFrom(workspace: Workspace, scenarioId: string): Promise<void> {
+  async saveFrom(
+    workspace: Workspace,
+    scenarioId: string,
+    stdOutput: string[],
+    stdErr?: string[],
+  ): Promise<void> {
     if (!existsSync(workspace.workingDirectory + `/output/output_sum.csv`)) {
       throw new Error(`Output is missing from the marxan run.`);
     }
+    await this.metadataRepository.save(scenarioId, workspace, {
+      stdOutput,
+      stdErr,
+    });
 
     // just a sample for brevity, ideally should stream into db tables & use csv streamer
     const runsSummary = (

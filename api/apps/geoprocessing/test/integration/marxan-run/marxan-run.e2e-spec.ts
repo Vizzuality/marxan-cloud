@@ -47,7 +47,7 @@ describe(`given input data is available`, () => {
     await fixtures.WhenRunningMarxan();
 
     expect(await fixtures.ThenExecutionOutput()).toBeGreaterThan(0);
-  }, 30000);
+  }, 60000);
 
   test(`cancellable marxan run`, async (done) => {
     expect.assertions(1);
