@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -24,7 +24,6 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
-import { inspect } from 'util';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -301,7 +300,6 @@ export class GeoFeaturesService extends AppBaseService<
     const featuresInRecipe = recipe.features.map(feature => feature.featureId);
     const metadataForFeaturesInRecipe = await this.findAll(undefined, { params: { ids: featuresInRecipe }})
     .then(result => result[0]);
-    Logger.debug(inspect(metadataForFeaturesInRecipe, undefined, 4));
     return { status: recipe.status, features: recipe.features.map(feature => {
       return { ...feature, metadata: metadataForFeaturesInRecipe.find(f => f.id === feature.featureId)}
     })}
