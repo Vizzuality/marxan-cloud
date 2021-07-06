@@ -42,28 +42,36 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
           {publishedProjectsData.length}
           )
         </h3>
-        <table>
-          <thead className="h-32">
-            <tr>
-              <th className="text-sm text-left w-96">
-                <h4 className="text-sm text-left">Name</h4>
-              </th>
-              <th className="text-sm text-left w-44">
-                <h4 className="text-sm text-left">Planning area</h4>
-              </th>
-              <th className="text-sm text-left w-44">
-                <h4 className="text-sm text-left">Creator</h4>
-              </th>
-              <th className="items-center w-72">
-                <div className="flex flex-row">
-                  <h4 className="text-sm text-left">Duplicated</h4>
-                  <Icon icon={ARROW_DOWN_SVG} className="w-3.5 h-3.5 ml-2 text-white transform rotate-90" />
-                </div>
-              </th>
-            </tr>
-          </thead>
-          {publishedProjectsIsFetching && <Loading />}
-          {publishedProjectsData && publishedProjectsIsFetched && (
+        {publishedProjectsIsFetching && (
+        <div className="flex items-center justify-center py-12">
+          <Loading
+            className="w-10 h-10 text-white"
+            iconClassName="w-10 h-10"
+            visible
+          />
+        </div>
+        )}
+        {publishedProjectsData && publishedProjectsIsFetched && (
+          <table>
+            <thead className="h-32">
+              <tr>
+                <th className="text-sm text-left w-96">
+                  <h4 className="text-sm text-left">Name</h4>
+                </th>
+                <th className="text-sm text-left w-44">
+                  <h4 className="text-sm text-left">Planning area</h4>
+                </th>
+                <th className="text-sm text-left w-44">
+                  <h4 className="text-sm text-left">Creator</h4>
+                </th>
+                <th className="items-center w-72">
+                  <div className="flex flex-row">
+                    <h4 className="text-sm text-left">Duplicated</h4>
+                    <Icon icon={ARROW_DOWN_SVG} className="w-3.5 h-3.5 ml-2 text-white transform rotate-90" />
+                  </div>
+                </th>
+              </tr>
+            </thead>
             <tbody>
               {publishedProjectsData.map((pp) => {
                 const {
@@ -96,8 +104,8 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
                 );
               })}
             </tbody>
-          )}
-        </table>
+          </table>
+        )}
       </div>
     </Wrapper>
   );
