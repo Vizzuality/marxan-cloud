@@ -10,7 +10,7 @@ export const parameters = {
       order: [
         'Intro',
         'Docs', ['Install', 'Deploy', 'Authentication', 'Fetching', 'Media', 'Tests'],
-        'Components'
+        'Components', ['Avatar', 'Breadcrum', 'Button', 'ConfirmationPrompt', 'Features', 'Forms', 'GapAnalysis', 'Icon', 'InfoButton','Loading', 'Map', 'Modal', 'ProgressBar', 'Projects', 'Scenarios', 'Search', 'Steps', 'Table', 'Tabs', 'Tag', 'Toast', 'Tooltip'], 
       ],
     },
   },
