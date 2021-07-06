@@ -11,7 +11,7 @@ import Item from 'components/features/selected-item';
 import IntersectFeatures from 'layout/scenarios/sidebar/features/intersect';
 
 import { useQueryClient } from 'react-query';
-import { useSelectedFeatures } from 'hooks/features';
+import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 import { useRouter } from 'next/router';
 
 export interface ScenariosFeaturesListProps {
@@ -21,11 +21,14 @@ export interface ScenariosFeaturesListProps {
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   onSuccess,
 }: ScenariosFeaturesListProps) => {
+  const [submitting, setSubmitting] = useState(false);
   const [intersecting, setIntersecting] = useState(null);
   const { query } = useRouter();
   const { pid, sid } = query;
 
   const queryClient = useQueryClient();
+
+  const selectedFeaturesMutation = useSaveSelectedFeatures({});
 
   const {
     data: selectedFeaturesData,
@@ -91,9 +94,61 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   }, []);
 
   const onSubmit = useCallback((values) => {
-    console.info(values);
-    onSuccess();
-  }, [onSuccess]);
+    const { features } = values;
+
+    // Save current features
+    selectedFeaturesMutation.mutate({
+      id: `${sid}`,
+      data: {
+        status: 'draft',
+        features: features.map((s) => {
+          const {
+            featureId,
+            splitSelected,
+            splitFeaturesSelected,
+            intersectFeaturesSelected,
+          } = s;
+
+          const {
+            marxanSettings,
+          } = selectedFeaturesData.find((sf) => sf.featureId === featureId) || {};
+
+          const kind = (splitSelected || intersectFeaturesSelected) ? 'withGeoprocessing' : 'plain';
+
+          let geoprocessingOperations;
+
+          if (splitSelected) {
+            geoprocessingOperations = [
+              {
+                kind: 'split/v1',
+                splitByProperty: splitSelected,
+                splits: splitFeaturesSelected.map((sf) => {
+                  return {
+                    value: sf.id,
+                  };
+                }),
+              },
+            ];
+          }
+
+          return {
+            featureId,
+            kind,
+            ...!!geoprocessingOperations && { geoprocessingOperations },
+            ...!!marxanSettings && { marxanSettings },
+          };
+        }),
+      },
+    }, {
+      onSuccess: () => {
+        onSuccess();
+        setSubmitting(false);
+      },
+      onError: () => {
+        setSubmitting(false);
+      },
+    });
+  }, [sid, selectedFeaturesData, selectedFeaturesMutation, onSuccess]);
 
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
@@ -128,6 +183,12 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     >
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow overflow-hidden">
+          <Loading
+            visible={submitting || selectedFeaturesIsFetching}
+            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+            iconClassName="w-10 h-10 text-white"
+          />
+
           {(!selectedFeaturesData || !selectedFeaturesData.length) && (
             <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
               No results found

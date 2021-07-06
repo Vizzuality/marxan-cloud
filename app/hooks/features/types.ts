@@ -4,11 +4,11 @@ export interface UseFeaturesFiltersProps {
   search?: string;
 }
 
-export interface UseSaveFeatureProps {
+export interface UseSaveSelectedFeaturesProps {
   requestConfig?: AxiosRequestConfig
 }
 
-export interface SaveFeatureProps {
+export interface SaveSelectedFeaturesProps {
   id?: string,
   data: any
 }

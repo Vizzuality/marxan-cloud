@@ -14,16 +14,13 @@ import { ItemProps as IntersectItemProps } from 'components/features/intersect-i
 
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
-
-import ITEMS from './mock';
+import GEOFEATURES from 'services/geo-features';
 
 import {
   UseFeaturesFiltersProps,
   UseFeaturesOptionsProps,
-  UseSaveFeatureProps,
-  SaveFeatureProps,
-  UseDeleteFeatureProps,
-  DeleteFeatureProps,
+  UseSaveSelectedFeaturesProps,
+  SaveSelectedFeaturesProps,
 } from './types';
 
 interface AllItemProps extends IntersectItemProps, RawItemProps {}
@@ -90,15 +87,28 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
           description,
           tag,
           source,
+          properties,
           splitSelected,
           splitFeaturesSelected,
-          splitOptions,
         } = d;
 
-        const splitFeaturesOptions = splitSelected ? splitOptions
-          .find((s) => s.key === splitSelected).values
-          .map((v) => ({ label: v.name, value: v.id }))
-          : [];
+        let splitOptions = [];
+        let splitFeaturesOptions = [];
+
+        if (tag === 'bioregional') {
+          splitOptions = Object.keys(properties).map((k) => {
+            return {
+              key: k,
+              label: k,
+              values: properties[k].map((v) => ({ id: v, name: v })),
+            };
+          });
+
+          splitFeaturesOptions = splitSelected ? splitOptions
+            .find((s) => s.key === splitSelected).values
+            .map((v) => ({ label: v.name, value: v.id }))
+            : [];
+        }
 
         return {
           id,
@@ -106,7 +116,9 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
           description,
           tag,
           source,
+
           splitSelected,
+          splitOptions,
           splitFeaturesSelected,
           splitFeaturesOptions,
         };
@@ -132,36 +144,66 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
     },
   });
 
-  const query = useQuery(['selected-features'], fetchFeatures, {
+  const query = useQuery(['selected-features', sid], fetchFeatures, {
     refetchOnWindowFocus: false,
   });
 
   const { data } = query;
 
   return useMemo(() => {
-    console.log(data);
-    let parsedData = [];
+    let parsedData = data?.data?.data || {};
 
     const {
-      features = ITEMS,
-    } = {};
+      features = [],
+    } = parsedData;
 
     parsedData = features.map((d):SelectedItemProps => {
       const {
-        id,
-        name,
-        type,
-        description,
-        splitOptions,
-        splitSelected,
-        splitFeaturesSelected,
-        intersectFeaturesSelected,
+        featureId,
+        geoprocessingOperations,
+        metadata,
       } = d;
 
-      const splitFeaturesOptions = splitSelected ? splitOptions
-        .find((s) => s.key === splitSelected).values
-        .map((v) => ({ label: v.name, value: v.id }))
-        : [];
+      const {
+        alias,
+        featureClassName,
+        tag,
+        description,
+        properties,
+
+        intersectFeaturesSelected,
+      } = metadata;
+
+      let splitOptions = [];
+      let splitFeaturesOptions = [];
+      let splitSelected;
+      let splitFeaturesSelected = [];
+
+      if (tag === 'bioregional') {
+        splitOptions = Object.keys(properties).map((k) => {
+          return {
+            key: k,
+            label: k,
+            values: properties[k].map((v) => ({ id: v, name: v })),
+          };
+        });
+
+        if (geoprocessingOperations && geoprocessingOperations[0].kind === 'split/v1') {
+          splitSelected = geoprocessingOperations[0].splitByProperty;
+
+          splitFeaturesOptions = splitSelected ? splitOptions
+            .find((s) => s.key === splitSelected).values
+            .map((v) => ({ label: v.name, value: v.id }))
+            : [];
+
+          splitFeaturesSelected = geoprocessingOperations[0].splits.map((s) => {
+            return {
+              id: s.value,
+              name: s.value,
+            };
+          });
+        }
+      }
 
       const intersectFeaturesOptions = intersectFeaturesSelected ? flatten(intersectFeaturesSelected
         .map((ifs) => {
@@ -190,9 +232,9 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
 
       return {
         ...d,
-        id,
-        name,
-        type: type === 'bioregional' ? 'bioregional' : 'species', // TODO: check why this is happening
+        id: featureId,
+        name: alias || featureClassName,
+        type: tag,
         description,
 
         // SPLIT
@@ -226,7 +268,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
       data: parsedData,
       rawData: data?.data?.data,
     };
-  }, [query, data, search]);
+  }, [query, data?.data?.data, search]);
 }
 
 export function useTargetedFeatures(sid) {
@@ -297,10 +339,43 @@ export function useTargetedFeatures(sid) {
     };
   }, [data, rest]);
 }
+
+export function useSaveSelectedFeatures({
+  requestConfig = {
+    method: 'PUT',
+  },
+}: UseSaveSelectedFeaturesProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveFeature = ({ id, data }: SaveSelectedFeaturesProps) => {
+    return SCENARIOS.request({
+      url: `/${id}/features/specification`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveFeature, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries(['selected-features']);
+
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
 export function useFeature(id) {
   const [session] = useSession();
 
-  const query = useQuery(['features', id], async () => SCENARIOS.request({
+  const query = useQuery(['features', id], async () => GEOFEATURES.request({
     method: 'GET',
     url: `/${id}`,
     headers: {
@@ -318,66 +393,4 @@ export function useFeature(id) {
       data: data?.data?.data,
     };
   }, [query, data?.data?.data]);
-}
-
-export function useSaveFeature({
-  requestConfig = {
-    method: 'POST',
-  },
-}: UseSaveFeatureProps) {
-  const queryClient = useQueryClient();
-  const [session] = useSession();
-
-  const saveFeature = ({ id, data }: SaveFeatureProps) => {
-    return SCENARIOS.request({
-      url: id ? `/${id}` : '/',
-      data,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(saveFeature, {
-    onSuccess: (data: any, variables, context) => {
-      const { id, projectId } = data;
-      queryClient.invalidateQueries(['features', projectId]);
-      queryClient.invalidateQueries(['features', id]);
-      console.info('Succces', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.info('Error', error, variables, context);
-    },
-  });
-}
-
-export function useDeleteFeature({
-  requestConfig = {
-    method: 'DELETE',
-  },
-}: UseDeleteFeatureProps) {
-  const [session] = useSession();
-
-  const deleteFeature = ({ id }: DeleteFeatureProps) => {
-    return SCENARIOS.request({
-      method: 'DELETE',
-      url: `/${id}`,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(deleteFeature, {
-    onSuccess: (data, variables, context) => {
-      console.info('Succces', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.info('Error', error, variables, context);
-    },
-  });
 }
