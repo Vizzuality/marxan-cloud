@@ -80,7 +80,7 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
                     </td>
                     <td>
                       <div className="flex flex-row justify-between pl-10">
-                        <p className="text-sm">{format('~s')(120000)}</p>
+                        <p className="text-sm">{format('.3s')(121452)}</p>
                         <Button size="s" theme="transparent-white" className="px-6 group">
                           Duplicate
                           <Icon icon={DOWNLOAD_SVG} className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black" />
