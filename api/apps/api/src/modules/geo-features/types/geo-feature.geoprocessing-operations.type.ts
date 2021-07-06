@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsObject, IsString, ValidateNested } from 'class-validator';
+import { IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { SpecForGeofeature } from '../dto/create.geo-feature-set.dto';
 import { MarxanSettingsForGeoFeature } from './geo-feature.marxan-settings.type';
 
@@ -36,10 +36,12 @@ export class GeoprocessingOpStratificationV1 extends GeoprocessingOp {
   @Type(() => SpecForGeofeature)
   intersectWith!: SpecForGeofeature;
 
+  @IsOptional()
   @IsString()
-  splitByProperty!: string;
+  splitByProperty?: string;
 
+  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => SplitV1Settings)
-  splits!: SplitV1Settings[];
+  splits?: SplitV1Settings[];
 }
