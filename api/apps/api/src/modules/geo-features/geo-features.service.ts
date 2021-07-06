@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { EntityManager, Repository, SelectQueryBuilder } from 'typeorm';
 import {
   GeoFeatureGeometry,
   GeoFeaturePropertySet,
@@ -24,6 +24,7 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
+import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -39,6 +40,14 @@ type GeoFeatureFilterKeys = keyof Pick<
   typeof geoFeatureFilterKeyNames[number]
 >;
 type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
+
+export const EntityManagerToken = Symbol();
+
+export const MarxanFeaturesMetadata = {
+  defaults: {
+    fpf: 1,
+  },
+};
 
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
@@ -61,6 +70,8 @@ export class GeoFeaturesService extends AppBaseService<
     private readonly projectRepository: Repository<Project>,
     @InjectRepository(Scenario)
     private readonly scenarioRepository: Repository<Scenario>,
+    @Inject(EntityManagerToken)
+    private readonly entityManager: EntityManager,
   ) {
     super(
       geoFeaturesRepository,
@@ -294,6 +305,42 @@ export class GeoFeaturesService extends AppBaseService<
   }
 
   /**
+   * Given a specification for features to be linked to a scenario, compute
+   * features defined via geoprocessing operations and link plain features
+   * and features from geoprocessing to the scenario.
+   */
+  async createFeaturesForScenario(
+    scenarioId: string,
+    featureSpecification: Pick<CreateGeoFeatureSetDTO, 'features'>,
+  ): Promise<void> {
+    await this.entityManager.transaction(async (transactionalEntityManager) => {
+      const repository = transactionalEntityManager.getRepository(
+        RemoteScenarioFeaturesData,
+      );
+      await repository.delete({ scenarioId });
+      // First process features which can be used as they are (plain)
+      await Promise.all(
+        featureSpecification.features
+          .filter((feature) => feature.kind === 'plain')
+          .map((feature) => {
+            return repository.save({
+              scenarioId,
+              featuresDataId: feature.featureId,
+              fpf:
+                feature.marxanSettings?.fpf ??
+                MarxanFeaturesMetadata.defaults.fpf,
+              prop: feature.marxanSettings?.prop,
+            });
+          }),
+      );
+      // Then process features from geoprocessing operations of kind `split/v1`
+      // TODO
+      // Then process features from geoprocessing operations of kind `stratification/v1`
+      // TODO
+    });
+  }
+
+  /**
    * Add feature metadata to features in a geofeatures processing recipe.
    */
   async extendGeoFeatureProcessingRecipe(
@@ -327,6 +374,7 @@ export class GeoFeaturesService extends AppBaseService<
   ): Promise<CreateGeoFeatureSetDTO | undefined> {
     const scenario = await this.scenarioRepository.findOneOrFail(id);
     await this.scenarioRepository.update(id, { featureSet: dto });
+    await this.createFeaturesForScenario(id, dto);
     return await this.extendGeoFeatureProcessingRecipe(dto);
   }
 }
