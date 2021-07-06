@@ -120,23 +120,26 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
   }, [query, pages]);
 }
 
-export function useSelectedFeatures(filters: UseFeaturesFiltersProps = {}) {
+export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) {
   const [session] = useSession();
   const { search } = filters;
 
   const fetchFeatures = () => SCENARIOS.request({
     method: 'GET',
-    url: '/',
+    url: `/${sid}/features/specification`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
   });
 
-  const query = useQuery(['selected-features'], fetchFeatures, { refetchOnWindowFocus: false });
+  const query = useQuery(['selected-features'], fetchFeatures, {
+    refetchOnWindowFocus: false,
+  });
 
   const { data } = query;
 
   return useMemo(() => {
+    console.log(data);
     let parsedData = [];
 
     const {
@@ -223,11 +226,11 @@ export function useSelectedFeatures(filters: UseFeaturesFiltersProps = {}) {
       data: parsedData,
       rawData: data?.data?.data,
     };
-  }, [query, data?.data?.data, search]);
+  }, [query, data, search]);
 }
 
-export function useTargetedFeatures() {
-  const { data, ...rest } = useSelectedFeatures();
+export function useTargetedFeatures(sid) {
+  const { data, ...rest } = useSelectedFeatures(sid);
 
   return useMemo(() => {
     const features = flatten(data.map((s) => {

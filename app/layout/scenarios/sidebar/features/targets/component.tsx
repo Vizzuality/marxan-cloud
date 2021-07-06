@@ -7,6 +7,7 @@ import Button from 'components/button';
 import Loading from 'components/loading';
 import Item from 'components/features/target-spf-item';
 
+import { useRouter } from 'next/router';
 import { useTargetedFeatures } from 'hooks/features';
 
 export interface ScenariosFeaturesListProps {
@@ -18,11 +19,14 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   onBack,
   onSuccess,
 }: ScenariosFeaturesListProps) => {
+  const { query } = useRouter();
+  const { sid } = query;
+
   const {
     data: targetedFeaturesData,
     isFetching: targetedFeaturesIsFetching,
     isFetched: targetedFeaturesIsFetched,
-  } = useTargetedFeatures();
+  } = useTargetedFeatures(sid);
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -119,7 +123,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
 
           {!!targetedFeaturesData && !!targetedFeaturesData.length && (
             <div className="relative flex flex-col flex-grow overflow-hidden">
-              <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700 pointer-events-none" />
+              <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
               <div className="relative h-full px-0.5 overflow-x-visible overflow-y-auto">
                 <FieldRFF name="features">
                   {({ input }) => (
@@ -164,7 +168,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                   )}
                 </FieldRFF>
               </div>
-              <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-gray-700 via-gray-700 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
           )}
 

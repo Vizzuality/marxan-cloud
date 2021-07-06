@@ -42,7 +42,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   const { data: scenarioData } = useScenario(sid);
   const {
     data: selectedFeaturesData,
-  } = useSelectedFeatures({});
+  } = useSelectedFeatures(sid, {});
 
   if (!scenarioData || tab !== 'features') return null;
 

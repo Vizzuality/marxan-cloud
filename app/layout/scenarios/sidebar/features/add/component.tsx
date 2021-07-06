@@ -22,11 +22,11 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid, sid } = query;
 
   const {
     data: selectedFeaturesData,
-  } = useSelectedFeatures({});
+  } = useSelectedFeatures(sid, {});
 
   const {
     isFetched: allFeaturesIsFetched,

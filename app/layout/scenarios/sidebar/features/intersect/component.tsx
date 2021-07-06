@@ -23,11 +23,11 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
 }: ScenariosFeaturesIntersectProps) => {
   const [search, setSearch] = useState(null);
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid, sid } = query;
 
   const {
     data: selectedFeaturesData,
-  } = useSelectedFeatures({});
+  } = useSelectedFeatures(sid, {});
 
   const intersectingCurrent = selectedFeaturesData.find((s) => s.id === intersecting);
   console.info(intersectingCurrent);
