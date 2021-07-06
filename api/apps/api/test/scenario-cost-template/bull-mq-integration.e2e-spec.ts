@@ -32,8 +32,8 @@ describe(`when the job is waiting`, () => {
   });
 
   // then
-  it(`should consider job as pending`, () => {
-    waitForExpect(async () => {
+  it(`should consider job as pending`, async () => {
+    await waitForExpect(async () => {
       expect(await queue.isPending('123')).toBe(true);
     });
   });
