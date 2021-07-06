@@ -16,7 +16,7 @@ export class GeoFeatureSetService {
   }
 
   async serialize(
-    entities: Partial<CreateGeoFeatureSetDTO> | (Partial<CreateGeoFeatureSetDTO> | undefined)[],
+    entities: Partial<CreateGeoFeatureSetDTO> | undefined | (Partial<CreateGeoFeatureSetDTO> | undefined)[],
     paginationMeta?: PaginationMeta,
   ): Promise<any> {
     const serializer = new JSONAPISerializer.Serializer('GeoFeatureSets', {
