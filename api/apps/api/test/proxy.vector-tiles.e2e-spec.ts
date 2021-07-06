@@ -1,8 +1,4 @@
-import {
-  HttpStatus,
-  INestApplication,
-  Logger,
-} from '@nestjs/common';
+import { HttpStatus, INestApplication, Logger } from '@nestjs/common';
 import * as request from 'supertest';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { tearDown } from './utils/tear-down';
@@ -75,7 +71,11 @@ describe('ProxyVectorTilesModule (e2e)', () => {
       },
     ).then(async (response) => await Deserializer.deserialize(response));
 
-    aFeature = await FeaturesTestUtils.getFeature(app, jwtToken, aProjectWithCountryAsPlanningArea.id)
+    aFeature = await FeaturesTestUtils.getFeature(
+      app,
+      jwtToken,
+      aProjectWithCountryAsPlanningArea.id,
+    );
 
     aScenario = await ScenariosTestUtils.createScenario(app, jwtToken, {
       ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -105,7 +105,6 @@ describe('ProxyVectorTilesModule (e2e)', () => {
      * https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991%3A2492
      */
     describe('Admin-areas layers', () => {
-
       test.todo('The response is a valid mvt');
       test.todo('User upload planning units vector tiles');
       test.todo('Irregular planning units vector tiles');
@@ -145,7 +144,9 @@ describe('ProxyVectorTilesModule (e2e)', () => {
       });
       test('User should be able to filter by bbox', async () => {
         const response = await request(app.getHttpServer())
-          .get('/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt?bbox=[10,10,5,5]')
+          .get(
+            '/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt?bbox=[10,10,5,5]',
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
@@ -165,13 +166,17 @@ describe('ProxyVectorTilesModule (e2e)', () => {
       });
       test('User should be able to filter by bbox', async () => {
         const response = await request(app.getHttpServer())
-          .get('/api/v1/protected-areas/preview/tiles/6/30/25.mvt?bbox=[10,10,5,5]')
+          .get(
+            '/api/v1/protected-areas/preview/tiles/6/30/25.mvt?bbox=[10,10,5,5]',
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
       test('Filter by wdpa id', async () => {
         const response = await request(app.getHttpServer())
-          .get('/api/v1/protected-areas/preview/tiles/6/30/25.mvt?id=e5c3b978-908c-49d3-b1e3-89727e9f999c')
+          .get(
+            '/api/v1/protected-areas/preview/tiles/6/30/25.mvt?id=e5c3b978-908c-49d3-b1e3-89727e9f999c',
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
@@ -189,19 +194,25 @@ describe('ProxyVectorTilesModule (e2e)', () => {
     describe('PUs layer previews', () => {
       test('Should give back a valid request for a regular hexagon PUs vector tile preview', async () => {
         const response = await request(app.getHttpServer())
-          .get('/api/v1/planning-units/preview/regular/hexagon/100/tiles/6/30/25.mvt')
+          .get(
+            '/api/v1/planning-units/preview/regular/hexagon/100/tiles/6/30/25.mvt',
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
       test('Should give back a valid request for a regular square PUs vector tile preview', async () => {
         const response = await request(app.getHttpServer())
-          .get('/api/v1/planning-units/preview/regular/square/100/tiles/6/30/25.mvt')
+          .get(
+            '/api/v1/planning-units/preview/regular/square/100/tiles/6/30/25.mvt',
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
       test('Should give back a error if the regular grid is not square or hexagon', async () => {
         const response = await request(app.getHttpServer())
-          .get('/api/v1/planning-units/preview/regular/te/100/tiles/6/30/25.mvt')
+          .get(
+            '/api/v1/planning-units/preview/regular/te/100/tiles/6/30/25.mvt',
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.BAD_REQUEST);
       });
@@ -209,7 +220,9 @@ describe('ProxyVectorTilesModule (e2e)', () => {
     describe('Scenario PUs layers', () => {
       test('Should give back a valid request for a scenario PUs', async () => {
         const response = await request(app.getHttpServer())
-          .get(`/api/v1/scenarios/${aScenario.id}/planning-units/tiles/6/30/25.mvt`)
+          .get(
+            `/api/v1/scenarios/${aScenario.id}/planning-units/tiles/6/30/25.mvt`,
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });

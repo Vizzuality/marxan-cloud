@@ -69,8 +69,7 @@ export class PlanningUnitsService {
       z,
       planningUnitGridShape,
       planningUnitAreakm2,
-      filters
-
+      filters,
     );
     const customQuery = this.buildPlanningUnitsWhereQuery(filters);
 
@@ -99,7 +98,7 @@ export class PlanningUnitsService {
     z: number,
     planningUnitGridShape: PlanningUnitGridShape,
     planningUnitAreakm2: number,
-    filters?:PlanningUnitsFilters
+    filters?: PlanningUnitsFilters,
   ): string {
     const gridShape = this.regularFunctionGridSelector(planningUnitGridShape);
     const gridSize = this.calculateGridSize(planningUnitAreakm2);
@@ -111,10 +110,11 @@ export class PlanningUnitsService {
      * a large area.
      * If so the shape we are getting is down the optimal to visualize it as points
      */
-    const query = (ratioPixelExtent < 8 && !filters?.bbox) ?
-  `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
-        ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom )` :
-  `( SELECT row_number() over() as id, (${gridShape}(${gridSize}, \
+    const query =
+      ratioPixelExtent < 8 && !filters?.bbox
+        ? `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
+        ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom )`
+        : `( SELECT row_number() over() as id, (${gridShape}(${gridSize}, \
                     ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom as the_geom)`;
 
     return query;

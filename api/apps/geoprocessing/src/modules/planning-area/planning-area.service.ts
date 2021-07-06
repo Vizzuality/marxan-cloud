@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { GeoJSON } from 'geojson';
-import { InjectRepository } from '@nestjs/typeorm';
-import { PlanningArea } from './planning-area.geo.entity';
+import { CustomPlanningAreaRepository } from '@marxan/planning-area-repository';
 import { ShapefileService } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.service';
 
 @Injectable()
 export class PlanningAreaService {
   constructor(
-    @InjectRepository(PlanningArea)
-    private readonly planningAreas: Repository<PlanningArea>,
+    private readonly repository: CustomPlanningAreaRepository,
     private readonly shapefileService: ShapefileService,
   ) {}
 
@@ -17,19 +14,7 @@ export class PlanningAreaService {
     shapefile: Express.Multer.File,
   ): Promise<{ data: GeoJSON; id: string }> {
     const { data } = await this.shapefileService.transformToGeoJson(shapefile);
-    const result = await this.planningAreas.query(
-      `
-INSERT INTO "planning_areas"("the_geom")
-  SELECT ST_SetSRID(
-    ST_Collect(
-      ST_GeomFromGeoJSON(features->>'geometry')
-    ), 4326)::geometry
-  FROM (
-    SELECT json_array_elements($1::json->'features') AS features
-  ) AS f RETURNING "id";
-    `,
-      [data],
-    );
+    const result = await this.repository.saveGeoJson(data);
     return {
       id: result[0].id,
       data,

@@ -6,12 +6,12 @@ import { Test } from '@nestjs/testing';
 import { HttpModule } from '@nestjs/common';
 import {
   geoprocessingUrlToken,
-  PlanningAreaUploader,
+  CustomPlanningAreasUploader,
   validationFailed,
-} from './planning-area-uploader';
+} from './custom-planning-areas-uploader.service';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
-let uploader: PlanningAreaUploader;
+let uploader: CustomPlanningAreasUploader;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
@@ -77,7 +77,7 @@ async function getFixtures() {
         provide: geoprocessingUrlToken,
         useValue: geoprocessingUrl,
       },
-      PlanningAreaUploader,
+      CustomPlanningAreasUploader,
     ],
   }).compile();
 
@@ -89,7 +89,7 @@ async function getFixtures() {
       fieldname: 'fake multer object',
     } as Express.Multer.File,
     validResponse: { success: true },
-    getUploader: () => testingModule.get(PlanningAreaUploader),
+    getUploader: () => testingModule.get(CustomPlanningAreasUploader),
     fileValidatedSuccessfully() {
       scope
         .post(`/api/v1/projects/planning-area/shapefile`, (body) =>

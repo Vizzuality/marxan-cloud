@@ -1,1 +1,1 @@
-export { AdminArea } from './admin-areas.geo.entity';
+export { AdminArea, adminAreaTableName } from './admin-areas.geo.entity';
