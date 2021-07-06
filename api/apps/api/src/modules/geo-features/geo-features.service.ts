@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -23,10 +23,8 @@ import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { GeoFeatureSet, GeoFeatureSetResult } from './geo-feature-set.api.entity';
-import { ScenariosService } from '../scenarios/scenarios.service';
 import { Scenario } from '../scenarios/scenario.api.entity';
-import { assertDefined } from '@marxan/utils';
+import { inspect } from 'util';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -119,13 +117,16 @@ export class GeoFeaturesService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<GeoFeature>,
     filters: GeoFeatureFilters,
-    _info?: AppInfoDTO,
+    info?: AppInfoDTO,
   ): SelectQueryBuilder<GeoFeature> {
     this._processBaseFilters<GeoFeatureFilters>(
       query,
       filters,
       geoFeatureFilterKeyNames,
     );
+    if(Array.isArray(info?.params?.ids) && info?.params?.ids.length) {
+      query.andWhere('id in (:...ids)', { ids: info?.params?.ids });
+    }
     return query;
   }
 
@@ -294,6 +295,19 @@ export class GeoFeaturesService extends AppBaseService<
   }
 
   /**
+   * Add feature metadata to features in a geofeatures processing recipe.
+   */
+  async extendGeoFeatureProcessingRecipe(recipe: CreateGeoFeatureSetDTO): Promise<any> {
+    const featuresInRecipe = recipe.features.map(feature => feature.featureId);
+    const metadataForFeaturesInRecipe = await this.findAll(undefined, { params: { ids: featuresInRecipe }})
+    .then(result => result[0]);
+    Logger.debug(inspect(metadataForFeaturesInRecipe, undefined, 4));
+    return { status: recipe.status, features: recipe.features.map(feature => {
+      return { ...feature, metadata: metadataForFeaturesInRecipe.find(f => f.id === feature.featureId)}
+    })}
+  }
+
+  /**
    * Create or replace the set of features linked to a scenario.
    */
   async createOrReplaceFeatureSet(
@@ -302,7 +316,6 @@ export class GeoFeaturesService extends AppBaseService<
   ): Promise<CreateGeoFeatureSetDTO | undefined> {
     const scenario = await this.scenarioRepository.findOneOrFail(id);
     await this.scenarioRepository.update(id, { featureSet: dto })
-    return this.scenarioRepository.findOneOrFail(id)
-      .then(result => result.featureSet);
+    return await this.extendGeoFeatureProcessingRecipe(dto);
   }
 }
