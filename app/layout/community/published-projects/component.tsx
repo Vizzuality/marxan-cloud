@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+
+import { useDebouncedCallback } from 'use-debounce';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSearch } from 'store/slices/projects';
 
 import Link from 'next/link';
 
@@ -26,16 +30,29 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
     isFetched: publishedProjectsIsFetched,
   } = usePublishedProjects();
 
+  const { search } = useSelector((state) => state['/projects']);
+  const dispatch = useDispatch();
+
+  const onChangeSearchDebounced = useDebouncedCallback((value) => {
+    dispatch(setSearch(value));
+  }, 500);
+
+  useEffect(() => {
+    return function unmount() {
+      dispatch(setSearch(null));
+    };
+  }, [dispatch]);
+
   return (
     <Wrapper>
       <div className="w-full max-w-5xl mx-auto py-18">
         <Search
           id="project-search"
-          // defaultValue={search}
+          defaultValue={search}
           size="base"
           placeholder="Search projects, locations, creators, features..."
           aria-label="Search"
-          // onChange={(value) => { dispatch(setSearch(value)); }}
+          onChange={onChangeSearchDebounced}
         />
         <h3 className="pt-10 text-2xl font-heading">
           Projects published (
