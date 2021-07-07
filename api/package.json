@@ -76,7 +76,6 @@
     "pg-large-object": "^2.0.0",
     "pg-query-stream": "4.1.0",
     "pure-geojson-validation": "0.3.0",
-    "purify-ts": "0.16.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
