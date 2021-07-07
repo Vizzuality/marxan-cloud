@@ -43,6 +43,49 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   }, [selectedFeaturesData]);
 
   // Callbacks
+  const getFeaturesRecipe = useCallback((features) => {
+    return {
+      status: 'draft',
+      features: features.map((s) => {
+        const {
+          featureId,
+          splitSelected,
+          splitFeaturesSelected,
+          intersectFeaturesSelected,
+        } = s;
+
+        const {
+          marxanSettings,
+        } = selectedFeaturesData.find((sf) => sf.featureId === featureId) || {};
+
+        const kind = (splitSelected || intersectFeaturesSelected) ? 'withGeoprocessing' : 'plain';
+
+        let geoprocessingOperations;
+
+        if (splitSelected) {
+          geoprocessingOperations = [
+            {
+              kind: 'split/v1',
+              splitByProperty: splitSelected,
+              splits: splitFeaturesSelected.map((sf) => {
+                return {
+                  value: sf.id,
+                };
+              }),
+            },
+          ];
+        }
+
+        return {
+          featureId,
+          kind,
+          ...!!geoprocessingOperations && { geoprocessingOperations },
+          ...!!marxanSettings && { marxanSettings },
+        };
+      }),
+    };
+  }, [selectedFeaturesData]);
+
   const onSplitSelected = useCallback((id, key, input) => {
     const { value, onChange } = input;
     const features = [...value];
@@ -91,54 +134,32 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     const featureIndex = features.findIndex((f) => f.id === id);
     features.splice(featureIndex, 1);
     onChange(features);
-  }, []);
 
-  const onSubmit = useCallback((values) => {
-    const { features } = values;
+    const data = getFeaturesRecipe(features);
 
     // Save current features
     selectedFeaturesMutation.mutate({
       id: `${sid}`,
-      data: {
-        status: 'draft',
-        features: features.map((s) => {
-          const {
-            featureId,
-            splitSelected,
-            splitFeaturesSelected,
-            intersectFeaturesSelected,
-          } = s;
-
-          const {
-            marxanSettings,
-          } = selectedFeaturesData.find((sf) => sf.featureId === featureId) || {};
-
-          const kind = (splitSelected || intersectFeaturesSelected) ? 'withGeoprocessing' : 'plain';
-
-          let geoprocessingOperations;
-
-          if (splitSelected) {
-            geoprocessingOperations = [
-              {
-                kind: 'split/v1',
-                splitByProperty: splitSelected,
-                splits: splitFeaturesSelected.map((sf) => {
-                  return {
-                    value: sf.id,
-                  };
-                }),
-              },
-            ];
-          }
-
-          return {
-            featureId,
-            kind,
-            ...!!geoprocessingOperations && { geoprocessingOperations },
-            ...!!marxanSettings && { marxanSettings },
-          };
-        }),
+      data,
+    }, {
+      onSuccess: () => {
+        setSubmitting(false);
       },
+      onError: () => {
+        setSubmitting(false);
+      },
+    });
+  }, [sid, getFeaturesRecipe, selectedFeaturesMutation]);
+
+  const onSubmit = useCallback((values) => {
+    const { features } = values;
+    const data = getFeaturesRecipe(features);
+    setSubmitting(true);
+
+    // Save current features
+    selectedFeaturesMutation.mutate({
+      id: `${sid}`,
+      data,
     }, {
       onSuccess: () => {
         onSuccess();
@@ -148,7 +169,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
         setSubmitting(false);
       },
     });
-  }, [sid, selectedFeaturesData, selectedFeaturesMutation, onSuccess]);
+  }, [sid, selectedFeaturesMutation, onSuccess, getFeaturesRecipe]);
 
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {

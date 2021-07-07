@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { motion } from 'framer-motion';
 
@@ -43,6 +43,12 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
+
+  useEffect(() => {
+    return () => {
+      setStep(0);
+    };
+  }, [tab]);
 
   if (!scenarioData || tab !== 'features') return null;
 

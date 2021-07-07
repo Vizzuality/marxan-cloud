@@ -361,7 +361,8 @@ export function useSaveSelectedFeatures({
 
   return useMutation(saveFeature, {
     onSuccess: (data: any, variables, context) => {
-      queryClient.invalidateQueries(['selected-features']);
+      const { id } = variables;
+      queryClient.setQueryData(['selected-features', id], data);
 
       console.info('Succces', data, variables, context);
     },
