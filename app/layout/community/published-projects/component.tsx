@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import { useDebouncedCallback } from 'use-debounce';
 import { useSelector, useDispatch } from 'react-redux';
-import { setSearch } from 'store/slices/projects';
+import { setSearch } from 'store/slices/community/projects';
 
 import Link from 'next/link';
 
@@ -30,7 +30,7 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
     isFetched: publishedProjectsIsFetched,
   } = usePublishedProjects();
 
-  const { search } = useSelector((state) => state['/projects']);
+  const { search } = useSelector((state) => state['/community/projects']);
   const dispatch = useDispatch();
 
   const onChangeSearchDebounced = useDebouncedCallback((value) => {

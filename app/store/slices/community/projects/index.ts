@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface ProjectListStateProps {
+interface CommunityProjectsStateProps {
   search: string
 }
 
-const initialState = { search: '' } as ProjectListStateProps;
+const initialState = { search: '' } as CommunityProjectsStateProps;
 
-const projectsSlice = createSlice({
+const communityProjectsSlice = createSlice({
   name: '/community/projects',
   initialState,
   reducers: {
@@ -16,5 +16,5 @@ const projectsSlice = createSlice({
   },
 });
 
-export const { setSearch } = projectsSlice.actions;
-export default projectsSlice.reducer;
+export const { setSearch } = communityProjectsSlice.actions;
+export default communityProjectsSlice.reducer;
