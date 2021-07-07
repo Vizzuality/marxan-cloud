@@ -31,6 +31,20 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
     description, name, planningAreaName, users, scenarios,
   } = publishedProject || {};
 
+  const handleCopy = () => {
+    const copyText = document.getElementById('copyInput').baseURI;
+    navigator.clipboard.writeText(copyText).then(
+      () => {
+        alert('yeah!');
+      },
+    )
+      .catch(
+        () => {
+          alert('err');
+        },
+      );
+  };
+
   return (
     <Wrapper>
       <div className="w-full max-w-5xl mx-auto my-32">
@@ -96,6 +110,10 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
               </div>
               <div>
                 <h3 className="mb-6 text-sm font-semibold text-white">Share</h3>
+                <button onClick={handleCopy} type="button">
+                  Copy link
+                </button>
+                <input className="hidden" type="text" value="" id="copyInput" />
               </div>
             </div>
           </div>
