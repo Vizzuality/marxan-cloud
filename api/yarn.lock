@@ -8044,7 +8044,7 @@ pure-geojson-validation@0.3.0:
     "@types/geojson" "^7946.0.7"
     purify-ts "^0.16.1"
 
-purify-ts@0.16.2, purify-ts@^0.16.1:
+purify-ts@^0.16.1:
   version "0.16.2"
   resolved "https://registry.yarnpkg.com/purify-ts/-/purify-ts-0.16.2.tgz#9a902414216da4df6f658c58044449d85860b733"
   integrity sha512-wOqzjuoka1v9VlexcfmPthh5VkaBG4BVsqUQkOZ0s1ctdxsQVtykGAKyeTfY+pfPIuD2efgGhy/eI8K/KGbDYw==
