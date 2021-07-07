@@ -34,7 +34,10 @@ ScenariosOutputResultsApiEntity,
       attributes: [
         'id',
         'runId',
-        'scoreValue'
+        'scoreValue',
+        'costValue',
+        'missingValues',
+        'planningUnits'
       ],
       keyForAttribute: 'camelCase',
     };
@@ -58,6 +61,11 @@ ScenariosOutputResultsApiEntity,
   ): Promise<ScenariosOutputResultsApiEntity> {
     // TODO implement
     entity.scoreValue = 999;
+    entity.costValue = 400;
+    entity.planningUnits = 17;
+    entity.missingValues = 13;
+    entity.runId = 1;
+
     return entity;
   }
 }

@@ -26,7 +26,7 @@ export class ScenariosOutputResultsApiEntity {
     nullable: true,
     name: `run_id`,
   })
-  runId?: string | null;
+  runId?: number | null;
 
   /**
    * Score of the run
@@ -59,7 +59,7 @@ export class ScenariosOutputResultsApiEntity {
   planningUnits?: number | null;
 
   /**
-   * nº planning units of the run
+   * The total boundary length of the reserve system.
    */
    @Column({
     type: `float8`,
@@ -69,7 +69,7 @@ export class ScenariosOutputResultsApiEntity {
   connectivity?: number | null;
 
   /**
-   * nº planning units of the run
+   * Total boundary of planning units in study area.
    */
    @Column({
     type: `float8`,
@@ -79,7 +79,7 @@ export class ScenariosOutputResultsApiEntity {
   connectivityTotal?: number | null;
 
   /**
-   * nº planning units of the run
+   * Minimum Proportion Met for the worst performing feature.
    */
    @Column({
     type: `float8`,
@@ -89,7 +89,7 @@ export class ScenariosOutputResultsApiEntity {
   mpm?: number | null;
 
   /**
-   * nº planning units of the run
+   * The penalty that was added to the objective function
    */
     @Column({
       type: `float8`,
@@ -99,7 +99,7 @@ export class ScenariosOutputResultsApiEntity {
   penaltyValue?: number | null;
 
   /**
-   * nº planning units of the run
+   * The amount by which the targets for conservation features have not been met
    */
    @Column({
     type: `float8`,
@@ -109,17 +109,17 @@ export class ScenariosOutputResultsApiEntity {
   shortfall?: number | null;
 
    /**
-   * nº planning units of the run
+   * The number of features that did not achieve their targets
    */
     @Column({
       type: `float8`,
       nullable: true,
       name: `missing_values`,
     })
-    missing_values?: number | null;
+    missingValues?: number | null;
 
-    /**
-   * nº planning units of the run
+    /**g
+   * Best solution/run for the scenario (1 per scenario)
    */
      @Column({
       type: `bool`,
@@ -129,17 +129,17 @@ export class ScenariosOutputResultsApiEntity {
     best?: boolean | null;
 
     /**
-   * nº planning units of the run
+   * 5 most different solution in the results (5 per scenario)
    */
      @Column({
       type: `bool`,
       nullable: true,
-      name: `distinct`,
+      name: `distinct_five`,
     })
-    distinct?: boolean | null;
+    distinctFive?: boolean | null;
 
    /**
-   * nº planning units of the run
+   * metadata
    */
     @Column({
       type: `jsonb`,

@@ -42,7 +42,7 @@ export const createWorld = async () => {
     WhenGettingSolutions: async () =>
       request(app.getHttpServer())
         .get(
-          `/api/v1/scenarios/${scenario.data.id}/marxan/run/${v4()}/solutions`,
+          `/api/v1/scenarios/${scenario.data.id}/marxan/solutions`,
         )
         .set('Authorization', `Bearer ${jwt}`),
     cleanup: async () => {

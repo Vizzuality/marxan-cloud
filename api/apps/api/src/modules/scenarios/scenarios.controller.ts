@@ -5,7 +5,6 @@ import {
   Get,
   Header,
   Param,
-  ParseBoolPipe,
   ParseUUIDPipe,
   Patch,
   Post,
@@ -64,7 +63,7 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
-const solutionsSubPath = `:id/marxan/run/:runId/solutions`;
+const solutionsSubPath = `:id/marxan/solutions`;
 
 const marxanRunTag = 'Marxan Run';
 const marxanRunFiles = 'Marxan Run - Files';
@@ -307,26 +306,10 @@ export class ScenariosController {
   @Get(solutionsSubPath)
   async getScenarioRunSolutions(
     @Param('id', ParseUUIDPipe) id: string,
-    @Param('runId', ParseUUIDPipe) runId: string,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-    @Query('best', ParseBoolPipe) selectOnlyBest?: boolean,
-    @Query('most-different', ParseBoolPipe) selectMostDifferent?: boolean,
   ): Promise<ScenarioFeatureResultDto> {
-    if (selectOnlyBest) {
-      return this.getScenarioRunBestSolutions(id, runId);
-    }
-
-    if (selectMostDifferent) {
-      return this.getScenarioRunMostDifferentSolutions(
-        id,
-        runId,
-        fetchSpecification,
-      );
-    }
-
     const result = await this.service.findAllSolutionsPaginated(
       id,
-      runId,
       fetchSpecification,
     );
     return this.scenarioSolutionSerializer.serialize(
@@ -377,10 +360,12 @@ export class ScenariosController {
   @Get(`${solutionsSubPath}/best`)
   async getScenarioRunBestSolutions(
     @Param('id', ParseUUIDPipe) id: string,
-    @Param('runId', ParseUUIDPipe) runId: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioFeatureResultDto> {
+    const result = await this.service.getBestSolution(id, fetchSpecification);
     return this.scenarioSolutionSerializer.serialize(
-      await this.service.getBestSolution(id, runId),
+      result.data,
+      result.metadata,
     );
   }
 
@@ -392,17 +377,30 @@ export class ScenariosController {
   @Get(`${solutionsSubPath}/most-different`)
   async getScenarioRunMostDifferentSolutions(
     @Param('id', ParseUUIDPipe) id: string,
-    @Param('runId', ParseUUIDPipe) runId: string,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioFeatureResultDto> {
     const result = await this.service.getMostDifferentSolutions(
       id,
-      runId,
       fetchSpecification,
     );
     return this.scenarioSolutionSerializer.serialize(
       result.data,
       result.metadata,
+    );
+  }
+
+  @ApiOkResponse({
+    type: ScenarioSolutionResultDto,
+  })
+  @JSONAPIQueryParams()
+  @Get(`${solutionsSubPath}/:runId`)
+  async getScenarioRunId(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('runId', ParseUUIDPipe) runId: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+  ): Promise<ScenarioFeatureResultDto> {
+    return this.scenarioSolutionSerializer.serialize(
+      await this.service.getOneSolution(id, runId, fetchSpecification),
     );
   }
 
