@@ -59,7 +59,7 @@ it(`should deny existence of unknown entity`, async () => {
   expect(hasResult).toBe(false);
 });
 
-it(`should replace planning area assignment`, async () => {
+it(`should replace planning area assignment and delete the old one`, async () => {
   // given
   const { id: firstId } = (
     await repository.saveGeoJson(fixtures.sampleGeoJSON)
@@ -81,7 +81,7 @@ it(`should replace planning area assignment`, async () => {
     '32ce1a52-51cb-4f50-ab41-92c4c5a71f31',
   );
   // then
-  await fixtures.areaShouldBeAssignedTo(firstId, null);
+  expect(await repository.has(firstId)).toBe(false);
   // and
   await fixtures.areaShouldBeAssignedTo(
     secondId,
@@ -189,6 +189,10 @@ async function getFixtures() {
         },
       );
       return id;
+    },
+    async areaShouldNotExist(id: string) {
+      const area = await fixtures.getTypeormRepository().findOne(id);
+      expect(area).toBeUndefined();
     },
     async areaShouldBeAssignedTo(id: string, projectId: string | null) {
       const area = await fixtures.getTypeormRepository().findOne(id);

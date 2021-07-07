@@ -1,18 +1,16 @@
-import { LessThan, Repository } from 'typeorm';
+import { EntityManager, LessThan } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import { BBox, GeoJSON } from 'geojson';
 import { isDefined } from '@marxan/utils';
 import { PlanningArea } from './planning-area.geo.entity';
 
-export const planningAreasRepositoryToken = Symbol(
-  'planning areas repository token',
-);
+export const geoEntityManagerToken = Symbol('geo entity manager token');
 
 @Injectable()
 export class CustomPlanningAreaRepository {
   constructor(
-    @Inject(planningAreasRepositoryToken)
-    private readonly planningAreas: Repository<PlanningArea>,
+    @Inject(geoEntityManagerToken)
+    private readonly entityManager: EntityManager,
   ) {}
 
   async saveGeoJson(
@@ -50,23 +48,24 @@ INSERT INTO "planning_areas"("the_geom")
     return isDefined(selectedId?.id);
   }
 
+  /**
+   * removes previously assigned project's planning area, and assigns the given area to the project
+   * transactional
+   */
   async assignProject(id: string, projectId: string): Promise<void> {
-    await this.planningAreas.update(
-      {
+    await this.transaction(async (transactionRepo) => {
+      await transactionRepo.planningAreas.delete({
         projectId,
-      },
-      {
-        projectId: null,
-      },
-    );
-    await this.planningAreas.update(
-      {
-        id: id,
-      },
-      {
-        projectId,
-      },
-    );
+      });
+      await transactionRepo.planningAreas.update(
+        {
+          id: id,
+        },
+        {
+          projectId,
+        },
+      );
+    });
   }
 
   async deleteUnassignedOldEntries(
@@ -79,5 +78,20 @@ INSERT INTO "planning_areas"("the_geom")
       projectId: null,
       createdAt: LessThan(new Date(+now - maxAgeInMs)),
     });
+  }
+
+  private transaction<T>(
+    code: (transactionRepository: CustomPlanningAreaRepository) => Promise<T>,
+  ): Promise<T> {
+    return this.entityManager.transaction((transactionEntityManager) => {
+      const transactionalRepository = new CustomPlanningAreaRepository(
+        transactionEntityManager,
+      );
+      return code(transactionalRepository);
+    });
+  }
+
+  private get planningAreas() {
+    return this.entityManager.getRepository(PlanningArea);
   }
 }

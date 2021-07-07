@@ -1,9 +1,9 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { PlanningArea } from './planning-area.geo.entity';
 import {
   CustomPlanningAreaRepository,
-  planningAreasRepositoryToken,
+  geoEntityManagerToken,
 } from './custom-planning-area.repository';
 
 @Module({})
@@ -14,8 +14,8 @@ export class PlanningAreaRepositoryModule {
       imports: [TypeOrmModule.forFeature([PlanningArea], connectionName)],
       providers: [
         {
-          provide: planningAreasRepositoryToken,
-          useExisting: getRepositoryToken(PlanningArea, connectionName),
+          provide: geoEntityManagerToken,
+          useExisting: getEntityManagerToken(connectionName),
         },
         CustomPlanningAreaRepository,
       ],
