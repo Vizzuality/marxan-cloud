@@ -82,13 +82,17 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
               </div>
               <div>
                 <h3 className="mb-6 text-sm font-semibold text-white">Scenarios</h3>
-                <p className="text-sm text-white">Marxan Standard</p>
-                <p className="text-sm text-white">
-                  {scenarios?.length}
-                  {' '}
-                  scenarios
-                </p>
-                <p className="text-sm text-white">Last creation: 2 days ago</p>
+                {scenarios && (
+                  <>
+                    <p className="text-sm text-white">Marxan Standard</p>
+                    <p className="text-sm text-white">
+                      {scenarios.length}
+                      {' '}
+                      scenarios
+                    </p>
+                    <p className="text-sm text-white">Last creation: 2 days ago</p>
+                  </>
+                )}
               </div>
               <div>
                 <h3 className="mb-6 text-sm font-semibold text-white">Share</h3>
