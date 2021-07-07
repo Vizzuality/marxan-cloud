@@ -13,8 +13,11 @@ export class Archive {
     });
     const destinationStream = createWriteStream(this.targetArchivePath);
     return new Promise((resolve, reject) => {
-      archive.on('finish', () => {
+      destinationStream.on(`close`, () => {
         resolve(this);
+      });
+      archive.on('finish', () => {
+        // archive created but not yet written to disk
       });
       archive.on('error', function (err) {
         reject(err);

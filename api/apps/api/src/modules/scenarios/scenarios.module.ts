@@ -36,6 +36,7 @@ import { SpecDatModule } from './input-files/spec.dat.module';
 
 import { MarxanRunService } from './marxan-run/marxan-run.service';
 import { MarxanRunController } from './marxan-run/marxan-run.controller';
+import { OutputFilesModule } from './output-files/output-files.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { MarxanRunController } from './marxan-run/marxan-run.controller';
     CostSurfaceViewModule,
     SpecDatModule,
     PlanningUnitsProtectionLevelModule,
+    OutputFilesModule,
   ],
   providers: [
     ScenariosService,

@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('marxan_execution_metadata')
 export class MarxanExecutionMetadataGeoEntity {
@@ -32,4 +38,7 @@ export class MarxanExecutionMetadataGeoEntity {
     name: `output_zip`,
   })
   outputZip?: Buffer | null;
+
+  @CreateDateColumn({ type: 'timestamp without time zone' })
+  createdAt!: Date;
 }
