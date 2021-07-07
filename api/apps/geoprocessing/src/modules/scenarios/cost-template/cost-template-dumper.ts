@@ -5,6 +5,9 @@ import { assertDefined } from '@marxan/utils';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { FeatureCollectionWrapper } from './feature-collection-wrapper';
 
+// sometimes is not imported by TypeORM in tests
+require(`pg-query-stream`);
+
 export class CostTemplateDumper {
   constructor(
     @InjectEntityManager(geoprocessingConnections.default)
