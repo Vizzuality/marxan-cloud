@@ -75,11 +75,11 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
             <tbody>
               {publishedProjectsData.map((pp) => {
                 const {
-                  id, name, description, planningArea, timesDuplicated, users,
+                  id: pid, name, description, planningArea, timesDuplicated, users,
                 } = pp;
                 return (
-                  <tr key={id} className="border-b border-white cursor-pointer border-opacity-20">
-                    <Link href="projects/1">
+                  <tr key={pid} className="border-b border-white cursor-pointer border-opacity-20">
+                    <Link href={`/community/projects/${pid}`}>
                       <td className="pb-10">
                         <p className="font-semibold hover:underline">{name}</p>
                         <p className="text-base leading-normal text-gray-400">{description}</p>
