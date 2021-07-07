@@ -309,7 +309,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 export function usePublishedProject(id) {
   const [session] = useSession();
 
-  const query = useQuery(['projects', id], async () => PROJECTS.request({
+  const query = useQuery(['published-projects', id], async () => PROJECTS.request({
     method: 'GET',
     url: `/${id}`,
     headers: {

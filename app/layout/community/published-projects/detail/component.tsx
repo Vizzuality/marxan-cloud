@@ -9,7 +9,7 @@ import Backlink from 'layout/statics/backlink';
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
-import ProjectMap from 'layout/projects/show/map';
+import PublishedProjectMap from 'layout/community/published-projects/detail/map';
 import Wrapper from 'layout/wrapper';
 
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
@@ -27,7 +27,9 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
     isFetched: publishedProjectIsFetched,
   } = usePublishedProject(pid);
 
-  const { description, name, planningAreaName } = publishedProject;
+  const {
+    description, name, planningAreaName, users, scenarios,
+  } = publishedProject || {};
 
   return (
     <Wrapper>
@@ -67,14 +69,12 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
             <div className="grid grid-cols-2 grid-rows-3 gap-y-11 gap-x-9">
               <div>
                 <h3 className="mb-6 text-sm font-semibold text-white">Creators</h3>
-                <div className="flex flex-row items-center mb-5">
-                  <Avatar bgImage="/images/avatar.png" size="s" />
-                  <p className="ml-5 text-sm text-white">Tamara Huete</p>
-                </div>
-                <div className="flex flex-row items-center mb-5">
-                  <Avatar bgImage="/images/avatar.png" size="s" />
-                  <p className="ml-5 text-sm text-white">Tamara Huete</p>
-                </div>
+                {users?.map((u) => (
+                  <div key={u.id} className="flex flex-row items-center mb-5">
+                    <Avatar bgImage={u.avatar || '/images/avatar.png'} size="s" />
+                    <p className="ml-5 text-sm text-white">{u.name}</p>
+                  </div>
+                ))}
               </div>
               <div>
                 <h3 className="mb-6 text-sm font-semibold text-white">Planning Área</h3>
@@ -83,7 +83,11 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
               <div>
                 <h3 className="mb-6 text-sm font-semibold text-white">Scenarios</h3>
                 <p className="text-sm text-white">Marxan Standard</p>
-                <p className="text-sm text-white">17 scenarios</p>
+                <p className="text-sm text-white">
+                  {scenarios?.length}
+                  {' '}
+                  scenarios
+                </p>
                 <p className="text-sm text-white">Last creation: 2 days ago</p>
               </div>
               <div>
@@ -92,7 +96,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
             </div>
           </div>
           <div className="w-5/12">
-            <ProjectMap />
+            <PublishedProjectMap />
           </div>
         </div>
         )}
