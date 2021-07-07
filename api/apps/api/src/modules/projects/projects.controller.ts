@@ -54,7 +54,7 @@ import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';
-import { PlanningAreaCreatedDto } from './dto/planning-area-created.dto';
+import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 
 @UseGuards(JwtAuthGuard)
@@ -191,7 +191,7 @@ export class ProjectsController {
     return this.jobsStatusSerizalizer.serialize(projectId, scenarios);
   }
 
-  @ApiConsumesShapefile(false)
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
     description: 'Upload shapefile for project-specific protected areas',
   })
@@ -209,16 +209,16 @@ export class ProjectsController {
     return;
   }
 
-  @ApiOkResponse({ type: PlanningAreaCreatedDto })
-  @ApiOperation({
+  @ApiConsumesShapefile({
+    withGeoJsonResponse: true,
+    type: PlanningAreaResponseDto,
     description: 'Upload shapefile with project planning-area',
   })
-  @ApiConsumesShapefile(false)
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @Post('planning-area/shapefile')
   async shapefileWithProjectPlanningArea(
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<PlanningAreaCreatedDto> {
+  ): Promise<PlanningAreaResponseDto> {
     const result = await this.projectsService.savePlanningAreaFromShapefile(
       file,
     );

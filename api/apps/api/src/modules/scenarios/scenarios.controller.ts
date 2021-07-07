@@ -187,7 +187,7 @@ export class ScenariosController {
     );
   }
 
-  @ApiConsumesShapefile(false)
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiNoContentResponse()
   @Post(`:id/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
