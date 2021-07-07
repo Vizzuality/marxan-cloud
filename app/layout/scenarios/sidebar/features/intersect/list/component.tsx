@@ -10,14 +10,18 @@ import useBottomScrollListener from 'hooks/scroll';
 
 export interface ScenariosFeaturesIntersectListProps {
   search?: string;
-  selected: number[] | string[];
+  selected: Record<string, unknown>[];
   onSelected: (selected: string | number) => void;
+  onSplitSelected: (id: string | number, key: string) => void;
+  onSplitFeaturesSelected: (selected: string | number, key: string) => void;
 }
 
 export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersectListProps> = ({
   search,
   selected = [],
   onSelected,
+  onSplitSelected,
+  onSplitFeaturesSelected,
 }: ScenariosFeaturesIntersectListProps) => {
   const { query } = useRouter();
   const { pid } = query;
@@ -47,6 +51,14 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
     if (onSelected) onSelected(feature);
   }, [onSelected]);
 
+  const handleSplitSelected = useCallback((id, key) => {
+    if (onSplitSelected) onSplitSelected(id, key);
+  }, [onSplitSelected]);
+
+  const handleSplitFeaturesSelected = useCallback((id, key) => {
+    if (onSplitFeaturesSelected) onSplitFeaturesSelected(id, key);
+  }, [onSplitFeaturesSelected]);
+
   return (
     <div className="relative flex flex-col flex-grow overflow-hidden" style={{ minHeight: 200 }}>
       <div className="absolute left-0 z-10 w-full h-6 pointer-events-none -top-1 bg-gradient-to-b from-white via-white" />
@@ -68,7 +80,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
           </div>
         )}
 
-        <div>
+        <div style={{ transform: 'translateZ(0)' }}>
           {(!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length)) && (
             <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
               No results found
@@ -76,6 +88,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
           )}
 
           {allFeaturesData && allFeaturesData.map((item, i) => {
+            const selectedItem = selected.find((f) => f.id === item.id);
             const selectedIndex = selected.findIndex((f) => f.id === item.id);
 
             return (
@@ -87,10 +100,17 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
               >
                 <Item
                   {...item}
+                  {...selectedItem}
                   scrollRoot={scrollRef}
                   selected={selectedIndex !== -1}
                   onSelected={() => {
                     handleSelected(item);
+                  }}
+                  onSplitSelected={(s) => {
+                    handleSplitSelected(item.id, s);
+                  }}
+                  onSplitFeaturesSelected={(s) => {
+                    handleSplitFeaturesSelected(item.id, s);
                   }}
                 />
               </div>

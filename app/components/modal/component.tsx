@@ -25,7 +25,7 @@ const CONTENT_CLASSES = {
   wide: `sm:w-10/12 md:w-10/12 lg:w-10/12 xl:w-8/12 ${COMMON_CONTENT_CLASSES}`,
 };
 
-const OVERLAY_CLASSES = 'z-50 fixed inset-0 bg-black bg-blur';
+const OVERLAY_CLASSES = 'z-40 fixed inset-0 bg-black bg-blur';
 
 export const Modal: React.FC<ModalProps> = ({
   title,
@@ -42,6 +42,9 @@ export const Modal: React.FC<ModalProps> = ({
     isDismissable: dismissable,
     isOpen: open,
     onClose: onDismiss,
+    shouldCloseOnInteractOutside: (element) => {
+      return (element.getAttribute('id') === 'overlay');
+    },
   }, containerRef);
   const { modalProps } = useModal();
   const { dialogProps } = useDialog({ 'aria-label': title }, containerRef);
@@ -53,6 +56,7 @@ export const Modal: React.FC<ModalProps> = ({
       {open && (
         <OverlayContainer>
           <motion.div
+            id="overlay"
             initial={{
               opacity: 0,
             }}
@@ -70,7 +74,7 @@ export const Modal: React.FC<ModalProps> = ({
             }}
             className={cx({ [OVERLAY_CLASSES]: true })}
           >
-            <FocusScope contain restoreFocus autoFocus>
+            <FocusScope restoreFocus autoFocus>
               <div
                 {...overlayProps}
                 {...dialogProps}

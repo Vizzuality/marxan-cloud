@@ -277,7 +277,9 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
               queryClient.removeQueries(['all-features', pid]);
             }}
           >
-            <IntersectFeatures intersecting={intersecting} />
+            <IntersectFeatures
+              intersecting={intersecting}
+            />
           </Modal>
 
         </form>

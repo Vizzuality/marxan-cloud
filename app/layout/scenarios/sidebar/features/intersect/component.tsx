@@ -52,7 +52,7 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
   }, [intersectingCurrent]);
 
   const onSelected = useCallback((feature, input) => {
-    const { id, name } = feature;
+    const { id } = feature;
     const { value, onChange } = input;
     const intersections = [...value];
 
@@ -61,13 +61,49 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
     if (intersectionsIndex !== -1) {
       intersections.splice(intersectionsIndex, 1);
     } else {
-      intersections.push({
-        id,
-        name,
-        splitSelected: null,
-        splitFeaturesSelected: [],
-      });
+      intersections.push(feature);
     }
+    onChange(intersections);
+  }, []);
+
+  const onSplitSelected = useCallback((id, key, input) => {
+    const { value, onChange } = input;
+    const intersections = [...value];
+
+    const feature = intersections.find((f) => f.id === id);
+    const featureIndex = intersections.findIndex((f) => f.id === id);
+
+    const { splitOptions } = feature;
+
+    const splitFeaturesOptions = key ? splitOptions
+      .find((s) => s.key === key).values
+      .map((v) => ({ label: v.name, value: v.id }))
+      : [];
+
+    intersections[featureIndex] = {
+      ...feature,
+      splitSelected: key,
+      splitFeaturesOptions,
+      splitFeaturesSelected: splitFeaturesOptions.map((s) => ({
+        id: s.value,
+        name: s.label,
+      })),
+    };
+
+    onChange(intersections);
+  }, []);
+
+  const onSplitFeaturesSelected = useCallback((id, key, input) => {
+    const { value, onChange } = input;
+    const intersections = [...value];
+
+    const feature = intersections.find((f) => f.id === id);
+    const featureIndex = intersections.findIndex((f) => f.id === id);
+
+    intersections[featureIndex] = {
+      ...feature,
+      splitFeaturesSelected: key,
+    };
     onChange(intersections);
   }, []);
 
@@ -112,6 +148,12 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
                 selected={values.selected}
                 onSelected={(id) => {
                   onSelected(id, input);
+                }}
+                onSplitSelected={(id, key) => {
+                  onSplitSelected(id, key, input);
+                }}
+                onSplitFeaturesSelected={(id, key) => {
+                  onSplitFeaturesSelected(id, key, input);
                 }}
               />
             )}
