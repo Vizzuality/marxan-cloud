@@ -305,3 +305,29 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
     };
   }, [query, pages]);
 }
+
+export function usePublishedProject(id) {
+  const [session] = useSession();
+
+  const query = useQuery(['projects', id], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${id}`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    params: {
+      include: 'scenarios,users',
+    },
+  }), {
+    enabled: !!id,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data?.data,
+    };
+  }, [query, data?.data?.data]);
+}

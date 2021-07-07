@@ -1,5 +1,9 @@
 import React from 'react';
 
+import { useRouter } from 'next/router';
+
+import { usePublishedProject } from 'hooks/projects';
+
 import Avatar from 'components/avatar';
 import Backlink from 'layout/statics/backlink';
 import Button from 'components/button';
@@ -13,6 +17,18 @@ export interface CommunityProjectsDetailProps {
 }
 
 export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = () => {
+  const { query } = useRouter();
+  const { pid } = query;
+  const {
+    data: publishedProject,
+    // isFetching: publishedProjectIsFetching,
+    // isFetched: publishedProjectIsFetched,
+  } = usePublishedProject(pid);
+
+  console.log({ publishedProject });
+
+  const { description, name, planningAreaName } = publishedProject;
+
   return (
     <Wrapper>
       <div className="flex flex-row w-full py-16">
@@ -23,13 +39,10 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
           <h2
             className="mt-3 mb-10 text-4xl font-semibold text-left font-heading"
           >
-            Kenya Project
+            {name}
           </h2>
           <p className="mb-10 text-base leading-normal text-gray-400">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem
-            ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua.
+            {description}
           </p>
           <div className="flex flex-row items-center mb-10">
             <Button size="s" theme="transparent-white" className="px-6 group">
@@ -54,16 +67,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
             </div>
             <div>
               <h3 className="mb-6 text-sm font-semibold text-white">Planning Área</h3>
-              <p className="text-sm text-white">Kenya</p>
+              <p className="text-sm text-white">{planningAreaName}</p>
             </div>
             <div>
               <h3 className="mb-6 text-sm font-semibold text-white">Scenarios</h3>
               <p className="text-sm text-white">Marxan Standard</p>
               <p className="text-sm text-white">17 scenarios</p>
               <p className="text-sm text-white">Last creation: 2 days ago</p>
-            </div>
-            <div>
-              <h3 className="mb-6 text-sm font-semibold text-white">Tags</h3>
             </div>
             <div>
               <h3 className="mb-6 text-sm font-semibold text-white">Share</h3>
