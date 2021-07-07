@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GeoJSON } from 'geojson';
+import { ShapefileGeoJSONResponseDTO } from '../../scenarios/dto/shapefile.geojson.response.dto';
 
-export class PlanningAreaCreatedDto {
+export class PlanningAreaResponseDto extends ShapefileGeoJSONResponseDTO {
   @ApiProperty({
     description: 'An ID of the created planning area',
   })
