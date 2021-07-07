@@ -8,28 +8,67 @@ import { v4 } from 'uuid';
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
 import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
 
-import { bootstrapApplication } from '../../utils';
+import { bootstrapApplication, delay } from '../../utils';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   fixtures = await getFixtures();
+});
+
+describe(`given input data is delayed`, () => {
+  beforeEach(() => {
+    fixtures.GivenInputFilesAreAvailable(5000);
+  });
+
+  test(`cancelling marxan run during fetching assets`, async (done) => {
+    expect.assertions(1);
+
+    fixtures
+      .GivenMarxanIsRunning()
+      .then(() => {
+        done(`Shouldn't finish Marxan run.`);
+      })
+      .catch((error) => {
+        expect(error.signal).toEqual('SIGTERM');
+        done();
+      });
+
+    await delay(1000);
+    fixtures.WhenKillingMarxanRun();
+  }, 30000);
 });
 
 describe(`given input data is available`, () => {
   beforeEach(() => {
     fixtures.GivenInputFilesAreAvailable();
   });
-
-  test(`marxan run`, async () => {
-    await fixtures.WhenRunningMarxan();
+  test(`marxan run during binary execution`, async () => {
+    await fixtures.GivenMarxanIsRunning();
 
     expect(await fixtures.ThenExecutionOutput()).toBeGreaterThan(0);
   }, 30000);
+
+  test(`cancelling marxan run`, async (done) => {
+    expect.assertions(1);
+
+    fixtures
+      .GivenMarxanIsRunning()
+      .then(() => {
+        done(`Shouldn't finish Marxan run.`);
+      })
+      .catch((error) => {
+        expect(error.signal).toEqual('SIGTERM');
+        done();
+      });
+
+    await delay(1000);
+    fixtures.WhenKillingMarxanRun();
+  }, 30000);
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await fixtures.cleanup();
 });
 
@@ -58,7 +97,7 @@ const getFixtures = async () => {
         scenarioId,
       });
     },
-    WhenRunningMarxan: async () =>
+    GivenMarxanIsRunning: async () =>
       await sut.run(
         scenarioId,
         resources.map((resource) => ({
@@ -66,16 +105,18 @@ const getFixtures = async () => {
           relativeDestination: resource.targetRelativeDestination,
         })),
       ),
+    WhenKillingMarxanRun: () => sut.kill(scenarioId),
     ThenExecutionOutput: async () =>
       await tempRepoReference.count({
         where: {
           scenarioId,
         },
       }),
-    GivenInputFilesAreAvailable: () =>
+    GivenInputFilesAreAvailable: (delayMs = 0) =>
       resources.forEach((resource) => {
         nockScope
           .get(resource.assetUrl)
+          .delay(delayMs)
           .reply(200, resourceResponse(resource.targetRelativeDestination), {
             'content-type': 'plain/text',
           });

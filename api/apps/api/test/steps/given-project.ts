@@ -7,7 +7,7 @@ export const GivenProjectExists = async (
   app: INestApplication,
   jwt: string,
   adminArea?: {
-    countryCode?: string;
+    countryCode: string;
     adminAreaLevel1Id?: string;
     adminAreaLevel2Id?: string;
   },

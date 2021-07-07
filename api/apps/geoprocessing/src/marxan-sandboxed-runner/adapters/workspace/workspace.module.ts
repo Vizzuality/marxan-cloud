@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { Workspace } from '../../ports/workspace';
 
+import { WorkspaceBuilder } from '../../ports/workspace-builder';
 import { LinkMarxan } from './ports/link-marxan';
 import { TemporaryDirectory } from './ports/temporary-directory';
 import { SymlinkBinary } from './symlink-binary';
@@ -21,11 +21,11 @@ import { MarxanConfig } from '../../marxan-config';
       useClass: SymlinkBinary,
     },
     {
-      provide: Workspace,
+      provide: WorkspaceBuilder,
       useClass: WorkspaceService,
     },
     WorkspaceService,
   ],
-  exports: [Workspace],
+  exports: [WorkspaceBuilder],
 })
 export class WorkspaceModule {}
