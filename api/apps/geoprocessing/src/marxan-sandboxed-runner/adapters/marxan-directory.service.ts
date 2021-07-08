@@ -16,7 +16,7 @@ export class MarxanDirectory {
     fullPath: string;
   } {
     const config = this.reader.read(joinPath(within, 'input.dat'));
-    const matcher = new RegExp(`(${type} )(?<dir>.*)$`, 'gm');
+    const matcher = new RegExp(`^(${type} )(?<dir>.*)$`, 'gm');
     const inputDirectory = matcher.exec(config);
     if (inputDirectory?.groups?.dir) {
       const sourceDirectory = inputDirectory.groups.dir;

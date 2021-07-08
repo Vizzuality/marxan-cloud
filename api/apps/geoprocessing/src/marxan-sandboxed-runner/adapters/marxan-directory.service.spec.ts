@@ -47,8 +47,9 @@ describe(`when input.dat does not contain requested type`, () => {
   beforeEach(() => {
     fileReader.mock.mockImplementation(
       () => `
-    OUTPUTDIR output
-    BLM 1
+OUTPUTDIR output
+prefix as a comment should be ignored INPUTDIR somedirectory
+BLM 1
     `,
     );
   });
@@ -64,8 +65,8 @@ describe(`when input.dat does contain requested type`, () => {
   beforeEach(() => {
     fileReader.mock.mockImplementation(
       () => `
-    INPUTDIR somedirectory
-    BLM 1
+INPUTDIR somedirectory
+BLM 1
     `,
     );
   });
