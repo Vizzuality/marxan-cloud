@@ -462,6 +462,7 @@ export class GeoFeaturesService extends AppBaseService<
    */
   async extendGeoFeatureProcessingRecipe(
     recipe: CreateGeoFeatureSetDTO,
+    scenario: Scenario,
   ): Promise<any> {
     const idsOfFeaturesInRecipe = recipe.features.map(
       (feature) => feature.featureId,
@@ -470,7 +471,7 @@ export class GeoFeaturesService extends AppBaseService<
       id: In(idsOfFeaturesInRecipe),
     });
     const metadataForFeaturesInRecipe = await this.getFeaturePropertySetsForFeatures(
-      idsOfFeaturesInRecipe,
+      idsOfFeaturesInRecipe, scenario.project
     );
     const featuresInRecipeWithPropertiesMetadata = this.extendGeoFeaturesWithPropertiesFromPropertySets(
       featuresInRecipe,
@@ -500,6 +501,6 @@ export class GeoFeaturesService extends AppBaseService<
     await this.scenarioRepository.update(id, { featureSet: dto });
     // @todo: move to async job - this was just for simple tests
     // await this.createFeaturesForScenario(id, dto.features);
-    return await this.extendGeoFeatureProcessingRecipe(dto);
+    return await this.extendGeoFeatureProcessingRecipe(dto, scenario);
   }
 }
