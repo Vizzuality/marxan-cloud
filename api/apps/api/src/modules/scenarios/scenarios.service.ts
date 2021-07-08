@@ -279,7 +279,10 @@ export class ScenariosService {
       })
       .then((result) =>
         result
-          ? this.geoFeaturesService.extendGeoFeatureProcessingRecipe(result, scenario)
+          ? this.geoFeaturesService.extendGeoFeatureProcessingRecipe(
+              result,
+              scenario,
+            )
           : EmptyGeoFeaturesSpecification,
       )
       .catch((e) => Logger.error(e));
