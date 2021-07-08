@@ -54,7 +54,7 @@ CREATE VIEW feature_properties AS
     `);
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
+  public async down(_queryRunner: QueryRunner): Promise<void> {
     // No need to revert to the previous implementation - it was ill-conceived,
     // period. My fault, apologies.
   }
