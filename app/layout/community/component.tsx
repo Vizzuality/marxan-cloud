@@ -24,8 +24,8 @@ export const CommunityInfo: React.FC<CommunityInfoProps> = () => {
           subtitle="Receive the latest Marxan updates and connect with other users to mobilize for action."
           description="Have questions about Marxan or suggestions for how to strengthen the platform? How about an idea for a bold new partnership around data use? We want to hear from you. Join us in the movement to build a more sustainable future."
           caption="Learn more"
-          href="/"
-          internal
+          href="https://groups.google.com/g/marxan"
+          external
         />
       </div>
       <div className="flex flex-col items-center w-full max-w-5xl py-16 mx-auto gap-x-36 ">
