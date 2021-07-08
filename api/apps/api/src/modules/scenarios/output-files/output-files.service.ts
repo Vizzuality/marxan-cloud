@@ -4,6 +4,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { Either, left, right } from 'fp-ts/Either';
+
+export const metadataNotFound = Symbol(
+  `marxan output file - metadata not found`,
+);
+export const outputZipNotYetAvailable = Symbol(
+  `marxan output file - output file not available, possibly error`,
+);
+
+export type OutputZipFailure =
+  | typeof metadataNotFound
+  | typeof outputZipNotYetAvailable;
 
 @Injectable()
 export class OutputFilesService {
@@ -15,7 +27,7 @@ export class OutputFilesService {
     private readonly executionMetadataRepo: Repository<MarxanExecutionMetadataGeoEntity>,
   ) {}
 
-  async get(scenarioId: string): Promise<Buffer> {
+  async get(scenarioId: string): Promise<Either<OutputZipFailure, Buffer>> {
     const latest = await this.executionMetadataRepo.findOne({
       where: {
         scenarioId,
@@ -25,11 +37,11 @@ export class OutputFilesService {
       },
     });
     if (!latest) {
-      throw new Error('Not found');
+      return left(metadataNotFound);
     }
     if (!latest.outputZip) {
-      throw new Error('Not available yet. Please execute Marxan first.');
+      return left(outputZipNotYetAvailable);
     }
-    return latest.outputZip;
+    return right(latest.outputZip);
   }
 }

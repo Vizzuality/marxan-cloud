@@ -4,11 +4,11 @@ import { createWorld } from './world';
 
 let world: PromiseType<ReturnType<typeof createWorld>>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   world = await createWorld();
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await world?.cleanup();
 });
 
@@ -24,5 +24,17 @@ describe(`given output zip is available`, () => {
 
   it(`allows to get zip archive`, async () => {
     await world.ThenZipContainsOutputFiles(zip);
+  });
+});
+
+describe(`given metadata is not available`, () => {
+  let response: any;
+  beforeEach(async () => {
+    // when
+    response = await world.WhenGettingZipArchive();
+  });
+
+  it(`returns NotFound`, () => {
+    world.ThenReturns404(response);
   });
 });

@@ -61,6 +61,7 @@ import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
 import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
+import { ZipFilesSerializer } from './dto/zip-files.serializer';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/run/:runId/solutions`;
@@ -79,6 +80,7 @@ export class ScenariosController {
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
     private readonly proxyService: ProxyService,
+    private readonly zipFilesSerializer: ZipFilesSerializer,
   ) {}
 
   @ApiOperation({
@@ -282,9 +284,10 @@ export class ScenariosController {
     @Param(`id`, ParseUUIDPipe) scenarioId: string,
     @Res() response: Response,
   ) {
-    response.send(
-      await this.service.getMarxanExecutionOutputArchive(scenarioId),
+    const result = await this.service.getMarxanExecutionOutputArchive(
+      scenarioId,
     );
+    response.send(this.zipFilesSerializer.serialize(result));
   }
 
   @ApiOkResponse({
