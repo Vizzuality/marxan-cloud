@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PaginationMeta } from '@marxan-api/utils/app-base.service';
 import { GeoFeatureSetService } from './geo-feature-set.service';
-import { CreateGeoFeatureSetDTO } from './dto/create.geo-feature-set.dto';
+import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
 
 @Injectable()
 export class GeoFeatureSetSerializer {
@@ -9,9 +9,9 @@ export class GeoFeatureSetSerializer {
 
   async serialize(
     entities:
-      | Partial<CreateGeoFeatureSetDTO>
+      | Partial<GeoFeatureSetSpecification>
       | undefined
-      | (Partial<CreateGeoFeatureSetDTO> | undefined)[],
+      | (Partial<GeoFeatureSetSpecification> | undefined)[],
     paginationMeta?: PaginationMeta,
   ): Promise<any> {
     return this.geoFeatureSetsService.serialize(entities, paginationMeta);

@@ -5,7 +5,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { SpecForGeofeature } from '../dto/create.geo-feature-set.dto';
+import { SpecForGeofeature } from '../dto/geo-feature-set-specification.dto';
 import { MarxanSettingsForGeoFeature } from './geo-feature.marxan-settings.type';
 
 export abstract class GeoprocessingOp {

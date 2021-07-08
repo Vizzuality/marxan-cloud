@@ -8,11 +8,11 @@ import {
   geoFeatureResource,
 } from './geo-feature.geo.entity';
 import {
-  CreateGeoFeatureSetDTO,
+  GeoFeatureSetSpecification,
   SpecForGeofeature,
   SpecForGeoFeatureWithGeoprocessing,
   SpecForPlainGeoFeature,
-} from './dto/create.geo-feature-set.dto';
+} from './dto/geo-feature-set-specification.dto';
 
 import * as faker from 'faker';
 import {
@@ -59,8 +59,8 @@ export const MarxanFeaturesMetadata = {
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
   GeoFeature,
-  CreateGeoFeatureSetDTO,
-  CreateGeoFeatureSetDTO,
+  GeoFeatureSetSpecification,
+  GeoFeatureSetSpecification,
   AppInfoDTO
 > {
   constructor(
@@ -457,33 +457,33 @@ export class GeoFeaturesService extends AppBaseService<
   }
 
   /**
-   * Add feature metadata to features in a geofeatures processing recipe.
+   * Add feature metadata to features in a geofeatures processing specification.
    */
-  async extendGeoFeatureProcessingRecipe(
-    recipe: CreateGeoFeatureSetDTO,
+  async extendGeoFeatureProcessingSpecification(
+    specification: GeoFeatureSetSpecification,
     scenario: Scenario,
   ): Promise<any> {
     const project = await this.projectRepository.findOne(scenario.projectId);
-    const idsOfFeaturesInRecipe = Array.from(
-      new Set(recipe.features.map((feature) => feature.featureId)),
+    const idsOfFeaturesInSpecification = Array.from(
+      new Set(specification.features.map((feature) => feature.featureId)),
     );
-    const featuresInRecipe = await this.geoFeaturesRepository.find({
-      id: In(idsOfFeaturesInRecipe),
+    const featuresInSpecification = await this.geoFeaturesRepository.find({
+      id: In(idsOfFeaturesInSpecification),
     });
-    const metadataForFeaturesInRecipe = await this.getFeaturePropertySetsForFeatures(
-      idsOfFeaturesInRecipe,
+    const metadataForFeaturesInSpecification = await this.getFeaturePropertySetsForFeatures(
+      idsOfFeaturesInSpecification,
       project,
     );
-    const featuresInRecipeWithPropertiesMetadata = this.extendGeoFeaturesWithPropertiesFromPropertySets(
-      featuresInRecipe,
-      metadataForFeaturesInRecipe,
+    const featuresInSpecificationWithPropertiesMetadata = this.extendGeoFeaturesWithPropertiesFromPropertySets(
+      featuresInSpecification,
+      metadataForFeaturesInSpecification,
     );
     return {
-      status: recipe.status,
-      features: recipe.features.map((feature) => {
+      status: specification.status,
+      features: specification.features.map((feature) => {
         return {
           ...feature,
-          metadata: featuresInRecipeWithPropertiesMetadata.find(
+          metadata: featuresInSpecificationWithPropertiesMetadata.find(
             (f) => f.id === feature.featureId,
           ),
         };
@@ -496,12 +496,12 @@ export class GeoFeaturesService extends AppBaseService<
    */
   async createOrReplaceFeatureSet(
     id: string,
-    dto: CreateGeoFeatureSetDTO,
-  ): Promise<CreateGeoFeatureSetDTO | undefined> {
+    dto: GeoFeatureSetSpecification,
+  ): Promise<GeoFeatureSetSpecification | undefined> {
     const scenario = await this.scenarioRepository.findOneOrFail(id);
     await this.scenarioRepository.update(id, { featureSet: dto });
     // @todo: move to async job - this was just for simple tests
     // await this.createFeaturesForScenario(id, dto.features);
-    return await this.extendGeoFeatureProcessingRecipe(dto, scenario);
+    return await this.extendGeoFeatureProcessingSpecification(dto, scenario);
   }
 }

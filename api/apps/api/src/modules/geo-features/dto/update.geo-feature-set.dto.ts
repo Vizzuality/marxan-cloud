@@ -1,3 +1,3 @@
-import { CreateGeoFeatureSetDTO } from './create.geo-feature-set.dto';
+import { GeoFeatureSetSpecification } from './geo-feature-set-specification.dto';
 
-export class UpdateGeoFeatureSetDTO extends CreateGeoFeatureSetDTO {}
+export class UpdateGeoFeatureSetDTO extends GeoFeatureSetSpecification {}
