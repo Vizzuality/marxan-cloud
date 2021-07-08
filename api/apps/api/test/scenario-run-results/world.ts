@@ -2,7 +2,7 @@ import * as archiver from 'archiver';
 import * as unzipper from 'unzipper';
 import * as request from 'supertest';
 import { v4 } from 'uuid';
-import { createWriteStream, readFileSync, writeFileSync, unlinkSync } from 'fs';
+import { createWriteStream, readFileSync, unlinkSync, writeFileSync } from 'fs';
 
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -46,7 +46,7 @@ export const createWorld = async () => {
       await marxanExecutionMetadataRepo.save(
         marxanExecutionMetadataRepo.create({
           outputZip: zipBuffer.archive,
-          inputZip: zipBuffer.archive,
+          inputZip: Buffer.from('abcd', 'utf-8'),
           scenarioId: scenario.id,
         }),
       );
@@ -54,14 +54,14 @@ export const createWorld = async () => {
     WhenGettingZipArchive: async () =>
       request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenario.id}/marxan/output`)
-        .set('Authorization', `Bearer ${token}`),
+        .set('Authorization', `Bearer ${token}`)
+        .responseType('blob'),
     ThenZipContainsOutputFiles: async (response: request.Response) => {
-      expect(response.header['content-type']).toEqual(
-        'application/octet-stream',
-      );
+      expect(response.header['content-type']).toEqual('application/zip');
       expect(response.header[`content-disposition`]).toEqual(
         `attachment; filename="output.zip"`,
       );
+
       const directory = await unzipper.Open.buffer(response.body);
       expect(directory.files.length).toEqual(1);
       expect(directory.files[0].path).toEqual(`hello.txt`);

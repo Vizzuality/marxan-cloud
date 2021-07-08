@@ -16,21 +16,20 @@ export class OutputFilesService {
   ) {}
 
   async get(scenarioId: string): Promise<Buffer> {
-    const latest = await this.executionMetadataRepo.find({
+    const latest = await this.executionMetadataRepo.findOne({
       where: {
         scenarioId,
       },
       order: {
         createdAt: 'DESC',
       },
-      take: 1,
     });
-    if (latest.length !== 1) {
+    if (!latest) {
       throw new Error('Not found');
     }
-    if (!latest[0].outputZip) {
+    if (!latest.outputZip) {
       throw new Error('Not available yet. Please execute Marxan first.');
     }
-    return latest[0].outputZip;
+    return latest.outputZip;
   }
 }
