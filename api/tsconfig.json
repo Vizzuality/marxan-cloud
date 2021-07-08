@@ -78,6 +78,12 @@
       ],
       "@marxan/scenario-puvspr/*": [
         "libs/scenario-puvspr/src/*"
+      ],
+      "@marxan/scenario-run-queue": [
+        "libs/scenario-run-queue/src"
+      ],
+      "@marxan/scenario-run-queue/*": [
+        "libs/scenario-run-queue/src/*"
       ]
     }
   },

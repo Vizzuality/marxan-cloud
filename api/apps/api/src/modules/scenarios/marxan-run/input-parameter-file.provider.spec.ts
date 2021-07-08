@@ -1,11 +1,10 @@
 import { PromiseType } from 'utility-types';
 import { Test } from '@nestjs/testing';
-import {
-  InputParameterFileProvider,
-  ioSettingsToken,
-} from './input-parameter-file.provider';
-import { JobStatus, Scenario, ScenarioType } from './scenario.api.entity';
-import { ScenariosCrudService } from './scenarios-crud.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { JobStatus, Scenario, ScenarioType } from '../scenario.api.entity';
+import { InputParameterFileProvider } from './input-parameter-file.provider';
+import { ioSettingsToken } from './io-settings';
 
 jest.useFakeTimers('modern').setSystemTime(new Date('2020-01-01').getTime());
 
@@ -119,10 +118,16 @@ OUTPUTDIR output`);
 });
 
 async function getFixtures() {
-  class FakeScenario implements Pick<ScenariosCrudService, 'getById'> {
+  class FakeScenario implements Pick<Repository<Scenario>, 'findOne'> {
     db: Record<string, Scenario> = {};
 
-    async getById(scenarioId: string): Promise<Scenario> {
+    async findOne(scenarioId: any, ...rest: any[]): Promise<Scenario> {
+      expect(rest).toStrictEqual([
+        {
+          relations: ['project', 'project.organization'],
+        },
+      ]);
+      if (typeof scenarioId !== 'string') fail();
       return this.db[scenarioId];
     }
   }
@@ -131,9 +136,10 @@ async function getFixtures() {
     imports: [],
     providers: [
       InputParameterFileProvider,
+      FakeScenario,
       {
-        provide: ScenariosCrudService,
-        useClass: FakeScenario,
+        provide: getRepositoryToken(Scenario),
+        useExisting: FakeScenario,
       },
       {
         provide: ioSettingsToken,
@@ -148,7 +154,7 @@ async function getFixtures() {
       },
     ],
   }).compile();
-  const fakeRepo: FakeScenario = testingModule.get(ScenariosCrudService);
+  const fakeRepo: FakeScenario = testingModule.get(FakeScenario);
 
   return {
     async hasInDb(scenario: Scenario) {
