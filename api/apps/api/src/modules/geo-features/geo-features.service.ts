@@ -260,41 +260,15 @@ export class GeoFeaturesService extends AppBaseService<
     const geoFeatureIds = (entitiesAndCount[0] as GeoFeature[]).map(
       (i) => i.id,
     );
-    const query = this.geoFeaturePropertySetsRepository
-      .createQueryBuilder('propertySets')
-      .distinct(true)
-      .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds });
 
-    if (this.forProject) {
-      query.andWhere(
-        `st_intersects(
-        st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
-        "propertySets".bbox
-      )`,
-        {
-          xmin: this.forProject.bbox[1],
-          ymin: this.forProject.bbox[3],
-          xmax: this.forProject.bbox[0],
-          ymax: this.forProject.bbox[2],
-        },
+    const entitiesWithProperties = await this.getFeaturePropertySetsForFeatures(
+      geoFeatureIds,
+      this.forProject,
+    ).then((results) => {
+      return this.extendGeoFeaturesWithPropertiesFromPropertySets(
+        entitiesAndCount[0],
+        results,
       );
-    }
-
-    const entitiesWithProperties = await query.getMany().then((results) => {
-      return (entitiesAndCount[0] as GeoFeature[]).map((i) => {
-        const propertySetForFeature = results.filter(
-          (propertySet) => propertySet.featureId === i.id,
-        );
-        return {
-          ...i,
-          properties: propertySetForFeature.reduce((acc, cur) => {
-            return {
-              ...acc,
-              [cur.key]: [...(acc[cur.key] || []), cur.value[0]],
-            };
-          }, {} as Record<string, Array<string | number>>),
-        };
-      });
     });
     return [entitiesWithProperties, entitiesAndCount[1]];
   }
@@ -309,6 +283,53 @@ export class GeoFeaturesService extends AppBaseService<
     _info?: AppInfoDTO,
   ): Promise<GeoFeature> {
     return entity;
+  }
+
+  extendGeoFeaturesWithPropertiesFromPropertySets(
+    geoFeatures: GeoFeature[],
+    propertySet: GeoFeaturePropertySet[],
+  ) {
+    return geoFeatures.map((i) => {
+      const propertySetForFeature = propertySet.filter(
+        (ps) => ps.featureId === i.id,
+      );
+      return {
+        ...i,
+        properties: propertySetForFeature.reduce((acc, cur) => {
+          return {
+            ...acc,
+            [cur.key]: [...(acc[cur.key] || []), cur.value[0]],
+          };
+        }, {} as Record<string, Array<string | number>>),
+      };
+    });
+  }
+
+  getFeaturePropertySetsForFeatures(
+    geoFeatureIds: string[],
+    forProject?: Project | null | undefined,
+  ) {
+    const query = this.geoFeaturePropertySetsRepository
+      .createQueryBuilder('propertySets')
+      .distinct(true)
+      .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds });
+
+    if (forProject) {
+      query.andWhere(
+        `st_intersects(
+        st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
+        "propertySets".bbox
+      )`,
+        {
+          xmin: forProject.bbox[1],
+          ymin: forProject.bbox[3],
+          xmax: forProject.bbox[0],
+          ymax: forProject.bbox[2],
+        },
+      );
+    }
+
+    return query.getMany();
   }
 
   /**
