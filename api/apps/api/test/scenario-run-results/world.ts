@@ -69,6 +69,10 @@ export const createWorld = async () => {
         `Hello Marxan!`,
       );
     },
+    ThenReturns404: (response: request.Response) => {
+      const asJson = JSON.parse(response.body.toString());
+      expect(asJson.errors[0].title).toEqual(`Marxan was not yet executed.`);
+    },
   };
 };
 

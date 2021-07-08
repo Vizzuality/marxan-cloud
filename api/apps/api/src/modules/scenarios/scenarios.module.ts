@@ -37,6 +37,7 @@ import { SpecDatModule } from './input-files/spec.dat.module';
 import { MarxanRunService } from './marxan-run/marxan-run.service';
 import { MarxanRunController } from './marxan-run/marxan-run.controller';
 import { OutputFilesModule } from './output-files/output-files.module';
+import { ZipFilesSerializer } from './dto/zip-files.serializer';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { OutputFilesModule } from './output-files/output-files.module';
     MarxanInput,
     InputParameterFileProvider,
     MarxanRunService,
+    ZipFilesSerializer,
     {
       provide: ioSettingsToken,
       useFactory: () => {
