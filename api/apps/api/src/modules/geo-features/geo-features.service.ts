@@ -328,7 +328,6 @@ export class GeoFeaturesService extends AppBaseService<
         },
       );
     }
-
     return query.getMany();
   }
 
@@ -464,14 +463,16 @@ export class GeoFeaturesService extends AppBaseService<
     recipe: CreateGeoFeatureSetDTO,
     scenario: Scenario,
   ): Promise<any> {
-    const idsOfFeaturesInRecipe = recipe.features.map(
-      (feature) => feature.featureId,
+    const project = await this.projectRepository.findOne(scenario.projectId);
+    const idsOfFeaturesInRecipe = Array.from(
+      new Set(recipe.features.map((feature) => feature.featureId)),
     );
     const featuresInRecipe = await this.geoFeaturesRepository.find({
       id: In(idsOfFeaturesInRecipe),
     });
     const metadataForFeaturesInRecipe = await this.getFeaturePropertySetsForFeatures(
-      idsOfFeaturesInRecipe, scenario.project
+      idsOfFeaturesInRecipe,
+      project,
     );
     const featuresInRecipeWithPropertiesMetadata = this.extendGeoFeaturesWithPropertiesFromPropertySets(
       featuresInRecipe,
