@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
@@ -32,7 +33,13 @@ import { InputFilesService } from './input-files';
 import { notFound, RunService } from './marxan-run';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
+import { SimpleJobStatus } from './scenario.api.entity';
 
+/** @debt move to own module */
+const EmptyGeoFeaturesSpecification: CreateGeoFeatureSetDTO = {
+  status: SimpleJobStatus.draft,
+  features: [],
+};
 @Injectable()
 export class ScenariosService {
   private readonly geoprocessingUrl: string = AppConfig.get(
@@ -261,7 +268,7 @@ export class ScenariosService {
    */
   async getFeatureSetForScenario(
     scenarioId: string,
-  ): Promise<CreateGeoFeatureSetDTO | undefined> {
+  ): Promise<CreateGeoFeatureSetDTO | undefined | void> {
     return await this.crudService
       .getById(scenarioId)
       .then((result) => {
@@ -270,8 +277,9 @@ export class ScenariosService {
       .then((result) =>
         result
           ? this.geoFeaturesService.extendGeoFeatureProcessingRecipe(result)
-          : undefined,
-      );
+          : EmptyGeoFeaturesSpecification,
+      )
+      .catch((e) => Logger.error(e));
   }
 
   async getMarxanExecutionOutputArchive(scenarioId: string) {
