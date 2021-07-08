@@ -39,6 +39,6 @@ export class MarxanExecutionMetadataGeoEntity {
   })
   outputZip?: Buffer | null;
 
-  @CreateDateColumn({ type: 'timestamp without time zone' })
+  @CreateDateColumn({ type: 'timestamp without time zone', name: 'created_at' })
   createdAt!: Date;
 }
