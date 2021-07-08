@@ -28,7 +28,7 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
   return (
     <>
       {internal && (
-        <a className="flex flex-row items-center cursor-pointer" href={href}>
+        <a className="flex flex-row items-center cursor-pointer" href={href} rel="noopener noreferrer" target="_blank">
           {children}
         </a>
       )}
