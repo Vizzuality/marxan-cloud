@@ -308,7 +308,7 @@ export class GeoFeaturesService extends AppBaseService<
   getFeaturePropertySetsForFeatures(
     geoFeatureIds: string[],
     forProject?: Project | null | undefined,
-  ) {
+  ): Promise<GeoFeaturePropertySet[]> {
     const query = this.geoFeaturePropertySetsRepository
       .createQueryBuilder('propertySets')
       .distinct(true)
