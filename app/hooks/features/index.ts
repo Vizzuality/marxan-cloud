@@ -169,7 +169,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
         featureClassName,
         tag,
         description,
-        properties,
+        properties = {},
       } = metadata;
 
       let splitOptions = [];
@@ -189,7 +189,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
         if (geoprocessingOperations && geoprocessingOperations[0].kind === 'split/v1') {
           splitSelected = geoprocessingOperations[0].splitByProperty;
 
-          splitFeaturesOptions = splitSelected ? splitOptions
+          splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
             .find((s) => s.key === splitSelected).values
             .map((v) => ({ label: v.name, value: v.id }))
             : [];
