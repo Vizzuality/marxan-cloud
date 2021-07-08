@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { EntityManager, Repository, SelectQueryBuilder } from 'typeorm';
+import { EntityManager, In, Repository, SelectQueryBuilder } from 'typeorm';
 import {
   GeoFeatureGeometry,
   GeoFeaturePropertySet,
@@ -463,18 +463,25 @@ export class GeoFeaturesService extends AppBaseService<
   async extendGeoFeatureProcessingRecipe(
     recipe: CreateGeoFeatureSetDTO,
   ): Promise<any> {
-    const featuresInRecipe = recipe.features.map(
+    const idsOfFeaturesInRecipe = recipe.features.map(
       (feature) => feature.featureId,
     );
-    const metadataForFeaturesInRecipe = await this.findAll(undefined, {
-      params: { ids: featuresInRecipe },
-    }).then((result) => result[0]);
+    const featuresInRecipe = await this.geoFeaturesRepository.find({
+      id: In(idsOfFeaturesInRecipe),
+    });
+    const metadataForFeaturesInRecipe = await this.getFeaturePropertySetsForFeatures(
+      idsOfFeaturesInRecipe,
+    );
+    const featuresInRecipeWithPropertiesMetadata = this.extendGeoFeaturesWithPropertiesFromPropertySets(
+      featuresInRecipe,
+      metadataForFeaturesInRecipe,
+    );
     return {
       status: recipe.status,
       features: recipe.features.map((feature) => {
         return {
           ...feature,
-          metadata: metadataForFeaturesInRecipe.find(
+          metadata: featuresInRecipeWithPropertiesMetadata.find(
             (f) => f.id === feature.featureId,
           ),
         };
