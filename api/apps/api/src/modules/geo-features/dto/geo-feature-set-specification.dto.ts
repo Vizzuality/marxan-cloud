@@ -2,6 +2,7 @@ import { SimpleJobStatus } from '@marxan-api/modules/scenarios/scenario.api.enti
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsUUID, ValidateNested } from 'class-validator';
+import { GeoFeature } from '../geo-feature.api.entity';
 import {
   GeoprocessingOp,
   GeoprocessingOpSplitV1,
@@ -28,6 +29,11 @@ export class SpecForPlainGeoFeature extends SpecForGeofeature {
   geoprocessingOperations?: never;
 }
 
+export class SpecForPlainGeoFeatureWithFeatureMetadata extends SpecForPlainGeoFeature {
+  @ApiProperty()
+  metadata!: GeoFeature;
+}
+
 export class SpecForGeoFeatureWithGeoprocessing extends SpecForGeofeature {
   @IsUUID()
   @ApiProperty()
@@ -50,6 +56,11 @@ export class SpecForGeoFeatureWithGeoprocessing extends SpecForGeofeature {
   >;
 
   marxanSettings?: never;
+}
+
+export class SpecForGeoFeatureWithGeoprocessingWithFeatureMetadata extends SpecForPlainGeoFeature {
+  @ApiProperty()
+  metadata!: GeoFeature;
 }
 
 export class GeoFeatureSetSpecification {
