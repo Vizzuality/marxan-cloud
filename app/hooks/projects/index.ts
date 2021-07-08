@@ -278,7 +278,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 
       return pageData.map((d):PublishedItemProps => {
         const {
-          id, name, description, area,
+          id, name, description, area, timesDuplicated,
         } = d;
 
         return {
@@ -286,6 +286,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
           name,
           description,
           area,
+          timesDuplicated,
         };
       });
     })) : [];

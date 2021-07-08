@@ -97,18 +97,18 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
                 return (
                   <tr key={pid} className="border-b border-white cursor-pointer border-opacity-20">
                     <Link href={`/community/projects/${pid}`}>
-                      <td className="pb-10">
-                        <p className="font-semibold hover:underline">{name}</p>
-                        <p className="text-base leading-normal text-gray-400">{description}</p>
+                      <td className="pr-4 py-7 w-96">
+                        <p className="pb-1 font-semibold hover:underline">{name}</p>
+                        <p className="text-base leading-normal text-gray-400 clamp-2">{description}</p>
                       </td>
                     </Link>
-                    <td>
+                    <td className="w-44">
                       <p className="text-sm">{planningArea}</p>
                     </td>
-                    <td>
+                    <td className="w-44">
                       {users?.map((u) => <p key={u.id} className="text-sm">{u.name}</p>)}
                     </td>
-                    <td>
+                    <td className="items-center w-72">
                       <div className="flex flex-row justify-between pl-10">
                         <p className="w-6 text-sm">{timesDuplicated && (format('.3s')(timesDuplicated))}</p>
                         <Button size="s" theme="transparent-white" className="px-6 group">
