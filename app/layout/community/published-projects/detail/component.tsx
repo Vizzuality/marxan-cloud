@@ -3,6 +3,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 
 import { usePublishedProject } from 'hooks/projects';
+import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
 import Backlink from 'layout/statics/backlink';
@@ -21,6 +22,7 @@ export interface CommunityProjectsDetailProps {
 export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
+  const { addToast } = useToasts();
   const {
     data: publishedProject,
     isFetching: publishedProjectIsFetching,
@@ -32,15 +34,34 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   } = publishedProject || {};
 
   const handleCopy = () => {
-    const copyText = document.getElementById('copyInput').baseURI;
+    const copyText = document.getElementById('copyLinkInput').baseURI;
     navigator.clipboard.writeText(copyText).then(
       () => {
-        alert('yeah!');
+        addToast('success-upload-shapefile', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Link copied to clipboard</p>
+          </>
+        ), {
+          level: 'success',
+        });
       },
     )
       .catch(
         () => {
-          alert('err');
+          addToast('error-upload-shapefile', (
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">
+                The link could not be copied.
+                {' '}
+                <br />
+                Please, try again!
+              </p>
+            </>
+          ), {
+            level: 'error',
+          });
         },
       );
   };
@@ -113,7 +134,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                 <button onClick={handleCopy} type="button">
                   Copy link
                 </button>
-                <input className="hidden" type="text" value="" id="copyInput" />
+                <input className="hidden" type="text" value="" id="copyLinkInput" />
               </div>
             </div>
           </div>
