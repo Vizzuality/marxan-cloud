@@ -196,6 +196,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
 
           splitFeaturesSelected = geoprocessingOperations[0].splits.map((s) => {
             return {
+              ...s,
               id: s.value,
               name: s.value,
             };
@@ -211,6 +212,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
             .map((ifs) => {
               return ifs.splits.map((v) => {
                 return {
+                  ...v,
                   label: v.value,
                   value: v.value,
                 };
@@ -265,7 +267,7 @@ export function useTargetedFeatures(sid) {
   return useMemo(() => {
     const features = flatten(data.map((s) => {
       const {
-        id, name, splitSelected, splitFeaturesSelected, intersectFeaturesSelected,
+        id, name, splitSelected, splitFeaturesSelected, intersectFeaturesSelected, marxanSettings,
       } = s;
       const isSplitted = !!splitSelected;
       const isIntersected = !!intersectFeaturesSelected?.length;
@@ -273,14 +275,23 @@ export function useTargetedFeatures(sid) {
       // Generate splitted features to target
       if (isSplitted) {
         return splitFeaturesSelected.map((sf) => {
-          const { id: sfId, name: sfName } = sf;
+          const {
+            id: sfId,
+            name: sfName,
+            marxanSettings: sfMarxanSettings,
+          } = sf;
 
           return {
             ...sf,
             id: `${id}-${sfId}`,
+            parentId: id,
             type: 'bioregional',
             name: `${name} / ${sfName}`,
             splitted: true,
+            ...!!sfMarxanSettings && {
+              target: sfMarxanSettings.prop * 100,
+              fpf: sfMarxanSettings.fpf,
+            },
           };
         });
       }
@@ -290,19 +301,31 @@ export function useTargetedFeatures(sid) {
           const {
             value: ifId,
             label: ifName,
+            marxanSettings: ifMarxanSettings,
           } = ifs;
 
           return {
             ...ifs,
             id: `${id}-${ifId}`,
+            parentId: id,
             type: 'bioregional-and-species',
             name: `${name} / ${ifName}`,
             splitted: true,
+            ...!!ifMarxanSettings && {
+              target: ifMarxanSettings.prop * 100,
+              fpf: ifMarxanSettings.fpf,
+            },
           };
         }));
       }
 
-      return s;
+      return {
+        ...s,
+        ...!!marxanSettings && {
+          target: marxanSettings.prop * 100,
+          fpf: marxanSettings.fpf,
+        },
+      };
     }));
 
     return {

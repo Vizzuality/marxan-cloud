@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import cx from 'classnames';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
@@ -8,7 +8,7 @@ import Loading from 'components/loading';
 import Item from 'components/features/target-spf-item';
 
 import { useRouter } from 'next/router';
-import { useTargetedFeatures } from 'hooks/features';
+import { useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 
 export interface ScenariosFeaturesListProps {
   onBack: () => void;
@@ -19,14 +19,21 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   onBack,
   onSuccess,
 }: ScenariosFeaturesListProps) => {
+  const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
+
+  const {
+    data: selectedFeaturesData,
+  } = useSelectedFeatures(sid, {});
 
   const {
     data: targetedFeaturesData,
     isFetching: targetedFeaturesIsFetching,
     isFetched: targetedFeaturesIsFetched,
   } = useTargetedFeatures(sid);
+
+  const selectedFeaturesMutation = useSaveSelectedFeatures({});
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -91,10 +98,71 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   }, []);
 
   const onSubmit = useCallback((values) => {
-    console.info(values);
+    // setSubmitting(true);
+    const { features } = values;
 
-    onSuccess();
-  }, [onSuccess]);
+    const data = {
+      status: 'created',
+      features: selectedFeaturesData.map((sf) => {
+        const { featureId, kind, geoprocessingOperations } = sf;
+
+        if (kind === 'withGeoprocessing') {
+          return {
+            featureId,
+            kind,
+            geoprocessingOperations: geoprocessingOperations.map((go) => {
+              const { splits } = go;
+              console.info(values);
+
+              return {
+                ...go,
+                splits: splits.map((s) => {
+                  const { target, fpf = 1 } = features.find((f) => {
+                    return f.parentId === featureId && f.value === s.value;
+                  });
+
+                  return {
+                    ...s,
+                    marxanSettings: {
+                      prop: target / 100 || 0.5,
+                      fpf,
+                    },
+                  };
+                }),
+              };
+            }),
+
+          };
+        }
+
+        const { target, fpf = 1 } = features.find((f) => f.featureId === featureId);
+        return {
+          featureId,
+          kind,
+          marxanSettings: {
+            prop: target / 100 || 0.5,
+            fpf,
+          },
+        };
+      }),
+    };
+
+    // // Save current features
+    selectedFeaturesMutation.mutate({
+      id: `${sid}`,
+      data,
+    }, {
+      onSuccess: () => {
+        onSuccess();
+        setSubmitting(false);
+      },
+      onError: () => {
+        setSubmitting(false);
+      },
+    });
+
+    // onSuccess();
+  }, [sid, selectedFeaturesData, selectedFeaturesMutation, onSuccess]);
 
   // Render
   if (targetedFeaturesIsFetching && !targetedFeaturesIsFetched) {
@@ -189,6 +257,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                 type="submit"
                 theme="primary"
                 size="lg"
+                disabled={submitting}
               >
                 Save
               </Button>
