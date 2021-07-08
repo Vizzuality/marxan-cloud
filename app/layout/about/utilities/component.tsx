@@ -18,6 +18,7 @@ export const AboutUtilities: React.FC<AboutUtilitiesProps> = () => {
           subtitle="This platform hosts the Marxan software suite which includes Marxan, Marxan with Zones, and Marxan with Connectivity on a stable Azure cloud environment. You can use this platform to:"
           caption="Learn more"
           href="https://marxansolutions.org"
+          external
         />
         <div className="flex flex-col items-start gap-10">
           {UTILITIES.map((u) => (

@@ -8,13 +8,13 @@ import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 export interface StaticButtonLinkProps {
   caption: string;
   href: string;
-  internal?: boolean;
+  external?: boolean;
 }
 
 export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
   caption,
   href,
-  internal = false,
+  external = false,
 }: StaticButtonLinkProps) => {
   const children = (
     <>
@@ -27,12 +27,12 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
 
   return (
     <>
-      {internal && (
+      {external && (
         <a className="flex flex-row items-center cursor-pointer" href={href} rel="noopener noreferrer" target="_blank">
           {children}
         </a>
       )}
-      {!internal && (
+      {!external && (
         <Link href={href}>
           <div className="flex flex-row items-center cursor-pointer">
             {children}
