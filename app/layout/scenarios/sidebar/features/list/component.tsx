@@ -205,12 +205,6 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
             iconClassName="w-10 h-10 text-white"
           />
 
-          {(!selectedFeaturesData || !selectedFeaturesData.length) && (
-            <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
-              No results found
-            </div>
-          )}
-
           {!!selectedFeaturesData && !!selectedFeaturesData.length && (
             <div className="relative flex flex-col flex-grow min-h-0 overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />

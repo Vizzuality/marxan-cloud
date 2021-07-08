@@ -80,7 +80,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
           </div>
         )}
 
-        <div style={{ transform: 'translateZ(0)' }}>
+        <div className="py-3" style={{ transform: 'translateZ(0)' }}>
           {(!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length)) && (
             <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
               No results found
