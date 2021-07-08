@@ -4,20 +4,15 @@ import { useDebouncedCallback } from 'use-debounce';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSearch } from 'store/slices/community/projects';
 
-import Link from 'next/link';
-
-import { format } from 'd3';
-
-import Button from 'components/button';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
+import PublishedItem from 'components/projects/published-item';
 import Search from 'components/search';
 import Wrapper from 'layout/wrapper';
 
 import { usePublishedProjects } from 'hooks/projects';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
-import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
 export interface CommunityProjectsListProps {
 
@@ -71,22 +66,22 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
         {publishedProjectsData && publishedProjectsIsFetched && (
           <table>
             <thead className="h-32">
-              <tr>
-                <th className="text-sm text-left w-96">
+              <tr className="flex flex-row">
+                <div className="py-12 w-96">
                   <h4 className="text-sm text-left">Name</h4>
-                </th>
-                <th className="text-sm text-left w-44">
+                </div>
+                <div className="py-12 w-44">
                   <h4 className="text-sm text-left">Planning area</h4>
-                </th>
-                <th className="text-sm text-left w-44">
+                </div>
+                <div className="py-12 w-44">
                   <h4 className="text-sm text-left">Creator</h4>
-                </th>
-                <th className="items-center w-72">
+                </div>
+                <div className="items-center p-12 w-72">
                   <div className="flex flex-row">
                     <h4 className="text-sm text-left">Duplicated</h4>
                     <Icon icon={ARROW_DOWN_SVG} className="w-3.5 h-3.5 ml-2 text-white transform rotate-90" />
                   </div>
-                </th>
+                </div>
               </tr>
             </thead>
             <tbody>
@@ -95,29 +90,15 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
                   id: pid, name, description, planningArea, timesDuplicated, users,
                 } = pp;
                 return (
-                  <tr key={pid} className="border-b border-white cursor-pointer border-opacity-20">
-                    <Link href={`/community/projects/${pid}`}>
-                      <td className="pr-4 py-7 w-96">
-                        <p className="pb-1 font-semibold hover:underline">{name}</p>
-                        <p className="text-base leading-normal text-gray-400 clamp-2">{description}</p>
-                      </td>
-                    </Link>
-                    <td className="w-44">
-                      <p className="text-sm">{planningArea}</p>
-                    </td>
-                    <td className="w-44">
-                      {users?.map((u) => <p key={u.id} className="text-sm">{u.name}</p>)}
-                    </td>
-                    <td className="items-center w-72">
-                      <div className="flex flex-row justify-between pl-10">
-                        <p className="w-6 text-sm">{timesDuplicated && (format('.3s')(timesDuplicated))}</p>
-                        <Button size="s" theme="transparent-white" className="px-6 group">
-                          Duplicate
-                          <Icon icon={DOWNLOAD_SVG} className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
+                  <PublishedItem
+                    key={pid}
+                    id={pid}
+                    name={name}
+                    description={description}
+                    area={planningArea}
+                    contributors={users}
+                    timesDuplicated={timesDuplicated}
+                  />
                 );
               })}
             </tbody>

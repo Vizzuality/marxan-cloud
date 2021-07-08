@@ -15,7 +15,7 @@ export interface PublishedItemProps extends Project {
   timesDuplicated?: number;
 }
 
-export const Item: React.FC<PublishedItemProps> = ({
+export const PublishedItem: React.FC<PublishedItemProps> = ({
   id,
   name,
   description,
@@ -31,10 +31,10 @@ export const Item: React.FC<PublishedItemProps> = ({
           <p className="text-base leading-normal text-gray-400 clamp-2">{description}</p>
         </td>
       </Link>
-      <td className="w-44">
+      <td className="pr-6 w-44">
         <p className="text-sm">{area}</p>
       </td>
-      <td className="w-44">
+      <td className="pr-6 w-44">
         {!!contributors.length && contributors?.map((c) => <p key={`${c.id}`} className="text-sm">{c.name}</p>)}
       </td>
       <td className="items-center w-72">
@@ -50,4 +50,4 @@ export const Item: React.FC<PublishedItemProps> = ({
   );
 };
 
-export default Item;
+export default PublishedItem;

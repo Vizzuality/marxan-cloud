@@ -1,15 +1,15 @@
 import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
-import Item, { PublishedItemProps } from './component';
+import PublishedItem, { PublishedItemProps } from './component';
 
 export default {
   title: 'Components/Projects/Published Item',
-  component: Item,
+  component: PublishedItem,
   argTypes: {},
 };
 
 const Template: Story<PublishedItemProps> = ({ ...args }: PublishedItemProps) => (
-  <Item {...args} />
+  <PublishedItem {...args} />
 );
 
 export const Default = Template.bind({});
