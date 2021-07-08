@@ -7,6 +7,7 @@ import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
 
 import { TemporaryDirectory } from './ports/temporary-directory';
+import { WorkingDirectory } from '../../ports/working-directory';
 
 @Injectable()
 export class SharedStorage implements TemporaryDirectory {
@@ -29,12 +30,12 @@ export class SharedStorage implements TemporaryDirectory {
     return;
   }
 
-  async get(): Promise<string> {
+  async get(): Promise<WorkingDirectory> {
     const directory = v4();
     const fullPath = resolve(this.#tempDirectory, directory);
     await promises.mkdir(resolve(this.#tempDirectory, directory));
     // TODO replace output with the name from params
     await promises.mkdir(resolve(this.#tempDirectory, directory, 'output'));
-    return fullPath;
+    return fullPath as WorkingDirectory;
   }
 }

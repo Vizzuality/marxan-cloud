@@ -1,8 +1,9 @@
+import { Test } from '@nestjs/testing';
+import { Injectable } from '@nestjs/common';
 import { MarxanDirectory } from './marxan-directory.service';
 import { Workspace } from '../ports/workspace';
 import { FileReader } from './file-reader';
-import { Test } from '@nestjs/testing';
-import { Injectable } from '@nestjs/common';
+import { WorkingDirectory } from '../ports/working-directory';
 
 let sut: MarxanDirectory;
 let workspace: Workspace;
@@ -23,7 +24,9 @@ beforeEach(async () => {
   }).compile();
   fileReader = sandbox.get(FileReader);
   sut = sandbox.get(MarxanDirectory);
-  workspace = new Workspace(cwd, bin, () => Promise.resolve());
+  workspace = new Workspace(cwd as WorkingDirectory, bin, () =>
+    Promise.resolve(),
+  );
 });
 
 describe(`when input.dat is missing`, () => {
@@ -34,7 +37,9 @@ describe(`when input.dat is missing`, () => {
   });
 
   it(`should throw`, () => {
-    expect(() => sut.get('INPUTDIR', workspace)).toThrow(/No such file/);
+    expect(() => sut.get('INPUTDIR', workspace.workingDirectory)).toThrow(
+      /No such file/,
+    );
   });
 });
 
@@ -49,7 +54,7 @@ describe(`when input.dat does not contain requested type`, () => {
   });
 
   it(`should throw`, () => {
-    expect(() => sut.get('INPUTDIR', workspace)).toThrow(
+    expect(() => sut.get('INPUTDIR', workspace.workingDirectory)).toThrow(
       /Cannot find INPUTDIR directory/,
     );
   });
@@ -66,7 +71,7 @@ describe(`when input.dat does contain requested type`, () => {
   });
 
   it(`should return full path to given type`, () => {
-    expect(sut.get('INPUTDIR', workspace)).toEqual({
+    expect(sut.get('INPUTDIR', workspace.workingDirectory)).toEqual({
       name: `somedirectory`,
       fullPath: cwd + '/somedirectory',
     });
