@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, In, Repository, WhereExpression } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { MultiPolygon, Polygon } from 'geojson';
 import { flatMap } from 'lodash';
 import { Job } from 'bullmq';

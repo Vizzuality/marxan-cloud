@@ -5,12 +5,7 @@ import {
 } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 import { ProtectedArea } from '@marxan-geoprocessing/modules/protected-areas/protected-areas.geo.entity';
 import { BBox } from 'geojson';

@@ -27,7 +27,6 @@ import {
   ApiQuery,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { TileRequest } from '@marxan-geoprocessing/modules/tile/tile.service';
 
 import { Response } from 'express';
 

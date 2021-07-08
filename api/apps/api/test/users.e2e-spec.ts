@@ -1,10 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  HttpStatus,
-  INestApplication,
-  Logger,
-  ValidationPipe,
-} from '@nestjs/common';
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import * as faker from 'faker';
 import * as request from 'supertest';
 import { AppModule } from '@marxan-api/app.module';
@@ -155,7 +150,7 @@ describe('UsersModule (e2e)', () => {
         throw new Error('Cannot retrieve data for newly created user.');
       }
 
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .get(
           `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
         )

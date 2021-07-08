@@ -1,4 +1,3 @@
-import { OpenAPIObject } from '@nestjs/swagger';
 import { writeFileSync } from 'fs';
 import { addSwagger } from './add-swagger';
 import { bootstrapSetUp } from './bootstrap-app';

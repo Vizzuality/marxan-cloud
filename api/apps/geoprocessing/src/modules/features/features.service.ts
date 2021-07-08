@@ -7,8 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
 import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { BBox } from 'geojson';
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 

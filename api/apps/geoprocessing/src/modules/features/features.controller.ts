@@ -6,7 +6,6 @@ import {
   Res,
   Query,
   Logger,
-  ParseArrayPipe,
 } from '@nestjs/common';
 import { FeatureService } from './features.service';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
