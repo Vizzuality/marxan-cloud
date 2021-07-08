@@ -3,7 +3,7 @@ import { Story } from '@storybook/react/types-6-0';
 import Item, { PublishedItemProps } from './component';
 
 export default {
-  title: 'Components/Projects/Item',
+  title: 'Components/Projects/Published Item',
   component: Item,
   argTypes: {},
 };
@@ -22,18 +22,8 @@ Default.args = {
   contributors: [
     { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
     { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
-    { id: 3, name: 'Alicia Arenzana', bgImage: '' },
   ],
-  onDownload: (e) => {
-    console.info('onDownload', e);
-  },
   onDuplicate: (e) => {
     console.info('onDuplicate', e);
-  },
-  onDelete: (e) => {
-    console.info('onDelete', e);
-  },
-  onClick: (e) => {
-    console.info('onClick', e);
   },
 };

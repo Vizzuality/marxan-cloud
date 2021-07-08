@@ -6,7 +6,7 @@ import {
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
 
-import { formatDistance, formatDistanceToNow } from 'date-fns';
+import { formatDistance } from 'date-fns';
 
 import { ItemProps } from 'components/projects/item/component';
 import { PublishedItemProps } from 'components/projects/published-item/component';
@@ -278,23 +278,14 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 
       return pageData.map((d):PublishedItemProps => {
         const {
-          id, name, lastModifiedAt,
+          id, name, description, area,
         } = d;
-
-        const lastUpdateDistance = () => {
-          return formatDistanceToNow(
-            new Date(lastModifiedAt),
-            { addSuffix: true },
-          );
-        };
 
         return {
           id,
           name,
-          // area,
-          // description,
-          lastUpdate: lastModifiedAt,
-          lastUpdateDistance: lastUpdateDistance(),
+          description,
+          area,
         };
       });
     })) : [];

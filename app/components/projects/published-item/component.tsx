@@ -19,9 +19,8 @@ export interface PublishedItemProps extends Project {
 export const Item: React.FC<PublishedItemProps> = ({
   className,
   name,
-  area,
   description,
-  lastUpdateDistance,
+  area,
   contributors = [],
   style,
 }: PublishedItemProps) => {
@@ -107,13 +106,6 @@ export const Item: React.FC<PublishedItemProps> = ({
             >
               {name}
             </motion.h2>
-          </div>
-
-          <div className="mb-3 text-sm">
-            <span>Last update:</span>
-            <span className="ml-2 text-primary-500">
-              {lastUpdateDistance || 'no scenario'}
-            </span>
           </div>
           <div className="text-sm opacity-50 clamp-2">{description}</div>
         </header>
