@@ -3,9 +3,10 @@ import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { Column, PrimaryColumn } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import {
+  GeoFeatureSetSpecification,
   SpecForGeoFeatureWithGeoprocessing,
   SpecForPlainGeoFeature,
-} from './dto/create.geo-feature-set.dto';
+} from './dto/geo-feature-set-specification.dto';
 
 export const geoFeatureResource: BaseServiceResource = {
   className: 'GeoFeature',
@@ -25,15 +26,6 @@ export interface GeoFeatureCategory {
   key: string;
   distinctValues: string[];
 }
-
-export class GeoFeatureSet {
-  @ApiProperty()
-  status!: JobStatus | 'draft';
-
-  @ApiPropertyOptional()
-  features?: Array<SpecForPlainGeoFeature | SpecForGeoFeatureWithGeoprocessing>;
-}
-
 export class JSONAPIGeoFeatureSetsData {
   @ApiProperty()
   type = geoFeatureResource.name.plural;
@@ -42,7 +34,7 @@ export class JSONAPIGeoFeatureSetsData {
   id!: string;
 
   @ApiProperty()
-  attributes!: GeoFeatureSet;
+  attributes!: GeoFeatureSetSpecification;
 }
 
 export class GeoFeatureSetResult {

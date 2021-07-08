@@ -14,7 +14,7 @@ import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { IUCNCategory } from '../protected-areas/protected-area.geo.entity';
-import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
+import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
@@ -117,7 +117,7 @@ export class Scenario extends TimeUserEntityMetadata {
 
   @Column('jsonb', { name: 'feature_set' })
   @IsOptional()
-  featureSet?: CreateGeoFeatureSetDTO;
+  featureSet?: GeoFeatureSetSpecification;
 
   /**
    * Number of runs for Marxan calculations.

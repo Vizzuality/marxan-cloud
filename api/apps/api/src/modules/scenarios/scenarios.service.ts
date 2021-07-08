@@ -31,13 +31,13 @@ import { SolutionResultCrudService } from './solutions-result/solution-result-cr
 import { OutputFilesService } from './output-files/output-files.service';
 import { InputFilesService } from './input-files';
 import { notFound, RunService } from './marxan-run';
-import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
+import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { SimpleJobStatus } from './scenario.api.entity';
 import { assertDefined } from '@marxan/utils';
 
 /** @debt move to own module */
-const EmptyGeoFeaturesSpecification: CreateGeoFeatureSetDTO = {
+const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
   status: SimpleJobStatus.draft,
   features: [],
 };
@@ -264,12 +264,12 @@ export class ScenariosService {
   }
 
   /**
-   * Get geofeatures recipe for a scenario. This is part of the scenario itself,
-   * but exposed via a separate endpoint.
+   * Get geofeatures specification for a scenario. This is part of the scenario
+   * itself, but exposed via a separate endpoint.
    */
   async getFeatureSetForScenario(
     scenarioId: string,
-  ): Promise<CreateGeoFeatureSetDTO | undefined> {
+  ): Promise<GeoFeatureSetSpecification | undefined> {
     const scenario = await this.getById(scenarioId);
     assertDefined(scenario);
     return await this.crudService
@@ -279,7 +279,7 @@ export class ScenariosService {
       })
       .then((result) =>
         result
-          ? this.geoFeaturesService.extendGeoFeatureProcessingRecipe(
+          ? this.geoFeaturesService.extendGeoFeatureProcessingSpecification(
               result,
               scenario,
             )
