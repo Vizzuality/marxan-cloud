@@ -5,7 +5,7 @@ import { useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
-import { useDeleteScenario, useScenarios } from 'hooks/scenarios';
+import { useDeleteScenario, useScenarios, useScenariosStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import useBottomScrollListener from 'hooks/scroll';
 
@@ -68,6 +68,14 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     },
     sort,
   });
+
+  const {
+    data: scenariosStatusData,
+    isFetching: scenariosStatusIsFetching,
+    isFetched: scenariosStatusIsFetched,
+  } = useScenariosStatus(pid);
+
+  console.log(scenariosStatusData, scenariosStatusIsFetching, scenariosStatusIsFetched);
 
   const scrollRef = useBottomScrollListener(
     () => {
