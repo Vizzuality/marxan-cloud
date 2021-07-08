@@ -1,18 +1,19 @@
 import { EventEmitter } from 'events';
 import { PromiseType } from 'utility-types';
-import { right, left } from 'fp-ts/Either';
+import { left, right } from 'fp-ts/Either';
 import waitForExpect from 'wait-for-expect';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test } from '@nestjs/testing';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
+import { Scenario } from '../scenario.api.entity';
 import {
   notFound,
   runEventsToken,
   runQueueToken,
   RunService,
-} from '@marxan-api/modules/scenarios/run.service';
-import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
-import { Scenario } from './scenario.api.entity';
+} from './run.service';
+import { AssetsService } from './assets.service';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let runService: RunService;
@@ -24,6 +25,8 @@ beforeEach(async () => {
 
 test(`scheduling job`, async () => {
   fixtures.setupMocksForSchedulingJobs();
+  // given
+  fixtures.GivenAssetsAvailable();
 
   // when
   await runService.run('scenario-1');
@@ -32,6 +35,18 @@ test(`scheduling job`, async () => {
   fixtures.ThenShouldUpdateScenario();
   fixtures.ThenShouldEmitSubmittedEvent();
   fixtures.ThenShouldAddJob();
+});
+
+test(`scheduling job for scenario without assets`, async () => {
+  fixtures.setupMocksForSchedulingJobs();
+  // given
+  fixtures.GivenAssetsNotAvailable();
+
+  // when
+  const result = runService.run('scenario-1');
+
+  // then
+  await expect(result).rejects.toBeDefined();
 });
 
 test(`canceling job`, async () => {
@@ -104,6 +119,9 @@ async function getFixtures() {
   const fakeScenarioRepo = {
     update: throwingMock(),
   };
+  const fakeAssets = {
+    forScenario: jest.fn(),
+  };
   const testingModule = await Test.createTestingModule({
     providers: [
       {
@@ -121,6 +139,10 @@ async function getFixtures() {
       {
         provide: getRepositoryToken(Scenario),
         useValue: fakeScenarioRepo,
+      },
+      {
+        provide: AssetsService,
+        useValue: fakeAssets,
       },
       RunService,
     ],
@@ -159,6 +181,12 @@ async function getFixtures() {
         scenarioId: 'other-scenario',
       },
     },
+    scenarioAssets: [
+      {
+        url: 'url-value',
+        relativeDestination: 'relativeDestination-value',
+      },
+    ],
     getRunService() {
       return testingModule.get(RunService);
     },
@@ -220,6 +248,7 @@ async function getFixtures() {
       expect(fixtures.fakeQueue.add).toBeCalledTimes(1);
       expect(fixtures.fakeQueue.add).toBeCalledWith(`run-scenario`, {
         scenarioId: `scenario-1`,
+        assets: this.scenarioAssets,
       });
     },
     async ThenEventCreated(kind: API_EVENT_KINDS) {
@@ -246,6 +275,18 @@ async function getFixtures() {
             scenarioId: `scenario-1`,
           },
         };
+      });
+    },
+    GivenAssetsAvailable() {
+      fakeAssets.forScenario.mockImplementation((id) => {
+        expect(id).toBe(`scenario-1`);
+        return this.scenarioAssets;
+      });
+    },
+    GivenAssetsNotAvailable() {
+      fakeAssets.forScenario.mockImplementation((id) => {
+        expect(id).toBe(`scenario-1`);
+        return undefined;
       });
     },
   };

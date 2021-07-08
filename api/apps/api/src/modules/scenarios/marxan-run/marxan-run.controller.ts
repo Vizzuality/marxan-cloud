@@ -16,12 +16,12 @@ import {
 import { Response } from 'express';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { XApiGuard } from '@marxan-api/guards/x-api.guard';
-import { MarxanRunService } from './marxan-run.service';
+import { MarxanFilesService } from './marxan-files.service';
 
 @UseGuards(XApiGuard)
 @Controller(`${apiGlobalPrefixes.v1}/marxan-run/scenarios`)
 export class MarxanRunController {
-  constructor(private readonly service: MarxanRunService) {}
+  constructor(private readonly service: MarxanFilesService) {}
 
   @Header('Content-Type', 'text/csv')
   @ApiOkResponse({

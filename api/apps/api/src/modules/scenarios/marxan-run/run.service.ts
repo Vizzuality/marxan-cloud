@@ -4,14 +4,15 @@ import { FactoryProvider, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { assertDefined, isDefined } from '@marxan/utils';
+import { JobData, ProgressData, queueName } from '@marxan/scenario-run-queue';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { QueueBuilder, QueueEventsBuilder } from '@marxan-api/modules/queue';
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { Scenario } from '../scenario.api.entity';
+import { AssetsService } from './assets.service';
 
 export const runQueueToken = Symbol('run queue token');
 export const runEventsToken = Symbol('run events token');
-export const queueName = 'scenario-run-queue';
 export const runQueueProvider: FactoryProvider<Queue<JobData>> = {
   provide: runQueueToken,
   useFactory: (queueBuilder: QueueBuilder<JobData>) => {
@@ -27,15 +28,15 @@ export const runQueueEventsProvider: FactoryProvider<QueueEvents> = {
   inject: [QueueEventsBuilder],
 };
 
-type JobData = {
-  scenarioId: string;
-};
-
 export const notFound = Symbol('not found');
 export type NotFound = typeof notFound;
 
 @Injectable()
 export class RunService {
+  private canceledProgressData: ProgressData = {
+    canceled: true,
+  };
+
   constructor(
     @Inject(runQueueToken)
     private readonly queue: Queue<JobData>,
@@ -44,14 +45,18 @@ export class RunService {
     private readonly apiEvents: ApiEventsService,
     @InjectRepository(Scenario)
     private readonly scenarios: Repository<Scenario>,
+    private readonly assets: AssetsService,
   ) {
     queueEvents.on(`completed`, ({ jobId }) => this.handleFinished(jobId));
     queueEvents.on(`failed`, ({ jobId }) => this.handleFailed(jobId));
   }
 
   async run(scenarioId: string): Promise<void> {
+    const assets = await this.assets.forScenario(scenarioId);
+    assertDefined(assets);
     await this.queue.add(`run-scenario`, {
       scenarioId,
+      assets,
     });
     await this.scenarios.update(scenarioId, {
       ranAtLeastOnce: true,
@@ -73,9 +78,7 @@ export class RunService {
     if (!isDefined(scenarioJob)) return left(notFound);
 
     if (await scenarioJob.isActive())
-      await scenarioJob.updateProgress({
-        canceled: true,
-      });
+      await scenarioJob.updateProgress(this.canceledProgressData);
     else if (await scenarioJob.isWaiting()) await scenarioJob.remove();
 
     return right(void 0);

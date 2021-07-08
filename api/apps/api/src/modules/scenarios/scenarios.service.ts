@@ -28,12 +28,11 @@ import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
-import { InputParameterFileProvider } from './input-parameter-file.provider';
 import { SpecDatService } from './input-files/spec.dat.service';
 import { PuvsprDatService } from './input-files/puvspr.dat.service';
 import { OutputFilesService } from './output-files/output-files.service';
 import { BoundDatService } from './input-files/bound.dat.service';
-import { notFound, RunService } from './run.service';
+import { notFound, RunService, InputParameterFileProvider } from './marxan-run';
 
 @Injectable()
 export class ScenariosService {
@@ -178,12 +177,13 @@ export class ScenariosService {
     await this.assertScenario(scenarioId);
     const result = await this.runService.cancel(scenarioId);
     if (isLeft(result)) {
-      const mapping: Record<typeof result.left, () => never> = {
-        [notFound]: () => {
+      switch (result.left) {
+        case notFound:
           throw new NotFoundException();
-        },
-      };
-      mapping[result.left]();
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
     }
   }
 
