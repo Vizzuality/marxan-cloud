@@ -34,6 +34,7 @@ import { notFound, RunService } from './marxan-run';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { SimpleJobStatus } from './scenario.api.entity';
+import { assertDefined } from '@marxan/utils';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: CreateGeoFeatureSetDTO = {
@@ -268,7 +269,9 @@ export class ScenariosService {
    */
   async getFeatureSetForScenario(
     scenarioId: string,
-  ): Promise<CreateGeoFeatureSetDTO | undefined | void> {
+  ): Promise<CreateGeoFeatureSetDTO | undefined> {
+    const scenario = await this.getById(scenarioId);
+    assertDefined(scenario);
     return await this.crudService
       .getById(scenarioId)
       .then((result) => {
@@ -276,7 +279,7 @@ export class ScenariosService {
       })
       .then((result) =>
         result
-          ? this.geoFeaturesService.extendGeoFeatureProcessingRecipe(result)
+          ? this.geoFeaturesService.extendGeoFeatureProcessingRecipe(result, scenario)
           : EmptyGeoFeaturesSpecification,
       )
       .catch((e) => Logger.error(e));
