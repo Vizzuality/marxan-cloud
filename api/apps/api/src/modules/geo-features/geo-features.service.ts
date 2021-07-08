@@ -498,7 +498,8 @@ export class GeoFeaturesService extends AppBaseService<
   ): Promise<CreateGeoFeatureSetDTO | undefined> {
     const scenario = await this.scenarioRepository.findOneOrFail(id);
     await this.scenarioRepository.update(id, { featureSet: dto });
-    await this.createFeaturesForScenario(id, dto.features);
+    // @todo: move to async job - this was just for simple tests
+    // await this.createFeaturesForScenario(id, dto.features);
     return await this.extendGeoFeatureProcessingRecipe(dto);
   }
 }
