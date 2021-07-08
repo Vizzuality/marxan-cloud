@@ -170,8 +170,6 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
         tag,
         description,
         properties,
-
-        intersectFeaturesSelected,
       } = metadata;
 
       let splitOptions = [];
@@ -205,30 +203,21 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
         }
       }
 
-      const intersectFeaturesOptions = intersectFeaturesSelected ? flatten(intersectFeaturesSelected
-        .map((ifs) => {
-          const {
-            id: ifsId,
-            name: ifsName,
-            splitSelected: ifsSplitSelected,
-            splitFeaturesSelected: ifsSplitFeaturesSelected,
-          } = ifs;
+      let intersectFeaturesSelected = [];
 
-          if (ifsSplitSelected) {
-            return ifsSplitFeaturesSelected.map((v) => {
-              return {
-                label: v.name,
-                value: v.id,
-              };
-            });
-          }
-
-          return {
-            label: ifsName,
-            value: ifsId,
-          };
-        }))
-        : [];
+      if (tag === 'species') {
+        if (geoprocessingOperations && geoprocessingOperations[0].kind === 'stratification/v1') {
+          intersectFeaturesSelected = flatten(geoprocessingOperations
+            .map((ifs) => {
+              return ifs.splits.map((v) => {
+                return {
+                  label: v.value,
+                  value: v.value,
+                };
+              });
+            }));
+        }
+      }
 
       return {
         ...d,
@@ -243,9 +232,8 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
         splitFeaturesSelected,
         splitFeaturesOptions,
 
-        // INTERESECTION
+        // INTERSECTION
         intersectFeaturesSelected,
-        intersectFeaturesOptions,
       };
     });
 
@@ -280,7 +268,7 @@ export function useTargetedFeatures(sid) {
         id, name, splitSelected, splitFeaturesSelected, intersectFeaturesSelected,
       } = s;
       const isSplitted = !!splitSelected;
-      const isIntersected = !!intersectFeaturesSelected;
+      const isIntersected = !!intersectFeaturesSelected?.length;
 
       // Generate splitted features to target
       if (isSplitted) {
@@ -300,25 +288,9 @@ export function useTargetedFeatures(sid) {
       if (isIntersected) {
         return flatten(intersectFeaturesSelected.map((ifs) => {
           const {
-            id: ifId,
-            name: ifName,
-            splitSelected: ifSplitSelected,
-            splitFeaturesSelected: ifSplitFeaturesSelected,
+            value: ifId,
+            label: ifName,
           } = ifs;
-
-          if (ifSplitSelected) {
-            return ifSplitFeaturesSelected.map((sf) => {
-              const { id: sfId, name: sfName } = sf;
-
-              return {
-                ...sf,
-                id: `${id}-${sfId}`,
-                type: 'bioregional-and-species',
-                name: `${name} in ${sfName}`,
-                splitted: true,
-              };
-            });
-          }
 
           return {
             ...ifs,

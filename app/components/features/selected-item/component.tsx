@@ -35,18 +35,6 @@ export interface ItemProps {
 
   // INTERSECT
   intersectFeaturesSelected?: {
-    id: string;
-    fpf?: number;
-    target?: number;
-    splitSelected?: string;
-    splitFeaturesSelected?: {
-      id: string;
-      name: string;
-      fpf?: number;
-      target?: number;
-    }[];
-  }[];
-  intersectFeaturesOptions?: {
     label: string;
     value: string;
   }[];
@@ -69,8 +57,7 @@ export const Item: React.FC<ItemProps> = ({
   splitFeaturesOptions = [],
   onSplitFeaturesSelected,
 
-  intersectFeaturesSelected,
-  intersectFeaturesOptions = [],
+  intersectFeaturesSelected = [],
 
   onIntersectSelected,
   onRemove,
@@ -183,7 +170,6 @@ export const Item: React.FC<ItemProps> = ({
               </h4>
             </div>
 
-            {/* TODO: Select from javi!! */}
             <div className="inline-block mt-2">
               <Button
                 theme="secondary-alt"
@@ -239,9 +225,9 @@ export const Item: React.FC<ItemProps> = ({
         </ul>
       )}
 
-      {type === 'species' && intersectFeaturesSelected && intersectFeaturesSelected.length && (
+      {type === 'species' && intersectFeaturesSelected && !!intersectFeaturesSelected.length && (
         <ul className="pl-3">
-          {intersectFeaturesOptions.map((f) => {
+          {intersectFeaturesSelected.map((f) => {
             return (
               <li
                 key={`${f.value}`}
