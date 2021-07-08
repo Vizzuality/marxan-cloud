@@ -417,7 +417,7 @@ export class GeoFeaturesService extends AppBaseService<
     //   fpf: number;
     //   prop: number | undefined;
     // } & RemoteScenarioFeaturesData)[]
-    const repository = transactionalEntityManager.getRepository(
+    const _repository = transactionalEntityManager.getRepository(
       RemoteScenarioFeaturesData,
     );
     return Promise.all(

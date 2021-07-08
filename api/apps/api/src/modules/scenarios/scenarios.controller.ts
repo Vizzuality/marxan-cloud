@@ -16,7 +16,6 @@ import {
   UseGuards,
   UseInterceptors,
   ValidationPipe,
-  Logger,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -24,7 +23,6 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import { GeoFeatureSetSpecification } from '@marxan-api/modules/geo-features/dto/geo-feature-set-specification.dto';
 import { GeoFeatureSetResult } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 
