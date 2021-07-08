@@ -5,6 +5,7 @@ import { useToasts } from 'hooks/toast';
 import Icon from 'components/icon';
 
 import FACEBOOK_FILLED_SVG from 'svgs/social/facebook-filled.svg?sprite';
+import LINK_SVG from 'svgs/social/link.svg?sprite';
 import TWITTER_FILLED_SVG from 'svgs/social/twitter-filled.svg?sprite';
 
 export interface ProjectShareProps {
@@ -51,8 +52,9 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
     <div>
       <h3 className="mb-6 text-sm font-semibold text-white">Share</h3>
       <div className="mb-5">
-        <button onClick={handleCopy} type="button">
-          Copy link
+        <button className="flex flex-row" onClick={handleCopy} type="button">
+          <Icon icon={LINK_SVG} className="w-5 h-5 mr-2.5 text-white" />
+          <p className="text-sm">Copy link</p>
         </button>
         <input className="hidden" type="text" value="" id="copyURLInput" />
       </div>
@@ -66,7 +68,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           target="_blank"
         >
           <Icon icon={TWITTER_FILLED_SVG} className="w-5 h-5 mr-2.5 text-white" />
-          Twitter
+          <p className="text-sm">Twitter</p>
         </a>
       </div>
       <a
@@ -77,8 +79,8 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
         rel="noreferrer"
         target="_blank"
       >
-        <Icon icon={FACEBOOK_FILLED_SVG} className="w-5 h-5 mr-2.5 text-white" />
-        Facebook
+        <Icon icon={FACEBOOK_FILLED_SVG} className="h-5 mr-6 text-white" />
+        <p className="text-sm">Facebook</p>
       </a>
     </div>
   );

@@ -2,6 +2,8 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
+import { format } from 'd3';
+
 import { usePublishedProject } from 'hooks/projects';
 
 import Avatar from 'components/avatar';
@@ -29,7 +31,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   } = usePublishedProject(pid);
 
   const {
-    description, name, planningAreaName, users, scenarios,
+    description, name, planningAreaName, timesDuplicated, users, scenarios,
   } = publishedProject || {};
 
   return (
@@ -63,9 +65,14 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                 Duplicate
                 <Icon icon={DOWNLOAD_SVG} className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black" />
               </Button>
+              {timesDuplicated && (
               <p className="ml-5 text-sm text-white">
-                Duplicated 120K times
+                Duplicated
+                {format('.3s')(timesDuplicated)}
+                {' '}
+                times
               </p>
+              )}
             </div>
             <div className="grid grid-cols-2 grid-rows-3 gap-y-11 gap-x-9">
               <div>
