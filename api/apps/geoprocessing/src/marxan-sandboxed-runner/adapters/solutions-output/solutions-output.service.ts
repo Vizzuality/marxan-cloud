@@ -53,38 +53,38 @@ export class SolutionsOutputService implements Cancellable {
     });
 
     // just a sample for brevity, ideally should stream into db tables & use csv streamer
-    const runsSummary = (
-      await promises.readFile(
-        workspace.workingDirectory + `/output/output_sum.csv`,
-      )
-    ).toString();
-    await this.resultsRepo.save(
-      runsSummary
-        .split('\n')
-        .slice(1)
-        .map((row) => {
-          const [
-            runId,
-            score,
-            cost,
-            planningUnits,
-            connectivity,
-            connectivityTotal,
-            connectivityIn,
-            connectivityEdge,
-            connectivityOut,
-            connectivityInFraction,
-            penalty,
-            shortfall,
-            missingValues,
-            mpm,
-          ] = row.split(',');
-          return this.resultsRepo.create({
-            scenarioId,
-            scoreValue: +score,
-          });
-        }),
-    );
+    // const runsSummary = (
+    //   await promises.readFile(
+    //     workspace.workingDirectory + `/output/output_sum.csv`,
+    //   )
+    // ).toString();
+    // await this.resultsRepo.save(
+    //   runsSummary
+    //     .split('\n')
+    //     .slice(1)
+    //     .map((row) => {
+    //       const [
+    //         runId,
+    //         score,
+    //         cost,
+    //         planningUnits,
+    //         connectivity,
+    //         connectivityTotal,
+    //         connectivityIn,
+    //         connectivityEdge,
+    //         connectivityOut,
+    //         connectivityInFraction,
+    //         penalty,
+    //         shortfall,
+    //         missingValues,
+    //         mpm,
+    //       ] = row.split(',');
+    //       return this.resultsRepo.create({
+    //         scenarioId,
+    //         scoreValue: +score,
+    //       });
+    //     }),
+    // );
 
     return;
   }

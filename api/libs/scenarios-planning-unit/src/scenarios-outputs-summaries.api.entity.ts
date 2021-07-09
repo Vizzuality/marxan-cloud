@@ -41,7 +41,7 @@ export class ScenariosOutputResultsApiEntity {
   /**
    * cost of the run
    */
-   @Column({
+  @Column({
     type: `float8`,
     nullable: true,
     name: `cost`,
@@ -51,7 +51,7 @@ export class ScenariosOutputResultsApiEntity {
   /**
    * nº planning units of the run
    */
-   @Column({
+  @Column({
     type: `float8`,
     nullable: true,
     name: `planning_units`,
@@ -61,7 +61,7 @@ export class ScenariosOutputResultsApiEntity {
   /**
    * The total boundary length of the reserve system.
    */
-   @Column({
+  @Column({
     type: `float8`,
     nullable: true,
     name: `connectivity`,
@@ -71,7 +71,7 @@ export class ScenariosOutputResultsApiEntity {
   /**
    * Total boundary of planning units in study area.
    */
-   @Column({
+  @Column({
     type: `float8`,
     nullable: true,
     name: `connectivity_total`,
@@ -81,7 +81,7 @@ export class ScenariosOutputResultsApiEntity {
   /**
    * Minimum Proportion Met for the worst performing feature.
    */
-   @Column({
+  @Column({
     type: `float8`,
     nullable: true,
     name: `mpm`,
@@ -91,60 +91,60 @@ export class ScenariosOutputResultsApiEntity {
   /**
    * The penalty that was added to the objective function
    */
-    @Column({
-      type: `float8`,
-      nullable: true,
-      name: `penalty`,
-    })
+  @Column({
+    type: `float8`,
+    nullable: true,
+    name: `penalty`,
+  })
   penaltyValue?: number | null;
 
   /**
    * The amount by which the targets for conservation features have not been met
    */
-   @Column({
+  @Column({
     type: `float8`,
     nullable: true,
     name: `shortfall`,
   })
   shortfall?: number | null;
 
-   /**
+  /**
    * The number of features that did not achieve their targets
    */
-    @Column({
-      type: `float8`,
-      nullable: true,
-      name: `missing_values`,
-    })
-    missingValues?: number | null;
+  @Column({
+    type: `float8`,
+    nullable: true,
+    name: `missing_values`,
+  })
+  missingValues?: number | null;
 
-    /**g
+  /**g
    * Best solution/run for the scenario (1 per scenario)
    */
-     @Column({
-      type: `bool`,
-      nullable: true,
-      name: `best`,
-    })
-    best?: boolean | null;
+  @Column({
+    type: `bool`,
+    nullable: true,
+    name: `best`,
+  })
+  best?: boolean | null;
 
-    /**
+  /**
    * 5 most different solution in the results (5 per scenario)
    */
-     @Column({
-      type: `bool`,
-      nullable: true,
-      name: `distinct_five`,
-    })
-    distinctFive?: boolean | null;
+  @Column({
+    type: `bool`,
+    nullable: true,
+    name: `distinct_five`,
+  })
+  distinctFive?: boolean | null;
 
-   /**
+  /**
    * metadata
    */
-    @Column({
-      type: `jsonb`,
-      nullable: true,
-      name: `metadata`,
-    })
-    metadata?: JSON | null;
+  @Column({
+    type: `jsonb`,
+    nullable: true,
+    name: `metadata`,
+  })
+  metadata?: JSON | null;
 }
