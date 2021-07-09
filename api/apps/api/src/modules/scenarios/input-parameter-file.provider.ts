@@ -84,12 +84,20 @@ export class InputParameterFileProvider {
   ) {}
 
   async getInputParameterFile(scenarioId: string): Promise<string> {
-    const scenario = await this.scenariosService.getById(scenarioId);
+    const scenario = await this.scenariosService.getById(scenarioId, {
+      include: ['project', 'project.organization'],
+    });
     const inputParameterFile = new InputParameterFile(
       this.ioSettings,
       scenario.boundaryLengthModifier,
       scenario.numberOfRuns,
-      scenario.metadata?.marxanInputParameterFile,
+      {
+        ...scenario.metadata?.marxanInputParameterFile,
+        _CLOUD_SCENARIO: scenario.name,
+        _CLOUD_PROJECT: scenario.project?.name ?? 'NA',
+        _CLOUD_ORGANIZATION: scenario.project?.organization?.name ?? 'NA',
+        _CLOUD_GENERATED_AT: new Date().toISOString(),
+      },
     );
     return inputParameterFile.toString();
   }
