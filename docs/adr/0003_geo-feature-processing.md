@@ -89,14 +89,40 @@ on a scenario should not be included in the list above.
 
 Splitting and stratification of features is only *planned* during the definition
 of the list of features to be included in a scenario: we can think about this as
-a sort of "recipe" for the definition of all the operations needed to select,
-subset and intersect features, leading to the actual features being linked to
-the scenario.
+a sort of "recipe" (specification) for the definition of all the operations
+needed to select, subset and intersect features, leading to the actual features
+eventually being linked to the scenario.
 
-The actual GIS operations to produce new features via splitting or
-stratification are only performed once the user finalises the list of features
-and this is converted from `draft` status to `processing` status and a BullMQ
-processing job for the definition is created.
+The `status` property (see below) of feature specifications can only be set to
+two values:
+
+- `draft`, in which case the specification is only validated and - if valid -
+  stored alongside the scenario, or
+- `created`, in which case actual computation of desired features is carried out
+  and these are eventually linked to a scenario; if features were already linked
+  to the scenario through a previously-submitted specification, these will be
+  unliked before the newly-calculated ones are linked to the scenario (in an
+  atomic transaction)
+
+Given the idempotence note above, once a specification's status has been set to
+`created`:
+
+- if the specification is submitted again with status `draft`, any already
+  existing features will be left intact and linked to the scenario; the
+  specification will be validated and persisted alongside the scenario
+- if the specification is submitted again with status `created`, resulting
+  features will be computed again, any existing features linked to the scenario
+  will be unlinked from it, and the newly calculated features will be linked to
+  it
+
+[TBD]: If a specification is submitted with status `created` while the effects
+of a previous submission with status `created` are still being computed (or are
+queued to be computed), the new submission can either be rejected (this requires
+checking for previous jobs that are neither completed nor failed) or it can be
+queued, although without guarantees on the order of processing of asynchronous
+jobs this could lead to inconsistent state.
+
+### Selection of features: plain or via geoprocessing operations
 
 Given the list of features available to users while configuring a scenario (see
 section above), users can:
@@ -146,6 +172,11 @@ We only support `POST` and `PUT`: the API always expects the full specification.
 Handling `PATCH` requests would significantly increase implementation complexity
 with arguably little benefit.
 
+`POST` and `PUT` are considered equivalent when creating or updating a
+specification, and in practice `PUT` can _always_ be used since an empty
+specification is assumed to be linked to each scenario until a user-configured
+specification is actually submitted and linked to it.
+
 Processing a specification of the set of features for a scenario should be an
 idempotent operation; moreover, geoprocessing operations are only executed once
 a specification is marked as `created` (as a transition from the initial default
@@ -193,6 +224,8 @@ computing throwaway results in order to simulate constant-time operations).
         /**
          * Either one operation of kind split/v1 or one operation of kind
          * stratification/v1.
+         * We also describe copy/v1 which may be used to  unify how we handle
+         * plain and geoprocessed features.
          */
         {
           kind: 'split/v1',
@@ -225,20 +258,28 @@ computing throwaway results in order to simulate constant-time operations).
             }
           ]
         },
+        {
+          kind: 'copy/v1',
+          marxanSettings: {
+            prop: number,
+            fpf: number,
+          }
+        }
       ]
     }
   ],
 };
 ```
 
-#### Recipe definition/confirmation flow
+#### Flow for the definition/confirmation of feature specifications
 
-For simplicity's sake, we assume a recipe will be created as `draft` initially.
+For the sake of simplicity, we assume a recipe will be created as `draft`
+initially.
 
 The intent here is not to describe all the possible flow paths but the key
 points, so this simplification will not affect the description of the process.
 
-* Recipe is created (`POST`) with `status: 'draft'`
+* Specification is created (`POST`) with `status: 'draft'`
 
   * for each feature
 
@@ -294,22 +335,79 @@ Identical flow as above.
 }
 ```
 
-    * persist the extracted recipe in `features_from_geoprocessing`:
+    * persist the extracted recipe in `scenario_features`:
 
 ```sql
-create table features_from_geoprocessing(
+create table scenario_features(
   id uuid not null default uuid_generate_v4(),
-  feature_id uuid null, -- will be null if the feature from this recipe hasn't been calculated yet
+  scenario_id uuid not null references scenarios(id) on update cascade on delete cascade,
+  -- feature_data_ids will be null if the feature from this recipe hasn't been calculated yet;
+  -- each id maps to the ids of the `geodb.scenario_features_data` which match
+  -- the 
+  feature_data_ids uuid[] null,
   geoprocessing_ops jsonb not null,
   geoprocessing_ops_hash text generated always as (digest(geoprocessing_ops::text, 'sha256')) stored,
-  name text -- e.g. <Species> in <ecoregion>
+  name text, -- e.g. "<Species> / <ecoregion>" (We avoid <Species> in <ecoregion> to simplify translations),
+  constraint unique_features_per_scenario unique(scenario_id, geoprocessing_ops_hash)
 );
 ```
 
-    * `feature_id` will be the id of the "split" feature for `split/v1`
-      operations (because )
+    * `feature_data_ids` will be set depending on the `kind` of operation:
 
-### Retrieving a feature set for a scenario
+      * `copy/v1`
+
+```sql
+array[(select id from geodb.scenario_features_data where feature_id = <featureId from the specification>
+and st_intersects(st_makeenvelope(<apidb.project.bbox>, 4326), the_geom))]
+```
+
+      * `split/v1`
+
+```sql
+array[(select distinct feature_data_id from geodb.feature_properties_kv where
+feature_id = <featureId from the specification>
+and key = <splitByProperty from the specification>
+and value = <split[n].value from the specification>
+and st_intersects(st_makeenvelope(<apidb.project.bbox>, 4326), bbox))]
+```
+
+      * `stratification/v1`
+
+First we need to create a new `features` row, setting `project_id` to the
+scenario's parent project so that this will be visible only within scenarios of
+the project.
+
+```sql
+insert into features (feature_class_name, tag, creation_status) values
+('<species / bioregional split>', 'species', 'created') returning id;
+```
+
+We can then compute the corresponding `features_data` row:
+
+```sql
+insert into features_data (the_geom, properties, source, feature_id)
+select st_intersection(the_geom, (select the_geom from features_data fd where features_id = <featureId from the specification>)) as the_geom, 
+(properties||(select properties from features_data fd where features_id = <featureId from the specification>)) as properties,
+'intersection',
+'<new feature id as created above in `features`>'
+from features_data fd
+where features_id = <featureId of the bioregional feature we split> and properties @> '{"dn":181}'
+and st_intersects(the_geom, (select the_geom from features_data fd where features_id = <featureId from the specification>));
+```
+
+And we can finally create a matching `scenario_features` row, setting
+`feature_data_ids` to `array[<id of the new features_data row inserted above>]`
+
+    * link `features_data` to `scenarios` via `scenario_features_data` (in a transaction)
+
+      * drop all the existing `scenario_features_data` rows for the given scenario
+      * insert new: ids from `scenario_features.feature_data_ids`, `fpf` and
+        `prop` from the specification, and `total_area` and `current_pa` from
+        the queries listed in `featuresForScenario_logic.ipynb`.
+
+    * set job status to success
+
+### Retrieving the feature set specification for a scenario
 
 To retrieve the (raw) specification for the list of features for a scenario:
 
@@ -334,7 +432,7 @@ Payload (`GeoFeatureSet`):
 {
   scenarioId: string,
   projectId: string,
-  status: 'draft' | 'created' | 'running' | 'done' | 'failure',
+  status: 'draft' | 'created' | 'running' | 'done' | 'failure';
   features: [
     {
       featureId: string;
