@@ -28,7 +28,9 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
 
   const {
     data: selectedFeaturesData,
-  } = useSelectedFeatures(sid, {});
+  } = useSelectedFeatures(sid, {}, {
+    refetchOnMount: false,
+  });
 
   const intersectingCurrent = selectedFeaturesData.find((s) => s.id === intersecting);
 

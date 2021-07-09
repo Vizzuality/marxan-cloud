@@ -75,7 +75,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     isFetched: scenariosStatusIsFetched,
   } = useScenariosStatus(pid);
 
-  console.log(scenariosStatusData, scenariosStatusIsFetching, scenariosStatusIsFetched);
+  console.info(scenariosStatusData, scenariosStatusIsFetching, scenariosStatusIsFetched);
 
   const scrollRef = useBottomScrollListener(
     () => {

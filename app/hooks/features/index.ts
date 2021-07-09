@@ -132,7 +132,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
   }, [query, pages]);
 }
 
-export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) {
+export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, queryOptions = {}) {
   const [session] = useSession();
   const { search } = filters;
 
@@ -145,7 +145,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}) 
   });
 
   const query = useQuery(['selected-features', sid], fetchFeatures, {
-    refetchOnWindowFocus: false,
+    ...queryOptions,
   });
 
   const { data } = query;
