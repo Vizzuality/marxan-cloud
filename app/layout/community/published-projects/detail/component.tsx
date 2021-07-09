@@ -68,7 +68,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
               </p>
               )}
             </div>
-            <div className="grid grid-cols-2 grid-rows-3 gap-y-11 gap-x-9">
+            <div className="grid grid-cols-2 grid-rows-2 gap-y-11 gap-x-9">
               <div>
                 <h3 className="mb-6 text-sm font-semibold text-white">Creators</h3>
                 {users?.map((u) => (
