@@ -19,7 +19,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
     const copyURL = document.getElementById('copyURLInput').baseURI;
     navigator.clipboard.writeText(copyURL).then(
       () => {
-        addToast('success-upload-shapefile', (
+        addToast('success-copy-url', (
           <>
             <h2 className="font-medium">Success!</h2>
             <p className="text-sm">Link copied to clipboard</p>
@@ -31,7 +31,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
     )
       .catch(
         () => {
-          addToast('error-upload-shapefile', (
+          addToast('error-copy-url', (
             <>
               <h2 className="font-medium">Error!</h2>
               <p className="text-sm">
