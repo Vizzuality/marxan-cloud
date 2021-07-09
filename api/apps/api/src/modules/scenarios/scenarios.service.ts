@@ -28,6 +28,7 @@ import { SolutionResultCrudService } from './solutions-result/solution-result-cr
 import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
 import { InputParameterFileProvider } from './input-parameter-file.provider';
 import { SpecDatService } from './input-files/spec.dat.service';
+import { OutputFilesService } from './output-files/output-files.service';
 
 @Injectable()
 export class ScenariosService {
@@ -46,6 +47,7 @@ export class ScenariosService {
     private readonly marxanInputValidator: MarxanInput,
     private readonly inputParameterFileProvider: InputParameterFileProvider,
     private readonly specDatService: SpecDatService,
+    private readonly outputFilesService: OutputFilesService,
   ) {}
 
   async findAllPaginated(
@@ -222,5 +224,10 @@ export class ScenariosService {
     const withValidatedMetadata: T = classToClass<T>(input);
     (withValidatedMetadata.metadata ??= {}).marxanInputParameterFile = marxanInput;
     return withValidatedMetadata;
+  }
+
+  async getMarxanExecutionOutputArchive(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    return this.outputFilesService.get(scenarioId);
   }
 }

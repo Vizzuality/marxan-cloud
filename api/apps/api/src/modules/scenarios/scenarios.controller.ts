@@ -25,18 +25,18 @@ import {
 } from 'nestjs-base-service';
 
 import {
+  ApiAcceptedResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
+  ApiParam,
   ApiProduces,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
-  ApiForbiddenResponse,
-  ApiParam,
-  ApiAcceptedResponse,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
@@ -61,12 +61,13 @@ import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
 import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
+import { ZipFilesSerializer } from './dto/zip-files.serializer';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/run/:runId/solutions`;
 
 const marxanRunTag = 'Marxan Run';
-const marxanFilesTag = 'Marxan Run - Files';
+const marxanRunFiles = 'Marxan Run - Files';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -79,6 +80,7 @@ export class ScenariosController {
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
     private readonly proxyService: ProxyService,
+    private readonly zipFilesSerializer: ZipFilesSerializer,
   ) {}
 
   @ApiOperation({
@@ -249,7 +251,7 @@ export class ScenariosController {
     );
   }
 
-  @ApiTags(marxanFilesTag)
+  @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's input parameter file.` })
   @Get(':id/marxan/dat/input.dat')
   @ApiProduces('text/plain')
@@ -260,7 +262,7 @@ export class ScenariosController {
     return await this.service.getInputParameterFile(id);
   }
 
-  @ApiTags(marxanFilesTag)
+  @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's spec file.` })
   @Get(':id/marxan/dat/spec.dat')
   @ApiProduces('text/plain')
@@ -269,6 +271,23 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
     return await this.service.getSpecDatCsv(id);
+  }
+
+  @ApiTags(marxanRunFiles)
+  @ApiOperation({
+    description: `Get archived output files`,
+  })
+  @Get(`:id/marxan/output`)
+  @Header(`Content-Type`, `application/zip`)
+  @Header('Content-Disposition', 'attachment; filename="output.zip"')
+  async getOutputArchive(
+    @Param(`id`, ParseUUIDPipe) scenarioId: string,
+    @Res() response: Response,
+  ) {
+    const result = await this.service.getMarxanExecutionOutputArchive(
+      scenarioId,
+    );
+    response.send(this.zipFilesSerializer.serialize(result));
   }
 
   @ApiOkResponse({
@@ -387,7 +406,7 @@ export class ScenariosController {
     );
   }
 
-  @ApiTags(marxanFilesTag)
+  @ApiTags(marxanRunFiles)
   @Header('Content-Type', 'text/csv')
   @ApiOkResponse({
     schema: {
