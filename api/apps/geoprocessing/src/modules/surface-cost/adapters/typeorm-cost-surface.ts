@@ -1,29 +1,37 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, Logger } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { In, Repository } from 'typeorm';
 import { flatten } from 'lodash';
 
 import { CostSurfacePersistencePort } from '../ports/persistence/cost-surface-persistence.port';
 import { PlanningUnitCost } from '../ports/planning-unit-cost';
-import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
+import {
+  ScenariosPlanningUnitGeoEntity,
+  ScenariosPuCostDataGeo,
+} from '@marxan/scenarios-planning-unit';
+import { isDefined } from '@marxan/utils';
 
 @Injectable()
 export class TypeormCostSurface implements CostSurfacePersistencePort {
-  private readonly logger = new Logger('test')
   constructor(
     @InjectRepository(ScenariosPuCostDataGeo)
-    private readonly costs: Repository<ScenariosPuCostDataGeo>
+    private readonly costs: Repository<ScenariosPuCostDataGeo>,
+    @InjectRepository(ScenariosPlanningUnitGeoEntity)
+    private readonly scenarioDataRepo: Repository<ScenariosPlanningUnitGeoEntity>,
   ) {
     //
   }
 
-  async save(_: string, values: PlanningUnitCost[]): Promise<void> {
-    const pairs = values.map<[string, number]>((pair) => [
-      pair.puId,
-      pair.cost,
-    ]);
-    const vals = this.generateParametrizedValues(pairs);
-    this.logger
+  async save(scenarioId: string, values: PlanningUnitCost[]): Promise<void> {
+    const scenarioData = await this.scenarioDataRepo.find({
+      where: {
+        scenarioId,
+        puGeometryId: In(values.map((pair) => pair.puId)),
+      },
+    });
+
+    const pairs = this.getUpdatePairs(scenarioData, values);
+
     await this.costs.query(
       `
     UPDATE scenarios_pu_cost_data as spd
@@ -58,4 +66,21 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
       )
       .join(',');
   }
+
+  private getUpdatePairs(
+    rows: ScenariosPlanningUnitGeoEntity[],
+    values: PlanningUnitCost[],
+  ): [string, number][] {
+    return rows
+      .map<[string, number | undefined]>((scenarioDataEntry) => [
+        scenarioDataEntry.id,
+        values.find((pair) => pair.puId === scenarioDataEntry.puGeometryId)
+          ?.cost,
+      ])
+      .filter(this.hasCostDefined);
+  }
+
+  private hasCostDefined = (
+    pair: [string, number | undefined],
+  ): pair is [string, number] => isDefined(pair[1]);
 }
