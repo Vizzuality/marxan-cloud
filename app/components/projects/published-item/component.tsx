@@ -2,10 +2,8 @@ import React from 'react';
 
 import Link from 'next/link';
 import { format } from 'd3';
-import Button from 'components/button';
-import Icon from 'components/icon';
+import DuplicateButton from 'layout/community/published-projects/duplicate-button/component';
 import type { Project } from 'types/project-model';
-import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
 export interface PublishedItemProps extends Project {
   timesDuplicated?: number;
@@ -36,10 +34,7 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
       <td className="items-center w-72">
         <div className="flex flex-row justify-between pl-10">
           <p className="w-6 text-sm">{timesDuplicated && (format('.3s')(timesDuplicated))}</p>
-          <Button size="s" theme="transparent-white" className="px-6 group">
-            Duplicate
-            <Icon icon={DOWNLOAD_SVG} className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black" />
-          </Button>
+          <DuplicateButton />
         </div>
       </td>
     </tr>

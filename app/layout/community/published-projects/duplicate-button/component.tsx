@@ -37,7 +37,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = () => {
     >
       {isDuplicated ? 'Duplicated' : 'Duplicate'}
       <Icon
-        className={isDuplicated ? 'w-3.5 h-3.5 ml-2 text-black group-hover:text-white' : 'w-3.5 h-3.5 ml-2 text-white group-hover:text-black'}
+        className={isDuplicated ? 'w-3 h-3 ml-1 text-black group-hover:text-white' : 'w-3.5 h-3.5 ml-2 text-white group-hover:text-black'}
         icon={isDuplicated ? CHECKED_SVG : DOWNLOAD_SVG}
       />
     </Button>
