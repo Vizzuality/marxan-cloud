@@ -8,13 +8,17 @@ import {
 } from './geo-feature.geo.entity';
 
 import { GeoFeaturesController } from './geo-features.controller';
-import { EntityManagerToken, GeoFeaturesService } from './geo-features.service';
+import { GeoFeaturesService } from './geo-features.service';
 import { apiConnections } from '../../ormconfig';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeatureSetSerializer } from './geo-feature-set.serializer';
-import { GeoFeatureSetService } from './geo-feature-set.service';
+import {
+  EntityManagerToken,
+  GeoFeatureSetService,
+} from './geo-feature-set.service';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
+import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 
 @Module({
   imports: [
@@ -28,6 +32,7 @@ import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remot
     GeoFeaturesService,
     GeoFeatureSetSerializer,
     GeoFeatureSetService,
+    GeoFeaturePropertySetService,
     ProxyService,
     {
       provide: EntityManagerToken,
@@ -35,6 +40,11 @@ import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remot
     },
   ],
   controllers: [GeoFeaturesController],
-  exports: [GeoFeaturesService, GeoFeatureSetSerializer],
+  exports: [
+    GeoFeaturesService,
+    GeoFeatureSetSerializer,
+    GeoFeatureSetService,
+    GeoFeaturePropertySetService,
+  ],
 })
 export class GeoFeaturesModule {}
