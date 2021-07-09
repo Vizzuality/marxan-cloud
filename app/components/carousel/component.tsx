@@ -3,7 +3,11 @@ import React, { useState } from 'react';
 import { useKeenSlider } from 'keen-slider/react';
 
 export interface CarouselProps {
-  images: [{id: string, alt: string, src: string}];
+  images: [{
+    id: string,
+    alt: string,
+    src: string
+  }];
 }
 
 export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => {
@@ -41,7 +45,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => 
               onClick={() => {
                 slider.moveToSlideRelative(i);
               }}
-              className={currentSlide === i ? 'w-14  bg-blue-500 h-px mx-2.5' : 'w-14 bg-gray-300 h-px mx-2.5'}
+              className={`h-px mx-2.5 w-14 ${currentSlide === i ? 'bg-blue-500' : 'bg-gray-300'}`}
             />
           );
         })}
