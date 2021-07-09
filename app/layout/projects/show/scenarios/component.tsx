@@ -180,10 +180,10 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                       subtitle="project detail"
                       content={(
                         <div>
-                          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                          Beatae ratione cumque in nobis fugiat,
-                          neque ullam aliquam, commodi dolorem unde inventore eaque,
-                          dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
+                          Here you can see listed all the scenarios under the same project.
+                          You can access a scenario and edit it at any time, unless there is
+                          a contributor working on the same scenario. In this case, you will see
+                          a warning.
                         </div>
                       )}
                     >
