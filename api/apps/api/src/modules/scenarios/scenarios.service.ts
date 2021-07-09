@@ -35,6 +35,7 @@ import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { SimpleJobStatus } from './scenario.api.entity';
 import { assertDefined } from '@marxan/utils';
+import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-property-sets.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -59,6 +60,7 @@ export class ScenariosService {
     private readonly inputFilesService: InputFilesService,
     private readonly outputFilesService: OutputFilesService,
     private readonly geoFeaturesService: GeoFeaturesService,
+    private readonly geoFeaturePropertySetService: GeoFeaturePropertySetService,
   ) {}
 
   async findAllPaginated(
@@ -279,7 +281,7 @@ export class ScenariosService {
       })
       .then((result) =>
         result
-          ? this.geoFeaturesService.extendGeoFeatureProcessingSpecification(
+          ? this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
               result,
               scenario,
             )

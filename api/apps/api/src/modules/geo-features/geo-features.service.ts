@@ -1,18 +1,12 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { EntityManager, In, Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import {
   GeoFeatureGeometry,
-  GeoFeaturePropertySet,
   geoFeatureResource,
 } from './geo-feature.geo.entity';
-import {
-  GeoFeatureSetSpecification,
-  SpecForGeofeature,
-  SpecForGeoFeatureWithGeoprocessing,
-  SpecForPlainGeoFeature,
-} from './dto/geo-feature-set-specification.dto';
+import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
 
 import * as faker from 'faker';
 import {
@@ -29,9 +23,7 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
-import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
-import { flatten, flattenDeep } from 'lodash';
-import { GeoprocessingOpSplitV1 } from './types/geo-feature.geoprocessing-operations.type';
+import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -48,14 +40,6 @@ type GeoFeatureFilterKeys = keyof Pick<
 >;
 type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
 
-export const EntityManagerToken = Symbol();
-
-export const MarxanFeaturesMetadata = {
-  defaults: {
-    fpf: 1,
-  },
-};
-
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
   GeoFeature,
@@ -66,19 +50,13 @@ export class GeoFeaturesService extends AppBaseService<
   constructor(
     @InjectRepository(GeoFeatureGeometry, apiConnections.geoprocessingDB.name)
     private readonly geoFeaturesGeometriesRepository: Repository<GeoFeatureGeometry>,
-    @InjectRepository(
-      GeoFeaturePropertySet,
-      apiConnections.geoprocessingDB.name,
-    )
-    private readonly geoFeaturePropertySetsRepository: Repository<GeoFeaturePropertySet>,
     @InjectRepository(GeoFeature)
     private readonly geoFeaturesRepository: Repository<GeoFeature>,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
     @InjectRepository(Scenario)
     private readonly scenarioRepository: Repository<Scenario>,
-    @Inject(EntityManagerToken)
-    private readonly entityManager: EntityManager,
+    private readonly geoFeaturesPropertySet: GeoFeaturePropertySetService,
   ) {
     super(
       geoFeaturesRepository,
@@ -261,15 +239,14 @@ export class GeoFeaturesService extends AppBaseService<
       (i) => i.id,
     );
 
-    const entitiesWithProperties = await this.getFeaturePropertySetsForFeatures(
-      geoFeatureIds,
-      this.forProject,
-    ).then((results) => {
-      return this.extendGeoFeaturesWithPropertiesFromPropertySets(
-        entitiesAndCount[0],
-        results,
-      );
-    });
+    const entitiesWithProperties = await this.geoFeaturesPropertySet
+      .getFeaturePropertySetsForFeatures(geoFeatureIds, this.forProject)
+      .then((results) => {
+        return this.geoFeaturesPropertySet.extendGeoFeaturesWithPropertiesFromPropertySets(
+          entitiesAndCount[0],
+          results,
+        );
+      });
     return [entitiesWithProperties, entitiesAndCount[1]];
   }
 
@@ -283,241 +260,5 @@ export class GeoFeaturesService extends AppBaseService<
     _info?: AppInfoDTO,
   ): Promise<GeoFeature> {
     return entity;
-  }
-
-  extendGeoFeaturesWithPropertiesFromPropertySets(
-    geoFeatures: GeoFeature[],
-    propertySet: GeoFeaturePropertySet[],
-  ) {
-    return geoFeatures.map((i) => {
-      const propertySetForFeature = propertySet.filter(
-        (ps) => ps.featureId === i.id,
-      );
-      return {
-        ...i,
-        properties: propertySetForFeature.reduce((acc, cur) => {
-          return {
-            ...acc,
-            [cur.key]: [...(acc[cur.key] || []), cur.value[0]],
-          };
-        }, {} as Record<string, Array<string | number>>),
-      };
-    });
-  }
-
-  getFeaturePropertySetsForFeatures(
-    geoFeatureIds: string[],
-    forProject?: Project | null | undefined,
-  ): Promise<GeoFeaturePropertySet[]> {
-    const query = this.geoFeaturePropertySetsRepository
-      .createQueryBuilder('propertySets')
-      .distinct(true)
-      .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds });
-
-    if (forProject) {
-      query.andWhere(
-        `st_intersects(
-        st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
-        "propertySets".bbox
-      )`,
-        {
-          xmin: forProject.bbox[1],
-          ymin: forProject.bbox[3],
-          xmax: forProject.bbox[0],
-          ymax: forProject.bbox[2],
-        },
-      );
-    }
-    return query.getMany();
-  }
-
-  /**
-   * Given a specification for features to be linked to a scenario, compute
-   * features defined via geoprocessing operations and link plain features
-   * and features from geoprocessing to the scenario.
-   */
-  async createFeaturesForScenario(
-    scenarioId: string,
-    featureSpecification: SpecForGeofeature[],
-  ): Promise<void> {
-    await this.entityManager.transaction(async (transactionalEntityManager) => {
-      const repository = transactionalEntityManager.getRepository(
-        RemoteScenarioFeaturesData,
-      );
-      await repository.delete({ scenarioId });
-      // First process features which can be used as they are (plain)
-      await this.createPlainFeaturesForScenario(
-        transactionalEntityManager,
-        scenarioId,
-        featureSpecification,
-      );
-      // Then process features from geoprocessing operations of kind `split/v1`
-      // TODO
-      // Then process features from geoprocessing operations of kind `stratification/v1`
-      // TODO
-    });
-  }
-
-  /**
-   * Given a specification for features to be linked to a scenario, select plain
-   * features (i.e. no geoprocessing required) and link them to the scenario as
-   * part of an ongoing db transaction.
-   *
-   * @todo fix typing
-   */
-  async createPlainFeaturesForScenario(
-    transactionalEntityManager: EntityManager,
-    scenarioId: string,
-    featureSpecification: SpecForGeofeature[],
-  ): Promise<
-    ({
-      scenarioId: string;
-      featuresDataId: string;
-      fpf: number;
-      prop: number | undefined;
-    } & RemoteScenarioFeaturesData)[]
-  > {
-    const repository = transactionalEntityManager.getRepository(
-      RemoteScenarioFeaturesData,
-    );
-    return Promise.all(
-      featureSpecification
-        .filter(
-          (feature): feature is SpecForPlainGeoFeature =>
-            feature.kind === 'plain',
-        )
-        .map((feature) => {
-          return repository.save({
-            scenarioId,
-            featuresDataId: feature.featureId,
-            fpf:
-              feature.marxanSettings?.fpf ??
-              MarxanFeaturesMetadata.defaults.fpf,
-            prop: feature.marxanSettings?.prop,
-          });
-        }),
-    );
-  }
-
-  /**
-   * Given a specification for features to be linked to a scenario, select plain
-   * features (i.e. no geoprocessing required) and link them to the scenario as
-   * part of an ongoing db transaction.
-   *
-   * @todo fix typing
-   */
-  async createGeoprocessedFeaturesForScenarioWithSplitV1(
-    transactionalEntityManager: EntityManager,
-    scenarioId: string,
-    featureSpecification: SpecForGeofeature[],
-  ): Promise<any> {
-    // ({
-    //   scenarioId: string;
-    //   featuresDataId: string;
-    //   fpf: number;
-    //   prop: number | undefined;
-    // } & RemoteScenarioFeaturesData)[]
-    const _repository = transactionalEntityManager.getRepository(
-      RemoteScenarioFeaturesData,
-    );
-    return Promise.all(
-      featureSpecification
-        .filter(
-          (feature): feature is SpecForGeoFeatureWithGeoprocessing =>
-            feature.kind === 'withGeoprocessing',
-        )
-        .map((feature) => {
-          const splitOperations = flattenDeep(
-            feature.geoprocessingOperations
-              ?.filter(
-                (operation): operation is GeoprocessingOpSplitV1 =>
-                  operation.kind === 'split/v1',
-              )
-              .map((operation) =>
-                operation.splits.map((split) => ({
-                  featureId: feature.featureId,
-                  splitByProperty: operation.splitByProperty,
-                  value: split.value,
-                  marxanSettings: split.marxanSettings,
-                })),
-              ),
-          );
-
-          Logger.debug(splitOperations);
-          // return repository.save({
-          //   scenarioId,
-          //   featuresDataId: feature.featureId,
-          //   fpf:
-          //     feature.marxanSettings?.fpf ??
-          //     MarxanFeaturesMetadata.defaults.fpf,
-          //   prop: feature.marxanSettings?.prop,
-          // });
-        }),
-    );
-  }
-
-  /**
-   * Add feature metadata to features in a geofeatures processing specification.
-   */
-  async extendGeoFeatureProcessingSpecification(
-    specification: GeoFeatureSetSpecification,
-    scenario: Scenario,
-  ): Promise<any> {
-    const project = await this.projectRepository.findOne(scenario.projectId);
-    const idsOfFeaturesInGeoprocessingOperations = new Set(
-      flatten(specification.features.map(
-        (feature) =>
-          feature.geoprocessingOperations?.map((op) => {
-            if (op.kind === 'stratification/v1') {
-              return op.intersectWith.featureId;
-            }
-          }).filter((id): id is string => !!id),
-      ).filter((id): id is string[] => !!id),
-    ));
-    const idsOfTopLevelFeaturesInSpecification = new Set(
-      specification.features.map((feature) => feature.featureId),
-    );
-    const idsOfFeaturesInSpecification = Array.from(
-      new Set([
-        ...idsOfTopLevelFeaturesInSpecification,
-        ...idsOfFeaturesInGeoprocessingOperations,
-      ]),
-    );
-    const featuresInSpecification = await this.geoFeaturesRepository.find({
-      id: In(idsOfFeaturesInSpecification),
-    });
-    const metadataForFeaturesInSpecification = await this.getFeaturePropertySetsForFeatures(
-      idsOfFeaturesInSpecification,
-      project,
-    );
-    const featuresInSpecificationWithPropertiesMetadata = this.extendGeoFeaturesWithPropertiesFromPropertySets(
-      featuresInSpecification,
-      metadataForFeaturesInSpecification,
-    );
-    return {
-      status: specification.status,
-      features: specification.features.map((feature) => {
-        return {
-          ...feature,
-          metadata: featuresInSpecificationWithPropertiesMetadata.find(
-            (f) => f.id === feature.featureId,
-          ),
-        };
-      }),
-    };
-  }
-
-  /**
-   * Create or replace the set of features linked to a scenario.
-   */
-  async createOrReplaceFeatureSet(
-    id: string,
-    dto: GeoFeatureSetSpecification,
-  ): Promise<GeoFeatureSetSpecification | undefined> {
-    const scenario = await this.scenarioRepository.findOneOrFail(id);
-    await this.scenarioRepository.update(id, { featureSet: dto });
-    // @todo: move to async job - this was just for simple tests
-    // await this.createFeaturesForScenario(id, dto.features);
-    return await this.extendGeoFeatureProcessingSpecification(dto, scenario);
   }
 }

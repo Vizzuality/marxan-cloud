@@ -67,6 +67,7 @@ import { ZipFilesSerializer } from './dto/zip-files.serializer';
 import { GeoFeatureSetSerializer } from '../geo-features/geo-feature-set.serializer';
 import { UpdateGeoFeatureSetDTO } from '../geo-features/dto/update.geo-feature-set.dto';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
+import { GeoFeatureSetService } from '../geo-features/geo-feature-set.service';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -83,6 +84,7 @@ export class ScenariosController {
     public readonly service: ScenariosService,
     private readonly geoFeaturesService: GeoFeaturesService,
     private readonly geoFeatureSetSerializer: GeoFeatureSetSerializer,
+    private readonly geoFeatureSetService: GeoFeatureSetService,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
@@ -204,7 +206,7 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
     return await this.geoFeatureSetSerializer.serialize(
-      await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto),
+      await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
     );
   }
 
@@ -216,7 +218,7 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
     return await this.geoFeatureSetSerializer.serialize(
-      await this.geoFeaturesService.createOrReplaceFeatureSet(id, dto),
+      await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
     );
   }
 
