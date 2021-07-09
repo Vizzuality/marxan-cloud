@@ -8,8 +8,20 @@ import * as request from 'supertest';
 export const createWorld = async () => {
   const app = await bootstrapApplication();
   const jwtToken = await GivenUserIsLoggedIn(app);
-  const { projectId, cleanup } = await GivenProjectExists(app, jwtToken);
-  const scenario = await GivenScenarioExists(app, projectId, jwtToken);
+  const { projectId, cleanup } = await GivenProjectExists(
+    app,
+    jwtToken,
+    {
+      countryCode: `NAM`,
+      name: `Humanity for living.`,
+    },
+    {
+      name: `Alaska`,
+    },
+  );
+  const scenario = await GivenScenarioExists(app, projectId, jwtToken, {
+    name: `Save the world species`,
+  });
 
   // TODO: fill bound.dat
   // TODO: fill puvspr.dat
