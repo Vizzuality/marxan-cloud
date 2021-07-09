@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { flatten } from 'lodash';
 
@@ -9,9 +9,10 @@ import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
 
 @Injectable()
 export class TypeormCostSurface implements CostSurfacePersistencePort {
+  private readonly logger = new Logger('test')
   constructor(
     @InjectRepository(ScenariosPuCostDataGeo)
-    private readonly costs: Repository<ScenariosPuCostDataGeo>,
+    private readonly costs: Repository<ScenariosPuCostDataGeo>
   ) {
     //
   }
@@ -21,6 +22,8 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
       pair.puId,
       pair.cost,
     ]);
+    const vals = this.generateParametrizedValues(pairs);
+    this.logger
     await this.costs.query(
       `
     UPDATE scenarios_pu_cost_data as spd
@@ -28,7 +31,7 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
     from (values
         ${this.generateParametrizedValues(pairs)}
     ) as pucd(id, new_cost)
-    where pucd.id = spd.id
+    where pucd.id = spd.scenarios_pu_data_id
     `,
       flatten(pairs),
     );
