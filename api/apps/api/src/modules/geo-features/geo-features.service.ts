@@ -30,7 +30,7 @@ import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
-import { flattenDeep } from 'lodash';
+import { flatten, flattenDeep } from 'lodash';
 import { GeoprocessingOpSplitV1 } from './types/geo-feature.geoprocessing-operations.type';
 
 const geoFeatureFilterKeyNames = [
@@ -464,8 +464,24 @@ export class GeoFeaturesService extends AppBaseService<
     scenario: Scenario,
   ): Promise<any> {
     const project = await this.projectRepository.findOne(scenario.projectId);
+    const idsOfFeaturesInGeoprocessingOperations = new Set(
+      flatten(specification.features.map(
+        (feature) =>
+          feature.geoprocessingOperations?.map((op) => {
+            if (op.kind === 'stratification/v1') {
+              return op.intersectWith.featureId;
+            }
+          }).filter((id): id is string => !!id),
+      ).filter((id): id is string[] => !!id),
+    ));
+    const idsOfTopLevelFeaturesInSpecification = new Set(
+      specification.features.map((feature) => feature.featureId),
+    );
     const idsOfFeaturesInSpecification = Array.from(
-      new Set(specification.features.map((feature) => feature.featureId)),
+      new Set([
+        ...idsOfTopLevelFeaturesInSpecification,
+        ...idsOfFeaturesInGeoprocessingOperations,
+      ]),
     );
     const featuresInSpecification = await this.geoFeaturesRepository.find({
       id: In(idsOfFeaturesInSpecification),
