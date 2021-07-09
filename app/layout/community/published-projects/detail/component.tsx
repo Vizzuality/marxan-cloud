@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useRouter } from 'next/router';
+import { useToasts } from 'hooks/toast';
 
 import { format } from 'd3';
 
@@ -15,6 +16,7 @@ import PublishedProjectMap from 'layout/community/published-projects/detail/map'
 import Share from 'layout/community/published-projects/detail/share';
 import Wrapper from 'layout/wrapper';
 
+import CHECKED_SVG from 'svgs/ui/checked.svg?sprite';
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
 export interface CommunityProjectsDetailProps {
@@ -23,16 +25,31 @@ export interface CommunityProjectsDetailProps {
 
 export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = () => {
   const { query } = useRouter();
+  const { addToast } = useToasts();
   const { pid } = query;
   const {
     data: publishedProject,
     isFetching: publishedProjectIsFetching,
     isFetched: publishedProjectIsFetched,
   } = usePublishedProject(pid);
+  const [isDuplicated, setIsDuplicated] = useState(false);
 
   const {
     description, name, planningAreaName, timesDuplicated, users, scenarios,
   } = publishedProject || {};
+
+  const handleDuplicated = () => {
+    setIsDuplicated(true);
+
+    addToast('success-upload-shapefile', (
+      <>
+        <h2 className="font-medium">Success!</h2>
+        <p className="text-sm">Project duplicated</p>
+      </>
+    ), {
+      level: 'success',
+    });
+  };
 
   return (
     <Wrapper>
@@ -61,9 +78,17 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
               {description}
             </p>
             <div className="flex flex-row items-center mb-10">
-              <Button size="s" theme="transparent-white" className="px-6 group">
-                Duplicate
-                <Icon icon={DOWNLOAD_SVG} className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black" />
+              <Button
+                className="px-6 group"
+                onClick={handleDuplicated}
+                size="s"
+                theme={isDuplicated ? 'white' : 'transparent-white'}
+              >
+                {isDuplicated ? 'Duplicated' : 'Duplicate'}
+                <Icon
+                  className={isDuplicated ? 'w-3.5 h-3.5 ml-2 text-black group-hover:text-white' : 'w-3.5 h-3.5 ml-2 text-white group-hover:text-black'}
+                  icon={isDuplicated ? CHECKED_SVG : DOWNLOAD_SVG}
+                />
               </Button>
               {timesDuplicated && (
               <p className="ml-5 text-sm text-white">
@@ -105,7 +130,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
               <Share />
             </div>
           </div>
-          <div className="w-5/12">
+          <div className="w-5/12 h-auto">
             <PublishedProjectMap />
           </div>
         </div>
