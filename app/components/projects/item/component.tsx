@@ -14,6 +14,8 @@ import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 export interface ItemProps extends Project {
   className?: string;
   style?: Record<string, unknown>;
+  lastUpdate: string;
+  lastUpdateDistance: string;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;

@@ -89,6 +89,7 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
                 const {
                   id: pid, name, description, planningArea, timesDuplicated, users,
                 } = pp;
+
                 return (
                   <PublishedItem
                     key={pid}
