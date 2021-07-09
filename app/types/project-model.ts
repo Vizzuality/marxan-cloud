@@ -3,6 +3,8 @@ export interface Project {
   name: string;
   area?: string;
   description?: string;
+  lastUpdate: string;
+  lastUpdateDistance: string;
   contributors?: Record<string, unknown>[];
 }
 

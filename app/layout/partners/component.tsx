@@ -18,7 +18,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
           </h2>
           <div className="grid w-full grid-cols-1 py-10 md:grid-cols-3 gap-x-56 gap-y-24">
             {FOUNDING_LOGOS.map((fl) => (
-              <a href={fl.hyperlink} key={fl.id} rel="noopener noreferrer" target="_blank" className="place-self-center">
+              <a href={fl.hyperlink} key={fl.id} rel="noreferrer" target="_blank" className="place-self-center">
                 <img alt={fl.alt} src={fl.src} />
               </a>
             ))}
@@ -32,7 +32,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
           </div>
           <div className="grid w-full grid-cols-1 py-10 md:grid-cols-3 gap-x-56 gap-y-24">
             {SUPPORTING_LOGOS.map((sl) => (
-              <a href={sl.hyperlink} key={sl.id} rel="noopener noreferrer" target="_blank" className="place-self-center">
+              <a href={sl.hyperlink} key={sl.id} rel="noreferrer" target="_blank" className="place-self-center">
                 <img alt={sl.alt} src={sl.src} />
               </a>
             ))}

@@ -6,7 +6,7 @@ import {
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
 
-import { formatDistance } from 'date-fns';
+import { formatDistance, formatDistanceToNow } from 'date-fns';
 
 import { ItemProps } from 'components/projects/item/component';
 import { PublishedItemProps } from 'components/projects/published-item/component';
@@ -278,15 +278,23 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 
       return pageData.map((d):PublishedItemProps => {
         const {
-          id, name, description, area, timesDuplicated,
+          id, name, lastModifiedAt,
         } = d;
+
+        const lastUpdateDistance = () => {
+          return formatDistanceToNow(
+            new Date(lastModifiedAt),
+            { addSuffix: true },
+          );
+        };
 
         return {
           id,
           name,
-          description,
-          area,
-          timesDuplicated,
+          // area,
+          // description,
+          lastUpdate: lastModifiedAt,
+          lastUpdateDistance: lastUpdateDistance(),
         };
       });
     })) : [];
@@ -296,4 +304,30 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
       data: parsedData,
     };
   }, [query, pages]);
+}
+
+export function usePublishedProject(id) {
+  const [session] = useSession();
+
+  const query = useQuery(['published-projects', id], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${id}`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    params: {
+      include: 'scenarios,users',
+    },
+  }), {
+    enabled: !!id,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data?.data,
+    };
+  }, [query, data?.data?.data]);
 }
