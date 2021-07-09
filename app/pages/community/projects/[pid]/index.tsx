@@ -14,7 +14,7 @@ const PublishedProjectPage: React.FC = () => {
       </Head>
 
       <main className="flex flex-col w-screen h-screen">
-        <Header size="base" />
+        <Header size="base" published />
         <ProjectDetail />
       </main>
     </div>

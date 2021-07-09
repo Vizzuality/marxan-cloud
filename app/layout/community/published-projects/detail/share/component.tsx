@@ -79,7 +79,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
         rel="noreferrer"
         target="_blank"
       >
-        <Icon icon={FACEBOOK_FILLED_SVG} className="h-5 mr-6 text-white" />
+        <Icon icon={FACEBOOK_FILLED_SVG} className="h-5 mr-5 text-white" />
         <p className="text-sm">Facebook</p>
       </a>
     </div>

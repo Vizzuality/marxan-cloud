@@ -14,6 +14,7 @@ import { useMe } from 'hooks/me';
 import LOGO_SVG from 'svgs/logo.svg';
 
 export interface HeaderProps {
+  published?: boolean;
   size: 'base' | 'lg',
 }
 
@@ -32,7 +33,7 @@ const SIZE = {
   },
 };
 
-export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
+export const Header: React.FC<HeaderProps> = ({ published = false, size }:HeaderProps) => {
   const { user } = useMe();
 
   return (
@@ -53,7 +54,9 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
             </a>
           </Link>
 
-          <Title />
+          {!published && (
+            <Title />
+          )}
 
           <div
             className="flex items-center space-x-1 divide-x divide-gray-500 md:space-x-5"
