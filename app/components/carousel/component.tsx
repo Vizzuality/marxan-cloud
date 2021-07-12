@@ -46,7 +46,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
       </div>
 
       {slider && (
-        <div className="flex flex-row items-center justify-center mt-14">
+        <div className="flex flex-row items-center justify-center space-x-1 mt-14">
           {[...Array(slider.details().size).keys()].map((i) => {
             return (
               <button
@@ -57,11 +57,15 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
                   slider.moveToSlideRelative(i);
                 }}
                 className={cx({
-                  'mx-0.5 w-20': true,
+                  'relative w-20': true,
                   'bg-blue-500 h-0.5': currentSlide === i,
                   'bg-gray-300 h-px': currentSlide !== i,
                 })}
-              />
+              >
+                <div
+                  className="absolute left-0 w-full h-3 transform -translate-y-1/2 bg-transparent top-1/2"
+                />
+              </button>
             );
           })}
         </div>
