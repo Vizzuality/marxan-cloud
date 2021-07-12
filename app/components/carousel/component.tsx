@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 import { useKeenSlider } from 'keen-slider/react';
 
+import cx from 'classnames';
+
 export interface CarouselProps {
   images: {
     id: string | number;
@@ -22,6 +24,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
 
   return (
     <div>
+
       <div className="relative">
         <div ref={sliderRef} className="keen-slider">
           {images?.map((i) => (
@@ -35,23 +38,29 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
           <div>1</div>
         </div>
       </div>
+
       {slider && (
-      <div className="flex flex-row items-center justify-center h-28">
-        {[...Array(slider.details().size).keys()].map((i) => {
-          return (
-            <button
-              key={i}
-              type="button"
-              aria-label="dot-element"
-              onClick={() => {
-                slider.moveToSlideRelative(i);
-              }}
-              className={`mx-0.5 w-20 ${currentSlide === i ? 'bg-blue-500 h-0.5' : 'bg-gray-300 h-px'}`}
-            />
-          );
-        })}
-      </div>
+        <div className="flex flex-row items-center justify-center h-28">
+          {[...Array(slider.details().size).keys()].map((i) => {
+            return (
+              <button
+                key={i}
+                type="button"
+                aria-label="dot-element"
+                onClick={() => {
+                  slider.moveToSlideRelative(i);
+                }}
+                className={cx({
+                  'mx-0.5 w-20': true,
+                  'bg-blue-500 h-0.5': currentSlide === i,
+                  'bg-gray-300 h-px': currentSlide !== i,
+                })}
+              />
+            );
+          })}
+        </div>
       )}
+
     </div>
   );
 };
