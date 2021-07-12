@@ -11,18 +11,22 @@ export interface HomeCarouselProps {
 
 export const HomeCarousel: React.FC<HomeCarouselProps> = () => {
   return (
-    <Wrapper>
-      <div className="relative p-40">
-        <div className="w-full mb-24 bg-black h-96" />
-        <div className="w-full h-56 bg-gray-700" />
-        <div className="absolute flex justify-center top-2">
-          <Carousel
-            images={IMAGES}
-            initial={0}
-          />
+    <>
+      <div className="w-full bg-black mt-52 h-96" />
+      <div className="w-full h-64 bg-gray-700" />
+      <Wrapper>
+
+        <div className="relative w-full max-w-5xl mx-auto">
+
+          <div className="absolute flex justify-center bottom-24">
+            <Carousel
+              images={IMAGES}
+              initial={0}
+            />
+          </div>
         </div>
-      </div>
-    </Wrapper>
+      </Wrapper>
+    </>
   );
 };
 
