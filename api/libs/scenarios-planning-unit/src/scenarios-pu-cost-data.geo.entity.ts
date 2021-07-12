@@ -16,13 +16,6 @@ export class ScenariosPuCostDataGeo {
   id!: string;
 
   @Column({
-    type: 'uuid',
-    nullable: false,
-    name: 'output_results_data_id',
-  })
-  planningUnitId!: string;
-
-  @Column({
     type: 'float8',
     nullable: false,
     default: 0,

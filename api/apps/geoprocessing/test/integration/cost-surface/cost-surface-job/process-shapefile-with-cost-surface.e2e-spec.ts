@@ -26,7 +26,6 @@ describe(`given scenario has some planning units`, () => {
   it(`updates cost surface`, async () => {
     await sut.process(world.getShapefileWithCost());
     await delay(1000);
-    const costs = (await world.GetPuCostsData()).map((pu) => pu.cost);
-    costs.forEach((cost, index) => expect(cost).toEqual(world.newCost[index]));
+    await world.ThenCostIsUpdated();
   }, 10000);
 });

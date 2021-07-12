@@ -1,7 +1,7 @@
 import { HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
 import { MarxanConfig } from './marxan-config';
 import { MarxanSandboxRunnerService } from './marxan-sandbox-runner.service';
 
@@ -11,12 +11,16 @@ import { MarxanExecutionMetadataModule } from './adapters/solutions-output/metad
 import { FileReader } from './adapters/file-reader';
 import { AssetFetcher } from './adapters/scenario-data/asset-fetcher';
 import { FetchConfig } from './adapters/scenario-data/fetch.config';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 @Module({
   imports: [
     HttpModule,
     WorkspaceModule,
-    TypeOrmModule.forFeature([ScenariosOutputResultsGeoEntity]),
+    TypeOrmModule.forFeature(
+      [ScenariosOutputResultsApiEntity],
+      geoprocessingConnections.apiDB,
+    ),
     MarxanExecutionMetadataModule,
   ],
   providers: [

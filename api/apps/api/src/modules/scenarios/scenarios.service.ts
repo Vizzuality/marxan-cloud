@@ -137,7 +137,6 @@ export class ScenariosService {
 
   async findScenarioResults(
     scenarioId: string,
-    runId: string,
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
@@ -174,25 +173,33 @@ export class ScenariosService {
     await this.crudService.getById(scenarioId);
   }
 
-  async getBestSolution(scenarioId: string, runId: string) {
+  async getOneSolution(scenarioId: string, runId: string, fetchSpecification: FetchSpecification) {
     await this.assertScenario(scenarioId);
     // TODO correct implementation
     return this.solutionsCrudService.getById(runId);
   }
 
+  async getBestSolution(
+    scenarioId: string,
+    fetchSpecification: FetchSpecification) {
+    await this.assertScenario(scenarioId);
+    // TODO correct implementation
+    fetchSpecification.filter = {...fetchSpecification.filter,  best: true }
+    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+  }
+
   async getMostDifferentSolutions(
     scenarioId: string,
-    runId: string,
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
     // TODO correct implementation
+    fetchSpecification.filter = {...fetchSpecification.filter,  distinctFive: true }
     return this.solutionsCrudService.findAllPaginated(fetchSpecification);
   }
 
   async findAllSolutionsPaginated(
     scenarioId: string,
-    runId: string,
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);

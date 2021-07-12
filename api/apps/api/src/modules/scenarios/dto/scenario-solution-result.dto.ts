@@ -1,5 +1,5 @@
 import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
-import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
 
 class ScenarioSolutionsDataDto {
   @ApiProperty()
@@ -10,9 +10,9 @@ class ScenarioSolutionsDataDto {
 
   @ApiProperty({
     isArray: true,
-    type: () => ScenariosOutputResultsGeoEntity,
+    type: () => ScenariosOutputResultsApiEntity,
   })
-  attributes!: ScenariosOutputResultsGeoEntity[];
+  attributes!: ScenariosOutputResultsApiEntity[];
 }
 
 class ScenarioSolutionDataDto {
@@ -23,9 +23,9 @@ class ScenarioSolutionDataDto {
   id!: string;
 
   @ApiProperty({
-    type: () => ScenariosOutputResultsGeoEntity,
+    type: () => ScenariosOutputResultsApiEntity,
   })
-  attributes!: ScenariosOutputResultsGeoEntity;
+  attributes!: ScenariosOutputResultsApiEntity;
 }
 
 @ApiExtraModels(ScenarioSolutionsDataDto, ScenarioSolutionDataDto)
