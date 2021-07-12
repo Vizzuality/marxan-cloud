@@ -15,7 +15,7 @@ export default {
     theme: {
       control: {
         type: 'select',
-        options: ['primary', 'primary-alt', 'secondary', 'secondary-alt', 'transparent-black', 'danger', 'run'],
+        options: ['primary', 'primary-alt', 'secondary', 'secondary-alt', 'danger', 'run', 'transparent-black', 'transparent-white'],
       },
     },
   },
