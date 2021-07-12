@@ -5,6 +5,10 @@ import { SolutionsRepository } from './ports/solutions-repository';
 import { Workspace } from './ports/workspace';
 
 import { MarxanRun } from './marxan-run';
+import { WorkspaceBuilder } from './ports/workspace-builder';
+import { Cancellable } from './ports/cancellable';
+import { Assets, InputFilesFs } from './adapters/scenario-data/input-files-fs';
+import { SolutionsOutputService } from './adapters/solutions-output/solutions-output.service';
 
 @Injectable()
 export class MarxanSandboxRunnerService {
@@ -16,20 +20,71 @@ export class MarxanSandboxRunnerService {
   ) {}
 
   async run(forScenarioId: string, assets: Assets): Promise<void> {
-    const {
-      cleanup,
-      marxanBinaryPath,
-      workingDirectory,
-    } = await this.workspaceService.get();
-    // useful to check output within docker, during development - needs `cleanup()` to be commented out
-    console.log(`doing things in..`, workingDirectory);
+    const workspace = await this.workspaceService.get();
+    const inputFiles = await this.moduleRef.create(InputFilesFs);
+    const outputFilesRepository = await this.moduleRef.create(
+      SolutionsOutputService,
+    );
+    const marxanRun = new MarxanRun();
 
-    await this.inputFilesProvider.include(workingDirectory, assets);
+    const cancellables: Cancellable[] = [
+      inputFiles,
+      outputFilesRepository,
+      marxanRun,
+    ];
 
-    return new Promise((resolve, reject) => {
-      this.marxanRunner.on(`pid`, (_pid: number) => {
-        // we will need PID for canceling the job
+    const controller = this.getAbortControllerForRun(
+      forScenarioId,
+      cancellables,
+    );
+
+    const interruptIfKilled = async () => {
+      if (controller.signal.aborted) {
+        await workspace.cleanup();
+        this.clearAbortController(forScenarioId);
+        throw {
+          stdError: [],
+          signal: 'SIGTERM',
+        };
+      }
+    };
+
+    await interruptIfKilled();
+    await inputFiles.include(workspace, assets);
+
+    return new Promise(async (resolve, reject) => {
+      marxanRun.on('error', async (result) => {
+        await workspace.cleanup();
+        this.clearAbortController(forScenarioId);
+        reject(result);
       });
+      marxanRun.on('finished', async () => {
+        try {
+          await interruptIfKilled();
+          await outputFilesRepository.saveFrom(
+            workspace,
+            forScenarioId,
+            marxanRun.stdOut,
+            [],
+          );
+          await workspace.cleanup();
+          resolve();
+        } catch (error) {
+          reject(error);
+        } finally {
+          this.clearAbortController(forScenarioId);
+        }
+      });
+
+      try {
+        await interruptIfKilled();
+        marxanRun.executeIn(workspace);
+      } catch (error) {
+        this.clearAbortController(forScenarioId);
+        reject(error);
+      }
+    });
+  }
 
       this.marxanRunner.on(
         'error',

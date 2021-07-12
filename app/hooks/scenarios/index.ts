@@ -10,6 +10,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 import { ItemProps } from 'components/scenarios/item/component';
 
+import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
 import DOWNLOADS from 'services/downloads';
@@ -201,6 +202,29 @@ export function useDeleteScenario({
       console.info('Error', error, variables, context);
     },
   });
+}
+
+export function useScenariosStatus(pid) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios-status', pid], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${pid}/scenarios/status`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }), {
+    enabled: !!pid,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data?.data,
+    };
+  }, [query, data?.data?.data]);
 }
 
 export function useUploadScenarioPU({

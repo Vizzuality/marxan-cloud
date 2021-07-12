@@ -5,7 +5,7 @@ import { useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
-import { useDeleteScenario, useScenarios } from 'hooks/scenarios';
+import { useDeleteScenario, useScenarios, useScenariosStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import useBottomScrollListener from 'hooks/scroll';
 
@@ -68,6 +68,14 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     },
     sort,
   });
+
+  const {
+    data: scenariosStatusData,
+    isFetching: scenariosStatusIsFetching,
+    isFetched: scenariosStatusIsFetched,
+  } = useScenariosStatus(pid);
+
+  console.info(scenariosStatusData, scenariosStatusIsFetching, scenariosStatusIsFetched);
 
   const scrollRef = useBottomScrollListener(
     () => {
@@ -175,17 +183,19 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                   return (
                     <TAG
                       key={`${s.id}`}
-                      id={`${s.id}`}
-                      title="Scenarios list"
-                      subtitle="project detail"
-                      content={(
-                        <div>
-                          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                          Beatae ratione cumque in nobis fugiat,
-                          neque ullam aliquam, commodi dolorem unde inventore eaque,
-                          dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
-                        </div>
-                      )}
+                      {...i === 0 && {
+                        id: `${s.id}`,
+                        title: 'Scenarios list',
+                        subtitle: 'project detail',
+                        content: (
+                          <div>
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                            Beatae ratione cumque in nobis fugiat,
+                            neque ullam aliquam, commodi dolorem unde inventore eaque,
+                            dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
+                          </div>
+                        ),
+                      }}
                     >
                       <div
                         className={cx({

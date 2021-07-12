@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { motion } from 'framer-motion';
 
@@ -13,7 +13,7 @@ import Icon from 'components/icon';
 import Modal from 'components/modal';
 
 import { useQueryClient } from 'react-query';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { useScenario } from 'hooks/scenarios';
 import { useSelectedFeatures } from 'hooks/features';
@@ -28,21 +28,25 @@ export interface ScenariosSidebarWDPAProps {
 export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   const [step, setStep] = useState(0);
   const [modal, setModal] = useState(false);
-  const { query } = useRouter();
+  const { query, push } = useRouter();
   const { pid, sid } = query;
 
   const queryClient = useQueryClient();
 
-  const scenarioSlice = getScenarioSlice(sid);
-  const { setTab } = scenarioSlice.actions;
+  getScenarioSlice(sid);
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-  const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
   const {
     data: selectedFeaturesData,
-  } = useSelectedFeatures({});
+  } = useSelectedFeatures(sid, {});
+
+  useEffect(() => {
+    return () => {
+      setStep(0);
+    };
+  }, [tab]);
 
   if (!scenarioData || tab !== 'features') return null;
 
@@ -115,7 +119,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
         {step === 1 && (
           <TargetFeatures
             onBack={() => setStep(step - 1)}
-            onSuccess={() => dispatch(setTab('analysis'))}
+            onSuccess={() => push(`/projects/${pid}`)}
           />
         )}
       </Pill>

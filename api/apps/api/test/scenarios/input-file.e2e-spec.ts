@@ -48,8 +48,12 @@ describe(`when a user updates scenario with input data`, () => {
   });
 
   it(`should return the same metadata when accessing with x-api-key`, async () => {
-    expect(await fixtures.ThenScenarioHasMetadataForMarxan(scenarioId))
-      .toMatchInlineSnapshot(`
+    expect(
+      (await fixtures.ThenScenarioHasMetadataForMarxan(scenarioId)).replace(
+        /^_CLOUD_GENERATED_AT (.*)$/gm,
+        '_CLOUD_GENERATED_AT __ISO_DATE__',
+      ),
+    ).toMatchInlineSnapshot(`
       "PROP 1.5
       COOLFAC 5
       NUMITNS 1000003
@@ -65,6 +69,10 @@ describe(`when a user updates scenario with input data`, () => {
       COSTTHRESH 7
       THRESHPEN1 8
       THRESHPEN2 9
+      _CLOUD_SCENARIO Save the world species
+      _CLOUD_PROJECT Humanity for living.
+      _CLOUD_ORGANIZATION Fresh Alaska array
+      _CLOUD_GENERATED_AT __ISO_DATE__
       INPUTDIR input
       PUNAME pu.dat
       SPECNAME spec.dat
@@ -156,11 +164,22 @@ async function getFixtures() {
   const fixtures = {
     async GivenScenarioExists() {
       jwtToken = await GivenUserIsLoggedIn(app);
-      const { projectId, cleanup } = await GivenProjectExists(app, jwtToken);
+      const { projectId, cleanup } = await GivenProjectExists(
+        app,
+        jwtToken,
+        {
+          countryCode: 'NAM',
+          name: 'Humanity for living.',
+        },
+        {
+          name: 'Fresh Alaska array',
+        },
+      );
       cleanups.push(cleanup);
       const scenario = await ScenariosTestUtils.createScenario(app, jwtToken, {
         ...E2E_CONFIG.scenarios.valid.minimal(),
         projectId,
+        name: 'Save the world species',
       });
       cleanups.push(() => scenarios.delete(scenario.data.id));
       return scenario.data;

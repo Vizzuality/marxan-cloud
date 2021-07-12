@@ -3,9 +3,7 @@ import {
   IsISO31661Alpha3,
   IsEnum,
   IsPositive,
-  ValidateNested,
 } from 'class-validator';
-import { Polygon } from 'geojson';
 
 /**
  * @todo We have this enum duplicated in the api service

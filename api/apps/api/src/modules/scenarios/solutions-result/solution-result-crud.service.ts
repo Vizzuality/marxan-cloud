@@ -9,64 +9,63 @@ import {
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { FetchSpecification } from 'nestjs-base-service';
-import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
 
 @Injectable()
 export class SolutionResultCrudService extends AppBaseService<
-  ScenariosOutputResultsGeoEntity,
+ScenariosOutputResultsApiEntity,
   never,
   never,
   AppInfoDTO
 > {
   constructor(
     @InjectRepository(
-      ScenariosOutputResultsGeoEntity,
-      DbConnections.geoprocessingDB,
+      ScenariosOutputResultsApiEntity
     )
-    protected readonly repository: Repository<ScenariosOutputResultsGeoEntity>,
+    protected readonly repository: Repository<ScenariosOutputResultsApiEntity>,
   ) {
     super(repository, 'solution', 'solutions', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
     });
   }
 
-  get serializerConfig(): JSONAPISerializerConfig<ScenariosOutputResultsGeoEntity> {
+  get serializerConfig(): JSONAPISerializerConfig<ScenariosOutputResultsApiEntity> {
     return {
       attributes: [
         'id',
-        'planningUnits',
+        'runId',
+        'scoreValue',
+        'costValue',
         'missingValues',
-        'cost',
-        'score',
-        'run',
+        'planningUnits'
       ],
       keyForAttribute: 'camelCase',
     };
   }
 
   async extendFindAllResults(
-    entitiesAndCount: [ScenariosOutputResultsGeoEntity[], number],
+    entitiesAndCount: [ScenariosOutputResultsApiEntity[], number],
     _fetchSpecification?: FetchSpecification,
     _info?: AppInfoDTO,
-  ): Promise<[ScenariosOutputResultsGeoEntity[], number]> {
-    const extendedEntities: Promise<ScenariosOutputResultsGeoEntity>[] = entitiesAndCount[0].map(
+  ): Promise<[ScenariosOutputResultsApiEntity[], number]> {
+    const extendedEntities: Promise<ScenariosOutputResultsApiEntity>[] = entitiesAndCount[0].map(
       (entity) => this.extendGetByIdResult(entity),
     );
     return [await Promise.all(extendedEntities), entitiesAndCount[1]];
   }
 
   async extendGetByIdResult(
-    entity: ScenariosOutputResultsGeoEntity,
+    entity: ScenariosOutputResultsApiEntity,
     _fetchSpecification?: FetchSpecification,
     _info?: AppInfoDTO,
-  ): Promise<ScenariosOutputResultsGeoEntity> {
+  ): Promise<ScenariosOutputResultsApiEntity> {
     // TODO implement
+    entity.scoreValue = 999;
+    entity.costValue = 400;
     entity.planningUnits = 17;
     entity.missingValues = 13;
-    entity.cost = 400;
-    entity.score = 999;
-    entity.run = 1;
+    entity.runId = 1;
+
     return entity;
   }
 }

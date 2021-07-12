@@ -15,8 +15,6 @@ import { bootstrapApplication } from './utils/api-application';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { FeaturesTestUtils } from './utils/features.test.utils';
 
-const logger = new Logger('test-vtiles');
-
 afterAll(async () => {
   await tearDown();
 });
@@ -40,7 +38,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
   const country = 'NAM';
   const l1AdminArea = 'NAM.13_1';
   const l2AdminArea = 'NAM.13.5_1';
-  const geoFeaturesFilters = {
+  const _geoFeaturesFilters = {
     cheeta: { featureClassName: 'iucn_acinonyxjubatus', alias: 'cheetah' },
     partialMatches: { us: 'us' },
   };
@@ -110,7 +108,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
       test.todo('Irregular planning units vector tiles');
 
       test('Should give back a valid request for preview', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get('/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt')
           .set('Accept-Encoding', 'gzip, deflate')
           .set('Authorization', `Bearer ${jwtToken}`)
@@ -118,32 +116,32 @@ describe('ProxyVectorTilesModule (e2e)', () => {
       });
       describe('Filter by guid', () => {
         test('guid country level should be visible', async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .get('/api/v1/administrative-areas/0/preview/tiles/6/30/25.mvt')
             .set('Authorization', `Bearer ${jwtToken}`)
             .expect(HttpStatus.OK);
         });
         test('guid adm1 level should be visible', async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .get('/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt')
             .set('Authorization', `Bearer ${jwtToken}`)
             .expect(HttpStatus.OK);
         });
         test('guid adm2 level should be visible', async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .get('/api/v1/administrative-areas/2/preview/tiles/6/30/25.mvt')
             .set('Authorization', `Bearer ${jwtToken}`)
             .expect(HttpStatus.OK);
         });
         test('guid level > 2 should not be allowed', async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .get('/api/v1/administrative-areas/3/preview/tiles/6/30/25.mvt')
             .set('Authorization', `Bearer ${jwtToken}`)
             .expect(HttpStatus.BAD_REQUEST);
         });
       });
       test('User should be able to filter by bbox', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get(
             '/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt?bbox=[10,10,5,5]',
           )
@@ -151,7 +149,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
           .expect(HttpStatus.OK);
       });
       test('Should throw a 400 error if filtering by z level greater than 20', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get('/api/v1/administrative-areas/0/preview/tiles/21/30/25.mvt')
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.BAD_REQUEST);
@@ -159,13 +157,13 @@ describe('ProxyVectorTilesModule (e2e)', () => {
     });
     describe('WDPA preview vector tiles.', () => {
       test('Should give back a valid request for wdpa preview tile', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get('/api/v1/protected-areas/preview/tiles/6/30/25.mvt')
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
       test('User should be able to filter by bbox', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get(
             '/api/v1/protected-areas/preview/tiles/6/30/25.mvt?bbox=[10,10,5,5]',
           )
@@ -173,7 +171,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
           .expect(HttpStatus.OK);
       });
       test('Filter by wdpa id', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get(
             '/api/v1/protected-areas/preview/tiles/6/30/25.mvt?id=e5c3b978-908c-49d3-b1e3-89727e9f999c',
           )
@@ -183,17 +181,15 @@ describe('ProxyVectorTilesModule (e2e)', () => {
     });
     describe('Feature preview vector tiles.', () => {
       test('Should give back a valid request for a feature preview', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get(`/api/v1/geo-features/${aFeature.id}/preview/tiles/6/30/25.mvt`)
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
-
-        logger.error(typeof response.body);
       });
     });
     describe('PUs layer previews', () => {
       test('Should give back a valid request for a regular hexagon PUs vector tile preview', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get(
             '/api/v1/planning-units/preview/regular/hexagon/100/tiles/6/30/25.mvt',
           )
@@ -201,7 +197,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
           .expect(HttpStatus.OK);
       });
       test('Should give back a valid request for a regular square PUs vector tile preview', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get(
             '/api/v1/planning-units/preview/regular/square/100/tiles/6/30/25.mvt',
           )
@@ -209,7 +205,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
           .expect(HttpStatus.OK);
       });
       test('Should give back a error if the regular grid is not square or hexagon', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get(
             '/api/v1/planning-units/preview/regular/te/100/tiles/6/30/25.mvt',
           )
@@ -219,7 +215,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
     });
     describe('Scenario PUs layers', () => {
       test('Should give back a valid request for a scenario PUs', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get(
             `/api/v1/scenarios/${aScenario.id}/planning-units/tiles/6/30/25.mvt`,
           )

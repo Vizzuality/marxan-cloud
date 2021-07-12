@@ -3,11 +3,12 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import Button from 'components/button';
+import Loading from 'components/loading';
 
 import Toolbar from 'layout/scenarios/sidebar/features/add/toolbar';
 import List from 'layout/scenarios/sidebar/features/add/list';
 
-import { useAllFeatures, useSelectedFeatures } from 'hooks/features';
+import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 import { useRouter } from 'next/router';
 
 export interface ScenariosFeaturesAddProps {
@@ -18,15 +19,18 @@ export interface ScenariosFeaturesAddProps {
 export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   onDismiss,
 }: ScenariosFeaturesAddProps) => {
+  const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState(null);
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid, sid } = query;
+
+  const selectedFeaturesMutation = useSaveSelectedFeatures({});
 
   const {
     data: selectedFeaturesData,
-  } = useSelectedFeatures({});
+  } = useSelectedFeatures(sid, {});
 
   const {
     isFetched: allFeaturesIsFetched,
@@ -74,10 +78,39 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   }, []);
 
   const onSubmit = useCallback((values) => {
+    const { selected } = values;
+
+    setSubmitting(true);
+
     // Save current features then dismiss the modal
-    console.info(values);
-    onDismiss();
-  }, [onDismiss]);
+    selectedFeaturesMutation.mutate({
+      id: `${sid}`,
+      data: {
+        status: 'draft',
+        features: selected.map((s) => {
+          const {
+            marxanSettings,
+            geoprocessingOperations,
+          } = selectedFeaturesData.find((sf) => sf.featureId === s) || {};
+
+          return {
+            featureId: s,
+            kind: geoprocessingOperations ? 'withGeoprocessing' : 'plain',
+            ...!!marxanSettings && { marxanSettings },
+            ...!!geoprocessingOperations && { geoprocessingOperations },
+          };
+        }),
+      },
+    }, {
+      onSuccess: () => {
+        onDismiss();
+        setSubmitting(false);
+      },
+      onError: () => {
+        setSubmitting(false);
+      },
+    });
+  }, [sid, selectedFeaturesData, selectedFeaturesMutation, onDismiss]);
 
   const onCancel = useCallback(() => {
     onDismiss();
@@ -92,6 +125,13 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
           <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">Add features to your planning area</h2>
+
+          <Loading
+            visible={submitting}
+            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
+            iconClassName="w-10 h-10 text-primary-500"
+          />
+
           <Toolbar
             search={search}
             filters={filters}
@@ -133,6 +173,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
                 className="w-full"
                 theme="primary"
                 size="lg"
+                disabled={submitting}
               >
                 Save
               </Button>

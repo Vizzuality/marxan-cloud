@@ -21,7 +21,7 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { CostSurfaceTemplateModule } from './cost-surface-template';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosOutputResultsApiEntity, ScenariosPuOutputGeoEntity } from '@marxan/scenarios-planning-unit';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { CostSurfaceViewModule } from './cost-surface-readmodel/cost-surface-view.module';
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
@@ -36,15 +36,17 @@ import { SpecDatModule } from './input-files/spec.dat.module';
 
 import { MarxanRunService } from './marxan-run/marxan-run.service';
 import { MarxanRunController } from './marxan-run/marxan-run.controller';
+import { OutputFilesModule } from './output-files/output-files.module';
+import { ZipFilesSerializer } from './dto/zip-files.serializer';
 
 @Module({
   imports: [
     CqrsModule,
     ProtectedAreasModule,
     forwardRef(() => ProjectsModule),
-    TypeOrmModule.forFeature([Project, Scenario]),
+    TypeOrmModule.forFeature([Project, Scenario, ScenariosOutputResultsApiEntity]),
     TypeOrmModule.forFeature(
-      [ScenariosOutputResultsGeoEntity],
+      [ScenariosPuOutputGeoEntity],
       DbConnections.geoprocessingDB,
     ),
     UsersModule,
@@ -56,6 +58,7 @@ import { MarxanRunController } from './marxan-run/marxan-run.controller';
     CostSurfaceViewModule,
     SpecDatModule,
     PlanningUnitsProtectionLevelModule,
+    OutputFilesModule,
   ],
   providers: [
     ScenariosService,
@@ -69,6 +72,7 @@ import { MarxanRunController } from './marxan-run/marxan-run.controller';
     MarxanInput,
     InputParameterFileProvider,
     MarxanRunService,
+    ZipFilesSerializer,
     {
       provide: ioSettingsToken,
       useFactory: () => {

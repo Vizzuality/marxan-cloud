@@ -6,10 +6,10 @@ import * as nock from 'nock';
 import { v4 } from 'uuid';
 
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
-import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
 
-import { bootstrapApplication } from '../../utils';
-import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
+import { bootstrapApplication, delay } from '../../utils';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -21,6 +21,11 @@ describe(`given input data is available`, () => {
   beforeEach(() => {
     fixtures.GivenInputFilesAreAvailable();
   });
+  test(`marxan run during binary execution`, async () => {
+    await fixtures.GivenMarxanIsRunning();
+
+    // expect(await fixtures.ThenExecutionOutput()).toBeGreaterThan(0);
+  }, 60000);
 
   test(`marxan run`, async () => {
     await fixtures.WhenRunningMarxan();
@@ -40,8 +45,11 @@ const getFixtures = async () => {
 
   const app = await bootstrapApplication();
   const sut: MarxanSandboxRunnerService = app.get(MarxanSandboxRunnerService);
-  const tempRepoReference: Repository<ScenariosOutputResultsGeoEntity> = app.get(
-    getRepositoryToken(ScenariosOutputResultsGeoEntity),
+  const tempRepoReference: Repository<ScenariosOutputResultsApiEntity> = app.get(
+    getRepositoryToken(
+      ScenariosOutputResultsApiEntity,
+      geoprocessingConnections.apiDB,
+    ),
   );
 
   const nockScope = nock(host, {

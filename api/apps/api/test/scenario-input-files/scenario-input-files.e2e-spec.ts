@@ -22,7 +22,13 @@ describe(`when getting spec.dat`, () => {
 
 describe(`when getting input.dat`, () => {
   it(`should resolve text/*`, async () => {
-    expect((await world.WhenGettingInputDat()).text).toMatchInlineSnapshot(`
+    const text = (await world.WhenGettingInputDat()).text;
+    expect(
+      text.replace(
+        /^_CLOUD_GENERATED_AT (.*)$/gm,
+        '_CLOUD_GENERATED_AT __ISO_DATE__',
+      ),
+    ).toMatchInlineSnapshot(`
       "PROP 0.5
       COOLFAC 0
       NUMITNS 1000000
@@ -38,6 +44,10 @@ describe(`when getting input.dat`, () => {
       COSTTHRESH 0
       THRESHPEN1 0
       THRESHPEN2 0
+      _CLOUD_SCENARIO Save the world species
+      _CLOUD_PROJECT Humanity for living.
+      _CLOUD_ORGANIZATION Alaska
+      _CLOUD_GENERATED_AT __ISO_DATE__
       INPUTDIR input
       PUNAME pu.dat
       SPECNAME spec.dat

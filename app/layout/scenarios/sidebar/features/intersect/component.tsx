@@ -7,30 +7,32 @@ import Button from 'components/button';
 import Toolbar from 'layout/scenarios/sidebar/features/intersect/toolbar';
 import List from 'layout/scenarios/sidebar/features/intersect/list';
 
-import { useAllFeatures, useSelectedFeatures } from 'hooks/features';
+import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 import { useRouter } from 'next/router';
 
 export interface ScenariosFeaturesIntersectProps {
   intersecting: string;
-  onSuccess?: () => void;
   onDismiss?: () => void;
 }
 
 export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProps> = ({
   intersecting,
-  onSuccess,
   onDismiss,
 }: ScenariosFeaturesIntersectProps) => {
+  const [submitting, setSubmitting] = useState(null);
   const [search, setSearch] = useState(null);
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid, sid } = query;
+
+  const selectedFeaturesMutation = useSaveSelectedFeatures({});
 
   const {
     data: selectedFeaturesData,
-  } = useSelectedFeatures({});
+  } = useSelectedFeatures(sid, {}, {
+    refetchOnMount: false,
+  });
 
   const intersectingCurrent = selectedFeaturesData.find((s) => s.id === intersecting);
-  console.info(intersectingCurrent);
 
   const {
     isFetched: allFeaturesIsFetched,
@@ -52,7 +54,7 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
   }, [intersectingCurrent]);
 
   const onSelected = useCallback((feature, input) => {
-    const { id, name } = feature;
+    const { id } = feature;
     const { value, onChange } = input;
     const intersections = [...value];
 
@@ -61,13 +63,49 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
     if (intersectionsIndex !== -1) {
       intersections.splice(intersectionsIndex, 1);
     } else {
-      intersections.push({
-        id,
-        name,
-        splitSelected: null,
-        splitFeaturesSelected: [],
-      });
+      intersections.push(feature);
     }
+    onChange(intersections);
+  }, []);
+
+  const onSplitSelected = useCallback((id, key, input) => {
+    const { value, onChange } = input;
+    const intersections = [...value];
+
+    const feature = intersections.find((f) => f.id === id);
+    const featureIndex = intersections.findIndex((f) => f.id === id);
+
+    const { splitOptions } = feature;
+
+    const splitFeaturesOptions = key ? splitOptions
+      .find((s) => s.key === key).values
+      .map((v) => ({ label: v.name, value: v.id }))
+      : [];
+
+    intersections[featureIndex] = {
+      ...feature,
+      splitSelected: key,
+      splitFeaturesOptions,
+      splitFeaturesSelected: splitFeaturesOptions.map((s) => ({
+        id: s.value,
+        name: s.label,
+      })),
+    };
+
+    onChange(intersections);
+  }, []);
+
+  const onSplitFeaturesSelected = useCallback((id, key, input) => {
+    const { value, onChange } = input;
+    const intersections = [...value];
+
+    const feature = intersections.find((f) => f.id === id);
+    const featureIndex = intersections.findIndex((f) => f.id === id);
+
+    intersections[featureIndex] = {
+      ...feature,
+      splitFeaturesSelected: key,
+    };
     onChange(intersections);
   }, []);
 
@@ -77,10 +115,58 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
 
   const onSubmit = useCallback((values) => {
     // Save current features then dismiss the modal
-    console.info(values);
-    onSuccess();
-    onDismiss();
-  }, [onSuccess, onDismiss]);
+    const { selected } = values;
+
+    setSubmitting(true);
+
+    // Save current features then dismiss the modal
+    selectedFeaturesMutation.mutate({
+      id: `${sid}`,
+      data: {
+        status: 'draft',
+        features: selectedFeaturesData.map((sf) => {
+          const { featureId, marxanSettings, geoprocessingOperations } = sf;
+          if (featureId !== intersecting) {
+            return {
+              featureId,
+              kind: geoprocessingOperations ? 'withGeoprocessing' : 'plain',
+              ...!!marxanSettings && { marxanSettings },
+              ...!!geoprocessingOperations && { geoprocessingOperations },
+            };
+          }
+
+          return {
+            featureId,
+            kind: 'withGeoprocessing',
+            geoprocessingOperations: selected.map((s) => {
+              const { splitSelected, splitFeaturesSelected } = s;
+
+              return {
+                kind: 'stratification/v1',
+                intersectWith: {
+                  featureId,
+                },
+                splitByProperty: splitSelected,
+                splits: splitFeaturesSelected.map((sfs) => {
+                  return {
+                    value: sfs.id,
+                  };
+                }),
+              };
+            }),
+          };
+        }),
+      },
+    }, {
+      onSuccess: () => {
+        onDismiss();
+        setSubmitting(false);
+      },
+      onError: () => {
+        setSubmitting(false);
+      },
+    });
+  }, [sid, intersecting, selectedFeaturesData, selectedFeaturesMutation, onDismiss]);
 
   const onCancel = useCallback(() => {
     onDismiss();
@@ -113,6 +199,12 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
                 onSelected={(id) => {
                   onSelected(id, input);
                 }}
+                onSplitSelected={(id, key) => {
+                  onSplitSelected(id, key, input);
+                }}
+                onSplitFeaturesSelected={(id, key) => {
+                  onSplitFeaturesSelected(id, key, input);
+                }}
               />
             )}
           </FieldRFF>
@@ -133,6 +225,7 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
                 className="w-full"
                 theme="primary"
                 size="lg"
+                disabled={submitting}
               >
                 Save
               </Button>

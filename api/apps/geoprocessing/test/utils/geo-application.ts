@@ -7,7 +7,7 @@ import {
 import { AppModule } from '../../src/app.module';
 
 export const bootstrapApplication = async (
-  providers?: ModuleMetadata['providers'],
+  _providers?: ModuleMetadata['providers'],
 ): Promise<INestApplication> => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],

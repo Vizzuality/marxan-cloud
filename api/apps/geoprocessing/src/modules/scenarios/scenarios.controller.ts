@@ -16,7 +16,6 @@ import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
 import {
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiBadRequestResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';

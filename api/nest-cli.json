@@ -89,6 +89,15 @@
         "tsConfigPath": "libs/marxan-input/tsconfig.lib.json"
       }
     },
+    "marxan-output": {
+      "type": "library",
+      "root": "libs/marxan-output",
+      "entryFile": "index",
+      "sourceRoot": "libs/marxan-output/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/marxan-output/tsconfig.lib.json"
+      }
+    },
     "planning-area-repository": {
       "type": "library",
       "root": "libs/planning-area-repository",

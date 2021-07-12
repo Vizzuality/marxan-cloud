@@ -6,21 +6,29 @@ import { E2E_CONFIG } from '../e2e.config';
 export const GivenProjectExists = async (
   app: INestApplication,
   jwt: string,
+  projectData?: {
+    countryCode: string;
+    adminAreaLevel1Id?: string;
+    adminAreaLevel2Id?: string;
+    name?: string;
+  },
+  organizationData?: {
+    name?: string;
+  },
 ): Promise<{
   projectId: string;
   organizationId: string;
   cleanup: () => Promise<void>;
 }> => {
   const organizationId = (
-    await OrganizationsTestUtils.createOrganization(
-      app,
-      jwt,
-      E2E_CONFIG.organizations.valid.minimal(),
-    )
+    await OrganizationsTestUtils.createOrganization(app, jwt, {
+      ...E2E_CONFIG.organizations.valid.minimal(),
+      ...(organizationData?.name ? { name: organizationData.name } : {}),
+    })
   ).data.id;
   const projectId = (
     await ProjectsTestUtils.createProject(app, jwt, {
-      ...E2E_CONFIG.projects.valid.minimal(),
+      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea(projectData),
       organizationId,
     })
   ).data.id;

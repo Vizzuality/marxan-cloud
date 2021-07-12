@@ -7,6 +7,8 @@ import {
 import { JobStatus, Scenario, ScenarioType } from './scenario.api.entity';
 import { ScenariosCrudService } from './scenarios-crud.service';
 
+jest.useFakeTimers('modern').setSystemTime(new Date('2020-01-01').getTime());
+
 jest.mock('config', () => ({
   get: () => 'value',
   has: () => true,
@@ -42,6 +44,10 @@ NUMREPS 100
 MARXANRUNKEY1 value1
 MARXANRUNKEY2 value2
 MARXANRUNKEY3 3
+_CLOUD_SCENARIO Scenario Name
+_CLOUD_PROJECT Project Name
+_CLOUD_ORGANIZATION NA
+_CLOUD_GENERATED_AT 2020-01-01T00:00:00.000Z
 INPUTDIR input
 PUNAME pu.dat
 SPECNAME spec.dat
@@ -73,6 +79,10 @@ NUMREPS 100
 MARXANRUNKEY1 value1
 MARXANRUNKEY2 value2
 MARXANRUNKEY3 3
+_CLOUD_SCENARIO Scenario Name
+_CLOUD_PROJECT Project Name
+_CLOUD_ORGANIZATION NA
+_CLOUD_GENERATED_AT 2020-01-01T00:00:00.000Z
 INPUTDIR input
 PUNAME pu.dat
 SPECNAME spec.dat
@@ -95,7 +105,11 @@ describe(`when a scenario without parameters`, () => {
 
   // then
   it(`should return a file with only io settings`, () => {
-    expect(parameterFile).toEqual(`INPUTDIR input
+    expect(parameterFile).toEqual(`_CLOUD_SCENARIO Scenario Name
+_CLOUD_PROJECT Project Name
+_CLOUD_ORGANIZATION NA
+_CLOUD_GENERATED_AT 2020-01-01T00:00:00.000Z
+INPUTDIR input
 PUNAME pu.dat
 SPECNAME spec.dat
 PUVSPRNAME puvspr.dat
@@ -148,8 +162,19 @@ async function getFixtures() {
         createdByUser: {} as any,
         id: 'anId',
         lastModifiedAt: new Date(),
-        name: '',
+        name: 'Scenario Name',
         projectId: '',
+        project: {
+          name: 'Project Name',
+          id: '',
+          createdByUser: {} as any,
+          createdAt: new Date(),
+          lastModifiedAt: new Date(),
+          organizationId: '',
+          createdBy: '',
+          countryId: '',
+          bbox: [0, 0, 0, 0, 0, 0],
+        },
         status: JobStatus.done,
         type: ScenarioType.marxanWithZones,
         users: [],

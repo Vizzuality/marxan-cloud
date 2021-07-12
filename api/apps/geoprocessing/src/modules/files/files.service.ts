@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { createReadStream } from 'fs';
 import { Extract } from 'unzipper';
 import * as path from 'path';
-import { unlink, rmdir, readdir } from 'fs/promises';
+import { unlink, rmdir } from 'fs/promises';
 
 @Injectable()
 export class FileService {
