@@ -57,12 +57,12 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
               <div className="w-7/12 pr-12">
 
                 <h2
-                  className="mt-3 mb-10 text-4xl font-semibold text-left font-heading"
+                  className="mt-5 mb-12 text-4xl font-medium text-left font-heading"
                 >
                   { name}
                 </h2>
 
-                <p className="mb-10 text-base leading-normal text-gray-400">
+                <p className="mb-10 text-sm leading-normal text-gray-400">
                   {description}
                 </p>
 
@@ -94,7 +94,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                   </div>
 
                   <div>
-                    <h3 className="mb-6 text-sm font-semibold text-white">Planning Área</h3>
+                    <h3 className="mb-6 text-sm font-semibold text-white">Planning area</h3>
                     <p className="text-lg text-white">{planningAreaName}</p>
                   </div>
 
@@ -118,7 +118,10 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                 </div>
               </div>
 
-              <div className="w-5/12 h-auto">
+              <div
+                className="w-5/12 mt-6"
+                style={{ maxHeight: 500 }}
+              >
                 <PublishedProjectMap />
               </div>
 

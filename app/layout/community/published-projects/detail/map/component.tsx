@@ -24,7 +24,9 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
     setBounds({
       bbox,
       options: { padding: 50 },
-      viewportOptions: { transitionDuration: 0 },
+      viewportOptions: {
+        transitionDuration: 0,
+      },
     });
   }, [bbox]);
 
@@ -37,7 +39,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
       {id && (
         <motion.div
           key="project-map"
-          className="relative w-full h-full col-span-5 overflow-hidden rounded-4xl"
+          className="relative w-full h-full col-span-5 overflow-hidden pointer-events-none rounded-4xl"
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
@@ -51,6 +53,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
             mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
             onMapViewportChange={handleViewportChange}
             doubleClickZoom={false}
+            dragPan={false}
           />
 
         </motion.div>
