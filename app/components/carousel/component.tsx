@@ -36,7 +36,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
         </div>
       </div>
       {slider && (
-      <div className="flex flex-row items-center justify-center py-10">
+      <div className="flex flex-row items-center justify-center h-28">
         {[...Array(slider.details().size).keys()].map((i) => {
           return (
             <button
@@ -46,7 +46,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
               onClick={() => {
                 slider.moveToSlideRelative(i);
               }}
-              className={`mx-2 w-14 ${currentSlide === i ? 'bg-blue-500 h-0.5' : 'bg-gray-300 h-px'}`}
+              className={`mx-0.5 w-20 ${currentSlide === i ? 'bg-blue-500 h-0.5' : 'bg-gray-300 h-px'}`}
             />
           );
         })}
