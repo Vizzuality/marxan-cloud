@@ -132,6 +132,14 @@ export function usePUGridLayer({
       render: {
         layers: [
           {
+            type: 'fill',
+            'source-layer': 'layer0',
+            paint: {
+              'fill-color': '#000',
+              'fill-opacity': 0,
+            },
+          },
+          {
             type: 'line',
             'source-layer': 'layer0',
             paint: {
