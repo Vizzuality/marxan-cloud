@@ -1,24 +1,27 @@
 import CarouselImage1 from 'images/carousel-1.png';
+import CarouselImage2 from 'images/carousel-2.png';
+import CarouselImage3 from 'images/carousel-3.png';
+import CarouselImage4 from 'images/carousel-4.png';
 
 export const IMAGES = [
   {
-    alt: 'carousel',
+    alt: 'project-features',
     id: 1,
     src: CarouselImage1,
   },
   {
-    alt: 'carousel',
+    alt: 'project-features',
     id: 2,
-    src: CarouselImage1,
+    src: CarouselImage2,
   },
   {
-    alt: 'carousel',
+    alt: 'project-analysis',
     id: 3,
-    src: CarouselImage1,
+    src: CarouselImage3,
   },
   {
-    alt: 'carousel',
+    alt: 'project-solutions',
     id: 4,
-    src: CarouselImage1,
+    src: CarouselImage4,
   },
 ];
