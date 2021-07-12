@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { format } from 'd3';
 
 import { usePublishedProject } from 'hooks/projects';
+import { useScenarios } from 'hooks/scenarios';
 
 import Avatar from 'components/avatar';
 import Loading from 'components/loading';
@@ -30,7 +31,17 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   } = usePublishedProject(pid);
 
   const {
-    id, description, name, planningAreaName, timesDuplicated, scenarios,
+    data: publishedprojectScenariosData,
+    isFetched: publishedprojectScenariosIsFetched,
+  } = useScenarios(pid, {
+    filters: {
+      projectId: pid,
+    },
+    sort: '-lastModifiedAt',
+  });
+
+  const {
+    id, description, name, planningAreaName, timesDuplicated,
   } = publishedProject || {};
 
   return (
@@ -100,15 +111,18 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                   <div>
                     <h3 className="mb-6 text-sm font-semibold text-white">Scenarios</h3>
-                    {scenarios && (
+                    {publishedprojectScenariosData && publishedprojectScenariosIsFetched && (
                       <>
-                        <p className="text-sm text-white">Marxan Standard</p>
                         <p className="text-sm text-white">
-                          {scenarios.length}
+                          {publishedprojectScenariosData.length}
                           {' '}
                           scenarios
                         </p>
-                        <p className="text-sm text-white">Last creation: 2 days ago</p>
+                        <p className="text-sm text-white">
+                          Last creation:
+                          {' '}
+                          {publishedprojectScenariosData[0].lastUpdateDistance}
+                        </p>
                       </>
                     )}
                   </div>
