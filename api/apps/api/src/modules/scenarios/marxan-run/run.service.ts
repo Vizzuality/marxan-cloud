@@ -4,7 +4,7 @@ import { FactoryProvider, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { assertDefined, isDefined } from '@marxan/utils';
-import { JobData, ProgressData, queueName } from '@marxan/scenario-run-queue';
+import { JobData, queueName } from '@marxan/scenario-run-queue';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { QueueBuilder, QueueEventsBuilder } from '@marxan-api/modules/queue';
@@ -33,10 +33,6 @@ export type NotFound = typeof notFound;
 
 @Injectable()
 export class RunService {
-  private canceledProgressData: ProgressData = {
-    canceled: true,
-  };
-
   constructor(
     @Inject(runQueueToken)
     private readonly queue: Queue<JobData>,
@@ -78,7 +74,10 @@ export class RunService {
     if (!isDefined(scenarioJob)) return left(notFound);
 
     if (await scenarioJob.isActive())
-      await scenarioJob.updateProgress(this.canceledProgressData);
+      await scenarioJob.updateProgress({
+        canceled: true,
+        scenarioId,
+      });
     else if (await scenarioJob.isWaiting()) await scenarioJob.remove();
 
     return right(void 0);

@@ -8,5 +8,6 @@ export type JobData = {
   assets: Assets;
 };
 export type ProgressData = {
+  scenarioId: string;
   canceled: boolean;
 };
