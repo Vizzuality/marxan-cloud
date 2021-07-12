@@ -55,13 +55,13 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
           )
         </h3>
         {publishedProjectsIsFetching && (
-        <div className="flex items-center justify-center py-12">
-          <Loading
-            className="w-10 h-10 text-white"
-            iconClassName="w-10 h-10"
-            visible
-          />
-        </div>
+          <div className="flex items-center justify-center py-12">
+            <Loading
+              className="w-10 h-10 text-white"
+              iconClassName="w-10 h-10"
+              visible
+            />
+          </div>
         )}
         {publishedProjectsData && publishedProjectsIsFetched && (
           <table>
