@@ -5,7 +5,7 @@ import { useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
-import { useDeleteScenario, useScenarios } from 'hooks/scenarios';
+import { useDeleteScenario, useScenarios, useScenariosStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import useBottomScrollListener from 'hooks/scroll';
 
@@ -68,6 +68,14 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     },
     sort,
   });
+
+  const {
+    data: scenariosStatusData,
+    isFetching: scenariosStatusIsFetching,
+    isFetched: scenariosStatusIsFetched,
+  } = useScenariosStatus(pid);
+
+  console.info(scenariosStatusData, scenariosStatusIsFetching, scenariosStatusIsFetched);
 
   const scrollRef = useBottomScrollListener(
     () => {
@@ -175,17 +183,19 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                   return (
                     <TAG
                       key={`${s.id}`}
-                      id={`${s.id}`}
-                      title="Scenarios list"
-                      subtitle="project detail"
-                      content={(
-                        <div>
-                          Here you can see listed all the scenarios under the same project.
-                          You can access a scenario and edit it at any time, unless there is
-                          a contributor working on the same scenario. In this case, you will see
-                          a warning.
-                        </div>
-                      )}
+                      {...i === 0 && {
+                        id: `${s.id}`,
+                        title: 'Scenarios list',
+                        subtitle: 'project detail',
+                        content: (
+                          <div>
+                            Here you can see listed all the scenarios under the same project.
+                            You can access a scenario and edit it at any time, unless there is
+                            a contributor working on the same scenario. In this case, you will see
+                            a warning.
+                          </div>
+                        ),
+                      }}
                     >
                       <div
                         className={cx({

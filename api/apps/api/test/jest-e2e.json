@@ -22,6 +22,9 @@
     "@marxan/scenario-cost-surface/(.*)": "<rootDir>/../../../libs/scenario-cost-surface/src/$1",
     "@marxan/scenario-cost-surface": "<rootDir>/../../../libs/scenario-cost-surface/src",
     "@marxan/marxan-input/(.*)": "<rootDir>/../../../libs/marxan-input/src/$1",
-    "@marxan/marxan-input": "<rootDir>/../../../libs/marxan-input/src"
+    "@marxan/marxan-input": "<rootDir>/../../../libs/marxan-input/src",
+    "@marxan/marxan-output": "<rootDir>/../../../libs/marxan-output/src",
+    "@marxan/planning-area-repository/(.*)": "<rootDir>/../../../libs/planning-area-repository/src/$1",
+    "@marxan/planning-area-repository": "<rootDir>/../../../libs/planning-area-repository/src"
   }
 }

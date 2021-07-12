@@ -63,7 +63,6 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
               key={SolutionsSections.DETAILS}
               onChangeSection={onChangeSection}
               onScheduleScenario={() => console.info('Schedule scenario - solutions')}
-              onViewSolutionsTable={() => console.info('View solutions table - solutions')}
               numberOfSchedules={2}
             />
           )}

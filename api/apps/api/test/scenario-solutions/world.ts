@@ -6,7 +6,7 @@ import { GivenProjectExists } from '../steps/given-project';
 import { E2E_CONFIG } from '../e2e.config';
 import { v4 } from 'uuid';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ScenariosOutputResultsGeoEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { Repository } from 'typeorm';
 
@@ -22,10 +22,9 @@ export const createWorld = async () => {
     projectId,
   });
 
-  const marxanOutputRepo: Repository<ScenariosOutputResultsGeoEntity> = app.get(
+  const marxanOutputRepo: Repository<ScenariosOutputResultsApiEntity> = app.get(
     getRepositoryToken(
-      ScenariosOutputResultsGeoEntity,
-      DbConnections.geoprocessingDB,
+      ScenariosOutputResultsApiEntity
     ),
   );
 
@@ -43,7 +42,7 @@ export const createWorld = async () => {
     WhenGettingSolutions: async () =>
       request(app.getHttpServer())
         .get(
-          `/api/v1/scenarios/${scenario.data.id}/marxan/run/${v4()}/solutions`,
+          `/api/v1/scenarios/${scenario.data.id}/marxan/solutions`,
         )
         .set('Authorization', `Bearer ${jwt}`),
     cleanup: async () => {

@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Patch,
@@ -52,9 +53,9 @@ import { ProjectsService, validationFailed } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
-import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { JobType } from './job-status/jobs.enum';
 import { JobStatusSerializer } from './dto/job-status.serializer';
+import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
+import { isLeft } from 'fp-ts/Either';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -190,7 +191,7 @@ export class ProjectsController {
     return this.jobsStatusSerizalizer.serialize(projectId, scenarios);
   }
 
-  @ApiConsumesShapefile(false)
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
     description: 'Upload shapefile for project-specific protected areas',
   })
@@ -208,27 +209,29 @@ export class ProjectsController {
     return;
   }
 
-  @ApiConsumesShapefile(true)
-  @ApiOperation({
+  @ApiConsumesShapefile({
+    withGeoJsonResponse: true,
+    type: PlanningAreaResponseDto,
     description: 'Upload shapefile with project planning-area',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @Post('planning-area/shapefile')
   async shapefileWithProjectPlanningArea(
     @UploadedFile() file: Express.Multer.File,
-  ) {
+  ): Promise<PlanningAreaResponseDto> {
     const result = await this.projectsService.savePlanningAreaFromShapefile(
       file,
     );
-    if (result.isLeft()) {
-      const mapping: Record<ReturnType<typeof result.extract>, () => never> = {
+    if (isLeft(result)) {
+      const mapping: Record<typeof result['left'], () => never> = {
         [validationFailed]: () => {
           throw new BadRequestException();
         },
       };
-      mapping[result.extract()]();
+      mapping[result.left]();
+      throw new InternalServerErrorException();
     }
 
-    return result.extract();
+    return result.right;
   }
 }

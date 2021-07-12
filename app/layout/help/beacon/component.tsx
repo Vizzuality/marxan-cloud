@@ -58,6 +58,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   const onResize = useCallback(() => {
     Object.keys(beacons).forEach((k) => {
       const b = beacons[k];
+      console.log(b);
       if (b.update) b.update();
     });
   }, [beacons]);

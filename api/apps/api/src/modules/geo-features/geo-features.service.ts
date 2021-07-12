@@ -70,6 +70,8 @@ export class GeoFeaturesService extends AppBaseService<
     );
   }
 
+  private forProject?: Project | null;
+
   get serializerConfig(): JSONAPISerializerConfig<GeoFeature> {
     return {
       attributes: [
@@ -138,6 +140,9 @@ export class GeoFeaturesService extends AppBaseService<
      * it is supplied as part of a GET query parsed according to the JSON:API
      * spec), and if a projectId is supplied in either way, we first check if
      * the project exists (if not, we throw a NotFoundException).
+     *
+     * In any case, when we have a projectId, we also limit the selection of
+     * features to those that intersect the project's bbox.
      */
 
     let queryFilteredByPublicOrProjectSpecificFeatures;
@@ -145,12 +150,38 @@ export class GeoFeaturesService extends AppBaseService<
       (info?.params?.projectId as string) ??
       (fetchSpecification?.filter?.projectId as string);
     if (projectId) {
-      await this.projectRepository.findOneOrFail(projectId).catch((_error) => {
-        throw new NotFoundException(`No project with id ${projectId} exists.`);
-      });
+      this.forProject = await this.projectRepository
+        .findOneOrFail(projectId)
+        .then((project) => project)
+        .catch((_error) => {
+          throw new NotFoundException(
+            `No project with id ${projectId} exists.`,
+          );
+        });
+      const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
+        .createQueryBuilder('geoFeatureGeometries')
+        .where(
+          `st_intersects(
+        st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
+        "geoFeatureGeometries".the_geom
+      )`,
+          {
+            xmin: this.forProject.bbox[1],
+            ymin: this.forProject.bbox[3],
+            xmax: this.forProject.bbox[0],
+            ymax: this.forProject.bbox[2],
+          },
+        )
+        .getMany()
+        .then((result) => result.map((i) => i.featureId))
+        .catch((error) => {
+          throw new Error(error);
+        });
+
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
-        `${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL`,
-        { projectId },
+        `${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL
+        AND ${this.alias}.id IN (:...geoFeaturesWithinProjectBbox)`,
+        { projectId, geoFeaturesWithinProjectBbox },
       );
     } else {
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
@@ -206,21 +237,42 @@ export class GeoFeaturesService extends AppBaseService<
     const geoFeatureIds = (entitiesAndCount[0] as GeoFeature[]).map(
       (i) => i.id,
     );
-    const entitiesWithProperties = await this.geoFeaturePropertySetsRepository
+    const query = this.geoFeaturePropertySetsRepository
       .createQueryBuilder('propertySets')
-      .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds })
-      .getMany()
-      .then((results) => {
-        return (entitiesAndCount[0] as GeoFeature[]).map((i) => {
-          const propertySetForFeature = results.find(
-            (propertySet) => propertySet.featureId === i.id,
-          );
-          return {
-            ...i,
-            properties: propertySetForFeature?.properties,
-          };
-        });
+      .distinct(true)
+      .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds });
+
+    if (this.forProject) {
+      query.andWhere(
+        `st_intersects(
+        st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
+        "propertySets".bbox
+      )`,
+        {
+          xmin: this.forProject.bbox[1],
+          ymin: this.forProject.bbox[3],
+          xmax: this.forProject.bbox[0],
+          ymax: this.forProject.bbox[2],
+        },
+      );
+    }
+
+    const entitiesWithProperties = await query.getMany().then((results) => {
+      return (entitiesAndCount[0] as GeoFeature[]).map((i) => {
+        const propertySetForFeature = results.filter(
+          (propertySet) => propertySet.featureId === i.id,
+        );
+        return {
+          ...i,
+          properties: propertySetForFeature.reduce((acc, cur) => {
+            return {
+              ...acc,
+              [cur.key]: [...(acc[cur.key] || []), cur.value[0]],
+            };
+          }, {} as Record<string, Array<string | number>>),
+        };
       });
+    });
     return [entitiesWithProperties, entitiesAndCount[1]];
   }
 

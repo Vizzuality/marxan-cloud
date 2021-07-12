@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 
 import { Provider as ReduxProvider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 import { Hydrate } from 'react-query/hydration';
 import { OverlayProvider } from '@react-aria/overlays';
 import { Provider as AuthenticationProvider } from 'next-auth/client';
@@ -23,6 +24,7 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
   return (
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClientRef.current}>
+        <ReactQueryDevtools />
         <Hydrate state={pageProps.dehydratedState}>
           <AuthenticationProvider
             session={pageProps.session}

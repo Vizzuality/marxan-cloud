@@ -27,5 +27,12 @@
     "sharedFileStorage": {
       "localPath": "API_SHARED_FILE_STORAGE_LOCAL_PATH"
     }
+  },
+  "fileUploads": {
+    "projects": {
+      "planningAreas": {
+        "maxAgeForOrphanUploads": "UPLOADS_PLANNING_AREAS_MAX_AGE"
+      }
+    }
   }
 }

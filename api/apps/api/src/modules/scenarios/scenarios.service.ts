@@ -1,4 +1,9 @@
-import { BadRequestException, HttpService, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpService,
+  Injectable,
+  NotImplementedException,
+} from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
@@ -22,6 +27,8 @@ import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-p
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
 import { InputParameterFileProvider } from './input-parameter-file.provider';
+import { SpecDatService } from './input-files/spec.dat.service';
+import { OutputFilesService } from './output-files/output-files.service';
 
 @Injectable()
 export class ScenariosService {
@@ -39,6 +46,8 @@ export class ScenariosService {
     private readonly costSurfaceView: CostSurfaceViewService,
     private readonly marxanInputValidator: MarxanInput,
     private readonly inputParameterFileProvider: InputParameterFileProvider,
+    private readonly specDatService: SpecDatService,
+    private readonly outputFilesService: OutputFilesService,
   ) {}
 
   async findAllPaginated(
@@ -80,6 +89,7 @@ export class ScenariosService {
   }
 
   async getInputParameterFile(scenarioId: string): Promise<string> {
+    await this.assertScenario(scenarioId);
     return this.inputParameterFileProvider.getInputParameterFile(scenarioId);
   }
 
@@ -127,7 +137,6 @@ export class ScenariosService {
 
   async findScenarioResults(
     scenarioId: string,
-    runId: string,
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
@@ -142,29 +151,55 @@ export class ScenariosService {
     await this.costSurfaceView.read(scenarioId, stream);
   }
 
+  async getSpecDatCsv(scenarioId: string): Promise<string> {
+    await this.assertScenario(scenarioId);
+    return this.specDatService.getSpecDatContent(scenarioId);
+  }
+
+  async run(scenarioId: string, _blm?: number): Promise<void> {
+    await this.assertScenario(scenarioId);
+    // TODO ensure not running yet
+    // TODO submit
+    throw new NotImplementedException();
+  }
+
+  async cancel(scenarioId: string): Promise<void> {
+    await this.assertScenario(scenarioId);
+    // TODO ensure it is running
+    throw new NotImplementedException();
+  }
+
   private async assertScenario(scenarioId: string) {
     await this.crudService.getById(scenarioId);
   }
 
-  async getBestSolution(scenarioId: string, runId: string) {
+  async getOneSolution(scenarioId: string, runId: string, fetchSpecification: FetchSpecification) {
     await this.assertScenario(scenarioId);
     // TODO correct implementation
     return this.solutionsCrudService.getById(runId);
   }
 
+  async getBestSolution(
+    scenarioId: string,
+    fetchSpecification: FetchSpecification) {
+    await this.assertScenario(scenarioId);
+    // TODO correct implementation
+    fetchSpecification.filter = {...fetchSpecification.filter,  best: true }
+    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+  }
+
   async getMostDifferentSolutions(
     scenarioId: string,
-    runId: string,
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
     // TODO correct implementation
+    fetchSpecification.filter = {...fetchSpecification.filter,  distinctFive: true }
     return this.solutionsCrudService.findAllPaginated(fetchSpecification);
   }
 
   async findAllSolutionsPaginated(
     scenarioId: string,
-    runId: string,
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
@@ -190,11 +225,16 @@ export class ScenariosService {
         // TODO debt: shouldn't throw HttpException
         throw new BadRequestException(errors);
       }
+    } else {
+      marxanInput = this.marxanInputValidator.from({});
     }
     const withValidatedMetadata: T = classToClass<T>(input);
-    if (withValidatedMetadata.metadata) {
-      withValidatedMetadata.metadata.marxanInputParameterFile = marxanInput;
-    }
+    (withValidatedMetadata.metadata ??= {}).marxanInputParameterFile = marxanInput;
     return withValidatedMetadata;
+  }
+
+  async getMarxanExecutionOutputArchive(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    return this.outputFilesService.get(scenarioId);
   }
 }

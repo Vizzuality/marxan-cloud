@@ -1,6 +1,6 @@
 import * as request from 'supertest';
 import { INestApplication, Logger } from '@nestjs/common';
-import { GeoFeature} from '@marxan-api/modules/geo-features/geo-feature.api.entity';
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 
 /**
  * Utility functions for tests related to features.
@@ -16,7 +16,7 @@ export class FeaturesTestUtils {
   static async getFeature(
     app: INestApplication,
     jwtToken: string,
-    projectId: string
+    projectId: string,
   ): Promise<GeoFeature> {
     return await request(app.getHttpServer())
       .get(`/api/v1/projects/${projectId}/features`)

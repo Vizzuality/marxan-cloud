@@ -31,7 +31,7 @@ export class ScenariosService {
    */
   public findTile(
     tileSpecification: ScenariosTileRequest,
-    filters?: ScenariosPUFilters,
+    _filters?: ScenariosPUFilters,
   ): Promise<Buffer> {
     const { id, z, x, y } = tileSpecification;
     /**

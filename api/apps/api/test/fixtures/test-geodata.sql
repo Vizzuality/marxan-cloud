@@ -1,8 +1,8 @@
 --- Creates the grid for project 1 org 1
 INSERT INTO planning_units_geom
 (the_geom, type, size)
-select st_transform(geom, 4326) as the_geom, 'square' as type, 1 as size from
-(SELECT (ST_SquareGrid(1000, ST_Transform(ST_GeomFromGeoJSON('{"type":"Polygon","coordinates":[[[21.654052734375,-20.756113874762068],[23.719482421875,-20.756113874762068],[23.719482421875,-18.802318121688117],[21.654052734375,-18.802318121688117],[21.654052734375,-20.756113874762068]]]}'), 3857))).*
+select st_transform(geom, 4326) as the_geom, 'square' as type, 100 as size from
+(SELECT (ST_SquareGrid(10000, ST_Transform(ST_GeomFromGeoJSON('{"type":"Polygon","coordinates":[[[21.654052734375,-20.756113874762068],[23.719482421875,-20.756113874762068],[23.719482421875,-18.802318121688117],[21.654052734375,-18.802318121688117],[21.654052734375,-20.756113874762068]]]}'), 3857))).*
  ) grid
  ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO NOTHING;
 
@@ -10,7 +10,7 @@ select st_transform(geom, 4326) as the_geom, 'square' as type, 1 as size from
 INSERT INTO scenarios_pu_data (pu_geom_id, scenario_id, puid)
 select id as pu_geom_id, '$scenario' as scenario_id, row_number() over () as puid
 from planning_units_geom pug
-where type='square' and size = 1;
+where type='square' and size = 100;
 
 --- Calculate pa area per pu and associated lockin based on PA
 with pa as (select * from wdpa),
@@ -76,3 +76,33 @@ left join wdpa
  )
  UPDATE scenario_features_data
 SET (current_pa) = (select current_pa from (select sum(area_protected) current_pa, feature_scen_id from features_wdpa group by feature_scen_id) s where  feature_scen_id = scenario_features_data.id );
+
+-- Cost equal area calculation project 1 scenario 1
+INSERT INTO scenarios_pu_cost_data
+(scenarios_pu_data_id, cost)
+select id, 1 as cost  from scenarios_pu_data where scenario_id = '$scenario';
+
+----Fake outputs
+--- Fake output_scenarios_pu_data
+WITH RECURSIVE nums (n) AS (
+    SELECT 1
+  UNION ALL
+    SELECT n+1 FROM nums WHERE n+1 <= 10
+)
+INSERT INTO output_scenarios_pu_data
+(run_id, scenario_pu_id, value)
+SELECT n as run_id, scenarios_pu_data.id, round(random()) as value
+FROM nums, scenarios_pu_data
+where scenarios_pu_data.scenario_id='$scenario';
+
+--- Fake output_scenarios_features_data
+WITH RECURSIVE nums (n) AS (
+    SELECT 1
+  UNION ALL
+    SELECT n+1 FROM nums WHERE n+1 <= 10
+)
+INSERT INTO output_scenarios_features_data
+(run_id, feature_scenario_id, amount, occurrences, separation, target, mpm)
+SELECT n as run_id, scenario_features_data.id, round(random()*53592) amount, round(random()*100) occurrences, 0 as separation, true as target,1 as mpm
+FROM nums, scenario_features_data
+where scenario_features_data.scenario_id='$scenario';

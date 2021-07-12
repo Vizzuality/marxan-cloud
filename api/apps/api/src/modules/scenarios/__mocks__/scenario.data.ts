@@ -1,6 +1,5 @@
 import { JobStatus, Scenario, ScenarioType } from '../scenario.api.entity';
 import { User } from '../../users/user.api.entity';
-import { IUCNCategory } from '../../protected-areas/protected-area.geo.entity';
 
 const scenarioBase = (): Scenario => ({
   createdAt: new Date('2021-05-10T10:25:11.959Z'),

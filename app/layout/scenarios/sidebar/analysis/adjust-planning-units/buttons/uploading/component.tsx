@@ -16,7 +16,7 @@ import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
-import { useSaveScenarioPUShapefile } from 'hooks/scenarios';
+import { useUploadScenarioPU } from 'hooks/scenarios';
 
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 import Loading from 'components/loading';
@@ -50,7 +50,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     };
   }, [type, uploadingValue]);
 
-  const saveScenarioPUShapefileMutation = useSaveScenarioPUShapefile({
+  const uploadScenarioPUMutation = useUploadScenarioPU({
     requestConfig: {
       method: 'POST',
     },
@@ -81,7 +81,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     const data = new FormData();
     data.append('file', f);
 
-    saveScenarioPUShapefileMutation.mutate({ id: `${sid}`, data }, {
+    uploadScenarioPUMutation.mutate({ id: `${sid}`, data }, {
       onSuccess: ({ data: { data: g } }) => {
         setLoading(false);
 

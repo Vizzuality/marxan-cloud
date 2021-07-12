@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, ViewEntity } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 
 export const geoFeatureResource: BaseServiceResource = {
@@ -16,6 +16,10 @@ export class GeoFeatureGeometry {
   @ApiProperty()
   @PrimaryColumn()
   id!: string;
+
+  @ApiProperty()
+  @Column('uuid', { name: 'feature_id' })
+  featureId?: string;
 }
 
 export class JSONAPIGeoFeaturesGeometryData {
@@ -37,13 +41,17 @@ export class GeoFeatureResult {
 /**
  * Entity class for the feature_properties view
  */
-@Entity('feature_properties')
+@ViewEntity('feature_properties')
 export class GeoFeaturePropertySet {
   @ApiProperty()
-  @PrimaryColumn('uuid', { name: 'feature_id' })
+  @Column('uuid', { name: 'feature_id' })
   featureId!: string;
 
   @ApiProperty()
-  @Column('jsonb', { name: 'properties_for_feature' })
-  properties!: Record<string, unknown>;
+  @Column('text')
+  key!: string;
+
+  @ApiProperty()
+  @Column('jsonb', { array: true })
+  value!: Array<string | number>;
 }
