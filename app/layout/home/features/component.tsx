@@ -1,5 +1,6 @@
 import React from 'react';
 
+import ButtonLink from 'layout/statics/button-link';
 import Wrapper from 'layout/wrapper';
 
 import Icon from 'components/icon';
@@ -30,6 +31,9 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
               </div>
             );
           })}
+          <div className="w-full mt-20 place-self-center">
+            <ButtonLink caption="Explore planning Examples" href="/community/projects" />
+          </div>
         </div>
       </div>
     </Wrapper>

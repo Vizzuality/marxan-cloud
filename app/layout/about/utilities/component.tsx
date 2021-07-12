@@ -24,7 +24,7 @@ export const AboutUtilities: React.FC<AboutUtilitiesProps> = () => {
             and Marxan with Connectivity on a stable Azure cloud environment.
             You can use this platform to:
           </p>
-          <ButtonLink />
+          <ButtonLink caption="Learn More" href="/" />
         </div>
         <div className="flex flex-col items-start gap-10">
           {UTILITIES.map((u) => (
