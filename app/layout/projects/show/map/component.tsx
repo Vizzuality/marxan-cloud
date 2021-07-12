@@ -68,7 +68,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           exit={{ y: -10, opacity: 0 }}
         >
           <HelpBeacon
-            id="project-upload"
+            id="project-map"
             title="Project map view"
             subtitle="Project list"
             content={(
@@ -77,7 +77,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
               </div>
               )}
           >
-            <div>
+            <div className="w-full h-full">
               <Map
                 bounds={bounds}
                 width="100%"
