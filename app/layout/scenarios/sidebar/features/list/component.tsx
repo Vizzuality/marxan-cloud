@@ -11,7 +11,7 @@ import Item from 'components/features/selected-item';
 import IntersectFeatures from 'layout/scenarios/sidebar/features/intersect';
 
 import { useQueryClient } from 'react-query';
-import { useSelectedFeatures } from 'hooks/features';
+import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 import { useRouter } from 'next/router';
 
 export interface ScenariosFeaturesListProps {
@@ -21,17 +21,20 @@ export interface ScenariosFeaturesListProps {
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   onSuccess,
 }: ScenariosFeaturesListProps) => {
+  const [submitting, setSubmitting] = useState(false);
   const [intersecting, setIntersecting] = useState(null);
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid, sid } = query;
 
   const queryClient = useQueryClient();
+
+  const selectedFeaturesMutation = useSaveSelectedFeatures({});
 
   const {
     data: selectedFeaturesData,
     isFetching: selectedFeaturesIsFetching,
     isFetched: selectedFeaturesIsFetched,
-  } = useSelectedFeatures({});
+  } = useSelectedFeatures(sid, {});
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -40,6 +43,58 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   }, [selectedFeaturesData]);
 
   // Callbacks
+  const getFeaturesRecipe = useCallback((features) => {
+    return {
+      status: 'draft',
+      features: features.map((s) => {
+        const {
+          featureId,
+          splitSelected,
+          splitFeaturesSelected,
+          intersectFeaturesSelected,
+        } = s;
+
+        const {
+          marxanSettings,
+          geoprocessingOperations,
+        } = selectedFeaturesData.find((sf) => sf.featureId === featureId) || {};
+
+        const kind = (splitSelected || intersectFeaturesSelected?.length) ? 'withGeoprocessing' : 'plain';
+
+        let newGeoprocessingOperations;
+
+        if (splitSelected) {
+          newGeoprocessingOperations = [
+            {
+              kind: 'split/v1',
+              splitByProperty: splitSelected,
+              splits: splitFeaturesSelected.map((sf) => {
+                return {
+                  value: sf.id,
+                };
+              }),
+            },
+          ];
+        }
+
+        if (intersectFeaturesSelected?.length) {
+          newGeoprocessingOperations = geoprocessingOperations;
+        }
+
+        return {
+          featureId,
+          kind,
+          ...!!newGeoprocessingOperations && {
+            geoprocessingOperations: newGeoprocessingOperations,
+          },
+          ...!!marxanSettings && {
+            marxanSettings,
+          },
+        };
+      }),
+    };
+  }, [selectedFeaturesData]);
+
   const onSplitSelected = useCallback((id, key, input) => {
     const { value, onChange } = input;
     const features = [...value];
@@ -88,12 +143,42 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     const featureIndex = features.findIndex((f) => f.id === id);
     features.splice(featureIndex, 1);
     onChange(features);
-  }, []);
+
+    const data = getFeaturesRecipe(features);
+
+    // Save current features
+    selectedFeaturesMutation.mutate({
+      id: `${sid}`,
+      data,
+    }, {
+      onSuccess: () => {
+        setSubmitting(false);
+      },
+      onError: () => {
+        setSubmitting(false);
+      },
+    });
+  }, [sid, getFeaturesRecipe, selectedFeaturesMutation]);
 
   const onSubmit = useCallback((values) => {
-    console.info(values);
-    onSuccess();
-  }, [onSuccess]);
+    const { features } = values;
+    const data = getFeaturesRecipe(features);
+    setSubmitting(true);
+
+    // Save current features
+    selectedFeaturesMutation.mutate({
+      id: `${sid}`,
+      data,
+    }, {
+      onSuccess: () => {
+        onSuccess();
+        setSubmitting(false);
+      },
+      onError: () => {
+        setSubmitting(false);
+      },
+    });
+  }, [sid, selectedFeaturesMutation, onSuccess, getFeaturesRecipe]);
 
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
@@ -111,32 +196,18 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       key="features-list"
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
-      initialValuesEqual={(prev, next) => {
-        const { features: prevFeatures } = prev;
-        const { features: nextFeatures } = next;
-
-        const prevIds = prevFeatures.map((f) => f.id);
-        const nextIds = nextFeatures.map((f) => f.id);
-
-        if (prevIds.length !== nextIds.length) return false;
-
-        if (JSON.stringify(prevIds) !== JSON.stringify(nextIds)) {
-          return false;
-        }
-        return true;
-      }}
     >
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow overflow-hidden">
-          {(!selectedFeaturesData || !selectedFeaturesData.length) && (
-            <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
-              No results found
-            </div>
-          )}
+          <Loading
+            visible={submitting || selectedFeaturesIsFetching}
+            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+            iconClassName="w-10 h-10 text-white"
+          />
 
           {!!selectedFeaturesData && !!selectedFeaturesData.length && (
             <div className="relative flex flex-col flex-grow min-h-0 overflow-hidden">
-              <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700 pointer-events-none" />
+              <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
               <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
                 <FieldRFF name="features">
                   {({ input }) => (
@@ -171,7 +242,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                   )}
                 </FieldRFF>
               </div>
-              <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-gray-700 via-gray-700 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
           )}
 
@@ -195,7 +266,9 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
               queryClient.removeQueries(['all-features', pid]);
             }}
           >
-            <IntersectFeatures intersecting={intersecting} />
+            <IntersectFeatures
+              intersecting={intersecting}
+            />
           </Modal>
 
         </form>

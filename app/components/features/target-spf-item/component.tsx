@@ -50,7 +50,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
         })}
       />
       <div className="flex items-start justify-between pb-2 pr-2">
-        <span className="text-sm font-medium font-heading">{isAllTargets ? 'Set target and SPF in all features' : name}</span>
+        <span className="pr-5 text-sm font-medium font-heading">{isAllTargets ? 'Set target and SPF in all features' : name}</span>
         {!isAllTargets && (
           <Button
             className="flex-shrink-0 text-xs"
@@ -91,7 +91,6 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
               theme="dark"
               mode="dashed"
               type="number"
-              defaultValue={FPFValue}
               value={FPFValue}
               onChange={({ target: { value: inputValue } }) => {
                 setFPFValue(Number(inputValue));

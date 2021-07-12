@@ -37,18 +37,6 @@ export interface ItemProps {
 
   // INTERSECT
   intersectFeaturesSelected?: {
-    id: string;
-    fpf?: number;
-    target?: number;
-    splitSelected?: string;
-    splitFeaturesSelected?: {
-      id: string;
-      name: string;
-      fpf?: number;
-      target?: number;
-    }[];
-  }[];
-  intersectFeaturesOptions?: {
     label: string;
     value: string;
   }[];
