@@ -17,6 +17,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sliderRef, slider] = useKeenSlider<HTMLDivElement>({
     initial,
+    loop: true,
     slideChanged(s) {
       setCurrentSlide(s.details().relativeSlide);
     },
@@ -24,9 +25,14 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
 
   return (
     <div>
-
       <div className="relative">
-        <div ref={sliderRef} className="keen-slider">
+        <div
+          ref={sliderRef}
+          className="bg-black keen-slider"
+          style={{
+            boxShadow: '0px 50px 50px rgba(0, 0, 0, 0.5)',
+          }}
+        >
           {images?.map((i) => (
             <img
               alt={i.alt}
@@ -40,7 +46,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
       </div>
 
       {slider && (
-        <div className="flex flex-row items-center justify-center h-28">
+        <div className="flex flex-row items-center justify-center mt-14">
           {[...Array(slider.details().size).keys()].map((i) => {
             return (
               <button
