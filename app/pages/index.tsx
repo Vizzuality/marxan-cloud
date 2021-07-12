@@ -5,7 +5,9 @@ import Header from 'layout/header';
 import Footer from 'layout/footer';
 
 import Hero from 'layout/home/hero';
+import CarouselSection from 'layout/home/carousel-section';
 import Features from 'layout/home/features';
+
 import { withUser } from 'hoc/auth';
 
 export const getServerSideProps = withUser();
@@ -22,6 +24,7 @@ const Home: React.FC = () => {
         <Header size="lg" />
         <Hero />
         <Features />
+        <CarouselSection />
         <Footer />
       </main>
     </>

@@ -568,13 +568,14 @@ input[type='search']::-webkit-search-decoration,
   -webkit-touch-callout:none;
   -khtml-user-select:none;
   touch-action:pan-y;
-  -webkit-tap-highlight-color:transparent
+  -webkit-tap-highlight-color:transparent;
+  border-radius:20px;
 }
 
 .keen-slider,.keen-slider__slide{
   overflow:hidden;
   position:relative;
-  border-radius:5px;
+  box-shadow: 0px 50px 58px -4px rgba(0, 0, 0, 0.5);
 }
 
 .keen-slider__slide{
