@@ -229,6 +229,7 @@ async function getFixtures() {
       expect(fixtures.activeJob.updateProgress).toBeCalledTimes(1);
       expect(fixtures.activeJob.updateProgress).toBeCalledWith({
         canceled: true,
+        scenarioId: `scenario-1`,
       });
     },
     ThenShouldUpdateScenario() {
