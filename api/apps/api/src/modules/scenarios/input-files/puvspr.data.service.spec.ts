@@ -52,6 +52,12 @@ describe(`when there is data available`, () => {
         puId: 'pu-1,',
       },
       {
+        amount: 0.001,
+        scenarioId: 'scenarioId',
+        featureId: 'feature-1',
+        puId: 'pu-2,',
+      },
+      {
         amount: 99.995,
         scenarioId: 'scenarioId',
         featureId: 'feature-1',
