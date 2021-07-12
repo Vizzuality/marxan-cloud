@@ -910,6 +910,7 @@ module.exports = {
       'focus-within',
       'hover',
       'focus',
+      'last',
     ],
     borderOpacity: [
       'responsive',

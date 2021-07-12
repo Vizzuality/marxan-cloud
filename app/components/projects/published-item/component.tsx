@@ -17,24 +17,27 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
   timesDuplicated,
 }: PublishedItemProps) => {
   return (
-    <tr key={id} className="flex flex-row items-center border-b border-white cursor-pointer border-opacity-20">
-      <Link href={`/community/projects/${id}`} prefetch={false}>
-        <td className="pr-6 py-7 w-96">
-          <p className="pb-1 font-semibold hover:underline">{name}</p>
-          <p className="text-base leading-normal text-gray-400 clamp-2">{description}</p>
-        </td>
-      </Link>
+    <tr key={id} className="border-b border-white border-opacity-20 last:border-transparent">
+      <td className="pr-6 py-7">
+        <Link href={`/community/projects/${id}`}>
+          <a href={`/community/projects/${id}`} className="pb-1 font-semibold hover:underline">{name}</a>
+        </Link>
+        <p className="text-sm leading-normal text-gray-400 clamp-2">{description}</p>
+      </td>
 
-      <td className="pr-6 w-44">
+      <td className="pr-6">
         <p className="text-sm">{area}</p>
       </td>
-      <td className="pr-6 w-44">
+      <td className="pr-6">
         {!!contributors.length && contributors?.map((c) => <p key={`${c.id}`} className="text-sm">{c.name}</p>)}
       </td>
-      <td className="items-center w-72">
+      <td className="">
         <div className="flex flex-row justify-between pl-10">
           <p className="w-6 text-sm">{timesDuplicated && (format('.3s')(timesDuplicated))}</p>
-          <DuplicateButton />
+          <DuplicateButton
+            id={id}
+            name={name}
+          />
         </div>
       </td>
     </tr>
