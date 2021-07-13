@@ -77,10 +77,9 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
             subtitle="project list"
             content={(
               <div>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Beatae ratione cumque in nobis fugiat,
-                neque ullam aliquam, commodi dolorem unde inventore eaque,
-                dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
+                You can see all your projects listed here.
+                Use the search bar to help you find specific projects.
+
               </div>
             )}
           >

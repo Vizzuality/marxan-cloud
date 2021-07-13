@@ -31,10 +31,9 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
           subtitle="Project list"
           content={(
             <div>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Beatae ratione cumque in nobis fugiat,
-              neque ullam aliquam, commodi dolorem unde inventore eaque,
-              dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
+              Find your projects by typing in keywords.
+              You can search by project name,
+              scenario name, planning region, contributors, etc.
             </div>
           )}
         >
@@ -57,10 +56,11 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
             subtitle="Project list"
             content={(
               <div>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Beatae ratione cumque in nobis fugiat,
-                neque ullam aliquam, commodi dolorem unde inventore eaque,
-                dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
+                Creating a project is the first step to be able to
+                perform a Marxan analysis.
+                Under a project you can create multiple alternative scenarios that
+                share the same planning region.
+
               </div>
             )}
           >
@@ -84,10 +84,12 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
             subtitle="Project list"
             content={(
               <div>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Beatae ratione cumque in nobis fugiat,
-                neque ullam aliquam, commodi dolorem unde inventore eaque,
-                dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
+                You can upload an existing marxan project.
+                You will need to compress your input files
+                as a zipfile and you will need to add your panning unit grid
+                as a shapefile. Optionally you can include your output files
+                to visualize the results.
+
               </div>
             )}
           >
