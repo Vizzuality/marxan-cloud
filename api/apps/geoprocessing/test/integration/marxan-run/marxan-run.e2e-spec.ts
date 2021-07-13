@@ -1,15 +1,12 @@
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { PromiseType } from 'utility-types';
-import { Repository } from 'typeorm';
 import { readFileSync } from 'fs';
 import * as nock from 'nock';
 import { v4 } from 'uuid';
 
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
-import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
+import { ExecutionResult } from '@marxan/marxan-output';
 
 import { bootstrapApplication, delay } from '../../utils';
-import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -45,9 +42,8 @@ describe(`given input data is available`, () => {
     fixtures.GivenInputFilesAreAvailable();
   });
   test(`marxan run during binary execution`, async () => {
-    await fixtures.GivenMarxanIsRunning();
-
-    // expect(await fixtures.ThenExecutionOutput()).toBeGreaterThan(0);
+    const output = await fixtures.GivenMarxanIsRunning();
+    fixtures.ThenHasValidOutput(output);
   }, 60000);
 
   test(`cancelling marxan run`, async (done) => {
@@ -79,12 +75,6 @@ const getFixtures = async () => {
 
   const app = await bootstrapApplication();
   const sut: MarxanSandboxRunnerService = app.get(MarxanSandboxRunnerService);
-  const tempRepoReference: Repository<ScenariosOutputResultsApiEntity> = app.get(
-    getRepositoryToken(
-      ScenariosOutputResultsApiEntity,
-      geoprocessingConnections.apiDB,
-    ),
-  );
 
   const nockScope = nock(host, {
     reqheaders: {
@@ -96,9 +86,6 @@ const getFixtures = async () => {
     cleanup: async () => {
       nockScope.done();
       nock.enableNetConnect();
-      await tempRepoReference.delete({
-        scenarioId,
-      });
     },
     GivenMarxanIsRunning: async () =>
       await sut.run(
@@ -109,12 +96,6 @@ const getFixtures = async () => {
         })),
       ),
     WhenKillingMarxanRun: () => sut.kill(scenarioId),
-    ThenExecutionOutput: async () =>
-      await tempRepoReference.count({
-        where: {
-          scenarioId,
-        },
-      }),
     GivenInputFilesAreAvailable: (delayMs = 0) =>
       resources.forEach((resource) => {
         nockScope
@@ -124,6 +105,9 @@ const getFixtures = async () => {
             'content-type': 'plain/text',
           });
       }),
+    ThenHasValidOutput(output: ExecutionResult) {
+      expect(output.length).toEqual(100);
+    },
   };
 };
 

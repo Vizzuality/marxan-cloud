@@ -32,8 +32,8 @@ export class MarxanExecutionMetadataRepository {
         scenarioId,
         stdOutput: metaData.stdOutput.toString(),
         stdError: metaData.stdErr?.toString(),
-        outputZip: readFileSync(inputArchivePath),
-        inputZip: readFileSync(outputArchivePath),
+        outputZip: readFileSync(outputArchivePath),
+        inputZip: readFileSync(inputArchivePath),
       }),
     );
   }
