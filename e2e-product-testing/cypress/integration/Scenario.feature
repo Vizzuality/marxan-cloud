@@ -1,4 +1,5 @@
 Feature: Create New Scenario
+    @happypath
     Scenario: create scenario inside platform
         Given the user is on the Project landing page (Marxan 03a)
         And the user selects 'Create Scenario +'

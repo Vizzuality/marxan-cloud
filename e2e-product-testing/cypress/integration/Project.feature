@@ -1,8 +1,10 @@
 Feature: Project dashboard actions
+    @happypath
     Scenario: See user's projects
-        Given the user has logged-in succesfuly
+        Given the user has logged-in successfully
         When the user is redirected to his/her project dashboard
         Then the user sees all his/her projects
+    @happypath
     Scenario: Search a project with correct keywords
         Given the user is in his/her project dashboard
         When the user uses the search bar and types a keyword that matches a project
@@ -11,10 +13,12 @@ Feature: Project dashboard actions
         Given the user is in his/her project dashboard
         When the user uses the search bar and types a keyword that does not match any project
         Then No projects are shown 
+    @happypath
     Scenario: Eliminate a project
         Given the user is in his/her project dashboard
         When the user deletes a project  
         Then The project is no longer in the users's dashboard
+    @happypath
     Scenario: Create new project
         Given the user is in his/her project dashboard
         When the user creates a new project
@@ -37,6 +41,7 @@ Feature: Project dashboard actions
         Then the user receives a message on screen where to find instructions  
 
 Feature: Share projects
+    @happypath
     Scenario: Share a project with contributors with Marxan profile
         Given the user is inside a Project (Marxan 03a_hover)
         And the user is in Add/Remove Members
@@ -47,17 +52,19 @@ Feature: Share projects
         And the user is in Add/Remove Members
         When the user adds an email for a contributor without a Marxan profile
         Then the contributor receives an email notification
+    @happypath
     Scenario: Search contributors
         Given the user is inside a Project (Marxan 03a_hover)
         And the user is in Add/Remove Members
-        When the user is searches for a contributor by keywords
+        When the user searches for a contributor by keywords
         Then only the contributors that match the keywords appear
         
 Feature: Add new planning region
+    @happypath
     Scenario: User without planning region shp
         Given the user is in the New Project Landing page
         And the user is DOES NOT have a planning region shapefile
-        When the user selectS a country and sub-region
+        When the user selects a country and sub-region
         Then the user see the contour area on the map
     Scenario: User with correct planning region shp
         Given the user is in the New Project Landing page
@@ -71,6 +78,7 @@ Feature: Add new planning region
         Then the user gets an error message
     
 Feature: Add new planning grid
+    @happypath
     Scenario: User without grid and correct shape/size combination
         Given the user is in the New Project Landing page
         And the user has added a planning region
@@ -97,8 +105,9 @@ Feature: Add new planning grid
         Then the user gets an error message
 
 Feature: Save project
+    @happypath
     Scenario: Completed all steps
-        Given the user is in the New Porject Landing page
+        Given the user is in the New Project Landing page
         And the user has added both a planning region and a grid
         When the user Saves the project
         Then the project shows in his/her Project dashboard

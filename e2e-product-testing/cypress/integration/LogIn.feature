@@ -7,7 +7,7 @@ Feature: Sign up
         And the user has introduced his/her information
         But the user hasn't accepted the Terms of service
         When the user clicks 'Sign up'
-        Then the user gets a notifciation on screen
+        Then the user gets a notification on screen
     Scenario: Accepted terms and conditions
         Given the user is in 'Sign up' page
         And the user has introduced his/her information
@@ -18,9 +18,9 @@ Feature: Sign up
         Given the user is in 'Sign up' page
         And the user has introduced his/her information
         And the user has accepted the Terms of service
-        And the user is alredy registered
+        And the user is already registered
         When the user clicks 'Sign up'
-        Then the user gets a notifciation on screen to 'Sign In'
+        Then the user gets a notification on screen to 'Sign In'
 
 Feature: validate account
     Scenario: correct email introduced
@@ -29,6 +29,7 @@ Feature: validate account
         Then the user's account is validated
 
 Feature: Sign in
+    @happypath
     Scenario: correct email and password
         Given the user is in 'Sign in' page
         When the user introduces a correct email and password
@@ -36,7 +37,7 @@ Feature: Sign in
     Scenario: wrong email or password
         Given the user is in 'Sign in' page
         When the user introduces an incorrect email or password
-        Then the user gets a notifciation on screen
+        Then the user gets a notification on screen
     Scenario: recover password email
         Given the user is in 'Sign in' page
         And The user has forgotten his/her password
@@ -45,4 +46,4 @@ Feature: Sign in
     Scenario: not registered email
         Given the user is in 'Sign in' page
         When the user introduces an email that is not registered
-        Then the user gets a notifciation on screenF
+        Then the user gets a notification on screenF
