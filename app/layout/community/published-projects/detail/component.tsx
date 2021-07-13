@@ -96,12 +96,16 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                   <div>
                     <h3 className="mb-5 text-sm font-semibold text-white">Creators</h3>
-                    {contributors && contributors.map((c) => (
-                      <div key={c.id} className="flex flex-row items-center mb-4">
-                        <Avatar bgImage={c.bgImage || '/images/avatar.png'} size="s" />
-                        <p className="ml-5 text-sm text-white">{c.name}</p>
+                    {!!contributors?.length && (
+                      <div className="space-y-4">
+                        {contributors.map((c) => (
+                          <div key={c.id} className="flex flex-row items-center">
+                            <Avatar bgImage={c.bgImage || '/images/avatar.png'} size="s" />
+                            <p className="ml-2.5 text-sm text-white">{c.name}</p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
 
                   <div>
@@ -118,6 +122,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                           {' '}
                           scenarios
                         </p>
+
                         {!!scenarios.length && (
                           <p className="text-sm text-white">
                             Last creation:
