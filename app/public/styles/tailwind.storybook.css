@@ -557,6 +557,44 @@ input[type='search']::-webkit-search-decoration,
   -webkit-appearance: none;
 }
 
+/* KEEN SLIDER  */
+
+.keen-slider{
+  display:flex;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+  -khtml-user-select:none;
+  touch-action:pan-y;
+  -webkit-tap-highlight-color:transparent;
+  border-radius:20px;
+}
+
+.keen-slider,.keen-slider__slide{
+  overflow:hidden;
+  position:relative;
+  box-shadow: 0px 50px 58px -4px rgba(0, 0, 0, 0.5);
+}
+
+.keen-slider__slide{
+  width:100%;
+  min-height:100%
+}
+
+.keen-slider[data-keen-slider-v]{
+  flex-wrap:wrap
+}
+
+.keen-slider[data-keen-slider-v] .keen-slider__slide{
+  width:100%
+}
+
+.keen-slider[data-keen-slider-moves] *{
+  pointer-events:none
+}
+
 /* Poppins */
 
 @font-face {
@@ -11394,10 +11432,6 @@ input[type='search']::-webkit-search-decoration,
 
 .leading-loose {
   line-height: 2;
-}
-
-.leading-extra-loose {
-  line-height: 3.75rem;
 }
 
 .list-inside {
@@ -41808,10 +41842,6 @@ input[type='search']::-webkit-search-decoration,
     line-height: 2;
   }
 
-  .sm\:leading-extra-loose {
-    line-height: 3.75rem;
-  }
-
   .sm\:list-inside {
     list-style-position: inside;
   }
@@ -72072,10 +72102,6 @@ input[type='search']::-webkit-search-decoration,
 
   .md\:leading-loose {
     line-height: 2;
-  }
-
-  .md\:leading-extra-loose {
-    line-height: 3.75rem;
   }
 
   .md\:list-inside {
@@ -102340,10 +102366,6 @@ input[type='search']::-webkit-search-decoration,
     line-height: 2;
   }
 
-  .lg\:leading-extra-loose {
-    line-height: 3.75rem;
-  }
-
   .lg\:list-inside {
     list-style-position: inside;
   }
@@ -132606,10 +132628,6 @@ input[type='search']::-webkit-search-decoration,
     line-height: 2;
   }
 
-  .xl\:leading-extra-loose {
-    line-height: 3.75rem;
-  }
-
   .xl\:list-inside {
     list-style-position: inside;
   }
@@ -162870,10 +162888,6 @@ input[type='search']::-webkit-search-decoration,
 
   .\32xl\:leading-loose {
     line-height: 2;
-  }
-
-  .\32xl\:leading-extra-loose {
-    line-height: 3.75rem;
   }
 
   .\32xl\:list-inside {

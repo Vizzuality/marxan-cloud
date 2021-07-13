@@ -28,7 +28,9 @@ import { SolutionResultCrudService } from './solutions-result/solution-result-cr
 import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
 import { InputParameterFileProvider } from './input-parameter-file.provider';
 import { SpecDatService } from './input-files/spec.dat.service';
+import { PuvsprDatService } from './input-files/puvspr.dat.service';
 import { OutputFilesService } from './output-files/output-files.service';
+import { BoundDatService } from './input-files/bound.dat.service';
 
 @Injectable()
 export class ScenariosService {
@@ -47,6 +49,8 @@ export class ScenariosService {
     private readonly marxanInputValidator: MarxanInput,
     private readonly inputParameterFileProvider: InputParameterFileProvider,
     private readonly specDatService: SpecDatService,
+    private readonly puvsprDatService: PuvsprDatService,
+    private readonly boundDatService: BoundDatService,
     private readonly outputFilesService: OutputFilesService,
   ) {}
 
@@ -156,6 +160,11 @@ export class ScenariosService {
     return this.specDatService.getSpecDatContent(scenarioId);
   }
 
+  async getBoundDatCsv(scenarioId: string): Promise<string> {
+    await this.assertScenario(scenarioId);
+    return this.boundDatService.getContent(scenarioId);
+  }
+
   async run(scenarioId: string, _blm?: number): Promise<void> {
     await this.assertScenario(scenarioId);
     // TODO ensure not running yet
@@ -173,7 +182,11 @@ export class ScenariosService {
     await this.crudService.getById(scenarioId);
   }
 
-  async getOneSolution(scenarioId: string, runId: string, fetchSpecification: FetchSpecification) {
+  async getOneSolution(
+    scenarioId: string,
+    runId: string,
+    fetchSpecification: FetchSpecification,
+  ) {
     await this.assertScenario(scenarioId);
     // TODO correct implementation
     return this.solutionsCrudService.getById(runId);
@@ -181,10 +194,11 @@ export class ScenariosService {
 
   async getBestSolution(
     scenarioId: string,
-    fetchSpecification: FetchSpecification) {
+    fetchSpecification: FetchSpecification,
+  ) {
     await this.assertScenario(scenarioId);
     // TODO correct implementation
-    fetchSpecification.filter = {...fetchSpecification.filter,  best: true }
+    fetchSpecification.filter = { ...fetchSpecification.filter, best: true };
     return this.solutionsCrudService.findAllPaginated(fetchSpecification);
   }
 
@@ -194,7 +208,10 @@ export class ScenariosService {
   ) {
     await this.assertScenario(scenarioId);
     // TODO correct implementation
-    fetchSpecification.filter = {...fetchSpecification.filter,  distinctFive: true }
+    fetchSpecification.filter = {
+      ...fetchSpecification.filter,
+      distinctFive: true,
+    };
     return this.solutionsCrudService.findAllPaginated(fetchSpecification);
   }
 
@@ -236,5 +253,10 @@ export class ScenariosService {
   async getMarxanExecutionOutputArchive(scenarioId: string) {
     await this.assertScenario(scenarioId);
     return this.outputFilesService.get(scenarioId);
+  }
+
+  async getPuvsprDatCsv(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    return this.puvsprDatService.getPuvsprDatContent(scenarioId);
   }
 }

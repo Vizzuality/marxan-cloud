@@ -14,7 +14,7 @@ afterEach(async () => {
 describe(`when getting spec.dat`, () => {
   it(`should resolve text/*`, async () => {
     expect((await world.WhenGettingSpecDat()).text).toMatchInlineSnapshot(`
-      "id	prop	target	spf	name
+      "id\ttarget\tprop\tspf\ttarget2\ttargetocc\tname\tsepnum\tsepdistance
       "
     `);
   });

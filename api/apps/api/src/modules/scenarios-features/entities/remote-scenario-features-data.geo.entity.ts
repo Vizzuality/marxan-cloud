@@ -9,6 +9,12 @@ export class RemoteScenarioFeaturesData {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @ApiProperty()
+  @Column({
+    name: `feature_id`,
+  })
+  featureId!: number;
+
   @Column({ name: 'feature_class_id' })
   featuresDataId!: string;
 
@@ -45,12 +51,36 @@ export class RemoteScenarioFeaturesData {
    */
   target!: number;
 
+  @Column({
+    name: `prop`,
+    type: `float8`,
+  })
+  prop?: number;
+
+  @Column({
+    name: `sepnum`,
+    type: `float8`,
+  })
+  sepNum?: number;
+
+  @Column({
+    name: `targetocc`,
+    type: `float8`,
+  })
+  targetocc?: number;
+
   @Column()
   /**
    * not used yet
    * in marxan realm you can set a secondary target for a minimum clump size for the representation of conservation features in the reserve
    */
   target2!: number;
+
+  @Column({
+    name: 'metadata',
+    type: 'jsonb',
+  })
+  metadata?: Record<'sepdistance', number | string>;
 
   /**
    * no FK
@@ -91,9 +121,6 @@ export class RemoteScenarioFeaturesData {
     enum: FeatureTags,
   })
   tag!: FeatureTags;
-
-  @ApiProperty()
-  featureId!: string;
 
   @ApiPropertyOptional({
     description: `Name of the feature, for example \`Lion in Deserts\`.`,
