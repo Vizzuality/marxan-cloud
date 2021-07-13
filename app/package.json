@@ -56,6 +56,7 @@
     "fuse.js": "^6.4.6",
     "jsona": "^1.9.2",
     "jsonwebtoken": "^8.5.1",
+    "keen-slider": "^5.5.1",
     "lodash": "^4.17.20",
     "luma.gl": "7.3.2",
     "next": "10.0.3",
