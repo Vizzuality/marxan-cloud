@@ -118,11 +118,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                           {' '}
                           scenarios
                         </p>
-                        <p className="text-sm text-white">
-                          Last creation:
-                          {' '}
-                          {scenarios[0].lastUpdateDistance}
-                        </p>
+                        {!!scenarios.length && (
+                          <p className="text-sm text-white">
+                            Last creation:
+                            {' '}
+                            {scenarios[0].lastUpdateDistance}
+                          </p>
+                        )}
                       </>
                     )}
                   </div>
