@@ -46,7 +46,7 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
           id="project-search"
           defaultValue={search}
           size="base"
-          placeholder="Search projects, locations, creators, features..."
+          placeholder="Search by project name, planning area, creators..."
           aria-label="Search"
           onChange={onChangeSearchDebounced}
         />

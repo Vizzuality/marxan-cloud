@@ -18,7 +18,7 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
 }: StaticButtonLinkProps) => {
   const children = (
     <>
-      <p className="mr-4 text-lg text-primary-500">{caption}</p>
+      <p className="mr-4 text-lg text-primary-500 hover:underline">{caption}</p>
       <div className="flex items-center justify-center bg-transparent border rounded-full h-7 w-7 border-primary-500">
         <Icon icon={ARROW_RIGHT_2_SVG} className="w-3 h-3 text-primary-500" />
       </div>

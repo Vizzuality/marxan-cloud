@@ -30,7 +30,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
   const {
     data: publishedProjectScenarios,
-    isFetched: publishedProjectScenariosIsFetched,
+    isFetching: publishedProjectScenariosIsFetching,
   } = useScenarios(pid, {
     filters: {
       projectId: pid,
@@ -53,7 +53,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
         </Backlink>
 
         <div className="relative" style={{ minHeight: 600 }}>
-          {publishedProjectIsFetching && (
+          {publishedProjectIsFetching && publishedProjectScenariosIsFetching && (
             <div className="absolute flex items-center justify-center w-full h-full py-12">
               <Loading
                 className="w-10 h-10 text-white"
@@ -63,7 +63,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
             </div>
           )}
 
-          {publishedProject && (
+          {publishedProject && scenarios && (
             <div className="flex flex-row">
               <div className="w-7/12 pr-12">
 
@@ -115,21 +115,18 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                   <div>
                     <h3 className="mb-6 text-sm font-semibold text-white">Scenarios</h3>
-                    {scenarios && publishedProjectScenariosIsFetched && (
+                    {!!scenarios.length && (
                       <>
                         <p className="text-sm text-white">
                           {scenarios?.length}
                           {' '}
                           scenarios
                         </p>
-
-                        {!!scenarios.length && (
-                          <p className="text-sm text-white">
-                            Last creation:
-                            {' '}
-                            {scenarios[0].lastUpdateDistance}
-                          </p>
-                        )}
+                        <p className="text-sm text-white">
+                          Last creation:
+                          {' '}
+                          {scenarios[0].lastUpdateDistance}
+                        </p>
                       </>
                     )}
                   </div>
