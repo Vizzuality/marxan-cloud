@@ -1,4 +1,5 @@
 Feature: Boundary length modifier
+    @happypath
     Scenario: Modify boundary length modifier with correct value
         Given the user is in the Run Scenario modal
         When the user writes a value between the max and min allowed
@@ -9,6 +10,7 @@ Feature: Boundary length modifier
         Then the user gets a notification on screen
 
 Feature: Number of repetitions
+    @happypath
     Scenario: Modify number of repetitions with correct value
         Given the user is in the Run Scenario modal
         When the user writes a value between the max and min allowed
@@ -33,6 +35,7 @@ Feature: Advanced settings
         Then the user gets a notification on screen
 
 Feature: Run Marxan
+    @happypath
     Scenario: run marxan
         Given the user is in the Run Scenario modal
         When the user selects 'Run Scenario'

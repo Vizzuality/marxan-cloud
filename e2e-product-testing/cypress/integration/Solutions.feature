@@ -5,6 +5,7 @@ Feature: View unmet targets
         And there are features that don't meet their target
         When the user clicks 'Go to features'
         Then the user is taken to the Feature tab
+    @happypath
     Scenario: View features with unmet targets
         Given the user has run marxan
         And there are unmet targets
@@ -13,6 +14,7 @@ Feature: View unmet targets
         Then only the features that don't meet the target are shown on display
 
 Feature: Modify unmet targets
+    @happypath
     Scenario: Mark as met
         Given the user has run marxan
         And there are unmet targets
@@ -25,6 +27,7 @@ Feature: Modify unmet targets
         And the user is in the Feature tab
         When the user increases the FPF in the 'Change FPF in all not met features' box
         Then the new FPF set by the user appears in all the unmet features
+    @happypath
     Scenario: Increase FPF in one feature
         Given the user has run marxan
         And there are unmet targets
@@ -74,6 +77,7 @@ Feature: Order solutions table
         Then the solutions are ordered by missing values (lowest to highest)
 
 Feature: Download solutions table
+    @happypath
     Scenario: Download complete solutions table
         Given the user is in the solutions table modal
         When the user selects 'Download solutions'
@@ -102,6 +106,7 @@ Feature: Download gap analysis
 
 @download_files
 Feature: Download files
+    @happypath
     Scenario: Download input files
         Given the user is in the Solutions tab
         When the user clicks on 'Download Input files'
@@ -119,7 +124,7 @@ Feature: View map layers
         Then that layer is not visible on the map
 
 @re-run
-Feature: Re-reun scenario
+Feature: Re-run scenario
     Given the user is in the Solutions tab
     When the user clicks Re-Run scenario
     Then the user is taken to the 'Run Scenario' modal
