@@ -131,7 +131,6 @@ export class ScenarioFeaturesService extends AppBaseService<
       coverageTarget: +(base?.target ?? 0).toFixed(2),
       coverageTargetArea: +((totalArea * (base?.target ?? 0)) / 100).toFixed(2),
       totalArea: +totalArea.toFixed(2),
-      featureId: assign.id,
       tag: assign.tag,
       name: assign.alias ?? undefined, // `null`
       description: assign.description ?? undefined,
