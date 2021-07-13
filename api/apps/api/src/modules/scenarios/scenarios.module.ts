@@ -42,6 +42,7 @@ import { MarxanRunService } from './marxan-run/marxan-run.service';
 import { MarxanRunController } from './marxan-run/marxan-run.controller';
 import { OutputFilesModule } from './output-files/output-files.module';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
+import { BoundDatModule } from './input-files/bound.dat.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { ZipFilesSerializer } from './dto/zip-files.serializer';
     CostSurfaceViewModule,
     SpecDatModule,
     PuvsprDatModule,
+    BoundDatModule,
     PlanningUnitsProtectionLevelModule,
     OutputFilesModule,
   ],

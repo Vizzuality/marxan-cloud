@@ -30,6 +30,7 @@ import { InputParameterFileProvider } from './input-parameter-file.provider';
 import { SpecDatService } from './input-files/spec.dat.service';
 import { PuvsprDatService } from './input-files/puvspr.dat.service';
 import { OutputFilesService } from './output-files/output-files.service';
+import { BoundDatService } from './input-files/bound.dat.service';
 
 @Injectable()
 export class ScenariosService {
@@ -49,6 +50,7 @@ export class ScenariosService {
     private readonly inputParameterFileProvider: InputParameterFileProvider,
     private readonly specDatService: SpecDatService,
     private readonly puvsprDatService: PuvsprDatService,
+    private readonly boundDatService: BoundDatService,
     private readonly outputFilesService: OutputFilesService,
   ) {}
 
@@ -156,6 +158,11 @@ export class ScenariosService {
   async getSpecDatCsv(scenarioId: string): Promise<string> {
     await this.assertScenario(scenarioId);
     return this.specDatService.getSpecDatContent(scenarioId);
+  }
+
+  async getBoundDatCsv(scenarioId: string): Promise<string> {
+    await this.assertScenario(scenarioId);
+    return this.boundDatService.getContent(scenarioId);
   }
 
   async run(scenarioId: string, _blm?: number): Promise<void> {

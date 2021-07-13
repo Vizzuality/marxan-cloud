@@ -284,6 +284,17 @@ export class ScenariosController {
   }
 
   @ApiTags(marxanRunFiles)
+  @ApiOperation({ description: `Resolve scenario's bound file.` })
+  @Get(':id/marxan/dat/bound.dat')
+  @ApiProduces('text/plain')
+  @Header('Content-Type', 'text/plain')
+  async getBoundDatFile(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<string> {
+    return await this.service.getBoundDatCsv(id);
+  }
+
+  @ApiTags(marxanRunFiles)
   @ApiOperation({
     description: `Get archived output files`,
   })

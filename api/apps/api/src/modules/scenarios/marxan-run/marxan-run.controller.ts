@@ -60,4 +60,14 @@ export class MarxanRunController {
   ): Promise<string> {
     return await this.service.getPuvsprDat(id);
   }
+
+  @ApiOperation({ description: `Resolve scenario's bound file.` })
+  @Get(':id/marxan/dat/bound.dat')
+  @ApiProduces('text/plain')
+  @Header('Content-Type', 'text/plain')
+  async getBoundDatFile(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<string> {
+    return await this.service.getBoundDat(id);
+  }
 }
