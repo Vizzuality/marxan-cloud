@@ -21,7 +21,10 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { CostSurfaceTemplateModule } from './cost-surface-template';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { ScenariosOutputResultsApiEntity, ScenariosPuOutputGeoEntity } from '@marxan/scenarios-planning-unit';
+import {
+  ScenariosOutputResultsApiEntity,
+  ScenariosPuOutputGeoEntity,
+} from '@marxan/scenarios-planning-unit';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { CostSurfaceViewModule } from './cost-surface-readmodel/cost-surface-view.module';
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
@@ -33,18 +36,24 @@ import {
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
 import { SpecDatModule } from './input-files/spec.dat.module';
+import { PuvsprDatModule } from './input-files/puvspr.dat.module';
 
 import { MarxanRunService } from './marxan-run/marxan-run.service';
 import { MarxanRunController } from './marxan-run/marxan-run.controller';
 import { OutputFilesModule } from './output-files/output-files.module';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
+import { BoundDatModule } from './input-files/bound.dat.module';
 
 @Module({
   imports: [
     CqrsModule,
     ProtectedAreasModule,
     forwardRef(() => ProjectsModule),
-    TypeOrmModule.forFeature([Project, Scenario, ScenariosOutputResultsApiEntity]),
+    TypeOrmModule.forFeature([
+      Project,
+      Scenario,
+      ScenariosOutputResultsApiEntity,
+    ]),
     TypeOrmModule.forFeature(
       [ScenariosPuOutputGeoEntity],
       DbConnections.geoprocessingDB,
@@ -57,6 +66,8 @@ import { ZipFilesSerializer } from './dto/zip-files.serializer';
     CostSurfaceTemplateModule,
     CostSurfaceViewModule,
     SpecDatModule,
+    PuvsprDatModule,
+    BoundDatModule,
     PlanningUnitsProtectionLevelModule,
     OutputFilesModule,
   ],
