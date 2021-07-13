@@ -6,5 +6,7 @@ import { WorkingDirectory } from '../../../ports/working-directory';
 export abstract class TemporaryDirectory {
   abstract get(): Promise<WorkingDirectory>;
 
+  abstract createOutputDirectory(inside: WorkingDirectory): Promise<void>;
+
   abstract cleanup(directory: string): Promise<void>;
 }

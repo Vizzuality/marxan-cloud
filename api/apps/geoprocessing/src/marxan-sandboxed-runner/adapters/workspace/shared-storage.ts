@@ -8,12 +8,13 @@ import { assertDefined } from '@marxan/utils';
 
 import { TemporaryDirectory } from './ports/temporary-directory';
 import { WorkingDirectory } from '../../ports/working-directory';
+import { MarxanDirectory } from '../marxan-directory.service';
 
 @Injectable()
 export class SharedStorage implements TemporaryDirectory {
   readonly #tempDirectory: string;
 
-  constructor() {
+  constructor(private readonly marxanDirectory: MarxanDirectory) {
     const storagePath = AppConfig.get<string>(
       'storage.sharedFileStorage.localPath',
     );
@@ -22,7 +23,9 @@ export class SharedStorage implements TemporaryDirectory {
   }
 
   async cleanup(directory: string): Promise<void> {
-    // TODO check if starts with tempDirectory
+    if (this.#hasPoisonNullByte(directory)) {
+      throw new Error(`Hacking is not allowed.`);
+    }
     await promises.rm(directory, {
       recursive: true,
       force: true,
@@ -32,10 +35,20 @@ export class SharedStorage implements TemporaryDirectory {
 
   async get(): Promise<WorkingDirectory> {
     const directory = v4();
-    const fullPath = resolve(this.#tempDirectory, directory);
+    const fullPath = resolve(
+      this.#tempDirectory,
+      directory,
+    ) as WorkingDirectory;
+
     await promises.mkdir(resolve(this.#tempDirectory, directory));
-    // TODO replace output with the name from params
-    await promises.mkdir(resolve(this.#tempDirectory, directory, 'output'));
+
     return fullPath as WorkingDirectory;
+  }
+
+  #hasPoisonNullByte = (path: string): boolean => path.indexOf('\0') !== -1;
+
+  async createOutputDirectory(inside: WorkingDirectory): Promise<void> {
+    const outputPath = this.marxanDirectory.get('OUTPUTDIR', inside);
+    await promises.mkdir(outputPath.fullPath);
   }
 }
