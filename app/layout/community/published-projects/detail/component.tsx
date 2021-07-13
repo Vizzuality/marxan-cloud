@@ -16,8 +16,6 @@ import PublishedProjectMap from 'layout/community/published-projects/detail/map'
 import Share from 'layout/community/published-projects/detail/share';
 import Wrapper from 'layout/wrapper';
 
-import { MOCK_CONTRIBUTORS } from './constants';
-
 export interface CommunityProjectsDetailProps {
 
 }
@@ -31,7 +29,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   } = usePublishedProject(pid);
 
   const {
-    data: publishedprojectScenariosData,
+    data: publishedprojectScenarios,
     isFetched: publishedprojectScenariosIsFetched,
   } = useScenarios(pid, {
     filters: {
@@ -41,7 +39,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   });
 
   const {
-    id, description, name, planningAreaName, timesDuplicated,
+    id, description, name, planningAreaName, timesDuplicated, contributors,
   } = publishedProject || {};
 
   return (
@@ -70,7 +68,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                 <h2
                   className="mt-5 mb-12 text-4xl font-medium text-left font-heading"
                 >
-                  { name}
+                  {name}
                 </h2>
 
                 <p className="mb-10 text-sm leading-normal text-gray-400">
@@ -96,10 +94,10 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                   <div>
                     <h3 className="mb-6 text-sm font-semibold text-white">Creators</h3>
-                    {MOCK_CONTRIBUTORS?.map((u) => (
-                      <div key={u.id} className="flex flex-row items-center mb-5">
-                        <Avatar bgImage={u.avatar || '/images/avatar.png'} size="s" />
-                        <p className="ml-5 text-sm text-white">{u.name}</p>
+                    {contributors?.map((c) => (
+                      <div key={c.id} className="flex flex-row items-center mb-5">
+                        <Avatar bgImage={c.bgImage || '/images/avatar.png'} size="s" />
+                        <p className="ml-5 text-sm text-white">{c.name}</p>
                       </div>
                     ))}
                   </div>
@@ -111,17 +109,17 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                   <div>
                     <h3 className="mb-6 text-sm font-semibold text-white">Scenarios</h3>
-                    {publishedprojectScenariosData && publishedprojectScenariosIsFetched && (
+                    {publishedprojectScenarios && publishedprojectScenariosIsFetched && (
                       <>
                         <p className="text-sm text-white">
-                          {publishedprojectScenariosData.length}
+                          {publishedprojectScenarios.length}
                           {' '}
                           scenarios
                         </p>
                         <p className="text-sm text-white">
                           Last creation:
                           {' '}
-                          {publishedprojectScenariosData[0].lastUpdateDistance}
+                          {publishedprojectScenarios[0]?.lastUpdateDistance}
                         </p>
                       </>
                     )}
