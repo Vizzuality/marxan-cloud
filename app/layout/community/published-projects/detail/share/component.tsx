@@ -63,7 +63,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           type="button"
           role="button"
-          href={`https://twitter.com/intent/tweet?url=${window.location.toString()}`}
+          href={`https://twitter.com/intent/tweet?url=${typeof window !== 'undefined' && window.location.toString()}`}
           rel="noreferrer"
           target="_blank"
         >
@@ -75,7 +75,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
         className="flex flex-row"
         type="button"
         role="button"
-        href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.toString()}`}
+        href={`https://www.facebook.com/sharer/sharer.php?u=${typeof window !== 'undefined' && window.location.toString()}`}
         rel="noreferrer"
         target="_blank"
       >

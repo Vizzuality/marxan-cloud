@@ -317,15 +317,15 @@ export function usePublishedProject(id) {
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = data?.data?.data || {};
     const contributors = [
       { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
       { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
     ];
+    const parsedData = { ...data?.data?.data, contributors } || {};
+
     return {
       ...query,
-      data: { ...parsedData, contributors },
-
+      data: parsedData,
     };
   }, [query, data?.data?.data]);
 }

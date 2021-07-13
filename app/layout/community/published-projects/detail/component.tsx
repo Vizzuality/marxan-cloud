@@ -29,8 +29,8 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   } = usePublishedProject(pid);
 
   const {
-    data: publishedprojectScenarios,
-    isFetched: publishedprojectScenariosIsFetched,
+    data: publishedProjectScenarios,
+    isFetched: publishedProjectScenariosIsFetched,
   } = useScenarios(pid, {
     filters: {
       projectId: pid,
@@ -41,6 +41,8 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   const {
     id, description, name, planningAreaName, timesDuplicated, contributors,
   } = publishedProject || {};
+
+  const scenarios = publishedProjectScenarios || [];
 
   return (
     <Wrapper>
@@ -93,9 +95,9 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                 <div className="grid grid-cols-2 grid-rows-2 gap-y-11 gap-x-9">
 
                   <div>
-                    <h3 className="mb-6 text-sm font-semibold text-white">Creators</h3>
-                    {contributors?.map((c) => (
-                      <div key={c.id} className="flex flex-row items-center mb-5">
+                    <h3 className="mb-5 text-sm font-semibold text-white">Creators</h3>
+                    {contributors && contributors.map((c) => (
+                      <div key={c.id} className="flex flex-row items-center mb-4">
                         <Avatar bgImage={c.bgImage || '/images/avatar.png'} size="s" />
                         <p className="ml-5 text-sm text-white">{c.name}</p>
                       </div>
@@ -109,17 +111,17 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                   <div>
                     <h3 className="mb-6 text-sm font-semibold text-white">Scenarios</h3>
-                    {publishedprojectScenarios && publishedprojectScenariosIsFetched && (
+                    {scenarios && publishedProjectScenariosIsFetched && (
                       <>
                         <p className="text-sm text-white">
-                          {publishedprojectScenarios.length}
+                          {scenarios?.length}
                           {' '}
                           scenarios
                         </p>
                         <p className="text-sm text-white">
                           Last creation:
                           {' '}
-                          {publishedprojectScenarios[0]?.lastUpdateDistance}
+                          {scenarios[0].lastUpdateDistance}
                         </p>
                       </>
                     )}
