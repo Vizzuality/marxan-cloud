@@ -31,7 +31,9 @@ import ProjectFormProps from './types';
 import { DEFAULT_AREA } from './constants';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
-  const [hasPlanningArea, setHasPlanningArea] = useState(false);
+  const [hasPlanningArea, setHasPlanningArea] = useState(null);
+
+  console.log({ hasPlanningArea });
   const { addToast } = useToasts();
   const { push } = useRouter();
   const { data: organizationsData } = useOrganizations();
@@ -148,11 +150,11 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                       </InfoButton>
                     </div>
                     {/* TEMPORARILY HIDDEN, it will be implemented in the future */}
-                    <div className="hidden">
+                    <div className="flex flex-row">
                       <Button
                         className="w-20 h-6 mr-4"
                         size="xs"
-                        theme={!hasPlanningArea ? 'white' : 'secondary'}
+                        theme={hasPlanningArea !== null && !hasPlanningArea ? 'white' : 'secondary'}
                         onClick={() => setHasPlanningArea(false)}
                       >
                         No
@@ -168,7 +170,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                     </div>
                   </div>
 
-                  {!hasPlanningArea && (
+                  {hasPlanningArea !== null && !hasPlanningArea && (
                     <PlanningAreaSelector
                       values={values}
                     />
