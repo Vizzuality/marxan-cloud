@@ -4,7 +4,6 @@ import Link from 'next/link';
 
 import ProjectNewMap from 'layout/projects/new/map';
 
-import Icon from 'components/icon';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Input from 'components/forms/input';
@@ -12,7 +11,7 @@ import Textarea from 'components/forms/textarea';
 import Button from 'components/button';
 import InfoButton from 'components/info-button';
 
-import UPLOAD_SHAPEFILE_SVG from 'svgs/ui/upload.svg?sprite';
+import Uploading from 'layout/projects/new/form/buttons/uploading';
 
 import {
   composeValidators,
@@ -32,8 +31,7 @@ import { DEFAULT_AREA } from './constants';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
   const [hasPlanningArea, setHasPlanningArea] = useState(null);
-
-  console.log({ hasPlanningArea });
+  const [selected, setSelected] = useState(null);
   const { addToast } = useToasts();
   const { push } = useRouter();
   const { data: organizationsData } = useOrganizations();
@@ -142,55 +140,52 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   </div>
 
                   {/* PLANNING AREA */}
-                  <div className="flex items-center justify-between mt-6">
-                    <div className="flex items-center">
-                      <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
-                      <InfoButton>
-                        <span>Planning area info button.</span>
-                      </InfoButton>
-                    </div>
-                    {/* TEMPORARILY HIDDEN, it will be implemented in the future */}
-                    <div className="flex flex-row">
-                      <Button
-                        className="w-20 h-6 mr-4"
-                        size="xs"
-                        theme={hasPlanningArea !== null && !hasPlanningArea ? 'white' : 'secondary'}
-                        onClick={() => setHasPlanningArea(false)}
-                      >
-                        No
-                      </Button>
-                      <Button
-                        className="w-20 h-6"
-                        size="xs"
-                        theme={hasPlanningArea ? 'white' : 'secondary'}
-                        onClick={() => setHasPlanningArea(true)}
-                      >
-                        Yes
-                      </Button>
+                  <div className="flex flex-col justify-between mt-6">
+                    <h2 className="mb-5 text-lg font-medium font-heading">Do you have a planning region shapefile of your own?</h2>
+                    <div className="flex flex-row items-center justify-between">
+                      <div className="flex flex-row">
+                        <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
+                        <InfoButton>
+                          <span>Planning area info button.</span>
+                        </InfoButton>
+                      </div>
+                      <div className="flex flex-row">
+                        <Button
+                          className="w-20 h-6 mr-4"
+                          size="xs"
+                          theme={hasPlanningArea !== null && !hasPlanningArea ? 'white' : 'secondary'}
+                          onClick={() => setHasPlanningArea(false)}
+                        >
+                          No
+                        </Button>
+                        <Button
+                          className="w-20 h-6"
+                          size="xs"
+                          theme={hasPlanningArea ? 'white' : 'secondary'}
+                          onClick={() => setHasPlanningArea(true)}
+                        >
+                          Yes
+                        </Button>
+                      </div>
                     </div>
                   </div>
 
                   {hasPlanningArea !== null && !hasPlanningArea && (
-                    <PlanningAreaSelector
-                      values={values}
-                    />
+                  <PlanningAreaSelector
+                    values={values}
+                  />
                   )}
 
                   {hasPlanningArea && (
-                  <Button
-                    className="flex w-full mt-4"
-                    theme="secondary"
-                    size="base"
-                    onClick={() => console.info('Upload shapefile')}
-                  >
-                    <span className="w-full">
-                      Upload shapefile
-                    </span>
-                    <Icon
-                      icon={UPLOAD_SHAPEFILE_SVG}
-                    />
-                  </Button>
+                    <div className="mt-9">
+                      <Uploading
+                        type="button"
+                        selected={selected}
+                        onSelected={(s) => setSelected(s)}
+                      />
+                    </div>
                   )}
+
                 </div>
                 <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
               </div>
