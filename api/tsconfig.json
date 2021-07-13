@@ -72,6 +72,12 @@
       ],
       "@marxan/planning-area-repository/*": [
         "libs/planning-area-repository/src/*"
+      ],
+      "@marxan/scenario-puvspr": [
+        "libs/scenario-puvspr/src"
+      ],
+      "@marxan/scenario-puvspr/*": [
+        "libs/scenario-puvspr/src/*"
       ]
     }
   },

@@ -273,6 +273,17 @@ export class ScenariosController {
   }
 
   @ApiTags(marxanRunFiles)
+  @ApiOperation({ description: `Resolve scenario's puvspr file.` })
+  @Get(':id/marxan/dat/puvspr.dat')
+  @ApiProduces('text/plain')
+  @Header('Content-Type', 'text/plain')
+  async getPuvsprDatFile(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<string> {
+    return await this.service.getPuvsprDatCsv(id);
+  }
+
+  @ApiTags(marxanRunFiles)
   @ApiOperation({
     description: `Get archived output files`,
   })
