@@ -19,6 +19,7 @@ import HelpTooltip from 'layout/help/tooltip';
 import HelpSpotlight from 'layout/help/spotlight';
 
 import type { Placement } from '@popperjs/core';
+import { useRouter } from 'next/router';
 
 const flipModifier = {
   name: 'flip',
@@ -48,6 +49,10 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
 }: HelpBeaconProps) => {
   const { active, beacons, addBeacon } = useHelp();
   const [visible, setVisible] = useState(false);
+  const { pathname } = useRouter();
+
+  const updateTimeout = useRef(null);
+
   const childrenRef = useRef(null);
   const [beaconRef, setBeaconRef] = useState(null);
 
@@ -58,10 +63,21 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   const onResize = useCallback(() => {
     Object.keys(beacons).forEach((k) => {
       const b = beacons[k];
-      console.log(b);
       if (b.update) b.update();
     });
   }, [beacons]);
+
+  const onUpdate = useCallback(() => {
+    onResize();
+
+    clearTimeout(updateTimeout.current);
+
+    updateTimeout.current = setTimeout(() => {
+      if (active) {
+        onUpdate();
+      }
+    }, 50);
+  }, [active, onResize]);
 
   // 'usePopper'
   const {
@@ -80,12 +96,20 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   });
 
   useEffect(() => {
+    onUpdate();
+
+    return () => {
+      clearTimeout(updateTimeout.current);
+    };
+  }, [onUpdate]);
+
+  useEffect(() => {
     addBeacon({
-      id,
+      id: `${pathname}-${id}`,
       state,
       update,
     });
-  }, [active, addBeacon, id, state, update, childrenRef, beaconRef]);
+  }, [active, pathname, id, state, childrenRef, beaconRef, addBeacon, update]);
 
   return (
     <>

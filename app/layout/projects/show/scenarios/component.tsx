@@ -21,11 +21,11 @@ import ScenarioItem from 'components/scenarios/item';
 import ScenarioTypes from 'layout/projects/show/scenarios/types';
 import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
 import ScenarioSettings from 'layout/projects/show/scenarios/settings';
+import HelpBeacon from 'layout/help/beacon';
 
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
-import HelpBeacon from 'layout/help/beacon';
 
 export interface ProjectScenariosProps {
 }
@@ -184,7 +184,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                     <TAG
                       key={`${s.id}`}
                       {...i === 0 && {
-                        id: `${s.id}`,
+                        id: `project-scenario-${s.id}`,
                         title: 'Scenarios list',
                         subtitle: 'project detail',
                         content: (

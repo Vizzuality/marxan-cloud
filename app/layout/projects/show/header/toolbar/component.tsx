@@ -57,7 +57,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
             </HelpBeacon>
 
             <HelpBeacon
-              id="project-upload"
+              id="project-download"
               title="Download scenario"
               subtitle="Project list"
               content={(
