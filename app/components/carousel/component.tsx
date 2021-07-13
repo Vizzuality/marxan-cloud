@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { useKeenSlider } from 'keen-slider/react';
 
@@ -15,6 +15,9 @@ export interface CarouselProps {
 
 export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: CarouselProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const timer = useRef(null);
+
+  const [pause, setPause] = useState(false);
   const [sliderRef, slider] = useKeenSlider<HTMLDivElement>({
     initial,
     loop: true,
@@ -22,6 +25,26 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
       setCurrentSlide(s.details().relativeSlide);
     },
   });
+
+  useEffect(() => {
+    sliderRef.current.addEventListener('mouseover', () => {
+      setPause(true);
+    });
+    sliderRef.current.addEventListener('mouseout', () => {
+      setPause(false);
+    });
+  }, [sliderRef]);
+
+  useEffect(() => {
+    timer.current = setInterval(() => {
+      if (!pause && slider) {
+        slider.next();
+      }
+    }, 2000);
+    return () => {
+      clearInterval(timer.current);
+    };
+  }, [pause, slider]);
 
   return (
     <div>
