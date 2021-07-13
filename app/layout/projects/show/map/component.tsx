@@ -75,7 +75,9 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
               <div>
                 Here you can see your planning region, features and results.
               </div>
-              )}
+            )}
+            modifiers={['flip']}
+            tooltipPlacement="left"
           >
             <div className="w-full h-full">
               <Map

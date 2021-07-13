@@ -30,6 +30,11 @@ const hideModifier = {
   name: 'hide',
   enabled: true,
 };
+
+const MODIFIERS = [
+  flipModifier,
+  hideModifier,
+];
 export interface HelpBeaconProps {
   id: string;
   title: string;
@@ -37,6 +42,8 @@ export interface HelpBeaconProps {
   content: ReactNode;
   children: ReactElement;
   placement?: Placement;
+  modifiers?: string[];
+  tooltipPlacement?: Placement;
 }
 
 export const HelpBeacon: React.FC<HelpBeaconProps> = ({
@@ -46,6 +53,8 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   content,
   children,
   placement = 'top-start',
+  modifiers = ['flip', 'hide'],
+  tooltipPlacement = 'bottom',
 }: HelpBeaconProps) => {
   const { active, beacons, addBeacon } = useHelp();
   const [visible, setVisible] = useState(false);
@@ -76,7 +85,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
       if (active) {
         onUpdate();
       }
-    }, 50);
+    }, 250);
   }, [active, onResize]);
 
   // 'usePopper'
@@ -84,10 +93,12 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
     styles, attributes, state, update,
   } = usePopper(childrenRef.current, beaconRef, {
     placement,
-    modifiers: [
-      flipModifier,
-      hideModifier,
-    ],
+    modifiers: MODIFIERS.map((m) => {
+      return {
+        ...m,
+        enabled: modifiers.includes(m.name),
+      };
+    }),
   });
 
   useResizeDetector({
@@ -115,7 +126,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
     <>
       <Tooltip
         arrow
-        placement="bottom"
+        placement={tooltipPlacement}
         visible={visible && active}
         maxWidth={350}
         onClickOutside={() => {
