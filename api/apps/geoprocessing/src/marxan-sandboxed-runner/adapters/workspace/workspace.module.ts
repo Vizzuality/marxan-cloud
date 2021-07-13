@@ -8,6 +8,8 @@ import { SharedStorage } from './shared-storage';
 
 import { WorkspaceService } from './workspace.service';
 import { MarxanConfig } from '../../marxan-config';
+import { MarxanDirectory } from '../marxan-directory.service';
+import { FileReader } from '../../adapters/file-reader';
 
 @Module({
   providers: [
@@ -25,6 +27,8 @@ import { MarxanConfig } from '../../marxan-config';
       useClass: WorkspaceService,
     },
     WorkspaceService,
+    FileReader,
+    MarxanDirectory,
   ],
   exports: [WorkspaceBuilder],
 })

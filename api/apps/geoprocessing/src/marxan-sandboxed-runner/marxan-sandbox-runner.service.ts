@@ -60,6 +60,7 @@ export class MarxanSandboxRunnerService {
 
     await interruptIfKilled();
     await inputFiles.include(workspace, assets);
+    await workspace.arrangeOutputSpace();
 
     return new Promise(async (resolve, reject) => {
       marxanRun.on('error', async (result) => {
