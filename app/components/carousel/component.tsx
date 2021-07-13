@@ -40,7 +40,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images, initial = 0 }: Carou
       if (!pause && slider) {
         slider.next();
       }
-    }, 2000);
+    }, 4000);
     return () => {
       clearInterval(timer.current);
     };
