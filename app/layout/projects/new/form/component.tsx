@@ -154,7 +154,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           className="w-20 h-6 mr-4"
                           size="xs"
                           theme={hasPlanningArea !== null && !hasPlanningArea ? 'white' : 'secondary'}
-                          onClick={() => setHasPlanningArea(false)}
+                          onClick={() => {
+                            setHasPlanningArea(false);
+                            setSelected(false);
+                          }}
                         >
                           No
                         </Button>
@@ -179,7 +182,6 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   {hasPlanningArea && (
                     <div className="mt-9">
                       <Uploading
-                        type="button"
                         selected={selected}
                         onSelected={(s) => setSelected(s)}
                       />
