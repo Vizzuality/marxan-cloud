@@ -10,7 +10,7 @@ export const parameters = {
       order: [
         'Intro',
         'Docs', ['Install', 'Deploy', 'Authentication', 'Fetching', 'Media', 'Tests'],
-        'Components'
+        'Components', 
       ],
     },
   },

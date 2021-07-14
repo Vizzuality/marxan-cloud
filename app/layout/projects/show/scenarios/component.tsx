@@ -21,11 +21,11 @@ import ScenarioItem from 'components/scenarios/item';
 import ScenarioTypes from 'layout/projects/show/scenarios/types';
 import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
 import ScenarioSettings from 'layout/projects/show/scenarios/settings';
+import HelpBeacon from 'layout/help/beacon';
 
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
-import HelpBeacon from 'layout/help/beacon';
 
 export interface ProjectScenariosProps {
 }
@@ -184,15 +184,15 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                     <TAG
                       key={`${s.id}`}
                       {...i === 0 && {
-                        id: `${s.id}`,
+                        id: `project-scenario-${s.id}`,
                         title: 'Scenarios list',
                         subtitle: 'project detail',
                         content: (
                           <div>
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                            Beatae ratione cumque in nobis fugiat,
-                            neque ullam aliquam, commodi dolorem unde inventore eaque,
-                            dolorum eveniet! Corrupti voluptatum molestias quaerat voluptatem ipsa.
+                            Here you can see listed all the scenarios under the same project.
+                            You can access a scenario and edit it at any time, unless there is
+                            a contributor working on the same scenario. In this case, you will see
+                            a warning.
                           </div>
                         ),
                       }}

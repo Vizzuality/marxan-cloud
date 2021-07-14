@@ -4,7 +4,7 @@ export const VALUES = [
     title: 'Free and open',
     description: 'We remain committed to free and open data and technology.',
     hypertext: 'Know more',
-    hyperlink: '/https://github.com/Marxan-source-code',
+    hyperlink: 'https://github.com/Marxan-source-code',
   },
   {
     order: '02.',
@@ -16,7 +16,7 @@ export const VALUES = [
   {
     order: '03.',
     title: 'Inclusive',
-    description: 'we are dedicated to developing technical capacity and expertise in Marxan around the world.',
+    description: 'We are dedicated to developing technical capacity and expertise in Marxan around the world.',
     hypertext: 'Know more',
     hyperlink: 'https://marxansolutions.org/getting-started',
   },

@@ -43,7 +43,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     .reduce((acc, k) => {
       return {
         ...acc,
-        [`filter[${k}]`]: filters[k].toString(),
+        [`filter[${k}]`]: (filters[k] && filters[k].toString) ? filters[k].toString() : filters[k],
       };
     }, {});
 

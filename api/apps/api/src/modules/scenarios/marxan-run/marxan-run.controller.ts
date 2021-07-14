@@ -7,16 +7,21 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiProduces } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiProduces,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { XApiGuard } from '@marxan-api/guards/x-api.guard';
-import { MarxanRunService } from './marxan-run.service';
+import { MarxanFilesService } from './marxan-files.service';
 
 @UseGuards(XApiGuard)
 @Controller(`${apiGlobalPrefixes.v1}/marxan-run/scenarios`)
 export class MarxanRunController {
-  constructor(private readonly service: MarxanRunService) {}
+  constructor(private readonly service: MarxanFilesService) {}
 
   @Header('Content-Type', 'text/csv')
   @ApiOkResponse({
@@ -44,5 +49,25 @@ export class MarxanRunController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
     return await this.service.getInputParameterFile(id);
+  }
+
+  @ApiOperation({ description: `Resolve scenario's puvspr file.` })
+  @Get(':id/marxan/dat/puvspr.dat')
+  @ApiProduces('text/plain')
+  @Header('Content-Type', 'text/plain')
+  async getPuvsprDatFile(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<string> {
+    return await this.service.getPuvsprDat(id);
+  }
+
+  @ApiOperation({ description: `Resolve scenario's bound file.` })
+  @Get(':id/marxan/dat/bound.dat')
+  @ApiProduces('text/plain')
+  @Header('Content-Type', 'text/plain')
+  async getBoundDatFile(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<string> {
+    return await this.service.getBoundDat(id);
   }
 }

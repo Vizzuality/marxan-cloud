@@ -14,11 +14,15 @@ export const Footer: React.FC<FooterProps> = () => {
       <Wrapper>
         <div className="w-full max-w-5xl py-32 mx-auto">
           <h2
-            className="max-w-3xl pb-10 text-5xl leading-snug md:text-6xl font-heading"
+            className="text-5xl pb-7 md:text-6xl font-heading"
           >
-            Want to know more about Marxan?
+            Want to know more
           </h2>
-
+          <h2
+            className="pb-10 text-5xl md:text-6xl font-heading"
+          >
+            about Marxan?
+          </h2>
           <div className="flex flex-col items-center mt-16 space-y-8 text-2xl md:mt-10 md:space-y-0 md:space-x-8 font-heading md:flex-row">
             <span>Explore more:</span>
             <Link href="/about">

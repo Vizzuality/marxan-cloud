@@ -1,29 +1,18 @@
 import { Injectable } from '@nestjs/common';
-
 import { existsSync, promises } from 'fs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+
+import { ExecutionResult } from '@marxan/marxan-output';
 import { Workspace } from '../../ports/workspace';
 import { Cancellable } from '../../ports/cancellable';
 
 import { MarxanExecutionMetadataRepository } from './metadata';
-import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
-import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ResultParserService } from './result-parser.service';
 
 @Injectable()
 export class SolutionsOutputService implements Cancellable {
-  /**
-   * load entities
-   * file streamers
-   * ...
-   */
   constructor(
-    @InjectRepository(
-      ScenariosOutputResultsApiEntity,
-      geoprocessingConnections.apiDB.name,
-    )
-    private readonly resultsRepo: Repository<ScenariosOutputResultsApiEntity>,
     private readonly metadataRepository: MarxanExecutionMetadataRepository,
+    private readonly resultParserService: ResultParserService,
   ) {
     //
   }
@@ -38,12 +27,12 @@ export class SolutionsOutputService implements Cancellable {
    * ScenariosPuOutputGeoEntity
    *
    */
-  async saveFrom(
+  async dump(
     workspace: Workspace,
     scenarioId: string,
     stdOutput: string[],
     stdErr?: string[],
-  ): Promise<void> {
+  ): Promise<ExecutionResult> {
     if (!existsSync(workspace.workingDirectory + `/output/output_sum.csv`)) {
       throw new Error(`Output is missing from the marxan run.`);
     }
@@ -51,46 +40,16 @@ export class SolutionsOutputService implements Cancellable {
       stdOutput,
       stdErr,
     });
+    const runsSummary = (
+      await promises.readFile(
+        workspace.workingDirectory + `/output/output_sum.csv`,
+      )
+    ).toString();
 
-    // just a sample for brevity, ideally should stream into db tables & use csv streamer
-    // const runsSummary = (
-    //   await promises.readFile(
-    //     workspace.workingDirectory + `/output/output_sum.csv`,
-    //   )
-    // ).toString();
-    // await this.resultsRepo.save(
-    //   runsSummary
-    //     .split('\n')
-    //     .slice(1)
-    //     .map((row) => {
-    //       const [
-    //         runId,
-    //         score,
-    //         cost,
-    //         planningUnits,
-    //         connectivity,
-    //         connectivityTotal,
-    //         connectivityIn,
-    //         connectivityEdge,
-    //         connectivityOut,
-    //         connectivityInFraction,
-    //         penalty,
-    //         shortfall,
-    //         missingValues,
-    //         mpm,
-    //       ] = row.split(',');
-    //       return this.resultsRepo.create({
-    //         scenarioId,
-    //         scoreValue: +score,
-    //       });
-    //     }),
-    // );
-
-    return;
+    return this.resultParserService.parse(runsSummary);
   }
 
-  cancel(): Promise<void> {
-    // TODO if streaming will be involved, can be interrupted
-    return Promise.resolve(undefined);
+  async cancel(): Promise<void> {
+    return;
   }
 }

@@ -19,6 +19,7 @@ import HelpTooltip from 'layout/help/tooltip';
 import HelpSpotlight from 'layout/help/spotlight';
 
 import type { Placement } from '@popperjs/core';
+import { useRouter } from 'next/router';
 
 const flipModifier = {
   name: 'flip',
@@ -29,6 +30,11 @@ const hideModifier = {
   name: 'hide',
   enabled: true,
 };
+
+const MODIFIERS = [
+  flipModifier,
+  hideModifier,
+];
 export interface HelpBeaconProps {
   id: string;
   title: string;
@@ -36,6 +42,8 @@ export interface HelpBeaconProps {
   content: ReactNode;
   children: ReactElement;
   placement?: Placement;
+  modifiers?: string[];
+  tooltipPlacement?: Placement;
 }
 
 export const HelpBeacon: React.FC<HelpBeaconProps> = ({
@@ -45,9 +53,15 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   content,
   children,
   placement = 'top-start',
+  modifiers = ['flip', 'hide'],
+  tooltipPlacement = 'bottom',
 }: HelpBeaconProps) => {
   const { active, beacons, addBeacon } = useHelp();
   const [visible, setVisible] = useState(false);
+  const { pathname } = useRouter();
+
+  const updateTimeout = useRef(null);
+
   const childrenRef = useRef(null);
   const [beaconRef, setBeaconRef] = useState(null);
 
@@ -62,15 +76,29 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
     });
   }, [beacons]);
 
+  const onUpdate = useCallback(() => {
+    onResize();
+
+    clearTimeout(updateTimeout.current);
+
+    updateTimeout.current = setTimeout(() => {
+      if (active) {
+        onUpdate();
+      }
+    }, 250);
+  }, [active, onResize]);
+
   // 'usePopper'
   const {
     styles, attributes, state, update,
   } = usePopper(childrenRef.current, beaconRef, {
     placement,
-    modifiers: [
-      flipModifier,
-      hideModifier,
-    ],
+    modifiers: MODIFIERS.map((m) => {
+      return {
+        ...m,
+        enabled: modifiers.includes(m.name),
+      };
+    }),
   });
 
   useResizeDetector({
@@ -79,18 +107,26 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   });
 
   useEffect(() => {
+    onUpdate();
+
+    return () => {
+      clearTimeout(updateTimeout.current);
+    };
+  }, [onUpdate]);
+
+  useEffect(() => {
     addBeacon({
-      id,
+      id: `${pathname}-${id}`,
       state,
       update,
     });
-  }, [active, addBeacon, id, state, update, childrenRef, beaconRef]);
+  }, [active, pathname, id, state, childrenRef, beaconRef, addBeacon, update]);
 
   return (
     <>
       <Tooltip
         arrow
-        placement="bottom"
+        placement={tooltipPlacement}
         visible={visible && active}
         maxWidth={350}
         onClickOutside={() => {

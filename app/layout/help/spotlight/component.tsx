@@ -51,8 +51,8 @@ export const HelpSpotlight = ({
 
       CTX.beginPath();
       CTX.rect(0, 0, canvaswidth, canvasheight);
-      // CTX.fillStyle = 'rgba(0,0,0,0.75)';
-      CTX.fillStyle = gradient;
+      CTX.fillStyle = 'rgba(0,0,0,0.75)';
+      // CTX.fillStyle = gradient;
       CTX.fill();
     }
   }, [canvasSize]);

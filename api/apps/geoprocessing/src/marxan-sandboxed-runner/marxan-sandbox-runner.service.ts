@@ -2,11 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import AbortController from 'abort-controller';
 
+import { ExecutionResult } from '@marxan/marxan-output';
+
 import { MarxanRun } from './marxan-run';
 import { WorkspaceBuilder } from './ports/workspace-builder';
 import { Cancellable } from './ports/cancellable';
 import { Assets, InputFilesFs } from './adapters/scenario-data/input-files-fs';
 import { SolutionsOutputService } from './adapters/solutions-output/solutions-output.service';
+
+export { Assets };
 
 @Injectable()
 export class MarxanSandboxRunnerService {
@@ -24,7 +28,7 @@ export class MarxanSandboxRunnerService {
     }
   }
 
-  async run(forScenarioId: string, assets: Assets): Promise<void> {
+  async run(forScenarioId: string, assets: Assets): Promise<ExecutionResult> {
     const workspace = await this.workspaceService.get();
     const inputFiles = await this.moduleRef.create(InputFilesFs);
     const outputFilesRepository = await this.moduleRef.create(
@@ -66,14 +70,14 @@ export class MarxanSandboxRunnerService {
       marxanRun.on('finished', async () => {
         try {
           await interruptIfKilled();
-          await outputFilesRepository.saveFrom(
+          const output = await outputFilesRepository.dump(
             workspace,
             forScenarioId,
             marxanRun.stdOut,
             [],
           );
           await workspace.cleanup();
-          resolve();
+          resolve(output);
         } catch (error) {
           reject(error);
         } finally {

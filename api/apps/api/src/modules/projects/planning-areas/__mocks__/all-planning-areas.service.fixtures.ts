@@ -1,6 +1,6 @@
 import { CustomPlanningAreaRepository } from '@marxan/planning-area-repository';
 import { BBox } from 'geojson';
-import { assertDefined, isDefined } from '@marxan/utils';
+import { assertDefined, FieldsOf, isDefined } from '@marxan/utils';
 import { Test } from '@nestjs/testing';
 import { HttpModule } from '@nestjs/common';
 import { AdminArea } from '@marxan/admin-regions';
@@ -14,10 +14,6 @@ import { AdminPlanningAreasService } from '../admin-planning-areas.service';
 import { CountryPlanningAreasService } from '../country-planning-areas.service';
 
 export async function getFixtures() {
-  type FieldsOf<T> = {
-    [index in keyof T]: T[index];
-  };
-
   class FakeCustomPlanningAreaRepository
     implements FieldsOf<CustomPlanningAreaRepository> {
     db: Record<string, { bbox: BBox; projectId?: string }> = {};

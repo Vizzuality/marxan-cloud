@@ -13,6 +13,9 @@ import Controls from 'components/map/controls';
 import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 
+// Guided help
+import HelpBeacon from 'layout/help/beacon';
+
 export interface ProjectMapProps {
 }
 
@@ -64,18 +67,31 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
         >
-          <Map
-            bounds={bounds}
-            width="100%"
-            height="100%"
-            minZoom={minZoom}
-            maxZoom={maxZoom}
-            viewport={viewport}
-            mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
-            mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
-            onMapViewportChange={handleViewportChange}
+          <HelpBeacon
+            id="project-map"
+            title="Project map view"
+            subtitle="Project list"
+            content={(
+              <div>
+                Here you can see your planning region, features and results.
+              </div>
+            )}
+            modifiers={['flip']}
+            tooltipPlacement="left"
           >
-            {/* {(map) => {
+            <div className="w-full h-full">
+              <Map
+                bounds={bounds}
+                width="100%"
+                height="100%"
+                minZoom={minZoom}
+                maxZoom={maxZoom}
+                viewport={viewport}
+                mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
+                mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
+                onMapViewportChange={handleViewportChange}
+              >
+                {/* {(map) => {
               return (
                 <LayerManager map={map} plugin={PluginMapboxGl}>
                   {LAYERS.map((l) => (
@@ -84,7 +100,10 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                 </LayerManager>
               );
             }} */}
-          </Map>
+
+              </Map>
+            </div>
+          </HelpBeacon>
 
           <Controls>
             <ZoomControl

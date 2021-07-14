@@ -37,3 +37,10 @@ export interface UploadProjectPAProps {
   id?: string,
   data: any,
 }
+
+// usePublicProjects
+export interface UsePublishedProjectsProps {
+  search?: string;
+  sort?: string,
+  filters?: Record<string, unknown>
+}

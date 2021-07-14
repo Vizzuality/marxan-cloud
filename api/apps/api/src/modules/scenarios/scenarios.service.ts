@@ -2,11 +2,13 @@ import {
   BadRequestException,
   HttpService,
   Injectable,
-  NotImplementedException,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
+import { isLeft } from 'fp-ts/Either';
 
 import { MarxanInput, MarxanParameters } from '@marxan/marxan-input';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -26,9 +28,11 @@ import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
-import { InputParameterFileProvider } from './input-parameter-file.provider';
 import { SpecDatService } from './input-files/spec.dat.service';
+import { PuvsprDatService } from './input-files/puvspr.dat.service';
 import { OutputFilesService } from './output-files/output-files.service';
+import { BoundDatService } from './input-files/bound.dat.service';
+import { notFound, RunService, InputParameterFileProvider } from './marxan-run';
 
 @Injectable()
 export class ScenariosService {
@@ -46,7 +50,10 @@ export class ScenariosService {
     private readonly costSurfaceView: CostSurfaceViewService,
     private readonly marxanInputValidator: MarxanInput,
     private readonly inputParameterFileProvider: InputParameterFileProvider,
+    private readonly runService: RunService,
     private readonly specDatService: SpecDatService,
+    private readonly puvsprDatService: PuvsprDatService,
+    private readonly boundDatService: BoundDatService,
     private readonly outputFilesService: OutputFilesService,
   ) {}
 
@@ -156,24 +163,39 @@ export class ScenariosService {
     return this.specDatService.getSpecDatContent(scenarioId);
   }
 
+  async getBoundDatCsv(scenarioId: string): Promise<string> {
+    await this.assertScenario(scenarioId);
+    return this.boundDatService.getContent(scenarioId);
+  }
+
   async run(scenarioId: string, _blm?: number): Promise<void> {
     await this.assertScenario(scenarioId);
-    // TODO ensure not running yet
-    // TODO submit
-    throw new NotImplementedException();
+    await this.runService.run(scenarioId);
   }
 
   async cancel(scenarioId: string): Promise<void> {
     await this.assertScenario(scenarioId);
-    // TODO ensure it is running
-    throw new NotImplementedException();
+    const result = await this.runService.cancel(scenarioId);
+    if (isLeft(result)) {
+      switch (result.left) {
+        case notFound:
+          throw new NotFoundException();
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
+    }
   }
 
   private async assertScenario(scenarioId: string) {
     await this.crudService.getById(scenarioId);
   }
 
-  async getOneSolution(scenarioId: string, runId: string, fetchSpecification: FetchSpecification) {
+  async getOneSolution(
+    scenarioId: string,
+    runId: string,
+    fetchSpecification: FetchSpecification,
+  ) {
     await this.assertScenario(scenarioId);
     // TODO correct implementation
     return this.solutionsCrudService.getById(runId);
@@ -181,10 +203,11 @@ export class ScenariosService {
 
   async getBestSolution(
     scenarioId: string,
-    fetchSpecification: FetchSpecification) {
+    fetchSpecification: FetchSpecification,
+  ) {
     await this.assertScenario(scenarioId);
     // TODO correct implementation
-    fetchSpecification.filter = {...fetchSpecification.filter,  best: true }
+    fetchSpecification.filter = { ...fetchSpecification.filter, best: true };
     return this.solutionsCrudService.findAllPaginated(fetchSpecification);
   }
 
@@ -194,7 +217,10 @@ export class ScenariosService {
   ) {
     await this.assertScenario(scenarioId);
     // TODO correct implementation
-    fetchSpecification.filter = {...fetchSpecification.filter,  distinctFive: true }
+    fetchSpecification.filter = {
+      ...fetchSpecification.filter,
+      distinctFive: true,
+    };
     return this.solutionsCrudService.findAllPaginated(fetchSpecification);
   }
 
@@ -236,5 +262,10 @@ export class ScenariosService {
   async getMarxanExecutionOutputArchive(scenarioId: string) {
     await this.assertScenario(scenarioId);
     return this.outputFilesService.get(scenarioId);
+  }
+
+  async getPuvsprDatCsv(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    return this.puvsprDatService.getPuvsprDatContent(scenarioId);
   }
 }
