@@ -151,6 +151,7 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
             onClick={() => onSelected('uploading')}
           >
             <header className="relative flex justify-between w-full">
+
               <div
                 className={cx({
                   'text-center': !selected,
@@ -166,58 +167,59 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
                   icon={UPLOAD_SVG}
                 />
               )}
+
             </header>
 
             {selected && !successFile && (
+              <div className="pt-2">
+                <div
+                  {...getRootProps()}
+                  className={cx({
+                    'relative px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
+                    'bg-gray-500': isDragActive,
+                    'border-green-800': isDragAccept,
+                    'border-red-800': isDragReject,
+                  })}
+                >
 
-            <div className="pt-2">
-              <div
-                {...getRootProps()}
-                className={cx({
-                  'relative px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
-                  'bg-gray-500': isDragActive,
-                  'border-green-800': isDragAccept,
-                  'border-red-800': isDragReject,
-                })}
-              >
-                <input {...getInputProps()} />
+                  <input {...getInputProps()} />
 
-                <p className="text-sm text-gray-300">
-                  Drag and drop your
-                  {' '}
-                  <b>polygon data file</b>
-                  {' '}
-                  or click here to upload
+                  <p className="text-sm text-gray-300">
+                    Drag and drop your
+                    {' '}
+                    <b>polygon data file</b>
+                    {' '}
+                    or click here to upload
+                  </p>
+
+                  <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 3 MB'}</p>
+
+                  <Loading
+                    visible={loading}
+                    className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                    iconClassName="w-5 h-5 text-primary-500"
+                  />
+
+                </div>
+
+                <p className="flex items-center space-x-2 text-xs text-gray-300 mt-2.5">
+                  <span>Learn more about supported file formats</span>
+                  <InfoButton
+                    theme="secondary"
+                  >
+                    <div className="text-sm">
+                      <h3 className="font-semibold">List of supported file formats:</h3>
+                      <ul className="pl-4 mt-2 space-y-1 list-disc list-outside">
+                        <li>
+                          Zipped: .shp
+                          (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)
+                        </li>
+                      </ul>
+                    </div>
+                  </InfoButton>
                 </p>
 
-                <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 3 MB'}</p>
-
-                <Loading
-                  visible={loading}
-                  className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-                  iconClassName="w-5 h-5 text-primary-500"
-                />
-
               </div>
-              <p className="flex items-center space-x-2 text-xs text-gray-300 mt-2.5">
-                <span>Learn more about supported file formats</span>
-
-                <InfoButton
-                  theme="secondary"
-                >
-                  <div className="text-sm">
-                    <h3 className="font-semibold">List of supported file formats:</h3>
-                    <ul className="pl-4 mt-2 space-y-1 list-disc list-outside">
-                      <li>
-                        Zipped: .shp
-                        (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)
-                      </li>
-                    </ul>
-                  </div>
-                </InfoButton>
-              </p>
-            </div>
-
             )}
 
             {selected && successFile && (

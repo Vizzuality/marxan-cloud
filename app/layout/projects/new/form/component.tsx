@@ -17,13 +17,15 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { useOrganizations } from 'hooks/organizations';
 import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
-import { setBbox, setMaxPuAreaSize, setMinPuAreaSize } from 'store/slices/projects/new';
+import {
+  setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingValue,
+} from 'store/slices/projects/new';
 
 import PlanningAreaSelector from './planning-area-selector';
 import ProjectFormProps from './types';
@@ -41,11 +43,16 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
 
+  const { uploadingValue: planningArea } = useSelector((state) => state['/projects/new']);
+
+  console.log('PLANNING AREA--->', planningArea);
+
   useEffect(() => {
     return () => {
       dispatch(setBbox(null));
       dispatch(setMinPuAreaSize(null));
       dispatch(setMaxPuAreaSize(null));
+      dispatch(setUploadingValue(null));
     };
   }, [dispatch]);
 
