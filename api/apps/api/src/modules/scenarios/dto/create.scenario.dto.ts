@@ -12,6 +12,7 @@ import {
 } from 'class-validator';
 import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 import { JobStatus, ScenarioType } from '../scenario.api.entity';
+import { ScenarioMetadataDto } from './scenario-metadata.dto';
 
 export class CreateScenarioDTO {
   @ApiProperty()
@@ -62,7 +63,7 @@ export class CreateScenarioDTO {
 
   @ApiPropertyOptional()
   @IsOptional()
-  metadata?: Record<string, unknown>;
+  metadata?: ScenarioMetadataDto;
 
   @ApiProperty({ enum: JobStatus, enumName: 'JobStatus' })
   @IsOptional()

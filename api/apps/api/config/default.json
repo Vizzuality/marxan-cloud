@@ -31,6 +31,20 @@
     "sharedFileStorage": {
       "localPath": "/tmp/storage"
     }
+  },
+  "marxan": {
+    "inputFiles": {
+      "inputDat": {
+        "ioSettings": {
+          "INPUTDIR": "input",
+          "PUNAME": "pu.dat",
+          "SPECNAME": "spec.dat",
+          "PUVSPRNAME": "puvspr.dat",
+          "BOUNDNAME": "bound.dat",
+          "OUTPUTDIR": "output"
+        }
+      }
+    }
   }
 }
 

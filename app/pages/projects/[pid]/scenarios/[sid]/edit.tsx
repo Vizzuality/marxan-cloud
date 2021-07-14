@@ -12,6 +12,8 @@ import ScenariosSidebar from 'layout/scenarios/sidebar';
 import SidebarWDPA from 'layout/scenarios/sidebar/wdpa';
 import SidebarFeatures from 'layout/scenarios/sidebar/features';
 import SidebarAnalysis from 'layout/scenarios/sidebar/analysis';
+import SidebarSolutions from 'layout/scenarios/sidebar/solutions';
+import { ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
 
 import { withProtection, withUser } from 'hoc/auth';
 
@@ -33,11 +35,11 @@ const EditScenarioPage: React.FC = () => {
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
               <ScenariosSidebar>
-                <SidebarWDPA key="wdpa" />
-                <SidebarFeatures key="features" />
-                <SidebarAnalysis key="analysis" />
+                <SidebarWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} />
+                <SidebarFeatures key={ScenarioSidebarTabs.FEATURES} />
+                <SidebarAnalysis key={ScenarioSidebarTabs.ANALYSIS} />
+                <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
               </ScenariosSidebar>
-
               <ScenariosMap />
             </div>
           </Wrapper>

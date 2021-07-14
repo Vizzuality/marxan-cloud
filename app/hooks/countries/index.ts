@@ -38,6 +38,8 @@ export function useCountries(filters: UseCountriesProps): UseCountriesResponse {
       name: c.name0,
       id: c.gid0,
       bbox: c.bbox,
+      minPuAreaSize: c.minPuAreaSize,
+      maxPuAreaSize: c.maxPuAreaSize,
     }));
 
     return {
@@ -77,6 +79,8 @@ export function useCountryRegions(props: UseCountryRegionsProps): UseCountryRegi
       id: r.id,
       level: 1,
       bbox: r.bbox,
+      minPuAreaSize: r.minPuAreaSize,
+      maxPuAreaSize: r.maxPuAreaSize,
     }));
 
     return {

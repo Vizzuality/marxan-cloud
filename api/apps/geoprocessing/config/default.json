@@ -5,11 +5,11 @@
       "max": 10,
       "duration": 1000
     },
-   "connection": {
-     "host": "marxan-redis",
-     "port": "6379"
-     }
-   },
+    "connection": {
+      "host": "marxan-redis",
+      "port": "6379"
+    }
+  },
   "api": {
     "url": "http://api:3000"
   },
@@ -17,5 +17,15 @@
     "sharedFileStorage": {
       "localPath": "/tmp/storage"
     }
+  },
+  "fileUploads": {
+    "projects": {
+      "planningAreas": {
+        "maxAgeForOrphanUploads": "2d"
+      }
+    }
+  },
+  "marxan": {
+    "bin": "/opt/marxan-geoprocessing/apps/geoprocessing/src/marxan/marxan-linux-4-0-6"
   }
 }

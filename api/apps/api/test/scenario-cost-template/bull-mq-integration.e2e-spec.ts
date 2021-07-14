@@ -2,7 +2,7 @@ import { PromiseType } from 'utility-types';
 import {
   BullmqQueue,
   costSurfaceTemplateCreationQueue,
-  queueName,
+  queueName as baseQueueName,
   queueProvider,
 } from '@marxan-api/modules/scenarios/cost-surface-template/bullmq-queue';
 import { Test } from '@nestjs/testing';
@@ -10,6 +10,8 @@ import { Queue, Worker } from 'bullmq';
 import * as config from 'config';
 import waitForExpect from 'wait-for-expect';
 import { QueueModule } from '@marxan-api/modules/queue/queue.module';
+
+const queueName = baseQueueName + '_test_' + Date.now();
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let queue: BullmqQueue;
@@ -24,18 +26,16 @@ afterEach(async () => {
 });
 
 describe(`when the job is waiting`, () => {
-  let result: boolean;
   beforeEach(async () => {
     // given
     await fixtures.createJob('123');
-
-    // when
-    result = await queue.isPending('123');
   });
 
   // then
-  it(`should consider job as pending`, () => {
-    expect(result).toBe(true);
+  it(`should consider job as pending`, async () => {
+    await waitForExpect(async () => {
+      expect(await queue.isPending('123')).toBe(true);
+    });
   });
 });
 
@@ -80,7 +80,7 @@ const getFixtures = async () => {
     ],
     providers: [queueProvider, BullmqQueue],
   }).compile();
-  await testingModule.init();
+  await testingModule.enableShutdownHooks().init();
 
   const queue: Queue = testingModule.get(costSurfaceTemplateCreationQueue);
 
@@ -96,14 +96,22 @@ const getFixtures = async () => {
     },
     async cleanup() {
       await Promise.all(addedJobIds.map((id) => queue.remove(id)));
-      await queue.drain();
-      await Promise.all(workers.map((worker) => worker.disconnect()));
+      await Promise.all(
+        workers.map(async (worker) => {
+          await worker.close(true);
+          await worker.disconnect();
+        }),
+      );
+      await queue.obliterate({ force: true });
+      await testingModule.close();
     },
     getBullmqQueue() {
       return testingModule.get(BullmqQueue);
     },
     async expectJobData(scenarioId: string, data: unknown) {
-      expect(await queue.getJob(scenarioId)).toMatchObject({ data });
+      await waitForExpect(async () => {
+        expect(await queue.getJob(scenarioId)).toMatchObject({ data });
+      });
     },
     async noJobInQueue(scenarioId: string) {
       await waitForExpect(async () => {

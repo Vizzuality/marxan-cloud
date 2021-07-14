@@ -1,26 +1,15 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-<<<<<<< HEAD
-=======
     "strict": true,
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
+    "target": "ES2020",
     "sourceMap": true,
     "outDir": "./dist",
-<<<<<<< HEAD
-    "baseUrl": "./src",
-    "incremental": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true
-  },
-  "exclude": ["node_modules", "dist"]
-=======
     "baseUrl": "./",
     "incremental": true,
     "paths": {
@@ -65,6 +54,30 @@
       ],
       "@marxan/scenario-cost-surface/*": [
         "libs/scenario-cost-surface/src/*"
+      ],
+      "@marxan/marxan-input": [
+        "libs/marxan-input/src"
+      ],
+      "@marxan/marxan-input/*": [
+        "libs/marxan-input/src/*"
+      ],
+      "@marxan/marxan-output": [
+        "libs/marxan-output/src"
+      ],
+      "@marxan/marxan-output/*": [
+        "libs/marxan-output/src/*"
+      ],
+      "@marxan/planning-area-repository": [
+        "libs/planning-area-repository/src"
+      ],
+      "@marxan/planning-area-repository/*": [
+        "libs/planning-area-repository/src/*"
+      ],
+      "@marxan/scenario-puvspr": [
+        "libs/scenario-puvspr/src"
+      ],
+      "@marxan/scenario-puvspr/*": [
+        "libs/scenario-puvspr/src/*"
       ]
     }
   },
@@ -72,5 +85,4 @@
     "node_modules",
     "dist"
   ]
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 }

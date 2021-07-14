@@ -1,10 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   NotFoundException,
-  NotImplementedException,
   Param,
   Patch,
   Post,
@@ -48,12 +49,13 @@ import {
 } from 'nestjs-base-service';
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
-import { ProjectsService } from './projects.service';
+import { ProjectsService, validationFailed } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
-import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { JobType } from './job-status/jobs.enum';
+import { JobStatusSerializer } from './dto/job-status.serializer';
+import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
+import { isLeft } from 'fp-ts/Either';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -64,6 +66,7 @@ export class ProjectsController {
     private readonly projectsService: ProjectsService,
     private readonly geoFeatureSerializer: GeoFeatureSerializer,
     private readonly projectSerializer: ProjectSerializer,
+    private readonly jobsStatusSerizalizer: JobStatusSerializer,
   ) {}
 
   @ApiOperation({
@@ -184,31 +187,11 @@ export class ProjectsController {
   async getJobsForProjectScenarios(
     @Param('id') projectId: string,
   ): Promise<ProjectJobsStatusDto> {
-    // TODO add JobStatus DTO
-    // TODO add serializer
-    return {
-      data: {
-        id: projectId,
-        type: 'project-jobs',
-        attributes: {
-          scenarios: [
-            {
-              id: projectId,
-              status: JobStatus.running,
-              jobs: [
-                {
-                  kind: JobType.CostSurface,
-                  status: JobStatus.running,
-                },
-              ],
-            },
-          ],
-        },
-      },
-    };
+    const scenarios = await this.projectsService.getJobStatusFor(projectId);
+    return this.jobsStatusSerizalizer.serialize(projectId, scenarios);
   }
 
-  @ApiConsumesShapefile(false)
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
     description: 'Upload shapefile for project-specific protected areas',
   })
@@ -224,5 +207,31 @@ export class ProjectsController {
       throw new NotFoundException();
     }
     return;
+  }
+
+  @ApiConsumesShapefile({
+    withGeoJsonResponse: true,
+    type: PlanningAreaResponseDto,
+    description: 'Upload shapefile with project planning-area',
+  })
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @Post('planning-area/shapefile')
+  async shapefileWithProjectPlanningArea(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<PlanningAreaResponseDto> {
+    const result = await this.projectsService.savePlanningAreaFromShapefile(
+      file,
+    );
+    if (isLeft(result)) {
+      const mapping: Record<typeof result['left'], () => never> = {
+        [validationFailed]: () => {
+          throw new BadRequestException();
+        },
+      };
+      mapping[result.left]();
+      throw new InternalServerErrorException();
+    }
+
+    return result.right;
   }
 }

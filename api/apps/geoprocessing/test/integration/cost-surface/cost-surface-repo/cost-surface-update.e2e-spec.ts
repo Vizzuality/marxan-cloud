@@ -31,7 +31,6 @@ describe(`when updating some of the costs`, () => {
   it(`applies new costs to given PU`, async () => {
     const costOf9999Id = puCostDataIds[0];
     const costOf1Id = puCostDataIds[1];
-    const sameCostId = puCostDataIds[2];
 
     await sut.save(world.scenarioId, [
       {
@@ -49,19 +48,13 @@ describe(`when updating some of the costs`, () => {
     expect(afterChanges).toContainEqual({
       scenario_id: world.scenarioId,
       cost: 9999,
-      pu_id: costOf9999Id,
+      spud_id: expect.any(String),
     });
 
     expect(afterChanges).toContainEqual({
       scenario_id: world.scenarioId,
       cost: 1,
-      pu_id: costOf1Id,
-    });
-
-    expect(afterChanges).toContainEqual({
-      scenario_id: world.scenarioId,
-      cost: expect.any(Number),
-      pu_id: sameCostId,
+      spud_id: expect.any(String),
     });
   });
 });

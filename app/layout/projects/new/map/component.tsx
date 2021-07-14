@@ -97,7 +97,10 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden rounded-r-3xl">
+    <div
+      id="project-new-map"
+      className="relative w-full h-full overflow-hidden rounded-r-3xl"
+    >
       <Map
         bounds={bounds}
         width="100%"

@@ -126,6 +126,31 @@ describe('ScenariosModule (e2e)', () => {
       expect(resources.length).toBeGreaterThanOrEqual(1);
     });
 
+    it(`Gets scenarios with a free search`, async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/api/v1/scenarios?q=oRG%202`)
+        .set(`Authorization`, `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const resources = response.body.data;
+      expect(resources).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'scenarios',
+            attributes: expect.objectContaining({
+              name: 'Example scenario 1 Project 2 Org 2',
+            }),
+          }),
+          expect.objectContaining({
+            type: 'scenarios',
+            attributes: expect.objectContaining({
+              name: 'Example scenario 2 Project 2 Org 2',
+            }),
+          }),
+        ]),
+      );
+    });
+
     it('Deletes the newly created scenario', async () => {
       const response = await request(app.getHttpServer())
         .delete('/api/v1/scenarios/' + aScenario.id)
@@ -135,6 +160,29 @@ describe('ScenariosModule (e2e)', () => {
       const resources = response.body.data;
 
       expect(resources).toBeUndefined();
+    });
+
+    it('should not allow to create scenario with invalid marxan properties', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/scenarios')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send({
+          ...E2E_CONFIG.scenarios.valid.minimal(),
+          metadata: {
+            marxanInputParameterFile: {
+              HEURTYPE: 99999999213231,
+            },
+          },
+        })
+        // .expect(400)
+        .then((response) => {
+          console.log(response.body);
+          console.log(response.text);
+          expect(
+            response.body.errors[0].meta.rawError.response.message[0]
+              .constraints.isEnum,
+          ).toMatchInlineSnapshot(`"HEURTYPE must be a valid enum value"`);
+        });
     });
   });
 });

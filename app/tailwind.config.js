@@ -525,8 +525,15 @@ module.exports = {
         },
       },
       pulse: {
-        '50%': {
-          opacity: '.5',
+        '0%': {
+          transform: 'scale(0.75)',
+          boxShadow: '0 0 0 0 rgba(0, 191, 255, 0)',
+          opacity: 1,
+        },
+        '100%': {
+          transform: 'scale(1.25)',
+          boxShadow: '0 0 0 10px rgba(0, 191, 255, 0.9)',
+          opacity: 0,
         },
       },
       bounce: {
@@ -903,6 +910,7 @@ module.exports = {
       'focus-within',
       'hover',
       'focus',
+      'last',
     ],
     borderOpacity: [
       'responsive',

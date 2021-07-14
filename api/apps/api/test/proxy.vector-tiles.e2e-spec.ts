@@ -1,8 +1,4 @@
-import {
-  HttpStatus,
-  INestApplication,
-  Logger,
-} from '@nestjs/common';
+import { HttpStatus, INestApplication, Logger } from '@nestjs/common';
 import * as request from 'supertest';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { tearDown } from './utils/tear-down';
@@ -16,8 +12,8 @@ import { ScenariosTestUtils } from './utils/scenarios.test.utils';
 import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 import { bootstrapApplication } from './utils/api-application';
-
-const logger = new Logger('test-vtiles');
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
+import { FeaturesTestUtils } from './utils/features.test.utils';
 
 afterAll(async () => {
   await tearDown();
@@ -32,6 +28,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
   let anOrganization: Organization;
   let aProjectWithCountryAsPlanningArea: Project;
   let aScenario: Scenario;
+  let aFeature: GeoFeature;
   /**
    * Seed test data includes protected areas in (among a handful of other
    * countries) Namibia, so we create a project in this country, and likewise
@@ -41,7 +38,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
   const country = 'NAM';
   const l1AdminArea = 'NAM.13_1';
   const l2AdminArea = 'NAM.13.5_1';
-  const geoFeaturesFilters = {
+  const _geoFeaturesFilters = {
     cheeta: { featureClassName: 'iucn_acinonyxjubatus', alias: 'cheetah' },
     partialMatches: { us: 'us' },
   };
@@ -72,6 +69,12 @@ describe('ProxyVectorTilesModule (e2e)', () => {
       },
     ).then(async (response) => await Deserializer.deserialize(response));
 
+    aFeature = await FeaturesTestUtils.getFeature(
+      app,
+      jwtToken,
+      aProjectWithCountryAsPlanningArea.id,
+    );
+
     aScenario = await ScenariosTestUtils.createScenario(app, jwtToken, {
       ...E2E_CONFIG.scenarios.valid.minimal(),
       projectId: aProjectWithCountryAsPlanningArea.id,
@@ -100,87 +103,122 @@ describe('ProxyVectorTilesModule (e2e)', () => {
      * https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991%3A2492
      */
     describe('Admin-areas layers', () => {
-      test.todo('we should test that the response is a valid mvt');
+      test.todo('The response is a valid mvt');
+      test.todo('User upload planning units vector tiles');
+      test.todo('Irregular planning units vector tiles');
+
       test('Should give back a valid request for preview', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get('/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt')
           .set('Accept-Encoding', 'gzip, deflate')
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
       describe('Filter by guid', () => {
-        test.skip('guid country level', async () => {
-          const response = await request(app.getHttpServer())
-            .get('/api/v1/administrative-areas/1/preview/tiles/100/60/30.mvt')
+        test('guid country level should be visible', async () => {
+          await request(app.getHttpServer())
+            .get('/api/v1/administrative-areas/0/preview/tiles/6/30/25.mvt')
             .set('Authorization', `Bearer ${jwtToken}`)
             .expect(HttpStatus.OK);
         });
-        test.skip('guid adm1 level', async () => {
-          const response = await request(app.getHttpServer())
-            .get('/api/v1/administrative-areas/1/preview/tiles/100/60/30.mvt')
+        test('guid adm1 level should be visible', async () => {
+          await request(app.getHttpServer())
+            .get('/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt')
             .set('Authorization', `Bearer ${jwtToken}`)
             .expect(HttpStatus.OK);
+        });
+        test('guid adm2 level should be visible', async () => {
+          await request(app.getHttpServer())
+            .get('/api/v1/administrative-areas/2/preview/tiles/6/30/25.mvt')
+            .set('Authorization', `Bearer ${jwtToken}`)
+            .expect(HttpStatus.OK);
+        });
+        test('guid level > 2 should not be allowed', async () => {
+          await request(app.getHttpServer())
+            .get('/api/v1/administrative-areas/3/preview/tiles/6/30/25.mvt')
+            .set('Authorization', `Bearer ${jwtToken}`)
+            .expect(HttpStatus.BAD_REQUEST);
         });
       });
-
-      test.skip('Filter by bbox', async () => {
-        const response = await request(app.getHttpServer())
-          .get('/api/v1/administrative-areas/1/preview/tiles/100/60/30.mvt')
+      test('User should be able to filter by bbox', async () => {
+        await request(app.getHttpServer())
+          .get(
+            '/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt?bbox=[10,10,5,5]',
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
-
-      test('Should simulate an error if input is invalid', async () => {
-        const response = await request(app.getHttpServer())
-          .get('/api/v1/administrative-areas/1/preview/tiles/100/60/30.mvt')
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(HttpStatus.BAD_REQUEST);
-      });
-
-      test('Should throw a 400 error if filtering by level other than 0, 1 or 2', async () => {
-        const response = await request(app.getHttpServer())
-          .get('/api/v1/administrative-areas/3/preview/tiles/6/30/25.mvt')
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .expect(HttpStatus.BAD_REQUEST);
-      });
-
       test('Should throw a 400 error if filtering by z level greater than 20', async () => {
-        const response = await request(app.getHttpServer())
-          .get('/api/v1/administrative-areas/3/preview/tiles/21/30/25.mvt')
+        await request(app.getHttpServer())
+          .get('/api/v1/administrative-areas/0/preview/tiles/21/30/25.mvt')
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.BAD_REQUEST);
       });
     });
-    describe('WDPA layers', () => {
-      test.skip('Should give back a valid request for wdpa preview', async () => {
-        const response = await request(app.getHttpServer())
-          .get('/api/v1/administrative-areas/3/preview/tiles/21/30/25.mvt')
+    describe('WDPA preview vector tiles.', () => {
+      test('Should give back a valid request for wdpa preview tile', async () => {
+        await request(app.getHttpServer())
+          .get('/api/v1/protected-areas/preview/tiles/6/30/25.mvt')
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.OK);
+      });
+      test('User should be able to filter by bbox', async () => {
+        await request(app.getHttpServer())
+          .get(
+            '/api/v1/protected-areas/preview/tiles/6/30/25.mvt?bbox=[10,10,5,5]',
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.OK);
+      });
+      test('Filter by wdpa id', async () => {
+        await request(app.getHttpServer())
+          .get(
+            '/api/v1/protected-areas/preview/tiles/6/30/25.mvt?id=e5c3b978-908c-49d3-b1e3-89727e9f999c',
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
     });
-    describe('Feature layer previews', () => {
-      test.skip('Should give back a valid request for a feature preview', async () => {
-        const response = await request(app.getHttpServer())
-          .get('/api/v1/administrative-areas/3/preview/tiles/21/30/25.mvt')
-          .set('Authorization', `Bearer ${jwtToken}`);
-
-        logger.error(typeof response.body);
-        // response.expect(HttpStatus.OK);
+    describe('Feature preview vector tiles.', () => {
+      test('Should give back a valid request for a feature preview', async () => {
+        await request(app.getHttpServer())
+          .get(`/api/v1/geo-features/${aFeature.id}/preview/tiles/6/30/25.mvt`)
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.OK);
       });
     });
     describe('PUs layer previews', () => {
-      test.skip('Should give back a valid request for a PUs preview', async () => {
-        const response = await request(app.getHttpServer())
-          .get('/api/v1/administrative-areas/3/preview/tiles/21/30/25.mvt')
+      test('Should give back a valid request for a regular hexagon PUs vector tile preview', async () => {
+        await request(app.getHttpServer())
+          .get(
+            '/api/v1/planning-units/preview/regular/hexagon/100/tiles/6/30/25.mvt',
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });
+      test('Should give back a valid request for a regular square PUs vector tile preview', async () => {
+        await request(app.getHttpServer())
+          .get(
+            '/api/v1/planning-units/preview/regular/square/100/tiles/6/30/25.mvt',
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.OK);
+      });
+      test('Should give back a error if the regular grid is not square or hexagon', async () => {
+        await request(app.getHttpServer())
+          .get(
+            '/api/v1/planning-units/preview/regular/te/100/tiles/6/30/25.mvt',
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.BAD_REQUEST);
+      });
     });
     describe('Scenario PUs layers', () => {
-      test.skip('Should give back a valid request for a scenario PUs', async () => {
-        const response = await request(app.getHttpServer())
-          .get('/api/v1/administrative-areas/3/preview/tiles/21/30/25.mvt')
+      test('Should give back a valid request for a scenario PUs', async () => {
+        await request(app.getHttpServer())
+          .get(
+            `/api/v1/scenarios/${aScenario.id}/planning-units/tiles/6/30/25.mvt`,
+          )
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
       });

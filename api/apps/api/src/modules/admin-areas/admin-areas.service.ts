@@ -78,6 +78,8 @@ export class AdminAreasService extends AppBaseService<
         'name2',
         'theGeom',
         'bbox',
+        'minPuAreaSize',
+        'maxPuAreaSize',
       ],
       keyForAttribute: 'camelCase',
     };

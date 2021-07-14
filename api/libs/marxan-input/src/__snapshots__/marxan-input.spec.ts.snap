@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`when providing some values should override defaults 1`] = `
+MarxanParameters {
+  "BESTSCORE": 1337,
+  "BLM": 1,
+  "CLUMPTYPE": 0,
+  "COOLFAC": 0,
+  "COSTTHRESH": 0,
+  "HEURTYPE": 7,
+  "ITIMPTYPE": 0,
+  "MISSLEVEL": 999,
+  "NUMITNS": 1000000,
+  "NUMREPS": 10,
+  "NUMTEMP": 10000,
+  "PROP": 0.5,
+  "RANDSEED": -1,
+  "RUNMODE": 6,
+  "STARTTEMP": 1000000,
+  "THRESHPEN1": 0,
+  "THRESHPEN2": 0,
+}
+`;
+
+exports[`when providing unsupported values for enums should throw 1`] = `
+Array [
+  ValidationError {
+    "children": Array [],
+    "constraints": Object {
+      "isEnum": "HEURTYPE must be a valid enum value",
+    },
+    "property": "HEURTYPE",
+    "target": MarxanParameters {
+      "BESTSCORE": 0,
+      "BLM": 1,
+      "CLUMPTYPE": 0,
+      "COOLFAC": 0,
+      "COSTTHRESH": 0,
+      "HEURTYPE": 9999999,
+      "ITIMPTYPE": 0,
+      "MISSLEVEL": 1,
+      "NUMITNS": 1000000,
+      "NUMREPS": 10,
+      "NUMTEMP": 10000,
+      "PROP": 0.5,
+      "RANDSEED": -1,
+      "RUNMODE": 1,
+      "STARTTEMP": 1000000,
+      "THRESHPEN1": 0,
+      "THRESHPEN2": 0,
+    },
+    "value": 9999999,
+  },
+]
+`;

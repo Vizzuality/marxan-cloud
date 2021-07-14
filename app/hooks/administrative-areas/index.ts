@@ -41,6 +41,8 @@ UseAdministrativeAreasResponse {
       id: r.id,
       level: 2,
       bbox: r.bbox,
+      minPuAreaSize: r.minPuAreaSize,
+      maxPuAreaSize: r.maxPuAreaSize,
     }));
 
     return {

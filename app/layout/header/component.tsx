@@ -7,14 +7,14 @@ import User from 'layout/header/user';
 import MyProjects from 'layout/header/my-projects';
 import Title from 'layout/header/title';
 
-import Icon from 'components/icon';
 import LinkButton from 'components/button';
 
 import { useMe } from 'hooks/me';
 
-import LOGO_SVG from 'svgs/logo.svg?sprite';
+import LOGO_SVG from 'svgs/logo.svg';
 
 export interface HeaderProps {
+  published?: boolean;
   size: 'base' | 'lg',
 }
 
@@ -33,7 +33,7 @@ const SIZE = {
   },
 };
 
-export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
+export const Header: React.FC<HeaderProps> = ({ published = false, size }:HeaderProps) => {
   const { user } = useMe();
 
   return (
@@ -41,29 +41,32 @@ export const Header: React.FC<HeaderProps> = ({ size }:HeaderProps) => {
       className="w-full row-auto"
     >
       <Wrapper>
-        <nav className="relative flex flex-wrap items-center justify-between bg-black navbar-expand-lg">
+        <nav className="relative flex flex-wrap items-center justify-between mt-10 bg-black md:mt-0 navbar-expand-lg">
           <Link
             href="/"
           >
             <a href="/">
-              <Icon
-                icon={LOGO_SVG}
+              <img
+                alt="Marxan logo"
+                src={LOGO_SVG}
                 style={SIZE[size].logo}
               />
             </a>
           </Link>
 
-          <Title />
+          {!published && (
+            <Title />
+          )}
 
           <div
-            className="flex items-center space-x-5 divide-x divide-gray-500"
+            className="flex items-center space-x-1 divide-x divide-gray-500 md:space-x-5"
             style={{
               height: SIZE[size].logo.height + 10,
             }}
           >
             <MyProjects />
 
-            <div className="flex items-center h-full pl-5">
+            <div className="flex items-center h-full pl-1 md:pl-5">
               <User />
             </div>
           </div>

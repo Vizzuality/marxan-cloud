@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Dictionary } from 'lodash';
 import { Project } from '../projects/project.api.entity';
 import {
   Column,
@@ -126,7 +125,9 @@ export class Scenario extends TimeUserEntityMetadata {
    */
   @ApiPropertyOptional()
   @Column('jsonb')
-  metadata?: Dictionary<string>;
+  metadata?: {
+    marxanInputParameterFile?: Record<string, string | number>;
+  };
 
   /**
    * Status of the scenario calculation job.

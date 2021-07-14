@@ -5,20 +5,17 @@ import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
+import type { Project } from 'types/project-model';
+
 import { AnimatePresence, motion } from 'framer-motion';
 
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
-export interface ItemProps {
-  id: string;
+export interface ItemProps extends Project {
   className?: string;
-  name: string;
-  area: string;
-  description: string;
+  style?: Record<string, unknown>;
   lastUpdate: string;
   lastUpdateDistance: string;
-  contributors?: Record<string, unknown>[];
-  style?: Record<string, unknown>;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -116,7 +113,7 @@ export const Item: React.FC<ItemProps> = ({
             />
 
             <motion.h2
-              className="mt-3 mb-10 text-lg font-medium font-heading"
+              className="mt-3 mb-10 text-lg font-medium break-words font-heading"
               initial={{
                 x: 0,
               }}

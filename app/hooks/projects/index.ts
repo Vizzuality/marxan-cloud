@@ -1,107 +1,135 @@
-import Fuse from 'fuse.js';
+import flatten from 'lodash/flatten';
 import { useMemo } from 'react';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {
+  useInfiniteQuery, useMutation, useQuery, useQueryClient,
+} from 'react-query';
 import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
 
-import orderBy from 'lodash/orderBy';
 import { formatDistance } from 'date-fns';
 
 import { ItemProps } from 'components/projects/item/component';
+import { PublishedItemProps } from 'components/projects/published-item/component';
 
 import PROJECTS from 'services/projects';
+
 import {
-  UseProjectsProps,
+  UseProjectsOptionsProps,
   UseProjectsResponse,
   UseSaveProjectProps,
   SaveProjectProps,
   UseDeleteProjectProps,
   DeleteProjectProps,
+  UsePublishedProjectsProps,
 } from './types';
 
-export function useProjects(filters: UseProjectsProps): UseProjectsResponse {
-  const [session] = useSession();
-  const { search } = filters;
+export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
   const { push } = useRouter();
+  const [session] = useSession();
 
-  const query = useQuery('projects', async () => PROJECTS.request({
+  const {
+    filters = {},
+    search,
+    sort,
+  } = options;
+
+  const parsedFilters = Object.keys(filters)
+    .reduce((acc, k) => {
+      return {
+        ...acc,
+        [`filter[${k}]`]: filters[k].toString(),
+      };
+    }, {});
+
+  const fetchProjects = ({ pageParam = 1 }) => PROJECTS.request({
     method: 'GET',
     url: '/',
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
     params: {
+      'page[number]': pageParam,
       include: 'scenarios,users',
+      ...parsedFilters,
+      ...search && {
+        q: search,
+      },
+      ...sort && {
+        sort,
+      },
     },
-  }));
+  });
+
+  const query = useInfiniteQuery(['projects', JSON.stringify(options)], fetchProjects, {
+    retry: false,
+    keepPreviousData: true,
+    getNextPageParam: (lastPage) => {
+      const { data: { meta } } = lastPage;
+      const { page, totalPages } = meta;
+
+      const nextPage = page + 1 > totalPages ? null : page + 1;
+      return nextPage;
+    },
+  });
 
   const { data } = query;
+  const { pages } = data || {};
 
   return useMemo(() => {
-    let parsedData = Array.isArray(data?.data?.data) ? data?.data?.data.map((d):ItemProps => {
-      const {
-        id, name, description, lastModifiedAt, scenarios, planningAreaName,
-      } = d;
+    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
+      const { data: { data: pageData } } = p;
 
-      const lastUpdate = scenarios.reduce((acc, s) => {
-        const { lastModifiedAt: slastModifiedAt } = s;
+      return pageData.map((d):ItemProps => {
+        const {
+          id, name, description, lastModifiedAt, scenarios, planningAreaName,
+        } = d;
 
-        return (slastModifiedAt > acc) ? slastModifiedAt : acc;
-      }, lastModifiedAt);
+        const lastUpdate = scenarios.reduce((acc, s) => {
+          const { lastModifiedAt: slastModifiedAt } = s;
 
-      const lastUpdateDistance = () => {
-        return formatDistance(
-          new Date(lastUpdate || null),
-          new Date(),
-          { addSuffix: true },
-        );
-      };
+          return (slastModifiedAt > acc) ? slastModifiedAt : acc;
+        }, lastModifiedAt);
 
-      return {
-        id,
-        area: planningAreaName || 'Custom area name',
-        name,
-        description,
-        lastUpdate,
-        lastUpdateDistance: lastUpdateDistance(),
-        contributors: [
-          { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
-          { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
-        ],
-        onClick: () => {
-          push(`/projects/${id}`);
-        },
-        onDownload: (e) => {
-          console.info('onDownload', e);
-        },
-        onDuplicate: (e) => {
-          console.info('onDuplicate', e);
-        },
-        onDelete: (e) => {
-          console.info('onDelete', e);
-        },
-      };
-    }) : [];
+        const lastUpdateDistance = () => {
+          return formatDistance(
+            new Date(lastUpdate || null),
+            new Date(),
+            { addSuffix: true },
+          );
+        };
 
-    // Filter
-    if (search) {
-      const fuse = new Fuse(parsedData, {
-        keys: ['name', 'area'],
-        threshold: 0.25,
+        return {
+          id,
+          area: planningAreaName || 'Custom area name',
+          name,
+          description,
+          lastUpdate,
+          lastUpdateDistance: lastUpdateDistance(),
+          contributors: [
+            { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
+            { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
+          ],
+          onClick: () => {
+            push(`/projects/${id}`);
+          },
+          onDownload: (e) => {
+            console.info('onDownload', e);
+          },
+          onDuplicate: (e) => {
+            console.info('onDuplicate', e);
+          },
+          onDelete: (e) => {
+            console.info('onDelete', e);
+          },
+        };
       });
-      parsedData = fuse.search(search).map((f) => {
-        return f.item;
-      });
-    }
-
-    // Sort
-    parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
+    })) : [];
 
     return {
       ...query,
       data: parsedData,
     };
-  }, [query, data?.data?.data, search, push]);
+  }, [query, pages, push]);
 }
 
 export function useProject(id) {
@@ -192,4 +220,112 @@ export function useDeleteProject({
       console.info('Error', error, variables, context);
     },
   });
+}
+
+export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
+  const [session] = useSession();
+
+  const {
+    search,
+    filters = {},
+    sort,
+  } = options;
+
+  const parsedFilters = Object.keys(filters)
+    .reduce((acc, k) => {
+      return {
+        ...acc,
+        [`filter[${k}]`]: filters[k].toString(),
+      };
+    }, {});
+
+  const fetchPublishedProjects = ({ pageParam = 1 }) => PROJECTS.request({
+    method: 'GET',
+    url: '/',
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    params: {
+      'page[number]': pageParam,
+      ...parsedFilters,
+      ...search && {
+        q: search,
+      },
+      ...sort && {
+        sort,
+      },
+    },
+  });
+
+  const query = useInfiniteQuery(['published-projects', JSON.stringify(options)], fetchPublishedProjects, {
+    retry: false,
+    keepPreviousData: true,
+    getNextPageParam: (lastPage) => {
+      const { data: { meta } } = lastPage;
+      const { page, totalPages } = meta;
+
+      const nextPage = page + 1 > totalPages ? null : page + 1;
+      return nextPage;
+    },
+  });
+
+  const { data } = query;
+  const { pages } = data || {};
+
+  return useMemo(() => {
+    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
+      const { data: { data: pageData } } = p;
+
+      return pageData.map((d):PublishedItemProps => {
+        const {
+          id, name, description, area, timesDuplicated,
+        } = d;
+
+        return {
+          id,
+          name,
+          area,
+          description,
+          timesDuplicated,
+        };
+      });
+    })) : [];
+
+    return {
+      ...query,
+      data: parsedData,
+    };
+  }, [query, pages]);
+}
+
+export function usePublishedProject(id) {
+  const [session] = useSession();
+
+  const query = useQuery(['published-projects', id], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${id}`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    params: {
+      include: 'scenarios,users',
+    },
+  }), {
+    enabled: !!id,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    const contributors = [
+      { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
+      { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
+    ];
+    const parsedData = { ...data?.data?.data, contributors } || {};
+
+    return {
+      ...query,
+      data: parsedData,
+    };
+  }, [query, data?.data?.data]);
 }

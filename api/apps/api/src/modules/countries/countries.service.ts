@@ -32,15 +32,46 @@ export class CountriesService extends AppBaseService<
   }
 
   async getByGid0(country: string): Promise<Country | undefined> {
-    const query = this.repository.createQueryBuilder(this.alias);
-    query.where(`${this.alias}.gid0 = :country`, { country });
-    return await query.getOne();
+    return this.repository.findOne({
+      where: {
+        gid0: country,
+      },
+    });
+  }
+
+  async getIdAndNameByGid0(
+    country: string,
+  ): Promise<Pick<Country, 'id' | 'gid0' | 'name0'> | undefined> {
+    return await this.repository.findOne({
+      where: {
+        gid0: country,
+      },
+      select: ['id', 'gid0', 'name0'],
+    });
+  }
+
+  async getBBoxByGid0(
+    country: string,
+  ): Promise<Pick<Country, 'bbox' | 'gid0'> | undefined> {
+    return await this.repository.findOne({
+      where: {
+        gid0: country,
+      },
+      select: ['bbox', 'gid0'],
+    });
   }
 
   get serializerConfig(): JSONAPISerializerConfig<Country> {
     return {
       transform: (item: Country) => ({ ...item, id: item.gid0 }),
-      attributes: ['gid0', 'name0', 'theGeom', 'bbox'],
+      attributes: [
+        'gid0',
+        'name0',
+        'theGeom',
+        'bbox',
+        'minPuAreaSize',
+        'maxPuAreaSize',
+      ],
       keyForAttribute: 'camelCase',
     };
   }

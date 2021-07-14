@@ -10,7 +10,6 @@ import {
   IsUUID,
   Length,
 } from 'class-validator';
-import { Polygon, MultiPolygon } from 'geojson';
 import { PlanningUnitGridShape } from '../project.api.entity';
 
 /**
@@ -30,6 +29,11 @@ export class CreateProjectDTO {
   @ApiProperty()
   @IsUUID()
   organizationId!: string;
+
+  @ApiPropertyOptional()
+  @IsUUID()
+  @IsOptional()
+  planningAreaId?: string;
 
   @ApiPropertyOptional({
     description: 'ISO 3166-1 alpha3 country code (uppercase)',

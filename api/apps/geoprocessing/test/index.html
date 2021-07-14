@@ -77,7 +77,7 @@
               minzoom: 1,
               maxzoom: 20,
               tiles: [
-                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/100/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,-19.202241064923044,22.980651855468746,-18.22935133838667]',
+                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/1/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,22.980651855468746,-18.22935133838667,-19.202241064923044]',
               ],
             },
             'postgis-tilesPU2': {
@@ -85,7 +85,7 @@
               minzoom: 1,
               maxzoom: 20,
               tiles: [
-                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/100/tiles/{z}/{x}/{y}.mvt',
+                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/10/tiles/{z}/{x}/{y}.mvt',
               ],
             },
             'postgis-tilesFeatures': {
@@ -93,7 +93,16 @@
               minzoom: 1,
               maxzoom: 20,
               tiles: [
-                'http://localhost:3040/api/v1/geo-features/127a5016-c697-4a6c-ae2a-4fa29a2729be/preview/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,-19.202241064923044,22.980651855468746,-18.22935133838667]',
+                'http://localhost:3040/api/v1/geo-features/127a5016-c697-4a6c-ae2a-4fa29a2729be/preview/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,22.980651855468746,-18.22935133838667,-19.202241064923044]',
+              ],
+            },
+
+            'postgis-tilesScenarioPu': {
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 20,
+              tiles: [
+                'http://localhost:3040/api/v1/scenarios/923eb5ae-f615-4563-b6ae-21008feeaa4b/planning-units/tiles/{z}/{x}/{y}.mvt',
               ],
             },
 
@@ -112,6 +121,19 @@
               source: 'BASEMAP',
               minzoom: 1,
               maxzoom: 22,
+            },
+
+            {
+              id: 'postgis-tiles-layer-ScenarioPU',
+              type: 'fill',
+              source: 'postgis-tilesScenarioPu',
+              'source-layer': 'layer0',
+
+              paint: {
+                'fill-outline-color': 'yellow',
+                'fill-color': 'red',
+                'fill-opacity': 0.1,
+              },
             },
 
             {
@@ -228,6 +250,9 @@
         console.log(e.features[0].properties)
         });
         map.on('click', 'postgis-tiles-layer2', function (e) {
+        console.log(e.features[0].properties)
+        });
+        map.on('click', 'postgis-tiles-layer-ScenarioPU', function (e) {
         console.log(e.features[0].properties)
         });
         // Change the cursor to a pointer when the mouse is over the places layer.

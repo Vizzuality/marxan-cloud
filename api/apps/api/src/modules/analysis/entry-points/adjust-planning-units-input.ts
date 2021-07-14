@@ -1,14 +1,12 @@
-import { GeoJSON } from 'geojson';
+import { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 export interface AdjustPlanningUnitsInput {
   include?: {
     pu?: string[];
-    geo?: GeoJSON[];
-    shape?: GeoJSON[];
+    geo?: FeatureCollection<Polygon | MultiPolygon>[];
   };
   exclude?: {
     pu?: string[];
-    geo?: GeoJSON[];
-    shape?: GeoJSON[];
+    geo?: FeatureCollection<Polygon | MultiPolygon>[];
   };
 }

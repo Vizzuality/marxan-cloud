@@ -26,7 +26,6 @@ INPUTDIR input
 PUNAME pu.dat
 SPECNAME spec.dat
 PUVSPRNAME puvspr.dat
-BOUNDNAME
 
 Save Files
 SCENNAME output

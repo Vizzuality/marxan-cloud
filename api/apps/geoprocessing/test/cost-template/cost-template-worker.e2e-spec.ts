@@ -33,7 +33,7 @@ afterEach(async () => {
   await fixtures.cleanup();
 });
 
-describe(`when no jobs in the queue`, () => {
+describe.skip(`when no jobs in the queue`, () => {
   let scenarioId: string;
   beforeEach(async () => {
     // given
@@ -48,7 +48,7 @@ describe(`when no jobs in the queue`, () => {
   });
 });
 
-describe(`when a job in the queue landed and processed`, () => {
+describe.skip(`when a job in the queue landed and processed`, () => {
   let scenarioId: string;
   beforeEach(async () => {
     // given
@@ -68,7 +68,7 @@ describe(`when a job in the queue landed and processed`, () => {
   });
 });
 
-describe(`when a job in the queue landed and failed`, () => {
+describe.skip(`when a job in the queue landed and failed`, () => {
   let scenarioId: string;
   beforeEach(async () => {
     // given

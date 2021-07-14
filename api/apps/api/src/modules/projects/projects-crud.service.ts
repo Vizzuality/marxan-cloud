@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  forwardRef,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { isDefined } from '@marxan/utils';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -21,10 +16,11 @@ import {
 import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';
 import { CountriesService } from '@marxan-api/modules/countries/countries.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { AdminArea } from '@marxan/admin-regions';
-import { BboxResolver } from './bbox/bbox-resolver';
-import { Polygon } from 'geojson';
 import { FetchSpecification } from 'nestjs-base-service';
+import {
+  MultiplePlanningAreaIds,
+  PlanningAreasService,
+} from './planning-areas';
 
 const projectFilterKeyNames = [
   'name',
@@ -58,7 +54,7 @@ export class ProjectsCrudService extends AppBaseService<
     protected readonly countriesService: CountriesService,
     @Inject(PlanningUnitsService)
     private readonly planningUnitsService: PlanningUnitsService,
-    private readonly bboxResolver: BboxResolver,
+    private readonly planningAreasService: PlanningAreasService,
   ) {
     super(repository, 'project', 'projects', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -141,45 +137,15 @@ export class ProjectsCrudService extends AppBaseService<
     const project = await super.setDataCreate(create, info);
     project.createdBy = info?.authenticatedUser?.id!;
 
-    const geometry = await this.resolveBBoxFromAdminArea(create, info);
-    if (geometry?.bbox) {
-      project.bbox = geometry.bbox;
+    const bbox = await this.planningAreasService.getPlanningAreaBBox({
+      ...create,
+      planningAreaGeometryId: create.planningAreaId,
+    });
+    if (bbox) {
+      project.bbox = bbox;
     }
 
     return project;
-  }
-
-  /**
-   * Look up the planning area for this project.
-   *
-   * In decreasing precedence (i.e. most specific is used):
-   *
-   * * a project-specific protected area (@todo not implemented yet)
-   * * a level 2 admin area
-   * * a level 1 admin area
-   * * a country
-   */
-  async getPlanningArea(
-    project: Partial<Project>,
-  ): Promise<Partial<AdminArea | undefined>> {
-    const planningArea = project.planningAreaGeometryId
-      ? /**
-         * @todo here we should look up the actual custom planning area from
-         * `planningAreaGeometryId`, when we implement this.
-         */
-        new AdminArea()
-      : project.adminAreaLevel2Id
-      ? await this.adminAreasService.getByLevel1OrLevel2Id(
-          project.adminAreaLevel2Id!,
-        )
-      : project.adminAreaLevel1Id
-      ? await this.adminAreasService.getByLevel1OrLevel2Id(
-          project.adminAreaLevel1Id!,
-        )
-      : project.countryId
-      ? await this.countriesService.getByGid0(project.countryId)
-      : undefined;
-    return planningArea;
   }
 
   async actionAfterCreate(
@@ -192,10 +158,19 @@ export class ProjectsCrudService extends AppBaseService<
       createModel.planningUnitGridShape &&
       (createModel.countryId ||
         createModel.adminAreaLevel1Id ||
-        createModel.adminAreaLevel2Id)
+        createModel.adminAreaLevel2Id ||
+        createModel.planningAreaId)
     ) {
-      this.logger.debug('creating planning unit job ');
-      return this.planningUnitsService.create(createModel);
+      this.logger.debug(
+        'creating planning unit job and assigning project to area',
+      );
+      await Promise.all([
+        this.planningUnitsService.create(createModel),
+        this.planningAreasService.assignProject({
+          projectId: model.id,
+          planningAreaGeometryId: createModel.planningAreaId,
+        }),
+      ]);
     }
   }
 
@@ -209,10 +184,19 @@ export class ProjectsCrudService extends AppBaseService<
       createModel.planningUnitGridShape &&
       (createModel.countryId ||
         createModel.adminAreaLevel1Id ||
-        createModel.adminAreaLevel2Id)
+        createModel.adminAreaLevel2Id ||
+        createModel.planningAreaId)
     ) {
-      this.logger.debug('creating planning unit job ');
-      return this.planningUnitsService.create(createModel);
+      this.logger.debug(
+        'creating planning unit job and assigning project to area',
+      );
+      await Promise.all([
+        this.planningUnitsService.create(createModel),
+        this.planningAreasService.assignProject({
+          projectId: model.id,
+          planningAreaGeometryId: createModel.planningAreaId,
+        }),
+      ]);
     }
   }
 
@@ -221,45 +205,16 @@ export class ProjectsCrudService extends AppBaseService<
     update: UpdateProjectDTO,
     _?: AppInfoDTO,
   ): Promise<Project> {
-    const geometry = await this.resolveBBoxFromAdminArea(update, _);
-    if (geometry?.bbox) {
+    const bbox = await this.planningAreasService.getPlanningAreaBBox({
+      ...update,
+      planningAreaGeometryId: update.planningAreaId,
+    });
+    if (bbox) {
       const modelWithBbox = await super.setDataUpdate(model, update, _);
-      modelWithBbox.bbox = geometry.bbox;
+      modelWithBbox.bbox = bbox;
       return modelWithBbox;
     }
     return model;
-  }
-
-  private async resolveBBoxFromAdminArea(
-    model: CreateProjectDTO | UpdateProjectDTO,
-    _?: AppInfoDTO,
-  ): Promise<Polygon | undefined> {
-    if (!this.bboxResolver.shouldResolveBbox(model)) {
-      return;
-    }
-    const derivedSubmittedAdminArea = await this.getPlanningArea({
-      ...model,
-    });
-
-    let geometry;
-
-    try {
-      geometry = this.bboxResolver.resolveBBox(
-        model,
-        derivedSubmittedAdminArea,
-      );
-    } catch (error) {
-      // currently no easy way to propagate specific error to controller, thus throwing Http error already
-      throw new BadRequestException(error);
-    }
-
-    if (geometry) {
-      return geometry;
-    } else {
-      throw new InternalServerErrorException(
-        `Missing bbox for given admin region.`,
-      );
-    }
   }
 
   async extendGetByIdResult(
@@ -267,18 +222,13 @@ export class ProjectsCrudService extends AppBaseService<
     _fetchSpecification?: FetchSpecification,
     _info?: AppInfoDTO,
   ): Promise<Project> {
-    const relatedAdminArea = await this.getPlanningArea(entity);
-    if (relatedAdminArea) {
-      entity.planningAreaId =
-        relatedAdminArea.gid2 ||
-        relatedAdminArea.gid1 ||
-        relatedAdminArea.gid0 ||
-        undefined;
-      entity.planningAreaName =
-        relatedAdminArea.name2 ||
-        relatedAdminArea.name1 ||
-        relatedAdminArea.name0 ||
-        undefined;
+    const ids: MultiplePlanningAreaIds = entity;
+    const idAndName = await this.planningAreasService.getPlanningAreaIdAndName(
+      ids,
+    );
+    if (isDefined(idAndName)) {
+      entity.planningAreaId = idAndName.planningAreaId;
+      entity.planningAreaName = idAndName.planningAreaName;
     }
     return entity;
   }
@@ -293,4 +243,8 @@ export class ProjectsCrudService extends AppBaseService<
     );
     return [await Promise.all(extendedEntities), entitiesAndCount[1]];
   }
+
+  locatePlanningAreaEntity = this.planningAreasService.locatePlanningAreaEntity.bind(
+    this.planningAreasService,
+  );
 }

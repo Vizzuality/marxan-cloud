@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import cx from 'classnames';
 import Icon from 'components/icon';
 
@@ -47,6 +47,10 @@ export const Table: React.FC<TableProps> = ({
       sort(newHeaderSelected);
     }
   };
+
+  useEffect(() => {
+    setSortedBody(body);
+  }, [body]);
 
   return (
     <table

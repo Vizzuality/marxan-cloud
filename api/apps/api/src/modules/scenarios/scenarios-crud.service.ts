@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FetchSpecification } from 'nestjs-base-service';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
@@ -28,12 +29,18 @@ type ScenarioFilterKeys = keyof Pick<
 >;
 type ScenarioFilters = Record<ScenarioFilterKeys, string[]>;
 
+export type ScenarioInfoDTO = AppInfoDTO & {
+  params?: {
+    nameAndDescriptionFilter?: string;
+  };
+};
+
 @Injectable()
 export class ScenariosCrudService extends AppBaseService<
   Scenario,
   CreateScenarioDTO,
   UpdateScenarioDTO,
-  AppInfoDTO
+  ScenarioInfoDTO
 > {
   constructor(
     @InjectRepository(Scenario)
@@ -80,6 +87,7 @@ export class ScenariosCrudService extends AppBaseService<
   get serializerConfig(): JSONAPISerializerConfig<Scenario> {
     return {
       attributes: [
+        'id',
         'name',
         'description',
         'type',
@@ -220,6 +228,14 @@ export class ScenariosCrudService extends AppBaseService<
         ),
       ];
     }
+
+    if (model.metadata?.marxanInputParameterFile) {
+      model.metadata.marxanInputParameterFile = Object.assign(
+        model.metadata.marxanInputParameterFile,
+        update.metadata?.marxanInputParameterFile,
+      );
+    }
+
     return model;
   }
 
@@ -257,23 +273,41 @@ export class ScenariosCrudService extends AppBaseService<
      * Project.getPlanningArea(), but we'll need to check that things work as
      * expected.
      */
-    const planningAreaId = await this.projectsService
-      .getPlanningArea(parentProject)
-      .then((r) => r?.id);
+    const planningAreaLocation = await this.projectsService.locatePlanningAreaEntity(
+      parentProject,
+    );
 
     /**
      * If project boundaries are set, we can then retrieve WDPA protected areas
      * that intersect the boundaries, via the list of user-supplied IUCN
      * categories they want to use as selector for protected areas.
      */
-    const wdpaAreaIdsWithinPlanningArea = planningAreaId
+    const wdpaAreaIdsWithinPlanningArea = planningAreaLocation
       ? await this.protectedAreasService
           .findAllWDPAProtectedAreasInPlanningAreaByIUCNCategory(
-            planningAreaId,
+            planningAreaLocation.id,
+            planningAreaLocation.tableName,
             wdpaIucnCategories,
           )
           .then((r) => r.map((i) => i.id))
       : undefined;
     return wdpaAreaIdsWithinPlanningArea;
+  }
+
+  async extendFindAllQuery(
+    query: SelectQueryBuilder<Scenario>,
+    fetchSpecification: FetchSpecification,
+    info?: ScenarioInfoDTO,
+  ): Promise<SelectQueryBuilder<Scenario>> {
+    const nameAndDescriptionFilter = info?.params?.nameAndDescriptionFilter;
+    if (nameAndDescriptionFilter) {
+      const nameAndDescriptionFilterField = 'nameAndDescriptionFilter' as const;
+      query.andWhere(
+        `(${this.alias}.name ||' '|| COALESCE(${this.alias}.description, '')) ILIKE :${nameAndDescriptionFilterField}`,
+        { [nameAndDescriptionFilterField]: `%${nameAndDescriptionFilter}%` },
+      );
+    }
+
+    return query;
   }
 }

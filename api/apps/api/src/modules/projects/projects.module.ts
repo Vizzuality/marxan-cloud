@@ -15,16 +15,19 @@ import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
 import { ProjectsService } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
-import { BboxResolver } from './bbox/bbox-resolver';
+import { JobStatusSerializer } from './dto/job-status.serializer';
 import { JobStatusService } from './job-status/job-status.service';
+import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
+import { PlanningAreasModule } from './planning-areas';
 
 @Module({
   imports: [
     AdminAreasModule,
     CountriesModule,
+    PlanningAreasModule,
     GeoFeaturesModule,
     forwardRef(() => ScenariosModule),
-    TypeOrmModule.forFeature([Project]),
+    TypeOrmModule.forFeature([Project, ScenarioJobStatus]),
     UsersModule,
     PlanningUnitsModule,
     ProtectedAreasModule,
@@ -35,8 +38,8 @@ import { JobStatusService } from './job-status/job-status.service';
     ProjectsService,
     GeoFeatureSerializer,
     ProjectSerializer,
-    BboxResolver,
     JobStatusService,
+    JobStatusSerializer,
   ],
   controllers: [ProjectsController],
   exports: [ProjectsCrudService],

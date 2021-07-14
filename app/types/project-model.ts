@@ -1,8 +1,9 @@
 export interface Project {
+  id: string;
   name: string;
-  description: string;
-  hasCustomArea: boolean;
-  area: PlanningArea;
+  area?: string;
+  description?: string;
+  contributors?: Record<string, unknown>[];
 }
 
 export interface PlanningArea {
@@ -26,4 +27,13 @@ export interface Area {
   planningUnitGridShape?: string;
   planningUnitAreakm2: number;
   countryId: string;
+}
+
+export interface Solution {
+  id: string;
+  run: number;
+  score: number;
+  cost: number;
+  planningUnits: number;
+  missingValues: number;
 }

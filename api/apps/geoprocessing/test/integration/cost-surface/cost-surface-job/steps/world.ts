@@ -14,7 +14,7 @@ import { defaultSrid } from '@marxan/utils/geo/spatial-data-format';
 import { getFixtures } from '../../planning-unit-fixtures';
 
 export const createWorld = async (app: INestApplication) => {
-  const newCost = [199.99, 300, 300];
+  const newCost = [199.99, 300, 1];
   const fixtures = await getFixtures(app);
   const shapefile = await getShapefileForPlanningUnits(
     fixtures.planningUnitsIds,
@@ -27,7 +27,6 @@ export const createWorld = async (app: INestApplication) => {
       await fixtures.cleanup();
     },
     GivenPuCostDataExists: fixtures.GivenPuCostDataExists,
-    GetPuCostsData: () => fixtures.GetPuCostsData(fixtures.scenarioId),
     getShapefileWithCost: () =>
       (({
         data: {
@@ -36,6 +35,16 @@ export const createWorld = async (app: INestApplication) => {
         },
         id: 'test-job',
       } as unknown) as Job<CostSurfaceJobInput>),
+    ThenCostIsUpdated: async () => {
+      const newCost = await fixtures.GetPuCostsData(fixtures.scenarioId);
+      expect(newCost).toEqual(
+        newCost.map((cost) => ({
+          scenario_id: fixtures.scenarioId,
+          cost: cost.cost,
+          spud_id: expect.any(String),
+        })),
+      );
+    },
   };
 };
 

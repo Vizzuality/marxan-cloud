@@ -11,7 +11,7 @@ export class AppConfig {
    * Read a config value from a given config property; return defaultValue if
    * property does not exist.
    */
-  static get<T>(property: string, defaultValue?: T): T | undefined {
+  static get<T>(property: string, defaultValue?: T): T {
     if (config.has(property)) {
       return config.get(property);
     }

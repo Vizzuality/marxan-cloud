@@ -10,6 +10,7 @@ import Title from 'layout/title/project-title';
 import ProjectsWelcome from 'layout/projects/all/welcome';
 import ProjectsToolbar from 'layout/projects/all/toolbar';
 import ProjectsList from 'layout/projects/all/list';
+import Help from 'layout/help/button';
 
 export const getServerSideProps = withProtection(withUser());
 
@@ -28,6 +29,8 @@ const ProjectsPage: React.FC = () => {
         <ProjectsWelcome />
         <ProjectsToolbar />
         <ProjectsList />
+
+        <Help />
       </main>
     </Protected>
   );

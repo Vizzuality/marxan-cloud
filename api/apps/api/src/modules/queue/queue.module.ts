@@ -26,14 +26,16 @@ export class QueueModule {
         },
         {
           provide: QueueToken,
-          useValue: new Queue(options.name, {
-            ...config.get('redisApi'),
-            defaultJobOptions: config.get('jobOptions'),
-          }),
+          useFactory: () =>
+            new Queue(options.name, {
+              ...config.get('redisApi'),
+              defaultJobOptions: config.get('jobOptions'),
+            }),
         },
         {
           provide: QueueEventsToken,
-          useValue: new QueueEvents(options.name, config.get('redisApi')),
+          useFactory: () =>
+            new QueueEvents(options.name, config.get('redisApi')),
         },
         {
           provide: QueueLoggerToken,

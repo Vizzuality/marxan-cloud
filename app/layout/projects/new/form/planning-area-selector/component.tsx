@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Field as FieldRFF } from 'react-final-form';
 
 import Field from 'components/forms/field';
@@ -6,7 +6,8 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 
-import { PlanningArea } from 'types/project-model';
+import { useSelector } from 'react-redux';
+
 import { PlanningAreaSelectorProps } from './types';
 
 import CountryRegionSelector from './country-region-selector';
@@ -14,14 +15,19 @@ import PlanningUnitGrid from './planning-unit-grid';
 import PlanningUnitAreaSize from './planning-unit-area-size';
 
 export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
-  area,
   values,
-  onChange,
 }: PlanningAreaSelectorProps) => {
-  const [data, setData] = useState<PlanningArea>(area);
-  const { planningUnitAreakm2, planningUnitGridShape } = data;
+  const {
+    countryId,
+    adminAreaLevel1Id,
+    adminAreaLevel2Id,
+    planningUnitGridShape,
+  } = values;
 
-  const { countryId, adminAreaLevel1Id, adminAreaLevel2Id } = values;
+  const {
+    minPuAreaSize,
+    maxPuAreaSize,
+  } = useSelector((state) => state['/projects/new']);
 
   return (
     <div>
@@ -31,67 +37,45 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
         subRegion={adminAreaLevel2Id}
       />
 
-      <div className="flex">
-        <div className="flex w-1/2">
-          <FieldRFF
-            name="planningUnitGridShape"
-            validate={composeValidators([{ presence: true }])}
-          >
-            {(fprops) => (
-              <Field id="planningUnitGridShape" {...fprops}>
-                <PlanningUnitGrid
-                  unit={planningUnitGridShape}
-                  onChange={(value) => {
-                    const newData = {
-                      ...data,
-                      planningUnitGridShape: value,
-                    };
-                    setData(newData);
-
-                    // React Final Form onChange
-                    fprops.input.onChange(value);
-                    if (onChange) {
-                      onChange(newData);
-                    }
-                  }}
-                />
-              </Field>
-            )}
-          </FieldRFF>
+      {!!countryId && (
+        <div className="flex">
+          <div className="flex w-1/2">
+            <FieldRFF
+              name="planningUnitGridShape"
+              validate={composeValidators([{ presence: true }])}
+            >
+              {(fprops) => (
+                <Field id="planningUnitGridShape" {...fprops}>
+                  <PlanningUnitGrid
+                    unit={planningUnitGridShape}
+                    onChange={(value) => {
+                      // React Final Form onChange
+                      fprops.input.onChange(value);
+                    }}
+                  />
+                </Field>
+              )}
+            </FieldRFF>
+          </div>
+          <div className="flex w-1/2">
+            <FieldRFF
+              name="planningUnitAreakm2"
+              validate={composeValidators([{
+                presence: true,
+                numericality: {
+                  onlyInteger: true,
+                  greaterThanOrEqualTo: +parseInt(minPuAreaSize, 10),
+                  lessThanOrEqualTo: +parseInt(maxPuAreaSize, 10),
+                },
+              }])}
+            >
+              {({ input }) => (
+                <PlanningUnitAreaSize input={input} />
+              )}
+            </FieldRFF>
+          </div>
         </div>
-        <div className="flex w-1/2">
-          <FieldRFF
-            name="planningUnitAreakm2"
-            validate={composeValidators([{
-              presence: true,
-              numericality: {
-                onlyInteger: true,
-                greaterThan: 0,
-              },
-            }])}
-          >
-            {(fprops) => (
-              <Field id="planningUnitAreakm2" {...fprops}>
-                <PlanningUnitAreaSize
-                  size={planningUnitAreakm2}
-                  onChange={(value) => {
-                    const newData = {
-                      ...data,
-                      planningUnitAreakm2: value,
-                    };
-                    setData(newData);
-                    // React Final Form onChange
-                    fprops.input.onChange(value);
-                    if (onChange) {
-                      onChange(newData);
-                    }
-                  }}
-                />
-              </Field>
-            )}
-          </FieldRFF>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

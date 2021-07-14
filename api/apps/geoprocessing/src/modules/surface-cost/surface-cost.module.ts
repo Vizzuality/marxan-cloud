@@ -2,10 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import { CqrsModule } from '@nestjs/cqrs';
-import {
-  WorkerModule,
-  WorkerProcessor,
-} from '@marxan-geoprocessing/modules/worker';
+import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
 import { ShapefilesModule } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.module';
 
 import { SurfaceCostProcessor } from './application/surface-cost-processor';
@@ -18,9 +15,9 @@ import { ShapefileConverterPort } from './ports/shapefile-converter/shapefile-co
 
 import { TypeormCostSurface } from './adapters/typeorm-cost-surface';
 import { ShapefileConverter } from './adapters/shapefile-converter';
-import { ScenariosPuCostDataGeo } from '../scenarios/scenarios-pu-cost-data.geo.entity';
 import { PuCostExtractor } from './adapters/pu-cost-extractor';
 import { AvailablePlanningUnitsRepository } from './adapters/available-planning-units-repository';
+import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
 
 @Module({
   imports: [

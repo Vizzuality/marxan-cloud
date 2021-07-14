@@ -18,8 +18,9 @@ export enum AdminLevel {
   Amd2 = 'adm_2',
 }
 
+export const adminAreaTableName = 'admin_regions' as const;
 // property names, not db names in indexes: https://github.com/typeorm/typeorm/issues/930
-@Entity('admin_regions')
+@Entity(adminAreaTableName)
 @Index('admin_regions_l012_ids', ['gid0', 'gid1', 'gid2', 'level'])
 @Index('unique_l2_regions', ['gid2', 'level'], {
   unique: true,
@@ -115,6 +116,26 @@ export class AdminArea {
 
   @Column('uuid', { name: 'created_by', nullable: true })
   createdBy?: string | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+  })
+  @Column('double precision', {
+    name: 'min_pu_area_size',
+    nullable: true,
+  })
+  minPuAreaSize?: number | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+  })
+  @Column('double precision', {
+    name: 'max_pu_area_size',
+    nullable: true,
+  })
+  maxPuAreaSize?: number | null;
 
   @UpdateDateColumn({
     name: 'last_modified_at',

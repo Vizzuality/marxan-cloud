@@ -19,8 +19,9 @@ export class ProtectedAreaProcessor
   ) {}
 
   async process(job: Job<ProtectedAreasJobInput, void>): Promise<void> {
-    const geo: GeoJSON = (await this.shapefileService.getGeoJson(job.data.file))
-      .data;
+    const geo: GeoJSON = (
+      await this.shapefileService.transformToGeoJson(job.data.file)
+    ).data;
 
     const geometries = this.geometryExtractor.extract(geo);
 

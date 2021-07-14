@@ -1,8 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  INestApplication,
+  ModuleMetadata,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AppModule } from '../../src/app.module';
 
-export const bootstrapApplication = async (): Promise<INestApplication> => {
+export const bootstrapApplication = async (
+  _providers?: ModuleMetadata['providers'],
+): Promise<INestApplication> => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();

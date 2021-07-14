@@ -1,6 +1,6 @@
-import { FeatureCollection } from 'geojson';
+import { FeatureCollection, MultiPolygon } from 'geojson';
 
-export const invalidMultiPolygon = (): FeatureCollection => ({
+export const invalidMultiPolygon = (): FeatureCollection<MultiPolygon> => ({
   type: 'FeatureCollection',
   features: [
     {
@@ -22,7 +22,7 @@ export const invalidMultiPolygon = (): FeatureCollection => ({
   ],
 });
 
-export const sampleMultiPolygonJson = (): FeatureCollection => ({
+export const sampleMultiPolygonJson = (): FeatureCollection<MultiPolygon> => ({
   type: 'FeatureCollection',
   features: [
     {

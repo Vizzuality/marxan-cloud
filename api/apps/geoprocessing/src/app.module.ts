@@ -12,6 +12,9 @@ import { ApiEventsModule } from './modules/api-events/api-events.module';
 import { SurfaceCostModule } from './modules/surface-cost/surface-cost.module';
 import { ScenarioPlanningUnitsInclusionModule } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/scenario-planning-units-inclusion.module';
 import { CostTemplateModule } from '@marxan-geoprocessing/modules/scenarios';
+import { PlanningAreaModule } from '@marxan-geoprocessing/modules/planning-area/planning-area.module';
+import { MarxanSandboxedRunnerModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandboxed-runner.module';
+import { ScenariosModule } from '@marxan-geoprocessing/modules/scenarios/scenarios.module';
 
 @Module({
   imports: [
@@ -32,6 +35,9 @@ import { CostTemplateModule } from '@marxan-geoprocessing/modules/scenarios';
     ApiEventsModule,
     SurfaceCostModule,
     ScenarioPlanningUnitsInclusionModule,
+    PlanningAreaModule,
+    MarxanSandboxedRunnerModule,
+    ScenariosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

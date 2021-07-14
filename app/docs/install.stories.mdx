@@ -44,3 +44,22 @@ These scripts refer to the different stages of developing an application:
 - `dev` - Runs next dev which starts Next.js in development mode
 - `build` - Runs next build which builds the application for production usage
 - `start` - Runs next start which starts a Next.js production server
+
+## 3. STORYBOOK
+
+Once you installed all the dependencies and packages you will be able to run these commands available in `package.json` by using `yarn storybook:dev`, `yarn storybook:build`
+
+```json
+// package.json
+"scripts": {
+  "storybook:dev": "yarn storybook:styles:dev && start-storybook -p 6006 -s ./public -c .storybook",
+  "storybook:build": "yarn storybook:styles:prod && build-storybook -s ./public -c .storybook",
+  "storybook:styles:dev": "NODE_ENV=development tailwind build ./styles/tailwind.css -o ./public/styles/tailwind.storybook.css",
+  "storybook:styles:prod": "NODE_ENV=production tailwind build ./styles/tailwind.css -o ./public/styles/tailwind.storybook.css"
+}
+```
+
+These scripts refer to the different stages of developing an application:
+
+- `storybook:dev` - Runs storybook dev which starts Storybook in development mode
+- `storybook:build` - Runs storybook build which builds the Storybook for production usage

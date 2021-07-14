@@ -44,7 +44,7 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
   >
     <button
       className={cx({
-        'flex items-center justify-center w-5 h-5 transition rounded-full bg-opacity-50 focus:outline-none hover:bg-opacity-75 focus:bg-opacity-90': true,
+        'flex flex-shrink-0 items-center justify-center w-5 h-5 transition rounded-full bg-opacity-50 focus:outline-none hover:bg-opacity-75 focus:bg-opacity-90': true,
         [THEME[theme].button]: true,
       })}
       type="button"

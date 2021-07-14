@@ -1,8 +1,5 @@
 {
   "collection": "@nestjs/schematics",
-<<<<<<< HEAD
-  "sourceRoot": "src"
-=======
   "sourceRoot": "apps/api/src",
   "monorepo": true,
   "root": "apps/api",
@@ -82,7 +79,42 @@
       "compilerOptions": {
         "tsConfigPath": "libs/scenario-cost-surface/tsconfig.lib.json"
       }
+    },
+    "marxan-input": {
+      "type": "library",
+      "root": "libs/marxan-input",
+      "entryFile": "index",
+      "sourceRoot": "libs/marxan-input/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/marxan-input/tsconfig.lib.json"
+      }
+    },
+    "marxan-output": {
+      "type": "library",
+      "root": "libs/marxan-output",
+      "entryFile": "index",
+      "sourceRoot": "libs/marxan-output/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/marxan-output/tsconfig.lib.json"
+      }
+    },
+    "planning-area-repository": {
+      "type": "library",
+      "root": "libs/planning-area-repository",
+      "entryFile": "index",
+      "sourceRoot": "libs/planning-area-repository/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/planning-area-repository/tsconfig.lib.json"
+      }
+    },
+    "scenario-puvspr": {
+      "type": "library",
+      "root": "libs/scenario-puvspr",
+      "entryFile": "index",
+      "sourceRoot": "libs/scenario-puvspr/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/scenario-puvspr/tsconfig.lib.json"
+      }
     }
   }
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 }

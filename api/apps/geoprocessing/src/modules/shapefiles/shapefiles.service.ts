@@ -54,7 +54,10 @@ export class ShapefileService {
     );
   }
 
-  async getGeoJson(shapeFile: Express.Multer.File) {
+  /**
+   * converts file to a geojson and *removes* it
+   */
+  async transformToGeoJson(shapeFile: Express.Multer.File) {
     try {
       this.logger.log(
         await this.fileService.unzipFile(

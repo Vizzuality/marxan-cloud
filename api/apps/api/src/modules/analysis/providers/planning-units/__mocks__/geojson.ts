@@ -1,11 +1,11 @@
-import { GeoJSON, MultiPolygon } from 'geojson';
+import { FeatureCollection, MultiPolygon } from 'geojson';
 
 const MultipolygonGeometry: MultiPolygon = Object.freeze({
   type: 'MultiPolygon',
   coordinates: [[[[0, 0]]]],
 });
 
-export const validGeoJson = (): GeoJSON => ({
+export const validGeoJson = (): FeatureCollection<MultiPolygon> => ({
   type: 'FeatureCollection',
   features: [
     {

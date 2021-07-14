@@ -10,27 +10,8 @@ import { getScenarioSlice } from 'store/slices/scenarios/edit';
 import Pill from 'layout/pill';
 import Tabs from 'components/tabs';
 
-const TABS = [
-  {
-    id: 'protected-areas',
-    name: 'Protected areas',
-  },
-  {
-    id: 'features',
-    name: 'Features',
-  },
-  {
-    id: 'analysis',
-    name: 'Analysis',
-  },
-  {
-    id: 'solutions',
-    name: 'Solutions',
-  },
-];
-
-export interface ScenariosSidebarTabsProps {
-}
+import { TABS } from './constants';
+import { ScenariosSidebarTabsProps } from './types';
 
 export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { query } = useRouter();

@@ -3,10 +3,13 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { ScenariosPuCostDataGeo } from '@marxan-geoprocessing/modules/scenarios/scenarios-pu-cost-data.geo.entity';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import {
+  ScenariosPlanningUnitGeoEntity,
+  ScenariosPuCostDataGeo,
+} from '@marxan/scenarios-planning-unit';
 
 import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
+import { isDefined } from '@marxan/utils';
 
 export const getFixtures = async (app: INestApplication) => {
   const scenarioId = v4();
@@ -33,9 +36,11 @@ export const getFixtures = async (app: INestApplication) => {
     scenarioPlanningUnitsGeometry: scenarioPuData,
     GetPuCostsData: async (
       scenarioId: string,
-    ): Promise<{ scenario_id: string; cost: number; pu_id: string }[]> =>
+    ): Promise<{ scenario_id: string; cost: number; spud_id: string }[]> =>
       puCostDataRepo.query(`
-      select spud.scenario_id, spucd."cost", spucd.output_results_data_id as pu_id from scenarios_pu_data as spud join scenarios_pu_cost_data as spucd on (spud."id" = spucd.scenarios_pu_data_id)
+      select spud.scenario_id, spucd."cost", spud.id as spud_id
+      from scenarios_pu_data as spud
+      join scenarios_pu_cost_data as spucd on (spud."id" = spucd.scenarios_pu_data_id)
       where spud.scenario_id = '${scenarioId}'
 `),
     GivenPuCostDataExists: async () =>
@@ -45,12 +50,16 @@ export const getFixtures = async (app: INestApplication) => {
             puCostDataRepo.create({
               scenariosPuDataId: scenarioPuData.id,
               cost: 300,
-              planningUnitId: scenarioPuData.puGeometryId,
               scenariosPlanningUnit: scenarioPuData,
             }),
           ),
         )
-        .then((rows) => rows.map((row) => row.planningUnitId)),
+        .then((rows) => rows.map((row) => row.scenariosPlanningUnit))
+        .then((scenarioPlanningUnits) =>
+          scenarioPlanningUnits
+            .map((spu) => spu?.puGeometryId)
+            .filter(isDefined),
+        ),
     cleanup: async () => {
       await puDataRepo.delete({
         scenarioId,

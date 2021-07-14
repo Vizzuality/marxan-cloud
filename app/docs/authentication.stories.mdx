@@ -4,6 +4,28 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Authentication
 
-- next-auth
-- react query hydratation
-- useMe hook
+The Authentication is based on [NEXT-AUTH](https://next-auth.js.org/), mixed with some HOC to get the session in the server side and a hook using React Query to get the user.
+
+## NEXT-AUTH
+
+Right now we only support Credentials provider and we work via JWT.
+
+Files to check: `['pages/api/auth/[...nextauth].ts']`
+
+## useSession
+
+Files to check [https://next-auth.js.org/getting-started/client#usesession](https://next-auth.js.org/getting-started/client#usesession)
+
+## useMe
+
+A hook to get the user info
+
+Files to check: `['hooks/me']`.
+
+## getServerSide HOCs
+
+This HOCs help us getting the session and the user on the server side. We decided to split them into different functions that you can use as you want in the different pages.
+
+Thanks to that we are able to protect one page but require the user on many other ones. Or, for example, prevent user going to the sign in page if they are already signed in.
+
+Files to check: `['hoc/auth.ts']`

@@ -9,4 +9,8 @@ export const jobStatusTargetEvents: Record<JobType, API_EVENT_KINDS[]> = {
     API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1,
     API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1,
   ],
+  [JobType.PlanningUnitInclusion]: [
+    API_EVENT_KINDS.scenario__planningUnitsInclusion__finished__v1__alpha1,
+    API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1,
+  ],
 };

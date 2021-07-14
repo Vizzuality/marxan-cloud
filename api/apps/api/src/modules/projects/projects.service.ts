@@ -5,10 +5,14 @@ import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 
 import { ProjectsCrudService } from './projects-crud.service';
+import { JobStatusService } from './job-status';
 import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
+import { PlanningAreasService } from './planning-areas';
+
+export { validationFailed } from './planning-areas';
 
 @Injectable()
 export class ProjectsService {
@@ -16,6 +20,8 @@ export class ProjectsService {
     private readonly geoCrud: GeoFeaturesService,
     private readonly projectsCrud: ProjectsCrudService,
     private readonly protectedAreaShapefile: ProtectedAreasFacade,
+    private readonly jobStatusService: JobStatusService,
+    private readonly planningAreaService: PlanningAreasService,
   ) {}
 
   async findAllGeoFeatures(
@@ -68,7 +74,16 @@ export class ProjectsService {
     return;
   }
 
+  async getJobStatusFor(projectId: string) {
+    await this.projectsCrud.getById(projectId);
+    return await this.jobStatusService.getJobStatusFor(projectId);
+  }
+
   async importLegacyProject(_: Express.Multer.File) {
     return new Project();
   }
+
+  savePlanningAreaFromShapefile = this.planningAreaService.savePlanningAreaFromShapefile.bind(
+    this.planningAreaService,
+  );
 }

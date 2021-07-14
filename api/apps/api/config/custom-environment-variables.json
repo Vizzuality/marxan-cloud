@@ -32,5 +32,19 @@
     "sharedFileStorage": {
       "localPath": "API_SHARED_FILE_STORAGE_LOCAL_PATH"
     }
+  },
+  "marxan": {
+    "inputFiles": {
+      "inputDat": {
+        "ioSettings": {
+          "INPUTDIR": "MARXAN_IO_SETTING_INPUTDIR",
+          "PUNAME": "MARXAN_IO_SETTING_PUNAME",
+          "SPECNAME": "MARXAN_IO_SETTING_SPECNAME",
+          "PUVSPRNAME": "MARXAN_IO_SETTING_PUVSPRNAME",
+          "BOUNDNAME": "MARXAN_IO_SETTING_BOUNDNAME",
+          "OUTPUTDIR": "MARXAN_IO_SETTING_OUTPUTDIR"
+        }
+      }
+    }
   }
 }

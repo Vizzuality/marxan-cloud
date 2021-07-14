@@ -15,9 +15,6 @@ export const WhenScenarioHasPreGapData = async (
     getRepositoryToken(RemoteScenarioFeaturesData, remoteConnectionName),
   );
   const rows = await repo.find();
-  console.log(`---- FOUND`);
-  console.log(`---- FOUND`, rows);
-  console.log(`---- FOUND`);
   if (rows.length === 0) {
     throw new Error('Missing scenario_features_data seeds!');
   }

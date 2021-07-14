@@ -2,8 +2,10 @@ import { AxiosRequestConfig } from 'axios';
 import { Response } from 'types/api-model';
 
 // useProjects
-export interface UseProjectsProps {
+export interface UseProjectsOptionsProps {
   search?: string;
+  sort?: string;
+  filters?: Record<string, unknown>
 }
 export interface UseProjectsResponse extends Response {
 
@@ -25,4 +27,11 @@ export interface UseDeleteProjectProps {
 
 export interface DeleteProjectProps {
   id: string
+}
+
+// usePublicProjects
+export interface UsePublishedProjectsProps {
+  search?: string;
+  sort?: string,
+  filters?: Record<string, unknown>
 }

@@ -6,6 +6,7 @@ import Header from 'layout/header';
 import Protected from 'layout/protected';
 
 import Wrapper from 'layout/wrapper';
+import Help from 'layout/help/button';
 
 import ProjectNewForm from 'layout/projects/new/form';
 import Breadcrumb from 'components/breadcrumb';
@@ -27,6 +28,8 @@ const NewProjectsPage: React.FC = () => {
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
+
+        <Help />
 
         <div className="flex flex-col py-2.5 overflow-hidden flex-grow">
           <Wrapper>

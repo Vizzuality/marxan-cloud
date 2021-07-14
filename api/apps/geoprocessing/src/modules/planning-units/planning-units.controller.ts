@@ -27,7 +27,6 @@ import {
   ApiQuery,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { TileRequest } from '@marxan-geoprocessing/modules/tile/tile.service';
 
 import { Response } from 'express';
 
@@ -46,7 +45,7 @@ export class PlanningUnitsController {
     @Body() shapefileInfo: Express.Multer.File,
   ): Promise<ShapefileGeoJSONResponseDTO | BadRequestException> {
     try {
-      return await this.shapefileService.getGeoJson(shapefileInfo);
+      return await this.shapefileService.transformToGeoJson(shapefileInfo);
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -105,7 +104,7 @@ export class PlanningUnitsController {
     @Query() PlanningUnitsFilters: PlanningUnitsFilters,
     @Res() response: Response,
   ): Promise<Object> {
-    const tile: Buffer = await this.service.findPreviewTile(
+    const tile: Buffer = await this.service.findTile(
       tileSpecification,
       PlanningUnitsFilters,
     );

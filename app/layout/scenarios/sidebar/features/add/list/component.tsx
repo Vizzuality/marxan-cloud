@@ -10,12 +10,16 @@ import useBottomScrollListener from 'hooks/scroll';
 
 export interface ScenariosFeaturesAddListProps {
   search?: string;
+  filters?: Record<string, any>;
+  sort?: string;
   selected: number[] | string[];
   onToggleSelected: (selected: string | number) => void;
 }
 
 export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> = ({
   search,
+  filters,
+  sort,
   selected = [],
   onToggleSelected,
 }: ScenariosFeaturesAddListProps) => {
@@ -31,6 +35,8 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
+    filters,
+    sort,
   });
 
   const scrollRef = useBottomScrollListener(
@@ -46,7 +52,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
 
   return (
     <div className="relative flex flex-col flex-grow overflow-hidden" style={{ minHeight: 200 }}>
-      <div className="absolute left-0 z-10 w-full h-6 -top-1 bg-gradient-to-b from-white via-white" />
+      <div className="absolute left-0 z-10 w-full h-6 pointer-events-none -top-1 bg-gradient-to-b from-white via-white" />
 
       <div
         ref={scrollRef}
@@ -96,7 +102,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-white via-white" />
+      <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-white via-white" />
 
       <div
         className={cx({

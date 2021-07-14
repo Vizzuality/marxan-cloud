@@ -8,6 +8,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
+import HelpBeacon from 'layout/help/beacon';
+
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
@@ -29,21 +31,55 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
           exit={{ y: -10, opacity: 0 }}
         >
           <div className="flex space-x-4">
-            <Button
-              theme="secondary"
-              size="base"
+            <HelpBeacon
+              id="scenarios-upload"
+              title="Upload scenario"
+              subtitle="Project list"
+              content={(
+                <div>
+                  You can upload the files of a marxan scenario directly.
+                  You will need to compress your input files
+                  as a zipfile. Make sure that your planning region and grid match the one used
+                  for all the scenarios is this project.
+                </div>
+              )}
             >
-              <span className="mr-2.5">Upload new Scenario</span>
-              <Icon icon={UPLOAD_SVG} />
-            </Button>
+              <div>
+                <Button
+                  theme="secondary"
+                  size="base"
+                >
+                  <span className="mr-2.5">Upload new Scenario</span>
+                  <Icon icon={UPLOAD_SVG} />
+                </Button>
+              </div>
+            </HelpBeacon>
 
-            <Button
-              theme="secondary"
-              size="base"
+            <HelpBeacon
+              id="project-download"
+              title="Download scenario"
+              subtitle="Project list"
+              content={(
+                <div>
+                  You can download all the files from any of your projects in the standard marxan
+                  format.This may be helpful if you need to prepare your files with more specific
+                  spatial operations.After doing so you can upload your files back into the
+                  platform to continue with the analysis
+
+                </div>
+              )}
             >
-              <span className="mr-2.5">Download project</span>
-              <Icon icon={DOWNLOAD_SVG} />
-            </Button>
+              <div>
+                <Button
+                  theme="secondary"
+                  size="base"
+                >
+                  <span className="mr-2.5">Download project</span>
+                  <Icon icon={DOWNLOAD_SVG} />
+                </Button>
+              </div>
+            </HelpBeacon>
+
           </div>
         </motion.div>
       )}
