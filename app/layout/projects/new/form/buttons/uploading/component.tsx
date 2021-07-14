@@ -11,7 +11,7 @@ import { Form as FormRFF } from 'react-final-form';
 
 import { useDispatch } from 'react-redux';
 
-import { setUploading, setUploadingValue } from 'store/slices/projects/new';
+import { setUploading, setUploadingValue, setPlanningAreaId } from 'store/slices/projects/new';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
@@ -50,6 +50,7 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
     if (!selected) {
       dispatch(setUploading(false));
       dispatch(setUploadingValue(null));
+      dispatch(setPlanningAreaId(null));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
@@ -78,6 +79,7 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
 
         dispatch(setUploadingValue(g));
         dispatch(setUploading(true));
+        dispatch(setPlanningAreaId(PUid));
 
         console.info('Shapefile uploaded', g);
       },

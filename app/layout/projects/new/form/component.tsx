@@ -43,7 +43,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
 
-  const { uploadingValue: planningArea } = useSelector((state) => state['/projects/new']);
+  const { uploadingValue: planningArea, planningAreaId } = useSelector((state) => state['/projects/new']);
 
   console.log('PLANNING AREA--->', planningArea);
 
@@ -62,6 +62,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     const data = {
       ...values,
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
+      planningAreaId,
     };
 
     saveProjectMutation.mutate({ data }, {
