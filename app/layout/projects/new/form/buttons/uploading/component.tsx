@@ -15,7 +15,7 @@ import { setUploading, setUploadingValue, setPlanningAreaId } from 'store/slices
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
-import { useUploadProjectPU } from 'hooks/projects';
+import { useUploadProjectPA } from 'hooks/projects';
 
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 import Loading from 'components/loading';
@@ -35,7 +35,7 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
 
   const dispatch = useDispatch();
 
-  const uploadProjectPUMutation = useUploadProjectPU({
+  const uploadProjectPAMutation = useUploadProjectPA({
     requestConfig: {
       method: 'POST',
     },
@@ -62,11 +62,11 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadProjectPUMutation.mutate({ data }, {
+    uploadProjectPAMutation.mutate({ data }, {
 
-      onSuccess: ({ data: { data: g, id: PUid } }) => {
+      onSuccess: ({ data: { data: g, id: PAid } }) => {
         setLoading(false);
-        setSuccessFile({ id: PUid, name: f.name });
+        setSuccessFile({ id: PAid, name: f.name });
 
         addToast('success-upload-shapefile', (
           <>
@@ -79,7 +79,7 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
 
         dispatch(setUploadingValue(g));
         dispatch(setUploading(true));
-        dispatch(setPlanningAreaId(PUid));
+        dispatch(setPlanningAreaId(PAid));
 
         console.info('Shapefile uploaded', g);
       },

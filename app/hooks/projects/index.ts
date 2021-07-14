@@ -19,8 +19,8 @@ import {
   SaveProjectProps,
   UseDeleteProjectProps,
   DeleteProjectProps,
-  UseUploadProjectPUProps,
-  UploadProjectPUProps,
+  UseUploadProjectPAProps,
+  UploadProjectPAProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -222,14 +222,14 @@ export function useDeleteProject({
   });
 }
 
-export function useUploadProjectPU({
+export function useUploadProjectPA({
   requestConfig = {
     method: 'POST',
   },
-}: UseUploadProjectPUProps) {
+}: UseUploadProjectPAProps) {
   const [session] = useSession();
 
-  const uploadProjectPUShapefile = ({ data }: UploadProjectPUProps) => {
+  const uploadProjectPAShapefile = ({ data }: UploadProjectPAProps) => {
     return UPLOADS.request({
       url: '/projects/planning-area/shapefile',
       data,
@@ -241,7 +241,7 @@ export function useUploadProjectPU({
     });
   };
 
-  return useMutation(uploadProjectPUShapefile, {
+  return useMutation(uploadProjectPAShapefile, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
     },
