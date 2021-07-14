@@ -2,6 +2,8 @@ import React, {
   useCallback, /* useEffect,  useMemo, */ useState,
 } from 'react';
 
+import { motion } from 'framer-motion';
+
 import cx from 'classnames';
 
 import InfoButton from 'components/info-button';
@@ -29,10 +31,9 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
   onSelected,
 }: NewProjectUploadingProps) => {
   const [loading, setLoading] = useState(false);
-  const [successFileName, setSuccessFileName] = useState(null);
+  const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
 
-  console.log('success file name', successFileName);
   // const scenarioSlice = getScenarioSlice(sid);
   // const { setUploading, setUploadingValue } = scenarioSlice.actions;
 
@@ -70,10 +71,11 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadProjectPUMutation.mutate({ /* id: `${pid}`, */ data }, {
-      onSuccess: ({ data: { data: g } }) => {
+    uploadProjectPUMutation.mutate({ data }, {
+
+      onSuccess: ({ data: { data: g, id: PUid } }) => {
         setLoading(false);
-        setSuccessFileName(f.name);
+        setSuccessFile({ id: PUid, name: f.name });
 
         addToast('success-upload-shapefile', (
           <>
@@ -90,7 +92,7 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
       },
       onError: () => {
         setLoading(false);
-        setSuccessFileName(null);
+        setSuccessFile(null);
 
         addToast('error-upload-shapefile', (
           <>
@@ -175,7 +177,8 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
               )}
             </header>
 
-            {selected && !successFileName && (
+            {selected && !successFile && (
+
             <div className="pt-2">
               <div
                 {...getRootProps()}
@@ -223,19 +226,24 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
                 </InfoButton>
               </p>
             </div>
+
             )}
 
-            {selected && successFileName && (
-            <div
-              className="flex items-center w-full px-5 space-x-6 cursor-pointer py-9"
-            >
-              <Icon
-                className="w-5 h-5 transform"
-                icon={UPLOAD_SVG}
-              />
-              <p className="mt-2 text-sm text-gray-300">{successFileName}</p>
-              <button type="button" onClick={() => setSuccessFileName(false)}>Cancel</button>
-            </div>
+            {selected && successFile && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="flex items-center w-full px-5 py-10 space-x-8 cursor-pointer">
+                  <Icon
+                    className="w-5 h-5 transform"
+                    icon={UPLOAD_SVG}
+                  />
+                  <p className="text-sm text-gray-300">{successFile.name}</p>
+                  <button type="button" onClick={() => setSuccessFile(null)}>x</button>
+                </div>
+              </motion.div>
             )}
 
           </div>
