@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect, useMemo, useState,
+  useCallback, /* useEffect, useMemo, */ useState,
 } from 'react';
 
 import cx from 'classnames';
@@ -10,69 +10,69 @@ import Icon from 'components/icon';
 
 import { Form as FormRFF } from 'react-final-form';
 
-import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+// import { useRouter } from 'next/router';
+// import {  useSelector,  useDispatch } from 'react-redux';
+// import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
-import { useUploadScenarioPU } from 'hooks/scenarios';
+import { useUploadProjectPU } from 'hooks/projects';
 
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 import Loading from 'components/loading';
 
-export interface AnalysisAdjustUploadingProps {
+export interface NewProjectUploadingProps {
   type: string;
   selected: boolean;
   onSelected: (s: string) => void;
 }
 
-export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = ({
-  type,
+export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
+  // type,
   selected,
   onSelected,
-}: AnalysisAdjustUploadingProps) => {
+}: NewProjectUploadingProps) => {
   const [loading, setLoading] = useState(false);
   const { addToast } = useToasts();
-  const { query } = useRouter();
-  const { sid } = query;
+  // const { query } = useRouter();
+  // const { pid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
-  const { setUploading, setUploadingValue } = scenarioSlice.actions;
+  // const scenarioSlice = getScenarioSlice(sid);
+  // const { setUploading, setUploadingValue } = scenarioSlice.actions;
 
-  const dispatch = useDispatch();
-  const { uploadingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  // const dispatch = useDispatch();
+  // const { uploadingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
-  const INITIAL_VALUES = useMemo(() => {
-    return {
-      type,
-      uploadingValue,
-    };
-  }, [type, uploadingValue]);
+  // const INITIAL_VALUES = useMemo(() => {
+  //   return {
+  //     type,
+  //     uploadingValue,
+  //   };
+  // }, [type, uploadingValue]);
 
-  const uploadScenarioPUMutation = useUploadScenarioPU({
+  const uploadProjectPUMutation = useUploadProjectPU({
     requestConfig: {
       method: 'POST',
     },
   });
 
   // Effects
-  useEffect(() => {
-    if (selected) {
-      dispatch(setUploading(true));
-    }
+  // useEffect(() => {
+  //   if (selected) {
+  //     dispatch(setUploading(true));
+  //   }
 
-    if (!selected) {
-      dispatch(setUploading(false));
-      dispatch(setUploadingValue(null));
-    }
+  //   if (!selected) {
+  //     dispatch(setUploading(false));
+  //     dispatch(setUploadingValue(null));
+  //   }
 
-    // Unmount
-    return () => {
-      dispatch(setUploading(false));
-      dispatch(setUploadingValue(null));
-    };
-  }, [selected]); // eslint-disable-line
+  //   // Unmount
+  //   return () => {
+  //     dispatch(setUploading(false));
+  //     dispatch(setUploadingValue(null));
+  //   };
+  // }, [selected]); // eslint-disable-line
 
   const onDropAccepted = async (acceptedFiles) => {
     setLoading(true);
@@ -81,7 +81,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     const data = new FormData();
     data.append('file', f);
 
-    uploadScenarioPUMutation.mutate({ id: `${sid}`, data }, {
+    uploadProjectPUMutation.mutate({ /* id: `${pid}`, */ data }, {
       onSuccess: ({ data: { data: g } }) => {
         setLoading(false);
 
@@ -94,7 +94,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
           level: 'success',
         });
 
-        dispatch(setUploadingValue(g));
+        // dispatch(setUploadingValue(g));
         console.info('Shapefile uploaded', g);
       },
       onError: () => {
@@ -136,7 +136,6 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    // accept: 'image/*',
     multiple: false,
     maxSize: 3000000,
     onDropAccepted,
@@ -152,7 +151,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     <FormRFF
       key="uploading-form"
       onSubmit={onSubmit}
-      initialValues={INITIAL_VALUES}
+      // initialValues={INITIAL_VALUES}
     >
       {({ handleSubmit }) => (
         <form onSubmit={handleSubmit} autoComplete="off">
@@ -202,18 +201,6 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
                   >
                     Save
                   </Button>
-                  {/* <button
-                    type="button"
-                    className="flex items-center justify-center h-5 pl-5 pr-1 focus:outline-none"
-                    onClickCapture={() => {
-                      setSelected(null);
-                    }}
-                  >
-                    <Icon
-                      className="w-3 h-3 text-primary-500"
-                      icon={ARROW_UP_SVG}
-                    />
-                  </button> */}
                 </div>
               )}
             </header>
@@ -256,13 +243,11 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
                   >
                     <div className="text-sm">
                       <h3 className="font-semibold">List of supported file formats:</h3>
-
-                      {/* eslint-disable max-len */}
                       <ul className="pl-4 mt-2 space-y-1 list-disc list-outside">
-                        {/* <li>
-                          Unzipped: .csv, .json, .geojson, .kml, .kmz (.csv files must contain a geom column of shape data converted to well known text (WKT) format).
-                        </li> */}
-                        <li>Zipped: .shp (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)</li>
+                        <li>
+                          Zipped: .shp
+                          (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)
+                        </li>
                       </ul>
                     </div>
                   </InfoButton>
@@ -277,4 +262,4 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   );
 };
 
-export default AnalysisAdjustUploading;
+export default NewProjectUploading;

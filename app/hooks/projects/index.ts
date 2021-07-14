@@ -11,6 +11,7 @@ import { formatDistance } from 'date-fns';
 import { ItemProps } from 'components/projects/item/component';
 
 import PROJECTS from 'services/projects';
+import UPLOADS from 'services/uploads';
 import {
   UseProjectsOptionsProps,
   UseProjectsResponse,
@@ -18,6 +19,8 @@ import {
   SaveProjectProps,
   UseDeleteProjectProps,
   DeleteProjectProps,
+  UseUploadProjectPUProps,
+  UploadProjectPUProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -214,6 +217,35 @@ export function useDeleteProject({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUploadProjectPU({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadProjectPUProps) {
+  const [session] = useSession();
+
+  const uploadProjectPUShapefile = ({ data }: UploadProjectPUProps) => {
+    return UPLOADS.request({
+      url: '/projects/planning-area/shapefile',
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadProjectPUShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

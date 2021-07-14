@@ -28,3 +28,12 @@ export interface UseDeleteProjectProps {
 export interface DeleteProjectProps {
   id: string
 }
+
+// useUploadProjectPU
+export interface UseUploadProjectPUProps {
+  requestConfig?: AxiosRequestConfig
+}
+export interface UploadProjectPUProps {
+  id?: string,
+  data: any,
+}
