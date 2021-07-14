@@ -45,7 +45,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
   const { uploadingValue: planningArea, planningAreaId } = useSelector((state) => state['/projects/new']);
 
-  console.log('PLANNING AREA--->', planningArea);
+  console.info('Planning area--->', planningArea);
 
   useEffect(() => {
     return () => {
