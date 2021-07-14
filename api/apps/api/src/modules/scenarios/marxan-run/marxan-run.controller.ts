@@ -24,6 +24,7 @@ export class MarxanRunController {
   constructor(private readonly service: MarxanRunService) {}
 
   @Header('Content-Type', 'text/csv')
+  @ApiProduces('text/csv')
   @ApiOkResponse({
     schema: {
       type: 'string',
@@ -43,8 +44,8 @@ export class MarxanRunController {
 
   @ApiOperation({ description: `Resolve scenario's input parameter file.` })
   @Get(':id/marxan/dat/input.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getInputParameterFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -53,8 +54,8 @@ export class MarxanRunController {
 
   @ApiOperation({ description: `Resolve scenario's puvspr file.` })
   @Get(':id/marxan/dat/puvspr.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getPuvsprDatFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -63,8 +64,8 @@ export class MarxanRunController {
 
   @ApiOperation({ description: `Resolve scenario's bound file.` })
   @Get(':id/marxan/dat/bound.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getBoundDatFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
