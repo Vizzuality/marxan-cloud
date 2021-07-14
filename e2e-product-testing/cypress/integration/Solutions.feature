@@ -37,10 +37,12 @@ Feature: Modify unmet targets
 
 @solutions_table
 Feature: View solutions table
+    @happypath
     Scenario: Open solutions modal
         Given the user is in the Solutions tab
         When the user clicks on 'View solutions table'
         Then the solution table modal opens on screen
+    @happypath
     Scenario: View all solutions
         Given the user is in the solutions table modal
         When the user does not select the 'View 5 most different solutions'
@@ -49,11 +51,13 @@ Feature: View solutions table
         Given the user is in the solutions table modal
         When the user selects the 'View 5 most different solutions'
         Then the user sees the 5 most different solutions ordered by run number
+    @happypath
     Scenario: View solutions on map
         Given the user is in the solutions table modal
         When the user marks a solution in the 'View on map' column
         Then the solution is shown on the map
 
+@happypath
 Feature: Order solutions table
     Scenario: Order solutions by run
         Given the user is in the solutions table modal
@@ -76,19 +80,23 @@ Feature: Order solutions table
         When the user selects 'Order by: Missing values'
         Then the solutions are ordered by missing values (lowest to highest)
 
+@happypath
 Feature: Download solutions table
-    @happypath
     Scenario: Download complete solutions table
         Given the user is in the solutions table modal
         When the user selects 'Download solutions'
         Then the user receives a bundle zip with all the result files in his/her local machine
 
-@run_gap_analysis
+@run_gap_analysis @happypath
 Feature: View post-run gap Analysis
-    Scenario: Open gap analysis (default view all features)
+    Scenario: Open gap analysis (default view all features, graph)
         Given the user is in Solutions tab
         When the user opens the 'View run gap analysis' modal
-        Then the gap analysis displays all the features as a bar graph and on map
+        Then the gap analysis displays all the features as a bar graph
+    Scenario: Open gap analysis (default view all features, map)
+        Given the user is in Solutions tab
+        When the user opens the 'View run gap analysis' modal
+        Then the gap analysis displays all the features on a map
     Scenario: Gap analysis view selected features
         Given the user has opened the gap analysis 
         When the user selects on the open eye icon on the features bar graph
@@ -104,9 +112,8 @@ Feature: Download gap analysis
         When the user clicks on 'Download'
         Then the user downloads a pdf with the gap analysis to his/her local machine
 
-@download_files
+@download_files @happypath
 Feature: Download files
-    @happypath
     Scenario: Download input files
         Given the user is in the Solutions tab
         When the user clicks on 'Download Input files'
