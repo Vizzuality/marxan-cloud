@@ -1,6 +1,4 @@
-import React, {
-  useCallback, /* useEffect,  useMemo, */ useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { motion } from 'framer-motion';
 
@@ -11,8 +9,9 @@ import Icon from 'components/icon';
 
 import { Form as FormRFF } from 'react-final-form';
 
-// import {  useSelector,  useDispatch } from 'react-redux';
-// import { getScenarioSlice } from 'store/slices/scenarios/edit';
+import { useDispatch } from 'react-redux';
+
+import { setUploading, setUploadingValue } from 'store/slices/projects/new';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
@@ -34,11 +33,7 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
   const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
 
-  // const scenarioSlice = getScenarioSlice(sid);
-  // const { setUploading, setUploadingValue } = scenarioSlice.actions;
-
-  // const dispatch = useDispatch();
-  // const { uploadingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const dispatch = useDispatch();
 
   const uploadProjectPUMutation = useUploadProjectPU({
     requestConfig: {
@@ -47,22 +42,17 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
   });
 
   // Effects
-  // useEffect(() => {
-  //   if (selected) {
-  //     dispatch(setUploading(true));
-  //   }
+  useEffect(() => {
+    if (selected) {
+      dispatch(setUploading(true));
+    }
 
-  //   if (!selected) {
-  //     dispatch(setUploading(false));
-  //     dispatch(setUploadingValue(null));
-  //   }
-
-  //   // Unmount
-  //   return () => {
-  //     dispatch(setUploading(false));
-  //     dispatch(setUploadingValue(null));
-  //   };
-  // }, [selected]); // eslint-disable-line
+    if (!selected) {
+      dispatch(setUploading(false));
+      dispatch(setUploadingValue(null));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected]);
 
   const onDropAccepted = async (acceptedFiles) => {
     setLoading(true);
@@ -86,9 +76,10 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
           level: 'success',
         });
 
-        // dispatch(setUploadingValue(g));
+        dispatch(setUploadingValue(g));
+        dispatch(setUploading(true));
+
         console.info('Shapefile uploaded', g);
-        // guardar redux geojson asociado con planning area id (g.id)
       },
       onError: () => {
         setLoading(false);
