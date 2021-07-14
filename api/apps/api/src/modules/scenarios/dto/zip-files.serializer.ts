@@ -1,13 +1,9 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Either, isRight } from 'fp-ts/Either';
 import {
   metadataNotFound,
-  outputZipNotYetAvailable,
   OutputZipFailure,
+  outputZipNotYetAvailable,
 } from '../output-files/output-files.service';
 
 @Injectable()

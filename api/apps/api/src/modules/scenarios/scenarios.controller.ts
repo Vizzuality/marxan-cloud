@@ -253,8 +253,8 @@ export class ScenariosController {
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's input parameter file.` })
   @Get(':id/marxan/dat/input.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getInputParameterFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -264,8 +264,8 @@ export class ScenariosController {
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's spec file.` })
   @Get(':id/marxan/dat/spec.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getSpecDatFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -275,8 +275,8 @@ export class ScenariosController {
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's puvspr file.` })
   @Get(':id/marxan/dat/puvspr.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getPuvsprDatFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -286,8 +286,8 @@ export class ScenariosController {
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's bound file.` })
   @Get(':id/marxan/dat/bound.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getBoundDatFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -309,6 +309,23 @@ export class ScenariosController {
       scenarioId,
     );
     response.send(this.zipFilesSerializer.serialize(result));
+  }
+
+  @ApiTags(marxanRunFiles)
+  @ApiOperation({
+    description: `Get archived input files`,
+  })
+  @Get(`:id/marxan/input`)
+  @Header(`Content-Type`, `application/zip`)
+  @Header('Content-Disposition', 'attachment; filename="input.zip"')
+  async getInputArchive(
+    @Param(`id`, ParseUUIDPipe) scenarioId: string,
+    @Res() response: Response,
+  ) {
+    const result = await this.service.getMarxanExecutionInputArchive(
+      scenarioId,
+    );
+    response.send(result);
   }
 
   @ApiOkResponse({

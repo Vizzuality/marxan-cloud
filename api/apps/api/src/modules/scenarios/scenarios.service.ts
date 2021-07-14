@@ -27,10 +27,8 @@ import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-p
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
 import { InputParameterFileProvider } from './input-parameter-file.provider';
-import { SpecDatService } from './input-files/spec.dat.service';
-import { PuvsprDatService } from './input-files/puvspr.dat.service';
 import { OutputFilesService } from './output-files/output-files.service';
-import { BoundDatService } from './input-files/bound.dat.service';
+import { InputFilesService } from './input-files/input-files.service';
 
 @Injectable()
 export class ScenariosService {
@@ -48,10 +46,8 @@ export class ScenariosService {
     private readonly costSurfaceView: CostSurfaceViewService,
     private readonly marxanInputValidator: MarxanInput,
     private readonly inputParameterFileProvider: InputParameterFileProvider,
-    private readonly specDatService: SpecDatService,
-    private readonly puvsprDatService: PuvsprDatService,
-    private readonly boundDatService: BoundDatService,
     private readonly outputFilesService: OutputFilesService,
+    private readonly inputFilesService: InputFilesService,
   ) {}
 
   async findAllPaginated(
@@ -157,12 +153,12 @@ export class ScenariosService {
 
   async getSpecDatCsv(scenarioId: string): Promise<string> {
     await this.assertScenario(scenarioId);
-    return this.specDatService.getSpecDatContent(scenarioId);
+    return this.inputFilesService.getSpecDatContent(scenarioId);
   }
 
   async getBoundDatCsv(scenarioId: string): Promise<string> {
     await this.assertScenario(scenarioId);
-    return this.boundDatService.getContent(scenarioId);
+    return this.inputFilesService.getBoundDatContent(scenarioId);
   }
 
   async run(scenarioId: string, _blm?: number): Promise<void> {
@@ -255,8 +251,13 @@ export class ScenariosService {
     return this.outputFilesService.get(scenarioId);
   }
 
+  async getMarxanExecutionInputArchive(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    return this.inputFilesService.getInputArchive(scenarioId);
+  }
+
   async getPuvsprDatCsv(scenarioId: string) {
     await this.assertScenario(scenarioId);
-    return this.puvsprDatService.getPuvsprDatContent(scenarioId);
+    return this.inputFilesService.getPuvsprDatContent(scenarioId);
   }
 }
