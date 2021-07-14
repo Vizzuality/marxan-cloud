@@ -74,7 +74,7 @@ export class MarxanSandboxRunnerService {
             marxanRun.stdOut,
             [],
           );
-          await workspace.cleanup();
+          // await workspace.cleanup();
           resolve(output);
         } catch (error) {
           reject(error);

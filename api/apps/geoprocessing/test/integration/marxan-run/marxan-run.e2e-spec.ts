@@ -37,7 +37,7 @@ describe(`given input data is delayed`, () => {
   }, 30000);
 });
 
-describe(`given input data is available`, () => {
+fdescribe(`given input data is available`, () => {
   beforeEach(() => {
     fixtures.GivenInputFilesAreAvailable();
   });
@@ -46,7 +46,7 @@ describe(`given input data is available`, () => {
     fixtures.ThenHasValidOutput(output);
   }, 60000);
 
-  test(`cancelling marxan run`, async (done) => {
+  test.skip(`cancelling marxan run`, async (done) => {
     expect.assertions(1);
 
     fixtures

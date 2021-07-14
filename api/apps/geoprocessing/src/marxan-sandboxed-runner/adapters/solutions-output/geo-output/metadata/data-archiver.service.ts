@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Workspace } from '../../../ports/workspace';
-import { MarxanDirectory } from '../../marxan-directory.service';
+import { Workspace } from '../../../../ports/workspace';
+import { MarxanDirectory } from '../../../marxan-directory.service';
 import { Archive } from './archive';
 
 @Injectable()
