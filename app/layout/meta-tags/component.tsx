@@ -4,7 +4,7 @@ export interface MetaTagsProps {
   name: string,
   title: string,
   description: string,
-  url: string,
+  url?: string,
   type: string,
   publisher?: string,
   section?: string,
@@ -18,7 +18,7 @@ export interface MetaTagsProps {
   twitterSite?: string,
 }
 
-export const Backlink: React.FC<MetaTagsProps> = ({
+export const MetaTags: React.FC<MetaTagsProps> = ({
   name,
   title,
   description,
@@ -56,4 +56,4 @@ export const Backlink: React.FC<MetaTagsProps> = ({
   );
 };
 
-export default Backlink;
+export default MetaTags;
