@@ -26,7 +26,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
 }: ProjectMapProps) => {
   const minZoom = 2;
   const maxZoom = 20;
-  const { bbox, uploadingValue } = useSelector((state) => state['/projects/new']);
+  const { bbox, uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
 
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
@@ -36,8 +36,8 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
   const LAYERS = [
     useGeoJsonLayer({
       id: 'uploaded-geojson',
-      active: !!uploadingValue,
-      data: uploadingValue,
+      active: !!uploadingPlanningArea,
+      data: uploadingPlanningArea,
     }),
     useAdminPreviewLayer({
       active: true,

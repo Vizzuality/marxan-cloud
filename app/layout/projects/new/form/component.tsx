@@ -42,9 +42,8 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { uploadingPlanningArea: planningArea, planningAreaId } = useSelector((state) => state['/projects/new']);
-
-  console.info('Planning area--->', planningArea);
 
   useEffect(() => {
     return () => {
@@ -100,7 +99,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
         ...DEFAULT_AREA,
       }}
     >
-      {({ handleSubmit, values }) => (
+      {({ form, handleSubmit, values }) => (
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
@@ -172,7 +171,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           className="w-20 h-6"
                           size="xs"
                           theme={hasPlanningArea ? 'white' : 'secondary'}
-                          onClick={() => setHasPlanningArea(true)}
+                          onClick={() => {
+                            setHasPlanningArea(true);
+                            form.reset();
+                          }}
                         >
                           Yes
                         </Button>

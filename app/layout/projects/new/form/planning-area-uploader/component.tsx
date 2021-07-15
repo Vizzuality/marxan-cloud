@@ -129,10 +129,10 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
       key="uploading"
       role="presentation"
       className={cx({
-        'border text-sm py-2.5 focus:outline-none relative transition rounded-3xl px-5 cursor-pointer mt-6 text-white': true,
+        'border text-sm py-2.5 focus:outline-none relative transition rounded-3xl  cursor-pointer mt-6 text-white': true,
         'border-transparent': !submitFailed && valid,
-        'border-red-500 bg-gray-600': submitFailed && !valid,
-        'bg-gray-600': !submitFailed && !valid,
+        'border-red-500 bg-gray-600 px-5': submitFailed && !valid,
+        'bg-gray-600 px-5': !submitFailed && !valid,
       })}
     >
       <header className="relative flex justify-between w-full">
@@ -140,6 +140,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
         <div
           className={cx({
             'text-left': true,
+            'text-gray-300': !submitFailed && valid,
           })}
         >
           {successFile ? 'Uploaded shapefile' : 'Upload shapefile'}
@@ -212,7 +213,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
               <button
                 id="cancel-shapefile-btn"
                 type="button"
-                className="flex items-center justify-center w-5 h-5 border border-white rounded-full border-opacity-20"
+                className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-white border-opacity-20"
                 onClick={() => {
                   setSuccessFile(null);
                   input.onChange(null);
@@ -220,7 +221,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                 }}
               >
                 <Icon
-                  className="w-1.5 h-1.5 text-white"
+                  className="w-1.5 h-1.5 text-white group-hover:text-black"
                   icon={CLOSE_SVG}
                 />
               </button>
