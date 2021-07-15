@@ -106,44 +106,56 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
               <div className="relative flex flex-col flex-grow min-h-0">
                 <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
                 <HelpBeacon
-                  id="project-new-name"
+                  id="project-new-overview"
                   title="New project basic information"
                   subtitle=""
                   content={(
                     <div>
                       Start by adding a name, description and planning area
-                      to your new project.A generic name for the project is
-                      recommended (eg: the name of the planning region)
-                      as well as a generic overview for the description.
-                      In each Scenario you will be able
-                      to provide specific details.
+                      to your new project.
 
                     </div>
                   )}
                   modifiers={['flip']}
-                  tooltipPlacement="right"
+                  tooltipPlacement="left"
                 >
                   <div className="flex flex-col flex-grow p-8 overflow-auto">
                     <h1 className="max-w-xs text-2xl text-white font-heading">
                       Name your project and define a planning area:
                     </h1>
+                    <HelpBeacon
+                      id="project-new-name_description"
+                      title="New project name and description"
+                      subtitle=""
+                      content={(
+                        <div>
+                          A generic name for the project is
+                          recommended (eg: the name of the planning region)
+                          as well as a generic overview for the description.
+                          In each Scenario you will be able
+                          to provide specific details.
 
-                    {/* NAME */}
+                        </div>
+                  )}
+                      modifiers={['flip', 'hide']}
+                      tooltipPlacement="right"
+                    >
+                      {/* NAME */}
 
-                    <div className="mt-8">
-                      <FieldRFF
-                        name="name"
-                        validate={composeValidators([{ presence: true }])}
-                      >
-                        {(fprops) => (
-                          <Field id="name" {...fprops}>
-                            <Label theme="dark" className="mb-3 uppercase">Project Name</Label>
-                            <Input theme="dark" type="text" placeholder="Write project name..." />
-                          </Field>
-                        )}
-                      </FieldRFF>
-                    </div>
-
+                      <div className="mt-8">
+                        <FieldRFF
+                          name="name"
+                          validate={composeValidators([{ presence: true }])}
+                        >
+                          {(fprops) => (
+                            <Field id="name" {...fprops}>
+                              <Label theme="dark" className="mb-3 uppercase">Project Name</Label>
+                              <Input theme="dark" type="text" placeholder="Write project name..." />
+                            </Field>
+                          )}
+                        </FieldRFF>
+                      </div>
+                    </HelpBeacon>
                     {/* DESCRIPTION */}
                     <div className="mt-8">
                       <FieldRFF
@@ -166,11 +178,14 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                       subtitle=""
                       content={(
                         <div>
-                          Next, you need to define where you want to
-                          develop your plan.
-                          You can use the administrative boundaries
+
+                          Decide the outer boundary of
+                          your planning area here.
+                          The platform provides a workflow to select an
+                          administrative
+                          boundary as planning area
                           (eg: countries or municipalities)
-                          provided inside the platform or upload your
+                          but you can also upload your
                           own geometry.
 
                         </div>
