@@ -1,6 +1,5 @@
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output/output-scenarios-pu-data.geo.entity';
-
-export type SolutionRowResult = Pick<
-  OutputScenariosPuDataGeoEntity,
-  'runId' | 'value' | 'scenarioPuId'
->;
+export interface SolutionRowResult {
+  spdId: string;
+  value: 0 | 1;
+  runId: number;
+}

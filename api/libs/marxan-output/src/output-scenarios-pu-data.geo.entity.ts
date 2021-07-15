@@ -7,17 +7,18 @@ export class OutputScenariosPuDataGeoEntity {
 
   @Column({
     name: `value`,
-    type: `float8`,
-    nullable: true,
+    array: true,
+    type: 'boolean',
+    nullable: false,
   })
-  value?: 0 | 1 | null;
+  values!: boolean[];
 
   @Column({
-    name: `run_id`,
-    type: `int`,
-    nullable: true,
+    name: `included_count`,
+    type: 'int8',
+    nullable: false,
   })
-  runId?: number | null;
+  includedCount!: number;
 
   @Column({
     name: `scenario_pu_id`,

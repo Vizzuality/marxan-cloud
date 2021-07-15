@@ -1,25 +1,27 @@
-import { readFileSync } from 'fs';
-
-import { Repository } from 'typeorm';
+import { EntityManager, In } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-
-import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
+import { InjectEntityManager } from '@nestjs/typeorm';
 
 import { Workspace } from '../../../ports/workspace';
 import { MetadataArchiver } from './metadata/data-archiver.service';
-import { SolutionsReaderService } from './solutions/solutions-reader.service';
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
+import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
+import { PlanningUnitStateCalculatorService } from './solutions/solution-aggregation/planning-unit-state-calculator.service';
+import { PlanningUnitsState } from './solutions/planning-unit-state';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import {
+  MarxanExecutionMetadataGeoEntity,
+  OutputScenariosPuDataGeoEntity,
+} from '@marxan/marxan-output';
+import { readFileSync } from 'fs';
 
 @Injectable()
 export class GeoOutputRepository {
   constructor(
-    @InjectRepository(MarxanExecutionMetadataGeoEntity)
-    private readonly executionMetadataRepo: Repository<MarxanExecutionMetadataGeoEntity>,
-    @InjectRepository(OutputScenariosPuDataGeoEntity)
-    private readonly scenarioSolutionsOutputRepo: Repository<OutputScenariosPuDataGeoEntity>,
     private readonly metadataArchiver: MetadataArchiver,
     private readonly solutionsReader: SolutionsReaderService,
+    private readonly planningUnitsStateCalculator: PlanningUnitStateCalculatorService,
+    @InjectEntityManager(geoprocessingConnections.default)
+    private readonly entityManager: EntityManager,
   ) {}
 
   async save(
@@ -36,56 +38,38 @@ export class GeoOutputRepository {
     const solutionMatrix =
       workspace.workingDirectory + `/output/output_solutionsmatrix.csv`;
 
-    const rowsStream = await this.solutionsReader.from(solutionMatrix);
+    const solutionsStream = await this.solutionsReader.from(
+      solutionMatrix,
+      scenarioId,
+    );
 
-    return new Promise((resolve, reject) => {
-      // TODO open transaction
-      //  // delete output_scenarios_pu_data for given scenarioId
-      //  // insert new rows from file
-
-      rowsStream.on('data', async (data) => {
-        //
-        if (data.length === 0) {
-          return;
-        }
-
-        // does not skip first batch of headers? (empty array)
-        console.log(`--- save rows:`, data, data.length);
-        try {
-          this.scenarioSolutionsOutputRepo
-            .save(
-              data.map((row) => this.scenarioSolutionsOutputRepo.create(row)),
-              {
-                chunk: 10000,
-              },
-            )
-            .then((res) => {
-              console.log(`--- saved`, res.length);
-            })
-            .catch((error) => {
-              console.log(`--- errors`, error);
-            });
-        } catch (er) {
-          console.log(`--- why no return at all?`, er);
-        }
+    const planningUnitsState: PlanningUnitsState = await this.planningUnitsStateCalculator.consume(
+      solutionsStream,
+    );
+    return this.entityManager.transaction(async (transaction) => {
+      await transaction.delete(OutputScenariosPuDataGeoEntity, {
+        scenarioPuId: In(Object.keys(planningUnitsState)),
       });
 
-      rowsStream.on('error', reject);
-
-      rowsStream.on('finish', async () => {
-        //  // insert metadata
-
-        await this.executionMetadataRepo.save(
-          this.executionMetadataRepo.create({
-            scenarioId,
-            stdOutput: metaData.stdOutput.toString(),
-            stdError: metaData.stdErr?.toString(),
-            outputZip: readFileSync(outputArchivePath),
-            inputZip: readFileSync(inputArchivePath),
+      await Promise.all(
+        Object.entries(planningUnitsState).map(([scenarioPuId, data]) =>
+          transaction.insert(OutputScenariosPuDataGeoEntity, {
+            scenarioPuId,
+            values: data.values,
+            includedCount: data.usedCount,
           }),
-        );
-        resolve();
-      });
+        ),
+      );
+
+      await transaction.save(
+        transaction.create(MarxanExecutionMetadataGeoEntity, {
+          scenarioId,
+          stdOutput: metaData.stdOutput.toString(),
+          stdError: metaData.stdErr?.toString(),
+          outputZip: readFileSync(outputArchivePath),
+          inputZip: readFileSync(inputArchivePath),
+        }),
+      );
     });
   }
 }
