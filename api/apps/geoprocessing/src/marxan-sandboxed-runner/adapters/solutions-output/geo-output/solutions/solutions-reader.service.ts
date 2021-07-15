@@ -10,6 +10,8 @@ import { SolutionRowResult } from './solution-row-result';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import { PuToScenarioPu } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters/solutions-output/geo-output/solutions/pu-to-scenario-pu';
+import { delay } from 'bullmq/dist/utils';
 
 interface ReaderEvents {
   data(rows: SolutionRowResult[]): void;
@@ -28,15 +30,25 @@ export class SolutionsReaderService {
     //
   }
 
-  async from(file: string): Promise<TypedEmitter<ReaderEvents>> {
-    /**
-     * get maaping of PU for given scenario
-     * <number, string> -> <puid, scenarios_pu_data.id>
-     *
-     *
-     *
-     *
-     */
+  async from(
+    file: string,
+    scenarioId: string,
+  ): Promise<TypedEmitter<ReaderEvents>> {
+    const planningUnits = await this.scenarioPuData.findAndCount({
+      where: {
+        scenarioId,
+      },
+      select: ['id', 'planningUnitMarxanId'],
+    });
+    console.log(`----- planning units found:`, planningUnits[1]);
+    const mapping = planningUnits[0].reduce<PuToScenarioPu>(
+      (previousValue, pu) => {
+        previousValue[pu.planningUnitMarxanId] = pu.id;
+        return previousValue;
+      },
+      {},
+    );
+    console.log(`----- keys in mapper:`, Object.keys(mapping).length);
 
     const duplex: Duplex<SolutionRowResult, string> = new PassThrough({
       objectMode: true,
@@ -46,22 +58,25 @@ export class SolutionsReaderService {
       crlfDelay: Infinity,
     });
 
-    rl.on('line', (line) => {
+    // let test = 0;
+    //
+    // rl.on('line', (line) => {
+    //   if (test <= 2) {
+    //     duplex.push(line);
+    //     test += 1;
+    //   } else {
+    //     duplex.end();
+    //   }
+    // });
+
+    rl.on(`line`, (line) => {
       duplex.push(line);
     });
 
     rl.on('close', () => {
       duplex.end();
     });
-
-    // TODO could it be that silent fails come from there?
-    return duplex.pipe(
-      new SolutionTransformer({
-        0: '+>>>>>>>',
-        1: '-1-',
-        99: '-99-',
-        98: '-^.^-',
-      }),
-    );
+    console.log(`scenarioId`, scenarioId);
+    return duplex.pipe(new SolutionTransformer(mapping));
   }
 }

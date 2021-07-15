@@ -1,25 +1,26 @@
 import { readFileSync } from 'fs';
 
-import { Repository } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectEntityManager } from '@nestjs/typeorm';
 
-import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
+import {
+  MarxanExecutionMetadataGeoEntity,
+  OutputScenariosPuDataGeoEntity,
+} from '@marxan/marxan-output';
 
 import { Workspace } from '../../../ports/workspace';
 import { MetadataArchiver } from './metadata/data-archiver.service';
 import { SolutionsReaderService } from './solutions/solutions-reader.service';
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 @Injectable()
 export class GeoOutputRepository {
   constructor(
-    @InjectRepository(MarxanExecutionMetadataGeoEntity)
-    private readonly executionMetadataRepo: Repository<MarxanExecutionMetadataGeoEntity>,
-    @InjectRepository(OutputScenariosPuDataGeoEntity)
-    private readonly scenarioSolutionsOutputRepo: Repository<OutputScenariosPuDataGeoEntity>,
     private readonly metadataArchiver: MetadataArchiver,
     private readonly solutionsReader: SolutionsReaderService,
+    @InjectEntityManager(geoprocessingConnections.default)
+    private readonly entityManager: EntityManager,
   ) {}
 
   async save(
@@ -36,55 +37,64 @@ export class GeoOutputRepository {
     const solutionMatrix =
       workspace.workingDirectory + `/output/output_solutionsmatrix.csv`;
 
-    const rowsStream = await this.solutionsReader.from(solutionMatrix);
+    const rowsStream = await this.solutionsReader.from(
+      solutionMatrix,
+      scenarioId,
+    );
+    return this.entityManager.transaction((transaction) => {
+      return new Promise(async (resolve, reject) => {
+        const onFinish = async () => {
+          await transaction.save(
+            transaction.create(MarxanExecutionMetadataGeoEntity, {
+              scenarioId,
+              stdOutput: metaData.stdOutput.toString(),
+              stdError: metaData.stdErr?.toString(),
+              outputZip: readFileSync(outputArchivePath),
+              inputZip: readFileSync(inputArchivePath),
+            }),
+          );
+          resolve();
+        };
 
-    return new Promise((resolve, reject) => {
-      // TODO open transaction
-      //  // delete output_scenarios_pu_data for given scenarioId
-      //  // insert new rows from file
+        let streamFinished = false;
+        let count = 0;
+        let finishedCount = 0;
 
-      rowsStream.on('data', async (data) => {
-        //
-        if (data.length === 0) {
-          return;
-        }
+        rowsStream.on('data', async (data) => {
+          if (data.length === 0) {
+            return;
+          }
 
-        // does not skip first batch of headers? (empty array)
-        console.log(`--- save rows:`, data, data.length);
-        try {
-          this.scenarioSolutionsOutputRepo
-            .save(
-              data.map((row) => this.scenarioSolutionsOutputRepo.create(row)),
-              {
-                chunk: 10000,
-              },
-            )
-            .then((res) => {
-              console.log(`--- saved`, res.length);
-            })
-            .catch((error) => {
-              console.log(`--- errors`, error);
-            });
-        } catch (er) {
-          console.log(`--- why no return at all?`, er);
-        }
-      });
+          try {
+            count += 1;
+            for (const r of data) {
+              await transaction.query(
+                `
+insert into output_scenarios_pu_data (value, scenario_pu_id, run_id)
+values (${r.value},'${r.spdId}', ${r.runId})`,
+              );
+            }
+            finishedCount += 1;
 
-      rowsStream.on('error', reject);
+            if (count === finishedCount && streamFinished) {
+              onFinish();
+            }
+          } catch (error) {
+            reject(error);
+          }
+        });
 
-      rowsStream.on('finish', async () => {
-        //  // insert metadata
+        rowsStream.on('error', (error) => {
+          reject(error);
+        });
 
-        await this.executionMetadataRepo.save(
-          this.executionMetadataRepo.create({
-            scenarioId,
-            stdOutput: metaData.stdOutput.toString(),
-            stdError: metaData.stdErr?.toString(),
-            outputZip: readFileSync(outputArchivePath),
-            inputZip: readFileSync(inputArchivePath),
-          }),
-        );
-        resolve();
+        rowsStream.on('finish', async () => {
+          streamFinished = true;
+
+          if (count === finishedCount) {
+            await onFinish();
+          }
+        });
       });
     });
   }

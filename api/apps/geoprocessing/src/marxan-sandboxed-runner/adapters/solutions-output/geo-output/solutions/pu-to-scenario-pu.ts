@@ -1,1 +1,1 @@
-export type PuToScenarioPu = Record<number, string>;
+export type PuToScenarioPu = Record<string, string>;

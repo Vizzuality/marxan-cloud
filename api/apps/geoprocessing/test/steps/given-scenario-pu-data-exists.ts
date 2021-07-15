@@ -38,3 +38,26 @@ export const GivenScenarioPuDataExists = async (
     rows,
   };
 };
+
+export const GivenScenarioPuData = async (
+  repo: Repository<ScenariosPlanningUnitGeoEntity>,
+  scenarioId = v4(),
+  count = 100,
+): Promise<{
+  scenarioId: string;
+  rows: ScenariosPlanningUnitGeoEntity[];
+}> => {
+  const rows = await repo.save(
+    [...Array(count).keys()].map((index) => ({
+      scenarioId,
+      lockStatus: LockStatus.Unstated,
+      puGeometryId: v4(),
+      planningUnitMarxanId: index + 1,
+    })),
+  );
+  console.log(`---- created ${rows.length} for ${scenarioId}`);
+  return {
+    scenarioId,
+    rows,
+  };
+};

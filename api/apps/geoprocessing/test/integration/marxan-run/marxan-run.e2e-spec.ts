@@ -7,6 +7,10 @@ import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandbox
 import { ExecutionResult } from '@marxan/marxan-output';
 
 import { bootstrapApplication, delay } from '../../utils';
+import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
+import { In, Repository } from 'typeorm';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -38,13 +42,18 @@ describe(`given input data is delayed`, () => {
 });
 
 fdescribe(`given input data is available`, () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     fixtures.GivenInputFilesAreAvailable();
-  });
-  test(`marxan run during binary execution`, async () => {
-    const output = await fixtures.GivenMarxanIsRunning();
-    fixtures.ThenHasValidOutput(output);
-  }, 60000);
+    await fixtures.GivenScenarioPuDataExists();
+  }, 60000 * 2);
+  test(
+    `marxan run during binary execution`,
+    async () => {
+      const output = await fixtures.GivenMarxanIsRunning();
+      fixtures.ThenHasValidOutput(output);
+    },
+    60000 * 15,
+  );
 
   test.skip(`cancelling marxan run`, async (done) => {
     expect.assertions(1);
@@ -65,8 +74,10 @@ fdescribe(`given input data is available`, () => {
 });
 
 afterEach(async () => {
+  console.log(`------ clean before`);
   await fixtures.cleanup();
-});
+  console.log(`------ clean after`);
+}, 50000);
 
 const getFixtures = async () => {
   const scenarioId = v4();
@@ -74,6 +85,9 @@ const getFixtures = async () => {
   nock.disableNetConnect();
 
   const app = await bootstrapApplication();
+  const scenariosPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
+    getRepositoryToken(ScenariosPlanningUnitGeoEntity),
+  );
   const sut: MarxanSandboxRunnerService = app.get(MarxanSandboxRunnerService);
 
   const nockScope = nock(host, {
@@ -84,6 +98,9 @@ const getFixtures = async () => {
   });
   return {
     cleanup: async () => {
+      // removing by scenarioId which misses index is way too slow
+      // removing by id of created pu data is too slow for that amount of data (100*pu*100runs)
+      await scenariosPuDataRepo.delete({});
       nockScope.done();
       nock.enableNetConnect();
     },
@@ -105,6 +122,8 @@ const getFixtures = async () => {
             'content-type': 'plain/text',
           });
       }),
+    GivenScenarioPuDataExists: async () =>
+      await GivenScenarioPuData(scenariosPuDataRepo, scenarioId, 12178),
     ThenHasValidOutput(output: ExecutionResult) {
       expect(output.length).toEqual(100);
     },

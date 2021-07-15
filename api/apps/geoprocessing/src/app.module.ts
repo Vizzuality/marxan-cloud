@@ -21,6 +21,7 @@ import { ScenariosModule } from '@marxan-geoprocessing/modules/scenarios/scenari
     TypeOrmModule.forRoot({
       ...geoprocessingConnections.default,
       keepConnectionAlive: true,
+      // logging: true,
     }),
     TypeOrmModule.forRoot({
       ...geoprocessingConnections.apiDB,
