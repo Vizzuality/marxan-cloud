@@ -11,7 +11,7 @@ import Textarea from 'components/forms/textarea';
 import Button from 'components/button';
 import InfoButton from 'components/info-button';
 
-import Uploading from 'layout/projects/new/form/buttons/uploading';
+import Uploading from 'layout/projects/new/form/planning-area-uploader';
 
 import {
   composeValidators,
@@ -182,18 +182,16 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   </div>
 
                   {hasPlanningArea !== null && !hasPlanningArea && (
-                  <PlanningAreaSelector
-                    values={values}
-                  />
+                    <PlanningAreaSelector
+                      values={values}
+                    />
                   )}
 
                   {hasPlanningArea && (
-                    <div className="mt-9">
-                      <Uploading
-                        selected={selected}
-                        onSelected={(s) => setSelected(s)}
-                      />
-                    </div>
+                    <Uploading
+                      selected={selected}
+                      onSelected={(s) => setSelected(s)}
+                    />
                   )}
 
                 </div>

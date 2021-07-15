@@ -6,6 +6,7 @@ import cx from 'classnames';
 
 import InfoButton from 'components/info-button';
 import Icon from 'components/icon';
+import Loading from 'components/loading';
 
 import { Form as FormRFF } from 'react-final-form';
 
@@ -18,17 +19,17 @@ import { useToasts } from 'hooks/toast';
 import { useUploadProjectPA } from 'hooks/projects';
 
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
-import Loading from 'components/loading';
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-export interface NewProjectUploadingProps {
+export interface PlanningAreUploaderProps {
   selected: boolean;
   onSelected: (s: string) => void;
 }
 
-export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
+export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   selected,
   onSelected,
-}: NewProjectUploadingProps) => {
+}: PlanningAreUploaderProps) => {
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
@@ -146,7 +147,7 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
             key="uploading"
             role="presentation"
             className={cx({
-              'text-sm py-2.5 focus:outline-none relative transition rounded-3xl px-10 cursor-pointer': true,
+              'text-sm py-2.5 focus:outline-none relative transition rounded-3xl px-10 cursor-pointer mt-6': true,
               'bg-gray-600 text-gray-200 opacity-50 hover:text-white hover:opacity-100': !selected,
               'bg-gray-600 text-white': selected,
             })}
@@ -230,13 +231,21 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <div className="flex items-center w-full px-5 py-10 space-x-8 cursor-pointer">
-                  <Icon
-                    className="w-5 h-5 transform"
-                    icon={UPLOAD_SVG}
-                  />
-                  <p className="text-sm text-gray-300">{successFile.name}</p>
-                  <button type="button" onClick={() => setSuccessFile(null)}>x</button>
+                <div className="flex items-center w-full py-5 space-x-8 cursor-pointer">
+                  <div className="flex items-center space-x-4">
+                    <h4 className="text-lg text-gray-300">{successFile.name}</h4>
+
+                    <button
+                      type="button"
+                      className="flex items-center justify-center w-5 h-5 border border-red-500 rounded-full"
+                      onClick={() => setSuccessFile(null)}
+                    >
+                      <Icon
+                        className="w-2 h-2"
+                        icon={CLOSE_SVG}
+                      />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -248,4 +257,4 @@ export const NewProjectUploading: React.FC<NewProjectUploadingProps> = ({
   );
 };
 
-export default NewProjectUploading;
+export default PlanningAreUploader;
