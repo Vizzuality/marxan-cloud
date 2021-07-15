@@ -30,7 +30,8 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
-  const { error } = meta;
+
+  const { submitFailed, valid } = meta;
 
   const dispatch = useDispatch();
 
@@ -128,9 +129,10 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
       key="uploading"
       role="presentation"
       className={cx({
-        'border text-sm py-2.5 focus:outline-none relative transition rounded-3xl px-5 cursor-pointer mt-6 bg-gray-600 text-white': true,
-        'border-transparent': !error,
-        'border-red-500': error,
+        'border text-sm py-2.5 focus:outline-none relative transition rounded-3xl px-5 cursor-pointer mt-6 text-white': true,
+        'border-transparent': !submitFailed && valid,
+        'border-red-500 bg-gray-600': submitFailed && !valid,
+        'bg-gray-600': !submitFailed && !valid,
       })}
     >
       <header className="relative flex justify-between w-full">
