@@ -26,6 +26,7 @@ import { useToasts } from 'hooks/toast';
 
 import { setBbox, setMaxPuAreaSize, setMinPuAreaSize } from 'store/slices/projects/new';
 
+import HelpBeacon from 'layout/help/beacon';
 import PlanningAreaSelector from './planning-area-selector';
 import ProjectFormProps from './types';
 import { DEFAULT_AREA } from './constants';
@@ -99,98 +100,151 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
           autoComplete="off"
           className="flex flex-col justify-between flex-grow w-full overflow-hidden"
         >
+
           <div className="grid h-full grid-cols-1 gap-0 overflow-hidden bg-gray-700 md:grid-cols-2 rounded-3xl">
             <div id="project-new-form" className="flex flex-col flex-grow overflow-hidden">
               <div className="relative flex flex-col flex-grow min-h-0">
                 <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
+                <HelpBeacon
+                  id="project-new-name"
+                  title="New project basic information"
+                  subtitle=""
+                  content={(
+                    <div>
+                      Start by adding a name, description and planning area
+                      to your new project.A generic name for the project is
+                      recommended (eg: the name of the planning region)
+                      as well as a generic overview for the description.
+                      In each Scenario you will be able
+                      to provide specific details.
 
-                <div className="flex flex-col flex-grow p-8 overflow-auto">
-                  <h1 className="max-w-xs text-2xl text-white font-heading">
-                    Name your project and define a planning area:
-                  </h1>
-
-                  {/* NAME */}
-                  <div className="mt-8">
-                    <FieldRFF
-                      name="name"
-                      validate={composeValidators([{ presence: true }])}
-                    >
-                      {(fprops) => (
-                        <Field id="name" {...fprops}>
-                          <Label theme="dark" className="mb-3 uppercase">Project Name</Label>
-                          <Input theme="dark" type="text" placeholder="Write project name..." />
-                        </Field>
-                      )}
-                    </FieldRFF>
-                  </div>
-
-                  {/* DESCRIPTION */}
-                  <div className="mt-8">
-                    <FieldRFF
-                      name="description"
-                      validate={composeValidators([{ presence: true }])}
-                    >
-                      {(fprops) => (
-                        <Field id="description" {...fprops}>
-                          <Label theme="dark" className="mb-3 uppercase">Description</Label>
-                          <Textarea rows={4} placeholder="Write your project description..." />
-                        </Field>
-                      )}
-                    </FieldRFF>
-                  </div>
-
-                  {/* PLANNING AREA */}
-                  <div className="flex items-center justify-between mt-6">
-                    <div className="flex items-center">
-                      <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
-                      <InfoButton>
-                        <span>Planning area info button.</span>
-                      </InfoButton>
                     </div>
-                    {/* TEMPORARILY HIDDEN, it will be implemented in the future */}
-                    <div className="hidden">
-                      <Button
-                        className="w-20 h-6 mr-4"
-                        size="xs"
-                        theme={!hasPlanningArea ? 'white' : 'secondary'}
-                        onClick={() => setHasPlanningArea(false)}
+                  )}
+                  modifiers={['flip']}
+                  tooltipPlacement="right"
+                >
+                  <div className="flex flex-col flex-grow p-8 overflow-auto">
+                    <h1 className="max-w-xs text-2xl text-white font-heading">
+                      Name your project and define a planning area:
+                    </h1>
+
+                    {/* NAME */}
+
+                    <div className="mt-8">
+                      <FieldRFF
+                        name="name"
+                        validate={composeValidators([{ presence: true }])}
                       >
-                        No
-                      </Button>
-                      <Button
-                        className="w-20 h-6"
-                        size="xs"
-                        theme={hasPlanningArea ? 'white' : 'secondary'}
-                        onClick={() => setHasPlanningArea(true)}
-                      >
-                        Yes
-                      </Button>
+                        {(fprops) => (
+                          <Field id="name" {...fprops}>
+                            <Label theme="dark" className="mb-3 uppercase">Project Name</Label>
+                            <Input theme="dark" type="text" placeholder="Write project name..." />
+                          </Field>
+                        )}
+                      </FieldRFF>
                     </div>
+
+                    {/* DESCRIPTION */}
+                    <div className="mt-8">
+                      <FieldRFF
+                        name="description"
+                        validate={composeValidators([{ presence: true }])}
+                      >
+                        {(fprops) => (
+                          <Field id="description" {...fprops}>
+                            <Label theme="dark" className="mb-3 uppercase">Description</Label>
+                            <Textarea rows={4} placeholder="Write your project description..." />
+                          </Field>
+                        )}
+                      </FieldRFF>
+                    </div>
+
+                    {/* PLANNING AREA */}
+                    <HelpBeacon
+                      id="project-new-planning-area"
+                      title="New project planning area"
+                      subtitle=""
+                      content={(
+                        <div>
+                          Next, you need to define where you want to
+                          develop your plan.
+                          You can use the administrative boundaries
+                          (eg: countries or municipalities)
+                          provided inside the platform or upload your
+                          own geometry.
+
+                        </div>
+                  )}
+                      modifiers={['flip', 'hide']}
+                      tooltipPlacement="right"
+                    >
+                      <div className="flex items-center justify-between mt-6">
+
+                        <div className="flex items-center">
+
+                          <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
+                          <InfoButton>
+                            <span>
+                              The planning area (or study region) is
+                              the outer boundary
+                              of the region where you want to create a
+                              plan. These regions
+                              often represent administrative units
+                              (such as countries or
+                              smaller regions), but can represent any
+                              planning area.
+                            </span>
+                          </InfoButton>
+                        </div>
+                        {/* TEMPORARILY HIDDEN, it will be implemented in the future */}
+                        <div className="hidden">
+                          <Button
+                            className="w-20 h-6 mr-4"
+                            size="xs"
+                            theme={!hasPlanningArea ? 'white' : 'secondary'}
+                            onClick={() => setHasPlanningArea(false)}
+                          >
+                            No
+                          </Button>
+                          <Button
+                            className="w-20 h-6"
+                            size="xs"
+                            theme={hasPlanningArea ? 'white' : 'secondary'}
+                            onClick={() => setHasPlanningArea(true)}
+                          >
+                            Yes
+                          </Button>
+
+                        </div>
+
+                      </div>
+                    </HelpBeacon>
+
+                    {!hasPlanningArea && (
+                      <PlanningAreaSelector
+                        values={values}
+                      />
+                    )}
+
+                    {hasPlanningArea && (
+                      <Button
+                        className="flex w-full mt-4"
+                        theme="secondary"
+                        size="base"
+                        onClick={() => console.info('Upload shapefile')}
+                      >
+                        <span className="w-full">
+                          Upload shapefile
+                        </span>
+                        <Icon
+                          icon={UPLOAD_SHAPEFILE_SVG}
+                        />
+                      </Button>
+                    )}
                   </div>
-
-                  {!hasPlanningArea && (
-                    <PlanningAreaSelector
-                      values={values}
-                    />
-                  )}
-
-                  {hasPlanningArea && (
-                  <Button
-                    className="flex w-full mt-4"
-                    theme="secondary"
-                    size="base"
-                    onClick={() => console.info('Upload shapefile')}
-                  >
-                    <span className="w-full">
-                      Upload shapefile
-                    </span>
-                    <Icon
-                      icon={UPLOAD_SHAPEFILE_SVG}
-                    />
-                  </Button>
-                  )}
-                </div>
+                </HelpBeacon>
                 <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
+
               </div>
 
               {/* BUTTON BAR */}
@@ -226,7 +280,9 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
               planningUnitAreakm2={values.planningUnitAreakm2}
 
             />
+
           </div>
+
         </form>
       )}
     </FormRFF>
