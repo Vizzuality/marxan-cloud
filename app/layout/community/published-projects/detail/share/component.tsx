@@ -16,6 +16,7 @@ export interface ProjectShareProps {
 export const ProjectShare: React.FC<ProjectShareProps> = () => {
   const { addToast } = useToasts();
   const { asPath } = useRouter();
+  console.log('ROUTER', useRouter());
 
   const handleCopy = () => {
     const copyURL = `${window.location.origin}${asPath}`;
@@ -69,7 +70,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           type="button"
           role="button"
-          href={`https://twitter.com/intent/tweet?url=${window.location.origin}${asPath}`}
+          href={`https://twitter.com/intent/tweet?url=${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
@@ -81,7 +82,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           type="button"
           role="button"
-          href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}${asPath}`}
+          href={`https://www.facebook.com/sharer/sharer.php?u=${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
