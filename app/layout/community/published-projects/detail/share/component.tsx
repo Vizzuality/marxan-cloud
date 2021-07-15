@@ -16,7 +16,6 @@ export interface ProjectShareProps {
 export const ProjectShare: React.FC<ProjectShareProps> = () => {
   const { addToast } = useToasts();
   const { asPath } = useRouter();
-  console.log('ROUTER', useRouter());
 
   const handleCopy = () => {
     const copyURL = `${window.location.origin}${asPath}`;
