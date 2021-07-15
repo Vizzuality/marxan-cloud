@@ -180,7 +180,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                         <div>
 
                           Decide the outer boundary of
-                          your planning area here.
+                          your planning area and grid here.
                           The platform provides a workflow to select an
                           administrative
                           boundary as planning area
