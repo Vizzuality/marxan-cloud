@@ -11,6 +11,7 @@ import Textarea from 'components/forms/textarea';
 import Button from 'components/button';
 import InfoButton from 'components/info-button';
 
+import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
 import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
 
 import {
@@ -27,7 +28,6 @@ import {
   setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingPlanningArea,
 } from 'store/slices/projects/new';
 
-import PlanningAreaSelector from './planning-area-selector';
 import ProjectFormProps from './types';
 import { DEFAULT_AREA } from './constants';
 

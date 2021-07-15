@@ -8,11 +8,11 @@ import {
 
 import { useSelector } from 'react-redux';
 
-import { PlanningAreaSelectorProps } from './types';
+import PlanningUnitGrid from 'layout/projects/new/form/planning-unit-grid';
+import PlanningUnitAreaSize from 'layout/projects/new/form/planning-unit-area-size';
+import CountryRegionSelector from 'layout/projects/new/form/planning-area-selector/country-region-selector';
 
-import CountryRegionSelector from './country-region-selector';
-import PlanningUnitGrid from './planning-unit-grid';
-import PlanningUnitAreaSize from './planning-unit-area-size';
+import { PlanningAreaSelectorProps } from './types';
 
 export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
   values,
