@@ -10,7 +10,7 @@ import Loading from 'components/loading';
 
 import { useDispatch } from 'react-redux';
 
-import { setUploadingValue } from 'store/slices/projects/new';
+import { setUploadingPlanningArea } from 'store/slices/projects/new';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
@@ -44,7 +44,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   useEffect(() => {
     return () => {
       input.onChange(null);
-      dispatch(setUploadingValue(null));
+      dispatch(setUploadingPlanningArea(null));
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -72,7 +72,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
           level: 'success',
         });
 
-        dispatch(setUploadingValue(g));
+        dispatch(setUploadingPlanningArea(g));
 
         console.info('Shapefile uploaded', g);
       },
@@ -140,7 +140,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
             'text-left': true,
           })}
         >
-          Upload shapefile
+          {successFile ? 'Uploaded shapefile' : 'Upload shapefile'}
         </div>
       </header>
 
@@ -203,20 +203,22 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
           exit={{ opacity: 0 }}
         >
           <div className="flex items-center w-full py-5 space-x-8 cursor-pointer">
-            <div className="flex items-center space-x-4">
-              <h4 className="text-lg text-gray-300">{successFile.name}</h4>
-
+            <div className="flex items-center space-x-2 ">
+              <label className="px-2.5 py-px bg-blue-500 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                <p className="text-sm text-blue-500">{successFile.name}</p>
+              </label>
               <button
+                id="cancel-shapefile-btn"
                 type="button"
-                className="flex items-center justify-center w-5 h-5 border border-red-500 rounded-full"
+                className="flex items-center justify-center w-5 h-5 border border-white rounded-full border-opacity-20"
                 onClick={() => {
                   setSuccessFile(null);
                   input.onChange(null);
-                  dispatch(setUploadingValue(null));
+                  dispatch(setUploadingPlanningArea(null));
                 }}
               >
                 <Icon
-                  className="w-2 h-2"
+                  className="w-1.5 h-1.5 text-white"
                   icon={CLOSE_SVG}
                 />
               </button>

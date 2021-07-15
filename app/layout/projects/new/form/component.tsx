@@ -24,7 +24,7 @@ import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import {
-  setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingValue,
+  setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingPlanningArea,
 } from 'store/slices/projects/new';
 
 import PlanningAreaSelector from './planning-area-selector';
@@ -42,7 +42,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
 
-  const { uploadingValue: planningArea, planningAreaId } = useSelector((state) => state['/projects/new']);
+  const { uploadingPlanningArea: planningArea, planningAreaId } = useSelector((state) => state['/projects/new']);
 
   console.info('Planning area--->', planningArea);
 
@@ -51,7 +51,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
       dispatch(setBbox(null));
       dispatch(setMinPuAreaSize(null));
       dispatch(setMaxPuAreaSize(null));
-      dispatch(setUploadingValue(null));
+      dispatch(setUploadingPlanningArea(null));
     };
   }, [dispatch]);
 
