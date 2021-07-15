@@ -16,7 +16,7 @@ import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
-import { useUploadScenarioPU } from 'hooks/scenarios';
+import { useSaveScenarioPU, useUploadScenarioPU } from 'hooks/scenarios';
 
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 import Loading from 'components/loading';
@@ -56,6 +56,8 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     },
   });
 
+  const scenarioPUMutation = useSaveScenarioPU({});
+
   // Effects
   useEffect(() => {
     if (selected) {
@@ -94,7 +96,17 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
           level: 'success',
         });
 
-        dispatch(setUploadingValue(g));
+        const validGeoJSON = {
+          ...g,
+          features: g.features.map((fe) => {
+            return {
+              ...fe,
+              properties: fe.properties || {},
+            };
+          }),
+        };
+
+        dispatch(setUploadingValue(validGeoJSON));
         console.info('Shapefile uploaded', g);
       },
       onError: () => {
@@ -142,11 +154,29 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     onDropAccepted,
     onDropRejected,
   });
+
   // Callbacks
   const onSubmit = useCallback((values) => {
-    // Save current drawn shape
-    console.info(values);
-  }, []);
+    // Save current uploaded shape
+    scenarioPUMutation.mutate({
+      id: `${sid}`,
+      data: {
+        byGeoJson: {
+          [values.type]: values.uploadingValue,
+        },
+      },
+    }, {
+      onSuccess: () => {
+        console.info('SUCCESS');
+        onSelected(null);
+        dispatch(setUploading(false));
+        dispatch(setUploadingValue(null));
+      },
+      onError: () => {
+        console.info('ERROR');
+      },
+    });
+  }, [sid, scenarioPUMutation, onSelected, dispatch, setUploading, setUploadingValue]);
 
   return (
     <FormRFF

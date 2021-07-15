@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import DRAW_SHAPE_SVG from 'svgs/ui/draw.svg?sprite';
+import { useSaveScenarioPU } from 'hooks/scenarios';
 
 export interface AnalysisAdjustDrawingProps {
   type: string;
@@ -32,6 +33,8 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
 
   const dispatch = useDispatch();
   const { drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
+  const scenarioPUMutation = useSaveScenarioPU({});
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -61,8 +64,28 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   // Callbacks
   const onSubmit = useCallback((values) => {
     // Save current drawn shape
-    console.info(values);
-  }, []);
+    scenarioPUMutation.mutate({
+      id: `${sid}`,
+      data: {
+        byGeoJson: {
+          [values.type]: {
+            type: 'FeatureCollection',
+            features: values.drawingValue,
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+        console.info('SUCCESS');
+        onSelected(null);
+        dispatch(setDrawing(null));
+        dispatch(setDrawingValue(null));
+      },
+      onError: () => {
+        console.info('ERROR');
+      },
+    });
+  }, [sid, scenarioPUMutation, onSelected, dispatch, setDrawing, setDrawingValue]);
 
   return (
     <FormRFF

@@ -23,4 +23,6 @@ export interface UseWDPAPreviewLayer {
 export interface UsePUGridLayer {
   sid?: string;
   active?: boolean;
+  type: 'default' | 'proyected-areas' | 'adjust-planning-units',
+  options?: Record<string, unknown>
 }

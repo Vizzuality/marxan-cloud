@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 
 // Map
@@ -53,9 +53,21 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     bbox,
   });
 
+  const type = useMemo(() => {
+    if (tab === 'analysis') {
+      return 'adjust-planning-units';
+    }
+
+    return 'default';
+  }, [tab]);
+
   const PUGridLayer = usePUGridLayer({
     active: true,
     sid: sid ? `${sid}` : null,
+    type,
+    options: {
+      clickingValue,
+    },
   });
 
   const LAYERS = [WDPApreviewLayer, PUGridLayer].filter((l) => !!l);
@@ -89,15 +101,29 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
 
   const handleClick = useCallback((e) => {
     if (e && e.features) {
-      console.log(e.features);
+      console.info(e.features);
     }
 
     if (clicking) {
-      console.info(e);
-      const newClickingValue = [...clickingValue];
-      newClickingValue.push(`pu_id-${Math.random() * 1000}`);
+      const { features = [] } = e;
 
-      dispatch(setClickingValue(newClickingValue));
+      const pUGridLayer = features.find((f) => f.source === 'pu-grid-layer');
+
+      if (pUGridLayer) {
+        const { properties } = pUGridLayer;
+        const { pugeomid } = properties;
+
+        const newClickingValue = [...clickingValue];
+        const index = newClickingValue.findIndex((s) => s === pugeomid);
+
+        if (index > -1) {
+          newClickingValue.splice(index, 1);
+        } else {
+          newClickingValue.push(pugeomid);
+        }
+
+        dispatch(setClickingValue(newClickingValue));
+      }
     }
   }, [clicking, clickingValue, dispatch, setClickingValue]);
 

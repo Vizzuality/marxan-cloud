@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import SELECT_PLANNING_UNITS_SVG from 'svgs/ui/planning-units.svg?sprite';
+import { useSaveScenarioPU } from 'hooks/scenarios';
 
 export interface AnalysisAdjustClickingProps {
   type: string;
@@ -31,6 +32,8 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
   const { setClicking, setClickingValue } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const { clickingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
+  const scenarioPUMutation = useSaveScenarioPU({});
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -60,8 +63,24 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
   // Callbacks
   const onSubmit = useCallback((values) => {
     // Save current clicked pu ids
-    console.info(values);
-  }, []);
+    scenarioPUMutation.mutate({
+      id: `${sid}`,
+      data: {
+        byId: {
+          [values.type]: values.clickingValue,
+        },
+      },
+    }, {
+      onSuccess: () => {
+        onSelected(null);
+        dispatch(setClicking(false));
+        dispatch(setClickingValue([]));
+      },
+      onError: () => {
+        console.info('ERROR');
+      },
+    });
+  }, [sid, scenarioPUMutation, onSelected, dispatch, setClicking, setClickingValue]);
 
   return (
     <FormRFF
