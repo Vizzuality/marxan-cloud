@@ -1,3 +1,8 @@
+export interface UseGeoJSONLayer {
+  id: string;
+  active?: boolean;
+  data: Record<string, unknown>;
+}
 export interface UseAdminPreviewLayer {
   active?: boolean;
   bbox?: number[];

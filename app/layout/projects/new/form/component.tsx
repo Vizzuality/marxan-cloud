@@ -11,7 +11,7 @@ import Textarea from 'components/forms/textarea';
 import Button from 'components/button';
 import InfoButton from 'components/info-button';
 
-import Uploading from 'layout/projects/new/form/planning-area-uploader';
+import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
 
 import {
   composeValidators,
@@ -32,8 +32,7 @@ import ProjectFormProps from './types';
 import { DEFAULT_AREA } from './constants';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
-  const [hasPlanningArea, setHasPlanningArea] = useState(null);
-  const [selected, setSelected] = useState(null);
+  const [hasPlanningArea, setHasPlanningArea] = useState(false);
   const { addToast } = useToasts();
   const { push } = useRouter();
   const { data: organizationsData } = useOrganizations();
@@ -150,6 +149,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   {/* PLANNING AREA */}
                   <div className="flex flex-col justify-between mt-6">
                     <h2 className="mb-5 text-lg font-medium font-heading">Do you have a planning region shapefile of your own?</h2>
+
                     <div className="flex flex-row items-center justify-between">
                       <div className="flex flex-row">
                         <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
@@ -164,7 +164,6 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           theme={hasPlanningArea !== null && !hasPlanningArea ? 'white' : 'secondary'}
                           onClick={() => {
                             setHasPlanningArea(false);
-                            setSelected(false);
                           }}
                         >
                           No
@@ -188,12 +187,15 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   )}
 
                   {hasPlanningArea && (
-                    <Uploading
-                      selected={selected}
-                      onSelected={(s) => setSelected(s)}
-                    />
+                    <FieldRFF
+                      name="planningAreaId"
+                      validate={composeValidators([{ presence: true }])}
+                    >
+                      {(fprops) => {
+                        return <PlanningAreaUploader {...fprops} />;
+                      }}
+                    </FieldRFF>
                   )}
-
                 </div>
                 <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
               </div>
@@ -229,7 +231,6 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
               subregion={values.adminAreaLevel2Id}
               planningUnitGridShape={values.planningUnitGridShape}
               planningUnitAreakm2={values.planningUnitAreakm2}
-
             />
           </div>
         </form>

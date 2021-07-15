@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { motion } from 'framer-motion';
 
@@ -8,31 +8,29 @@ import InfoButton from 'components/info-button';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 
-import { Form as FormRFF } from 'react-final-form';
-
 import { useDispatch } from 'react-redux';
 
-import { setUploading, setUploadingValue, setPlanningAreaId } from 'store/slices/projects/new';
+import { setUploadingValue } from 'store/slices/projects/new';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
 import { useUploadProjectPA } from 'hooks/projects';
 
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface PlanningAreUploaderProps {
-  selected: boolean;
-  onSelected: (s: string) => void;
+  input: any;
+  meta: any;
 }
 
 export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
-  selected,
-  onSelected,
+  input,
+  meta,
 }: PlanningAreUploaderProps) => {
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
+  const { error } = meta;
 
   const dispatch = useDispatch();
 
@@ -44,17 +42,12 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
 
   // Effects
   useEffect(() => {
-    if (selected) {
-      dispatch(setUploading(true));
-    }
-
-    if (!selected) {
-      dispatch(setUploading(false));
+    return () => {
+      input.onChange(null);
       dispatch(setUploadingValue(null));
-      dispatch(setPlanningAreaId(null));
-    }
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected]);
+  }, []);
 
   const onDropAccepted = async (acceptedFiles) => {
     setLoading(true);
@@ -68,6 +61,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
       onSuccess: ({ data: { data: g, id: PAid } }) => {
         setLoading(false);
         setSuccessFile({ id: PAid, name: f.name });
+        input.onChange(PAid);
 
         addToast('success-upload-shapefile', (
           <>
@@ -79,8 +73,6 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
         });
 
         dispatch(setUploadingValue(g));
-        dispatch(setUploading(true));
-        dispatch(setPlanningAreaId(PAid));
 
         console.info('Shapefile uploaded', g);
       },
@@ -130,130 +122,110 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     onDropAccepted,
     onDropRejected,
   });
-  // Callbacks
-  const onSubmit = useCallback((values) => {
-    // Save current drawn shape
-    console.info(values);
-  }, []);
 
   return (
-    <FormRFF
-      key="uploading-form"
-      onSubmit={onSubmit}
+    <div
+      key="uploading"
+      role="presentation"
+      className={cx({
+        'border text-sm py-2.5 focus:outline-none relative transition rounded-3xl px-5 cursor-pointer mt-6 bg-gray-600 text-white': true,
+        'border-transparent': !error,
+        'border-red-500': error,
+      })}
     >
-      {({ handleSubmit }) => (
-        <form onSubmit={handleSubmit} autoComplete="off">
+      <header className="relative flex justify-between w-full">
+
+        <div
+          className={cx({
+            'text-left': true,
+          })}
+        >
+          Upload shapefile
+        </div>
+      </header>
+
+      {!successFile && (
+        <div className="pt-2">
           <div
-            key="uploading"
-            role="presentation"
+            {...getRootProps()}
             className={cx({
-              'text-sm py-2.5 focus:outline-none relative transition rounded-3xl px-10 cursor-pointer mt-6': true,
-              'bg-gray-600 text-gray-200 opacity-50 hover:text-white hover:opacity-100': !selected,
-              'bg-gray-600 text-white': selected,
+              'relative px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
+              'bg-gray-500': isDragActive,
+              'border-green-800': isDragAccept,
+              'border-red-800': isDragReject,
             })}
-            onClick={() => onSelected('uploading')}
           >
-            <header className="relative flex justify-between w-full">
 
-              <div
-                className={cx({
-                  'text-center': !selected,
-                  'text-left': selected,
-                })}
-              >
-                Upload shapefile
-              </div>
+            <input {...getInputProps()} />
 
-              {!selected && (
-                <Icon
-                  className="absolute right-0 w-5 h-5 transform -translate-y-1/2 top-1/2"
-                  icon={UPLOAD_SVG}
-                />
-              )}
+            <p className="text-sm text-gray-300">
+              Drag and drop your
+              {' '}
+              <b>polygon data file</b>
+              {' '}
+              or click here to upload
+            </p>
 
-            </header>
+            <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 3 MB'}</p>
 
-            {selected && !successFile && (
-              <div className="pt-2">
-                <div
-                  {...getRootProps()}
-                  className={cx({
-                    'relative px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
-                    'bg-gray-500': isDragActive,
-                    'border-green-800': isDragAccept,
-                    'border-red-800': isDragReject,
-                  })}
-                >
-
-                  <input {...getInputProps()} />
-
-                  <p className="text-sm text-gray-300">
-                    Drag and drop your
-                    {' '}
-                    <b>polygon data file</b>
-                    {' '}
-                    or click here to upload
-                  </p>
-
-                  <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 3 MB'}</p>
-
-                  <Loading
-                    visible={loading}
-                    className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-                    iconClassName="w-5 h-5 text-primary-500"
-                  />
-
-                </div>
-
-                <p className="flex items-center space-x-2 text-xs text-gray-300 mt-2.5">
-                  <span>Learn more about supported file formats</span>
-                  <InfoButton
-                    theme="secondary"
-                  >
-                    <div className="text-sm">
-                      <h3 className="font-semibold">List of supported file formats:</h3>
-                      <ul className="pl-4 mt-2 space-y-1 list-disc list-outside">
-                        <li>
-                          Zipped: .shp
-                          (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)
-                        </li>
-                      </ul>
-                    </div>
-                  </InfoButton>
-                </p>
-
-              </div>
-            )}
-
-            {selected && successFile && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <div className="flex items-center w-full py-5 space-x-8 cursor-pointer">
-                  <div className="flex items-center space-x-4">
-                    <h4 className="text-lg text-gray-300">{successFile.name}</h4>
-
-                    <button
-                      type="button"
-                      className="flex items-center justify-center w-5 h-5 border border-red-500 rounded-full"
-                      onClick={() => setSuccessFile(null)}
-                    >
-                      <Icon
-                        className="w-2 h-2"
-                        icon={CLOSE_SVG}
-                      />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+            <Loading
+              visible={loading}
+              className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+              iconClassName="w-5 h-5 text-primary-500"
+            />
 
           </div>
-        </form>
+
+          <p className="flex items-center space-x-2 text-xs text-gray-300 mt-2.5">
+            <span>Learn more about supported file formats</span>
+            <InfoButton
+              theme="secondary"
+            >
+              <div className="text-sm">
+                <h3 className="font-semibold">List of supported file formats:</h3>
+                <ul className="pl-4 mt-2 space-y-1 list-disc list-outside">
+                  <li>
+                    Zipped: .shp
+                    (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)
+                  </li>
+                </ul>
+              </div>
+            </InfoButton>
+          </p>
+
+        </div>
       )}
-    </FormRFF>
+
+      {successFile && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div className="flex items-center w-full py-5 space-x-8 cursor-pointer">
+            <div className="flex items-center space-x-4">
+              <h4 className="text-lg text-gray-300">{successFile.name}</h4>
+
+              <button
+                type="button"
+                className="flex items-center justify-center w-5 h-5 border border-red-500 rounded-full"
+                onClick={() => {
+                  setSuccessFile(null);
+                  input.onChange(null);
+                  dispatch(setUploadingValue(null));
+                }}
+              >
+                <Icon
+                  className="w-2 h-2"
+                  icon={CLOSE_SVG}
+                />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+    </div>
   );
 };
 
