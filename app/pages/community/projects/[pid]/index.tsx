@@ -10,6 +10,7 @@ import Header from 'layout/header';
 import Footer from 'layout/footer';
 import MetaTags from 'layout/meta-tags';
 import ProjectDetail from 'layout/community/published-projects/detail';
+import Title from 'layout/title/project-title';
 
 const PublishedProjectPage: React.FC = () => {
   const { asPath } = useRouter();
@@ -28,20 +29,20 @@ const PublishedProjectPage: React.FC = () => {
   const dataIsFectched = publishedProject && publishedProjectIsFetched;
   return (
     <>
-      {dataIsFectched && (
-        <MetaTags
-          name="Marxan conservation Solutions"
-          title={name}
-          description={description}
-          url={`${window.location.origin}${asPath}`}
-          type="article"
-          twitterCard="summary"
-          twitterSite="@Marxan_Planning"
-        />
-      )}
-
       <Head>
         <link rel="icon" href="/favicon.ico" />
+        <Title title={name} />
+        {dataIsFectched && (
+          <MetaTags
+            name="Marxan conservation Solutions"
+            title={name}
+            description={description}
+            url={typeof window !== 'undefined' && `${window.location.origin}${asPath}`}
+            type="article"
+            twitterCard="summary"
+            twitterSite="@Marxan_Planning"
+          />
+        )}
       </Head>
 
       <main>

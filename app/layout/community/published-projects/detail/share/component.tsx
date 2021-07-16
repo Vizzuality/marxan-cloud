@@ -69,7 +69,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           type="button"
           role="button"
-          href={`https://twitter.com/intent/tweet?url=${asPath}`}
+          href={typeof window !== 'undefined' && `https://twitter.com/intent/tweet?url=${window.location.origin}${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
