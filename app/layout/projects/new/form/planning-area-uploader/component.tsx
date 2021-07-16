@@ -23,11 +23,15 @@ import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 export interface PlanningAreUploaderProps {
   input: any;
   meta: any;
+  resetPlanningArea: any,
+  form: any,
 }
 
 export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   input,
   meta,
+  resetPlanningArea,
+  form,
 }: PlanningAreUploaderProps) => {
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
@@ -230,7 +234,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                 onClick={() => {
                   setSuccessFile(null);
                   input.onChange(null);
-                  dispatch(setUploadingPlanningArea(null));
+                  resetPlanningArea(form);
                 }}
               >
                 <Icon

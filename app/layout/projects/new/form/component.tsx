@@ -210,7 +210,13 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                         validate={composeValidators([{ presence: true }])}
                       >
                         {(fprops) => {
-                          return <PlanningAreaUploader {...fprops} />;
+                          return (
+                            <PlanningAreaUploader
+                              {...fprops}
+                              resetPlanningArea={resetPlanningArea}
+                              form={form}
+                            />
+                          );
                         }}
                       </FieldRFF>
 
