@@ -81,14 +81,14 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           type="button"
           role="button"
-          href="https://www.facebook.com/sharer/sharer.php?u=https://www.marxan.com"
-          // href={typeof window !== 'undefined' && `https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}${asPath}`}
+          href={typeof window !== 'undefined' && `https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
           <Icon icon={FACEBOOK_FILLED_SVG} className="h-5 mr-5 text-white" />
           <p className="text-sm">Facebook</p>
         </a>
+
       </div>
     </div>
   );

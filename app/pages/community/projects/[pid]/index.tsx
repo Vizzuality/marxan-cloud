@@ -30,7 +30,6 @@ const PublishedProjectPage: React.FC = () => {
 
   return (
     <>
-
       <link rel="icon" href="/favicon.ico" />
       <Head>
         {dataIsFectched && (
