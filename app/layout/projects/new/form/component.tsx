@@ -45,7 +45,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const saveProjectMutation = useSaveProject({});
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { bbox, uploadingPlanningArea: planningArea } = useSelector((state) => state['/projects/new']);
+  const { uploadingPlanningArea: planningArea } = useSelector((state) => state['/projects/new']);
 
   useEffect(() => {
     return () => {
@@ -188,7 +188,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
                             const registeredFields = form.getRegisteredFields();
                             registeredFields.forEach((f) => {
-                              const omitFields = ['name', 'description'];
+                              const omitFields = ['name', 'description', 'planningUnitGridShape'];
                               if (!omitFields.includes(f)) {
                                 form.change(f, null);
                               }

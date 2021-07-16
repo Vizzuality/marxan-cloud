@@ -74,7 +74,6 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                     onChange={(value: string) => {
                       const COUNTRY = countriesData.find((c) => c.id === value);
                       const { bbox, minPuAreaSize, maxPuAreaSize } = COUNTRY || {};
-                      console.log('HELLLLLLLOOOO------->', minPuAreaSize, maxPuAreaSize);
                       dispatch(setBbox(bbox));
                       dispatch(setMinPuAreaSize(minPuAreaSize));
                       dispatch(setMaxPuAreaSize(maxPuAreaSize));
