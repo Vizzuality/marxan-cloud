@@ -81,7 +81,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           type="button"
           role="button"
-          href={`https://www.facebook.com/sharer/sharer.php?u=${asPath}`}
+          href={typeof window !== 'undefined' && `https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
