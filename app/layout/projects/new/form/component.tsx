@@ -11,16 +11,15 @@ import Textarea from 'components/forms/textarea';
 import Button from 'components/button';
 import InfoButton from 'components/info-button';
 
+import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
 import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
 import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
-import PlanningUnitGrid from 'layout/projects/new/form/planning-unit-grid';
-import PlanningUnitAreaSize from 'layout/projects/new/form/planning-unit-area-size';
 
 import {
   composeValidators,
 } from 'components/forms/validations';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { useOrganizations } from 'hooks/organizations';
 import { useSaveProject } from 'hooks/projects';
@@ -43,9 +42,6 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { uploadingPlanningArea: planningArea } = useSelector((state) => state['/projects/new']);
 
   useEffect(() => {
     return () => {
@@ -198,9 +194,16 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   </div>
 
                   {hasPlanningArea !== null && !hasPlanningArea && (
-                    <PlanningAreaSelector
-                      values={values}
-                    />
+                    <>
+                      <CountryRegionSelector
+                        country={values.countryId}
+                        region={values.adminAreaLevel1Id}
+                        subRegion={values.adminAreaLevel2Id}
+                      />
+                      <PlanningAreaSelector
+                        values={values}
+                      />
+                    </>
                   )}
 
                   {hasPlanningArea && (
@@ -219,41 +222,9 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           );
                         }}
                       </FieldRFF>
-
-                      {values.planningAreaId && (
-                        <div className="grid grid-cols-2">
-                          <FieldRFF
-                            name="planningUnitGridShape"
-                            validate={composeValidators([{ presence: true }])}
-                          >
-                            {(fprops) => (
-                              <Field id="planningUnitGridShape" {...fprops}>
-                                <PlanningUnitGrid
-                                  unit={values.planningUnitGridShape}
-                                  onChange={(value) => {
-                                    fprops.input.onChange(value);
-                                  }}
-                                />
-                              </Field>
-                            )}
-                          </FieldRFF>
-                          <FieldRFF
-                            name="planningUnitAreakm2"
-                            validate={composeValidators([{
-                              presence: true,
-                              numericality: {
-                                onlyInteger: true,
-                                greaterThanOrEqualTo: +parseInt(values.minPuAreaSize, 10),
-                                lessThanOrEqualTo: +parseInt(values.maxPuAreaSize, 10),
-                              },
-                            }])}
-                          >
-                            {({ input }) => (
-                              <PlanningUnitAreaSize input={input} />
-                            )}
-                          </FieldRFF>
-                        </div>
-                      )}
+                      <PlanningAreaSelector
+                        values={values}
+                      />
                     </>
                   )}
                 </div>
