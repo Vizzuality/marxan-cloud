@@ -122,7 +122,10 @@ export function usePUGridLayer({
   return useMemo(() => {
     if (!active || !sid) return null;
 
-    const { clickingValue } = options;
+    const {
+      clickingValue,
+      puAction,
+    } = options;
 
     const LOCKIN_STATUS = [
       { id: 0, color: '#FF0' },
@@ -184,7 +187,7 @@ export function usePUGridLayer({
                 ['in', ['get', 'pugeomid'], ['literal', clickingValue]],
               ],
               paint: {
-                'line-color': '#F00',
+                'line-color': puAction === 'include' ? '#0F0' : '#F00',
                 'line-opacity': 1,
                 'line-width': 2,
               },

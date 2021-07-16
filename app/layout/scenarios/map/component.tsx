@@ -39,7 +39,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { setClickingValue } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const {
-    tab, wdpaCategories, clicking, clickingValue,
+    tab, wdpaCategories, clicking, clickingValue, puAction,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const minZoom = 2;
@@ -66,6 +66,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     sid: sid ? `${sid}` : null,
     type,
     options: {
+      puAction,
       clickingValue,
     },
   });
