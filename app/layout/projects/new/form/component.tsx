@@ -13,6 +13,8 @@ import InfoButton from 'components/info-button';
 
 import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
 import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
+import PlanningUnitGrid from 'layout/projects/new/form/planning-unit-grid';
+import PlanningUnitAreaSize from 'layout/projects/new/form/planning-unit-area-size';
 
 import {
   composeValidators,
@@ -43,7 +45,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const saveProjectMutation = useSaveProject({});
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { uploadingPlanningArea: planningArea, planningAreaId } = useSelector((state) => state['/projects/new']);
+  const { uploadingPlanningArea: planningArea } = useSelector((state) => state['/projects/new']);
 
   useEffect(() => {
     return () => {
@@ -60,7 +62,6 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     const data = {
       ...values,
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
-      planningAreaId,
     };
 
     saveProjectMutation.mutate({ data }, {
@@ -163,6 +164,8 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           theme={hasPlanningArea !== null && !hasPlanningArea ? 'white' : 'secondary'}
                           onClick={() => {
                             setHasPlanningArea(false);
+                            dispatch(setUploadingPlanningArea(null));
+                            form.reset();
                           }}
                         >
                           No
@@ -173,6 +176,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           theme={hasPlanningArea ? 'white' : 'secondary'}
                           onClick={() => {
                             setHasPlanningArea(true);
+                            dispatch(setUploadingPlanningArea(null));
                             form.reset();
                           }}
                         >
@@ -189,14 +193,51 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   )}
 
                   {hasPlanningArea && (
-                    <FieldRFF
-                      name="planningAreaId"
-                      validate={composeValidators([{ presence: true }])}
-                    >
-                      {(fprops) => {
-                        return <PlanningAreaUploader {...fprops} />;
-                      }}
-                    </FieldRFF>
+                    <>
+                      <FieldRFF
+                        name="planningAreaId"
+                        validate={composeValidators([{ presence: true }])}
+                      >
+                        {(fprops) => {
+                          return <PlanningAreaUploader {...fprops} />;
+                        }}
+                      </FieldRFF>
+
+                      {values.planningAreaId && (
+                        <div className="grid grid-cols-2">
+                          <FieldRFF
+                            name="planningUnitGridShape"
+                            validate={composeValidators([{ presence: true }])}
+                          >
+                            {(fprops) => (
+                              <Field id="planningUnitGridShape" {...fprops}>
+                                <PlanningUnitGrid
+                                  unit={values.planningUnitGridShape}
+                                  onChange={(value) => {
+                                    fprops.input.onChange(value);
+                                  }}
+                                />
+                              </Field>
+                            )}
+                          </FieldRFF>
+                          <FieldRFF
+                            name="planningUnitAreakm2"
+                            validate={composeValidators([{
+                              presence: true,
+                              numericality: {
+                                onlyInteger: true,
+                                greaterThanOrEqualTo: +parseInt(values.minPuAreaSize, 10),
+                                lessThanOrEqualTo: +parseInt(values.maxPuAreaSize, 10),
+                              },
+                            }])}
+                          >
+                            {({ input }) => (
+                              <PlanningUnitAreaSize input={input} />
+                            )}
+                          </FieldRFF>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
                 <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />

@@ -58,7 +58,6 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     data.append('file', f);
 
     uploadProjectPAMutation.mutate({ data }, {
-
       onSuccess: ({ data: { data: g, id: PAid } }) => {
         setLoading(false);
         setSuccessFile({ id: PAid, name: f.name });
@@ -130,7 +129,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
       role="presentation"
       className={cx({
         'border text-sm py-2.5 focus:outline-none relative transition rounded-3xl  cursor-pointer mt-6 text-white': true,
-        'border-transparent': !submitFailed && valid,
+        'border-transparent': (!submitFailed && valid) || (submitFailed && valid),
         'border-red-500 bg-gray-600 px-5': submitFailed && !valid,
         'bg-gray-600 px-5': !submitFailed && !valid,
       })}
@@ -229,7 +228,6 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
           </div>
         </motion.div>
       )}
-
     </div>
   );
 };
