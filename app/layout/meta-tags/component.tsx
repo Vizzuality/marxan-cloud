@@ -37,21 +37,21 @@ export const MetaTags: React.FC<MetaTagsProps> = ({
 }: MetaTagsProps) => {
   return (
     <>
-      <meta property="og:site_name" content={name} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:url" content={url} />
-      <meta property="og:type" content={type} />
-      <meta property="article:publisher" content={publisher} />
-      <meta property="article:section" content={section} />
-      <meta property="article:tag" content={tag} />
-      <meta property="og:image" content={image} />
-      <meta property="og:image:secure_url" content={imageURL} />
-      <meta property="og:image:width" content={imageWidth} />
-      <meta property="og:image:height" content={imageHeight} />
-      <meta property="twitter:card" content={twitterCard} />
-      <meta property="twitter:image" content={twitterImage} />
-      <meta property="twitter:site" content={twitterSite} />
+      <meta property="og:site_name" content={name} key="name" />
+      <meta property="og:title" content={title} key="title" />
+      <meta property="og:description" content={description} key="description" />
+      <meta property="og:url" content={url} key="url" />
+      <meta property="og:type" content={type} key="type" />
+      <meta property="article:publisher" content={publisher} key="publisher" />
+      <meta property="article:section" content={section} key="section" />
+      <meta property="article:tag" content={tag} key="tag" />
+      <meta property="og:image" content={image} key="image" />
+      <meta property="og:image:secure_url" content={imageURL} key="imageURL" />
+      <meta property="og:image:width" content={imageWidth} key="imageWidth" />
+      <meta property="og:image:height" content={imageHeight} key="imageHeight" />
+      <meta property="twitter:card" content={twitterCard} key="twitterCard" />
+      <meta property="twitter:image" content={twitterImage} key="twitterImage" />
+      <meta property="twitter:site" content={twitterSite} key="twitterSite" />
     </>
   );
 };

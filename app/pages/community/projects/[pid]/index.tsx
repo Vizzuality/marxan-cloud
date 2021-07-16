@@ -27,22 +27,25 @@ const PublishedProjectPage: React.FC = () => {
   } = publishedProject || {};
 
   const dataIsFectched = publishedProject && publishedProjectIsFetched;
+
   return (
     <>
-      <Title title={name} />
 
+      <link rel="icon" href="/favicon.ico" />
       <Head>
-        <link rel="icon" href="/favicon.ico" />
         {dataIsFectched && (
-          <MetaTags
-            name="Marxan conservation Solutions"
-            title={name}
-            description={description}
-            url={asPath}
-            type="article"
-            twitterCard="summary"
-            twitterSite="@Marxan_Planning"
-          />
+          <>
+            <Title title={name} />
+            <MetaTags
+              name="Marxan conservation Solutions"
+              title={name}
+              description={description}
+              url={asPath}
+              type="article"
+              twitterCard="summary"
+              twitterSite="@Marxan_Planning"
+            />
+          </>
         )}
       </Head>
 
