@@ -93,6 +93,19 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     });
   };
 
+  const resetPlanningArea = (form) => {
+    dispatch(setUploadingPlanningArea(null));
+    dispatch(setBbox(null));
+
+    const registeredFields = form.getRegisteredFields();
+    registeredFields.forEach((f) => {
+      const omitFields = ['name', 'description', 'planningUnitGridShape'];
+      if (!omitFields.includes(f)) {
+        form.change(f, null);
+      }
+    });
+  };
+
   return (
     <FormRFF
       onSubmit={onSubmit}
@@ -164,15 +177,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           theme={hasPlanningArea !== null && !hasPlanningArea ? 'white' : 'secondary'}
                           onClick={() => {
                             setHasPlanningArea(false);
-                            dispatch(setUploadingPlanningArea(null));
-
-                            const registeredFields = form.getRegisteredFields();
-                            registeredFields.forEach((f) => {
-                              const omitFields = ['name', 'description', 'planningUnitGridShape'];
-                              if (!omitFields.includes(f)) {
-                                form.change(f, null);
-                              }
-                            });
+                            resetPlanningArea(form);
                           }}
                         >
                           No
@@ -183,16 +188,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           theme={hasPlanningArea ? 'white' : 'secondary'}
                           onClick={() => {
                             setHasPlanningArea(true);
-                            dispatch(setUploadingPlanningArea(null));
-                            dispatch(setBbox(null));
-
-                            const registeredFields = form.getRegisteredFields();
-                            registeredFields.forEach((f) => {
-                              const omitFields = ['name', 'description', 'planningUnitGridShape'];
-                              if (!omitFields.includes(f)) {
-                                form.change(f, null);
-                              }
-                            });
+                            resetPlanningArea(form);
                           }}
                         >
                           Yes
