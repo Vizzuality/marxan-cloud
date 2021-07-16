@@ -2,6 +2,7 @@ import { PromiseType } from 'utility-types';
 import { readFileSync } from 'fs';
 import * as nock from 'nock';
 import { v4 } from 'uuid';
+import { last } from 'lodash';
 
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
 import {
@@ -56,6 +57,7 @@ fdescribe(`given input data is available`, () => {
       const output = await fixtures.GivenMarxanIsRunning();
       fixtures.ThenHasValidOutput(output);
       await fixtures.ThenOutputScenarioPuDataWasPersisted();
+      fixtures.ThenProgressWasReported();
     },
     60000 * 15,
   );
@@ -118,14 +120,19 @@ const getFixtures = async () => {
       nockScope.done();
       nock.enableNetConnect();
     },
-    GivenMarxanIsRunning: async () =>
-      await sut.run(
+    progressMock: jest.fn(),
+    async GivenMarxanIsRunning() {
+      return await sut.run(
         scenarioId,
         resources.map((resource) => ({
           url: host + resource.assetUrl,
           relativeDestination: resource.targetRelativeDestination,
         })),
-      ),
+        (value) => {
+          this.progressMock(value);
+        },
+      );
+    },
     WhenKillingMarxanRun: () => sut.kill(scenarioId),
     GivenInputFilesAreAvailable: (delayMs = 0) =>
       resources.forEach((resource) => {
@@ -153,6 +160,11 @@ const getFixtures = async () => {
         },
       });
       expect(k).toEqual(12178);
+    },
+    ThenProgressWasReported() {
+      // checking only the last call, otherwise the test is flaky as it depends on chunking the buffer
+      const { calls } = this.progressMock.mock;
+      expect(last(calls)).toEqual([1]);
     },
   };
 };
