@@ -29,15 +29,16 @@ const PublishedProjectPage: React.FC = () => {
   const dataIsFectched = publishedProject && publishedProjectIsFetched;
   return (
     <>
+      <Title title={name} />
+
       <Head>
         <link rel="icon" href="/favicon.ico" />
-        <Title title={name} />
         {dataIsFectched && (
           <MetaTags
             name="Marxan conservation Solutions"
             title={name}
             description={description}
-            url={typeof window !== 'undefined' && `${window.location.origin}${asPath}`}
+            url={asPath}
             type="article"
             twitterCard="summary"
             twitterSite="@Marxan_Planning"
