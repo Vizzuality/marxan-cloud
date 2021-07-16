@@ -29,6 +29,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
   const { bbox, uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
 
   const [viewport, setViewport] = useState({});
+
   const [bounds, setBounds] = useState(null);
 
   const [session] = useSession();

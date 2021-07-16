@@ -45,7 +45,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const saveProjectMutation = useSaveProject({});
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { uploadingPlanningArea: planningArea } = useSelector((state) => state['/projects/new']);
+  const { bbox, uploadingPlanningArea: planningArea } = useSelector((state) => state['/projects/new']);
 
   useEffect(() => {
     return () => {
@@ -165,7 +165,14 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           onClick={() => {
                             setHasPlanningArea(false);
                             dispatch(setUploadingPlanningArea(null));
-                            form.reset();
+
+                            const registeredFields = form.getRegisteredFields();
+                            registeredFields.forEach((f) => {
+                              const omitFields = ['name', 'description', 'planningUnitGridShape'];
+                              if (!omitFields.includes(f)) {
+                                form.change(f, null);
+                              }
+                            });
                           }}
                         >
                           No
@@ -177,7 +184,15 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           onClick={() => {
                             setHasPlanningArea(true);
                             dispatch(setUploadingPlanningArea(null));
-                            form.reset();
+                            dispatch(setBbox(null));
+
+                            const registeredFields = form.getRegisteredFields();
+                            registeredFields.forEach((f) => {
+                              const omitFields = ['name', 'description'];
+                              if (!omitFields.includes(f)) {
+                                form.change(f, null);
+                              }
+                            });
                           }}
                         >
                           Yes

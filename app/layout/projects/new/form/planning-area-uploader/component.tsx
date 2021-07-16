@@ -10,7 +10,9 @@ import Loading from 'components/loading';
 
 import { useDispatch } from 'react-redux';
 
-import { setUploadingPlanningArea } from 'store/slices/projects/new';
+import {
+  setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
+} from 'store/slices/projects/new';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
@@ -59,6 +61,15 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
 
     uploadProjectPAMutation.mutate({ data }, {
       onSuccess: ({ data: { data: g, id: PAid } }) => {
+        const mockMinPuAreaSize = 251;
+        const mockMaxPuAreaSize = 2311631;
+        const mockBbox = [
+          4.21875,
+          14.150390625,
+          2.8113711933311403,
+          12.811801316582619,
+        ];
+
         setLoading(false);
         setSuccessFile({ id: PAid, name: f.name });
         input.onChange(PAid);
@@ -73,6 +84,9 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
         });
 
         dispatch(setUploadingPlanningArea(g));
+        dispatch(setBbox(mockBbox));
+        dispatch(setMinPuAreaSize(mockMinPuAreaSize));
+        dispatch(setMaxPuAreaSize(mockMaxPuAreaSize));
 
         console.info('Shapefile uploaded', g);
       },
