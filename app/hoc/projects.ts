@@ -25,6 +25,7 @@ export function withPublishedProject(getServerSidePropsFunc?: Function) {
     }
 
     const { params } = context;
+
     const { pid } = params;
 
     const queryClient = new QueryClient();

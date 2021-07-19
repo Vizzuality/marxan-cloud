@@ -15,11 +15,12 @@ import MetaTags from 'layout/meta-tags';
 import ProjectDetail from 'layout/community/published-projects/detail';
 import PublishedProjectTitle from 'layout/title/published-project-title';
 
+import MARXAN_SOCIAL_MEDIA_IMG from 'images/marxan-social-media.png';
+
 export const getServerSideProps = withUser(withPublishedProject());
 
 const PublishedProjectPage: React.FC = () => {
-  const { asPath } = useRouter();
-  const { query } = useRouter();
+  const { query, asPath } = useRouter();
   const { pid } = query;
 
   const {
@@ -44,7 +45,7 @@ const PublishedProjectPage: React.FC = () => {
         title={name}
         description={description}
         url={asPath}
-        image="https://ipbes.net/sites/default/files/screen_shot_2017-11-19_at_20.20.14.png"
+        image={MARXAN_SOCIAL_MEDIA_IMG}
         type="article"
         twitterCard="summary"
         twitterSite="@Marxan_Planning"
