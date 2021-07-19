@@ -34,6 +34,18 @@ export class ApiEvent {
   id!: string;
 
   /**
+   * Unique identifier of an event, when the event origins from other sources than the application itself and has its own id.
+   * It is unique to prevent duplicates in case of multiple instances listening on the same source.
+   */
+  @Column({
+    name: 'external_id',
+    nullable: true,
+    type: 'varchar',
+    unique: true,
+  })
+  externalId?: string | null;
+
+  /**
    * Timestamp of the event.
    */
   @Column('timestamp', {

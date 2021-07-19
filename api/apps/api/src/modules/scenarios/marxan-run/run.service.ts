@@ -43,23 +43,29 @@ export class RunService {
     private readonly scenarios: Repository<Scenario>,
     private readonly assets: AssetsService,
   ) {
-    queueEvents.on(`completed`, ({ jobId }) => this.handleFinished(jobId));
-    queueEvents.on(`failed`, ({ jobId }) => this.handleFailed(jobId));
+    queueEvents.on(`completed`, ({ jobId }, eventId) =>
+      this.handleFinished(jobId, eventId),
+    );
+    queueEvents.on(`failed`, ({ jobId }, eventId) =>
+      this.handleFailed(jobId, eventId),
+    );
   }
 
   async run(scenarioId: string): Promise<void> {
     const assets = await this.assets.forScenario(scenarioId);
     assertDefined(assets);
-    await this.queue.add(`run-scenario`, {
+    const job = await this.queue.add(`run-scenario`, {
       scenarioId,
       assets,
     });
     await this.scenarios.update(scenarioId, {
       ranAtLeastOnce: true,
     });
+    const kind = API_EVENT_KINDS.scenario__run__submitted__v1__alpha1;
     await this.apiEvents.create({
       topic: scenarioId,
-      kind: API_EVENT_KINDS.scenario__run__submitted__v1__alpha1,
+      kind,
+      externalId: job.id + kind,
     });
   }
 
@@ -83,19 +89,23 @@ export class RunService {
     return right(void 0);
   }
 
-  private async handleFinished(jobId: string) {
+  private async handleFinished(jobId: string, eventId: string) {
     const job = await this.getJob(jobId);
-    await this.apiEvents.create({
+    const kind = API_EVENT_KINDS.scenario__run__finished__v1__alpha1;
+    await this.apiEvents.createIfNotExists({
       topic: job.data.scenarioId,
-      kind: API_EVENT_KINDS.scenario__run__finished__v1__alpha1,
+      kind,
+      externalId: eventId,
     });
   }
 
-  private async handleFailed(jobId: string) {
+  private async handleFailed(jobId: string, eventId: string) {
     const job = await this.getJob(jobId);
-    await this.apiEvents.create({
+    const kind = API_EVENT_KINDS.scenario__run__failed__v1__alpha1;
+    await this.apiEvents.createIfNotExists({
       topic: job.data.scenarioId,
-      kind: API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
+      kind,
+      externalId: eventId,
     });
   }
 
