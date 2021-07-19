@@ -10,7 +10,7 @@ export interface MetaTagsProps {
   publisher?: string,
   section?: string,
   tag?: string,
-  image?: string,
+  image: string,
   imageURL?: string,
   imageWidth?: string,
   imageHeight?: string,

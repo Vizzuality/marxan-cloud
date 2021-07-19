@@ -40,6 +40,7 @@ const PublishedProjectPage: React.FC = () => {
         title={name}
         description={description}
         url={asPath}
+        image="https://ipbes.net/sites/default/files/screen_shot_2017-11-19_at_20.20.14.png"
         type="article"
         twitterCard="summary"
         twitterSite="@Marxan_Planning"
