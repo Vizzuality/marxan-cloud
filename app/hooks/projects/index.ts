@@ -33,7 +33,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
   const {
     filters = {},
     search,
-    sort,
+    sort = '-lastModifiedAt',
   } = options;
 
   const parsedFilters = Object.keys(filters)
@@ -260,7 +260,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
   const {
     search,
     filters = {},
-    sort,
+    sort = '-lastModifiedAt',
   } = options;
 
   const parsedFilters = Object.keys(filters)
