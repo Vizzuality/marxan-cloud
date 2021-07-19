@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 
-import Title from 'layout/title/project-title';
+import ProjectTitle from 'layout/title/project-title';
 import Header from 'layout/header';
 import Protected from 'layout/protected';
 
@@ -12,7 +12,7 @@ export const getServerSideProps = withProtection(withUser());
 const EditProjectsPage: React.FC = () => {
   return (
     <Protected>
-      <Title title="Edit" />
+      <ProjectTitle title="Edit" />
 
       <Head>
         <link rel="icon" href="/favicon.ico" />

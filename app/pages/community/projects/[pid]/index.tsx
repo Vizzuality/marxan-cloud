@@ -10,7 +10,7 @@ import Header from 'layout/header';
 import Footer from 'layout/footer';
 import MetaTags from 'layout/meta-tags';
 import ProjectDetail from 'layout/community/published-projects/detail';
-import Title from 'layout/title/project-title';
+import ProjectTitle from 'layout/title/project-title';
 
 const PublishedProjectPage: React.FC = () => {
   const { asPath } = useRouter();
@@ -34,7 +34,7 @@ const PublishedProjectPage: React.FC = () => {
       <Head>
         {dataIsFectched && (
           <>
-            <Title title={name} />
+            <ProjectTitle title={name} />
             <MetaTags
               name="Marxan conservation Solutions"
               title={name}
