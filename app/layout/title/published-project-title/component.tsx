@@ -3,7 +3,7 @@ import React from 'react';
 import Head from 'next/head';
 
 import { useRouter } from 'next/router';
-import { useProject } from 'hooks/projects';
+import { usePublishedProject } from 'hooks/projects';
 
 export interface PublishedProjectTitleProps {
   title?: string;
@@ -14,7 +14,7 @@ export const PublishedProjectTitle: React.FC<PublishedProjectTitleProps> = ({
 }:PublishedProjectTitleProps) => {
   const { query } = useRouter();
   const { pid } = query;
-  const { data: projectData } = useProject(pid);
+  const { data: projectData } = usePublishedProject(pid);
 
   return (
     <Head>

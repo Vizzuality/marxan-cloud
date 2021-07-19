@@ -24,11 +24,14 @@ export function withPublishedProject(getServerSidePropsFunc?: Function) {
       };
     }
 
+    const { params } = context;
+    const { pid } = params;
+
     const queryClient = new QueryClient();
 
-    await queryClient.prefetchQuery('published-projects', () => PROJECTS.request({
+    await queryClient.prefetchQuery(['published-projects', pid], () => PROJECTS.request({
       method: 'GET',
-      url: '/projects',
+      url: `/projects/${pid}`,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
