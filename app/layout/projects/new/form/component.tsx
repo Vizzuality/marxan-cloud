@@ -125,7 +125,8 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
               content={(
                 <div>
                   Start by adding a name, description and planning area
-                  to your new project.
+                  to your new project. You will be able to create a
+                  planning area from scratch or upload a file.
 
                 </div>
                 )}
@@ -297,13 +298,14 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
             </HelpBeacon>
 
             <HelpBeacon
-              id="project-new-overview"
-              title="New project basic information"
+              id="project-new-map"
+              title="New project planning area and grid"
               subtitle=""
               content={(
                 <div>
-                  Start by adding a name, description and planning area
-                  to your new project.
+                  On the map you will be able to see your selected
+                  or uploaded planning area and grid.
+
                 </div>
               )}
               modifiers={['flip']}
