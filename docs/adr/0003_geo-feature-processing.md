@@ -204,23 +204,6 @@ computing throwaway results in order to simulate constant-time operations).
     {
       featureId: string;
 
-      /**
-       * We can either have marxanSettings *or* geoprocessingOperations.
-       * If marxanSettings is present (*but* we also need to set `kind: 'plain'`
-       * because of limitations on the way we can describe union types),
-       * the feature should be used as is (i.e. no splits/intersections),
-       * with the given settings.
-       *
-       * If geoprocessingOperations is present (and `kind: 'withGeoprocessing'`,
-       * see above), the features generated via geoprocessing operations will be
-       * used, each with their marxanSettings as specified for each of them.
-       */
-      kind: 'plain' | 'withGeoprocessing';
-      marxanSettings: {
-        prop: number,
-        fpf: number,
-      },
-
       geoprocessingOperations: [
         /**
          * Either one operation of kind split/v1 or one operation of kind
@@ -259,6 +242,12 @@ computing throwaway results in order to simulate constant-time operations).
             }
           ]
         },
+        /**
+         * This could replace the previous different treatment of `plain` and
+         * `withGeoprocessing` features: *all* features will be "geoprocessed",
+         * and the `kind = 'copy/v1'` will be a plain selection/pick of an
+         * existing feature, associating `marxanSettings` to it.
+         */
         {
           kind: 'copy/v1',
           marxanSettings: {
