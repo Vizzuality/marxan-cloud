@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsJSON, IsOptional, IsUUID } from 'class-validator';
+import { IsEnum, IsJSON, IsOptional, IsString, IsUUID } from 'class-validator';
 import * as ApiEventsUserData from '@marxan-api/modules/api-events/dto/apiEvents.user.data.dto';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 
@@ -18,6 +18,11 @@ export class CreateApiEventDTO {
   @ApiProperty()
   @IsUUID(4)
   topic!: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  externalId?: string;
 
   /**
    * Data payload of the event. Its semantics depend on kind.

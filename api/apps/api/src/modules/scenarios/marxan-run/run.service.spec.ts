@@ -24,7 +24,7 @@ beforeEach(async () => {
 });
 
 test(`scheduling job`, async () => {
-  fixtures.setupMocksForSchedulingJobs();
+  fixtures.setupMocksForSchedulingJobs(() => `1234`);
   // given
   fixtures.GivenAssetsAvailable();
 
@@ -33,12 +33,12 @@ test(`scheduling job`, async () => {
 
   // then
   fixtures.ThenShouldUpdateScenario();
-  fixtures.ThenShouldEmitSubmittedEvent();
+  fixtures.ThenShouldEmitSubmittedEvent(`1234`);
   fixtures.ThenShouldAddJob();
 });
 
 test(`scheduling job for scenario without assets`, async () => {
-  fixtures.setupMocksForSchedulingJobs();
+  fixtures.setupMocksForSchedulingJobs(() => `12345`);
   // given
   fixtures.GivenAssetsNotAvailable();
 
@@ -94,14 +94,18 @@ describe(`with a single job in the queue`, () => {
     ${`failed`}    | ${API_EVENT_KINDS.scenario__run__failed__v1__alpha1}
     ${`completed`} | ${API_EVENT_KINDS.scenario__run__finished__v1__alpha1}
   `(`when $GotEvent, saves $SavedKind`, async ({ GotEvent, SavedKind }) => {
-    fixtures.fakeEvents.emit(GotEvent, {
-      jobId: `123`,
-      data: {
-        scenarioId: `scenario-x`,
+    fixtures.fakeEvents.emit(
+      GotEvent,
+      {
+        jobId: `123`,
+        data: {
+          scenarioId: `scenario-x`,
+        },
       },
-    });
+      `eventId1`,
+    );
 
-    await fixtures.ThenEventCreated(SavedKind);
+    await fixtures.ThenEventCreated(SavedKind, `eventId1`);
   });
 });
 
@@ -114,6 +118,7 @@ async function getFixtures() {
   };
   const fakeEvents = new EventEmitter();
   const fakeApiEvents = {
+    createIfNotExists: throwingMock(),
     create: throwingMock(),
   };
   const fakeScenarioRepo = {
@@ -190,17 +195,21 @@ async function getFixtures() {
     getRunService() {
       return testingModule.get(RunService);
     },
-    setupMocksForSchedulingJobs() {
-      this.setupMockForCreatingEvents();
-      fakeQueue.add.mockImplementation(() => {
+    setupMocksForSchedulingJobs(createId: () => string) {
+      fakeApiEvents.create.mockImplementation(() => {
         //
+      });
+      fakeQueue.add.mockImplementation(async () => {
+        return {
+          id: createId(),
+        };
       });
       fakeScenarioRepo.update.mockImplementation(() => {
         //
       });
     },
     setupMockForCreatingEvents() {
-      fakeApiEvents.create.mockImplementation(() => {
+      fakeApiEvents.createIfNotExists.mockImplementation(() => {
         //
       });
     },
@@ -238,11 +247,12 @@ async function getFixtures() {
         ranAtLeastOnce: true,
       });
     },
-    ThenShouldEmitSubmittedEvent() {
+    ThenShouldEmitSubmittedEvent(id: string) {
       expect(fixtures.fakeApiEvents.create).toBeCalledTimes(1);
       expect(fixtures.fakeApiEvents.create).toBeCalledWith({
         topic: `scenario-1`,
         kind: API_EVENT_KINDS.scenario__run__submitted__v1__alpha1,
+        externalId: `${id}${API_EVENT_KINDS.scenario__run__submitted__v1__alpha1}`,
       });
     },
     ThenShouldAddJob() {
@@ -252,12 +262,13 @@ async function getFixtures() {
         assets: this.scenarioAssets,
       });
     },
-    async ThenEventCreated(kind: API_EVENT_KINDS) {
+    async ThenEventCreated(kind: API_EVENT_KINDS, eventId: string) {
       await waitForExpect(() => {
-        expect(fixtures.fakeApiEvents.create).toBeCalledTimes(1);
-        expect(fixtures.fakeApiEvents.create).toBeCalledWith({
+        expect(fixtures.fakeApiEvents.createIfNotExists).toBeCalledTimes(1);
+        expect(fixtures.fakeApiEvents.createIfNotExists).toBeCalledWith({
           kind,
           topic: `scenario-1`,
+          externalId: eventId,
         });
       });
     },
