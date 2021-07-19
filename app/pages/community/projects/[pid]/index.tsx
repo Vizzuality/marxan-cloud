@@ -33,8 +33,7 @@ const PublishedProjectPage: React.FC = () => {
 
   return (
     <>
-
-      <PublishedProjectTitle title={name} />
+      <PublishedProjectTitle />
 
       <Head>
         <link rel="icon" href="/favicon.ico" />

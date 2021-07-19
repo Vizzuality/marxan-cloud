@@ -38,21 +38,21 @@ export const MetaTags: React.FC<MetaTagsProps> = ({
 }: MetaTagsProps) => {
   return (
     <Head>
-      {name && <meta property="og:site_name" content={name} key="name" />}
-      {title && <meta property="og:title" content={title} key="title" />}
-      {description && <meta property="og:description" content={description} key="description" />}
-      {url && <meta property="og:url" content={url} key="url" />}
-      {type && <meta property="og:type" content={type} key="type" />}
-      {publisher && <meta property="article:publisher" content={publisher} key="publisher" />}
-      {section && <meta property="article:section" content={section} key="section" />}
-      {tag && <meta property="article:tag" content={tag} key="tag" />}
-      {image && <meta property="og:image" content={image} key="image" />}
-      {imageURL && <meta property="og:image:secure_url" content={imageURL} key="imageURL" />}
-      {imageWidth && <meta property="og:image:width" content={imageWidth} key="imageWidth" />}
-      {imageHeight && <meta property="og:image:height" content={imageHeight} key="imageHeight" />}
-      {twitterCard && <meta property="twitter:card" content={twitterCard} key="twitterCard" />}
-      {twitterImage && <meta property="twitter:image" content={twitterImage} key="twitterImage" />}
-      {twitterSite && <meta property="twitter:site" content={twitterSite} key="twitterSite" />}
+      {name && <meta name="og:site_name" content={name} key="name" />}
+      {title && <meta name="og:title" content={title} key="title" />}
+      {description && <meta name="og:description" content={description} key="description" />}
+      {url && <meta name="og:url" content={url} key="url" />}
+      {type && <meta name="og:type" content={type} key="type" />}
+      {publisher && <meta name="article:publisher" content={publisher} key="publisher" />}
+      {section && <meta name="article:section" content={section} key="section" />}
+      {tag && <meta name="article:tag" content={tag} key="tag" />}
+      {image && <meta name="og:image" content={image} key="image" />}
+      {imageURL && <meta name="og:image:secure_url" content={imageURL} key="imageURL" />}
+      {imageWidth && <meta name="og:image:width" content={imageWidth} key="imageWidth" />}
+      {imageHeight && <meta name="og:image:height" content={imageHeight} key="imageHeight" />}
+      {twitterCard && <meta name="twitter:card" content={twitterCard} key="twitterCard" />}
+      {twitterImage && <meta name="twitter:image" content={twitterImage} key="twitterImage" />}
+      {twitterSite && <meta name="twitter:site" content={twitterSite} key="twitterSite" />}
     </Head>
   );
 };
