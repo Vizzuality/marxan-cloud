@@ -4,6 +4,8 @@ import { dehydrate } from 'react-query/hydration';
 
 import PROJECTS from 'services/projects';
 
+import { mergeDehydratedState } from './utils';
+
 export function withPublishedProject(getServerSidePropsFunc?: Function) {
   return async (context: any) => {
     const session = await getSession(context);
@@ -32,7 +34,7 @@ export function withPublishedProject(getServerSidePropsFunc?: Function) {
 
     await queryClient.prefetchQuery(['published-projects', pid], () => PROJECTS.request({
       method: 'GET',
-      url: `/projects/${pid}`,
+      url: `/${pid}`,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
@@ -43,11 +45,17 @@ export function withPublishedProject(getServerSidePropsFunc?: Function) {
     if (getServerSidePropsFunc) {
       const SSPF = await getServerSidePropsFunc(context) || {};
 
+      const { dehydratedState: prevDehydratedState } = SSPF.props;
+      const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
+
+      const newDehydratedState = mergeDehydratedState(prevDehydratedState, currentDehydratedState);
+
       return {
+        ...SSPF,
         props: {
           session,
-          dehydratedState: JSON.parse(JSON.stringify(dehydrate(queryClient))),
           ...SSPF.props,
+          dehydratedState: newDehydratedState,
         },
       };
     }

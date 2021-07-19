@@ -69,7 +69,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           type="button"
           role="button"
-          href={`https://twitter.com/intent/tweet?url=${process.env.VERCEL_URL}${asPath}`}
+          href={`https://twitter.com/intent/tweet?url=${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
@@ -81,7 +81,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           type="button"
           role="button"
-          href={`https://www.facebook.com/sharer/sharer.php?u=${process.env.VERCEL_URL}${asPath}`}
+          href={`https://www.facebook.com/sharer/sharer.php?u=${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
