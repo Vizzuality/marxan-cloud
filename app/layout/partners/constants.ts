@@ -26,15 +26,15 @@ export const FOUNDING_LOGOS = [
 export const PARTNERSHIP_LOGOS = [
   {
     id: 3,
-    alt: 'Biopama logo',
-    hyperlink: 'https://biopama.org',
-    src: BIOPAMA_LOGO,
-  },
-  {
-    id: 4,
     alt: 'The University of Queensland logo',
     hyperlink: 'https://www.uq.edu.au',
     src: UNIVERSITY_QUEENSLAND_LOGO,
+  },
+  {
+    id: 4,
+    alt: 'Biopama logo',
+    hyperlink: 'https://biopama.org',
+    src: BIOPAMA_LOGO,
   },
 ];
 
