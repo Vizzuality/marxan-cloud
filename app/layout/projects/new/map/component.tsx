@@ -13,7 +13,7 @@ import FitBoundsControl from 'components/map/controls/fit-bounds';
 
 import { useSelector } from 'react-redux';
 import { useSession } from 'next-auth/client';
-import { useAdminPreviewLayer, usePUGridPreviewLayer } from 'hooks/map';
+import { useAdminPreviewLayer, usePUGridPreviewLayer, useGeoJsonLayer } from 'hooks/map';
 
 import ProjectMapProps from './types';
 
@@ -26,14 +26,20 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
 }: ProjectMapProps) => {
   const minZoom = 2;
   const maxZoom = 20;
-  const { bbox } = useSelector((state) => state['/projects/new']);
+  const { bbox, uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
 
   const [viewport, setViewport] = useState({});
+
   const [bounds, setBounds] = useState(null);
 
   const [session] = useSession();
 
   const LAYERS = [
+    useGeoJsonLayer({
+      id: 'uploaded-geojson',
+      active: !!uploadingPlanningArea,
+      data: uploadingPlanningArea,
+    }),
     useAdminPreviewLayer({
       active: true,
       country,

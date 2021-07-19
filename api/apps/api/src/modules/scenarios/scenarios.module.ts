@@ -1,4 +1,4 @@
-import { forwardRef, Module, HttpModule } from '@nestjs/common';
+import { forwardRef, HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 
@@ -28,21 +28,12 @@ import {
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { CostSurfaceViewModule } from './cost-surface-readmodel/cost-surface-view.module';
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
-import {
-  InputParameterFileProvider,
-  IoSettings,
-  ioSettingsToken,
-} from './input-parameter-file.provider';
-import { AppConfig } from '@marxan-api/utils/config.utils';
-import { assertDefined } from '@marxan/utils';
 import { SpecDatModule } from './input-files/spec.dat.module';
 import { PuvsprDatModule } from './input-files/puvspr.dat.module';
-
-import { MarxanRunService } from './marxan-run/marxan-run.service';
-import { MarxanRunController } from './marxan-run/marxan-run.controller';
 import { OutputFilesModule } from './output-files/output-files.module';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
 import { BoundDatModule } from './input-files/bound.dat.module';
+import { MarxanRunModule } from './marxan-run';
 
 @Module({
   imports: [
@@ -70,6 +61,7 @@ import { BoundDatModule } from './input-files/bound.dat.module';
     BoundDatModule,
     PlanningUnitsProtectionLevelModule,
     OutputFilesModule,
+    MarxanRunModule,
   ],
   providers: [
     ScenariosService,
@@ -81,21 +73,9 @@ import { BoundDatModule } from './input-files/bound.dat.module';
     SolutionResultCrudService,
     ScenarioSolutionSerializer,
     MarxanInput,
-    InputParameterFileProvider,
-    MarxanRunService,
     ZipFilesSerializer,
-    {
-      provide: ioSettingsToken,
-      useFactory: () => {
-        const config = AppConfig.get<IoSettings>(
-          'marxan.inputFiles.inputDat.ioSettings',
-        );
-        assertDefined(config);
-        return config;
-      },
-    },
   ],
-  controllers: [ScenariosController, MarxanRunController],
+  controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],
 })
 export class ScenariosModule {}

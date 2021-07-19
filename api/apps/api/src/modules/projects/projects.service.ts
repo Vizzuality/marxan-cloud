@@ -4,7 +4,7 @@ import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 
-import { ProjectsCrudService } from './projects-crud.service';
+import { ProjectsCrudService, ProjectsInfoDTO } from './projects-crud.service';
 import { JobStatusService } from './job-status';
 import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 import { Project } from './project.api.entity';
@@ -32,9 +32,9 @@ export class ProjectsService {
     return this.geoCrud.findAllPaginated(fetchSpec, appInfo);
   }
 
-  async findAll(fetchSpec: FetchSpecification, _?: AppInfoDTO) {
+  async findAll(fetchSpec: FetchSpecification, info?: ProjectsInfoDTO) {
     // /ACL slot/
-    return this.projectsCrud.findAllPaginated(fetchSpec);
+    return this.projectsCrud.findAllPaginated(fetchSpec, info);
   }
 
   async findOne(id: string) {

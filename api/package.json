@@ -59,7 +59,7 @@
     "config": "^3.3.3",
     "express": "^4.17.1",
     "faker": "^5.1.0",
-    "fp-ts": "^2.10.5",
+    "fp-ts": "2.10.5",
     "geojson": "0.5.0",
     "helmet": "^4.3.1",
     "http-proxy": "^1.18.1",
@@ -180,7 +180,9 @@
       "@marxan/planning-area-repository/(.*)": "<rootDir>/libs/planning-area-repository/src/$1",
       "@marxan/planning-area-repository": "<rootDir>/libs/planning-area-repository/src",
       "@marxan/scenario-puvspr/(.*)": "<rootDir>/libs/scenario-puvspr/src/$1",
-      "@marxan/scenario-puvspr": "<rootDir>/libs/scenario-puvspr/src"
+      "@marxan/scenario-puvspr": "<rootDir>/libs/scenario-puvspr/src",
+      "@marxan/scenario-run-queue/(.*)": "<rootDir>/libs/scenario-run-queue/src/$1",
+      "@marxan/scenario-run-queue": "<rootDir>/libs/scenario-run-queue/src"
     }
   }
 }

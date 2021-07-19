@@ -8,20 +8,18 @@ import {
 
 import { useSelector } from 'react-redux';
 
-import { PlanningAreaSelectorProps } from './types';
+import PlanningUnitGrid from 'layout/projects/new/form/planning-area-selector/planning-unit-grid';
+import PlanningUnitAreaSize from 'layout/projects/new/form/planning-area-selector/planning-unit-area-size';
 
-import CountryRegionSelector from './country-region-selector';
-import PlanningUnitGrid from './planning-unit-grid';
-import PlanningUnitAreaSize from './planning-unit-area-size';
+import { PlanningAreaSelectorProps } from './types';
 
 export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
   values,
 }: PlanningAreaSelectorProps) => {
   const {
     countryId,
-    adminAreaLevel1Id,
-    adminAreaLevel2Id,
     planningUnitGridShape,
+    planningAreaId,
   } = values;
 
   const {
@@ -31,13 +29,7 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
 
   return (
     <div>
-      <CountryRegionSelector
-        country={countryId}
-        region={adminAreaLevel1Id}
-        subRegion={adminAreaLevel2Id}
-      />
-
-      {!!countryId && (
+      {(!!countryId || !!planningAreaId) && (
         <div className="flex">
           <div className="flex w-1/2">
             <FieldRFF
@@ -49,7 +41,6 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
                   <PlanningUnitGrid
                     unit={planningUnitGridShape}
                     onChange={(value) => {
-                      // React Final Form onChange
                       fprops.input.onChange(value);
                     }}
                   />

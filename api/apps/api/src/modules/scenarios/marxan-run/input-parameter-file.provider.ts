@@ -1,18 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { omit, pick } from 'lodash';
-import { isDefined } from '@marxan/utils';
-import { ScenariosCrudService } from './scenarios-crud.service';
-
-export const ioSettingsToken = Symbol('Marxan IO settings token');
-
-export interface IoSettings {
-  INPUTDIR: string;
-  PUNAME: string;
-  SPECNAME: string;
-  PUVSPRNAME: string;
-  BOUNDNAME: string;
-  OUTPUTDIR: string;
-}
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { assertDefined, isDefined } from '@marxan/utils';
+import { Scenario } from '../scenario.api.entity';
+import { IoSettings, ioSettingsToken } from './io-settings';
 
 class InputParameterFile {
   private ioSettingsKeys: (keyof IoSettings)[] = [
@@ -78,15 +70,17 @@ class InputParameterFile {
 @Injectable()
 export class InputParameterFileProvider {
   constructor(
-    private readonly scenariosService: ScenariosCrudService,
+    @InjectRepository(Scenario)
+    private readonly scenarioRepository: Repository<Scenario>,
     @Inject(ioSettingsToken)
     private readonly ioSettings: IoSettings,
   ) {}
 
   async getInputParameterFile(scenarioId: string): Promise<string> {
-    const scenario = await this.scenariosService.getById(scenarioId, {
-      include: ['project', 'project.organization'],
+    const scenario = await this.scenarioRepository.findOne(scenarioId, {
+      relations: ['project', 'project.organization'],
     });
+    assertDefined(scenario);
     const inputParameterFile = new InputParameterFile(
       this.ioSettings,
       scenario.boundaryLengthModifier,

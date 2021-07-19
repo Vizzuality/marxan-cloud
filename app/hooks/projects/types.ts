@@ -29,6 +29,15 @@ export interface DeleteProjectProps {
   id: string
 }
 
+// useUploadProjectPA
+export interface UseUploadProjectPAProps {
+  requestConfig?: AxiosRequestConfig
+}
+export interface UploadProjectPAProps {
+  id?: string,
+  data: any,
+}
+
 // usePublicProjects
 export interface UsePublishedProjectsProps {
   search?: string;

@@ -10,6 +10,8 @@ import { Cancellable } from './ports/cancellable';
 import { Assets, InputFilesFs } from './adapters/scenario-data/input-files-fs';
 import { SolutionsOutputService } from './adapters/solutions-output/solutions-output.service';
 
+export { Assets };
+
 @Injectable()
 export class MarxanSandboxRunnerService {
   readonly #controllers: Record<string, AbortController> = {};
@@ -58,6 +60,7 @@ export class MarxanSandboxRunnerService {
 
     await interruptIfKilled();
     await inputFiles.include(workspace, assets);
+    await workspace.arrangeOutputSpace();
 
     return new Promise(async (resolve, reject) => {
       marxanRun.on('error', async (result) => {
