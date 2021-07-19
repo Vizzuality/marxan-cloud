@@ -1,16 +1,20 @@
 import React from 'react';
-import Head from 'next/head';
 
 import { useRouter } from 'next/router';
 
 import { usePublishedProject } from 'hooks/projects';
+
+import { withUser } from 'hoc/auth';
+import { withPublishedProject } from 'hoc/projects';
 
 import Contact from 'layout/statics/contact';
 import Header from 'layout/header';
 import Footer from 'layout/footer';
 import MetaTags from 'layout/meta-tags';
 import ProjectDetail from 'layout/community/published-projects/detail';
-import ProjectTitle from 'layout/title/project-title';
+import PublishedProjectTitle from 'layout/title/published-project-title';
+
+export const getServerSideProps = withUser(withPublishedProject());
 
 const PublishedProjectPage: React.FC = () => {
   const { asPath } = useRouter();
@@ -19,34 +23,27 @@ const PublishedProjectPage: React.FC = () => {
 
   const {
     data: publishedProject,
-    isFetched: publishedProjectIsFetched,
   } = usePublishedProject(pid);
 
   const {
     description, name,
   } = publishedProject || {};
 
-  const dataIsFectched = publishedProject && publishedProjectIsFetched;
-
   return (
     <>
+
+      <PublishedProjectTitle title={name} />
       <link rel="icon" href="/favicon.ico" />
-      <Head>
-        {dataIsFectched && (
-          <>
-            <ProjectTitle title={name} />
-            <MetaTags
-              name="Marxan conservation Solutions"
-              title={name}
-              description={description}
-              url={asPath}
-              type="article"
-              twitterCard="summary"
-              twitterSite="@Marxan_Planning"
-            />
-          </>
-        )}
-      </Head>
+
+      <MetaTags
+        name="Marxan conservation Solutions"
+        title={name}
+        description={description}
+        url={asPath}
+        type="article"
+        twitterCard="summary"
+        twitterSite="@Marxan_Planning"
+      />
 
       <main>
         <Header size="base" published />
