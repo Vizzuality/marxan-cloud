@@ -14,13 +14,13 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
   return (
     <div className="py-24 bg-white">
       <Wrapper>
-        <div className="space-y-32">
+        <div className="space-y-24">
 
           <div className="flex flex-col items-center w-full max-w-5xl mx-auto">
-            <h2 className="pb-16 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
+            <h2 className="pb-20 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
               Brought to you by:
             </h2>
-            <div className="grid w-full grid-cols-1 px-24 md:grid-cols-2 md:gap-y-96">
+            <div className="grid w-full grid-cols-1 px-24 md:grid-cols-2 gap-y-20">
               {FOUNDING_LOGOS.map((fl) => (
                 <a href={fl.hyperlink} key={fl.id} rel="noreferrer" target="_blank" className="place-self-center">
                   <img alt={fl.alt} src={fl.src} />
@@ -29,11 +29,11 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
             </div>
           </div>
 
-          <div className="flex flex-col items-center w-full max-w-5xl pb-20 mx-auto">
-            <h2 className="pb-16 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
+          <div className="flex flex-col items-center w-full max-w-5xl pb-20 mx-auto md:px-24">
+            <h2 className="pb-20 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
               In partnership with:
             </h2>
-            <div className="grid w-full grid-cols-1 md:grid-cols-2 md:gap-y-96">
+            <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-y-20">
               {PARTNERSHIP_LOGOS.map((fl) => (
                 <a href={fl.hyperlink} key={fl.id} rel="noreferrer" target="_blank" className="place-self-center">
                   <img alt={fl.alt} src={fl.src} />
@@ -42,13 +42,13 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
             </div>
           </div>
 
-          <div className="relative flex flex-col items-center w-full max-w-5xl pb-20 mx-auto border-t border-black border-opacity-20">
+          <div className="relative flex flex-col items-center w-full max-w-5xl pb-20 mx-auto border-t border-black border-opacity-0 md:border-opacity-20">
             <div className="absolute flex justify-center h-10 bg-white -top-5">
               <h2 className="px-10 pb-20 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
                 With additional support from:
               </h2>
             </div>
-            <div className="grid w-full grid-cols-1 pt-32 md:grid-cols-5 gap-y-24 md:gap-y-0 md:gap-x-16">
+            <div className="grid w-full grid-cols-1 px-32 pt-24 md:px-0 md:grid-cols-5 gap-y-24 md:gap-y-0 md:gap-x-16">
               {ADDITIONAL_SUPPORT_LOGOS.map((sl) => (
                 <a href={sl.hyperlink} key={sl.id} rel="noreferrer" target="_blank" className="place-self-center">
                   <img alt={sl.alt} src={sl.src} />
@@ -57,7 +57,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
             </div>
           </div>
 
-          <div className="relative flex flex-col items-center w-full max-w-5xl mx-auto border-t border-black border-opacity-20">
+          <div className="relative flex flex-col items-center w-full max-w-5xl mx-auto border-t border-black border-opacity-0 md:border-opacity-20">
             <div className="absolute flex justify-center h-10 px-10 bg-white -top-5">
               <h2 className="pb-20 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
                 Supported by an initiative of the:
