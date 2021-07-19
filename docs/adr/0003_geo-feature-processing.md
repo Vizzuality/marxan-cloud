@@ -152,12 +152,13 @@ section above), users can:
   the two subsets in the split operation outlined above, resulting in two
   features:
 
-  * Cheetas in Deserts and Xeric Shrublands
-  * Cheetas in Flooded Grasslands and Savannas
+  * Cheetas / Deserts and Xeric Shrublands
+  * Cheetas / Flooded Grasslands and Savannas
 
   Names of the resulting subsets are generated via a template:
 
-  `${species_feature_name} in ${bioregional_feature_name}`
+  `${species_feature_name} / ${bioregional_feature_name}`
+
 
 ### Defining the set of features for a scenario
 
@@ -283,7 +284,11 @@ points, so this simplification will not affect the description of the process.
 
   * for each feature
 
-    * check that `featureId` matches an existing feature: if not, throw an error
+    * check that `featureId` matches an existing feature `(apidb)features.id`:
+      if not, throw an error
+
+    * check that for the feature referenced, `projectId` is either `null` or
+      matches the `id` of the parent project of the scenario
 
     * if this is a `withGeoprocessing` feature
 
