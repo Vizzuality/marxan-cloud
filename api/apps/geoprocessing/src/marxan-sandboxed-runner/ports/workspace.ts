@@ -6,9 +6,14 @@ export class Workspace implements Cancellable {
     public readonly workingDirectory: WorkingDirectory,
     public readonly marxanBinaryPath: string,
     public readonly cleanup: () => Promise<void>,
+    public readonly assembleOutputDirectory: () => Promise<void>,
   ) {}
 
   cancel(): Promise<void> {
-    return Promise.resolve(undefined);
+    return this.cleanup();
+  }
+
+  arrangeOutputSpace() {
+    return this.assembleOutputDirectory();
   }
 }

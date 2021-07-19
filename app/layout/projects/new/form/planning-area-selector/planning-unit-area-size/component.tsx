@@ -32,7 +32,24 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
       <div className="flex items-center">
         <Label theme="dark" className="mr-2 uppercase text-xxs">Planning unit area size</Label>
         <InfoButton>
-          <span>Planning unit area size info button</span>
+          <span>
+            Select a size that is relevant to your planning area
+            and to the resolution of the features you are considering
+            in the study. For example, small areas with detailed species
+            or ecosystems information typically have small planning
+            unit sizes (below 1km
+            <sup>2</sup>
+            ) while whole country studies with
+            broader species information generally have larger planning
+            unit sizes of 5 km
+            <sup>2</sup>
+            {' '}
+            or 10 km
+            <sup>2</sup>
+            . The platform
+            provides a recommended planning unit area size based on the
+            planning area selected
+          </span>
         </InfoButton>
       </div>
       <div className="flex items-baseline mt-4">

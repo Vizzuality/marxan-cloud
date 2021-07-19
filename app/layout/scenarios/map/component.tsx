@@ -19,7 +19,7 @@ import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 import { useProject } from 'hooks/projects';
-import { useWDPAPreviewLayer } from 'hooks/map';
+import { useWDPAPreviewLayer, usePUGridLayer } from 'hooks/map';
 
 import ScenariosDrawingManager from './drawing-manager';
 
@@ -53,7 +53,12 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     bbox,
   });
 
-  const LAYERS = [WDPApreviewLayer].filter((l) => !!l);
+  const PUGridLayer = usePUGridLayer({
+    active: true,
+    sid: sid ? `${sid}` : null,
+  });
+
+  const LAYERS = [WDPApreviewLayer, PUGridLayer].filter((l) => !!l);
 
   useEffect(() => {
     setBounds({

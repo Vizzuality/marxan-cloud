@@ -12,6 +12,7 @@ import { ItemProps } from 'components/projects/item/component';
 import { PublishedItemProps } from 'components/projects/published-item/component';
 
 import PROJECTS from 'services/projects';
+import UPLOADS from 'services/uploads';
 
 import {
   UseProjectsOptionsProps,
@@ -20,6 +21,8 @@ import {
   SaveProjectProps,
   UseDeleteProjectProps,
   DeleteProjectProps,
+  UseUploadProjectPAProps,
+  UploadProjectPAProps,
   UsePublishedProjectsProps,
 } from './types';
 
@@ -217,6 +220,35 @@ export function useDeleteProject({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUploadProjectPA({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadProjectPAProps) {
+  const [session] = useSession();
+
+  const uploadProjectPAShapefile = ({ data }: UploadProjectPAProps) => {
+    return UPLOADS.request({
+      url: '/projects/planning-area/shapefile',
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadProjectPAShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

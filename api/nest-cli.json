@@ -115,6 +115,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/scenario-puvspr/tsconfig.lib.json"
       }
+    },
+    "scenario-run-queue": {
+      "type": "library",
+      "root": "libs/scenario-run-queue",
+      "entryFile": "index",
+      "sourceRoot": "libs/scenario-run-queue/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/scenario-run-queue/tsconfig.lib.json"
+      }
     }
   }
 }

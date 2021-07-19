@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import * as stream from 'stream';
 
 import { CostSurfaceViewService } from '../cost-surface-readmodel/cost-surface-view.service';
-import { InputParameterFileProvider } from '../input-parameter-file.provider';
 import { PuvsprDatService } from '../input-files/puvspr.dat.service';
 import { BoundDatService } from '../input-files/bound.dat.service';
+import { InputParameterFileProvider } from './input-parameter-file.provider';
 
 @Injectable()
-export class MarxanRunService {
+export class MarxanFilesService {
   constructor(
     private readonly costSurfaceService: CostSurfaceViewService,
     private readonly inputParameterFileProvider: InputParameterFileProvider,

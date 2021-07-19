@@ -28,6 +28,7 @@ import {
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -128,11 +129,21 @@ export class ProjectsController {
       { name: 'adminAreaLevel21Id' },
     ],
   })
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    description: `A free search over names`,
+  })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Query('q') namesSearch?: string,
   ): Promise<ProjectResultPlural> {
-    const results = await this.projectsService.findAll(fetchSpecification);
+    const results = await this.projectsService.findAll(fetchSpecification, {
+      params: {
+        namesSearch,
+      },
+    });
     return this.projectSerializer.serialize(results.data, results.metadata);
   }
 
