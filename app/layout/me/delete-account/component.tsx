@@ -8,7 +8,7 @@ import { useDeleteMe } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 import { signOut } from 'next-auth/client';
 
-import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
+import DELETE_USER_WARNING_SVG from 'svgs/notifications/delete-user-warning.svg?sprite';
 
 export interface DeleteAccountProps {
 
@@ -68,9 +68,10 @@ export const DeleteAccount: React.FC<DeleteAccountProps> = () => {
       />
 
       <ConfirmationPrompt
+        danger
         title="Are you sure you want to delete your account?"
-        description="The action cannot be reverted. All the projects, scenarios and features created will be removed too."
-        icon={DELETE_WARNING_SVG}
+        description="Learn more about deleting your account."
+        icon={DELETE_USER_WARNING_SVG}
         open={!!open}
         onAccept={onDelete}
         onRefuse={() => setOpen(null)}
