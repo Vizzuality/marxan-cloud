@@ -2,7 +2,7 @@ import { PromiseType } from 'utility-types';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { JobStatus, Scenario, ScenarioType } from '../scenario.api.entity';
+import { JobStatus, Scenario, ScenarioType } from '../../scenario.api.entity';
 import { InputParameterFileProvider } from './input-parameter-file.provider';
 import { ioSettingsToken } from './io-settings';
 

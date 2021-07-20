@@ -3,7 +3,7 @@ import { omit, pick } from 'lodash';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { assertDefined, isDefined } from '@marxan/utils';
-import { Scenario } from '../scenario.api.entity';
+import { Scenario } from '../../scenario.api.entity';
 import { IoSettings, ioSettingsToken } from './io-settings';
 
 class InputParameterFile {
@@ -94,5 +94,9 @@ export class InputParameterFileProvider {
       },
     );
     return inputParameterFile.toString();
+  }
+
+  settings() {
+    return this.ioSettings;
   }
 }
