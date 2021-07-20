@@ -4,8 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "cypress:open": "cypress open'",
-    "cypress:ci": "cypress-tags run -e TAGS=\"@implemented\" --headless --browser chrome"
+    "cypress:open": "cypress open",
+    "cypress:ci": "cypress-tags run -e TAGS=\"@implemented\""
   },
   "devDependencies": {
     "@types/cypress-cucumber-preprocessor": "4.0.1",
