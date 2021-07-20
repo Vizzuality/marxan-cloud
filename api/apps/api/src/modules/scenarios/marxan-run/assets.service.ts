@@ -1,10 +1,6 @@
 import { Assets } from '@marxan/scenario-run-queue';
 import { FactoryProvider, Inject, Injectable } from '@nestjs/common';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import {
-  IoSettings,
-  ioSettingsToken,
-} from '../input-files/input-params/io-settings';
 import { InputFilesService } from '@marxan-api/modules/scenarios/input-files';
 
 export const apiUrlToken = Symbol('api url token');
@@ -21,7 +17,7 @@ export class AssetsService {
     private readonly inputFiles: InputFilesService,
   ) {}
 
-  async forScenario(id: string): Promise<Assets> {
+  async forScenario(id: string, blm?: number): Promise<Assets> {
     const settings = await this.inputFiles.getSettings();
     return [
       {
@@ -32,10 +28,14 @@ export class AssetsService {
         url: `${this.apiUrlToken}/api/v1/marxan-run/scenarios/${id}/marxan/dat/pu.dat`,
         relativeDestination: `${settings.INPUTDIR}/${settings.PUNAME}`,
       },
-      {
-        url: `${this.apiUrlToken}/api/v1/marxan-run/scenarios/${id}/marxan/dat/bound.dat`,
-        relativeDestination: `${settings.INPUTDIR}/${settings.BOUNDNAME}`,
-      },
+      ...(blm !== 0
+        ? [
+            {
+              url: `${this.apiUrlToken}/api/v1/marxan-run/scenarios/${id}/marxan/dat/bound.dat`,
+              relativeDestination: `${settings.INPUTDIR}/${settings.BOUNDNAME}`,
+            },
+          ]
+        : []),
       {
         url: `${this.apiUrlToken}/api/v1/marxan-run/scenarios/${id}/marxan/dat/spec.dat`,
         relativeDestination: `${settings.INPUTDIR}/${settings.SPECNAME}`,

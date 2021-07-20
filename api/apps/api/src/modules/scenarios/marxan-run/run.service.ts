@@ -47,8 +47,8 @@ export class RunService {
     queueEvents.on(`failed`, ({ jobId }) => this.handleFailed(jobId));
   }
 
-  async run(scenarioId: string): Promise<void> {
-    const assets = await this.assets.forScenario(scenarioId);
+  async run(scenarioId: string, blm?: number): Promise<void> {
+    const assets = await this.assets.forScenario(scenarioId, blm);
     assertDefined(assets);
     await this.queue.add(`run-scenario`, {
       scenarioId,
