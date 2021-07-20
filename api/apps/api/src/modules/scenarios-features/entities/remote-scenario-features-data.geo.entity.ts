@@ -51,6 +51,10 @@ export class RemoteScenarioFeaturesData {
    */
   target!: number;
 
+  @ApiProperty({
+    description:
+      'Protection target for this feature, as proportion of the conservation feature to be included in the reserve system.',
+  })
   @Column({
     name: `prop`,
     type: `float8`,

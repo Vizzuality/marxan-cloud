@@ -26,18 +26,17 @@ import {
   ScenariosPuOutputGeoEntity,
 } from '@marxan/scenarios-planning-unit';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
-import { CostSurfaceViewModule } from './cost-surface-readmodel/cost-surface-view.module';
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
-import { SpecDatModule } from './input-files/spec.dat.module';
-import { PuvsprDatModule } from './input-files/puvspr.dat.module';
 import { OutputFilesModule } from './output-files/output-files.module';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
-import { BoundDatModule } from './input-files/bound.dat.module';
+import { InputFilesModule } from './input-files';
 import { MarxanRunModule } from './marxan-run';
+import { GeoFeaturesModule } from '../geo-features/geo-features.module';
 
 @Module({
   imports: [
     CqrsModule,
+    GeoFeaturesModule,
     ProtectedAreasModule,
     forwardRef(() => ProjectsModule),
     TypeOrmModule.forFeature([
@@ -55,10 +54,7 @@ import { MarxanRunModule } from './marxan-run';
     CostSurfaceModule,
     HttpModule,
     CostSurfaceTemplateModule,
-    CostSurfaceViewModule,
-    SpecDatModule,
-    PuvsprDatModule,
-    BoundDatModule,
+    InputFilesModule,
     PlanningUnitsProtectionLevelModule,
     OutputFilesModule,
     MarxanRunModule,

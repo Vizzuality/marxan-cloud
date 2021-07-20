@@ -4,11 +4,9 @@ import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import {
   GeoFeatureGeometry,
-  GeoFeaturePropertySet,
   geoFeatureResource,
 } from './geo-feature.geo.entity';
-import { CreateGeoFeatureDTO } from './dto/create.geo-feature.dto';
-import { UpdateGeoFeatureDTO } from './dto/update.geo-feature.dto';
+import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
 
 import * as faker from 'faker';
 import {
@@ -22,8 +20,10 @@ import {
 } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { apiConnections } from '../../ormconfig';
+import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { Scenario } from '../scenarios/scenario.api.entity';
+import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -43,22 +43,20 @@ type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
   GeoFeature,
-  CreateGeoFeatureDTO,
-  UpdateGeoFeatureDTO,
+  GeoFeatureSetSpecification,
+  GeoFeatureSetSpecification,
   AppInfoDTO
 > {
   constructor(
     @InjectRepository(GeoFeatureGeometry, apiConnections.geoprocessingDB.name)
     private readonly geoFeaturesGeometriesRepository: Repository<GeoFeatureGeometry>,
-    @InjectRepository(
-      GeoFeaturePropertySet,
-      apiConnections.geoprocessingDB.name,
-    )
-    private readonly geoFeaturePropertySetsRepository: Repository<GeoFeaturePropertySet>,
     @InjectRepository(GeoFeature)
     private readonly geoFeaturesRepository: Repository<GeoFeature>,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
+    @InjectRepository(Scenario)
+    private readonly scenarioRepository: Repository<Scenario>,
+    private readonly geoFeaturesPropertySet: GeoFeaturePropertySetService,
   ) {
     super(
       geoFeaturesRepository,
@@ -114,13 +112,16 @@ export class GeoFeaturesService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<GeoFeature>,
     filters: GeoFeatureFilters,
-    _info?: AppInfoDTO,
+    info?: AppInfoDTO,
   ): SelectQueryBuilder<GeoFeature> {
     this._processBaseFilters<GeoFeatureFilters>(
       query,
       filters,
       geoFeatureFilterKeyNames,
     );
+    if (Array.isArray(info?.params?.ids) && info?.params?.ids.length) {
+      query.andWhere('id in (:...ids)', { ids: info?.params?.ids });
+    }
     return query;
   }
 
@@ -237,42 +238,15 @@ export class GeoFeaturesService extends AppBaseService<
     const geoFeatureIds = (entitiesAndCount[0] as GeoFeature[]).map(
       (i) => i.id,
     );
-    const query = this.geoFeaturePropertySetsRepository
-      .createQueryBuilder('propertySets')
-      .distinct(true)
-      .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds });
 
-    if (this.forProject) {
-      query.andWhere(
-        `st_intersects(
-        st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
-        "propertySets".bbox
-      )`,
-        {
-          xmin: this.forProject.bbox[1],
-          ymin: this.forProject.bbox[3],
-          xmax: this.forProject.bbox[0],
-          ymax: this.forProject.bbox[2],
-        },
-      );
-    }
-
-    const entitiesWithProperties = await query.getMany().then((results) => {
-      return (entitiesAndCount[0] as GeoFeature[]).map((i) => {
-        const propertySetForFeature = results.filter(
-          (propertySet) => propertySet.featureId === i.id,
+    const entitiesWithProperties = await this.geoFeaturesPropertySet
+      .getFeaturePropertySetsForFeatures(geoFeatureIds, this.forProject)
+      .then((results) => {
+        return this.geoFeaturesPropertySet.extendGeoFeaturesWithPropertiesFromPropertySets(
+          entitiesAndCount[0],
+          results,
         );
-        return {
-          ...i,
-          properties: propertySetForFeature.reduce((acc, cur) => {
-            return {
-              ...acc,
-              [cur.key]: [...(acc[cur.key] || []), cur.value[0]],
-            };
-          }, {} as Record<string, Array<string | number>>),
-        };
       });
-    });
     return [entitiesWithProperties, entitiesAndCount[1]];
   }
 

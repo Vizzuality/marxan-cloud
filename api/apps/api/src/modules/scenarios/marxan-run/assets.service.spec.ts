@@ -1,7 +1,11 @@
 import { PromiseType } from 'utility-types';
 import { Test } from '@nestjs/testing';
 import { apiUrlToken, AssetsService } from './assets.service';
-import { IoSettings, ioSettingsToken } from './io-settings';
+import {
+  IoSettings,
+  ioSettingsToken,
+} from '../input-files/input-params/io-settings';
+import { InputFilesService } from '@marxan-api/modules/scenarios/input-files';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let service: AssetsService;
@@ -51,8 +55,10 @@ async function getFixtures() {
   const testingModule = await Test.createTestingModule({
     providers: [
       {
-        provide: ioSettingsToken,
-        useValue: ioSettings,
+        provide: InputFilesService,
+        useValue: {
+          getSettings: () => ioSettings,
+        },
       },
       {
         provide: apiUrlToken,

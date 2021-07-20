@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  Put,
   Req,
   Res,
   UploadedFile,
@@ -22,6 +23,8 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
+import { GeoFeatureSetResult } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 
 import {
   ApiAcceptedResponse,
@@ -61,6 +64,10 @@ import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
+import { GeoFeatureSetSerializer } from '../geo-features/geo-feature-set.serializer';
+import { UpdateGeoFeatureSetDTO } from '../geo-features/dto/update.geo-feature-set.dto';
+import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
+import { GeoFeatureSetService } from '../geo-features/geo-feature-set.service';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -74,7 +81,10 @@ const marxanRunFiles = 'Marxan Run - Files';
 @Controller(basePath)
 export class ScenariosController {
   constructor(
-    private readonly service: ScenariosService,
+    public readonly service: ScenariosService,
+    private readonly geoFeaturesService: GeoFeaturesService,
+    private readonly geoFeatureSetSerializer: GeoFeatureSetSerializer,
+    private readonly geoFeatureSetService: GeoFeatureSetService,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
@@ -188,6 +198,41 @@ export class ScenariosController {
     );
   }
 
+  @ApiOperation({ description: 'Create feature set for scenario' })
+  @ApiCreatedResponse({ type: GeoFeatureSetResult })
+  @Post(':id/features/specification')
+  async createFeatureSetFor(
+    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<GeoFeatureSetResult> {
+    return await this.geoFeatureSetSerializer.serialize(
+      await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
+    );
+  }
+
+  @ApiOperation({ description: 'Update feature set for scenario' })
+  @ApiOkResponse({ type: GeoFeatureSetResult })
+  @Put(':id/features/specification')
+  async updateFeatureSetFor(
+    @Body(new ValidationPipe()) dto: UpdateGeoFeatureSetDTO,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<GeoFeatureSetResult> {
+    return await this.geoFeatureSetSerializer.serialize(
+      await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
+    );
+  }
+
+  @ApiOperation({ description: 'Get feature set for scenario' })
+  @ApiOkResponse({ type: GeoFeatureSetResult })
+  @Get(':id/features/specification')
+  async getFeatureSetFor(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<GeoFeatureSetResult> {
+    return await this.geoFeatureSetSerializer.serialize(
+      await this.service.getFeatureSetForScenario(id),
+    );
+  }
+
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiNoContentResponse()
   @Post(`:id/cost-surface/shapefile`)
@@ -253,8 +298,8 @@ export class ScenariosController {
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's input parameter file.` })
   @Get(':id/marxan/dat/input.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getInputParameterFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -264,8 +309,8 @@ export class ScenariosController {
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's spec file.` })
   @Get(':id/marxan/dat/spec.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getSpecDatFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -275,8 +320,8 @@ export class ScenariosController {
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's puvspr file.` })
   @Get(':id/marxan/dat/puvspr.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getPuvsprDatFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -286,8 +331,8 @@ export class ScenariosController {
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's bound file.` })
   @Get(':id/marxan/dat/bound.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getBoundDatFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -306,6 +351,23 @@ export class ScenariosController {
     @Res() response: Response,
   ) {
     const result = await this.service.getMarxanExecutionOutputArchive(
+      scenarioId,
+    );
+    response.send(this.zipFilesSerializer.serialize(result));
+  }
+
+  @ApiTags(marxanRunFiles)
+  @ApiOperation({
+    description: `Get archived input files`,
+  })
+  @Get(`:id/marxan/input`)
+  @Header(`Content-Type`, `application/zip`)
+  @Header('Content-Disposition', 'attachment; filename="input.zip"')
+  async getInputArchive(
+    @Param(`id`, ParseUUIDPipe) scenarioId: string,
+    @Res() response: Response,
+  ) {
+    const result = await this.service.getMarxanExecutionInputArchive(
       scenarioId,
     );
     response.send(this.zipFilesSerializer.serialize(result));
