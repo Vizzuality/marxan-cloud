@@ -159,9 +159,9 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
             <div>
               <h2 className="text-2xl font-semibold">Collecting and Using Your Personal Data</h2>
               <br />
-              <h3 className="font-semibold">Types of Data Collected</h3>
+              <h3 className="text-lg font-semibold">Types of Data Collected</h3>
               <br />
-              <h4 className="font-semibold">Personal Data</h4>
+              <h4 className="font-semibold underline">Personal Data</h4>
               <br />
               <p>
                 While using Our Service, We may ask You to provide Us with certain personally
@@ -169,13 +169,13 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
                 identifiable information may include, but is not limited to:
               </p>
               <br />
-              <ul>
+              <ul className="pl-10 list-disc">
                 <li>Email address</li>
                 <li>First name and last name</li>
                 <li>Usage Data</li>
               </ul>
               <br />
-              <h4 className="font-semibold">Usage Data</h4>
+              <h4 className="font-semibold underline">Usage Data</h4>
               <br />
               <p>Usage Data is collected automatically when using the Service.</p>
               <br />
@@ -199,7 +199,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
                 Service or when You access the Service by or through a mobile device.
               </p>
               <br />
-              <h4 className="font-semibold">Tracking Technologies and Cookies</h4>
+              <h4 className="font-semibold underline">Tracking Technologies and Cookies</h4>
               <br />
               <p>
                 We use Cookies and similar tracking technologies to track the activity on Our
@@ -226,7 +226,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
               <br />
               <p>We use both session and persistent Cookies for the purposes set out below:</p>
               <br />
-              <p className="pl-10"><strong>Necessary / Essential Cookies</strong></p>
+              <p className="pl-10 underline"><strong>Necessary / Essential Cookies</strong></p>
               <br />
               <p className="pl-10">Type: Session Cookies</p>
               <br />
@@ -241,7 +241,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
 
               </p>
               <br />
-              <p className="pl-10"><strong>Cookies Policy / Notice Acceptance Cookies</strong></p>
+              <p className="pl-10 underline"><strong>Cookies Policy / Notice Acceptance Cookies</strong></p>
               <br />
               <p className="pl-10">Type: Persistent Cookies</p>
               <br />
@@ -249,7 +249,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
               <br />
               <p className="pl-10">Purpose: These Cookies identify if users have accepted the use of cookies on the Website.</p>
               <br />
-              <p className="pl-10"><strong>Functionality Cookies</strong></p>
+              <p className="pl-10 underline"><strong>Functionality Cookies</strong></p>
               <br />
               <p className="pl-10">Type: Persistent Cookies</p>
               <br />
@@ -257,7 +257,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
               <br />
               <p className="pl-10">Purpose: These Cookies allow us to remember choices You make when You use the Website, such as remembering your login details or language preference. The purpose of these Cookies is to provide You with a more personal experience and to avoid You having to re-enter your preferences every time You use the Website.</p>
               <br />
-              <p className="pl-10"><strong>Tracking and Performance Cookies</strong></p>
+              <p className="pl-10 underline"><strong>Tracking and Performance Cookies</strong></p>
               <br />
               <p className="pl-10">Type: Persistent Cookies</p>
               <br />
@@ -278,11 +278,12 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
                 please visit our Cookies Policy.
               </p>
               <br />
-              <h3 className="font-semibold">Use of Your Personal Data</h3>
+
+              <h3 className="text-lg font-semibold">Use of Your Personal Data</h3>
               <br />
               <p>We may use Personal Data for the following purposes:</p>
               <br />
-              <ul>
+              <ul className="ml-10 list-disc">
                 <li>
                   <strong>To provide and maintain our Service</strong>
                   , including to monitor the usage of our Service.
@@ -296,7 +297,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
               <br />
               <p>We will not share your personal information.</p>
               <br />
-              <h3 className="font-semibold">Retention of Your Personal Data</h3>
+              <h3 className="text-lg font-semibold">Retention of Your Personal Data</h3>
               <br />
               <p>
                 The Company will retain Your Personal Data only for as long as is necessary for the
@@ -314,7 +315,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
                 legally obligated to retain this data for longer time periods.
               </p>
               <br />
-              <h3 className="font-semibold">Transfer of Your Personal Data</h3>
+              <h3 className="text-lg font-semibold">Transfer of Your Personal Data</h3>
               <br />
               <p>
                 Your information, including Personal Data, is processed at the Company’s operating
@@ -338,7 +339,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
                 personal information.
               </p>
               <br />
-              <h3 className="font-semibold">Security of Your Personal Data</h3>
+              <h3 className="text-lg font-semibold">Security of Your Personal Data</h3>
               <br />
               <p>
                 The security of Your Personal Data is important to Us, but remember that no
@@ -364,13 +365,16 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
               </p>
               <br />
               <p className="pl-10"><strong>Google Analytics</strong></p>
+              <br />
               <p className="pl-10">Google Analytics is a web analytics service offered by Google that tracks and reports website traffic. Google uses the data collected to track and monitor the use of our Service. This data is shared with other Google services. Google may use the collected data to contextualise and personalise the ads of its own advertising network.</p>
+              <br />
               <p className="pl-10">You can opt-out of having made your activity on the Service available to Google Analytics by installing the Google Analytics opt-out browser add-on. The add-on prevents the Google Analytics JavaScript (ga.js, analytics.js and dc.js) from sharing information with Google Analytics about visits activity.</p>
+              <br />
               <p className="pl-10">
-                For more information on the privacy practices of Google, please visit the Google
-                Privacy Terms web page:
+                For more information on the privacy practices of Google, please visit the
                 {' '}
-                <a href="https://policies.google.com/privacy?hl=en">https://policies.google.com/privacy?hl=en</a>
+                <a className="underline" href="https://policies.google.com/privacy?hl=en">Google Privacy Terms web page</a>
+                .
               </p>
             </div>
 
