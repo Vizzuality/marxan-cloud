@@ -7,6 +7,7 @@ import Icon from 'components/icon';
 
 import { Form as FormRFF } from 'react-final-form';
 
+import { useToasts } from 'hooks/toast';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
@@ -28,9 +29,10 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   const { query } = useRouter();
   const { sid } = query;
 
+  const { addToast } = useToasts();
+
   const scenarioSlice = getScenarioSlice(sid);
   const { setDrawing, setDrawingValue } = scenarioSlice.actions;
-
   const dispatch = useDispatch();
   const { drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
@@ -80,12 +82,32 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
         onSelected(null);
         dispatch(setDrawing(null));
         dispatch(setDrawingValue(null));
+
+        addToast('adjust-planning-units-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <ul className="text-sm">
+              <li>Planning units saved</li>
+            </ul>
+          </>
+        ), {
+          level: 'success',
+        });
       },
       onError: () => {
-        console.info('ERROR');
+        addToast('adjust-planning-units-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <ul className="text-sm">
+              <li>Ooops! Something went wrong. Try again</li>
+            </ul>
+          </>
+        ), {
+          level: 'error',
+        });
       },
     });
-  }, [sid, scenarioPUMutation, onSelected, dispatch, setDrawing, setDrawingValue]);
+  }, [sid, scenarioPUMutation, onSelected, dispatch, setDrawing, setDrawingValue, addToast]);
 
   return (
     <FormRFF

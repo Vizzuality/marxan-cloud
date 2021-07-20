@@ -167,16 +167,35 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
       },
     }, {
       onSuccess: () => {
-        console.info('SUCCESS');
         onSelected(null);
         dispatch(setUploading(false));
         dispatch(setUploadingValue(null));
+
+        addToast('adjust-planning-units-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <ul className="text-sm">
+              <li>Planning units saved</li>
+            </ul>
+          </>
+        ), {
+          level: 'success',
+        });
       },
       onError: () => {
-        console.info('ERROR');
+        addToast('adjust-planning-units-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <ul className="text-sm">
+              <li>Ooops! Something went wrong. Try again</li>
+            </ul>
+          </>
+        ), {
+          level: 'error',
+        });
       },
     });
-  }, [sid, scenarioPUMutation, onSelected, dispatch, setUploading, setUploadingValue]);
+  }, [sid, scenarioPUMutation, onSelected, dispatch, setUploading, setUploadingValue, addToast]);
 
   return (
     <FormRFF

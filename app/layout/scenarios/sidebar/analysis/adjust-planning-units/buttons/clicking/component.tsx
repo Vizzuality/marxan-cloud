@@ -8,6 +8,7 @@ import Icon from 'components/icon';
 import { Form as FormRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
+import { useToasts } from 'hooks/toast';
 import { useSelector, useDispatch } from 'react-redux';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
@@ -27,6 +28,8 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
 }: AnalysisAdjustClickingProps) => {
   const { query } = useRouter();
   const { sid } = query;
+
+  const { addToast } = useToasts();
 
   const scenarioSlice = getScenarioSlice(sid);
   const { setClicking, setClickingValue } = scenarioSlice.actions;
@@ -75,12 +78,32 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
         onSelected(null);
         dispatch(setClicking(false));
         dispatch(setClickingValue([]));
+
+        addToast('adjust-planning-units-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <ul className="text-sm">
+              <li>Planning units saved</li>
+            </ul>
+          </>
+        ), {
+          level: 'success',
+        });
       },
       onError: () => {
-        console.info('ERROR');
+        addToast('adjust-planning-units-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <ul className="text-sm">
+              <li>Ooops! Something went wrong. Try again</li>
+            </ul>
+          </>
+        ), {
+          level: 'error',
+        });
       },
     });
-  }, [sid, scenarioPUMutation, onSelected, dispatch, setClicking, setClickingValue]);
+  }, [sid, scenarioPUMutation, onSelected, dispatch, setClicking, setClickingValue, addToast]);
 
   return (
     <FormRFF
