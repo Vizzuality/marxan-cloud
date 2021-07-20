@@ -41,15 +41,17 @@ export class RunWorker {
       job.data.scenarioId,
       job.data.assets,
       async (progress) => {
-        await job.updateProgress({
+        const progressData: ProgressData = {
+          scenarioId: job.data.scenarioId,
           fractionalProgress: progress,
-        });
+        };
+        await job.updateProgress(progressData);
       },
     );
   }
 
   private handleProgress(data: ProgressData) {
-    if (data.canceled) {
+    if ('canceled' in data && data.canceled) {
       this.marxanRunner.kill(data.scenarioId);
     }
   }

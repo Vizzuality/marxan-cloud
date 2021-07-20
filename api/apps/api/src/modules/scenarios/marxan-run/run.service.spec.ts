@@ -5,7 +5,9 @@ import waitForExpect from 'wait-for-expect';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test } from '@nestjs/testing';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ProgressData } from '@marxan/scenario-run-queue';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
+import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
 import { Scenario } from '../scenario.api.entity';
 import {
   notFound,
@@ -107,6 +109,32 @@ describe(`with a single job in the queue`, () => {
 
     await fixtures.ThenEventCreated(SavedKind, `eventId1`);
   });
+});
+
+test(`handling progress`, async () => {
+  fixtures.setupMockForCreatingEvents();
+  fixtures.GivenAJobInQueue();
+
+  const progressData: ProgressData = {
+    scenarioId: `scenario-x`,
+    fractionalProgress: 0.62,
+  };
+  fixtures.fakeEvents.emit(
+    `progress`,
+    {
+      jobId: `123`,
+      data: progressData,
+    },
+    `eventId1`,
+  );
+  await fixtures.ThenEventCreated(
+    API_EVENT_KINDS.scenario__run__progress__v1__alpha1,
+    `eventId1`,
+    {
+      kind: API_EVENT_KINDS.scenario__run__progress__v1__alpha1,
+      fractionalProgress: progressData.fractionalProgress,
+    },
+  );
 });
 
 async function getFixtures() {
@@ -262,13 +290,18 @@ async function getFixtures() {
         assets: this.scenarioAssets,
       });
     },
-    async ThenEventCreated(kind: API_EVENT_KINDS, eventId: string) {
+    async ThenEventCreated(
+      kind: API_EVENT_KINDS,
+      eventId: string,
+      data?: CreateApiEventDTO['data'],
+    ) {
       await waitForExpect(() => {
         expect(fixtures.fakeApiEvents.createIfNotExists).toBeCalledTimes(1);
         expect(fixtures.fakeApiEvents.createIfNotExists).toBeCalledWith({
           kind,
           topic: `scenario-1`,
           externalId: eventId,
+          data,
         });
       });
     },

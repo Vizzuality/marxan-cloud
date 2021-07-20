@@ -5,7 +5,7 @@ import * as config from 'config';
 import waitForExpect from 'wait-for-expect';
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
 import { assertDefined, FieldsOf } from '@marxan/utils';
-import { JobData } from '@marxan/scenario-run-queue';
+import { JobData, ProgressData } from '@marxan/scenario-run-queue';
 import {
   RunWorker,
   runWorkerQueueNameToken,
@@ -192,13 +192,17 @@ async function getFixtures() {
         expect(await job.isCompleted()).toBe(true);
       });
     },
-    async thenProgressChangedInTheJob(job: Job, progress: number) {
+    async thenProgressChangedInTheJob(job: Job<JobData>, progress: number) {
       await waitForExpect(async () => {
         const jobId = job.id;
         assertDefined(jobId);
-        expect((await queue.getJob(jobId))?.progress).toStrictEqual({
+        const progressData: ProgressData = {
           fractionalProgress: progress,
-        });
+          scenarioId: job.data.scenarioId,
+        };
+        expect((await queue.getJob(jobId))?.progress).toStrictEqual(
+          progressData,
+        );
       });
     },
   };
