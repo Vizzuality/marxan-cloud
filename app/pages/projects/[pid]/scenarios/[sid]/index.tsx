@@ -1,9 +1,8 @@
 import React from 'react';
 
-import Head from 'next/head';
-
 import Title from 'layout/title/scenario-title';
 import Header from 'layout/header';
+import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
 
 import { withProtection, withUser } from 'hoc/auth';
@@ -15,9 +14,7 @@ const ShowScenarioPage: React.FC = () => {
     <Protected>
       <Title />
 
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <MetaIcons />
 
       <main>
         <Header size="base" />

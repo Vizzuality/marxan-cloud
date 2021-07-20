@@ -9,6 +9,7 @@ import Footer from 'layout/footer';
 import Hero from 'layout/home/hero';
 import CarouselSection from 'layout/home/carousel-section';
 import Features from 'layout/home/features';
+import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 
 import MARXAN_SOCIAL_MEDIA_IMG from 'images/social-media/marxan-social-media.png';
@@ -23,8 +24,9 @@ const Home: React.FC = () => {
     <>
       <Head>
         <title>Home</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <MetaIcons />
 
       <MetaTags
         name="Marxan conservation Solutions"

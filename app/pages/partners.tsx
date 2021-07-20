@@ -7,6 +7,7 @@ import Contact from 'layout/statics/contact';
 import Header from 'layout/header';
 import Hero from 'layout/statics/hero';
 import Footer from 'layout/footer';
+import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 import PartnersList from 'layout/partners';
 
@@ -26,8 +27,9 @@ const Partners: React.FC = () => {
     <>
       <Head>
         <title>Partners</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <MetaIcons />
 
       <MetaTags
         name="Marxan conservation Solutions"

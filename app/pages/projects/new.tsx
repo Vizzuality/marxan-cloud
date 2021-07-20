@@ -3,9 +3,9 @@ import React from 'react';
 import ProjectTitle from 'layout/title/project-title';
 import Header from 'layout/header';
 import Protected from 'layout/protected';
-
-import Wrapper from 'layout/wrapper';
 import Help from 'layout/help/button';
+import MetaIcons from 'layout/meta-icons';
+import Wrapper from 'layout/wrapper';
 
 import ProjectNewForm from 'layout/projects/new/form';
 import Breadcrumb from 'components/breadcrumb';
@@ -22,6 +22,8 @@ const NewProjectsPage: React.FC = () => {
     <Protected>
 
       <ProjectTitle title="New" />
+
+      <MetaIcons />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />

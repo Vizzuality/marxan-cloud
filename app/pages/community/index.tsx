@@ -8,6 +8,7 @@ import Contact from 'layout/statics/contact';
 import Header from 'layout/header';
 import Hero from 'layout/statics/hero';
 import Footer from 'layout/footer';
+import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 
 import MARXAN_SOCIAL_MEDIA_IMG from 'images/social-media/marxan-social-media.png';
@@ -26,8 +27,9 @@ const Community: React.FC = () => {
     <>
       <Head>
         <title>Community</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <MetaIcons />
 
       <MetaTags
         name="Marxan conservation Solutions"

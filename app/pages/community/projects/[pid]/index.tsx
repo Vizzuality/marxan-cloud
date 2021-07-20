@@ -10,6 +10,7 @@ import { withPublishedProject } from 'hoc/projects';
 import Contact from 'layout/statics/contact';
 import Header from 'layout/header';
 import Footer from 'layout/footer';
+import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 import ProjectDetail from 'layout/community/published-projects/detail';
 import PublishedProjectTitle from 'layout/title/published-project-title';
@@ -33,6 +34,8 @@ const PublishedProjectPage: React.FC = () => {
   return (
     <>
       <PublishedProjectTitle />
+
+      <MetaIcons />
 
       <MetaTags
         name="Marxan conservation Solutions"

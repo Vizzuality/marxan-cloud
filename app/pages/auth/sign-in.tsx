@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import Header from 'layout/header';
+import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 import SignIn from 'layout/sign-in';
 
@@ -20,8 +21,9 @@ const SignInPage: React.FC = () => {
     <>
       <Head>
         <title>Sign in</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <MetaIcons />
 
       <MetaTags
         name="Marxan conservation Solutions"
