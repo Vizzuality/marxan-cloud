@@ -163,7 +163,7 @@ export class AuthenticationService {
    */
   async validateActivationToken(
     token: Pick<
-      ApiEventsUserData.ActivationTokenGeneratedV1Alpha1,
+      ApiEventsUserData.ActivationTokenGeneratedV1Alpha1DTO,
       'validationToken' | 'sub'
     >,
   ): Promise<true | never> {

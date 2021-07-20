@@ -1,7 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsJSON, IsOptional, IsString, IsUUID } from 'class-validator';
-import * as ApiEventsUserData from '@marxan-api/modules/api-events/dto/apiEvents.user.data.dto';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import * as ApiEventsUserData from './apiEvents.user.data.dto';
+import { ScenarioRunProgressV1Alpha1DTO } from './scenario-run-progress-v1-alpha-1';
 
 export class CreateApiEventDTO {
   /**
@@ -32,5 +33,6 @@ export class CreateApiEventDTO {
   @IsOptional()
   data?:
     | Record<string, unknown>
-    | ApiEventsUserData.ActivationTokenGeneratedV1Alpha1;
+    | ApiEventsUserData.ActivationTokenGeneratedV1Alpha1DTO
+    | ScenarioRunProgressV1Alpha1DTO;
 }
