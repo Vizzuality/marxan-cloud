@@ -178,9 +178,9 @@ export class ScenariosService {
     return this.inputFilesService.getBoundDatContent(scenarioId);
   }
 
-  async run(scenarioId: string, _blm?: number): Promise<void> {
+  async run(scenarioId: string, blm?: number): Promise<void> {
     await this.assertScenario(scenarioId);
-    await this.runService.run(scenarioId);
+    await this.runService.run(scenarioId, blm);
   }
 
   async cancel(scenarioId: string): Promise<void> {

@@ -61,8 +61,8 @@ export class RunService {
     );
   }
 
-  async run(scenarioId: string): Promise<void> {
-    const assets = await this.assets.forScenario(scenarioId);
+  async run(scenarioId: string, blm?: number): Promise<void> {
+    const assets = await this.assets.forScenario(scenarioId, blm);
     assertDefined(assets);
     const job = await this.queue.add(`run-scenario`, {
       scenarioId,
