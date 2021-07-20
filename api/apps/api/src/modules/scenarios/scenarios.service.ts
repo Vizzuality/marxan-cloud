@@ -27,13 +27,10 @@ import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
-import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
-import { InputParameterFileProvider } from './input-parameter-file.provider';
-import { SpecDatService } from './input-files/spec.dat.service';
-import { PuvsprDatService } from './input-files/puvspr.dat.service';
+import { CostSurfaceViewService } from './input-files/cost-surface-view.service';
 import { OutputFilesService } from './output-files/output-files.service';
-import { BoundDatService } from './input-files/bound.dat.service';
-import { notFound, RunService } from './run.service';
+import { notFound, RunService } from './marxan-run';
+import { InputFilesService } from './input-files';
 
 @Injectable()
 export class ScenariosService {
@@ -48,13 +45,9 @@ export class ScenariosService {
     private readonly costSurface: CostSurfaceFacade,
     private readonly httpService: HttpService,
     private readonly solutionsCrudService: SolutionResultCrudService,
-    private readonly costSurfaceView: CostSurfaceViewService,
     private readonly marxanInputValidator: MarxanInput,
-    private readonly inputParameterFileProvider: InputParameterFileProvider,
     private readonly runService: RunService,
-    private readonly specDatService: SpecDatService,
-    private readonly puvsprDatService: PuvsprDatService,
-    private readonly boundDatService: BoundDatService,
+    private readonly inputFilesService: InputFilesService,
     private readonly outputFilesService: OutputFilesService,
   ) {}
 
@@ -98,7 +91,7 @@ export class ScenariosService {
 
   async getInputParameterFile(scenarioId: string): Promise<string> {
     await this.assertScenario(scenarioId);
-    return this.inputParameterFileProvider.getInputParameterFile(scenarioId);
+    return this.inputFilesService.getInputParameterFile(scenarioId);
   }
 
   async changeLockStatus(
@@ -156,17 +149,17 @@ export class ScenariosService {
     stream: stream.Writable,
   ): Promise<void> {
     await this.assertScenario(scenarioId);
-    await this.costSurfaceView.read(scenarioId, stream);
+    await this.inputFilesService.readCostSurface(scenarioId, stream);
   }
 
   async getSpecDatCsv(scenarioId: string): Promise<string> {
     await this.assertScenario(scenarioId);
-    return this.specDatService.getSpecDatContent(scenarioId);
+    return this.inputFilesService.getSpecDatContent(scenarioId);
   }
 
   async getBoundDatCsv(scenarioId: string): Promise<string> {
     await this.assertScenario(scenarioId);
-    return this.boundDatService.getContent(scenarioId);
+    return this.inputFilesService.getBoundDatContent(scenarioId);
   }
 
   async run(scenarioId: string, _blm?: number): Promise<void> {
@@ -178,12 +171,13 @@ export class ScenariosService {
     await this.assertScenario(scenarioId);
     const result = await this.runService.cancel(scenarioId);
     if (isLeft(result)) {
-      const mapping: Record<typeof result.left, () => never> = {
-        [notFound]: () => {
+      switch (result.left) {
+        case notFound:
           throw new NotFoundException();
-        },
-      };
-      mapping[result.left]();
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
     }
   }
 
@@ -266,6 +260,11 @@ export class ScenariosService {
 
   async getPuvsprDatCsv(scenarioId: string) {
     await this.assertScenario(scenarioId);
-    return this.puvsprDatService.getPuvsprDatContent(scenarioId);
+    return this.inputFilesService.getPuvsprDatContent(scenarioId);
+  }
+
+  async getMarxanExecutionInputArchive(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    return this.inputFilesService.getArchive(scenarioId);
   }
 }

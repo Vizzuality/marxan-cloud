@@ -1,7 +1,36 @@
 import { useMemo } from 'react';
 import {
-  UseAdminPreviewLayer, UsePUGridLayer, UsePUGridPreviewLayer, UseWDPAPreviewLayer,
+  UseAdminPreviewLayer, UseGeoJSONLayer, UsePUGridLayer, UsePUGridPreviewLayer, UseWDPAPreviewLayer,
 } from './types';
+
+// GeoJSON
+export function useGeoJsonLayer({
+  id, active, data,
+}: UseGeoJSONLayer) {
+  return useMemo(() => {
+    if (!active || !id || !data) return null;
+
+    return {
+      id: `${id}`,
+      type: 'geojson',
+      source: {
+        type: 'geojson',
+        data,
+      },
+      render: {
+        layers: [
+          {
+            type: 'line',
+            paint: {
+              'line-color': '#FFF',
+              'line-width': 3,
+            },
+          },
+        ],
+      },
+    };
+  }, [id, active, data]);
+}
 
 // AdminPreview
 export function useAdminPreviewLayer({

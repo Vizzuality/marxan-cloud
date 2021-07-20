@@ -13,6 +13,9 @@
      },
    "concurrency": 50
    },
+  "api": {
+    "url": "http://api:3000"
+  },
   "jobOptions":{
     "removeOnComplete": 100,
     "removeOnFail": 1000,

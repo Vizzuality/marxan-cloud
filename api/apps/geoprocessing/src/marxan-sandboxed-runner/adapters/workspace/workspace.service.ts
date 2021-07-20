@@ -21,8 +21,12 @@ export class WorkspaceService implements WorkspaceBuilder {
     await this.binaryLinker.link(this.marxanConfig.binPath, marxanBinaryPath);
 
     console.log(`doing things in..`, workingDirectory);
-    return new Workspace(workingDirectory, marxanBinaryPath, async () =>
-      this.workingDirectoryService.cleanup(workingDirectory),
+    return new Workspace(
+      workingDirectory,
+      marxanBinaryPath,
+      async () => this.workingDirectoryService.cleanup(workingDirectory),
+      async () =>
+        this.workingDirectoryService.createOutputDirectory(workingDirectory),
     );
   }
 }

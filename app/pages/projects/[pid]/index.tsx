@@ -1,7 +1,6 @@
 import React from 'react';
-import Head from 'next/head';
 
-import Title from 'layout/title/project-title';
+import ProjectTitle from 'layout/title/project-title';
 import Header from 'layout/header';
 import Wrapper from 'layout/wrapper';
 import Protected from 'layout/protected';
@@ -18,10 +17,7 @@ export const getServerSideProps = withProtection(withUser());
 const ShowProjectsPage: React.FC = () => {
   return (
     <Protected>
-      <Title title="" />
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <ProjectTitle title="" />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />

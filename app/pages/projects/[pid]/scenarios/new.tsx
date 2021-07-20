@@ -10,6 +10,7 @@ import ScenariosMap from 'layout/scenarios/map';
 
 import ScenariosSidebar from 'layout/scenarios/sidebar';
 import SidebarName from 'layout/scenarios/sidebar/name';
+import Help from 'layout/help/button';
 
 import { withProtection, withUser } from 'hoc/auth';
 
@@ -37,6 +38,8 @@ const NewScenarioPage: React.FC = () => {
             </div>
           </Wrapper>
         </div>
+
+        <Help />
       </main>
     </Protected>
   );

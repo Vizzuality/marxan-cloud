@@ -1,7 +1,6 @@
 import React from 'react';
-import Head from 'next/head';
 
-import Title from 'layout/title/project-title';
+import ProjectTitle from 'layout/title/project-title';
 import Header from 'layout/header';
 import Protected from 'layout/protected';
 
@@ -21,10 +20,8 @@ const NewProjectsPage: React.FC = () => {
 
   return (
     <Protected>
-      <Title title="New" />
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+
+      <ProjectTitle title="New" />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />

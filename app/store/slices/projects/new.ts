@@ -4,12 +4,14 @@ interface ProjectShowStateProps {
   bbox: number[];
   minPuAreaSize: number;
   maxPuAreaSize: number;
+  uploadingPlanningArea: Record<string, object>
 }
 
 const initialState = {
   bbox: null,
   minPuAreaSize: 0,
   maxPuAreaSize: 100,
+  uploadingPlanningArea: null,
 } as ProjectShowStateProps;
 
 const projectsNewSlice = createSlice({
@@ -25,8 +27,13 @@ const projectsNewSlice = createSlice({
     setMaxPuAreaSize: (state, action: PayloadAction<number>) => {
       state.maxPuAreaSize = action.payload;
     },
+    setUploadingPlanningArea: (state, action: PayloadAction<Record<string, object>>) => {
+      state.uploadingPlanningArea = action.payload;
+    },
   },
 });
 
-export const { setBbox, setMinPuAreaSize, setMaxPuAreaSize } = projectsNewSlice.actions;
+export const {
+  setBbox, setMinPuAreaSize, setMaxPuAreaSize, setUploadingPlanningArea,
+} = projectsNewSlice.actions;
 export default projectsNewSlice.reducer;

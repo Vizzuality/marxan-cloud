@@ -1,13 +1,10 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { Job, JobsOptions, Queue, QueueBase } from 'bullmq';
 import { v4 } from 'uuid';
-import { assertDefined } from '@marxan/utils';
+import { assertDefined, FieldsOf } from '@marxan/utils';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
 import { QueueNameToken } from '@marxan-api/modules/queue/queue.tokens';
 
-type FieldsOf<T> = {
-  [index in keyof T]: T[index];
-};
 @Injectable({
   scope: Scope.TRANSIENT,
 })
