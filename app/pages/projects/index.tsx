@@ -1,5 +1,4 @@
 import React from 'react';
-import Head from 'next/head';
 
 import { withProtection, withUser } from 'hoc/auth';
 
@@ -18,10 +17,6 @@ const ProjectsPage: React.FC = () => {
   return (
     <Protected>
       <ProjectTitle title="" />
-
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
 
       <main>
         <Header size="base" />

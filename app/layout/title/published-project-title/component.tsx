@@ -26,6 +26,7 @@ export const PublishedProjectTitle: React.FC<PublishedProjectTitleProps> = ({
         {' '}
         {projectData?.name}
       </title>
+      <link rel="icon" href="/favicon.ico" />
     </Head>
   );
 };

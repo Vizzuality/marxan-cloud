@@ -1,5 +1,4 @@
 import React from 'react';
-import Head from 'next/head';
 
 import { useRouter } from 'next/router';
 
@@ -34,10 +33,6 @@ const PublishedProjectPage: React.FC = () => {
   return (
     <>
       <PublishedProjectTitle />
-
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
 
       <MetaTags
         name="Marxan conservation Solutions"

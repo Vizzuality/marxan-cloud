@@ -1,5 +1,4 @@
 import React from 'react';
-import Head from 'next/head';
 
 import ProjectTitle from 'layout/title/project-title';
 import Header from 'layout/header';
@@ -13,10 +12,6 @@ const EditProjectsPage: React.FC = () => {
   return (
     <Protected>
       <ProjectTitle title="Edit" />
-
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
 
       <main>
         <Header size="base" />
