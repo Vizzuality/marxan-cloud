@@ -136,6 +136,7 @@ export class ProjectsCrudService extends AppBaseService<
      */
     const project = await super.setDataCreate(create, info);
     project.createdBy = info?.authenticatedUser?.id!;
+    project.planningAreaGeometryId = create.planningAreaId;
 
     const bbox = await this.planningAreasService.getPlanningAreaBBox({
       ...create,
@@ -209,10 +210,12 @@ export class ProjectsCrudService extends AppBaseService<
       ...update,
       planningAreaGeometryId: update.planningAreaId,
     });
-    if (bbox) {
-      const modelWithBbox = await super.setDataUpdate(model, update, _);
-      modelWithBbox.bbox = bbox;
-      return modelWithBbox;
+    if (bbox || update.planningAreaId !== undefined) {
+      const updatedModel = await super.setDataUpdate(model, update, _);
+      if (bbox) updatedModel.bbox = bbox;
+      if (update.planningAreaId !== undefined)
+        updatedModel.planningAreaGeometryId = update.planningAreaId;
+      return updatedModel;
     }
     return model;
   }
