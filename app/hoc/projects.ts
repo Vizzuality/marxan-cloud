@@ -2,45 +2,11 @@ import { getSession } from 'next-auth/client';
 import { QueryClient } from 'react-query';
 import { dehydrate } from 'react-query/hydration';
 
-import USERS from 'services/users';
+import PROJECTS from 'services/projects';
 
 import { mergeDehydratedState } from './utils';
 
-export function withProtection(getServerSidePropsFunc?: Function) {
-  return async (context: any) => {
-    const session = await getSession(context);
-    const { resolvedUrl } = context;
-
-    if (!session) {
-      return {
-        redirect: {
-          destination: `/auth/sign-in?callbackUrl=${resolvedUrl}`,
-          permanent: false,
-        },
-      };
-    }
-
-    if (getServerSidePropsFunc) {
-      const SSPF = await getServerSidePropsFunc(context, session);
-
-      return {
-        ...SSPF,
-        props: {
-          session,
-          ...SSPF.props,
-        },
-      };
-    }
-
-    return {
-      props: {
-        session,
-      },
-    };
-  };
-}
-
-export function withUser(getServerSidePropsFunc?: Function) {
+export function withPublishedProject(getServerSidePropsFunc?: Function) {
   return async (context: any) => {
     const session = await getSession(context);
 
@@ -60,11 +26,15 @@ export function withUser(getServerSidePropsFunc?: Function) {
       };
     }
 
+    const { params } = context;
+
+    const { pid } = params;
+
     const queryClient = new QueryClient();
 
-    await queryClient.prefetchQuery('me', () => USERS.request({
+    await queryClient.prefetchQuery(['published-projects', pid], () => PROJECTS.request({
       method: 'GET',
-      url: '/me',
+      url: `/${pid}`,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
@@ -94,38 +64,6 @@ export function withUser(getServerSidePropsFunc?: Function) {
       props: {
         session,
         dehydratedState: JSON.parse(JSON.stringify(dehydrate(queryClient))),
-      },
-    };
-  };
-}
-
-export function withoutProtection(getServerSidePropsFunc?: Function) {
-  return async (context: any) => {
-    const session = await getSession(context);
-
-    if (session) {
-      return {
-        redirect: {
-          destination: '/projects',
-          permanent: false,
-        },
-      };
-    }
-
-    if (getServerSidePropsFunc) {
-      const SSPF = await getServerSidePropsFunc(context);
-
-      return {
-        ...SSPF,
-        props: {
-          ...SSPF.props,
-        },
-      };
-    }
-
-    return {
-      props: {
-
       },
     };
   };

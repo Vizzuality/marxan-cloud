@@ -147,6 +147,8 @@ export function useProject(id) {
     params: {
       include: 'scenarios,users',
     },
+  }).then((response) => {
+    return response.data;
   }), {
     enabled: !!id,
   });
@@ -156,9 +158,9 @@ export function useProject(id) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data?.data,
+      data: data?.data,
     };
-  }, [query, data?.data?.data]);
+  }, [query, data?.data]);
 }
 
 export function useSaveProject({
@@ -342,6 +344,8 @@ export function usePublishedProject(id) {
     params: {
       include: 'scenarios,users',
     },
+  }).then((response) => {
+    return response.data;
   }), {
     enabled: !!id,
   });
@@ -353,11 +357,11 @@ export function usePublishedProject(id) {
       { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
       { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
     ];
-    const parsedData = { ...data?.data?.data, contributors } || {};
+    const parsedData = { ...data?.data, contributors } || {};
 
     return {
       ...query,
       data: parsedData,
     };
-  }, [query, data?.data?.data]);
+  }, [query, data?.data]);
 }
