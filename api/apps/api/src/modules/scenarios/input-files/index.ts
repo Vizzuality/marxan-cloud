@@ -5,3 +5,5 @@ export {
   inputZipNotYetAvailable,
   InputZipFailure,
 } from './input-files.service';
+
+export { InputFilesArchiverService } from './input-files-archiver.service';
