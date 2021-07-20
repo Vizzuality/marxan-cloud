@@ -16,19 +16,19 @@ import { withUser } from 'hoc/auth';
 
 export const getServerSideProps = withUser();
 
-const PrivacyPolicy: React.FC = () => {
+const TermsOfUse: React.FC = () => {
   const { asPath } = useRouter();
 
   return (
     <>
       <Head>
-        <title>Privacy Police</title>
+        <title>Terms of Use</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <MetaTags
         name="Marxan conservation Solutions"
-        title="Privacy Police"
+        title="Terms of use"
         description=""
         url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
         image={MARXAN_SOCIAL_MEDIA_IMG}
@@ -47,4 +47,4 @@ const PrivacyPolicy: React.FC = () => {
   );
 };
 
-export default PrivacyPolicy;
+export default TermsOfUse;

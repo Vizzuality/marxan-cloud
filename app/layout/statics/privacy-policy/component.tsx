@@ -157,7 +157,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold">Collecting and Using Your Personal Data</h2>
+              <h2 className="text-3xl font-semibold">Collecting and Using Your Personal Data</h2>
               <br />
               <h3 className="text-lg font-semibold">Types of Data Collected</h3>
               <br />
@@ -350,7 +350,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold">Detailed Information on the Processing of Your Personal Data</h2>
+              <h2 className="text-3xl font-semibold">Detailed Information on the Processing of Your Personal Data</h2>
               <br />
               <p>
                 Service Providers have access to Your Personal Data only to perform their tasks
@@ -379,7 +379,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold">Children’s Privacy</h2>
+              <h2 className="text-3xl font-semibold">Children’s Privacy</h2>
               <br />
               <p>
                 Our Service does not address anyone under the age of 13. We do not knowingly collect
@@ -392,7 +392,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold">Your California Privacy Rights (California’s Shine the Light law)</h2>
+              <h2 className="text-3xl font-semibold">Your California Privacy Rights (California’s Shine the Light law)</h2>
               <br />
               <p>
                 Under California Civil Code Section 1798 (California’s Shine the Light law),
@@ -408,7 +408,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold">
+              <h2 className="text-3xl font-semibold">
                 California Privacy Rights for Minor Users (California Business and Professions Code
                 Section 22581)
               </h2>
@@ -435,7 +435,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold">Links to Other Websites</h2>
+              <h2 className="text-3xl font-semibold">Links to Other Websites</h2>
               <br />
               <p>
                 Our Service may contain links to other websites that are not operated by Us. If You
@@ -451,7 +451,7 @@ export const PrivacyPolicyTerms: React.FC<PrivacyPolicyTermsProps> = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold">Changes to this Privacy Policy</h2>
+              <h2 className="text-3xl font-semibold">Changes to this Privacy Policy</h2>
               <br />
               <p>
                 We may update our Privacy Policy from time to time. We will notify You of any
