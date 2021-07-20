@@ -12,8 +12,6 @@ import MetaTags from 'layout/meta-tags';
 import Utilities from 'layout/about/utilities';
 import Values from 'layout/about/values';
 
-import MARXAN_SOCIAL_MEDIA_IMG from 'images/social-media/marxan-social-media.png';
-
 import { withUser } from 'hoc/auth';
 
 export const getServerSideProps = withUser();
@@ -37,7 +35,6 @@ const About: React.FC = () => {
         title={TITLE_TEXT}
         description={DESCRIPTION_TEXT}
         url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
-        image={MARXAN_SOCIAL_MEDIA_IMG}
         type="article"
         twitterCard="summary"
         twitterSite="@Marxan_Planning"

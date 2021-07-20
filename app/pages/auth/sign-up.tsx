@@ -8,8 +8,6 @@ import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 import SignUp from 'layout/sign-up';
 
-import MARXAN_SOCIAL_MEDIA_IMG from 'images/social-media/marxan-social-media.png';
-
 import { withUser } from 'hoc/auth';
 
 export const getServerSideProps = withUser();
@@ -30,7 +28,6 @@ const SignUpPage: React.FC = () => {
         title="Sign up"
         description="Get Started!"
         url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
-        image={MARXAN_SOCIAL_MEDIA_IMG}
         type="article"
         twitterCard="summary"
         twitterSite="@Marxan_Planning"

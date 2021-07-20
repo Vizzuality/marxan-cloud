@@ -11,8 +11,6 @@ import Footer from 'layout/footer';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 
-import MARXAN_SOCIAL_MEDIA_IMG from 'images/social-media/marxan-social-media.png';
-
 import { withUser } from 'hoc/auth';
 
 export const getServerSideProps = withUser();
@@ -36,7 +34,6 @@ const Community: React.FC = () => {
         title={TITLE_TEXT}
         description={DESCRIPTION_TEXT}
         url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
-        image={MARXAN_SOCIAL_MEDIA_IMG}
         type="article"
         twitterCard="summary"
         twitterSite="@Marxan_Planning"

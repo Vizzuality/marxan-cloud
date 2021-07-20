@@ -8,8 +8,6 @@ import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 import SignIn from 'layout/sign-in';
 
-import MARXAN_SOCIAL_MEDIA_IMG from 'images/social-media/marxan-social-media.png';
-
 import { withoutProtection } from 'hoc/auth';
 
 export const getServerSideProps = withoutProtection();
@@ -30,7 +28,6 @@ const SignInPage: React.FC = () => {
         title="Sign in"
         description="Get in Marxan!"
         url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
-        image={MARXAN_SOCIAL_MEDIA_IMG}
         type="article"
         twitterCard="summary"
         twitterSite="@Marxan_Planning"
