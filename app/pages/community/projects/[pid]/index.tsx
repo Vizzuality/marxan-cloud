@@ -15,7 +15,7 @@ import MetaTags from 'layout/meta-tags';
 import ProjectDetail from 'layout/community/published-projects/detail';
 import PublishedProjectTitle from 'layout/title/published-project-title';
 
-import MARXAN_SOCIAL_MEDIA_IMG from 'images/marxan-social-media.png';
+import MARXAN_SOCIAL_MEDIA_IMG from 'images/social-media/marxan-social-media.png';
 
 export const getServerSideProps = withUser(withPublishedProject());
 
@@ -43,7 +43,7 @@ const PublishedProjectPage: React.FC = () => {
         name="Marxan conservation Solutions"
         title={name}
         description={description}
-        url={asPath}
+        url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
         image={MARXAN_SOCIAL_MEDIA_IMG}
         type="article"
         twitterCard="summary"

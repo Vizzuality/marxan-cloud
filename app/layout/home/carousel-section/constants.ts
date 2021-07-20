@@ -1,7 +1,7 @@
-import CarouselImage1 from 'images/carousel-1.png';
-import CarouselImage2 from 'images/carousel-2.png';
-import CarouselImage3 from 'images/carousel-3.png';
-import CarouselImage4 from 'images/carousel-4.png';
+import CarouselImage1 from 'images/home-carousel/carousel-1.png';
+import CarouselImage2 from 'images/home-carousel/carousel-2.png';
+import CarouselImage3 from 'images/home-carousel/carousel-3.png';
+import CarouselImage4 from 'images/home-carousel/carousel-4.png';
 
 export const IMAGES = [
   {
