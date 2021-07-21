@@ -36,6 +36,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
   const CHILD = cloneElement(children, {
     sortable,
     listeners,
+    attributes,
     isDragging,
   });
 
@@ -43,8 +44,10 @@ export const SortableItem: React.FC<SortableItemProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...!sortable.handle && listeners}
+      {...!sortable.handle && {
+        ...listeners,
+        ...attributes,
+      }}
       className={cx({
         'opacity-0': isDragging,
       })}
