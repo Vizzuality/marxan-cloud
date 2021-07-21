@@ -2,6 +2,7 @@ import React from 'react';
 import Head from 'next/head';
 
 import Header from 'layout/header';
+import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
 
 import Me from 'layout/me';
@@ -15,8 +16,9 @@ const MePage: React.FC = () => {
     <Protected>
       <Head>
         <title>Me</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <MetaIcons />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />

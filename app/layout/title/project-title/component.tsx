@@ -24,7 +24,6 @@ export const ProjectTitle: React.FC<ProjectTitleProps> = ({ title }:ProjectTitle
         {' '}
         {projectData?.name}
       </title>
-      <link rel="icon" href="/favicon.ico" />
     </Head>
   );
 };

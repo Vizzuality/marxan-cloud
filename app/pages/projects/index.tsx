@@ -4,6 +4,7 @@ import { withProtection, withUser } from 'hoc/auth';
 
 import Protected from 'layout/protected';
 import Header from 'layout/header';
+import MetaIcons from 'layout/meta-icons';
 import ProjectTitle from 'layout/title/project-title';
 
 import ProjectsWelcome from 'layout/projects/all/welcome';
@@ -17,6 +18,8 @@ const ProjectsPage: React.FC = () => {
   return (
     <Protected>
       <ProjectTitle title="" />
+
+      <MetaIcons />
 
       <main>
         <Header size="base" />
