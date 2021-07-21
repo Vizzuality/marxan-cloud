@@ -5,7 +5,9 @@ import { useRouter } from 'next/router';
 
 import Header from 'layout/header';
 import MetaTags from 'layout/meta-tags';
-import SignUp from 'layout/sign-up';
+
+// import SignUp from 'layout/sign-up';
+import GuideRequest from 'layout/sign-up/guide-request';
 
 import MARXAN_SOCIAL_MEDIA_IMG from 'images/social-media/marxan-social-media.png';
 
@@ -39,7 +41,8 @@ const SignUpPage: React.FC = () => {
 
         <div className="flex flex-col h-full md:flex-grow">
           <div className="flex items-center justify-center h-full py-10 bg-white">
-            <SignUp />
+            {/* <SignUp /> */}
+            <GuideRequest />
           </div>
         </div>
       </main>
