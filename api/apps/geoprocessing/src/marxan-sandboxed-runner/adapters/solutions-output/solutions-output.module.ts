@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { MarxanExecutionMetadataModule } from './metadata';
+import { GeoOutputModule } from './geo-output';
 import { ResultParserService } from './result-parser.service';
 
 @Module({
-  imports: [MarxanExecutionMetadataModule],
+  imports: [GeoOutputModule],
   providers: [ResultParserService],
   exports: [ResultParserService],
 })

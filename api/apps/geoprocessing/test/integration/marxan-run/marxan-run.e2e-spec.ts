@@ -4,9 +4,17 @@ import * as nock from 'nock';
 import { v4 } from 'uuid';
 
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
-import { ExecutionResult } from '@marxan/marxan-output';
+import {
+  ExecutionResult,
+  MarxanExecutionMetadataGeoEntity,
+  OutputScenariosPuDataGeoEntity,
+} from '@marxan/marxan-output';
 
 import { bootstrapApplication, delay } from '../../utils';
+import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
+import { In, Repository } from 'typeorm';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -37,16 +45,22 @@ describe(`given input data is delayed`, () => {
   }, 30000);
 });
 
-describe(`given input data is available`, () => {
-  beforeEach(() => {
+fdescribe(`given input data is available`, () => {
+  beforeEach(async () => {
     fixtures.GivenInputFilesAreAvailable();
-  });
-  test(`marxan run during binary execution`, async () => {
-    const output = await fixtures.GivenMarxanIsRunning();
-    fixtures.ThenHasValidOutput(output);
-  }, 60000);
+    await fixtures.GivenScenarioPuDataExists();
+  }, 60000 * 2);
+  test(
+    `marxan run during binary execution`,
+    async () => {
+      const output = await fixtures.GivenMarxanIsRunning();
+      fixtures.ThenHasValidOutput(output);
+      await fixtures.ThenOutputScenarioPuDataWasPersisted();
+    },
+    60000 * 15,
+  );
 
-  test(`cancelling marxan run`, async (done) => {
+  test.skip(`cancelling marxan run`, async (done) => {
     expect.assertions(1);
 
     fixtures
@@ -66,14 +80,24 @@ describe(`given input data is available`, () => {
 
 afterEach(async () => {
   await fixtures.cleanup();
-});
+}, 50000);
 
 const getFixtures = async () => {
   const scenarioId = v4();
+  const outputsIds: string[] = [];
 
   nock.disableNetConnect();
 
   const app = await bootstrapApplication();
+  const scenariosPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
+    getRepositoryToken(ScenariosPlanningUnitGeoEntity),
+  );
+  const puOutputRepo: Repository<OutputScenariosPuDataGeoEntity> = app.get(
+    getRepositoryToken(OutputScenariosPuDataGeoEntity),
+  );
+  const metadataRepo: Repository<MarxanExecutionMetadataGeoEntity> = app.get(
+    getRepositoryToken(MarxanExecutionMetadataGeoEntity),
+  );
   const sut: MarxanSandboxRunnerService = app.get(MarxanSandboxRunnerService);
 
   const nockScope = nock(host, {
@@ -84,6 +108,13 @@ const getFixtures = async () => {
   });
   return {
     cleanup: async () => {
+      await metadataRepo.delete({
+        scenarioId,
+      });
+      await puOutputRepo.delete({});
+      await scenariosPuDataRepo.delete({
+        scenarioId,
+      });
       nockScope.done();
       nock.enableNetConnect();
     },
@@ -105,8 +136,23 @@ const getFixtures = async () => {
             'content-type': 'plain/text',
           });
       }),
+    GivenScenarioPuDataExists: async () => {
+      outputsIds.push(
+        ...(
+          await GivenScenarioPuData(scenariosPuDataRepo, scenarioId, 12178)
+        ).rows.map((r) => r.id),
+      );
+    },
     ThenHasValidOutput(output: ExecutionResult) {
       expect(output.length).toEqual(100);
+    },
+    ThenOutputScenarioPuDataWasPersisted: async () => {
+      const k = await puOutputRepo.count({
+        where: {
+          scenarioPuId: In(outputsIds),
+        },
+      });
+      expect(k).toEqual(12178);
     },
   };
 };

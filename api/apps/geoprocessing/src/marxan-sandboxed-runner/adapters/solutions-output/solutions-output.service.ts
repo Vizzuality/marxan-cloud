@@ -5,13 +5,13 @@ import { ExecutionResult } from '@marxan/marxan-output';
 import { Workspace } from '../../ports/workspace';
 import { Cancellable } from '../../ports/cancellable';
 
-import { MarxanExecutionMetadataRepository } from './metadata';
+import { GeoOutputRepository } from './geo-output';
 import { ResultParserService } from './result-parser.service';
 
 @Injectable()
 export class SolutionsOutputService implements Cancellable {
   constructor(
-    private readonly metadataRepository: MarxanExecutionMetadataRepository,
+    private readonly geoOutputRepository: GeoOutputRepository,
     private readonly resultParserService: ResultParserService,
   ) {
     //
@@ -33,13 +33,24 @@ export class SolutionsOutputService implements Cancellable {
     stdOutput: string[],
     stdErr?: string[],
   ): Promise<ExecutionResult> {
+    // TODO remove hardcoded `output`, parse input.dat instead
     if (!existsSync(workspace.workingDirectory + `/output/output_sum.csv`)) {
       throw new Error(`Output is missing from the marxan run.`);
     }
-    await this.metadataRepository.save(scenarioId, workspace, {
+    if (
+      !existsSync(
+        workspace.workingDirectory + `/output/output_solutionsmatrix.csv`,
+      )
+    ) {
+      throw new Error(
+        `Output (solutions matrix) is missing from the marxan run.`,
+      );
+    }
+    await this.geoOutputRepository.save(scenarioId, workspace, {
       stdOutput,
       stdErr,
     });
+
     const runsSummary = (
       await promises.readFile(
         workspace.workingDirectory + `/output/output_sum.csv`,

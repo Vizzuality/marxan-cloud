@@ -4,7 +4,7 @@ import { MarxanSandboxRunnerService } from './marxan-sandbox-runner.service';
 
 import { WorkspaceModule } from './adapters/workspace/workspace.module';
 import { MarxanDirectory } from './adapters/marxan-directory.service';
-import { MarxanExecutionMetadataModule } from './adapters/solutions-output/metadata/marxan-execution-metadata.module';
+import { GeoOutputModule } from './adapters/solutions-output/geo-output/geo-output.module';
 import { FileReader } from './adapters/file-reader';
 import { AssetFetcher } from './adapters/scenario-data/asset-fetcher';
 import { FetchConfig } from './adapters/scenario-data/fetch.config';
@@ -14,7 +14,7 @@ import { SolutionsOutputModule } from './adapters/solutions-output/solutions-out
   imports: [
     HttpModule,
     WorkspaceModule,
-    MarxanExecutionMetadataModule,
+    GeoOutputModule,
     SolutionsOutputModule,
   ],
   providers: [
