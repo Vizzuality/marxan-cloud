@@ -1,33 +1,19 @@
 import { Job, Queue, QueueEvents } from 'bullmq';
 import { Either, left, right } from 'fp-ts/Either';
-import { FactoryProvider, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { assertDefined, isDefined } from '@marxan/utils';
-import { JobData, ProgressData, queueName } from '@marxan/scenario-run-queue';
+import { JobData, ProgressData } from '@marxan/scenario-run-queue';
 import { ScenarioRunProgressV1Alpha1DTO } from '@marxan-api/modules/api-events/dto/scenario-run-progress-v1-alpha-1';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { QueueBuilder, QueueEventsBuilder } from '@marxan-api/modules/queue';
 import { Scenario } from '../scenario.api.entity';
 import { AssetsService } from './assets.service';
 
 export const runQueueToken = Symbol('run queue token');
 export const runEventsToken = Symbol('run events token');
-export const runQueueProvider: FactoryProvider<Queue<JobData>> = {
-  provide: runQueueToken,
-  useFactory: (queueBuilder: QueueBuilder<JobData>) => {
-    return queueBuilder.buildQueue(queueName);
-  },
-  inject: [QueueBuilder],
-};
-export const runQueueEventsProvider: FactoryProvider<QueueEvents> = {
-  provide: runEventsToken,
-  useFactory: (eventsBuilder: QueueEventsBuilder) => {
-    return eventsBuilder.buildQueueEvents(queueName);
-  },
-  inject: [QueueEventsBuilder],
-};
+export const blmDefaultToken = Symbol('blm default token');
 
 export const notFound = Symbol('not found');
 export type NotFound = typeof notFound;
@@ -43,6 +29,8 @@ export class RunService {
     @InjectRepository(Scenario)
     private readonly scenarios: Repository<Scenario>,
     private readonly assets: AssetsService,
+    @Inject(blmDefaultToken)
+    private readonly blmDefault: number,
   ) {
     queueEvents.on(`completed`, ({ jobId }, eventId) =>
       this.handleFinished(jobId, eventId),
@@ -62,6 +50,7 @@ export class RunService {
   }
 
   async run(scenarioId: string, blm?: number): Promise<void> {
+    blm ??= this.blmDefault;
     const assets = await this.assets.forScenario(scenarioId, blm);
     assertDefined(assets);
     const job = await this.queue.add(`run-scenario`, {

@@ -10,6 +10,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.serv
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
 import { Scenario } from '../scenario.api.entity';
 import {
+  blmDefaultToken,
   notFound,
   runEventsToken,
   runQueueToken,
@@ -37,6 +38,22 @@ test(`scheduling job`, async () => {
   fixtures.ThenShouldUpdateScenario();
   fixtures.ThenShouldEmitSubmittedEvent(`1234`);
   fixtures.ThenShouldAddJob();
+  fixtures.ThenShouldUseDefaultBlm();
+});
+
+test(`scheduling job with blm`, async () => {
+  fixtures.setupMocksForSchedulingJobs();
+  // given
+  fixtures.GivenAssetsAvailable();
+
+  // when
+  await runService.run('scenario-1', -123);
+
+  // then
+  fixtures.ThenShouldUpdateScenario();
+  fixtures.ThenShouldEmitSubmittedEvent();
+  fixtures.ThenShouldAddJob();
+  fixtures.ThenShouldUseBlm(-123);
 });
 
 test(`scheduling job for scenario without assets`, async () => {
@@ -158,6 +175,10 @@ async function getFixtures() {
   const testingModule = await Test.createTestingModule({
     providers: [
       {
+        provide: blmDefaultToken,
+        useValue: 42,
+      },
+      {
         provide: runQueueToken,
         useValue: fakeQueue,
       },
@@ -220,6 +241,7 @@ async function getFixtures() {
         relativeDestination: 'relativeDestination-value',
       },
     ],
+    defaultBlm: testingModule.get<number>(blmDefaultToken),
     getRunService() {
       return testingModule.get(RunService);
     },
@@ -333,6 +355,13 @@ async function getFixtures() {
         expect(id).toBe(`scenario-1`);
         return undefined;
       });
+    },
+    ThenShouldUseDefaultBlm() {
+      this.ThenShouldUseBlm(this.defaultBlm);
+    },
+    ThenShouldUseBlm(blm: number) {
+      expect(fakeAssets.forScenario).toBeCalledTimes(1);
+      expect(fakeAssets.forScenario).toBeCalledWith(`scenario-1`, blm);
     },
   };
 }

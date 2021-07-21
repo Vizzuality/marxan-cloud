@@ -17,7 +17,7 @@ export class AssetsService {
     private readonly inputFiles: InputFilesService,
   ) {}
 
-  async forScenario(id: string, blm?: number): Promise<Assets> {
+  async forScenario(id: string, blm: number): Promise<Assets> {
     const settings = await this.inputFiles.getSettings();
     return [
       {
