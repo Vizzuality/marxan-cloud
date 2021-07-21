@@ -1,7 +1,4 @@
-import React from 'react';
-
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import React, { useCallback } from 'react';
 
 import { useHelp } from 'hooks/help';
 
@@ -11,19 +8,30 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 
 import GUIDE_REQUEST_SVG from 'svgs/users/guide-request.svg?sprite';
+import { useMe } from 'hooks/me';
 
 export interface GuideRequestProps {
-
+  onDismiss?: () => void,
 }
 
-export const GuideRequest: React.FC<GuideRequestProps> = () => {
-  const router = useRouter();
+export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }:GuideRequestProps) => {
+  const { user } = useMe();
+
   const { onActive } = useHelp();
 
-  const handleAcceptRequestGuide = () => {
+  const handleAcceptRequestGuide = useCallback(() => {
     onActive(true);
-    router.push('/auth/sign-in');
-  };
+    const { id: userId } = user;
+    window.localStorage.setItem(`help-${userId}`, userId);
+    onDismiss();
+  }, [onActive, onDismiss, user]);
+
+  const handleCancelRequestGuide = useCallback(() => {
+    onActive(false);
+    const { id: userId } = user;
+    window.localStorage.setItem(`help-${userId}`, userId);
+    onDismiss();
+  }, [onActive, onDismiss, user]);
 
   return (
     <Wrapper>
@@ -37,11 +45,17 @@ export const GuideRequest: React.FC<GuideRequestProps> = () => {
           <p className="text-lg text-center text-gray-600 font-heading">Would you like to follow our guided Marxan workflow?</p>
         </div>
         <div className="flex space-x-4 w-72">
-          <Link href="/auth/sign-in">
-            <Button theme="tertiary" size="lg" type="submit" className="w-full">
-              No
-            </Button>
-          </Link>
+
+          <Button
+            theme="tertiary"
+            size="lg"
+            type="submit"
+            className="w-full"
+            onClick={handleCancelRequestGuide}
+          >
+            No
+          </Button>
+
           <Button
             theme="primary"
             size="lg"
