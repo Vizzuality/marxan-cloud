@@ -179,8 +179,11 @@ export class ScenariosService {
   }
 
   async run(scenarioId: string, blm?: number): Promise<void> {
-    await this.assertScenario(scenarioId);
-    await this.runService.run(scenarioId, blm);
+    const scenario = await this.assertScenario(scenarioId);
+    await this.runService.run(
+      scenario.id,
+      blm ?? scenario.boundaryLengthModifier,
+    );
   }
 
   async cancel(scenarioId: string): Promise<void> {
@@ -198,7 +201,7 @@ export class ScenariosService {
   }
 
   private async assertScenario(scenarioId: string) {
-    await this.crudService.getById(scenarioId);
+    return await this.crudService.getById(scenarioId);
   }
 
   async getOneSolution(
