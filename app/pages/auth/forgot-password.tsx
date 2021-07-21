@@ -3,6 +3,7 @@ import Head from 'next/head';
 
 import Header from 'layout/header';
 import ForgotPassword from 'layout/forgot-password';
+import MetaIcons from 'layout/meta-icons';
 
 import { withoutProtection } from 'hoc/auth';
 
@@ -13,8 +14,9 @@ const ForgotPasswordPage: React.FC = () => {
     <>
       <Head>
         <title>Forgot password</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <MetaIcons />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
