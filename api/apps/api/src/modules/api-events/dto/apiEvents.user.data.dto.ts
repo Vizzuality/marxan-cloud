@@ -1,6 +1,8 @@
 import { IsNumber, IsUUID } from 'class-validator';
+import { ActivationTokenGeneratedV1Alpha1 } from '../events-data/activation-token-generated-v1-alpha-1';
 
-export class ActivationTokenGeneratedV1Alpha1 {
+export class ActivationTokenGeneratedV1Alpha1DTO
+  implements ActivationTokenGeneratedV1Alpha1 {
   /**
    * Unique activation token generated during user signup flow.
    */

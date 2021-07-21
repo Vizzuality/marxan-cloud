@@ -4,7 +4,8 @@ import { FactoryProvider, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { assertDefined, isDefined } from '@marxan/utils';
-import { JobData, queueName } from '@marxan/scenario-run-queue';
+import { JobData, ProgressData, queueName } from '@marxan/scenario-run-queue';
+import { ScenarioRunProgressV1Alpha1DTO } from '@marxan-api/modules/api-events/dto/scenario-run-progress-v1-alpha-1';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { QueueBuilder, QueueEventsBuilder } from '@marxan-api/modules/queue';
@@ -49,6 +50,15 @@ export class RunService {
     queueEvents.on(`failed`, ({ jobId }, eventId) =>
       this.handleFailed(jobId, eventId),
     );
+    queueEvents.on(
+      `progress`,
+      async (
+        { jobId, data }: { data: ProgressData; jobId: string },
+        eventId,
+      ) => {
+        await this.handleProgress(jobId, eventId, data);
+      },
+    );
   }
 
   async run(scenarioId: string): Promise<void> {
@@ -87,6 +97,31 @@ export class RunService {
     else if (await scenarioJob.isWaiting()) await scenarioJob.remove();
 
     return right(void 0);
+  }
+
+  private async handleProgress(
+    jobId: string,
+    eventId: string,
+    progress: ProgressData | null,
+  ) {
+    if (
+      typeof progress !== 'object' ||
+      progress === null ||
+      !('fractionalProgress' in progress)
+    )
+      return;
+    const job = await this.getJob(jobId);
+    const kind = API_EVENT_KINDS.scenario__run__progress__v1__alpha1;
+    const eventData: ScenarioRunProgressV1Alpha1DTO = {
+      kind,
+      fractionalProgress: progress.fractionalProgress,
+    };
+    await this.apiEvents.createIfNotExists({
+      topic: job.data.scenarioId,
+      kind,
+      externalId: eventId,
+      data: eventData,
+    });
   }
 
   private async handleFinished(jobId: string, eventId: string) {

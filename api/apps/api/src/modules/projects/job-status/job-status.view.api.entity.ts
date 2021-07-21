@@ -1,6 +1,10 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 import { JobType } from '@marxan-api/modules/projects/job-status/jobs.enum';
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import {
+  ApiEvent,
+  KnownEventsData,
+} from '@marxan-api/modules/api-events/api-event.api.entity';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ScenarioEvents } from '@marxan/api-events/api-event-kinds.enum';
 import { ValuesType } from 'utility-types';
@@ -11,7 +15,8 @@ import { ValuesType } from 'utility-types';
       DISTINCT ON (job_type, topic) job_type,
       api_events.topic AS scenario_id,
       projects.id AS project_id,
-      api_events.kind
+      api_events.kind,
+      api_events.data
     FROM
       api_events
       INNER JOIN scenarios ON api_events.topic = scenarios.id
@@ -50,6 +55,22 @@ export class ScenarioJobStatus {
     name: 'project_id',
   })
   projectId!: string;
+
+  @ViewColumn()
+  data!: ApiEvent['data'];
+
+  get publicEventData(): { fractionalProgress: number } | undefined {
+    const data: KnownEventsData | undefined = this.data;
+    if (
+      data &&
+      'kind' in data &&
+      data.kind === API_EVENT_KINDS.scenario__run__progress__v1__alpha1
+    ) {
+      return {
+        fractionalProgress: data.fractionalProgress,
+      };
+    }
+  }
 }
 
 const eventToJobStatusMapping: Record<ValuesType<ScenarioEvents>, JobStatus> = {
@@ -62,6 +83,7 @@ const eventToJobStatusMapping: Record<ValuesType<ScenarioEvents>, JobStatus> = {
     JobStatus.running,
   [API_EVENT_KINDS.scenario__costSurface__submitted__v1_alpha1]:
     JobStatus.running,
+  [API_EVENT_KINDS.scenario__run__progress__v1__alpha1]: JobStatus.running,
   [API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1]:
     JobStatus.failure,
   [API_EVENT_KINDS.scenario__planningUnitsInclusion__finished__v1__alpha1]:

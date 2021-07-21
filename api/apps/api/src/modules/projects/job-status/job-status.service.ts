@@ -13,9 +13,17 @@ export interface Job {
   status: Status;
 }
 
+export type ProgressJob = Job & {
+  data: {
+    fractionalProgress: number;
+  };
+};
+
+export type AnyJob = Job | ProgressJob;
+
 export interface Scenario {
   scenarioId: string;
-  jobs: Job[];
+  jobs: AnyJob[];
 }
 
 @Injectable()
@@ -41,6 +49,7 @@ export class JobStatusService {
       groupedStatuses[status.scenarioId].jobs.push({
         kind: status.jobType,
         status: jobStatus,
+        data: status.publicEventData,
       });
     }
 

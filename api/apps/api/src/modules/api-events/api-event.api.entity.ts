@@ -4,6 +4,8 @@ import { IsEnum } from 'class-validator';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ActivationTokenGeneratedV1Alpha1 } from './events-data/activation-token-generated-v1-alpha-1';
+import { ScenarioRunProgressV1Alpha1 } from './events-data/scenario-run-progress-v1-alpha-1';
 
 export const apiEventResource: BaseServiceResource = {
   className: 'ApiEvent',
@@ -80,13 +82,16 @@ export class ApiEvent {
 
   /**
    * Data payload of the event. Its semantics depend on kind.
-   *
-   * @debt Right now, we don't use formal schemas: emitters and consumers of
-   * events are responsible for the appropriate handling of shared semantics.
    */
   @Column('jsonb')
-  data!: Record<string, unknown>;
+  data!: Record<string, unknown> | KnownEventsData;
 }
+
+export type KnownEventsData =
+  | ActivationTokenGeneratedV1Alpha1
+  | ScenarioRunProgressV1Alpha1
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  | {};
 
 export class JSONAPIApiEventData {
   @ApiProperty()

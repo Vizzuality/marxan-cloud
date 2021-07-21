@@ -1,7 +1,18 @@
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiProperty,
+  ApiPropertyOptional,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { JobType } from '../job-status/jobs.enum';
 
+export class ProgressJobDTO {
+  @ApiProperty()
+  fractionalProgress!: number;
+}
+
+@ApiExtraModels(ProgressJobDTO)
 export class ScenarioJobStatus {
   @ApiProperty({
     enum: JobType,
@@ -13,6 +24,11 @@ export class ScenarioJobStatus {
     enum: JobStatus,
   })
   status!: JobStatus;
+
+  @ApiPropertyOptional({
+    oneOf: [{ $ref: getSchemaPath(ProgressJobDTO) }],
+  })
+  data?: ProgressJobDTO;
 }
 
 export class ScenarioStatus {
