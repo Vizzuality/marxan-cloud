@@ -19,15 +19,8 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }:GuideReq
 
   const { onActive } = useHelp();
 
-  const handleAcceptRequestGuide = useCallback(() => {
-    onActive(true);
-    const { id: userId } = user;
-    window.localStorage.setItem(`help-${userId}`, userId);
-    onDismiss();
-  }, [onActive, onDismiss, user]);
-
-  const handleCancelRequestGuide = useCallback(() => {
-    onActive(false);
+  const handleActiveRequestGuide = useCallback((active) => {
+    onActive(active);
     const { id: userId } = user;
     window.localStorage.setItem(`help-${userId}`, userId);
     onDismiss();
@@ -51,7 +44,7 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }:GuideReq
             size="lg"
             type="submit"
             className="w-full"
-            onClick={handleCancelRequestGuide}
+            onClick={() => handleActiveRequestGuide(false)}
           >
             No
           </Button>
@@ -61,7 +54,7 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }:GuideReq
             size="lg"
             type="submit"
             className="w-full"
-            onClick={handleAcceptRequestGuide}
+            onClick={() => handleActiveRequestGuide(true)}
           >
             Yes
           </Button>
