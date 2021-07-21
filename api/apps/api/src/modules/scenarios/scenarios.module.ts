@@ -21,10 +21,8 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { CostSurfaceTemplateModule } from './cost-surface-template';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import {
-  ScenariosOutputResultsApiEntity,
-  ScenariosPuOutputGeoEntity,
-} from '@marxan/scenarios-planning-unit';
+import { ScenariosPuOutputGeoEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
 import { OutputFilesModule } from './output-files/output-files.module';

@@ -9,19 +9,17 @@ import {
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { FetchSpecification } from 'nestjs-base-service';
-import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 
 @Injectable()
 export class SolutionResultCrudService extends AppBaseService<
-ScenariosOutputResultsApiEntity,
+  ScenariosOutputResultsApiEntity,
   never,
   never,
   AppInfoDTO
 > {
   constructor(
-    @InjectRepository(
-      ScenariosOutputResultsApiEntity
-    )
+    @InjectRepository(ScenariosOutputResultsApiEntity)
     protected readonly repository: Repository<ScenariosOutputResultsApiEntity>,
   ) {
     super(repository, 'solution', 'solutions', {
@@ -37,7 +35,7 @@ ScenariosOutputResultsApiEntity,
         'scoreValue',
         'costValue',
         'missingValues',
-        'planningUnits'
+        'planningUnits',
       ],
       keyForAttribute: 'camelCase',
     };
