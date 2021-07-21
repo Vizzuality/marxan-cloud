@@ -42,6 +42,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     tab, wdpaCategories, clicking, clickingValue, puAction,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
+  const [MAP, setMAP] = useState(null);
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
@@ -80,6 +81,30 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
       viewportOptions: { transitionDuration: 0 },
     });
   }, [bbox]);
+
+  useEffect(() => {
+    if (MAP) {
+      MAP.on('sourcedata', ({ sourceId, isSourceLoaded }) => {
+        if (sourceId === 'pu-grid-layer' && isSourceLoaded) {
+          const features = MAP.querySourceFeatures('pu-grid-layer', {
+            filter: [
+              'all',
+              ['==', ['get', 'lockinstatus'], 1],
+            ],
+            sourceLayer: 'layer0',
+          });
+          console.log(features);
+        }
+      });
+    }
+
+    return () => {
+      console.log('OFFFFF MAP');
+      if (MAP) {
+        MAP.off('sourcedata');
+      }
+    };
+  }, [MAP]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
@@ -152,16 +177,33 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
         viewport={viewport}
         mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
         mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
+        transformRequest={handleTransformRequest}
         onMapViewportChange={handleViewportChange}
         onClick={handleClick}
-        transformRequest={handleTransformRequest}
+        onMapReady={({ map }) => {
+          setMAP(map);
+        }}
       >
         {(map) => {
           return (
             <>
               <LayerManager map={map} plugin={PluginMapboxGl}>
                 {LAYERS.map((l) => (
-                  <Layer key={l.id} {...l} />
+                  <Layer
+                    key={l.id}
+                    {...l}
+                    {...l.id === 'pu-grid-layer' && {
+                      onAfterAdd: () => {
+
+                      },
+
+                      onAfterRemove: () => {
+                        // map.on('sourcedata', () => {
+                        //   console.log('A sourcedata event occurred.');
+                        // });
+                      },
+                    }}
+                  />
                 ))}
               </LayerManager>
 

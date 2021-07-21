@@ -158,8 +158,8 @@ export function usePUGridLayer({
 
     const LOCKIN_STATUS = [
       { id: 0, color: '#FF0' },
-      { id: 1, color: '#F0F' },
-      { id: 2, color: '#0FF' },
+      { id: 1, color: '#0F0' },
+      { id: 2, color: '#F00' },
       { id: 3, color: '#0F0' },
       { id: 4, color: '#F00' },
       { id: 5, color: '#00F' },
@@ -201,6 +201,7 @@ export function usePUGridLayer({
               paint: {
                 'line-color': s.color,
                 'line-opacity': 1,
+                'line-width': 2,
               },
               layout: {
                 'line-sort-key': i * 10,
