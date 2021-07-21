@@ -17,6 +17,8 @@ import {
   ShapeType,
 } from '@marxan-jobs/planning-unit-geometry';
 
+export type ForCase = 'singleFeature' | 'multipleFeatures';
+
 export const createWorld = async (app: INestApplication) => {
   const scenarioId = v4();
   const puGeometryRepo: Repository<PlanningUnitsGeom> = app.get(
@@ -26,42 +28,68 @@ export const createWorld = async (app: INestApplication) => {
     getRepositoryToken(ScenariosPlanningUnitGeoEntity),
   );
 
-  const storedGeometries: string[] = [];
-  const geoToBeExcluded: string[] = [];
-  const geoToBeIncluded: string[] = [];
-  const geoToBeUntouched: string[] = [];
+  const geometriesByCase: {
+    [k in ForCase]: {
+      storedGeometries: string[],
+      geoToBeExcluded: string[],
+      geoToBeIncluded: string[],
+      geoToBeUntouched: string[],
+    }
+  } = {
+    singleFeature: {
+      storedGeometries: [],
+      geoToBeExcluded: [],
+      geoToBeIncluded: [],
+      geoToBeUntouched: [],
+    },
+    multipleFeatures: {
+      storedGeometries: [],
+      geoToBeExcluded: [],
+      geoToBeIncluded: [],
+      geoToBeUntouched: [],
+    },
+  };
 
   return {
     scenarioId,
-    geoToBeExcluded: () => geoToBeExcluded.sort(sortUuid),
-    geoToBeIncluded: () => geoToBeIncluded.sort(sortUuid),
-    geoToBeUntouched: () => geoToBeUntouched.sort(sortUuid),
+    geoToBeExcluded: (forCase: ForCase) =>
+      geometriesByCase[forCase].geoToBeExcluded.sort(sortUuid),
+    geoToBeIncluded: (forCase: ForCase) =>
+      geometriesByCase[forCase].geoToBeIncluded.sort(sortUuid),
+    geoToBeUntouched: (forCase: ForCase) =>
+      geometriesByCase[forCase].geoToBeUntouched.sort(sortUuid),
     GivenPlanningUnitsExist: async (
+      forCase: ForCase,
       planningUnits: AreaUnitSampleGeometry,
     ): Promise<void> => {
       const toInclude = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
-        planningUnits.features.filter((f) => f.properties.shouldBeIncluded),
+        planningUnits.features.filter(
+          (f) => f.properties[forCase].shouldBeIncluded,
+        ),
       );
       const toExclude = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
-        planningUnits.features.filter((f) => f.properties.shouldBeExcluded),
+        planningUnits.features.filter(
+          (f) => f.properties[forCase].shouldBeExcluded,
+        ),
       );
       const untouched = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
         planningUnits.features.filter(
           (f) =>
-            !f.properties.shouldBeExcluded && !f.properties.shouldBeIncluded,
+            !f.properties[forCase].shouldBeExcluded &&
+            !f.properties[forCase].shouldBeIncluded,
         ),
       );
 
-      storedGeometries.push(...toInclude, ...toExclude, ...untouched);
-      geoToBeExcluded.push(...toExclude);
-      geoToBeIncluded.push(...toInclude);
-      geoToBeUntouched.push(...untouched);
+      geometriesByCase[forCase].storedGeometries.push(...toInclude, ...toExclude, ...untouched);
+      geometriesByCase[forCase].geoToBeExcluded.push(...toExclude);
+      geometriesByCase[forCase].geoToBeIncluded.push(...toInclude);
+      geometriesByCase[forCase].geoToBeUntouched.push(...untouched);
 
       await scenarioPuDataRepo.save(
-        storedGeometries.map((id, index) =>
+        geometriesByCase[forCase].storedGeometries.map((id, index) =>
           scenarioPuDataRepo.create({
             puGeometryId: id,
             scenarioId,
@@ -103,9 +131,9 @@ export const createWorld = async (app: INestApplication) => {
       )
         .map((entity) => entity.puGeometryId)
         .sort(sortUuid),
-    cleanup: async () => {
+    cleanup: async (forCase: ForCase) => {
       await puGeometryRepo.delete({
-        id: In(storedGeometries),
+        id: In(geometriesByCase[forCase].storedGeometries),
       });
       await scenarioPuDataRepo.delete({
         scenarioId,
