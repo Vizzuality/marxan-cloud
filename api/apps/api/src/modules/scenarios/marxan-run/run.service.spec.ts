@@ -8,6 +8,12 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ProgressData } from '@marxan/scenario-run-queue';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
+import { OutputRepository } from '@marxan-api/modules/scenarios/marxan-run/output.repository';
+import {
+  ExecutionResult,
+  ScenariosOutputResultsApiEntity,
+} from '@marxan/marxan-output';
+import { assertDefined, FieldsOf } from '@marxan/utils';
 import { Scenario } from '../scenario.api.entity';
 import { RunService } from './run.service';
 import { AssetsService } from './assets.service';
@@ -115,30 +121,47 @@ test(`canceling waiting job`, async () => {
   expect(result).toStrictEqual(right(void 0));
 });
 
-describe(`with a single job in the queue`, () => {
-  beforeEach(() => {
-    fixtures.setupMockForCreatingEvents();
-    fixtures.GivenAJobInQueue();
-  });
+test(`failed job`, async () => {
+  fixtures.setupMockForCreatingEvents();
+  fixtures.GivenAJobInQueue();
 
-  test.each`
-    Got Event      | Saved Kind
-    ${`failed`}    | ${API_EVENT_KINDS.scenario__run__failed__v1__alpha1}
-    ${`completed`} | ${API_EVENT_KINDS.scenario__run__finished__v1__alpha1}
-  `(`when $GotEvent, saves $SavedKind`, async ({ GotEvent, SavedKind }) => {
-    fixtures.fakeEvents.emit(
-      GotEvent,
-      {
-        jobId: `123`,
-        data: {
-          scenarioId: `scenario-x`,
-        },
+  fixtures.fakeEvents.emit(
+    `failed`,
+    {
+      jobId: `123`,
+      data: {
+        scenarioId: `scenario-x`,
       },
-      `eventId1`,
-    );
+    },
+    `eventid1`,
+  );
 
-    await fixtures.ThenEventCreated(SavedKind, `eventId1`);
-  });
+  await fixtures.ThenEventCreated(
+    API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
+    `eventid1`,
+  );
+});
+
+test(`completed job`, async () => {
+  fixtures.setupMockForCreatingEvents();
+  fixtures.GivenAJobInQueueWithReturnValue();
+
+  fixtures.fakeEvents.emit(
+    `completed`,
+    {
+      jobId: `123`,
+      data: {
+        scenarioId: `scenario-x`,
+      },
+    },
+    `eventId2`,
+  );
+
+  await fixtures.ThenEventCreated(
+    API_EVENT_KINDS.scenario__run__finished__v1__alpha1,
+    `eventId2`,
+  );
+  fixtures.ThenOutputPersisted();
 });
 
 test(`handling progress`, async () => {
@@ -185,6 +208,20 @@ async function getFixtures() {
   const fakeAssets = {
     forScenario: jest.fn(),
   };
+  class FakeOutputRepository implements FieldsOf<OutputRepository> {
+    db: ScenariosOutputResultsApiEntity[] = [];
+    async saveOutput(job: {
+      returnvalue: ExecutionResult | undefined;
+      data: { scenarioId: string };
+    }): Promise<void> {
+      assertDefined(job.returnvalue);
+      this.db.push({
+        id: this.db.length.toString(),
+        ...job.returnvalue,
+        scenarioId: job.data.scenarioId,
+      });
+    }
+  }
   const testingModule = await Test.createTestingModule({
     providers: [
       RunHandler,
@@ -193,6 +230,11 @@ async function getFixtures() {
       {
         provide: blmDefaultToken,
         useValue: 42,
+      },
+      FakeOutputRepository,
+      {
+        provide: OutputRepository,
+        useExisting: FakeOutputRepository,
       },
       {
         provide: runQueueToken,
@@ -217,6 +259,8 @@ async function getFixtures() {
       RunService,
     ],
   }).compile();
+
+  const fakeOutputRepository = testingModule.get(FakeOutputRepository);
 
   return {
     fakeQueue,
@@ -343,6 +387,16 @@ async function getFixtures() {
         });
       });
     },
+    ThenOutputPersisted() {
+      expect(fakeOutputRepository.db).toStrictEqual([
+        {
+          id: '0',
+          runId: '25',
+          scenarioId: 'scenario-1',
+          scoreValue: 100,
+        },
+      ]);
+    },
     GivenNoJobsInQueue() {
       const jobs = [] as const;
       this.fakeQueue.getJobs.mockImplementation((...args) => {
@@ -356,6 +410,20 @@ async function getFixtures() {
         return {
           data: {
             scenarioId: `scenario-1`,
+          },
+        };
+      });
+    },
+    GivenAJobInQueueWithReturnValue() {
+      fixtures.fakeQueue.getJob.mockImplementation((...args) => {
+        expect(args).toStrictEqual([`123`]);
+        return {
+          data: {
+            scenarioId: `scenario-1`,
+          },
+          returnvalue: {
+            runId: '25',
+            scoreValue: 100,
           },
         };
       });

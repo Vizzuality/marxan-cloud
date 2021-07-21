@@ -4,10 +4,8 @@ import * as request from 'supertest';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { GivenProjectExists } from '../steps/given-project';
 import { E2E_CONFIG } from '../e2e.config';
-import { v4 } from 'uuid';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 import { Repository } from 'typeorm';
 
 export const createWorld = async () => {
