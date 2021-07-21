@@ -3,18 +3,21 @@ import { Job, Queue, QueueEvents } from 'bullmq';
 import { JobData, ProgressData } from '@marxan/scenario-run-queue';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { assertDefined } from '@marxan/utils';
+import { ExecutionResult } from '@marxan/marxan-output';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { ScenarioRunProgressV1Alpha1DTO } from '@marxan-api/modules/api-events/dto/scenario-run-progress-v1-alpha-1';
 import { runEventsToken, runQueueToken } from './tokens';
+import { OutputRepository } from './output.repository';
 
 @Injectable()
 export class EventsHandler {
   constructor(
     @Inject(runQueueToken)
-    private readonly queue: Queue<JobData>,
+    private readonly queue: Queue<JobData, ExecutionResult>,
     @Inject(runEventsToken)
     queueEvents: QueueEvents,
     private readonly apiEvents: ApiEventsService,
+    private readonly outputs: OutputRepository,
   ) {
     queueEvents.on(`completed`, ({ jobId }, eventId) =>
       this.handleFinished(jobId, eventId),
@@ -66,6 +69,7 @@ export class EventsHandler {
       kind,
       externalId: eventId,
     });
+    await this.outputs.saveOutput(job);
   }
 
   private async handleFailed(jobId: string, eventId: string) {
@@ -78,8 +82,10 @@ export class EventsHandler {
     });
   }
 
-  private async getJob(jobId: string): Promise<Job<JobData>> {
-    const job = await this.queue.getJob(jobId);
+  private async getJob(jobId: string): Promise<Job<JobData, ExecutionResult>> {
+    const job:
+      | Job<JobData, ExecutionResult>
+      | undefined = await this.queue.getJob(jobId);
     assertDefined(job);
     return job;
   }
