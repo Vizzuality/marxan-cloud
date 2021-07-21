@@ -5,12 +5,11 @@ import { useRouter } from 'next/router';
 
 import Header from 'layout/header';
 import Footer from 'layout/footer';
+import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 
 import Contact from 'layout/statics/contact';
 import PrivacyPolicyTerms from 'layout/statics/privacy-policy';
-
-import MARXAN_SOCIAL_MEDIA_IMG from 'images/social-media/marxan-social-media.png';
 
 import { withUser } from 'hoc/auth';
 
@@ -23,15 +22,15 @@ const TermsOfUse: React.FC = () => {
     <>
       <Head>
         <title>Terms of Use</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <MetaIcons />
 
       <MetaTags
         name="Marxan conservation Solutions"
         title="Terms of use"
         description=""
         url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
-        image={MARXAN_SOCIAL_MEDIA_IMG}
         type="article"
         twitterCard="summary"
         twitterSite="@Marxan_Planning"
