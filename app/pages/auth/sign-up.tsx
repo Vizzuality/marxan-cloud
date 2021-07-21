@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
+
 import SignUp from 'layout/sign-up';
 
 import { withUser } from 'hoc/auth';
