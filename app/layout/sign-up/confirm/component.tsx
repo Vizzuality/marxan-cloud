@@ -7,7 +7,7 @@ import Icon from 'components/icon';
 import CHECK_EMAIL_SVG from 'svgs/users/check-email.svg?sprite';
 
 export interface ConfirmSignUpProps {
-  setConfirm: any,
+  setConfirm: (confirm: boolean) => void,
 }
 
 export const ConfirmSignUp: React.FC<ConfirmSignUpProps> = ({ setConfirm }:ConfirmSignUpProps) => {
