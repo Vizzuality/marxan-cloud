@@ -23,11 +23,10 @@ const MePage: React.FC = () => {
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
 
-        <div className="md:flex-grow">
-          <div className="flex items-center justify-center h-full text-gray-600 bg-white">
-            <Me />
-          </div>
+        <div className="flex items-center justify-center h-full text-gray-600 bg-white">
+          <Me />
         </div>
+
       </main>
     </Protected>
   );
