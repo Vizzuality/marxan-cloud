@@ -1,4 +1,4 @@
-import { IsOptional, IsUUID, ValidateNested } from 'class-validator';
+import { IsArray, IsOptional, IsUUID, ValidateNested } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 import { Type } from 'class-transformer';
@@ -19,11 +19,13 @@ export class PlanningUnitsByIdUpdateDto {
 export class PlanningUnitsByGeoJsonUpdateDto {
   @ApiPropertyOptional()
   @IsOptional()
+  @IsArray()
   @IsFeatureCollectionOfPolygons({ each: true })
   include?: FeatureCollection<MultiPolygon | Polygon>[];
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsArray()
   @IsFeatureCollectionOfPolygons({ each: true })
   exclude?: FeatureCollection<MultiPolygon | Polygon>[];
 }
