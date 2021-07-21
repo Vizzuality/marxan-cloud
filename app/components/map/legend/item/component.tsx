@@ -7,6 +7,12 @@ export interface LegendItemProps {
   description?: string;
   icon?: ReactNode,
   children?: ReactNode;
+  sortable?: {
+    enabled: boolean;
+    handle: boolean;
+    handleIcon: React.ReactNode,
+  };
+  listeners?: Record<string, unknown>;
 }
 
 export const LegendItem: React.FC<LegendItemProps> = ({
@@ -15,13 +21,15 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   description,
   icon,
   children,
+  sortable,
+  listeners,
 }: LegendItemProps) => {
   return (
     <div
       key={id}
       className="py-2.5 px-5"
     >
-      <header className="flex">
+      <header className="relative flex">
         <div
           className={cx({
             relative: true,
@@ -35,6 +43,16 @@ export const LegendItem: React.FC<LegendItemProps> = ({
           )}
           <div className="text-sm text-white font-heading">{name}</div>
         </div>
+
+        {sortable?.handle && (
+          <button
+            type="button"
+            className="absolute top-0 right-0 text-white"
+            {...listeners}
+          >
+            handle
+          </button>
+        )}
       </header>
 
       <div className="text-sm text-gray-300">

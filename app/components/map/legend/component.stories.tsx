@@ -16,6 +16,7 @@ export default {
 };
 
 const Template: Story<LegendProps> = (args) => {
+  const { sortable } = args;
   const [sortArray, setSortArray] = useState([]);
   // Sorted
   const sortedItems = useMemo(() => {
@@ -32,13 +33,16 @@ const Template: Story<LegendProps> = (args) => {
   return (
     <Legend
       {...args}
+      sortable={sortable}
       maxHeight={300}
       onChangeOrder={onChangeOrder}
     >
       {sortedItems.map((i) => {
         const { type, items } = i;
+
         return (
           <LegendItem
+            sortable={sortable}
             key={i.id}
             {...i}
           >
@@ -55,4 +59,21 @@ const Template: Story<LegendProps> = (args) => {
 export const Default = Template.bind({});
 Default.args = {
   className: '',
+};
+
+export const Sortable = Template.bind({});
+Sortable.args = {
+  className: '',
+  sortable: {
+    enabled: true,
+  },
+};
+
+export const SortableHandle = Template.bind({});
+SortableHandle.args = {
+  className: '',
+  sortable: {
+    enabled: true,
+    handle: true,
+  },
 };

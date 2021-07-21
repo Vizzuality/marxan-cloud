@@ -11,13 +11,19 @@ export interface LegendProps {
   className?: string;
   children: React.ReactNode;
   maxHeight: string | number;
-  onChangeOrder: (id: string[]) => void;
+  sortable?: {
+    enabled: boolean;
+    handle: boolean;
+    handleIcon: React.ReactNode,
+  };
+  onChangeOrder?: (id: string[]) => void;
 }
 
 export const Legend: React.FC<LegendProps> = ({
   children,
   className = '',
   maxHeight,
+  sortable,
   onChangeOrder,
 }: LegendProps) => {
   const [active, setActive] = useState(true);
@@ -61,11 +67,18 @@ export const Legend: React.FC<LegendProps> = ({
           <div
             className="overflow-x-hidden overflow-y-auto"
           >
-            <SortableList
-              onChangeOrder={onChangeOrder}
-            >
-              {children}
-            </SortableList>
+            {!!sortable && (
+              <SortableList
+                sortable={sortable}
+                onChangeOrder={onChangeOrder}
+              >
+                {children}
+              </SortableList>
+            )}
+
+            {!sortable && (
+              children
+            )}
           </div>
           <div className="absolute bottom-0 left-0 z-10 w-full h-3 pointer-events-none bg-gradient-to-t from-black via-black" />
         </div>
