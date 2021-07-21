@@ -173,7 +173,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
       </FormRFF>
 
       {confirm && (
-        <ConfirmSignUp />
+        <ConfirmSignUp setConfirm={setConfirm} />
       )}
     </Wrapper>
   );
