@@ -14,11 +14,16 @@ export class ArePuidsAllowedAdapter
     puIds: string[],
   ): Promise<{ errors: unknown[] }> {
     const allowedFeaturesIds = (
-      await this.findAll(undefined, {
-        params: {
-          scenarioId,
+      await this.findAll(
+        {
+          disablePagination: true,
         },
-      })
+        {
+          params: {
+            scenarioId,
+          },
+        },
+      )
     )[0]
       .map((scenario) => scenario.puGeometryId)
       .filter(isDefined);
