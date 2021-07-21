@@ -7,7 +7,7 @@ import { MetadataArchiver } from './metadata/data-archiver.service';
 import { MarxanDirectory } from '../../marxan-directory.service';
 import { FileReader } from '../../file-reader';
 import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
-import { PlanningUnitStateCalculatorService } from './solutions/solution-aggregation/planning-unit-state-calculator.service';
+import { PlanningUnitSelectionCalculatorService } from './solutions/solution-aggregation/planning-unit-selection-calculator.service';
 import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 
@@ -25,7 +25,7 @@ import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit'
     MarxanDirectory,
     FileReader,
     SolutionsReaderService,
-    PlanningUnitStateCalculatorService,
+    PlanningUnitSelectionCalculatorService,
   ],
   exports: [GeoOutputRepository],
 })

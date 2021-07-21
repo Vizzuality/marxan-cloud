@@ -5,8 +5,8 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { Workspace } from '../../../ports/workspace';
 import { MetadataArchiver } from './metadata/data-archiver.service';
 import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
-import { PlanningUnitStateCalculatorService } from './solutions/solution-aggregation/planning-unit-state-calculator.service';
-import { PlanningUnitsState } from './solutions/planning-unit-state';
+import { PlanningUnitSelectionCalculatorService } from './solutions/solution-aggregation/planning-unit-selection-calculator.service';
+import { PlanningUnitsSelectionState } from './solutions/planning-unit-selection-state';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
   MarxanExecutionMetadataGeoEntity,
@@ -19,7 +19,7 @@ export class GeoOutputRepository {
   constructor(
     private readonly metadataArchiver: MetadataArchiver,
     private readonly solutionsReader: SolutionsReaderService,
-    private readonly planningUnitsStateCalculator: PlanningUnitStateCalculatorService,
+    private readonly planningUnitsStateCalculator: PlanningUnitSelectionCalculatorService,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
   ) {}
@@ -43,7 +43,7 @@ export class GeoOutputRepository {
       scenarioId,
     );
 
-    const planningUnitsState: PlanningUnitsState = await this.planningUnitsStateCalculator.consume(
+    const planningUnitsState: PlanningUnitsSelectionState = await this.planningUnitsStateCalculator.consume(
       solutionsStream,
     );
     return this.entityManager.transaction(async (transaction) => {

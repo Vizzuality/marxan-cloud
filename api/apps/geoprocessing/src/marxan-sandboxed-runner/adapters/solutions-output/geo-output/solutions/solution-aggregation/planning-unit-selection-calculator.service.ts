@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import TypedEventEmitter from 'typed-emitter';
 
 import { SolutionsEvents } from '../solutions-events';
-import { PlanningUnitsState } from '../planning-unit-state';
+import { PlanningUnitsSelectionState } from '../planning-unit-selection-state';
 
 @Injectable()
-export class PlanningUnitStateCalculatorService {
+export class PlanningUnitSelectionCalculatorService {
   async consume(
     solutionsStream: TypedEventEmitter<SolutionsEvents>,
-  ): Promise<PlanningUnitsState> {
-    const result: PlanningUnitsState = {};
+  ): Promise<PlanningUnitsSelectionState> {
+    const result: PlanningUnitsSelectionState = {};
     return new Promise((resolve, reject) => {
       solutionsStream.on('error', reject);
       solutionsStream.on('finish', () => resolve(result));

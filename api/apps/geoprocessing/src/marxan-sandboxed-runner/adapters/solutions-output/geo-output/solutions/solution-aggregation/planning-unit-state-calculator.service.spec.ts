@@ -1,4 +1,4 @@
-import { PlanningUnitStateCalculatorService } from './planning-unit-state-calculator.service';
+import { PlanningUnitSelectionCalculatorService } from './planning-unit-selection-calculator.service';
 import { Test } from '@nestjs/testing';
 import { PromiseType } from 'utility-types';
 import TypedEventEmitter from 'typed-emitter';
@@ -58,12 +58,12 @@ type AvailableSpdIds = 'one' | 'two' | 'three' | 'four' | 'five';
 const getFixtures = async () => {
   const spdIds: AvailableSpdIds[] = ['one', 'two', 'three', 'four', 'five'];
   const sandbox = await Test.createTestingModule({
-    providers: [PlanningUnitStateCalculatorService],
+    providers: [PlanningUnitSelectionCalculatorService],
   }).compile();
 
   return {
     spdIds: spdIds,
-    sut: sandbox.get(PlanningUnitStateCalculatorService),
+    sut: sandbox.get(PlanningUnitSelectionCalculatorService),
     emitSolutions: (
       stream: TypedEventEmitter<SolutionsEvents>,
       solutions: Array<Array<AvailableSpdIds>>,
