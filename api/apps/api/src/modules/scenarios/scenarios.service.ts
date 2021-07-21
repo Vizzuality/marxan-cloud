@@ -29,7 +29,7 @@ import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { OutputFilesService } from './output-files/output-files.service';
-import { InputFilesService } from './input-files';
+import { InputFilesService, InputFilesArchiverService } from './input-files';
 import { notFound, RunService } from './marxan-run';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
@@ -61,6 +61,7 @@ export class ScenariosService {
     private readonly outputFilesService: OutputFilesService,
     private readonly geoFeaturesService: GeoFeaturesService,
     private readonly geoFeaturePropertySetService: GeoFeaturePropertySetService,
+    private readonly inputArchiveService: InputFilesArchiverService,
   ) {}
 
   async findAllPaginated(
@@ -302,6 +303,6 @@ export class ScenariosService {
 
   async getMarxanExecutionInputArchive(scenarioId: string) {
     await this.assertScenario(scenarioId);
-    return this.inputFilesService.getArchive(scenarioId);
+    return this.inputArchiveService.archive(scenarioId);
   }
 }

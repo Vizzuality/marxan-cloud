@@ -1,5 +1,6 @@
 {
-  "testFiles": "**/*.{feature,features}",
+  "testFiles": "**/*.feature",
   "screenshotOnRunFailure": true,
-  "videoUploadOnPasses": false
+  "videoUploadOnPasses": false,
+  "TAGS": "@implemented-tag"
 }

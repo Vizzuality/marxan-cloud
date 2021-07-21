@@ -1,8 +1,8 @@
 import React from 'react';
-import Head from 'next/head';
 
 import Title from 'layout/title/scenario-title';
 import Header from 'layout/header';
+import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
 import Wrapper from 'layout/wrapper';
 
@@ -24,9 +24,7 @@ const EditScenarioPage: React.FC = () => {
     <Protected>
       <Title title="Edit" />
 
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <MetaIcons />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />

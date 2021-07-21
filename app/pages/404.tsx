@@ -2,14 +2,16 @@ import React from 'react';
 import Head from 'next/head';
 
 import Header from 'layout/header';
+import MetaIcons from 'layout/meta-icons';
 
 const Custom404: React.FC = () => {
   return (
     <>
       <Head>
         <title>404 - Page Not Found</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <MetaIcons />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
