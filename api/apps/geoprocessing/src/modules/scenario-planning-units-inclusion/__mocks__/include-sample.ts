@@ -1,3 +1,4 @@
+import { ForCase } from 'apps/geoprocessing/test/integration/planning-unit-inclusion/world';
 import { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 export const excludeSample = (): FeatureCollection<Polygon | MultiPolygon> => ({
@@ -105,9 +106,73 @@ export const includeSample = (): FeatureCollection<Polygon | MultiPolygon> => ({
   ],
 });
 
+export const excludeSampleWithSingleFeature = (): FeatureCollection<
+  Polygon | MultiPolygon
+> => ({
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      properties: {
+        stroke: '#555555',
+        'stroke-width': 2,
+        'stroke-opacity': 1,
+        fill: '#d41111',
+        'fill-opacity': 0.5,
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-9.91518259048462, 51.65401459280553],
+            [-9.913830757141113, 51.65401459280553],
+            [-9.913830757141113, 51.65485327420114],
+            [-9.91518259048462, 51.65485327420114],
+            [-9.91518259048462, 51.65401459280553],
+          ],
+        ],
+      },
+    },
+  ],
+});
+
+export const includeSampleWithSingleFeature = (): FeatureCollection<
+  Polygon | MultiPolygon
+> => ({
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      properties: {
+        stroke: '#555555',
+        'stroke-width': 2,
+        'stroke-opacity': 1,
+        fill: '#13be55',
+        'fill-opacity': 0.5,
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-9.908766746520996, 51.65438734200841],
+            [-9.90965723991394, 51.65384818592163],
+            [-9.908895492553711, 51.65298951669091],
+            [-9.906202554702759, 51.6530161423378],
+            [-9.905773401260376, 51.654413966834184],
+            [-9.906063079833984, 51.655252640839656],
+            [-9.908766746520996, 51.65438734200841],
+          ],
+        ],
+      },
+    },
+  ],
+});
+
 export type AreaUnitSampleGeometryProps = {
-  shouldBeExcluded: boolean;
-  shouldBeIncluded: boolean;
+  [k in ForCase]: {
+    shouldBeExcluded: boolean;
+    shouldBeIncluded: boolean;
+  };
 };
 
 export type AreaUnitSampleGeometry = FeatureCollection<
@@ -115,14 +180,20 @@ export type AreaUnitSampleGeometry = FeatureCollection<
   AreaUnitSampleGeometryProps
 >;
 
-export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
+export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
   type: 'FeatureCollection',
   features: [
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: true,
-        shouldBeIncluded: false,
+        singleFeature: {
+          shouldBeExcluded: true,
+          shouldBeIncluded: false,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: true,
+          shouldBeIncluded: false,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -140,8 +211,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: false,
-        shouldBeIncluded: false,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: false,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: false,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -159,8 +236,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: false,
-        shouldBeIncluded: true,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -178,8 +261,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: false,
-        shouldBeIncluded: true,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -197,8 +286,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: false,
-        shouldBeIncluded: true,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: false,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -216,8 +311,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: true,
-        shouldBeIncluded: false,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: false,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: true,
+          shouldBeIncluded: false,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -235,8 +336,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: true,
-        shouldBeIncluded: false,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: true,
+          shouldBeIncluded: false,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -254,8 +361,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: false,
-        shouldBeIncluded: true,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -273,8 +386,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: false,
-        shouldBeIncluded: true,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: false,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -292,8 +411,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: false,
-        shouldBeIncluded: true,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: false,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -311,8 +436,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: false,
-        shouldBeIncluded: true,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: false,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
+        },
       },
       geometry: {
         type: 'Polygon',
@@ -330,8 +461,14 @@ export const areaUnitsSample = (): AreaUnitSampleGeometry => ({
     {
       type: 'Feature',
       properties: {
-        shouldBeExcluded: false,
-        shouldBeIncluded: false,
+        singleFeature: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: false,
+        },
+        multipleFeatures: {
+          shouldBeExcluded: false,
+          shouldBeIncluded: false,
+        },
       },
       geometry: {
         type: 'Polygon',
