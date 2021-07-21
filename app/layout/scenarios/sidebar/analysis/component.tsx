@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -35,6 +35,12 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   const onChangeSection = useCallback((s) => {
     setSection(s);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      setSection(null);
+    };
+  }, [tab]);
 
   if (!scenarioData || tab !== 'analysis') return null;
 

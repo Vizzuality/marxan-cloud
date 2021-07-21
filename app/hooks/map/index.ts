@@ -146,10 +146,24 @@ export function usePUGridPreviewLayer({
 
 // PUGridpreview
 export function usePUGridLayer({
-  active, sid,
+  active, sid, type, options = {},
 }: UsePUGridLayer) {
   return useMemo(() => {
     if (!active || !sid) return null;
+
+    const {
+      clickingValue,
+      puAction,
+    } = options;
+
+    const LOCKIN_STATUS = [
+      { id: 0, color: '#FF0' },
+      { id: 1, color: '#F0F' },
+      { id: 2, color: '#0FF' },
+      { id: 3, color: '#0F0' },
+      { id: 4, color: '#F00' },
+      { id: 5, color: '#00F' },
+    ];
 
     return {
       id: 'pu-grid-layer',
@@ -173,11 +187,46 @@ export function usePUGridLayer({
             'source-layer': 'layer0',
             paint: {
               'line-color': '#00BFFF',
-              'line-opacity': 0.5,
+              'line-opacity': 1,
             },
           },
+          ...type === 'adjust-planning-units' ? LOCKIN_STATUS.map((s, i) => (
+            {
+              type: 'line',
+              'source-layer': 'layer0',
+              filter: [
+                'all',
+                ['==', ['get', 'lockinstatus'], s.id],
+              ],
+              paint: {
+                'line-color': s.color,
+                'line-opacity': 1,
+              },
+              layout: {
+                'line-sort-key': i * 10,
+              },
+            }
+          )) : [],
+          ...type === 'adjust-planning-units' ? [
+            {
+              type: 'line',
+              'source-layer': 'layer0',
+              filter: [
+                'all',
+                ['in', ['get', 'pugeomid'], ['literal', clickingValue]],
+              ],
+              paint: {
+                'line-color': puAction === 'include' ? '#0F0' : '#F00',
+                'line-opacity': 1,
+                'line-width': 2,
+              },
+              layout: {
+                'line-sort-key': 100,
+              },
+            },
+          ] : [],
         ],
       },
     };
-  }, [active, sid]);
+  }, [active, sid, type, options]);
 }
