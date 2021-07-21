@@ -5,5 +5,6 @@ export {
   HeuristicType,
   IterativeImprovementType,
   MarxanParameters,
+  MarxanParametersDefaults,
 } from './marxan-parameters';
 export { MarxanInput } from './marxan-input';
