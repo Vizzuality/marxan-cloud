@@ -110,12 +110,12 @@ export const Profile: React.FC<MeProps> = () => {
             </div>
 
             {/* EMAIL */}
-            <div className="mt-5">
+            <div className="mt-7">
               <Label theme="light" className="mb-3 uppercase">Email</Label>
               <Input theme="light" type="email" icon={EMAIL_SVG} readOnly value={email} disabled />
             </div>
 
-            <div className="mt-5">
+            <div className="mt-7">
               <Button theme="primary" size="s" type="submit" disabled={submitting}>
                 Save changes
               </Button>
