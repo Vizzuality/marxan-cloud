@@ -1,5 +1,5 @@
 import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
-import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 
 class ScenarioSolutionsDataDto {
   @ApiProperty()

@@ -4,12 +4,14 @@ import { FactoryProvider, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { assertDefined, isDefined } from '@marxan/utils';
+import { ExecutionResult } from '@marxan/marxan-output';
 import { JobData, queueName } from '@marxan/scenario-run-queue';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { QueueBuilder, QueueEventsBuilder } from '@marxan-api/modules/queue';
 import { Scenario } from '../scenario.api.entity';
 import { AssetsService } from './assets.service';
+import { OutputRepository } from './output.repository';
 
 export const runQueueToken = Symbol('run queue token');
 export const runEventsToken = Symbol('run events token');
@@ -35,16 +37,17 @@ export type NotFound = typeof notFound;
 export class RunService {
   constructor(
     @Inject(runQueueToken)
-    private readonly queue: Queue<JobData>,
+    private readonly queue: Queue<JobData, ExecutionResult>,
     @Inject(runEventsToken)
     queueEvents: QueueEvents,
     private readonly apiEvents: ApiEventsService,
     @InjectRepository(Scenario)
     private readonly scenarios: Repository<Scenario>,
+    private readonly outputs: OutputRepository,
     private readonly assets: AssetsService,
   ) {
     queueEvents.on(`completed`, ({ jobId }, eventId) =>
-      this.handleFinished(jobId, eventId),
+      this.handleCompleted(jobId, eventId),
     );
     queueEvents.on(`failed`, ({ jobId }, eventId) =>
       this.handleFailed(jobId, eventId),
@@ -89,7 +92,7 @@ export class RunService {
     return right(void 0);
   }
 
-  private async handleFinished(jobId: string, eventId: string) {
+  private async handleCompleted(jobId: string, eventId: string) {
     const job = await this.getJob(jobId);
     const kind = API_EVENT_KINDS.scenario__run__finished__v1__alpha1;
     await this.apiEvents.createIfNotExists({
@@ -97,6 +100,7 @@ export class RunService {
       kind,
       externalId: eventId,
     });
+    await this.outputs.saveOutput(job);
   }
 
   private async handleFailed(jobId: string, eventId: string) {
@@ -109,8 +113,10 @@ export class RunService {
     });
   }
 
-  private async getJob(jobId: string): Promise<Job<JobData>> {
-    const job = await this.queue.getJob(jobId);
+  private async getJob(jobId: string): Promise<Job<JobData, ExecutionResult>> {
+    const job:
+      | Job<JobData, ExecutionResult>
+      | undefined = await this.queue.getJob(jobId);
     assertDefined(job);
     return job;
   }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PaginationMeta } from '@marxan-api/utils/app-base.service';
-import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 import { SolutionResultCrudService } from '../solutions-result/solution-result-crud.service';
 
 @Injectable()

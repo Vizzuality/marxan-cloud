@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 import { MarxanRunController } from './marxan-run.controller';
 import {
   runQueueEventsProvider,
@@ -11,12 +12,13 @@ import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.modul
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Scenario } from '../scenario.api.entity';
 import { InputFilesModule } from '../input-files';
+import { OutputRepository } from './output.repository';
 
 @Module({
   imports: [
     QueueModule.register(),
     ApiEventsModule,
-    TypeOrmModule.forFeature([Scenario]),
+    TypeOrmModule.forFeature([Scenario, ScenariosOutputResultsApiEntity]),
     InputFilesModule,
   ],
   providers: [
@@ -25,6 +27,7 @@ import { InputFilesModule } from '../input-files';
     RunService,
     AssetsService,
     apiUrlProvider,
+    OutputRepository,
   ],
   controllers: [MarxanRunController],
   exports: [RunService],
