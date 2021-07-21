@@ -16,7 +16,10 @@ export class OutputScenariosPuDataAggregate1626682903111
       `ALTER TABLE "output_scenarios_pu_data" DROP COLUMN "value"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "output_scenarios_pu_data" ADD "value" boolean array NOT NULL`,
+      `ALTER TABLE "output_scenarios_pu_data" ADD "value" boolean array NOT NULL DEFAULT '{}'`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "output_scenarios_pu_data" ALTER COLUMN "value" DROP DEFAULT`,
     );
     await queryRunner.query(
       `ALTER TABLE "output_scenarios_pu_data" ALTER COLUMN "included_count" DROP DEFAULT`,
