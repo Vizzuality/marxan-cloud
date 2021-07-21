@@ -51,7 +51,6 @@ const Protected: React.FC = ({ children }: ProtectedProps) => {
         onDismiss={() => setModal(false)}
       >
         <GuideRequest />
-        {/* // le pasa por defecto */}
       </Modal>
     </>
   );

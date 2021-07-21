@@ -2,10 +2,12 @@ import React, { useCallback, useState } from 'react';
 
 import omit from 'lodash/omit';
 
+import ConfirmSignUp from 'layout/sign-up/confirm';
 import Wrapper from 'layout/wrapper';
 
 import Link from 'next/link';
 import Button from 'components/button';
+import Modal from 'components/modal';
 import Loading from 'components/loading';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
@@ -34,6 +36,7 @@ export interface SignUpProps {
 export const SignUp: React.FC<SignUpProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
+  const [modal, setModal] = useState(false);
 
   const handleSubmit = useCallback(async (data) => {
     setSubmitting(true);
@@ -165,6 +168,16 @@ export const SignUp: React.FC<SignUpProps> = () => {
           </form>
         )}
       </FormRFF>
+
+      <Modal
+        title="Hello"
+        open={modal}
+        size="narrow"
+        onDismiss={() => setModal(false)}
+      >
+        <ConfirmSignUp />
+      </Modal>
+
     </Wrapper>
   );
 };

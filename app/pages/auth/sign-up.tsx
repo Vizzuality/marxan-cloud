@@ -8,7 +8,6 @@ import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 
 import SignUp from 'layout/sign-up';
-// import GuideRequest from 'layout/sign-up/guide-request';
 
 import { withUser } from 'hoc/auth';
 
@@ -41,9 +40,6 @@ const SignUpPage: React.FC = () => {
         <div className="flex flex-col h-full md:flex-grow">
           <div className="flex items-center justify-center h-full py-10 bg-white">
             <SignUp />
-
-            {/* <GuideRequest /> */}
-
           </div>
         </div>
       </main>
