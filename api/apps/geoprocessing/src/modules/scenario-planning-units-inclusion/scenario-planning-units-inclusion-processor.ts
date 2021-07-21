@@ -59,6 +59,11 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
+    if (!includeGeo && !excludeGeo) {
+      geometriesIdsToInclude.push(...(job.data.include?.pu ?? []));
+      geometriesIdsToExclude.push(...(job.data.exclude?.pu ?? []));
+    }
+
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
