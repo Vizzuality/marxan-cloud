@@ -1,6 +1,9 @@
 import React from 'react';
 
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+import { useHelp } from 'hooks/help';
 
 import Wrapper from 'layout/wrapper';
 
@@ -14,6 +17,14 @@ export interface GuideRequestProps {
 }
 
 export const GuideRequest: React.FC<GuideRequestProps> = () => {
+  const router = useRouter();
+  const { onActive } = useHelp();
+
+  const handleAcceptRequestGuide = () => {
+    onActive(true);
+    router.push('/auth/sign-in');
+  };
+
   return (
     <Wrapper>
 
@@ -31,7 +42,13 @@ export const GuideRequest: React.FC<GuideRequestProps> = () => {
               No
             </Button>
           </Link>
-          <Button theme="primary" size="lg" type="submit" className="w-full">
+          <Button
+            theme="primary"
+            size="lg"
+            type="submit"
+            className="w-full"
+            onClick={handleAcceptRequestGuide}
+          >
             Yes
           </Button>
         </div>
