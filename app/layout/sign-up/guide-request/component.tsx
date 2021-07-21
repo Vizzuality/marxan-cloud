@@ -27,7 +27,7 @@ export const GuideRequest: React.FC<GuideRequestProps> = () => {
         </div>
         <div className="flex space-x-4 w-72">
           <Link href="/auth/sign-in">
-            <Button theme="secondary" size="lg" type="submit" className="w-full">
+            <Button theme="tertiary" size="lg" type="submit" className="w-full">
               No
             </Button>
           </Link>

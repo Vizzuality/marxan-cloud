@@ -11,6 +11,8 @@ const THEME = {
   secondary: 'text-white bg-gray-500 hover:bg-gray-400 active:bg-gray-300 border border-gray-500 hover:border-gray-400 active:border-gray-300',
   'secondary-alt': 'text-gray-300 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
 
+  tertiary: 'text-black bg-gray-100 hover:bg-gray-400 active:bg-gray-300 border border-gray-500 hover:border-gray-400 active:border-gray-300 hover:text-white',
+
   white: 'text-gray-700 bg-white hover:text-white hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
 
   danger: 'text-red-700 bg-transparent hover:text-white hover:bg-red-700 active:bg-red-600 border border-red-700 hover:border-red-600 active:border-red-500',
@@ -31,7 +33,7 @@ const SIZE = {
 };
 
 export interface AnchorButtonProps {
-  theme: 'primary' | 'primary-alt' | 'white'| 'secondary' | 'secondary-alt' | 'danger' | 'spacial' | 'transparent-black' | 'transparent-white';
+  theme: 'primary' | 'primary-alt' | 'white'| 'secondary' | 'secondary-alt' | 'tertiary' | 'danger' | 'spacial' | 'transparent-black' | 'transparent-white';
   size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }
