@@ -63,7 +63,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
             {errors.map(({ title }) => (
               <li key={title}>
                 <p className="text-sm">
-                  { title || 'Ooops! Something went wrong. Try again'}
+                  Ooops! Something went wrong. Try again
                 </p>
               </li>
             ))}
