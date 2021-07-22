@@ -79,7 +79,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
 
   return (
     <Wrapper>
-      {confirm && (
+      {!confirm && (
         <FormRFF
           onSubmit={handleSubmit}
         >
@@ -172,7 +172,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
           )}
         </FormRFF>
       )}
-      {!confirm && (
+      {confirm && (
         <ConfirmSignUp setConfirm={setConfirm} />
       )}
     </Wrapper>
