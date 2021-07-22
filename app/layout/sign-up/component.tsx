@@ -39,7 +39,6 @@ export const SignUp: React.FC<SignUpProps> = () => {
 
   const handleSubmit = useCallback(async (data) => {
     setSubmitting(true);
-    setConfirm(true);
 
     try {
       const signUpResponse = await AUTHENTICATION
@@ -51,7 +50,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
       // There is an inconsistency on the API
       // where username is used for log in instead of email
       if (signUpResponse.status === 201) {
-        setConfirm(false);
+        setConfirm(true);
         await signIn('credentials', { ...data, username: data.email });
       }
     } catch (error) {
@@ -80,12 +79,13 @@ export const SignUp: React.FC<SignUpProps> = () => {
 
   return (
     <Wrapper>
-      <FormRFF
-        onSubmit={handleSubmit}
-      >
-        {(props) => (
-          <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex items-center justify-center h-full">
-            {!confirm && (
+      {confirm && (
+        <FormRFF
+          onSubmit={handleSubmit}
+        >
+          {(props) => (
+            <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex items-center justify-center h-full">
+
               <div className="w-full max-w-xs">
                 <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Get Started!</h2>
 
@@ -167,12 +167,12 @@ export const SignUp: React.FC<SignUpProps> = () => {
                   <Link href="/auth/sign-in"><a href="/auth/sign-in" className="underline">Sign in</a></Link>
                 </div>
               </div>
-            )}
-          </form>
-        )}
-      </FormRFF>
 
-      {confirm && (
+            </form>
+          )}
+        </FormRFF>
+      )}
+      {!confirm && (
         <ConfirmSignUp setConfirm={setConfirm} />
       )}
     </Wrapper>

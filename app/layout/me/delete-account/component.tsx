@@ -57,7 +57,6 @@ export const DeleteAccount: React.FC<DeleteAccountProps> = () => {
           <p className="text-sm">If you delete your account, please keep the following in mind:</p>
           <p className="text-sm">Your profile will be permenantly deleted, including information about projects.</p>
         </div>
-        <p className="text-sm underline">Learn more about deleting your account.</p>
         <div className="w-40">
           <Button theme="danger-alt" size="s" type="submit" disabled={submitting} onClick={() => setOpen(true)}>
             Delete Account

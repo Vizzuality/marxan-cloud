@@ -29,7 +29,7 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }:GuideReq
   return (
     <Wrapper>
 
-      <div className="flex flex-col items-center justify-center my-32 space-y-16">
+      <div className="flex flex-col items-center justify-center p-10 space-y-10">
 
         <h2 className="text-lg font-medium text-center text-gray-600 font-heading">First things first...</h2>
 
