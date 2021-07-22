@@ -7,7 +7,7 @@ import LegendItem from './item';
 import LegendTypeBasic from './types/basic';
 import LegendTypeChoropleth from './types/choropleth';
 import LegendTypeGradient from './types/gradient';
-import LegendTypeGrid from './types/grid';
+import LegendTypeMatrix from './types/matrix';
 
 import ITEMS from './mock';
 
@@ -47,7 +47,7 @@ const Template: Story<LegendProps> = (args) => {
             key={i.id}
             {...i}
           >
-            {type === 'grid' && <LegendTypeGrid className="text-sm text-red-600" items={items} />}
+            {type === 'matrix' && <LegendTypeMatrix className="text-sm text-red-600" items={items} />}
             {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
             {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
             {type === 'gradient' && <LegendTypeGradient className="text-sm text-gray-300" items={items} />}

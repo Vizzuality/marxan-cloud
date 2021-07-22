@@ -7,7 +7,7 @@ const ITEMS = [
     id: 'grid-example-1',
     name: 'Solutions distribution',
     icon: null,
-    type: 'grid',
+    type: 'matrix',
     items: [
       {
         value: 'Scenario 2',
