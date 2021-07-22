@@ -6,17 +6,20 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
-import { plainToClass } from 'class-transformer';
 import { ApiConsumesShapefile } from '@marxan-geoprocessing/decoratos/shapefile.decorator';
-import { PlanningAreaService } from '@marxan-geoprocessing/modules/planning-area/planning-area.service';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
 import { PlanningAreaDto } from './planning-area.dto';
+import { PlanningAreaService } from './planning-area.service';
+import { PlanningAreaSerializer } from './planning-area.serializer';
 
 @Controller(`${apiGlobalPrefixes.v1}/projects/planning-area`)
 export class PlanningAreaController {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(private planningAreaService: PlanningAreaService) {}
+  constructor(
+    private planningAreaService: PlanningAreaService,
+    private planningAreaSerializer: PlanningAreaSerializer,
+  ) {}
 
   @ApiConsumesShapefile()
   @ApiOkResponse({ type: PlanningAreaDto })
@@ -25,10 +28,8 @@ export class PlanningAreaController {
     @Body() shapefileInfo: Express.Multer.File,
   ): Promise<PlanningAreaDto> {
     try {
-      return plainToClass<PlanningAreaDto, PlanningAreaDto>(
-        PlanningAreaDto,
-        await this.planningAreaService.save(shapefileInfo),
-      );
+      const result = await this.planningAreaService.save(shapefileInfo);
+      return this.planningAreaSerializer.serialize(result);
     } catch (error) {
       this.logger.error(
         'failed to create a planning area from shapefile: ' + error.message,
