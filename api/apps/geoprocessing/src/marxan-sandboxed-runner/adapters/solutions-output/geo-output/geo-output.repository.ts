@@ -13,7 +13,7 @@ import {
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
 import { readFileSync } from 'fs';
-import { ScenarioFeaturesDataService } from './scenario-features/scenario-features-data.service';
+import { ScenarioFeaturesDataService } from './scenario-features';
 
 @Injectable()
 export class GeoOutputRepository {
@@ -60,8 +60,8 @@ export class GeoOutputRepository {
         scenarioPuId: In(Object.keys(planningUnitsState)),
       });
 
-      // TODO clean ScenarioFeaturesData
-      // TODO add ScenarioFeaturesData new data
+      // TODO clean OutputScenariosFeaturesDataGeoEntity
+      // TODO add OutputScenariosFeaturesDataGeoEntity new data
 
       await Promise.all(
         Object.entries(planningUnitsState).map(([scenarioPuId, data]) =>
