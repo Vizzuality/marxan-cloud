@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import cx from 'classnames';
 
-import Flicking from '@egjs/react-flicking';
+import Flicking, { ERROR_CODE, FlickingError } from '@egjs/react-flicking';
 
 export interface CarouselProps {
   images: {
@@ -10,7 +10,6 @@ export interface CarouselProps {
     alt: string;
     src: string
   }[];
-  initial?: number;
 }
 
 export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => {
@@ -23,7 +22,16 @@ export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => 
     if (timer.current) clearInterval(timer.current);
     timer.current = setInterval(() => {
       if (!pause && slider) {
-        slider.current.next();
+        slider.current
+          .next()
+          .catch((err) => {
+            if (!(
+              err instanceof FlickingError
+              && err.code === ERROR_CODE.ANIMATION_ALREADY_PLAYING
+            )) {
+              throw err;
+            }
+          });
       }
     }, 4000);
 
@@ -79,7 +87,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => 
                   }}
                 >
                   <div
-                    className="absolute w-full h-full rounded-3xl"
+                    className="absolute w-full h-full bg-center bg-no-repeat bg-contain rounded-3xl"
                     style={{
                       backgroundImage: `url(${img.src})`,
                     }}
