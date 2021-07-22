@@ -4,7 +4,10 @@ import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { assertDefined } from '@marxan/utils';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
-import { CustomPlanningAreaRepository } from '@marxan/planning-area-repository';
+import {
+  CustomPlanningAreaRepository,
+  SaveGeoJsonResult,
+} from '@marxan/planning-area-repository';
 import { bootstrapApplication } from '../../utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
@@ -20,24 +23,38 @@ afterEach(async () => {
 });
 
 describe(`when entity created`, () => {
-  let id: string;
+  let result: SaveGeoJsonResult;
   beforeEach(async () => {
     // given
-    ({ id } = (await repository.saveGeoJson(fixtures.sampleGeoJSON))[0]);
-    fixtures.createdEntities.push(id);
+    result = await repository.saveGeoJson(fixtures.sampleGeoJSON);
+    fixtures.createdEntities.push(result.id);
   });
 
   it(`should confirm existence of newly created entity `, async () => {
     // when
-    const hasResult = await repository.has(id);
+    const hasResult = await repository.has(result.id);
 
     // then
     expect(hasResult).toBe(true);
   });
 
-  it(`should return a bbox of entity`, async () => {
+  it(`should return id, bbox, max and min pu size in insert`, async () => {
+    expect(result).toStrictEqual({
+      bbox: [
+        -30.146484374999996,
+        -40.341796875,
+        38.20365531807149,
+        29.22889003019423,
+      ],
+      id: expect.any(String),
+      maxPuAreaSize: 940152,
+      minPuAreaSize: 103,
+    });
+  });
+
+  it(`should find a bbox of entity`, async () => {
     // when
-    const bbox = await repository.getBBox(id);
+    const bbox = await repository.getBBox(result.id);
 
     // then
     expect(bbox).toStrictEqual([
@@ -61,14 +78,10 @@ it(`should deny existence of unknown entity`, async () => {
 
 it(`should replace planning area assignment and delete the old one`, async () => {
   // given
-  const { id: firstId } = (
-    await repository.saveGeoJson(fixtures.sampleGeoJSON)
-  )[0];
+  const { id: firstId } = await repository.saveGeoJson(fixtures.sampleGeoJSON);
   fixtures.createdEntities.push(firstId);
   // and
-  const { id: secondId } = (
-    await repository.saveGeoJson(fixtures.sampleGeoJSON)
-  )[0];
+  const { id: secondId } = await repository.saveGeoJson(fixtures.sampleGeoJSON);
   fixtures.createdEntities.push(secondId);
   // and
   await repository.assignProject(
@@ -179,7 +192,7 @@ async function getFixtures() {
       );
     },
     async createEntityWithCreatedAtDate(date: Date) {
-      const { id } = (await repository.saveGeoJson(this.sampleGeoJSON))[0];
+      const { id } = await repository.saveGeoJson(this.sampleGeoJSON);
       await fixtures.getTypeormRepository().update(
         {
           id,
