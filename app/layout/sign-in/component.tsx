@@ -1,6 +1,11 @@
 import React, { useCallback, useState } from 'react';
+
+import omit from 'lodash/omit';
+
 import { signIn } from 'next-auth/client';
+import AUTHENTICATION from 'services/authentication';
 import { useRouter } from 'next/router';
+
 import Wrapper from 'layout/wrapper';
 import Link from 'next/link';
 import Button from 'components/button';
@@ -33,8 +38,16 @@ export const SignIn: React.FC<SignInProps> = () => {
   const handleSubmit = useCallback(async (data) => {
     setSubmitting(true);
     try {
-      await signIn('credentials', { ...data, callbackUrl });
-    } catch (err) {
+      const signUpResponse = await AUTHENTICATION
+        .request({
+          method: 'POST',
+          url: '/sign-in',
+          data: omit(data, 'checkbox'),
+        });
+      if (signUpResponse.status === 201) {
+        await signIn('credentials', { ...data, callbackUrl });
+      }
+    } catch (error) {
       addToast('error-signin', (
         <>
           <h2 className="font-medium">Error!</h2>
@@ -45,7 +58,7 @@ export const SignIn: React.FC<SignInProps> = () => {
       });
 
       setSubmitting(false);
-      console.error(err);
+      console.error(error);
     }
   }, [addToast, callbackUrl]);
 

@@ -72,7 +72,7 @@ export const Profile: React.FC<MeProps> = () => {
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex">
           <div className="w-full max-w-xs">
-            <h2 className="mb-5 text-5xl font-medium text-gray-600 font-heading">My Profile</h2>
+            <h2 className="text-5xl font-medium text-gray-600 mb-9 font-heading">My Profile</h2>
 
             <Loading
               visible={submitting}
@@ -95,7 +95,7 @@ export const Profile: React.FC<MeProps> = () => {
             </div>
 
             {/* DISPLAY NAME */}
-            <div className="mt-5">
+            <div className="mt-8">
               <FieldRFF
                 name="displayName"
                 validate={composeValidators([{ presence: true }])}
@@ -110,12 +110,12 @@ export const Profile: React.FC<MeProps> = () => {
             </div>
 
             {/* EMAIL */}
-            <div className="mt-5">
+            <div className="mt-7">
               <Label theme="light" className="mb-3 uppercase">Email</Label>
               <Input theme="light" type="email" icon={EMAIL_SVG} readOnly value={email} disabled />
             </div>
 
-            <div className="mt-5">
+            <div className="mt-7">
               <Button theme="primary" size="s" type="submit" disabled={submitting}>
                 Save changes
               </Button>
