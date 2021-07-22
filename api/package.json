@@ -183,7 +183,9 @@
       "@marxan/scenario-puvspr/(.*)": "<rootDir>/libs/scenario-puvspr/src/$1",
       "@marxan/scenario-puvspr": "<rootDir>/libs/scenario-puvspr/src",
       "@marxan/scenario-run-queue/(.*)": "<rootDir>/libs/scenario-run-queue/src/$1",
-      "@marxan/scenario-run-queue": "<rootDir>/libs/scenario-run-queue/src"
+      "@marxan/scenario-run-queue": "<rootDir>/libs/scenario-run-queue/src",
+      "@marxan/features/(.*)": "<rootDir>/libs/features/src/$1",
+      "@marxan/features": "<rootDir>/libs/features/src"
     }
   }
 }

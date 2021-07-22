@@ -84,6 +84,12 @@
       ],
       "@marxan/scenario-run-queue/*": [
         "libs/scenario-run-queue/src/*"
+      ],
+      "@marxan/features": [
+        "libs/features/src"
+      ],
+      "@marxan/features/*": [
+        "libs/features/src/*"
       ]
     }
   },

@@ -13,12 +13,14 @@ import {
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
 import { readFileSync } from 'fs';
+import { ScenarioFeaturesDataService } from './scenario-features/scenario-features-data.service';
 
 @Injectable()
 export class GeoOutputRepository {
   constructor(
     private readonly metadataArchiver: MetadataArchiver,
     private readonly solutionsReader: SolutionsReaderService,
+    private readonly scenarioFeaturesDataReader: ScenarioFeaturesDataService,
     private readonly planningUnitsStateCalculator: PlanningUnitSelectionCalculatorService,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
@@ -46,10 +48,20 @@ export class GeoOutputRepository {
     const planningUnitsState: PlanningUnitsSelectionState = await this.planningUnitsStateCalculator.consume(
       solutionsStream,
     );
+
+    // TODO grab data from ScenarioFeaturesDataService
+    const _sfds = await this.scenarioFeaturesDataReader.from(
+      workspace.workingDirectory,
+      scenarioId,
+    );
+
     return this.entityManager.transaction(async (transaction) => {
       await transaction.delete(OutputScenariosPuDataGeoEntity, {
         scenarioPuId: In(Object.keys(planningUnitsState)),
       });
+
+      // TODO clean ScenarioFeaturesData
+      // TODO add ScenarioFeaturesData new data
 
       await Promise.all(
         Object.entries(planningUnitsState).map(([scenarioPuId, data]) =>

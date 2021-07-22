@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RemoteScenarioFeaturesData } from '@marxan-api/modules/scenarios-features/entities/remote-scenario-features-data.geo.entity';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { Repository } from 'typeorm';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class SpecDatService {
   constructor(
-    @InjectRepository(RemoteScenarioFeaturesData, DbConnections.geoprocessingDB)
-    private readonly scenarioFeaturesData: Repository<RemoteScenarioFeaturesData>,
+    @InjectRepository(ScenarioFeaturesData, DbConnections.geoprocessingDB)
+    private readonly scenarioFeaturesData: Repository<ScenarioFeaturesData>,
   ) {}
 
   async getSpecDatContent(scenarioId: string): Promise<string> {
