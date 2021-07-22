@@ -4,6 +4,22 @@ import HEXAGON_SVG from 'svgs/map/hexagon.svg';
 
 const ITEMS = [
   {
+    id: 'grid-example-1',
+    name: 'Solutions distribution',
+    icon: null,
+    type: 'grid',
+    items: [
+      {
+        value: 'Scenario 2',
+        color: '#3C7B7E',
+      },
+      {
+        value: 'Scenario 3',
+        color: '#DA9827',
+      },
+    ],
+  },
+  {
     id: 'XXX',
     name: 'Included areas',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-1 text-purple-500" />,
