@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 import { ScenarioPuvsprGeoEntity } from '@marxan/scenario-puvspr';
-import { RemoteScenarioFeaturesData } from '@marxan-api/modules/scenarios-features/entities/remote-scenario-features-data.geo.entity';
+import { ScenarioFeaturesData } from '@marxan/features';
 import {
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuCostDataGeo,
@@ -27,7 +27,7 @@ import { InputFilesArchiverService } from './input-files-archiver.service';
       [
         PlanningUnitsGeom,
         ScenarioPuvsprGeoEntity,
-        RemoteScenarioFeaturesData,
+        ScenarioFeaturesData,
         ScenariosPlanningUnitGeoEntity,
         ScenariosPuCostDataGeo,
       ],

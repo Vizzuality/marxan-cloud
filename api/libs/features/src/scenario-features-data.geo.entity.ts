@@ -1,11 +1,9 @@
+import { FeatureTags } from '@marxan/features';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { FeatureTags } from '../../geo-features/geo-feature.api.entity';
 
-export const remoteScenarioFeaturesDataName = 'scenario_features_data';
-
-@Entity(remoteScenarioFeaturesDataName)
-export class RemoteScenarioFeaturesData {
+@Entity(`scenario_features_data`)
+export class ScenarioFeaturesData {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 

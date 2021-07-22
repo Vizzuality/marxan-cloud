@@ -124,6 +124,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/scenario-run-queue/tsconfig.lib.json"
       }
+    },
+    "features": {
+      "type": "library",
+      "root": "libs/features",
+      "entryFile": "index",
+      "sourceRoot": "libs/features/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/features/tsconfig.lib.json"
+      }
     }
   }
 }

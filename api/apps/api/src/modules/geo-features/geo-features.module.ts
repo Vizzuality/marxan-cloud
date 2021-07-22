@@ -17,13 +17,13 @@ import {
   EntityManagerToken,
   GeoFeatureSetService,
 } from './geo-feature-set.service';
-import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature(
-      [GeoFeatureGeometry, GeoFeaturePropertySet, RemoteScenarioFeaturesData],
+      [GeoFeatureGeometry, GeoFeaturePropertySet, ScenarioFeaturesData],
       apiConnections.geoprocessingDB.name,
     ),
     TypeOrmModule.forFeature([GeoFeature, Project, Scenario]),

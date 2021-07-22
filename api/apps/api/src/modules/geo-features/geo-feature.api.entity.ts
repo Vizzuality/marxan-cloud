@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
+import { FeatureTags } from '@marxan/features';
 
 export const geoFeatureResource: BaseServiceResource = {
   className: 'GeoFeature',
@@ -10,11 +11,6 @@ export const geoFeatureResource: BaseServiceResource = {
   },
   moduleControllerPrefix: 'geo-features',
 };
-
-export enum FeatureTags {
-  bioregional = 'bioregional',
-  species = 'species',
-}
 
 export interface GeoFeatureProperty {
   key: string;

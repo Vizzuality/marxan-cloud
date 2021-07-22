@@ -1,4 +1,4 @@
-import { RemoteScenarioFeaturesData } from '@marxan-api/modules/scenarios-features/entities/remote-scenario-features-data.geo.entity';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { Repository } from 'typeorm';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -7,11 +7,11 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { SpecDatService } from './spec.dat.service';
 
 let sut: SpecDatService;
-let dataRepo: jest.Mocked<Repository<RemoteScenarioFeaturesData>>;
+let dataRepo: jest.Mocked<Repository<ScenarioFeaturesData>>;
 
 beforeEach(async () => {
   const token = getRepositoryToken(
-    RemoteScenarioFeaturesData,
+    ScenarioFeaturesData,
     DbConnections.geoprocessingDB,
   );
   const sandbox = await Test.createTestingModule({
@@ -50,7 +50,7 @@ describe(`when there is data available`, () => {
         fpf: 0.33,
         featuresDataId: '...',
         prop: 0.25,
-      } as RemoteScenarioFeaturesData,
+      } as ScenarioFeaturesData,
       {
         scenarioId: 'id',
         featureId: 1,
@@ -64,7 +64,7 @@ describe(`when there is data available`, () => {
         metadata: {
           sepdistance: 4000,
         },
-      } as RemoteScenarioFeaturesData,
+      } as ScenarioFeaturesData,
     ]);
   });
 

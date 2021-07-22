@@ -2,17 +2,17 @@ import { INestApplication } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { RemoteScenarioFeaturesData } from '../../../src/modules/scenarios-features/entities/remote-scenario-features-data.geo.entity';
-import { remoteConnectionName } from '../../../src/modules/scenarios-features/entities/remote-connection-name';
+import { ScenarioFeaturesData } from '@marxan/features';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 export const WhenScenarioHasPreGapData = async (
   app: INestApplication,
 ): Promise<{
-  featuresData: RemoteScenarioFeaturesData[];
+  featuresData: ScenarioFeaturesData[];
   scenarioId: string;
 }> => {
-  const repo: Repository<RemoteScenarioFeaturesData> = await app.get(
-    getRepositoryToken(RemoteScenarioFeaturesData, remoteConnectionName),
+  const repo: Repository<ScenarioFeaturesData> = await app.get(
+    getRepositoryToken(ScenarioFeaturesData, DbConnections.geoprocessingDB),
   );
   const rows = await repo.find();
   if (rows.length === 0) {

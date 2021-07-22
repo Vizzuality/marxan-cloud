@@ -15,7 +15,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
-import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { flattenDeep } from 'lodash';
 import { GeoprocessingOpSplitV1 } from './types/geo-feature.geoprocessing-operations.type';
 
@@ -87,7 +87,7 @@ export class GeoFeatureSetService {
   ): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
       const repository = transactionalEntityManager.getRepository(
-        RemoteScenarioFeaturesData,
+        ScenarioFeaturesData,
       );
       await repository.delete({ scenarioId });
       // First process features which can be used as they are (plain)
@@ -120,10 +120,10 @@ export class GeoFeatureSetService {
       featuresDataId: string;
       fpf: number;
       prop: number | undefined;
-    } & RemoteScenarioFeaturesData)[]
+    } & ScenarioFeaturesData)[]
   > {
     const repository = transactionalEntityManager.getRepository(
-      RemoteScenarioFeaturesData,
+      ScenarioFeaturesData,
     );
     return Promise.all(
       featureSpecification
@@ -163,7 +163,7 @@ export class GeoFeatureSetService {
     //   prop: number | undefined;
     // } & RemoteScenarioFeaturesData)[]
     const _repository = transactionalEntityManager.getRepository(
-      RemoteScenarioFeaturesData,
+      ScenarioFeaturesData,
     );
     return Promise.all(
       featureSpecification

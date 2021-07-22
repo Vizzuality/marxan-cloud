@@ -7,16 +7,16 @@ import {
   JSONAPISerializerConfig,
 } from '../../utils/app-base.service';
 
-import { remoteConnectionName } from './entities/remote-connection-name';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
-import { RemoteScenarioFeaturesData } from './entities/remote-scenario-features-data.geo.entity';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 import { UserSearchCriteria } from './search-criteria';
 import { AppConfig } from '../../utils/config.utils';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class ScenarioFeaturesService extends AppBaseService<
-  RemoteScenarioFeaturesData,
+  ScenarioFeaturesData,
   never,
   never,
   UserSearchCriteria
@@ -24,10 +24,10 @@ export class ScenarioFeaturesService extends AppBaseService<
   constructor(
     @InjectRepository(GeoFeature)
     private readonly features: Repository<GeoFeature>,
-    @InjectRepository(RemoteFeaturesData, remoteConnectionName)
+    @InjectRepository(RemoteFeaturesData, DbConnections.geoprocessingDB)
     private readonly remoteFeature: Repository<RemoteFeaturesData>,
-    @InjectRepository(RemoteScenarioFeaturesData, remoteConnectionName)
-    private readonly remoteScenarioFeatures: Repository<RemoteScenarioFeaturesData>,
+    @InjectRepository(ScenarioFeaturesData, DbConnections.geoprocessingDB)
+    private readonly remoteScenarioFeatures: Repository<ScenarioFeaturesData>,
   ) {
     super(remoteScenarioFeatures, 'scenario_features', 'scenario_feature', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -35,10 +35,10 @@ export class ScenarioFeaturesService extends AppBaseService<
   }
 
   setFilters(
-    query: SelectQueryBuilder<RemoteScenarioFeaturesData>,
+    query: SelectQueryBuilder<ScenarioFeaturesData>,
     filters?: FiltersSpecification['filter'],
     info?: UserSearchCriteria,
-  ): SelectQueryBuilder<RemoteScenarioFeaturesData> {
+  ): SelectQueryBuilder<ScenarioFeaturesData> {
     const scenarioId = info?.params?.scenarioId;
     if (scenarioId) {
       return query.andWhere(`${this.alias}.scenario_id = :scenarioId`, {
@@ -51,7 +51,7 @@ export class ScenarioFeaturesService extends AppBaseService<
   async extendFindAllResults(
     entitiesAndCount: [any[], number],
   ): Promise<[any[], number]> {
-    const scenarioFeaturesData = entitiesAndCount[0] as RemoteScenarioFeaturesData[];
+    const scenarioFeaturesData = entitiesAndCount[0] as ScenarioFeaturesData[];
     const featuresDataIds = scenarioFeaturesData.map(
       (rsfd) => rsfd.featuresDataId,
     );
@@ -98,7 +98,7 @@ export class ScenarioFeaturesService extends AppBaseService<
     ];
   }
 
-  get serializerConfig(): JSONAPISerializerConfig<RemoteScenarioFeaturesData> {
+  get serializerConfig(): JSONAPISerializerConfig<ScenarioFeaturesData> {
     return {
       attributes: [
         'description',
@@ -116,9 +116,9 @@ export class ScenarioFeaturesService extends AppBaseService<
   }
 
   #injectAndCompute = (
-    base: RemoteScenarioFeaturesData,
+    base: ScenarioFeaturesData,
     assign: GeoFeature,
-  ): RemoteScenarioFeaturesData => {
+  ): ScenarioFeaturesData => {
     const metArea = base?.currentArea ?? 0;
     const totalArea = base?.totalArea ?? 0;
     const targetPct = (base?.target ?? 0) / 100;

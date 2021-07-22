@@ -1,9 +1,8 @@
 import { ScenarioFeaturesService } from './scenario-features.service';
 import { Repository } from 'typeorm';
-import { RemoteScenarioFeaturesData } from './entities/remote-scenario-features-data.geo.entity';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { remoteConnectionName } from './entities/remote-connection-name';
 import { fakeQueryBuilder } from '../../utils/__mocks__/fake-query-builder';
 import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
@@ -12,6 +11,7 @@ import {
   getValidNonGeoData,
   getValidRemoteFeatureData,
 } from './__mocks__/scenario-features.view-data';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 let sut: ScenarioFeaturesService;
 let geoFeatureRepoMock: jest.Mocked<Repository<GeoFeature>>;
@@ -23,12 +23,12 @@ beforeAll(async () => {
   fakeResultResolver = jest.fn();
   const geoFeatureToken = getRepositoryToken(GeoFeature);
   const geoRemoteScenarioFeaturesRepoToken = getRepositoryToken(
-    RemoteScenarioFeaturesData,
-    remoteConnectionName,
+    ScenarioFeaturesData,
+    DbConnections.geoprocessingDB,
   );
   const geoRemoteFeaturesRepoToken = getRepositoryToken(
     RemoteFeaturesData,
-    remoteConnectionName,
+    DbConnections.geoprocessingDB,
   );
   const sandbox = await Test.createTestingModule({
     providers: [

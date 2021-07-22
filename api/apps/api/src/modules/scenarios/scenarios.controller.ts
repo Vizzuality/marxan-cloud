@@ -50,7 +50,7 @@ import {
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
@@ -284,12 +284,12 @@ export class ScenariosController {
 
   @ApiOperation({ description: `Resolve scenario's features pre-gap data.` })
   @ApiOkResponse({
-    type: RemoteScenarioFeaturesData,
+    type: ScenarioFeaturesData,
   })
   @Get(':id/features')
   async getScenarioFeatures(
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<Partial<RemoteScenarioFeaturesData>[]> {
+  ): Promise<Partial<ScenarioFeaturesData>[]> {
     return this.scenarioFeatureSerializer.serialize(
       await this.service.getFeatures(id),
     );

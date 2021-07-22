@@ -8,8 +8,10 @@ import { MarxanDirectory } from '../../marxan-directory.service';
 import { FileReader } from '../../file-reader';
 import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
 import { PlanningUnitSelectionCalculatorService } from './solutions/solution-aggregation/planning-unit-selection-calculator.service';
+import { ScenarioFeaturesDataService } from './scenario-features/scenario-features-data.service';
 import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import { ScenarioFeaturesData } from '@marxan/features';
 
 @Module({
   imports: [
@@ -17,6 +19,7 @@ import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit'
       MarxanExecutionMetadataGeoEntity,
       OutputScenariosPuDataGeoEntity,
       ScenariosPlanningUnitGeoEntity,
+      ScenarioFeaturesData,
     ]),
   ],
   providers: [
@@ -25,6 +28,7 @@ import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit'
     MarxanDirectory,
     FileReader,
     SolutionsReaderService,
+    ScenarioFeaturesDataService,
     PlanningUnitSelectionCalculatorService,
   ],
   exports: [GeoOutputRepository],

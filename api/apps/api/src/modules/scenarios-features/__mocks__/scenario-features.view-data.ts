@@ -1,9 +1,6 @@
 import { RemoteFeaturesData } from '../entities/remote-features-data.geo.entity';
-import { RemoteScenarioFeaturesData } from '../entities/remote-scenario-features-data.geo.entity';
-import {
-  FeatureTags,
-  GeoFeature,
-} from '../../geo-features/geo-feature.api.entity';
+import { FeatureTags, ScenarioFeaturesData } from '@marxan/features';
+import { GeoFeature } from '../../geo-features/geo-feature.api.entity';
 
 const featureIdMet = `feature-uuid-1-criteria-met`;
 const featureIdFailed = `feature-uuid-2-criteria-failed`;
@@ -12,7 +9,7 @@ const metaFeatureIdMet = `meta-feature-uuid-1-criteria-met`;
 const metaFeatureIdFailed = `meta-feature-uuid-1-criteria-failed`;
 
 type RawRemoteScenarioFeaturesData = Pick<
-  RemoteScenarioFeaturesData,
+  ScenarioFeaturesData,
   | 'id'
   | 'target'
   | 'scenarioId'

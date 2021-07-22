@@ -13,17 +13,14 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
-import {
-  FeatureTags,
-  GeoFeature,
-  GeoFeatureProperty,
-} from './geo-feature.api.entity';
+import { GeoFeature, GeoFeatureProperty } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
+import { FeatureTags } from '@marxan/features';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
