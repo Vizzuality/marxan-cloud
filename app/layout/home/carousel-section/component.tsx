@@ -44,7 +44,6 @@ export const HomeCarousel: React.FC<HomeCarouselProps> = () => {
           {!!imgs.length && (
             <Carousel
               images={imgs}
-              initial={0}
             />
           )}
         </div>
