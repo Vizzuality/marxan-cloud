@@ -7,7 +7,7 @@ import {
   IsUUID,
 } from 'class-validator';
 
-export class ScenarioFeatureData
+export class ScenarioFeatureRunData
   implements Omit<OutputScenariosFeaturesDataGeoEntity, `id`> {
   @IsOptional()
   @IsNumber()

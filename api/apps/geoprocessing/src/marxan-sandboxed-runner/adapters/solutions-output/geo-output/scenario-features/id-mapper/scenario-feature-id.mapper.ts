@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { FeatureIdToScenarioFeatureData } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters/solutions-output/geo-output/scenario-features/feature-id-to-scenario-feature-data';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { Repository } from 'typeorm';
+import { FeatureIdToScenarioFeatureData } from '../feature-id-to-scenario-feature-data';
 
 @Injectable()
 export class ScenarioFeatureIdMapper {
