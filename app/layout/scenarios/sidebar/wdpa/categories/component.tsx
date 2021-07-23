@@ -10,6 +10,8 @@ import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Select from 'components/forms/select';
 
+import ProtectedAreaUploader from 'layout/scenarios/sidebar/wdpa/categories/protected-area-uploader';
+
 import { useRouter } from 'next/router';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -209,7 +211,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
               {(flprops) => (
                 <Field id="scenario-wdpaIucnCategories" {...flprops}>
                   <div className="flex items-center mb-3">
-                    <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
+                    <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas (optional)</Label>
                     <InfoButton>
                       <span>Info about WDPA categories</span>
                     </InfoButton>
@@ -252,38 +254,58 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
               )}
             </FieldRFF>
           </div>
+          <p className="py-8 text-sm text-center">or</p>
+          <FieldRFF
+            name="protectedAreaId"
+            // validate={composeValidators([{ presence: true }])}
+          >
+            {(fprops) => {
+              return (
+                <ProtectedAreaUploader
+                  {...fprops}
+                  // resetProtectedArea={resetProtectedArea}
+                  form={form}
+                />
+              );
+            }}
+          </FieldRFF>
 
           {!!values.wdpaIucnCategories.length && (
-            <div className="mt-10">
-              <h3 className="text-sm">Selected protected areas:</h3>
+            <div className="mt-10 space-y-10">
+              <div>
+                <h3 className="text-sm">Selected protected areas:</h3>
 
-              <div className="flex flex-wrap mt-2.5">
-                {values.wdpaIucnCategories.map((w) => {
-                  const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
+                <div className="flex flex-wrap mt-2.5">
+                  {values.wdpaIucnCategories.map((w) => {
+                    const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
 
-                  if (!wdpa) return null;
+                    if (!wdpa) return null;
 
-                  return (
-                    <div
-                      key={`${wdpa.value}`}
-                      className="flex mb-2.5 mr-5"
-                    >
-                      <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
-                        {wdpa.label}
-                      </span>
-
-                      <button
-                        type="button"
-                        className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
-                        onClick={() => {
-                          form.mutators.removeWDPAFilter(wdpa.value, values.wdpaIucnCategories);
-                        }}
+                    return (
+                      <div
+                        key={`${wdpa.value}`}
+                        className="flex mb-2.5 mr-5"
                       >
-                        <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
-                      </button>
-                    </div>
-                  );
-                })}
+                        <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
+                          {wdpa.label}
+                        </span>
+
+                        <button
+                          type="button"
+                          className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
+                          onClick={() => {
+                            form.mutators.removeWDPAFilter(wdpa.value, values.wdpaIucnCategories);
+                          }}
+                        >
+                          <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm">Uploaded protected areas:</h3>
               </div>
             </div>
           )}
