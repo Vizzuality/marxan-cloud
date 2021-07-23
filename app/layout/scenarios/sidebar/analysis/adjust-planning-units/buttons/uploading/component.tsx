@@ -40,7 +40,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   const { sid } = query;
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setUploading, setUploadingValue } = scenarioSlice.actions;
+  const { setUploading, setUploadingValue, setCache } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
   const { uploadingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
@@ -166,12 +166,13 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
       id: `${sid}`,
       data: {
         byGeoJson: {
-          [values.type]: values.uploadingValue,
+          [values.type]: [values.uploadingValue],
         },
       },
     }, {
       onSuccess: () => {
         onSelected(null);
+        dispatch(setCache(Date.now()));
         dispatch(setUploading(false));
         dispatch(setUploadingValue(null));
 
@@ -199,7 +200,16 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         });
       },
     });
-  }, [sid, scenarioPUMutation, onSelected, dispatch, setUploading, setUploadingValue, addToast]);
+  }, [
+    sid,
+    scenarioPUMutation,
+    onSelected,
+    dispatch,
+    setUploading,
+    setUploadingValue,
+    setCache,
+    addToast,
+  ]);
 
   return (
     <FormRFF

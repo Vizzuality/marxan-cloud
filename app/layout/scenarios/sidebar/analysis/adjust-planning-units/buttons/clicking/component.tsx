@@ -32,7 +32,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
   const { addToast } = useToasts();
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setClicking, setClickingValue } = scenarioSlice.actions;
+  const { setClicking, setClickingValue, setCache } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const { clickingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
@@ -76,6 +76,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
     }, {
       onSuccess: () => {
         onSelected(null);
+        dispatch(setCache(Date.now()));
         dispatch(setClicking(false));
         dispatch(setClickingValue([]));
 
@@ -103,7 +104,15 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
         });
       },
     });
-  }, [sid, scenarioPUMutation, onSelected, dispatch, setClicking, setClickingValue, addToast]);
+  }, [sid,
+    scenarioPUMutation,
+    onSelected,
+    dispatch,
+    setClicking,
+    setClickingValue,
+    setCache,
+    addToast,
+  ]);
 
   return (
     <FormRFF

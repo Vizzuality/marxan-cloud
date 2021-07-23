@@ -39,7 +39,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { setClickingValue } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const {
-    tab, wdpaCategories, clicking, clickingValue, puAction,
+    tab, cache, wdpaCategories, clicking, clickingValue, puAction,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const minZoom = 2;
@@ -49,6 +49,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
 
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
+    cache,
     active: tab === 'protected-areas',
     bbox,
   });
@@ -62,6 +63,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   }, [tab]);
 
   const PUGridLayer = usePUGridLayer({
+    cache,
     active: true,
     sid: sid ? `${sid}` : null,
     type,
@@ -108,7 +110,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     if (clicking) {
       const { features = [] } = e;
 
-      const pUGridLayer = features.find((f) => f.source === 'pu-grid-layer');
+      const pUGridLayer = features.find((f) => f.source === `pu-grid-layer-${cache}`);
 
       if (pUGridLayer) {
         const { properties } = pUGridLayer;
@@ -126,7 +128,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
         dispatch(setClickingValue(newClickingValue));
       }
     }
-  }, [clicking, clickingValue, dispatch, setClickingValue]);
+  }, [clicking, clickingValue, dispatch, setClickingValue, cache]);
 
   const handleTransformRequest = (url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {

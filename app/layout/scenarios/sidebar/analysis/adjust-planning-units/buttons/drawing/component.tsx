@@ -32,7 +32,7 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   const { addToast } = useToasts();
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setDrawing, setDrawingValue } = scenarioSlice.actions;
+  const { setDrawing, setDrawingValue, setCache } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const { drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
@@ -70,16 +70,17 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
       id: `${sid}`,
       data: {
         byGeoJson: {
-          [values.type]: {
+          [values.type]: [{
             type: 'FeatureCollection',
             features: values.drawingValue,
-          },
+          }],
         },
       },
     }, {
       onSuccess: () => {
         console.info('SUCCESS');
         onSelected(null);
+        dispatch(setCache(Date.now()));
         dispatch(setDrawing(null));
         dispatch(setDrawingValue(null));
 
@@ -107,7 +108,16 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
         });
       },
     });
-  }, [sid, scenarioPUMutation, onSelected, dispatch, setDrawing, setDrawingValue, addToast]);
+  }, [
+    sid,
+    scenarioPUMutation,
+    onSelected,
+    dispatch,
+    setDrawing,
+    setDrawingValue,
+    setCache,
+    addToast,
+  ]);
 
   return (
     <FormRFF

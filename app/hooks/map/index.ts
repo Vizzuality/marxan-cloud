@@ -34,7 +34,7 @@ export function useGeoJsonLayer({
 
 // AdminPreview
 export function useAdminPreviewLayer({
-  active, country, region, subregion,
+  active, country, region, subregion, cache = 0,
 }: UseAdminPreviewLayer) {
   const level = useMemo(() => {
     if (subregion) return 2;
@@ -50,7 +50,7 @@ export function useAdminPreviewLayer({
     if (!active || typeof level === 'undefined' || !guid) return null;
 
     return {
-      id: `admin-preview-layer-${guid}`,
+      id: `admin-preview-layer-${guid}-${cache}`,
       type: 'vector',
       source: {
         type: 'vector',
@@ -69,18 +69,18 @@ export function useAdminPreviewLayer({
         ],
       },
     };
-  }, [active, level, guid]);
+  }, [active, level, guid, cache]);
 }
 
 // PUGridpreview
 export function useWDPAPreviewLayer({
-  active, bbox, wdpaIucnCategories,
+  active, bbox, wdpaIucnCategories, cache = 0,
 }: UseWDPAPreviewLayer) {
   return useMemo(() => {
     if (!active || !bbox) return null;
 
     return {
-      id: 'wdpa-preview-layer',
+      id: `wdpa-preview-layer-${cache}`,
       type: 'vector',
       source: {
         type: 'vector',
@@ -111,18 +111,18 @@ export function useWDPAPreviewLayer({
         ],
       },
     };
-  }, [active, bbox, wdpaIucnCategories]);
+  }, [active, bbox, wdpaIucnCategories, cache]);
 }
 
 // PUGridpreview
 export function usePUGridPreviewLayer({
-  active, bbox, planningUnitGridShape, planningUnitAreakm2,
+  active, bbox, planningUnitGridShape, planningUnitAreakm2, cache,
 }: UsePUGridPreviewLayer) {
   return useMemo(() => {
     if (!active || !bbox || !planningUnitGridShape || !planningUnitAreakm2) return null;
 
     return {
-      id: 'pu-grid-preview-layer',
+      id: `pu-grid-preview-layer-${cache}`,
       type: 'vector',
       source: {
         type: 'vector',
@@ -141,12 +141,12 @@ export function usePUGridPreviewLayer({
         ],
       },
     };
-  }, [active, bbox, planningUnitGridShape, planningUnitAreakm2]);
+  }, [active, bbox, planningUnitGridShape, planningUnitAreakm2, cache]);
 }
 
 // PUGridpreview
 export function usePUGridLayer({
-  active, sid, type, options = {},
+  active, sid, type, options = {}, cache,
 }: UsePUGridLayer) {
   return useMemo(() => {
     if (!active || !sid) return null;
@@ -158,15 +158,12 @@ export function usePUGridLayer({
 
     const LOCKIN_STATUS = [
       { id: 0, color: '#FF0' },
-      { id: 1, color: '#F0F' },
-      { id: 2, color: '#0FF' },
-      { id: 3, color: '#0F0' },
-      { id: 4, color: '#F00' },
-      { id: 5, color: '#00F' },
+      { id: 1, color: '#0F0' },
+      { id: 2, color: '#F00' },
     ];
 
     return {
-      id: 'pu-grid-layer',
+      id: `pu-grid-layer-${cache}`,
       type: 'vector',
       source: {
         type: 'vector',
@@ -201,6 +198,7 @@ export function usePUGridLayer({
               paint: {
                 'line-color': s.color,
                 'line-opacity': 1,
+                'line-width': 2,
               },
               layout: {
                 'line-sort-key': i * 10,
@@ -228,5 +226,5 @@ export function usePUGridLayer({
         ],
       },
     };
-  }, [active, sid, type, options]);
+  }, [cache, active, sid, type, options]);
 }
