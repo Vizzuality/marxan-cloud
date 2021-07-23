@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { DeleteResult, Repository } from 'typeorm';
+import { Either, left, right } from 'fp-ts/lib/Either';
 
 import {
   ApiEvent,
@@ -22,6 +23,8 @@ import { CreateApiEventDTO } from './dto/create.api-event.dto';
 import { UpdateApiEventDTO } from './dto/update.api-event.dto';
 import { AppInfoDTO } from '../../dto/info.dto';
 import { AppConfig } from '../../utils/config.utils';
+
+export const duplicate = Symbol();
 
 @Injectable()
 /**
@@ -67,6 +70,27 @@ export class ApiEventsService extends AppBaseService<
     }
 
     return result;
+  }
+
+  /**
+   * recognizes duplicates on {@link CreateApiEventDTO.externalId}
+   */
+  async createIfNotExists(
+    data: CreateApiEventDTO,
+  ): Promise<Either<typeof duplicate, ApiEvent>> {
+    try {
+      return right(await this.create(data));
+    } catch (error) {
+      const postgresDuplicateKeyErrorCode = '23505';
+      const externalIdConstraint = 'api_events_external_id_unique';
+      if (
+        error.code === postgresDuplicateKeyErrorCode &&
+        error.constraint === externalIdConstraint
+      ) {
+        return left(duplicate);
+      }
+      throw error;
+    }
   }
 
   /**

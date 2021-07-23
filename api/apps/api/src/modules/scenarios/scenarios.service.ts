@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
@@ -27,11 +28,20 @@ import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
-import { CostSurfaceViewService } from './input-files/cost-surface-view.service';
 import { OutputFilesService } from './output-files/output-files.service';
+import { InputFilesService, InputFilesArchiverService } from './input-files';
 import { notFound, RunService } from './marxan-run';
-import { InputFilesService } from './input-files';
+import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
+import { GeoFeaturesService } from '../geo-features/geo-features.service';
+import { SimpleJobStatus } from './scenario.api.entity';
+import { assertDefined } from '@marxan/utils';
+import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-property-sets.service';
 
+/** @debt move to own module */
+const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
+  status: SimpleJobStatus.draft,
+  features: [],
+};
 @Injectable()
 export class ScenariosService {
   private readonly geoprocessingUrl: string = AppConfig.get(
@@ -49,6 +59,9 @@ export class ScenariosService {
     private readonly runService: RunService,
     private readonly inputFilesService: InputFilesService,
     private readonly outputFilesService: OutputFilesService,
+    private readonly geoFeaturesService: GeoFeaturesService,
+    private readonly geoFeaturePropertySetService: GeoFeaturePropertySetService,
+    private readonly inputArchiveService: InputFilesArchiverService,
   ) {}
 
   async findAllPaginated(
@@ -253,6 +266,31 @@ export class ScenariosService {
     return withValidatedMetadata;
   }
 
+  /**
+   * Get geofeatures specification for a scenario. This is part of the scenario
+   * itself, but exposed via a separate endpoint.
+   */
+  async getFeatureSetForScenario(
+    scenarioId: string,
+  ): Promise<GeoFeatureSetSpecification | undefined> {
+    const scenario = await this.getById(scenarioId);
+    assertDefined(scenario);
+    return await this.crudService
+      .getById(scenarioId)
+      .then((result) => {
+        return result.featureSet;
+      })
+      .then((result) =>
+        result
+          ? this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
+              result,
+              scenario,
+            )
+          : EmptyGeoFeaturesSpecification,
+      )
+      .catch((e) => Logger.error(e));
+  }
+
   async getMarxanExecutionOutputArchive(scenarioId: string) {
     await this.assertScenario(scenarioId);
     return this.outputFilesService.get(scenarioId);
@@ -265,6 +303,6 @@ export class ScenariosService {
 
   async getMarxanExecutionInputArchive(scenarioId: string) {
     await this.assertScenario(scenarioId);
-    return this.inputFilesService.getArchive(scenarioId);
+    return this.inputArchiveService.archive(scenarioId);
   }
 }

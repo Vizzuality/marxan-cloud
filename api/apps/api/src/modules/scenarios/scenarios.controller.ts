@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  Put,
   Req,
   Res,
   UploadedFile,
@@ -22,6 +23,8 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
+import { GeoFeatureSetResult } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 
 import {
   ApiAcceptedResponse,
@@ -47,7 +50,7 @@ import {
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import { RemoteScenarioFeaturesData } from '../scenarios-features/entities/remote-scenario-features-data.geo.entity';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
@@ -61,6 +64,10 @@ import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
+import { GeoFeatureSetSerializer } from '../geo-features/geo-feature-set.serializer';
+import { UpdateGeoFeatureSetDTO } from '../geo-features/dto/update.geo-feature-set.dto';
+import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
+import { GeoFeatureSetService } from '../geo-features/geo-feature-set.service';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -74,7 +81,10 @@ const marxanRunFiles = 'Marxan Run - Files';
 @Controller(basePath)
 export class ScenariosController {
   constructor(
-    private readonly service: ScenariosService,
+    public readonly service: ScenariosService,
+    private readonly geoFeaturesService: GeoFeaturesService,
+    private readonly geoFeatureSetSerializer: GeoFeatureSetSerializer,
+    private readonly geoFeatureSetService: GeoFeatureSetService,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
@@ -188,6 +198,41 @@ export class ScenariosController {
     );
   }
 
+  @ApiOperation({ description: 'Create feature set for scenario' })
+  @ApiCreatedResponse({ type: GeoFeatureSetResult })
+  @Post(':id/features/specification')
+  async createFeatureSetFor(
+    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<GeoFeatureSetResult> {
+    return await this.geoFeatureSetSerializer.serialize(
+      await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
+    );
+  }
+
+  @ApiOperation({ description: 'Update feature set for scenario' })
+  @ApiOkResponse({ type: GeoFeatureSetResult })
+  @Put(':id/features/specification')
+  async updateFeatureSetFor(
+    @Body(new ValidationPipe()) dto: UpdateGeoFeatureSetDTO,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<GeoFeatureSetResult> {
+    return await this.geoFeatureSetSerializer.serialize(
+      await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
+    );
+  }
+
+  @ApiOperation({ description: 'Get feature set for scenario' })
+  @ApiOkResponse({ type: GeoFeatureSetResult })
+  @Get(':id/features/specification')
+  async getFeatureSetFor(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<GeoFeatureSetResult> {
+    return await this.geoFeatureSetSerializer.serialize(
+      await this.service.getFeatureSetForScenario(id),
+    );
+  }
+
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiNoContentResponse()
   @Post(`:id/cost-surface/shapefile`)
@@ -239,12 +284,12 @@ export class ScenariosController {
 
   @ApiOperation({ description: `Resolve scenario's features pre-gap data.` })
   @ApiOkResponse({
-    type: RemoteScenarioFeaturesData,
+    type: ScenarioFeaturesData,
   })
   @Get(':id/features')
   async getScenarioFeatures(
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<Partial<RemoteScenarioFeaturesData>[]> {
+  ): Promise<Partial<ScenarioFeaturesData>[]> {
     return this.scenarioFeatureSerializer.serialize(
       await this.service.getFeatures(id),
     );

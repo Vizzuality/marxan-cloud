@@ -30,11 +30,17 @@ import SortableItem from './item';
 export interface SortableListProps {
   className?: string;
   children: React.ReactNode;
+  sortable: {
+    enabled: boolean;
+    handle: boolean;
+    handleIcon: React.ReactNode,
+  };
   onChangeOrder: (id: string[]) => void;
 }
 
 export const SortableList: React.FC<SortableListProps> = ({
   children,
+  sortable,
   onChangeOrder,
 }: SortableListProps) => {
   const [activeId, setActiveId] = useState(null);
@@ -115,9 +121,12 @@ export const SortableList: React.FC<SortableListProps> = ({
             .map(children, (Child) => {
               if (isValidElement(Child)) {
                 const { props: { id } } = Child;
+
                 return (
-                  <SortableItem id={id}>
-                    {cloneElement(Child)}
+                  <SortableItem id={id} sortable={sortable}>
+                    {cloneElement(Child, {
+                      sortable,
+                    })}
                   </SortableItem>
                 );
               }

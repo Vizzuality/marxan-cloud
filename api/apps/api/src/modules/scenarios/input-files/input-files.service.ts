@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Either, right } from 'fp-ts/Either';
 import { Writable } from 'stream';
 
 import { BoundDatService } from './bound.dat.service';
@@ -43,12 +42,6 @@ export class InputFilesService {
 
   async readCostSurface(scenarioId: string, stream: Writable) {
     return this.costSurfaceService.read(scenarioId, stream);
-  }
-
-  async getArchive(
-    _scenarioId: string,
-  ): Promise<Either<InputZipFailure, Buffer>> {
-    return right(Buffer.from([]));
   }
 
   async getInputParameterFile(scenarioId: string) {

@@ -4,7 +4,8 @@ import { FactoryProvider, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { assertDefined, isDefined } from '@marxan/utils';
-import { JobData, queueName } from '@marxan/scenario-run-queue';
+import { JobData, ProgressData, queueName } from '@marxan/scenario-run-queue';
+import { ScenarioRunProgressV1Alpha1DTO } from '@marxan-api/modules/api-events/dto/scenario-run-progress-v1-alpha-1';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { QueueBuilder, QueueEventsBuilder } from '@marxan-api/modules/queue';
@@ -43,23 +44,38 @@ export class RunService {
     private readonly scenarios: Repository<Scenario>,
     private readonly assets: AssetsService,
   ) {
-    queueEvents.on(`completed`, ({ jobId }) => this.handleFinished(jobId));
-    queueEvents.on(`failed`, ({ jobId }) => this.handleFailed(jobId));
+    queueEvents.on(`completed`, ({ jobId }, eventId) =>
+      this.handleFinished(jobId, eventId),
+    );
+    queueEvents.on(`failed`, ({ jobId }, eventId) =>
+      this.handleFailed(jobId, eventId),
+    );
+    queueEvents.on(
+      `progress`,
+      async (
+        { jobId, data }: { data: ProgressData; jobId: string },
+        eventId,
+      ) => {
+        await this.handleProgress(jobId, eventId, data);
+      },
+    );
   }
 
   async run(scenarioId: string): Promise<void> {
     const assets = await this.assets.forScenario(scenarioId);
     assertDefined(assets);
-    await this.queue.add(`run-scenario`, {
+    const job = await this.queue.add(`run-scenario`, {
       scenarioId,
       assets,
     });
     await this.scenarios.update(scenarioId, {
       ranAtLeastOnce: true,
     });
+    const kind = API_EVENT_KINDS.scenario__run__submitted__v1__alpha1;
     await this.apiEvents.create({
       topic: scenarioId,
-      kind: API_EVENT_KINDS.scenario__run__submitted__v1__alpha1,
+      kind,
+      externalId: job.id + kind,
     });
   }
 
@@ -83,19 +99,48 @@ export class RunService {
     return right(void 0);
   }
 
-  private async handleFinished(jobId: string) {
+  private async handleProgress(
+    jobId: string,
+    eventId: string,
+    progress: ProgressData | null,
+  ) {
+    if (
+      typeof progress !== 'object' ||
+      progress === null ||
+      !('fractionalProgress' in progress)
+    )
+      return;
     const job = await this.getJob(jobId);
-    await this.apiEvents.create({
+    const kind = API_EVENT_KINDS.scenario__run__progress__v1__alpha1;
+    const eventData: ScenarioRunProgressV1Alpha1DTO = {
+      kind,
+      fractionalProgress: progress.fractionalProgress,
+    };
+    await this.apiEvents.createIfNotExists({
       topic: job.data.scenarioId,
-      kind: API_EVENT_KINDS.scenario__run__finished__v1__alpha1,
+      kind,
+      externalId: eventId,
+      data: eventData,
     });
   }
 
-  private async handleFailed(jobId: string) {
+  private async handleFinished(jobId: string, eventId: string) {
     const job = await this.getJob(jobId);
-    await this.apiEvents.create({
+    const kind = API_EVENT_KINDS.scenario__run__finished__v1__alpha1;
+    await this.apiEvents.createIfNotExists({
       topic: job.data.scenarioId,
-      kind: API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
+      kind,
+      externalId: eventId,
+    });
+  }
+
+  private async handleFailed(jobId: string, eventId: string) {
+    const job = await this.getJob(jobId);
+    const kind = API_EVENT_KINDS.scenario__run__failed__v1__alpha1;
+    await this.apiEvents.createIfNotExists({
+      topic: job.data.scenarioId,
+      kind,
+      externalId: eventId,
     });
   }
 

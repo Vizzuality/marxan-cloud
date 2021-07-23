@@ -5,6 +5,7 @@ import Header from 'layout/header';
 import Wrapper from 'layout/wrapper';
 import Protected from 'layout/protected';
 import Help from 'layout/help/button';
+import MetaIcons from 'layout/meta-icons';
 
 import ProjectHeader from 'layout/projects/show/header';
 import ProjectScenarios from 'layout/projects/show/scenarios';
@@ -18,6 +19,8 @@ const ShowProjectsPage: React.FC = () => {
   return (
     <Protected>
       <ProjectTitle title="" />
+
+      <MetaIcons />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />

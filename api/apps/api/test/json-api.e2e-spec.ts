@@ -42,6 +42,8 @@ describe('JSON API Specs (e2e)', () => {
     fakeProject = await ProjectsTestUtils.createProject(app, jwtToken, {
       ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
         countryCode: 'NAM',
+        adminAreaLevel1Id: 'NAM.12_1',
+        adminAreaLevel2Id: 'NAM.12.7_1',
       }),
       organizationId: fakeOrganization.id,
     }).then(async (response) => await Deserializer.deserialize(response));
@@ -51,7 +53,7 @@ describe('JSON API Specs (e2e)', () => {
     await Promise.all([app.close()]);
   });
 
-  it('should return a response shaped as JSON:API Error spec, including ', async () => {
+  it('should return a response shaped as JSON:API Error spec, including raw error data', async () => {
     const jsonApiErrorResponse = {
       id: null,
       links: null,
@@ -104,6 +106,8 @@ describe('JSON API Specs (e2e)', () => {
       .send({
         ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
           countryCode: 'NAM',
+          adminAreaLevel1Id: 'NAM.12_1',
+          adminAreaLevel2Id: 'NAM.12.7_1',
         }),
         organizationId: fakeOrganization.id,
       });

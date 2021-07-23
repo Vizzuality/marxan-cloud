@@ -23,9 +23,7 @@ export const createWorld = async () => {
   });
 
   const marxanOutputRepo: Repository<ScenariosOutputResultsApiEntity> = app.get(
-    getRepositoryToken(
-      ScenariosOutputResultsApiEntity
-    ),
+    getRepositoryToken(ScenariosOutputResultsApiEntity),
   );
 
   return {
@@ -41,9 +39,7 @@ export const createWorld = async () => {
     },
     WhenGettingSolutions: async () =>
       request(app.getHttpServer())
-        .get(
-          `/api/v1/scenarios/${scenario.data.id}/marxan/solutions`,
-        )
+        .get(`/api/v1/scenarios/${scenario.data.id}/marxan/solutions`)
         .set('Authorization', `Bearer ${jwt}`),
     cleanup: async () => {
       await marxanOutputRepo.delete({

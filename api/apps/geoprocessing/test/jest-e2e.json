@@ -29,6 +29,8 @@
     "@marxan/planning-area-repository/(.*)": "<rootDir>/../../libs/planning-area-repository/src/$1",
     "@marxan/planning-area-repository": "<rootDir>/../../libs/planning-area-repository/src",
     "@marxan/scenario-run-queue/(.*)": "<rootDir>/../../libs/scenario-run-queue/src/$1",
-    "@marxan/scenario-run-queue": "<rootDir>/../../libs/scenario-run-queue/src"
+    "@marxan/scenario-run-queue": "<rootDir>/../../libs/scenario-run-queue/src",
+    "@marxan/features/(.*)": "<rootDir>/../../libs/features/src/$1",
+    "@marxan/features": "<rootDir>/../../libs/features/src"
   }
 }
