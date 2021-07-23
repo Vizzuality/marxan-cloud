@@ -5,6 +5,7 @@ import { OutputScenariosFeaturesDataGeoEntity } from '@marxan/marxan-output';
 
 import { ScenarioFeatureIdMapper } from './id-mapper/scenario-feature-id.mapper';
 import { ScenarioFeaturesDataService } from './scenario-features-data.service';
+import { MvFileReader } from './file-reader/mv-file-reader';
 
 @Module({
   imports: [
@@ -13,7 +14,11 @@ import { ScenarioFeaturesDataService } from './scenario-features-data.service';
       OutputScenariosFeaturesDataGeoEntity,
     ]),
   ],
-  providers: [ScenarioFeatureIdMapper, ScenarioFeaturesDataService],
+  providers: [
+    ScenarioFeatureIdMapper,
+    ScenarioFeaturesDataService,
+    MvFileReader,
+  ],
   exports: [ScenarioFeaturesDataService],
 })
 export class ScenarioFeaturesModule {}

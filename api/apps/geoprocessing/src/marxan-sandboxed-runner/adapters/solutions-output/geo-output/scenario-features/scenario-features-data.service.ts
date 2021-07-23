@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { pipeline } from 'stream';
 import { ScenarioFeatureRunData } from './scenario-feature-run-data';
-import { Readable } from 'stronger-typed-streams';
 
 import { ScenarioFeatureIdMapper } from './id-mapper/scenario-feature-id.mapper';
+import { MvFileReader } from './file-reader/mv-file-reader';
 import { OutputLineToDataTransformer } from './file-reader/output-line-to-data.transformer';
 
 @Injectable()
 export class ScenarioFeaturesDataService {
-  constructor(private readonly scenarioIdMapper: ScenarioFeatureIdMapper) {}
+  constructor(
+    private readonly scenarioIdMapper: ScenarioFeatureIdMapper,
+    private readonly fileReader: MvFileReader,
+  ) {}
 
   async from(
     outputDirectory: string,
@@ -17,15 +21,18 @@ export class ScenarioFeaturesDataService {
       const result: ScenarioFeatureRunData[] = [];
       const idMap = await this.scenarioIdMapper.getMapping(scenarioId);
       console.log(`--- scenario features data mapping`, idMap);
-
-      // const featureDataStream: Readable<ScenarioFeatureRunData> = this.filesReader
-      //   .from(outputDirectory)
-      //   .pipe(new OutputLineToDataTransformer(idMap));
-      // featureDataStream.on('error', reject);
-      // featureDataStream.on('end', () => resolve(result));
-      // featureDataStream.on('data', (data) => {
-      //   result.push(data);
-      // });
+      pipeline(
+        this.fileReader.from(outputDirectory),
+        new OutputLineToDataTransformer(idMap),
+        (error) => {
+          if (error) {
+            return reject(error);
+          }
+          return resolve(result);
+        },
+      ).on(`data`, (data: ScenarioFeatureRunData) => {
+        result.push(data);
+      });
     });
   }
 }

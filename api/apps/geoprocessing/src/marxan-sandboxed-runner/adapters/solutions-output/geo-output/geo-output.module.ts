@@ -11,7 +11,6 @@ import { MarxanDirectory } from '../../marxan-directory.service';
 import { FileReader } from '../../file-reader';
 import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
 import { PlanningUnitSelectionCalculatorService } from './solutions/solution-aggregation/planning-unit-selection-calculator.service';
-import { ScenarioFeaturesDataService } from './scenario-features/scenario-features-data.service';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 
 import { ScenarioFeaturesModule } from './scenario-features';
@@ -31,7 +30,6 @@ import { ScenarioFeaturesModule } from './scenario-features';
     MarxanDirectory,
     FileReader,
     SolutionsReaderService,
-    ScenarioFeaturesDataService,
     PlanningUnitSelectionCalculatorService,
   ],
   exports: [GeoOutputRepository],
