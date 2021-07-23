@@ -47,7 +47,7 @@ const Template: Story<LegendProps> = (args) => {
             key={i.id}
             {...i}
           >
-            {type === 'matrix' && <LegendTypeMatrix className="text-sm text-red-600" items={items} />}
+            {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" items={items} />}
             {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
             {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
             {type === 'gradient' && <LegendTypeGradient className="text-sm text-gray-300" items={items} />}

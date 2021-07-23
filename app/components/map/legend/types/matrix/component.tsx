@@ -82,22 +82,25 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
 }: LegendTypeMatrixProps) => {
   return (
     <>
-      <div className="relative p-16">
-        <p className="absolute pl-6 text-xs font-medium text-white font-heading top-1">Always</p>
-        <p className="absolute pl-6 text-xs font-medium text-white font-heading bottom-1">Never</p>
+      <div className="relative p-12">
+        <p className="absolute text-xs font-medium text-white pl-7 font-heading top-2">Always</p>
+        <p className="absolute text-xs font-medium text-white pl-7 font-heading bottom-2">Never</p>
         <div className="transform rotate-45 w-min">
           <div className="grid grid-flow-col grid-rows-4">
             {intersections.map((i) => (
               <div key={i.id} className="w-6 h-6" style={{ background: `${i.color}` }} />
             ))}
+
           </div>
+          <div className="absolute w-3 h-3 bg-white left-0.5 top-0.5" />
+          <div className="absolute w-3 h-3 bg-gray-700 right-0.5 bottom-0.5" />
           <div className="absolute flex w-24 text-xs text-white font-heading -bottom-6 -left-6">
             <p className="transform -rotate-45">100%</p>
             <p className="transform -rotate-45">75%</p>
             <p className="transform -rotate-45">50%</p>
             <p className="transform -rotate-45">25%</p>
           </div>
-          <div className="absolute flex w-24 text-xs text-white transform -rotate-90 top-7 left-16 font-heading">
+          <div className="absolute flex w-24 text-xs text-white transform -rotate-90 top-6 left-16 font-heading">
             <p className="transform rotate-45">25%</p>
             <p className="transform rotate-45">50%</p>
             <p className="transform rotate-45">75%</p>
@@ -111,15 +114,15 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
           [className]: !!className,
         })}
       >
-        <ul className="flex flex-col w-full space-y-1">
+        <ul className="flex flex-col w-full space-y-3">
           {items
             .map(({ value, color }) => (
               <li
                 key={`${value}`}
-                className="flex space-x-2 text-xs"
+                className="flex space-x-2 text-sm font-heading"
               >
                 <div
-                  className="flex-shrink-0 w-3 h-3 mt-0.5 rounded"
+                  className="flex-shrink-0 w-3 h-3 mt-0.5 rounded-sm"
                   style={{
                     backgroundColor: color,
                   }}
