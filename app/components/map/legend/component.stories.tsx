@@ -7,6 +7,7 @@ import LegendItem from './item';
 import LegendTypeBasic from './types/basic';
 import LegendTypeChoropleth from './types/choropleth';
 import LegendTypeGradient from './types/gradient';
+import LegendTypeMatrix from './types/matrix';
 
 import ITEMS from './mock';
 
@@ -38,7 +39,7 @@ const Template: Story<LegendProps> = (args) => {
       onChangeOrder={onChangeOrder}
     >
       {sortedItems.map((i) => {
-        const { type, items } = i;
+        const { type, items, intersections } = i;
 
         return (
           <LegendItem
@@ -46,6 +47,7 @@ const Template: Story<LegendProps> = (args) => {
             key={i.id}
             {...i}
           >
+            {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
             {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
             {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
             {type === 'gradient' && <LegendTypeGradient className="text-sm text-gray-300" items={items} />}

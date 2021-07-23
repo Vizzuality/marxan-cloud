@@ -4,6 +4,88 @@ import HEXAGON_SVG from 'svgs/map/hexagon.svg';
 
 const ITEMS = [
   {
+    id: 'grid-example-1',
+    name: 'Solutions distribution',
+    icon: null,
+    type: 'matrix',
+    intersections: [
+      {
+        id: 1,
+        color: '#9EB6B8',
+      },
+      {
+        id: 2,
+        color: '#9EB6B8',
+      },
+      {
+        id: 3,
+        color: '#6A9A9B',
+      },
+      {
+        id: 4,
+        color: '#3C7B7E',
+      },
+      {
+        id: 5,
+        color: '#CCBDA0',
+      },
+      {
+        id: 6,
+        color: '#97A38A',
+      },
+      {
+        id: 7,
+        color: '#648975',
+      },
+      {
+        id: 8,
+        color: '#366E5F',
+      },
+      {
+        id: 9,
+        color: '#C5A66B',
+      },
+      {
+        id: 10,
+        color: '#918E5C',
+      },
+      {
+        id: 11,
+        color: '#5E774D',
+      },
+      {
+        id: 12,
+        color: '#30603F',
+      },
+      {
+        id: 13,
+        color: '#BD8D3B',
+      },
+      {
+        id: 14,
+        color: '#8B7931',
+      },
+      {
+        id: 15,
+        color: '#586527',
+      },
+      {
+        id: 16,
+        color: '#2A511E',
+      },
+    ],
+    items: [
+      {
+        value: 'Scenario 2',
+        color: '#3C7B7E',
+      },
+      {
+        value: 'Scenario 3',
+        color: '#DA9827',
+      },
+    ],
+  },
+  {
     id: 'XXX',
     name: 'Included areas',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-1 text-purple-500" />,
