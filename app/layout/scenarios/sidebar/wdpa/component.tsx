@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { motion } from 'framer-motion';
 
@@ -37,6 +37,12 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
     || projectData?.countryId,
   );
 
+  useEffect(() => {
+    return () => {
+      setStep(0);
+    };
+  }, [tab]);
+
   if (!scenarioData || tab !== 'protected-areas') return null;
 
   return (
@@ -46,7 +52,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
       animate={{ opacity: 1, y: 0 }}
     >
       <Pill selected>
-        <header className="flex items-baseline space-x-4 mb-5">
+        <header className="flex items-baseline mb-5 space-x-4">
           <h2 className="text-lg font-medium font-heading">Protected areas</h2>
 
           {(wdpaData && !!wdpaData.length) && (

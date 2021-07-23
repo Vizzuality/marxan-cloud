@@ -1,9 +1,11 @@
 export interface UseGeoJSONLayer {
+  cache?: number;
   id: string;
   active?: boolean;
   data: Record<string, unknown>;
 }
 export interface UseAdminPreviewLayer {
+  cache?: number;
   active?: boolean;
   bbox?: number[];
   country?: string;
@@ -13,6 +15,7 @@ export interface UseAdminPreviewLayer {
 }
 
 export interface UsePUGridPreviewLayer {
+  cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
   planningUnitGridShape?: string;
@@ -20,12 +23,16 @@ export interface UsePUGridPreviewLayer {
 }
 
 export interface UseWDPAPreviewLayer {
+  cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
   wdpaIucnCategories?: string[];
 }
 
 export interface UsePUGridLayer {
+  cache?: number;
   sid?: string;
   active?: boolean;
+  type: 'default' | 'proyected-areas' | 'adjust-planning-units';
+  options?: Record<string, unknown>;
 }
