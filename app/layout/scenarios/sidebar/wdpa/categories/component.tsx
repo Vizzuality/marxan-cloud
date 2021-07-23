@@ -17,7 +17,7 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useProject } from 'hooks/projects';
 import { useWDPACategories } from 'hooks/wdpa';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
@@ -38,6 +38,9 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
   const scenarioSlice = getScenarioSlice(sid);
   const { setWDPACategories } = scenarioSlice.actions;
   const dispatch = useDispatch();
+  const {
+    uploadingProtectedAreaFileName,
+  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: projectData } = useProject(pid);
 
@@ -263,7 +266,6 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
               return (
                 <ProtectedAreaUploader
                   {...fprops}
-                  // resetProtectedArea={resetProtectedArea}
                   form={form}
                 />
               );
@@ -304,8 +306,24 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                   })}
                 </div>
               </div>
-              <div>
-                <h3 className="text-sm">Uploaded protected areas:</h3>
+
+            </div>
+          )}
+
+          {!!uploadingProtectedAreaFileName && (
+            <div>
+              <h3 className="text-sm">Uploaded protected areas:</h3>
+              <div className="flex mb-2.5 mr-5">
+                <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
+                  {uploadingProtectedAreaFileName}
+                </span>
+
+                <button
+                  type="button"
+                  className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
+                >
+                  <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
+                </button>
               </div>
             </div>
           )}

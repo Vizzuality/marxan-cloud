@@ -336,8 +336,6 @@ export function useUploadProtectedArea({
   const [session] = useSession();
 
   const uploadProtectedAreaShapefile = ({ data, id }: UploadProtectedAreaProps) => {
-    console.log('HOOKS--->', data, 'ID', id);
-
     return UPLOADS.request({
       url: `/projects/${id}/protected-areas/shapefile`,
       data,

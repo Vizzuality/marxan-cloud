@@ -2,47 +2,40 @@ import React, { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { motion } from 'framer-motion';
-
 import cx from 'classnames';
 
 import { useDispatch } from 'react-redux';
 
-import {
-  setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
-} from 'store/slices/projects/new';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
 import { useUploadProtectedArea } from 'hooks/scenarios';
 
-import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
-
-import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface ProtectedAreaUploaderProps {
   input: any;
   meta: any;
-  resetProtectedArea?: any,
-  form: any,
+  form: any;
 }
 
 export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   input,
   meta,
-  resetProtectedArea,
-  form,
+  // form,
 }: ProtectedAreaUploaderProps) => {
   const [loading, setLoading] = useState(false);
-  const [successFile, setSuccessFile] = useState(null);
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid, sid } = query;
+
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setUploadingProtectedArea, setUploadingProtectedAreaFileName } = scenarioSlice.actions;
 
   const { addToast } = useToasts();
 
-  const { submitFailed, valid } = meta;
+  const { submitFailed } = meta;
 
   const dispatch = useDispatch();
 
@@ -56,7 +49,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   useEffect(() => {
     return () => {
       input.onChange(null);
-      dispatch(setUploadingPlanningArea(null));
+      dispatch(setUploadingProtectedArea(null));
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -68,21 +61,13 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadProtectedAreaMutation.mutate({ data, id: pid }, {
-      onSuccess: ({ data: { data: g, id: PAid } }) => {
-        console.log('uploadProtectedAreaMutation', { data: { data: g, id: PAid } });
-        const mockMinPuAreaSize = 251;
-        const mockMaxPuAreaSize = 2311631;
-        const mockBbox = [
-          4.21875,
-          14.150390625,
-          2.8113711933311403,
-          12.811801316582619,
-        ];
-
+    uploadProtectedAreaMutation.mutate({
+      data,
+      id: `${pid}`,
+    }, {
+      onSuccess: ({ data: { data: g, id: protectedAreaId } }) => {
         setLoading(false);
-        setSuccessFile({ id: PAid, name: f.name });
-        input.onChange(PAid);
+        input.onChange(protectedAreaId);
 
         addToast('success-upload-protected-area', (
           <>
@@ -93,16 +78,13 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
           level: 'success',
         });
 
-        dispatch(setUploadingPlanningArea(g));
-        dispatch(setBbox(mockBbox));
-        dispatch(setMinPuAreaSize(mockMinPuAreaSize));
-        dispatch(setMaxPuAreaSize(mockMaxPuAreaSize));
+        dispatch(setUploadingProtectedArea(g));
+        dispatch(setUploadingProtectedAreaFileName(f.name));
 
         console.info('Protected area uploaded', g);
       },
       onError: () => {
         setLoading(false);
-        setSuccessFile(null);
 
         addToast('error-upload-protected-area', (
           <>
@@ -162,95 +144,63 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         <div
           className={cx({
             'text-left': true,
-            'text-gray-300': !submitFailed && valid,
+            'text-gray-300': !submitFailed,
           })}
         >
-          {successFile ? 'Uploaded protected area' : 'Upload your protected area network'}
+          Upload your protected area network
         </div>
       </header>
 
-      {!successFile && (
-        <div className="pt-2">
-          <div
-            {...getRootProps()}
-            className={cx({
-              'relative px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
-              'bg-gray-500': isDragActive,
-              'border-green-800': isDragAccept,
-              'border-red-800': isDragReject,
-            })}
-          >
+      <div className="pt-2">
+        <div
+          {...getRootProps()}
+          className={cx({
+            'relative px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
+            'bg-gray-500': isDragActive,
+            'border-green-800': isDragAccept,
+            'border-red-800': isDragReject,
+          })}
+        >
 
-            <input {...getInputProps()} />
+          <input {...getInputProps()} />
 
-            <p className="text-sm text-gray-300">
-              Drag and drop your
-              {' '}
-              <b>polygon data file</b>
-              {' '}
-              or click here to upload
-            </p>
-
-            <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 3 MB'}</p>
-
-            <Loading
-              visible={loading}
-              className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-              iconClassName="w-5 h-5 text-primary-500"
-            />
-
-          </div>
-
-          <p className="flex items-center space-x-2 text-xs text-gray-300 mt-2.5">
-            <span>Learn more about supported file formats</span>
-            <InfoButton
-              theme="secondary"
-            >
-              <div className="text-sm">
-                <h3 className="font-semibold">List of supported file formats:</h3>
-                <ul className="pl-4 mt-2 space-y-1 list-disc list-outside">
-                  <li>
-                    Zipped: .shp
-                    (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)
-                  </li>
-                </ul>
-              </div>
-            </InfoButton>
+          <p className="text-sm text-gray-300">
+            Drag and drop your
+            {' '}
+            <b>polygon data file</b>
+            {' '}
+            or click here to upload
           </p>
 
-        </div>
-      )}
+          <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 3 MB'}</p>
 
-      {successFile && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <div className="flex items-center w-full py-5 space-x-8 cursor-pointer">
-            <div className="flex items-center space-x-2 ">
-              <label className="px-2.5 py-px bg-blue-500 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
-                <p className="text-sm text-blue-500">{successFile.name}</p>
-              </label>
-              <button
-                id="cancel-shapefile-btn"
-                type="button"
-                className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-white border-opacity-20"
-                onClick={() => {
-                  setSuccessFile(null);
-                  input.onChange(null);
-                  resetProtectedArea(form);
-                }}
-              >
-                <Icon
-                  className="w-1.5 h-1.5 text-white group-hover:text-black"
-                  icon={CLOSE_SVG}
-                />
-              </button>
+          <Loading
+            visible={loading}
+            className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+            iconClassName="w-5 h-5 text-primary-500"
+          />
+
+        </div>
+
+        <p className="flex items-center space-x-2 text-xs text-gray-300 mt-2.5">
+          <span>Learn more about supported file formats</span>
+          <InfoButton
+            theme="secondary"
+          >
+            <div className="text-sm">
+              <h3 className="font-semibold">List of supported file formats:</h3>
+              <ul className="pl-4 mt-2 space-y-1 list-disc list-outside">
+                <li>
+                  Zipped: .shp
+                  (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)
+                </li>
+              </ul>
             </div>
-          </div>
-        </motion.div>
-      )}
+          </InfoButton>
+        </p>
+
+      </div>
+
     </div>
   );
 };

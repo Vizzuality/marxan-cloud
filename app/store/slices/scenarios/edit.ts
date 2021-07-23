@@ -7,6 +7,10 @@ interface ScenarioEditStateProps {
   // WDPA
   wdpaCategories: Record<string, any>;
 
+  // PROTECTED AREAS
+  uploadingProtectedArea: Record<string, object>
+  uploadingProtectedAreaFileName: string,
+
   // ADJUST PLANNING UNITS
   clicking: boolean;
   clickingValue: string[];
@@ -23,6 +27,10 @@ const initialState = {
 
   // WDPA
   wdpaCategories: {},
+
+  // PROTECTED AREAS
+  uploadingProtectedArea: null,
+  uploadingProtectedAreaFileName: null,
 
   // ADJUST PLANNING UNITS
   clicking: false,
@@ -45,6 +53,15 @@ export function getScenarioSlice(id) {
       // WDPA
       setWDPACategories: (state, action: PayloadAction<Record<string, object>>) => {
         state.wdpaCategories = action.payload;
+      },
+
+      // PROTECTED AREAS
+      setUploadingProtectedArea: (state, action: PayloadAction<Record<string, object>>) => {
+        state.uploadingProtectedArea = action.payload;
+      },
+
+      setUploadingProtectedAreaFileName: (state, action: PayloadAction<string>) => {
+        state.uploadingProtectedAreaFileName = action.payload;
       },
 
       // ADJUST PLANNING UNITS
