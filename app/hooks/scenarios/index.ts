@@ -27,6 +27,8 @@ import {
   UploadScenarioCostSurfaceProps,
   UseUploadScenarioPUProps,
   UploadScenarioPUProps,
+  UseUploadProtectedAreaProps,
+  UploadProtectedAreaProps,
 } from './types';
 
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
@@ -321,6 +323,37 @@ export function useUploadCostSurface({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUploadProtectedArea({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadProtectedAreaProps) {
+  const [session] = useSession();
+
+  const uploadProtectedAreaShapefile = ({ data, id }: UploadProtectedAreaProps) => {
+    console.log('HOOKS--->', data, 'ID', id);
+
+    return UPLOADS.request({
+      url: `/projects/${id}/protected-areas/shapefile`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadProtectedAreaShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

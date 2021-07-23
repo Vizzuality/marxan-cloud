@@ -47,3 +47,12 @@ export interface UploadScenarioCostSurfaceProps {
   id?: string,
   data: any,
 }
+
+// useUploadProtectedArea
+export interface UseUploadProtectedAreaProps {
+  requestConfig?: AxiosRequestConfig
+}
+export interface UploadProtectedAreaProps {
+  id?: any,
+  data: any,
+}

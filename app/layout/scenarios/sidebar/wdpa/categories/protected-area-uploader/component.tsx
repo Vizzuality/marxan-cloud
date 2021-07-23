@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import { useRouter } from 'next/router';
+
 import { motion } from 'framer-motion';
 
 import cx from 'classnames';
@@ -12,7 +14,7 @@ import {
 
 import { useDropzone } from 'react-dropzone';
 import { useToasts } from 'hooks/toast';
-import { useUploadProjectPA } from 'hooks/projects';
+import { useUploadProtectedArea } from 'hooks/scenarios';
 
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
@@ -35,15 +37,16 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 }: ProtectedAreaUploaderProps) => {
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
+  const { query } = useRouter();
+  const { pid } = query;
+
   const { addToast } = useToasts();
 
   const { submitFailed, valid } = meta;
 
-  console.log({ meta });
-
   const dispatch = useDispatch();
 
-  const uploadProjectPAMutation = useUploadProjectPA({
+  const uploadProtectedAreaMutation = useUploadProtectedArea({
     requestConfig: {
       method: 'POST',
     },
@@ -65,8 +68,9 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadProjectPAMutation.mutate({ data }, {
+    uploadProtectedAreaMutation.mutate({ data, id: pid }, {
       onSuccess: ({ data: { data: g, id: PAid } }) => {
+        console.log('uploadProtectedAreaMutation', { data: { data: g, id: PAid } });
         const mockMinPuAreaSize = 251;
         const mockMaxPuAreaSize = 2311631;
         const mockBbox = [
