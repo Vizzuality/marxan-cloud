@@ -10,6 +10,7 @@ import { PlanningUnitsSelectionState } from './solutions/planning-unit-selection
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
   MarxanExecutionMetadataGeoEntity,
+  OutputScenariosFeaturesDataGeoEntity,
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
 import { readFileSync } from 'fs';
@@ -49,8 +50,7 @@ export class GeoOutputRepository {
       solutionsStream,
     );
 
-    // TODO grab data from ScenarioFeaturesDataService
-    const _sfds = await this.scenarioFeaturesDataReader.from(
+    const scenarioFeatureDataFromAllRuns = await this.scenarioFeaturesDataReader.from(
       workspace.workingDirectory,
       scenarioId,
     );
@@ -60,8 +60,16 @@ export class GeoOutputRepository {
         scenarioPuId: In(Object.keys(planningUnitsState)),
       });
 
-      // TODO clean OutputScenariosFeaturesDataGeoEntity
-      // TODO add OutputScenariosFeaturesDataGeoEntity new data
+      await transaction.delete(OutputScenariosFeaturesDataGeoEntity, {
+        featureScenarioId: In(
+          scenarioFeatureDataFromAllRuns.map((e) => e.featureScenarioId),
+        ),
+      });
+
+      await transaction.insert(
+        OutputScenariosFeaturesDataGeoEntity,
+        scenarioFeatureDataFromAllRuns,
+      );
 
       await Promise.all(
         Object.entries(planningUnitsState).map(([scenarioPuId, data]) =>

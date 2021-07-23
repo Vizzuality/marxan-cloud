@@ -8,6 +8,7 @@ import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandbox
 import {
   ExecutionResult,
   MarxanExecutionMetadataGeoEntity,
+  OutputScenariosFeaturesDataGeoEntity,
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
 
@@ -16,6 +17,8 @@ import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
 import { In, Repository } from 'typeorm';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { FeatureTags, ScenarioFeaturesData } from '@marxan/features';
+import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -46,9 +49,10 @@ describe(`given input data is delayed`, () => {
   }, 30000);
 });
 
-fdescribe(`given input data is available`, () => {
+describe(`given input data is available`, () => {
   beforeEach(async () => {
     fixtures.GivenInputFilesAreAvailable();
+    await fixtures.GivenScenarioDataExists();
     await fixtures.GivenScenarioPuDataExists();
   }, 60000 * 2);
   test(
@@ -62,7 +66,7 @@ fdescribe(`given input data is available`, () => {
     60000 * 15,
   );
 
-  test.skip(`cancelling marxan run`, async (done) => {
+  test(`cancelling marxan run`, async (done) => {
     expect.assertions(1);
 
     fixtures
@@ -84,13 +88,24 @@ afterEach(async () => {
   await fixtures.cleanup();
 }, 50000);
 
+const NUMBER_OF_FEATURES_IN_SAMPLE = 59;
+const NUMBER_OF_PU_IN_SAMPLE = 12178;
+const NUMBER_OF_RUNS = 100;
+
 const getFixtures = async () => {
   const scenarioId = v4();
   const outputsIds: string[] = [];
+  const scenarioFeatures: string[] = [];
 
   nock.disableNetConnect();
 
   const app = await bootstrapApplication();
+  const featuresData: Repository<GeoFeatureGeometry> = app.get(
+    getRepositoryToken(GeoFeatureGeometry),
+  );
+  const scenarioFeatureRepo: Repository<ScenarioFeaturesData> = app.get(
+    getRepositoryToken(ScenarioFeaturesData),
+  );
   const scenariosPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
     getRepositoryToken(ScenariosPlanningUnitGeoEntity),
   );
@@ -99,6 +114,9 @@ const getFixtures = async () => {
   );
   const metadataRepo: Repository<MarxanExecutionMetadataGeoEntity> = app.get(
     getRepositoryToken(MarxanExecutionMetadataGeoEntity),
+  );
+  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> = app.get(
+    getRepositoryToken(OutputScenariosFeaturesDataGeoEntity),
   );
   const sut: MarxanSandboxRunnerService = app.get(MarxanSandboxRunnerService);
 
@@ -117,6 +135,10 @@ const getFixtures = async () => {
       await scenariosPuDataRepo.delete({
         scenarioId,
       });
+      await scenarioFeatureRepo.delete({
+        scenarioId,
+      });
+      // featuresOutputRepo removes on cascade
       nockScope.done();
       nock.enableNetConnect();
     },
@@ -146,20 +168,62 @@ const getFixtures = async () => {
     GivenScenarioPuDataExists: async () => {
       outputsIds.push(
         ...(
-          await GivenScenarioPuData(scenariosPuDataRepo, scenarioId, 12178)
+          await GivenScenarioPuData(
+            scenariosPuDataRepo,
+            scenarioId,
+            NUMBER_OF_PU_IN_SAMPLE,
+          )
         ).rows.map((r) => r.id),
+      );
+    },
+    GivenScenarioDataExists: async () => {
+      const feature = await featuresData.save(
+        featuresData.create({
+          featuresId: v4(),
+        }),
+      );
+      scenarioFeatures.push(
+        ...(
+          await scenarioFeatureRepo.save(
+            [...Array(NUMBER_OF_FEATURES_IN_SAMPLE).keys()].map((index) => ({
+              scenarioId,
+              featureId: index + 1,
+              coverageTarget: 0,
+              coverageTargetArea: 1000,
+              featuresDataId: feature.id,
+              currentArea: 200,
+              fpf: 1,
+              met: 1,
+              tag: FeatureTags.bioregional,
+              target: 300,
+              metArea: 200,
+              onTarget: false,
+              target2: 200,
+              totalArea: 40000,
+              metadata: {},
+            })),
+          )
+        ).map((entity) => entity.id),
       );
     },
     ThenHasValidOutput(output: ExecutionResult) {
       expect(output.length).toEqual(100);
     },
     ThenOutputScenarioPuDataWasPersisted: async () => {
-      const k = await puOutputRepo.count({
-        where: {
-          scenarioPuId: In(outputsIds),
-        },
-      });
-      expect(k).toEqual(12178);
+      expect(
+        await puOutputRepo.count({
+          where: {
+            scenarioPuId: In(outputsIds),
+          },
+        }),
+      ).toEqual(12178);
+      expect(
+        await featuresOutputRepo.count({
+          where: {
+            featureScenarioId: In(scenarioFeatures),
+          },
+        }),
+      ).toEqual(NUMBER_OF_FEATURES_IN_SAMPLE * NUMBER_OF_RUNS);
     },
     ThenProgressWasReported() {
       // checking only the last call, otherwise the test is flaky as it depends on chunking the buffer

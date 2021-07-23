@@ -20,7 +20,6 @@ export class ScenarioFeaturesDataService {
     return new Promise(async (resolve, reject) => {
       const result: ScenarioFeatureRunData[] = [];
       const idMap = await this.scenarioIdMapper.getMapping(scenarioId);
-      console.log(`--- scenario features data mapping`, idMap);
       pipeline(
         this.fileReader.from(outputDirectory),
         new OutputLineToDataTransformer(idMap),

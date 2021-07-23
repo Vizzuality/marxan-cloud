@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   MarxanExecutionMetadataGeoEntity,
+  OutputScenariosFeaturesDataGeoEntity,
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
 
@@ -21,6 +22,7 @@ import { ScenarioFeaturesModule } from './scenario-features';
       MarxanExecutionMetadataGeoEntity,
       OutputScenariosPuDataGeoEntity,
       ScenariosPlanningUnitGeoEntity,
+      OutputScenariosFeaturesDataGeoEntity,
     ]),
     ScenarioFeaturesModule,
   ],
