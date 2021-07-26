@@ -34,9 +34,11 @@ module.exports = {
     'import/order': [
       'warn',
       {
-        groups: ['builtin', 'external', 'internal', 'parent', 'sibling'],
+        groups: [['builtin'], 'external', 'internal', 'parent', 'sibling'],
+        'newlines-between': 'always',
         alphabetize: {
           order: 'asc',
+          caseInsensitive: true,
         },
         pathGroups: [
           {
@@ -44,8 +46,57 @@ module.exports = {
             group: 'builtin',
             position: 'before',
           },
+          {
+            pattern: 'react-redux',
+            group: 'builtin',
+          },
+          {
+            pattern: 'react-final-form',
+            group: 'builtin',
+          },
+          {
+            pattern: 'next/**',
+            group: 'builtin',
+            position: 'after',
+          },
+          {
+            pattern: 'hoc/**',
+            group: 'external',
+            position: 'before',
+          },
+          {
+            pattern: 'store/**',
+            group: 'external',
+          },
+          {
+            pattern: 'hooks/**',
+            group: 'external',
+          },
+          {
+            pattern: 'layout/**',
+            group: 'internal',
+            position: 'before',
+          },
+          {
+            pattern: 'components/**',
+            group: 'internal',
+          },
+          {
+            pattern: 'images/**',
+            group: 'internal',
+            position: 'after',
+          },
+          {
+            pattern: 'svgs/**',
+            group: 'internal',
+            position: 'after',
+          },
         ],
-        pathGroupsExcludedImportTypes: ['builtin'],
+        pathGroupsExcludedImportTypes: [
+          'react',
+          'react-final-form',
+          'react-redux',
+        ],
       },
     ],
   },
