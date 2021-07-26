@@ -44,8 +44,14 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
         <InfoButton
           theme="primary"
         >
-          <div className="text-sm opacity-50">
-            This is the description from the info button.
+          <div className="text-sm opacity-100">
+            Evaluate the status in terms of protection of
+            your features in the resulting conservation plan.
+            The result will show the percentage of each
+            feature inside the included protected areas
+            plus the percentage inside the planning units
+            selected by Marxan and will inform you of
+            the protection situation regarding your targets.
           </div>
         </InfoButton>
         <Button

@@ -127,10 +127,10 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header>
+      <header className="flex items-center pt-5 pb-1 space-x-3">
         <button
           type="button"
-          className="flex items-center w-full pt-5 pb-1 space-x-2 text-left focus:outline-none"
+          className="flex items-center w-full space-x-2 text-left focus:outline-none"
           onClick={() => {
             onChangeSection(null);
           }}

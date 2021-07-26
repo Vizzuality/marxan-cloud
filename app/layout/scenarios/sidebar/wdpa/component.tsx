@@ -45,7 +45,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
       <HelpBeacon
         id="scenarios-wdpa"
         title="Protected Areas"
-        subtitle="Add Protected Areas to the conservation plan"
+        subtitle="Add protected areas to the conservation plan"
         content={(
           <div>
             Add here any existing protected areas you would

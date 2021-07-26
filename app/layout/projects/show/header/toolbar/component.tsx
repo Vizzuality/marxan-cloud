@@ -34,7 +34,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
             <HelpBeacon
               id="scenarios-upload"
               title="Upload scenario"
-              subtitle="Project list"
+              subtitle=""
               content={(
                 <div>
                   You can upload the files of a marxan scenario directly.
@@ -58,7 +58,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
             <HelpBeacon
               id="project-download"
               title="Download scenario"
-              subtitle="Project list"
+              subtitle=""
               content={(
                 <div>
                   You can download all the files from any of your projects in the standard marxan

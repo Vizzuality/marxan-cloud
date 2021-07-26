@@ -113,6 +113,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
                     handleSplitFeaturesSelected(item.id, s);
                   }}
                 />
+
               </div>
             );
           })}

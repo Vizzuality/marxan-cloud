@@ -27,10 +27,10 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header>
+      <header className="flex items-center pt-5 pb-1 space-x-3">
         <button
           type="button"
-          className="flex items-center w-full pt-5 pb-1 space-x-2 text-left focus:outline-none"
+          className="flex items-center w-full space-x-2 text-left focus:outline-none"
           onClick={() => {
             onChangeSection(null);
           }}
@@ -40,7 +40,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         </button>
         <InfoButton>
           <div>
-            <h4 className="font-heading text-lg mb-2.5">What is a Cost Surface?</h4>
+            <h4 className="font-heading text-lg mb-2.5">Locked-in and locked-out planning units</h4>
             <div>
 
               You can force Marxan to include or exclude some planning units from your analysis.

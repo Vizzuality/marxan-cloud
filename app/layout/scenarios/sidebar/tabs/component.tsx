@@ -34,8 +34,8 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   return (
     <HelpBeacon
       id="scenarios-tabs"
-      title="STEPS TO FOLLOW"
-      subtitle="Where to start?"
+      title="the marxan workflow"
+      subtitle="Steps to follow for the analysis"
       content={(
         <div>
           This tab will show the steps needed to complete a
