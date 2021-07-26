@@ -1,4 +1,4 @@
-import { FeatureTags } from '@marxan/features';
+import { FeatureTag } from '@marxan/features/domain';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -120,9 +120,9 @@ export class ScenarioFeaturesData {
 
   // what we expose with Extend
   @ApiProperty({
-    enum: FeatureTags,
+    enum: FeatureTag,
   })
-  tag!: FeatureTags;
+  tag!: FeatureTag;
 
   @ApiPropertyOptional({
     description: `Name of the feature, for example \`Lion in Deserts\`.`,

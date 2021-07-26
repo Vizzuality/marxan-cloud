@@ -1,0 +1,52 @@
+import { getFixtures } from './fixtures';
+
+let fixtures: ReturnType<typeof getFixtures>;
+
+beforeEach(() => {
+  fixtures = getFixtures();
+});
+
+describe(`Draft specification with non-calculated features determined`, () => {
+  beforeEach(() => {
+    fixtures.GivenDraftWasSubmitted();
+    fixtures.WhenFeaturesWereDetermined(false);
+  });
+
+  test(`Then specification isn't published`, () => {
+    fixtures.ThenSpecificationIsNotPublished();
+  });
+});
+
+describe(`Draft specification with all-calculated features determined`, () => {
+  beforeEach(() => {
+    fixtures.GivenDraftWasSubmitted();
+    fixtures.WhenFeaturesWereDetermined(true);
+  });
+
+  test(`Then specification isn't published`, () => {
+    fixtures.ThenSpecificationIsNotPublished();
+  });
+});
+
+describe(`"Created" specification with non-calculated features determined`, () => {
+  beforeEach(() => {
+    fixtures.GivenCreatedWasSubmitted();
+    fixtures.WhenFeaturesWereDetermined(false);
+  });
+
+  test(`Then specification is published`, () => {
+    fixtures.ThenSpecificationIsPublished();
+  });
+});
+
+describe(`"Created" specification with features determined (proved to be already calculated)`, () => {
+  beforeEach(() => {
+    fixtures.GivenCreatedWasSubmitted();
+    fixtures.WhenFeaturesWereDetermined(true);
+  });
+
+  test(`Then specification is activated`, () => {
+    fixtures.ThenSpecificationIsActivated();
+    fixtures.ThenSpecCandidateIsEmpty();
+  });
+});
