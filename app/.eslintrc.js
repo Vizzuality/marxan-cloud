@@ -20,7 +20,7 @@ module.exports = {
     'plugin:react/recommended', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
     'plugin:cypress/recommended',
   ],
-  plugins: ['cypress'],
+  plugins: ['cypress', 'import'],
   rules: {
     // Place to specify ESLint rules.
     // Can be used to overwrite rules specified from the extended configs
@@ -31,5 +31,22 @@ module.exports = {
     'import/no-named-as-default': 0,
     'import/prefer-default-export': 0,
     'no-param-reassign': ['error', { props: false }],
+    'import/order': [
+      'warn',
+      {
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling'],
+        alphabetize: {
+          order: 'asc',
+        },
+        pathGroups: [
+          {
+            pattern: 'react',
+            group: 'builtin',
+            position: 'before',
+          },
+        ],
+        pathGroupsExcludedImportTypes: ['builtin'],
+      },
+    ],
   },
 };
