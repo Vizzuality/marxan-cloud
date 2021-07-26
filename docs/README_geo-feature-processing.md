@@ -1,6 +1,6 @@
 # Processing of GeoFeatures
 
-WIP - not structured yet as a proper ADR.
+Design document for the processing of geofeatures for scenarios.
 
 ## Listing of features
 
