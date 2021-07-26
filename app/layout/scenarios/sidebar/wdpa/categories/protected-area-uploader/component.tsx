@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
@@ -31,7 +31,11 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   const { pid, sid } = query;
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setUploadingProtectedArea, setUploadingProtectedAreaFileName } = scenarioSlice.actions;
+  const { setUploadingProtectedArea, setUploadingProtectedAreaFileNames } = scenarioSlice.actions;
+
+  const {
+    uploadingProtectedAreaFileNames,
+  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { addToast } = useToasts();
 
@@ -79,7 +83,13 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         });
 
         dispatch(setUploadingProtectedArea(g));
-        dispatch(setUploadingProtectedAreaFileName(f.name));
+
+        const fileToUpdate = {
+          id: Math.random(),
+          value: f.name,
+        };
+        const filesArrayToUpdate = [...uploadingProtectedAreaFileNames, fileToUpdate];
+        dispatch(setUploadingProtectedAreaFileNames(filesArrayToUpdate));
 
         console.info('Protected area uploaded', g);
       },

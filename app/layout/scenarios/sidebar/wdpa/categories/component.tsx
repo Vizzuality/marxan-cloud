@@ -38,8 +38,11 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
   const scenarioSlice = getScenarioSlice(sid);
   const { setWDPACategories } = scenarioSlice.actions;
   const dispatch = useDispatch();
+
+  const { setUploadingProtectedAreaFileNames } = scenarioSlice.actions;
+
   const {
-    uploadingProtectedAreaFileName,
+    uploadingProtectedAreaFileNames,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: projectData } = useProject(pid);
@@ -159,6 +162,11 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     });
   }, [mutation, scenarioData?.id, addToast, onDismiss]);
 
+  const removeProtectedAreaFile = (fileId) => {
+    const filesArrayToUpdate = uploadingProtectedAreaFileNames.filter((file) => file.id !== fileId);
+    dispatch(setUploadingProtectedAreaFileNames(filesArrayToUpdate));
+  };
+
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
     return (
@@ -271,62 +279,66 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
               );
             }}
           </FieldRFF>
+          <div className="mt-10">
+            {!!values.wdpaIucnCategories.length && (
+              <div className="space-y-10">
+                <div>
+                  <h3 className="text-sm">Selected protected areas:</h3>
 
-          {!!values.wdpaIucnCategories.length && (
-            <div className="mt-10 space-y-10">
-              <div>
-                <h3 className="text-sm">Selected protected areas:</h3>
+                  <div className="flex flex-wrap mt-2.5">
+                    {values.wdpaIucnCategories.map((w) => {
+                      const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
 
-                <div className="flex flex-wrap mt-2.5">
-                  {values.wdpaIucnCategories.map((w) => {
-                    const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
+                      if (!wdpa) return null;
 
-                    if (!wdpa) return null;
-
-                    return (
-                      <div
-                        key={`${wdpa.value}`}
-                        className="flex mb-2.5 mr-5"
-                      >
-                        <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
-                          {wdpa.label}
-                        </span>
-
-                        <button
-                          type="button"
-                          className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
-                          onClick={() => {
-                            form.mutators.removeWDPAFilter(wdpa.value, values.wdpaIucnCategories);
-                          }}
+                      return (
+                        <div
+                          key={`${wdpa.value}`}
+                          className="flex mb-2.5 mr-5"
                         >
-                          <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
-                        </button>
-                      </div>
-                    );
-                  })}
+                          <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
+                            {wdpa.label}
+                          </span>
+
+                          <button
+                            type="button"
+                            className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
+                            onClick={() => {
+                              form.mutators.removeWDPAFilter(wdpa.value, values.wdpaIucnCategories);
+                            }}
+                          >
+                            <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
+
               </div>
+            )}
 
-            </div>
-          )}
+            {uploadingProtectedAreaFileNames.length !== 0 && (
+              <div className="mt-6">
+                <h3 className="text-sm">Uploaded protected areas:</h3>
+                {uploadingProtectedAreaFileNames.map((u) => (
+                  <div key={u.id} className="flex mb-2.5 mr-5 mt-2">
+                    <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
+                      {u.value}
+                    </span>
 
-          {!!uploadingProtectedAreaFileName && (
-            <div>
-              <h3 className="text-sm">Uploaded protected areas:</h3>
-              <div className="flex mb-2.5 mr-5">
-                <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
-                  {uploadingProtectedAreaFileName}
-                </span>
-
-                <button
-                  type="button"
-                  className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
-                >
-                  <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
-                </button>
+                    <button
+                      onClick={() => removeProtectedAreaFile(u.id)}
+                      type="button"
+                      className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
+                    >
+                      <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="flex justify-center mt-20 space-x-2">
             <Button

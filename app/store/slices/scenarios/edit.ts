@@ -9,7 +9,7 @@ interface ScenarioEditStateProps {
 
   // PROTECTED AREAS
   uploadingProtectedArea: Record<string, object>
-  uploadingProtectedAreaFileName: string,
+  uploadingProtectedAreaFileNames: string[];
 
   // ADJUST PLANNING UNITS
   clicking: boolean;
@@ -30,7 +30,7 @@ const initialState = {
 
   // PROTECTED AREAS
   uploadingProtectedArea: null,
-  uploadingProtectedAreaFileName: null,
+  uploadingProtectedAreaFileNames: [],
 
   // ADJUST PLANNING UNITS
   clicking: false,
@@ -60,8 +60,10 @@ export function getScenarioSlice(id) {
         state.uploadingProtectedArea = action.payload;
       },
 
-      setUploadingProtectedAreaFileName: (state, action: PayloadAction<string>) => {
-        state.uploadingProtectedAreaFileName = action.payload;
+      setUploadingProtectedAreaFileNames: (
+        state, action: PayloadAction<string[]>,
+      ) => {
+        state.uploadingProtectedAreaFileNames = action.payload;
       },
 
       // ADJUST PLANNING UNITS
