@@ -36,12 +36,14 @@ import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { SimpleJobStatus } from './scenario.api.entity';
 import { assertDefined } from '@marxan/utils';
 import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-property-sets.service';
+import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
   status: SimpleJobStatus.draft,
   features: [],
 };
+
 @Injectable()
 export class ScenariosService {
   private readonly geoprocessingUrl: string = AppConfig.get(
@@ -62,6 +64,7 @@ export class ScenariosService {
     private readonly geoFeaturesService: GeoFeaturesService,
     private readonly geoFeaturePropertySetService: GeoFeaturePropertySetService,
     private readonly inputArchiveService: InputFilesArchiverService,
+    private readonly planningUnitsService: ScenarioPlanningUnitsService,
   ) {}
 
   async findAllPaginated(
@@ -304,5 +307,10 @@ export class ScenariosService {
   async getMarxanExecutionInputArchive(scenarioId: string) {
     await this.assertScenario(scenarioId);
     return this.inputArchiveService.archive(scenarioId);
+  }
+
+  async getPlanningUnits(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    return this.planningUnitsService.get(scenarioId);
   }
 }

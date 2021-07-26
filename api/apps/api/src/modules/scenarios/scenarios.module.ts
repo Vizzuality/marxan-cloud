@@ -23,6 +23,7 @@ import { SolutionResultCrudService } from './solutions-result/solution-result-cr
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import {
   ScenariosOutputResultsApiEntity,
+  ScenariosPlanningUnitGeoEntity,
   ScenariosPuOutputGeoEntity,
 } from '@marxan/scenarios-planning-unit';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
@@ -32,6 +33,8 @@ import { ZipFilesSerializer } from './dto/zip-files.serializer';
 import { InputFilesModule } from './input-files';
 import { MarxanRunModule } from './marxan-run';
 import { GeoFeaturesModule } from '../geo-features/geo-features.module';
+import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.serializer';
+import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 
 @Module({
   imports: [
@@ -45,7 +48,7 @@ import { GeoFeaturesModule } from '../geo-features/geo-features.module';
       ScenariosOutputResultsApiEntity,
     ]),
     TypeOrmModule.forFeature(
-      [ScenariosPuOutputGeoEntity],
+      [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],
       DbConnections.geoprocessingDB,
     ),
     UsersModule,
@@ -64,12 +67,14 @@ import { GeoFeaturesModule } from '../geo-features/geo-features.module';
     ScenariosCrudService,
     ProxyService,
     WdpaAreaCalculationService,
+    ScenarioPlanningUnitsService,
     ScenarioSerializer,
     ScenarioFeatureSerializer,
     SolutionResultCrudService,
     ScenarioSolutionSerializer,
     MarxanInput,
     ZipFilesSerializer,
+    ScenarioPlanningUnitSerializer,
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],
