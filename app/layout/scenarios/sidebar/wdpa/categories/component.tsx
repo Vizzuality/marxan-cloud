@@ -268,7 +268,6 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
           <p className="py-8 text-sm text-center">or</p>
           <FieldRFF
             name="protectedAreaId"
-            // validate={composeValidators([{ presence: true }])}
           >
             {(fprops) => {
               return (
@@ -340,6 +339,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                 </div>
               </div>
             )}
+
           </div>
 
           <div className="flex justify-center mt-20 space-x-2">
