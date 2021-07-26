@@ -5,6 +5,7 @@ import Title from 'layout/title/scenario-title';
 import Header from 'layout/header';
 import Protected from 'layout/protected';
 import Wrapper from 'layout/wrapper';
+import Help from 'layout/help/button';
 
 import ScenariosMap from 'layout/scenarios/map';
 
@@ -27,6 +28,8 @@ const EditScenarioPage: React.FC = () => {
       <Head>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <Help />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />

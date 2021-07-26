@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
 import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -37,6 +38,38 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
           <h4 className="text-xs uppercase font-heading">Adjust planning units</h4>
         </button>
+        <InfoButton>
+          <div>
+            <h4 className="font-heading text-lg mb-2.5">What is a Cost Surface?</h4>
+            <div>
+
+              You can force Marxan to include or exclude some planning units from your analysis.
+
+              <br />
+              <br />
+              Manually including or excluding individual planning units
+              is useful when a real-world issue affects where new
+              protected areas can be designated. For example, if
+              you know that a particular planning unit contains a restricted
+              military area and cannot be designated, then you could
+              manually exclude that planning unit from the project.
+              <br />
+              <br />
+
+              The areas selected to be included will be
+              {' '}
+              <b>locked in </b>
+              to your conservation plan and will appear in all of the solutions.
+              <br />
+              <br />
+              The areas selected to be excluded will be
+              {' '}
+              <b>locked out </b>
+              of your conservation plan and will never appear in the solutions
+            </div>
+
+          </div>
+        </InfoButton>
       </header>
 
       <Tabs

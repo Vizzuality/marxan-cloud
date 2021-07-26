@@ -211,7 +211,26 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                   <div className="flex items-center mb-3">
                     <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
                     <InfoButton>
-                      <span>Info about WDPA categories</span>
+
+                      <span>
+                        <h4 className="font-heading text-lg mb-2.5">IUCN categrories</h4>
+                        You can select to include protected areas
+
+                        from any or all of the
+                        IUCN categories that exist in your planning area:
+                        <br />
+                        <br />
+                        <ul className="list-disc pl-6">
+                          <li>Ia: Strict Nature Reserve.</li>
+                          <li>Ib: Wilderness Area.</li>
+                          <li>II: National Park.</li>
+                          <li>III: Natural Monument or Feature.</li>
+                          <li>IV: Habitat/Species Management Area.</li>
+                          <li>V: Protected Landscape/Seascape.</li>
+                          <li>VI: Protected area with sustainable use of natural resources.</li>
+                        </ul>
+
+                      </span>
                     </InfoButton>
                   </div>
 

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Pill from 'layout/pill';
 import ScenariosSidebarWDPACategories from 'layout/scenarios/sidebar/wdpa/categories';
 import ScenariosSidebarWDPAThreshold from 'layout/scenarios/sidebar/wdpa/threshold';
+import HelpBeacon from 'layout/help/beacon';
 
 import Steps from 'components/steps';
 
@@ -40,35 +41,68 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   if (!scenarioData || tab !== 'protected-areas') return null;
 
   return (
-    <motion.div
-      key="protected-areas"
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
-      <Pill selected>
-        <header className="flex items-baseline space-x-4 mb-5">
-          <h2 className="text-lg font-medium font-heading">Protected areas</h2>
+    <div className="w-full h-full">
+      <HelpBeacon
+        id="scenarios-wdpa"
+        title="Protected Areas"
+        subtitle="Add Protected Areas to the conservation plan"
+        content={(
+          <div>
+            Add here any existing protected areas you would
+            like to include in the plan. They will be
+            included as locked-in areas (meaning they will be
+            included in all the solutions of this scenario).
+            You can select current
+            protected areas listed in World Database of
+            Protected Areas (WCMC-UNEP)
+            or upload your own protected area geometry. If you do
+            not wish to include any protected areas, click on the
+            <b> Skip to features</b>
+            {' '}
+            button below.
 
-          {(wdpaData && !!wdpaData.length) && (
-            <Steps step={step + 1} length={2} />
+          </div>
           )}
-        </header>
+        modifiers={['flip']}
+        tooltipPlacement="left"
+      >
 
-        {step === 0 && (
-          <ScenariosSidebarWDPACategories
-            onSuccess={() => setStep(1)}
-            onDismiss={() => dispatch(setTab('features'))}
-          />
-        )}
+        <motion.div
+          key="protected-areas"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
 
-        {step === 1 && (
-          <ScenariosSidebarWDPAThreshold
-            onSuccess={() => dispatch(setTab('features'))}
-            onBack={() => { setStep(0); }}
-          />
-        )}
-      </Pill>
-    </motion.div>
+          <Pill selected>
+
+            <header className="flex items-baseline space-x-4 mb-5">
+
+              <h2 className="text-lg font-medium font-heading">Protected areas</h2>
+
+              {(wdpaData && !!wdpaData.length) && (
+              <Steps step={step + 1} length={2} />
+              )}
+            </header>
+
+            {step === 0 && (
+            <ScenariosSidebarWDPACategories
+              onSuccess={() => setStep(1)}
+              onDismiss={() => dispatch(setTab('features'))}
+            />
+            )}
+
+            {step === 1 && (
+            <ScenariosSidebarWDPAThreshold
+              onSuccess={() => dispatch(setTab('features'))}
+              onBack={() => { setStep(0); }}
+            />
+            )}
+          </Pill>
+
+        </motion.div>
+      </HelpBeacon>
+    </div>
+
   );
 };
 
