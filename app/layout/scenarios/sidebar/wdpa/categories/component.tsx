@@ -321,21 +321,23 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
             {uploadingProtectedAreaFileNames.length !== 0 && (
               <div className="mt-6">
                 <h3 className="text-sm">Uploaded protected areas:</h3>
-                {uploadingProtectedAreaFileNames.map((u) => (
-                  <div key={u.id} className="flex mb-2.5 mr-5 mt-2">
-                    <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
-                      {u.value}
-                    </span>
+                <div className="flex flex-wrap">
+                  {uploadingProtectedAreaFileNames.map((u) => (
+                    <div key={u.id} className="flex pt-3 pr-3">
+                      <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
+                        {u.value}
+                      </span>
 
-                    <button
-                      onClick={() => removeProtectedAreaFile(u.id)}
-                      type="button"
-                      className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
-                    >
-                      <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
-                    </button>
-                  </div>
-                ))}
+                      <button
+                        onClick={() => removeProtectedAreaFile(u.id)}
+                        type="button"
+                        className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
+                      >
+                        <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
