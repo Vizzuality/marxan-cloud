@@ -44,3 +44,12 @@ export interface UsePublishedProjectsProps {
   sort?: string,
   filters?: Record<string, unknown>
 }
+
+// useDuplicateProject
+export interface UseDuplicateProjectProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface DuplicateProjectProps {
+  data: any
+}
