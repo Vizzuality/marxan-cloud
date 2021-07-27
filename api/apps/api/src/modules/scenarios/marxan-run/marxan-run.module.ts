@@ -12,6 +12,9 @@ import {
   runQueueEventsProvider,
   runQueueProvider,
 } from './run-service.providers';
+import { RunHandler } from './run.handler';
+import { CancelHandler } from './cancel.handler';
+import { EventsHandler } from './events.handler';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import {
     InputFilesModule,
   ],
   providers: [
+    RunHandler,
+    CancelHandler,
+    EventsHandler,
     runQueueProvider,
     runQueueEventsProvider,
     blmDefaultProvider,
