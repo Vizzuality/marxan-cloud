@@ -10,7 +10,7 @@ import Loading from 'components/loading';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Item from 'components/projects/item';
 
-import { useProjects, useDeleteProject } from 'hooks/projects';
+import { useProjects, useDeleteProject, useDuplicateProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
@@ -61,6 +61,53 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
     });
   }, [deleteProject, deleteMutation, addToast]);
 
+  const duplicateProjectMutation = useDuplicateProject({
+    requestConfig: {
+      method: 'POST',
+    },
+  });
+
+  const onDuplicate = useCallback((projectId, projectName) => {
+    duplicateProjectMutation.mutate({ id: projectId }, {
+      onSuccess: ({ data: { data: s } }) => {
+        addToast('success-duplicate-project', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">
+              Project
+              {' '}
+              {projectName}
+              {' '}
+              duplicated
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
+
+        console.info('Project duplicated succesfully', s);
+      },
+      onError: () => {
+        addToast('error-duplicate-project', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              Project
+              {' '}
+              {projectName}
+              {' '}
+              not duplicated
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+
+        console.error('Project not duplicated');
+      },
+    });
+  }, [addToast, duplicateProjectMutation]);
+
   return (
     <Wrapper>
       <div className="relative pb-10">
@@ -97,6 +144,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
                     onDelete={() => {
                       setDelete(d);
                     }}
+                    onDuplicate={() => onDuplicate(d.id, d.name)}
                   />
                 );
               })}
