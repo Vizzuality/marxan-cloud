@@ -8,11 +8,8 @@ import { isDefined } from '@marxan/utils';
 
 @Injectable()
 export class MvFileReader {
-  from(directory: string): NodeJS.ReadableStream {
-    // TODO replace hardcoded output name
-    const filesLocation = directory + `/output`;
-
-    const files = readdirSync(filesLocation, {
+  from(outputDirectory: string): NodeJS.ReadableStream {
+    const files = readdirSync(outputDirectory, {
       encoding: `utf8`,
       withFileTypes: true,
     })
@@ -22,7 +19,7 @@ export class MvFileReader {
         const matches = matcher.exec(file.name);
         if (isDefined(matches?.groups?.runId)) {
           return {
-            path: filesLocation + '/' + file.name,
+            path: outputDirectory + '/' + file.name,
             runId: parseInt(matches!.groups!.runId, 10),
           };
         }

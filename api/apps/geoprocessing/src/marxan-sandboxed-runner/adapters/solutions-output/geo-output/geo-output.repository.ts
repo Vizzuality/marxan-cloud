@@ -1,8 +1,6 @@
 import { EntityManager, In } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-
-import { Workspace } from '../../../ports/workspace';
 import { MetadataArchiver } from './metadata/data-archiver.service';
 import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
 import { PlanningUnitSelectionCalculatorService } from './solutions/solution-aggregation/planning-unit-selection-calculator.service';
@@ -15,6 +13,7 @@ import {
 } from '@marxan/marxan-output';
 import { readFileSync } from 'fs';
 import { ScenarioFeaturesDataService } from './scenario-features';
+import { RunDirectories } from '../run-directories';
 
 @Injectable()
 export class GeoOutputRepository {
@@ -29,20 +28,18 @@ export class GeoOutputRepository {
 
   async save(
     scenarioId: string,
-    workspace: Workspace,
-    metaData: {
-      stdOutput: string[];
-      stdErr?: string[];
-    },
+    runDirectories: RunDirectories,
+    metaData: { stdOutput: string[]; stdErr?: string[] },
   ): Promise<void> {
-    const inputArchivePath = await this.metadataArchiver.zipInput(workspace);
-    const outputArchivePath = await this.metadataArchiver.zipOutput(workspace);
-
-    const solutionMatrix =
-      workspace.workingDirectory + `/output/output_solutionsmatrix.csv`;
+    const inputArchivePath = await this.metadataArchiver.zip(
+      runDirectories.input,
+    );
+    const outputArchivePath = await this.metadataArchiver.zip(
+      runDirectories.output,
+    );
 
     const solutionsStream = await this.solutionsReader.from(
-      solutionMatrix,
+      runDirectories.output,
       scenarioId,
     );
 
@@ -51,7 +48,7 @@ export class GeoOutputRepository {
     );
 
     const scenarioFeatureDataFromAllRuns = await this.scenarioFeaturesDataReader.from(
-      workspace.workingDirectory,
+      runDirectories.output,
       scenarioId,
     );
 
