@@ -33,7 +33,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
 
   const scenarioSlice = getScenarioSlice(sid);
   const {
-    setClicking, setPuIncludedValue, setPuExcludedValue, setCache,
+    setClicking, setCache,
   } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const { puIncludedValue, puExcludedValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
@@ -56,15 +56,11 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
 
     if (!selected) {
       dispatch(setClicking(false));
-      dispatch(setPuIncludedValue([]));
-      dispatch(setPuExcludedValue([]));
     }
 
     // Unmount
     return () => {
       dispatch(setClicking(false));
-      dispatch(setPuIncludedValue([]));
-      dispatch(setPuExcludedValue([]));
     };
   }, [selected]); // eslint-disable-line
 
@@ -75,9 +71,9 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
       id: `${sid}`,
       data: {
         byId: {
-          included: values.puIncludedValue,
-          excluded: values.puExcludedValue,
-          [values.type]: values.type === 'included' ? values.puIncludedValue : values.puExcludedValue,
+          include: values.puIncludedValue,
+          exclude: values.puExcludedValue,
+          [values.type]: values.type === 'include' ? values.puIncludedValue : values.puExcludedValue,
         },
       },
     }, {

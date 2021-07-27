@@ -28,7 +28,9 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   const { sid } = query;
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setPUAction, setPuIncludedValue, setPuExcludedValue } = scenarioSlice.actions;
+  const {
+    setPUAction, setPuIncludedValue, setPuExcludedValue,
+  } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
   const { data: PUData } = useScenarioPU(sid);
@@ -39,7 +41,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       dispatch(setPuIncludedValue(included));
       dispatch(setPuExcludedValue(excluded));
     }
-  }, [PUData, dispatch, setPuIncludedValue, setPuExcludedValue]);
+  }, [PUData]); //eslint-disable-line
 
   const onChangeTab = useCallback((t) => {
     setType(t);
