@@ -2,6 +2,13 @@
 
 Design document for the processing of geofeatures for scenarios.
 
+For context, please see a detailed [illustration of how split and stratification
+operations are
+handled](./README_geo-feature-processing/split-vs-stratification.pdf), and a
+[sketch of how these map to the formal specification of these
+operations](README_geo-feature-processing/stratification-example.png) described
+below in this design document.
+
 ## Listing of features
 
 Endpoint:
