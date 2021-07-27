@@ -94,8 +94,6 @@ module.exports = {
         ],
         pathGroupsExcludedImportTypes: [
           'react',
-          'react-final-form',
-          'react-redux',
         ],
       },
     ],
