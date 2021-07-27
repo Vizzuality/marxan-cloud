@@ -9,6 +9,7 @@ import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 import { Transform } from 'class-transformer';
 import { IsInt, Max, Min } from 'class-validator';
+import { logger } from '@marxan-api/modules/api-events/api-events.module';
 
 /**
  * @description The specification of the tile request
@@ -144,6 +145,9 @@ export class TileService {
         }
         return subQuery;
       }, 'tile');
+
+      logger.debug(query.printSql());
+
     const result = await query.getRawMany();
 
     if (result) {

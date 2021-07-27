@@ -39,9 +39,9 @@ export class ScenariosService {
      */
     const attributes =
       'test_pu_geom_id as puGeomId,\
-                        test_puid as puid,\
-                        test_lockin_status as lockinStatus, \
-                        test_protected_area as protectedArea';
+       test_puid as puid,\
+       test_lockin_status as lockinStatus, \
+       test_protected_area as protectedArea';
 
     /**
      * @todo: avoid sql injection in the scenario Id.
@@ -52,10 +52,12 @@ export class ScenariosService {
       'test',
     )
       .leftJoinAndSelect('test.planningUnitGeom', 'plan')
-      .leftJoinAndSelect('test.costData', 'cost')
+      .leftJoinAndSelect('test.outputData', 'outputData')
       .addSelect('plan.the_geom')
-      .addSelect('cost.cost')
       .where(`scenario_id = '${id}'`);
+
+      // .leftJoinAndSelect('test.costData', 'cost')
+      // .addSelect('cost.cost')
 
     const table = `(${sql.getSql()})`;
 
