@@ -1,12 +1,10 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 
 import { useRouter } from 'next/router';
 
 import { format } from 'd3';
 
-import { Form as FormRFF } from 'react-final-form';
-
-import { usePublishedProject, useDuplicateProject } from 'hooks/projects';
+import { usePublishedProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
 import Avatar from 'components/avatar';
@@ -18,8 +16,6 @@ import PublishedProjectMap from 'layout/community/published-projects/detail/map'
 import Share from 'layout/community/published-projects/detail/share';
 import Wrapper from 'layout/wrapper';
 
-import { useToasts } from 'hooks/toast';
-
 export interface CommunityProjectsDetailProps {
 
 }
@@ -27,7 +23,6 @@ export interface CommunityProjectsDetailProps {
 export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
-  const { addToast } = useToasts();
 
   const {
     data: publishedProject,
@@ -45,57 +40,10 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   });
 
   const {
-    description, name, planningAreaName, timesDuplicated, contributors,
+    id, description, name, planningAreaName, timesDuplicated, contributors,
   } = publishedProject || {};
 
   const scenarios = publishedProjectScenarios || [];
-
-  const duplicateProjectMutation = useDuplicateProject({
-    requestConfig: {
-      method: 'POST',
-    },
-  });
-
-  const handleDuplicateProjectSubmit = useCallback(() => {
-    duplicateProjectMutation.mutate({ id: pid }, {
-      onSuccess: ({ data: { data: s } }) => {
-        addToast('success-duplicate-project', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">
-              Project
-              {' '}
-              {name}
-              {' '}
-              duplicated
-            </p>
-          </>
-        ), {
-          level: 'success',
-        });
-
-        console.info('Project name saved succesfully', s);
-      },
-      onError: () => {
-        addToast('error-duplicate-project', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              Project
-              {' '}
-              {name}
-              {' '}
-              not duplicated
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-
-        console.error('Project name not saved');
-      },
-    });
-  }, [pid, addToast, duplicateProjectMutation, name]);
 
   return (
     <Wrapper>
@@ -132,18 +80,10 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                 <div className="flex flex-row items-center mb-10">
 
-                  <FormRFF onSubmit={handleDuplicateProjectSubmit}>
-                    {({ handleSubmit }) => (
-                      <form
-                        id="form-duplicate-project"
-                        onSubmit={handleSubmit}
-                        autoComplete="off"
-                        className="relative max-w-xs px-2"
-                      >
-                        <DuplicateButton />
-                      </form>
-                    )}
-                  </FormRFF>
+                  <DuplicateButton
+                    id={id}
+                    name={name}
+                  />
 
                   {timesDuplicated && (
                     <p className="ml-5 text-sm text-white">
