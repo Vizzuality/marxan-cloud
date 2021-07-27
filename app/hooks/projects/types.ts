@@ -51,5 +51,5 @@ export interface UseDuplicateProjectProps {
 }
 
 export interface DuplicateProjectProps {
-  data: any
+  id: string | string[];
 }

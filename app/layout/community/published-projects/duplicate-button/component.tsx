@@ -41,6 +41,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
       onClick={handleDuplicated}
       size="s"
       theme="transparent-white"
+      type="submit"
     >
       Duplicate
 

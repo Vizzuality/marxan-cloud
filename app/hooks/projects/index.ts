@@ -376,10 +376,11 @@ export function useDuplicateProject({
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  const duplicateProject = ({ data }: DuplicateProjectProps) => {
+  const duplicateProject = ({ id }: DuplicateProjectProps) => {
+    console.log('ID ON HOOK', id);
     return PROJECTS.request({
-      url: '/',
-      data,
+      url: `/${id}`,
+
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
