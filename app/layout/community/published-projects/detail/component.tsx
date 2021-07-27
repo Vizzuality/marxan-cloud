@@ -45,7 +45,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   });
 
   const {
-    id, description, name, planningAreaName, timesDuplicated, contributors,
+    description, name, planningAreaName, timesDuplicated, contributors,
   } = publishedProject || {};
 
   const scenarios = publishedProjectScenarios || [];
@@ -62,7 +62,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
         addToast('success-duplicate-project', (
           <>
             <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Project duplicated</p>
+            <p className="text-sm">
+              Project
+              {' '}
+              {name}
+              {' '}
+              duplicated
+            </p>
           </>
         ), {
           level: 'success',
@@ -74,7 +80,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
         addToast('error-duplicate-project', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Project not duplicated</p>
+            <p className="text-sm">
+              Project
+              {' '}
+              {name}
+              {' '}
+              not duplicated
+            </p>
           </>
         ), {
           level: 'error',
@@ -83,7 +95,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
         console.error('Project name not saved');
       },
     });
-  }, [pid, addToast, duplicateProjectMutation]);
+  }, [pid, addToast, duplicateProjectMutation, name]);
 
   return (
     <Wrapper>
@@ -128,10 +140,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                         autoComplete="off"
                         className="relative max-w-xs px-2"
                       >
-                        <DuplicateButton
-                          id={id}
-                          name={name}
-                        />
+                        <DuplicateButton />
                       </form>
                     )}
                   </FormRFF>

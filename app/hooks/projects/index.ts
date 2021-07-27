@@ -377,10 +377,9 @@ export function useDuplicateProject({
   const [session] = useSession();
 
   const duplicateProject = ({ id }: DuplicateProjectProps) => {
-    console.log('ID ON HOOK', id);
     return PROJECTS.request({
+      // Pending endpoint
       url: `/${id}`,
-
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
