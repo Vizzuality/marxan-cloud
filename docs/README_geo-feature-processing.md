@@ -213,10 +213,9 @@ computing throwaway results in order to simulate constant-time operations).
 
       geoprocessingOperations: [
         /**
-         * Either one operation of kind split/v1 or one operation of kind
-         * stratification/v1.
-         * We also describe copy/v1 which may be used to  unify how we handle
-         * plain and geoprocessed features.
+         * At most *one* operation: either one operation of kind `split/v1` or
+         * one operation of kind `stratification/v1`, or one operation of kind
+         * `copy/v1`.
          */
         {
           kind: 'split/v1',
@@ -286,7 +285,25 @@ points, so this simplification will not affect the description of the process.
     * check that for the feature referenced, `projectId` is either `null` or
       matches the `id` of the parent project of the scenario
 
-    * if this is a `withGeoprocessing` feature
+    * validate the `geoprocessingOperations` part of the feature's specification
+
+      * `geoprocessingOperations` is defined as an array to accommodate possible
+        future sequential operations, but for the time being it is limited to
+        one operation only (so the length of the array can be at most 1)
+
+      * moreover, each specification is meant to be processed in a single pass,
+        so no geoprocessing operations should depend on the result of other
+        geoprocessing operations within the same specification
+
+      * all features *referenced* in a specification must be "plain" features,
+        that is, not the result of a geoprocessing operation, such as a
+        split/subsetting, already performed in the platform as part of the same
+        project
+
+      * both platform-wide (that is, imported by the administrators of an
+        instance via ETL pipelines) and user-uploaded features can be
+        referenced, although only features uploaded within the current project
+        are available as usable within a specification
 
       * check that all the traits of the geoprocessing operations are valid
         (properties exist, intersected feature exists, etc.)
