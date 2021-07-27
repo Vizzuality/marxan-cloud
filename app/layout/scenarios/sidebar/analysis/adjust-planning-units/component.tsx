@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 import { motion } from 'framer-motion';
 
@@ -7,6 +7,8 @@ import Icon from 'components/icon';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
+import { useScenarioPU } from 'hooks/scenarios';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -26,8 +28,18 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   const { sid } = query;
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setPUAction } = scenarioSlice.actions;
+  const { setPUAction, setPuIncludedValue, setPuExcludedValue } = scenarioSlice.actions;
   const dispatch = useDispatch();
+
+  const { data: PUData } = useScenarioPU(sid);
+
+  useEffect(() => {
+    if (PUData) {
+      const { included, excluded } = PUData;
+      dispatch(setPuIncludedValue(included));
+      dispatch(setPuExcludedValue(excluded));
+    }
+  }, [PUData, dispatch, setPuIncludedValue, setPuExcludedValue]);
 
   const onChangeTab = useCallback((t) => {
     setType(t);

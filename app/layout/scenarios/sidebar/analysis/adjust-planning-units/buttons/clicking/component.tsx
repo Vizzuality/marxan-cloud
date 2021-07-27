@@ -32,18 +32,21 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
   const { addToast } = useToasts();
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setClicking, setClickingValue, setCache } = scenarioSlice.actions;
+  const {
+    setClicking, setPuIncludedValue, setPuExcludedValue, setCache,
+  } = scenarioSlice.actions;
   const dispatch = useDispatch();
-  const { clickingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { puIncludedValue, puExcludedValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const scenarioPUMutation = useSaveScenarioPU({});
 
   const INITIAL_VALUES = useMemo(() => {
     return {
       type,
-      clickingValue,
+      puIncludedValue,
+      puExcludedValue,
     };
-  }, [type, clickingValue]);
+  }, [type, puIncludedValue, puExcludedValue]);
 
   // Effects
   useEffect(() => {
@@ -53,13 +56,15 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
 
     if (!selected) {
       dispatch(setClicking(false));
-      dispatch(setClickingValue([]));
+      dispatch(setPuIncludedValue([]));
+      dispatch(setPuExcludedValue([]));
     }
 
     // Unmount
     return () => {
       dispatch(setClicking(false));
-      dispatch(setClickingValue([]));
+      dispatch(setPuIncludedValue([]));
+      dispatch(setPuExcludedValue([]));
     };
   }, [selected]); // eslint-disable-line
 
@@ -70,7 +75,9 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
       id: `${sid}`,
       data: {
         byId: {
-          [values.type]: values.clickingValue,
+          included: values.puIncludedValue,
+          excluded: values.puExcludedValue,
+          [values.type]: values.type === 'included' ? values.puIncludedValue : values.puExcludedValue,
         },
       },
     }, {
@@ -78,7 +85,6 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
         onSelected(null);
         dispatch(setCache(Date.now()));
         dispatch(setClicking(false));
-        dispatch(setClickingValue([]));
 
         addToast('adjust-planning-units-success', (
           <>
@@ -109,7 +115,6 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
     onSelected,
     dispatch,
     setClicking,
-    setClickingValue,
     setCache,
     addToast,
   ]);
