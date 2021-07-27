@@ -47,11 +47,11 @@ module.exports = {
             position: 'before',
           },
           {
-            pattern: 'react-redux',
+            pattern: 'react** || @react**',
             group: 'builtin',
           },
           {
-            pattern: 'react-final-form',
+            pattern: 'node_modules/**',
             group: 'builtin',
           },
           {
@@ -70,7 +70,7 @@ module.exports = {
           },
           {
             pattern: 'hooks/**',
-            group: 'external',
+            group: 'unknown',
           },
           {
             pattern: 'layout/**',
