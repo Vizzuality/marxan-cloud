@@ -10,6 +10,7 @@ import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
 import { isLeft } from 'fp-ts/Either';
+import { pick } from 'lodash';
 
 import { MarxanInput, MarxanParameters } from '@marxan/marxan-input';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -181,8 +182,8 @@ export class ScenariosService {
   async run(scenarioId: string, blm?: number): Promise<void> {
     const scenario = await this.assertScenario(scenarioId);
     await this.runService.run(
-      scenario.id,
-      blm ?? scenario.boundaryLengthModifier,
+      pick(scenario, 'id', 'boundaryLengthModifier'),
+      blm,
     );
   }
 

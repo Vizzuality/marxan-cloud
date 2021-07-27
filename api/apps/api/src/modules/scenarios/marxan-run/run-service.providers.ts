@@ -1,13 +1,9 @@
 import { FactoryProvider } from '@nestjs/common';
 import { Queue, QueueEvents } from 'bullmq';
 import { JobData, queueName } from '@marxan/scenario-run-queue';
-import { QueueBuilder, QueueEventsBuilder } from '@marxan-api/modules/queue';
-import {
-  blmDefaultToken,
-  runEventsToken,
-  runQueueToken,
-} from '@marxan-api/modules/scenarios/marxan-run/run.service';
 import { MarxanParametersDefaults } from '@marxan/marxan-input';
+import { QueueBuilder, QueueEventsBuilder } from '@marxan-api/modules/queue';
+import { blmDefaultToken, runEventsToken, runQueueToken } from './tokens';
 
 export const runQueueProvider: FactoryProvider<Queue<JobData>> = {
   provide: runQueueToken,
