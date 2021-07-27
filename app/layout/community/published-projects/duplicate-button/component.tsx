@@ -1,7 +1,5 @@
 import React, { useCallback } from 'react';
 
-import { Form as FormRFF } from 'react-final-form';
-
 import { useDuplicateProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
@@ -27,7 +25,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
     },
   });
 
-  const handleDuplicateProjectSubmit = useCallback(() => {
+  const onDuplicate = useCallback(() => {
     duplicateProjectMutation.mutate({ id }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-duplicate-project', (
@@ -69,31 +67,18 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
   }, [id, addToast, duplicateProjectMutation, name]);
 
   return (
-
-    <FormRFF onSubmit={handleDuplicateProjectSubmit}>
-      {({ handleSubmit }) => (
-        <form
-          id="form-duplicate-project"
-          onSubmit={handleSubmit}
-          autoComplete="off"
-          className="relative max-w-xs px-2"
-        >
-          <Button
-            className="px-6 group"
-            size="s"
-            theme="transparent-white"
-            type="submit"
-          >
-            Duplicate
-
-            <Icon
-              className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black"
-              icon={DOWNLOAD_SVG}
-            />
-          </Button>
-        </form>
-      )}
-    </FormRFF>
+    <Button
+      className="px-6 group"
+      size="s"
+      theme="transparent-white"
+      onClick={onDuplicate}
+    >
+      Duplicate
+      <Icon
+        className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black"
+        icon={DOWNLOAD_SVG}
+      />
+    </Button>
   );
 };
 

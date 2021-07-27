@@ -131,7 +131,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     },
   });
 
-  const handleDuplicateScenarioSubmit = useCallback((scenarioId, scenarioName) => {
+  const onDuplicate = useCallback((scenarioId, scenarioName) => {
     duplicateScenarioMutation.mutate({ id: scenarioId }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-duplicate-project', (
@@ -258,7 +258,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                           onDelete={() => {
                             setDelete(s);
                           }}
-                          onDuplicate={() => handleDuplicateScenarioSubmit(s.id, s.name)}
+                          onDuplicate={() => onDuplicate(s.id, s.name)}
                           SettingsC={<ScenarioSettings sid={s.id} />}
                         />
 
