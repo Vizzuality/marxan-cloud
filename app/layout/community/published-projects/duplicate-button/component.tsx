@@ -45,7 +45,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
           level: 'success',
         });
 
-        console.info('Project name saved succesfully', s);
+        console.info('Project duplicated succesfully', s);
       },
       onError: () => {
         addToast('error-duplicate-project', (
@@ -63,7 +63,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
           level: 'error',
         });
 
-        console.error('Project name not saved');
+        console.error('Project not duplicated');
       },
     });
   }, [id, addToast, duplicateProjectMutation, name]);

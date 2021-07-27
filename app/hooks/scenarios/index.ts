@@ -29,6 +29,8 @@ import {
   UploadScenarioPUProps,
   UseSaveScenarioPUProps,
   SaveScenarioPUProps,
+  UseDuplicateScenarioProps,
+  DuplicateScenarioProps,
 } from './types';
 
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
@@ -351,6 +353,39 @@ export function useSaveScenarioPU({
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDuplicateScenario({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseDuplicateScenarioProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const duplicateScenario = ({ id }: DuplicateScenarioProps) => {
+    // Pending endpoint
+    return SCENARIOS.request({
+      url: `/${id}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(duplicateScenario, {
+    onSuccess: (data: any, variables, context) => {
+      const { id, projectId } = data;
+      queryClient.invalidateQueries(['scenarios', projectId]);
+      queryClient.invalidateQueries(['scenarios', id]);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
       console.info('Error', error, variables, context);
     },
   });
