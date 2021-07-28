@@ -30,10 +30,13 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
   return (
     <>
       <div className="flex justify-between">
-        <div className="flex items-center">
-          <p className="mr-4 text-sm text-white font-heading">
-            {`Run ${runId}`}
-          </p>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <div className="relative w-4 h-4 bg-blue-700 rounded" />
+            <p className="mr-4 text-sm text-white font-heading">
+              {`Run ${runId}`}
+            </p>
+          </div>
           {best && (
             <div className="flex items-center">
               <p className="text-sm text-blue-400">Best solution</p>
