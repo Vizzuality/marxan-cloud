@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
+
 import { useRouter } from 'next/router';
+
+import useBottomScrollListener from 'hooks/scroll';
+import { useSolutions } from 'hooks/solutions';
 
 import { Button } from 'components/button/component';
 import Checkbox from 'components/forms/checkbox';
-import Icon from 'components/icon';
 import Label from 'components/forms/label';
-import LoadingMore from 'components/loading-more/component';
+import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
+import LoadingMore from 'components/loading-more/component';
 
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
-import { useSolutions } from 'hooks/solutions';
-import useBottomScrollListener from 'hooks/scroll';
-
-import InfoButton from 'components/info-button';
 import SolutionsTable from '../table';
 
 import { SolutionsTableFormProps } from './types';
@@ -22,9 +23,10 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   onCancel,
   onSave,
 }: SolutionsTableFormProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
   const { query } = useRouter();
-  const { pid } = query;
+  const { sid } = query;
 
   const {
     data,
@@ -33,7 +35,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     isFetching,
     isFetchingNextPage,
     isFetched,
-  } = useSolutions(pid, { filters: { 'most-different': mostDifSolutions } });
+  } = useSolutions(sid);
 
   const scrollRef = useBottomScrollListener(
     () => {

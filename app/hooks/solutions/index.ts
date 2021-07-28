@@ -1,18 +1,18 @@
 import { useMemo } from 'react';
+
 import {
   useInfiniteQuery,
 } from 'react-query';
-import { useSession } from 'next-auth/client';
 
 import flatten from 'lodash/flatten';
-
-import PROJECTS from 'services/projects';
+import { useSession } from 'next-auth/client';
+import SCENARIOS from 'services/scenarios';
 
 import {
   UseSolutionsOptionsProps,
 } from './types';
 
-export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) {
+export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {}) {
   const [session] = useSession();
 
   const {
@@ -29,9 +29,9 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
       };
     }, {});
 
-  const fetchFeatures = ({ pageParam = 1 }) => PROJECTS.request({
+  const fetchFeatures = ({ pageParam = 1 }) => SCENARIOS.request({
     method: 'GET',
-    url: `/${projectId}/features`,
+    url: `/${scenarioId}/marxan/solutions`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
@@ -47,7 +47,7 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
     },
   });
 
-  const query = useInfiniteQuery(['solutions', projectId, JSON.stringify(options)], fetchFeatures, {
+  const query = useInfiniteQuery(['solutions', scenarioId, JSON.stringify(options)], fetchFeatures, {
     keepPreviousData: true,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;

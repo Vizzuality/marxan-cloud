@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 
 import { motion } from 'framer-motion';
 
-import Icon from 'components/icon';
 import Button from 'components/button';
+import Icon from 'components/icon';
 import Modal from 'components/modal';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOCK_SVG from 'svgs/ui/clock.svg?sprite';
 import TABLE_SVG from 'svgs/ui/table.svg?sprite';
 
-import { ScenariosSolutionsDetailsProps } from './types';
 import SolutionsTableForm from '../table-form/component';
+
+import { ScenariosSolutionsDetailsProps } from './types';
 
 export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps> = ({
   onChangeSection,
