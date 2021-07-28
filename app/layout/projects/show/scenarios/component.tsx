@@ -1,33 +1,36 @@
 import React, { Fragment, useCallback, useState } from 'react';
-import cx from 'classnames';
 
 import { useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
-import { useProject } from 'hooks/projects';
-import { useRouter } from 'next/router';
-import {
-  useDeleteScenario, useScenarios, useScenariosStatus, useDuplicateScenario,
-} from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
-import useBottomScrollListener from 'hooks/scroll';
 
+import { useRouter } from 'next/router';
+
+import { useProject } from 'hooks/projects';
+import {
+  useDeleteScenario, useScenarios, useDuplicateScenario, useScenariosStatus,
+} from 'hooks/scenarios';
+import useBottomScrollListener from 'hooks/scroll';
+import { useToasts } from 'hooks/toast';
+
+import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
+import HelpBeacon from 'layout/help/beacon';
+import ScenarioSettings from 'layout/projects/show/scenarios/settings';
+import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
+import ScenarioTypes from 'layout/projects/show/scenarios/types';
+
 import Button from 'components/button';
-import Icon from 'components/icon';
-import Modal from 'components/modal';
-import Loading from 'components/loading';
 import ConfirmationPrompt from 'components/confirmation-prompt';
+import Icon from 'components/icon';
+import Loading from 'components/loading';
+import Modal from 'components/modal';
 import ScenarioItem from 'components/scenarios/item';
 
-import ScenarioTypes from 'layout/projects/show/scenarios/types';
-import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
-import ScenarioSettings from 'layout/projects/show/scenarios/settings';
-import HelpBeacon from 'layout/help/beacon';
-
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
-import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
+
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
+import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 export interface ProjectScenariosProps {
 }
@@ -73,11 +76,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
   const {
     data: scenariosStatusData,
-    isFetching: scenariosStatusIsFetching,
-    isFetched: scenariosStatusIsFetched,
   } = useScenariosStatus(pid);
-
-  console.info(scenariosStatusData, scenariosStatusIsFetching, scenariosStatusIsFetched);
 
   const scrollRef = useBottomScrollListener(
     () => {
@@ -226,8 +225,13 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             <div className="relative overflow-hidden" id="scenarios-list">
               <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-black via-black" />
               <div ref={scrollRef} className="relative z-0 flex flex-col flex-grow h-full py-6 overflow-x-hidden overflow-y-auto">
-                {!!allScenariosData.length && allScenariosData.map((s, i) => {
+                {!!allScenariosData.length
+                && scenariosStatusData
+                && allScenariosData.map((s, i) => {
                   const TAG = i === 0 ? HelpBeacon : Fragment;
+
+                  const { scenarios } = scenariosStatusData;
+                  const status = scenarios.find((st) => st.id === s.id);
 
                   return (
                     <TAG
@@ -251,10 +255,10 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                           'mt-3': i !== 0,
                         })}
                       >
-
                         <ScenarioItem
                           {...s}
                           status="draft"
+                          jobs={status?.jobs || []}
                           onDelete={() => {
                             setDelete(s);
                           }}

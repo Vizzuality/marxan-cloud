@@ -152,6 +152,37 @@ export function useScenario(id) {
   }, [query, data?.data?.data]);
 }
 
+// SCENARIO STATUS
+export function useScenariosStatus(pId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios-status', pId], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${pId}/scenarios/status`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!pId,
+    placeholderData: {
+      data: {
+        scenarios: [],
+      },
+    },
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
 export function useSaveScenario({
   requestConfig = {
     method: 'POST',
@@ -212,29 +243,6 @@ export function useDeleteScenario({
       console.info('Error', error, variables, context);
     },
   });
-}
-
-export function useScenariosStatus(pid) {
-  const [session] = useSession();
-
-  const query = useQuery(['scenarios-status', pid], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pid}/scenarios/status`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }), {
-    enabled: !!pid,
-  });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data?.data,
-    };
-  }, [query, data?.data?.data]);
 }
 
 export function useUploadScenarioPU({
