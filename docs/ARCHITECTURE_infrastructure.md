@@ -29,10 +29,10 @@ complexity to a suitable minimum.
 
 - Reliance on shared concepts
 
-For example, the use of Kubernetes as an DevOps platform, or Airflow as
-orchestration engine for data pipelines. Besides the operational leverage, these
-and other frameworks we choose should also help both onboard developers to the
-project, as well as making it easier for independent organizations to deploy
+For example, the use of Kubernetes as an DevOps platform, or BullMQ and Redis to
+manage queues of asynchronous compute jobs. Besides the operational leverage,
+these and other frameworks we choose should also help both onboard developers to
+the project, as well as making it easier for independent organizations to deploy
 their own instances, relying on commodity cloud services such as Azure AKS.
 
 - Scalability
@@ -56,7 +56,7 @@ expected platform performance profile:
 Marxan Cloud is a multi-tenant platform; logical isolation of data is provided
 via hierarchical grouping of entities (scenarios belong to projects; users may
 belong to organizations; projects can be associated to users or organizations -
-where organizations may be actually implemented at a later stage). However, all
+where organizations will be actually implemented at a later stage). However, all
 tenants of a Marxan Cloud instance do share computational resources (Kubernetes
 clusters, PostGIS workloads, Airflow executor resources, etc.).
 
@@ -76,8 +76,7 @@ four key system contexts:
 - The Marxan Cloud "application" proper (frontend and backend API)
 - Data pipelines
 
-These are shown (though not yet fully articulated in C4 logical terms, please
-bear with us!) here:
+These are shown here:
 
 ![Marxan Cloud platform - contexts](./ARCHITECTURE_infrastructure/marxan-contexts.png)
 
@@ -98,10 +97,11 @@ per-project PostgreSQL cloud database instances for the *GeoDatabase* component.
 
 ### Pub/Sub and job queues
 
-An Airflow instance orchestrates data and geo processing jobs, communicating
-with the API via Redis Pub/Sub queues to retrieve jobs ready to be processed,
-and to update job status as computation jobs in the Airflow cluster start,
-progress, terminate successfully or result in error conditions.
+BullMQ with Redis orchestrates data and geo processing jobs: jobs are pushed to
+job queues, from which they are retrieved by workers in the geoprocessing
+service when ready to be processed; the status of computation jobs is updated
+when processing of jobs starts, progresses, terminates successfully or results
+in error conditions.
 
 ## Data processing and geoprocessing context
 
