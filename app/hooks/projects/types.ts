@@ -47,7 +47,7 @@ export interface UsePublishedProjectsProps {
 
 // useDuplicateProject
 export interface UseDuplicateProjectProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface DuplicateProjectProps {
