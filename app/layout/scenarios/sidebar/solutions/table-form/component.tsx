@@ -45,6 +45,18 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     isFetched: mostDifSolutionsisFetched,
   } = useMostDifferentSolutions(sid);
 
+  const allSolutionsFetched = (!isFetching || isFetchingNextPage)
+  && data && data.length > 0 && !mostDifSolutions;
+
+  const mostDifSolutionsIsSelected = mostDifSolutions
+  && mostDifSolutionsData && mostDifSolutionsData.length > 0;
+
+  const noSolutionResults = ((!isFetching && (!data || !data.length)) || (!mostDifSolutionsisFetched
+    && (!mostDifSolutionsData || !mostDifSolutionsData.length)));
+
+  const solutionsAreLoading = ((isFetching && !isFetched)
+    || (mostDifSolutionsisFetching && !mostDifSolutionsisFetched));
+
   const scrollRef = useBottomScrollListener(
     () => {
       if (hasNextPage) fetchNextPage();
@@ -87,8 +99,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
         className="relative overflow-x-hidden overflow-y-auto"
         style={{ height: '400px' }}
       >
-        {((isFetching && !isFetched)
-        || (mostDifSolutionsisFetching && !mostDifSolutionsisFetched)) && (
+        {solutionsAreLoading && (
           <div className="absolute top-0 left-0 z-30 flex flex-col items-center justify-center w-full h-full">
             <Loading
               visible
@@ -99,21 +110,20 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           </div>
         )}
 
-        {((!isFetching && (!data || !data.length)) || (!mostDifSolutionsisFetched
-        && (!mostDifSolutionsData || !mostDifSolutionsData.length))) && (
+        {noSolutionResults && (
           <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
             No results found
           </div>
         )}
 
-        {(!isFetching || isFetchingNextPage) && data && data.length > 0 && !mostDifSolutions && (
+        {allSolutionsFetched && (
           <SolutionsTable
             body={data}
             onSelectSolution={(solution) => setSolutionSelected(solution.id)}
           />
         )}
 
-        {mostDifSolutions && mostDifSolutionsData && mostDifSolutionsData.length > 0 && (
+        {mostDifSolutionsIsSelected && (
           <SolutionsTable
             body={mostDifSolutionsData.slice(0, 5)}
             onSelectSolution={(solution) => setSolutionSelected(solution.id)}
