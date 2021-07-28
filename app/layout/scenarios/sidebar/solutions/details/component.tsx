@@ -99,11 +99,11 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           />
         </Modal>
       </div>
-      <div>
+      <div className="w-full p-6 mt-12 border-t border-gray-600">
         <SolutionSelected
-          id="2"
           best
           values={selectedSolutionData}
+          onToggleOnMap={() => console.log('Show map')}
         />
       </div>
     </motion.div>

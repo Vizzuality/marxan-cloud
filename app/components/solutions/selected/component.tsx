@@ -7,7 +7,6 @@ import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 import STAR_SVG from 'svgs/ui/star.svg?sprite';
 
 export interface SelectedSolutionProps {
-  id: string;
   best: boolean;
   values: {
     runId: number;
@@ -28,7 +27,7 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
   } = values;
 
   return (
-    <>
+    <div className="w-full">
       <div className="flex justify-between">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
@@ -53,7 +52,7 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
           <Icon icon={onMap ? HIDE_SVG : SHOW_SVG} className="w-5 h-5 ml-3" />
         </button>
       </div>
-      <div className="grid grid-cols-2 pt-5 pl-1 pr-16 text-sm text-white gap-y-6 gap-x-12">
+      <div className="grid grid-cols-2 pt-5 pl-1 pr-32 text-sm text-white gap-y-6 gap-x-5">
         <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
           <p>Score:</p>
           <p className="w-20 font-semibold text-left">{scoreValue}</p>
@@ -71,7 +70,7 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
           <p className="w-20 font-semibold text-left">{planningUnits}</p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

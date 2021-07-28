@@ -16,7 +16,6 @@ const Template: Story<SelectedSolutionProps> = ({ ...args }) => (
 
 export const Default: Story<SelectedSolutionProps> = Template.bind({});
 Default.args = {
-  id: 'dfasdfasd',
   best: true,
   values: {
     runId: 1,
