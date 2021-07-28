@@ -27,7 +27,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
 
   const onDuplicate = useCallback(() => {
     // Name must be the new one defined by the user
-    duplicateProjectMutation.mutate({ id, data: name }, {
+    duplicateProjectMutation.mutate({ id }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-duplicate-project', (
           <>
