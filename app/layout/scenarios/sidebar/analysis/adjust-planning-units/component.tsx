@@ -2,14 +2,17 @@ import React, { useState, useCallback, useEffect } from 'react';
 
 import { motion } from 'framer-motion';
 
+import Button from 'components/button';
 import Icon from 'components/icon';
 
+import { useToasts } from 'hooks/toast';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
-import { useScenarioPU } from 'hooks/scenarios';
+import { useScenarioPU, useSaveScenarioPU } from 'hooks/scenarios';
 
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 import Tabs from './tabs';
@@ -22,6 +25,7 @@ export interface ScenariosSidebarAnalysisSectionsProps {
 export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysisSectionsProps> = ({
   onChangeSection,
 }: ScenariosSidebarAnalysisSectionsProps) => {
+  const [clearing, setClearing] = useState(false);
   const [type, setType] = useState('include');
 
   const { query } = useRouter();
@@ -33,7 +37,10 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
+  const { addToast } = useToasts();
+
   const { data: PUData } = useScenarioPU(sid);
+  const scenarioPUMutation = useSaveScenarioPU({});
 
   useEffect(() => {
     if (PUData) {
@@ -47,6 +54,49 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
     setType(t);
     dispatch(setPUAction(t));
   }, [dispatch, setPUAction]);
+
+  const onClear = useCallback(() => {
+    const { includedDefault, excludedDefault } = PUData;
+    setClearing(true);
+
+    // Save current clicked pu ids
+    scenarioPUMutation.mutate({
+      id: `${sid}`,
+      data: {
+        byId: {
+          include: includedDefault,
+          exclude: excludedDefault,
+        },
+      },
+    }, {
+      onSuccess: () => {
+        addToast('clear-planning-units-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <ul className="text-sm">
+              <li>Planning units cleared</li>
+            </ul>
+          </>
+        ), {
+          level: 'success',
+        });
+        setClearing(false);
+      },
+      onError: () => {
+        addToast('clear-planning-units-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <ul className="text-sm">
+              <li>Ooops! Something went wrong. Try again</li>
+            </ul>
+          </>
+        ), {
+          level: 'error',
+        });
+        setClearing(false);
+      },
+    });
+  }, [sid, PUData, scenarioPUMutation, addToast]);
 
   return (
     <motion.div
@@ -69,10 +119,28 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         </button>
       </header>
 
-      <Tabs
-        type={type}
-        onChange={onChangeTab}
-      />
+      <div className="w-full flex items-center justify-between border-t border-gray-500 mt-2.5">
+        <Tabs
+          type={type}
+          onChange={onChangeTab}
+        />
+
+        {PUData && (!!PUData.included.length || !!PUData.excluded.length) && (
+          <div>
+            <Button
+              theme="secondary"
+              size="s"
+              disabled={clearing}
+              onClick={onClear}
+            >
+              <div className="flex items-center space-x-2">
+                <span>Clear</span>
+                <Icon icon={CLOSE_SVG} className="w-2 h-2" />
+              </div>
+            </Button>
+          </div>
+        )}
+      </div>
 
       <div className="relative flex flex-col flex-grow w-full min-h-0 overflow-hidden">
         <div className="absolute top-0 left-0 z-10 w-full h-3 bg-gradient-to-b from-gray-700 via-gray-700" />
