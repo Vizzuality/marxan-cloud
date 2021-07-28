@@ -6,7 +6,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test } from '@nestjs/testing';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ProgressData } from '@marxan/scenario-run-queue';
-import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
+import {
+  ApiEventsService,
+  duplicate,
+} from '@marxan-api/modules/api-events/api-events.service';
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
 import { OutputRepository } from '@marxan-api/modules/scenarios/marxan-run/output.repository';
 import {
@@ -136,14 +139,14 @@ test(`failed job`, async () => {
     `eventid1`,
   );
 
-  await fixtures.ThenEventCreated(
+  await fixtures.ThenEventCreatedIfNotExisted(
     API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
     `eventid1`,
   );
 });
 
 test(`completed job`, async () => {
-  fixtures.setupMockForCreatingEvents();
+  fixtures.setupMocksForCompletedJob();
   fixtures.GivenAJobInQueueWithReturnValue();
 
   fixtures.fakeEvents.emit(
@@ -157,11 +160,61 @@ test(`completed job`, async () => {
     `eventId2`,
   );
 
-  await fixtures.ThenEventCreated(
+  await fixtures.ThenEventCreatedIfNotExisted(
     API_EVENT_KINDS.scenario__run__finished__v1__alpha1,
     `eventId2`,
   );
+  await fixtures.ThenEventCreated(
+    API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1,
+  );
   fixtures.ThenOutputPersisted();
+});
+
+test(`duplicated completed job`, async () => {
+  fixtures.setupMocksForDuplicatedCompletedJob();
+  fixtures.GivenAJobInQueueWithReturnValue();
+
+  fixtures.fakeEvents.emit(
+    `completed`,
+    {
+      jobId: `123`,
+      data: {
+        scenarioId: `scenario-x`,
+      },
+    },
+    `eventId2`,
+  );
+
+  await fixtures.ThenEventCreatedIfNotExisted(
+    API_EVENT_KINDS.scenario__run__finished__v1__alpha1,
+    `eventId2`,
+  );
+  fixtures.ThenOutputNotPersisted();
+});
+
+test(`completed job with failing save`, async () => {
+  fixtures.setupMocksForCompletedJob();
+  fixtures.GivenOutputRepositoryFails();
+  fixtures.GivenAJobInQueueWithReturnValue();
+
+  fixtures.fakeEvents.emit(
+    `completed`,
+    {
+      jobId: `123`,
+      data: {
+        scenarioId: `scenario-x`,
+      },
+    },
+    `eventId2`,
+  );
+
+  await fixtures.ThenEventCreatedIfNotExisted(
+    API_EVENT_KINDS.scenario__run__finished__v1__alpha1,
+    `eventId2`,
+  );
+  await fixtures.ThenEventCreated(
+    API_EVENT_KINDS.scenario__run__outputSaveFailed__v1__alpha1,
+  );
 });
 
 test(`handling progress`, async () => {
@@ -180,7 +233,7 @@ test(`handling progress`, async () => {
     },
     `eventId1`,
   );
-  await fixtures.ThenEventCreated(
+  await fixtures.ThenEventCreatedIfNotExisted(
     API_EVENT_KINDS.scenario__run__progress__v1__alpha1,
     `eventId1`,
     {
@@ -320,8 +373,26 @@ async function getFixtures() {
     },
     setupMockForCreatingEvents() {
       fakeApiEvents.createIfNotExists.mockImplementation(() => {
-        //
+        return right({});
       });
+    },
+    setupMocksForCompletedJob() {
+      fakeApiEvents.createIfNotExists.mockImplementation(() => {
+        return right({});
+      });
+      fakeApiEvents.create.mockImplementation(() => {
+        return {};
+      });
+    },
+    setupMocksForDuplicatedCompletedJob() {
+      fakeApiEvents.createIfNotExists.mockImplementation(() => {
+        return left(duplicate);
+      });
+    },
+    GivenOutputRepositoryFails() {
+      fakeOutputRepository.saveOutput = () => {
+        throw new Error('failed!');
+      };
     },
     GivenAnActiveJobInQueue() {
       const jobs = [this.otherJob, this.activeJob];
@@ -372,7 +443,7 @@ async function getFixtures() {
         assets: this.scenarioAssets,
       });
     },
-    async ThenEventCreated(
+    async ThenEventCreatedIfNotExisted(
       kind: API_EVENT_KINDS,
       eventId: string,
       data?: CreateApiEventDTO['data'],
@@ -380,6 +451,21 @@ async function getFixtures() {
       await waitForExpect(() => {
         expect(fixtures.fakeApiEvents.createIfNotExists).toBeCalledTimes(1);
         expect(fixtures.fakeApiEvents.createIfNotExists).toBeCalledWith({
+          kind,
+          topic: `scenario-1`,
+          externalId: eventId,
+          data,
+        });
+      });
+    },
+    async ThenEventCreated(
+      kind: API_EVENT_KINDS,
+      eventId?: string,
+      data?: CreateApiEventDTO['data'],
+    ) {
+      await waitForExpect(() => {
+        expect(fixtures.fakeApiEvents.create).toBeCalledTimes(1);
+        expect(fixtures.fakeApiEvents.create).toBeCalledWith({
           kind,
           topic: `scenario-1`,
           externalId: eventId,
@@ -396,6 +482,9 @@ async function getFixtures() {
           scoreValue: 100,
         },
       ]);
+    },
+    ThenOutputNotPersisted() {
+      expect(fakeOutputRepository.db).toStrictEqual([]);
     },
     GivenNoJobsInQueue() {
       const jobs = [] as const;

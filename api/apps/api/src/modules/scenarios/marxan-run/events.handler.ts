@@ -1,10 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Job, Queue, QueueEvents } from 'bullmq';
+import { isLeft } from 'fp-ts/Either';
 import { JobData, ProgressData } from '@marxan/scenario-run-queue';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { assertDefined } from '@marxan/utils';
 import { ExecutionResult } from '@marxan/marxan-output';
-import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
+import {
+  ApiEventsService,
+  duplicate,
+} from '@marxan-api/modules/api-events/api-events.service';
 import { ScenarioRunProgressV1Alpha1DTO } from '@marxan-api/modules/api-events/dto/scenario-run-progress-v1-alpha-1';
 import { runEventsToken, runQueueToken } from './tokens';
 import { OutputRepository } from './output.repository';
@@ -64,12 +68,32 @@ export class EventsHandler {
   private async handleFinished(jobId: string, eventId: string) {
     const job = await this.getJob(jobId);
     const kind = API_EVENT_KINDS.scenario__run__finished__v1__alpha1;
-    await this.apiEvents.createIfNotExists({
+    const result = await this.apiEvents.createIfNotExists({
       topic: job.data.scenarioId,
       kind,
       externalId: eventId,
     });
-    await this.outputs.saveOutput(job);
+    if (isLeft(result)) {
+      const _isDuplicate: typeof duplicate = result.left;
+      return;
+    }
+    await this.saveOutput(job);
+  }
+
+  private async saveOutput(job: Job<JobData, ExecutionResult>) {
+    try {
+      await this.outputs.saveOutput(job);
+    } catch (error) {
+      await this.apiEvents.create({
+        topic: job.data.scenarioId,
+        kind: API_EVENT_KINDS.scenario__run__outputSaveFailed__v1__alpha1,
+      });
+      return;
+    }
+    await this.apiEvents.create({
+      topic: job.data.scenarioId,
+      kind: API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1,
+    });
   }
 
   private async handleFailed(jobId: string, eventId: string) {
