@@ -1,22 +1,22 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { useSelector } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useScenario } from 'hooks/scenarios';
+
 import { AnimatePresence, motion } from 'framer-motion';
+
+import Pill from 'layout/pill';
+import AdjustPanningUnits from 'layout/scenarios/sidebar/analysis/adjust-planning-units';
+import CostSurface from 'layout/scenarios/sidebar/analysis/cost-surface';
+import GapAnalysis from 'layout/scenarios/sidebar/analysis/gap-analysis';
+import Sections from 'layout/scenarios/sidebar/analysis/sections';
+import Run from 'layout/scenarios/sidebar/run';
 
 import Button from 'components/button';
 import Modal from 'components/modal';
-
-import Pill from 'layout/pill';
-
-import Sections from 'layout/scenarios/sidebar/analysis/sections';
-import GapAnalysis from 'layout/scenarios/sidebar/analysis/gap-analysis';
-import CostSurface from 'layout/scenarios/sidebar/analysis/cost-surface';
-import AdjustPanningUnits from 'layout/scenarios/sidebar/analysis/adjust-planning-units';
-
-import Run from 'layout/scenarios/sidebar/run';
-
-import { useSelector } from 'react-redux';
-import { useRouter } from 'next/router';
-import { useScenario } from 'hooks/scenarios';
 
 export interface ScenariosSidebarAnalysisProps {
 }

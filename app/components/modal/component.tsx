@@ -1,16 +1,15 @@
 import React, { Children, cloneElement, isValidElement } from 'react';
-import cx from 'classnames';
 
-import { AnimatePresence, motion } from 'framer-motion';
-
+import { useDialog } from '@react-aria/dialog';
+import { FocusScope } from '@react-aria/focus';
 import {
   useOverlay,
   usePreventScroll,
   useModal,
   OverlayContainer,
 } from '@react-aria/overlays';
-import { useDialog } from '@react-aria/dialog';
-import { FocusScope } from '@react-aria/focus';
+import cx from 'classnames';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import Icon from 'components/icon';
 
@@ -22,7 +21,7 @@ const COMMON_CONTENT_CLASSES = 'absolute top-1/2 inset-x-4 sm:left-1/2 transform
 const CONTENT_CLASSES = {
   narrow: `sm:w-4/6 md:w-1/2 lg:w-5/12 xl:w-1/3 ${COMMON_CONTENT_CLASSES}`,
   default: `sm:w-4/5 md:w-2/3 lg:1/2 xl:w-2/5 ${COMMON_CONTENT_CLASSES}`,
-  wide: `sm:w-10/12 md:w-10/12 lg:w-10/12 xl:w-8/12 ${COMMON_CONTENT_CLASSES}`,
+  wide: `sm:w-10/12 md:w-10/12 lg:w-8/12 xl:w-6/12 ${COMMON_CONTENT_CLASSES}`,
 };
 
 const OVERLAY_CLASSES = 'z-40 fixed inset-0 bg-black bg-blur';

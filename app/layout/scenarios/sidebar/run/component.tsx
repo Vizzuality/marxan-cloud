@@ -1,17 +1,23 @@
 import React, {
   useCallback, useMemo, useState,
 } from 'react';
-import cx from 'classnames';
 
 import { Form as FormRFF } from 'react-final-form';
 
+import { useRouter } from 'next/router';
+
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
+import cx from 'classnames';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
+
 import RUN_SVG from 'svgs/ui/run.svg?sprite';
 
-import { FIELDS } from './constants';
-
 import RunChart from './chart';
+import { FIELDS } from './constants';
 import RunField from './field';
 
 export interface ScenariosRunProps {
@@ -19,19 +25,68 @@ export interface ScenariosRunProps {
 
 export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   const [advanced, setAdvanced] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const { addToast } = useToasts();
+
+  const { query } = useRouter();
+  const { sid } = query;
+
+  const { data: scenarioData } = useScenario(sid);
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
 
   const INITIAL_VALUES = useMemo(() => {
     return FIELDS.reduce((acc, f) => {
+      const scenarioParamters = scenarioData?.metadata?.marxanInputParameterFile || {};
+
       return {
         ...acc,
-        [f.id]: f.default,
+        [f.id]: scenarioParamters[f.id] || f.default,
       };
     }, {});
-  }, []);
+  }, [scenarioData]);
 
   const onSubmit = useCallback((values) => {
-    console.info(values);
-  }, []);
+    setSubmitting(true);
+
+    const data = {
+      metadata: {
+        marxanInputParameterFile: values,
+      },
+    };
+
+    saveScenarioMutation.mutate({ id: `${sid}`, data }, {
+      onSuccess: ({ data: { data: s } }) => {
+        setSubmitting(false);
+
+        addToast('save-scenario-name', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Scenario name saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
+        console.info('Scenario name saved succesfully', s);
+      },
+      onError: () => {
+        setSubmitting(false);
+
+        addToast('error-scenario-name', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario name not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [sid, saveScenarioMutation, addToast]);
 
   return (
     <FormRFF
@@ -52,7 +107,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
 
             <div className="flex flex-col flex-grow flex-shrink-0 space-y-6 overflow-hidden w-80">
               <div className="relative flex flex-col flex-grow overflow-hidden">
-                <div className="absolute left-0 z-10 w-full h-6 -top-1 bg-gradient-to-b from-white via-white pointer-events-none" />
+                <div className="absolute left-0 z-10 w-full h-6 pointer-events-none -top-1 bg-gradient-to-b from-white via-white" />
                 <div className="pr-10 overflow-x-hidden overflow-y-auto">
                   <div className="py-6 space-y-10">
                     {FIELDS
@@ -73,7 +128,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-white via-white pointer-events-none" />
+                <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-white via-white" />
               </div>
 
               <div className="flex-shrink-0 pr-10">
@@ -82,6 +137,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
                   theme="primary"
                   size="base"
                   className="w-full"
+                  disabled={submitting}
                 >
                   <div className="flex items-center space-x-5">
                     <div className="text-left">
