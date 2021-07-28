@@ -2,19 +2,19 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-import { format } from 'd3';
-
 import { usePublishedProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
-import Avatar from 'components/avatar';
-import Loading from 'components/loading';
+import { format } from 'd3';
 
-import Backlink from 'layout/statics/backlink';
-import DuplicateButton from 'layout/community/published-projects/duplicate-button';
 import PublishedProjectMap from 'layout/community/published-projects/detail/map';
 import Share from 'layout/community/published-projects/detail/share';
+import DuplicateButton from 'layout/community/published-projects/duplicate-button';
+import Backlink from 'layout/statics/backlink';
 import Wrapper from 'layout/wrapper';
+
+import Avatar from 'components/avatar';
+import Loading from 'components/loading';
 
 export interface CommunityProjectsDetailProps {
 
@@ -23,6 +23,7 @@ export interface CommunityProjectsDetailProps {
 export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
+
   const {
     data: publishedProject,
     isFetching: publishedProjectIsFetching,
@@ -78,10 +79,12 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                 </p>
 
                 <div className="flex flex-row items-center mb-10">
+
                   <DuplicateButton
                     id={id}
                     name={name}
                   />
+
                   {timesDuplicated && (
                     <p className="ml-5 text-sm text-white">
                       Duplicated

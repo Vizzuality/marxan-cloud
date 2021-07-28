@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+
+import { useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import Icon from 'components/icon';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
-import Tabs from './tabs';
 import Buttons from './buttons';
+import Tabs from './tabs';
 
 export interface ScenariosSidebarAnalysisSectionsProps {
   onChangeSection: (s: string) => void;
@@ -17,6 +22,18 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   onChangeSection,
 }: ScenariosSidebarAnalysisSectionsProps) => {
   const [type, setType] = useState('include');
+
+  const { query } = useRouter();
+  const { sid } = query;
+
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setPUAction } = scenarioSlice.actions;
+  const dispatch = useDispatch();
+
+  const onChangeTab = useCallback((t) => {
+    setType(t);
+    dispatch(setPUAction(t));
+  }, [dispatch, setPUAction]);
 
   return (
     <motion.div
@@ -41,7 +58,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
 
       <Tabs
         type={type}
-        onChange={(t) => setType(t)}
+        onChange={onChangeTab}
       />
 
       <div className="relative flex flex-col flex-grow w-full min-h-0 overflow-hidden">

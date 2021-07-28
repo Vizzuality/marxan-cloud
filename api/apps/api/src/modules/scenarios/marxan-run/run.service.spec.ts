@@ -9,13 +9,12 @@ import { ProgressData } from '@marxan/scenario-run-queue';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
 import { Scenario } from '../scenario.api.entity';
-import {
-  notFound,
-  runEventsToken,
-  runQueueToken,
-  RunService,
-} from './run.service';
+import { RunService } from './run.service';
 import { AssetsService } from './assets.service';
+import { blmDefaultToken, runEventsToken, runQueueToken } from './tokens';
+import { RunHandler } from './run.handler';
+import { CancelHandler, notFound } from './cancel.handler';
+import { EventsHandler } from './events.handler';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let runService: RunService;
@@ -31,12 +30,43 @@ test(`scheduling job`, async () => {
   fixtures.GivenAssetsAvailable();
 
   // when
-  await runService.run('scenario-1');
+  await runService.run({ id: 'scenario-1' });
 
   // then
   fixtures.ThenShouldUpdateScenario();
   fixtures.ThenShouldEmitSubmittedEvent(`1234`);
   fixtures.ThenShouldAddJob();
+  fixtures.ThenShouldUseDefaultBlm();
+});
+
+test(`scheduling job with overriding blm`, async () => {
+  fixtures.setupMocksForSchedulingJobs(() => `1234`);
+  // given
+  fixtures.GivenAssetsAvailable();
+
+  // when
+  await runService.run({ id: 'scenario-1', boundaryLengthModifier: 78 }, -123);
+
+  // then
+  fixtures.ThenShouldUpdateScenario();
+  fixtures.ThenShouldEmitSubmittedEvent(`1234`);
+  fixtures.ThenShouldAddJob();
+  fixtures.ThenShouldUseBlm(-123);
+});
+
+test(`scheduling job with scenario that has blm`, async () => {
+  fixtures.setupMocksForSchedulingJobs(() => `1234`);
+  // given
+  fixtures.GivenAssetsAvailable();
+
+  // when
+  await runService.run({ id: 'scenario-1', boundaryLengthModifier: 78 });
+
+  // then
+  fixtures.ThenShouldUpdateScenario();
+  fixtures.ThenShouldEmitSubmittedEvent(`1234`);
+  fixtures.ThenShouldAddJob();
+  fixtures.ThenShouldUseBlm(78);
 });
 
 test(`scheduling job for scenario without assets`, async () => {
@@ -45,7 +75,7 @@ test(`scheduling job for scenario without assets`, async () => {
   fixtures.GivenAssetsNotAvailable();
 
   // when
-  const result = runService.run('scenario-1');
+  const result = runService.run({ id: 'scenario-1' });
 
   // then
   await expect(result).rejects.toBeDefined();
@@ -157,6 +187,13 @@ async function getFixtures() {
   };
   const testingModule = await Test.createTestingModule({
     providers: [
+      RunHandler,
+      CancelHandler,
+      EventsHandler,
+      {
+        provide: blmDefaultToken,
+        useValue: 42,
+      },
       {
         provide: runQueueToken,
         useValue: fakeQueue,
@@ -220,6 +257,7 @@ async function getFixtures() {
         relativeDestination: 'relativeDestination-value',
       },
     ],
+    defaultBlm: testingModule.get<number>(blmDefaultToken),
     getRunService() {
       return testingModule.get(RunService);
     },
@@ -333,6 +371,13 @@ async function getFixtures() {
         expect(id).toBe(`scenario-1`);
         return undefined;
       });
+    },
+    ThenShouldUseDefaultBlm() {
+      this.ThenShouldUseBlm(this.defaultBlm);
+    },
+    ThenShouldUseBlm(blm: number) {
+      expect(fakeAssets.forScenario).toBeCalledTimes(1);
+      expect(fakeAssets.forScenario).toBeCalledWith(`scenario-1`, blm);
     },
   };
 }

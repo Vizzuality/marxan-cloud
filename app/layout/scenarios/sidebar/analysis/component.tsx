@@ -1,22 +1,22 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+
+import { useSelector } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useScenario } from 'hooks/scenarios';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-import Button from 'components/button';
-import Modal from 'components/modal';
-
 import Pill from 'layout/pill';
-
-import Sections from 'layout/scenarios/sidebar/analysis/sections';
-import GapAnalysis from 'layout/scenarios/sidebar/analysis/gap-analysis';
-import CostSurface from 'layout/scenarios/sidebar/analysis/cost-surface';
 import AdjustPanningUnits from 'layout/scenarios/sidebar/analysis/adjust-planning-units';
-
+import CostSurface from 'layout/scenarios/sidebar/analysis/cost-surface';
+import GapAnalysis from 'layout/scenarios/sidebar/analysis/gap-analysis';
+import Sections from 'layout/scenarios/sidebar/analysis/sections';
 import Run from 'layout/scenarios/sidebar/run';
 
-import { useSelector } from 'react-redux';
-import { useRouter } from 'next/router';
-import { useScenario } from 'hooks/scenarios';
+import Button from 'components/button';
+import Modal from 'components/modal';
 
 export interface ScenariosSidebarAnalysisProps {
 }
@@ -35,6 +35,12 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   const onChangeSection = useCallback((s) => {
     setSection(s);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      setSection(null);
+    };
+  }, [tab]);
 
   if (!scenarioData || tab !== 'analysis') return null;
 

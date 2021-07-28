@@ -1,25 +1,27 @@
 import React, {
-  useCallback, useEffect, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 
 // Map
+import { useSelector, useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useWDPAPreviewLayer, usePUGridLayer } from 'hooks/map';
+import { useProject } from 'hooks/projects';
+
+import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
+import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import { useSession } from 'next-auth/client';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
 import Map from 'components/map';
 // import LAYERS from 'components/map/layers';
 
-import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
-import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
-
 // Controls
 import Controls from 'components/map/controls';
-import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
-
-import { useSession } from 'next-auth/client';
-import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-import { useProject } from 'hooks/projects';
-import { useWDPAPreviewLayer, usePUGridLayer } from 'hooks/map';
+import ZoomControl from 'components/map/controls/zoom';
 
 import ScenariosDrawingManager from './drawing-manager';
 
@@ -39,7 +41,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { setClickingValue } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const {
-    tab, wdpaCategories, clicking, clickingValue,
+    tab, cache, wdpaCategories, clicking, clickingValue, puAction,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const minZoom = 2;
@@ -49,13 +51,28 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
 
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
+    cache,
     active: tab === 'protected-areas',
     bbox,
   });
 
+  const type = useMemo(() => {
+    if (tab === 'analysis') {
+      return 'adjust-planning-units';
+    }
+
+    return 'default';
+  }, [tab]);
+
   const PUGridLayer = usePUGridLayer({
+    cache,
     active: true,
     sid: sid ? `${sid}` : null,
+    type,
+    options: {
+      puAction,
+      clickingValue,
+    },
   });
 
   const LAYERS = [WDPApreviewLayer, PUGridLayer].filter((l) => !!l);
@@ -89,17 +106,31 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
 
   const handleClick = useCallback((e) => {
     if (e && e.features) {
-      console.log(e.features);
+      console.info(e.features);
     }
 
     if (clicking) {
-      console.info(e);
-      const newClickingValue = [...clickingValue];
-      newClickingValue.push(`pu_id-${Math.random() * 1000}`);
+      const { features = [] } = e;
 
-      dispatch(setClickingValue(newClickingValue));
+      const pUGridLayer = features.find((f) => f.source === `pu-grid-layer-${cache}`);
+
+      if (pUGridLayer) {
+        const { properties } = pUGridLayer;
+        const { pugeomid } = properties;
+
+        const newClickingValue = [...clickingValue];
+        const index = newClickingValue.findIndex((s) => s === pugeomid);
+
+        if (index > -1) {
+          newClickingValue.splice(index, 1);
+        } else {
+          newClickingValue.push(pugeomid);
+        }
+
+        dispatch(setClickingValue(newClickingValue));
+      }
     }
-  }, [clicking, clickingValue, dispatch, setClickingValue]);
+  }, [clicking, clickingValue, dispatch, setClickingValue, cache]);
 
   const handleTransformRequest = (url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {

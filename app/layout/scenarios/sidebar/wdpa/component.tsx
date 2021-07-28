@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+import { useSelector, useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useProject } from 'hooks/projects';
+import { useScenario } from 'hooks/scenarios';
+import { useWDPACategories } from 'hooks/wdpa';
 
 import { motion } from 'framer-motion';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import Pill from 'layout/pill';
 import ScenariosSidebarWDPACategories from 'layout/scenarios/sidebar/wdpa/categories';
 import ScenariosSidebarWDPAThreshold from 'layout/scenarios/sidebar/wdpa/threshold';
 
 import Steps from 'components/steps';
-
-import { useSelector, useDispatch } from 'react-redux';
-import { useRouter } from 'next/router';
-import { useScenario } from 'hooks/scenarios';
-import { useProject } from 'hooks/projects';
-import { useWDPACategories } from 'hooks/wdpa';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 export interface ScenariosSidebarWDPAProps {
 }
@@ -37,6 +39,12 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
     || projectData?.countryId,
   );
 
+  useEffect(() => {
+    return () => {
+      setStep(0);
+    };
+  }, [tab]);
+
   if (!scenarioData || tab !== 'protected-areas') return null;
 
   return (
@@ -46,7 +54,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
       animate={{ opacity: 1, y: 0 }}
     >
       <Pill selected>
-        <header className="flex items-baseline space-x-4 mb-5">
+        <header className="flex items-baseline mb-5 space-x-4">
           <h2 className="text-lg font-medium font-heading">Protected areas</h2>
 
           {(wdpaData && !!wdpaData.length) && (

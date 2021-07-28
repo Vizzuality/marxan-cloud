@@ -1,14 +1,14 @@
 import React, { useCallback, useMemo, useState } from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
 
 import Legend, { LegendProps } from './component';
 import LegendItem from './item';
-
+import ITEMS from './mock';
 import LegendTypeBasic from './types/basic';
 import LegendTypeChoropleth from './types/choropleth';
 import LegendTypeGradient from './types/gradient';
-
-import ITEMS from './mock';
+import LegendTypeMatrix from './types/matrix';
 
 export default {
   title: 'Components/Map/Legend',
@@ -38,7 +38,7 @@ const Template: Story<LegendProps> = (args) => {
       onChangeOrder={onChangeOrder}
     >
       {sortedItems.map((i) => {
-        const { type, items } = i;
+        const { type, items, intersections } = i;
 
         return (
           <LegendItem
@@ -46,6 +46,7 @@ const Template: Story<LegendProps> = (args) => {
             key={i.id}
             {...i}
           >
+            {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
             {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
             {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
             {type === 'gradient' && <LegendTypeGradient className="text-sm text-gray-300" items={items} />}

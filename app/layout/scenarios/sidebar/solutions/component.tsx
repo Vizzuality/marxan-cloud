@@ -1,22 +1,24 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+
+import { useSelector } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useScenario } from 'hooks/scenarios';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-import Button from 'components/button';
-
 import Pill from 'layout/pill';
-
-import Sections from 'layout/scenarios/sidebar/solutions/sections';
 import SolutionsDetails from 'layout/scenarios/sidebar/solutions/details';
 import SolutionsGapAnalysis from 'layout/scenarios/sidebar/solutions/gap-analysis';
 import SolutionsList from 'layout/scenarios/sidebar/solutions/list';
+import Sections from 'layout/scenarios/sidebar/solutions/sections';
 import { ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
 
-import { useSelector } from 'react-redux';
-import { useRouter } from 'next/router';
-import { useScenario } from 'hooks/scenarios';
-import { ScenariosSidebarSolutionsProps } from './types';
+import Button from 'components/button';
+
 import { SolutionsSections } from './sections/types';
+import { ScenariosSidebarSolutionsProps } from './types';
 
 export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps> = () => {
   const [section, setSection] = useState(null);
@@ -31,6 +33,12 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
   const onChangeSection = useCallback((s) => {
     setSection(s);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      setSection(null);
+    };
+  }, [tab]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.SOLUTIONS) return null;
 

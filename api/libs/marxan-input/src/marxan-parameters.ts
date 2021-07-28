@@ -36,41 +36,63 @@ export enum ClumpType {
   GraduatedPenalty = 3,
 }
 
+export class MarxanParametersDefaults {
+  BLM = 1;
+  PROP = 0.5;
+  RANDSEED = -1;
+  BESTSCORE = 0;
+  NUMREPS = 10;
+  NUMITNS = 1000000;
+  STARTTEMP = 1000000;
+  COOLFAC = 0;
+  NUMTEMP = 10000;
+  COSTTHRESH = 0;
+  THRESHPEN1 = 0;
+  THRESHPEN2 = 0;
+  RUNMODE = RunMode.SimulatedAnnealingFollowedByIterativeImprovement;
+  MISSLEVEL = 1;
+  ITIMPTYPE = IterativeImprovementType.Normal;
+  HEURTYPE = HeuristicType.Ignored;
+  CLUMPTYPE = ClumpType.PartialDoNotCount;
+}
+
+const marxanDefaults = new MarxanParametersDefaults();
+
 export class MarxanParameters {
   /**
    * Boundary Length Modifier
    */
   @IsOptional()
   @IsNumber()
-  BLM?: number = 1;
+  BLM?: number = marxanDefaults.BLM;
 
   /**
    * Proportion of planning units ininitial reserve system
    */
   @IsOptional()
   @IsNumber()
-  PROP?: number = 0.5;
+  PROP?: number = marxanDefaults.PROP;
 
   /**
    * Random seed number
    */
   @IsOptional()
   @IsNumber()
-  RANDSEED?: number = -1;
+  RANDSEED?: number = marxanDefaults.RANDSEED;
 
   /**
    * Best score hint
    */
   @IsOptional()
   @IsNumber()
-  BESTSCORE?: number = 0;
+  BESTSCORE?: number = marxanDefaults.BESTSCORE;
 
   /**
    * Number of repeat runs (or solutions)
    */
   @IsOptional()
   @IsNumber()
-  NUMREPS?: number = 10;
+  NUMREPS?: number = marxanDefaults.NUMREPS;
 
   // Annealing
 
@@ -79,28 +101,28 @@ export class MarxanParameters {
    */
   @IsOptional()
   @IsNumber()
-  NUMITNS?: number = 1000000;
+  NUMITNS?: number = marxanDefaults.NUMITNS;
 
   /**
    * Number of iterations for annealing
    */
   @IsOptional()
   @IsNumber()
-  STARTTEMP?: number = 1000000;
+  STARTTEMP?: number = marxanDefaults.STARTTEMP;
 
   /**
    * Cooling factor for annealing
    */
   @IsOptional()
   @IsNumber()
-  COOLFAC?: number = 0;
+  COOLFAC?: number = marxanDefaults.COOLFAC;
 
   /**
    * Number of temperature decreases for annealing
    */
   @IsOptional()
   @IsNumber()
-  NUMTEMP?: number = 10000;
+  NUMTEMP?: number = marxanDefaults.NUMTEMP;
 
   // Cost Threshold
 
@@ -109,43 +131,43 @@ export class MarxanParameters {
    */
   @IsOptional()
   @IsNumber()
-  COSTTHRESH?: number = 0;
+  COSTTHRESH?: number = marxanDefaults.COSTTHRESH;
 
   /**
    * Size of cost threshold penalty
    */
   @IsOptional()
   @IsNumber()
-  THRESHPEN1?: number = 0;
+  THRESHPEN1?: number = marxanDefaults.THRESHPEN1;
 
   /**
    * Shape of cost threshold penalty
    */
   @IsOptional()
   @IsNumber()
-  THRESHPEN2?: number = 0;
+  THRESHPEN2?: number = marxanDefaults.THRESHPEN2;
 
   // Program Control
 
   @IsOptional()
   @IsEnum(RunMode)
-  RUNMODE?: RunMode = RunMode.SimulatedAnnealingFollowedByIterativeImprovement;
+  RUNMODE?: RunMode = marxanDefaults.RUNMODE;
 
   /**
    * Species missing proportion
    */
   @IsOptional()
-  MISSLEVEL?: number = 1;
+  MISSLEVEL?: number = marxanDefaults.MISSLEVEL;
 
   @IsOptional()
   @IsEnum(IterativeImprovementType)
-  ITIMPTYPE?: IterativeImprovementType = IterativeImprovementType.Normal;
+  ITIMPTYPE?: IterativeImprovementType = marxanDefaults.ITIMPTYPE;
 
   @IsOptional()
   @IsEnum(HeuristicType)
-  HEURTYPE?: HeuristicType = HeuristicType.Ignored;
+  HEURTYPE?: HeuristicType = marxanDefaults.HEURTYPE;
 
   @IsOptional()
   @IsEnum(ClumpType)
-  CLUMPTYPE?: ClumpType = ClumpType.PartialDoNotCount;
+  CLUMPTYPE?: ClumpType = marxanDefaults.CLUMPTYPE;
 }

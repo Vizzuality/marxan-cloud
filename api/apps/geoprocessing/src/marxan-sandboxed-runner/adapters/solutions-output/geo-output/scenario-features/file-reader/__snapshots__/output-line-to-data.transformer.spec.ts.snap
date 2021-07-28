@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`when piece of data has incorrect values should throw 1`] = `
+[Error: An instance of ScenarioFeatureRunData has failed the validation:
+ - property amount has failed the following constraints: isNumber 
+=> [NaN]. An instance of ScenarioFeatureRunData has failed the validation:
+ - property featureScenarioId has failed the following constraints: isUuid 
+=> [undefined]. An instance of ScenarioFeatureRunData has failed the validation:
+ - property occurrences has failed the following constraints: isNumber, isInt 
+=> [NaN]. An instance of ScenarioFeatureRunData has failed the validation:
+ - property separation has failed the following constraints: isNumber 
+=> [NaN]. An instance of ScenarioFeatureRunData has failed the validation:
+ - property mpm has failed the following constraints: isNumber 
+=> [NaN]. Chunk: ,a,VALUE_6,string-value-1,string-value-2,string-value-3,string-value-4,string-value-5,string-value-6,,string-value-7]
+`;

@@ -1,8 +1,6 @@
 import { EntityManager, In } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-
-import { Workspace } from '../../../ports/workspace';
 import { MetadataArchiver } from './metadata/data-archiver.service';
 import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
 import { PlanningUnitSelectionCalculatorService } from './solutions/solution-aggregation/planning-unit-selection-calculator.service';
@@ -10,10 +8,12 @@ import { PlanningUnitsSelectionState } from './solutions/planning-unit-selection
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
   MarxanExecutionMetadataGeoEntity,
+  OutputScenariosFeaturesDataGeoEntity,
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
 import { readFileSync } from 'fs';
-import { ScenarioFeaturesDataService } from './scenario-features/scenario-features-data.service';
+import { ScenarioFeaturesDataService } from './scenario-features';
+import { RunDirectories } from '../run-directories';
 
 @Injectable()
 export class GeoOutputRepository {
@@ -28,20 +28,18 @@ export class GeoOutputRepository {
 
   async save(
     scenarioId: string,
-    workspace: Workspace,
-    metaData: {
-      stdOutput: string[];
-      stdErr?: string[];
-    },
+    runDirectories: RunDirectories,
+    metaData: { stdOutput: string[]; stdErr?: string[] },
   ): Promise<void> {
-    const inputArchivePath = await this.metadataArchiver.zipInput(workspace);
-    const outputArchivePath = await this.metadataArchiver.zipOutput(workspace);
-
-    const solutionMatrix =
-      workspace.workingDirectory + `/output/output_solutionsmatrix.csv`;
+    const inputArchivePath = await this.metadataArchiver.zip(
+      runDirectories.input,
+    );
+    const outputArchivePath = await this.metadataArchiver.zip(
+      runDirectories.output,
+    );
 
     const solutionsStream = await this.solutionsReader.from(
-      solutionMatrix,
+      runDirectories.output,
       scenarioId,
     );
 
@@ -49,9 +47,8 @@ export class GeoOutputRepository {
       solutionsStream,
     );
 
-    // TODO grab data from ScenarioFeaturesDataService
-    const _sfds = await this.scenarioFeaturesDataReader.from(
-      workspace.workingDirectory,
+    const scenarioFeatureDataFromAllRuns = await this.scenarioFeaturesDataReader.from(
+      runDirectories.output,
       scenarioId,
     );
 
@@ -60,8 +57,16 @@ export class GeoOutputRepository {
         scenarioPuId: In(Object.keys(planningUnitsState)),
       });
 
-      // TODO clean ScenarioFeaturesData
-      // TODO add ScenarioFeaturesData new data
+      await transaction.delete(OutputScenariosFeaturesDataGeoEntity, {
+        featureScenarioId: In(
+          scenarioFeatureDataFromAllRuns.map((e) => e.featureScenarioId),
+        ),
+      });
+
+      await transaction.insert(
+        OutputScenariosFeaturesDataGeoEntity,
+        scenarioFeatureDataFromAllRuns,
+      );
 
       await Promise.all(
         Object.entries(planningUnitsState).map(([scenarioPuId, data]) =>

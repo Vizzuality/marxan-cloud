@@ -1,38 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { ScenarioFeatureData } from './scenario-feature-data';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ScenarioFeaturesData } from '@marxan/features';
-import { FeatureIdToScenarioFeatureData } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters/solutions-output/geo-output/scenario-features/feature-id-to-scenario-feature-data';
+import { pipeline } from 'stream';
+import { ScenarioFeatureRunData } from './scenario-feature-run-data';
+
+import { ScenarioFeatureIdMapper } from './id-mapper/scenario-feature-id.mapper';
+import { MvFileReader } from './file-reader/mv-file-reader';
+import { OutputLineToDataTransformer } from './file-reader/output-line-to-data.transformer';
 
 @Injectable()
 export class ScenarioFeaturesDataService {
-  // iterate over all mv* files
-  // stream their content to transformer
-
   constructor(
-    @InjectRepository(ScenarioFeaturesData)
-    private readonly scenarioFeatureData: Repository<ScenarioFeaturesData>,
+    private readonly scenarioIdMapper: ScenarioFeatureIdMapper,
+    private readonly fileReader: MvFileReader,
   ) {}
 
   async from(
     outputDirectory: string,
     scenarioId: string,
-  ): Promise<ScenarioFeatureData[]> {
-    const planningUnits = await this.scenarioFeatureData.findAndCount({
-      where: {
-        scenarioId,
-      },
-      select: ['id', 'featureId'],
+  ): Promise<ScenarioFeatureRunData[]> {
+    return new Promise(async (resolve, reject) => {
+      const result: ScenarioFeatureRunData[] = [];
+      const idMap = await this.scenarioIdMapper.getMapping(scenarioId);
+      pipeline(
+        this.fileReader.from(outputDirectory),
+        new OutputLineToDataTransformer(idMap),
+        (error) => {
+          if (error) {
+            return reject(error);
+          }
+          return resolve(result);
+        },
+      ).on(`data`, (data: ScenarioFeatureRunData) => {
+        result.push(data);
+      });
     });
-    const _mapping = planningUnits[0].reduce<FeatureIdToScenarioFeatureData>(
-      (previousValue, sfd) => {
-        previousValue[sfd.featureId] = sfd.id;
-        return previousValue;
-      },
-      {},
-    );
-    console.log(`--- scenario features data mapping`, _mapping);
-    return [];
   }
 }
