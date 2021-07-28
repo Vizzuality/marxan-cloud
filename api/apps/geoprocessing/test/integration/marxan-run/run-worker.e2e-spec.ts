@@ -4,8 +4,8 @@ import { Job, Queue } from 'bullmq';
 import * as config from 'config';
 import waitForExpect from 'wait-for-expect';
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
-import { FieldsOf } from '@marxan/utils';
-import { JobData } from '@marxan/scenario-run-queue';
+import { assertDefined, FieldsOf } from '@marxan/utils';
+import { JobData, ProgressData } from '@marxan/scenario-run-queue';
 import {
   RunWorker,
   runWorkerQueueNameToken,
@@ -31,6 +31,23 @@ test(`starting run`, async () => {
 
   // then
   await fixtures.thenScenarioIsRunning(jobData);
+});
+
+test(`progress reporting`, async () => {
+  fixtures.setupForProgressReporting();
+
+  // given
+  const jobData: JobData = fixtures.jobData;
+
+  // and
+  const job = await fixtures.queue.add(`whatever`, jobData);
+
+  // when
+  const progress = Math.random();
+  await fixtures.whenReportProgressFromTheRun(progress);
+
+  // then
+  await fixtures.thenProgressChangedInTheJob(job, progress);
 });
 
 test(`killing run`, async () => {
@@ -60,6 +77,7 @@ async function getFixtures() {
   const throwingMock = () => jest.fn<any, any>(fail);
   type MockedMarxanRunner = jest.Mocked<FieldsOf<MarxanSandboxRunnerService>>;
   class FakeMarxanRunner implements MockedMarxanRunner {
+    progressCallbacks: ((progress: number) => void)[] = [];
     kill: MockedMarxanRunner['kill'] = throwingMock();
     run: MockedMarxanRunner['run'] = throwingMock();
   }
@@ -121,9 +139,34 @@ async function getFixtures() {
         release();
       });
     },
+    setupForProgressReporting() {
+      let release: () => void;
+      const lock = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      fakeMarxanRunner.run.mockImplementation(async () => {
+        await lock;
+        return [];
+      });
+      this.fakeMarxanRunner.run.mockImplementation(
+        async (_1, _2, progressCallback) => {
+          this.fakeMarxanRunner.progressCallbacks.push((value) => {
+            progressCallback(value);
+            release();
+          });
+          return [];
+        },
+      );
+    },
     async givenJobIsActive(job: Job) {
       await waitForExpect(async () => {
         expect(await job.isActive()).toBe(true);
+      });
+    },
+    async whenReportProgressFromTheRun(progress: number) {
+      await waitForExpect(async () => {
+        expect(fakeMarxanRunner.progressCallbacks.length).toEqual(1);
+        fakeMarxanRunner.progressCallbacks[0](progress);
       });
     },
     async thenScenarioIsRunning(jobData: JobData) {
@@ -132,6 +175,7 @@ async function getFixtures() {
         expect(fakeMarxanRunner.run).toBeCalledWith(
           jobData.scenarioId,
           jobData.assets,
+          expect.any(Function),
         );
       });
     },
@@ -146,6 +190,19 @@ async function getFixtures() {
     async thenJobIsCompleted(job: Job) {
       await waitForExpect(async () => {
         expect(await job.isCompleted()).toBe(true);
+      });
+    },
+    async thenProgressChangedInTheJob(job: Job<JobData>, progress: number) {
+      await waitForExpect(async () => {
+        const jobId = job.id;
+        assertDefined(jobId);
+        const progressData: ProgressData = {
+          fractionalProgress: progress,
+          scenarioId: job.data.scenarioId,
+        };
+        expect((await queue.getJob(jobId))?.progress).toStrictEqual(
+          progressData,
+        );
       });
     },
   };

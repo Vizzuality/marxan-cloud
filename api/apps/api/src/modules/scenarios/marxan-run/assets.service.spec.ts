@@ -1,7 +1,8 @@
 import { PromiseType } from 'utility-types';
 import { Test } from '@nestjs/testing';
 import { apiUrlToken, AssetsService } from './assets.service';
-import { IoSettings, ioSettingsToken } from './io-settings';
+import { IoSettings } from '../input-files/input-params/io-settings';
+import { InputFilesService } from '@marxan-api/modules/scenarios/input-files';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let service: AssetsService;
@@ -14,7 +15,7 @@ beforeEach(async () => {
 
 it(`should return valid config`, async () => {
   const random = fixtures.random;
-  expect(await service.forScenario(`scenario-${random}`)).toStrictEqual([
+  expect(await service.forScenario(`scenario-${random}`, 2)).toStrictEqual([
     {
       url: `https://api-endpoint${random}.test:3000/api/v1/marxan-run/scenarios/scenario-${random}/marxan/dat/input.dat`,
       relativeDestination: `input.dat`,
@@ -26,6 +27,28 @@ it(`should return valid config`, async () => {
     {
       url: `https://api-endpoint${random}.test:3000/api/v1/marxan-run/scenarios/scenario-${random}/marxan/dat/bound.dat`,
       relativeDestination: `inputDir${random}/bound-name-file${random}`,
+    },
+    {
+      url: `https://api-endpoint${random}.test:3000/api/v1/marxan-run/scenarios/scenario-${random}/marxan/dat/spec.dat`,
+      relativeDestination: `inputDir${random}/spec-name-file${random}`,
+    },
+    {
+      url: `https://api-endpoint${random}.test:3000/api/v1/marxan-run/scenarios/scenario-${random}/marxan/dat/puvspr.dat`,
+      relativeDestination: `inputDir${random}/puv-spr-name-file${random}`,
+    },
+  ]);
+});
+
+it(`should return config without bound when zero blm given`, async () => {
+  const random = fixtures.random;
+  expect(await service.forScenario(`scenario-${random}`, 0)).toStrictEqual([
+    {
+      url: `https://api-endpoint${random}.test:3000/api/v1/marxan-run/scenarios/scenario-${random}/marxan/dat/input.dat`,
+      relativeDestination: `input.dat`,
+    },
+    {
+      url: `https://api-endpoint${random}.test:3000/api/v1/marxan-run/scenarios/scenario-${random}/marxan/dat/pu.dat`,
+      relativeDestination: `inputDir${random}/pu-name-file${random}`,
     },
     {
       url: `https://api-endpoint${random}.test:3000/api/v1/marxan-run/scenarios/scenario-${random}/marxan/dat/spec.dat`,
@@ -51,8 +74,10 @@ async function getFixtures() {
   const testingModule = await Test.createTestingModule({
     providers: [
       {
-        provide: ioSettingsToken,
-        useValue: ioSettings,
+        provide: InputFilesService,
+        useValue: {
+          getSettings: () => ioSettings,
+        },
       },
       {
         provide: apiUrlToken,

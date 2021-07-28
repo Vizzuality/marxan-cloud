@@ -1,11 +1,27 @@
-import { ResultParserService } from './result-parser.service';
 import { Test } from '@nestjs/testing';
+import { ResultRow } from '@marxan/marxan-output';
+import { ResultParserService } from './result-parser.service';
+import { MostDifferentService } from './most-different.service';
 
 let sut: ResultParserService;
 
 beforeEach(async () => {
   const sandbox = await Test.createTestingModule({
-    providers: [ResultParserService],
+    providers: [
+      ResultParserService,
+      {
+        provide: MostDifferentService,
+        useValue: {
+          map: (source: ResultRow[]) =>
+            source.map((r) =>
+              Object.assign(new ResultRow(), {
+                ...r,
+                best: true,
+              }),
+            ),
+        },
+      },
+    ],
   }).compile();
 
   sut = sandbox.get(ResultParserService);
@@ -41,7 +57,7 @@ describe(`given data`, () => {
     expect(sut.parse(content)).toMatchInlineSnapshot(`
       Array [
         ResultRow {
-          "best": false,
+          "best": true,
           "connectivity": 16000,
           "connectivityEdge": 16000,
           "connectivityIn": 0,
@@ -59,7 +75,7 @@ describe(`given data`, () => {
           "shortfall": 0,
         },
         ResultRow {
-          "best": false,
+          "best": true,
           "connectivity": 8000,
           "connectivityEdge": 8000,
           "connectivityIn": 0,
@@ -77,7 +93,7 @@ describe(`given data`, () => {
           "shortfall": 0.5,
         },
         ResultRow {
-          "best": false,
+          "best": true,
           "connectivity": 12000,
           "connectivityEdge": 12000,
           "connectivityIn": 2000,
@@ -95,7 +111,7 @@ describe(`given data`, () => {
           "shortfall": 0.5,
         },
         ResultRow {
-          "best": false,
+          "best": true,
           "connectivity": 16000,
           "connectivityEdge": 16000,
           "connectivityIn": 0,
@@ -113,7 +129,7 @@ describe(`given data`, () => {
           "shortfall": 0,
         },
         ResultRow {
-          "best": false,
+          "best": true,
           "connectivity": 32000,
           "connectivityEdge": 32000,
           "connectivityIn": 4000,

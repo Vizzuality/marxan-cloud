@@ -59,6 +59,11 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
+    if (!includeGeo && !excludeGeo) {
+      geometriesIdsToInclude.push(...(job.data.include?.pu ?? []));
+      geometriesIdsToExclude.push(...(job.data.exclude?.pu ?? []));
+    }
+
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
@@ -117,7 +122,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       .leftJoin(`planning_units_geom`, `pug`, `pug.id = spd.pu_geom_id`)
       .where(`spd.scenario_id = :scenarioId`, { scenarioId })
       .andWhere(
-        `st_intersects(st_union(${geometriesUnion}), pug.the_geom)`,
+        `st_intersects(st_union(ARRAY[${geometriesUnion}]), pug.the_geom)`,
         geometriesParameters,
       );
 

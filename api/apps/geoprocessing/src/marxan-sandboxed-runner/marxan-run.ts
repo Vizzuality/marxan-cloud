@@ -5,6 +5,7 @@ import { assertDefined } from '@marxan/utils';
 
 import { Workspace } from './ports/workspace';
 import { Cancellable } from './ports/cancellable';
+import { Progress } from './progress';
 
 interface MessageEvents {
   error(error: {
@@ -14,6 +15,8 @@ interface MessageEvents {
   }): void;
 
   finished(): void;
+
+  progress(progress: number): void;
 }
 
 const MarxanRunEmitter: new () => TypedEmitter<MessageEvents> = EventEmitter;
@@ -41,7 +44,10 @@ export class MarxanRun extends MarxanRunEmitter implements Cancellable {
       this.#stdError.push(chunk.toString());
     });
 
+    const progressWatcher = new Progress();
     this.#process.stdout.on('data', (chunk) => {
+      const currentProgress = progressWatcher.read(chunk);
+      this.emit(`progress`, currentProgress);
       // TODO place for "progress update" parsing and emitting to consumer
       this.#stdOut.push(chunk.toString());
     });

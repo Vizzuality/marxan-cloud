@@ -28,7 +28,11 @@ export class MarxanSandboxRunnerService {
     }
   }
 
-  async run(forScenarioId: string, assets: Assets): Promise<ExecutionResult> {
+  async run(
+    forScenarioId: string,
+    assets: Assets,
+    progressCallback: (progress: number) => void,
+  ): Promise<ExecutionResult> {
     const workspace = await this.workspaceService.get();
     const inputFiles = await this.moduleRef.create(InputFilesFs);
     const outputFilesRepository = await this.moduleRef.create(
@@ -85,6 +89,7 @@ export class MarxanSandboxRunnerService {
           this.clearAbortController(forScenarioId);
         }
       });
+      marxanRun.on(`progress`, (progress) => progressCallback(progress));
 
       try {
         await interruptIfKilled();

@@ -1,4 +1,4 @@
-import { QueueEvents, Worker } from 'bullmq';
+import { Job, QueueEvents, Worker } from 'bullmq';
 import { Inject, Injectable, ValueProvider } from '@nestjs/common';
 import {
   JobData,
@@ -9,10 +9,7 @@ import {
   WorkerBuilder,
   QueueEventsBuilder,
 } from '@marxan-geoprocessing/modules/worker';
-import {
-  Assets,
-  MarxanSandboxRunnerService,
-} from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
+import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
 
 export const runWorkerQueueNameToken = Symbol(`run worker queue name token`);
 export const runWorkerQueueNameProvider: ValueProvider<string> = {
@@ -31,7 +28,7 @@ export class RunWorker {
     private readonly marxanRunner: MarxanSandboxRunnerService,
   ) {
     this.worker = workerBuilder.build<JobData, void>(queueName, {
-      process: (job) => this.startRun(job.data.scenarioId, job.data.assets),
+      process: (job) => this.startRun(job),
     });
     this.queueEvents = queueEventsBuilder.buildQueueEvents(queueName);
     this.queueEvents.on(`progress`, ({ data }: { data: ProgressData }) => {
@@ -39,12 +36,22 @@ export class RunWorker {
     });
   }
 
-  private async startRun(scenarioId: string, assets: Assets) {
-    await this.marxanRunner.run(scenarioId, assets);
+  private async startRun(job: Job<JobData>) {
+    await this.marxanRunner.run(
+      job.data.scenarioId,
+      job.data.assets,
+      async (progress) => {
+        const progressData: ProgressData = {
+          scenarioId: job.data.scenarioId,
+          fractionalProgress: progress,
+        };
+        await job.updateProgress(progressData);
+      },
+    );
   }
 
   private handleProgress(data: ProgressData) {
-    if (data.canceled) {
+    if ('canceled' in data && data.canceled) {
       this.marxanRunner.kill(data.scenarioId);
     }
   }

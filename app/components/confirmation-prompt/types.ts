@@ -25,6 +25,10 @@ export interface ConfirmationPromptProps {
   /**
    * Callback executed when the user accepts the action
    */
+  danger?: boolean,
+  /**
+   * Optional boolean to set dangeroust prompts.
+   */
   onAccept: () => void,
   /**
    * Callback executed when the user refuses the action

@@ -5,11 +5,11 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useProject } from 'hooks/projects';
 
-export interface TitleProps {
+export interface ProjectTitleProps {
   title?: string;
 }
 
-export const Title: React.FC<TitleProps> = ({ title }:TitleProps) => {
+export const ProjectTitle: React.FC<ProjectTitleProps> = ({ title }:ProjectTitleProps) => {
   const { query } = useRouter();
   const { pid } = query;
   const { data: projectData } = useProject(pid);
@@ -28,4 +28,4 @@ export const Title: React.FC<TitleProps> = ({ title }:TitleProps) => {
   );
 };
 
-export default Title;
+export default ProjectTitle;

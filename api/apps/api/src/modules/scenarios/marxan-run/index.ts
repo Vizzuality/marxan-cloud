@@ -1,9 +1,4 @@
-export {
-  RunService,
-  notFound,
-  NotFound,
-  runQueueProvider,
-  runQueueEventsProvider,
-} from './run.service';
-export { InputParameterFileProvider } from './input-parameter-file.provider';
+export { RunService } from './run.service';
 export { MarxanRunModule } from './marxan-run.module';
+export { NotFound } from './cancel.handler';
+export { notFound } from './cancel.handler';

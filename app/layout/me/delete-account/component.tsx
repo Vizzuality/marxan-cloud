@@ -8,7 +8,7 @@ import { useDeleteMe } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 import { signOut } from 'next-auth/client';
 
-import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
+import DELETE_USER_WARNING_SVG from 'svgs/notifications/delete-user-warning.svg?sprite';
 
 export interface DeleteAccountProps {
 
@@ -49,17 +49,20 @@ export const DeleteAccount: React.FC<DeleteAccountProps> = () => {
   }, [mutation, addToast]);
 
   return (
-    <div className="relative">
+    <div className="relative w-full max-w-2xl">
       <h2 className="mb-5 text-lg font-medium text-gray-600 font-heading">Delete account</h2>
 
-      <div className="mb-5">
-        <p className="text-sm">If you delete your account, please keep the following in mind:</p>
-        <p className="text-sm">Your profile will be permenantly deleted, including information about projects.</p>
+      <div className="inline-flex flex-col px-10 py-8 space-y-5 bg-white rounded-3xl">
+        <div>
+          <p className="text-sm">If you delete your account, please keep the following in mind:</p>
+          <p className="text-sm">Your profile will be permenantly deleted, including information about projects.</p>
+        </div>
+        <div className="w-40">
+          <Button theme="danger-alt" size="s" type="submit" disabled={submitting} onClick={() => setOpen(true)}>
+            Delete Account
+          </Button>
+        </div>
       </div>
-
-      <Button theme="danger" size="s" type="submit" disabled={submitting} onClick={() => setOpen(true)}>
-        Delete account
-      </Button>
 
       <Loading
         visible={submitting}
@@ -68,9 +71,10 @@ export const DeleteAccount: React.FC<DeleteAccountProps> = () => {
       />
 
       <ConfirmationPrompt
+        danger
         title="Are you sure you want to delete your account?"
-        description="The action cannot be reverted. All the projects, scenarios and features created will be removed too."
-        icon={DELETE_WARNING_SVG}
+        description="Learn more about deleting your account."
+        icon={DELETE_USER_WARNING_SVG}
         open={!!open}
         onAccept={onDelete}
         onRefuse={() => setOpen(null)}

@@ -84,16 +84,16 @@ select id, 1 as cost  from scenarios_pu_data where scenario_id = '$scenario';
 
 ----Fake outputs
 --- Fake output_scenarios_pu_data
-WITH RECURSIVE nums (n) AS (
-    SELECT 1
-  UNION ALL
-    SELECT n+1 FROM nums WHERE n+1 <= 10
-)
-INSERT INTO output_scenarios_pu_data
-(run_id, scenario_pu_id, value)
-SELECT n as run_id, scenarios_pu_data.id, round(random()) as value
-FROM nums, scenarios_pu_data
-where scenarios_pu_data.scenario_id='$scenario';
+--WITH RECURSIVE nums (n) AS (
+--    SELECT 1
+--  UNION ALL
+--    SELECT n+1 FROM nums WHERE n+1 <= 10
+--)
+--INSERT INTO output_scenarios_pu_data
+--(run_id, scenario_pu_id, value)
+--SELECT n as run_id, scenarios_pu_data.id, round(random()) as value
+--FROM nums, scenarios_pu_data
+--where scenarios_pu_data.scenario_id='$scenario';
 
 --- Fake output_scenarios_features_data
 WITH RECURSIVE nums (n) AS (

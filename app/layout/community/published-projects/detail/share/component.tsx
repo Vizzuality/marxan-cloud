@@ -69,7 +69,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           type="button"
           role="button"
-          href={`https://twitter.com/intent/tweet?url=${asPath}`}
+          href={`https://twitter.com/intent/tweet?url=${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
@@ -81,13 +81,14 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           type="button"
           role="button"
-          href={`https://www.facebook.com/sharer/sharer.php?u=${asPath}`}
+          href={`https://www.facebook.com/sharer/sharer.php?u=${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
           <Icon icon={FACEBOOK_FILLED_SVG} className="h-5 mr-5 text-white" />
           <p className="text-sm">Facebook</p>
         </a>
+
       </div>
     </div>
   );

@@ -8,10 +8,12 @@ import Icon from 'components/icon';
 import { Form as FormRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
+import { useToasts } from 'hooks/toast';
 import { useSelector, useDispatch } from 'react-redux';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import SELECT_PLANNING_UNITS_SVG from 'svgs/ui/planning-units.svg?sprite';
+import { useSaveScenarioPU } from 'hooks/scenarios';
 
 export interface AnalysisAdjustClickingProps {
   type: string;
@@ -27,10 +29,14 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
   const { query } = useRouter();
   const { sid } = query;
 
+  const { addToast } = useToasts();
+
   const scenarioSlice = getScenarioSlice(sid);
-  const { setClicking, setClickingValue } = scenarioSlice.actions;
+  const { setClicking, setClickingValue, setCache } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const { clickingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
+  const scenarioPUMutation = useSaveScenarioPU({});
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -60,8 +66,53 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
   // Callbacks
   const onSubmit = useCallback((values) => {
     // Save current clicked pu ids
-    console.info(values);
-  }, []);
+    scenarioPUMutation.mutate({
+      id: `${sid}`,
+      data: {
+        byId: {
+          [values.type]: values.clickingValue,
+        },
+      },
+    }, {
+      onSuccess: () => {
+        onSelected(null);
+        dispatch(setCache(Date.now()));
+        dispatch(setClicking(false));
+        dispatch(setClickingValue([]));
+
+        addToast('adjust-planning-units-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <ul className="text-sm">
+              <li>Planning units saved</li>
+            </ul>
+          </>
+        ), {
+          level: 'success',
+        });
+      },
+      onError: () => {
+        addToast('adjust-planning-units-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <ul className="text-sm">
+              <li>Ooops! Something went wrong. Try again</li>
+            </ul>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [sid,
+    scenarioPUMutation,
+    onSelected,
+    dispatch,
+    setClicking,
+    setClickingValue,
+    setCache,
+    addToast,
+  ]);
 
   return (
     <FormRFF

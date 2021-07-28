@@ -7,7 +7,12 @@ export type JobData = {
   scenarioId: string;
   assets: Assets;
 };
-export type ProgressData = {
-  scenarioId: string;
-  canceled: boolean;
-};
+export type ProgressData =
+  | {
+      scenarioId: string;
+      canceled: boolean;
+    }
+  | {
+      scenarioId: string;
+      fractionalProgress: number;
+    };

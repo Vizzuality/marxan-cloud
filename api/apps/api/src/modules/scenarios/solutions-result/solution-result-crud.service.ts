@@ -13,15 +13,13 @@ import { ScenariosOutputResultsApiEntity } from '@marxan/scenarios-planning-unit
 
 @Injectable()
 export class SolutionResultCrudService extends AppBaseService<
-ScenariosOutputResultsApiEntity,
+  ScenariosOutputResultsApiEntity,
   never,
   never,
   AppInfoDTO
 > {
   constructor(
-    @InjectRepository(
-      ScenariosOutputResultsApiEntity
-    )
+    @InjectRepository(ScenariosOutputResultsApiEntity)
     protected readonly repository: Repository<ScenariosOutputResultsApiEntity>,
   ) {
     super(repository, 'solution', 'solutions', {
@@ -37,7 +35,7 @@ ScenariosOutputResultsApiEntity,
         'scoreValue',
         'costValue',
         'missingValues',
-        'planningUnits'
+        'planningUnits',
       ],
       keyForAttribute: 'camelCase',
     };

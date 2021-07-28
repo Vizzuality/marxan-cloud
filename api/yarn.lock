@@ -2212,6 +2212,13 @@
   dependencies:
     "@types/express" "*"
 
+"@types/multistream@2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@types/multistream/-/multistream-2.1.1.tgz#4badd2440ee3570594ea552420fe2e29ebe512bd"
+  integrity sha512-PqavtNFnMyXRZS5vuW16wMOKeJUCD5PIGHdNBHzF5Urjncsij90hRQ82Wcy9+uSdnmrR2Gfao6xoJVq1wAWzbA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/node@*", "@types/node@^14.14.6":
   version "14.14.20"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.20.tgz#f7974863edd21d1f8a494a73e8e2b3658615c340"
@@ -7114,6 +7121,14 @@ multer@1.4.2, multer@^1.4.2:
     type-is "^1.6.4"
     xtend "^4.0.0"
 
+multistream@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/multistream/-/multistream-4.1.0.tgz#7bf00dfd119556fbc153cff3de4c6d477909f5a8"
+  integrity sha512-J1XDiAmmNpRCBfIWJv+n0ymC4ABcf/Pl+5YvC5B/D2f/2+8PtHvCNxMPKiQcZyi922Hq69J2YOpb1pTywfifyw==
+  dependencies:
+    once "^1.4.0"
+    readable-stream "^3.6.0"
+
 mute-stream@0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
@@ -9195,6 +9210,11 @@ strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
   integrity sha1-PFMZQukIwml8DsNEhYwobHygpgo=
+
+stronger-typed-streams@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/stronger-typed-streams/-/stronger-typed-streams-0.2.0.tgz#6bf2e73bec8f8639157de68c0a5cba78c2f57779"
+  integrity sha512-ffROKnjOTZ1JvaiuN2mugBo4GIyLQWGF1oUaPOFaaW14IR6pdF5DN4Pn8Gv/GkbnbO8e1CdcY1ZvIal61r7diw==
 
 superagent@6.1.0:
   version "6.1.0"

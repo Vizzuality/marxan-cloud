@@ -68,6 +68,7 @@
     "mapshaper": "0.5.57",
     "ms": "2.1.3",
     "multer": "^1.4.2",
+    "multistream": "4.1.0",
     "nestjs-base-service": "0.6.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
@@ -79,6 +80,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
+    "stronger-typed-streams": "0.2.0",
     "swagger-ui-express": "^4.1.6",
     "temp-dir": "^2.0.0",
     "typeorm": "0.2.30",
@@ -103,6 +105,7 @@
     "@types/lodash": "^4.14.167",
     "@types/ms": "0.7.31",
     "@types/multer": "^1.4.5",
+    "@types/multistream": "2.1.1",
     "@types/node": "^14.14.6",
     "@types/passport-jwt": "^3.0.3",
     "@types/passport-local": "^1.0.33",
@@ -182,7 +185,9 @@
       "@marxan/scenario-puvspr/(.*)": "<rootDir>/libs/scenario-puvspr/src/$1",
       "@marxan/scenario-puvspr": "<rootDir>/libs/scenario-puvspr/src",
       "@marxan/scenario-run-queue/(.*)": "<rootDir>/libs/scenario-run-queue/src/$1",
-      "@marxan/scenario-run-queue": "<rootDir>/libs/scenario-run-queue/src"
+      "@marxan/scenario-run-queue": "<rootDir>/libs/scenario-run-queue/src",
+      "@marxan/features/(.*)": "<rootDir>/libs/features/src/$1",
+      "@marxan/features": "<rootDir>/libs/features/src"
     }
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -31,6 +31,12 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
   const onChangeSection = useCallback((s) => {
     setSection(s);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      setSection(null);
+    };
+  }, [tab]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.SOLUTIONS) return null;
 

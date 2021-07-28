@@ -27,6 +27,8 @@ import {
   UploadScenarioCostSurfaceProps,
   UseUploadScenarioPUProps,
   UploadScenarioPUProps,
+  UseSaveScenarioPUProps,
+  SaveScenarioPUProps,
 } from './types';
 
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
@@ -321,6 +323,34 @@ export function useUploadCostSurface({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useSaveScenarioPU({
+  requestConfig = {
+    method: 'PATCH',
+  },
+}: UseSaveScenarioPUProps) {
+  const [session] = useSession();
+
+  const saveScenario = ({ id, data }: SaveScenarioPUProps) => {
+    return SCENARIOS.request({
+      url: `/${id}/planning-units`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveScenario, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

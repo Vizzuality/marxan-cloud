@@ -12,7 +12,7 @@ describe(`When scenario has PUs with cost and lock status`, () => {
     await world.GivenScenarioWithPuAndLocks();
   });
 
-  it(`returns relevant data`, async () => {
+  it(`returns relevant data for pu.dat`, async () => {
     const result = await world.WhenGettingMarxanData();
     const [headers, ...costAndStatus] = result.split('\n');
 
@@ -25,6 +25,32 @@ describe(`When scenario has PUs with cost and lock status`, () => {
         "3	800	2",
       ]
     `);
+  });
+
+  it(`returns relevant data for PU listing`, async () => {
+    const results = await world.WhenGettingPuInclusionState();
+    expect(results).toEqual([
+      {
+        defaultStatus: 'unstated',
+        id: expect.any(String),
+        inclusionStatus: 'unstated',
+      },
+      {
+        defaultStatus: 'unstated',
+        id: expect.any(String),
+        inclusionStatus: 'locked-in',
+      },
+      {
+        defaultStatus: 'unstated',
+        id: expect.any(String),
+        inclusionStatus: 'locked-out',
+      },
+      {
+        defaultStatus: 'unstated',
+        id: expect.any(String),
+        inclusionStatus: 'locked-out',
+      },
+    ]);
   });
 });
 

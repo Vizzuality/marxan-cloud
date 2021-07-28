@@ -8,6 +8,8 @@ interface ScenarioEditStateProps {
   wdpaCategories: Record<string, any>;
 
   // ADJUST PLANNING UNITS
+  cache: number;
+  puAction: string;
   clicking: boolean;
   clickingValue: string[];
 
@@ -25,6 +27,8 @@ const initialState = {
   wdpaCategories: {},
 
   // ADJUST PLANNING UNITS
+  cache: Date.now(),
+  puAction: 'include',
   clicking: false,
   clickingValue: [],
   drawing: null,
@@ -48,6 +52,12 @@ export function getScenarioSlice(id) {
       },
 
       // ADJUST PLANNING UNITS
+      setCache: (state, action: PayloadAction<number>) => {
+        state.cache = action.payload;
+      },
+      setPUAction: (state, action: PayloadAction<string>) => {
+        state.puAction = action.payload;
+      },
       setClicking: (state, action: PayloadAction<boolean>) => {
         state.clicking = action.payload;
       },
