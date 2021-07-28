@@ -1,7 +1,7 @@
+const customForms = require('@tailwindcss/custom-forms');
 const colors = require('tailwindcss/colors');
 
 // PLUGINS
-const customForms = require('@tailwindcss/custom-forms');
 const lineClamp = require('./styles/line-clamp');
 
 module.exports = {
