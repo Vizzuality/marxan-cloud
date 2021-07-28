@@ -5,7 +5,9 @@ import { useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
-import { useDeleteScenario, useScenarios, useScenariosStatus } from 'hooks/scenarios';
+import {
+  useDeleteScenario, useScenarios, useScenariosStatus, useDuplicateScenario,
+} from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import useBottomScrollListener from 'hooks/scroll';
 
@@ -123,6 +125,53 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     });
   }, [deleteScenario, deleteMutation, queryClient, pid, addToast]);
 
+  const duplicateScenarioMutation = useDuplicateScenario({
+    requestConfig: {
+      method: 'POST',
+    },
+  });
+
+  const onDuplicate = useCallback((scenarioId, scenarioName) => {
+    duplicateScenarioMutation.mutate({ id: scenarioId }, {
+      onSuccess: ({ data: { data: s } }) => {
+        addToast('success-duplicate-project', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">
+              Scenario
+              {' '}
+              {scenarioName}
+              {' '}
+              duplicated
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
+
+        console.info('Scenario duplicated succesfully', s);
+      },
+      onError: () => {
+        addToast('error-duplicate-scenario', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              Scenario
+              {' '}
+              {scenarioName}
+              {' '}
+              not duplicated
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+
+        console.error('Scenario not duplicated');
+      },
+    });
+  }, [addToast, duplicateScenarioMutation]);
+
   return (
     <AnimatePresence>
       <div key="project-scenarios-sidebar" className="flex flex-col flex-grow col-span-7 overflow-hidden">
@@ -202,14 +251,17 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                           'mt-3': i !== 0,
                         })}
                       >
+
                         <ScenarioItem
                           {...s}
                           status="draft"
                           onDelete={() => {
                             setDelete(s);
                           }}
+                          onDuplicate={() => onDuplicate(s.id, s.name)}
                           SettingsC={<ScenarioSettings sid={s.id} />}
                         />
+
                       </div>
                     </TAG>
                   );
