@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import {
-  useInfiniteQuery,
+  useInfiniteQuery, useQuery,
 } from 'react-query';
 
 import flatten from 'lodash/flatten';
@@ -17,7 +17,6 @@ export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {})
 
   const {
     filters = {},
-    search,
     sort,
   } = options;
 
@@ -38,9 +37,6 @@ export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {})
     params: {
       'page[number]': pageParam,
       ...parsedFilters,
-      ...search && {
-        q: search,
-      },
       ...sort && {
         sort,
       },
@@ -68,18 +64,119 @@ export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {})
       return pageData.map((d) => {
         const {
           id,
-          alias,
-          featureClassName,
+          runId,
+          scoreValue,
+          costValue,
+          planningUnits,
+          missingValues,
         } = d;
 
         return {
           id,
-          name: alias || featureClassName,
-          run: Math.round(Math.random() * 100),
-          score: Math.round(Math.random() * 200),
-          cost: Math.round(Math.random() * 300),
-          planningUnits: Math.round(Math.random() * 20),
-          missingValues: Math.round(Math.random() * 10),
+          run: runId,
+          score: scoreValue,
+          cost: costValue,
+          planningUnits,
+          missingValues,
+        };
+      });
+    })) : [];
+
+    return {
+      ...query,
+      data: parsedData,
+    };
+  }, [query, pages]);
+}
+
+export function useSolution(scenarioId, solutionId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios', scenarioId], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/solutions/${solutionId}`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }));
+
+  const { data } = query;
+  console.log('DATA ON USE SOLUTION', data);
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
+export function useMostDifferentSolutions(scenarioId, options: UseSolutionsOptionsProps = {}) {
+  const [session] = useSession();
+
+  const {
+    filters = {},
+    sort,
+  } = options;
+
+  const parsedFilters = Object.keys(filters)
+    .reduce((acc, k) => {
+      return {
+        ...acc,
+        [`filter[${k}]`]: filters[k],
+      };
+    }, {});
+
+  const fetchFeatures = ({ pageParam = 1 }) => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/marxan/solutions/most-different`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    params: {
+      'page[number]': pageParam,
+      ...parsedFilters,
+      ...sort && {
+        sort,
+      },
+    },
+  });
+
+  const query = useInfiniteQuery(['solutions', scenarioId, JSON.stringify(options)], fetchFeatures, {
+    keepPreviousData: true,
+    getNextPageParam: (lastPage) => {
+      const { data: { meta } } = lastPage;
+      const { page, totalPages } = meta;
+
+      const nextPage = page + 1 > totalPages ? null : page + 1;
+      return nextPage;
+    },
+  });
+
+  const { data } = query;
+  const { pages } = data || {};
+
+  return useMemo(() => {
+    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
+      const { data: { data: pageData } } = p;
+
+      return pageData.map((d) => {
+        const {
+          id,
+          runId,
+          scoreValue,
+          costValue,
+          planningUnits,
+          missingValues,
+        } = d;
+
+        return {
+          id,
+          run: runId,
+          score: scoreValue,
+          cost: costValue,
+          planningUnits,
+          missingValues,
         };
       });
     })) : [];

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
 import useBottomScrollListener from 'hooks/scroll';
-import { useSolutions } from 'hooks/solutions';
+import { useSolutions, useMostDifferentSolutions } from 'hooks/solutions';
 
 import { Button } from 'components/button/component';
 import Checkbox from 'components/forms/checkbox';
@@ -23,10 +23,12 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   onCancel,
   onSave,
 }: SolutionsTableFormProps) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
+  const [solutionSelected, setSolutionSelected] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
+
+  console.log('SOLUTION SELECTED ID TO SAVE', solutionSelected);
 
   const {
     data,
@@ -36,6 +38,12 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     isFetchingNextPage,
     isFetched,
   } = useSolutions(sid);
+
+  const {
+    data: mostDifSolutionsData,
+    isFetching: mostDifSolutionsisFetching,
+    isFetched: mostDifSolutionsisFetched,
+  } = useMostDifferentSolutions(sid);
 
   const scrollRef = useBottomScrollListener(
     () => {
@@ -79,7 +87,8 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
         className="relative overflow-x-hidden overflow-y-auto"
         style={{ height: '400px' }}
       >
-        {(isFetching && !isFetched) && (
+        {((isFetching && !isFetched)
+        || (mostDifSolutionsisFetching && !mostDifSolutionsisFetched)) && (
           <div className="absolute top-0 left-0 z-30 flex flex-col items-center justify-center w-full h-full">
             <Loading
               visible
@@ -90,17 +99,27 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           </div>
         )}
 
-        {(!isFetching && (!data || !data.length)) && (
+        {((!isFetching && (!data || !data.length)) || (!mostDifSolutionsisFetched
+        && (!mostDifSolutionsData || !mostDifSolutionsData.length))) && (
           <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
             No results found
           </div>
         )}
-        {(!isFetching || isFetchingNextPage) && data && data.length > 0 && (
+
+        {(!isFetching || isFetchingNextPage) && data && data.length > 0 && !mostDifSolutions && (
           <SolutionsTable
             body={data}
-            onSelectSolution={(solution) => console.info('solution selected', solution)}
+            onSelectSolution={(solution) => setSolutionSelected(solution.id)}
           />
         )}
+
+        {mostDifSolutions && mostDifSolutionsData && mostDifSolutionsData.length > 0 && (
+          <SolutionsTable
+            body={mostDifSolutionsData.slice(0, 5)}
+            onSelectSolution={(solution) => setSolutionSelected(solution.id)}
+          />
+        )}
+
         <LoadingMore visible={isFetchingNextPage} />
       </div>
       <div className="flex items-center justify-center w-full pt-8">
