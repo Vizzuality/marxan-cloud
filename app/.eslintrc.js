@@ -34,7 +34,7 @@ module.exports = {
     'import/order': [
       'warn',
       {
-        groups: [['builtin'], 'external', 'internal', 'parent', 'sibling'],
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling'],
         'newlines-between': 'always',
         alphabetize: {
           order: 'asc',
@@ -47,15 +47,24 @@ module.exports = {
             position: 'before',
           },
           {
-            pattern: 'react** || @react**',
+            pattern: 'react**',
             group: 'builtin',
+          },
+          {
+            pattern: '@react**',
+            group: 'builtin',
+          },
+          {
+            pattern: 'next/**',
+            group: 'builtin',
+            position: 'after',
           },
           {
             pattern: 'node_modules/**',
             group: 'builtin',
           },
           {
-            pattern: 'next/**',
+            pattern: 'hooks/**',
             group: 'builtin',
             position: 'after',
           },
@@ -67,10 +76,6 @@ module.exports = {
           {
             pattern: 'store/**',
             group: 'external',
-          },
-          {
-            pattern: 'hooks/**',
-            group: 'unknown',
           },
           {
             pattern: 'layout/**',
