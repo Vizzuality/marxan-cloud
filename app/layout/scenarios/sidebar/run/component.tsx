@@ -6,7 +6,7 @@ import { Form as FormRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import { useSaveScenario, useScenario } from 'hooks/scenarios';
+import { useRunScenario, useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import cx from 'classnames';
@@ -29,8 +29,8 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
 
   const { addToast } = useToasts();
 
-  const { query } = useRouter();
-  const { sid } = query;
+  const { query, push } = useRouter();
+  const { pid, sid } = query;
 
   const { data: scenarioData } = useScenario(sid);
   const saveScenarioMutation = useSaveScenario({
@@ -38,6 +38,8 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
       method: 'PATCH',
     },
   });
+
+  const runScenarioMutation = useRunScenario({});
 
   const INITIAL_VALUES = useMemo(() => {
     return FIELDS.reduce((acc, f) => {
@@ -60,18 +62,36 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
     };
 
     saveScenarioMutation.mutate({ id: `${sid}`, data }, {
-      onSuccess: ({ data: { data: s } }) => {
-        setSubmitting(false);
+      onSuccess: () => {
+        runScenarioMutation.mutate({ id: `${sid}` }, {
+          onSuccess: ({ data: { data: s } }) => {
+            setSubmitting(false);
 
-        addToast('save-scenario-name', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario name saved</p>
-          </>
-        ), {
-          level: 'success',
+            addToast('save-scenario-name', (
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Run started</p>
+              </>
+            ), {
+              level: 'success',
+            });
+
+            push(`/projects/${pid}`);
+            console.info('Scenario name saved succesfully', s);
+          },
+          onError: () => {
+            setSubmitting(false);
+
+            addToast('error-scenario-name', (
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Scenario name not saved</p>
+              </>
+            ), {
+              level: 'error',
+            });
+          },
         });
-        console.info('Scenario name saved succesfully', s);
       },
       onError: () => {
         setSubmitting(false);
@@ -86,7 +106,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
         });
       },
     });
-  }, [sid, saveScenarioMutation, addToast]);
+  }, [pid, sid, push, saveScenarioMutation, runScenarioMutation, addToast]);
 
   return (
     <FormRFF

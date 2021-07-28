@@ -65,3 +65,19 @@ export interface UseDuplicateScenarioProps {
 export interface DuplicateScenarioProps {
   id: string | string[];
 }
+
+export interface UseRunScenarioProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface RunScenarioProps {
+  id: string | string[];
+}
+
+export interface UseCancelRunScenarioProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface CancelRunScenarioProps {
+  id: string | string[];
+}
