@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
+
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import useBottomScrollListener from 'hooks/scroll';
 import { useSolutions, useMostDifferentSolutions } from 'hooks/solutions';
+
+import { setSelectedSolution } from 'store/slices/solutions/details';
 
 import { Button } from 'components/button/component';
 import Checkbox from 'components/forms/checkbox';
@@ -24,11 +28,9 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   onSave,
 }: SolutionsTableFormProps) => {
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
-  const [solutionSelected, setSolutionSelected] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
-
-  console.log('SOLUTION SELECTED ID TO SAVE', solutionSelected);
+  const dispatch = useDispatch();
 
   const {
     data,
@@ -62,6 +64,10 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
       if (hasNextPage) fetchNextPage();
     },
   );
+
+  const onSelectSolution = useCallback((solutionId) => {
+    dispatch(setSelectedSolution(solutionId));
+  }, [dispatch]);
 
   return (
     <div className="text-gray-800">
@@ -119,14 +125,14 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
         {allSolutionsFetched && (
           <SolutionsTable
             body={data}
-            onSelectSolution={(solution) => setSolutionSelected(solution.id)}
+            onSelectSolution={(solution) => onSelectSolution(solution.id)}
           />
         )}
 
         {mostDifSolutionsIsSelected && (
           <SolutionsTable
             body={mostDifSolutionsData.slice(0, 5)}
-            onSelectSolution={(solution) => setSolutionSelected(solution.id)}
+            onSelectSolution={(solution) => onSelectSolution(solution.id)}
           />
         )}
 

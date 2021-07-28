@@ -92,23 +92,22 @@ export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {})
 export function useSolution(scenarioId, solutionId) {
   const [session] = useSession();
 
-  const query = useQuery(['scenarios', scenarioId], async () => SCENARIOS.request({
+  const query = useQuery(['scenarios', scenarioId, solutionId], async () => SCENARIOS.request({
     method: 'GET',
-    url: `/${scenarioId}/solutions/${solutionId}`,
+    url: `/${scenarioId}/marxan/solutions/${solutionId}`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
   }));
 
   const { data } = query;
-  console.log('DATA ON USE SOLUTION', data);
 
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data,
+      data: data?.data.data,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data.data]);
 }
 
 export function useMostDifferentSolutions(scenarioId, options: UseSolutionsOptionsProps = {}) {

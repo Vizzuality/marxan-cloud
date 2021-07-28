@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 
+import { useSelector } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useSolution } from 'hooks/solutions';
+
 import { motion } from 'framer-motion';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
+import SolutionSelected from 'components/solutions/selected';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOCK_SVG from 'svgs/ui/clock.svg?sprite';
@@ -19,7 +26,17 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   onScheduleScenario,
   numberOfSchedules,
 }: ScenariosSolutionsDetailsProps) => {
+  const { query } = useRouter();
+  const { sid } = query;
   const [showTable, setShowTable] = useState<boolean>(false);
+
+  const { selectedSolutionId } = useSelector((state) => state['/solutions/details']);
+
+  const {
+    data: selectedSolutionData,
+    // isFetching,
+    // isFetched,
+  } = useSolution(sid, selectedSolutionId);
 
   return (
     <motion.div
@@ -81,6 +98,13 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
             onSave={() => setShowTable(false)}
           />
         </Modal>
+      </div>
+      <div>
+        <SolutionSelected
+          id="2"
+          best
+          values={selectedSolutionData}
+        />
       </div>
     </motion.div>
   );
