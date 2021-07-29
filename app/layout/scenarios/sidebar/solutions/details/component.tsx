@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
+import Loading from 'components/loading';
 import Modal from 'components/modal';
 import SolutionSelected from 'components/solutions/selected';
 
@@ -34,9 +35,17 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
 
   const {
     data: selectedSolutionData,
-    // isFetching,
-    // isFetched,
+    isFetching: selectedSolutionisFetching,
+    isFetched: selectedSolutionisFetched,
   } = useSolution(sid, selectedSolutionId);
+
+  const fakeBestSolution = {
+    runId: 9,
+    scoreValue: 999,
+    costValue: 900,
+    missingValues: 19,
+    planningUnits: 19,
+  };
 
   return (
     <motion.div
@@ -100,11 +109,18 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
         </Modal>
       </div>
       <div className="w-full p-6 mt-12 border-t border-gray-600">
-        <SolutionSelected
-          best
-          values={selectedSolutionData}
-          onToggleOnMap={() => console.log('Show map')}
+        <Loading
+          visible={selectedSolutionisFetching && !selectedSolutionisFetched}
+          className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+          iconClassName="w-10 h-10 text-primary-500"
         />
+        {(selectedSolutionData || fakeBestSolution) && (
+          <SolutionSelected
+            best={!selectedSolutionData}
+            values={selectedSolutionData || fakeBestSolution}
+            onToggleOnMap={() => console.info('Show map')}
+          />
+        )}
       </div>
     </motion.div>
   );
