@@ -33,3 +33,17 @@ resource "azurerm_private_dns_zone_virtual_network_link" "landgriffon" {
   virtual_network_id    = azurerm_virtual_network.landgriffon.id
   resource_group_name   = azurerm_resource_group.landgriffon.name
 }
+
+# # For the bastion VM
+# resource "azurerm_network_interface" "landgriffon" {
+#   name                = "landgriffon-nic"
+#   location            = azurerm_resource_group.landgriffon.location
+#   resource_group_name = azurerm_resource_group.landgriffon.name
+
+#   ip_configuration {
+#     name                          = "internal"
+#     subnet_id                     = azurerm_subnet.landgriffon.id
+#     private_ip_address_allocation = "Dynamic"
+#   }
+# }
+

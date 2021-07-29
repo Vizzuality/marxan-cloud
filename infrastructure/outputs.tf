@@ -1,4 +1,21 @@
 # Output values which can be referenced in other repos
+output "kube_config" {
+  value     = azurerm_kubernetes_cluster.landgriffon.kube_config_raw
+  sensitive = true
+}
+
+# output "postgres_host" {
+#   value = azurerm_postgresql_flexible_server.landgriffon
+# }
+
+# output "postgres_port" {
+#   value = azurerm_postgresql_flexible_server.port
+# }
+
+# output "postgres_username" {
+#   value     = azurerm_postgresql_flexible_server.administrator_login
+# }
+
 # output "account_id" {
 #   value       = data.aws_caller_identity.current.account_id
 #   description = "ID of AWS account"
