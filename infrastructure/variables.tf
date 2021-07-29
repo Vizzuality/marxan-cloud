@@ -29,6 +29,16 @@ variable "storage_container_name" {
   description = ""
 }
 
+variable "virtual_network_name" {
+  type        = string
+  description = ""
+}
+
+variable "subnet_name" {
+  type        = string
+  description = ""
+}
+
 
 
 # variable "domain" {
