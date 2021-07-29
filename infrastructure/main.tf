@@ -5,6 +5,9 @@
 # 2. postgresql
 # 3. storage account
 
+# Questions:
+# 1. What node groups do you need for AKS?
+
 terraform {
   backend "azurerm" {
     resource_group_name  = "landgriffonmanual-tom"
