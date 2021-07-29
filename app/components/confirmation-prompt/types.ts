@@ -1,5 +1,5 @@
-import { ModalProps } from 'components/modal';
 import { IconProps } from 'components/icon';
+import { ModalProps } from 'components/modal';
 
 export interface ConfirmationPromptProps {
   /**
@@ -24,6 +24,10 @@ export interface ConfirmationPromptProps {
   icon?: IconProps['icon'],
   /**
    * Callback executed when the user accepts the action
+   */
+  danger?: boolean,
+  /**
+   * Optional boolean to set dangeroust prompts.
    */
   onAccept: () => void,
   /**

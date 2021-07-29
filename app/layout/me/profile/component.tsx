@@ -1,24 +1,23 @@
 import React, { useCallback, useState } from 'react';
 
-import Avatar from 'layout/me/profile/avatar';
-
-import Button from 'components/button';
-import Loading from 'components/loading';
-
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import Field from 'components/forms/field';
-import Label from 'components/forms/label';
-import Input from 'components/forms/input';
-
-import {
-  composeValidators,
-} from 'components/forms/validations';
 
 import { useMe, useSaveMe } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 
-import USER_SVG from 'svgs/ui/user.svg?sprite';
+import Avatar from 'layout/me/profile/avatar';
+
+import Button from 'components/button';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
+import {
+  composeValidators,
+} from 'components/forms/validations';
+import Loading from 'components/loading';
+
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
+import USER_SVG from 'svgs/ui/user.svg?sprite';
 
 export interface MeProps {
 
@@ -72,7 +71,7 @@ export const Profile: React.FC<MeProps> = () => {
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex">
           <div className="w-full max-w-xs">
-            <h2 className="mb-5 text-5xl font-medium text-gray-600 font-heading">My Profile</h2>
+            <h2 className="text-5xl font-medium text-gray-600 mb-9 font-heading">My Profile</h2>
 
             <Loading
               visible={submitting}
@@ -95,7 +94,7 @@ export const Profile: React.FC<MeProps> = () => {
             </div>
 
             {/* DISPLAY NAME */}
-            <div className="mt-5">
+            <div className="mt-8">
               <FieldRFF
                 name="displayName"
                 validate={composeValidators([{ presence: true }])}
@@ -110,12 +109,12 @@ export const Profile: React.FC<MeProps> = () => {
             </div>
 
             {/* EMAIL */}
-            <div className="mt-5">
+            <div className="mt-7">
               <Label theme="light" className="mb-3 uppercase">Email</Label>
               <Input theme="light" type="email" icon={EMAIL_SVG} readOnly value={email} disabled />
             </div>
 
-            <div className="mt-5">
+            <div className="mt-7">
               <Button theme="primary" size="s" type="submit" disabled={submitting}>
                 Save changes
               </Button>

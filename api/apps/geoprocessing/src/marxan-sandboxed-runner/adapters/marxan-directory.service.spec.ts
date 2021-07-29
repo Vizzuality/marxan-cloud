@@ -24,8 +24,11 @@ beforeEach(async () => {
   }).compile();
   fileReader = sandbox.get(FileReader);
   sut = sandbox.get(MarxanDirectory);
-  workspace = new Workspace(cwd as WorkingDirectory, bin, () =>
-    Promise.resolve(),
+  workspace = new Workspace(
+    cwd as WorkingDirectory,
+    bin,
+    () => Promise.resolve(),
+    () => Promise.resolve(),
   );
 });
 

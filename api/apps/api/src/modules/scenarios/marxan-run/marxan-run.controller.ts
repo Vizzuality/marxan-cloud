@@ -16,12 +16,12 @@ import {
 import { Response } from 'express';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { XApiGuard } from '@marxan-api/guards/x-api.guard';
-import { MarxanRunService } from './marxan-run.service';
+import { InputFilesService } from '../input-files';
 
 @UseGuards(XApiGuard)
 @Controller(`${apiGlobalPrefixes.v1}/marxan-run/scenarios`)
 export class MarxanRunController {
-  constructor(private readonly service: MarxanRunService) {}
+  constructor(private readonly service: InputFilesService) {}
 
   @Header('Content-Type', 'text/csv')
   @ApiOkResponse({
@@ -37,14 +37,14 @@ export class MarxanRunController {
     @Param('id', ParseUUIDPipe) id: string,
     @Res() res: Response,
   ): Promise<void> {
-    await this.service.getCostSurfaceCsv(id, res);
+    await this.service.readCostSurface(id, res);
     return;
   }
 
   @ApiOperation({ description: `Resolve scenario's input parameter file.` })
   @Get(':id/marxan/dat/input.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getInputParameterFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
@@ -53,21 +53,31 @@ export class MarxanRunController {
 
   @ApiOperation({ description: `Resolve scenario's puvspr file.` })
   @Get(':id/marxan/dat/puvspr.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getPuvsprDatFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
-    return await this.service.getPuvsprDat(id);
+    return await this.service.getPuvsprDatContent(id);
   }
 
   @ApiOperation({ description: `Resolve scenario's bound file.` })
   @Get(':id/marxan/dat/bound.dat')
-  @ApiProduces('text/plain')
-  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
   async getBoundDatFile(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
-    return await this.service.getBoundDat(id);
+    return await this.service.getBoundDatContent(id);
+  }
+
+  @ApiOperation({ description: `Resolve scenario's spec file.` })
+  @Get(':id/marxan/dat/spec.dat')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
+  async getSpecDatFile(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<string> {
+    return await this.service.getSpecDatContent(id);
   }
 }

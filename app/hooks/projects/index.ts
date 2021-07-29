@@ -1,17 +1,19 @@
-import flatten from 'lodash/flatten';
 import { useMemo } from 'react';
+
 import {
   useInfiniteQuery, useMutation, useQuery, useQueryClient,
 } from 'react-query';
-import { useSession } from 'next-auth/client';
+
 import { useRouter } from 'next/router';
 
 import { formatDistance } from 'date-fns';
+import flatten from 'lodash/flatten';
+import { useSession } from 'next-auth/client';
+import PROJECTS from 'services/projects';
+import UPLOADS from 'services/uploads';
 
 import { ItemProps } from 'components/projects/item/component';
 import { PublishedItemProps } from 'components/projects/published-item/component';
-
-import PROJECTS from 'services/projects';
 
 import {
   UseProjectsOptionsProps,
@@ -20,7 +22,11 @@ import {
   SaveProjectProps,
   UseDeleteProjectProps,
   DeleteProjectProps,
+  UseUploadProjectPAProps,
+  UploadProjectPAProps,
   UsePublishedProjectsProps,
+  UseDuplicateProjectProps,
+  DuplicateProjectProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -30,7 +36,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
   const {
     filters = {},
     search,
-    sort,
+    sort = '-lastModifiedAt',
   } = options;
 
   const parsedFilters = Object.keys(filters)
@@ -144,6 +150,8 @@ export function useProject(id) {
     params: {
       include: 'scenarios,users',
     },
+  }).then((response) => {
+    return response.data;
   }), {
     enabled: !!id,
   });
@@ -153,9 +161,9 @@ export function useProject(id) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data?.data,
+      data: data?.data,
     };
-  }, [query, data?.data?.data]);
+  }, [query, data?.data]);
 }
 
 export function useSaveProject({
@@ -222,13 +230,42 @@ export function useDeleteProject({
   });
 }
 
+export function useUploadProjectPA({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadProjectPAProps) {
+  const [session] = useSession();
+
+  const uploadProjectPAShapefile = ({ data }: UploadProjectPAProps) => {
+    return UPLOADS.request({
+      url: '/projects/planning-area/shapefile',
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadProjectPAShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
 export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
   const [session] = useSession();
 
   const {
     search,
     filters = {},
-    sort,
+    sort = '-lastModifiedAt',
   } = options;
 
   const parsedFilters = Object.keys(filters)
@@ -310,6 +347,8 @@ export function usePublishedProject(id) {
     params: {
       include: 'scenarios,users',
     },
+  }).then((response) => {
+    return response.data;
   }), {
     enabled: !!id,
   });
@@ -321,11 +360,44 @@ export function usePublishedProject(id) {
       { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
       { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
     ];
-    const parsedData = { ...data?.data?.data, contributors } || {};
+    const parsedData = { ...data?.data, contributors } || {};
 
     return {
       ...query,
       data: parsedData,
     };
-  }, [query, data?.data?.data]);
+  }, [query, data?.data]);
+}
+
+export function useDuplicateProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseDuplicateProjectProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const duplicateProject = ({ id }: DuplicateProjectProps) => {
+    return PROJECTS.request({
+      // Pending endpoint
+      url: `/${id}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(duplicateProject, {
+    onSuccess: (data: any, variables, context) => {
+      const { id } = data;
+      queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['projects', id]);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
 }

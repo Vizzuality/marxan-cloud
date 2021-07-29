@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { MarxanExecutionMetadataModule } from './metadata';
+import { GeoOutputModule } from './geo-output';
 import { ResultParserService } from './result-parser.service';
+import { MostDifferentService } from './most-different.service';
 
 @Module({
-  imports: [MarxanExecutionMetadataModule],
-  providers: [ResultParserService],
+  imports: [GeoOutputModule],
+  providers: [ResultParserService, MostDifferentService],
   exports: [ResultParserService],
 })
 export class SolutionsOutputModule {}

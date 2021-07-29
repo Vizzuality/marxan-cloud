@@ -1,3 +1,4 @@
+@implemented
 Feature: LogIn
 
   I want to log in

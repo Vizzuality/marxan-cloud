@@ -16,6 +16,8 @@ import {
 import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';
 import { CountriesService } from '@marxan-api/modules/countries/countries.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
+import { User } from '@marxan-api/modules/users/user.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 import {
   MultiplePlanningAreaIds,
@@ -34,6 +36,12 @@ type ProjectFilterKeys = keyof Pick<
   typeof projectFilterKeyNames[number]
 >;
 type ProjectFilters = Record<ProjectFilterKeys, string[]>;
+
+export type ProjectsInfoDTO = AppInfoDTO & {
+  params?: {
+    nameSearch?: string;
+  };
+};
 
 @Injectable()
 export class ProjectsCrudService extends AppBaseService<
@@ -136,6 +144,7 @@ export class ProjectsCrudService extends AppBaseService<
      */
     const project = await super.setDataCreate(create, info);
     project.createdBy = info?.authenticatedUser?.id!;
+    project.planningAreaGeometryId = create.planningAreaId;
 
     const bbox = await this.planningAreasService.getPlanningAreaBBox({
       ...create,
@@ -209,10 +218,12 @@ export class ProjectsCrudService extends AppBaseService<
       ...update,
       planningAreaGeometryId: update.planningAreaId,
     });
-    if (bbox) {
-      const modelWithBbox = await super.setDataUpdate(model, update, _);
-      modelWithBbox.bbox = bbox;
-      return modelWithBbox;
+    if (bbox || update.planningAreaId !== undefined) {
+      const updatedModel = await super.setDataUpdate(model, update, _);
+      if (bbox) updatedModel.bbox = bbox;
+      if (update.planningAreaId !== undefined)
+        updatedModel.planningAreaGeometryId = update.planningAreaId;
+      return updatedModel;
     }
     return model;
   }
@@ -231,6 +242,36 @@ export class ProjectsCrudService extends AppBaseService<
       entity.planningAreaName = idAndName.planningAreaName;
     }
     return entity;
+  }
+
+  async extendFindAllQuery(
+    query: SelectQueryBuilder<Project>,
+    fetchSpecification: FetchSpecification,
+    info?: ProjectsInfoDTO,
+  ): Promise<SelectQueryBuilder<Project>> {
+    const { namesSearch } = info?.params ?? {};
+    if (namesSearch) {
+      const nameSearchFilterField = 'nameSearchFilter' as const;
+      query.leftJoin(
+        GeoFeature,
+        'geofeature',
+        `${this.alias}.id = geofeature.project_id`,
+      );
+      query.leftJoin(User, 'user', `${this.alias}.createdBy = user.id`);
+      query.andWhere(
+        `(
+          ${this.alias}.name
+          ||' '|| COALESCE(geofeature.description, '')
+          ||' '|| COALESCE(geofeature.feature_class_name, '')
+          ||' '|| COALESCE(user.fname, '')
+          ||' '|| COALESCE(user.lname, '')
+          ||' '|| COALESCE(user.display_name, '')
+        ) ILIKE :${nameSearchFilterField}`,
+        { [nameSearchFilterField]: `%${namesSearch}%` },
+      );
+    }
+
+    return query;
   }
 
   async extendFindAllResults(

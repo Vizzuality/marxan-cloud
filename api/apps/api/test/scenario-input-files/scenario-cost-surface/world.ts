@@ -119,5 +119,11 @@ export const createWorld = async () => {
           .get(`/api/v1/scenarios/${scenarioId}/marxan/dat/pu.dat`)
           .set('Authorization', `Bearer ${jwt}`)
       ).text,
+    WhenGettingPuInclusionState: async () =>
+      (
+        await request(app.getHttpServer())
+          .get(`/api/v1/scenarios/${scenarioId}/planning-units`)
+          .set('Authorization', `Bearer ${jwt}`)
+      ).body,
   };
 };

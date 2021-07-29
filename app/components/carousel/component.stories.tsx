@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import Carousel, { CarouselProps } from './component';
 
 export default {
@@ -16,7 +18,6 @@ const Template: Story<CarouselProps> = ({ ...args }: CarouselProps) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  initial: 0,
   images: [
     {
       id: 1,

@@ -2,11 +2,15 @@ import {
   BadRequestException,
   HttpService,
   Injectable,
-  NotImplementedException,
+  InternalServerErrorException,
+  NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
+import { isLeft } from 'fp-ts/Either';
+import { pick } from 'lodash';
 
 import { MarxanInput, MarxanParameters } from '@marxan/marxan-input';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -25,12 +29,21 @@ import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
-import { CostSurfaceViewService } from './cost-surface-readmodel/cost-surface-view.service';
-import { InputParameterFileProvider } from './input-parameter-file.provider';
-import { SpecDatService } from './input-files/spec.dat.service';
-import { PuvsprDatService } from './input-files/puvspr.dat.service';
 import { OutputFilesService } from './output-files/output-files.service';
-import { BoundDatService } from './input-files/bound.dat.service';
+import { InputFilesService, InputFilesArchiverService } from './input-files';
+import { notFound, RunService } from './marxan-run';
+import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
+import { GeoFeaturesService } from '../geo-features/geo-features.service';
+import { SimpleJobStatus } from './scenario.api.entity';
+import { assertDefined } from '@marxan/utils';
+import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-property-sets.service';
+import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
+
+/** @debt move to own module */
+const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
+  status: SimpleJobStatus.draft,
+  features: [],
+};
 
 @Injectable()
 export class ScenariosService {
@@ -45,13 +58,14 @@ export class ScenariosService {
     private readonly costSurface: CostSurfaceFacade,
     private readonly httpService: HttpService,
     private readonly solutionsCrudService: SolutionResultCrudService,
-    private readonly costSurfaceView: CostSurfaceViewService,
     private readonly marxanInputValidator: MarxanInput,
-    private readonly inputParameterFileProvider: InputParameterFileProvider,
-    private readonly specDatService: SpecDatService,
-    private readonly puvsprDatService: PuvsprDatService,
-    private readonly boundDatService: BoundDatService,
+    private readonly runService: RunService,
+    private readonly inputFilesService: InputFilesService,
     private readonly outputFilesService: OutputFilesService,
+    private readonly geoFeaturesService: GeoFeaturesService,
+    private readonly geoFeaturePropertySetService: GeoFeaturePropertySetService,
+    private readonly inputArchiveService: InputFilesArchiverService,
+    private readonly planningUnitsService: ScenarioPlanningUnitsService,
   ) {}
 
   async findAllPaginated(
@@ -94,7 +108,7 @@ export class ScenariosService {
 
   async getInputParameterFile(scenarioId: string): Promise<string> {
     await this.assertScenario(scenarioId);
-    return this.inputParameterFileProvider.getInputParameterFile(scenarioId);
+    return this.inputFilesService.getInputParameterFile(scenarioId);
   }
 
   async changeLockStatus(
@@ -152,34 +166,43 @@ export class ScenariosService {
     stream: stream.Writable,
   ): Promise<void> {
     await this.assertScenario(scenarioId);
-    await this.costSurfaceView.read(scenarioId, stream);
+    await this.inputFilesService.readCostSurface(scenarioId, stream);
   }
 
   async getSpecDatCsv(scenarioId: string): Promise<string> {
     await this.assertScenario(scenarioId);
-    return this.specDatService.getSpecDatContent(scenarioId);
+    return this.inputFilesService.getSpecDatContent(scenarioId);
   }
 
   async getBoundDatCsv(scenarioId: string): Promise<string> {
     await this.assertScenario(scenarioId);
-    return this.boundDatService.getContent(scenarioId);
+    return this.inputFilesService.getBoundDatContent(scenarioId);
   }
 
-  async run(scenarioId: string, _blm?: number): Promise<void> {
-    await this.assertScenario(scenarioId);
-    // TODO ensure not running yet
-    // TODO submit
-    throw new NotImplementedException();
+  async run(scenarioId: string, blm?: number): Promise<void> {
+    const scenario = await this.assertScenario(scenarioId);
+    await this.runService.run(
+      pick(scenario, 'id', 'boundaryLengthModifier'),
+      blm,
+    );
   }
 
   async cancel(scenarioId: string): Promise<void> {
     await this.assertScenario(scenarioId);
-    // TODO ensure it is running
-    throw new NotImplementedException();
+    const result = await this.runService.cancel(scenarioId);
+    if (isLeft(result)) {
+      switch (result.left) {
+        case notFound:
+          throw new NotFoundException();
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
+    }
   }
 
   private async assertScenario(scenarioId: string) {
-    await this.crudService.getById(scenarioId);
+    return await this.crudService.getById(scenarioId);
   }
 
   async getOneSolution(
@@ -250,6 +273,31 @@ export class ScenariosService {
     return withValidatedMetadata;
   }
 
+  /**
+   * Get geofeatures specification for a scenario. This is part of the scenario
+   * itself, but exposed via a separate endpoint.
+   */
+  async getFeatureSetForScenario(
+    scenarioId: string,
+  ): Promise<GeoFeatureSetSpecification | undefined> {
+    const scenario = await this.getById(scenarioId);
+    assertDefined(scenario);
+    return await this.crudService
+      .getById(scenarioId)
+      .then((result) => {
+        return result.featureSet;
+      })
+      .then((result) =>
+        result
+          ? this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
+              result,
+              scenario,
+            )
+          : EmptyGeoFeaturesSpecification,
+      )
+      .catch((e) => Logger.error(e));
+  }
+
   async getMarxanExecutionOutputArchive(scenarioId: string) {
     await this.assertScenario(scenarioId);
     return this.outputFilesService.get(scenarioId);
@@ -257,6 +305,16 @@ export class ScenariosService {
 
   async getPuvsprDatCsv(scenarioId: string) {
     await this.assertScenario(scenarioId);
-    return this.puvsprDatService.getPuvsprDatContent(scenarioId);
+    return this.inputFilesService.getPuvsprDatContent(scenarioId);
+  }
+
+  async getMarxanExecutionInputArchive(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    return this.inputArchiveService.archive(scenarioId);
+  }
+
+  async getPlanningUnits(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    return this.planningUnitsService.get(scenarioId);
   }
 }

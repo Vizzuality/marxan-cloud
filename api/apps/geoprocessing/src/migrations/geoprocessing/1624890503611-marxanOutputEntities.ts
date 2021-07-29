@@ -1,9 +1,8 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class marxanOutputEntities1624890503611 implements MigrationInterface {
-
-    public async up(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
       -- Adds area column
       ALTER TABLE planning_units_geom
         ADD COLUMN area DOUBLE PRECISION GENERATED ALWAYS AS (st_area(st_transform(the_geom, 3410))) STORED;
@@ -68,11 +67,11 @@ export class marxanOutputEntities1624890503611 implements MigrationInterface {
         );
 
       CREATE INDEX scenario_features_data_index ON scenario_features_data (feature_id asc, scenario_id);
-      `,);
-    }
+      `);
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
       -- Drop area column
       ALTER TABLE planning_units_geom
         DROP COLUMN area;
@@ -103,7 +102,6 @@ export class marxanOutputEntities1624890503611 implements MigrationInterface {
 
         DROP TABLE output_scenarios_features_data;
 
-      `,);
-    }
-
+      `);
+  }
 }

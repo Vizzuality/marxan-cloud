@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
+import { PlanningUnit } from 'types/project-model';
+
 import Label from 'components/forms/label';
 import InfoButton from 'components/info-button';
 
-import { PlanningUnit } from 'types/project-model';
-
 import PlanningUnitButton from './planning-unit-button/component';
-import { PlanningUnitGridProps } from './types';
 import { PlanningUnitButtonSizeProps } from './planning-unit-button/types';
+import { PlanningUnitGridProps } from './types';
 
 export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
   unit,
@@ -25,7 +25,14 @@ export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
       <div className="flex items-center">
         <Label theme="dark" className="mr-2 uppercase text-xxs">Planning unit grid</Label>
         <InfoButton>
-          <span>Planning unit grid info button</span>
+          <span>
+            The planning area or study region needs to be divided
+            into smaller spatial units, called planning units.
+            The division can be done with a regular grid (hexagons or squares)
+            or with an irreglular grid (for example using management or
+            ecological land units). The planning units are central to a Marxan analysis and
+            deciding an appropriate shape and size is important.
+          </span>
         </InfoButton>
       </div>
 

@@ -1,12 +1,13 @@
 import React from 'react';
+
 import Head from 'next/head';
 
-import Header from 'layout/header';
-import Protected from 'layout/protected';
-
-import Me from 'layout/me';
-
 import { withProtection, withUser } from 'hoc/auth';
+
+import Header from 'layout/header';
+import Me from 'layout/me';
+import MetaIcons from 'layout/meta-icons';
+import Protected from 'layout/protected';
 
 export const getServerSideProps = withProtection(withUser());
 
@@ -15,17 +16,17 @@ const MePage: React.FC = () => {
     <Protected>
       <Head>
         <title>Me</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <MetaIcons />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
 
-        <div className="md:flex-grow">
-          <div className="flex items-center justify-center h-full text-gray-600 bg-white">
-            <Me />
-          </div>
+        <div className="flex items-center justify-center text-gray-600 bg-white">
+          <Me />
         </div>
+
       </main>
     </Protected>
   );

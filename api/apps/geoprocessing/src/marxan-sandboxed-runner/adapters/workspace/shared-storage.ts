@@ -1,28 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
 import { promises } from 'fs';
 import { resolve } from 'path';
 
-import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
-import { assertDefined } from '@marxan/utils';
-
 import { TemporaryDirectory } from './ports/temporary-directory';
 import { WorkingDirectory } from '../../ports/working-directory';
+import { MarxanDirectory } from '../marxan-directory.service';
+
+export const SharedStoragePath = Symbol('shared storage temporary directory');
 
 @Injectable()
 export class SharedStorage implements TemporaryDirectory {
-  readonly #tempDirectory: string;
-
-  constructor() {
-    const storagePath = AppConfig.get<string>(
-      'storage.sharedFileStorage.localPath',
-    );
-    assertDefined(storagePath);
-    this.#tempDirectory = storagePath;
-  }
+  constructor(
+    @Inject(SharedStoragePath) private readonly tempDirectory: string,
+    private readonly marxanDirectory: MarxanDirectory,
+  ) {}
 
   async cleanup(directory: string): Promise<void> {
-    // TODO check if starts with tempDirectory
+    if (this.#hasPoisonNullByte(directory)) {
+      throw new Error(`Hacking is not allowed.`);
+    }
+
+    if (this.#isDirectoryTraversal(directory, this.tempDirectory)) {
+      throw new Error(`Directory traversal is not allowed.`);
+    }
+
     await promises.rm(directory, {
       recursive: true,
       force: true,
@@ -32,10 +34,20 @@ export class SharedStorage implements TemporaryDirectory {
 
   async get(): Promise<WorkingDirectory> {
     const directory = v4();
-    const fullPath = resolve(this.#tempDirectory, directory);
-    await promises.mkdir(resolve(this.#tempDirectory, directory));
-    // TODO replace output with the name from params
-    await promises.mkdir(resolve(this.#tempDirectory, directory, 'output'));
+    const fullPath = resolve(this.tempDirectory, directory) as WorkingDirectory;
+
+    await promises.mkdir(fullPath);
+
     return fullPath as WorkingDirectory;
+  }
+
+  #hasPoisonNullByte = (path: string): boolean => path.indexOf('\0') !== -1;
+
+  #isDirectoryTraversal = (fullPath: string, rootDirectory: string) =>
+    !fullPath.startsWith(rootDirectory);
+
+  async createOutputDirectory(inside: WorkingDirectory): Promise<void> {
+    const outputPath = this.marxanDirectory.get('OUTPUTDIR', inside);
+    await promises.mkdir(outputPath.fullPath);
   }
 }

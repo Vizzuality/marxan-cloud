@@ -1,18 +1,18 @@
 import React from 'react';
-import Head from 'next/head';
 
-import Title from 'layout/title/project-title';
-import Header from 'layout/header';
-import Protected from 'layout/protected';
-
-import Wrapper from 'layout/wrapper';
-import Help from 'layout/help/button';
-
-import ProjectNewForm from 'layout/projects/new/form';
-import Breadcrumb from 'components/breadcrumb';
+import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
-import { useRouter } from 'next/router';
+
+import Header from 'layout/header';
+import Help from 'layout/help/button';
+import MetaIcons from 'layout/meta-icons';
+import ProjectNewForm from 'layout/projects/new/form';
+import Protected from 'layout/protected';
+import ProjectTitle from 'layout/title/project-title';
+import Wrapper from 'layout/wrapper';
+
+import Breadcrumb from 'components/breadcrumb';
 
 export const getServerSideProps = withProtection(withUser());
 
@@ -21,10 +21,10 @@ const NewProjectsPage: React.FC = () => {
 
   return (
     <Protected>
-      <Title title="New" />
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+
+      <ProjectTitle title="New" />
+
+      <MetaIcons />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />

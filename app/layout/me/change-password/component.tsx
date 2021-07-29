@@ -1,21 +1,20 @@
 import React, { useCallback, useState } from 'react';
 
-import Button from 'components/button';
-import Loading from 'components/loading';
-
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import Field from 'components/forms/field';
-import Label from 'components/forms/label';
-import Input from 'components/forms/input';
-
-import {
-  composeValidators,
-} from 'components/forms/validations';
-
-import { signOut } from 'next-auth/client';
 
 import { useSaveMePassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
+
+import { signOut } from 'next-auth/client';
+
+import Button from 'components/button';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
+import {
+  composeValidators,
+} from 'components/forms/validations';
+import Loading from 'components/loading';
 
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
 
@@ -82,7 +81,7 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
     >
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex">
-          <div className="w-full max-w-xs">
+          <div className="w-full max-w-xl">
             <h2 className="mb-5 text-lg font-medium text-gray-600 font-heading">Change password</h2>
             <p className="text-sm">
               Choose a new password. Changing your password will sign you out.
@@ -96,58 +95,65 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
               iconClassName="w-10 h-10 text-primary-500"
             />
 
-            {/* CURRENT PASSWORD */}
-            <div className="mt-5">
-              <FieldRFF
-                name="currentPassword"
-                validate={composeValidators([{ presence: true }])}
-              >
-                {(fprops) => (
-                  <Field id="profile-current-password" {...fprops}>
-                    <Label theme="light" className="mb-3 uppercase">Current password</Label>
-                    <Input theme="light" icon={PASSWORD_SVG} type="password" />
-                  </Field>
-                )}
-              </FieldRFF>
-            </div>
+            <div className="mt-20 md:grid md:grid-cols-2 gap-x-10">
+              <div>
+                {/* CURRENT PASSWORD */}
+                <div className="mt-5 ">
+                  <FieldRFF
+                    name="currentPassword"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="profile-current-password" {...fprops}>
+                        <Label theme="light" className="mb-3 uppercase">Current password</Label>
+                        <Input theme="light" icon={PASSWORD_SVG} type="password" />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
+              </div>
 
-            {/* NEW PASSWORD */}
-            <div className="mt-5">
-              <FieldRFF
-                name="newPassword"
-                validate={composeValidators([{ presence: true }])}
-              >
-                {(fprops) => (
-                  <Field id="profile-new-password" {...fprops}>
-                    <Label theme="light" className="mb-3 uppercase">New password</Label>
-                    <Input theme="light" icon={PASSWORD_SVG} type="password" />
-                  </Field>
-                )}
-              </FieldRFF>
-            </div>
+              <div>
+                {/* NEW PASSWORD */}
+                <div className="mt-5">
+                  <FieldRFF
+                    name="newPassword"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="profile-new-password" {...fprops}>
+                        <Label theme="light" className="mb-3 uppercase">New password</Label>
+                        <Input theme="light" icon={PASSWORD_SVG} type="password" />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
 
-            {/* CONFIRM NEW PASSWORD */}
-            <div className="mt-5">
-              <FieldRFF
-                name="confirmPassword"
-                validate={composeValidators([
-                  { presence: true },
-                  equalPasswordValidator,
-                ])}
-              >
-                {(fprops) => (
-                  <Field id="profile-confirm-password" {...fprops}>
-                    <Label theme="light" className="mb-3 uppercase">New password</Label>
-                    <Input theme="light" icon={PASSWORD_SVG} type="password" />
-                  </Field>
-                )}
-              </FieldRFF>
-            </div>
+                {/* CONFIRM NEW PASSWORD */}
+                <div className="mt-5">
+                  <FieldRFF
+                    name="confirmPassword"
+                    validate={composeValidators([
+                      { presence: true },
+                      equalPasswordValidator,
+                    ])}
+                  >
+                    {(fprops) => (
+                      <Field id="profile-confirm-password" {...fprops}>
+                        <Label theme="light" className="mb-3 uppercase">Confirm new password</Label>
+                        <Input theme="light" icon={PASSWORD_SVG} type="password" />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
 
-            <div className="mt-5">
-              <Button theme="primary" size="s" type="submit" disabled={submitting}>
-                Change password
-              </Button>
+                <div className="mt-5">
+                  <Button theme="primary" size="s" type="submit" disabled={submitting}>
+                    Change password
+                  </Button>
+                </div>
+
+              </div>
             </div>
           </div>
         </form>

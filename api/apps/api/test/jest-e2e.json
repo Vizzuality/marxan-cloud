@@ -1,6 +1,13 @@
 {
-  "moduleFileExtensions": ["js", "json", "ts"],
-  "moduleDirectories": ["node_modules", "src"],
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "moduleDirectories": [
+    "node_modules",
+    "src"
+  ],
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
@@ -9,16 +16,36 @@
   },
   "moduleNameMapper": {
     "@marxan-api/(.*)": "<rootDir>/../src/$1",
-    "^@marxan/utils": ["<rootDir>/../../../libs/utils/src"],
-    "^@marxan/utils/(.*)$": ["<rootDir>/../../..//libs/utils/src/$1"],
-    "^@marxan/scenarios-planning-unit": ["<rootDir>/../../../libs/scenarios-planning-unit/src"],
-    "^@marxan/scenarios-planning-unit/(.*)$": ["<rootDir>/../../../libs/scenarios-planning-unit/src/$1"],
-    "^@marxan/admin-regions": ["<rootDir>/../../../libs/admin-regions/src"],
-    "^@marxan/admin-regions/(.*)$": ["<rootDir>/../../../libs/admin-regions/src/$1"],
-    "^@marxan/api-events": ["<rootDir>/../../../libs/api-events/src"],
-    "^@marxan/api-events/(.*)$": ["<rootDir>/../../../libs/api-events/src/$1"],
-    "^@marxan-jobs/planning-unit-geometry": ["<rootDir>/../../../libs/planning-unit-geometry/src"],
-    "^@marxan-jobs/planning-unit-geometry/(.*)$": ["<rootDir>/../../../libs/planning-unit-geometry/src/$1"],
+    "^@marxan/utils": [
+      "<rootDir>/../../../libs/utils/src"
+    ],
+    "^@marxan/utils/(.*)$": [
+      "<rootDir>/../../..//libs/utils/src/$1"
+    ],
+    "^@marxan/scenarios-planning-unit": [
+      "<rootDir>/../../../libs/scenarios-planning-unit/src"
+    ],
+    "^@marxan/scenarios-planning-unit/(.*)$": [
+      "<rootDir>/../../../libs/scenarios-planning-unit/src/$1"
+    ],
+    "^@marxan/admin-regions": [
+      "<rootDir>/../../../libs/admin-regions/src"
+    ],
+    "^@marxan/admin-regions/(.*)$": [
+      "<rootDir>/../../../libs/admin-regions/src/$1"
+    ],
+    "^@marxan/api-events": [
+      "<rootDir>/../../../libs/api-events/src"
+    ],
+    "^@marxan/api-events/(.*)$": [
+      "<rootDir>/../../../libs/api-events/src/$1"
+    ],
+    "^@marxan-jobs/planning-unit-geometry": [
+      "<rootDir>/../../../libs/planning-unit-geometry/src"
+    ],
+    "^@marxan-jobs/planning-unit-geometry/(.*)$": [
+      "<rootDir>/../../../libs/planning-unit-geometry/src/$1"
+    ],
     "@marxan/scenario-cost-surface/(.*)": "<rootDir>/../../../libs/scenario-cost-surface/src/$1",
     "@marxan/scenario-cost-surface": "<rootDir>/../../../libs/scenario-cost-surface/src",
     "@marxan/marxan-input/(.*)": "<rootDir>/../../../libs/marxan-input/src/$1",
@@ -27,6 +54,10 @@
     "@marxan/planning-area-repository/(.*)": "<rootDir>/../../../libs/planning-area-repository/src/$1",
     "@marxan/planning-area-repository": "<rootDir>/../../../libs/planning-area-repository/src",
     "@marxan/scenario-puvspr/(.*)": "<rootDir>/../../../libs/scenario-puvspr/src/$1",
-    "@marxan/scenario-puvspr": "<rootDir>/../../../libs/scenario-puvspr/src"
+    "@marxan/scenario-puvspr": "<rootDir>/../../../libs/scenario-puvspr/src",
+    "@marxan/scenario-run-queue/(.*)": "<rootDir>/../../../libs/scenario-run-queue/src/$1",
+    "@marxan/scenario-run-queue": "<rootDir>/../../../libs/scenario-run-queue/src",
+    "@marxan/features/(.*)": "<rootDir>/../../../libs/features/src/$1",
+    "@marxan/features": "<rootDir>/../../../libs/features/src"
   }
 }

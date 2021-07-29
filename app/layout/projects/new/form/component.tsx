@@ -1,36 +1,37 @@
 import React, { useState, useEffect } from 'react';
+
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import Link from 'next/link';
-
-import ProjectNewMap from 'layout/projects/new/map';
-
-import Icon from 'components/icon';
-import Field from 'components/forms/field';
-import Label from 'components/forms/label';
-import Input from 'components/forms/input';
-import Textarea from 'components/forms/textarea';
-import Button from 'components/button';
-import InfoButton from 'components/info-button';
-
-import HelpBeacon from 'layout/help/beacon';
-
-import UPLOAD_SHAPEFILE_SVG from 'svgs/ui/upload.svg?sprite';
-
-import {
-  composeValidators,
-} from 'components/forms/validations';
-
 import { useDispatch } from 'react-redux';
+
+import Link from 'next/link';
 import { useRouter } from 'next/router';
+
 import { useOrganizations } from 'hooks/organizations';
 import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
-import { setBbox, setMaxPuAreaSize, setMinPuAreaSize } from 'store/slices/projects/new';
+import {
+  setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingPlanningArea,
+} from 'store/slices/projects/new';
 
-import PlanningAreaSelector from './planning-area-selector';
-import ProjectFormProps from './types';
+import HelpBeacon from 'layout/help/beacon';
+import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
+import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
+import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
+import ProjectNewMap from 'layout/projects/new/map';
+
+import Button from 'components/button';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
+import Textarea from 'components/forms/textarea';
+import {
+  composeValidators,
+} from 'components/forms/validations';
+import InfoButton from 'components/info-button';
+
 import { DEFAULT_AREA } from './constants';
+import ProjectFormProps from './types';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
   const [hasPlanningArea, setHasPlanningArea] = useState(false);
@@ -48,6 +49,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
       dispatch(setBbox(null));
       dispatch(setMinPuAreaSize(null));
       dispatch(setMaxPuAreaSize(null));
+      dispatch(setUploadingPlanningArea(null));
     };
   }, [dispatch]);
 
@@ -88,6 +90,19 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     });
   };
 
+  const resetPlanningArea = (form) => {
+    dispatch(setUploadingPlanningArea(null));
+    dispatch(setBbox(null));
+
+    const registeredFields = form.getRegisteredFields();
+    registeredFields.forEach((f) => {
+      const omitFields = ['name', 'description', 'planningUnitGridShape'];
+      if (!omitFields.includes(f)) {
+        form.change(f, null);
+      }
+    });
+  };
+
   return (
     <FormRFF
       onSubmit={onSubmit}
@@ -95,7 +110,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
         ...DEFAULT_AREA,
       }}
     >
-      {({ handleSubmit, values }) => (
+      {({ form, handleSubmit, values }) => (
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
@@ -113,7 +128,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   planning area from scratch or upload a file.
 
                 </div>
-                )}
+              )}
               modifiers={['flip']}
               tooltipPlacement="right"
             >
@@ -135,7 +150,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                         {(fprops) => (
                           <Field id="name" {...fprops}>
                             <div className="flex items-center mb-3 space-x-2">
-                              <Label theme="dark" className="uppercase">Project Name</Label>
+                              <Label theme="dark" className="uppercase" id="name">
+                                Project Name
+                              </Label>
+
                               <InfoButton>
                                 <span>
                                   A generic name for the project is
@@ -168,63 +186,85 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                     </div>
 
                     {/* PLANNING AREA */}
-                    <div className="flex items-center justify-between mt-6">
-                      <div className="flex items-center">
-                        <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
-                        <InfoButton>
-                          <span>
-                            The planning area (or study region) is
-                            the outer boundary
-                            of the region where you want to create a
-                            plan. These regions
-                            often represent administrative units
-                            (such as countries or
-                            smaller regions), but you can also upload your
-                            own geometry.
-                          </span>
-                        </InfoButton>
-                      </div>
-                      {/* TEMPORARILY HIDDEN, it will be implemented in the future */}
-                      <div className="hidden">
-                        <Button
-                          className="w-20 h-6 mr-4"
-                          size="xs"
-                          theme={!hasPlanningArea ? 'white' : 'secondary'}
-                          onClick={() => setHasPlanningArea(false)}
-                        >
-                          No
-                        </Button>
-                        <Button
-                          className="w-20 h-6"
-                          size="xs"
-                          theme={hasPlanningArea ? 'white' : 'secondary'}
-                          onClick={() => setHasPlanningArea(true)}
-                        >
-                          Yes
-                        </Button>
+                    <div className="flex flex-col justify-between mt-6">
+                      <h2 className="mb-5 text-lg font-medium font-heading">Do you have a planning region shapefile of your own?</h2>
+
+                      <div className="flex flex-row items-center justify-between">
+                        <div className="flex items-center">
+                          <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
+                          <InfoButton>
+                            <span>
+                              The planning area (or study region) is
+                              the outer boundary
+                              of the region where you want to create a
+                              plan. These regions
+                              often represent administrative units
+                              (such as countries or
+                              smaller regions), but you can also upload your
+                              own geometry.
+                            </span>
+                          </InfoButton>
+                        </div>
+                        <div className="flex flex-row">
+                          <Button
+                            className="w-20 h-6 mr-4"
+                            size="xs"
+                            theme={hasPlanningArea !== null && !hasPlanningArea ? 'white' : 'secondary'}
+                            onClick={() => {
+                              setHasPlanningArea(false);
+                              resetPlanningArea(form);
+                            }}
+                          >
+                            No
+                          </Button>
+                          <Button
+                            className="w-20 h-6"
+                            size="xs"
+                            theme={hasPlanningArea ? 'white' : 'secondary'}
+                            onClick={() => {
+                              setHasPlanningArea(true);
+                              resetPlanningArea(form);
+                            }}
+                          >
+                            Yes
+                          </Button>
+                        </div>
                       </div>
                     </div>
 
-                    {!hasPlanningArea && (
-                    <PlanningAreaSelector
-                      values={values}
-                    />
+                    {hasPlanningArea !== null && !hasPlanningArea && (
+                      <>
+                        <CountryRegionSelector
+                          country={values.countryId}
+                          region={values.adminAreaLevel1Id}
+                          subRegion={values.adminAreaLevel2Id}
+                        />
+                        <PlanningAreaSelector
+                          values={values}
+                        />
+                      </>
                     )}
 
                     {hasPlanningArea && (
-                    <Button
-                      className="flex w-full mt-4"
-                      theme="secondary"
-                      size="base"
-                      onClick={() => console.info('Upload shapefile')}
-                    >
-                      <span className="w-full">
-                        Upload shapefile
-                      </span>
-                      <Icon
-                        icon={UPLOAD_SHAPEFILE_SVG}
-                      />
-                    </Button>
+                      <>
+                        <FieldRFF
+                          name="planningAreaId"
+                          validate={composeValidators([{ presence: true }])}
+                        >
+                          {(fprops) => {
+                            return (
+                              <PlanningAreaUploader
+                                {...fprops}
+                                resetPlanningArea={resetPlanningArea}
+                                form={form}
+                              />
+                            );
+                          }}
+                        </FieldRFF>
+                        <PlanningAreaSelector
+                          values={values}
+                        />
+                      </>
                     )}
                   </div>
                   <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />

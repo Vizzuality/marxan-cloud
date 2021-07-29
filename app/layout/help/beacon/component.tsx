@@ -4,22 +4,23 @@ import React, {
   useCallback,
   useRef,
 } from 'react';
+
 import { createPortal } from 'react-dom';
-
-import cx from 'classnames';
-
-import { useHelp } from 'hooks/help';
 import { usePopper } from 'react-popper';
 import { useResizeDetector } from 'react-resize-detector';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/router';
 
-import Tooltip from 'components/tooltip';
-import HelpTooltip from 'layout/help/tooltip';
-import HelpSpotlight from 'layout/help/spotlight';
+import { useHelp } from 'hooks/help';
 
 import type { Placement } from '@popperjs/core';
-import { useRouter } from 'next/router';
+import cx from 'classnames';
+import { AnimatePresence, motion } from 'framer-motion';
+
+import HelpSpotlight from 'layout/help/spotlight';
+import HelpTooltip from 'layout/help/tooltip';
+
+import Tooltip from 'components/tooltip';
 
 const flipModifier = {
   name: 'flip',
@@ -44,6 +45,7 @@ export interface HelpBeaconProps {
   placement?: Placement;
   modifiers?: string[];
   tooltipPlacement?: Placement;
+  beaconClassName?: string;
 }
 
 export const HelpBeacon: React.FC<HelpBeaconProps> = ({
@@ -55,6 +57,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   placement = 'top-start',
   modifiers = ['flip', 'hide'],
   tooltipPlacement = 'bottom',
+  beaconClassName,
 }: HelpBeaconProps) => {
   const { active, beacons, addBeacon } = useHelp();
   const [visible, setVisible] = useState(false);
@@ -152,7 +155,8 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
               exit={{ opacity: 0 }}
               ref={((el) => setBeaconRef(el))}
               className={cx({
-                'z-50': true,
+                'z-40': !beaconClassName,
+                [beaconClassName]: !!beaconClassName,
                 'visible pointer-events-auto': active,
                 'invisible pointer-events-none': !active || attributes?.popper?.['data-popper-reference-hidden'] || attributes?.popper?.['data-popper-escaped'],
               })}

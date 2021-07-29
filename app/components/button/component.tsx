@@ -1,7 +1,9 @@
 import React, {
   ButtonHTMLAttributes, AnchorHTMLAttributes, FC,
 } from 'react';
+
 import Link, { LinkProps } from 'next/link';
+
 import cx from 'classnames';
 
 const THEME = {
@@ -11,9 +13,12 @@ const THEME = {
   secondary: 'text-white bg-gray-500 hover:bg-gray-400 active:bg-gray-300 border border-gray-500 hover:border-gray-400 active:border-gray-300',
   'secondary-alt': 'text-gray-300 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
 
+  tertiary: 'text-black bg-gray-100 hover:bg-gray-400 hover:border-gray-400 hover:text-white',
+
   white: 'text-gray-700 bg-white hover:text-white hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
 
   danger: 'text-red-700 bg-transparent hover:text-white hover:bg-red-700 active:bg-red-600 border border-red-700 hover:border-red-600 active:border-red-500',
+  'danger-alt': 'text-white hover:bg-transparent border border-red-700 hover:text-red-700 bg-red-700 active:bg-red-600 hover:border hover:border-red-700 active:text-white active:border-red-500',
 
   spacial: 'text-white bg-transparent hover:bg-gray-400 active:bg-gray-300 flex items-center justify-center rounded-4xl focus:outline-none',
 
@@ -31,7 +36,7 @@ const SIZE = {
 };
 
 export interface AnchorButtonProps {
-  theme: 'primary' | 'primary-alt' | 'white'| 'secondary' | 'secondary-alt' | 'danger' | 'spacial' | 'transparent-black' | 'transparent-white';
+  theme: 'primary' | 'primary-alt' | 'white'| 'secondary' | 'secondary-alt' | 'tertiary' | 'danger' | 'danger-alt' |'spacial' | 'transparent-black' | 'transparent-white';
   size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }

@@ -1,17 +1,16 @@
 import React from 'react';
-import Head from 'next/head';
-
-import Title from 'layout/title/scenario-title';
-import Header from 'layout/header';
-import Protected from 'layout/protected';
-import Wrapper from 'layout/wrapper';
-
-import ScenariosMap from 'layout/scenarios/map';
-
-import ScenariosSidebar from 'layout/scenarios/sidebar';
-import SidebarName from 'layout/scenarios/sidebar/name';
 
 import { withProtection, withUser } from 'hoc/auth';
+
+import Header from 'layout/header';
+import Help from 'layout/help/button';
+import MetaIcons from 'layout/meta-icons';
+import Protected from 'layout/protected';
+import ScenariosMap from 'layout/scenarios/map';
+import ScenariosSidebar from 'layout/scenarios/sidebar';
+import SidebarName from 'layout/scenarios/sidebar/name';
+import Title from 'layout/title/scenario-title';
+import Wrapper from 'layout/wrapper';
 
 export const getServerSideProps = withProtection(withUser());
 
@@ -20,9 +19,7 @@ const NewScenarioPage: React.FC = () => {
     <Protected>
       <Title title="New" />
 
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <MetaIcons />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
@@ -37,6 +34,8 @@ const NewScenarioPage: React.FC = () => {
             </div>
           </Wrapper>
         </div>
+
+        <Help />
       </main>
     </Protected>
   );

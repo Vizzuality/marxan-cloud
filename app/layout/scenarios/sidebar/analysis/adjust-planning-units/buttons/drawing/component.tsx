@@ -1,15 +1,18 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 
+import { Form as FormRFF } from 'react-final-form';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useSaveScenarioPU } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
 import cx from 'classnames';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
-
-import { Form as FormRFF } from 'react-final-form';
-
-import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import DRAW_SHAPE_SVG from 'svgs/ui/draw.svg?sprite';
 
@@ -27,11 +30,14 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
-  const { setDrawing, setDrawingValue } = scenarioSlice.actions;
+  const { addToast } = useToasts();
 
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setDrawing, setDrawingValue, setCache } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const { drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
+  const scenarioPUMutation = useSaveScenarioPU({});
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -61,8 +67,58 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   // Callbacks
   const onSubmit = useCallback((values) => {
     // Save current drawn shape
-    console.info(values);
-  }, []);
+    scenarioPUMutation.mutate({
+      id: `${sid}`,
+      data: {
+        byGeoJson: {
+          [values.type]: [{
+            type: 'FeatureCollection',
+            features: values.drawingValue,
+          }],
+        },
+      },
+    }, {
+      onSuccess: () => {
+        console.info('SUCCESS');
+        onSelected(null);
+        dispatch(setCache(Date.now()));
+        dispatch(setDrawing(null));
+        dispatch(setDrawingValue(null));
+
+        addToast('adjust-planning-units-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <ul className="text-sm">
+              <li>Planning units saved</li>
+            </ul>
+          </>
+        ), {
+          level: 'success',
+        });
+      },
+      onError: () => {
+        addToast('adjust-planning-units-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <ul className="text-sm">
+              <li>Ooops! Something went wrong. Try again</li>
+            </ul>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    sid,
+    scenarioPUMutation,
+    onSelected,
+    dispatch,
+    setDrawing,
+    setDrawingValue,
+    setCache,
+    addToast,
+  ]);
 
   return (
     <FormRFF

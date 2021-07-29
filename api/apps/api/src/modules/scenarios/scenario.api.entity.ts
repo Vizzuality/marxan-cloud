@@ -14,6 +14,7 @@ import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { IUCNCategory } from '../protected-areas/protected-area.geo.entity';
+import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
@@ -34,10 +35,20 @@ export enum ScenarioType {
 }
 
 export enum JobStatus {
+  draft = 'draft',
   created = 'created',
   running = 'running',
   done = 'done',
   failure = 'failure',
+}
+
+/**
+ * A simple job status, usable to represent jobs that can be only in the
+ * draft or created status.
+ */
+export enum SimpleJobStatus {
+  draft = 'draft',
+  created = 'created',
 }
 
 @Entity('scenarios')
@@ -104,6 +115,10 @@ export class Scenario extends TimeUserEntityMetadata {
   @IsOptional()
   wdpaThreshold?: number | null;
 
+  @Column('jsonb', { name: 'feature_set' })
+  @IsOptional()
+  featureSet?: GeoFeatureSetSpecification;
+
   /**
    * Number of runs for Marxan calculations.
    */
@@ -158,6 +173,13 @@ export class Scenario extends TimeUserEntityMetadata {
   @IsArray()
   @ManyToMany((_type) => User, (user) => user.scenarios, { eager: true })
   users!: Partial<User>[];
+
+  @ApiProperty()
+  @Column({
+    name: 'ran_at_least_once',
+    default: false,
+  })
+  ranAtLeastOnce!: boolean;
 }
 
 export class JSONAPIScenarioData {

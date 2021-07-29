@@ -1,8 +1,10 @@
-import { getSession } from 'next-auth/client';
 import { QueryClient } from 'react-query';
-import { dehydrate } from 'react-query/hydration';
 
+import { getSession } from 'next-auth/client';
+import { dehydrate } from 'react-query/hydration';
 import USERS from 'services/users';
+
+import { mergeDehydratedState } from './utils';
 
 export function withProtection(getServerSidePropsFunc?: Function) {
   return async (context: any) => {
@@ -22,6 +24,7 @@ export function withProtection(getServerSidePropsFunc?: Function) {
       const SSPF = await getServerSidePropsFunc(context, session);
 
       return {
+        ...SSPF,
         props: {
           session,
           ...SSPF.props,
@@ -72,11 +75,17 @@ export function withUser(getServerSidePropsFunc?: Function) {
     if (getServerSidePropsFunc) {
       const SSPF = await getServerSidePropsFunc(context) || {};
 
+      const { dehydratedState: prevDehydratedState } = SSPF.props;
+      const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
+
+      const newDehydratedState = mergeDehydratedState(prevDehydratedState, currentDehydratedState);
+
       return {
+        ...SSPF,
         props: {
           session,
-          dehydratedState: JSON.parse(JSON.stringify(dehydrate(queryClient))),
           ...SSPF.props,
+          dehydratedState: newDehydratedState,
         },
       };
     }
@@ -107,6 +116,7 @@ export function withoutProtection(getServerSidePropsFunc?: Function) {
       const SSPF = await getServerSidePropsFunc(context);
 
       return {
+        ...SSPF,
         props: {
           ...SSPF.props,
         },

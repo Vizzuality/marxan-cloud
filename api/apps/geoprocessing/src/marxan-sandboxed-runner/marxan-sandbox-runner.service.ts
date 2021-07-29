@@ -10,6 +10,8 @@ import { Cancellable } from './ports/cancellable';
 import { Assets, InputFilesFs } from './adapters/scenario-data/input-files-fs';
 import { SolutionsOutputService } from './adapters/solutions-output/solutions-output.service';
 
+export { Assets };
+
 @Injectable()
 export class MarxanSandboxRunnerService {
   readonly #controllers: Record<string, AbortController> = {};
@@ -26,7 +28,11 @@ export class MarxanSandboxRunnerService {
     }
   }
 
-  async run(forScenarioId: string, assets: Assets): Promise<ExecutionResult> {
+  async run(
+    forScenarioId: string,
+    assets: Assets,
+    progressCallback: (progress: number) => void,
+  ): Promise<ExecutionResult> {
     const workspace = await this.workspaceService.get();
     const inputFiles = await this.moduleRef.create(InputFilesFs);
     const outputFilesRepository = await this.moduleRef.create(
@@ -58,6 +64,7 @@ export class MarxanSandboxRunnerService {
 
     await interruptIfKilled();
     await inputFiles.include(workspace, assets);
+    await workspace.arrangeOutputSpace();
 
     return new Promise(async (resolve, reject) => {
       marxanRun.on('error', async (result) => {
@@ -82,6 +89,7 @@ export class MarxanSandboxRunnerService {
           this.clearAbortController(forScenarioId);
         }
       });
+      marxanRun.on(`progress`, (progress) => progressCallback(progress));
 
       try {
         await interruptIfKilled();

@@ -1,27 +1,24 @@
 import React from 'react';
-import Head from 'next/head';
 
 import { withProtection, withUser } from 'hoc/auth';
 
-import Protected from 'layout/protected';
 import Header from 'layout/header';
-import Title from 'layout/title/project-title';
-
-import ProjectsWelcome from 'layout/projects/all/welcome';
-import ProjectsToolbar from 'layout/projects/all/toolbar';
-import ProjectsList from 'layout/projects/all/list';
 import Help from 'layout/help/button';
+import MetaIcons from 'layout/meta-icons';
+import ProjectsList from 'layout/projects/all/list';
+import ProjectsToolbar from 'layout/projects/all/toolbar';
+import ProjectsWelcome from 'layout/projects/all/welcome';
+import Protected from 'layout/protected';
+import ProjectTitle from 'layout/title/project-title';
 
 export const getServerSideProps = withProtection(withUser());
 
 const ProjectsPage: React.FC = () => {
   return (
     <Protected>
-      <Title title="" />
+      <ProjectTitle title="" />
 
-      <Head>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <MetaIcons />
 
       <main>
         <Header size="base" />

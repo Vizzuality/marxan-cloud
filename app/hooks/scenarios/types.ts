@@ -47,3 +47,21 @@ export interface UploadScenarioCostSurfaceProps {
   id?: string,
   data: any,
 }
+
+export interface UseSaveScenarioPUProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface SaveScenarioPUProps {
+  id?: string,
+  data: any
+}
+
+// useDuplicateScenario
+export interface UseDuplicateScenarioProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface DuplicateScenarioProps {
+  id: string | string[];
+}

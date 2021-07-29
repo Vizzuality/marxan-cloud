@@ -1,42 +1,58 @@
-import React, { ReactNode } from 'react';
-import cx from 'classnames';
+import React, { ReactElement, cloneElement } from 'react';
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import cx from 'classnames';
 
 export interface SortableItemProps {
   id: string;
-  children: ReactNode
+  sortable: {
+    enabled: boolean;
+    handle: boolean;
+    handleIcon: React.ReactNode,
+  };
+  children: ReactElement
 }
 
 export const SortableItem: React.FC<SortableItemProps> = ({
   id,
+  sortable,
   children,
 }: SortableItemProps) => {
   const {
     attributes,
     listeners,
-    setNodeRef,
     transform,
     transition,
     isDragging,
+    setNodeRef,
   } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  const CHILD = cloneElement(children, {
+    sortable,
+    listeners,
+    attributes,
+    isDragging,
+  });
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
+      {...!sortable.handle && {
+        ...listeners,
+        ...attributes,
+      }}
       className={cx({
         'opacity-0': isDragging,
       })}
     >
-      {children}
+      {CHILD}
     </div>
   );
 };

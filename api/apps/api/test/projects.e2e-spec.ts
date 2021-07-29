@@ -124,6 +124,17 @@ describe('ProjectsModule (e2e)', () => {
       expect(jsonAPIResponse.data[0].type).toBe('projects');
     });
 
+    test('A user should be able to get a list of projects with q param', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/v1/projects?q=User')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      const jsonAPIResponse: ProjectResultPlural = response.body;
+
+      expect(jsonAPIResponse.data[0].type).toBe('projects');
+    });
+
     test('A user should be get a list of projects without any included relationships if these have not been requested', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')

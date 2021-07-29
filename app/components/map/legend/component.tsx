@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from 'react';
+
 import cx from 'classnames';
 
 import Icon from 'components/icon';
+
 import LEGEND_SVG from 'svgs/map/legend.svg?sprite';
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
@@ -11,13 +13,19 @@ export interface LegendProps {
   className?: string;
   children: React.ReactNode;
   maxHeight: string | number;
-  onChangeOrder: (id: string[]) => void;
+  sortable?: {
+    enabled: boolean;
+    handle: boolean;
+    handleIcon: React.ReactNode,
+  };
+  onChangeOrder?: (id: string[]) => void;
 }
 
 export const Legend: React.FC<LegendProps> = ({
   children,
   className = '',
   maxHeight,
+  sortable,
   onChangeOrder,
 }: LegendProps) => {
   const [active, setActive] = useState(true);
@@ -57,15 +65,22 @@ export const Legend: React.FC<LegendProps> = ({
             maxHeight,
           }}
         >
-          <div className="absolute top-0 left-0 z-10 w-full h-4 pointer-events-none bg-gradient-to-b from-black via-black" />
+          <div className="absolute top-0 left-0 z-10 w-full h-3 pointer-events-none bg-gradient-to-b from-black via-black" />
           <div
             className="overflow-x-hidden overflow-y-auto"
           >
-            <SortableList
-              onChangeOrder={onChangeOrder}
-            >
-              {children}
-            </SortableList>
+            {!!sortable && (
+              <SortableList
+                sortable={sortable}
+                onChangeOrder={onChangeOrder}
+              >
+                {children}
+              </SortableList>
+            )}
+
+            {!sortable && (
+              children
+            )}
           </div>
           <div className="absolute bottom-0 left-0 z-10 w-full h-3 pointer-events-none bg-gradient-to-t from-black via-black" />
         </div>

@@ -11,6 +11,13 @@ afterEach(async () => {
   await world?.cleanup();
 });
 
+describe(`when getting input.zip`, () => {
+  it(`should contain required input files`, async () => {
+    const archiveResponse = await world.WhenGettingArchivedInput();
+    await world.ThenArchiveContainsRequiredFiles(archiveResponse);
+  });
+});
+
 describe(`when getting spec.dat`, () => {
   it(`should resolve text/*`, async () => {
     expect((await world.WhenGettingSpecDat()).text).toMatchInlineSnapshot(`
