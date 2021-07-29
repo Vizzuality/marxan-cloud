@@ -115,7 +115,6 @@ export function useMostDifferentSolutions(scenarioId, options: UseSolutionsOptio
 
   const {
     filters = {},
-    sort,
   } = options;
 
   const parsedFilters = Object.keys(filters)
@@ -126,63 +125,43 @@ export function useMostDifferentSolutions(scenarioId, options: UseSolutionsOptio
       };
     }, {});
 
-  const fetchFeatures = ({ pageParam = 1 }) => SCENARIOS.request({
+  const query = useQuery(['scenarios', scenarioId], async () => SCENARIOS.request({
     method: 'GET',
     url: `/${scenarioId}/marxan/solutions/most-different`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
     params: {
-      'page[number]': pageParam,
       ...parsedFilters,
-      ...sort && {
-        sort,
-      },
     },
-  });
-
-  const query = useInfiniteQuery(['solutions', scenarioId, JSON.stringify(options)], fetchFeatures, {
-    keepPreviousData: true,
-    getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
-      const { page, totalPages } = meta;
-
-      const nextPage = page + 1 > totalPages ? null : page + 1;
-      return nextPage;
-    },
-  });
+  }));
 
   const { data } = query;
-  const { pages } = data || {};
 
   return useMemo(() => {
-    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: { data: pageData } } = p;
+    const parsedData = Array.isArray(data.data.data) ? data.data.data.map((d) => {
+      const {
+        id,
+        runId,
+        scoreValue,
+        costValue,
+        planningUnits,
+        missingValues,
+      } = d;
 
-      return pageData.map((d) => {
-        const {
-          id,
-          runId,
-          scoreValue,
-          costValue,
-          planningUnits,
-          missingValues,
-        } = d;
-
-        return {
-          id,
-          run: runId,
-          score: scoreValue,
-          cost: costValue,
-          planningUnits,
-          missingValues,
-        };
-      });
-    })) : [];
+      return {
+        id,
+        run: runId,
+        score: scoreValue,
+        cost: costValue,
+        planningUnits,
+        missingValues,
+      };
+    }) : [];
 
     return {
       ...query,
       data: parsedData,
     };
-  }, [query, pages]);
+  }, [query, data]);
 }
