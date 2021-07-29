@@ -91,6 +91,18 @@ export class InputParameterFileProvider {
         _CLOUD_PROJECT: scenario.project?.name ?? 'NA',
         _CLOUD_ORGANIZATION: scenario.project?.organization?.name ?? 'NA',
         _CLOUD_GENERATED_AT: new Date().toISOString(),
+        VERBOSITY: 2,
+        SAVESOLUTIONSMATRIX: 3,
+        SAVERUN: 3,
+        SAVEBEST: 3,
+        SAVESUMMARY: 3,
+        SAVESCEN: 3,
+        SAVETARGMET: 3,
+        SAVESUMSOLN: 3,
+        SAVELOG: 3,
+        SAVESNAPSTEPS: 0,
+        SAVESNAPCHANGES: 0,
+        SAVESNAPFREQUENCY: 0,
       },
     );
     return inputParameterFile.toString();
