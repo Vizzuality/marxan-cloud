@@ -171,6 +171,7 @@ export function useScenariosStatus(pId) {
         scenarios: [],
       },
     },
+    refetchInterval: 5000,
   });
 
   const { data } = query;
