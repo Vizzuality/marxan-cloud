@@ -2,6 +2,7 @@ import { PromiseType } from 'utility-types';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { MarxanParametersDefaults } from '@marxan/marxan-input';
 import { JobStatus, Scenario, ScenarioType } from '../../scenario.api.entity';
 import { InputParameterFileProvider } from './input-parameter-file.provider';
 import { ioSettingsToken } from './io-settings';
@@ -40,9 +41,12 @@ describe(`when a full scenario available`, () => {
   it(`should return a string with valid format`, () => {
     expect(parameterFile).toEqual(`BLM 0
 NUMREPS 100
-MARXANRUNKEY1 value1
-MARXANRUNKEY2 value2
-MARXANRUNKEY3 3
+INPUTDIR input
+PUNAME pu.dat
+SPECNAME spec.dat
+PUVSPRNAME puvspr.dat
+BOUNDNAME bound.dat
+OUTPUTDIR output
 _CLOUD_SCENARIO Scenario Name
 _CLOUD_PROJECT Project Name
 _CLOUD_ORGANIZATION NA
@@ -59,12 +63,10 @@ SAVELOG 3
 SAVESNAPSTEPS 0
 SAVESNAPCHANGES 0
 SAVESNAPFREQUENCY 0
-INPUTDIR input
-PUNAME pu.dat
-SPECNAME spec.dat
-PUVSPRNAME puvspr.dat
-BOUNDNAME bound.dat
-OUTPUTDIR output`);
+MARXANRUNKEY1 value1
+MARXANRUNKEY2 value2
+MARXANRUNKEY3 3
+`);
   });
 });
 
@@ -87,9 +89,12 @@ describe(`when a full scenario with duplicated BLM & NUMREPS available`, () => {
   it(`should return a file without duplications`, () => {
     expect(parameterFile).toEqual(`BLM 0
 NUMREPS 100
-MARXANRUNKEY1 value1
-MARXANRUNKEY2 value2
-MARXANRUNKEY3 3
+INPUTDIR input
+PUNAME pu.dat
+SPECNAME spec.dat
+PUVSPRNAME puvspr.dat
+BOUNDNAME bound.dat
+OUTPUTDIR output
 _CLOUD_SCENARIO Scenario Name
 _CLOUD_PROJECT Project Name
 _CLOUD_ORGANIZATION NA
@@ -106,12 +111,10 @@ SAVELOG 3
 SAVESNAPSTEPS 0
 SAVESNAPCHANGES 0
 SAVESNAPFREQUENCY 0
-INPUTDIR input
-PUNAME pu.dat
-SPECNAME spec.dat
-PUVSPRNAME puvspr.dat
-BOUNDNAME bound.dat
-OUTPUTDIR output`);
+MARXANRUNKEY1 value1
+MARXANRUNKEY2 value2
+MARXANRUNKEY3 3
+`);
   });
 });
 describe(`when a scenario without parameters`, () => {
@@ -127,8 +130,14 @@ describe(`when a scenario without parameters`, () => {
   });
 
   // then
-  it(`should return a file with only io settings`, () => {
-    expect(parameterFile).toEqual(`_CLOUD_SCENARIO Scenario Name
+  it(`should return a file with only io settings and program control`, () => {
+    expect(parameterFile).toEqual(`INPUTDIR input
+PUNAME pu.dat
+SPECNAME spec.dat
+PUVSPRNAME puvspr.dat
+BOUNDNAME bound.dat
+OUTPUTDIR output
+_CLOUD_SCENARIO Scenario Name
 _CLOUD_PROJECT Project Name
 _CLOUD_ORGANIZATION NA
 _CLOUD_GENERATED_AT 2020-01-01T00:00:00.000Z
@@ -144,12 +153,7 @@ SAVELOG 3
 SAVESNAPSTEPS 0
 SAVESNAPCHANGES 0
 SAVESNAPFREQUENCY 0
-INPUTDIR input
-PUNAME pu.dat
-SPECNAME spec.dat
-PUVSPRNAME puvspr.dat
-BOUNDNAME bound.dat
-OUTPUTDIR output`);
+`);
   });
 });
 
@@ -172,6 +176,7 @@ async function getFixtures() {
     imports: [],
     providers: [
       InputParameterFileProvider,
+      MarxanParametersDefaults,
       FakeScenario,
       {
         provide: getRepositoryToken(Scenario),
