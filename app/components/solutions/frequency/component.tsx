@@ -8,12 +8,12 @@ import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 
 export interface SolutionFrequencyProps {
   values: any,
-  onMap?: boolean;
-  onToggleOnMap?: (onMap: boolean) => void;
+  frequencyOnMap?: boolean;
+  onToggleFrequencyOnMap?: (frequencyMap: boolean) => void;
 }
 
 export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
-  values, onMap, onToggleOnMap,
+  values, frequencyOnMap, onToggleFrequencyOnMap,
 }: SolutionFrequencyProps) => {
   return (
     <div className="w-full">
@@ -22,10 +22,10 @@ export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
         <button
           type="button"
           className="flex items-center justify-between flex-shrink-0 px-2 py-1 text-xs text-white border border-transparent focus:border-white rounded-4xl"
-          onClick={() => onToggleOnMap(!onMap)}
+          onClick={() => onToggleFrequencyOnMap(!frequencyOnMap)}
         >
-          {onMap ? 'Hide from map' : 'View on map'}
-          <Icon icon={onMap ? HIDE_SVG : SHOW_SVG} className="w-5 h-6 ml-3" />
+          {frequencyOnMap ? 'Hide from map' : 'View on map'}
+          <Icon icon={frequencyOnMap ? HIDE_SVG : SHOW_SVG} className="w-5 h-6 ml-3" />
         </button>
       </div>
       <LegendTypeGradient

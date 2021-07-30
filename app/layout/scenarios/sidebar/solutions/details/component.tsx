@@ -31,6 +31,8 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   const { query } = useRouter();
   const { sid } = query;
   const [showTable, setShowTable] = useState<boolean>(false);
+  const [selectedSolutionOnMap, onToggleSelectedSolutionOnMap] = useState<boolean>(false);
+  const [frequencyOnMap, onToggleFrequencyOnMap] = useState<boolean>(false);
 
   const { selectedSolutionId } = useSelector((state) => state['/solutions/details']);
 
@@ -129,7 +131,11 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
       </div>
 
       <div className="w-full p-6 mt-12 border-t border-gray-600">
-        <SolutionFrequency values={frequencyValues} />
+        <SolutionFrequency
+          values={frequencyValues}
+          onToggleFrequencyOnMap={onToggleFrequencyOnMap}
+          frequencyOnMap={frequencyOnMap}
+        />
       </div>
 
       <div className="w-full p-6 border-t border-gray-600">
@@ -142,7 +148,8 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           <SolutionSelected
             best={!selectedSolutionData}
             values={selectedSolutionData || fakeBestSolution}
-            onToggleOnMap={() => console.info('Show map')}
+            onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
+            selectedSolutionOnMap={selectedSolutionOnMap}
           />
         )}
       </div>

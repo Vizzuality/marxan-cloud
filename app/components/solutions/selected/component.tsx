@@ -15,12 +15,12 @@ export interface SelectedSolutionProps {
     missingValues: number,
     planningUnits: number,
   };
-  onMap?: boolean;
-  onToggleOnMap?: (onMap: boolean) => void;
+  selectedSolutionOnMap?: boolean;
+  onToggleSelectedSolutionOnMap?: (onMap: boolean) => void;
 }
 
 export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
-  best = false, values, onMap, onToggleOnMap,
+  best = false, values, selectedSolutionOnMap, onToggleSelectedSolutionOnMap,
 }: SelectedSolutionProps) => {
   const {
     runId, scoreValue, costValue, missingValues, planningUnits,
@@ -31,7 +31,7 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
       <div className="flex justify-between">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <div className="relative w-3.5 h-4 bg-blue-700 rounded" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+            <div className="relative w-3.5 h-4 bg-blue-700" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
             <p className="pl-1 mr-4 text-sm text-white font-heading">
               {`Run ${runId}`}
             </p>
@@ -46,10 +46,10 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
         <button
           type="button"
           className="flex items-center justify-between flex-shrink-0 px-2 py-1 text-xs text-white border border-transparent focus:border-white rounded-4xl"
-          onClick={() => onToggleOnMap(!onMap)}
+          onClick={() => onToggleSelectedSolutionOnMap(!selectedSolutionOnMap)}
         >
-          {onMap ? 'Hide from map' : 'View on map'}
-          <Icon icon={onMap ? HIDE_SVG : SHOW_SVG} className="w-5 h-6 ml-3" />
+          {selectedSolutionOnMap ? 'Hide from map' : 'View on map'}
+          <Icon icon={selectedSolutionOnMap ? HIDE_SVG : SHOW_SVG} className="w-5 h-6 ml-3" />
         </button>
       </div>
       <div className="grid grid-cols-2 pt-5 pl-1 pr-32 text-sm text-white gap-y-6 gap-x-5">
