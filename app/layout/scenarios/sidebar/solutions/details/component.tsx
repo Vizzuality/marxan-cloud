@@ -8,12 +8,13 @@ import { useSolution } from 'hooks/solutions';
 
 import { motion } from 'framer-motion';
 
+import SolutionFrequency from 'layout/solutions/frequency';
+import SolutionSelected from 'layout/solutions/selected';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
-import SolutionFrequency from 'components/solutions/frequency';
-import SolutionSelected from 'components/solutions/selected';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOCK_SVG from 'svgs/ui/clock.svg?sprite';
