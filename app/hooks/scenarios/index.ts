@@ -1,19 +1,20 @@
-import flatten from 'lodash/flatten';
 import { useMemo } from 'react';
+
 import {
   useQuery, useInfiniteQuery, useMutation, useQueryClient,
 } from 'react-query';
-import { useSession } from 'next-auth/client';
+
 import { useRouter } from 'next/router';
 
 import { formatDistanceToNow } from 'date-fns';
-
-import { ItemProps } from 'components/scenarios/item/component';
-
+import flatten from 'lodash/flatten';
+import { useSession } from 'next-auth/client';
+import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
-import DOWNLOADS from 'services/downloads';
+
+import { ItemProps } from 'components/scenarios/item/component';
 
 import {
   UseScenariosOptionsProps,

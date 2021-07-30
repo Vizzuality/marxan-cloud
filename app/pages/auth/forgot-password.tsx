@@ -1,11 +1,12 @@
 import React from 'react';
+
 import Head from 'next/head';
 
-import Header from 'layout/header';
-import ForgotPassword from 'layout/forgot-password';
-import MetaIcons from 'layout/meta-icons';
-
 import { withoutProtection } from 'hoc/auth';
+
+import ForgotPassword from 'layout/forgot-password';
+import Header from 'layout/header';
+import MetaIcons from 'layout/meta-icons';
 
 export const getServerSideProps = withoutProtection();
 

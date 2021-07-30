@@ -1,21 +1,20 @@
 import React from 'react';
 
-import Title from 'layout/title/scenario-title';
+import { withProtection, withUser } from 'hoc/auth';
+
 import Header from 'layout/header';
+import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
-import Wrapper from 'layout/wrapper';
-
 import ScenariosMap from 'layout/scenarios/map';
-
 import ScenariosSidebar from 'layout/scenarios/sidebar';
-import SidebarWDPA from 'layout/scenarios/sidebar/wdpa';
-import SidebarFeatures from 'layout/scenarios/sidebar/features';
 import SidebarAnalysis from 'layout/scenarios/sidebar/analysis';
+import SidebarFeatures from 'layout/scenarios/sidebar/features';
 import SidebarSolutions from 'layout/scenarios/sidebar/solutions';
 import { ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
-
-import { withProtection, withUser } from 'hoc/auth';
+import SidebarWDPA from 'layout/scenarios/sidebar/wdpa';
+import Title from 'layout/title/scenario-title';
+import Wrapper from 'layout/wrapper';
 
 export const getServerSideProps = withProtection(withUser());
 
@@ -25,6 +24,8 @@ const EditScenarioPage: React.FC = () => {
       <Title title="Edit" />
 
       <MetaIcons />
+
+      <Help />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />

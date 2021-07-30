@@ -1,8 +1,8 @@
 import React, { ReactElement, cloneElement } from 'react';
-import cx from 'classnames';
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import cx from 'classnames';
 
 export interface SortableItemProps {
   id: string;

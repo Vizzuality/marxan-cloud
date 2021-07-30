@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 
 import { useHelp } from 'hooks/help';
+import { useMe } from 'hooks/me';
 
 import Wrapper from 'layout/wrapper';
 
@@ -8,7 +9,6 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 
 import GUIDE_REQUEST_SVG from 'svgs/users/guide-request.svg?sprite';
-import { useMe } from 'hooks/me';
 
 export interface GuideRequestProps {
   onDismiss?: () => void,

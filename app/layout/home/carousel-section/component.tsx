@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import Carousel from 'components/carousel';
 import Wrapper from 'layout/wrapper';
+
+import Carousel from 'components/carousel';
 
 import { IMAGES } from './constants';
 

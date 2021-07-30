@@ -1,7 +1,9 @@
 import React, { ReactNode } from 'react';
+
 import cx from 'classnames';
 
 import Icon from 'components/icon';
+
 import DRAG_SVG from 'svgs/ui/drag.svg?sprite';
 
 export interface LegendItemProps {

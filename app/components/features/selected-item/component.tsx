@@ -5,6 +5,7 @@ import Icon from 'components/icon';
 import Button from 'components/button';
 import Select from 'components/forms/select';
 import Checkbox from 'components/forms/checkbox';
+import InfoButton from 'components/info-button';
 
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
@@ -140,6 +141,19 @@ export const Item: React.FC<ItemProps> = ({
                 {' '}
                 this feature into categories
               </h4>
+              <InfoButton>
+                <span>
+                  <h4 className="font-heading text-lg mb-2.5">Split a feature</h4>
+                  You should split a dataset when you have several
+                  features together that you want to treat separately.
+
+                  For example, if you may want to treat each ecoregion
+                  within a dataset as a separate feature.
+                  You will be able to split your dataset
+                  by any of the available attributes in the feature.
+
+                </span>
+              </InfoButton>
             </div>
 
             <div className="inline-block mt-2">
@@ -159,7 +173,7 @@ export const Item: React.FC<ItemProps> = ({
 
         {type === 'species' && (
           <div>
-            <div className="flex items-center mt-3 tracking-wide font-heading">
+            <div className="flex items-center mt-3 tracking-wide font-heading space-x-2">
               <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-yellow-300" />
               <h4 className="ml-2 text-xs text-white uppercase">
                 You can
@@ -168,6 +182,22 @@ export const Item: React.FC<ItemProps> = ({
                 {' '}
                 this feature with others
               </h4>
+              <InfoButton>
+                <span>
+                  <h4 className="font-heading text-lg mb-2.5">Intersecting features</h4>
+                  You may want to intersect two or more features when
+                  you are interested in having a new feature that
+                  combines the information of both. For example,
+                  you may wish to ensure that Marxan identifies
+                  priority areas for a given feature across a
+                  range of habitats. In
+                  this case you can intersect a species
+                  distribution with a habitat or ecosystem
+                  layer thereby making your species features
+                  ecologically representative.
+
+                </span>
+              </InfoButton>
             </div>
 
             <div className="inline-block mt-2">
