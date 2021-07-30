@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -26,8 +26,9 @@ import { SolutionsTableFormProps } from './types';
 export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   bestSolutionId, onCancel,
 }: SolutionsTableFormProps) => {
+  const { selectedSolutionId } = useSelector((state) => state['/solutions/details']);
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
-  const [selectedSolution, onSelectSolution] = useState(null);
+  const [selectedSolution, onSelectSolution] = useState(selectedSolutionId || bestSolutionId);
   const { query } = useRouter();
   const { sid } = query;
   const dispatch = useDispatch();
@@ -126,6 +127,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           <SolutionsTable
             bestSolutionId={bestSolutionId}
             body={data}
+            selectedSolution={selectedSolution}
             onSelectSolution={(solution) => onSelectSolution(solution.id)}
           />
         )}
@@ -134,6 +136,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           <SolutionsTable
             bestSolutionId={bestSolutionId}
             body={mostDifSolutionsData.slice(0, 5)}
+            selectedSolution={selectedSolution}
             onSelectSolution={(solution) => onSelectSolution(solution.id)}
           />
         )}

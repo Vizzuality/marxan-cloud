@@ -10,5 +10,6 @@ export interface SolutionRow extends TableRow, Solution {
 export interface SolutionsTableProps {
   bestSolutionId: string,
   body: SolutionRow[];
+  selectedSolution: string,
   onSelectSolution: (s: Solution) => void;
 }

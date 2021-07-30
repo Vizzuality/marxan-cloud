@@ -10,9 +10,10 @@ import { SolutionsTableProps } from './types';
 export const SolutionsTable: React.FC<SolutionsTableProps> = ({
   bestSolutionId,
   body,
+  selectedSolution,
   onSelectSolution,
 }: SolutionsTableProps) => {
-  const [selectedRowId, setSelectedRowId] = useState<string>(null);
+  const [selectedRowId, setSelectedRowId] = useState<string>(selectedSolution || bestSolutionId);
 
   const solutionsArrayWithBestProperty = body.map((obj) => {
     if (obj.id === bestSolutionId) {
