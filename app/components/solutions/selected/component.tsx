@@ -31,8 +31,8 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
       <div className="flex justify-between">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <div className="relative w-4 h-4 bg-blue-700 rounded" />
-            <p className="mr-4 text-sm text-white font-heading">
+            <div className="relative w-3.5 h-4 bg-blue-700 rounded" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+            <p className="pl-1 mr-4 text-sm text-white font-heading">
               {`Run ${runId}`}
             </p>
           </div>
@@ -49,7 +49,7 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
           onClick={() => onToggleOnMap(!onMap)}
         >
           {onMap ? 'Hide from map' : 'View on map'}
-          <Icon icon={onMap ? HIDE_SVG : SHOW_SVG} className="w-5 h-5 ml-3" />
+          <Icon icon={onMap ? HIDE_SVG : SHOW_SVG} className="w-5 h-6 ml-3" />
         </button>
       </div>
       <div className="grid grid-cols-2 pt-5 pl-1 pr-32 text-sm text-white gap-y-6 gap-x-5">

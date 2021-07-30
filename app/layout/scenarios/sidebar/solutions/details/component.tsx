@@ -12,6 +12,7 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
+import SolutionFrequency from 'components/solutions/frequency';
 import SolutionSelected from 'components/solutions/selected';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
@@ -46,6 +47,24 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
     missingValues: 19,
     planningUnits: 19,
   };
+
+  const frequencyValues = [
+    {
+      color: '#0C2C32',
+      value: '0',
+    },
+    {
+      color: '#006D83',
+      value: null,
+    },
+    {
+      color: '#008B8C',
+      value: null,
+    },
+    {
+      color: '#0BC6C2',
+      value: '10',
+    }];
 
   return (
     <motion.div
@@ -108,7 +127,12 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           />
         </Modal>
       </div>
+
       <div className="w-full p-6 mt-12 border-t border-gray-600">
+        <SolutionFrequency values={frequencyValues} />
+      </div>
+
+      <div className="w-full p-6 border-t border-gray-600">
         <Loading
           visible={selectedSolutionisFetching && !selectedSolutionisFetched}
           className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"

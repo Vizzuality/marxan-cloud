@@ -21,7 +21,7 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
       })}
     >
       <div
-        className="flex w-full h-2"
+        className="flex w-full h-3 rounded-lg"
         style={{
           backgroundImage: `linear-gradient(to right, ${items.map((i) => i.color).join(',')})`,
         }}
@@ -33,7 +33,7 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
           .map(({ value }) => (
             <li
               key={`${value}`}
-              className="flex-shrink-0 text-xs"
+              className="flex-shrink-0 text-sm"
             >
               {value}
             </li>
