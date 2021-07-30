@@ -38,7 +38,7 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
     SET (protected_area, lockin_status) =
         (SELECT protected_area, lockin_status FROM (select id, sum(pa_pu_area) as protected_area, max(lockin_status) as lockin_status 
                                                     from pu_pa group by id) as result
-         WHERE scenarios_pu_data.id = result.id);
+         WHERE scenarios_pu_data.id = result.id) where scenario_id = '${scenario.id}';
     `;
     console.log(query);
     await this.puRepo.query(query);
