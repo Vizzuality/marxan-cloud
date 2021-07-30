@@ -45,11 +45,14 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
 
   const {
     data: bestSolutionData,
-    // isFetching: bestSolutionisFetching,
-    // isFetched: bestSolutionisFetched,
+    isFetching: bestSolutionisFetching,
+    isFetched: bestSolutionisFetched,
   } = useBestSolution(sid);
 
   const isBestSolutionShown = selectedSolutionId === bestSolutionData.id || !selectedSolutionId;
+
+  const solutionIsLoading = bestSolutionisFetching && !bestSolutionisFetched
+  && selectedSolutionisFetching && !selectedSolutionisFetched;
 
   const frequencyValues = [
     {
@@ -142,7 +145,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
 
       <div className="w-full p-6 border-t border-gray-600">
         <Loading
-          visible={selectedSolutionisFetching && !selectedSolutionisFetched}
+          visible={solutionIsLoading}
           className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
           iconClassName="w-10 h-10 text-primary-500"
         />
