@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+
 import cx from 'classnames';
+
 import Icon from 'components/icon';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
@@ -68,7 +70,7 @@ export const Table: React.FC<TableProps> = ({
             <th
               key={`header-${header.id}`}
               className={cx({
-                'px-4 text-left cursor-pointer': true,
+                'px-4 text-left cursor-pointer font-heading text-sm font-medium': true,
                 [header.className]: !!header.className,
               })}
               onClick={() => handleHeaderClick(header)}

@@ -71,8 +71,8 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   return (
     <div className="text-gray-800">
-      <div className="px-8 pb-8">
-        <div className="flex items-center justify-start pb-6">
+      <div className="flex items-center px-8 pb-8 space-x-6">
+        <div className="flex items-center justify-start">
           <Button
             theme="secondary"
             size="base"
@@ -90,7 +90,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             className="block w-4 h-4 text-green-300 form-checkbox-dark"
             onChange={(event) => setMostDifSolutions(event.target.checked)}
           />
-          <Label className="mx-2 text-gray-700">
+          <Label className="mx-2 text-sm text-gray-700">
             View 5 most different solutions
           </Label>
           <InfoButton

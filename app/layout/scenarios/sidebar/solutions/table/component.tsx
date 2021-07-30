@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 
-import Table from 'components/table';
 import { Button } from 'components/button/component';
+import Table from 'components/table';
 
 import BestCell from './cells/best';
-
 import { SolutionsTableProps } from './types';
 
 export const SolutionsTable: React.FC<SolutionsTableProps> = ({
