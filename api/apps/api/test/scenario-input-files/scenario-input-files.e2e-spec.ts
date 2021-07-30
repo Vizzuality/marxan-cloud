@@ -35,21 +35,12 @@ describe(`when getting input.dat`, () => {
         '_CLOUD_GENERATED_AT __ISO_DATE__',
       ),
     ).toMatchInlineSnapshot(`
-      "PROP 0.5
-      COOLFAC 0
-      NUMITNS 1000000
-      NUMTEMP 10000
-      RUNMODE 1
-      HEURTYPE -1
-      RANDSEED -1
-      BESTSCORE 0
-      CLUMPTYPE 0
-      ITIMPTYPE 0
-      MISSLEVEL 1
-      STARTTEMP 1000000
-      COSTTHRESH 0
-      THRESHPEN1 0
-      THRESHPEN2 0
+      "INPUTDIR input
+      PUNAME pu.dat
+      SPECNAME spec.dat
+      PUVSPRNAME puvspr.dat
+      BOUNDNAME bound.dat
+      OUTPUTDIR output
       _CLOUD_SCENARIO Save the world species
       _CLOUD_PROJECT Humanity for living.
       _CLOUD_ORGANIZATION Alaska
@@ -66,12 +57,22 @@ describe(`when getting input.dat`, () => {
       SAVESNAPSTEPS 0
       SAVESNAPCHANGES 0
       SAVESNAPFREQUENCY 0
-      INPUTDIR input
-      PUNAME pu.dat
-      SPECNAME spec.dat
-      PUVSPRNAME puvspr.dat
-      BOUNDNAME bound.dat
-      OUTPUTDIR output"
+      PROP 0.5
+      COOLFAC 0
+      NUMITNS 1000000
+      NUMTEMP 10000
+      RUNMODE 1
+      HEURTYPE -1
+      RANDSEED -1
+      BESTSCORE 0
+      CLUMPTYPE 0
+      ITIMPTYPE 0
+      MISSLEVEL 1
+      STARTTEMP 1000000
+      COSTTHRESH 0
+      THRESHPEN1 0
+      THRESHPEN2 0
+      "
     `);
   });
 });
