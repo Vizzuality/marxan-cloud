@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useSolution } from 'hooks/solutions';
+import { useSolution, useBestSolution } from 'hooks/solutions';
 
 import { motion } from 'framer-motion';
 
@@ -43,13 +43,13 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
     isFetched: selectedSolutionisFetched,
   } = useSolution(sid, selectedSolutionId);
 
-  const fakeBestSolution = {
-    runId: 9,
-    scoreValue: 999,
-    costValue: 900,
-    missingValues: 19,
-    planningUnits: 19,
-  };
+  const {
+    data: bestSolutionData,
+    // isFetching: bestSolutionisFetching,
+    // isFetched: bestSolutionisFetched,
+  } = useBestSolution(sid);
+
+  const isBestSolutionShown = selectedSolutionId === bestSolutionData.id || !selectedSolutionId;
 
   const frequencyValues = [
     {
@@ -145,10 +145,10 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
           iconClassName="w-10 h-10 text-primary-500"
         />
-        {(selectedSolutionData || fakeBestSolution) && (
+        {(selectedSolutionData || bestSolutionData) && (
           <SolutionSelected
-            best={!selectedSolutionData}
-            values={selectedSolutionData || fakeBestSolution}
+            best={isBestSolutionShown}
+            values={selectedSolutionData || bestSolutionData}
             onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
             selectedSolutionOnMap={selectedSolutionOnMap}
           />

@@ -165,3 +165,33 @@ export function useMostDifferentSolutions(scenarioId, options: UseSolutionsOptio
     };
   }, [query, data]);
 }
+
+export function useBestSolution(scenarioId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios', scenarioId], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/marxan/solutions/best`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }));
+
+  // const { data } = query;
+
+  return useMemo(() => {
+    const fakeBestSolution = {
+      id: '01cffd43-e4f5-4b06-a34e-6bfaac9d6c62',
+      runId: 9,
+      scoreValue: 999,
+      costValue: 900,
+      missingValues: 19,
+      planningUnits: 19,
+    };
+
+    return {
+      ...query,
+      data: fakeBestSolution,
+    };
+  }, [query]);
+}
