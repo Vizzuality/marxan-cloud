@@ -25,9 +25,9 @@ import { SolutionsTableFormProps } from './types';
 
 export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   onCancel,
-  onSave,
 }: SolutionsTableFormProps) => {
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
+  const [selectedSolution, onSelectSolution] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
   const dispatch = useDispatch();
@@ -65,9 +65,9 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     },
   );
 
-  const onSelectSolution = useCallback((solutionId) => {
-    dispatch(setSelectedSolution(solutionId));
-  }, [dispatch]);
+  const onSave = useCallback(() => {
+    dispatch(setSelectedSolution(selectedSolution));
+  }, [dispatch, selectedSolution]);
 
   return (
     <div className="text-gray-800">
