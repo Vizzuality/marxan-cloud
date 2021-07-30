@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
 
 import { Button } from 'components/button/component';
+import Icon from 'components/icon';
 import Table from 'components/table';
 
-import BestCell from './cells/best';
+import STAR_SVG from 'svgs/ui/star.svg?sprite';
+
 import { SolutionsTableProps } from './types';
 
 export const SolutionsTable: React.FC<SolutionsTableProps> = ({
+  bestSolutionId,
   body,
   onSelectSolution,
 }: SolutionsTableProps) => {
   const [selectedRowId, setSelectedRowId] = useState<string>(null);
+
+  const solutionsArrayWithBestProperty = body.map((obj) => {
+    if (obj.id === bestSolutionId) {
+      return ({ ...obj, best: true });
+    }
+    return ({ ...obj, best: false });
+  });
 
   const ViewOnMapCell = (value, row) => {
     const { isSelected } = row;
@@ -27,6 +37,14 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
       >
         {isSelected ? 'Selected' : 'Select solution'}
       </Button>
+    );
+  };
+
+  const BestCell = (value) => {
+    return (
+      <>
+        {value && (<Icon className="w-3 h-3 text-gray-500" icon={STAR_SVG} />)}
+      </>
     );
   };
 
@@ -67,7 +85,7 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
   return (
     <Table
       headers={headers}
-      body={body}
+      body={solutionsArrayWithBestProperty}
       selectedRowId={selectedRowId}
     />
   );

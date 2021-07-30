@@ -9,7 +9,7 @@ import STAR_SVG from 'svgs/ui/star.svg?sprite';
 export interface SelectedSolutionProps {
   best: boolean;
   values: {
-    runId: number;
+    runId: string;
     scoreValue: number;
     costValue: number,
     missingValues: number,

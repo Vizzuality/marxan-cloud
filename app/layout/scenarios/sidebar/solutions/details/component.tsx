@@ -125,6 +125,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           onDismiss={() => setShowTable(false)}
         >
           <SolutionsTableForm
+            bestSolutionId={bestSolutionData.id}
             onCancel={() => setShowTable(false)}
             onSave={() => setShowTable(false)}
           />

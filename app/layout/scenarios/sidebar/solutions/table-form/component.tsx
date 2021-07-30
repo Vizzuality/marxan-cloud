@@ -24,7 +24,7 @@ import SolutionsTable from '../table';
 import { SolutionsTableFormProps } from './types';
 
 export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
-  onCancel,
+  bestSolutionId, onCancel,
 }: SolutionsTableFormProps) => {
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
   const [selectedSolution, onSelectSolution] = useState(null);
@@ -124,6 +124,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
         {allSolutionsFetched && (
           <SolutionsTable
+            bestSolutionId={bestSolutionId}
             body={data}
             onSelectSolution={(solution) => onSelectSolution(solution.id)}
           />
@@ -131,6 +132,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
         {mostDifSolutionsIsSelected && (
           <SolutionsTable
+            bestSolutionId={bestSolutionId}
             body={mostDifSolutionsData.slice(0, 5)}
             onSelectSolution={(solution) => onSelectSolution(solution.id)}
           />
