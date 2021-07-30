@@ -1,12 +1,12 @@
 environment        = "dev"
-resource_group_name = "landgriffonmanual-rg"
+resource_group_name = "marxanmanual-rg"
 location = "West Europe"
-storage_account_name = "landgriffonsa"
-storage_container_name = "landgriffon"
+storage_account_name = "marxansa"
+storage_container_name = "marxan"
 
 # networking
-virtual_network_name = "landgriffon-vn"
-subnet_name = "landgriffon-sn"
+virtual_network_name = "marxan-vn"
+subnet_name = "marxan-sn"
 
 
 # tf_state_bucket    = "landgriffon-tf-state"

@@ -10,10 +10,10 @@
 
 terraform {
   backend "azurerm" {
-    resource_group_name  = "landgriffonmanual-tom"
-    storage_account_name = "landgriffontom"
+    resource_group_name  = "marxanmanual-hotzevzl"
+    storage_account_name = "marxanhotzevzl"
     container_name       = "tfstate"
-    key                  = "landgriffon.tfstate"
+    key                  = "marxan.tfstate"
   }
 }
 
