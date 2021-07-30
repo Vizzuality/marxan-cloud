@@ -28,18 +28,18 @@ export class ScenariosPuPaDataGeo extends ScenariosPlanningUnitGeoEntity {
   })
   planningUnitGeom?: PlanningUnitsGeom | null;
 
-  // @OneToOne(
-  //   () => ScenariosPuCostDataGeo,
-  //   (scenariosPuCostDataGeo: ScenariosPuCostDataGeo) => scenariosPuCostDataGeo.scenariosssssssss,
-  //   {
-  //     onDelete: 'CASCADE',
-  //   },
-  // )
-  // @JoinColumn({
-  //   referencedColumnName: 'scenariosssssssss',
-  //   name: 'id',
-  // })
-  // costData?: ScenariosPuCostDataGeo | null;
+  @OneToOne(
+    () => ScenariosPuCostDataGeo,
+    (scenariosPuCostDataGeo: ScenariosPuCostDataGeo) => scenariosPuCostDataGeo.scenariosPuDataId,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
+  @JoinColumn({
+    referencedColumnName: 'scenariosPuDataId',
+    name: 'id',
+  })
+  costData?: ScenariosPuCostDataGeo | null;
 
 
   @OneToOne(
