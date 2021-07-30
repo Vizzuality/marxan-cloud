@@ -49,7 +49,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   if (!scenarioData || tab !== 'protected-areas') return null;
 
   return (
-    <div className="w-full h-full">
+    <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
       <HelpBeacon
         id="scenarios-wdpa"
         title="Protected Areas"
@@ -77,13 +77,14 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
 
         <motion.div
           key="protected-areas"
+          className="flex flex-col min-h-0 overflow-hidden"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
 
           <Pill selected>
 
-            <header className="flex items-baseline mb-5 space-x-4">
+            <header className="flex items-baseline space-x-4">
 
               <h2 className="text-lg font-medium font-heading">Protected areas</h2>
 

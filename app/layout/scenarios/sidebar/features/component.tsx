@@ -1,28 +1,30 @@
 import React, { useState, useEffect } from 'react';
 
-import { motion } from 'framer-motion';
+import { useQueryClient } from 'react-query';
+import { useSelector } from 'react-redux';
 
+import { useRouter } from 'next/router';
+
+import { useSelectedFeatures } from 'hooks/features';
+import { useScenario } from 'hooks/scenarios';
+
+import { motion } from 'framer-motion';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
+import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 import AddFeatures from 'layout/scenarios/sidebar/features/add';
 import ListFeatures from 'layout/scenarios/sidebar/features/list';
 import TargetFeatures from 'layout/scenarios/sidebar/features/targets';
-import HelpBeacon from 'layout/help/beacon';
 
-import Steps from 'components/steps';
 import Button from 'components/button';
 import Icon from 'components/icon';
-import Modal from 'components/modal';
 import InfoButton from 'components/info-button';
+import Modal from 'components/modal';
+import Steps from 'components/steps';
 
-import { useQueryClient } from 'react-query';
-import { useSelector } from 'react-redux';
-import { useRouter } from 'next/router';
-import { useScenario } from 'hooks/scenarios';
-import { useSelectedFeatures } from 'hooks/features';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-
-import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
+import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 export interface ScenariosSidebarWDPAProps {
 }
@@ -53,7 +55,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   if (!scenarioData || tab !== 'features') return null;
 
   return (
-    <div className="w-full h-full">
+    <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
       <HelpBeacon
         id="scenarios-features"
         title="Features"
@@ -198,16 +200,16 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
             </Modal>
 
             {step === 0 && (
-            <ListFeatures
-              onSuccess={() => setStep(step + 1)}
-            />
+              <ListFeatures
+                onSuccess={() => setStep(step + 1)}
+              />
             )}
 
             {step === 1 && (
-            <TargetFeatures
-              onBack={() => setStep(step - 1)}
-              onSuccess={() => push(`/projects/${pid}`)}
-            />
+              <TargetFeatures
+                onBack={() => setStep(step - 1)}
+                onSuccess={() => push(`/projects/${pid}`)}
+              />
             )}
           </Pill>
         </motion.div>
