@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 
-import { Button } from 'components/button/component';
-import Icon from 'components/icon';
-import Table from 'components/table';
+import BestCell from 'layout/scenarios/sidebar/solutions/table/cells/best';
 
-import STAR_SVG from 'svgs/ui/star.svg?sprite';
+import { Button } from 'components/button/component';
+import Table from 'components/table';
 
 import { SolutionsTableProps } from './types';
 
@@ -37,14 +36,6 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
       >
         {isSelected ? 'Selected' : 'Select solution'}
       </Button>
-    );
-  };
-
-  const BestCell = (value) => {
-    return (
-      <>
-        {value && (<Icon className="w-3 h-3 text-gray-500" icon={STAR_SVG} />)}
-      </>
     );
   };
 

@@ -180,8 +180,8 @@ export function useBestSolution(scenarioId) {
   // const { data } = query;
 
   return useMemo(() => {
-    const fakeBestSolution = {
-      id: '01cffd43-e4f5-4b06-a34e-6bfaac9d6c62',
+    const mockBestSolution = {
+      id: 'c5780319-a9cc-49ce-8e44-bd7b72303c2a',
       runId: 9,
       scoreValue: 999,
       costValue: 900,
@@ -191,7 +191,7 @@ export function useBestSolution(scenarioId) {
 
     return {
       ...query,
-      data: fakeBestSolution,
+      data: mockBestSolution,
     };
   }, [query]);
 }
