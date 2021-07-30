@@ -37,6 +37,7 @@ import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.ser
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { AdminAreasModule } from '../admin-areas/admin-areas.module';
+import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from './planning-units/scenario-planning-units-protection-status-calculator-service';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { AdminAreasModule } from '../admin-areas/admin-areas.module';
     WdpaAreaCalculationService,
     ScenarioPlanningUnitsService,
     ScenarioPlanningUnitsLinkerService,
+    ScenarioPlanningUnitsProtectedStatusCalculatorService,
     ScenarioSerializer,
     ScenarioFeatureSerializer,
     SolutionResultCrudService,
