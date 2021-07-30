@@ -12,9 +12,11 @@ export const metadataNotFound = Symbol(
 export const outputZipNotYetAvailable = Symbol(
   `marxan output file - output file not available, possibly error`,
 );
+export const marxanFailed = Symbol(`marxan failed`);
 
 export type OutputZipFailure =
   | typeof metadataNotFound
+  | typeof marxanFailed
   | typeof outputZipNotYetAvailable;
 
 @Injectable()
@@ -38,6 +40,9 @@ export class OutputFilesService {
     });
     if (!latest) {
       return left(metadataNotFound);
+    }
+    if (latest.failed) {
+      return left(marxanFailed);
     }
     if (!latest.outputZip) {
       return left(outputZipNotYetAvailable);

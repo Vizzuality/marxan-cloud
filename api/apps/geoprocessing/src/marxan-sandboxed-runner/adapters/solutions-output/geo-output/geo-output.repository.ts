@@ -29,7 +29,7 @@ export class GeoOutputRepository {
   async save(
     scenarioId: string,
     runDirectories: RunDirectories,
-    metaData: { stdOutput: string[]; stdErr?: string[] },
+    metaData: { stdOutput: string[]; stdError?: string[] },
   ): Promise<void> {
     const inputArchivePath = await this.metadataArchiver.zip(
       runDirectories.input,
@@ -82,11 +82,28 @@ export class GeoOutputRepository {
         transaction.create(MarxanExecutionMetadataGeoEntity, {
           scenarioId,
           stdOutput: metaData.stdOutput.toString(),
-          stdError: metaData.stdErr?.toString(),
+          stdError: metaData.stdError?.toString(),
           outputZip: readFileSync(outputArchivePath),
           inputZip: readFileSync(inputArchivePath),
         }),
       );
     });
+  }
+
+  async saveFailure(
+    scenarioId: string,
+    input: string,
+    metaData: { stdOutput: string[]; stdError?: string[] },
+  ): Promise<void> {
+    const inputArchivePath = await this.metadataArchiver.zip(input);
+    await this.entityManager.save(
+      this.entityManager.create(MarxanExecutionMetadataGeoEntity, {
+        scenarioId,
+        stdOutput: metaData.stdOutput.toString(),
+        stdError: metaData.stdError?.toString(),
+        inputZip: readFileSync(inputArchivePath),
+        failed: true,
+      }),
+    );
   }
 }

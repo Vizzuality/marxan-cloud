@@ -48,7 +48,6 @@ export class MarxanRun extends MarxanRunEmitter implements Cancellable {
     this.#process.stdout.on('data', (chunk) => {
       const currentProgress = progressWatcher.read(chunk);
       this.emit(`progress`, currentProgress);
-      // TODO place for "progress update" parsing and emitting to consumer
       this.#stdOut.push(chunk.toString());
     });
 
@@ -73,5 +72,9 @@ export class MarxanRun extends MarxanRunEmitter implements Cancellable {
 
   get stdOut() {
     return this.#stdOut;
+  }
+
+  get stdError() {
+    return this.#stdError;
   }
 }

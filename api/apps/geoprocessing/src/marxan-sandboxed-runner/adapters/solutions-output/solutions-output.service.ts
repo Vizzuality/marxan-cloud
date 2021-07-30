@@ -54,7 +54,7 @@ export class SolutionsOutputService implements Cancellable {
     }
     await this.geoOutputRepository.save(scenarioId, runDirectories, {
       stdOutput,
-      stdErr,
+      stdError: stdErr,
     });
 
     const runsSummary = (
@@ -62,6 +62,22 @@ export class SolutionsOutputService implements Cancellable {
     ).toString();
 
     return this.resultParserService.parse(runsSummary);
+  }
+
+  async dumpFailure(
+    workspace: Workspace,
+    scenarioId: string,
+    stdOutput: string[],
+    stdError: string[],
+  ) {
+    const { fullPath: fullInputPath } = this.marxanDirectory.get(
+      'INPUTDIR',
+      workspace.workingDirectory,
+    );
+    await this.geoOutputRepository.saveFailure(scenarioId, fullInputPath, {
+      stdOutput,
+      stdError,
+    });
   }
 
   async cancel(): Promise<void> {
