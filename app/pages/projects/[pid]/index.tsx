@@ -1,17 +1,16 @@
 import React from 'react';
 
-import ProjectTitle from 'layout/title/project-title';
+import { withProtection, withUser } from 'hoc/auth';
+
 import Header from 'layout/header';
-import Wrapper from 'layout/wrapper';
-import Protected from 'layout/protected';
 import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
-
 import ProjectHeader from 'layout/projects/show/header';
-import ProjectScenarios from 'layout/projects/show/scenarios';
 import ProjectMap from 'layout/projects/show/map';
-
-import { withProtection, withUser } from 'hoc/auth';
+import ProjectScenarios from 'layout/projects/show/scenarios';
+import Protected from 'layout/protected';
+import ProjectTitle from 'layout/title/project-title';
+import Wrapper from 'layout/wrapper';
 
 export const getServerSideProps = withProtection(withUser());
 

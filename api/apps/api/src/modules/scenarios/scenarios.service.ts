@@ -235,6 +235,11 @@ export class ScenariosService {
       ...fetchSpecification.filter,
       distinctFive: true,
     };
+    // TODO remove the following two lines once implementation is in place.
+    // The artificial limiting of response elements is only to serve (up to) the
+    // expected number of elements to frontend in the meanwhile.
+    fetchSpecification.pageSize = 5;
+    fetchSpecification.pageNumber = 1;
     return this.solutionsCrudService.findAllPaginated(fetchSpecification);
   }
 

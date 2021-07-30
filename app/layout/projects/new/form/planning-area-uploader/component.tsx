@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react';
 
-import { motion } from 'framer-motion';
-
-import cx from 'classnames';
-
-import InfoButton from 'components/info-button';
-import Icon from 'components/icon';
-import Loading from 'components/loading';
-
+import { useDropzone } from 'react-dropzone';
 import { useDispatch } from 'react-redux';
 
+import { useUploadProjectPA } from 'hooks/projects';
+import { useToasts } from 'hooks/toast';
+
+import cx from 'classnames';
+import { motion } from 'framer-motion';
 import {
   setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
 } from 'store/slices/projects/new';
 
-import { useDropzone } from 'react-dropzone';
-import { useToasts } from 'hooks/toast';
-import { useUploadProjectPA } from 'hooks/projects';
+import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
+import Loading from 'components/loading';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 

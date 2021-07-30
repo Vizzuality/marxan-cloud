@@ -4,22 +4,23 @@ import React, {
   useCallback,
   useRef,
 } from 'react';
+
 import { createPortal } from 'react-dom';
-
-import cx from 'classnames';
-
-import { useHelp } from 'hooks/help';
 import { usePopper } from 'react-popper';
 import { useResizeDetector } from 'react-resize-detector';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/router';
 
-import Tooltip from 'components/tooltip';
-import HelpTooltip from 'layout/help/tooltip';
-import HelpSpotlight from 'layout/help/spotlight';
+import { useHelp } from 'hooks/help';
 
 import type { Placement } from '@popperjs/core';
-import { useRouter } from 'next/router';
+import cx from 'classnames';
+import { AnimatePresence, motion } from 'framer-motion';
+
+import HelpSpotlight from 'layout/help/spotlight';
+import HelpTooltip from 'layout/help/tooltip';
+
+import Tooltip from 'components/tooltip';
 
 const flipModifier = {
   name: 'flip',

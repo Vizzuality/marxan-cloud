@@ -5,6 +5,7 @@ import {
   ProgressData,
   queueName as scenarioRunQueueName,
 } from '@marxan/scenario-run-queue';
+import { ExecutionResult } from '@marxan/marxan-output';
 import {
   WorkerBuilder,
   QueueEventsBuilder,
@@ -19,7 +20,7 @@ export const runWorkerQueueNameProvider: ValueProvider<string> = {
 
 @Injectable()
 export class RunWorker {
-  private worker: Worker<JobData, void>;
+  private worker: Worker<JobData, ExecutionResult>;
   private queueEvents: QueueEvents;
   constructor(
     queueEventsBuilder: QueueEventsBuilder,
@@ -27,8 +28,8 @@ export class RunWorker {
     @Inject(runWorkerQueueNameToken) queueName: string,
     private readonly marxanRunner: MarxanSandboxRunnerService,
   ) {
-    this.worker = workerBuilder.build<JobData, void>(queueName, {
-      process: (job) => this.startRun(job),
+    this.worker = workerBuilder.build<JobData, ExecutionResult>(queueName, {
+      process: (job) => this.run(job),
     });
     this.queueEvents = queueEventsBuilder.buildQueueEvents(queueName);
     this.queueEvents.on(`progress`, ({ data }: { data: ProgressData }) => {
@@ -36,8 +37,8 @@ export class RunWorker {
     });
   }
 
-  private async startRun(job: Job<JobData>) {
-    await this.marxanRunner.run(
+  private async run(job: Job<JobData>) {
+    return await this.marxanRunner.run(
       job.data.scenarioId,
       job.data.assets,
       async (progress) => {

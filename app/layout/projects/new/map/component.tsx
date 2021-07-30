@@ -1,19 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import { useSelector } from 'react-redux';
+
+import { useAdminPreviewLayer, usePUGridPreviewLayer, useGeoJsonLayer } from 'hooks/map';
+
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
+import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 // Map
+import { useSession } from 'next-auth/client';
+
 import Map from 'components/map';
 
 // Controls
 import Controls from 'components/map/controls';
-import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
-
-import { useSelector } from 'react-redux';
-import { useSession } from 'next-auth/client';
-import { useAdminPreviewLayer, usePUGridPreviewLayer, useGeoJsonLayer } from 'hooks/map';
+import ZoomControl from 'components/map/controls/zoom';
 
 import ProjectMapProps from './types';
 

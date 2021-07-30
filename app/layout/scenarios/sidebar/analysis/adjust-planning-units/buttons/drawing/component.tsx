@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 
+import { Form as FormRFF } from 'react-final-form';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useSaveScenarioPU } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
 import cx from 'classnames';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 
-import { Form as FormRFF } from 'react-final-form';
-
-import { useToasts } from 'hooks/toast';
-import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-
 import DRAW_SHAPE_SVG from 'svgs/ui/draw.svg?sprite';
-import { useSaveScenarioPU } from 'hooks/scenarios';
 
 export interface AnalysisAdjustDrawingProps {
   type: string;

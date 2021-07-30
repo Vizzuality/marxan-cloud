@@ -1,7 +1,7 @@
-import { getSession } from 'next-auth/client';
 import { QueryClient } from 'react-query';
-import { dehydrate } from 'react-query/hydration';
 
+import { getSession } from 'next-auth/client';
+import { dehydrate } from 'react-query/hydration';
 import USERS from 'services/users';
 
 import { mergeDehydratedState } from './utils';

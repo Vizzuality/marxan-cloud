@@ -1,5 +1,5 @@
-import { injectReducer } from 'store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { injectReducer } from 'store';
 
 interface ScenarioEditStateProps {
   tab: string,

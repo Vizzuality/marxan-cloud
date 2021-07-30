@@ -69,11 +69,15 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
         >
           <HelpBeacon
             id="project-map"
-            title="Project map view"
-            subtitle="Project list"
+            title="Map view"
+            subtitle="Visualize all features"
             content={(
               <div>
-                Here you can see your planning region, features and results.
+                On this map you will be able to visualize all the
+                spatial components of the conservation plan. You will
+                be able to visualize your planning region,
+                features and results.
+
               </div>
             )}
             modifiers={['flip']}

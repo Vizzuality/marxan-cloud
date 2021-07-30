@@ -1,21 +1,20 @@
 import React, { useCallback, useState } from 'react';
 
-import Button from 'components/button';
-import Loading from 'components/loading';
-
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import Field from 'components/forms/field';
-import Label from 'components/forms/label';
-import Input from 'components/forms/input';
-
-import {
-  composeValidators,
-} from 'components/forms/validations';
-
-import { signOut } from 'next-auth/client';
 
 import { useSaveMePassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
+
+import { signOut } from 'next-auth/client';
+
+import Button from 'components/button';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
+import {
+  composeValidators,
+} from 'components/forms/validations';
+import Loading from 'components/loading';
 
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
 

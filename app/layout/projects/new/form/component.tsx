@@ -1,28 +1,11 @@
 import React, { useState, useEffect } from 'react';
+
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import Link from 'next/link';
-
-import ProjectNewMap from 'layout/projects/new/map';
-
-import Field from 'components/forms/field';
-import Label from 'components/forms/label';
-import Input from 'components/forms/input';
-import Textarea from 'components/forms/textarea';
-import Button from 'components/button';
-import InfoButton from 'components/info-button';
-
-import HelpBeacon from 'layout/help/beacon';
-
-import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
-import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
-import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
-
-import {
-  composeValidators,
-} from 'components/forms/validations';
-
 import { useDispatch } from 'react-redux';
+
+import Link from 'next/link';
 import { useRouter } from 'next/router';
+
 import { useOrganizations } from 'hooks/organizations';
 import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
@@ -31,8 +14,24 @@ import {
   setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingPlanningArea,
 } from 'store/slices/projects/new';
 
-import ProjectFormProps from './types';
+import HelpBeacon from 'layout/help/beacon';
+import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
+import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
+import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
+import ProjectNewMap from 'layout/projects/new/map';
+
+import Button from 'components/button';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
+import Textarea from 'components/forms/textarea';
+import {
+  composeValidators,
+} from 'components/forms/validations';
+import InfoButton from 'components/info-button';
+
 import { DEFAULT_AREA } from './constants';
+import ProjectFormProps from './types';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
   const [hasPlanningArea, setHasPlanningArea] = useState(false);
@@ -129,7 +128,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   planning area from scratch or upload a file.
 
                 </div>
-                )}
+              )}
               modifiers={['flip']}
               tooltipPlacement="right"
             >

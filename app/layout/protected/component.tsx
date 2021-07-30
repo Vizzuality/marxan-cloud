@@ -1,13 +1,14 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 
-import { useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
 
 import { useMe } from 'hooks/me';
 
-import Modal from 'components/modal';
+import { useSession } from 'next-auth/client';
 
 import GuideRequest from 'layout/guide-request';
+
+import Modal from 'components/modal';
 
 // const TIME_INTERVAL = 1000 * 60 * 10; // 10 min
 // const SESSION_BUFFER_TIME = 30 * 60 * 1000; // 30 min

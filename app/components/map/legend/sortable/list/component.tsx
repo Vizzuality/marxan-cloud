@@ -1,7 +1,6 @@
 import React, {
   Children, cloneElement, isValidElement, useCallback, useMemo, useState,
 } from 'react';
-import cx from 'classnames';
 
 import {
   DndContext,
@@ -12,18 +11,17 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-
+import {
+  restrictToVerticalAxis,
+  restrictToWindowEdges,
+} from '@dnd-kit/modifiers';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-
-import {
-  restrictToVerticalAxis,
-  restrictToWindowEdges,
-} from '@dnd-kit/modifiers';
+import cx from 'classnames';
 
 import SortableItem from './item';
 

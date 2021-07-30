@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react';
 
 import { Field as FieldRFF } from 'react-final-form';
+import { useDispatch } from 'react-redux';
+
+import { useAdministrativeAreas } from 'hooks/administrative-areas';
+import { useCountries, useCountryRegions } from 'hooks/countries';
+
+import { setBbox, setMinPuAreaSize, setMaxPuAreaSize } from 'store/slices/projects/new';
+import { RegionLevel } from 'types/country-model';
 
 import Field from 'components/forms/field';
+import Select from 'components/forms/select';
 import {
   composeValidators,
 } from 'components/forms/validations';
-
-import { RegionLevel } from 'types/country-model';
-
-import { useDispatch } from 'react-redux';
-import { useCountries, useCountryRegions } from 'hooks/countries';
-import { useAdministrativeAreas } from 'hooks/administrative-areas';
-
-import { setBbox, setMinPuAreaSize, setMaxPuAreaSize } from 'store/slices/projects/new';
-
 import Loading from 'components/loading';
-import Select from 'components/forms/select';
 
 import CountryRegionSelectorProps from './types';
 

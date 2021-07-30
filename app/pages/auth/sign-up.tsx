@@ -1,15 +1,14 @@
 import React from 'react';
-import Head from 'next/head';
 
+import Head from 'next/head';
 import { useRouter } from 'next/router';
+
+import { withUser } from 'hoc/auth';
 
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
-
 import SignUp from 'layout/sign-up';
-
-import { withUser } from 'hoc/auth';
 
 export const getServerSideProps = withUser();
 

@@ -1,18 +1,19 @@
-import flatten from 'lodash/flatten';
 import { useMemo } from 'react';
+
 import {
   useInfiniteQuery, useMutation, useQuery, useQueryClient,
 } from 'react-query';
-import { useSession } from 'next-auth/client';
+
 import { useRouter } from 'next/router';
 
 import { formatDistance } from 'date-fns';
+import flatten from 'lodash/flatten';
+import { useSession } from 'next-auth/client';
+import PROJECTS from 'services/projects';
+import UPLOADS from 'services/uploads';
 
 import { ItemProps } from 'components/projects/item/component';
 import { PublishedItemProps } from 'components/projects/published-item/component';
-
-import PROJECTS from 'services/projects';
-import UPLOADS from 'services/uploads';
 
 import {
   UseProjectsOptionsProps,

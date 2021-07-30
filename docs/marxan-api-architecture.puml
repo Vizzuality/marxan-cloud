@@ -21,25 +21,41 @@ LAYOUT_WITH_LEGEND()
 Person(Admin, Admin, "Marxan platform administrators")
 
 Person(User, User, "A User")
-Container(app, "Frontend App", "React / NextJs", "Main interface for the user to interact with","react")
-Container(bastion, "Bastion host", "Linux / VM", "")
 
-System_Boundary(c1, "Backend") {
-  System_Boundary(c2, "API") {
-    Container(api, "API Service", "Typescript, NestJS", "Main API and gateway to backend data/metadata/processing")
+Boundary(appDeploymentContext, 'Vercel') {
+  Container(app, "Frontend App", "React / NextJs", "Main interface for the user to interact with","react")
+}
+Boundary(bastionHostDeploymentContext, 'Azure VM') {
+  Container(bastion, "Bastion host", "Linux / VM", "")
+}
+
+System_Boundary(c1, "Azure EKS") {
+  System_Boundary(c2, "Backend") {
+    Boundary(apiKubernetesDeployment, "AKS Kubernetes deployment") {
+      Container(api, "API Service", "Typescript, NestJS", "Main API and gateway to backend data/metadata/processing")
+    }
     System_Boundary(c3, "ETL pipelines and solver workers") {
-      Container(geoprocessing, "Geoprocessing Service", "Typescript, NestJS", "Core geoprocessing service")
-      System_Boundary(c4, "Geoprocessing service workers") {
-        Container(shapefileProcessor, "Shapefile worker", "Shapefile processing", "Importing and exporting of shapefiles...")
-        Container(marxanExec, "Marxan solver worker", "Marxan CLI", "Marxan calculations")
-        Container(worker1, "ETL worker", "Isolated BullMQ job processors...", "Other data processing jobs")
-        Container(worker2, "ETL worker", "In-Process BullMQ job processors...", "Other data processing jobs")
+      Boundary(geoprocessingKubernetesDeployment, "AKS Kubernetes deployment") {
+        Container(geoprocessing, "Geoprocessing Service", "Typescript, NestJS", "Core geoprocessing service")
+        System_Boundary(c4, "Geoprocessing service workers") {
+          Container(shapefileProcessor, "Shapefile worker", "Shapefile processing", "Importing and exporting of shapefiles...")
+          Container(marxanExec, "Marxan solver worker", "Marxan CLI", "Marxan calculations")
+          Container(worker1, "ETL worker", "Isolated BullMQ job processors...", "Other data processing jobs")
+          Container(worker2, "ETL worker", "In-Process BullMQ job processors...", "Other data processing jobs")
+        }
       }
     }
-    ' Container(tilesService, "Tile Service", "Typescript, NestJS", "Tile processing (storage and caching via blob storage and CDN)")
-    ContainerDb(redis, "Pub/Sub and async job queues", "Redis", "Pub/Sub messaging, job queues, k/v caching", "redis" )
-    ContainerDb(postgresDB, "Database", "Postgres 13 + Postgis 3", "Stores user/project/scenario data", "postgresql" )
-    ContainerDb(postgresGeoDB, "GeoDatabase", "Postgres 13 + Postgis 3", "Stores geo data, performs geoprocessing tasks", "postgresql" )
+    Boundary(redisKubernetesDeployment, "AKS Kubernetes deployment") {
+      ContainerDb(redis, "Pub/Sub and async job queues (Kubernetes deployment)", "Redis", "Pub/Sub messaging, job queues, k/v caching", "redis" )
+    }
+
+    Boundary(apidbKubernetesDeployment, "AKS Kubernetes deployment") {
+      ContainerDb(postgresDB, "Database (Kubernetes deployment)", "Postgres 13 + Postgis 3", "Stores user/project/scenario data", "postgresql" )
+    }
+
+    Boundary(geodbKubernetesDeployment, "AKS Kubernetes deployment") {
+      ContainerDb(postgresGeoDB, "GeoDatabase (Kubernetes deployment)", "Postgres 13 + Postgis 3", "Stores geo data, performs geoprocessing tasks", "postgresql" )
+    }
   }
 }
 Lay_R(api, geoprocessing)

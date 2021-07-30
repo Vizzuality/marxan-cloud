@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Title from 'layout/title/scenario-title';
+import { withProtection, withUser } from 'hoc/auth';
+
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
-
-import { withProtection, withUser } from 'hoc/auth';
+import Title from 'layout/title/scenario-title';
 
 export const getServerSideProps = withProtection(withUser());
 

@@ -1,15 +1,15 @@
 import React from 'react';
+
 import { Field as FieldRFF } from 'react-final-form';
+import { useSelector } from 'react-redux';
+
+import PlanningUnitAreaSize from 'layout/projects/new/form/planning-area-selector/planning-unit-area-size';
+import PlanningUnitGrid from 'layout/projects/new/form/planning-area-selector/planning-unit-grid';
 
 import Field from 'components/forms/field';
 import {
   composeValidators,
 } from 'components/forms/validations';
-
-import { useSelector } from 'react-redux';
-
-import PlanningUnitGrid from 'layout/projects/new/form/planning-area-selector/planning-unit-grid';
-import PlanningUnitAreaSize from 'layout/projects/new/form/planning-area-selector/planning-unit-area-size';
 
 import { PlanningAreaSelectorProps } from './types';
 

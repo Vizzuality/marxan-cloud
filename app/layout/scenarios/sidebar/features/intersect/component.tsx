@@ -178,6 +178,7 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
+
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
           <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">
