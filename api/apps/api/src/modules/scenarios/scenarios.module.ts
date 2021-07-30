@@ -35,6 +35,7 @@ import { MarxanRunModule } from './marxan-run';
 import { GeoFeaturesModule } from '../geo-features/geo-features.module';
 import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.serializer';
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
+import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning
     ProxyService,
     WdpaAreaCalculationService,
     ScenarioPlanningUnitsService,
+    ScenarioPlanningUnitsLinkerService,
     ScenarioSerializer,
     ScenarioFeatureSerializer,
     SolutionResultCrudService,
