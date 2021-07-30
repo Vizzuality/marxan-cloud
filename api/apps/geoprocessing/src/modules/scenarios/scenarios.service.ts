@@ -4,18 +4,46 @@ import {
   TileRequest,
 } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { IsString } from 'class-validator';
+import { Repository, SelectQueryBuilder } from 'typeorm';
+import { IsString, IsArray, IsIn,IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
+import { logger } from '@marxan-api/modules/api-events/api-events.module';
 
-export class ScenariosPUFilters {}
 
+const includeSelections = {
+  'protection':{
+    'attributes':', "percentageProtected"'
+  },
+  'features':{
+    'attributes':''
+  },
+  'cost':{
+    'attributes':', cost_cost as cost'
+  },
+  'lock-status':{
+    'attributes':', test_lockin_status as "lockinStatus"'
+  },
+  'results':{
+    'attributes':', "output_included_count" as "includedCount", \
+                "valuePosition"'
+  },
+};
+export class ScenariosPUFilters {
+  // @IsOptional()
+  // @IsArray()
+  // @IsString({ each: true })
+  // @IsIn(Object.keys(includeSelections), {
+  //   each: true,
+  // })
+  // @Transform((value: string): Array<String> => JSON.parse(value))
+  // include?: Array<String>;
+}
 export class ScenariosTileRequest extends TileRequest {
   @IsString()
   id!: string;
 }
-
 @Injectable()
 export class ScenariosService {
   private readonly logger: Logger = new Logger(ScenariosService.name);
@@ -36,28 +64,33 @@ export class ScenariosService {
     const { id, z, x, y } = tileSpecification;
     /**
      * @todo: rework the way columns are being named.
+     * @todo probably this is not the most kosher solution
      */
-    const attributes =
-      'test_pu_geom_id as puGeomId,\
-       test_puid as puid,\
-       test_lockin_status as lockinStatus, \
-       test_protected_area as protectedArea';
-
+    // const attributes = 'test_pu_geom_id as "puGeomId",\
+    //    test_id as "scenarioPuId",\
+    //    test_puid as "puid", \
+    //    "percentageProtected",  \
+    //    cost_cost as cost, \
+    //    test_lockin_status as "lockinStatus", \
+    //    "output_included_count" as "includedCount", "valuePosition"';
+       const attributes = '*'
     /**
      * @todo: avoid sql injection in the scenario Id.
      * @todo: provide features id array
      * @todo: provide results/output data
      */
-    const sql = this.ScenariosPlanningUnitGeoEntityRepository.createQueryBuilder(
+    let sql = this.ScenariosPlanningUnitGeoEntityRepository.createQueryBuilder(
       'test',
-    )
-      .leftJoinAndSelect('test.planningUnitGeom', 'plan')
-      .leftJoinAndSelect('test.outputData', 'outputData')
-      .addSelect('plan.the_geom')
-      .where(`scenario_id = '${id}'`);
-
-      // .leftJoinAndSelect('test.costData', 'cost')
-      // .addSelect('cost.cost')
+    ).addSelect('plan.the_geom')
+    .addSelect(`'-'||array_to_string(array_positions(output.value, true),'-,-')||'-' as "valuePosition"`)
+    .addSelect(`'value' as "parseKeys"`)
+    .addSelect('round((test.protected_area/plan.area)::numeric)::float as "percentageProtected"')
+    .addSelect(`feature_list`)
+    .leftJoinAndSelect('planning_units_geom', 'plan', `test.pu_geom_id = plan.id`)
+    .leftJoinAndSelect('scenarios_pu_cost_data', 'cost', `test.id = cost.scenarios_pu_data_id`)
+    .leftJoinAndSelect('output_scenarios_pu_data', 'output',`test.id = output.scenario_pu_id`)
+    .leftJoin('scenario_pu_features_entity', 'features', 'test.id = features.scenario_pu_id')
+    .where(`scenario_id = '${id}'`);
 
     const table = `(${sql.getSql()})`;
 
@@ -69,4 +102,13 @@ export class ScenariosService {
       attributes,
     });
   }
+
+  private selectJoins(qB: SelectQueryBuilder<ScenariosPuPaDataGeo>, _filters?: ScenariosPUFilters): SelectQueryBuilder<ScenariosPuPaDataGeo> {
+    return qB
+  }
+  private atributtesSelection(attib: string, _filters?: ScenariosPUFilters) {
+
+  }
 }
+
+

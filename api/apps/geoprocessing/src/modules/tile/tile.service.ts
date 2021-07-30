@@ -124,7 +124,7 @@ export class TileService {
     const connection = getConnection();
     const query = connection
       .createQueryBuilder()
-      .select(`ST_AsMVT(tile, 'layer0', ${extent}, 'mvt_geom')`, 'mvt')
+      .select(`ST_AsMVT(tile.*, 'layer0', ${extent}, 'mvt_geom')`, 'mvt')
       .from((subQuery) => {
         subQuery.select(
           `${attributes}, ST_AsMVTGeom(ST_Transform(${this.geometrySimplification(
@@ -145,8 +145,6 @@ export class TileService {
         }
         return subQuery;
       }, 'tile');
-
-      logger.debug(query.printSql());
 
     const result = await query.getRawMany();
 
