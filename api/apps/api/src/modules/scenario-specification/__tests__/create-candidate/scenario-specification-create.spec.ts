@@ -8,11 +8,11 @@ beforeEach(() => {
 
 describe(`When two features were submitted as draft`, () => {
   beforeEach(() => {
-    fixtures.WhenSubmittingDraft();
+    fixtures.WhenCreatingCandidateWithTwoConfigurations();
   });
 
   test(`Then it informs that spec was created`, () => {
-    fixtures.ThenCandidateSpecWasCreated();
+    fixtures.ThenCandidateSpecificationWasCreated();
   });
 
   describe(`When another draft was submitted`, () => {
@@ -22,7 +22,7 @@ describe(`When two features were submitted as draft`, () => {
       previousSpecificationId = fixtures.scenarioSpec.getCandidateSpecification()!
         .id;
 
-      fixtures.WhenSubmittingDraft();
+      fixtures.WhenCreatingCandidateWithTwoConfigurations();
     });
 
     test(`Then candidate was replaced`, () => {

@@ -72,7 +72,7 @@ export const getFixtures = () => {
     GivenCreatedWasSubmitted: () => {
       scenarioSpec.createCandidate([splitConfig, stratificationConfig], false);
     },
-    WhenFeaturesWereDetermined(allCalculated: boolean) {
+    WhenFeaturesAreDetermined(allCalculated: boolean) {
       scenarioSpec.determineFeatures([
         {
           ...splitConfig,

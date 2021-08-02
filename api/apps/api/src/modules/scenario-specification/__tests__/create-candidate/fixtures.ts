@@ -26,10 +26,10 @@ export const getFixtures = () => {
 
   return {
     scenarioSpec,
-    WhenSubmittingDraft: () => {
+    WhenCreatingCandidateWithTwoConfigurations: () => {
       scenarioSpec.createCandidate([splitConfig, stratificationConfig], true);
     },
-    ThenCandidateSpecWasCreated() {
+    ThenCandidateSpecificationWasCreated() {
       const snapshot = scenarioSpec.getCandidateSpecification();
       expect(snapshot).toBeDefined();
       expect(scenarioSpec.getUncommittedEvents()).toEqual([

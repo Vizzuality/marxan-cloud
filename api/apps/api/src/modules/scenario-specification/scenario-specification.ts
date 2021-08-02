@@ -220,12 +220,9 @@ class Specification {
   }
 
   allFeaturesCalculated(): boolean {
-    return this.configuration.every((featureConfig) =>
-      featureConfig.resultFeatures.reduce<boolean>(
-        (calculated, feature) => calculated && feature.calculated,
-        true,
-      ),
-    );
+    return this.configuration
+      .flatMap((configuration) => configuration.resultFeatures)
+      .every((feature) => feature.calculated);
   }
 
   relatedSubFeaturesRequiringCalculations(): string[] {
