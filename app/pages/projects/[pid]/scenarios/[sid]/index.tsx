@@ -31,7 +31,7 @@ const ShowScenarioPage: React.FC = () => {
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
               <ScenariosSidebar>
-                <SidebarWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} />
+                <SidebarWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} readOnly />
                 <SidebarFeatures key={ScenarioSidebarTabs.FEATURES} readOnly />
                 <SidebarAnalysis key={ScenarioSidebarTabs.ANALYSIS} readOnly />
                 <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} readOnly />

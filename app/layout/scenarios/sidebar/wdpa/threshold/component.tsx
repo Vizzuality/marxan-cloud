@@ -1,32 +1,34 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import Button from 'components/button';
-import Loading from 'components/loading';
-import InfoButton from 'components/info-button';
-
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+
+import { useRouter } from 'next/router';
+
+import { useProject } from 'hooks/projects';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+import { useWDPACategories } from 'hooks/wdpa';
+
+import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Slider from 'components/forms/slider';
-
 import {
   composeValidators,
 } from 'components/forms/validations';
-
-import { useRouter } from 'next/router';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
-import { useProject } from 'hooks/projects';
-import { useWDPACategories } from 'hooks/wdpa';
-import { useToasts } from 'hooks/toast';
+import InfoButton from 'components/info-button';
+import Loading from 'components/loading';
 
 import THRESHOLDING_IMG from 'images/img-thresholding.png';
 
 export interface WDPAThresholdCategories {
+  readOnly: boolean;
   onSuccess: () => void;
   onBack: () => void;
 }
 
 export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
+  readOnly,
   onSuccess,
   onBack,
 }: WDPAThresholdCategories) => {
@@ -171,6 +173,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                     maxValue={1}
                     minValue={0}
                     step={0.01}
+                    disabled={readOnly}
                   />
                 </Field>
               )}
@@ -198,12 +201,18 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
             </div>
           </div>
 
-          <div className="flex justify-center space-x-4 mt-20">
+          <div className="flex justify-center mt-20 space-x-4">
             <Button theme="secondary" size="lg" type="button" className="relative px-20" disabled={submitting} onClick={onBack}>
               <span>Back</span>
             </Button>
 
-            <Button theme="primary" size="lg" type="submit" className="relative px-20" disabled={submitting}>
+            <Button
+              theme="primary"
+              size="lg"
+              type="submit"
+              className="relative px-20"
+              disabled={submitting || readOnly}
+            >
               <span>Save</span>
 
               <Loading

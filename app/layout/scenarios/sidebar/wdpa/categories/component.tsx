@@ -23,11 +23,13 @@ import Loading from 'components/loading';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface WDPACategoriesProps {
+  readOnly: boolean;
   onSuccess: () => void,
   onDismiss: () => void,
 }
 
 export const WDPACategories:React.FC<WDPACategoriesProps> = ({
+  readOnly,
   onSuccess,
   onDismiss,
 }: WDPACategoriesProps) => {
@@ -223,6 +225,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                       size="base"
                       placeholder="Select..."
                       clearSelectionActive
+                      disabled={readOnly}
                       selected={values.wdpaIucnCategories.length
                         ? values.wdpaIucnCategories[0]
                         : null}
@@ -248,6 +251,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                       batchSelectionLabel="All protected areas"
                       selected={values.wdpaIucnCategories}
                       options={WDPA_CATEGORIES_OPTIONS}
+                      disabled={readOnly}
                     />
                   )}
                 </Field>
@@ -277,6 +281,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                       <button
                         type="button"
                         className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
+                        disabled={readOnly}
                         onClick={() => {
                           form.mutators.removeWDPAFilter(wdpa.value, values.wdpaIucnCategories);
                         }}

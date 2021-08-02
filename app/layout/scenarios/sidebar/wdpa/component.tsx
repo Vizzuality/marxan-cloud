@@ -18,9 +18,12 @@ import ScenariosSidebarWDPAThreshold from 'layout/scenarios/sidebar/wdpa/thresho
 import Steps from 'components/steps';
 
 export interface ScenariosSidebarWDPAProps {
+  readOnly: boolean;
 }
 
-export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
+export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
+  readOnly,
+}: ScenariosSidebarWDPAProps) => {
   const [step, setStep] = useState(0);
   const { query } = useRouter();
   const { pid, sid } = query;
@@ -64,6 +67,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
 
         {step === 0 && (
           <ScenariosSidebarWDPACategories
+            readOnly={readOnly}
             onSuccess={() => setStep(1)}
             onDismiss={() => dispatch(setTab('features'))}
           />
@@ -71,6 +75,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
 
         {step === 1 && (
           <ScenariosSidebarWDPAThreshold
+            readOnly={readOnly}
             onSuccess={() => dispatch(setTab('features'))}
             onBack={() => { setStep(0); }}
           />
