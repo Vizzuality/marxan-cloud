@@ -65,14 +65,16 @@ export class ScenariosService {
      * @todo: rework the way columns are being named.
      * @todo probably this is not the most kosher solution
      */
-    // const attributes = 'test_pu_geom_id as "puGeomId",\
-    //    test_id as "scenarioPuId",\
-    //    test_puid as "puid", \
-    //    "percentageProtected",  \
-    //    cost_cost as cost, \
-    //    test_lockin_status as "lockinStatus", \
-    //    "output_included_count" as "includedCount", "valuePosition"';
-       const attributes = '*'
+    const attributes = 'test_pu_geom_id as "puGeomId",\
+       test_id as "scenarioPuId",\
+       test_puid as "puid", \
+       "percentageProtected",  \
+       "featureList",  \
+       "parseKeys",  \
+       output_included_count as "frequencyValue", \
+       cost_cost as "costValue", \
+       test_lockin_status as "lockinStatus", \
+       "output_included_count" as "includedCount", "valuePosition"';
     /**
      * @todo: avoid sql injection in the scenario Id.
      * @todo: provide features id array
