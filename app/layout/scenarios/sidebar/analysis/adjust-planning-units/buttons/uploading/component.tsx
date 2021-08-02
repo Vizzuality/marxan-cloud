@@ -2,25 +2,25 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
-import cx from 'classnames';
-
-import Button from 'components/button';
-import InfoButton from 'components/info-button';
-import Icon from 'components/icon';
-import Loading from 'components/loading';
-
+import { useDropzone } from 'react-dropzone';
 import { Form as FormRFF } from 'react-final-form';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
-import { useDropzone } from 'react-dropzone';
-import { useToasts } from 'hooks/toast';
 import { useSaveScenarioPU, useUploadScenarioPU } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
+import cx from 'classnames';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import Button from 'components/button';
+import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
+import Loading from 'components/loading';
+
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
+import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
 export interface AnalysisAdjustUploadingProps {
   type: string;
@@ -39,7 +39,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setUploading, setUploadingValue, setCache } = scenarioSlice.actions;
 
   const dispatch = useDispatch();

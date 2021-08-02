@@ -1,5 +1,5 @@
-import { injectReducer } from 'store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { injectReducer } from 'store';
 
 interface ScenarioEditStateProps {
   tab: string,
@@ -37,7 +37,7 @@ const initialState = {
   uploadingValue: null,
 } as ScenarioEditStateProps;
 
-export function getScenarioSlice(id) {
+export function getScenarioEditSlice(id) {
   const scenariosEditSlice = createSlice({
     name: `/scenarios/${id}/edit`,
     initialState,

@@ -181,7 +181,7 @@ export function useBestSolution(scenarioId) {
 
   return useMemo(() => {
     const mockBestSolution = {
-      id: 'c5780319-a9cc-49ce-8e44-bd7b72303c2a',
+      id: 'c5a7ac37-3a88-4a08-9f23-bb83f0e8af11',
       runId: 9,
       scoreValue: 999,
       costValue: 900,

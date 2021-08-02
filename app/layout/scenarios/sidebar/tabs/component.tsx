@@ -1,13 +1,14 @@
 import React, { useCallback } from 'react';
 
-import { motion } from 'framer-motion';
-
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
+import { motion } from 'framer-motion';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import Pill from 'layout/pill';
+
 import Tabs from 'components/tabs';
 
 import { TABS } from './constants';
@@ -17,7 +18,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);

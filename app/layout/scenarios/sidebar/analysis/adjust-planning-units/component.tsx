@@ -1,17 +1,18 @@
 import React, { useState, useCallback } from 'react';
 
+import { useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
 import { motion } from 'framer-motion';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import Icon from 'components/icon';
 
-import { useRouter } from 'next/router';
-import { useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
-import Tabs from './tabs';
 import Buttons from './buttons';
+import Tabs from './tabs';
 
 export interface ScenariosSidebarAnalysisSectionsProps {
   onChangeSection: (s: string) => void;
@@ -25,7 +26,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setPUAction } = scenarioSlice.actions;
   const dispatch = useDispatch();
 

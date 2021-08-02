@@ -1,22 +1,24 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import Button from 'components/button';
-import Loading from 'components/loading';
-import Icon from 'components/icon';
-import InfoButton from 'components/info-button';
-
 import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
+import { useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useProject } from 'hooks/projects';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+import { useWDPACategories } from 'hooks/wdpa';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Select from 'components/forms/select';
-
-import { useRouter } from 'next/router';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
-import { useProject } from 'hooks/projects';
-import { useWDPACategories } from 'hooks/wdpa';
-import { useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
+import Loading from 'components/loading';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -33,7 +35,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPACategories } = scenarioSlice.actions;
   const dispatch = useDispatch();
 

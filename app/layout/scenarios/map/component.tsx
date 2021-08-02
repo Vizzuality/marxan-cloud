@@ -3,23 +3,24 @@ import React, {
 } from 'react';
 
 // Map
-import Map from 'components/map';
-// import LAYERS from 'components/map/layers';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import { useRouter } from 'next/router';
+
+import { useWDPAPreviewLayer, usePUGridLayer } from 'hooks/map';
+import { useProject } from 'hooks/projects';
+
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
+import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import { useSession } from 'next-auth/client';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+// import LAYERS from 'components/map/layers';
+import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
-import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
-
-import { useSession } from 'next-auth/client';
-import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-import { useProject } from 'hooks/projects';
-import { useWDPAPreviewLayer, usePUGridLayer } from 'hooks/map';
+import ZoomControl from 'components/map/controls/zoom';
 
 import ScenariosDrawingManager from './drawing-manager';
 
@@ -35,7 +36,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { data = {} } = useProject(pid);
   const { bbox } = data;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setClickingValue } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const {

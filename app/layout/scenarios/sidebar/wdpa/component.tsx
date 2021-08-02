@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 
+import { useSelector, useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useProject } from 'hooks/projects';
+import { useScenario } from 'hooks/scenarios';
+import { useWDPACategories } from 'hooks/wdpa';
+
 import { motion } from 'framer-motion';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import Pill from 'layout/pill';
 import ScenariosSidebarWDPACategories from 'layout/scenarios/sidebar/wdpa/categories';
 import ScenariosSidebarWDPAThreshold from 'layout/scenarios/sidebar/wdpa/threshold';
 
 import Steps from 'components/steps';
-
-import { useSelector, useDispatch } from 'react-redux';
-import { useRouter } from 'next/router';
-import { useScenario } from 'hooks/scenarios';
-import { useProject } from 'hooks/projects';
-import { useWDPACategories } from 'hooks/wdpa';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 export interface ScenariosSidebarWDPAProps {
 }
@@ -23,7 +25,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);

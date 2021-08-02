@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 
+import { Form as FormRFF } from 'react-final-form';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useSaveScenarioPU } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
 import cx from 'classnames';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 
-import { Form as FormRFF } from 'react-final-form';
-
-import { useRouter } from 'next/router';
-import { useToasts } from 'hooks/toast';
-import { useSelector, useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-
 import SELECT_PLANNING_UNITS_SVG from 'svgs/ui/planning-units.svg?sprite';
-import { useSaveScenarioPU } from 'hooks/scenarios';
 
 export interface AnalysisAdjustClickingProps {
   type: string;
@@ -31,7 +32,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
 
   const { addToast } = useToasts();
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setClicking, setClickingValue, setCache } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const { clickingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
