@@ -3,8 +3,10 @@ import {MigrationInterface, QueryRunner} from "typeorm";
 export class ScenarioPuFeaturesForTilesView1627652172613 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`CREATE VIEW "scenario_pu_features_entity" AS
-    select pu.scenario_id as scenario_id, pu.id as scenario_pu_id, array_agg(feature_id) as feature_list
+    await queryRunner.query(`
+    DROP VIEW IF EXISTS "scenario_pu_features_entity";
+    CREATE VIEW "scenario_pu_features_entity" AS
+    select pu.scenario_id as scenario_id, pu.id as scenario_pu_id, string_agg(feature_id::text, ',') as feature_list
     from
      (
         select scenario_id, the_geom, fd.feature_id
@@ -17,11 +19,11 @@ export class ScenarioPuFeaturesForTilesView1627652172613 implements MigrationInt
         inner join scenarios_pu_data spd on pug.id = spd.pu_geom_id order by puid asc
     ) pu
     where st_intersects(species.the_geom, pu.the_geom)
-   group by pu.scenario_id, pu.id
+   group by pu.scenario_id, pu.id;
   `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP VIEW "scenario_puvspr_geo_entity"`);
+    await queryRunner.query(`DROP VIEW "scenario_pu_features_entity";`);
   }
 }

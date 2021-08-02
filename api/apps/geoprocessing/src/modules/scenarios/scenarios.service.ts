@@ -9,7 +9,6 @@ import { IsString, IsArray, IsIn,IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
-import { logger } from '@marxan-api/modules/api-events/api-events.module';
 
 
 const includeSelections = {
@@ -83,9 +82,9 @@ export class ScenariosService {
       'test',
     ).addSelect('plan.the_geom')
     .addSelect(`'-'||array_to_string(array_positions(output.value, true),'-,-')||'-' as "valuePosition"`)
-    .addSelect(`'value' as "parseKeys"`)
-    .addSelect('round((test.protected_area/plan.area)::numeric)::float as "percentageProtected"')
-    .addSelect(`feature_list`)
+    .addSelect(`'valuePosition, featureList' as "parseKeys"`)
+    .addSelect('round((test.protected_area/plan.area)::numeric*100)::int as "percentageProtected"')
+    .addSelect(`feature_list as "featureList"`)
     .leftJoinAndSelect('planning_units_geom', 'plan', `test.pu_geom_id = plan.id`)
     .leftJoinAndSelect('scenarios_pu_cost_data', 'cost', `test.id = cost.scenarios_pu_data_id`)
     .leftJoinAndSelect('output_scenarios_pu_data', 'output',`test.id = output.scenario_pu_id`)
@@ -104,11 +103,19 @@ export class ScenariosService {
   }
 
   private selectJoins(qB: SelectQueryBuilder<ScenariosPuPaDataGeo>, _filters?: ScenariosPUFilters): SelectQueryBuilder<ScenariosPuPaDataGeo> {
-    return qB
+    
+    
+    return qB.addSelect('plan.the_geom')
+    .addSelect(`'-'||array_to_string(array_positions(output.value, true),'-,-')||'-' as "valuePosition"`)
+    .addSelect(`'valuePosition, featureList' as "parseKeys"`)
+    .addSelect('round((test.protected_area/plan.area)::numeric*100)::int as "percentageProtected"')
+    .addSelect(`feature_list as "featureList"`)
+    .leftJoinAndSelect('planning_units_geom', 'plan', `test.pu_geom_id = plan.id`)
+    .leftJoinAndSelect('scenarios_pu_cost_data', 'cost', `test.id = cost.scenarios_pu_data_id`)
+    .leftJoinAndSelect('output_scenarios_pu_data', 'output',`test.id = output.scenario_pu_id`)
+    .leftJoin('scenario_pu_features_entity', 'features', 'test.id = features.scenario_pu_id')
   }
-  private atributtesSelection(attib: string, _filters?: ScenariosPUFilters) {
 
-  }
 }
 
 
