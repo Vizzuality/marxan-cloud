@@ -13,13 +13,14 @@ from planning_units_geom pug
 where type='square' and size = 100;
 
 --- Calculate pa area per pu and associated lockin based on PA
-with pa as (select * from wdpa),
+with pa as (select ST_MemUnion(the_geom) as the_geom from wdpa),
 pu as (
-select spd.id, pug.the_geom
+select spd.id, pug.the_geom, pug.area as pu_area
 from scenarios_pu_data spd
 inner join planning_units_geom pug on spd.pu_geom_id = pug.id
 where scenario_id='$scenario'),
-pu_pa as (select pu.id, st_area(st_transform(st_intersection(pu.the_geom, pa.the_geom), 3410)) as pa_pu_area, st_area(st_transform(pu.the_geom, 3410)) as pu_area
+pu_pa as (select pu.id, st_area(st_transform(st_intersection(pu.the_geom, pa.the_geom), 3410)) as pa_pu_area, 
+                                 pu_area
           from pu
           left join pa on pu.the_geom && pa.the_geom)
 UPDATE scenarios_pu_data
