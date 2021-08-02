@@ -26,12 +26,13 @@ export class ScenarioPlanningUnitsLinkerService {
   /** Currently we only support linking regular planning unit geometries
    * computed via ST_HexagonGrid or ST_SquareGrid */
   private isPlanningUnitGridShapeSupported(
-    shape: PlanningUnitGridShape,
+    shape: PlanningUnitGridShape | undefined,
   ): boolean {
-    return [
-      PlanningUnitGridShape.hexagon,
-      PlanningUnitGridShape.square,
-    ].includes(shape);
+    return !isNil(shape)
+      ? [PlanningUnitGridShape.hexagon, PlanningUnitGridShape.square].includes(
+          shape,
+        )
+      : false;
   }
 
   /**
@@ -40,16 +41,12 @@ export class ScenarioPlanningUnitsLinkerService {
    */
   async link(scenario: Scenario): Promise<void> {
     const project = await this.projectsRepo.findOneOrFail(scenario.projectId);
-    if (
-      !this.isPlanningUnitGridShapeSupported 
-    )
+    if (!this.isPlanningUnitGridShapeSupported(project.planningUnitGridShape))
       throw new Error(
         'Only square or hexagonal planning unit grids are supported.',
       );
-    if(
-      isNil(project.planningUnitAreakm2) ||
-      isNil(project.bbox)
-    ) throw new Error('Incomplete project data: this may be a bug.');
+    if (isNil(project.planningUnitAreakm2) || isNil(project.bbox))
+      throw new Error('Incomplete project data: this may be a bug.');
 
     const [xmin, ymin, xmax, ymax] = project.bbox;
     const query = `insert into scenarios_pu_data (pu_geom_id, scenario_id, puid)
