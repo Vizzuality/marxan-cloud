@@ -12,8 +12,8 @@ export const SpecificationIsNoLongerACandidate = Symbol(
 );
 
 export class ScenarioSpecification extends AggregateRoot {
-  #currentActiveSpec?: SpecificationId; // a one that was published and calculations made and is marked as active (effective)
-  #currentCandidateSpec?: SpecificationId;
+  #active?: SpecificationId; // a one that was published and calculations made and is marked as active (effective)
+  #candidate?: SpecificationId;
 
   constructor(
     public readonly scenarioId: string,
@@ -21,12 +21,12 @@ export class ScenarioSpecification extends AggregateRoot {
     specificationCandidate?: SpecificationId,
   ) {
     super();
-    this.#currentActiveSpec = currentActiveSpecification;
-    this.#currentCandidateSpec = specificationCandidate;
+    this.#active = currentActiveSpecification;
+    this.#candidate = specificationCandidate;
   }
 
   assignCandidateSpecification(specificationId: SpecificationId): void {
-    this.#currentCandidateSpec = specificationId;
+    this.#candidate = specificationId;
     this.apply(new CandidateSpecificationChanged(specificationId));
   }
 
@@ -36,25 +36,25 @@ export class ScenarioSpecification extends AggregateRoot {
     typeof NoCandidateToActivate | typeof SpecificationIsNoLongerACandidate,
     void
   > {
-    if (!this.#currentCandidateSpec) {
+    if (!this.#candidate) {
       return left(NoCandidateToActivate);
     }
 
-    if (this.#currentCandidateSpec !== specificationId) {
+    if (this.#candidate !== specificationId) {
       return left(SpecificationIsNoLongerACandidate);
     }
 
-    this.#currentActiveSpec = this.#currentCandidateSpec;
-    this.#currentCandidateSpec = undefined;
-    this.apply(new SpecificationActivated(this.#currentActiveSpec));
+    this.#active = this.#candidate;
+    this.#candidate = undefined;
+    this.apply(new SpecificationActivated(this.#active));
     return right(void 0);
   }
 
   get currentActiveSpecification(): SpecificationId | undefined {
-    return this.#currentActiveSpec;
+    return this.#active;
   }
 
   get currentCandidateSpecification(): SpecificationId | undefined {
-    return this.#currentCandidateSpec;
+    return this.#candidate;
   }
 }
