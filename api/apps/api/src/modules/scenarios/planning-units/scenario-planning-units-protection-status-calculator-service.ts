@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -40,7 +40,7 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
                                                     from pu_pa group by id) as result
          WHERE scenarios_pu_data.id = result.id) where scenario_id = '${scenario.id}';
     `;
-    console.log(query);
+    Logger.debug(query);
     await this.puRepo.query(query);
   }
 }
