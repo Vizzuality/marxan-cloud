@@ -45,7 +45,7 @@ export const HomeCarousel: React.FC<HomeCarouselProps> = () => {
       }}
     >
       <Wrapper>
-        <div className="relative -top-8 flex justify-center w-full max-w-5xl px-10 mx-auto">
+        <div className="relative -top-8 flex justify-center w-full max-w-4xl px-10 mx-auto">
           {!!imgs.length && (
             <Carousel
               images={imgs}
