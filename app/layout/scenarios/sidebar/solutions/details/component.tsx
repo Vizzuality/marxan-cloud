@@ -29,6 +29,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   onChangeSection,
   onScheduleScenario,
   numberOfSchedules,
+  readOnly,
 }: ScenariosSolutionsDetailsProps) => {
   const { query } = useRouter();
   const { sid } = query;
@@ -101,6 +102,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           theme="primary"
           size="base"
           className="flex h-12 mb-4"
+          disabled={readOnly}
           onClick={() => setShowTable(true)}
         >
           View solutions table
@@ -109,8 +111,9 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
         <Button
           theme="secondary"
           size="base"
-          onClick={() => onScheduleScenario()}
           className="h-12"
+          disabled={readOnly}
+          onClick={() => onScheduleScenario()}
         >
           <div className="flex flex-col justify-center">
             Schedule scenario

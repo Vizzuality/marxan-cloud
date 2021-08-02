@@ -34,7 +34,7 @@ const ShowScenarioPage: React.FC = () => {
                 <SidebarWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} />
                 <SidebarFeatures key={ScenarioSidebarTabs.FEATURES} />
                 <SidebarAnalysis key={ScenarioSidebarTabs.ANALYSIS} />
-                <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
+                <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} readOnly />
               </ScenariosSidebar>
               <ScenariosMap />
             </div>

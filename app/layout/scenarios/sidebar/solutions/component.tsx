@@ -1,24 +1,28 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
+import { useSelector } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useScenario } from 'hooks/scenarios';
+
 import { AnimatePresence, motion } from 'framer-motion';
 
-import Button from 'components/button';
-
 import Pill from 'layout/pill';
-
-import Sections from 'layout/scenarios/sidebar/solutions/sections';
 import SolutionsDetails from 'layout/scenarios/sidebar/solutions/details';
 import SolutionsGapAnalysis from 'layout/scenarios/sidebar/solutions/gap-analysis';
 import SolutionsList from 'layout/scenarios/sidebar/solutions/list';
+import Sections from 'layout/scenarios/sidebar/solutions/sections';
 import { ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
 
-import { useSelector } from 'react-redux';
-import { useRouter } from 'next/router';
-import { useScenario } from 'hooks/scenarios';
-import { ScenariosSidebarSolutionsProps } from './types';
-import { SolutionsSections } from './sections/types';
+import Button from 'components/button';
 
-export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps> = () => {
+import { SolutionsSections } from './sections/types';
+import { ScenariosSidebarSolutionsProps } from './types';
+
+export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps> = ({
+  readOnly,
+}: ScenariosSidebarSolutionsProps) => {
   const [section, setSection] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
@@ -70,6 +74,7 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
               onChangeSection={onChangeSection}
               onScheduleScenario={() => console.info('Schedule scenario - solutions')}
               numberOfSchedules={2}
+              readOnly={readOnly}
             />
           )}
 
@@ -108,6 +113,7 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
               theme="primary"
               size="lg"
               onClick={() => console.info('Save scenario - solutions')}
+              disabled={readOnly}
             >
               Save Scenario
             </Button>

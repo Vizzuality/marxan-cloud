@@ -1,1 +1,3 @@
-export interface ScenariosSidebarSolutionsProps { }
+export interface ScenariosSidebarSolutionsProps {
+  readOnly?: boolean,
+}
