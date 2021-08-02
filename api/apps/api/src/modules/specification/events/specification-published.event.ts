@@ -5,5 +5,8 @@ import { IEvent } from '@nestjs/cqrs';
  * relevant geometries can be calculated
  */
 export class SpecificationPublished implements IEvent {
-  constructor(public readonly id: string, public readonly features: string[]) {}
+  constructor(
+    public readonly id: string,
+    public readonly nonCalculatedFeatures: string[],
+  ) {}
 }

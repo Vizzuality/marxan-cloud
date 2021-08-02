@@ -1,5 +1,5 @@
 import { IEvent } from '@nestjs/cqrs';
 
-export class SpecificationActivated implements IEvent {
+export class SpecificationReadyToActivate implements IEvent {
   constructor(public readonly id: string) {}
 }

@@ -4,7 +4,7 @@ import {
   ScenarioSpecification,
 } from '../../scenario-specification';
 import { SpecificationOperation } from '../../specification-operation';
-import { CandidateSpecCreated } from '../../candidate-spec-created.event';
+import { CandidateSpecCreated } from '../../../specification/events/candidate-spec-created.event';
 
 export const getFixtures = () => {
   const scenarioId = v4();

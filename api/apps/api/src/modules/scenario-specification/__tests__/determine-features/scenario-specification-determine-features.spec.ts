@@ -8,7 +8,7 @@ beforeEach(() => {
 
 describe(`Draft specification with non-calculated features determined`, () => {
   beforeEach(() => {
-    fixtures.GivenDraftWasSubmitted();
+    fixtures.GivenCandidateDraftWasCreated();
     fixtures.WhenFeaturesAreDetermined(false);
   });
 
@@ -19,7 +19,7 @@ describe(`Draft specification with non-calculated features determined`, () => {
 
 describe(`Draft specification with all-calculated features determined`, () => {
   beforeEach(() => {
-    fixtures.GivenDraftWasSubmitted();
+    fixtures.GivenCandidateDraftWasCreated();
     fixtures.WhenFeaturesAreDetermined(true);
   });
 
@@ -30,7 +30,7 @@ describe(`Draft specification with all-calculated features determined`, () => {
 
 describe(`"Created" specification with non-calculated features determined`, () => {
   beforeEach(() => {
-    fixtures.GivenCreatedWasSubmitted();
+    fixtures.GivenCandidateWasCreated();
     fixtures.WhenFeaturesAreDetermined(false);
   });
 
@@ -41,7 +41,7 @@ describe(`"Created" specification with non-calculated features determined`, () =
 
 describe(`"Created" specification with features determined (proved to be already calculated)`, () => {
   beforeEach(() => {
-    fixtures.GivenCreatedWasSubmitted();
+    fixtures.GivenCandidateWasCreated();
     fixtures.WhenFeaturesAreDetermined(true);
   });
 

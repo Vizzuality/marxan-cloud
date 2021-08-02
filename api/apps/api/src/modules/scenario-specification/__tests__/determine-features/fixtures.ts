@@ -4,8 +4,8 @@ import {
   ScenarioSpecification,
 } from '../../scenario-specification';
 import { SpecificationOperation } from '../../specification-operation';
-import { SpecificationPublished } from '../../specification-published.event';
-import { SpecificationActivated } from '../../specification-actived.event';
+import { SpecificationPublished } from '../../../specification/events/specification-published.event';
+import { SpecificationActivated } from '../../../specification/specification-actived.event';
 
 export const getFixtures = () => {
   const scenarioId = v4();
@@ -66,10 +66,10 @@ export const getFixtures = () => {
 
   return {
     scenarioSpec,
-    GivenDraftWasSubmitted: () => {
+    GivenCandidateDraftWasCreated: () => {
       scenarioSpec.createCandidate([splitConfig, stratificationConfig], true);
     },
-    GivenCreatedWasSubmitted: () => {
+    GivenCandidateWasCreated: () => {
       scenarioSpec.createCandidate([splitConfig, stratificationConfig], false);
     },
     WhenFeaturesAreDetermined(allCalculated: boolean) {

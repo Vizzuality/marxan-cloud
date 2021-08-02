@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 import { ScenarioSpecification } from '../../scenario-specification';
 import { SpecificationOperation } from '../../specification-operation';
-import { SpecificationActivated } from '../../specification-actived.event';
+import { SpecificationActivated } from '../../../specification/specification-actived.event';
 
 export const getFixtures = () => {
   const scenarioId = v4();
