@@ -38,10 +38,10 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { bbox } = data;
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setClickingValue } = scenarioSlice.actions;
+  const { setPuIncludedValue, setPuExcludedValue } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const {
-    tab, cache, wdpaCategories, clicking, clickingValue, puAction,
+    tab, cache, wdpaCategories, clicking, puAction, puIncludedValue, puExcludedValue,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const minZoom = 2;
@@ -71,7 +71,8 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     type,
     options: {
       puAction,
-      clickingValue,
+      puIncludedValue,
+      puExcludedValue,
     },
   });
 
@@ -118,7 +119,9 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
         const { properties } = pUGridLayer;
         const { pugeomid } = properties;
 
-        const newClickingValue = [...clickingValue];
+        const newClickingValue = puAction === 'include' ? [...puIncludedValue] : [...puExcludedValue];
+        const newAction = puAction === 'include' ? setPuIncludedValue : setPuExcludedValue;
+
         const index = newClickingValue.findIndex((s) => s === pugeomid);
 
         if (index > -1) {
@@ -127,10 +130,19 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
           newClickingValue.push(pugeomid);
         }
 
-        dispatch(setClickingValue(newClickingValue));
+        dispatch(newAction(newClickingValue));
       }
     }
-  }, [clicking, clickingValue, dispatch, setClickingValue, cache]);
+  }, [
+    clicking,
+    puAction,
+    puIncludedValue,
+    puExcludedValue,
+    dispatch,
+    setPuIncludedValue,
+    setPuExcludedValue,
+    cache,
+  ]);
 
   const handleTransformRequest = (url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
