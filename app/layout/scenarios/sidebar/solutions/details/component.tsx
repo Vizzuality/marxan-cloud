@@ -96,72 +96,76 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
         </button>
       </header>
 
-      <div className="relative flex flex-col w-full mt-1 text-sm">
-        <p className="py-4 opacity-50">Description Lorem ipsum dolor sit amet, solutions consectetuer adipiscing elit.</p>
-        <Button
-          theme="primary"
-          size="base"
-          className="flex h-12 mb-4"
-          disabled={readOnly}
-          onClick={() => setShowTable(true)}
-        >
-          View solutions table
-          <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
-        </Button>
-        <Button
-          theme="secondary"
-          size="base"
-          className="h-12"
-          disabled={readOnly}
-          onClick={() => onScheduleScenario()}
-        >
-          <div className="flex flex-col justify-center">
-            Schedule scenario
-            {numberOfSchedules > 0 && (
-              <span className="text-blue-400 text-xxs">
-                {`${numberOfSchedules} schedule${numberOfSchedules > 1 ? 's' : ''}`}
-              </span>
+      <div className="flex flex-col flex-grow w-full min-h-0 overflow-hidden">
+        <div className="px-0.5 overflow-x-visible overflow-y-auto">
+          <div className="relative flex flex-col w-full mt-1 text-sm">
+            <p className="py-4 opacity-50">Description Lorem ipsum dolor sit amet, solutions consectetuer adipiscing elit.</p>
+            <Button
+              theme="primary"
+              size="base"
+              className="flex h-12 mb-4"
+              disabled={readOnly}
+              onClick={() => setShowTable(true)}
+            >
+              View solutions table
+              <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
+            </Button>
+            <Button
+              theme="secondary"
+              size="base"
+              className="h-12"
+              disabled={readOnly}
+              onClick={() => onScheduleScenario()}
+            >
+              <div className="flex flex-col justify-center">
+                Schedule scenario
+                {numberOfSchedules > 0 && (
+                <span className="text-blue-400 text-xxs">
+                  {`${numberOfSchedules} schedule${numberOfSchedules > 1 ? 's' : ''}`}
+                </span>
+                )}
+              </div>
+              <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
+            </Button>
+            <Modal
+              open={showTable}
+              title="Solutions table"
+              size="wide"
+              dismissable
+              onDismiss={() => setShowTable(false)}
+            >
+              <SolutionsTableForm
+                bestSolutionId={bestSolutionData.id}
+                onCancel={() => setShowTable(false)}
+                setShowTable={setShowTable}
+              />
+            </Modal>
+          </div>
+
+          <div className="w-full p-6 mt-12 border-t border-gray-600">
+            <SolutionFrequency
+              values={frequencyValues}
+              onToggleFrequencyOnMap={onToggleFrequencyOnMap}
+              frequencyOnMap={frequencyOnMap}
+            />
+          </div>
+
+          <div className="w-full p-6 border-t border-gray-600">
+            <Loading
+              visible={solutionIsLoading}
+              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+              iconClassName="w-10 h-10 text-primary-500"
+            />
+            {(selectedSolutionData || bestSolutionData) && (
+            <SolutionSelected
+              best={isBestSolutionShown}
+              values={selectedSolutionData || bestSolutionData}
+              onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
+              selectedSolutionOnMap={selectedSolutionOnMap}
+            />
             )}
           </div>
-          <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
-        </Button>
-        <Modal
-          open={showTable}
-          title="Solutions table"
-          size="wide"
-          dismissable
-          onDismiss={() => setShowTable(false)}
-        >
-          <SolutionsTableForm
-            bestSolutionId={bestSolutionData.id}
-            onCancel={() => setShowTable(false)}
-            setShowTable={setShowTable}
-          />
-        </Modal>
-      </div>
-
-      <div className="w-full p-6 mt-12 border-t border-gray-600">
-        <SolutionFrequency
-          values={frequencyValues}
-          onToggleFrequencyOnMap={onToggleFrequencyOnMap}
-          frequencyOnMap={frequencyOnMap}
-        />
-      </div>
-
-      <div className="w-full p-6 border-t border-gray-600">
-        <Loading
-          visible={solutionIsLoading}
-          className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
-          iconClassName="w-10 h-10 text-primary-500"
-        />
-        {(selectedSolutionData || bestSolutionData) && (
-          <SolutionSelected
-            best={isBestSolutionShown}
-            values={selectedSolutionData || bestSolutionData}
-            onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
-            selectedSolutionOnMap={selectedSolutionOnMap}
-          />
-        )}
+        </div>
       </div>
     </motion.div>
   );
