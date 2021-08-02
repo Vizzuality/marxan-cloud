@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -59,7 +59,7 @@ export class ScenarioPlanningUnitsLinkerService {
       type = '${project.planningUnitGridShape}' and
       size = '${project.planningUnitAreakm2}' and
       st_intersects(the_geom, ST_GeomFromText('MULTIPOLYGON (((${xmin} ${ymin}, ${xmin} ${ymax}, ${xmax} ${ymax}, ${xmax} ${ymin}, ${xmin} ${ymin})))', 4326));`;
-    console.log(query);
+    Logger.debug(query);
     await this.puRepo.query(query);
   }
 }
