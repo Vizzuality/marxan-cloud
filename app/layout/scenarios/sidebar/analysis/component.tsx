@@ -19,7 +19,7 @@ import Button from 'components/button';
 import Modal from 'components/modal';
 
 export interface ScenariosSidebarAnalysisProps {
-  readOnly: boolean;
+  readOnly?: boolean;
 }
 
 export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> = ({
