@@ -38,14 +38,34 @@ export const HomeCarousel: React.FC<HomeCarouselProps> = () => {
 
   return (
     <div
-      style={{
-        backgroundImage: `linear-gradient(to top, #151515 0, #151515 120px, transparent 120px, transparent 100%), url(${BackgroundImage})`,
-        backgroundPosition: 'center, center -100px',
-        backgroundSize: 'cover, cover',
-      }}
+      className="relative"
     >
+      <div
+        role="presentation"
+        style={{
+          backgroundImage: `url(${BackgroundImage})`,
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          position: 'absolute',
+          top: '0',
+          right: '0',
+          height: '70%',
+          width: '100%',
+        }}
+      />
+      <div
+        role="presentation"
+        style={{
+          background: '#151515',
+          position: 'absolute',
+          bottom: '0',
+          right: '0',
+          height: '30%',
+          width: '100%',
+        }}
+      />
       <Wrapper>
-        <div className="relative -top-8 flex justify-center w-full max-w-4xl px-10 mx-auto">
+        <div className="relative -top-8 flex justify-center w-full max-w-4xl px-10 pb-8 mx-auto">
           {!!imgs.length && (
             <Carousel
               images={imgs}
