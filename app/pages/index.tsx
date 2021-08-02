@@ -35,7 +35,7 @@ const Home: React.FC = () => {
         twitterSite="@Marxan_Planning"
       />
       <main>
-        <Header size="lg" />
+        <Header size="lg" theme="light" />
         <Hero />
         <Features />
         <CarouselSection />
