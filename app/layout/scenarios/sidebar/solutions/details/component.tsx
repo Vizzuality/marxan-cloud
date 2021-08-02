@@ -130,7 +130,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           <SolutionsTableForm
             bestSolutionId={bestSolutionData.id}
             onCancel={() => setShowTable(false)}
-            onSave={() => setShowTable(false)}
+            setShowTable={setShowTable}
           />
         </Modal>
       </div>

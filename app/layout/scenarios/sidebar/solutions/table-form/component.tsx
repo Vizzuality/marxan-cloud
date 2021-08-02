@@ -24,7 +24,7 @@ import SolutionsTable from '../table';
 import { SolutionsTableFormProps } from './types';
 
 export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
-  bestSolutionId, onCancel,
+  bestSolutionId, onCancel, setShowTable,
 }: SolutionsTableFormProps) => {
   const { selectedSolutionId } = useSelector((state) => state['/solutions/details']);
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
@@ -68,7 +68,8 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   const onSave = useCallback(() => {
     dispatch(setSelectedSolution(selectedSolution));
-  }, [dispatch, selectedSolution]);
+    setShowTable(false);
+  }, [dispatch, selectedSolution, setShowTable]);
 
   return (
     <div className="text-gray-800">
