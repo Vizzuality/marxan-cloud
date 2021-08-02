@@ -22,12 +22,15 @@ const SECTIONS = [
   },
 ];
 export interface ScenariosSidebarAnalysisSectionsProps {
+  readOnly,
   onChangeSection: (s: string) => void;
 }
 
 export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysisSectionsProps> = ({
+  readOnly,
   onChangeSection,
 }: ScenariosSidebarAnalysisSectionsProps) => {
+  const SECTIONS_CONTENT = readOnly ? SECTIONS.slice(0, 2) : SECTIONS;
   return (
     <motion.div
       key="analysis"
@@ -36,7 +39,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {SECTIONS.map((s) => (
+      {SECTIONS_CONTENT.map((s) => (
         <Item
           key={s.id}
           {...s}
