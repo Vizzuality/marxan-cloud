@@ -1,27 +1,37 @@
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-
-import { ScenarioPuvsprGeoEntity } from '@marxan/scenario-puvspr';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class PuvsprDatService {
-  constructor(
-    @InjectRepository(ScenarioPuvsprGeoEntity, DbConnections.geoprocessingDB)
-    private readonly puvsprRepo: Repository<ScenarioPuvsprGeoEntity>,
-  ) {}
-
   async getPuvsprDatContent(scenarioId: string): Promise<string> {
-    const rows = await this.puvsprRepo.find({
-      where: {
-        scenarioId,
-      },
-    });
+    const rows: {
+      scenario_id: string;
+      pu_id: number;
+      feature_id: number;
+      amount: number;
+    }[] = await getConnection(DbConnections.geoprocessingDB).query(`
+    select pu.scenario_id as scenario_id, puid as pu_id, feature_id, ST_Area(ST_Transform(st_intersection(species.the_geom, pu.the_geom),3410)) as amount
+    from
+    (
+        select scenario_id, the_geom, sfd.feature_id
+        from scenario_features_data sfd
+        inner join features_data fd on sfd.feature_class_id = fd.id where sfd.scenario_id = '${scenarioId}'
+    ) species,
+    (
+        select the_geom, spd.puid, spd.scenario_id
+        from planning_units_geom pug
+        inner join scenarios_pu_data spd on pug.id = spd.pu_geom_id where spd.scenario_id = '${scenarioId}' order by puid asc
+    ) pu
+    where pu.scenario_id = '${scenarioId} and st_intersects(species.the_geom, pu.the_geom)'
+    order by puid, feature_id asc;
+    `);
     return (
       'species\tpu\tamount\n' +
       rows
-        .map((row) => `${row.featureId}\t${row.puId}\t${row.amount.toFixed(6)}`)
+        .map(
+          (row) => `${row.feature_id}\t${row.pu_id}\t${row.amount.toFixed(6)}`,
+        )
         .join('\n')
     );
   }
