@@ -4,7 +4,6 @@ import projects from 'store/slices/projects';
 import projectsDetail from 'store/slices/projects/[id]';
 import projectsNew from 'store/slices/projects/new';
 import solutionsDetails from 'store/slices/solutions/details';
-// import scenariosEdit from 'store/slices/scenarios/edit';
 
 // Reducers
 const staticReducers = {
