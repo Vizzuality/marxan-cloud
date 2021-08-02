@@ -39,8 +39,8 @@ export const HomeCarousel: React.FC<HomeCarouselProps> = () => {
   return (
     <div
       style={{
-        backgroundImage: `linear-gradient(to top, #151515 0, #151515 100px, transparent 100px, transparent 100%), url(${BackgroundImage})`,
-        backgroundPosition: 'center, center -90px',
+        backgroundImage: `linear-gradient(to top, #151515 0, #151515 120px, transparent 120px, transparent 100%), url(${BackgroundImage})`,
+        backgroundPosition: 'center, center -100px',
         backgroundSize: 'cover, cover',
       }}
     >
