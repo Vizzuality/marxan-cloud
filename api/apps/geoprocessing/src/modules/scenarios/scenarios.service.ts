@@ -90,7 +90,7 @@ export class ScenariosService {
     .leftJoinAndSelect('scenarios_pu_cost_data', 'cost', `test.id = cost.scenarios_pu_data_id`)
     .leftJoinAndSelect('output_scenarios_pu_data', 'output',`test.id = output.scenario_pu_id`)
     .leftJoin('scenario_pu_features_entity', 'features', 'test.id = features.scenario_pu_id')
-    .where(`scenario_id = '${id}'`);
+    .where(`"test"."scenario_id" = '${id}'`);
 
     const table = `(${sql.getSql()})`;
 
