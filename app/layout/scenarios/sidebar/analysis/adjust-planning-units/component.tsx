@@ -1,22 +1,24 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { motion } from 'framer-motion';
-
-import Button from 'components/button';
-import Icon from 'components/icon';
+import { useDispatch } from 'react-redux';
 
 import { useToasts } from 'hooks/toast';
 import { useRouter } from 'next/router';
-import { useDispatch } from 'react-redux';
+
+import { motion } from 'framer-motion';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import { useScenarioPU, useSaveScenarioPU } from 'hooks/scenarios';
 
+import Button from 'components/button';
+import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
+
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
-import Tabs from './tabs';
 import Buttons from './buttons';
+import Tabs from './tabs';
 
 export interface ScenariosSidebarAnalysisSectionsProps {
   onChangeSection: (s: string) => void;
@@ -106,10 +108,10 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header>
+      <header className="flex items-center pt-5 pb-1 space-x-3">
         <button
           type="button"
-          className="flex items-center w-full pt-5 pb-1 space-x-2 text-left focus:outline-none"
+          className="flex items-center w-full space-x-2 text-left focus:outline-none"
           onClick={() => {
             onChangeSection(null);
           }}
@@ -117,6 +119,38 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
           <h4 className="text-xs uppercase font-heading">Adjust planning units</h4>
         </button>
+        <InfoButton>
+          <div>
+            <h4 className="font-heading text-lg mb-2.5">Locked-in and locked-out planning units</h4>
+            <div>
+
+              You can force Marxan to include or exclude some planning units from your analysis.
+
+              <br />
+              <br />
+              Manually including or excluding individual planning units
+              is useful when a real-world issue affects where new
+              protected areas can be designated. For example, if
+              you know that a particular planning unit contains a restricted
+              military area and cannot be designated, then you could
+              manually exclude that planning unit from the project.
+              <br />
+              <br />
+
+              The areas selected to be included will be
+              {' '}
+              <b>locked in </b>
+              to your conservation plan and will appear in all of the solutions.
+              <br />
+              <br />
+              The areas selected to be excluded will be
+              {' '}
+              <b>locked out </b>
+              of your conservation plan and will never appear in the solutions
+            </div>
+
+          </div>
+        </InfoButton>
       </header>
 
       <div className="w-full flex items-center justify-between border-t border-gray-500 mt-2.5">

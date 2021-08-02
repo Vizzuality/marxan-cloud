@@ -6,6 +6,13 @@ import { PlanningArea } from './planning-area.geo.entity';
 
 export const geoEntityManagerToken = Symbol('geo entity manager token');
 
+export type SaveGeoJsonResult = {
+  id: string;
+  bbox: BBox;
+  maxPuAreaSize: number;
+  minPuAreaSize: number;
+};
+
 @Injectable()
 export class CustomPlanningAreaRepository {
   constructor(
@@ -13,14 +20,9 @@ export class CustomPlanningAreaRepository {
     private readonly entityManager: EntityManager,
   ) {}
 
-  async saveGeoJson(
-    data: GeoJSON,
-  ): Promise<
-    {
-      id: string;
-    }[]
-  > {
-    const result = await this.planningAreas.query(
+  async saveGeoJson(data: GeoJSON): Promise<SaveGeoJsonResult> {
+    const resultKey = (key: keyof SaveGeoJsonResult) => key;
+    const result: SaveGeoJsonResult[] = await this.planningAreas.query(
       `
 INSERT INTO "planning_areas"("the_geom")
   SELECT ST_SetSRID(
@@ -29,11 +31,19 @@ INSERT INTO "planning_areas"("the_geom")
     ), 4326)::geometry
   FROM (
     SELECT json_array_elements($1::json->'features') AS features
-  ) AS f RETURNING "id";
+  ) AS f RETURNING
+      "${resultKey('id')}",
+      "${resultKey('bbox')}",
+      CEIL((st_area(st_transform(the_geom, 3410))) / 1000000) as "${resultKey(
+        `maxPuAreaSize`,
+      )}",
+      CEIL((st_area(st_transform(the_geom, 3410)) / 9216 ) / 1000000) as "${resultKey(
+        `minPuAreaSize`,
+      )}";
     `,
       [data],
     );
-    return result;
+    return result[0];
   }
 
   async getBBox(id: string): Promise<BBox | undefined> {

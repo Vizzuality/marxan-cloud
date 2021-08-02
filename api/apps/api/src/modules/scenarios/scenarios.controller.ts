@@ -64,10 +64,12 @@ import { ScenarioSolutionResultDto } from './dto/scenario-solution-result.dto';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
+import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.serializer';
 import { GeoFeatureSetSerializer } from '../geo-features/geo-feature-set.serializer';
 import { UpdateGeoFeatureSetDTO } from '../geo-features/dto/update.geo-feature-set.dto';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { GeoFeatureSetService } from '../geo-features/geo-feature-set.service';
+import { ScenarioPlanningUnitDto } from './dto/scenario-planning-unit.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -90,6 +92,7 @@ export class ScenariosController {
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
     private readonly proxyService: ProxyService,
     private readonly zipFilesSerializer: ZipFilesSerializer,
+    private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
   ) {}
 
   @ApiOperation({
@@ -280,6 +283,16 @@ export class ScenariosController {
   ): Promise<void> {
     await this.service.changeLockStatus(id, input);
     return;
+  }
+
+  @Get(':id/planning-units')
+  @ApiOkResponse({ type: ScenarioPlanningUnitDto, isArray: true })
+  async getPlanningUnits(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ScenarioPlanningUnitDto[]> {
+    return this.planningUnitsSerializer.serialize(
+      await this.service.getPlanningUnits(id),
+    );
   }
 
   @ApiOperation({ description: `Resolve scenario's features pre-gap data.` })

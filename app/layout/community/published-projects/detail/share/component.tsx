@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { useToasts } from 'hooks/toast';
 import { useRouter } from 'next/router';
+
+import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
 

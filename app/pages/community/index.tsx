@@ -1,17 +1,17 @@
 import React from 'react';
-import Head from 'next/head';
 
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 
+import { withUser } from 'hoc/auth';
+
 import CommunityInfo from 'layout/community';
-import Contact from 'layout/statics/contact';
-import Header from 'layout/header';
-import Hero from 'layout/statics/hero';
 import Footer from 'layout/footer';
+import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
-
-import { withUser } from 'hoc/auth';
+import Contact from 'layout/statics/contact';
+import Hero from 'layout/statics/hero';
 
 export const getServerSideProps = withUser();
 

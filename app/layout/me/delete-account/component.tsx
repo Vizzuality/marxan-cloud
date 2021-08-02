@@ -1,12 +1,13 @@
 import React, { useCallback, useState } from 'react';
 
+import { useDeleteMe } from 'hooks/me';
+import { useToasts } from 'hooks/toast';
+
+import { signOut } from 'next-auth/client';
+
 import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Loading from 'components/loading';
-
-import { useDeleteMe } from 'hooks/me';
-import { useToasts } from 'hooks/toast';
-import { signOut } from 'next-auth/client';
 
 import DELETE_USER_WARNING_SVG from 'svgs/notifications/delete-user-warning.svg?sprite';
 

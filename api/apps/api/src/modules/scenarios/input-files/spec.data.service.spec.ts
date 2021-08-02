@@ -37,7 +37,7 @@ describe(`when there are no rows`, () => {
 
   it(`should return headers only`, async () => {
     expect(await sut.getSpecDatContent('scenario-id')).toEqual(
-      `id\ttarget\tprop\tspf\ttarget2\ttargetocc\tname\tsepnum\tsepdistance\n`,
+      `id\ttarget\tprop\tspf\ttarget2\ttargetocc\tname\tsepnum\tsepdistance`,
     );
   });
 });
@@ -68,11 +68,40 @@ describe(`when there is data available`, () => {
     ]);
   });
 
+  it(`should return content with omitted not fully filled columns`, async () => {
+    expect(await sut.getSpecDatContent('scenario-id')).toMatchInlineSnapshot(`
+      "id	target	prop	spf
+      0	0.00	0.25	0.33
+      1	30.00	0.25	1.66"
+    `);
+  });
+});
+
+describe(`when there is data available`, () => {
+  beforeEach(() => {
+    dataRepo.find.mockImplementationOnce(async () => [
+      {
+        scenarioId: 'id',
+        featureId: 1,
+        fpf: 1.66,
+        featuresDataId: '...',
+        prop: 0.25,
+        target: 30,
+        target2: 32,
+        sepNum: 10,
+        targetocc: 999,
+        name: 'entry',
+        metadata: {
+          sepdistance: 4000,
+        },
+      } as ScenarioFeaturesData,
+    ]);
+  });
+
   it(`should return content`, async () => {
     expect(await sut.getSpecDatContent('scenario-id')).toMatchInlineSnapshot(`
       "id	target	prop	spf	target2	targetocc	name	sepnum	sepdistance
-      0	0.00	0.25	0.33		0\t\t\t
-      1	30.00	0.25	1.66	32	999		10	4000"
+      1	30.00	0.25	1.66	32.00	999.00	entry	10.00	4000.00"
     `);
   });
 });

@@ -73,6 +73,18 @@ describe(`when a user updates scenario with input data`, () => {
       _CLOUD_PROJECT Humanity for living.
       _CLOUD_ORGANIZATION Fresh Alaska array
       _CLOUD_GENERATED_AT __ISO_DATE__
+      VERBOSITY 2
+      SAVESOLUTIONSMATRIX 3
+      SAVERUN 3
+      SAVEBEST 3
+      SAVESUMMARY 3
+      SAVESCEN 3
+      SAVETARGMET 3
+      SAVESUMSOLN 3
+      SAVELOG 3
+      SAVESNAPSTEPS 0
+      SAVESNAPCHANGES 0
+      SAVESNAPFREQUENCY 0
       INPUTDIR input
       PUNAME pu.dat
       SPECNAME spec.dat

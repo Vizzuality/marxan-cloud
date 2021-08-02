@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import cx from 'classnames';
-
 import Flicking, { ERROR_CODE, FlickingError } from '@egjs/react-flicking';
+import cx from 'classnames';
 
 export interface CarouselProps {
   images: {

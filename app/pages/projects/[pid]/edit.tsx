@@ -1,11 +1,12 @@
 import React from 'react';
 
-import ProjectTitle from 'layout/title/project-title';
+import { withProtection, withUser } from 'hoc/auth';
+
 import Header from 'layout/header';
+import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
-
-import { withProtection, withUser } from 'hoc/auth';
+import ProjectTitle from 'layout/title/project-title';
 
 export const getServerSideProps = withProtection(withUser());
 
@@ -15,6 +16,8 @@ const EditProjectsPage: React.FC = () => {
       <ProjectTitle title="Edit" />
 
       <MetaIcons />
+
+      <Help />
 
       <main>
         <Header size="base" />

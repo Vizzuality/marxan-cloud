@@ -6,16 +6,24 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test } from '@nestjs/testing';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ProgressData } from '@marxan/scenario-run-queue';
-import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
-import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
-import { Scenario } from '../scenario.api.entity';
 import {
-  notFound,
-  runEventsToken,
-  runQueueToken,
-  RunService,
-} from './run.service';
+  ApiEventsService,
+  duplicate,
+} from '@marxan-api/modules/api-events/api-events.service';
+import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
+import { OutputRepository } from '@marxan-api/modules/scenarios/marxan-run/output.repository';
+import {
+  ExecutionResult,
+  ScenariosOutputResultsApiEntity,
+} from '@marxan/marxan-output';
+import { assertDefined, FieldsOf } from '@marxan/utils';
+import { Scenario } from '../scenario.api.entity';
+import { RunService } from './run.service';
 import { AssetsService } from './assets.service';
+import { blmDefaultToken, runEventsToken, runQueueToken } from './tokens';
+import { RunHandler } from './run.handler';
+import { CancelHandler, notFound } from './cancel.handler';
+import { EventsHandler } from './events.handler';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let runService: RunService;
@@ -31,12 +39,43 @@ test(`scheduling job`, async () => {
   fixtures.GivenAssetsAvailable();
 
   // when
-  await runService.run('scenario-1');
+  await runService.run({ id: 'scenario-1' });
 
   // then
   fixtures.ThenShouldUpdateScenario();
   fixtures.ThenShouldEmitSubmittedEvent(`1234`);
   fixtures.ThenShouldAddJob();
+  fixtures.ThenShouldUseDefaultBlm();
+});
+
+test(`scheduling job with overriding blm`, async () => {
+  fixtures.setupMocksForSchedulingJobs(() => `1234`);
+  // given
+  fixtures.GivenAssetsAvailable();
+
+  // when
+  await runService.run({ id: 'scenario-1', boundaryLengthModifier: 78 }, -123);
+
+  // then
+  fixtures.ThenShouldUpdateScenario();
+  fixtures.ThenShouldEmitSubmittedEvent(`1234`);
+  fixtures.ThenShouldAddJob();
+  fixtures.ThenShouldUseBlm(-123);
+});
+
+test(`scheduling job with scenario that has blm`, async () => {
+  fixtures.setupMocksForSchedulingJobs(() => `1234`);
+  // given
+  fixtures.GivenAssetsAvailable();
+
+  // when
+  await runService.run({ id: 'scenario-1', boundaryLengthModifier: 78 });
+
+  // then
+  fixtures.ThenShouldUpdateScenario();
+  fixtures.ThenShouldEmitSubmittedEvent(`1234`);
+  fixtures.ThenShouldAddJob();
+  fixtures.ThenShouldUseBlm(78);
 });
 
 test(`scheduling job for scenario without assets`, async () => {
@@ -45,7 +84,7 @@ test(`scheduling job for scenario without assets`, async () => {
   fixtures.GivenAssetsNotAvailable();
 
   // when
-  const result = runService.run('scenario-1');
+  const result = runService.run({ id: 'scenario-1' });
 
   // then
   await expect(result).rejects.toBeDefined();
@@ -85,30 +124,97 @@ test(`canceling waiting job`, async () => {
   expect(result).toStrictEqual(right(void 0));
 });
 
-describe(`with a single job in the queue`, () => {
-  beforeEach(() => {
-    fixtures.setupMockForCreatingEvents();
-    fixtures.GivenAJobInQueue();
-  });
+test(`failed job`, async () => {
+  fixtures.setupMockForCreatingEvents();
+  fixtures.GivenAJobInQueue();
 
-  test.each`
-    Got Event      | Saved Kind
-    ${`failed`}    | ${API_EVENT_KINDS.scenario__run__failed__v1__alpha1}
-    ${`completed`} | ${API_EVENT_KINDS.scenario__run__finished__v1__alpha1}
-  `(`when $GotEvent, saves $SavedKind`, async ({ GotEvent, SavedKind }) => {
-    fixtures.fakeEvents.emit(
-      GotEvent,
-      {
-        jobId: `123`,
-        data: {
-          scenarioId: `scenario-x`,
-        },
+  fixtures.fakeEvents.emit(
+    `failed`,
+    {
+      jobId: `123`,
+      data: {
+        scenarioId: `scenario-x`,
       },
-      `eventId1`,
-    );
+    },
+    `eventid1`,
+  );
 
-    await fixtures.ThenEventCreated(SavedKind, `eventId1`);
-  });
+  await fixtures.ThenEventCreatedIfNotExisted(
+    API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
+    `eventid1`,
+  );
+});
+
+test(`completed job`, async () => {
+  fixtures.setupMocksForCompletedJob();
+  fixtures.GivenAJobInQueueWithReturnValue();
+
+  fixtures.fakeEvents.emit(
+    `completed`,
+    {
+      jobId: `123`,
+      data: {
+        scenarioId: `scenario-x`,
+      },
+    },
+    `eventId2`,
+  );
+
+  await fixtures.ThenEventCreatedIfNotExisted(
+    API_EVENT_KINDS.scenario__run__finished__v1__alpha1,
+    `eventId2`,
+  );
+  await fixtures.ThenEventCreated(
+    API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1,
+  );
+  fixtures.ThenOutputPersisted();
+});
+
+test(`duplicated completed job`, async () => {
+  fixtures.setupMocksForDuplicatedCompletedJob();
+  fixtures.GivenAJobInQueueWithReturnValue();
+
+  fixtures.fakeEvents.emit(
+    `completed`,
+    {
+      jobId: `123`,
+      data: {
+        scenarioId: `scenario-x`,
+      },
+    },
+    `eventId2`,
+  );
+
+  await fixtures.ThenEventCreatedIfNotExisted(
+    API_EVENT_KINDS.scenario__run__finished__v1__alpha1,
+    `eventId2`,
+  );
+  fixtures.ThenOutputNotPersisted();
+});
+
+test(`completed job with failing save`, async () => {
+  fixtures.setupMocksForCompletedJob();
+  fixtures.GivenOutputRepositoryFails();
+  fixtures.GivenAJobInQueueWithReturnValue();
+
+  fixtures.fakeEvents.emit(
+    `completed`,
+    {
+      jobId: `123`,
+      data: {
+        scenarioId: `scenario-x`,
+      },
+    },
+    `eventId2`,
+  );
+
+  await fixtures.ThenEventCreatedIfNotExisted(
+    API_EVENT_KINDS.scenario__run__finished__v1__alpha1,
+    `eventId2`,
+  );
+  await fixtures.ThenEventCreated(
+    API_EVENT_KINDS.scenario__run__outputSaveFailed__v1__alpha1,
+  );
 });
 
 test(`handling progress`, async () => {
@@ -127,7 +233,7 @@ test(`handling progress`, async () => {
     },
     `eventId1`,
   );
-  await fixtures.ThenEventCreated(
+  await fixtures.ThenEventCreatedIfNotExisted(
     API_EVENT_KINDS.scenario__run__progress__v1__alpha1,
     `eventId1`,
     {
@@ -155,8 +261,34 @@ async function getFixtures() {
   const fakeAssets = {
     forScenario: jest.fn(),
   };
+  class FakeOutputRepository implements FieldsOf<OutputRepository> {
+    db: ScenariosOutputResultsApiEntity[] = [];
+    async saveOutput(job: {
+      returnvalue: ExecutionResult | undefined;
+      data: { scenarioId: string };
+    }): Promise<void> {
+      assertDefined(job.returnvalue);
+      this.db.push({
+        id: this.db.length.toString(),
+        ...job.returnvalue,
+        scenarioId: job.data.scenarioId,
+      });
+    }
+  }
   const testingModule = await Test.createTestingModule({
     providers: [
+      RunHandler,
+      CancelHandler,
+      EventsHandler,
+      {
+        provide: blmDefaultToken,
+        useValue: 42,
+      },
+      FakeOutputRepository,
+      {
+        provide: OutputRepository,
+        useExisting: FakeOutputRepository,
+      },
       {
         provide: runQueueToken,
         useValue: fakeQueue,
@@ -180,6 +312,8 @@ async function getFixtures() {
       RunService,
     ],
   }).compile();
+
+  const fakeOutputRepository = testingModule.get(FakeOutputRepository);
 
   return {
     fakeQueue,
@@ -220,6 +354,7 @@ async function getFixtures() {
         relativeDestination: 'relativeDestination-value',
       },
     ],
+    defaultBlm: testingModule.get<number>(blmDefaultToken),
     getRunService() {
       return testingModule.get(RunService);
     },
@@ -238,8 +373,26 @@ async function getFixtures() {
     },
     setupMockForCreatingEvents() {
       fakeApiEvents.createIfNotExists.mockImplementation(() => {
-        //
+        return right({});
       });
+    },
+    setupMocksForCompletedJob() {
+      fakeApiEvents.createIfNotExists.mockImplementation(() => {
+        return right({});
+      });
+      fakeApiEvents.create.mockImplementation(() => {
+        return {};
+      });
+    },
+    setupMocksForDuplicatedCompletedJob() {
+      fakeApiEvents.createIfNotExists.mockImplementation(() => {
+        return left(duplicate);
+      });
+    },
+    GivenOutputRepositoryFails() {
+      fakeOutputRepository.saveOutput = () => {
+        throw new Error('failed!');
+      };
     },
     GivenAnActiveJobInQueue() {
       const jobs = [this.otherJob, this.activeJob];
@@ -290,7 +443,7 @@ async function getFixtures() {
         assets: this.scenarioAssets,
       });
     },
-    async ThenEventCreated(
+    async ThenEventCreatedIfNotExisted(
       kind: API_EVENT_KINDS,
       eventId: string,
       data?: CreateApiEventDTO['data'],
@@ -304,6 +457,34 @@ async function getFixtures() {
           data,
         });
       });
+    },
+    async ThenEventCreated(
+      kind: API_EVENT_KINDS,
+      eventId?: string,
+      data?: CreateApiEventDTO['data'],
+    ) {
+      await waitForExpect(() => {
+        expect(fixtures.fakeApiEvents.create).toBeCalledTimes(1);
+        expect(fixtures.fakeApiEvents.create).toBeCalledWith({
+          kind,
+          topic: `scenario-1`,
+          externalId: eventId,
+          data,
+        });
+      });
+    },
+    ThenOutputPersisted() {
+      expect(fakeOutputRepository.db).toStrictEqual([
+        {
+          id: '0',
+          runId: '25',
+          scenarioId: 'scenario-1',
+          scoreValue: 100,
+        },
+      ]);
+    },
+    ThenOutputNotPersisted() {
+      expect(fakeOutputRepository.db).toStrictEqual([]);
     },
     GivenNoJobsInQueue() {
       const jobs = [] as const;
@@ -322,6 +503,20 @@ async function getFixtures() {
         };
       });
     },
+    GivenAJobInQueueWithReturnValue() {
+      fixtures.fakeQueue.getJob.mockImplementation((...args) => {
+        expect(args).toStrictEqual([`123`]);
+        return {
+          data: {
+            scenarioId: `scenario-1`,
+          },
+          returnvalue: {
+            runId: '25',
+            scoreValue: 100,
+          },
+        };
+      });
+    },
     GivenAssetsAvailable() {
       fakeAssets.forScenario.mockImplementation((id) => {
         expect(id).toBe(`scenario-1`);
@@ -333,6 +528,13 @@ async function getFixtures() {
         expect(id).toBe(`scenario-1`);
         return undefined;
       });
+    },
+    ThenShouldUseDefaultBlm() {
+      this.ThenShouldUseBlm(this.defaultBlm);
+    },
+    ThenShouldUseBlm(blm: number) {
+      expect(fakeAssets.forScenario).toBeCalledTimes(1);
+      expect(fakeAssets.forScenario).toBeCalledWith(`scenario-1`, blm);
     },
   };
 }

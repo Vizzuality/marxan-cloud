@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Head from 'next/head';
 
 import FB_IMAGE from 'images/social-media/share-fb.png';

@@ -10,6 +10,7 @@ import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
 import { isLeft } from 'fp-ts/Either';
+import { pick } from 'lodash';
 
 import { MarxanInput, MarxanParameters } from '@marxan/marxan-input';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -36,12 +37,14 @@ import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { SimpleJobStatus } from './scenario.api.entity';
 import { assertDefined } from '@marxan/utils';
 import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-property-sets.service';
+import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
   status: SimpleJobStatus.draft,
   features: [],
 };
+
 @Injectable()
 export class ScenariosService {
   private readonly geoprocessingUrl: string = AppConfig.get(
@@ -62,6 +65,7 @@ export class ScenariosService {
     private readonly geoFeaturesService: GeoFeaturesService,
     private readonly geoFeaturePropertySetService: GeoFeaturePropertySetService,
     private readonly inputArchiveService: InputFilesArchiverService,
+    private readonly planningUnitsService: ScenarioPlanningUnitsService,
   ) {}
 
   async findAllPaginated(
@@ -175,9 +179,12 @@ export class ScenariosService {
     return this.inputFilesService.getBoundDatContent(scenarioId);
   }
 
-  async run(scenarioId: string, _blm?: number): Promise<void> {
-    await this.assertScenario(scenarioId);
-    await this.runService.run(scenarioId);
+  async run(scenarioId: string, blm?: number): Promise<void> {
+    const scenario = await this.assertScenario(scenarioId);
+    await this.runService.run(
+      pick(scenario, 'id', 'boundaryLengthModifier'),
+      blm,
+    );
   }
 
   async cancel(scenarioId: string): Promise<void> {
@@ -195,7 +202,7 @@ export class ScenariosService {
   }
 
   private async assertScenario(scenarioId: string) {
-    await this.crudService.getById(scenarioId);
+    return await this.crudService.getById(scenarioId);
   }
 
   async getOneSolution(
@@ -228,6 +235,11 @@ export class ScenariosService {
       ...fetchSpecification.filter,
       distinctFive: true,
     };
+    // TODO remove the following two lines once implementation is in place.
+    // The artificial limiting of response elements is only to serve (up to) the
+    // expected number of elements to frontend in the meanwhile.
+    fetchSpecification.pageSize = 5;
+    fetchSpecification.pageNumber = 1;
     return this.solutionsCrudService.findAllPaginated(fetchSpecification);
   }
 
@@ -304,5 +316,10 @@ export class ScenariosService {
   async getMarxanExecutionInputArchive(scenarioId: string) {
     await this.assertScenario(scenarioId);
     return this.inputArchiveService.archive(scenarioId);
+  }
+
+  async getPlanningUnits(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    return this.planningUnitsService.get(scenarioId);
   }
 }

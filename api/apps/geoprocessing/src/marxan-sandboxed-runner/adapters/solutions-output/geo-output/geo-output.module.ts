@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
+import {
+  MarxanExecutionMetadataGeoEntity,
+  OutputScenariosFeaturesDataGeoEntity,
+  OutputScenariosPuDataGeoEntity,
+} from '@marxan/marxan-output';
 
 import { GeoOutputRepository } from './geo-output.repository';
 import { MetadataArchiver } from './metadata/data-archiver.service';
@@ -8,10 +12,9 @@ import { MarxanDirectory } from '../../marxan-directory.service';
 import { FileReader } from '../../file-reader';
 import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
 import { PlanningUnitSelectionCalculatorService } from './solutions/solution-aggregation/planning-unit-selection-calculator.service';
-import { ScenarioFeaturesDataService } from './scenario-features/scenario-features-data.service';
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
-import { ScenarioFeaturesData } from '@marxan/features';
+
+import { ScenarioFeaturesModule } from './scenario-features';
 
 @Module({
   imports: [
@@ -19,8 +22,9 @@ import { ScenarioFeaturesData } from '@marxan/features';
       MarxanExecutionMetadataGeoEntity,
       OutputScenariosPuDataGeoEntity,
       ScenariosPlanningUnitGeoEntity,
-      ScenarioFeaturesData,
+      OutputScenariosFeaturesDataGeoEntity,
     ]),
+    ScenarioFeaturesModule,
   ],
   providers: [
     GeoOutputRepository,
@@ -28,7 +32,6 @@ import { ScenarioFeaturesData } from '@marxan/features';
     MarxanDirectory,
     FileReader,
     SolutionsReaderService,
-    ScenarioFeaturesDataService,
     PlanningUnitSelectionCalculatorService,
   ],
   exports: [GeoOutputRepository],

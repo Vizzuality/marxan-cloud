@@ -4,6 +4,7 @@ import * as uuid from 'uuid';
 import { CustomPlanningAreaRepository } from '@marxan/planning-area-repository';
 import { ShapefileService } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.service';
 import { GarbageCollectorConfig } from '@marxan-geoprocessing/modules/planning-area/garbage-collector-config';
+import { SaveGeoJsonResult } from '@marxan/planning-area-repository/custom-planning-area.repository';
 
 @Injectable()
 export class PlanningAreaService {
@@ -17,12 +18,12 @@ export class PlanningAreaService {
 
   async save(
     shapefile: Express.Multer.File,
-  ): Promise<{ data: GeoJSON; id: string }> {
+  ): Promise<{ data: GeoJSON } & SaveGeoJsonResult> {
     const { data } = await this.shapefileService.transformToGeoJson(shapefile);
     const result = await this.repository.saveGeoJson(data);
     this.scheduleGarbageCollection();
     return {
-      id: result[0].id,
+      ...result,
       data,
     };
   }

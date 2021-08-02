@@ -3,23 +3,25 @@ import React, {
 } from 'react';
 
 // Map
+import { useSelector, useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useWDPAPreviewLayer, usePUGridLayer } from 'hooks/map';
+import { useProject } from 'hooks/projects';
+
+import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
+import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import { useSession } from 'next-auth/client';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
 import Map from 'components/map';
 // import LAYERS from 'components/map/layers';
 
-import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
-import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
-
 // Controls
 import Controls from 'components/map/controls';
-import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
-
-import { useSession } from 'next-auth/client';
-import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-import { useProject } from 'hooks/projects';
-import { useWDPAPreviewLayer, usePUGridLayer } from 'hooks/map';
+import ZoomControl from 'components/map/controls/zoom';
 
 import ScenariosDrawingManager from './drawing-manager';
 

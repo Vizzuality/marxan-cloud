@@ -1,19 +1,20 @@
-import flatten from 'lodash/flatten';
 import { useMemo } from 'react';
+
 import {
   useQuery, useInfiniteQuery, useMutation, useQueryClient,
 } from 'react-query';
-import { useSession } from 'next-auth/client';
+
 import { useRouter } from 'next/router';
 
 import { formatDistanceToNow } from 'date-fns';
-
-import { ItemProps } from 'components/scenarios/item/component';
-
+import flatten from 'lodash/flatten';
+import { useSession } from 'next-auth/client';
+import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
-import DOWNLOADS from 'services/downloads';
+
+import { ItemProps } from 'components/scenarios/item/component';
 
 import {
   UseScenariosOptionsProps,
@@ -29,6 +30,8 @@ import {
   UploadScenarioPUProps,
   UseSaveScenarioPUProps,
   SaveScenarioPUProps,
+  UseDuplicateScenarioProps,
+  DuplicateScenarioProps,
 } from './types';
 
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
@@ -409,6 +412,39 @@ export function useSaveScenarioPU({
       queryClient.invalidateQueries(['scenarios-pu', id]);
     },
     onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDuplicateScenario({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseDuplicateScenarioProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const duplicateScenario = ({ id }: DuplicateScenarioProps) => {
+    // Pending endpoint
+    return SCENARIOS.request({
+      url: `/${id}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(duplicateScenario, {
+    onSuccess: (data: any, variables, context) => {
+      const { id, projectId } = data;
+      queryClient.invalidateQueries(['scenarios', projectId]);
+      queryClient.invalidateQueries(['scenarios', id]);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
       console.info('Error', error, variables, context);
     },
   });

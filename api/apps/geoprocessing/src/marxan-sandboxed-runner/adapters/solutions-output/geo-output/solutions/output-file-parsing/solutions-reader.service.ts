@@ -21,9 +21,10 @@ export class SolutionsReaderService {
   ) {}
 
   async from(
-    file: string,
+    outputsDirectory: string,
     scenarioId: string,
   ): Promise<TypedEmitter<SolutionsEvents>> {
+    const solutionsFile = outputsDirectory + `/output_solutionsmatrix.csv`;
     const planningUnits = await this.scenarioPuData.findAndCount({
       where: {
         scenarioId,
@@ -41,7 +42,7 @@ export class SolutionsReaderService {
       objectMode: true,
     });
     const rl = createInterface({
-      input: createReadStream(file),
+      input: createReadStream(solutionsFile),
       crlfDelay: Infinity,
     });
 

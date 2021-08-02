@@ -1,17 +1,18 @@
 import React, {
   useCallback, useMemo, useState,
 } from 'react';
-import cx from 'classnames';
 
 import { Form as FormRFF } from 'react-final-form';
 
+import cx from 'classnames';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
+
 import RUN_SVG from 'svgs/ui/run.svg?sprite';
 
-import { FIELDS } from './constants';
-
 import RunChart from './chart';
+import { FIELDS } from './constants';
 import RunField from './field';
 
 export interface ScenariosRunProps {
@@ -52,7 +53,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
 
             <div className="flex flex-col flex-grow flex-shrink-0 space-y-6 overflow-hidden w-80">
               <div className="relative flex flex-col flex-grow overflow-hidden">
-                <div className="absolute left-0 z-10 w-full h-6 -top-1 bg-gradient-to-b from-white via-white pointer-events-none" />
+                <div className="absolute left-0 z-10 w-full h-6 pointer-events-none -top-1 bg-gradient-to-b from-white via-white" />
                 <div className="pr-10 overflow-x-hidden overflow-y-auto">
                   <div className="py-6 space-y-10">
                     {FIELDS
@@ -73,7 +74,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-white via-white pointer-events-none" />
+                <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-white via-white" />
               </div>
 
               <div className="flex-shrink-0 pr-10">
