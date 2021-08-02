@@ -7,6 +7,9 @@ import { SpecificationActivated } from './events/specification-activated.event';
 export const NoCandidateToActivate = Symbol(
   `No scenario candidate to activate`,
 );
+export const SpecificationIsNoLongerACandidate = Symbol(
+  `Specification is no longer a candidate.`,
+);
 
 export class ScenarioSpecification extends AggregateRoot {
   #currentActiveSpec?: SpecificationId; // a one that was published and calculations made and is marked as active (effective)
@@ -27,21 +30,31 @@ export class ScenarioSpecification extends AggregateRoot {
     this.apply(new CandidateSpecificationChanged(specificationId));
   }
 
-  activateCandidateSpecification(): Either<typeof NoCandidateToActivate, void> {
+  activateCandidateSpecification(
+    specificationId: SpecificationId,
+  ): Either<
+    typeof NoCandidateToActivate | typeof SpecificationIsNoLongerACandidate,
+    void
+  > {
     if (!this.#currentCandidateSpec) {
       return left(NoCandidateToActivate);
     }
+
+    if (this.#currentCandidateSpec !== specificationId) {
+      return left(SpecificationIsNoLongerACandidate);
+    }
+
     this.#currentActiveSpec = this.#currentCandidateSpec;
     this.#currentCandidateSpec = undefined;
     this.apply(new SpecificationActivated(this.#currentActiveSpec));
     return right(void 0);
   }
 
-  get currentActiveSpec(): SpecificationId | undefined {
+  get currentActiveSpecification(): SpecificationId | undefined {
     return this.#currentActiveSpec;
   }
 
-  get currentCandidateSpec(): SpecificationId | undefined {
+  get currentCandidateSpecification(): SpecificationId | undefined {
     return this.#currentCandidateSpec;
   }
 }

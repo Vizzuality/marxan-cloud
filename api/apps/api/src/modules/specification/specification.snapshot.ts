@@ -5,7 +5,6 @@ export interface SpecificationSnapshotInput {
   scenarioId: string;
   config: FeatureConfig[];
   draft: boolean;
-  activated: boolean;
 }
 
 export interface SpecificationSnapshot extends SpecificationSnapshotInput {

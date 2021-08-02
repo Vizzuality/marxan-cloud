@@ -1,20 +1,15 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 import { v4 } from 'uuid';
-import { Either, left, right } from 'fp-ts/Either';
-import {
-  FeatureConfig,
-  FeatureConfigInput,
-  FeatureState,
-} from './feature-config';
+import { FeatureConfig, FeatureConfigInput } from './feature-config';
 import {
   SpecificationSnapshot,
   SpecificationSnapshotInput,
 } from './specification.snapshot';
 import { DeterminedFeatures } from './commands/determine-features.command';
 
-import { SpecificationReadyToActivate } from './events/specification-ready-to-activate.event';
+import { SpecificationGotReady } from './events/specification-got-ready.event';
 import { SpecificationPublished } from './events/specification-published.event';
-import { SpecificationCreated } from './events/specification-created.event';
+import { SpecificationCandidateCreated } from './events/specification-candidate-created.event';
 
 export class Specification extends AggregateRoot {
   private constructor(
@@ -22,7 +17,6 @@ export class Specification extends AggregateRoot {
     public readonly scenarioId: string,
     private configuration: FeatureConfig[] = [],
     private draft: boolean,
-    private activated: boolean,
   ) {
     super();
   }
@@ -33,7 +27,6 @@ export class Specification extends AggregateRoot {
       snapshot.scenarioId,
       snapshot.config,
       snapshot.draft,
-      snapshot.activated,
     );
   }
 
@@ -51,10 +44,12 @@ export class Specification extends AggregateRoot {
         resultFeatures: [],
       })),
       draft,
-      false,
     );
     specification.apply(
-      new SpecificationCreated(specification.scenarioId, specification.id),
+      new SpecificationCandidateCreated(
+        specification.scenarioId,
+        specification.id,
+      ),
     );
     return specification;
   }
@@ -67,7 +62,6 @@ export class Specification extends AggregateRoot {
       readyToActivate:
         this.allFeaturesDetermined() && this.allFeaturesCalculated(),
       config: this.configuration,
-      activated: this.activated,
       featuresDetermined: this.allFeaturesDetermined(),
     };
   }
@@ -86,7 +80,15 @@ export class Specification extends AggregateRoot {
       configPiece.featuresDetermined = true;
     });
 
-    if (this.allFeaturesDetermined() && !this.draft) {
+    if (this.draft) {
+      return;
+    }
+
+    if (this.allFeaturesCalculated()) {
+      return this.apply(new SpecificationGotReady(this.id, this.scenarioId));
+    }
+
+    if (this.allFeaturesDetermined()) {
       this.apply(
         new SpecificationPublished(
           this.id,
@@ -105,18 +107,22 @@ export class Specification extends AggregateRoot {
       }),
     );
 
-    if (this.allFeaturesCalculated() && !this.draft) {
-      this.apply(new SpecificationReadyToActivate(this.id));
+    if (
+      this.allFeaturesCalculated() &&
+      this.allFeaturesDetermined() &&
+      !this.draft
+    ) {
+      this.apply(new SpecificationGotReady(this.id, this.scenarioId));
     }
   }
 
-  allFeaturesDetermined(): boolean {
+  private allFeaturesDetermined(): boolean {
     return this.configuration.every(
       (featureConfig) => featureConfig.featuresDetermined,
     );
   }
 
-  allFeaturesCalculated(): boolean {
+  private allFeaturesCalculated(): boolean {
     return this.configuration
       .flatMap((configuration) => configuration.resultFeatures)
       .every((feature) => feature.calculated);
