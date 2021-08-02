@@ -25,7 +25,7 @@ import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 export interface ScenariosSidebarWDPAProps {
-  readOnly: boolean,
+  readOnly?: boolean,
 }
 
 export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({

@@ -18,7 +18,7 @@ import ScenariosSidebarWDPAThreshold from 'layout/scenarios/sidebar/wdpa/thresho
 import Steps from 'components/steps';
 
 export interface ScenariosSidebarWDPAProps {
-  readOnly: boolean;
+  readOnly?: boolean;
 }
 
 export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
