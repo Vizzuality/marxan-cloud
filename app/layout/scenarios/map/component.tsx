@@ -117,17 +117,17 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
 
       if (pUGridLayer) {
         const { properties } = pUGridLayer;
-        const { test_id: testId } = properties;
+        const { scenarioPuId } = properties;
 
         const newClickingValue = puAction === 'include' ? [...puIncludedValue] : [...puExcludedValue];
         const newAction = puAction === 'include' ? setPuIncludedValue : setPuExcludedValue;
 
-        const index = newClickingValue.findIndex((s) => s === testId);
+        const index = newClickingValue.findIndex((s) => s === scenarioPuId);
 
         if (index > -1) {
           newClickingValue.splice(index, 1);
         } else {
-          newClickingValue.push(testId);
+          newClickingValue.push(scenarioPuId);
         }
 
         dispatch(newAction(newClickingValue));

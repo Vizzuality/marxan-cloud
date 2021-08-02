@@ -193,7 +193,7 @@ export function usePUGridLayer({
                   'case',
                   ['all',
                     ['has', 'percentageProtected'],
-                    ['>=', ['get', 'percentageProtected'], wdpaThreshold * 100],
+                    ['>=', ['get', 'percentageProtected'], (wdpaThreshold * 100)],
                   ],
                   0.5,
                   0,
@@ -208,7 +208,7 @@ export function usePUGridLayer({
               'source-layer': 'layer0',
               filter: [
                 'all',
-                ['in', ['get', 'test_id'], ['literal', puIncludedValue]],
+                ['in', ['get', 'scenarioPuId'], ['literal', puIncludedValue]],
               ],
               paint: {
                 'line-color': '#0F0',
@@ -223,7 +223,7 @@ export function usePUGridLayer({
               'source-layer': 'layer0',
               filter: [
                 'all',
-                ['in', ['get', 'test_id'], ['literal', puExcludedValue]],
+                ['in', ['get', 'scenarioPuId'], ['literal', puExcludedValue]],
               ],
               paint: {
                 'line-color': '#F00',
