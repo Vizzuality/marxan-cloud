@@ -142,6 +142,7 @@ export class Scenario extends TimeUserEntityMetadata {
   @Column('jsonb')
   metadata?: {
     marxanInputParameterFile?: Record<string, string | number>;
+    scenarioEditingMetadata?: Record<string, unknown>;
   };
 
   /**

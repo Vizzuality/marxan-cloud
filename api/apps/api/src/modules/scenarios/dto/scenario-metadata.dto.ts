@@ -60,4 +60,7 @@ export class MarxanParametersDto extends MarxanParameters {
 export class ScenarioMetadataDto {
   @ApiPropertyOptional()
   marxanInputParameterFile?: MarxanParametersDto;
+
+  @ApiPropertyOptional()
+  scenarioEditingMetadata?: Record<string, unknown>;
 }
