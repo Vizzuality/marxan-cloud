@@ -1,3 +1,5 @@
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
+
 export interface UseGeoJSONLayer {
   cache?: number;
   id: string;
@@ -33,7 +35,7 @@ export interface UsePUGridLayer {
   cache?: number;
   sid?: string;
   active?: boolean;
-  type: 'default' | 'protected-areas' | 'features' | 'analysis' | 'solutions';
-  subtype: 'protected-areas-preview' | 'protected-areas-percentage' | 'gap-analysis' | 'cost-surface' | 'adjust-planning-units';
+  type: ScenarioSidebarTabs;
+  subtype: ScenarioSidebarSubTabs;
   options?: Record<string, unknown>;
 }

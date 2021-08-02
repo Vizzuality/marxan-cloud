@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -16,6 +16,7 @@ import Pill from 'layout/pill';
 import AddFeatures from 'layout/scenarios/sidebar/features/add';
 import ListFeatures from 'layout/scenarios/sidebar/features/list';
 import TargetFeatures from 'layout/scenarios/sidebar/features/targets';
+import { ScenarioSidebarSubTabs } from 'layout/scenarios/sidebar/types';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -37,9 +38,11 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
 
   const queryClient = useQueryClient();
 
-  getScenarioSlice(sid);
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
   const {
@@ -201,13 +204,19 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
 
             {step === 0 && (
               <ListFeatures
-                onSuccess={() => setStep(step + 1)}
+                onSuccess={() => {
+                  setStep(step + 1);
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_FPF));
+                }}
               />
             )}
 
             {step === 1 && (
               <TargetFeatures
-                onBack={() => setStep(step - 1)}
+                onBack={() => {
+                  setStep(step - 1);
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
+                }}
                 onSuccess={() => push(`/projects/${pid}`)}
               />
             )}

@@ -182,7 +182,7 @@ export function usePUGridLayer({
               'line-opacity': 1,
             },
           },
-          ...type === 'analysis' && subtype === 'adjust-planning-units' && !!puIncludedValue ? [
+          ...type === 'analysis' && subtype === 'analysis-adjust-planning-units' && !!puIncludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
@@ -197,7 +197,7 @@ export function usePUGridLayer({
               },
             },
           ] : [],
-          ...type === 'analysis' && subtype === 'adjust-planning-units' && !!puExcludedValue ? [
+          ...type === 'analysis' && subtype === 'analysis-adjust-planning-units' && !!puExcludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',

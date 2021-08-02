@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { useScenario } from 'hooks/scenarios';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -28,14 +29,20 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   const { query } = useRouter();
   const { sid } = query;
 
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setSubTab } = scenarioSlice.actions;
+
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
-  }, []);
+    const subtab = s ? `analysis-${s}` : 'analysis-preview';
+    dispatch(setSubTab(subtab));
+  }, [dispatch, setSubTab]);
 
   useEffect(() => {
     return () => {

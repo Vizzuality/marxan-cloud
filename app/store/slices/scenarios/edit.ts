@@ -3,6 +3,7 @@ import { injectReducer } from 'store';
 
 interface ScenarioEditStateProps {
   tab: string,
+  subtab: string,
 
   // WDPA
   wdpaCategories: Record<string, any>;
@@ -23,6 +24,7 @@ interface ScenarioEditStateProps {
 
 const initialState = {
   tab: 'protected-areas',
+  subtab: 'protected-areas-preview',
 
   // WDPA
   wdpaCategories: {},
@@ -46,6 +48,9 @@ export function getScenarioSlice(id) {
     reducers: {
       setTab: (state, action: PayloadAction<string>) => {
         state.tab = action.payload;
+      },
+      setSubTab: (state, action: PayloadAction<string>) => {
+        state.subtab = action.payload;
       },
 
       // WDPA
