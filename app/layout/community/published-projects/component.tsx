@@ -1,16 +1,18 @@
 import React, { useEffect } from 'react';
 
-import { useDebouncedCallback } from 'use-debounce';
 import { useSelector, useDispatch } from 'react-redux';
+
+import { usePublishedProjects } from 'hooks/projects';
+
 import { setSearch } from 'store/slices/community/projects';
+import { useDebouncedCallback } from 'use-debounce';
+
+import Wrapper from 'layout/wrapper';
 
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import PublishedItem from 'components/projects/published-item';
 import Search from 'components/search';
-import Wrapper from 'layout/wrapper';
-
-import { usePublishedProjects } from 'hooks/projects';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -93,7 +95,7 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
               <tbody>
                 {publishedProjectsData.map((pp) => {
                   const {
-                    id: pid, name, description, planningArea, timesDuplicated, users,
+                    id: pid, name, description, area, timesDuplicated, contributors,
                   } = pp;
 
                   return (
@@ -102,8 +104,8 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
                       id={pid}
                       name={name}
                       description={description}
-                      area={planningArea}
-                      contributors={users}
+                      area={area}
+                      contributors={contributors}
                       timesDuplicated={timesDuplicated}
                     />
                   );
