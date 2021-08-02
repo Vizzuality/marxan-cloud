@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import useBottomScrollListener from 'hooks/scroll';
 import { useSolutions, useMostDifferentSolutions } from 'hooks/solutions';
 
-import { setSelectedSolution } from 'store/slices/solutions/details';
+import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { Button } from 'components/button/component';
 import Checkbox from 'components/forms/checkbox';
@@ -26,12 +26,16 @@ import { SolutionsTableFormProps } from './types';
 export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   bestSolutionId, onCancel, setShowTable,
 }: SolutionsTableFormProps) => {
-  const { selectedSolutionId } = useSelector((state) => state['/solutions/details']);
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
-  const [selectedSolution, onSelectSolution] = useState(selectedSolutionId || bestSolutionId);
   const { query } = useRouter();
   const { sid } = query;
   const dispatch = useDispatch();
+
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setSelectedSolution } = scenarioSlice.actions;
+
+  const { selectedSolutionId } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const [selectedSolution, onSelectSolution] = useState(selectedSolutionId || bestSolutionId);
 
   const {
     data,
@@ -69,7 +73,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   const onSave = useCallback(() => {
     dispatch(setSelectedSolution(selectedSolution));
     setShowTable(false);
-  }, [dispatch, selectedSolution, setShowTable]);
+  }, [dispatch, selectedSolution, setSelectedSolution, setShowTable]);
 
   return (
     <div className="text-gray-800">

@@ -22,7 +22,6 @@ export function getScenarioSlice(id) {
       setSelectedSolution: (state, action: PayloadAction<string>) => {
         state.selectedSolutionId = action.payload;
       },
-
     },
   });
 
