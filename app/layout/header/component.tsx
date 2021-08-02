@@ -19,7 +19,7 @@ import LOGO_SVG from 'svgs/logo.svg';
 export interface HeaderProps {
   published?: boolean;
   size: 'base' | 'lg',
-  theme?: 'base' | 'light',
+  theme?: 'dark' | 'light',
 }
 
 const SIZE = {
@@ -37,7 +37,7 @@ const SIZE = {
   },
 };
 
-export const Header: React.FC<HeaderProps> = ({ published = false, size, theme = 'base' }:HeaderProps) => {
+export const Header: React.FC<HeaderProps> = ({ published = false, size, theme = 'dark' }:HeaderProps) => {
   const { user } = useMe();
 
   return (
