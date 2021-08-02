@@ -16,7 +16,7 @@ export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
   values, frequencyOnMap, onToggleFrequencyOnMap,
 }: SolutionFrequencyProps) => {
   return (
-    <div className="w-full">
+    <div className="w-full pb-6">
       <div className="flex items-center justify-between pb-4">
         <p className="text-sm font-heading">Selection Frequency</p>
         <button
@@ -29,7 +29,7 @@ export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
         </button>
       </div>
       <LegendTypeGradient
-        className="text-sm text-gray-300"
+        className="h-3 text-sm text-gray-300 rounded-lg"
         items={values}
       />
     </div>
