@@ -31,6 +31,13 @@ export interface UseWDPAPreviewLayer {
   wdpaIucnCategories?: string[];
 }
 
+export interface UseFeaturePreviewLayer {
+  cache?: number;
+  active?: boolean;
+  bbox?: number[] | unknown;
+  id?: string;
+}
+
 export interface UsePUGridLayer {
   cache?: number;
   sid?: string;

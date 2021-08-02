@@ -1,7 +1,12 @@
 import { useMemo } from 'react';
 
 import {
-  UseAdminPreviewLayer, UseGeoJSONLayer, UsePUGridLayer, UsePUGridPreviewLayer, UseWDPAPreviewLayer,
+  UseAdminPreviewLayer,
+  UseFeaturePreviewLayer,
+  UseGeoJSONLayer,
+  UsePUGridLayer,
+  UsePUGridPreviewLayer,
+  UseWDPAPreviewLayer,
 } from './types';
 
 // GeoJSON
@@ -96,7 +101,7 @@ export function useWDPAPreviewLayer({
               ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
             ],
             paint: {
-              'fill-color': '#00BFFF',
+              'fill-color': '#00F',
             },
           },
           {
@@ -115,6 +120,41 @@ export function useWDPAPreviewLayer({
   }, [active, bbox, wdpaIucnCategories, cache]);
 }
 
+// PUGridpreview
+export function useFeaturePreviewLayer({
+  active, bbox, id, cache = 0,
+}: UseFeaturePreviewLayer) {
+  return useMemo(() => {
+    if (!active || !bbox) return null;
+
+    return {
+      id: `feature-preview-layer-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'fill',
+            'source-layer': 'layer0',
+            paint: {
+              'fill-color': '#FFCC00',
+            },
+          },
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-color': '#000',
+            },
+          },
+        ],
+      },
+    };
+  }, [active, bbox, id, cache]);
+}
 // PUGridpreview
 export function usePUGridPreviewLayer({
   active, bbox, planningUnitGridShape, planningUnitAreakm2, cache,

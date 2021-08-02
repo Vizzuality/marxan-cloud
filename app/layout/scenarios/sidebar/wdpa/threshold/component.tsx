@@ -206,7 +206,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                             style: 'percent',
                           }}
                           maxValue={1}
-                          minValue={0}
+                          minValue={0.01}
                           step={0.01}
                           onChange={(s) => {
                             flprops.input.onChange(s);

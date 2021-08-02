@@ -53,7 +53,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   if (!scenarioData || tab !== 'analysis') return null;
 
   return (
-    <div className="w-full h-full">
+    <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
       <HelpBeacon
         id="scenarios-analysis"
         title="Analysis"

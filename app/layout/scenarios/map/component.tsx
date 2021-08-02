@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useWDPAPreviewLayer, usePUGridLayer } from 'hooks/map';
+import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
@@ -62,6 +62,13 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     bbox,
   });
 
+  const FeaturepreviewLayer = useFeaturePreviewLayer({
+    id: 'a429cdee-c390-4948-83a7-7b0a5f428d53', // 'f40854fe-1fb4-4ec2-ae21-45d3409ee83b',
+    cache,
+    active: tab === 'features',
+    bbox,
+  });
+
   const PUGridLayer = usePUGridLayer({
     cache,
     active: true,
@@ -76,7 +83,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     },
   });
 
-  const LAYERS = [WDPApreviewLayer, PUGridLayer].filter((l) => !!l);
+  const LAYERS = [PUGridLayer, WDPApreviewLayer, FeaturepreviewLayer].filter((l) => !!l);
 
   useEffect(() => {
     setBounds({
