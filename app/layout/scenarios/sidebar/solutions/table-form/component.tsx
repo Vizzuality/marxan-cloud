@@ -126,7 +126,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
         {(allSolutionsFetched || mostDifSolutionsIsSelected) && (
           <SolutionsTable
             bestSolutionId={bestSolutionId}
-            body={mostDifSolutionsIsSelected ? mostDifSolutionsData.slice(0, 5) : data}
+            body={mostDifSolutionsIsSelected ? mostDifSolutionsData : data}
             selectedSolution={selectedSolution}
             onSelectSolution={(solution) => onSelectSolution(solution.id)}
           />
