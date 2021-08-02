@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect, useMemo, useState,
+  useCallback, useEffect, useState,
 } from 'react';
 
 // Map
@@ -16,8 +16,6 @@ import { useSession } from 'next-auth/client';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import Map from 'components/map';
-// import LAYERS from 'components/map/layers';
-
 // Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
@@ -41,7 +39,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { setPuIncludedValue, setPuExcludedValue } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const {
-    tab, cache, wdpaCategories, clicking, puAction, puIncludedValue, puExcludedValue,
+    tab, subtab, cache, wdpaCategories, clicking, puAction, puIncludedValue, puExcludedValue,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const minZoom = 2;
@@ -56,19 +54,12 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     bbox,
   });
 
-  const type = useMemo(() => {
-    if (tab === 'analysis') {
-      return 'adjust-planning-units';
-    }
-
-    return 'default';
-  }, [tab]);
-
   const PUGridLayer = usePUGridLayer({
     cache,
     active: true,
     sid: sid ? `${sid}` : null,
-    type,
+    type: tab,
+    subtype: subtab,
     options: {
       puAction,
       puIncludedValue,

@@ -33,6 +33,7 @@ export interface UsePUGridLayer {
   cache?: number;
   sid?: string;
   active?: boolean;
-  type: 'default' | 'proyected-areas' | 'adjust-planning-units';
+  type: 'default' | 'protected-areas' | 'features' | 'analysis' | 'solutions';
+  subtype: 'protected-areas-preview' | 'protected-areas-percentage' | 'gap-analysis' | 'cost-surface' | 'adjust-planning-units';
   options?: Record<string, unknown>;
 }

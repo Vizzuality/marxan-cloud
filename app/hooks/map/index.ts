@@ -147,7 +147,7 @@ export function usePUGridPreviewLayer({
 
 // PUGridpreview
 export function usePUGridLayer({
-  active, sid, type, options = {}, cache,
+  active, sid, type, subtype, options = {}, cache,
 }: UsePUGridLayer) {
   return useMemo(() => {
     if (!active || !sid) return null;
@@ -182,7 +182,7 @@ export function usePUGridLayer({
               'line-opacity': 1,
             },
           },
-          ...type === 'adjust-planning-units' && !!puIncludedValue ? [
+          ...type === 'analysis' && subtype === 'adjust-planning-units' && !!puIncludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
@@ -197,7 +197,7 @@ export function usePUGridLayer({
               },
             },
           ] : [],
-          ...type === 'adjust-planning-units' && !!puExcludedValue ? [
+          ...type === 'analysis' && subtype === 'adjust-planning-units' && !!puExcludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
@@ -215,5 +215,5 @@ export function usePUGridLayer({
         ],
       },
     };
-  }, [cache, active, sid, type, options]);
+  }, [cache, active, sid, type, subtype, options]);
 }
