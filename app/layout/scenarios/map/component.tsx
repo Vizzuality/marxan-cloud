@@ -39,7 +39,15 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { setPuIncludedValue, setPuExcludedValue } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const {
-    tab, subtab, cache, wdpaCategories, clicking, puAction, puIncludedValue, puExcludedValue,
+    tab,
+    subtab,
+    cache,
+    wdpaCategories,
+    wdpaThreshold,
+    clicking,
+    puAction,
+    puIncludedValue,
+    puExcludedValue,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const minZoom = 2;
@@ -50,7 +58,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
     cache,
-    active: tab === 'protected-areas',
+    active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
     bbox,
   });
 
@@ -61,6 +69,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     type: tab,
     subtype: subtab,
     options: {
+      wdpaThreshold,
       puAction,
       puIncludedValue,
       puExcludedValue,
@@ -108,17 +117,17 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
 
       if (pUGridLayer) {
         const { properties } = pUGridLayer;
-        const { pugeomid } = properties;
+        const { test_id: testId } = properties;
 
         const newClickingValue = puAction === 'include' ? [...puIncludedValue] : [...puExcludedValue];
         const newAction = puAction === 'include' ? setPuIncludedValue : setPuExcludedValue;
 
-        const index = newClickingValue.findIndex((s) => s === pugeomid);
+        const index = newClickingValue.findIndex((s) => s === testId);
 
         if (index > -1) {
           newClickingValue.splice(index, 1);
         } else {
-          newClickingValue.push(pugeomid);
+          newClickingValue.push(testId);
         }
 
         dispatch(newAction(newClickingValue));

@@ -37,5 +37,10 @@ export interface UsePUGridLayer {
   active?: boolean;
   type: ScenarioSidebarTabs;
   subtype: ScenarioSidebarSubTabs;
-  options?: Record<string, unknown>;
+  options?: {
+    wdpaThreshold?: number;
+    puAction?: string;
+    puIncludedValue?: string[];
+    puExcludedValue?: string[];
+  };
 }

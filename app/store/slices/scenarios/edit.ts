@@ -7,6 +7,7 @@ interface ScenarioEditStateProps {
 
   // WDPA
   wdpaCategories: Record<string, any>;
+  wdpaThreshold: number;
 
   // ADJUST PLANNING UNITS
   cache: number;
@@ -28,6 +29,7 @@ const initialState = {
 
   // WDPA
   wdpaCategories: {},
+  wdpaThreshold: 0.75,
 
   // ADJUST PLANNING UNITS
   cache: Date.now(),
@@ -56,6 +58,9 @@ export function getScenarioSlice(id) {
       // WDPA
       setWDPACategories: (state, action: PayloadAction<Record<string, object>>) => {
         state.wdpaCategories = action.payload;
+      },
+      setWDPAThreshold: (state, action: PayloadAction<number>) => {
+        state.wdpaThreshold = action.payload;
       },
 
       // ADJUST PLANNING UNITS

@@ -153,6 +153,7 @@ export function usePUGridLayer({
     if (!active || !sid) return null;
 
     const {
+      wdpaThreshold = 0,
       puIncludedValue,
       puExcludedValue,
     } = options;
@@ -182,13 +183,32 @@ export function usePUGridLayer({
               'line-opacity': 1,
             },
           },
+          ...type === 'protected-areas' && subtype === 'protected-areas-percentage' ? [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-color': '#00F',
+                'fill-opacity': [
+                  'case',
+                  ['all',
+                    ['has', 'percentageProtected'],
+                    ['>=', ['get', 'percentageProtected'], wdpaThreshold * 100],
+                  ],
+                  0.5,
+                  0,
+                ],
+              },
+            },
+          ] : [],
+
           ...type === 'analysis' && subtype === 'analysis-adjust-planning-units' && !!puIncludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
               filter: [
                 'all',
-                ['in', ['get', 'pugeomid'], ['literal', puIncludedValue]],
+                ['in', ['get', 'test_id'], ['literal', puIncludedValue]],
               ],
               paint: {
                 'line-color': '#0F0',
@@ -203,7 +223,7 @@ export function usePUGridLayer({
               'source-layer': 'layer0',
               filter: [
                 'all',
-                ['in', ['get', 'pugeomid'], ['literal', puExcludedValue]],
+                ['in', ['get', 'test_id'], ['literal', puExcludedValue]],
               ],
               paint: {
                 'line-color': '#F00',
