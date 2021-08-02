@@ -1,9 +1,10 @@
 import React, { ReactNode, useCallback, useState } from 'react';
+
 import cx from 'classnames';
 
 import Button from 'components/button';
-import ProgressBar from 'components/progress-bar';
 import Icon from 'components/icon';
+import ProgressBar from 'components/progress-bar';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
 import WARNING_SVG from 'svgs/ui/warning.svg?sprite';
@@ -150,7 +151,7 @@ export const Item: React.FC<ItemProps> = ({
           className={cx({
             'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl focus:outline-blue': true,
             'rounded-br-none': settings,
-            'text-primary-500': status === 'completed',
+            'text-primary-500 cursor-pointer': status === 'completed',
             'text-gray-400 pointer-events-none': status !== 'completed',
           })}
         >

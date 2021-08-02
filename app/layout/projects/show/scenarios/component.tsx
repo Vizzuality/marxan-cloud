@@ -1,33 +1,36 @@
 import React, { Fragment, useCallback, useState } from 'react';
-import cx from 'classnames';
 
 import { useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
-import { useProject } from 'hooks/projects';
+
 import { useRouter } from 'next/router';
+
+import { useProject } from 'hooks/projects';
 import {
   useDeleteScenario, useScenarios, useScenariosStatus, useDuplicateScenario,
 } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
 import useBottomScrollListener from 'hooks/scroll';
+import { useToasts } from 'hooks/toast';
 
+import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
+import HelpBeacon from 'layout/help/beacon';
+import ScenarioSettings from 'layout/projects/show/scenarios/settings';
+import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
+import ScenarioTypes from 'layout/projects/show/scenarios/types';
+
 import Button from 'components/button';
-import Icon from 'components/icon';
-import Modal from 'components/modal';
-import Loading from 'components/loading';
 import ConfirmationPrompt from 'components/confirmation-prompt';
+import Icon from 'components/icon';
+import Loading from 'components/loading';
+import Modal from 'components/modal';
 import ScenarioItem from 'components/scenarios/item';
 
-import ScenarioTypes from 'layout/projects/show/scenarios/types';
-import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
-import ScenarioSettings from 'layout/projects/show/scenarios/settings';
-import HelpBeacon from 'layout/help/beacon';
-
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
-import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
+
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
+import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 export interface ProjectScenariosProps {
 }
