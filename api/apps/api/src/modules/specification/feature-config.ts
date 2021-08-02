@@ -19,10 +19,3 @@ export interface FeatureConfig extends FeatureConfigInput {
   featuresDetermined: boolean;
   resultFeatures: FeatureState[];
 }
-
-// export class FeatureConfig {
-//   constructor(
-//     public readonly determined: boolean,
-//     resultFeatures?: FeatureState[],
-//   ) {}
-// }
