@@ -75,7 +75,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   return (
     <motion.div
       key="details"
-      className="flex flex-col items-start justify-start min-h-0 overflow-hidden"
+      className="flex flex-col items-start justify-start flex-grow min-h-0 overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -93,7 +93,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
         </button>
       </header>
 
-      <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden text-sm">
+      <div className="relative flex flex-col w-full mt-1 text-sm">
         <p className="py-4 opacity-50">Description Lorem ipsum dolor sit amet, solutions consectetuer adipiscing elit.</p>
         <Button
           theme="primary"

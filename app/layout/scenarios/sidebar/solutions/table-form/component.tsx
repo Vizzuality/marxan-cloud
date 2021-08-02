@@ -123,24 +123,14 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           </div>
         )}
 
-        {allSolutionsFetched && (
+        {(allSolutionsFetched || mostDifSolutionsIsSelected) && (
           <SolutionsTable
             bestSolutionId={bestSolutionId}
-            body={data}
+            body={mostDifSolutionsIsSelected ? mostDifSolutionsData.slice(0, 5) : data}
             selectedSolution={selectedSolution}
             onSelectSolution={(solution) => onSelectSolution(solution.id)}
           />
         )}
-
-        {mostDifSolutionsIsSelected && (
-          <SolutionsTable
-            bestSolutionId={bestSolutionId}
-            body={mostDifSolutionsData.slice(0, 5)}
-            selectedSolution={selectedSolution}
-            onSelectSolution={(solution) => onSelectSolution(solution.id)}
-          />
-        )}
-
         <LoadingMore visible={isFetchingNextPage} />
       </div>
       <div className="flex items-center justify-center w-full pt-8">
