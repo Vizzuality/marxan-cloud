@@ -315,15 +315,21 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 
       return pageData.map((d):PublishedItemProps => {
         const {
-          id, name, description, area, timesDuplicated,
+          id, name, description, planningAreaName, timesDuplicated,
         } = d;
+
+        const contributors = [
+          { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
+          { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
+        ];
 
         return {
           id,
           name,
-          area,
+          area: planningAreaName,
           description,
           timesDuplicated,
+          contributors,
         };
       });
     })) : [];
