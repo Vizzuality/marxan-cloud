@@ -42,26 +42,17 @@ export const HomeCarousel: React.FC<HomeCarouselProps> = () => {
     >
       <div
         role="presentation"
+        className="absolute top-0 left-0 w-full bg-center bg-cover"
         style={{
           backgroundImage: `url(${BackgroundImage})`,
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
-          position: 'absolute',
-          top: '0',
-          right: '0',
           height: '70%',
-          width: '100%',
         }}
       />
       <div
         role="presentation"
+        className="absolute bottom-0 left-0 w-full bg-gray-700"
         style={{
-          background: '#151515',
-          position: 'absolute',
-          bottom: '0',
-          right: '0',
           height: '30%',
-          width: '100%',
         }}
       />
       <Wrapper>
