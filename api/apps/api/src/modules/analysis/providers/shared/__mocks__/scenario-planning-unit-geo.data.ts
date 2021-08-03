@@ -12,6 +12,6 @@ export const validDataWithGivenPuIds = (
     lockStatus: LockStatus.Unstated,
     planningUnitMarxanId: index++,
     scenarioId,
-    puGeometryId: id,
-    id: v4(),
+    puGeometryId: v4(),
+    id: id,
   }));
