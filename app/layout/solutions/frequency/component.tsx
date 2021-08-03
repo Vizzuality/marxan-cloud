@@ -29,7 +29,10 @@ export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
         </button>
       </div>
       <LegendTypeGradient
-        className="h-3 text-sm text-gray-300 rounded-lg"
+        className={{
+          bar: 'h-3 rounded-lg',
+          labels: 'text-sm text-gray-300',
+        }}
         items={values}
       />
     </div>
