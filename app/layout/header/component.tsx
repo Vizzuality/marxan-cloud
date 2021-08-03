@@ -66,7 +66,11 @@ export const Header: React.FC<HeaderProps> = ({ published = false, size, theme =
           )}
 
           <div
-            className="flex items-center space-x-1 divide-x divide-gray-500 md:space-x-5"
+            className={classnames({
+              'flex items-center space-x-1 md:space-x-5': true,
+              'divide-x divide-gray-500': theme === 'dark',
+              'divide-x divide-gray-200': theme === 'light',
+            })}
             style={{
               height: SIZE[size].logo.height + 10,
             }}

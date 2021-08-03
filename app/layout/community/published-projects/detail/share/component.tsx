@@ -59,7 +59,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
       <div className="space-y-5">
         <button
           type="button"
-          className="flex flex-row"
+          className="flex flex-row hover:underline"
           onClick={handleCopy}
         >
           <Icon icon={LINK_SVG} className="w-5 h-5 mr-2.5 text-black" />
@@ -67,7 +67,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
         </button>
 
         <a
-          className="flex flex-row"
+          className="flex flex-row hover:underline"
           type="button"
           role="button"
           href={`https://twitter.com/intent/tweet?url=${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
@@ -79,7 +79,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
         </a>
 
         <a
-          className="flex flex-row"
+          className="flex flex-row hover:underline"
           type="button"
           role="button"
           href={`https://www.facebook.com/sharer/sharer.php?u=${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
