@@ -45,6 +45,9 @@ export interface UseFeaturePreviewLayers {
   active?: boolean;
   bbox?: number[] | unknown;
   features?: SelectedItemProps[];
+  options?: {
+    featureHoverId?: string;
+  };
 }
 
 export interface UsePUGridLayer {

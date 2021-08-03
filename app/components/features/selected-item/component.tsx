@@ -1,15 +1,16 @@
 import React, { useCallback, useMemo } from 'react';
+
 import cx from 'classnames';
 
-import Icon from 'components/icon';
 import Button from 'components/button';
-import Select from 'components/forms/select';
 import Checkbox from 'components/forms/checkbox';
+import Select from 'components/forms/select';
+import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
-import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
+import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 
 export interface ItemProps {
   id: string | number;
@@ -40,7 +41,9 @@ export interface ItemProps {
     value: string;
   }[];
   onIntersectSelected?: (id: string) => void;
-  onRemove?: (value) => void
+  onRemove?: (value) => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -62,6 +65,8 @@ export const Item: React.FC<ItemProps> = ({
 
   onIntersectSelected,
   onRemove,
+  onMouseEnter,
+  onMouseLeave,
 }: ItemProps) => {
   // EVENTS
   const onSplitChanged = useCallback(
@@ -107,6 +112,8 @@ export const Item: React.FC<ItemProps> = ({
         'bg-gray-700 text-white': true,
         [className]: !!className,
       })}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <header
         className={cx({
@@ -173,7 +180,7 @@ export const Item: React.FC<ItemProps> = ({
 
         {type === 'species' && (
           <div>
-            <div className="flex items-center mt-3 tracking-wide font-heading space-x-2">
+            <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-yellow-300" />
               <h4 className="ml-2 text-xs text-white uppercase">
                 You can
@@ -206,6 +213,7 @@ export const Item: React.FC<ItemProps> = ({
                 size="s"
                 onClick={() => {
                   onIntersectChanged(id);
+                  onMouseLeave();
                 }}
               >
                 <div className="flex items-center">

@@ -11,10 +11,11 @@ import { useSelectedFeatures } from 'hooks/features';
 import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import Map from 'components/map';
 // Controls
@@ -47,8 +48,13 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     tab,
     subtab,
     cache,
+    // WDPA
     wdpaCategories,
     wdpaThreshold,
+
+    // Features
+    featureHoverId,
+    // Adjust planning units
     clicking,
     puAction,
     puIncludedValue,
@@ -72,6 +78,9 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     cache,
     active: tab === 'features',
     bbox,
+    options: {
+      featureHoverId,
+    },
   });
 
   const PUGridLayer = usePUGridLayer({

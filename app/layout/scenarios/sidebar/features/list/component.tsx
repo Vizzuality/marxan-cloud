@@ -1,18 +1,24 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import cx from 'classnames';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useQueryClient } from 'react-query';
+import { useDispatch } from 'react-redux';
 
-import Button from 'components/button';
-import Loading from 'components/loading';
-import Modal from 'components/modal';
-import Item from 'components/features/selected-item';
+import { useRouter } from 'next/router';
+
+import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+
+import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
+import cx from 'classnames';
+import { useDebouncedCallback } from 'use-debounce/lib';
 
 import IntersectFeatures from 'layout/scenarios/sidebar/features/intersect';
 
-import { useQueryClient } from 'react-query';
-import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
-import { useRouter } from 'next/router';
+import Button from 'components/button';
+import Item from 'components/features/selected-item';
+import Loading from 'components/loading';
+import Modal from 'components/modal';
 
 export interface ScenariosFeaturesListProps {
   onSuccess: () => void
@@ -25,6 +31,11 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   const [intersecting, setIntersecting] = useState(null);
   const { query } = useRouter();
   const { pid, sid } = query;
+
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setFeatureHoverId } = scenarioSlice.actions;
+
+  const dispatch = useDispatch();
 
   const queryClient = useQueryClient();
 
@@ -160,6 +171,14 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     });
   }, [sid, getFeaturesRecipe, selectedFeaturesMutation]);
 
+  const onEnter = useDebouncedCallback((id) => {
+    dispatch(setFeatureHoverId(id));
+  }, 500);
+
+  const onLeave = useDebouncedCallback(() => {
+    dispatch(setFeatureHoverId(null));
+  }, 500);
+
   const onSubmit = useCallback((values) => {
     const { features } = values;
     const data = getFeaturesRecipe(features);
@@ -234,6 +253,12 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                               }}
                               onRemove={() => {
                                 onRemove(item.id, input);
+                              }}
+                              onMouseEnter={() => {
+                                onEnter(item.id);
+                              }}
+                              onMouseLeave={() => {
+                                onLeave();
                               }}
                             />
 

@@ -76,6 +76,7 @@ module.exports = {
           {
             pattern: 'store/**',
             group: 'external',
+            position: 'before',
           },
           {
             pattern: 'layout/**',

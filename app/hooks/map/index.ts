@@ -159,7 +159,7 @@ export function useFeaturePreviewLayer({
 }
 
 export function useFeaturePreviewLayers({
-  active, bbox, features, cache = 0,
+  active, bbox, features, cache = 0, options = {},
 }: UseFeaturePreviewLayers) {
   const COLORS = useMemo(() => {
     return {
@@ -171,38 +171,44 @@ export function useFeaturePreviewLayers({
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
 
-    return features.map((f) => {
-      const { id, type } = f;
+    const { featureHoverId } = options;
 
-      return {
-        id: `feature-${id}-preview-layer-${cache}`,
-        type: 'vector',
-        source: {
+    const currentFeatureHoverIndex = features.findIndex((f) => f.id === featureHoverId);
+    features.splice(0, 0, features.splice(currentFeatureHoverIndex, 1)[0]);
+
+    return features
+      .map((f) => {
+        const { id, type } = f;
+
+        return {
+          id: `feature-${id}-preview-layer-${cache}`,
           type: 'vector',
-          tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
-        },
-        render: {
-          layers: [
-            {
-              type: 'fill',
-              'source-layer': 'layer0',
-              paint: {
-                'fill-color': COLORS[type],
-                'fill-opacity': 0.5,
+          source: {
+            type: 'vector',
+            tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
+          },
+          render: {
+            layers: [
+              {
+                type: 'fill',
+                'source-layer': 'layer0',
+                paint: {
+                  'fill-color': featureHoverId === id ? '#FF9900' : COLORS[type],
+                  'fill-opacity': featureHoverId === id ? 1 : 0.5,
+                },
               },
-            },
-            {
-              type: 'line',
-              'source-layer': 'layer0',
-              paint: {
-                'line-color': '#000',
+              {
+                type: 'line',
+                'source-layer': 'layer0',
+                paint: {
+                  'line-color': '#000',
+                },
               },
-            },
-          ],
-        },
-      };
-    });
-  }, [active, bbox, features, cache, COLORS]);
+            ],
+          },
+        };
+      });
+  }, [active, bbox, features, cache, options, COLORS]);
 }
 
 // PUGridpreview

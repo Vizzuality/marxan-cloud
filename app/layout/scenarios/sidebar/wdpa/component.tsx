@@ -8,8 +8,9 @@ import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import { motion } from 'framer-motion';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
+import { motion } from 'framer-motion';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';

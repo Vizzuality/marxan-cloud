@@ -9,6 +9,9 @@ interface ScenarioEditStateProps {
   wdpaCategories: Record<string, any>;
   wdpaThreshold: number;
 
+  // FEATURES
+  featureHoverId: string;
+
   // ADJUST PLANNING UNITS
   cache: number;
   puAction: string;
@@ -30,6 +33,9 @@ const initialState = {
   // WDPA
   wdpaCategories: {},
   wdpaThreshold: 0.75,
+
+  // FEATURES
+  featureHoverId: null,
 
   // ADJUST PLANNING UNITS
   cache: Date.now(),
@@ -61,6 +67,11 @@ export function getScenarioSlice(id) {
       },
       setWDPAThreshold: (state, action: PayloadAction<number>) => {
         state.wdpaThreshold = action.payload;
+      },
+
+      // FEATURES
+      setFeatureHoverId: (state, action: PayloadAction<string>) => {
+        state.featureHoverId = action.payload;
       },
 
       // ADJUST PLANNING UNITS
