@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
+import { PlanningUnit } from 'types/project-model';
+
 import Label from 'components/forms/label';
 import InfoButton from 'components/info-button';
 
-import { PlanningUnit } from 'types/project-model';
-
 import PlanningUnitButton from './planning-unit-button/component';
-import { PlanningUnitGridProps } from './types';
 import { PlanningUnitButtonSizeProps } from './planning-unit-button/types';
+import { PlanningUnitGridProps } from './types';
 
 export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
   unit,

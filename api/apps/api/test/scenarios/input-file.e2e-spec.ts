@@ -54,7 +54,29 @@ describe(`when a user updates scenario with input data`, () => {
         '_CLOUD_GENERATED_AT __ISO_DATE__',
       ),
     ).toMatchInlineSnapshot(`
-      "PROP 1.5
+      "INPUTDIR input
+      PUNAME pu.dat
+      SPECNAME spec.dat
+      PUVSPRNAME puvspr.dat
+      BOUNDNAME bound.dat
+      OUTPUTDIR output
+      _CLOUD_SCENARIO Save the world species
+      _CLOUD_PROJECT Humanity for living.
+      _CLOUD_ORGANIZATION Fresh Alaska array
+      _CLOUD_GENERATED_AT __ISO_DATE__
+      VERBOSITY 2
+      SAVESOLUTIONSMATRIX 3
+      SAVERUN 3
+      SAVEBEST 3
+      SAVESUMMARY 3
+      SAVESCEN 3
+      SAVETARGMET 3
+      SAVESUMSOLN 3
+      SAVELOG 3
+      SAVESNAPSTEPS 0
+      SAVESNAPCHANGES 0
+      SAVESNAPFREQUENCY 0
+      PROP 1.5
       COOLFAC 5
       NUMITNS 1000003
       NUMTEMP 10006
@@ -69,16 +91,7 @@ describe(`when a user updates scenario with input data`, () => {
       COSTTHRESH 7
       THRESHPEN1 8
       THRESHPEN2 9
-      _CLOUD_SCENARIO Save the world species
-      _CLOUD_PROJECT Humanity for living.
-      _CLOUD_ORGANIZATION Fresh Alaska array
-      _CLOUD_GENERATED_AT __ISO_DATE__
-      INPUTDIR input
-      PUNAME pu.dat
-      SPECNAME spec.dat
-      PUVSPRNAME puvspr.dat
-      BOUNDNAME bound.dat
-      OUTPUTDIR output"
+      "
     `);
   });
 });

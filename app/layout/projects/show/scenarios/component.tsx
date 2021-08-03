@@ -237,8 +237,8 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                       key={`${s.id}`}
                       {...i === 0 && {
                         id: `project-scenario-${s.id}`,
-                        title: 'Scenarios list',
-                        subtitle: 'project detail',
+                        title: 'Scenario list',
+                        subtitle: 'List and detail overview',
                         content: (
                           <div>
                             Here you can see listed all the scenarios under the same project.

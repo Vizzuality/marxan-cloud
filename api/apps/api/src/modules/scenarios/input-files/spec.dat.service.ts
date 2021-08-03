@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { Repository } from 'typeorm';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { SpecDataTsvFile } from './spec-dat-tsv-file';
 
 @Injectable()
 export class SpecDatService {
@@ -20,23 +21,12 @@ export class SpecDatService {
         featureId: 'ASC',
       },
     });
-    return (
-      'id\ttarget\tprop\tspf\ttarget2\ttargetocc\tname\tsepnum\tsepdistance\n' +
-      rows
-        .map((row) =>
-          [
-            row.featureId,
-            (row.target ?? 0.0).toFixed(2),
-            (row.prop ?? 0.0).toFixed(2),
-            row.fpf.toFixed(2),
-            row.target2 ?? '',
-            row.targetocc ?? 0.0,
-            '',
-            row.sepNum ?? '',
-            row.metadata?.sepdistance ?? '',
-          ].join('\t'),
-        )
-        .join('\n')
-    );
+
+    const specDatFile = new SpecDataTsvFile();
+    for (const row of rows) {
+      specDatFile.addRow(row);
+    }
+
+    return specDatFile.toString();
   }
 }

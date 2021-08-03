@@ -11,7 +11,7 @@ export const AnalysisAdjustTabs: React.FC<AnalysisAdjustTabsProps> = ({
   onChange,
 }: AnalysisAdjustTabsProps) => {
   return (
-    <div className="flex w-full space-x-8 border-t border-gray-500 mt-2.5">
+    <div className="flex w-full space-x-8">
       <button
         type="button"
         className={cx({

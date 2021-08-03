@@ -136,72 +136,99 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       initialValues={INITIAL_VALUES}
     >
       {({ values, handleSubmit }) => (
-        <form onSubmit={handleSubmit} autoComplete="off" className="relative w-full">
-          {/* WDPA */}
-          <div>
-            <FieldRFF
-              name="wdpaThreshold"
-              validate={composeValidators([{ presence: true }])}
-            >
-              {(flprops) => (
-                <Field id="scenario-wdpaThreshold" {...flprops}>
-                  <div className="flex items-center mb-3">
-                    <Label ref={labelRef} theme="dark" className="mr-3 uppercase">Set the threshold for protected areas</Label>
-                    <InfoButton>
-                      <div>
-                        <h4 className="font-heading text-lg mb-2.5">Thresholding</h4>
-                        <img src={THRESHOLDING_IMG} alt="Thresholding" />
-                      </div>
-                    </InfoButton>
-                  </div>
+        <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow w-full overflow-hidden">
+          <div className="relative flex flex-col flex-grow overflow-hidden">
+            <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
-                  <p
-                    className="mb-3 text-sm text-gray-400"
+            <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
+              <div className="py-6">
+                {/* WDPA */}
+                <div>
+                  <FieldRFF
+                    name="wdpaThreshold"
+                    validate={composeValidators([{ presence: true }])}
                   >
-                    Refers to what percentage of a planning unit must
-                    {' '}
-                    be covered by a protected area to be considered “protected”.
-                  </p>
+                    {(flprops) => (
+                      <Field id="scenario-wdpaThreshold" {...flprops}>
+                        <div className="flex items-center mb-3">
+                          <Label ref={labelRef} theme="dark" className="mr-3 uppercase">Set the threshold for protected areas</Label>
+                          <InfoButton>
+                            <div>
+                              <h4 className="font-heading text-lg mb-2.5">What is a threshold?</h4>
+                              <div>
+                                Inside Marxan, planning units are considered as either
+                                protected
+                                or not protected. The threshold value represents a
+                                percentage of the area
+                                inside a planning unit. By setting the threshold you decide
+                                how much of a protected area needs to fall inside a
+                                planning unit to consider the whole planning unit
+                                as &quot;protected&quot;.
+                                <br />
+                                <br />
 
-                  <Slider
-                    labelRef={labelRef}
-                    theme="dark"
-                    defaultValue={values.wdpaThreshold}
-                    formatOptions={{
-                      style: 'percent',
-                    }}
-                    maxValue={1}
-                    minValue={0}
-                    step={0.01}
-                    disabled={readOnly}
-                  />
-                </Field>
-              )}
-            </FieldRFF>
-          </div>
+                                The following
+                                image shows an example setting a threshold of 50%:
+                                <br />
+                                <br />
+                              </div>
 
-          <div className="mt-10">
-            <h3 className="text-sm">Selected protected areas:</h3>
+                              <img src={THRESHOLDING_IMG} alt="Thresholding" />
+                            </div>
+                          </InfoButton>
+                        </div>
 
-            <div className="flex flex-wrap mt-2.5">
-              {INITIAL_VALUES.wdpaIucnCategories && INITIAL_VALUES.wdpaIucnCategories.map((w) => {
-                const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
+                        <p
+                          className="mb-3 text-sm text-gray-300"
+                        >
+                          Refers to what percentage of a planning unit must
+                          {' '}
+                          be covered by a protected area to be considered “protected”.
+                        </p>
 
-                return (
-                  <div
-                    key={`${wdpa.value}`}
-                    className="flex mb-2.5 mr-5"
-                  >
-                    <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
-                      {wdpa.label}
-                    </span>
+                        <Slider
+                          labelRef={labelRef}
+                          theme="dark"
+                          defaultValue={values.wdpaThreshold}
+                          formatOptions={{
+                            style: 'percent',
+                          }}
+                          maxValue={1}
+                          minValue={0}
+                          step={0.01}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
+
+                <div className="mt-10">
+                  <h3 className="text-sm">Selected protected areas:</h3>
+
+                  <div className="flex flex-wrap mt-2.5">
+                    {INITIAL_VALUES.wdpaIucnCategories
+                    && INITIAL_VALUES.wdpaIucnCategories.map((w) => {
+                      const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
+
+                      return (
+                        <div
+                          key={`${wdpa.value}`}
+                          className="flex mb-2.5 mr-5"
+                        >
+                          <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
+                            {wdpa.label}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                </div>
+              </div>
             </div>
+            <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
           </div>
 
-          <div className="flex justify-center mt-20 space-x-4">
+          <div className="flex justify-center mt-5 space-x-4">
             <Button theme="secondary" size="lg" type="button" className="relative px-20" disabled={submitting} onClick={onBack}>
               <span>Back</span>
             </Button>

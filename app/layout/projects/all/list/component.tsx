@@ -1,17 +1,18 @@
 import React, { useCallback, useState } from 'react';
-import cx from 'classnames';
 
 import { useSelector } from 'react-redux';
 
-import Wrapper from 'layout/wrapper';
-import HelpBeacon from 'layout/help/beacon';
-
-import Loading from 'components/loading';
-import ConfirmationPrompt from 'components/confirmation-prompt';
-import Item from 'components/projects/item';
-
 import { useProjects, useDeleteProject, useDuplicateProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
+
+import cx from 'classnames';
+
+import HelpBeacon from 'layout/help/beacon';
+import Wrapper from 'layout/wrapper';
+
+import ConfirmationPrompt from 'components/confirmation-prompt';
+import Loading from 'components/loading';
+import Item from 'components/projects/item';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 

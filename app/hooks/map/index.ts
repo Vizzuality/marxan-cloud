@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import {
   UseAdminPreviewLayer, UseGeoJSONLayer, UsePUGridLayer, UsePUGridPreviewLayer, UseWDPAPreviewLayer,
 } from './types';
@@ -152,15 +153,9 @@ export function usePUGridLayer({
     if (!active || !sid) return null;
 
     const {
-      clickingValue,
-      puAction,
+      puIncludedValue,
+      puExcludedValue,
     } = options;
-
-    const LOCKIN_STATUS = [
-      { id: 0, color: '#FF0' },
-      { id: 1, color: '#0F0' },
-      { id: 2, color: '#F00' },
-    ];
 
     return {
       id: `pu-grid-layer-${cache}`,
@@ -187,39 +182,33 @@ export function usePUGridLayer({
               'line-opacity': 1,
             },
           },
-          ...type === 'adjust-planning-units' ? LOCKIN_STATUS.map((s, i) => (
+          ...type === 'adjust-planning-units' && !!puIncludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
               filter: [
                 'all',
-                ['==', ['get', 'lockinstatus'], s.id],
+                ['in', ['get', 'pugeomid'], ['literal', puIncludedValue]],
               ],
               paint: {
-                'line-color': s.color,
+                'line-color': '#0F0',
                 'line-opacity': 1,
                 'line-width': 2,
               },
-              layout: {
-                'line-sort-key': i * 10,
-              },
-            }
-          )) : [],
-          ...type === 'adjust-planning-units' ? [
+            },
+          ] : [],
+          ...type === 'adjust-planning-units' && !!puExcludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
               filter: [
                 'all',
-                ['in', ['get', 'pugeomid'], ['literal', clickingValue]],
+                ['in', ['get', 'pugeomid'], ['literal', puExcludedValue]],
               ],
               paint: {
-                'line-color': puAction === 'include' ? '#0F0' : '#F00',
+                'line-color': '#F00',
                 'line-opacity': 1,
                 'line-width': 2,
-              },
-              layout: {
-                'line-sort-key': 100,
               },
             },
           ] : [],

@@ -17,6 +17,8 @@ export enum API_EVENT_KINDS {
   scenario__run__submitted__v1__alpha1 = 'scenario.run.submitted/v1alpha',
   scenario__run__progress__v1__alpha1 = 'scenario.run.progress/v1alpha',
   scenario__run__failed__v1__alpha1 = 'scenario.run.failed/v1alpha',
+  scenario__run__outputSaved__v1__alpha1 = 'scenario.run.outputSaved/v1alpha',
+  scenario__run__outputSaveFailed__v1__alpha1 = 'scenario.run.outputSaveFailed/v1alpha',
   scenario__run__finished__v1__alpha1 = 'scenario.run.finished/v1alpha',
   project__protectedAreas__submitted__v1__alpha = 'project.protectedAreas.submitted/v1/alpha',
   project__protectedAreas__finished__v1__alpha = 'project.protectedAreas.finished/v1/alpha',

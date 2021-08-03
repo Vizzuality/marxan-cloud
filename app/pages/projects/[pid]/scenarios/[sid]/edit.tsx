@@ -3,6 +3,7 @@ import React from 'react';
 import { withProtection, withUser } from 'hoc/auth';
 
 import Header from 'layout/header';
+import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
 import ScenariosMap from 'layout/scenarios/map';
@@ -23,6 +24,8 @@ const EditScenarioPage: React.FC = () => {
       <Title title="Edit" />
 
       <MetaIcons />
+
+      <Help />
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />

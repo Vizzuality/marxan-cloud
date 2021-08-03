@@ -1,18 +1,19 @@
-import flatten from 'lodash/flatten';
 import { useMemo } from 'react';
+
 import {
   useInfiniteQuery, useMutation, useQuery, useQueryClient,
 } from 'react-query';
-import { useSession } from 'next-auth/client';
+
 import { useRouter } from 'next/router';
 
 import { formatDistance } from 'date-fns';
+import flatten from 'lodash/flatten';
+import { useSession } from 'next-auth/client';
+import PROJECTS from 'services/projects';
+import UPLOADS from 'services/uploads';
 
 import { ItemProps } from 'components/projects/item/component';
 import { PublishedItemProps } from 'components/projects/published-item/component';
-
-import PROJECTS from 'services/projects';
-import UPLOADS from 'services/uploads';
 
 import {
   UseProjectsOptionsProps,
@@ -314,15 +315,21 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 
       return pageData.map((d):PublishedItemProps => {
         const {
-          id, name, description, area, timesDuplicated,
+          id, name, description, planningAreaName, timesDuplicated,
         } = d;
+
+        const contributors = [
+          { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
+          { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
+        ];
 
         return {
           id,
           name,
-          area,
+          area: planningAreaName,
           description,
           timesDuplicated,
+          contributors,
         };
       });
     })) : [];

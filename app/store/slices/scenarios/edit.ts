@@ -10,8 +10,9 @@ interface ScenarioEditStateProps {
   // ADJUST PLANNING UNITS
   cache: number;
   puAction: string;
+  puIncludedValue: string[];
+  puExcludedValue: string[];
   clicking: boolean;
-  clickingValue: string[];
 
   drawing: string;
   drawingValue: Record<string, object>;
@@ -30,7 +31,8 @@ const initialState = {
   cache: Date.now(),
   puAction: 'include',
   clicking: false,
-  clickingValue: [],
+  puIncludedValue: [],
+  puExcludedValue: [],
   drawing: null,
   drawingValue: null,
   uploading: false,
@@ -58,11 +60,14 @@ export function getScenarioEditSlice(id) {
       setPUAction: (state, action: PayloadAction<string>) => {
         state.puAction = action.payload;
       },
+      setPuIncludedValue: (state, action: PayloadAction<string[]>) => {
+        state.puIncludedValue = action.payload;
+      },
+      setPuExcludedValue: (state, action: PayloadAction<string[]>) => {
+        state.puExcludedValue = action.payload;
+      },
       setClicking: (state, action: PayloadAction<boolean>) => {
         state.clicking = action.payload;
-      },
-      setClickingValue: (state, action: PayloadAction<string[]>) => {
-        state.clickingValue = action.payload;
       },
       setDrawing: (state, action: PayloadAction<string>) => {
         state.drawing = action.payload;

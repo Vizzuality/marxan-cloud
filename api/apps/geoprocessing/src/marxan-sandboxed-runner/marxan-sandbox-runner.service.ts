@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import AbortController from 'abort-controller';
 
@@ -15,6 +15,7 @@ export { Assets };
 @Injectable()
 export class MarxanSandboxRunnerService {
   readonly #controllers: Record<string, AbortController> = {};
+  readonly #logger = new Logger(this.constructor.name);
 
   constructor(
     private readonly workspaceService: WorkspaceBuilder,
@@ -68,8 +69,14 @@ export class MarxanSandboxRunnerService {
 
     return new Promise(async (resolve, reject) => {
       marxanRun.on('error', async (result) => {
-        await workspace.cleanup();
         this.clearAbortController(forScenarioId);
+        await outputFilesRepository.dumpFailure(
+          workspace,
+          forScenarioId,
+          marxanRun.stdOut,
+          marxanRun.stdError,
+        );
+        await workspace.cleanup();
         reject(result);
       });
       marxanRun.on('finished', async () => {
@@ -79,12 +86,22 @@ export class MarxanSandboxRunnerService {
             workspace,
             forScenarioId,
             marxanRun.stdOut,
-            [],
+            marxanRun.stdError,
           );
           await workspace.cleanup();
           resolve(output);
         } catch (error) {
           reject(error);
+          await outputFilesRepository
+            .dumpFailure(
+              workspace,
+              forScenarioId,
+              marxanRun.stdOut,
+              marxanRun.stdError,
+            )
+            .catch((error) => {
+              this.#logger.error(error);
+            });
         } finally {
           this.clearAbortController(forScenarioId);
         }

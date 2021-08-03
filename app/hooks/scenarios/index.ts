@@ -331,11 +331,67 @@ export function useUploadCostSurface({
   });
 }
 
+// PLANNING UNITS
+export function useScenarioPU(sid) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios-pu', sid], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${sid}/planning-units`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => {
+      try {
+        return JSON.parse(data);
+      } catch (error) {
+        return data;
+      }
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!sid,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    const parsedData = data || [];
+    const included = parsedData
+      .filter((p) => p.inclusionStatus === 'locked-in' || p.defaultStatus === 'locked-in')
+      .map((p) => p.id);
+
+    const includedDefault = parsedData
+      .filter((p) => p.defaultStatus === 'locked-in')
+      .map((p) => p.id);
+
+    const excluded = parsedData
+      .filter((p) => p.inclusionStatus === 'locked-out' || p.defaultStatus === 'locked-out')
+      .map((p) => p.id);
+
+    const excludedDefault = parsedData
+      .filter((p) => p.defaultStatus === 'locked-out')
+      .map((p) => p.id);
+
+    return {
+      ...query,
+      data: {
+        included,
+        excluded,
+        includedDefault,
+        excludedDefault,
+      },
+    };
+  }, [query, data]);
+}
+
 export function useSaveScenarioPU({
   requestConfig = {
     method: 'PATCH',
   },
 }: UseSaveScenarioPUProps) {
+  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const saveScenario = ({ id, data }: SaveScenarioPUProps) => {
@@ -352,6 +408,8 @@ export function useSaveScenarioPU({
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
+      const { id } = variables;
+      queryClient.invalidateQueries(['scenarios-pu', id]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);

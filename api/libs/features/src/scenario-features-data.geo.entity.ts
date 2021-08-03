@@ -38,7 +38,7 @@ export class ScenarioFeaturesData {
   /**
    * penalty factor
    */
-  fpf!: number;
+  fpf?: number;
 
   @ApiProperty({
     description: `Total area space, expressed in m^2`,
@@ -47,7 +47,7 @@ export class ScenarioFeaturesData {
   /**
    * target to be met for protection
    */
-  target!: number;
+  target?: number;
 
   @ApiProperty({
     description:
@@ -76,7 +76,7 @@ export class ScenarioFeaturesData {
    * not used yet
    * in marxan realm you can set a secondary target for a minimum clump size for the representation of conservation features in the reserve
    */
-  target2!: number;
+  target2?: number;
 
   @Column({
     name: 'metadata',

@@ -199,6 +199,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
+
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow overflow-hidden">
           <Loading
@@ -237,6 +238,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                                 onRemove(item.id, input);
                               }}
                             />
+
                           </div>
                         );
                       })}

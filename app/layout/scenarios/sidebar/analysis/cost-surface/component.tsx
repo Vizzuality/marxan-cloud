@@ -13,6 +13,7 @@ import { motion } from 'framer-motion';
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
+import InfoButton from 'components/info-button';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -130,10 +131,10 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header>
+      <header className="flex items-center pt-5 pb-1 space-x-3">
         <button
           type="button"
-          className="flex items-center w-full pt-5 pb-1 space-x-2 text-left focus:outline-none"
+          className="flex items-center w-full space-x-2 text-left focus:outline-none"
           onClick={() => {
             onChangeSection(null);
           }}
@@ -141,6 +142,35 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
           <h4 className="text-xs uppercase font-heading">Cost surface</h4>
         </button>
+        <InfoButton>
+          <div>
+            <h4 className="font-heading text-lg mb-2.5">What is a Cost Surface?</h4>
+            <div>
+
+              In conservation planning, cost data reflects how much a
+              planning unit costs to include into a
+              conservation network. Typically, it reflects the
+              actual price of a parcel of land. However, cost
+              information is usually scarce and often the cost
+              surface is used to reflect any variety of
+              socioeconomic factors,
+              which if minimized, might help the conservation
+              plan be implemented more effectively and reduce
+              conflicts with other uses.
+              <br />
+              <br />
+              The default value for cost will be the planning
+              unit area but you can upload a cost
+              surface. Once you upload a cost surface,
+              it will be intersected with your planning unit
+              grid to get one cost value per planning unit.
+              This will be the cost that Marxan will use for
+              each planning unit.
+
+            </div>
+
+          </div>
+        </InfoButton>
       </header>
 
       <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden text-sm">

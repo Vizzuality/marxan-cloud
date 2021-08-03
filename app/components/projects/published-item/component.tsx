@@ -1,9 +1,11 @@
 import React from 'react';
 
 import Link from 'next/link';
+
 import { format } from 'd3';
-import DuplicateButton from 'layout/community/published-projects/duplicate-button/component';
 import type { Project } from 'types/project-model';
+
+import DuplicateButton from 'layout/community/published-projects/duplicate-button/component';
 
 export interface PublishedItemProps extends Project {
   timesDuplicated?: number;
