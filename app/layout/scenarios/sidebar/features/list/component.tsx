@@ -11,7 +11,7 @@ import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
-import { useDebouncedCallback } from 'use-debounce/lib';
+import { useDebouncedCallback } from 'use-debounce';
 
 import IntersectFeatures from 'layout/scenarios/sidebar/features/intersect';
 
