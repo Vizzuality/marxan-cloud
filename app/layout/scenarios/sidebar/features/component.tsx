@@ -178,7 +178,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                 </div>
               </div>
 
-              {step === 0 && (
+              {step === 0 && !readOnly && (
                 <Button
                   theme="primary"
                   size="base"
@@ -204,6 +204,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
 
             {step === 0 && (
               <ListFeatures
+                readOnly={readOnly}
                 onSuccess={() => setStep(step + 1)}
               />
             )}

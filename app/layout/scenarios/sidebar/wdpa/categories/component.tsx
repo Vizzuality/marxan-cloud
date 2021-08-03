@@ -258,7 +258,6 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                                 flprops.input.onChange([]);
                               }
                             }}
-                            disabled={readOnly}
                           />
                         )}
 
@@ -299,19 +298,20 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                             <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
                               {wdpa.label}
                             </span>
-
-                            <button
-                              type="button"
-                              className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
-                              onClick={() => {
-                                form.mutators.removeWDPAFilter(
-                                  wdpa.value,
-                                  values.wdpaIucnCategories,
-                                );
-                              }}
-                            >
-                              <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
-                            </button>
+                            {!readOnly && (
+                              <button
+                                type="button"
+                                className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
+                                onClick={() => {
+                                  form.mutators.removeWDPAFilter(
+                                    wdpa.value,
+                                    values.wdpaIucnCategories,
+                                  );
+                                }}
+                              >
+                                <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
+                              </button>
+                            )}
                           </div>
                         );
                       })}
