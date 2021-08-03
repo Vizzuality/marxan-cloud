@@ -103,6 +103,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
               {!section && (
               <Sections
                 key="sections"
+                readOnly={readOnly}
                 onChangeSection={onChangeSection}
               />
               )}
@@ -117,6 +118,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
               {section === 'cost-surface' && (
               <CostSurface
                 key="cost-surface"
+                readOnly={readOnly}
                 onChangeSection={onChangeSection}
               />
               )}

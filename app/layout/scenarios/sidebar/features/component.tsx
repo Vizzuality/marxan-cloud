@@ -9,7 +9,6 @@ import { useSelectedFeatures } from 'hooks/features';
 import { useScenario } from 'hooks/scenarios';
 
 import { motion } from 'framer-motion';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import HelpBeacon from 'layout/help/beacon';
@@ -178,7 +177,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
 
                 </div>
               </div>
-              
+
               {step === 0 && (
                 <Button
                   theme="primary"
@@ -211,6 +210,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
 
             {step === 1 && (
               <TargetFeatures
+                readOnly={readOnly}
                 onBack={() => setStep(step - 1)}
                 onSuccess={() => push(`/projects/${pid}`)}
               />
