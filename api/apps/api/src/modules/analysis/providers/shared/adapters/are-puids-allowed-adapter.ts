@@ -25,7 +25,7 @@ export class ArePuidsAllowedAdapter
         },
       )
     )[0]
-      .map((scenario) => scenario.puGeometryId)
+      .map((scenarioPlanningUnit) => scenarioPlanningUnit.id)
       .filter(isDefined);
 
     /**
