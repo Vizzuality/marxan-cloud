@@ -6,6 +6,7 @@ import {
 
 import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/client';
+
 import SCENARIOS from 'services/scenarios';
 
 import {

@@ -6,8 +6,9 @@ import { useRouter } from 'next/router';
 
 import { useSolution, useBestSolution } from 'hooks/solutions';
 
-import { motion } from 'framer-motion';
 import { getScenarioSlice } from 'store/slices/scenarios/detail';
+
+import { motion } from 'framer-motion';
 
 import SolutionFrequency from 'layout/solutions/frequency';
 import SolutionSelected from 'layout/solutions/selected';
@@ -110,22 +111,22 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
               <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
             </Button>
             {!readOnly && (
-              <Button
-                theme="secondary"
-                size="base"
-                className="h-12"
-                onClick={() => onScheduleScenario()}
-              >
-                <div className="flex flex-col justify-center">
-                  Schedule scenario
-                  {numberOfSchedules > 0 && (
+            <Button
+              theme="secondary"
+              size="base"
+              className="h-12"
+              onClick={() => onScheduleScenario()}
+            >
+              <div className="flex flex-col justify-center">
+                Schedule scenario
+                {numberOfSchedules > 0 && (
                   <span className="text-blue-400 text-xxs">
                     {`${numberOfSchedules} schedule${numberOfSchedules > 1 ? 's' : ''}`}
                   </span>
-                  )}
-                </div>
-                <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
-              </Button>
+                )}
+              </div>
+              <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
+            </Button>
             )}
             <Modal
               open={showTable}

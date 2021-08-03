@@ -211,74 +211,76 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
             <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
               <div className="py-6">
                 {/* WDPA */}
-                <div>
-                  <FieldRFF
-                    name="wdpaIucnCategories"
-                  >
-                    {(flprops) => (
-                      <Field id="scenario-wdpaIucnCategories" {...flprops}>
-                        <div className="flex items-center mb-3">
-                          <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
-                          <InfoButton>
-                            <span>
-                              <h4 className="font-heading text-lg mb-2.5">IUCN categrories</h4>
-                              You can select to include protected areas
+                {!readOnly && (
+                  <div>
+                    <FieldRFF
+                      name="wdpaIucnCategories"
+                    >
+                      {(flprops) => (
+                        <Field id="scenario-wdpaIucnCategories" {...flprops}>
+                          <div className="flex items-center mb-3">
+                            <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
+                            <InfoButton>
+                              <span>
+                                <h4 className="font-heading text-lg mb-2.5">IUCN categrories</h4>
+                                You can select to include protected areas
 
-                              from any or all of the
-                              IUCN categories that exist in your planning area:
-                              <br />
-                              <br />
-                              <ul className="pl-6 list-disc">
-                                <li>Ia: Strict Nature Reserve.</li>
-                                <li>Ib: Wilderness Area.</li>
-                                <li>II: National Park.</li>
-                                <li>III: Natural Monument or Feature.</li>
-                                <li>IV: Habitat/Species Management Area.</li>
-                                <li>V: Protected Landscape/Seascape.</li>
-                                <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
-                              </ul>
-                            </span>
-                          </InfoButton>
-                        </div>
+                                from any or all of the
+                                IUCN categories that exist in your planning area:
+                                <br />
+                                <br />
+                                <ul className="pl-6 list-disc">
+                                  <li>Ia: Strict Nature Reserve.</li>
+                                  <li>Ib: Wilderness Area.</li>
+                                  <li>II: National Park.</li>
+                                  <li>III: Natural Monument or Feature.</li>
+                                  <li>IV: Habitat/Species Management Area.</li>
+                                  <li>V: Protected Landscape/Seascape.</li>
+                                  <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
+                                </ul>
+                              </span>
+                            </InfoButton>
+                          </div>
 
-                        {WDPA_CATEGORIES_OPTIONS.length === 1 && (
-                          <Select
-                            theme="dark"
-                            size="base"
-                            placeholder="Select..."
-                            clearSelectionActive
-                            selected={values.wdpaIucnCategories.length
-                              ? values.wdpaIucnCategories[0]
-                              : null}
-                            options={WDPA_CATEGORIES_OPTIONS}
-                            onChange={(v) => {
-                              if (v) {
-                                flprops.input.onChange([v]);
-                              } else {
-                                flprops.input.onChange([]);
-                              }
-                            }}
-                          />
-                        )}
+                          {WDPA_CATEGORIES_OPTIONS.length === 1 && (
+                            <Select
+                              theme="dark"
+                              size="base"
+                              placeholder="Select..."
+                              clearSelectionActive
+                              selected={values.wdpaIucnCategories.length
+                                ? values.wdpaIucnCategories[0]
+                                : null}
+                              options={WDPA_CATEGORIES_OPTIONS}
+                              onChange={(v) => {
+                                if (v) {
+                                  flprops.input.onChange([v]);
+                                } else {
+                                  flprops.input.onChange([]);
+                                }
+                              }}
+                            />
+                          )}
 
-                        {WDPA_CATEGORIES_OPTIONS.length > 1 && (
-                          <Select
-                            theme="dark"
-                            size="base"
-                            multiple
-                            placeholder="Select..."
-                            clearSelectionActive={false}
-                            batchSelectionActive
-                            batchSelectionLabel="All protected areas"
-                            selected={values.wdpaIucnCategories}
-                            options={WDPA_CATEGORIES_OPTIONS}
-                            disabled={readOnly}
-                          />
-                        )}
-                      </Field>
-                    )}
-                  </FieldRFF>
-                </div>
+                          {WDPA_CATEGORIES_OPTIONS.length > 1 && (
+                            <Select
+                              theme="dark"
+                              size="base"
+                              multiple
+                              placeholder="Select..."
+                              clearSelectionActive={false}
+                              batchSelectionActive
+                              batchSelectionLabel="All protected areas"
+                              selected={values.wdpaIucnCategories}
+                              options={WDPA_CATEGORIES_OPTIONS}
+                              disabled={readOnly}
+                            />
+                          )}
+                        </Field>
+                      )}
+                    </FieldRFF>
+                  </div>
+                )}
 
                 {!!values.wdpaIucnCategories.length && (
                   <div className="mt-10">
