@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { ScenarioPuvsprGeoEntity } from '@marxan/scenario-puvspr';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getConnectionToken, getRepositoryToken } from '@nestjs/typeorm';
 import { Test } from '@nestjs/testing';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
@@ -10,17 +10,14 @@ let sut: PuvsprDatService;
 let dataRepo: jest.Mocked<Repository<ScenarioPuvsprGeoEntity>>;
 
 beforeEach(async () => {
-  const token = getRepositoryToken(
-    ScenarioPuvsprGeoEntity,
-    DbConnections.geoprocessingDB,
-  );
+  const token = getConnectionToken(DbConnections.geoprocessingDB);
   const sandbox = await Test.createTestingModule({
     providers: [
       PuvsprDatService,
       {
         provide: token,
         useValue: {
-          find: jest.fn(),
+          query: jest.fn(),
         } as any,
       },
     ],
@@ -32,7 +29,7 @@ beforeEach(async () => {
 
 describe(`when there are no rows`, () => {
   beforeEach(() => {
-    dataRepo.find.mockImplementationOnce(async () => []);
+    dataRepo.query.mockImplementationOnce(async () => []);
   });
 
   it(`should return headers only`, async () => {
@@ -44,24 +41,24 @@ describe(`when there are no rows`, () => {
 
 describe(`when there is data available`, () => {
   beforeEach(() => {
-    dataRepo.find.mockImplementationOnce(async () => [
+    dataRepo.query.mockImplementationOnce(async () => [
       {
         amount: 1000.0,
-        scenarioId: 'scenarioId',
-        featureId: 'feature-1',
-        puId: 'pu-1,',
+        scenario_id: 'scenarioId',
+        feature_id: 'feature-1',
+        pu_id: 'pu-1,',
       },
       {
         amount: 0.001,
-        scenarioId: 'scenarioId',
-        featureId: 'feature-1',
-        puId: 'pu-2,',
+        scenario_id: 'scenarioId',
+        feature_id: 'feature-1',
+        pu_id: 'pu-2,',
       },
       {
         amount: 99.995,
-        scenarioId: 'scenarioId',
-        featureId: 'feature-1',
-        puId: 'pu-3,',
+        scenario_id: 'scenarioId',
+        feature_id: 'feature-1',
+        pu_id: 'pu-3,',
       },
     ]);
   });
