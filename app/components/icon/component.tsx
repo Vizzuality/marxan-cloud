@@ -1,4 +1,5 @@
 import React from 'react';
+
 import cx from 'classnames';
 
 export interface IconProps {
@@ -18,7 +19,7 @@ export const Icon: React.FC<IconProps> = ({
   return (
     <svg
       className={cx({
-        'fill-current': true,
+        'fill-current transition': true,
         [className]: className,
       })}
       viewBox={icon?.viewBox || '0 0 32 32'}
