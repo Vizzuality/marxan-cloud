@@ -75,7 +75,10 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
     <Button
       className="px-6 group"
       size="s"
-      theme={theme === 'light' ? 'transparent-white' : 'transparent-black'}
+      theme={classnames({
+        'transparent-white': theme === 'light',
+        'transparent-black': theme !== 'light' 
+      })}
       onClick={onDuplicate}
     >
       Duplicate
