@@ -54,21 +54,12 @@ describe(`when a user updates scenario with input data`, () => {
         '_CLOUD_GENERATED_AT __ISO_DATE__',
       ),
     ).toMatchInlineSnapshot(`
-      "PROP 1.5
-      COOLFAC 5
-      NUMITNS 1000003
-      NUMTEMP 10006
-      RUNMODE 5
-      HEURTYPE 1
-      RANDSEED -1.5
-      BESTSCORE 2
-      CLUMPTYPE 3
-      ITIMPTYPE 3
-      MISSLEVEL 11
-      STARTTEMP 1000004
-      COSTTHRESH 7
-      THRESHPEN1 8
-      THRESHPEN2 9
+      "INPUTDIR input
+      PUNAME pu.dat
+      SPECNAME spec.dat
+      PUVSPRNAME puvspr.dat
+      BOUNDNAME bound.dat
+      OUTPUTDIR output
       _CLOUD_SCENARIO Save the world species
       _CLOUD_PROJECT Humanity for living.
       _CLOUD_ORGANIZATION Fresh Alaska array
@@ -85,12 +76,22 @@ describe(`when a user updates scenario with input data`, () => {
       SAVESNAPSTEPS 0
       SAVESNAPCHANGES 0
       SAVESNAPFREQUENCY 0
-      INPUTDIR input
-      PUNAME pu.dat
-      SPECNAME spec.dat
-      PUVSPRNAME puvspr.dat
-      BOUNDNAME bound.dat
-      OUTPUTDIR output"
+      PROP 1.5
+      COOLFAC 5
+      NUMITNS 1000003
+      NUMTEMP 10006
+      RUNMODE 5
+      HEURTYPE 1
+      RANDSEED -1.5
+      BESTSCORE 2
+      CLUMPTYPE 3
+      ITIMPTYPE 3
+      MISSLEVEL 11
+      STARTTEMP 1000004
+      COSTTHRESH 7
+      THRESHPEN1 8
+      THRESHPEN2 9
+      "
     `);
   });
 });

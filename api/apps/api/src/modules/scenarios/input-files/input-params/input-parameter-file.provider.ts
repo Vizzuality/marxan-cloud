@@ -3,6 +3,7 @@ import { omit, pick } from 'lodash';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { assertDefined, isDefined } from '@marxan/utils';
+import { MarxanParametersDefaults } from '@marxan/marxan-input';
 import { Scenario } from '../../scenario.api.entity';
 import { IoSettings, ioSettingsToken } from './io-settings';
 
@@ -28,26 +29,29 @@ class InputParameterFile {
     let builder = '';
     builder = this.addBlm(builder);
     builder = this.addNumreps(builder);
-    builder = this.addInputParametersFile(builder);
     builder = this.addIoSettings(builder);
+    builder = this.addInputParametersFile(builder);
     return builder;
   }
 
   private addIoSettings(builder: string) {
-    builder += Object.entries(pick(this.ioSettings, this.ioSettingsKeys))
+    const ioEntries = Object.entries(pick(this.ioSettings, this.ioSettingsKeys))
       .map((entry) => entry.join(' '))
       .join('\n');
+    builder += ioEntries + (ioEntries === '' ? '' : '\n');
     return builder;
   }
 
   private addInputParametersFile(builder: string) {
     if (isDefined(this.marxanInputParameterFile)) {
-      builder += Object.entries(
+      const inputParameterFileEntries = Object.entries(
         omit(this.marxanInputParameterFile, this.forbiddenKeys),
       )
         .map((entry) => entry.join(' '))
         .join('\n');
-      builder += '\n';
+      builder +=
+        inputParameterFileEntries +
+        (inputParameterFileEntries === '' ? '' : '\n');
     }
     return builder;
   }
@@ -74,6 +78,7 @@ export class InputParameterFileProvider {
     private readonly scenarioRepository: Repository<Scenario>,
     @Inject(ioSettingsToken)
     private readonly ioSettings: IoSettings,
+    private readonly marxanDefaults: MarxanParametersDefaults,
   ) {}
 
   async getInputParameterFile(scenarioId: string): Promise<string> {
@@ -86,23 +91,26 @@ export class InputParameterFileProvider {
       scenario.boundaryLengthModifier,
       scenario.numberOfRuns,
       {
-        ...scenario.metadata?.marxanInputParameterFile,
         _CLOUD_SCENARIO: scenario.name,
-        _CLOUD_PROJECT: scenario.project?.name ?? 'NA',
-        _CLOUD_ORGANIZATION: scenario.project?.organization?.name ?? 'NA',
+        _CLOUD_PROJECT:
+          scenario.project?.name ?? this.marxanDefaults._CLOUD_PROJECT,
+        _CLOUD_ORGANIZATION:
+          scenario.project?.organization?.name ??
+          this.marxanDefaults._CLOUD_ORGANIZATION,
         _CLOUD_GENERATED_AT: new Date().toISOString(),
-        VERBOSITY: 2,
-        SAVESOLUTIONSMATRIX: 3,
-        SAVERUN: 3,
-        SAVEBEST: 3,
-        SAVESUMMARY: 3,
-        SAVESCEN: 3,
-        SAVETARGMET: 3,
-        SAVESUMSOLN: 3,
-        SAVELOG: 3,
-        SAVESNAPSTEPS: 0,
-        SAVESNAPCHANGES: 0,
-        SAVESNAPFREQUENCY: 0,
+        VERBOSITY: this.marxanDefaults.VERBOSITY,
+        SAVESOLUTIONSMATRIX: this.marxanDefaults.SAVESOLUTIONSMATRIX,
+        SAVERUN: this.marxanDefaults.SAVERUN,
+        SAVEBEST: this.marxanDefaults.SAVEBEST,
+        SAVESUMMARY: this.marxanDefaults.SAVESUMMARY,
+        SAVESCEN: this.marxanDefaults.SAVESCEN,
+        SAVETARGMET: this.marxanDefaults.SAVETARGMET,
+        SAVESUMSOLN: this.marxanDefaults.SAVESUMSOLN,
+        SAVELOG: this.marxanDefaults.SAVELOG,
+        SAVESNAPSTEPS: this.marxanDefaults.SAVESNAPSTEPS,
+        SAVESNAPCHANGES: this.marxanDefaults.SAVESNAPCHANGES,
+        SAVESNAPFREQUENCY: this.marxanDefaults.SAVESNAPFREQUENCY,
+        ...scenario.metadata?.marxanInputParameterFile,
       },
     );
     return inputParameterFile.toString();

@@ -9,6 +9,7 @@ import {
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuCostDataGeo,
 } from '@marxan/scenarios-planning-unit';
+import { MarxanParametersDefaults } from '@marxan/marxan-input';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 import { BoundDatService } from './bound.dat.service';
@@ -35,6 +36,7 @@ import { InputFilesArchiverService } from './input-files-archiver.service';
     ),
   ],
   providers: [
+    MarxanParametersDefaults,
     InputFilesService,
     BoundDatService,
     PuvsprDatService,

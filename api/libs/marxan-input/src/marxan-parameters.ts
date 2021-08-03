@@ -54,6 +54,20 @@ export class MarxanParametersDefaults {
   ITIMPTYPE = IterativeImprovementType.Normal;
   HEURTYPE = HeuristicType.Ignored;
   CLUMPTYPE = ClumpType.PartialDoNotCount;
+  _CLOUD_PROJECT = 'NA';
+  _CLOUD_ORGANIZATION = 'NA';
+  VERBOSITY = 2;
+  SAVESOLUTIONSMATRIX = 3;
+  SAVERUN = 3;
+  SAVEBEST = 3;
+  SAVESUMMARY = 3;
+  SAVESCEN = 3;
+  SAVETARGMET = 3;
+  SAVESUMSOLN = 3;
+  SAVELOG = 3;
+  SAVESNAPSTEPS = 0;
+  SAVESNAPCHANGES = 0;
+  SAVESNAPFREQUENCY = 0;
 }
 
 const marxanDefaults = new MarxanParametersDefaults();

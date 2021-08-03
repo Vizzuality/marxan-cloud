@@ -41,7 +41,7 @@ export const AboutValues: React.FC<AboutValuesProps> = () => {
                 <p className="mb-5 text-sm text-black">
                   {v.description}
                 </p>
-                <a className="text-base text-black hover:underline" href={v.hyperlink} rel="noopener noreferrer" target="_blank">{v.hypertext}</a>
+                <a className="text-base text-black underline" href={v.hyperlink} rel="noopener noreferrer" target="_blank">{v.hypertext}</a>
               </div>
             ))}
           </div>

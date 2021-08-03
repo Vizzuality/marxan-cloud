@@ -4,6 +4,11 @@ import React, {
 
 import { Form as FormRFF } from 'react-final-form';
 
+import { useRouter } from 'next/router';
+
+import { useRunScenario, useSaveScenario, useScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
 import cx from 'classnames';
 
 import Button from 'components/button';
@@ -20,19 +25,88 @@ export interface ScenariosRunProps {
 
 export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   const [advanced, setAdvanced] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const { addToast } = useToasts();
+
+  const { query, push } = useRouter();
+  const { pid, sid } = query;
+
+  const { data: scenarioData } = useScenario(sid);
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const runScenarioMutation = useRunScenario({});
 
   const INITIAL_VALUES = useMemo(() => {
     return FIELDS.reduce((acc, f) => {
+      const scenarioParamters = scenarioData?.metadata?.marxanInputParameterFile || {};
+
       return {
         ...acc,
-        [f.id]: f.default,
+        [f.id]: scenarioParamters[f.id] || f.default,
       };
     }, {});
-  }, []);
+  }, [scenarioData]);
 
   const onSubmit = useCallback((values) => {
-    console.info(values);
-  }, []);
+    setSubmitting(true);
+
+    const data = {
+      metadata: {
+        marxanInputParameterFile: values,
+      },
+    };
+
+    saveScenarioMutation.mutate({ id: `${sid}`, data }, {
+      onSuccess: () => {
+        runScenarioMutation.mutate({ id: `${sid}` }, {
+          onSuccess: ({ data: { data: s } }) => {
+            setSubmitting(false);
+
+            addToast('save-scenario-name', (
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Run started</p>
+              </>
+            ), {
+              level: 'success',
+            });
+
+            push(`/projects/${pid}`);
+            console.info('Scenario name saved succesfully', s);
+          },
+          onError: () => {
+            setSubmitting(false);
+
+            addToast('error-scenario-name', (
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Scenario name not saved</p>
+              </>
+            ), {
+              level: 'error',
+            });
+          },
+        });
+      },
+      onError: () => {
+        setSubmitting(false);
+
+        addToast('error-scenario-name', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario name not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [pid, sid, push, saveScenarioMutation, runScenarioMutation, addToast]);
 
   return (
     <FormRFF
@@ -83,6 +157,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
                   theme="primary"
                   size="base"
                   className="w-full"
+                  disabled={submitting}
                 >
                   <div className="flex items-center space-x-5">
                     <div className="text-left">
