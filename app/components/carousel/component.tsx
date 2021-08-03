@@ -82,7 +82,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => 
                 <div
                   className="relative w-full"
                   style={{
-                    paddingBottom: '64.61318052%',
+                    paddingBottom: '56.25%',
                   }}
                 >
                   <div
