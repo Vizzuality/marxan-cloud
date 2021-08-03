@@ -80,7 +80,6 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
     >
       Duplicate
       <Icon
-        // className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black"
         className={classnames({
           'w-3.5 h-3.5 ml-2': true,
           'text-white group-hover:text-black': theme === 'light',
