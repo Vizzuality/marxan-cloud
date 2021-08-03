@@ -1,9 +1,14 @@
-import { getConnection, Repository } from 'typeorm';
+import { Connection, getConnection } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-
+import { InjectConnection } from '@nestjs/typeorm';
 @Injectable()
 export class PuvsprDatService {
+  constructor(
+    @InjectConnection(DbConnections.geoprocessingDB)
+    private readonly connection: Connection,
+  ) {}
+
   async getPuvsprDatContent(scenarioId: string): Promise<string> {
     /**
      * @TODO further performance savings: limiting scans to planning_units_geom
@@ -16,7 +21,7 @@ export class PuvsprDatService {
       pu_id: number;
       feature_id: number;
       amount: number;
-    }[] = await getConnection(DbConnections.geoprocessingDB).query(`
+    }[] = await this.connection.query(`
     select pu.scenario_id as scenario_id, puid as pu_id, feature_id, ST_Area(ST_Transform(st_intersection(species.the_geom, pu.the_geom),3410)) as amount
     from
     (
