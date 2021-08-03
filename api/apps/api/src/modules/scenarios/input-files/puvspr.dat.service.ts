@@ -5,6 +5,12 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 @Injectable()
 export class PuvsprDatService {
   async getPuvsprDatContent(scenarioId: string): Promise<string> {
+    /**
+     * @TODO further performance savings: limiting scans to planning_units_geom
+     * by partition (we need to get the grid shape from the parent project); use
+     * && operator instead of st_intersects() for bbox-based calculation of
+     * intersections.
+     */
     const rows: {
       scenario_id: string;
       pu_id: number;
@@ -23,7 +29,7 @@ export class PuvsprDatService {
         from planning_units_geom pug
         inner join scenarios_pu_data spd on pug.id = spd.pu_geom_id where spd.scenario_id = '${scenarioId}' order by puid asc
     ) pu
-    where pu.scenario_id = '${scenarioId} and st_intersects(species.the_geom, pu.the_geom)'
+    where pu.scenario_id = '${scenarioId}' and species.the_geom && pu.the_geom
     order by puid, feature_id asc;
     `);
     return (
