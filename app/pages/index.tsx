@@ -12,6 +12,7 @@ import Features from 'layout/home/features';
 import Hero from 'layout/home/hero';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
+import PartnersList from 'layout/partners';
 
 export const getServerSideProps = withUser();
 
@@ -35,10 +36,11 @@ const Home: React.FC = () => {
         twitterSite="@Marxan_Planning"
       />
       <main>
-        <Header size="lg" />
+        <Header size="lg" theme="light" />
         <Hero />
         <Features />
         <CarouselSection />
+        <PartnersList />
         <Footer />
       </main>
     </>

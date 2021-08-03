@@ -22,6 +22,7 @@ const THEME = {
 
   spacial: 'text-white bg-transparent hover:bg-gray-400 active:bg-gray-300 flex items-center justify-center rounded-4xl focus:outline-none',
 
+  dark: 'text-white bg-gray-600 border border-gray-600 hover:bg-black hover:text-white',
   'transparent-black': 'text-black bg-transparent border border-black hover:bg-black hover:text-white',
 
   'transparent-white': 'text-white bg-transparent border border-white hover:bg-white hover:text-black',
@@ -36,7 +37,7 @@ const SIZE = {
 };
 
 export interface AnchorButtonProps {
-  theme: 'primary' | 'primary-alt' | 'white'| 'secondary' | 'secondary-alt' | 'tertiary' | 'danger' | 'danger-alt' |'spacial' | 'transparent-black' | 'transparent-white';
+  theme: 'primary' | 'primary-alt' | 'white'| 'secondary' | 'secondary-alt' | 'tertiary' | 'danger' | 'danger-alt' | 'spacial' | 'dark' | 'transparent-black' | 'transparent-white';
   size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }

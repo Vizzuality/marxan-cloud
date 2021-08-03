@@ -17,7 +17,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
         <div className="space-y-24">
 
           <div className="flex flex-col items-center w-full max-w-5xl mx-auto">
-            <h2 className="pb-20 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
+            <h2 className="pb-20 text-2xl leading-relaxed text-black font-heading bg-clip-text">
               Brought to you by:
             </h2>
             <div className="grid w-full grid-cols-1 px-24 md:grid-cols-2 gap-y-20">
@@ -30,7 +30,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
           </div>
 
           <div className="flex flex-col items-center w-full max-w-5xl pb-20 mx-auto md:px-24">
-            <h2 className="pb-20 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
+            <h2 className="pb-20 text-2xl leading-relaxed text-black font-heading bg-clip-text">
               In partnership with:
             </h2>
             <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-y-20">
@@ -44,7 +44,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
 
           <div className="relative flex flex-col items-center w-full max-w-5xl pb-20 mx-auto border-t border-black border-opacity-0 md:border-opacity-20">
             <div className="absolute flex justify-center h-10 bg-white -top-5">
-              <h2 className="px-10 pb-20 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
+              <h2 className="px-10 pb-20 text-2xl leading-relaxed text-black font-heading bg-clip-text">
                 With additional support from:
               </h2>
             </div>
@@ -59,7 +59,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
 
           <div className="relative flex flex-col items-center w-full max-w-5xl mx-auto border-t border-black border-opacity-0 md:border-opacity-20">
             <div className="absolute flex justify-center h-10 px-10 bg-white -top-5">
-              <h2 className="pb-20 text-2xl leading-relaxed text-black font-heading max-w-max bg-clip-text">
+              <h2 className="pb-20 text-2xl leading-relaxed text-black font-heading bg-clip-text">
                 Supported by an initiative of the:
               </h2>
             </div>

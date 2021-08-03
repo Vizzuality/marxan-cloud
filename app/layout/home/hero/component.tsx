@@ -4,46 +4,63 @@ import Wrapper from 'layout/wrapper';
 
 import Button from 'components/button';
 
+import HERO_IMAGE from 'images/home-hero/hero-image-1.png';
+
 export interface HomeHeroProps {
 
 }
 
 export const HomeHero: React.FC<HomeHeroProps> = () => {
   return (
-    <Wrapper>
-      <div className="w-full py-32 text-center">
-        <h1
-          className="max-w-3xl pb-10 mx-auto font-semibold leading-tight text-transparent bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-7xl"
-        >
-          Spatial conservation planning in the cloud
-        </h1>
+    <div className="bg-primary-50 text-gray-800">
+      <Wrapper>
+        <div className="flex gap-48">
+          <div className="w-full py-26 pl-32">
+            <h1
+              className="pb-8 font-semibold leading-tight text-5xl"
+            >
+              Spatial conservation planning in the cloud
+            </h1>
 
-        <p className="max-w-lg mx-auto">
-          This platform supports decision-making for biodiversity
-          {' '}
-          and people on land, freshwater and ocean systems.
-        </p>
+            <p className="">
+              This platform supports decision-making for biodiversity
+              {' '}
+              and people on land, freshwater and ocean systems.
+            </p>
 
-        <div className="flex items-center justify-center mt-10 space-x-4">
-          <Button
-            className="w-40"
-            theme="spacial"
-            size="lg"
-            href="/projects"
-          >
-            Get started
-          </Button>
+            <div className="flex mt-18 space-x-4">
+              <Button
+                className="w-40"
+                theme="dark"
+                size="lg"
+                href="/projects"
+              >
+                Get started
+              </Button>
 
-          <Button
-            className="w-40"
-            theme="secondary"
-            size="lg"
-          >
-            How to
-          </Button>
+              <Button
+                className="w-40"
+                theme="secondary-alt"
+                size="lg"
+              >
+                How to
+              </Button>
+            </div>
+          </div>
+          <div className="flex-shrink-0 relative top-14">
+            <img
+              alt=""
+              src={HERO_IMAGE}
+              style={{
+                width: '384px',
+                height: 'auto',
+                filter: 'drop-shadow(0px 8px 15px rgba(0, 0, 0, .35))',
+              }}
+            />
+          </div>
         </div>
-      </div>
-    </Wrapper>
+      </Wrapper>
+    </div>
   );
 };
 

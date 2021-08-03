@@ -1,7 +1,7 @@
+const customForms = require('@tailwindcss/custom-forms');
 const colors = require('tailwindcss/colors');
 
 // PLUGINS
-const customForms = require('@tailwindcss/custom-forms');
 const lineClamp = require('./styles/line-clamp');
 
 module.exports = {
@@ -45,6 +45,7 @@ module.exports = {
       transparent: 'transparent',
       current: 'currentColor',
       primary: {
+        50: '#F1F9FE',
         200: '#4dd2ff',
         300: '#33ccff',
         400: '#1ac5ff',
@@ -154,8 +155,10 @@ module.exports = {
       12: '3rem',
       14: '3.5rem',
       16: '4rem',
+      18: '4.5rem',
       20: '5rem',
       24: '6rem',
+      26: '6.5rem',
       28: '7rem',
       32: '8rem',
       36: '9rem',

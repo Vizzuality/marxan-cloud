@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 
 import { useProject } from 'hooks/projects';
 import {
-  useDeleteScenario, useScenarios, useScenariosStatus, useDuplicateScenario,
+  useDeleteScenario, useScenarios, useDuplicateScenario, useScenariosStatus,
 } from 'hooks/scenarios';
 import useBottomScrollListener from 'hooks/scroll';
 import { useToasts } from 'hooks/toast';
@@ -76,11 +76,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
   const {
     data: scenariosStatusData,
-    isFetching: scenariosStatusIsFetching,
-    isFetched: scenariosStatusIsFetched,
   } = useScenariosStatus(pid);
-
-  console.info(scenariosStatusData, scenariosStatusIsFetching, scenariosStatusIsFetched);
 
   const scrollRef = useBottomScrollListener(
     () => {
@@ -229,8 +225,13 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             <div className="relative overflow-hidden" id="scenarios-list">
               <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-black via-black" />
               <div ref={scrollRef} className="relative z-0 flex flex-col flex-grow h-full py-6 overflow-x-hidden overflow-y-auto">
-                {!!allScenariosData.length && allScenariosData.map((s, i) => {
+                {!!allScenariosData.length
+                && scenariosStatusData
+                && allScenariosData.map((s, i) => {
                   const TAG = i === 0 ? HelpBeacon : Fragment;
+
+                  const { scenarios } = scenariosStatusData;
+                  const status = scenarios.find((st) => st.id === s.id);
 
                   return (
                     <TAG
@@ -254,10 +255,10 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                           'mt-3': i !== 0,
                         })}
                       >
-
                         <ScenarioItem
                           {...s}
                           status="draft"
+                          jobs={status?.jobs || []}
                           onDelete={() => {
                             setDelete(s);
                           }}
