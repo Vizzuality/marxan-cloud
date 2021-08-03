@@ -7,7 +7,8 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayer } from 'hooks/map';
+import { useSelectedFeatures } from 'hooks/features';
+import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
@@ -34,6 +35,10 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
 
   const { data = {} } = useProject(pid);
   const { bbox } = data;
+
+  const {
+    data: selectedFeaturesData,
+  } = useSelectedFeatures(sid, {});
 
   const scenarioSlice = getScenarioSlice(sid);
   const { setPuIncludedValue, setPuExcludedValue } = scenarioSlice.actions;
@@ -62,8 +67,8 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     bbox,
   });
 
-  const FeaturepreviewLayer = useFeaturePreviewLayer({
-    id: 'a429cdee-c390-4948-83a7-7b0a5f428d53', // 'f40854fe-1fb4-4ec2-ae21-45d3409ee83b',
+  const FeaturePreviewLayers = useFeaturePreviewLayers({
+    features: selectedFeaturesData,
     cache,
     active: tab === 'features',
     bbox,
@@ -83,7 +88,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     },
   });
 
-  const LAYERS = [PUGridLayer, WDPApreviewLayer, FeaturepreviewLayer].filter((l) => !!l);
+  const LAYERS = [PUGridLayer, WDPApreviewLayer, ...FeaturePreviewLayers].filter((l) => !!l);
 
   useEffect(() => {
     setBounds({

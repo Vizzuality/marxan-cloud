@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import {
   UseAdminPreviewLayer,
   UseFeaturePreviewLayer,
+  UseFeaturePreviewLayers,
   UseGeoJSONLayer,
   UsePUGridLayer,
   UsePUGridPreviewLayer,
@@ -78,7 +79,7 @@ export function useAdminPreviewLayer({
   }, [active, level, guid, cache]);
 }
 
-// PUGridpreview
+// WDPApreview
 export function useWDPAPreviewLayer({
   active, bbox, wdpaIucnCategories, cache = 0,
 }: UseWDPAPreviewLayer) {
@@ -120,7 +121,7 @@ export function useWDPAPreviewLayer({
   }, [active, bbox, wdpaIucnCategories, cache]);
 }
 
-// PUGridpreview
+// Featurepreview
 export function useFeaturePreviewLayer({
   active, bbox, id, cache = 0,
 }: UseFeaturePreviewLayer) {
@@ -128,7 +129,7 @@ export function useFeaturePreviewLayer({
     if (!active || !bbox) return null;
 
     return {
-      id: `feature-preview-layer-${cache}`,
+      id: `feature-${id}-preview-layer-${cache}`,
       type: 'vector',
       source: {
         type: 'vector',
@@ -141,6 +142,7 @@ export function useFeaturePreviewLayer({
             'source-layer': 'layer0',
             paint: {
               'fill-color': '#FFCC00',
+              'fill-opacity': 0.5,
             },
           },
           {
@@ -155,6 +157,54 @@ export function useFeaturePreviewLayer({
     };
   }, [active, bbox, id, cache]);
 }
+
+export function useFeaturePreviewLayers({
+  active, bbox, features, cache = 0,
+}: UseFeaturePreviewLayers) {
+  const COLORS = useMemo(() => {
+    return {
+      species: '#FFCC00',
+      bioregional: '#03E7D1',
+    };
+  }, []);
+
+  return useMemo(() => {
+    if (!active || !bbox || !features) return [];
+
+    return features.map((f) => {
+      const { id, type } = f;
+
+      return {
+        id: `feature-${id}-preview-layer-${cache}`,
+        type: 'vector',
+        source: {
+          type: 'vector',
+          tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
+        },
+        render: {
+          layers: [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-color': COLORS[type],
+                'fill-opacity': 0.5,
+              },
+            },
+            {
+              type: 'line',
+              'source-layer': 'layer0',
+              paint: {
+                'line-color': '#000',
+              },
+            },
+          ],
+        },
+      };
+    });
+  }, [active, bbox, features, cache, COLORS]);
+}
+
 // PUGridpreview
 export function usePUGridPreviewLayer({
   active, bbox, planningUnitGridShape, planningUnitAreakm2, cache,
@@ -185,7 +235,7 @@ export function usePUGridPreviewLayer({
   }, [active, bbox, planningUnitGridShape, planningUnitAreakm2, cache]);
 }
 
-// PUGridpreview
+// PUGrid
 export function usePUGridLayer({
   active, sid, type, subtype, options = {}, cache,
 }: UsePUGridLayer) {
@@ -223,7 +273,7 @@ export function usePUGridLayer({
               'line-opacity': 1,
             },
           },
-          ...type === 'protected-areas' && subtype === 'protected-areas-percentage' ? [
+          ...(type === 'protected-areas' && subtype === 'protected-areas-percentage') || type === 'features' ? [
             {
               type: 'fill',
               'source-layer': 'layer0',

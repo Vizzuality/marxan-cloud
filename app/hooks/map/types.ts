@@ -1,5 +1,7 @@
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
 
+import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
+
 export interface UseGeoJSONLayer {
   cache?: number;
   id: string;
@@ -36,6 +38,13 @@ export interface UseFeaturePreviewLayer {
   active?: boolean;
   bbox?: number[] | unknown;
   id?: string;
+}
+
+export interface UseFeaturePreviewLayers {
+  cache?: number;
+  active?: boolean;
+  bbox?: number[] | unknown;
+  features?: SelectedItemProps[];
 }
 
 export interface UsePUGridLayer {
