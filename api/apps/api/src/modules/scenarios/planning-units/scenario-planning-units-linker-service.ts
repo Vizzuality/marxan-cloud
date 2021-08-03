@@ -26,13 +26,12 @@ export class ScenarioPlanningUnitsLinkerService {
   /** Currently we only support linking regular planning unit geometries
    * computed via ST_HexagonGrid or ST_SquareGrid */
   private isPlanningUnitGridShapeSupported(
-    shape: PlanningUnitGridShape | undefined,
+    shape: PlanningUnitGridShape,
   ): boolean {
-    return !isNil(shape)
-      ? [PlanningUnitGridShape.hexagon, PlanningUnitGridShape.square].includes(
-          shape,
-        )
-      : false;
+    return [
+      PlanningUnitGridShape.hexagon,
+      PlanningUnitGridShape.square,
+    ].includes(shape);
   }
 
   /**
@@ -41,6 +40,8 @@ export class ScenarioPlanningUnitsLinkerService {
    */
   async link(scenario: Scenario): Promise<void> {
     const project = await this.projectsRepo.findOneOrFail(scenario.projectId);
+    // If no planning unit grid shape is set for the project, do nothing.
+    if (isNil(project.planningUnitGridShape)) return;
     if (!this.isPlanningUnitGridShapeSupported(project.planningUnitGridShape))
       throw new Error(
         'Only square or hexagonal planning unit grids are supported.',
