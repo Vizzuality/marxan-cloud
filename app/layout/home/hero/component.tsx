@@ -40,7 +40,7 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
 
               <Button
                 className="w-40"
-                theme="secondary-alt"
+                theme="dark-alt"
                 size="lg"
               >
                 How to
