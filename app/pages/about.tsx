@@ -41,9 +41,9 @@ const About: React.FC = () => {
       />
 
       <main>
-        <Header size="base" />
+        <Header size="base" theme="light" />
         <Hero
-          section="About"
+          theme="light"
           title={TITLE_TEXT}
           description={DESCRIPTION_TEXT}
         />

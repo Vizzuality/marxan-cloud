@@ -4,10 +4,11 @@ import Backlink from 'layout/statics/backlink';
 import Wrapper from 'layout/wrapper';
 
 export interface StaticHeroProps {
-  section: string;
+  section?: string;
   title: string;
   description: string;
-  backlink?: string,
+  backlink?: string;
+  theme: 'dark' | 'light';
 }
 
 export const StaticHero: React.FC<StaticHeroProps> = ({
@@ -15,29 +16,27 @@ export const StaticHero: React.FC<StaticHeroProps> = ({
   title,
   description,
   backlink,
+  theme = 'dark',
 }: StaticHeroProps) => {
   return (
-    <Wrapper>
-      <div className="w-full max-w-5xl mx-auto my-32">
-        {backlink && (
-          <Backlink href={backlink}>{section}</Backlink>
-        )}
-        {!backlink && (
-          <h1 className="max-w-3xl text-lg font-semibold font-heading opacity-40">
-            {section}
-          </h1>
-        )}
-        <h2
-          className="pb-16 mt-3 font-semibold leading-tight text-left max-w-max bg-clip-text text-7xl"
-        >
-          {title}
-        </h2>
+    <div className={theme === 'light' ? 'bg-primary-50 text-black' : 'bg-black'}>
+      <Wrapper>
+        <div className="w-full max-w-5xl mx-auto my-32">
+          {backlink && (
+            <Backlink href={backlink}>{section}</Backlink>
+          )}
+          <h2
+            className="pb-16 mt-3 font-semibold leading-tight text-left max-w-max bg-clip-text text-7xl"
+          >
+            {title}
+          </h2>
 
-        <p className="text-lg leading-8 text-justify max-w-max font-heading">
-          {description}
-        </p>
-      </div>
-    </Wrapper>
+          <p className="text-lg leading-8 max-w-max" style={{ columnCount: 2 }}>
+            {description}
+          </p>
+        </div>
+      </Wrapper>
+    </div>
   );
 };
 
