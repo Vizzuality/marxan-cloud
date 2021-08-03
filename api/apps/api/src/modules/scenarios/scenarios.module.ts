@@ -36,6 +36,7 @@ import { GeoFeaturesModule } from '../geo-features/geo-features.module';
 import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.serializer';
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
+import { AdminAreasModule } from '../admin-areas/admin-areas.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-pl
     PlanningUnitsProtectionLevelModule,
     OutputFilesModule,
     MarxanRunModule,
+    AdminAreasModule,
   ],
   providers: [
     ScenariosService,
