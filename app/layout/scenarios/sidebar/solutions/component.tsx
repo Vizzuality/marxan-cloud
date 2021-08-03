@@ -46,7 +46,7 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
   if (!scenarioData || tab !== ScenarioSidebarTabs.SOLUTIONS) return null;
 
   return (
-    <div className="w-full h-full">
+    <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
       <HelpBeacon
         id="scenarios-solutions"
         title="Solutions"
