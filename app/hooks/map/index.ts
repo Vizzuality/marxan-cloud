@@ -288,6 +288,8 @@ export function usePUGridLayer({
               'line-opacity': 1,
             },
           },
+
+          // PROTECTED AREAS
           ...(type === 'protected-areas' && subtype === 'protected-areas-percentage') || type === 'features' ? [
             {
               type: 'fill',
@@ -307,6 +309,25 @@ export function usePUGridLayer({
             },
           ] : [],
 
+          // ANALYSIS - COST SURFACE
+          ...type === 'analysis' && subtype === 'analysis-cost-surface' ? [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-color': {
+                  property: 'costValue',
+                  stops: [
+                    [0, '#FFBFB7'],
+                    [1, '#C21701'],
+                  ],
+                },
+                'fill-opacity': 0.75,
+              },
+            },
+          ] : [],
+
+          // ANALYSIS - ADJUST PLANNING UNITS
           ...type === 'analysis' && subtype === 'analysis-adjust-planning-units' && !!puIncludedValue ? [
             {
               type: 'line',
