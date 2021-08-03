@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import { Scenario } from '../scenario.api.entity';
+import { isNil } from 'lodash';
 
 @Injectable()
 export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
@@ -21,6 +22,16 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
    * with protected areas.
    */
   async calculatedProtectionStatusForPlanningUnitsIn(scenario: Scenario): Promise<void> {
+    /**
+     * If no protected areas are defined, or no threshold has been defined,
+     * there's nothing to do. We allow to set these on update, so we should not
+     * enforce this here.
+     *
+     * @TODO We'll need to handle custom protected areas here once we add
+     * support for these.
+     */
+    if(isNil(scenario.wdpaIucnCategories) || isNil(scenario.wdpaThreshold)) return;
+
     const wdpaIucnCategoriesForScenario = scenario.wdpaIucnCategories?.map(i => `'${i}'`).join(', ');
     console.log(wdpaIucnCategoriesForScenario);
 
