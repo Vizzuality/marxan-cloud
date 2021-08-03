@@ -101,6 +101,8 @@ export const E2E_CONFIG: {
       minimal: () => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
+        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitAreakm2: 10,
       }),
       minimalInGivenAdminArea: (options?: {
         countryCode?: string;
@@ -113,6 +115,8 @@ export const E2E_CONFIG: {
         countryId: options?.countryCode,
         adminAreaLevel1Id: options?.adminAreaLevel1Id,
         adminAreaLevel2Id: options?.adminAreaLevel2Id,
+        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitAreakm2: 10,
       }),
       complete: (options: CountryCodeInput): CreateProjectDTO => ({
         name: faker.random.words(5),
