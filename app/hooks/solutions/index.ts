@@ -101,7 +101,9 @@ export function useSolution(scenarioId, solutionId) {
     },
   }).then((response) => {
     return response.data;
-  }));
+  }), {
+    enabled: !!solutionId,
+  });
 
   const { data } = query;
 
