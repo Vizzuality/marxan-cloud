@@ -245,6 +245,15 @@ export function usePUGridPreviewLayer({
 export function usePUGridLayer({
   active, sid, type, subtype, options = {}, cache,
 }: UsePUGridLayer) {
+  const include = useMemo(() => {
+    if (type === 'protected-areas' || type === 'features') return 'protection';
+    if (type === 'analysis' && subtype === 'analysis-gap-analysis') return 'features';
+    if (type === 'analysis' && subtype === 'analysis-cost-surface') return 'cost';
+    if (type === 'analysis' && subtype === 'analysis-adjust-planning-units') return 'lock-status';
+
+    return 'protection';
+  }, [type, subtype]);
+
   return useMemo(() => {
     if (!active || !sid) return null;
 
@@ -259,7 +268,7 @@ export function usePUGridLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/planning-units/tiles/{z}/{x}/{y}.mvt`],
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/planning-units/tiles/{z}/{x}/{y}.mvt?include=${include}`],
       },
       render: {
         layers: [
@@ -331,5 +340,5 @@ export function usePUGridLayer({
         ],
       },
     };
-  }, [cache, active, sid, type, subtype, options]);
+  }, [cache, active, sid, type, subtype, options, include]);
 }
