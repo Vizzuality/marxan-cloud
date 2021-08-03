@@ -33,11 +33,6 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
               );
             })}
             <div className="w-full mt-20 place-self-center">
-              {/* <Link href="/community/projects">
-                <a href="/community/projects" className="mt-2">
-                  Explore planning Examples
-                </a>
-              </Link> */}
               <ButtonLink caption="Explore planning Examples" href="/community/projects" />
             </div>
           </div>
