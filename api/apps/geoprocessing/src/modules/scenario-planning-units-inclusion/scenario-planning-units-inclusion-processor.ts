@@ -76,7 +76,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
-        puGeometryId: In(geometriesIdsToInclude),
+        id: In(geometriesIdsToInclude),
       },
       {
         lockStatus: LockStatus.LockedIn,
@@ -86,7 +86,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
-        puGeometryId: In(geometriesIdsToExclude),
+        id: In(geometriesIdsToExclude),
       },
       {
         lockStatus: LockStatus.LockedOut,
