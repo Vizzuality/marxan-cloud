@@ -4,6 +4,8 @@ import Wrapper from 'layout/wrapper';
 
 import Carousel from 'components/carousel';
 
+import BackgroundImage from 'images/home-carousel/bg-image.jpg';
+
 import { IMAGES } from './constants';
 
 export interface HomeCarouselProps {
@@ -36,12 +38,25 @@ export const HomeCarousel: React.FC<HomeCarouselProps> = () => {
 
   return (
     <div
-      style={{
-        background: 'linear-gradient(to bottom, #000 75%, #151515 25%)',
-      }}
+      className="relative"
     >
+      <div
+        role="presentation"
+        className="absolute top-0 left-0 w-full bg-center bg-cover"
+        style={{
+          backgroundImage: `url(${BackgroundImage})`,
+          height: '70%',
+        }}
+      />
+      <div
+        role="presentation"
+        className="absolute bottom-0 left-0 w-full bg-gray-700"
+        style={{
+          height: '30%',
+        }}
+      />
       <Wrapper>
-        <div className="flex justify-center w-full max-w-5xl px-10 mx-auto">
+        <div className="relative -top-8 flex justify-center w-full max-w-4xl px-10 pb-8 mx-auto">
           {!!imgs.length && (
             <Carousel
               images={imgs}
