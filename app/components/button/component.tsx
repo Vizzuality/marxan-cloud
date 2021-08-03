@@ -70,7 +70,7 @@ function buildClassName({
   theme,
 }) {
   return cx({
-    'group relative flex items-center justify-center rounded-4xl transition focus:outline-none': true,
+    'group relative flex items-center justify-center rounded-4xl transition-colors focus:outline-none': true,
     [THEME[theme]]: true,
     [SIZE[size]]: true,
     [className]: !!className,

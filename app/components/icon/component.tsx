@@ -19,7 +19,7 @@ export const Icon: React.FC<IconProps> = ({
   return (
     <svg
       className={cx({
-        'fill-current transition': true,
+        'fill-current transition-colors': true,
         [className]: className,
       })}
       viewBox={icon?.viewBox || '0 0 32 32'}
