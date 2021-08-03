@@ -10,7 +10,6 @@ import Footer from 'layout/footer';
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
-import Contact from 'layout/statics/contact';
 import Hero from 'layout/statics/hero';
 
 export const getServerSideProps = withUser();
@@ -40,14 +39,14 @@ const Community: React.FC = () => {
       />
 
       <main>
-        <Header size="base" />
+        <Header size="base" theme="light" />
         <Hero
           section="Community"
           title={TITLE_TEXT}
           description={DESCRIPTION_TEXT}
+          theme="light"
         />
         <CommunityInfo />
-        <Contact />
         <Footer />
       </main>
     </>
