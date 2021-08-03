@@ -54,7 +54,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
 
   return (
     <div>
-      <h3 className="mb-6 text-sm font-semibold text-white">Share</h3>
+      <h3 className="mb-6 text-sm font-semibold">Share</h3>
 
       <div className="space-y-5">
         <button
@@ -62,7 +62,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           className="flex flex-row"
           onClick={handleCopy}
         >
-          <Icon icon={LINK_SVG} className="w-5 h-5 mr-2.5 text-white" />
+          <Icon icon={LINK_SVG} className="w-5 h-5 mr-2.5 text-black" />
           <p className="text-sm">Copy link</p>
         </button>
 
@@ -74,7 +74,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           rel="noreferrer"
           target="_blank"
         >
-          <Icon icon={TWITTER_FILLED_SVG} className="w-5 h-5 mr-2.5 text-white" />
+          <Icon icon={TWITTER_FILLED_SVG} className="w-5 h-5 mr-2.5" />
           <p className="text-sm">Twitter</p>
         </a>
 
@@ -86,7 +86,7 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
           rel="noreferrer"
           target="_blank"
         >
-          <Icon icon={FACEBOOK_FILLED_SVG} className="h-5 mr-5 text-white" />
+          <Icon icon={FACEBOOK_FILLED_SVG} className="h-5 mr-5" />
           <p className="text-sm">Facebook</p>
         </a>
 

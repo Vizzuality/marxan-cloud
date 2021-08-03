@@ -46,112 +46,115 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   const scenarios = publishedProjectScenarios || [];
 
   return (
-    <Wrapper>
-      <div className="w-full max-w-5xl mx-auto my-32">
+    <div className="bg-primary-50 text-black">
+      <Wrapper>
+        <div className="w-full max-w-5xl mx-auto my-32">
 
-        <Backlink href="/community/projects">
-          Projects
-        </Backlink>
+          <Backlink href="/community/projects">
+            Projects
+          </Backlink>
 
-        <div className="relative" style={{ minHeight: 600 }}>
-          {publishedProjectIsFetching && publishedProjectScenariosIsFetching && (
-            <div className="absolute flex items-center justify-center w-full h-full py-12">
-              <Loading
-                className="w-10 h-10 text-white"
-                iconClassName="w-10 h-10"
-                visible
-              />
-            </div>
-          )}
+          <div className="relative" style={{ minHeight: 600 }}>
+            {publishedProjectIsFetching && publishedProjectScenariosIsFetching && (
+              <div className="absolute flex items-center justify-center w-full h-full py-12">
+                <Loading
+                  className="w-10 h-10"
+                  iconClassName="w-10 h-10"
+                  visible
+                />
+              </div>
+            )}
 
-          {publishedProject && scenarios && (
-            <div className="flex flex-row">
-              <div className="w-7/12 pr-12">
+            {publishedProject && scenarios && (
+              <div className="flex flex-row">
+                <div className="w-7/12 pr-12">
 
-                <h2
-                  className="mt-5 mb-12 text-4xl font-medium text-left font-heading"
+                  <h2
+                    className="mt-5 mb-12 text-4xl font-medium text-left font-heading"
+                  >
+                    {name}
+                  </h2>
+
+                  <p className="mb-10 text-sm leading-normal text-gray-400">
+                    {description}
+                  </p>
+
+                  <div className="flex flex-row items-center mb-10">
+
+                    <DuplicateButton
+                      id={id}
+                      name={name}
+                      theme="dark"
+                    />
+
+                    {timesDuplicated && (
+                      <p className="ml-5 text-sm">
+                        Duplicated
+                        {format('.3s')(timesDuplicated)}
+                        {' '}
+                        times
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 grid-rows-2 gap-y-11 gap-x-9">
+
+                    <div>
+                      <h3 className="mb-5 text-sm font-semibold">Creators</h3>
+                      {!!contributors?.length && (
+                        <div className="space-y-4">
+                          {contributors.map((c) => (
+                            <div key={c.id} className="flex flex-row items-center">
+                              <Avatar bgImage={c.bgImage || '/images/avatar.png'} size="s" />
+                              <p className="ml-2.5 text-sm">{c.name}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <h3 className="mb-6 text-sm font-semibold">Planning area</h3>
+                      <p className="text-lg">{planningAreaName}</p>
+                    </div>
+
+                    <div>
+                      <h3 className="mb-6 text-sm font-semibold">Scenarios</h3>
+                      {!!scenarios.length && (
+                        <>
+                          <p className="text-sm">
+                            {scenarios?.length}
+                            {' '}
+                            scenarios
+                          </p>
+                          <p className="text-sm">
+                            Last creation:
+                            {' '}
+                            {scenarios[0].lastUpdateDistance}
+                          </p>
+                        </>
+                      )}
+                    </div>
+
+                    <Share />
+
+                  </div>
+                </div>
+
+                <div
+                  className="w-5/12 mt-6"
+                  style={{ maxHeight: 500 }}
                 >
-                  {name}
-                </h2>
-
-                <p className="mb-10 text-sm leading-normal text-gray-400">
-                  {description}
-                </p>
-
-                <div className="flex flex-row items-center mb-10">
-
-                  <DuplicateButton
-                    id={id}
-                    name={name}
-                  />
-
-                  {timesDuplicated && (
-                    <p className="ml-5 text-sm text-white">
-                      Duplicated
-                      {format('.3s')(timesDuplicated)}
-                      {' '}
-                      times
-                    </p>
-                  )}
+                  <PublishedProjectMap />
                 </div>
 
-                <div className="grid grid-cols-2 grid-rows-2 gap-y-11 gap-x-9">
-
-                  <div>
-                    <h3 className="mb-5 text-sm font-semibold text-white">Creators</h3>
-                    {!!contributors?.length && (
-                      <div className="space-y-4">
-                        {contributors.map((c) => (
-                          <div key={c.id} className="flex flex-row items-center">
-                            <Avatar bgImage={c.bgImage || '/images/avatar.png'} size="s" />
-                            <p className="ml-2.5 text-sm text-white">{c.name}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <h3 className="mb-6 text-sm font-semibold text-white">Planning area</h3>
-                    <p className="text-lg text-white">{planningAreaName}</p>
-                  </div>
-
-                  <div>
-                    <h3 className="mb-6 text-sm font-semibold text-white">Scenarios</h3>
-                    {!!scenarios.length && (
-                      <>
-                        <p className="text-sm text-white">
-                          {scenarios?.length}
-                          {' '}
-                          scenarios
-                        </p>
-                        <p className="text-sm text-white">
-                          Last creation:
-                          {' '}
-                          {scenarios[0].lastUpdateDistance}
-                        </p>
-                      </>
-                    )}
-                  </div>
-
-                  <Share />
-
-                </div>
               </div>
+            )}
+          </div>
 
-              <div
-                className="w-5/12 mt-6"
-                style={{ maxHeight: 500 }}
-              >
-                <PublishedProjectMap />
-              </div>
-
-            </div>
-          )}
         </div>
-
-      </div>
-    </Wrapper>
+      </Wrapper>
+    </div>
   );
 };
 
