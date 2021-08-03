@@ -6,9 +6,9 @@ export interface StaticColumnProps {
   title: string;
   subtitle?: string;
   description?: string;
-  caption: string;
+  caption?: string;
   image?: string;
-  href: string,
+  href?: string,
   external?: boolean,
 }
 
