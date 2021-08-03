@@ -45,7 +45,7 @@ const PublishedProjectPage: React.FC = () => {
       />
 
       <main>
-        <Header size="base" published />
+        <Header size="base" theme="light" published />
         <ProjectDetail />
         <Footer />
       </main>
