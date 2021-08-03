@@ -10,7 +10,7 @@ export interface StaticHeroProps {
   title: string;
   description: string;
   backlink?: string;
-  theme: 'dark' | 'light';
+  theme?: 'dark' | 'light';
 }
 
 export const StaticHero: React.FC<StaticHeroProps> = ({
