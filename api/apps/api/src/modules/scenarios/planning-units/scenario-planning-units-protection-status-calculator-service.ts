@@ -46,8 +46,8 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
               from pu
               left join pa on pu.the_geom && pa.the_geom) 
     UPDATE scenarios_pu_data
-    SET (protected_area, lockin_status) =
-        (SELECT protected_area, lockin_status FROM (select id, sum(pa_pu_area) as protected_area, max(lockin_status) as lockin_status 
+    SET (lockin_status) =
+        (SELECT lockin_status FROM (select id, max(lockin_status) as lockin_status
                                                     from pu_pa group by id) as result
          WHERE scenarios_pu_data.id = result.id) where scenario_id = '${scenario.id}';
     `;
