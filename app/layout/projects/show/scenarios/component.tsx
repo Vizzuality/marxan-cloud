@@ -257,7 +257,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
                         <ScenarioItem
                           {...s}
-                          status="completed"
+                          status="draft"
                           onDelete={() => {
                             setDelete(s);
                           }}
