@@ -104,29 +104,29 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
               theme="primary"
               size="base"
               className="flex h-12 mb-4"
-              disabled={readOnly}
               onClick={() => setShowTable(true)}
             >
               View solutions table
               <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
             </Button>
-            <Button
-              theme="secondary"
-              size="base"
-              className="h-12"
-              disabled={readOnly}
-              onClick={() => onScheduleScenario()}
-            >
-              <div className="flex flex-col justify-center">
-                Schedule scenario
-                {numberOfSchedules > 0 && (
-                <span className="text-blue-400 text-xxs">
-                  {`${numberOfSchedules} schedule${numberOfSchedules > 1 ? 's' : ''}`}
-                </span>
-                )}
-              </div>
-              <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
-            </Button>
+            {!readOnly && (
+              <Button
+                theme="secondary"
+                size="base"
+                className="h-12"
+                onClick={() => onScheduleScenario()}
+              >
+                <div className="flex flex-col justify-center">
+                  Schedule scenario
+                  {numberOfSchedules > 0 && (
+                  <span className="text-blue-400 text-xxs">
+                    {`${numberOfSchedules} schedule${numberOfSchedules > 1 ? 's' : ''}`}
+                  </span>
+                  )}
+                </div>
+                <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
+              </Button>
+            )}
             <Modal
               open={showTable}
               title="Solutions table"
