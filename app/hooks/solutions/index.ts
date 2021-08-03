@@ -99,6 +99,8 @@ export function useSolution(scenarioId, solutionId) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+  }).then((response) => {
+    return response.data;
   }));
 
   const { data } = query;
@@ -106,9 +108,9 @@ export function useSolution(scenarioId, solutionId) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data.data,
+      data: data?.data,
     };
-  }, [query, data?.data.data]);
+  }, [query, data?.data]);
 }
 
 export function useMostDifferentSolutions(scenarioId, options: UseSolutionsOptionsProps = {}) {
