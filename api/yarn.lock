@@ -554,6 +554,11 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
+"@nestjs-architects/typed-cqrs@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@nestjs-architects/typed-cqrs/-/typed-cqrs-0.1.1.tgz#2d016c5fbed46d4f05973c7374a1f8ca0b88f930"
+  integrity sha512-r195aN2vZ7mKLGsnCEQmx7AbAxP9SeJRcmak8BdSScrI1vvTVlfw1mzwWQZHZKtjwbnJCXBoM6EYpDiNzm9q8A==
+
 "@nestjs/cli@^7.5.1":
   version "7.5.4"
   resolved "https://registry.npmjs.org/@nestjs/cli/-/cli-7.5.4.tgz"
