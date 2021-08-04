@@ -317,8 +317,17 @@ export function usePUGridLayer({
               type: 'fill',
               'source-layer': 'layer0',
               paint: {
-                'fill-color': '#0F0',
-                'fill-opacity': 1,
+                'fill-color': '#6F53F7',
+                'fill-opacity': [
+                  'case',
+                  ['any',
+                    ...(['69088d67-a699-4080-9c2e-d076540c27e0', '70502e30-b6dd-4e40-8bca-1803a6ad5f5f'].map((id) => {
+                      return ['in', id, ['get', 'featureList']];
+                    })),
+                  ],
+                  0.5,
+                  0,
+                ],
               },
             },
           ] : [],
