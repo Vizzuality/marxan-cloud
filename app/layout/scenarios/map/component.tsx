@@ -11,7 +11,7 @@ import { useSelectedFeatures } from 'hooks/features';
 import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -41,8 +41,9 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setPuIncludedValue, setPuExcludedValue } = scenarioSlice.actions;
+
   const dispatch = useDispatch();
   const {
     tab,

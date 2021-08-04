@@ -1,30 +1,41 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
+
+import { useDispatch, useSelector } from 'react-redux';
+
 import { useRouter } from 'next/router';
+
+import useBottomScrollListener from 'hooks/scroll';
+import { useSolutions, useMostDifferentSolutions } from 'hooks/solutions';
+
+import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { Button } from 'components/button/component';
 import Checkbox from 'components/forms/checkbox';
-import Icon from 'components/icon';
 import Label from 'components/forms/label';
-import LoadingMore from 'components/loading-more/component';
+import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
+import LoadingMore from 'components/loading-more/component';
 
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
-import { useSolutions } from 'hooks/solutions';
-import useBottomScrollListener from 'hooks/scroll';
-
-import InfoButton from 'components/info-button';
 import SolutionsTable from '../table';
 
 import { SolutionsTableFormProps } from './types';
 
 export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
-  onCancel,
-  onSave,
+  bestSolutionId, onCancel, setShowTable,
 }: SolutionsTableFormProps) => {
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
   const { query } = useRouter();
-  const { pid } = query;
+  const { sid } = query;
+  const dispatch = useDispatch();
+
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setSelectedSolution } = scenarioSlice.actions;
+
+  const { selectedSolutionId } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const [selectedSolution, onSelectSolution] = useState(selectedSolutionId || bestSolutionId);
 
   const {
     data,
@@ -33,7 +44,25 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     isFetching,
     isFetchingNextPage,
     isFetched,
-  } = useSolutions(pid, { filters: { 'most-different': mostDifSolutions } });
+  } = useSolutions(sid);
+
+  const {
+    data: mostDifSolutionsData,
+    isFetching: mostDifSolutionsisFetching,
+    isFetched: mostDifSolutionsisFetched,
+  } = useMostDifferentSolutions(sid);
+
+  const allSolutionsFetched = (!isFetching || isFetchingNextPage)
+  && data && data.length > 0 && !mostDifSolutions;
+
+  const mostDifSolutionsIsSelected = mostDifSolutions
+  && mostDifSolutionsData && mostDifSolutionsData.length > 0;
+
+  const noSolutionResults = ((!isFetching && (!data || !data.length)) || (!mostDifSolutionsisFetched
+    && (!mostDifSolutionsData || !mostDifSolutionsData.length)));
+
+  const solutionsAreLoading = ((isFetching && !isFetched)
+    || (mostDifSolutionsisFetching && !mostDifSolutionsisFetched));
 
   const scrollRef = useBottomScrollListener(
     () => {
@@ -41,10 +70,15 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     },
   );
 
+  const onSave = useCallback(() => {
+    dispatch(setSelectedSolution(selectedSolution));
+    setShowTable(false);
+  }, [dispatch, selectedSolution, setSelectedSolution, setShowTable]);
+
   return (
     <div className="text-gray-800">
-      <div className="px-8 pb-8">
-        <div className="flex items-center justify-start pb-6">
+      <div className="flex items-center px-8 pb-8 space-x-6">
+        <div className="flex items-center justify-start">
           <Button
             theme="secondary"
             size="base"
@@ -115,7 +149,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             className="block w-4 h-4 text-green-300 form-checkbox-dark"
             onChange={(event) => setMostDifSolutions(event.target.checked)}
           />
-          <Label className="mx-2 text-gray-700">
+          <Label className="mx-2 text-sm text-gray-700">
             View 5 most different solutions
           </Label>
 
@@ -146,7 +180,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
         className="relative overflow-x-hidden overflow-y-auto"
         style={{ height: '400px' }}
       >
-        {(isFetching && !isFetched) && (
+        {solutionsAreLoading && (
           <div className="absolute top-0 left-0 z-30 flex flex-col items-center justify-center w-full h-full">
             <Loading
               visible
@@ -157,15 +191,18 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           </div>
         )}
 
-        {(!isFetching && (!data || !data.length)) && (
+        {noSolutionResults && (
           <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
             No results found
           </div>
         )}
-        {(!isFetching || isFetchingNextPage) && data && data.length > 0 && (
+
+        {(allSolutionsFetched || mostDifSolutionsIsSelected) && (
           <SolutionsTable
-            body={data}
-            onSelectSolution={(solution) => console.info('solution selected', solution)}
+            bestSolutionId={bestSolutionId}
+            body={mostDifSolutionsIsSelected ? mostDifSolutionsData : data}
+            selectedSolution={selectedSolution}
+            onSelectSolution={(solution) => onSelectSolution(solution.id)}
           />
         )}
         <LoadingMore visible={isFetchingNextPage} />

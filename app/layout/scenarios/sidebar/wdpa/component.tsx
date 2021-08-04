@@ -8,7 +8,7 @@ import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
@@ -21,14 +21,17 @@ import ScenariosSidebarWDPAThreshold from 'layout/scenarios/sidebar/wdpa/thresho
 import Steps from 'components/steps';
 
 export interface ScenariosSidebarWDPAProps {
+  readOnly?: boolean;
 }
 
-export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
+export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
+  readOnly,
+}: ScenariosSidebarWDPAProps) => {
   const [step, setStep] = useState(0);
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
@@ -101,6 +104,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
                   dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PERCENTAGE));
                 }}
                 onDismiss={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
+                readOnly={readOnly}
               />
             )}
 
@@ -111,6 +115,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
                   setStep(0);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));
                 }}
+                readOnly={readOnly}
               />
             )}
           </Pill>

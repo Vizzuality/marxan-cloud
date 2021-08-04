@@ -166,6 +166,15 @@ export class ScenariosController {
     required: true,
     example: 35,
   })
+  @ApiQuery({
+    name: 'include',
+    description: 'one of `protection`, `lock-status`, `features`, `cost`, `results`',
+    type: Array,
+    required: false,
+    example: 35,
+  }
+
+  )
   @Get(':id/planning-units/tiles/:z/:x/:y.mvt')
   async proxyProtectedAreaTile(
     @Req() request: Request,

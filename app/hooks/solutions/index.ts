@@ -1,23 +1,23 @@
 import { useMemo } from 'react';
+
 import {
-  useInfiniteQuery,
+  useInfiniteQuery, useQuery,
 } from 'react-query';
-import { useSession } from 'next-auth/client';
 
 import flatten from 'lodash/flatten';
+import { useSession } from 'next-auth/client';
 
-import PROJECTS from 'services/projects';
+import SCENARIOS from 'services/scenarios';
 
 import {
   UseSolutionsOptionsProps,
 } from './types';
 
-export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) {
+export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {}) {
   const [session] = useSession();
 
   const {
     filters = {},
-    search,
     sort,
   } = options;
 
@@ -29,25 +29,22 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
       };
     }, {});
 
-  const fetchFeatures = ({ pageParam = 1 }) => PROJECTS.request({
+  const fetchFeatures = ({ pageParam = 1 }) => SCENARIOS.request({
     method: 'GET',
-    url: `/${projectId}/features`,
+    url: `/${scenarioId}/marxan/solutions`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
     params: {
       'page[number]': pageParam,
       ...parsedFilters,
-      ...search && {
-        q: search,
-      },
       ...sort && {
         sort,
       },
     },
   });
 
-  const query = useInfiniteQuery(['solutions', projectId, JSON.stringify(options)], fetchFeatures, {
+  const query = useInfiniteQuery(['solutions', scenarioId, JSON.stringify(options)], fetchFeatures, {
     keepPreviousData: true,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
@@ -68,18 +65,20 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
       return pageData.map((d) => {
         const {
           id,
-          alias,
-          featureClassName,
+          runId,
+          scoreValue,
+          costValue,
+          planningUnits,
+          missingValues,
         } = d;
 
         return {
           id,
-          name: alias || featureClassName,
-          run: Math.round(Math.random() * 100),
-          score: Math.round(Math.random() * 200),
-          cost: Math.round(Math.random() * 300),
-          planningUnits: Math.round(Math.random() * 20),
-          missingValues: Math.round(Math.random() * 10),
+          run: runId,
+          score: scoreValue,
+          cost: costValue,
+          planningUnits,
+          missingValues,
         };
       });
     })) : [];
@@ -89,4 +88,115 @@ export function useSolutions(projectId, options: UseSolutionsOptionsProps = {}) 
       data: parsedData,
     };
   }, [query, pages]);
+}
+
+export function useSolution(scenarioId, solutionId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios', scenarioId, solutionId], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/marxan/solutions/${solutionId}`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!solutionId,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
+export function useMostDifferentSolutions(scenarioId, options: UseSolutionsOptionsProps = {}) {
+  const [session] = useSession();
+
+  const {
+    filters = {},
+  } = options;
+
+  const parsedFilters = Object.keys(filters)
+    .reduce((acc, k) => {
+      return {
+        ...acc,
+        [`filter[${k}]`]: filters[k],
+      };
+    }, {});
+
+  const query = useQuery(['scenarios', scenarioId], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/marxan/solutions/most-different`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    params: {
+      ...parsedFilters,
+    },
+  }));
+
+  const { data } = query;
+
+  return useMemo(() => {
+    const parsedData = Array.isArray(data.data.data) ? data.data.data.map((d) => {
+      const {
+        id,
+        runId,
+        scoreValue,
+        costValue,
+        planningUnits,
+        missingValues,
+      } = d;
+
+      return {
+        id,
+        run: runId,
+        score: scoreValue,
+        cost: costValue,
+        planningUnits,
+        missingValues,
+      };
+    }) : [];
+
+    return {
+      ...query,
+      data: parsedData,
+    };
+  }, [query, data]);
+}
+
+export function useBestSolution(scenarioId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios', scenarioId], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/marxan/solutions/best`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }));
+
+  // const { data } = query;
+
+  return useMemo(() => {
+    const mockBestSolution = {
+      id: 'c5a7ac37-3a88-4a08-9f23-bb83f0e8af11',
+      runId: 9,
+      scoreValue: 999,
+      costValue: 900,
+      missingValues: 19,
+      planningUnits: 19,
+    };
+
+    return {
+      ...query,
+      data: mockBestSolution,
+    };
+  }, [query]);
 }

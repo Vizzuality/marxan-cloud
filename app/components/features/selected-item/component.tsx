@@ -19,6 +19,9 @@ export interface ItemProps {
   description: string;
   type: 'bioregional' | 'species';
 
+  // EDIT/SHOW
+  readOnly: boolean;
+
   // SPLIT
   splitSelected?: string;
   splitOptions?: { key: string; values: any[]; }[];
@@ -52,6 +55,8 @@ export const Item: React.FC<ItemProps> = ({
   className,
   description,
   type,
+
+  readOnly,
 
   splitSelected,
   splitOptions = [],
@@ -125,19 +130,21 @@ export const Item: React.FC<ItemProps> = ({
         <div className="flex items-start justify-between">
           <h2 className="mt-1 text-sm font-heading">{name}</h2>
 
-          <Button
-            className="flex-shrink-0 text-xs"
-            theme="secondary"
-            size="xs"
-            onClick={() => onRemove && onRemove(id)}
-          >
-            Remove
-          </Button>
+          {!readOnly && (
+            <Button
+              className="flex-shrink-0 text-xs"
+              theme="secondary"
+              size="xs"
+              onClick={() => onRemove && onRemove(id)}
+            >
+              Remove
+            </Button>
+          )}
 
         </div>
         <div className="mt-2 text-sm opacity-50 clamp-2">{description}</div>
 
-        {type === 'bioregional' && (
+        {type === 'bioregional' && !readOnly && (
           <div>
             <div className="flex items-center mt-3 tracking-wide font-heading">
               <Icon icon={SPLIT_SVG} className="w-5 h-5 text-green-300" />
@@ -178,7 +185,7 @@ export const Item: React.FC<ItemProps> = ({
           </div>
         )}
 
-        {type === 'species' && (
+        {type === 'species' && !readOnly && (
           <div>
             <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-yellow-300" />

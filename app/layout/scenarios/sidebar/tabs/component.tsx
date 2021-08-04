@@ -4,8 +4,9 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import { motion } from 'framer-motion';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -19,7 +20,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);

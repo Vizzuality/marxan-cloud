@@ -2,20 +2,21 @@ import React, { useState, useCallback, useEffect } from 'react';
 
 import { useDispatch } from 'react-redux';
 
-import { useToasts } from 'hooks/toast';
 import { useRouter } from 'next/router';
 
-import { motion } from 'framer-motion';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-
 import { useScenarioPU, useSaveScenarioPU } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import { motion } from 'framer-motion';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
-import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 import Buttons from './buttons';
 import Tabs from './tabs';
@@ -33,10 +34,11 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const {
     setPUAction, setPuIncludedValue, setPuExcludedValue,
   } = scenarioSlice.actions;
+
   const dispatch = useDispatch();
 
   const { addToast } = useToasts();

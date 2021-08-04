@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 import { useDebouncedCallback } from 'use-debounce';
@@ -21,10 +21,12 @@ import Loading from 'components/loading';
 import Modal from 'components/modal';
 
 export interface ScenariosFeaturesListProps {
+  readOnly?: boolean,
   onSuccess: () => void
 }
 
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
+  readOnly,
   onSuccess,
 }: ScenariosFeaturesListProps) => {
   const [submitting, setSubmitting] = useState(false);
@@ -32,7 +34,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setFeatureHoverId } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
@@ -242,6 +244,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                           >
                             <Item
                               {...item}
+                              readOnly={readOnly}
                               onSplitSelected={(s) => {
                                 onSplitSelected(item.id, s, input);
                               }}

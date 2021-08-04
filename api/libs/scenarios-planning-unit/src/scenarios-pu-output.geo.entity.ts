@@ -24,17 +24,18 @@ export class ScenariosPuOutputGeoEntity {
   @Column({
     type: `int`,
     nullable: true,
-    name: `run_id`,
+    name: `included_count`,
   })
-  runId?: string | null;
+  includedCount?: number | null;
 
   /**
    * Score of the run
    */
-  @Column({
-    type: `int`,
-    nullable: true,
+   @Column({
     name: `value`,
+    array: true,
+    type: 'boolean',
+    nullable: false,
   })
-  scoreValue?: number | null;
+  values!: Array<boolean>;
 }

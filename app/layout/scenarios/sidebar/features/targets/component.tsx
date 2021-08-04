@@ -1,21 +1,25 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import cx from 'classnames';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-import Button from 'components/button';
-import Loading from 'components/loading';
-import Item from 'components/features/target-spf-item';
-
 import { useRouter } from 'next/router';
+
 import { useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 
+import cx from 'classnames';
+
+import Button from 'components/button';
+import Item from 'components/features/target-spf-item';
+import Loading from 'components/loading';
+
 export interface ScenariosFeaturesListProps {
+  readOnly: boolean;
   onBack: () => void;
   onSuccess: () => void;
 }
 
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
+  readOnly,
   onBack,
   onSuccess,
 }: ScenariosFeaturesListProps) => {
@@ -257,7 +261,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                 type="submit"
                 theme="primary"
                 size="lg"
-                disabled={submitting}
+                disabled={submitting || readOnly}
               >
                 Save
               </Button>
