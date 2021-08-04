@@ -120,8 +120,8 @@ export class GeoFeatureSetService {
     {
       scenarioId: string;
       featuresDataId: string;
-      fpf?: number | undefined;
-      prop?: number | undefined;
+      fpf?: number;
+      prop?: number;
     }[][]
   > {
     const scenarioFeaturesData = Promise.all(
