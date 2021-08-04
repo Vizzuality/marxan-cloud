@@ -44,7 +44,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   const { setUploading, setUploadingValue, setCache } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
-  const { uploadingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { uploadingValue, puIncludedValue, puExcludedValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -166,6 +166,10 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     scenarioPUMutation.mutate({
       id: `${sid}`,
       data: {
+        byId: {
+          include: puIncludedValue,
+          exclude: puExcludedValue,
+        },
         byGeoJson: {
           [values.type]: [values.uploadingValue],
         },
@@ -204,6 +208,8 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   }, [
     sid,
     scenarioPUMutation,
+    puIncludedValue,
+    puExcludedValue,
     onSelected,
     dispatch,
     setUploading,

@@ -36,7 +36,11 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setDrawing, setDrawingValue, setCache } = scenarioSlice.actions;
   const dispatch = useDispatch();
-  const { drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const {
+    puIncludedValue,
+    puExcludedValue,
+    drawingValue,
+  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const scenarioPUMutation = useSaveScenarioPU({});
 
@@ -71,6 +75,10 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
     scenarioPUMutation.mutate({
       id: `${sid}`,
       data: {
+        byId: {
+          include: puIncludedValue,
+          exclude: puExcludedValue,
+        },
         byGeoJson: {
           [values.type]: [{
             type: 'FeatureCollection',
@@ -113,6 +121,8 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   }, [
     sid,
     scenarioPUMutation,
+    puIncludedValue,
+    puExcludedValue,
     onSelected,
     dispatch,
     setDrawing,
