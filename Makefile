@@ -79,13 +79,24 @@ clean-slate: stop clean-slate-full-stop-and-cleanup
 
 test-clean-slate: clean-slate-full-stop-and-cleanup
 
-seed-dbs: seed-api-with-test-data | seed-geoapi-with-test-data
+# setup full testing data
+seed-dbs: seed-api-init-data | seed-geoapi-init-data | seed-api-with-test-data | seed-geoapi-with-test-data
 
 seed-api-with-test-data:
 	@echo "$(RED)seeding db:$(NC) $(API_DB_INSTANCE)"
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-data.sql
 
-seed-geoapi-with-test-data:
+seed-api-init-data:
+	@echo "$(RED)seeding db:$(NC) $(API_DB_INSTANCE)"
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-init-apidb.sql
+
+seed-geoapi-with-test-data: seed-geoapi-init-data
+	SCENARIOID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
+	USERID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from users limit 1"); \
+	echo "appending data for scenario with id $${SCENARIOID}"; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/apps/api/test/fixtures/test-geodata.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
+
+seed-geoapi-init-data:
 	@echo "$(RED)seeding dbs:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE) and ${REDIS_INSTANCE}"
 	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-admin-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}"; \
 	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-wdpa-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
@@ -95,11 +106,7 @@ seed-geoapi-with-test-data:
 		featureid=`docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
 		echo "appending data for $${table_name} with id $${featureid}"; \
 		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}"; \
-		done; \
-	SCENARIOID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
-	USERID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from users limit 1"); \
-	echo "appending data for scenario with id $${SCENARIOID}"; \
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/apps/api/test/fixtures/test-geodata.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
+		done;
 
 # need notebook service to execute a expecific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
@@ -112,7 +119,7 @@ generate-geo-test-data: extract-geo-test-data
 # Don't forget to run make clean-slate && make start-api before repopulating the whole db
 # This will delete all existing data and create tables/views/etc. through the migrations that
 # run when starting up the API service.
-seed-geodb-data: seed-api-with-test-data
+seed-geodb-data: seed-api-init-data
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
 
 test-start-services: clean-slate
@@ -162,6 +169,9 @@ dump-api-data:
 
 upload-dump-data:
 	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps -s data/data/processed/db_dumps
+
+upload-data-for-demo:
+	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/data-demo -s data/data/data_demo/organized
 
 restore-dumps:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
