@@ -84,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({ published = false, size, theme =
 
           {!user && (
             <div className="flex items-center space-x-4">
-              <LinkButton href="/auth/sign-in" theme="secondary-alt" size="s">
+              <LinkButton href="/auth/sign-in" theme="clear" size="s">
                 Sign in
               </LinkButton>
 
