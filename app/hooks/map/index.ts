@@ -288,6 +288,8 @@ export function usePUGridLayer({
             paint: {
               'line-color': '#00BFFF',
               'line-opacity': 1,
+              'line-width': 1,
+              'line-offset': 0.5,
             },
           },
 
@@ -363,6 +365,7 @@ export function usePUGridLayer({
                 'line-color': '#0F0',
                 'line-opacity': 1,
                 'line-width': 2,
+                'line-offset': 0.75,
               },
             },
           ] : [],
@@ -378,6 +381,7 @@ export function usePUGridLayer({
                 'line-color': '#F00',
                 'line-opacity': 1,
                 'line-width': 2,
+                'line-offset': 0.75,
               },
             },
           ] : [],
