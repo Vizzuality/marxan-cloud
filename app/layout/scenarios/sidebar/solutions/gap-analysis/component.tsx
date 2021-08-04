@@ -2,10 +2,11 @@ import React, { useState, useCallback } from 'react';
 
 import { motion } from 'framer-motion';
 
-import Icon from 'components/icon';
-import Button from 'components/button';
 import List from 'layout/scenarios/sidebar/analysis/gap-analysis/list';
 import Toolbar from 'layout/scenarios/sidebar/analysis/gap-analysis/toolbar';
+
+import Button from 'components/button';
+import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
 // Icons
@@ -44,14 +45,27 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
         <InfoButton
           theme="primary"
         >
-          <div className="text-sm opacity-100">
-            Evaluate the status in terms of protection of
-            your features in the resulting conservation plan.
-            The result will show the percentage of each
-            feature inside the included protected areas
-            plus the percentage inside the planning units
-            selected by Marxan and will inform you of
-            the protection situation regarding your targets.
+          <div>
+            <h4 className="font-heading text-lg mb-2.5">What is the Solutions Gap Analysis?</h4>
+            <div className="space-y-5 text-sm opacity-100">
+              <p>
+                Before running Marxan you were able to see
+                the percentage of each feature that was currently
+                inside your conservation network in
+                {' '}
+                <b>Gap Analysis</b>
+              </p>
+              <p>
+                In this Gap analysis, you add to that
+                previous network all the planning units that have been
+                selected by Marxan,
+                so this new percentage shows the amount of each feature that
+                would be included if the new conservation plan your
+                are working on is
+                implemented.
+              </p>
+
+            </div>
           </div>
         </InfoButton>
         <Button

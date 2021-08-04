@@ -19,7 +19,7 @@ import {
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
-import THRESHOLDING_IMG from 'images/img-thresholding.png';
+import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
 export interface WDPAThresholdCategories {
   onSuccess: () => void;
@@ -153,25 +153,28 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                           <InfoButton>
                             <div>
                               <h4 className="font-heading text-lg mb-2.5">What is a threshold?</h4>
-                              <div>
-                                Inside Marxan, planning units are considered as either
-                                protected
-                                or not protected. The threshold value represents a
-                                percentage of the area
-                                inside a planning unit. By setting the threshold you decide
-                                how much of a protected area needs to fall inside a
-                                planning unit to consider the whole planning unit
-                                as &quot;protected&quot;.
-                                <br />
-                                <br />
-
-                                The following
-                                image shows an example setting a threshold of 50%:
-                                <br />
-                                <br />
+                              <div className="space-y-2">
+                                <p>
+                                  Inside Marxan, planning units are considered as either
+                                  protected
+                                  or not protected.
+                                </p>
+                                <p>
+                                  The threshold value represents a
+                                  percentage of the area
+                                  inside a planning unit. By setting the threshold you decide
+                                  how much of a protected area needs to fall inside a
+                                  planning unit to consider the whole planning unit
+                                  as &quot;protected&quot;.
+                                </p>
+                                <p>
+                                  The following
+                                  image shows an example setting a threshold of 50%:
+                                </p>
                               </div>
 
-                              <img src={THRESHOLDING_IMG} alt="Thresholding" />
+                              <img src={THRESHOLD_IMG} alt="Threshold" />
+
                             </div>
                           </InfoButton>
                         </div>

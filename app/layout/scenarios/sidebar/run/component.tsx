@@ -6,6 +6,8 @@ import { Form as FormRFF } from 'react-final-form';
 
 import cx from 'classnames';
 
+import HelpBeacon from 'layout/help/beacon';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
 
@@ -35,10 +37,12 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   }, []);
 
   return (
+
     <FormRFF
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
+
       {({ handleSubmit }) => (
         <form
           className={cx({
@@ -48,7 +52,32 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
           noValidate
           onSubmit={handleSubmit}
         >
-          <h2 className="px-10 text-2xl font-medium font-heading">Run scenario:</h2>
+          <HelpBeacon
+            id="run-settings"
+            title="RUN OPTIONS"
+            subtitle="Marxan settings"
+            content={(
+              <div className="space-y-5">
+                <p>
+                  Before you run Marxan, you can adjust some
+                  parameters.
+                </p>
+                <p>
+                  All settings are set to the default values recommended
+                  by the manual, but you can choose other allowed values.
+                </p>
+                <p>
+                  Some of these parameters have more implications that others.
+                  Particularly important is to decide teh Number of Runs,
+                  The Clumping and the Conservation Feature missing proportion.
+                </p>
+              </div>
+        )}
+            modifiers={['flip']}
+            tooltipPlacement="left"
+          >
+            <h2 className="px-10 text-2xl font-medium font-heading">Run scenario:</h2>
+          </HelpBeacon>
           <div className="flex w-full px-10 pt-5 overflow-hidden" style={{ height: 475 }}>
 
             <div className="flex flex-col flex-grow flex-shrink-0 space-y-6 overflow-hidden w-80">
@@ -101,8 +130,11 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
             </div>
           </div>
         </form>
+
       )}
+
     </FormRFF>
+
   );
 };
 

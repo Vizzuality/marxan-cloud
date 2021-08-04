@@ -50,36 +50,34 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
         title="Solutions"
         subtitle="View the results"
         content={(
-          <div>
-            Under
-            {' '}
-            <b>Details</b>
-            {' '}
-            you will find each of the
-            individual solutions as a table. You can select
-            here which solution to view on the map and
-            download the results.
-
-            <br />
-            <br />
-            Under
-            {' '}
-            <b>Gap Analysis</b>
-            {' '}
-            you can see
-            how much your conservation network would improve
-            the current conservation of your features.
-            <br />
-            <br />
-            Under
-            {' '}
-            <b>Solutions</b>
-            {' '}
-            you can see each individual
-            solution and it&apos;s details
-
-            <br />
-            <br />
+          <div className="space-y-5">
+            <p>
+              Under
+              {' '}
+              <b>Details</b>
+              {' '}
+              you will find each of the
+              individual solutions as a table. You can select
+              here which solution to view on the map and
+              download the results.
+            </p>
+            <p>
+              Under
+              {' '}
+              <b>Gap Analysis</b>
+              {' '}
+              you can see
+              how much your conservation network would improve
+              the current conservation of your features.
+            </p>
+            <p>
+              Under
+              {' '}
+              <b>Solutions</b>
+              {' '}
+              you can see each individual
+              solution and it&apos;s details
+            </p>
 
           </div>
           )}
@@ -147,24 +145,25 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
                   title="Re-Run scenario"
                   subtitle=""
                   content={(
-                    <div>
-                      Once you have checked your solutions,
-                      you can go back to any of the previous tabs
-                      and make any needed
-                      adjustments.
-                      Use this button to run the Scenario again applying
-                      the changes you have made.
-                      <br />
-                      <br />
-                      <i>
-                        All the
-                        solutions of your previous run will be replaced
-                        by those of the new run.
-                        If you do not want to lose your results
-                        simply duplicate this scenario and make the
-                        changes in the new one.
-                      </i>
-
+                    <div className="space-y-5">
+                      <p>
+                        Once you have checked your solutions,
+                        you can go back to any of the previous tabs
+                        and make any needed
+                        adjustments.
+                        Use this button to run the Scenario again applying
+                        the changes you have made.
+                      </p>
+                      <p>
+                        <i>
+                          All the
+                          solutions of your previous run will be replaced
+                          by those of the new run.
+                          If you do not want to lose your results
+                          simply duplicate this scenario and make the
+                          changes in the new one.
+                        </i>
+                      </p>
                     </div>
                 )}
                   modifiers={['flip']}

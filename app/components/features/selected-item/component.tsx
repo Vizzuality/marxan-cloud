@@ -1,15 +1,16 @@
 import React, { useCallback, useMemo } from 'react';
+
 import cx from 'classnames';
 
-import Icon from 'components/icon';
 import Button from 'components/button';
-import Select from 'components/forms/select';
 import Checkbox from 'components/forms/checkbox';
+import Select from 'components/forms/select';
+import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
-import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
+import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 
 export interface ItemProps {
   id: string | number;
@@ -144,14 +145,18 @@ export const Item: React.FC<ItemProps> = ({
               <InfoButton>
                 <span>
                   <h4 className="font-heading text-lg mb-2.5">Split a feature</h4>
-                  You should split a dataset when you have several
-                  features together that you want to treat separately.
-
-                  For example, if you may want to treat each ecoregion
-                  within a dataset as a separate feature.
-                  You will be able to split your dataset
-                  by any of the available attributes in the feature.
-
+                  <div className="space-y-5">
+                    <p>
+                      You should split a dataset when you have several
+                      features together that you want to treat separately.
+                    </p>
+                    <p>
+                      For example, if you may want to treat each ecoregion
+                      within a dataset as a separate feature.
+                      You will be able to split your dataset
+                      by any of the available attributes in the feature.
+                    </p>
+                  </div>
                 </span>
               </InfoButton>
             </div>
@@ -185,16 +190,26 @@ export const Item: React.FC<ItemProps> = ({
               <InfoButton>
                 <span>
                   <h4 className="font-heading text-lg mb-2.5">Intersecting features</h4>
-                  You may want to intersect two or more features when
-                  you are interested in having a new feature that
-                  combines the information of both. For example,
-                  you may wish to ensure that Marxan identifies
-                  priority areas for a given feature across a
-                  range of habitats. In
-                  this case you can intersect a species
-                  distribution with a habitat or ecosystem
-                  layer thereby making your species features
-                  ecologically representative.
+                  <div className="space-y-5">
+                    <p>
+                      You may want to intersect two or more features when
+                      you are interested in having a new feature that
+                      combines the information of both.
+                    </p>
+                    <p>
+                      For example,
+                      you may wish to ensure that Marxan identifies
+                      priority areas for a given feature across a
+                      range of habitats.
+                    </p>
+                    <p>
+                      In
+                      this case you can intersect a species
+                      distribution with a habitat or ecosystem
+                      layer thereby making your species features
+                      ecologically representative.
+                    </p>
+                  </div>
 
                 </span>
               </InfoButton>

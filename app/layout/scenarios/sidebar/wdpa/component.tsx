@@ -55,19 +55,26 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
         title="Protected Areas"
         subtitle="Add protected areas to the conservation plan"
         content={(
-          <div>
-            Add here any existing protected areas you would
-            like to include in the plan. They will be
-            included as locked-in areas (meaning they will be
-            included in all the solutions of this scenario).
-            You can select current
-            protected areas listed in World Database of
-            Protected Areas (WCMC-UNEP)
-            or upload your own protected area geometry. If you do
-            not wish to include any protected areas, click on the
-            <b> Skip to features</b>
-            {' '}
-            button below.
+          <div className="space-y-2">
+            <p>
+              Add here any existing protected areas you would
+              like to include in the plan. They will be
+              included as locked-in areas (meaning they will be
+              included in all the solutions of this scenario).
+            </p>
+            <p>
+              You can select current
+              protected areas listed in World Database of
+              Protected Areas (WCMC-UNEP)
+              or upload your own protected area geometry.
+            </p>
+            <p>
+              If you do
+              not wish to include any protected areas, click on the
+              <b> Skip to features</b>
+              {' '}
+              button below.
+            </p>
 
           </div>
         )}

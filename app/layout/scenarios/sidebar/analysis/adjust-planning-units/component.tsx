@@ -2,20 +2,22 @@ import React, { useState, useCallback, useEffect } from 'react';
 
 import { useDispatch } from 'react-redux';
 
-import { useToasts } from 'hooks/toast';
 import { useRouter } from 'next/router';
+
+import { useScenarioPU, useSaveScenarioPU } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
 import { motion } from 'framer-motion';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
-
-import { useScenarioPU, useSaveScenarioPU } from 'hooks/scenarios';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
-import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
+import LOCK_IN_OUT_IMG from 'images/info-buttons/img_lockin_lock_out.png';
+
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 import Buttons from './buttons';
 import Tabs from './tabs';
@@ -122,31 +124,36 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         <InfoButton>
           <div>
             <h4 className="font-heading text-lg mb-2.5">Locked-in and locked-out planning units</h4>
-            <div>
-
-              You can force Marxan to include or exclude some planning units from your analysis.
-
-              <br />
-              <br />
-              Manually including or excluding individual planning units
-              is useful when a real-world issue affects where new
-              protected areas can be designated. For example, if
-              you know that a particular planning unit contains a restricted
-              military area and cannot be designated, then you could
-              manually exclude that planning unit from the project.
-              <br />
-              <br />
-
-              The areas selected to be included will be
-              {' '}
-              <b>locked in </b>
-              to your conservation plan and will appear in all of the solutions.
-              <br />
-              <br />
-              The areas selected to be excluded will be
-              {' '}
-              <b>locked out </b>
-              of your conservation plan and will never appear in the solutions
+            <div className="space-y-5">
+              <p>
+                You can force Marxan to include or exclude some planning units from your analysis.
+              </p>
+              <p>
+                Manually including or excluding individual planning units
+                is useful when a real-world issue affects where new
+                protected areas can be designated. For example, if
+                you know that a particular planning unit contains a restricted
+                military area and cannot be designated, then you could
+                manually exclude that planning unit from the project.
+              </p>
+              <p>
+                You can see the example below where a city is
+                marked as locked-out and a protected area is
+                marked as locked-in:
+              </p>
+              <img src={LOCK_IN_OUT_IMG} alt="Feature-Range" />
+              <p>
+                The areas selected to be included will be
+                {' '}
+                <b>locked in </b>
+                to your conservation plan and will appear in all of the solutions.
+              </p>
+              <p>
+                The areas selected to be excluded will be
+                {' '}
+                <b>locked out </b>
+                of your conservation plan and will never appear in the solutions
+              </p>
             </div>
 
           </div>

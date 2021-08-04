@@ -220,21 +220,24 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                           <InfoButton>
                             <span>
                               <h4 className="font-heading text-lg mb-2.5">IUCN categrories</h4>
-                              You can select to include protected areas
-
-                              from any or all of the
-                              IUCN categories that exist in your planning area:
-                              <br />
-                              <br />
-                              <ul className="pl-6 list-disc">
-                                <li>Ia: Strict Nature Reserve.</li>
-                                <li>Ib: Wilderness Area.</li>
-                                <li>II: National Park.</li>
-                                <li>III: Natural Monument or Feature.</li>
-                                <li>IV: Habitat/Species Management Area.</li>
-                                <li>V: Protected Landscape/Seascape.</li>
-                                <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
-                              </ul>
+                              <div className="space-y-2">
+                                <p>
+                                  You can select to include protected areas
+                                  from any or all of the
+                                  IUCN categories that exist in your planning area:
+                                </p>
+                                <p>
+                                  <ul className="pl-6 list-disc">
+                                    <li>Ia: Strict Nature Reserve.</li>
+                                    <li>Ib: Wilderness Area.</li>
+                                    <li>II: National Park.</li>
+                                    <li>III: Natural Monument or Feature.</li>
+                                    <li>IV: Habitat/Species Management Area.</li>
+                                    <li>V: Protected Landscape/Seascape.</li>
+                                    <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
+                                  </ul>
+                                </p>
+                              </div>
                             </span>
                           </InfoButton>
                         </div>

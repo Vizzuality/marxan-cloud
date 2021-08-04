@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react';
 
-import { motion } from 'framer-motion';
-
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
+
+import { motion } from 'framer-motion';
 import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
-import Pill from 'layout/pill';
 import HelpBeacon from 'layout/help/beacon';
+import Pill from 'layout/pill';
 
 import Tabs from 'components/tabs';
 
@@ -37,13 +37,14 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
       title="the marxan workflow"
       subtitle="Steps to follow for the analysis"
       content={(
-        <div>
-          This tab will show the steps needed to complete a
-          conservation plan using Marxan. The logical workflow
-          requires you to take some actions at each step
-          as follows:
-          <br />
-          <br />
+        <div className="space-y-2">
+          <p>
+            This tab will show the steps needed to complete a
+            conservation plan using Marxan. The logical workflow
+            requires you to take some actions at each step
+            as follows:
+          </p>
+
           <ul className="list-decimal pl-6">
             <li>
               First you will

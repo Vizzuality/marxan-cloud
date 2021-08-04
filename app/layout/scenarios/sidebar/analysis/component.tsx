@@ -52,24 +52,27 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
         title="Analysis"
         subtitle="Fine tune your Marxan plan"
         content={(
-          <div>
-            This section helps you refine your
-            plan by allowing you to:
-            <ol>
+          <div className="space-y-5">
+            <p>
+              This section helps you refine your
+              plan by allowing you to:
+            </p>
+            <ol className="pl-6 list-disc space-y-2">
               <li>
                 Evaluate your set targets by viewing the
                 current conservation status of your
                 features in the
-                <b>GAP ANALYSIS</b>
+                <b> GAP ANALYSIS</b>
               </li>
               <li>
                 Add a cost surface in
-                <b>COST SURFACE</b>
+                <b> COST SURFACE</b>
               </li>
               <li>
                 Exclude or force include
                 some planning units in the analysis in
                 <b>
+                  {' '}
                   ADJUST
                   PLANNING UNITS
                 </b>
@@ -110,7 +113,9 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
               <GapAnalysis
                 key="gap-analysis"
                 onChangeSection={onChangeSection}
+
               />
+
               )}
 
               {section === 'cost-surface' && (

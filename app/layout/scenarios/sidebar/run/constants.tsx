@@ -8,7 +8,46 @@ export const FIELDS = [
   {
     id: 'NUMREPS',
     label: 'Number of Runs',
-    description: (<p>The number of repeat runs you want Marxan to perform; effectively, the number of solutions to the reserve problem you want Marxan to generate. Each new run is independent of the previous one, but they will all use the same parameter and variable values. The frequency with which planning units are selected in multiple runs, gives an indication of the importance of that planning unit for efficiently meeting your reserve targets. When running a new scenario for the first time it is always advisable, to begin with a very small number of runs (e.g. 10) so you can check the program is performing as desired (i.e. the solutions are meeting the required targets) without having to wait a long time. In order to get an idea of selection frequency, however, you will generally need to do many runs. 100 runs are the standard best practice, as it is an intuitive value from which to calculate selection frequency. Adding more runs will sample more of the solution space but will of course increase the processing time.</p>),
+    description: (
+      <div className="space-y-5">
+        <h4 className="font-heading text-lg mb-2.5">Number of runs</h4>
+        <p>
+          The number of repeat runs you want Marxan to perform;
+          effectively, the number of solutions to the reserve
+          problem you want Marxan to generate.
+        </p>
+        <p>
+          Each new run
+          is independent of the previous one, but they will
+          all use the same parameter and variable values.
+          The frequency with which planning units are
+          selected in multiple runs, gives an indication
+          of the importance of that planning unit for
+          efficiently meeting your reserve targets.
+        </p>
+        <p>
+          When running a new scenario for the first
+          time it is always advisable, to begin with
+          a very small number of runs (e.g. 10) so
+          you can check the program is performing as
+          desired (i.e. the solutions are meeting the
+          required targets) without having to wait a
+          long time.
+        </p>
+        <p>
+          In order to get an idea of selection
+          frequency, however, you will generally
+          need to do many runs.
+        </p>
+        <p>
+          100 runs are the
+          standard best practice, as it is an intuitive
+          value from which to calculate selection frequency.
+          Adding more runs will sample more of the solution
+          space but will of course increase
+          the processing time.
+        </p>
+      </div>),
     category: {
       id: 'general-parameters',
       label: 'General parameters',
@@ -36,7 +75,35 @@ export const FIELDS = [
   {
     id: 'BLM',
     label: 'Clumping',
-    description: (<p>The BLM should be either ‘0’ or a positive number. It is permissible for the BLM to include decimal points (e.g. 0.1). Setting the BLM to ‘0’ will remove boundary length from consideration altogether. There is no universally good value for the BLM, as it works in relation to the costs and geometry of the study region/planning units. With a small BLM, Marxan will concentrate on minimizing overall reserve cost and will only aim for compactness when little extra cost will be incurred. Alternatively, a large BLM will place a high emphasis on minimizing the boundary length, even if it means a more costly solution.</p>),
+    description: (
+      <div className="space-y-5">
+        <h4 className="font-heading text-lg mb-2.5">Boundary Length Modifier (BLM)</h4>
+        <p>
+          The BLM should be either ‘0’ or a positive number.
+        </p>
+        <p>
+          It is permissible for the BLM to include decimal
+          points (e.g. 0.1). Setting the BLM to ‘0’ will
+          remove boundary length from consideration altogether.
+        </p>
+        <p>
+          There is no universally good value for the BLM,
+          as it works in relation to the costs and
+          geometry of the study region/planning units.
+        </p>
+        <p>
+          With a small BLM, Marxan will concentrate on
+          minimizing overall reserve cost and will only
+          aim for compactness when little extra cost will
+          be incurred.
+        </p>
+        <p>
+          Alternatively, a large BLM will
+          place a high emphasis on minimizing the
+          boundary length, even if it means a more
+          costly solution.
+        </p>
+      </div>),
     note: '(Boundary Length Modifier)',
     category: {
       id: 'general-parameters',
@@ -63,9 +130,98 @@ export const FIELDS = [
     ],
   },
   {
+    id: 'MISSLEVEL',
+    label: 'Conservation Feature missing proportion',
+    description: (
+      <div className="space-y-5">
+        <h4 className="font-heading text-lg mb-2.5">Conservation Feature missing proportion</h4>
+        <p>
+          Amount or target below which a Conservation Feature
+          is counted as ‘missing’.
+        </p>
+        <p>
+          This is the proportion of the
+          target a conservation feature must reach in order for
+          it to be reported as met.
+        </p>
+        <p>
+          There are situations where
+          Marxan can get extremely close to the target
+          (e.g. 99% of the desired level) without actually
+          meeting the target.
+        </p>
+        <p>
+          You can specify a level for
+          which you are pragmatically satisfied that the
+          amount of representation is close enough to the
+          target to report it as met.
+        </p>
+        <p>
+          This value should always
+          be high, i.e. greater than or equal to ‘0.95’. If you
+          are setting it lower than ‘0.95’, you should probably
+          think about changing your targets.
+        </p>
+      </div>),
+    category: {
+      id: 'program-control',
+      label: 'Program control',
+    },
+    default: 1,
+    required: false,
+    advanced: true,
+    input: {
+      className: 'text-2xl',
+      min: 0.80,
+      max: 1,
+      type: 'number',
+      step: '0.01',
+    },
+    validations: [
+      {
+        presence: true,
+        numericality: {
+          greaterThanOrEqualTo: 0.80,
+          lessThanOrEqualTo: 1,
+        },
+      },
+    ],
+  },
+  {
     id: 'PROP',
     label: 'Starting Proportion',
-    description: (<p>Proportion of planning units in initial reserve system. When Marxan starts a run, it must generate an initial reserve system. This variable defines the proportion of planning units to be included in the initial reserve system at the start of each run. The variable ‘PROP’ must be a number between 0 and 1. If zero is chosen then no planning units will be included in the initial reserve, a value of 1 means all planning units will be included, and a value of 0.5 means 50% of planning units will be randomly included. In practice, the setting has no effect on the operation of simulated annealing, provided a sufficient number of iterations is used. This will only be applied to those planning units whose status does not lock them in or out of solutions</p>),
+    description: (
+      <div className="space-y-5">
+        <h4 className="font-heading text-lg mb-2.5">Starting proportion</h4>
+        <p>
+          Proportion of planning units in initial
+          reserve system.
+        </p>
+        <p>
+          When Marxan starts a run,
+          it must generate an initial reserve system.
+          This variable defines the proportion of
+          planning units to be included in the initial
+          reserve system at the start of each run.
+        </p>
+        <p>
+          The
+          variable must be a number between 0 and 1.
+          If zero is chosen then no planning units will
+          be included in the initial reserve, a value of 1
+          means all planning units will be included,
+          and a value of 0.5 means 50% of planning
+          units will be randomly included.
+        </p>
+        <p>
+          In practice,
+          the setting has no effect on the operation of
+          simulated annealing, provided a sufficient
+          number of iterations is used. This will only
+          be applied to those planning units whose status
+          does not lock them in or out of solutions
+        </p>
+      </div>),
     category: {
       id: 'general-parameters',
       label: 'General parameters',
@@ -93,7 +249,19 @@ export const FIELDS = [
   {
     id: 'RANDSEED',
     label: 'Random seed',
-    description: (<p>Random seed number. It controls whether the same ‘random’ selection of planning units is included in the initial reserve system each run. Using a constant positive integer for this variable will make Marxan use the same random seed each time it is run. Except for debugging purposes, it should be set to ‘-1’ in the input.dat file.</p>),
+    description: (
+      <div className="space-y-5">
+        <p>
+          It controls whether the same ‘random’
+          selection of planning units is included
+          in the initial reserve system each run.
+          Using a constant positive integer for
+          this variable will make Marxan use
+          the same random seed each time it is run.
+          Except for debugging purposes, it
+          should be set to ‘-1’.
+        </p>
+      </div>),
     category: {
       id: 'general-parameters',
       label: 'General parameters',
@@ -122,7 +290,18 @@ export const FIELDS = [
   {
     id: 'BESTSCORE',
     label: 'Best Score Speedup',
-    description: (<p>This variable tells Marxan not to keep track of the best score until it reaches a specified minimum level. It was intended to be a time saving measure but is seldom required. It should always be set to -1.</p>),
+    description: (
+      <div className="space-y-5">
+
+        <p>
+          This variable tells Marxan not to
+          keep track of the best score until
+          it reaches a specified minimum level.
+          It was intended to be a time saving
+          measure but is seldom required.
+          It should always be set to -1.
+        </p>
+      </div>),
     category: {
       id: 'general-parameters',
       label: 'General parameters',
@@ -150,7 +329,13 @@ export const FIELDS = [
   {
     id: 'NUMITNS',
     label: 'Number of Iterations',
-    description: (<p>Required when RUNMODE = &quot;Simulated Annealing&quot;. Number of iterations for annealing</p>),
+    description: (
+      <div className="space-y-5">
+        <p>
+          Required when RUNMODE = &quot;Simulated Annealing&quot;.
+          Number of iterations for annealing
+        </p>
+      </div>),
     category: {
       id: 'annealing-parameters',
       label: 'Annealing parameters',
@@ -178,7 +363,16 @@ export const FIELDS = [
   {
     id: 'STARTTEMP',
     label: 'Initial temperature',
-    description: (<p>Required when RUNMODE = &quot;Simulated Annealing&quot;. Starting temperature for annealing. The use of the adaptive annealing schedule can be applied by setting the variable to any negative value</p>),
+    description: (
+      <div className="space-y-5">
+        <p>
+          Required when RUNMODE = &quot;Simulated Annealing&quot;.
+          Starting temperature for annealing.
+          The use of the adaptive annealing
+          schedule can be applied by setting
+          the variable to any negative value
+        </p>
+      </div>),
     category: {
       id: 'annealing-parameters',
       label: 'Annealing parameters',
@@ -206,7 +400,10 @@ export const FIELDS = [
   {
     id: 'COOLFAC',
     label: 'Cooling factor',
-    description: <p>Required when RUNMODE = &quot;Simulated Annealing&quot;. Cooling factor for annealing</p>,
+    description:
+  <div className="space-y-5">
+    <p>Required when RUNMODE = &quot;Simulated Annealing&quot;. Cooling factor for annealing</p>
+  </div>,
     category: {
       id: 'annealing-parameters',
       label: 'Annealing parameters',
@@ -235,7 +432,13 @@ export const FIELDS = [
   {
     id: 'NUMTEMP',
     label: 'Temperature decreases for annealing',
-    description: <p>Required when RUNMODE = &quot;Simulated Annealing&quot;. Number of temperature decreases for annealing</p>,
+    description:
+  <div className="space-y-5">
+    <p>
+      Required when RUNMODE = &quot;Simulated Annealing&quot;.
+      Number of temperature decreases for annealing
+    </p>
+  </div>,
     category: {
       id: 'annealing-parameters',
       label: 'Annealing parameters',
@@ -263,7 +466,44 @@ export const FIELDS = [
   {
     id: 'COSTTHRESH',
     label: 'Cost threshold',
-    description: (<p>This variable can be included if you want Marxan to find reserve solutions below a total cost. It works together with THRESHPEN1 and THRESHPEN2. Setting this variable to ‘0’ in the ‘input.dat’ file will disable it. Marxan is designed to solve a ‘minimum set’ problem, its goal being to meet all our conservation targets for the least cost. Another class of conservation problem is known as the ‘maximum coverage’ problem where the goal is to achieve the best conservation outcomes for a given fixed budget. In many cases, this is more representative of how conservation actions operate. Although including a cost threshold does not make Marxan solve the strict ‘maximum coverage’ problem, it is comparable and can be used in cases where you have conservation targets you hope to meet and cannot exceed a predetermined budget. The actual way this cost threshold is applied within the algorithm is described in detail in Marxan Manual 2020 Appendix B-1.5.</p>),
+    description: (
+      <div className="space-y-5">
+        <h4 className="font-heading text-lg mb-2.5">Cost threshold</h4>
+        <p>
+          This variable can be included if you want Marxan
+          to find reserve solutions below a total cost.
+        </p>
+        <p>
+          It works together with THRESHPEN1 and THRESHPEN2.
+          Setting this variable to ‘0’ will disable it.
+        </p>
+        <p>
+          Marxan is designed to solve
+          a ‘minimum set’ problem, its goal being to meet
+          all our conservation targets for the least cost.
+        </p>
+        <p>
+          Another class of conservation problem is known
+          as the ‘maximum coverage’ problem where the
+          goal is to achieve the best conservation outcomes
+          for a given fixed budget. In many cases, this is
+          more representative of how conservation actions
+          operate.
+        </p>
+        <p>
+          Although including a cost threshold does
+          not make Marxan solve the strict ‘maximum coverage’
+          problem, it is comparable and can be used in cases
+          where you have conservation targets you hope to meet
+          and cannot exceed a predetermined budget.
+        </p>
+        <p>
+          The actual
+          way this cost threshold is applied within the algorithm
+          is described in detail in
+          Marxan Manual 2020 Appendix B-1.5.
+        </p>
+      </div>),
     category: {
       id: 'cost-threshold',
       label: 'Cost threshold',
@@ -290,7 +530,44 @@ export const FIELDS = [
   {
     id: 'THRESHPEN1',
     label: 'Size of cost threshold penalty',
-    description: (<p>This variable can be included if you want Marxan to find reserve solutions below a total cost. It works together with COSTTHRESH and THRESHPEN2. Setting this variable to ‘0’ in the ‘input.dat’ file will disable it. Marxan is designed to solve a ‘minimum set’ problem, its goal being to meet all our conservation targets for the least cost. Another class of conservation problem is known as the ‘maximum coverage’ problem where the goal is to achieve the best conservation outcomes for a given fixed budget. In many cases, this is more representative of how conservation actions operate. Although including a cost threshold does not make Marxan solve the strict ‘maximum coverage’ problem, it is comparable and can be used in cases where you have conservation targets you hope to meet and cannot exceed a predetermined budget. The actual way this cost threshold is applied within the algorithm is described in detail in Marxan Manual 2020 Appendix B-1.5.</p>),
+    description: (
+      <div className="space-y-5">
+        <h4 className="font-heading text-lg mb-2.5">Size of cost threshold</h4>
+        <p>
+          This variable can be included if you want Marxan to
+          find reserve solutions below a total cost.
+        </p>
+        <p>
+          It works together with COSTTHRESH and THRESHPEN2.
+          Setting this variable to ‘0’ will disable it.
+        </p>
+        <p>
+          Marxan is designed to solve
+          a ‘minimum set’ problem, its goal being to meet
+          all our conservation targets for the least cost.
+        </p>
+        <p>
+          Another class of conservation problem is known
+          as the ‘maximum coverage’ problem where the
+          goal is to achieve the best conservation outcomes
+          for a given fixed budget. In many cases, this is
+          more representative of how conservation actions
+          operate.
+        </p>
+        <p>
+          Although including a cost threshold does
+          not make Marxan solve the strict ‘maximum coverage’
+          problem, it is comparable and can be used in cases
+          where you have conservation targets you hope to meet
+          and cannot exceed a predetermined budget.
+        </p>
+        <p>
+          The actual
+          way this cost threshold is applied within the algorithm
+          is described in detail in
+          Marxan Manual 2020 Appendix B-1.5.
+        </p>
+      </div>),
     category: {
       id: 'cost-threshold',
       label: 'Cost threshold',
@@ -317,7 +594,44 @@ export const FIELDS = [
   {
     id: 'THRESHPEN2',
     label: 'Shape of cost threshold penalty',
-    description: (<p>This variable can be included if you want Marxan to find reserve solutions below a total cost. It works together with COSTTHRESH and THRESHPEN1. Setting this variable to ‘0’ in the ‘input.dat’ file will disable it. Marxan is designed to solve a ‘minimum set’ problem, its goal being to meet all our conservation targets for the least cost. Another class of conservation problem is known as the ‘maximum coverage’ problem where the goal is to achieve the best conservation outcomes for a given fixed budget. In many cases, this is more representative of how conservation actions operate. Although including a cost threshold does not make Marxan solve the strict ‘maximum coverage’ problem, it is comparable and can be used in cases where you have conservation targets you hope to meet and cannot exceed a predetermined budget. The actual way this cost threshold is applied within the algorithm is described in detail in Marxan Manual 2020 Appendix B-1.5.</p>),
+    description: (
+      <div className="space-y-5">
+        <h4 className="font-heading text-lg mb-2.5">Shape of cost threshold</h4>
+        <p>
+          This variable can be included if you
+          want Marxan to find reserve solutions below
+          a total cost.
+        </p>
+        <p>
+          It works together with COSTTHRESH and THRESHPEN1.
+        </p>
+        <p>
+          Marxan is designed to solve
+          a ‘minimum set’ problem, its goal being to meet
+          all our conservation targets for the least cost.
+        </p>
+        <p>
+          Another class of conservation problem is known
+          as the ‘maximum coverage’ problem where the
+          goal is to achieve the best conservation outcomes
+          for a given fixed budget. In many cases, this is
+          more representative of how conservation actions
+          operate.
+        </p>
+        <p>
+          Although including a cost threshold does
+          not make Marxan solve the strict ‘maximum coverage’
+          problem, it is comparable and can be used in cases
+          where you have conservation targets you hope to meet
+          and cannot exceed a predetermined budget.
+        </p>
+        <p>
+          The actual
+          way this cost threshold is applied within the algorithm
+          is described in detail in
+          Marxan Manual 2020 Appendix B-1.5.
+        </p>
+      </div>),
     category: {
       id: 'cost-threshold',
       label: 'Cost threshold',
@@ -344,7 +658,10 @@ export const FIELDS = [
   {
     id: 'INPUTDIR',
     label: 'Input Folder',
-    description: <p>User Defined Name of the folder containing input data files</p>,
+    description:
+  <div className="space-y-5">
+    <p>User Defined Name of the folder containing input data files</p>
+  </div>,
     category: {
       id: 'input-files',
       label: 'Input files',
@@ -368,7 +685,16 @@ export const FIELDS = [
   {
     id: 'SPECNAME',
     label: 'Conservation Feature File',
-    description: (<p>Name of Conservation Feature File. It contains information about each of the conservation features being considered, such as their name, targets and representation requirements, and the penalty that should be applied if these representation requirements are not met.</p>),
+    description: (
+      <div className="space-y-5">
+        <p>
+          Name of Conservation Feature File. It contains information
+          about each of the conservation features being considered,
+          such as their name, targets and representation
+          requirements, and the penalty that should be applied
+          if these representation requirements are not met.
+        </p>
+      </div>),
     category: {
       id: 'input-files',
       label: 'Input files',
@@ -392,7 +718,15 @@ export const FIELDS = [
   {
     id: 'PUNAME',
     label: 'Planning Unit File',
-    description: (<p>Name of Planning Unit File. It contains information about the planning units themselves, such as ID number, cost, location and status.</p>),
+    description: (
+      <div className="space-y-5">
+        <p>
+          Name of Planning Unit File.
+          It contains information about the
+          planning units themselves, such as ID
+          number, cost, location and status.
+        </p>
+      </div>),
     category: {
       id: 'input-files',
       label: 'Input files',
@@ -416,7 +750,14 @@ export const FIELDS = [
   {
     id: 'PUVSPRNAME',
     label: 'Planning Unit versus Conservation Feature File',
-    description: (<p>Name of Planning Unit versus Conservation Feature File. Tt contains information on the distribution of conservation features in each of the planning units.</p>),
+    description: (
+      <div className="space-y-5">
+        <p>
+          Name of Planning Unit versus Conservation Feature File.
+          It contains information on the distribution of conservation
+          features in each of the planning units.
+        </p>
+      </div>),
     category: {
       id: 'input-files',
       label: 'Input files',
@@ -440,7 +781,18 @@ export const FIELDS = [
   {
     id: 'BOUNDNAME',
     label: 'Boundary Length File',
-    description: (<p>Name of Boundary Length File. It contains information about the length or ‘effective length’ of shared boundaries between planning units. This file is necessary if you wish to use the Boundary Length Modifier to improve the compactness of reserve solutions, and while not required, is recommended.</p>),
+    description: (
+      <div className="space-y-5">
+        <p>
+          Name of Boundary Length File. It contains
+          information about the length or ‘effective length’
+          of shared boundaries between planning units.
+          This file is necessary if you wish to use the
+          Boundary Length Modifier to improve the compactness
+          of reserve solutions, and while not required,
+          is recommended.
+        </p>
+      </div>),
     category: {
       id: 'input-files',
       label: 'Input files',
@@ -568,34 +920,6 @@ export const FIELDS = [
           onlyInteger: true,
           greaterThanOrEqualTo: 0,
           lessThanOrEqualTo: 4,
-        },
-      },
-    ],
-  },
-  {
-    id: 'MISSLEVEL',
-    label: 'Conservation Feature missing proportion',
-    description: (<p>Amount or target below which a Conservation Feature is counted as ‘missing’.This is the proportion of the target a conservation feature must reach in order for it to be reported as met. There are situations where Marxan can get extremely close to the target (e.g. 99% of the desired level) without actually meeting the target. You can specify a level for which you are pragmatically satisfied that the amount of representation is close enough to the target to report it as met. This value should always be high, i.e. greater than or equal to ‘0.95’. If you are setting it lower than ‘0.95’, you should probably think about changing your targets.</p>),
-    category: {
-      id: 'program-control',
-      label: 'Program control',
-    },
-    default: 1,
-    required: false,
-    advanced: true,
-    input: {
-      className: 'text-2xl',
-      min: 0.80,
-      max: 1,
-      type: 'number',
-      step: '0.01',
-    },
-    validations: [
-      {
-        presence: true,
-        numericality: {
-          greaterThanOrEqualTo: 0.80,
-          lessThanOrEqualTo: 1,
         },
       },
     ],

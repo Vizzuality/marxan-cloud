@@ -26,12 +26,23 @@ export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
         <Label theme="dark" className="mr-2 uppercase text-xxs">Planning unit grid</Label>
         <InfoButton>
           <span>
-            The planning area or study region needs to be divided
-            into smaller spatial units, called planning units.
-            The division can be done with a regular grid (hexagons or squares)
-            or with an irreglular grid (for example using management or
-            ecological land units). The planning units are central to a Marxan analysis and
-            deciding an appropriate shape and size is important.
+            <h4 className="font-heading text-lg mb-2.5">Planning unit shape</h4>
+            <div className="space-y-5">
+              <p>
+                The planning area needs to be divided
+                into smaller spatial units, called planning units.
+              </p>
+              <p>
+                This division can be made with a regular grid (hexagons or squares)
+                or with an irreglular grid (for example using management or
+                ecological land units).
+              </p>
+              <p>
+                The planning units are central to a
+                Marxan analysis and
+                deciding an appropriate shape and size is important.
+              </p>
+            </div>
           </span>
         </InfoButton>
       </div>
