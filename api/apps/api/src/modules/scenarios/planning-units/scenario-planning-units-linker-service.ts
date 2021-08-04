@@ -29,8 +29,6 @@ export class ScenarioPlanningUnitsLinkerService {
     private readonly projectsRepo: Repository<Project>,
   ) {}
 
-  /** Currently we only support linking regular planning unit geometries
-   * computed via ST_HexagonGrid or ST_SquareGrid */
   private isPlanningUnitGridShapeRegular(
     shape: PlanningUnitGridShape | undefined,
   ): boolean {
