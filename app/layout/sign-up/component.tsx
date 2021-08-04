@@ -54,7 +54,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
       // where username is used for log in instead of email
       if (signUpResponse.status === 201) {
         setConfirm(true);
-        plausible('User has sign up');
+        plausible('Sign up');
         await signIn('credentials', { ...data, username: data.email });
       }
     } catch (error) {
