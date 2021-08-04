@@ -77,7 +77,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
     >
       <button
         type="button"
-        className="flex items-center justify-start focus:outline-none"
+        className="flex items-center justify-start space-x-1 focus:outline-none"
         onClick={handleClick}
       >
         <Avatar className="text-sm text-white uppercase bg-blue-700" bgImage={avatarDataUrl}>
