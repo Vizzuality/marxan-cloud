@@ -10,7 +10,6 @@ export const HeadComponent: React.FC<HeadComponentProps> = ({ title }:HeadCompon
   return (
     <Head>
       <title>{title}</title>
-      <script defer data-domain="marxan.vercel.app" src="https://plausible.io/js/plausible.js" />
     </Head>
   );
 };
