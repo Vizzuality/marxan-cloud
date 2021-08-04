@@ -4,8 +4,9 @@ import React, {
 
 import { AnimatePresence } from 'framer-motion';
 
-import Toast from 'components/toast';
 import ToastContainer from 'layout/toast';
+
+import Toast from 'components/toast';
 
 import {
   ToastItemProps, ToastContextProps, ToastProviderProps, ToastContent, ToastItemOptionsProps,

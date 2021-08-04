@@ -170,13 +170,15 @@ export function useFeaturePreviewLayers({
 
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
-
+    const FEATURES = [...features];
     const { featureHoverId } = options;
 
-    const currentFeatureHoverIndex = features.findIndex((f) => f.id === featureHoverId);
-    features.splice(0, 0, features.splice(currentFeatureHoverIndex, 1)[0]);
+    const currentFeatureHoverIndex = FEATURES.findIndex((f) => f.id === featureHoverId);
+    if (currentFeatureHoverIndex > -1) {
+      FEATURES.splice(0, 0, FEATURES.splice(currentFeatureHoverIndex, 1)[0]);
+    }
 
-    return features
+    return FEATURES
       .map((f) => {
         const { id, type } = f;
 

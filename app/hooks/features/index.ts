@@ -8,13 +8,14 @@ import Fuse from 'fuse.js';
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
 import { useSession } from 'next-auth/client';
-import GEOFEATURES from 'services/geo-features';
-import PROJECTS from 'services/projects';
-import SCENARIOS from 'services/scenarios';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
+
+import GEOFEATURES from 'services/geo-features';
+import PROJECTS from 'services/projects';
+import SCENARIOS from 'services/scenarios';
 
 import {
   UseFeaturesFiltersProps,
