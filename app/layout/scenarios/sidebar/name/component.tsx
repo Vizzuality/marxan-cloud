@@ -60,7 +60,11 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
         });
 
         push(`/projects/${pid}/scenarios/${s.id}/edit`);
-        plausible('New scenario');
+        plausible('New scenario', {
+          props: {
+            projectId: `${pid}`,
+          },
+        });
       },
       onError: () => {
         addToast('success-scenario-create', (
