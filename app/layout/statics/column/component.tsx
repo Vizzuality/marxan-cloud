@@ -32,7 +32,7 @@ export const StaticColumn: React.FC<StaticColumnProps> = ({
         </h3>
       )}
       {description && (
-        <p className="mb-12 text-base leading-normal text-gray-400 max-w-max">
+        <p className="mb-12 text-base leading-normal text-white max-w-max">
           {description}
         </p>
       )}
@@ -50,7 +50,7 @@ export const StaticColumn: React.FC<StaticColumnProps> = ({
         </div>
       )}
       {href && (
-        <ButtonLink caption={caption} href={href} external={external} />
+        <ButtonLink caption={caption} href={href} external={external} theme="light" />
       )}
     </div>
   );
