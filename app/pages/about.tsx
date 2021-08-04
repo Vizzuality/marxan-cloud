@@ -26,6 +26,7 @@ const About: React.FC = () => {
     <>
       <Head>
         <title>About</title>
+        <script defer data-domain="marxan.vercel.app" src="https://plausible.io/js/plausible.js" />
       </Head>
 
       <MetaIcons />
