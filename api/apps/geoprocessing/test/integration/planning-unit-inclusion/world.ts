@@ -30,34 +30,34 @@ export const createWorld = async (app: INestApplication) => {
 
   const geometriesByCase: {
     [k in ForCase]: {
-      storedGeometries: string[],
-      geoToBeExcluded: string[],
-      geoToBeIncluded: string[],
-      geoToBeUntouched: string[],
-    }
+      storedGeometries: string[];
+      planningUnitsToBeExcluded: string[];
+      planningUnitsToBeIncluded: string[];
+      planningUnitsToBeUntouched: string[];
+    };
   } = {
     singleFeature: {
       storedGeometries: [],
-      geoToBeExcluded: [],
-      geoToBeIncluded: [],
-      geoToBeUntouched: [],
+      planningUnitsToBeExcluded: [],
+      planningUnitsToBeIncluded: [],
+      planningUnitsToBeUntouched: [],
     },
     multipleFeatures: {
       storedGeometries: [],
-      geoToBeExcluded: [],
-      geoToBeIncluded: [],
-      geoToBeUntouched: [],
+      planningUnitsToBeExcluded: [],
+      planningUnitsToBeIncluded: [],
+      planningUnitsToBeUntouched: [],
     },
   };
 
   return {
     scenarioId,
-    geoToBeExcluded: (forCase: ForCase) =>
-      geometriesByCase[forCase].geoToBeExcluded.sort(sortUuid),
-    geoToBeIncluded: (forCase: ForCase) =>
-      geometriesByCase[forCase].geoToBeIncluded.sort(sortUuid),
-    geoToBeUntouched: (forCase: ForCase) =>
-      geometriesByCase[forCase].geoToBeUntouched.sort(sortUuid),
+    planningUnitsToBeExcluded: (forCase: ForCase) =>
+      geometriesByCase[forCase].planningUnitsToBeExcluded.sort(sortUuid),
+    planningUnitsToBeIncluded: (forCase: ForCase) =>
+      geometriesByCase[forCase].planningUnitsToBeIncluded.sort(sortUuid),
+    planningUnitsToBeUntouched: (forCase: ForCase) =>
+      geometriesByCase[forCase].planningUnitsToBeUntouched.sort(sortUuid),
     GivenPlanningUnitsExist: async (
       forCase: ForCase,
       planningUnits: AreaUnitSampleGeometry,
@@ -83,22 +83,60 @@ export const createWorld = async (app: INestApplication) => {
         ),
       );
 
-      geometriesByCase[forCase].storedGeometries.push(...toInclude, ...toExclude, ...untouched);
-      geometriesByCase[forCase].geoToBeExcluded.push(...toExclude);
-      geometriesByCase[forCase].geoToBeIncluded.push(...toInclude);
-      geometriesByCase[forCase].geoToBeUntouched.push(...untouched);
+      geometriesByCase[forCase].storedGeometries.push(
+        ...toInclude,
+        ...toExclude,
+        ...untouched,
+      );
 
-      await scenarioPuDataRepo.save(
-        geometriesByCase[forCase].storedGeometries.map((id, index) =>
-          scenarioPuDataRepo.create({
-            puGeometryId: id,
-            scenarioId,
-            planningUnitMarxanId: index,
-          }),
-        ),
+      let index = 1;
+      const puToBeExcluded = (
+        await scenarioPuDataRepo.save(
+          toExclude.map((id) =>
+            scenarioPuDataRepo.create({
+              puGeometryId: id,
+              scenarioId,
+              planningUnitMarxanId: index++,
+            }),
+          ),
+        )
+      ).map((pu) => pu.id);
+
+      const puToBeIncluded = (
+        await scenarioPuDataRepo.save(
+          toInclude.map((id) =>
+            scenarioPuDataRepo.create({
+              puGeometryId: id,
+              scenarioId,
+              planningUnitMarxanId: index++,
+            }),
+          ),
+        )
+      ).map((pu) => pu.id);
+
+      const puToBeUnstated = (
+        await scenarioPuDataRepo.save(
+          untouched.map((id) =>
+            scenarioPuDataRepo.create({
+              puGeometryId: id,
+              scenarioId,
+              planningUnitMarxanId: index++,
+            }),
+          ),
+        )
+      ).map((pu) => pu.id);
+
+      geometriesByCase[forCase].planningUnitsToBeExcluded.push(
+        ...puToBeExcluded,
+      );
+      geometriesByCase[forCase].planningUnitsToBeIncluded.push(
+        ...puToBeIncluded,
+      );
+      geometriesByCase[forCase].planningUnitsToBeUntouched.push(
+        ...puToBeUnstated,
       );
     },
-    GetLockedInGeometries: async () =>
+    GetLockedInPlanningUnits: async () =>
       (
         await scenarioPuDataRepo.find({
           where: {
@@ -107,9 +145,9 @@ export const createWorld = async (app: INestApplication) => {
           },
         })
       )
-        .map((entity) => entity.puGeometryId)
+        .map((entity) => entity.id)
         .sort(sortUuid),
-    GetLockedOutGeometries: async () =>
+    GetLockedOutPlanningUnits: async () =>
       (
         await scenarioPuDataRepo.find({
           where: {
@@ -118,9 +156,9 @@ export const createWorld = async (app: INestApplication) => {
           },
         })
       )
-        .map((entity) => entity.puGeometryId)
+        .map((entity) => entity.id)
         .sort(sortUuid),
-    GetUnstatedGeometries: async () =>
+    GetUnstatedPlanningUnits: async () =>
       (
         await scenarioPuDataRepo.find({
           where: {
@@ -129,7 +167,7 @@ export const createWorld = async (app: INestApplication) => {
           },
         })
       )
-        .map((entity) => entity.puGeometryId)
+        .map((entity) => entity.id)
         .sort(sortUuid),
     cleanup: async (forCase: ForCase) => {
       await puGeometryRepo.delete({
