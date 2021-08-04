@@ -43,22 +43,23 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
       .join(', ');
 
     const query = `
-    with pa as (select * from wdpa where iucn_cat in (${wdpaIucnCategoriesForScenario})),
-    pu as (
-    select spd.id, pug.the_geom
-    from scenarios_pu_data spd
-    inner join planning_units_geom pug on spd.pu_geom_id = pug.id
-    where scenario_id='${scenario.id}'),
-    pu_pa as (select pu.id, st_area(st_intersection(pu.the_geom, pa.the_geom)) as pa_pu_area, (CASE pu.the_geom && pa.the_geom WHEN true THEN 2 else 0 end) as lockin_status
-              from pu
-              left join pa on pu.the_geom && pa.the_geom) 
-    UPDATE scenarios_pu_data
-    SET (lockin_status) =
-        (SELECT lockin_status FROM (select id, max(lockin_status) as lockin_status
-                                                    from pu_pa group by id) as result
-         WHERE scenarios_pu_data.id = result.id) where scenario_id = '${scenario.id}';
+  with pu as (
+    select spd.id,  (pug.area/spd.protected_area)*100 as perc_protection
+      from scenarios_pu_data spd
+      inner join planning_units_geom pug on spd.pu_geom_id = pug.id
+      where scenario_id=$1),
+  pu_pa as (
+    select pu.id, (CASE pu.perc_protection > $2 WHEN true THEN 2 else 0 end) as lockin_status
+    from pu)
+  UPDATE scenarios_pu_data
+      SET (lockin_status) =
+          (SELECT lockin_status FROM pu_pa
+           WHERE scenarios_pu_data.id = pu_pa.id) where scenario_id = $3;
     `;
-    Logger.debug(query);
-    await this.puRepo.query(query);
+    await this.puRepo.query(query, [
+      scenario.id,
+      scenario.wdpaThreshold,
+      scenario.id,
+    ]);
   }
 }
