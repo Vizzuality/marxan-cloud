@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 
 import { useScenario } from 'hooks/scenarios';
 
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -33,7 +33,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);

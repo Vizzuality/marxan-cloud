@@ -309,6 +309,18 @@ export function usePUGridLayer({
             },
           ] : [],
 
+          // ANALYSIS - GAP ANALYSIS
+          ...type === 'analysis' && subtype === 'analysis-gap-analysis' ? [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-color': '#0F0',
+                'fill-opacity': 1,
+              },
+            },
+          ] : [],
+
           // ANALYSIS - COST SURFACE
           ...type === 'analysis' && subtype === 'analysis-cost-surface' ? [
             {

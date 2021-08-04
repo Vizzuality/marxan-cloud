@@ -12,7 +12,7 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -44,7 +44,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const { data: projectData } = useProject(pid);
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPAThreshold } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
