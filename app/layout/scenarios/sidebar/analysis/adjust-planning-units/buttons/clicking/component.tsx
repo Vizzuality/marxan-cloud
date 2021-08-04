@@ -8,9 +8,9 @@ import { useRouter } from 'next/router';
 import { useSaveScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
-import cx from 'classnames';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import cx from 'classnames';
 
 import Button from 'components/button';
 import Icon from 'components/icon';

@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { useSelectedFeatures } from 'hooks/features';
 import { useScenario } from 'hooks/scenarios';
 
-import { motion } from 'framer-motion';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import { motion } from 'framer-motion';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 import AddFeatures from 'layout/scenarios/sidebar/features/add';
 import ListFeatures from 'layout/scenarios/sidebar/features/list';
 import TargetFeatures from 'layout/scenarios/sidebar/features/targets';
+import { ScenarioSidebarSubTabs } from 'layout/scenarios/sidebar/types';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -40,9 +42,11 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
 
   const queryClient = useQueryClient();
 
-  getScenarioEditSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
   const {
@@ -204,15 +208,21 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
 
             {step === 0 && (
               <ListFeatures
+                onSuccess={() => {
+                  setStep(step + 1);
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_FPF));
+                }}
                 readOnly={readOnly}
-                onSuccess={() => setStep(step + 1)}
               />
             )}
 
             {step === 1 && (
               <TargetFeatures
+                onBack={() => {
+                  setStep(step - 1);
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
+                }}
                 readOnly={readOnly}
-                onBack={() => setStep(step - 1)}
                 onSuccess={() => push(`/projects/${pid}`)}
               />
             )}

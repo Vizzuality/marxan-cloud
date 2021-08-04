@@ -2,12 +2,16 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useQueryClient } from 'react-query';
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import cx from 'classnames';
+import { useDebouncedCallback } from 'use-debounce';
 
 import IntersectFeatures from 'layout/scenarios/sidebar/features/intersect';
 
@@ -29,6 +33,11 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   const [intersecting, setIntersecting] = useState(null);
   const { query } = useRouter();
   const { pid, sid } = query;
+
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setFeatureHoverId } = scenarioSlice.actions;
+
+  const dispatch = useDispatch();
 
   const queryClient = useQueryClient();
 
@@ -164,6 +173,14 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     });
   }, [sid, getFeaturesRecipe, selectedFeaturesMutation]);
 
+  const onEnter = useDebouncedCallback((id) => {
+    dispatch(setFeatureHoverId(id));
+  }, 500);
+
+  const onLeave = useDebouncedCallback(() => {
+    dispatch(setFeatureHoverId(null));
+  }, 500);
+
   const onSubmit = useCallback((values) => {
     const { features } = values;
     const data = getFeaturesRecipe(features);
@@ -239,6 +256,12 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                               }}
                               onRemove={() => {
                                 onRemove(item.id, input);
+                              }}
+                              onMouseEnter={() => {
+                                onEnter(item.id);
+                              }}
+                              onMouseLeave={() => {
+                                onLeave();
                               }}
                             />
 

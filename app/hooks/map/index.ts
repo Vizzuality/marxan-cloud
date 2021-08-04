@@ -1,7 +1,13 @@
 import { useMemo } from 'react';
 
 import {
-  UseAdminPreviewLayer, UseGeoJSONLayer, UsePUGridLayer, UsePUGridPreviewLayer, UseWDPAPreviewLayer,
+  UseAdminPreviewLayer,
+  UseFeaturePreviewLayer,
+  UseFeaturePreviewLayers,
+  UseGeoJSONLayer,
+  UsePUGridLayer,
+  UsePUGridPreviewLayer,
+  UseWDPAPreviewLayer,
 } from './types';
 
 // GeoJSON
@@ -73,7 +79,7 @@ export function useAdminPreviewLayer({
   }, [active, level, guid, cache]);
 }
 
-// PUGridpreview
+// WDPApreview
 export function useWDPAPreviewLayer({
   active, bbox, wdpaIucnCategories, cache = 0,
 }: UseWDPAPreviewLayer) {
@@ -96,7 +102,7 @@ export function useWDPAPreviewLayer({
               ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
             ],
             paint: {
-              'fill-color': '#00BFFF',
+              'fill-color': '#00F',
             },
           },
           {
@@ -113,6 +119,98 @@ export function useWDPAPreviewLayer({
       },
     };
   }, [active, bbox, wdpaIucnCategories, cache]);
+}
+
+// Featurepreview
+export function useFeaturePreviewLayer({
+  active, bbox, id, cache = 0,
+}: UseFeaturePreviewLayer) {
+  return useMemo(() => {
+    if (!active || !bbox) return null;
+
+    return {
+      id: `feature-${id}-preview-layer-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'fill',
+            'source-layer': 'layer0',
+            paint: {
+              'fill-color': '#FFCC00',
+              'fill-opacity': 0.5,
+            },
+          },
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-color': '#000',
+            },
+          },
+        ],
+      },
+    };
+  }, [active, bbox, id, cache]);
+}
+
+export function useFeaturePreviewLayers({
+  active, bbox, features, cache = 0, options = {},
+}: UseFeaturePreviewLayers) {
+  const COLORS = useMemo(() => {
+    return {
+      species: '#FFCC00',
+      bioregional: '#03E7D1',
+    };
+  }, []);
+
+  return useMemo(() => {
+    if (!active || !bbox || !features) return [];
+    const FEATURES = [...features];
+    const { featureHoverId } = options;
+
+    const currentFeatureHoverIndex = FEATURES.findIndex((f) => f.id === featureHoverId);
+    if (currentFeatureHoverIndex > -1) {
+      FEATURES.splice(0, 0, FEATURES.splice(currentFeatureHoverIndex, 1)[0]);
+    }
+
+    return FEATURES
+      .map((f) => {
+        const { id, type } = f;
+
+        return {
+          id: `feature-${id}-preview-layer-${cache}`,
+          type: 'vector',
+          source: {
+            type: 'vector',
+            tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
+          },
+          render: {
+            layers: [
+              {
+                type: 'fill',
+                'source-layer': 'layer0',
+                paint: {
+                  'fill-color': featureHoverId === id ? '#FF9900' : COLORS[type],
+                  'fill-opacity': featureHoverId === id ? 1 : 0.5,
+                },
+              },
+              {
+                type: 'line',
+                'source-layer': 'layer0',
+                paint: {
+                  'line-color': '#000',
+                },
+              },
+            ],
+          },
+        };
+      });
+  }, [active, bbox, features, cache, options, COLORS]);
 }
 
 // PUGridpreview
@@ -145,14 +243,24 @@ export function usePUGridPreviewLayer({
   }, [active, bbox, planningUnitGridShape, planningUnitAreakm2, cache]);
 }
 
-// PUGridpreview
+// PUGrid
 export function usePUGridLayer({
-  active, sid, type, options = {}, cache,
+  active, sid, type, subtype, options = {}, cache,
 }: UsePUGridLayer) {
+  const include = useMemo(() => {
+    if (type === 'protected-areas' || type === 'features') return 'protection';
+    if (type === 'analysis' && subtype === 'analysis-gap-analysis') return 'features';
+    if (type === 'analysis' && subtype === 'analysis-cost-surface') return 'cost';
+    if (type === 'analysis' && subtype === 'analysis-adjust-planning-units') return 'lock-status';
+
+    return 'protection';
+  }, [type, subtype]);
+
   return useMemo(() => {
     if (!active || !sid) return null;
 
     const {
+      wdpaThreshold = 0,
       puIncludedValue,
       puExcludedValue,
     } = options;
@@ -162,7 +270,7 @@ export function usePUGridLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/planning-units/tiles/{z}/{x}/{y}.mvt`],
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/planning-units/tiles/{z}/{x}/{y}.mvt?include=${include}`],
       },
       render: {
         layers: [
@@ -182,13 +290,74 @@ export function usePUGridLayer({
               'line-opacity': 1,
             },
           },
-          ...type === 'adjust-planning-units' && !!puIncludedValue ? [
+
+          // PROTECTED AREAS
+          ...(type === 'protected-areas' && subtype === 'protected-areas-percentage') || type === 'features' ? [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-color': '#00F',
+                'fill-opacity': [
+                  'case',
+                  ['all',
+                    ['has', 'percentageProtected'],
+                    ['>=', ['get', 'percentageProtected'], (wdpaThreshold * 100)],
+                  ],
+                  0.5,
+                  0,
+                ],
+              },
+            },
+          ] : [],
+
+          // ANALYSIS - GAP ANALYSIS
+          ...type === 'analysis' && subtype === 'analysis-gap-analysis' ? [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-color': '#6F53F7',
+                'fill-opacity': [
+                  'case',
+                  ['any',
+                    ...(['69088d67-a699-4080-9c2e-d076540c27e0', '70502e30-b6dd-4e40-8bca-1803a6ad5f5f'].map((id) => {
+                      return ['in', id, ['get', 'featureList']];
+                    })),
+                  ],
+                  0.5,
+                  0,
+                ],
+              },
+            },
+          ] : [],
+
+          // ANALYSIS - COST SURFACE
+          ...type === 'analysis' && subtype === 'analysis-cost-surface' ? [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-color': {
+                  property: 'costValue',
+                  stops: [
+                    [0, '#FFBFB7'],
+                    [1, '#C21701'],
+                  ],
+                },
+                'fill-opacity': 0.75,
+              },
+            },
+          ] : [],
+
+          // ANALYSIS - ADJUST PLANNING UNITS
+          ...type === 'analysis' && subtype === 'analysis-adjust-planning-units' && !!puIncludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
               filter: [
                 'all',
-                ['in', ['get', 'pugeomid'], ['literal', puIncludedValue]],
+                ['in', ['get', 'scenarioPuId'], ['literal', puIncludedValue]],
               ],
               paint: {
                 'line-color': '#0F0',
@@ -197,13 +366,13 @@ export function usePUGridLayer({
               },
             },
           ] : [],
-          ...type === 'adjust-planning-units' && !!puExcludedValue ? [
+          ...type === 'analysis' && subtype === 'analysis-adjust-planning-units' && !!puExcludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
               filter: [
                 'all',
-                ['in', ['get', 'pugeomid'], ['literal', puExcludedValue]],
+                ['in', ['get', 'scenarioPuId'], ['literal', puExcludedValue]],
               ],
               paint: {
                 'line-color': '#F00',
@@ -215,5 +384,5 @@ export function usePUGridLayer({
         ],
       },
     };
-  }, [cache, active, sid, type, options]);
+  }, [cache, active, sid, type, subtype, options, include]);
 }

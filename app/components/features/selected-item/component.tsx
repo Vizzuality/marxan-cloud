@@ -44,7 +44,9 @@ export interface ItemProps {
     value: string;
   }[];
   onIntersectSelected?: (id: string) => void;
-  onRemove?: (value) => void
+  onRemove?: (value) => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -68,6 +70,8 @@ export const Item: React.FC<ItemProps> = ({
 
   onIntersectSelected,
   onRemove,
+  onMouseEnter,
+  onMouseLeave,
 }: ItemProps) => {
   // EVENTS
   const onSplitChanged = useCallback(
@@ -113,6 +117,8 @@ export const Item: React.FC<ItemProps> = ({
         'bg-gray-700 text-white': true,
         [className]: !!className,
       })}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <header
         className={cx({
@@ -214,6 +220,7 @@ export const Item: React.FC<ItemProps> = ({
                 size="s"
                 onClick={() => {
                   onIntersectChanged(id);
+                  onMouseLeave();
                 }}
               >
                 <div className="flex items-center">
