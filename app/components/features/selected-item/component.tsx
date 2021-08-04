@@ -1,14 +1,16 @@
 import React, { useCallback, useMemo } from 'react';
+
 import cx from 'classnames';
 
-import Icon from 'components/icon';
 import Button from 'components/button';
-import Select from 'components/forms/select';
 import Checkbox from 'components/forms/checkbox';
+import Select from 'components/forms/select';
+import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
 
-import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
+import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 
 export interface ItemProps {
   id: string | number;
@@ -16,6 +18,9 @@ export interface ItemProps {
   name: string;
   description: string;
   type: 'bioregional' | 'species';
+
+  // EDIT/SHOW
+  readOnly: boolean;
 
   // SPLIT
   splitSelected?: string;
@@ -39,7 +44,9 @@ export interface ItemProps {
     value: string;
   }[];
   onIntersectSelected?: (id: string) => void;
-  onRemove?: (value) => void
+  onRemove?: (value) => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -48,6 +55,8 @@ export const Item: React.FC<ItemProps> = ({
   className,
   description,
   type,
+
+  readOnly,
 
   splitSelected,
   splitOptions = [],
@@ -61,6 +70,8 @@ export const Item: React.FC<ItemProps> = ({
 
   onIntersectSelected,
   onRemove,
+  onMouseEnter,
+  onMouseLeave,
 }: ItemProps) => {
   // EVENTS
   const onSplitChanged = useCallback(
@@ -106,6 +117,8 @@ export const Item: React.FC<ItemProps> = ({
         'bg-gray-700 text-white': true,
         [className]: !!className,
       })}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <header
         className={cx({
@@ -117,19 +130,21 @@ export const Item: React.FC<ItemProps> = ({
         <div className="flex items-start justify-between">
           <h2 className="mt-1 text-sm font-heading">{name}</h2>
 
-          <Button
-            className="flex-shrink-0 text-xs"
-            theme="secondary"
-            size="xs"
-            onClick={() => onRemove && onRemove(id)}
-          >
-            Remove
-          </Button>
+          {!readOnly && (
+            <Button
+              className="flex-shrink-0 text-xs"
+              theme="secondary"
+              size="xs"
+              onClick={() => onRemove && onRemove(id)}
+            >
+              Remove
+            </Button>
+          )}
 
         </div>
         <div className="mt-2 text-sm opacity-50 clamp-2">{description}</div>
 
-        {type === 'bioregional' && (
+        {type === 'bioregional' && !readOnly && (
           <div>
             <div className="flex items-center mt-3 tracking-wide font-heading">
               <Icon icon={SPLIT_SVG} className="w-5 h-5 text-green-300" />
@@ -140,6 +155,19 @@ export const Item: React.FC<ItemProps> = ({
                 {' '}
                 this feature into categories
               </h4>
+              <InfoButton>
+                <span>
+                  <h4 className="font-heading text-lg mb-2.5">Split a feature</h4>
+                  You should split a dataset when you have several
+                  features together that you want to treat separately.
+
+                  For example, if you may want to treat each ecoregion
+                  within a dataset as a separate feature.
+                  You will be able to split your dataset
+                  by any of the available attributes in the feature.
+
+                </span>
+              </InfoButton>
             </div>
 
             <div className="inline-block mt-2">
@@ -157,9 +185,9 @@ export const Item: React.FC<ItemProps> = ({
           </div>
         )}
 
-        {type === 'species' && (
+        {type === 'species' && !readOnly && (
           <div>
-            <div className="flex items-center mt-3 tracking-wide font-heading">
+            <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-yellow-300" />
               <h4 className="ml-2 text-xs text-white uppercase">
                 You can
@@ -168,6 +196,22 @@ export const Item: React.FC<ItemProps> = ({
                 {' '}
                 this feature with others
               </h4>
+              <InfoButton>
+                <span>
+                  <h4 className="font-heading text-lg mb-2.5">Intersecting features</h4>
+                  You may want to intersect two or more features when
+                  you are interested in having a new feature that
+                  combines the information of both. For example,
+                  you may wish to ensure that Marxan identifies
+                  priority areas for a given feature across a
+                  range of habitats. In
+                  this case you can intersect a species
+                  distribution with a habitat or ecosystem
+                  layer thereby making your species features
+                  ecologically representative.
+
+                </span>
+              </InfoButton>
             </div>
 
             <div className="inline-block mt-2">
@@ -176,6 +220,7 @@ export const Item: React.FC<ItemProps> = ({
                 size="s"
                 onClick={() => {
                   onIntersectChanged(id);
+                  onMouseLeave();
                 }}
               >
                 <div className="flex items-center">

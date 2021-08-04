@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Profile from 'layout/me/profile';
 import ChangePassword from 'layout/me/change-password';
 import DeleteAccount from 'layout/me/delete-account';
+import Profile from 'layout/me/profile';
 
 export interface MeProps {
 

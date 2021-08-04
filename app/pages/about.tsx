@@ -1,18 +1,18 @@
 import React from 'react';
-import Head from 'next/head';
 
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import Contact from 'layout/statics/contact';
-import Header from 'layout/header';
-import Hero from 'layout/statics/hero';
-import Footer from 'layout/footer';
-import MetaIcons from 'layout/meta-icons';
-import MetaTags from 'layout/meta-tags';
+import { withUser } from 'hoc/auth';
+
 import Utilities from 'layout/about/utilities';
 import Values from 'layout/about/values';
-
-import { withUser } from 'hoc/auth';
+import Footer from 'layout/footer';
+import Header from 'layout/header';
+import MetaIcons from 'layout/meta-icons';
+import MetaTags from 'layout/meta-tags';
+import Contact from 'layout/statics/contact';
+import Hero from 'layout/statics/hero';
 
 export const getServerSideProps = withUser();
 
@@ -41,9 +41,9 @@ const About: React.FC = () => {
       />
 
       <main>
-        <Header size="base" />
+        <Header size="base" theme="light" />
         <Hero
-          section="About"
+          theme="light"
           title={TITLE_TEXT}
           description={DESCRIPTION_TEXT}
         />

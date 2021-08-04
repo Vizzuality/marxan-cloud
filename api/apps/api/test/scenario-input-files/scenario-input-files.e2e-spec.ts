@@ -20,10 +20,9 @@ describe(`when getting input.zip`, () => {
 
 describe(`when getting spec.dat`, () => {
   it(`should resolve text/*`, async () => {
-    expect((await world.WhenGettingSpecDat()).text).toMatchInlineSnapshot(`
-      "id\ttarget\tprop\tspf\ttarget2\ttargetocc\tname\tsepnum\tsepdistance
-      "
-    `);
+    expect((await world.WhenGettingSpecDat()).text).toMatchInlineSnapshot(
+      `"id	target	prop	spf	target2	targetocc	name	sepnum	sepdistance"`,
+    );
   });
 });
 
@@ -36,7 +35,29 @@ describe(`when getting input.dat`, () => {
         '_CLOUD_GENERATED_AT __ISO_DATE__',
       ),
     ).toMatchInlineSnapshot(`
-      "PROP 0.5
+      "INPUTDIR input
+      PUNAME pu.dat
+      SPECNAME spec.dat
+      PUVSPRNAME puvspr.dat
+      BOUNDNAME bound.dat
+      OUTPUTDIR output
+      _CLOUD_SCENARIO Save the world species
+      _CLOUD_PROJECT Humanity for living.
+      _CLOUD_ORGANIZATION Alaska
+      _CLOUD_GENERATED_AT __ISO_DATE__
+      VERBOSITY 2
+      SAVESOLUTIONSMATRIX 3
+      SAVERUN 3
+      SAVEBEST 3
+      SAVESUMMARY 3
+      SAVESCEN 3
+      SAVETARGMET 3
+      SAVESUMSOLN 3
+      SAVELOG 3
+      SAVESNAPSTEPS 0
+      SAVESNAPCHANGES 0
+      SAVESNAPFREQUENCY 0
+      PROP 0.5
       COOLFAC 0
       NUMITNS 1000000
       NUMTEMP 10000
@@ -51,16 +72,7 @@ describe(`when getting input.dat`, () => {
       COSTTHRESH 0
       THRESHPEN1 0
       THRESHPEN2 0
-      _CLOUD_SCENARIO Save the world species
-      _CLOUD_PROJECT Humanity for living.
-      _CLOUD_ORGANIZATION Alaska
-      _CLOUD_GENERATED_AT __ISO_DATE__
-      INPUTDIR input
-      PUNAME pu.dat
-      SPECNAME spec.dat
-      PUVSPRNAME puvspr.dat
-      BOUNDNAME bound.dat
-      OUTPUTDIR output"
+      "
     `);
   });
 });

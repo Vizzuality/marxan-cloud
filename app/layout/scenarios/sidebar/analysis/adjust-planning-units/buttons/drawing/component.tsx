@@ -1,19 +1,21 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 
+import { Form as FormRFF } from 'react-final-form';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { useSaveScenarioPU } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import cx from 'classnames';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 
-import { Form as FormRFF } from 'react-final-form';
-
-import { useToasts } from 'hooks/toast';
-import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-
 import DRAW_SHAPE_SVG from 'svgs/ui/draw.svg?sprite';
-import { useSaveScenarioPU } from 'hooks/scenarios';
 
 export interface AnalysisAdjustDrawingProps {
   type: string;
@@ -31,10 +33,14 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
 
   const { addToast } = useToasts();
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setDrawing, setDrawingValue, setCache } = scenarioSlice.actions;
   const dispatch = useDispatch();
-  const { drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const {
+    puIncludedValue,
+    puExcludedValue,
+    drawingValue,
+  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const scenarioPUMutation = useSaveScenarioPU({});
 
@@ -69,6 +75,10 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
     scenarioPUMutation.mutate({
       id: `${sid}`,
       data: {
+        byId: {
+          include: puIncludedValue,
+          exclude: puExcludedValue,
+        },
         byGeoJson: {
           [values.type]: [{
             type: 'FeatureCollection',
@@ -111,6 +121,8 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   }, [
     sid,
     scenarioPUMutation,
+    puIncludedValue,
+    puExcludedValue,
     onSelected,
     dispatch,
     setDrawing,

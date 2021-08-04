@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Either, isRight } from 'fp-ts/Either';
 import {
+  marxanFailed,
+  metadataNotFound as outputMetadataNotFound,
   OutputZipFailure,
   outputZipNotYetAvailable,
-  metadataNotFound as outputMetadataNotFound,
 } from '../output-files/output-files.service';
 import {
   InputZipFailure,
-  metadataNotFound,
   inputZipNotYetAvailable,
+  metadataNotFound,
 } from '../input-files';
 
 @Injectable()
@@ -25,6 +26,7 @@ export class ZipFilesSerializer {
       case outputMetadataNotFound:
         throw new NotFoundException(`Marxan was not yet executed.`);
       case outputZipNotYetAvailable:
+      case marxanFailed:
       case inputZipNotYetAvailable:
         throw new NotFoundException(
           `Marxan has not yet finished or finished with error.`,

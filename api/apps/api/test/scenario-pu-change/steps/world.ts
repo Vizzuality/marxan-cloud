@@ -13,7 +13,11 @@ import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity'
 import { GivenProjectExists } from '../../steps/given-project';
 
 export const createWorld = async (app: INestApplication, jwt: string) => {
-  const { cleanup, projectId } = await GivenProjectExists(app, jwt);
+  const { cleanup, projectId } = await GivenProjectExists(app, jwt, {
+    countryCode: 'BWA',
+    adminAreaLevel1Id: 'BWA.12_1',
+    adminAreaLevel2Id: 'BWA.12.1_1',
+  });
   const scenariosPuData: Repository<ScenariosPlanningUnitGeoEntity> = await app.get(
     getRepositoryToken(
       ScenariosPlanningUnitGeoEntity,
@@ -41,7 +45,7 @@ export const createWorld = async (app: INestApplication, jwt: string) => {
         scenarioId,
         jwt,
         (await GivenScenarioPuDataExists(scenariosPuData, scenarioId)).rows.map(
-          (entity) => entity.puGeometryId,
+          (entity) => entity.id,
         ),
       ),
     cleanup: async () => {

@@ -9454,6 +9454,11 @@ through@2, "through@>=2.2.7 <3", through@^2.3.4, through@^2.3.6, through@^2.3.8,
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU=
 
+tiny-types@1.16.1:
+  version "1.16.1"
+  resolved "https://registry.yarnpkg.com/tiny-types/-/tiny-types-1.16.1.tgz#5ea18637ac47678f820249c22f871ebc66d83ad9"
+  integrity sha512-CLNYYZF6Q0VyDhJ5c5u75Y2SHWhHZBvdLm/P23RLyYzB/yBIWG52lLAomObC3IOlufA1ubl4eLfp9PZU/1U6Jg==
+
 tinyqueue@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/tinyqueue/-/tinyqueue-2.0.3.tgz#64d8492ebf39e7801d7bd34062e29b45b2035f08"

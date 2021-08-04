@@ -1,24 +1,23 @@
 import React, { useCallback, useState } from 'react';
 
-import Avatar from 'layout/me/profile/avatar';
-
-import Button from 'components/button';
-import Loading from 'components/loading';
-
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import Field from 'components/forms/field';
-import Label from 'components/forms/label';
-import Input from 'components/forms/input';
-
-import {
-  composeValidators,
-} from 'components/forms/validations';
 
 import { useMe, useSaveMe } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 
-import USER_SVG from 'svgs/ui/user.svg?sprite';
+import Avatar from 'layout/me/profile/avatar';
+
+import Button from 'components/button';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
+import {
+  composeValidators,
+} from 'components/forms/validations';
+import Loading from 'components/loading';
+
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
+import USER_SVG from 'svgs/ui/user.svg?sprite';
 
 export interface MeProps {
 

@@ -6,8 +6,9 @@ export interface StaticColumnProps {
   title: string;
   subtitle?: string;
   description?: string;
-  caption: string;
-  href: string,
+  caption?: string;
+  image?: string;
+  href?: string,
   external?: boolean,
 }
 
@@ -16,12 +17,13 @@ export const StaticColumn: React.FC<StaticColumnProps> = ({
   subtitle,
   description,
   caption,
+  image,
   href,
   external = false,
 }: StaticColumnProps) => {
   return (
     <div>
-      <h2 className="h-56 pb-10 text-4xl leading-relaxed text-transparent font-heading max-w-max bg-gradient-to-r from-blue-700 via-blue-400 to-green-300 bg-clip-text">
+      <h2 className="h-56 pb-10 text-4xl leading-relaxed font-heading max-w-max">
         {title}
       </h2>
       {subtitle && (
@@ -30,11 +32,26 @@ export const StaticColumn: React.FC<StaticColumnProps> = ({
         </h3>
       )}
       {description && (
-        <p className="mb-12 text-base leading-normal text-gray-400 max-w-max">
+        <p className="mb-12 text-base leading-normal text-white max-w-max">
           {description}
         </p>
       )}
-      <ButtonLink caption={caption} href={href} external={external} />
+      {image && (
+        <div>
+          <img
+            src={image}
+            alt=""
+            style={{
+              width: '403px',
+              height: 'auto',
+              filter: 'drop-shadow(0px 8px 15px rgba(0, 0, 0, .35))',
+            }}
+          />
+        </div>
+      )}
+      {href && (
+        <ButtonLink caption={caption} href={href} external={external} theme="light" />
+      )}
     </div>
   );
 };

@@ -2,3 +2,4 @@ export { MarxanExecutionMetadataGeoEntity } from './marxan-execution-metadata.ge
 export { OutputScenariosPuDataGeoEntity } from './output-scenarios-pu-data.geo.entity';
 export { OutputScenariosFeaturesDataGeoEntity } from './output-scenarios-features-data.geo.entity';
 export { ResultRow, ExecutionResult } from './execution-result';
+export { ScenariosOutputResultsApiEntity } from './scenarios-outputs-summaries.api.entity';

@@ -1,18 +1,16 @@
 import React from 'react';
 
-import Title from 'layout/title/scenario-title';
+import { withProtection, withUser } from 'hoc/auth';
+
 import Header from 'layout/header';
+import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
-import Wrapper from 'layout/wrapper';
-
 import ScenariosMap from 'layout/scenarios/map';
-
 import ScenariosSidebar from 'layout/scenarios/sidebar';
 import SidebarName from 'layout/scenarios/sidebar/name';
-import Help from 'layout/help/button';
-
-import { withProtection, withUser } from 'hoc/auth';
+import Title from 'layout/title/scenario-title';
+import Wrapper from 'layout/wrapper';
 
 export const getServerSideProps = withProtection(withUser());
 

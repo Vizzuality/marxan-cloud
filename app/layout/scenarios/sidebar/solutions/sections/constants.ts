@@ -11,9 +11,10 @@ export const SECTIONS = [
     name: 'Gap Analysis',
     description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
   },
-  {
-    id: SolutionsSections.SOLUTIONS,
-    name: 'Solutions',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
-  },
+  // {
+  //   id: SolutionsSections.SOLUTIONS,
+  //   name: 'Solutions',
+  //   description: 'Lorem ipsum dolor sit amet, consectetur
+  //   adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
+  // },
 ];

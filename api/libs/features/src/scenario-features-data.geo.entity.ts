@@ -1,4 +1,4 @@
-import { FeatureTags } from '@marxan/features';
+import { FeatureTag } from '@marxan/features/domain';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -38,7 +38,7 @@ export class ScenarioFeaturesData {
   /**
    * penalty factor
    */
-  fpf!: number;
+  fpf?: number;
 
   @ApiProperty({
     description: `Total area space, expressed in m^2`,
@@ -47,7 +47,7 @@ export class ScenarioFeaturesData {
   /**
    * target to be met for protection
    */
-  target!: number;
+  target?: number;
 
   @ApiProperty({
     description:
@@ -76,7 +76,7 @@ export class ScenarioFeaturesData {
    * not used yet
    * in marxan realm you can set a secondary target for a minimum clump size for the representation of conservation features in the reserve
    */
-  target2!: number;
+  target2?: number;
 
   @Column({
     name: 'metadata',
@@ -120,9 +120,9 @@ export class ScenarioFeaturesData {
 
   // what we expose with Extend
   @ApiProperty({
-    enum: FeatureTags,
+    enum: FeatureTag,
   })
-  tag!: FeatureTags;
+  tag!: FeatureTag;
 
   @ApiPropertyOptional({
     description: `Name of the feature, for example \`Lion in Deserts\`.`,

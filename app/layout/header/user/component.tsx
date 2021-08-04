@@ -1,12 +1,14 @@
 import React, { useCallback, useState } from 'react';
 
 import Link from 'next/link';
-import Icon from 'components/icon';
-import Avatar from 'components/avatar';
-import Tooltip from 'components/tooltip';
+
+import { useMe } from 'hooks/me';
 
 import { signOut } from 'next-auth/client';
-import { useMe } from 'hooks/me';
+
+import Avatar from 'components/avatar';
+import Icon from 'components/icon';
+import Tooltip from 'components/tooltip';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import SIGN_OUT_SVG from 'svgs/ui/sign-out.svg?sprite';
@@ -75,13 +77,13 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
     >
       <button
         type="button"
-        className="flex items-center justify-start focus:outline-none"
+        className="flex items-center justify-start space-x-1 focus:outline-none"
         onClick={handleClick}
       >
         <Avatar className="text-sm text-white uppercase bg-blue-700" bgImage={avatarDataUrl}>
           {!avatarDataUrl && displayName.slice(0, 2)}
         </Avatar>
-        <Icon icon={ARROW_DOWN_SVG} className="w-2.5 h-2.5 text-white" />
+        <Icon icon={ARROW_DOWN_SVG} className="w-2.5 h-2.5" />
       </button>
     </Tooltip>
   );

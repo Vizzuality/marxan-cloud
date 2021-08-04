@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { useToasts } from 'hooks/toast';
 import { useRouter } from 'next/router';
+
+import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
 
@@ -53,39 +54,39 @@ export const ProjectShare: React.FC<ProjectShareProps> = () => {
 
   return (
     <div>
-      <h3 className="mb-6 text-sm font-semibold text-white">Share</h3>
+      <h3 className="mb-6 text-sm font-semibold">Share</h3>
 
       <div className="space-y-5">
         <button
           type="button"
-          className="flex flex-row"
+          className="flex flex-row hover:underline"
           onClick={handleCopy}
         >
-          <Icon icon={LINK_SVG} className="w-5 h-5 mr-2.5 text-white" />
+          <Icon icon={LINK_SVG} className="w-5 h-5 mr-2.5 text-black" />
           <p className="text-sm">Copy link</p>
         </button>
 
         <a
-          className="flex flex-row"
+          className="flex flex-row hover:underline"
           type="button"
           role="button"
           href={`https://twitter.com/intent/tweet?url=${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
-          <Icon icon={TWITTER_FILLED_SVG} className="w-5 h-5 mr-2.5 text-white" />
+          <Icon icon={TWITTER_FILLED_SVG} className="w-5 h-5 mr-2.5" />
           <p className="text-sm">Twitter</p>
         </a>
 
         <a
-          className="flex flex-row"
+          className="flex flex-row hover:underline"
           type="button"
           role="button"
           href={`https://www.facebook.com/sharer/sharer.php?u=${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
           rel="noreferrer"
           target="_blank"
         >
-          <Icon icon={FACEBOOK_FILLED_SVG} className="h-5 mr-5 text-white" />
+          <Icon icon={FACEBOOK_FILLED_SVG} className="h-5 mr-5" />
           <p className="text-sm">Facebook</p>
         </a>
 

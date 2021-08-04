@@ -56,3 +56,28 @@ export interface SaveScenarioPUProps {
   id?: string,
   data: any
 }
+
+// useDuplicateScenario
+export interface UseDuplicateScenarioProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface DuplicateScenarioProps {
+  id: string | string[];
+}
+
+export interface UseRunScenarioProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface RunScenarioProps {
+  id: string | string[];
+}
+
+export interface UseCancelRunScenarioProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface CancelRunScenarioProps {
+  id: string | string[];
+}

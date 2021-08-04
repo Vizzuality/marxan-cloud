@@ -1,25 +1,27 @@
 import React, {
-  useCallback, useEffect, useMemo, useState,
+  useCallback, useEffect, useState,
 } from 'react';
 
 // Map
-import Map from 'components/map';
-// import LAYERS from 'components/map/layers';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import { useRouter } from 'next/router';
+
+import { useSelectedFeatures } from 'hooks/features';
+import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'hooks/map';
+import { useProject } from 'hooks/projects';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
+import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import { useSession } from 'next-auth/client';
 
+import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
-import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
-
-import { useSession } from 'next-auth/client';
-import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
-import { useProject } from 'hooks/projects';
-import { useWDPAPreviewLayer, usePUGridLayer } from 'hooks/map';
+import ZoomControl from 'components/map/controls/zoom';
 
 import ScenariosDrawingManager from './drawing-manager';
 
@@ -35,11 +37,29 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { data = {} } = useProject(pid);
   const { bbox } = data;
 
-  const scenarioSlice = getScenarioSlice(sid);
-  const { setClickingValue } = scenarioSlice.actions;
+  const {
+    data: selectedFeaturesData,
+  } = useSelectedFeatures(sid, {});
+
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setPuIncludedValue, setPuExcludedValue } = scenarioSlice.actions;
+
   const dispatch = useDispatch();
   const {
-    tab, cache, wdpaCategories, clicking, clickingValue, puAction,
+    tab,
+    subtab,
+    cache,
+    // WDPA
+    wdpaCategories,
+    wdpaThreshold,
+
+    // Features
+    featureHoverId,
+    // Adjust planning units
+    clicking,
+    puAction,
+    puIncludedValue,
+    puExcludedValue,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const minZoom = 2;
@@ -50,30 +70,35 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
     cache,
-    active: tab === 'protected-areas',
+    active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
     bbox,
   });
 
-  const type = useMemo(() => {
-    if (tab === 'analysis') {
-      return 'adjust-planning-units';
-    }
-
-    return 'default';
-  }, [tab]);
+  const FeaturePreviewLayers = useFeaturePreviewLayers({
+    features: selectedFeaturesData,
+    cache,
+    active: tab === 'features',
+    bbox,
+    options: {
+      featureHoverId,
+    },
+  });
 
   const PUGridLayer = usePUGridLayer({
     cache,
     active: true,
     sid: sid ? `${sid}` : null,
-    type,
+    type: tab,
+    subtype: subtab,
     options: {
+      wdpaThreshold,
       puAction,
-      clickingValue,
+      puIncludedValue,
+      puExcludedValue,
     },
   });
 
-  const LAYERS = [WDPApreviewLayer, PUGridLayer].filter((l) => !!l);
+  const LAYERS = [PUGridLayer, WDPApreviewLayer, ...FeaturePreviewLayers].filter((l) => !!l);
 
   useEffect(() => {
     setBounds({
@@ -114,21 +139,32 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
 
       if (pUGridLayer) {
         const { properties } = pUGridLayer;
-        const { pugeomid } = properties;
+        const { scenarioPuId } = properties;
 
-        const newClickingValue = [...clickingValue];
-        const index = newClickingValue.findIndex((s) => s === pugeomid);
+        const newClickingValue = puAction === 'include' ? [...puIncludedValue] : [...puExcludedValue];
+        const newAction = puAction === 'include' ? setPuIncludedValue : setPuExcludedValue;
+
+        const index = newClickingValue.findIndex((s) => s === scenarioPuId);
 
         if (index > -1) {
           newClickingValue.splice(index, 1);
         } else {
-          newClickingValue.push(pugeomid);
+          newClickingValue.push(scenarioPuId);
         }
 
-        dispatch(setClickingValue(newClickingValue));
+        dispatch(newAction(newClickingValue));
       }
     }
-  }, [clicking, clickingValue, dispatch, setClickingValue, cache]);
+  }, [
+    clicking,
+    puAction,
+    puIncludedValue,
+    puExcludedValue,
+    dispatch,
+    setPuIncludedValue,
+    setPuExcludedValue,
+    cache,
+  ]);
 
   const handleTransformRequest = (url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {

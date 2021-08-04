@@ -33,11 +33,11 @@ import { OutputFilesService } from './output-files/output-files.service';
 import { InputFilesService, InputFilesArchiverService } from './input-files';
 import { notFound, RunService } from './marxan-run';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
-import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { SimpleJobStatus } from './scenario.api.entity';
 import { assertDefined } from '@marxan/utils';
 import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-property-sets.service';
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
+import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -62,10 +62,10 @@ export class ScenariosService {
     private readonly runService: RunService,
     private readonly inputFilesService: InputFilesService,
     private readonly outputFilesService: OutputFilesService,
-    private readonly geoFeaturesService: GeoFeaturesService,
     private readonly geoFeaturePropertySetService: GeoFeaturePropertySetService,
     private readonly inputArchiveService: InputFilesArchiverService,
     private readonly planningUnitsService: ScenarioPlanningUnitsService,
+    private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
   ) {}
 
   async findAllPaginated(
@@ -86,7 +86,9 @@ export class ScenariosService {
 
   async create(input: CreateScenarioDTO, info: AppInfoDTO) {
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
-    return this.crudService.create(validatedMetadata, info);
+    const scenario = await this.crudService.create(validatedMetadata, info);
+    await this.planningUnitsLinkerService.link(scenario);
+    return scenario;
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
@@ -235,6 +237,11 @@ export class ScenariosService {
       ...fetchSpecification.filter,
       distinctFive: true,
     };
+    // TODO remove the following two lines once implementation is in place.
+    // The artificial limiting of response elements is only to serve (up to) the
+    // expected number of elements to frontend in the meanwhile.
+    fetchSpecification.pageSize = 5;
+    fetchSpecification.pageNumber = 1;
     return this.solutionsCrudService.findAllPaginated(fetchSpecification);
   }
 

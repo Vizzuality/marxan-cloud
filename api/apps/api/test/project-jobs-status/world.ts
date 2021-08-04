@@ -18,6 +18,11 @@ export const createWorld = async (app: INestApplication) => {
   const { projectId, cleanup: projectCleanup } = await GivenProjectExists(
     app,
     token,
+    {
+      countryCode: 'BWA',
+      adminAreaLevel1Id: 'BWA.12_1',
+      adminAreaLevel2Id: 'BWA.12.1_1',
+    },
   );
   const scenarios: string[] = [];
   let scenarioIdWithPendingJob: string | undefined;

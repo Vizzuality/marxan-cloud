@@ -1,19 +1,21 @@
-import flatten from 'lodash/flatten';
 import { useMemo } from 'react';
+
 import {
   useQuery, useInfiniteQuery, useMutation, useQueryClient,
 } from 'react-query';
-import { useSession } from 'next-auth/client';
+
 import { useRouter } from 'next/router';
 
 import { formatDistanceToNow } from 'date-fns';
+import flatten from 'lodash/flatten';
+import { useSession } from 'next-auth/client';
 
 import { ItemProps } from 'components/scenarios/item/component';
 
+import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
-import DOWNLOADS from 'services/downloads';
 
 import {
   UseScenariosOptionsProps,
@@ -29,6 +31,12 @@ import {
   UploadScenarioPUProps,
   UseSaveScenarioPUProps,
   SaveScenarioPUProps,
+  UseDuplicateScenarioProps,
+  DuplicateScenarioProps,
+  UseRunScenarioProps,
+  RunScenarioProps,
+  UseCancelRunScenarioProps,
+  CancelRunScenarioProps,
 } from './types';
 
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
@@ -144,6 +152,38 @@ export function useScenario(id) {
   }, [query, data?.data?.data]);
 }
 
+// SCENARIO STATUS
+export function useScenariosStatus(pId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios-status', pId], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${pId}/scenarios/status`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!pId,
+    placeholderData: {
+      data: {
+        scenarios: [],
+      },
+    },
+    refetchInterval: 5000,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
 export function useSaveScenario({
   requestConfig = {
     method: 'POST',
@@ -204,29 +244,6 @@ export function useDeleteScenario({
       console.info('Error', error, variables, context);
     },
   });
-}
-
-export function useScenariosStatus(pid) {
-  const [session] = useSession();
-
-  const query = useQuery(['scenarios-status', pid], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pid}/scenarios/status`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }), {
-    enabled: !!pid,
-  });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data?.data,
-    };
-  }, [query, data?.data?.data]);
 }
 
 export function useUploadScenarioPU({
@@ -328,11 +345,67 @@ export function useUploadCostSurface({
   });
 }
 
+// PLANNING UNITS
+export function useScenarioPU(sid) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios-pu', sid], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${sid}/planning-units`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => {
+      try {
+        return JSON.parse(data);
+      } catch (error) {
+        return data;
+      }
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!sid,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    const parsedData = data || [];
+    const included = parsedData
+      .filter((p) => p.inclusionStatus === 'locked-in' || p.defaultStatus === 'locked-in')
+      .map((p) => p.id);
+
+    const includedDefault = parsedData
+      .filter((p) => p.defaultStatus === 'locked-in')
+      .map((p) => p.id);
+
+    const excluded = parsedData
+      .filter((p) => p.inclusionStatus === 'locked-out' || p.defaultStatus === 'locked-out')
+      .map((p) => p.id);
+
+    const excludedDefault = parsedData
+      .filter((p) => p.defaultStatus === 'locked-out')
+      .map((p) => p.id);
+
+    return {
+      ...query,
+      data: {
+        included,
+        excluded,
+        includedDefault,
+        excludedDefault,
+      },
+    };
+  }, [query, data]);
+}
+
 export function useSaveScenarioPU({
   requestConfig = {
     method: 'PATCH',
   },
 }: UseSaveScenarioPUProps) {
+  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const saveScenario = ({ id, data }: SaveScenarioPUProps) => {
@@ -349,8 +422,101 @@ export function useSaveScenarioPU({
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
+      const { id } = variables;
+      queryClient.invalidateQueries(['scenarios-pu', id]);
     },
     onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDuplicateScenario({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseDuplicateScenarioProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const duplicateScenario = ({ id }: DuplicateScenarioProps) => {
+    // Pending endpoint
+    return SCENARIOS.request({
+      url: `/${id}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(duplicateScenario, {
+    onSuccess: (data: any, variables, context) => {
+      const { id, projectId } = data;
+      queryClient.invalidateQueries(['scenarios', projectId]);
+      queryClient.invalidateQueries(['scenarios', id]);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useRunScenario({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseRunScenarioProps) {
+  const [session] = useSession();
+
+  const duplicateScenario = ({ id }: RunScenarioProps) => {
+    // Pending endpoint
+    return SCENARIOS.request({
+      url: `/${id}/marxan`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(duplicateScenario, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useCancelRunScenario({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseCancelRunScenarioProps) {
+  const [session] = useSession();
+
+  const duplicateScenario = ({ id }: CancelRunScenarioProps) => {
+    // Pending endpoint
+    return SCENARIOS.request({
+      url: `/${id}/marxan`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(duplicateScenario, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
       console.info('Error', error, variables, context);
     },
   });

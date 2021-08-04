@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import cx from 'classnames';
-
 import Flicking, { ERROR_CODE, FlickingError } from '@egjs/react-flicking';
+import cx from 'classnames';
 
 export interface CarouselProps {
   images: {
@@ -46,7 +45,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => 
     >
       <div
         role="presentation"
-        className="bg-black rounded-3xl"
+        className="bg-black rounded-3xl overflow-hidden"
         style={{
           boxShadow: '0px 50px 50px rgba(0, 0, 0, 0.5)',
         }}

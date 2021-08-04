@@ -1,5 +1,5 @@
-import { ModalProps } from 'components/modal';
 import { IconProps } from 'components/icon';
+import { ModalProps } from 'components/modal';
 
 export interface ConfirmationPromptProps {
   /**

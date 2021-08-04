@@ -22,10 +22,10 @@ import { CostSurfaceTemplateModule } from './cost-surface-template';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import {
-  ScenariosOutputResultsApiEntity,
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuOutputGeoEntity,
 } from '@marxan/scenarios-planning-unit';
+import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 import { ScenarioSolutionSerializer } from './dto/scenario-solution.serializer';
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
 import { OutputFilesModule } from './output-files/output-files.module';
@@ -35,6 +35,8 @@ import { MarxanRunModule } from './marxan-run';
 import { GeoFeaturesModule } from '../geo-features/geo-features.module';
 import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.serializer';
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
+import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
+import { AdminAreasModule } from '../admin-areas/admin-areas.module';
 
 @Module({
   imports: [
@@ -61,6 +63,7 @@ import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning
     PlanningUnitsProtectionLevelModule,
     OutputFilesModule,
     MarxanRunModule,
+    AdminAreasModule,
   ],
   providers: [
     ScenariosService,
@@ -68,6 +71,7 @@ import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning
     ProxyService,
     WdpaAreaCalculationService,
     ScenarioPlanningUnitsService,
+    ScenarioPlanningUnitsLinkerService,
     ScenarioSerializer,
     ScenarioFeatureSerializer,
     SolutionResultCrudService,
