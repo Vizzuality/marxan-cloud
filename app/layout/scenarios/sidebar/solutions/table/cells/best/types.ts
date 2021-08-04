@@ -1,3 +1,3 @@
 export interface BestCellProps {
-  value: unknown;
+  isTheBest: boolean;
 }

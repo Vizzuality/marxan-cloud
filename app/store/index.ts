@@ -1,10 +1,8 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-
+import communityProjects from 'store/slices/community/projects';
 import projects from 'store/slices/projects';
 import projectsDetail from 'store/slices/projects/[id]';
 import projectsNew from 'store/slices/projects/new';
-import communityProjects from 'store/slices/community/projects';
-// import scenariosEdit from 'store/slices/scenarios/edit';
 
 // Reducers
 const staticReducers = {
@@ -14,7 +12,8 @@ const staticReducers = {
   '/community/projects': communityProjects,
 };
 
-const asyncReducers = {};
+const asyncReducers = {
+};
 
 const createReducer = (newReducers) => combineReducers({
   ...staticReducers,

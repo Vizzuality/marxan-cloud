@@ -9,7 +9,8 @@ import { useSaveScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import cx from 'classnames';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -32,7 +33,7 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
 
   const { addToast } = useToasts();
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setDrawing, setDrawingValue, setCache } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const { drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);

@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
 
-import Table from 'components/table';
-import { Button } from 'components/button/component';
+import BestCell from 'layout/scenarios/sidebar/solutions/table/cells/best';
 
-import BestCell from './cells/best';
+import { Button } from 'components/button/component';
+import Table from 'components/table';
 
 import { SolutionsTableProps } from './types';
 
 export const SolutionsTable: React.FC<SolutionsTableProps> = ({
+  bestSolutionId,
   body,
+  selectedSolution,
   onSelectSolution,
 }: SolutionsTableProps) => {
-  const [selectedRowId, setSelectedRowId] = useState<string>(null);
+  const [selectedRowId, setSelectedRowId] = useState<string>(selectedSolution || bestSolutionId);
+
+  const solutionsArrayWithBestProperty = body.map((obj) => {
+    if (obj.id === bestSolutionId) {
+      return ({ ...obj, best: true });
+    }
+    return ({ ...obj, best: false });
+  });
 
   const ViewOnMapCell = (value, row) => {
     const { isSelected } = row;
@@ -68,7 +77,7 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
   return (
     <Table
       headers={headers}
-      body={body}
+      body={solutionsArrayWithBestProperty}
       selectedRowId={selectedRowId}
     />
   );

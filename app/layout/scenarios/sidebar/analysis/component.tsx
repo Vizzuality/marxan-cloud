@@ -20,9 +20,12 @@ import Button from 'components/button';
 import Modal from 'components/modal';
 
 export interface ScenariosSidebarAnalysisProps {
+  readOnly?: boolean;
 }
 
-export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> = () => {
+export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> = ({
+  readOnly,
+}: ScenariosSidebarAnalysisProps) => {
   const [section, setSection] = useState(null);
   const [runOpen, setRunOpen] = useState(false);
   const { query } = useRouter();
@@ -74,11 +77,9 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
                   PLANNING UNITS
                 </b>
               </li>
-
             </ol>
-
           </div>
-          )}
+         )}
         modifiers={['flip']}
         tooltipPlacement="left"
       >
@@ -102,6 +103,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
               {!section && (
               <Sections
                 key="sections"
+                readOnly={readOnly}
                 onChangeSection={onChangeSection}
               />
               )}
@@ -116,6 +118,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
               {section === 'cost-surface' && (
               <CostSurface
                 key="cost-surface"
+                readOnly={readOnly}
                 onChangeSection={onChangeSection}
               />
               )}

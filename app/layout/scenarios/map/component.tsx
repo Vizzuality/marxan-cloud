@@ -13,11 +13,11 @@ import { useProject } from 'hooks/projects';
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
-import Map from 'components/map';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 // import LAYERS from 'components/map/layers';
-
+import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
@@ -37,8 +37,9 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { data = {} } = useProject(pid);
   const { bbox } = data;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setPuIncludedValue, setPuExcludedValue } = scenarioSlice.actions;
+
   const dispatch = useDispatch();
   const {
     tab, cache, wdpaCategories, clicking, puAction, puIncludedValue, puExcludedValue,

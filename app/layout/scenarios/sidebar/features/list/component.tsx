@@ -1,24 +1,28 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import cx from 'classnames';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useQueryClient } from 'react-query';
 
-import Button from 'components/button';
-import Loading from 'components/loading';
-import Modal from 'components/modal';
-import Item from 'components/features/selected-item';
+import { useRouter } from 'next/router';
+
+import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+
+import cx from 'classnames';
 
 import IntersectFeatures from 'layout/scenarios/sidebar/features/intersect';
 
-import { useQueryClient } from 'react-query';
-import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
-import { useRouter } from 'next/router';
+import Button from 'components/button';
+import Item from 'components/features/selected-item';
+import Loading from 'components/loading';
+import Modal from 'components/modal';
 
 export interface ScenariosFeaturesListProps {
+  readOnly?: boolean,
   onSuccess: () => void
 }
 
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
+  readOnly,
   onSuccess,
 }: ScenariosFeaturesListProps) => {
   const [submitting, setSubmitting] = useState(false);
@@ -223,6 +227,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                           >
                             <Item
                               {...item}
+                              readOnly={readOnly}
                               onSplitSelected={(s) => {
                                 onSplitSelected(item.id, s, input);
                               }}

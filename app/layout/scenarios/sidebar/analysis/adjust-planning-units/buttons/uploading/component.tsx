@@ -12,7 +12,8 @@ import { useSaveScenarioPU, useUploadScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import cx from 'classnames';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -39,7 +40,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setUploading, setUploadingValue, setCache } = scenarioSlice.actions;
 
   const dispatch = useDispatch();

@@ -6,7 +6,7 @@ import { useToasts } from 'hooks/toast';
 import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { useScenarioPU, useSaveScenarioPU } from 'hooks/scenarios';
 
@@ -33,10 +33,11 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const {
     setPUAction, setPuIncludedValue, setPuExcludedValue,
   } = scenarioSlice.actions;
+
   const dispatch = useDispatch();
 
   const { addToast } = useToasts();

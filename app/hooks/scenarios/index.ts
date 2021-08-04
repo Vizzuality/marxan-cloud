@@ -10,12 +10,12 @@ import { formatDistanceToNow } from 'date-fns';
 import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/client';
 
+import { ItemProps } from 'components/scenarios/item/component';
+
 import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
-
-import { ItemProps } from 'components/scenarios/item/component';
 
 import {
   UseScenariosOptionsProps,
