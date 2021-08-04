@@ -223,22 +223,22 @@ describe('ProxyVectorTilesModule (e2e)', () => {
           .expect(HttpStatus.OK);
       });
 
-    test('Should give back a valid request for a scenario PUs filtering by include', async () => {
-      await request(app.getHttpServer())
-        .get(
-          `/api/v1/scenarios/${aScenario.id}/planning-units/tiles/6/30/25.mvt?include=protection`,
-        )
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .expect(HttpStatus.OK);
+      test('Should give back a valid request for a scenario PUs filtering by include', async () => {
+        await request(app.getHttpServer())
+          .get(
+            `/api/v1/scenarios/${aScenario.id}/planning-units/tiles/6/30/25.mvt?include=protection`,
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.OK);
       });
 
-    test('Should give back an error if an invalid include param is passed', async () => {
-      await request(app.getHttpServer())
-        .get(
-          `/api/v1/scenarios/${aScenario.id}/planning-units/tiles/6/30/25.mvt?include=protectiosn`,
-        )
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .expect(HttpStatus.BAD_REQUEST);
+      test('Should give back an error if an invalid include param is passed', async () => {
+        await request(app.getHttpServer())
+          .get(
+            `/api/v1/scenarios/${aScenario.id}/planning-units/tiles/6/30/25.mvt?include=protectiosn`,
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.BAD_REQUEST);
       });
     });
   });

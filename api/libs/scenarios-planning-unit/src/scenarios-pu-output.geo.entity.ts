@@ -31,7 +31,7 @@ export class ScenariosPuOutputGeoEntity {
   /**
    * Score of the run
    */
-   @Column({
+  @Column({
     name: `value`,
     array: true,
     type: 'boolean',

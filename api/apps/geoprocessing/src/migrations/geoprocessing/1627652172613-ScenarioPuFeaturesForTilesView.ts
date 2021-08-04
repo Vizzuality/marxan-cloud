@@ -1,7 +1,7 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class ScenarioPuFeaturesForTilesView1627652172613 implements MigrationInterface {
-
+export class ScenarioPuFeaturesForTilesView1627652172613
+  implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
     DROP VIEW IF EXISTS "scenario_pu_features_entity";
