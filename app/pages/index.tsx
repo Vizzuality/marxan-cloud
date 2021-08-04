@@ -23,6 +23,9 @@ const Home: React.FC = () => {
       <Head>
         <title>Home</title>
       </Head>
+      <head>
+        <script defer data-domain="marxan.vercel.app" src="https://plausible.io/js/plausible.js" />
+      </head>
 
       <MetaIcons />
 
