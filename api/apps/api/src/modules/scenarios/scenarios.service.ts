@@ -90,15 +90,22 @@ export class ScenariosService {
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
-    await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(scenario);
+    await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
+      scenario,
+    );
     return scenario;
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
     await this.assertScenario(scenarioId);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
-    const scenario = await this.crudService.update(scenarioId, validatedMetadata);
-    await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(scenario);
+    const scenario = await this.crudService.update(
+      scenarioId,
+      validatedMetadata,
+    );
+    await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
+      scenario,
+    );
     return scenario;
   }
 
