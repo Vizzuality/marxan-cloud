@@ -56,7 +56,6 @@ export const SignUp: React.FC<SignUpProps> = () => {
         setConfirm(true);
         plausible('Sign up', {
           props: {
-            userId: `${data.id}`,
             userEmail: `${data.email}`,
           },
         });
