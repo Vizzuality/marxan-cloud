@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
+import { useMe } from 'hooks/me';
 import { useProject } from 'hooks/projects';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -21,8 +22,10 @@ export interface ToolbarProps {
 export const Toolbar: React.FC<ToolbarProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
-  const { data } = useProject(pid);
   const plausible = usePlausible();
+
+  const { data } = useProject(pid);
+  const { user } = useMe();
 
   return (
     <AnimatePresence>
@@ -76,7 +79,14 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
                 <Button
                   theme="secondary"
                   size="base"
-                  onClick={() => plausible('Download project')}
+                  onClick={() => plausible('Download project', {
+                    props: {
+                      userId: `${user.id}`,
+                      userEmail: `${user.email}`,
+                      projectId: `${pid}`,
+                      projectName: `${data.name}`,
+                    },
+                  })}
                 >
                   <span className="mr-2.5">Download project</span>
                   <Icon icon={DOWNLOAD_SVG} />

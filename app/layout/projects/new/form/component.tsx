@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+import { useMe } from 'hooks/me';
 import { useOrganizations } from 'hooks/organizations';
 import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
@@ -39,6 +40,9 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const { addToast } = useToasts();
   const { push } = useRouter();
   const plausible = usePlausible();
+
+  const { user } = useMe();
+
   const [hasPlanningArea, setHasPlanningArea] = useState(false);
   const { data: organizationsData } = useOrganizations();
 
@@ -77,7 +81,12 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
         console.info('Project saved succesfully', p);
         push('/projects');
-        plausible('New project');
+        plausible('New project', {
+          props: {
+            userId: `${user.id}`,
+            userEmail: `${user.email}`,
+          },
+        });
       },
       onError: () => {
         addToast('error-project-creation', (
