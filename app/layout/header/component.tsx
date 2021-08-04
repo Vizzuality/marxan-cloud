@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { useMe } from 'hooks/me';
 
-import classnames from 'classnames';
+import cx from 'classnames';
 
 import MyProjects from 'layout/header/my-projects';
 import Title from 'layout/header/title';
@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({ published = false, size, theme =
 
   return (
     <header
-      className={classnames({
+      className={cx({
         'w-full row-auto': true,
         'bg-primary-50 text-gray-800': theme === 'light',
       })}
@@ -66,10 +66,9 @@ export const Header: React.FC<HeaderProps> = ({ published = false, size, theme =
           )}
 
           <div
-            className={classnames({
+            className={cx({
               'flex items-center space-x-1 md:space-x-5': true,
               'divide-x divide-gray-500': theme === 'dark',
-              'divide-x divide-gray-200': theme === 'light',
             })}
             style={{
               height: SIZE[size].logo.height + 10,
@@ -84,7 +83,14 @@ export const Header: React.FC<HeaderProps> = ({ published = false, size, theme =
 
           {!user && (
             <div className="flex items-center space-x-4">
-              <LinkButton href="/auth/sign-in" theme="clear" size="s">
+              <LinkButton
+                href="/auth/sign-in"
+                theme={cx({
+                  clear: theme === 'light',
+                  'secondary-alt': theme !== 'light',
+                })}
+                size="s"
+              >
                 Sign in
               </LinkButton>
 
