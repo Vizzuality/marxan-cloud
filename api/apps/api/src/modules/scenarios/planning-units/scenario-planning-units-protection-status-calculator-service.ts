@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -18,22 +18,29 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
   ) {}
 
   /**
+   * WDPA IUCN categories and threshold may be undefined on scenario creation
+   * and only be set on update, therefore we should not rely on their presence
+   * here.
+   *
+   * @TODO We'll need to handle custom protected areas here once we add support
+   * for these.
+   */
+  private shouldSetDefaultInclusionStatus(scenario: Scenario): boolean {
+    return !isNil(scenario.wdpaIucnCategories) && !isNil(scenario.wdpaThreshold);
+  }
+
+  /**
    * Calculate default lock status of planning units given their intersection
    * with protected areas.
    */
-  async calculatedProtectionStatusForPlanningUnitsIn(scenario: Scenario): Promise<void> {
-    /**
-     * If no protected areas are defined, or no threshold has been defined,
-     * there's nothing to do. We allow to set these on update, so we should not
-     * enforce this here.
-     *
-     * @TODO We'll need to handle custom protected areas here once we add
-     * support for these.
-     */
-    if(isNil(scenario.wdpaIucnCategories) || isNil(scenario.wdpaThreshold)) return;
+  async calculatedProtectionStatusForPlanningUnitsIn(
+    scenario: Scenario,
+  ): Promise<void> {
+    if(!this.shouldSetDefaultInclusionStatus(scenario)) return;
 
-    const wdpaIucnCategoriesForScenario = scenario.wdpaIucnCategories?.map(i => `'${i}'`).join(', ');
-    console.log(wdpaIucnCategoriesForScenario);
+    const wdpaIucnCategoriesForScenario = scenario.wdpaIucnCategories
+      ?.map((i) => `'${i}'`)
+      .join(', ');
 
     const query = `
     with pa as (select * from wdpa where iucn_cat in (${wdpaIucnCategoriesForScenario})),
