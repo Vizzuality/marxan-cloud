@@ -41,7 +41,7 @@ export const createWorld = async (app: INestApplication, jwt: string) => {
         scenarioId,
         jwt,
         (await GivenScenarioPuDataExists(scenariosPuData, scenarioId)).rows.map(
-          (entity) => entity.puGeometryId,
+          (entity) => entity.id,
         ),
       ),
     cleanup: async () => {
