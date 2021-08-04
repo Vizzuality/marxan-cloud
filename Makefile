@@ -80,24 +80,25 @@ clean-slate: stop clean-slate-full-stop-and-cleanup
 test-clean-slate: clean-slate-full-stop-and-cleanup
 
 # setup full testing data
-seed-dbs: seed-api-init-data | seed-geoapi-init-data | seed-api-with-test-data | seed-geoapi-with-test-data
+seed-dbs: seed-api-with-test-data | seed-geoapi-with-test-data
 
-seed-api-with-test-data:
-	@echo "$(RED)seeding db:$(NC) $(API_DB_INSTANCE)"
+seed-api-with-test-data: seed-api-init-data | seed-geoapi-init-data
+	@echo "$(RED)seeding db with testing project and scenarios:$(NC) $(API_DB_INSTANCE)"
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-data.sql
 
 seed-api-init-data:
-	@echo "$(RED)seeding db:$(NC) $(API_DB_INSTANCE)"
+	@echo "$(RED)seeding initial dbs:$(NC) $(API_DB_INSTANCE)"
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-init-apidb.sql
 
-seed-geoapi-with-test-data: seed-geoapi-init-data
-	SCENARIOID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
+seed-geoapi-with-test-data:
+	@echo "$(RED)seeding initial geodata for created projects and scenarios:$(NC) $(GEO_DB_INSTANCE)"
+	@SCENARIOID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
 	USERID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from users limit 1"); \
-	echo "appending data for scenario with id $${SCENARIOID}"; \
+	echo "appending data for scenario with id $${SCENARIOID}" for user with id $${USERID}"; \
 	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/apps/api/test/fixtures/test-geodata.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
 
 seed-geoapi-init-data:
-	@echo "$(RED)seeding dbs:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE) and ${REDIS_INSTANCE}"
+	@echo "$(RED)seeding dbs with initial geodata:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE)"
 	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-admin-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}"; \
 	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-wdpa-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-features.sql
