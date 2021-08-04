@@ -10,7 +10,6 @@ import { useRunScenario, useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import cx from 'classnames';
-import { usePlausible } from 'next-plausible';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -27,9 +26,7 @@ export interface ScenariosRunProps {
 export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   const [advanced, setAdvanced] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
   const { addToast } = useToasts();
-  const plausible = usePlausible();
 
   const { query, push } = useRouter();
   const { pid, sid } = query;
@@ -77,10 +74,8 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
             ), {
               level: 'success',
             });
-
-            push(`/projects/${pid}`);
             console.info('Scenario name saved succesfully', s);
-            plausible('New scenario');
+            push(`/projects/${pid}`);
           },
           onError: () => {
             setSubmitting(false);
@@ -109,7 +104,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
         });
       },
     });
-  }, [pid, sid, push, saveScenarioMutation, runScenarioMutation, addToast, plausible]);
+  }, [pid, sid, push, saveScenarioMutation, runScenarioMutation, addToast]);
 
   return (
     <FormRFF
