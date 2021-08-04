@@ -12,13 +12,13 @@ import { motion } from 'framer-motion';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
-import Loading from 'components/loading';
 import InfoButton from 'components/info-button';
+import Loading from 'components/loading';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ScenariosCostSurfaceProps {
-  readOnly: boolean,
+  readOnly?: boolean,
   onChangeSection: (s: string) => void;
 }
 

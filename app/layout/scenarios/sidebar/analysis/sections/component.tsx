@@ -25,7 +25,7 @@ const SECTIONS = [
   },
 ];
 export interface ScenariosSidebarAnalysisSectionsProps {
-  readOnly: boolean,
+  readOnly?: boolean,
   onChangeSection: (s: string) => void;
 }
 

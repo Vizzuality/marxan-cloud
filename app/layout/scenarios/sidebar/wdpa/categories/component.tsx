@@ -23,7 +23,7 @@ import Loading from 'components/loading';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface WDPACategoriesProps {
-  readOnly: boolean;
+  readOnly?: boolean;
   onSuccess: () => void,
   onDismiss: () => void,
 }

@@ -1,8 +1,8 @@
 import React from 'react';
 
 import Head from 'next/head';
-
 import { useRouter } from 'next/router';
+
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 
@@ -32,6 +32,7 @@ export const Title: React.FC<TitleProps> = ({ title }:TitleProps) => {
         {' '}
         {projectData?.name}
       </title>
+      <script defer data-domain="marxan.vercel.app" src="https://plausible.io/js/plausible.js" />
     </Head>
   );
 };

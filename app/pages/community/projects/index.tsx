@@ -1,12 +1,12 @@
 import React from 'react';
 
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import { withUser } from 'hoc/auth';
 
 import PublishedProjects from 'layout/community/published-projects';
 import Footer from 'layout/footer';
+import Head from 'layout/head';
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
@@ -22,9 +22,7 @@ const CommunityProjects: React.FC = () => {
 
   return (
     <>
-      <Head>
-        <title>Community</title>
-      </Head>
+      <Head title="Community" />
 
       <MetaIcons />
 

@@ -26,6 +26,7 @@ export const PublishedProjectTitle: React.FC<PublishedProjectTitleProps> = ({
         {' '}
         {projectData?.name}
       </title>
+      <script defer data-domain="marxan.vercel.app" src="https://plausible.io/js/plausible.js" />
     </Head>
   );
 };
