@@ -14,6 +14,8 @@ import {
   setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingPlanningArea,
 } from 'store/slices/projects/new';
 
+import { usePlausible } from 'next-plausible';
+
 import HelpBeacon from 'layout/help/beacon';
 import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
 import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
@@ -34,9 +36,10 @@ import { DEFAULT_AREA } from './constants';
 import ProjectFormProps from './types';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
-  const [hasPlanningArea, setHasPlanningArea] = useState(false);
   const { addToast } = useToasts();
   const { push } = useRouter();
+  const plausible = usePlausible();
+  const [hasPlanningArea, setHasPlanningArea] = useState(false);
   const { data: organizationsData } = useOrganizations();
 
   const dispatch = useDispatch();
@@ -74,6 +77,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
         console.info('Project saved succesfully', p);
         push('/projects');
+        plausible('New project');
       },
       onError: () => {
         addToast('error-project-creation', (

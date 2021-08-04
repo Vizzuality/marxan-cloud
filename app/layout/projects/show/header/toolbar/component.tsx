@@ -1,17 +1,19 @@
 import React from 'react';
 
-import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
 
+import { useProject } from 'hooks/projects';
+
 import { AnimatePresence, motion } from 'framer-motion';
+import { usePlausible } from 'next-plausible';
+
+import HelpBeacon from 'layout/help/beacon';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 
-import HelpBeacon from 'layout/help/beacon';
-
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
+import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
 export interface ToolbarProps {
 }
@@ -20,6 +22,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
   const { data } = useProject(pid);
+  const plausible = usePlausible();
 
   return (
     <AnimatePresence>
@@ -73,6 +76,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
                 <Button
                   theme="secondary"
                   size="base"
+                  onClick={() => plausible('Download project')}
                 >
                   <span className="mr-2.5">Download project</span>
                   <Icon icon={DOWNLOAD_SVG} />
