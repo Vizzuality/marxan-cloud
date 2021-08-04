@@ -19,6 +19,7 @@ import { ScenarioFeaturesData } from '@marxan/features';
 import { flattenDeep } from 'lodash';
 import { GeoprocessingOpSplitV1 } from './types/geo-feature.geoprocessing-operations.type';
 import { RemoteFeaturesData } from '../scenarios-features/entities/remote-features-data.geo.entity';
+import { plainToClass } from 'class-transformer';
 
 export const EntityManagerToken = Symbol();
 
@@ -123,9 +124,6 @@ export class GeoFeatureSetService {
       prop?: number | undefined;
     }[][]
   > {
-    const repository = transactionalEntityManager.getRepository(
-      ScenarioFeaturesData,
-    );
     const scenarioFeaturesData = Promise.all(
       featureSpecification
         .filter(
@@ -133,11 +131,8 @@ export class GeoFeatureSetService {
             feature.kind === 'plain',
         )
         .map(async (feature) => {
-          const featuresDataRepo = transactionalEntityManager.getRepository(
-            RemoteFeaturesData,
-          );
-          const featuresData = await featuresDataRepo
-            .find({ featureId: feature.featureId })
+          const featuresData: Partial<ScenarioFeaturesData>[] = await transactionalEntityManager
+            .find(RemoteFeaturesData, { featureId: feature.featureId })
             .then((result) =>
               result.map((fd) => ({
                 scenarioId,
@@ -149,7 +144,7 @@ export class GeoFeatureSetService {
               })),
             );
 
-          return repository.save(featuresData);
+          return transactionalEntityManager.save(plainToClass(ScenarioFeaturesData, featuresData));
         }),
     );
     return scenarioFeaturesData;
