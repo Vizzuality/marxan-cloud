@@ -158,7 +158,7 @@ export const Item: React.FC<ItemProps> = ({
               <InfoButton>
                 <span>
                   <h4 className="font-heading text-lg mb-2.5">Split a feature</h4>
-                  <div className="space-y-5">
+                  <div className="space-y-2">
                     <p>
                       You should split a dataset when you have several
                       features together that you want to treat separately.

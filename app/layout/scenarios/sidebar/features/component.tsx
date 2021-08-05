@@ -117,7 +117,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                   <InfoButton>
                     <div>
                       <h4 className="font-heading text-lg mb-2.5">What are features?</h4>
-                      <div className="space-y-5">
+                      <div className="space-y-2">
                         <p>
                           Features represent everything you want to include in
                           your conservation or land/sea use plan.
@@ -157,7 +157,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                     <InfoButton>
                       <div>
                         <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
-                        <div className="space-y-5">
+                        <div className="space-y-2">
                           <p>
                             This value represents how much you want to conserve of a particular
                             feature. In an ideal conservation, land or sea use plan,
@@ -177,7 +177,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                     <InfoButton>
                       <div>
                         <h4 className="font-heading text-lg mb-2.5">What is the FPF?</h4>
-                        <div className="space-y-5">
+                        <div className="space-y-2">
                           <p>
                             FPF stands for
                             {' '}

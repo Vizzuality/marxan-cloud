@@ -167,7 +167,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                               <InfoButton>
                                 <span>
                                   <h4 className="font-heading text-lg mb-2.5">Project Name</h4>
-                                  <div className="space-y-5">
+                                  <div className="space-y-2">
                                     <p>
                                       One project can aggregate multiple scenarios
                                       with the same planning region and grid.

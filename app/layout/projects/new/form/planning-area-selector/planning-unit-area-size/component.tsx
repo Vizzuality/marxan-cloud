@@ -34,7 +34,7 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
         <InfoButton>
           <span>
             <h4 className="font-heading text-lg mb-2.5">Planning unit size</h4>
-            <div className="space-y-5">
+            <div className="space-y-2">
               <p>
                 Select a size that is relevant to your planning area
                 and to the resolution of the features you are considering

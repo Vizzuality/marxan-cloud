@@ -27,7 +27,7 @@ export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
         <InfoButton>
           <span>
             <h4 className="font-heading text-lg mb-2.5">Planning unit shape</h4>
-            <div className="space-y-5">
+            <div className="space-y-2">
               <p>
                 The planning area needs to be divided
                 into smaller spatial units, called planning units.

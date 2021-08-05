@@ -94,51 +94,55 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           >
             <div>
               <h4 className="font-heading text-lg mb-2.5">Solutions</h4>
-              Each solution gives an alternative answer to your planning problem.
-              The result of each solution reflects whether a planning unit is
-              selected or not in the conservation network.
-              <br />
-              <br />
-              The table shows a summary of the most informative
-              variables for each solution including:
-              <ul className="list-disc pl-6">
-                <li>
-                  <b>Score:</b>
-                  {' '}
-                  the answer to Marxan&apos;s
-                  mathematical objective function. Simply put
-                  it is the sum of the three terms:
-                  1) the sum of the costs of the selected
-                  planning units; 2) the total perimeter
-                  of the selected planning units; and 3)
-                  the total penalty incurred if conservation
-                  targets are not met.
-                </li>
-                <li>
-                  <b>Cost:</b>
-                  {' '}
-                  the sum of the costs of the selected planning units
-                </li>
-                <li>
-                  <b>Missing Values:</b>
-                  {' '}
-                  number of features that don&apos;t meet their target
-                </li>
-                <li>
-                  <b>Planning Units:</b>
-                  number of planning units selected
-                </li>
-              </ul>
-              When you click on &apos;View on map&apos; you will
-              see the distribution of the selected planning units on the map
-
-              <br />
-              <br />
-              <i>
-                The files are equivalent to the
-                output_xxxx.csv from the generic Marxan outputs.
-              </i>
-
+              <div className="space-y-2">
+                <p>
+                  Each solution gives an alternative answer to your planning problem.
+                  The result of each solution reflects whether a planning unit is
+                  selected or not in the conservation network.
+                </p>
+                <p>
+                  The table shows a summary of the most informative
+                  variables for each solution including:
+                </p>
+                <ul className="pl-6 space-y-1 list-disc">
+                  <li>
+                    <b>Score:</b>
+                    {' '}
+                    the answer to Marxan&apos;s
+                    mathematical objective function. Simply put
+                    it is the sum of the three terms:
+                    1) the sum of the costs of the selected
+                    planning units; 2) the total perimeter
+                    of the selected planning units; and 3)
+                    the total penalty incurred if conservation
+                    targets are not met.
+                  </li>
+                  <li>
+                    <b>Cost:</b>
+                    {' '}
+                    the sum of the costs of the selected planning units
+                  </li>
+                  <li>
+                    <b>Missing Values:</b>
+                    {' '}
+                    number of features that don&apos;t meet their target
+                  </li>
+                  <li>
+                    <b>Planning Units:</b>
+                    number of planning units selected
+                  </li>
+                </ul>
+                <p>
+                  When you click on &apos;View on map&apos; you will
+                  see the distribution of the selected planning units on the map
+                </p>
+                <p>
+                  <i>
+                    The files are equivalent to the
+                    output_xxxx.csv from the generic Marxan outputs.
+                  </i>
+                </p>
+              </div>
             </div>
           </InfoButton>
         </div>
@@ -158,19 +162,24 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           >
             <div>
               <h4 className="font-heading text-lg mb-2.5">5 most different solutions</h4>
-              Marxan calculates a range of possible good solutions,
-              instead of a unique solution.
-              <br />
-              It is useful to see
-              how much the solutions differ by assessing
-              the 5 most extreme cases. These are obtained by
-              creating a distance matrix of all solutions by
-              applying the Jaccard similarity index and
-              then by grouping the results in 5 clusters.
-              The solutions that are more similar to each
-              other will fall in the same cluster. Finally,
-              for each cluster, the solution with the lowest
-              score is used as the representative solution of the group.
+              <div className="space-y-2">
+                <p>
+                  Marxan calculates a range of possible good solutions,
+                  instead of a unique solution.
+                </p>
+                <p>
+                  It is useful to see
+                  how much the solutions differ by assessing
+                  the 5 most extreme cases. These are obtained by
+                  creating a distance matrix of all solutions by
+                  applying the Jaccard similarity index and
+                  then by grouping the results in 5 clusters.
+                  The solutions that are more similar to each
+                  other will fall in the same cluster. Finally,
+                  for each cluster, the solution with the lowest
+                  score is used as the representative solution of the group.
+                </p>
+              </div>
             </div>
           </InfoButton>
         </div>

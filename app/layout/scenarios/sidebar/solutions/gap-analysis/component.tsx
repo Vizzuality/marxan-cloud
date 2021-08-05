@@ -47,7 +47,7 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
         >
           <div>
             <h4 className="font-heading text-lg mb-2.5">What is the Solutions Gap Analysis?</h4>
-            <div className="space-y-5 text-sm opacity-100">
+            <div className="space-y-2 text-sm opacity-100">
               <p>
                 Before running Marxan you were able to see
                 the percentage of each feature that was currently

@@ -2,13 +2,13 @@ import React, { useCallback, useState } from 'react';
 
 import { motion } from 'framer-motion';
 
+import List from 'layout/scenarios/sidebar/analysis/gap-analysis/list';
+import Toolbar from 'layout/scenarios/sidebar/analysis/gap-analysis/toolbar';
+
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
-
-import Toolbar from 'layout/scenarios/sidebar/analysis/gap-analysis/toolbar';
-import List from 'layout/scenarios/sidebar/analysis/gap-analysis/list';
 
 export interface ScenariosGapAnalysisProps {
   onChangeSection: (s: string) => void;
@@ -47,30 +47,34 @@ export const ScenariosGapAnalysis: React.FC<ScenariosGapAnalysisProps> = ({
         <InfoButton>
           <div>
             <h4 className="font-heading text-lg mb-2.5">What is a Gap Analysis?</h4>
-            <div>
+            <div className="space-y-2">
+              <p>
+                The term &apos;gap&apos; refers to the difference between what
+                is already under conservation and how much is still missing.
+              </p>
+              <p>
+                The result
+                shows the percentage of each feature that is currently
+                inside your selected conservation network (the conservation
+                areas you added in
+                {' '}
+                <b>Protected Areas</b>
+                )
+                {' '}
+                and will inform you of the amount of conservation
+                action still needed to achieve your targets.
+              </p>
 
-              The term &apos;gap&apos; refers to the difference between what
-              is already under conservation and how much is still missing.
-              <br />
-              <br />
-              The result
-              shows the percentage of each feature that is currently
-              inside your selected conservation network (the conservation
-              areas you added in
-              {' '}
-              <b>Protected Areas</b>
-              )
-              and will inform you of the amount of conservation
-              action still needed to achieve your targets.
-              <br />
-              <br />
-              The Gap Analysis can be useful to adjust your targets in
-              <b> Features</b>
-              <br />
-              <br />
-              If no conservation areas were added to the plan,
-              the Gap Analysis will show the current protection as 0%.
+              <p>
+                The Gap Analysis can be useful to adjust your targets in
+                {' '}
+                <b>Features</b>
+              </p>
 
+              <p>
+                If no conservation areas were added to the plan,
+                the Gap Analysis will show the current protection as 0%.
+              </p>
             </div>
 
           </div>
