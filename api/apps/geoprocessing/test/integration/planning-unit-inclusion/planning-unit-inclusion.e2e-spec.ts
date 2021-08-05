@@ -11,6 +11,7 @@ import {
   excludeSampleWithSingleFeature,
   includeSample,
   includeSampleWithSingleFeature,
+  includeSampleOverlappingWithExclude,
 } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/__mocks__/include-sample';
 import { Job } from 'bullmq';
 
@@ -114,6 +115,29 @@ describe(`When planning units exist for a scenario`, () => {
   });
 
   describe('When there are contrasting claims for inclusion and exclusion on one or more planning units', () => {
-    it.todo('The operation should be rejected with an error');
+    const forCase: ForCase = 'multipleFeatures';
+    beforeEach(async () => {
+      await world.GivenPlanningUnitsExist(forCase, areaUnitsSample(forCase));
+    });
+
+    afterEach(async () => {
+      await world?.cleanup('multipleFeatures');
+    });
+
+    it(`the operation should be rejected with an error`, async () => {
+      await expect(
+        sut.process(({
+          data: {
+            scenarioId: world.scenarioId,
+            include: {
+              geo: [includeSampleOverlappingWithExclude()],
+            },
+            exclude: {
+              geo: [excludeSample()],
+            },
+          },
+        } as unknown) as Job<JobInput>),
+      ).rejects.toThrow(/Contrasting claims/);
+    }, 10000);
   });
 });
