@@ -46,11 +46,11 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
 
   const { addToast } = useToasts();
 
-  const { data: PUData } = useScenarioPU(sid);
+  const { data: PUData, isFetched: PUisFetched } = useScenarioPU(sid);
   const scenarioPUMutation = useSaveScenarioPU({});
 
   useEffect(() => {
-    if (PUData) {
+    if (PUData && PUisFetched) {
       const { included, excluded } = PUData;
       dispatch(setPuIncludedValue(included));
       dispatch(setPuExcludedValue(excluded));

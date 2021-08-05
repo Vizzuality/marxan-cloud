@@ -61,6 +61,8 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
 
     if (!selected) {
       dispatch(setClicking(false));
+      dispatch(setTmpPuIncludedValue(puIncludedValue));
+      dispatch(setTmpPuExcludedValue(puExcludedValue));
     }
 
     // Unmount
@@ -91,7 +93,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
           <>
             <h2 className="font-medium">Success!</h2>
             <ul className="text-sm">
-              <li>Planning units saved</li>
+              <li>Planning units lock status saved</li>
             </ul>
           </>
         ), {
@@ -186,18 +188,6 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
                   >
                     Save
                   </Button>
-                  {/* <button
-                    type="button"
-                    className="flex items-center justify-center h-5 pl-5 pr-1 focus:outline-none"
-                    onClickCapture={() => {
-                      setSelected(null);
-                    }}
-                  >
-                    <Icon
-                      className="w-3 h-3 text-primary-500"
-                      icon={ARROW_UP_SVG}
-                    />
-                  </button> */}
                 </div>
               )}
             </header>
