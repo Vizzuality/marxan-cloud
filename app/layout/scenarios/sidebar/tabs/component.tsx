@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -37,11 +37,12 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
-  console.log(refTab, refSubtab);
-  // useEffect(() => {
-  //   dispatch(setTab(refTab));
-  //   dispatch(setSubTab(refSubtab));
-  // }, [dispatch, setTab, setSubTab, refTab, refSubtab]);
+  useEffect(() => {
+    console.info(refTab, refSubtab);
+    dispatch(setTab(refTab));
+    dispatch(setSubTab(refSubtab));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, refTab, refSubtab]);
 
   const onSelectedTab = useCallback((t) => {
     const TAB = TABS.find((T) => T.id === t);
