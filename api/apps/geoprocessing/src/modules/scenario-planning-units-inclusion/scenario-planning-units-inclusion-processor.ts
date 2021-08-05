@@ -20,6 +20,29 @@ export class ScenarioPlanningUnitsInclusionProcessor
     private readonly scenarioPlanningUnitsRepo: Repository<ScenariosPlanningUnitGeoEntity>,
   ) {}
 
+  /**
+   * Process specifications for initial inclusion and exclusion of planning
+   * units.
+   *
+   * Given that there are two distinct ways to express inclusion/exclusion
+   * claims (by id or by GeoJSON), and that API clients may not know which ids
+   * would be covered by a GeoJSON geometry they send (calculation of GeoJSON to
+   * ids is done here), handling overlapping claims for the same planning units
+   * may not be trivial.
+   *
+   * Hence, the logic implemented here is:
+   * - calculate ids from GeoJSON, for both inclusions and exclusions
+   * - subtract ids of PUs excluded by GeoJSON from the ids of PUs *included* by
+   *   id
+   * - subtract ids of PUs included by GeoJSON from the ids of PUs *excluded* by
+   *   id
+   * - calculate the union of inclusions by id and GeoJSON, and that of
+   *   exclusions by id and GeoJSON
+   * - if claims for inclusions and exclusions have any overlaps, throw an error
+   * - otherwise, apply the resulting claims
+   *
+   * TL;DR claims by GeoJSON always "win" over claims by id when overlapping,
+   */
   async process(job: Job<JobInput, true>): Promise<true> {
     const scenarioId = job.data.scenarioId;
     const includeGeo = job.data.include?.geo;
@@ -28,13 +51,14 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const puIdsToInclude: string[] = [];
     const puIdsToExclude: string[] = [];
 
+    const puIdsToIncludeFromGeo: string[] = [];
     if (includeGeo) {
       const targetGeometries = flatMap(
         includeGeo,
         (collection) => collection.features,
       ).map((feature) => feature.geometry);
 
-      puIdsToInclude.push(
+      puIdsToIncludeFromGeo.push(
         ...(
           await this.getPlanningUnitsIntersectingGeometriesFor(
             scenarioId,
@@ -44,12 +68,13 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
+    const puIdsToExcludeFromGeo: string[] = [];
     if (excludeGeo) {
       const targetGeometries = flatMap(
         excludeGeo,
         (collection) => collection.features,
       ).map((feature) => feature.geometry);
-      puIdsToExclude.push(
+      puIdsToExcludeFromGeo.push(
         ...(
           await this.getPlanningUnitsIntersectingGeometriesFor(
             scenarioId,
@@ -59,13 +84,40 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
-    // After setting inclusions and exclusions from geometries above, add
-    // inclusions and exclusions by id, so that we effectively use the union
-    // of the two methods (byId and byGeoJson).
-    puIdsToInclude.push(...(job.data.include?.pu ?? []));
-    puIdsToExclude.push(...(job.data.exclude?.pu ?? []));
-    const uniquePuIdsToInclude = [... new Set(puIdsToInclude)];
-    const uniquePuIdsToExclude = [... new Set(puIdsToExclude)];
+    const puIdsToIncludeFromIds = new Set(job.data.include?.pu ?? []);
+    const puIdsToExcludeFromIds = new Set(job.data.exclude?.pu ?? []);
+
+    // If there are overlaps between opposing claims byId and byGeoJSON, ignore the claims byId
+    const puIdsToIncludeFromIdsLessIdsToExcludeFromGeo = [
+      ...new Set(
+        [...puIdsToIncludeFromIds].filter(
+          (i) => !new Set(puIdsToExcludeFromGeo).has(i),
+        ),
+      ),
+    ];
+    const puIdsToExcludeFromIdsLessIdsToIncludeFromGeo = [
+      ...new Set(
+        [...puIdsToExcludeFromIds].filter(
+          (i) => !new Set(puIdsToIncludeFromGeo).has(i),
+        ),
+      ),
+    ];
+
+    // Union of claims byId and byGeoJSON, for inclusion and for exclusions
+    puIdsToInclude.push(
+      ...[
+        ...puIdsToIncludeFromIdsLessIdsToExcludeFromGeo,
+        ...puIdsToIncludeFromGeo,
+      ],
+    );
+    puIdsToExclude.push(
+      ...[
+        ...puIdsToExcludeFromIdsLessIdsToIncludeFromGeo,
+        ...puIdsToExcludeFromGeo,
+      ],
+    );
+    const uniquePuIdsToInclude = new Set(puIdsToInclude);
+    const uniquePuIdsToExclude = new Set(puIdsToExclude);
 
     await this.scenarioPlanningUnitsRepo.update(
       {
@@ -79,7 +131,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
-        id: In(uniquePuIdsToInclude),
+        id: In([...uniquePuIdsToInclude]),
       },
       {
         lockStatus: LockStatus.LockedIn,
@@ -89,7 +141,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
-        id: In(uniquePuIdsToExclude),
+        id: In([...uniquePuIdsToExclude]),
       },
       {
         lockStatus: LockStatus.LockedOut,
