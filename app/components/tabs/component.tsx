@@ -10,7 +10,12 @@ export interface TabsProps {
     warning?: boolean;
     requirements?: React.ReactNode;
   }[];
-  statusData: {};
+  statusData: {
+    'protected-areas': string;
+    features: string;
+    analysis: string;
+    solutions: string;
+  };
   selected: string | number;
   className?: string;
   onSelected?: (selected: string | number) => void | unknown;
@@ -22,8 +27,6 @@ export const Tabs: React.FC<TabsProps> = ({
   selected,
   onSelected,
 }: TabsProps) => {
-  console.log('METADATA', statusData);
-  // desactivar los que estén en empty, activar solo los draft
   return (
     <ul className="flex justify-between font-heading">
       {items.map((tab) => (
@@ -35,9 +38,9 @@ export const Tabs: React.FC<TabsProps> = ({
                 'relative focus:outline-none text-white text-opacity-50 text-sm': true,
                 'hover:text-opacity-75': tab.id !== selected,
                 'text-opacity-100': tab.id === selected,
+                hidden: statusData[`${tab.id}`] === 'empty',
               },
             )}
-          // disabled={tab.id !== selected}
             onClick={() => onSelected(tab.id)}
           >
             {tab.name}
