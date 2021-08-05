@@ -5,8 +5,11 @@ export type DeterminedFeatures = FeatureConfigInput & {
   features: FeatureState[];
 };
 
-export class DetermineFeatures extends Command<void> {
-  constructor(public readonly featuresConfig: DeterminedFeatures) {
+export class DetermineFeaturesForSpecification extends Command<void> {
+  constructor(
+    public readonly specificationId: string,
+    public readonly featuresConfig: DeterminedFeatures,
+  ) {
     super();
   }
 }
