@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import { withUser } from 'hoc/auth';
 
 import Footer from 'layout/footer';
+import Head from 'layout/head';
 import Header from 'layout/header';
 import CarouselSection from 'layout/home/carousel-section';
 import Features from 'layout/home/features';
@@ -20,9 +20,7 @@ const Home: React.FC = () => {
   const { asPath } = useRouter();
   return (
     <>
-      <Head>
-        <title>Home</title>
-      </Head>
+      <Head title="Home" />
 
       <MetaIcons />
 

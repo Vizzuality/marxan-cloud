@@ -13,7 +13,7 @@ import Item from 'components/features/target-spf-item';
 import Loading from 'components/loading';
 
 export interface ScenariosFeaturesListProps {
-  readOnly: boolean;
+  readOnly?: boolean;
   onBack: () => void;
   onSuccess: () => void;
 }
