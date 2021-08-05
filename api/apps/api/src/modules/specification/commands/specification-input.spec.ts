@@ -121,7 +121,7 @@ test(`invalid values / types`, () => {
       expect.objectContaining({
         property: `operation`,
         constraints: {
-          isEnum: expect.anything(),
+          isIn: expect.anything(),
         },
       }),
     ]),

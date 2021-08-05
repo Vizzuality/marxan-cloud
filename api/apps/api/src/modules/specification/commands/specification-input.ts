@@ -1,8 +1,10 @@
 import {
+  Equals,
   IsArray,
   IsBoolean,
   IsDefined,
   IsEnum,
+  IsIn,
   IsUUID,
   ValidateNested,
 } from 'class-validator';
@@ -24,7 +26,7 @@ export class SpecificationInput {
 }
 
 export class SpecificationFeature {
-  @IsEnum(SpecificationOperation)
+  @IsIn([SpecificationOperation.Split, SpecificationOperation.Copy])
   @IsDefined()
   operation!: SpecificationOperation.Split | SpecificationOperation.Copy;
 
@@ -34,6 +36,7 @@ export class SpecificationFeature {
 }
 
 export class SpecificationFeatureStratification {
+  @Equals(SpecificationOperation.Stratification)
   operation = SpecificationOperation.Stratification;
 
   @IsUUID()

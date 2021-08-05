@@ -13,18 +13,17 @@ import { Specification } from '../../specification';
 export const getFixtures = async () => {
   const scenarioId = v4();
   let specificationId: string;
-  const sandbox = await (
-    await Test.createTestingModule({
-      imports: [CqrsModule],
-      providers: [
-        {
-          provide: SpecificationRepository,
-          useClass: InMemorySpecificationRepo,
-        },
-        SubmitSpecificationHandler,
-      ],
-    }).compile()
-  ).init();
+  const sandbox = await Test.createTestingModule({
+    imports: [CqrsModule],
+    providers: [
+      {
+        provide: SpecificationRepository,
+        useClass: InMemorySpecificationRepo,
+      },
+      SubmitSpecificationHandler,
+    ],
+  }).compile();
+  await sandbox.init();
 
   const events: IEvent[] = [];
   const eventBus = sandbox.get(EventBus);
@@ -53,6 +52,7 @@ export const getFixtures = async () => {
     ThenItSavesTheSpecification() {
       expect(specificationId).toBeDefined();
       expect(repo.getById(specificationId)).toBeDefined();
+      expect(repo.count()).toEqual(1);
     },
     ThenItPublishesSpecificationCandidateCreated() {
       expect(specificationId).toBeDefined();
@@ -72,5 +72,9 @@ class InMemorySpecificationRepo implements SpecificationRepository {
 
   async save(specification: Specification): Promise<void> {
     this.#memory[specification.id] = specification;
+  }
+
+  count(): number {
+    return Object.keys(this.#memory).length;
   }
 }
