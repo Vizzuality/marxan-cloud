@@ -64,6 +64,8 @@ export class ScenarioPlanningUnitsInclusionProcessor
     // of the two methods (byId and byGeoJson).
     puIdsToInclude.push(...(job.data.include?.pu ?? []));
     puIdsToExclude.push(...(job.data.exclude?.pu ?? []));
+    const uniquePuIdsToInclude = [... new Set(puIdsToInclude)];
+    const uniquePuIdsToExclude = [... new Set(puIdsToExclude)];
 
     await this.scenarioPlanningUnitsRepo.update(
       {
@@ -77,7 +79,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
-        id: In(puIdsToInclude),
+        id: In(uniquePuIdsToInclude),
       },
       {
         lockStatus: LockStatus.LockedIn,
@@ -87,7 +89,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
-        id: In(puIdsToExclude),
+        id: In(uniquePuIdsToExclude),
       },
       {
         lockStatus: LockStatus.LockedOut,
