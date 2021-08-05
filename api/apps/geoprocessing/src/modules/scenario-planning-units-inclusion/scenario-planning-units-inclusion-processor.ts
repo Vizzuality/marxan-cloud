@@ -121,9 +121,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
 
     if (
       new Set(
-        [...uniquePuIdsToInclude].filter((i) =>
-          uniquePuIdsToExclude.has(i),
-        ),
+        [...uniquePuIdsToInclude].filter((i) => uniquePuIdsToExclude.has(i)),
       ).size > 0
     ) {
       throw new Error(
