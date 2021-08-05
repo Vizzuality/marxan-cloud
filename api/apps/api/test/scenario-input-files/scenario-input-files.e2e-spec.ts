@@ -47,6 +47,7 @@ describe(`when getting input.dat`, () => {
       _CLOUD_ORGANIZATION Alaska
       _CLOUD_GENERATED_AT __ISO_DATE__
       VERBOSITY 2
+      SCENNAME output
       SAVESOLUTIONSMATRIX 3
       SAVERUN 3
       SAVEBEST 3

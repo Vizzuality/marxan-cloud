@@ -99,6 +99,7 @@ export class InputParameterFileProvider {
           this.marxanDefaults._CLOUD_ORGANIZATION,
         _CLOUD_GENERATED_AT: new Date().toISOString(),
         VERBOSITY: this.marxanDefaults.VERBOSITY,
+        SCENNAME: this.marxanDefaults.SCENNAME,
         SAVESOLUTIONSMATRIX: this.marxanDefaults.SAVESOLUTIONSMATRIX,
         SAVERUN: this.marxanDefaults.SAVERUN,
         SAVEBEST: this.marxanDefaults.SAVEBEST,
