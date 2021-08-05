@@ -29,7 +29,7 @@ data/ecosystems/World_Ecosystems_simp.geojson: data/ecosystems/World_Ecosystems.
 	-filter-slivers remove-empty \
 	-clean \
 	-join data/ecosystems/categories.csv keys=DN,Value field-types=Value:int fields=W_Ecosystm \
-	-o $@ force
+	-o $@ force ndjson
 
 data/ecosystems/World_Ecosystems.geojson: data/ecosystems/World_Ecosystems.tif
 	gdal_polygonize.py $< -f GeoJSONSeq $@

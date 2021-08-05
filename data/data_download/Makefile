@@ -18,3 +18,8 @@ seed-iucn:
 seed-ecosystems:
 	@echo "Starting seeding ecosystems data... "
 	@time $(MAKE) -C ./world_terrestrial_ecosystems import
+
+seed-demo-features:
+	@echo "Starting seeding features from demo data... "
+	@time $(MAKE) -C ./demo_data_features import
+
