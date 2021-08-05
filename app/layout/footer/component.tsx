@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Wrapper from 'layout/wrapper';
-
 import Link from 'next/link';
+
+import Wrapper from 'layout/wrapper';
 
 export interface FooterProps {
 
@@ -30,9 +30,6 @@ export const Footer: React.FC<FooterProps> = () => {
             </Link>
             <Link href="/community">
               <a href="/community" className="text-gray-400 hover:text-gray-200">Community</a>
-            </Link>
-            <Link href="/partners">
-              <a href="/partners" className="text-gray-400 hover:text-gray-200">Partners</a>
             </Link>
           </div>
         </div>

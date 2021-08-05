@@ -21,7 +21,9 @@ import Button from 'components/button';
 import { SolutionsSections } from './sections/types';
 import { ScenariosSidebarSolutionsProps } from './types';
 
-export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps> = () => {
+export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps> = ({
+  readOnly,
+}: ScenariosSidebarSolutionsProps) => {
   const [section, setSection] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
@@ -44,7 +46,7 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
   if (!scenarioData || tab !== ScenarioSidebarTabs.SOLUTIONS) return null;
 
   return (
-    <div className="w-full h-full">
+    <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
       <HelpBeacon
         id="scenarios-solutions"
         title="Solutions"
@@ -101,94 +103,96 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
               </header>
 
               {!section && (
-              <Sections
-                key="sections"
-                onChangeSection={onChangeSection}
-              />
+                <Sections
+                  key="sections"
+                  onChangeSection={onChangeSection}
+                />
               )}
 
               {section === SolutionsSections.DETAILS && (
-              <SolutionsDetails
-                key={SolutionsSections.DETAILS}
-                onChangeSection={onChangeSection}
-                onScheduleScenario={() => console.info('Schedule scenario - solutions')}
-                numberOfSchedules={2}
-              />
+                <SolutionsDetails
+                  key={SolutionsSections.DETAILS}
+                  onChangeSection={onChangeSection}
+                  onScheduleScenario={() => console.info('Schedule scenario - solutions')}
+                  numberOfSchedules={2}
+                  readOnly={readOnly}
+                />
               )}
 
               {section === SolutionsSections.GAP_ANALYSIS && (
-              <SolutionsGapAnalysis
-                key={SolutionsSections.GAP_ANALYSIS}
-                onChangeSection={onChangeSection}
-              />
+                <SolutionsGapAnalysis
+                  key={SolutionsSections.GAP_ANALYSIS}
+                  onChangeSection={onChangeSection}
+                />
               )}
 
               {section === SolutionsSections.SOLUTIONS && (
-              <SolutionsList
-                key={SolutionsSections.SOLUTIONS}
-                onChangeSection={onChangeSection}
-              />
+                <SolutionsList
+                  key={SolutionsSections.SOLUTIONS}
+                  onChangeSection={onChangeSection}
+                />
               )}
 
             </Pill>
 
             {!section && (
-            <motion.div
-              key="run-scenario-button"
-              className="flex justify-center flex-shrink-0 mt-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <div className="">
-                <HelpBeacon
-                  id="scenarios-rerun"
-                  title="Re-Run scenario"
-                  subtitle=""
-                  content={(
-                    <div className="space-y-5">
-                      <p>
-                        Once you have checked your solutions,
-                        you can go back to any of the previous tabs
-                        and make any needed
-                        adjustments.
-                        Use this button to run the Scenario again applying
-                        the changes you have made.
-                      </p>
-                      <p>
-                        <i>
-                          All the
-                          solutions of your previous run will be replaced
-                          by those of the new run.
-                          If you do not want to lose your results
-                          simply duplicate this scenario and make the
-                          changes in the new one.
-                        </i>
-                      </p>
-                    </div>
-                )}
-                  modifiers={['flip']}
-                  tooltipPlacement="left"
-                >
-                  <div>
-                    <Button
-                      theme="spacial"
-                      size="lg"
-                      onClick={() => console.info('Re-Run scenario - solutions')}
-                    >
-                      Re-Run scenario
-                    </Button>
-                  </div>
-                </HelpBeacon>
-              </div>
-              <Button
-                className="ml-4"
-                theme="primary"
-                size="lg"
-                onClick={() => console.info('Save scenario - solutions')}
+              <motion.div
+                key="run-scenario-button"
+                className="flex justify-center flex-shrink-0 mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
               >
-                Save Scenario
-              </Button>
-            </motion.div>
+                <div className="">
+                  <HelpBeacon
+                    id="scenarios-rerun"
+                    title="Re-Run scenario"
+                    subtitle=""
+                    content={(
+                      <div className="space-y-2">
+                        <p>
+                          Once you have checked your solutions,
+                          you can go back to any of the previous tabs
+                          and make any needed
+                          adjustments.
+                          Use this button to run the Scenario again applying
+                          the changes you have made.
+                        </p>
+
+                        <p>
+                          <i>
+                            All the
+                            solutions of your previous run will be replaced
+                            by those of the new run.
+                            If you do not want to lose your results
+                            simply duplicate this scenario and make the
+                            changes in the new one.
+                          </i>
+                        </p>
+                      </div>
+                  )}
+                    modifiers={['flip']}
+                    tooltipPlacement="left"
+                  >
+                    <div>
+                      <Button
+                        theme="spacial"
+                        size="lg"
+                        onClick={() => console.info('Re-Run scenario - solutions')}
+                      >
+                        Re-Run scenario
+                      </Button>
+                    </div>
+                  </HelpBeacon>
+                </div>
+                <Button
+                  className="ml-4"
+                  theme="primary"
+                  size="lg"
+                  onClick={() => console.info('Save scenario - solutions')}
+                >
+                  Save Scenario
+                </Button>
+              </motion.div>
             )}
           </AnimatePresence>
         </motion.div>

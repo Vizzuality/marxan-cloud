@@ -1,9 +1,12 @@
-import React, { ReactNode, useCallback, useState } from 'react';
+import React, {
+  ReactNode, useCallback, useMemo, useState,
+} from 'react';
+
 import cx from 'classnames';
 
 import Button from 'components/button';
-import ProgressBar from 'components/progress-bar';
 import Icon from 'components/icon';
+import ProgressBar from 'components/progress-bar';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
 import WARNING_SVG from 'svgs/ui/warning.svg?sprite';
@@ -11,13 +14,21 @@ import WARNING_SVG from 'svgs/ui/warning.svg?sprite';
 import Settings from './settings';
 
 const SCENARIO_STATES = {
-  running: {
+  'run-running': {
     text: 'Running Scenario',
     styles: 'text-white',
   },
-  completed: {
-    text: 'Added',
-    styles: 'text-gray-400',
+  'run-failure': {
+    text: 'Fail Running Scenario',
+    styles: 'text-red-500',
+  },
+  'pu-running': {
+    text: 'Running PU inclusion',
+    styles: 'text-white',
+  },
+  'pu-failure': {
+    text: 'Fail PU inclusion',
+    styles: 'text-red-500',
   },
   draft: {
     text: 'Edited',
@@ -31,9 +42,9 @@ export interface ItemProps {
   warnings: boolean;
   progress?: number;
   lastUpdate: string;
+  jobs?: Record<string, unknown>[];
   lastUpdateDistance: string;
   className?: string;
-  status?: 'running' | 'completed' | 'draft';
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onView: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDelete?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -47,7 +58,7 @@ export const Item: React.FC<ItemProps> = ({
   progress,
   lastUpdateDistance,
   className,
-  status = 'draft',
+  jobs,
   onEdit,
   onView,
   onDelete,
@@ -55,6 +66,20 @@ export const Item: React.FC<ItemProps> = ({
   SettingsC,
 }: ItemProps) => {
   const [settings, setSettings] = useState(false);
+
+  const status = useMemo(() => {
+    const run = jobs.find((j) => j.kind === 'run');
+    const planningUnitsInclusion = jobs.find((j) => j.kind === 'planningUnitsInclusion');
+
+    if (planningUnitsInclusion && planningUnitsInclusion.status === 'running') return 'pu-running';
+    if (planningUnitsInclusion && planningUnitsInclusion.status === 'failure') return 'pu-failure';
+
+    if (run && run.status === 'running') return 'run-running';
+    if (run && run.status === 'failure') return 'run-failure';
+    if (run && run.status === 'done') return 'run-done';
+
+    return 'draft';
+  }, [jobs]);
 
   const onSettings = useCallback(() => {
     setSettings(!settings);
@@ -140,18 +165,18 @@ export const Item: React.FC<ItemProps> = ({
               </Button>
             </div>
           </div>
-          {status === 'running' && progress && <ProgressBar progress={progress} />}
+          {status.includes('running') && progress && <ProgressBar progress={progress} />}
         </div>
 
         <button
           type="button"
           onClick={onView}
-          disabled={status !== 'completed'}
+          disabled={status.includes('running')}
           className={cx({
             'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl focus:outline-blue': true,
             'rounded-br-none': settings,
-            'text-primary-500': status === 'completed',
-            'text-gray-400 pointer-events-none': status !== 'completed',
+            'text-primary-500': status === 'run-done',
+            'text-gray-400 pointer-events-none': status !== 'run-done',
           })}
         >
           <span className="mr-2 text-sm">View</span>

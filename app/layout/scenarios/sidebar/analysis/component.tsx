@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { useScenario } from 'hooks/scenarios';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -20,22 +22,31 @@ import Button from 'components/button';
 import Modal from 'components/modal';
 
 export interface ScenariosSidebarAnalysisProps {
+  readOnly?: boolean;
 }
 
-export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> = () => {
+export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> = ({
+  readOnly,
+}: ScenariosSidebarAnalysisProps) => {
   const [section, setSection] = useState(null);
   const [runOpen, setRunOpen] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
 
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setSubTab } = scenarioSlice.actions;
+
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
-  }, []);
+    const subtab = s ? `analysis-${s}` : 'analysis-preview';
+    dispatch(setSubTab(subtab));
+  }, [dispatch, setSubTab]);
 
   useEffect(() => {
     return () => {
@@ -46,7 +57,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   if (!scenarioData || tab !== 'analysis') return null;
 
   return (
-    <div className="w-full h-full">
+    <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
       <HelpBeacon
         id="scenarios-analysis"
         title="Analysis"
@@ -77,11 +88,9 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
                   PLANNING UNITS
                 </b>
               </li>
-
             </ol>
-
           </div>
-          )}
+         )}
         modifiers={['flip']}
         tooltipPlacement="left"
       >
@@ -105,6 +114,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
               {!section && (
               <Sections
                 key="sections"
+                readOnly={readOnly}
                 onChangeSection={onChangeSection}
               />
               )}
@@ -121,6 +131,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
               {section === 'cost-surface' && (
               <CostSurface
                 key="cost-surface"
+                readOnly={readOnly}
                 onChangeSection={onChangeSection}
               />
               )}

@@ -25,8 +25,8 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const includeGeo = job.data.include?.geo;
     const excludeGeo = job.data.exclude?.geo;
 
-    const geometriesIdsToInclude: string[] = [];
-    const geometriesIdsToExclude: string[] = [];
+    const puIdsToInclude: string[] = [];
+    const puIdsToExclude: string[] = [];
 
     if (includeGeo) {
       const targetGeometries = flatMap(
@@ -34,13 +34,13 @@ export class ScenarioPlanningUnitsInclusionProcessor
         (collection) => collection.features,
       ).map((feature) => feature.geometry);
 
-      geometriesIdsToInclude.push(
+      puIdsToInclude.push(
         ...(
           await this.getPlanningUnitsIntersectingGeometriesFor(
             scenarioId,
             targetGeometries,
           )
-        ).map(({ pu_geom_id }) => pu_geom_id),
+        ).map(({ spd_id: id }) => id),
       );
     }
 
@@ -49,20 +49,23 @@ export class ScenarioPlanningUnitsInclusionProcessor
         excludeGeo,
         (collection) => collection.features,
       ).map((feature) => feature.geometry);
-      geometriesIdsToExclude.push(
+      puIdsToExclude.push(
         ...(
           await this.getPlanningUnitsIntersectingGeometriesFor(
             scenarioId,
             targetGeometries,
           )
-        ).map(({ pu_geom_id }) => pu_geom_id),
+        ).map(({ spd_id: id }) => id),
       );
     }
 
-    if (!includeGeo && !excludeGeo) {
-      geometriesIdsToInclude.push(...(job.data.include?.pu ?? []));
-      geometriesIdsToExclude.push(...(job.data.exclude?.pu ?? []));
-    }
+    // After setting inclusions and exclusions from geometries above, add
+    // inclusions and exclusions by id, so that we effectively use the union
+    // of the two methods (byId and byGeoJson).
+    puIdsToInclude.push(...(job.data.include?.pu ?? []));
+    puIdsToExclude.push(...(job.data.exclude?.pu ?? []));
+    const uniquePuIdsToInclude = [... new Set(puIdsToInclude)];
+    const uniquePuIdsToExclude = [... new Set(puIdsToExclude)];
 
     await this.scenarioPlanningUnitsRepo.update(
       {
@@ -76,7 +79,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
-        puGeometryId: In(geometriesIdsToInclude),
+        id: In(uniquePuIdsToInclude),
       },
       {
         lockStatus: LockStatus.LockedIn,
@@ -86,7 +89,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
-        puGeometryId: In(geometriesIdsToExclude),
+        id: In(uniquePuIdsToExclude),
       },
       {
         lockStatus: LockStatus.LockedOut,
@@ -98,7 +101,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
   private async getPlanningUnitsIntersectingGeometriesFor(
     scenarioId: string,
     geometries: (Polygon | MultiPolygon)[],
-  ): Promise<Array<{ pu_geom_id: string }>> {
+  ): Promise<Array<{ spd_id: string }>> {
     /**
      * {
      *   geom1 = '<GeoJson>>',

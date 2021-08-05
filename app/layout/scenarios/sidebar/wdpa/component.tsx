@@ -8,26 +8,31 @@ import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import { motion } from 'framer-motion';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
 import ScenariosSidebarWDPACategories from 'layout/scenarios/sidebar/wdpa/categories';
 import ScenariosSidebarWDPAThreshold from 'layout/scenarios/sidebar/wdpa/threshold';
 
 import Steps from 'components/steps';
 
 export interface ScenariosSidebarWDPAProps {
+  readOnly?: boolean;
 }
 
-export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
+export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
+  readOnly,
+}: ScenariosSidebarWDPAProps) => {
   const [step, setStep] = useState(0);
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
-  const { setTab } = scenarioSlice.actions;
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
@@ -90,7 +95,6 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
         >
 
           <Pill selected>
-
             <header className="flex items-baseline space-x-4">
 
               <h2 className="text-lg font-medium font-heading">Protected areas</h2>
@@ -102,15 +106,23 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
 
             {step === 0 && (
               <ScenariosSidebarWDPACategories
-                onSuccess={() => setStep(1)}
-                onDismiss={() => dispatch(setTab('features'))}
+                onSuccess={() => {
+                  setStep(1);
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PERCENTAGE));
+                }}
+                onDismiss={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
+                readOnly={readOnly}
               />
             )}
 
             {step === 1 && (
               <ScenariosSidebarWDPAThreshold
-                onSuccess={() => dispatch(setTab('features'))}
-                onBack={() => { setStep(0); }}
+                onSuccess={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
+                onBack={() => {
+                  setStep(0);
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));
+                }}
+                readOnly={readOnly}
               />
             )}
           </Pill>

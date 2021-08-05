@@ -9,12 +9,13 @@ import { useRouter } from 'next/router';
 import { formatDistanceToNow } from 'date-fns';
 import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/client';
+
+import { ItemProps } from 'components/scenarios/item/component';
+
 import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
-
-import { ItemProps } from 'components/scenarios/item/component';
 
 import {
   UseScenariosOptionsProps,
@@ -32,6 +33,10 @@ import {
   SaveScenarioPUProps,
   UseDuplicateScenarioProps,
   DuplicateScenarioProps,
+  UseRunScenarioProps,
+  RunScenarioProps,
+  UseCancelRunScenarioProps,
+  CancelRunScenarioProps,
 } from './types';
 
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
@@ -147,6 +152,38 @@ export function useScenario(id) {
   }, [query, data?.data?.data]);
 }
 
+// SCENARIO STATUS
+export function useScenariosStatus(pId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios-status', pId], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${pId}/scenarios/status`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!pId,
+    placeholderData: {
+      data: {
+        scenarios: [],
+      },
+    },
+    refetchInterval: 5000,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
 export function useSaveScenario({
   requestConfig = {
     method: 'POST',
@@ -207,29 +244,6 @@ export function useDeleteScenario({
       console.info('Error', error, variables, context);
     },
   });
-}
-
-export function useScenariosStatus(pid) {
-  const [session] = useSession();
-
-  const query = useQuery(['scenarios-status', pid], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pid}/scenarios/status`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }), {
-    enabled: !!pid,
-  });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data?.data,
-    };
-  }, [query, data?.data?.data]);
 }
 
 export function useUploadScenarioPU({
@@ -352,6 +366,8 @@ export function useScenarioPU(sid) {
     return response.data;
   }), {
     enabled: !!sid,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
   });
 
   const { data } = query;
@@ -441,6 +457,64 @@ export function useDuplicateScenario({
       const { id, projectId } = data;
       queryClient.invalidateQueries(['scenarios', projectId]);
       queryClient.invalidateQueries(['scenarios', id]);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useRunScenario({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseRunScenarioProps) {
+  const [session] = useSession();
+
+  const duplicateScenario = ({ id }: RunScenarioProps) => {
+    // Pending endpoint
+    return SCENARIOS.request({
+      url: `/${id}/marxan`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(duplicateScenario, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useCancelRunScenario({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseCancelRunScenarioProps) {
+  const [session] = useSession();
+
+  const duplicateScenario = ({ id }: CancelRunScenarioProps) => {
+    // Pending endpoint
+    return SCENARIOS.request({
+      url: `/${id}/marxan`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(duplicateScenario, {
+    onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

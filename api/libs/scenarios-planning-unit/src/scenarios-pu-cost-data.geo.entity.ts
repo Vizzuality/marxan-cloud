@@ -33,6 +33,7 @@ export class ScenariosPuCostDataGeo {
   scenariosPlanningUnit?: ScenariosPlanningUnitGeoEntity | null;
 
   @Column({
+    type: 'uuid',
     name: 'scenarios_pu_data_id',
   })
   @RelationId((spud: ScenariosPuCostDataGeo) => spud.scenariosPlanningUnit)

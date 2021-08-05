@@ -8,8 +8,9 @@ import { useRouter } from 'next/router';
 import { useSaveScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import cx from 'classnames';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -32,10 +33,14 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
 
   const { addToast } = useToasts();
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setDrawing, setDrawingValue, setCache } = scenarioSlice.actions;
   const dispatch = useDispatch();
-  const { drawingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const {
+    puIncludedValue,
+    puExcludedValue,
+    drawingValue,
+  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const scenarioPUMutation = useSaveScenarioPU({});
 
@@ -70,6 +75,10 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
     scenarioPUMutation.mutate({
       id: `${sid}`,
       data: {
+        byId: {
+          include: puIncludedValue,
+          exclude: puExcludedValue,
+        },
         byGeoJson: {
           [values.type]: [{
             type: 'FeatureCollection',
@@ -89,7 +98,7 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
           <>
             <h2 className="font-medium">Success!</h2>
             <ul className="text-sm">
-              <li>Planning units saved</li>
+              <li>Planning units lock status saved</li>
             </ul>
           </>
         ), {
@@ -112,6 +121,8 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   }, [
     sid,
     scenarioPUMutation,
+    puIncludedValue,
+    puExcludedValue,
     onSelected,
     dispatch,
     setDrawing,

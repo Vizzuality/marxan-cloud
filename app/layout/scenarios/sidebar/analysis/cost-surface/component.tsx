@@ -21,10 +21,12 @@ import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ScenariosCostSurfaceProps {
+  readOnly: boolean,
   onChangeSection: (s: string) => void;
 }
 
 export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
+  readOnly,
   onChangeSection,
 }: ScenariosCostSurfaceProps) => {
   const [loading, setLoading] = useState(false);
@@ -146,7 +148,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
         <InfoButton>
           <div>
             <h4 className="font-heading text-lg mb-2.5">What is a Cost Surface?</h4>
-            <div className="space-y-5">
+            <div className="space-y-2">
               <p>
                 In conservation planning, cost data reflects how much a
                 planning unit costs to include into a
@@ -194,37 +196,38 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
             Template
           </Button>
         </div>
+        {!readOnly && (
+          <div className="pt-5">
+            <h4 className="mb-2">2. Upload your cost surface</h4>
+            <div
+              {...getRootProps()}
+              className={cx({
+                'dropzone px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
+                'bg-gray-500': isDragActive,
+                'border-green-800': isDragAccept,
+                'border-red-800': isDragReject,
+              })}
+            >
+              <input {...getInputProps()} />
 
-        <div className="pt-5">
-          <h4 className="mb-2">2. Upload your cost surface</h4>
-          <div
-            {...getRootProps()}
-            className={cx({
-              'dropzone px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
-              'bg-gray-500': isDragActive,
-              'border-green-800': isDragAccept,
-              'border-red-800': isDragReject,
-            })}
-          >
-            <input {...getInputProps()} />
+              <p className="text-sm text-gray-300">
+                Drag and drop your
+                {' '}
+                <b>polygon data file</b>
+                {' '}
+                or click here to upload
+              </p>
 
-            <p className="text-sm text-gray-300">
-              Drag and drop your
-              {' '}
-              <b>polygon data file</b>
-              {' '}
-              or click here to upload
-            </p>
+              <Loading
+                visible={loading}
+                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                iconClassName="w-5 h-5 text-primary-500"
+              />
 
-            <Loading
-              visible={loading}
-              className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-              iconClassName="w-5 h-5 text-primary-500"
-            />
-
-            <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 1 MB'}</p>
+              <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 1 MB'}</p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </motion.div>
   );

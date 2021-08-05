@@ -1,5 +1,10 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 
+/**
+ * @deprecated Due to performance limitations of the approach using a db view,
+ * we have moved this logic to a query which is run directly from the service
+ * responsible for retrieving this data.
+ */
 @ViewEntity({
   expression: `
     select pu.scenario_id as scenario_id, puid as pu_id, feature_id, ST_Area(ST_Transform(st_intersection(species.the_geom, pu.the_geom),3410)) as amount

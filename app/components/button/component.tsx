@@ -22,8 +22,12 @@ const THEME = {
 
   spacial: 'text-white bg-transparent hover:bg-gray-400 active:bg-gray-300 flex items-center justify-center rounded-4xl focus:outline-none',
 
-  'transparent-black': 'text-black bg-transparent border border-black hover:bg-black hover:text-white',
+  dark: 'text-white bg-gray-600 border border-gray-600 hover:bg-black hover:text-white',
+  'dark-alt': 'text-gray-800 bg-transparent border border-gray-800 hover:border-gray-400 hover:text-gray-400',
 
+  clear: 'text-gray-800 hover:text-gray-400',
+
+  'transparent-black': 'text-black bg-transparent border border-black hover:bg-black hover:text-white',
   'transparent-white': 'text-white bg-transparent border border-white hover:bg-white hover:text-black',
 };
 
@@ -36,7 +40,7 @@ const SIZE = {
 };
 
 export interface AnchorButtonProps {
-  theme: 'primary' | 'primary-alt' | 'white'| 'secondary' | 'secondary-alt' | 'tertiary' | 'danger' | 'danger-alt' |'spacial' | 'transparent-black' | 'transparent-white';
+  theme: 'primary' | 'primary-alt' | 'white'| 'secondary' | 'secondary-alt' | 'tertiary' | 'danger' | 'danger-alt' | 'spacial' | 'dark' | 'dark-alt' | 'transparent-black' | 'transparent-white' | 'clear';
   size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }
@@ -69,7 +73,7 @@ function buildClassName({
   theme,
 }) {
   return cx({
-    'group relative flex items-center justify-center rounded-4xl focus:outline-none': true,
+    'group relative flex items-center justify-center rounded-4xl transition-colors focus:outline-none': true,
     [THEME[theme]]: true,
     [SIZE[size]]: true,
     [className]: !!className,

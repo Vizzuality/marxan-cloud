@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { useSelectedFeatures } from 'hooks/features';
 import { useScenario } from 'hooks/scenarios';
 
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import { motion } from 'framer-motion';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 import AddFeatures from 'layout/scenarios/sidebar/features/add';
 import ListFeatures from 'layout/scenarios/sidebar/features/list';
 import TargetFeatures from 'layout/scenarios/sidebar/features/targets';
+import { ScenarioSidebarSubTabs } from 'layout/scenarios/sidebar/types';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -31,9 +33,12 @@ import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 export interface ScenariosSidebarWDPAProps {
+  readOnly?: boolean,
 }
 
-export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
+export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
+  readOnly,
+}: ScenariosSidebarWDPAProps) => {
   const [step, setStep] = useState(0);
   const [modal, setModal] = useState(false);
   const { query, push } = useRouter();
@@ -41,9 +46,11 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
 
   const queryClient = useQueryClient();
 
-  getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
   const {
@@ -199,15 +206,15 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
                 </div>
               </div>
 
-              {step === 0 && (
-              <Button
-                theme="primary"
-                size="base"
-                onClick={() => setModal(true)}
-              >
-                <span className="mr-3">Add features</span>
-                <Icon icon={PLUS_SVG} className="w-4 h-4" />
-              </Button>
+              {step === 0 && !readOnly && (
+                <Button
+                  theme="primary"
+                  size="base"
+                  onClick={() => setModal(true)}
+                >
+                  <span className="mr-3">Add features</span>
+                  <Icon icon={PLUS_SVG} className="w-4 h-4" />
+                </Button>
               )}
             </header>
 
@@ -225,13 +232,21 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = () => {
 
             {step === 0 && (
               <ListFeatures
-                onSuccess={() => setStep(step + 1)}
+                onSuccess={() => {
+                  setStep(step + 1);
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_FPF));
+                }}
+                readOnly={readOnly}
               />
             )}
 
             {step === 1 && (
               <TargetFeatures
-                onBack={() => setStep(step - 1)}
+                onBack={() => {
+                  setStep(step - 1);
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
+                }}
+                readOnly={readOnly}
                 onSuccess={() => push(`/projects/${pid}`)}
               />
             )}

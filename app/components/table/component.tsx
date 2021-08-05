@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+
 import cx from 'classnames';
+
 import Icon from 'components/icon';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
@@ -64,22 +66,28 @@ export const Table: React.FC<TableProps> = ({
         <tr className="bg-white">
           {/* Add property to specify header to sort by, this should probably work as well when
           clicking on header, also support custom sort function */}
-          {headers.map((header) => (
-            <th
-              key={`header-${header.id}`}
-              className={cx({
-                'px-4 text-left cursor-pointer': true,
-                [header.className]: !!header.className,
-              })}
-              onClick={() => handleHeaderClick(header)}
-            >
-              <div className="flex items-center">
-                {header.label}
-                {headerSelected?.id === header.id
+          {headers.map((header, index) => {
+            const firstHeader = index === 0;
+            const lastHeader = index === (headers.length - 1);
+            return (
+              <th
+                key={`header-${header.id}`}
+                className={cx({
+                  'px-4 text-left cursor-pointer font-heading text-sm font-medium': true,
+                  'pl-10 pr-0': firstHeader,
+                  'pr-10 pl-0': lastHeader,
+                  [header.className]: !!header.className,
+                })}
+                onClick={() => handleHeaderClick(header)}
+              >
+                <div className="flex items-center">
+                  {header.label}
+                  {headerSelected?.id === header.id
                   && <Icon icon={headerSelected.order === Direction.DESC ? ARROW_DOWN_SVG : ARROW_UP_SVG} className="w-4 h-4 pl-2" />}
-              </div>
-            </th>
-          ))}
+                </div>
+              </th>
+            );
+          })}
         </tr>
       </thead>
       <tbody>
@@ -97,9 +105,11 @@ export const Table: React.FC<TableProps> = ({
               })}
             >
               {
-                headers.map(({ id: headerId, Cell }: TableHeaderItem) => {
+                headers.map(({ id: headerId, Cell }: TableHeaderItem, index) => {
                   const value = row[headerId];
                   const CellIsFunction = typeof Cell === 'function';
+                  const firstColumn = index === 0;
+                  const lastColumn = index === (headers.length - 1);
 
                   const rowData = {
                     ...row,
@@ -109,7 +119,11 @@ export const Table: React.FC<TableProps> = ({
                   return (
                     <td
                       key={`td-${headerId}-${value}`}
-                      className="px-4 py-2"
+                      className={cx({
+                        'px-4 py-2': true,
+                        'pl-10 pr-0': firstColumn,
+                        'pr-8 pl-0': lastColumn,
+                      })}
                       role="gridcell"
                     >
                       {/* Cell is a function */}

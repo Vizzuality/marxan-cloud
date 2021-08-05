@@ -3,6 +3,8 @@ import React, { useCallback } from 'react';
 import { useDuplicateProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
+import classnames from 'classnames';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
 
@@ -11,11 +13,13 @@ import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 export interface DuplicateButtonProps {
   id: string;
   name: string;
+  theme?: 'dark' | 'light';
 }
 
 export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
   id,
   name,
+  theme = 'dark',
 }: DuplicateButtonProps) => {
   const { addToast } = useToasts();
 
@@ -71,12 +75,19 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
     <Button
       className="px-6 group"
       size="s"
-      theme="transparent-white"
+      theme={classnames({
+        'transparent-white': theme === 'light',
+        'transparent-black': theme !== 'light',
+      })}
       onClick={onDuplicate}
     >
       Duplicate
       <Icon
-        className="w-3.5 h-3.5 ml-2 text-white group-hover:text-black"
+        className={classnames({
+          'w-3.5 h-3.5 ml-2': true,
+          'text-white group-hover:text-black': theme === 'light',
+          'text-black group-hover:text-white': theme === 'dark',
+        })}
         icon={DOWNLOAD_SVG}
       />
     </Button>

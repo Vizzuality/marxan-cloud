@@ -17,7 +17,7 @@ import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
 import { In, Repository } from 'typeorm';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { FeatureTags, ScenarioFeaturesData } from '@marxan/features';
+import { FeatureTag, ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
@@ -194,7 +194,7 @@ const getFixtures = async () => {
               currentArea: 200,
               fpf: 1,
               met: 1,
-              tag: FeatureTags.bioregional,
+              tag: FeatureTag.Bioregional,
               target: 300,
               metArea: 200,
               onTarget: false,

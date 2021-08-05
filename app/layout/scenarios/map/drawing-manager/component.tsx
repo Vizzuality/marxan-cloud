@@ -10,7 +10,8 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { featureStyle, editHandleStyle } from './drawing-styles';
 
@@ -22,7 +23,7 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
   const { sid } = query;
   const editorRef = useRef(null);
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setDrawing, setDrawingValue, setUploadingValue } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
@@ -41,20 +42,20 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
   useEffect(() => {
     const EDITOR = editorRef?.current;
 
-    if ((!drawing && !uploading) && !!EDITOR) {
-      EDITOR.deleteFeatures(drawingValue || uploadingValue);
+    if ((!drawing) && !!EDITOR) {
+      EDITOR.deleteFeatures(drawingValue);
       dispatch(setDrawingValue(null));
+    }
+  }, [drawing, drawingValue]); // eslint-disable-line
+
+  useEffect(() => {
+    const EDITOR = editorRef?.current;
+
+    if (!uploading && !!EDITOR) {
+      EDITOR.deleteFeatures(uploadingValue);
       dispatch(setUploadingValue(null));
     }
-  }, [
-    drawing,
-    uploading,
-    drawingValue,
-    uploadingValue,
-    dispatch,
-    setDrawingValue,
-    setUploadingValue,
-  ]);
+  }, [uploading, uploadingValue]); // eslint-disable-line
 
   // Delete feature as soon as you unmount this component
   useEffect(() => {
@@ -64,6 +65,7 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
       if (EDITOR) {
         EDITOR.deleteFeatures(drawingValue || uploadingValue);
         dispatch(setDrawingValue(null));
+        dispatch(setUploadingValue(null));
       }
     };
   }, []); // eslint-disable-line

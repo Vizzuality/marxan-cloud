@@ -12,7 +12,6 @@ import Footer from 'layout/footer';
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
-import Contact from 'layout/statics/contact';
 import PublishedProjectTitle from 'layout/title/published-project-title';
 
 export const getServerSideProps = withUser(withPublishedProject());
@@ -46,9 +45,8 @@ const PublishedProjectPage: React.FC = () => {
       />
 
       <main>
-        <Header size="base" published />
+        <Header size="base" theme="light" published />
         <ProjectDetail />
-        <Contact />
         <Footer />
       </main>
     </>

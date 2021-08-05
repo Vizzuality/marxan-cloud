@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { ScenariosPlanningUnitGeoEntity } from './scenarios-planning-unit.geo.entity';
 import { ScenariosPuCostDataGeo } from './scenarios-pu-cost-data.geo.entity';
+import { ScenariosPuOutputGeoEntity } from './scenarios-pu-output.geo.entity';
 import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 
 @Entity({
@@ -16,27 +17,42 @@ export class ScenariosPuPaDataGeo extends ScenariosPlanningUnitGeoEntity {
 
   @OneToOne(
     () => PlanningUnitsGeom,
-    (PlanningUnitsGeom) => PlanningUnitsGeom.id,
+    (planningUnitsGeom: PlanningUnitsGeom) => planningUnitsGeom.id,
     {
       onDelete: 'CASCADE',
     },
   )
   @JoinColumn({
-    name: 'pu_geom_id',
     referencedColumnName: 'id',
+    name: 'pu_geom_id',
   })
   planningUnitGeom?: PlanningUnitsGeom | null;
 
   @OneToOne(
     () => ScenariosPuCostDataGeo,
-    (ScenariosPuCostDataGeo) => ScenariosPuCostDataGeo.id,
+    (scenariosPuCostDataGeo: ScenariosPuCostDataGeo) =>
+      scenariosPuCostDataGeo.scenariosPuDataId,
     {
       onDelete: 'CASCADE',
     },
   )
   @JoinColumn({
-    name: 'pu_geom_id',
-    referencedColumnName: 'id',
+    referencedColumnName: 'scenariosPuDataId',
+    name: 'id',
   })
   costData?: ScenariosPuCostDataGeo | null;
+
+  @OneToOne(
+    () => ScenariosPuOutputGeoEntity,
+    (scenariosPuOutputGeoEntity: ScenariosPuOutputGeoEntity) =>
+      scenariosPuOutputGeoEntity.scenariosPuId,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
+  @JoinColumn({
+    referencedColumnName: 'scenariosPuId',
+    name: 'id',
+  })
+  outputData?: ScenariosPuOutputGeoEntity | null;
 }

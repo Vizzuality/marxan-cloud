@@ -4,8 +4,9 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import { motion } from 'framer-motion';
-import { getScenarioSlice } from 'store/slices/scenarios/edit';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -19,15 +20,17 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
-  const { setTab } = scenarioSlice.actions;
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const onSelectedTab = useCallback((t) => {
+    const TAB = TABS.find((T) => T.id === t);
     dispatch(setTab(t));
-  }, [dispatch, setTab]);
+    dispatch(setSubTab(TAB.subtab));
+  }, [dispatch, setTab, setSubTab]);
 
   if (!sid) return null;
 
@@ -45,7 +48,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
             as follows:
           </p>
 
-          <ul className="list-decimal pl-6">
+          <ul className="pl-6 space-y-1 list-decimal">
             <li>
               First you will
               decide if you want to

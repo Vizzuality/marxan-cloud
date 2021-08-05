@@ -1,0 +1,56 @@
+{
+  "status": "draft",
+  "features": [{
+    "featureId": "<select id from (apidb)features where feature_class_name = 'iucn_zebras'",
+    "geoprocessingOperations": [{
+      "kind": "split/v1",
+      "splitByProperty": "within_1km_of_rivers",
+      "splits": [{
+        "value": "true",
+        "marxanSettings": {
+          "prop": 0.6,
+          "fpf": 1
+        }
+      }]
+    }]
+  },
+  {
+    "featureId": "<select id from (apidb)features where feature_class_name = 'all bats within my planning area'>",
+    "geoprocessingOperations": [{
+      "kind": "copy/v1"
+    }]
+  },
+  {
+    "featureId": "<select if from (apidb)features where feature_class_name = 'iucn_pantheraleo'",
+    "kind": "withGeoprocessing",
+    "geoprocessingOperations": [{
+      "kind": "stratification/v1",
+      "intersectWith": {
+        "featureId": "<select id from (apidb)features where feature_class_name = 'world terrestrial ecosystems'>"
+      },
+      "splitByProperty": "WWF_MHTNAM",
+      "splits": [{
+          "value": "Deserts and Xeric Shrublands",
+          "marxanSettings": {
+            "prop": 0.65,
+            "fpf": 1.1
+          }
+        },
+        {
+          "value": "Tropical and Subtropical Grasslands, Savannas and Shrublands",
+          "marxanSettings": {
+            "prop": 0.75,
+            "fpf": 1.2
+          }
+        },
+        {
+          "value": "Flooded Grasslands and Savannas",
+          "marxanSettings": {
+            "prop": 0.7,
+            "fpf": 1.0
+          }
+        }
+      ]
+    }]
+  }]
+}

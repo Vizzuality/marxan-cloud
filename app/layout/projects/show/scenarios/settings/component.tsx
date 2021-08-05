@@ -1,8 +1,9 @@
 import React from 'react';
 
-import Loading from 'components/loading';
-
+import { useSelectedFeatures } from 'hooks/features';
 import { useScenario } from 'hooks/scenarios';
+
+import Loading from 'components/loading';
 
 export interface ProjectScenariosSettingsProps {
   sid: string;
@@ -15,6 +16,10 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
     data: scenarioData,
     isFetching: scenarioIsFetching,
   } = useScenario(sid);
+
+  const {
+    data: selectedFeaturesData,
+  } = useSelectedFeatures(sid, {});
 
   if (scenarioIsFetching) {
     return (
@@ -40,7 +45,7 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>Features:</dt>
-        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">-</dd>
+        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(selectedFeaturesData || []).length || '-'}</dd>
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>Runs:</dt>
