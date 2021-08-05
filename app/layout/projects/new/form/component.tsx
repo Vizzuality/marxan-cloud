@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+import { useMe } from 'hooks/me';
 import { useOrganizations } from 'hooks/organizations';
 import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
@@ -13,6 +14,8 @@ import { useToasts } from 'hooks/toast';
 import {
   setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingPlanningArea,
 } from 'store/slices/projects/new';
+
+import { usePlausible } from 'next-plausible';
 
 import HelpBeacon from 'layout/help/beacon';
 import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
@@ -36,9 +39,13 @@ import { DEFAULT_AREA } from './constants';
 import ProjectFormProps from './types';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
-  const [hasPlanningArea, setHasPlanningArea] = useState(false);
   const { addToast } = useToasts();
   const { push } = useRouter();
+  const plausible = usePlausible();
+
+  const { user } = useMe();
+
+  const [hasPlanningArea, setHasPlanningArea] = useState(false);
   const { data: organizationsData } = useOrganizations();
 
   const dispatch = useDispatch();
@@ -76,6 +83,12 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
         console.info('Project saved succesfully', p);
         push('/projects');
+        plausible('New project', {
+          props: {
+            userId: `${user.id}`,
+            userEmail: `${user.email}`,
+          },
+        });
       },
       onError: () => {
         addToast('error-project-creation', (

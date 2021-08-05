@@ -20,7 +20,7 @@ export interface ItemProps {
   type: 'bioregional' | 'species';
 
   // EDIT/SHOW
-  readOnly: boolean;
+  readOnly?: boolean;
 
   // SPLIT
   splitSelected?: string;

@@ -21,7 +21,7 @@ import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ScenariosCostSurfaceProps {
-  readOnly: boolean,
+  readOnly?: boolean,
   onChangeSection: (s: string) => void;
 }
 

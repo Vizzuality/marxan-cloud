@@ -27,7 +27,7 @@ import Loading from 'components/loading';
 import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
 export interface WDPAThresholdCategories {
-  readOnly: boolean;
+  readOnly?: boolean;
   onSuccess: () => void;
   onBack: () => void;
 }

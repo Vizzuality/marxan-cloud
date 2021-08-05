@@ -28,7 +28,6 @@ export interface ScenariosRunProps {
 export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   const [advanced, setAdvanced] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
   const { addToast } = useToasts();
 
   const { query, push } = useRouter();
@@ -77,9 +76,8 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
             ), {
               level: 'success',
             });
-
-            push(`/projects/${pid}`);
             console.info('Scenario name saved succesfully', s);
+            push(`/projects/${pid}`);
           },
           onError: () => {
             setSubmitting(false);
