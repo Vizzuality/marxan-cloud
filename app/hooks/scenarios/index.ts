@@ -366,6 +366,7 @@ export function useScenarioPU(sid) {
     return response.data;
   }), {
     enabled: !!sid,
+    refetchOnWindowFocus: false,
   });
 
   const { data } = query;

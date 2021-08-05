@@ -35,21 +35,23 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
-    setClicking, setCache,
+    setClicking, setCache, setTmpPuIncludedValue, setTmpPuExcludedValue,
   } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
-  const { puIncludedValue, puExcludedValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const {
+    puIncludedValue, puExcludedValue, puTmpIncludedValue, puTmpExcludedValue,
+  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const scenarioPUMutation = useSaveScenarioPU({});
 
   const INITIAL_VALUES = useMemo(() => {
     return {
       type,
-      puIncludedValue,
-      puExcludedValue,
+      puTmpIncludedValue,
+      puTmpExcludedValue,
     };
-  }, [type, puIncludedValue, puExcludedValue]);
+  }, [type, puTmpIncludedValue, puTmpExcludedValue]);
 
   // Effects
   useEffect(() => {
@@ -74,9 +76,9 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
       id: `${sid}`,
       data: {
         byId: {
-          include: values.puIncludedValue,
-          exclude: values.puExcludedValue,
-          [values.type]: values.type === 'include' ? values.puIncludedValue : values.puExcludedValue,
+          include: values.puTmpIncludedValue,
+          exclude: values.puTmpExcludedValue,
+          [values.type]: values.type === 'include' ? values.puTmpIncludedValue : values.puTmpExcludedValue,
         },
       },
     }, {
@@ -116,6 +118,20 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
     setClicking,
     setCache,
     addToast,
+  ]);
+
+  const onCancel = useCallback(() => {
+    onSelected(null);
+
+    dispatch(setTmpPuIncludedValue(puIncludedValue));
+    dispatch(setTmpPuExcludedValue(puExcludedValue));
+  }, [
+    onSelected,
+    puIncludedValue,
+    puExcludedValue,
+    dispatch,
+    setTmpPuIncludedValue,
+    setTmpPuExcludedValue,
   ]);
 
   return (
@@ -158,9 +174,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
                   <Button
                     theme="secondary-alt"
                     size="s"
-                    onClickCapture={() => {
-                      onSelected(null);
-                    }}
+                    onClickCapture={onCancel}
                   >
                     Cancel
                   </Button>
