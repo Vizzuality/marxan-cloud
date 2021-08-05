@@ -123,11 +123,10 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                           your conservation or land/sea use plan.
                           Some examples include:
                         </p>
-                        <p />
+                        <img src={FEATURE_SPECIES_IMG} alt="Feature-Range" />
+                        <img src={FEATURE_ABUND_IMG} alt="Feature-Abundance" />
+                        <img src={FEATURE_SOCIAL_IMG} alt="Feature-Social" />
                       </div>
-                      <img src={FEATURE_SPECIES_IMG} alt="Feature-Range" />
-                      <img src={FEATURE_ABUND_IMG} alt="Feature-Abundance" />
-                      <img src={FEATURE_SOCIAL_IMG} alt="Feature-Social" />
                     </div>
                   </InfoButton>
                 </div>
@@ -171,7 +170,6 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                             your feature to be included in the solution.
                           </p>
                         </div>
-
                       </div>
                     </InfoButton>
                     <InfoButton>
