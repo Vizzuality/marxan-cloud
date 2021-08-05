@@ -100,4 +100,20 @@ describe(`When planning units exist for a scenario`, () => {
       );
     }, 10000);
   });
+
+  describe('When setting inclusions by id and exclusions by GeoJSON', () => {
+    it.todo(
+      'If there are overlaps between these, then exclusions set by GeoJSON should be applied',
+    );
+  });
+
+  describe('When setting exclusions by id and inclusions by GeoJSON', () => {
+    it.todo(
+      'If there are overlaps between these, then inclusions set by GeoJSON should be applied',
+    );
+  });
+
+  describe('When there are contrasting claims for inclusion and exclusion on one or more planning units', () => {
+    it.todo('The operation should be rejected with an error');
+  });
 });
