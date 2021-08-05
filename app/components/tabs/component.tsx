@@ -38,7 +38,7 @@ export const Tabs: React.FC<TabsProps> = ({
                 'relative focus:outline-none text-white text-opacity-50 text-sm': true,
                 'hover:text-opacity-75': tab.id !== selected,
                 'text-opacity-100': tab.id === selected,
-                hidden: statusData[`${tab.id}`] === 'empty',
+                invisible: statusData[tab.id] === 'empty',
               },
             )}
             onClick={() => onSelected(tab.id)}

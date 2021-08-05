@@ -23,6 +23,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { sid } = query;
   const {
     data: scenarioData,
+    isFetched: scenarioFetched,
   } = useScenario(sid);
 
   const { metadata } = scenarioData || {};
@@ -97,6 +98,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
         </div>
           )}
     >
+
       <motion.div
         key="scenario-tabs"
         className="mt-2.5"
@@ -106,16 +108,19 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
 
         <Pill>
 
-          <Tabs
-            items={TABS}
-            statusData={scenarioEditingMetadata}
-            selected={tab}
-            onSelected={onSelectedTab}
-          />
+          {scenarioFetched && (
+            <Tabs
+              items={TABS}
+              statusData={scenarioEditingMetadata}
+              selected={tab}
+              onSelected={onSelectedTab}
+            />
+          )}
 
         </Pill>
 
       </motion.div>
+
     </HelpBeacon>
   );
 };

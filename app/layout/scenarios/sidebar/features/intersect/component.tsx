@@ -2,13 +2,14 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-import Button from 'components/button';
-
-import Toolbar from 'layout/scenarios/sidebar/features/intersect/toolbar';
-import List from 'layout/scenarios/sidebar/features/intersect/list';
+import { useRouter } from 'next/router';
 
 import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
-import { useRouter } from 'next/router';
+
+import List from 'layout/scenarios/sidebar/features/intersect/list';
+import Toolbar from 'layout/scenarios/sidebar/features/intersect/toolbar';
+
+import Button from 'components/button';
 
 export interface ScenariosFeaturesIntersectProps {
   intersecting: string;
@@ -156,6 +157,14 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
             }),
           };
         }),
+        metadata: {
+          scenarioEditingMetadata: {
+            'protected-areas': 'draft',
+            features: 'draft',
+            analysis: 'draft',
+            solutions: 'empty',
+          },
+        },
       },
     }, {
       onSuccess: () => {

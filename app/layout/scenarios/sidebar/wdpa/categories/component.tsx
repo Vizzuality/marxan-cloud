@@ -128,6 +128,14 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         wdpaIucnCategories: null,
+        metadata: {
+          scenarioEditingMetadata: {
+            'protected-areas': 'draft',
+            features: 'draft',
+            analysis: 'empty',
+            solutions: 'empty',
+          },
+        },
       },
     }, {
       onSuccess: () => {
