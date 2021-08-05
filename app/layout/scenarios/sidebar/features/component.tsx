@@ -65,6 +65,24 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
 
   if (!scenarioData || tab !== 'features') return null;
 
+  // const mutation = useSaveScenario({
+  //   requestConfig: {
+  //     method: 'POST',
+  //   },
+  // });
+
+  const handleSaveSuccess = () => {
+    push(`/projects/${pid}`);
+  // metadata: {
+  //   scenarioEditingMetadata: {
+  //     'protected-areas': 'draft',
+  //     features: 'draft',
+  //     analysis: 'draft',
+  //     solutions: 'empty',
+  //   },
+  // },
+  };
+
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
       <HelpBeacon
@@ -245,7 +263,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
                 }}
                 readOnly={readOnly}
-                onSuccess={() => push(`/projects/${pid}`)}
+                onSuccess={() => handleSaveSuccess()}
               />
             )}
           </Pill>
