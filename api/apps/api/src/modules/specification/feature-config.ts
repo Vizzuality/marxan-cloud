@@ -9,13 +9,28 @@ export interface FeatureState {
   calculated: boolean;
 }
 
-export interface FeatureConfigInput {
+interface FeatureConfigBase {
   operation: SpecificationOperation;
   baseFeatureId: string;
   againstFeatureId?: string;
 }
 
-export interface FeatureConfig extends FeatureConfigInput {
+export interface FeatureConfigStratification extends FeatureConfigBase {
+  operation: SpecificationOperation.Stratification;
+  baseFeatureId: string;
+  againstFeatureId: string;
+}
+
+export interface FeatureConfigDefault extends FeatureConfigBase {
+  operation: SpecificationOperation.Copy | SpecificationOperation.Split;
+  baseFeatureId: string;
+}
+
+export type FeatureConfigInput =
+  | FeatureConfigStratification
+  | FeatureConfigDefault;
+
+export interface FeatureConfig extends FeatureConfigBase {
   featuresDetermined: boolean;
   resultFeatures: FeatureState[];
 }
