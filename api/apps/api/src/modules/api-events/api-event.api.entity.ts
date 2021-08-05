@@ -6,6 +6,7 @@ import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ActivationTokenGeneratedV1Alpha1 } from './events-data/activation-token-generated-v1-alpha-1';
 import { ScenarioRunProgressV1Alpha1 } from './events-data/scenario-run-progress-v1-alpha-1';
+import { ScenarioGeofeatureDataV1Alpha } from './events-data/scenario-geofeature-data-v1-alpha';
 
 export const apiEventResource: BaseServiceResource = {
   className: 'ApiEvent',
@@ -90,6 +91,7 @@ export class ApiEvent {
 export type KnownEventsData =
   | ActivationTokenGeneratedV1Alpha1
   | ScenarioRunProgressV1Alpha1
+  | ScenarioGeofeatureDataV1Alpha
   // eslint-disable-next-line @typescript-eslint/ban-types
   | {};
 
