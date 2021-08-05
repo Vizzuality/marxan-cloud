@@ -171,7 +171,7 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
                       </div>
                   )}
                     modifiers={['flip']}
-                    tooltipPlacement="left"
+                    tooltipPlacement="top"
                   >
                     <div>
                       <Button
@@ -184,14 +184,15 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
                     </div>
                   </HelpBeacon>
                 </div>
-                <Button
+
+                {/* <Button
                   className="ml-4"
                   theme="primary"
                   size="lg"
                   onClick={() => console.info('Save scenario - solutions')}
                 >
                   Save Scenario
-                </Button>
+                </Button> */}
               </motion.div>
             )}
           </AnimatePresence>
