@@ -1,20 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { AnimatePresence, motion } from 'framer-motion';
-
-import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
 
-// Map
-import Map from 'components/map';
+import { useProject } from 'hooks/projects';
 
+import { AnimatePresence, motion } from 'framer-motion';
+
+// Map
+import HelpBeacon from 'layout/help/beacon';
+
+import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
-import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
+import ZoomControl from 'components/map/controls/zoom';
 
 // Guided help
-import HelpBeacon from 'layout/help/beacon';
 
 export interface ProjectMapProps {
 }
@@ -70,14 +71,20 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           <HelpBeacon
             id="project-map"
             title="Map view"
-            subtitle="Visualize all features"
+            subtitle="Visualize all elements"
             content={(
-              <div>
-                On this map you will be able to visualize all the
-                spatial components of the conservation plan. You will
-                be able to visualize your planning region,
-                features and results.
-
+              <div className="space-y-2">
+                <p>
+                  On this map you will be able to visualize all the
+                  spatial components of the conservation plan.
+                </p>
+                <p>
+                  You will
+                  be able to visualize your planning region,
+                  your features and, once you have run Marxan,
+                  you will also be able to visualize here the
+                  results.
+                </p>
               </div>
             )}
             modifiers={['flip']}

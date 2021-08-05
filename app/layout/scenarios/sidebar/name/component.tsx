@@ -4,10 +4,13 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import { useMe } from 'hooks/me';
+import { useProject } from 'hooks/projects';
 import { useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import { motion } from 'framer-motion';
+import { usePlausible } from 'next-plausible';
 
 import Pill from 'layout/pill';
 
@@ -27,8 +30,11 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { query, push } = useRouter();
   const { pid } = query;
-
+  const plausible = usePlausible();
   const { addToast } = useToasts();
+
+  const { data: project } = useProject(pid);
+  const { user } = useMe();
 
   const mutation = useSaveScenario({
     requestConfig: {
@@ -66,6 +72,14 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
         });
 
         push(`/projects/${pid}/scenarios/${s.id}/edit`);
+        plausible('New scenario', {
+          props: {
+            userId: `${user.id}`,
+            userEmail: `${user.email}`,
+            projectId: `${pid}`,
+            projectName: `${project.name}`,
+          },
+        });
       },
       onError: () => {
         addToast('success-scenario-create', (
@@ -89,7 +103,7 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
         });
       },
     });
-  }, [mutation, pid, push, addToast]);
+  }, [mutation, pid, push, addToast, plausible, project, user]);
 
   return (
     <motion.div

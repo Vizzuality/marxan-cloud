@@ -1,10 +1,9 @@
 import React from 'react';
 
-import Head from 'next/head';
-
 import { withoutProtection } from 'hoc/auth';
 
 import ForgotPassword from 'layout/forgot-password';
+import Head from 'layout/head';
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 
@@ -13,10 +12,7 @@ export const getServerSideProps = withoutProtection();
 const ForgotPasswordPage: React.FC = () => {
   return (
     <>
-      <Head>
-        <title>Forgot password</title>
-      </Head>
-
+      <Head title="Forgot password" />
       <MetaIcons />
 
       <main className="flex flex-col w-screen h-screen">

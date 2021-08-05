@@ -15,10 +15,13 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
+import COST_LAND_IMG from 'images/info-buttons/img_cost_surface_marine.png';
+import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
+
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ScenariosCostSurfaceProps {
-  readOnly: boolean,
+  readOnly?: boolean,
   onChangeSection: (s: string) => void;
 }
 
@@ -145,27 +148,35 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
         <InfoButton>
           <div>
             <h4 className="font-heading text-lg mb-2.5">What is a Cost Surface?</h4>
-            <div>
-
-              In conservation planning, cost data reflects how much a
-              planning unit costs to include into a
-              conservation network. Typically, it reflects the
-              actual price of a parcel of land. However, cost
-              information is usually scarce and often the cost
-              surface is used to reflect any variety of
-              socioeconomic factors,
-              which if minimized, might help the conservation
-              plan be implemented more effectively and reduce
-              conflicts with other uses.
-              <br />
-              <br />
-              The default value for cost will be the planning
-              unit area but you can upload a cost
-              surface. Once you upload a cost surface,
-              it will be intersected with your planning unit
-              grid to get one cost value per planning unit.
-              This will be the cost that Marxan will use for
-              each planning unit.
+            <div className="space-y-2">
+              <p>
+                In conservation planning, cost data reflects how much a
+                planning unit costs to include into a
+                conservation network. Typically, it reflects the
+                actual price of a parcel of land. However, cost
+                information is usually scarce and often the cost
+                surface is used to reflect any variety of
+                socioeconomic factors,
+                which if minimized, might help the conservation
+                plan be implemented more effectively and reduce
+                conflicts with other uses.
+              </p>
+              <p>
+                For example, here you can see 2 examples of
+                cost surfaces terrestrial and marine environments:
+              </p>
+              <img src={COST_SEA_IMG} alt="Feature-Range" />
+              <img src={COST_LAND_IMG} alt="Feature-Range" />
+              <p>
+                The default value for cost will be the planning
+                unit area but you can upload a cost
+                surface. Once you upload a cost surface,
+                it will be intersected with your planning unit
+                grid to get one cost value per planning unit.
+                This will be the cost that Marxan will use for
+                each planning unit.
+              </p>
+              <img src={COST_LAND_IMG} alt="Feature-Range" />
 
             </div>
 
