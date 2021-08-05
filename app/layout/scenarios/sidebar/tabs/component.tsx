@@ -40,14 +40,15 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
       title="the marxan workflow"
       subtitle="Steps to follow for the analysis"
       content={(
-        <div>
-          This tab will show the steps needed to complete a
-          conservation plan using Marxan. The logical workflow
-          requires you to take some actions at each step
-          as follows:
-          <br />
-          <br />
-          <ul className="pl-6 list-decimal">
+        <div className="space-y-2">
+          <p>
+            This tab will show the steps needed to complete a
+            conservation plan using Marxan. The logical workflow
+            requires you to take some actions at each step
+            as follows:
+          </p>
+
+          <ul className="pl-6 space-y-1 list-decimal">
             <li>
               First you will
               decide if you want to
