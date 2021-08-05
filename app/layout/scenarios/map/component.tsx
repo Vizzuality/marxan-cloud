@@ -42,7 +42,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   } = useSelectedFeatures(sid, {});
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setPuIncludedValue, setPuExcludedValue } = scenarioSlice.actions;
+  const { setTmpPuIncludedValue, setTmpPuExcludedValue } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
   const {
@@ -58,8 +58,8 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     // Adjust planning units
     clicking,
     puAction,
-    puIncludedValue,
-    puExcludedValue,
+    puTmpIncludedValue,
+    puTmpExcludedValue,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const minZoom = 2;
@@ -93,8 +93,8 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     options: {
       wdpaThreshold,
       puAction,
-      puIncludedValue,
-      puExcludedValue,
+      puIncludedValue: puTmpIncludedValue,
+      puExcludedValue: puTmpExcludedValue,
     },
   });
 
@@ -141,15 +141,24 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
         const { properties } = pUGridLayer;
         const { scenarioPuId } = properties;
 
-        const newClickingValue = puAction === 'include' ? [...puIncludedValue] : [...puExcludedValue];
-        const newAction = puAction === 'include' ? setPuIncludedValue : setPuExcludedValue;
+        const newClickingValue = puAction === 'include' ? [...puTmpIncludedValue] : [...puTmpExcludedValue];
+        const newAction = puAction === 'include' ? setTmpPuIncludedValue : setTmpPuExcludedValue;
+
+        const newOpositeClickingValue = puAction !== 'include' ? [...puTmpIncludedValue] : [...puTmpExcludedValue];
+        const newOpositeAction = puAction !== 'include' ? setTmpPuIncludedValue : setTmpPuExcludedValue;
 
         const index = newClickingValue.findIndex((s) => s === scenarioPuId);
+        const indexOposite = newOpositeClickingValue.findIndex((s) => s === scenarioPuId);
 
         if (index > -1) {
           newClickingValue.splice(index, 1);
         } else {
           newClickingValue.push(scenarioPuId);
+        }
+
+        if (indexOposite > -1) {
+          newOpositeClickingValue.splice(indexOposite, 1);
+          dispatch(newOpositeAction(newOpositeClickingValue));
         }
 
         dispatch(newAction(newClickingValue));
@@ -158,11 +167,11 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   }, [
     clicking,
     puAction,
-    puIncludedValue,
-    puExcludedValue,
+    puTmpIncludedValue,
+    puTmpExcludedValue,
     dispatch,
-    setPuIncludedValue,
-    setPuExcludedValue,
+    setTmpPuIncludedValue,
+    setTmpPuExcludedValue,
     cache,
   ]);
 

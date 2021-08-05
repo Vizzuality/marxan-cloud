@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -29,33 +29,37 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   onChangeSection,
 }: ScenariosSidebarAnalysisSectionsProps) => {
   const [clearing, setClearing] = useState(false);
-  const [type, setType] = useState('include');
 
   const { query } = useRouter();
   const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
-    setPUAction, setPuIncludedValue, setPuExcludedValue,
+    setPUAction,
+    setPuIncludedValue,
+    setPuExcludedValue,
+    setTmpPuIncludedValue,
+    setTmpPuExcludedValue,
   } = scenarioSlice.actions;
-
   const dispatch = useDispatch();
+  const { puAction } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { addToast } = useToasts();
 
-  const { data: PUData } = useScenarioPU(sid);
+  const { data: PUData, isFetched: PUisFetched } = useScenarioPU(sid);
   const scenarioPUMutation = useSaveScenarioPU({});
 
   useEffect(() => {
-    if (PUData) {
+    if (PUData && PUisFetched) {
       const { included, excluded } = PUData;
       dispatch(setPuIncludedValue(included));
       dispatch(setPuExcludedValue(excluded));
+      dispatch(setTmpPuIncludedValue(included));
+      dispatch(setTmpPuExcludedValue(excluded));
     }
   }, [PUData]); //eslint-disable-line
 
   const onChangeTab = useCallback((t) => {
-    setType(t);
     dispatch(setPUAction(t));
   }, [dispatch, setPUAction]);
 
@@ -157,7 +161,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
 
       <div className="w-full flex items-center justify-between border-t border-gray-500 mt-2.5">
         <Tabs
-          type={type}
+          type={puAction}
           onChange={onChangeTab}
         />
 
@@ -183,7 +187,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
           <div className="py-3">
             <Buttons
-              type={type}
+              type={puAction}
             />
           </div>
         </div>

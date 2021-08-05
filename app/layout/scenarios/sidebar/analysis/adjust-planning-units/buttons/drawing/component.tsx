@@ -98,7 +98,7 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
           <>
             <h2 className="font-medium">Success!</h2>
             <ul className="text-sm">
-              <li>Planning units saved</li>
+              <li>Planning units lock status saved</li>
             </ul>
           </>
         ), {
