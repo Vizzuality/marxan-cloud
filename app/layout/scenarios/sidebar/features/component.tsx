@@ -74,6 +74,8 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
             features: 'draft',
             analysis: 'draft',
             solutions: 'empty',
+            tab: 'analysis',
+            subtab: 'analysis-preview',
           },
         },
       },

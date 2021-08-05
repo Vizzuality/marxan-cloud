@@ -29,11 +29,19 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
 
+  const { tab: refTab, subtab: refSubtab } = scenarioEditingMetadata || {};
+
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
+
+  console.log(refTab, refSubtab);
+  // useEffect(() => {
+  //   dispatch(setTab(refTab));
+  //   dispatch(setSubTab(refSubtab));
+  // }, [dispatch, setTab, setSubTab, refTab, refSubtab]);
 
   const onSelectedTab = useCallback((t) => {
     const TAB = TABS.find((T) => T.id === t);

@@ -57,6 +57,8 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
             features: 'empty',
             analysis: 'empty',
             solutions: 'empty',
+            tab: 'protected-areas',
+            subtab: 'protected-areas-preview',
           },
         },
       },

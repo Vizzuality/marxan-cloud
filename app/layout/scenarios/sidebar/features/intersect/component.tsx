@@ -163,6 +163,8 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
             features: 'draft',
             analysis: 'draft',
             solutions: 'empty',
+            tab: 'analysis',
+            subtab: 'analysis-preview',
           },
         },
       },

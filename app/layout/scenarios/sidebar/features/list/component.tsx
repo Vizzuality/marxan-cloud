@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
@@ -34,6 +35,8 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   const { query } = useRouter();
   const { pid, sid } = query;
 
+  const { data: scenarioData } = useScenario(sid);
+
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setFeatureHoverId } = scenarioSlice.actions;
 
@@ -42,6 +45,12 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   const queryClient = useQueryClient();
 
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
 
   const {
     data: selectedFeaturesData,
@@ -181,6 +190,27 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     dispatch(setFeatureHoverId(null));
   }, 500);
 
+  const saveTabsStatus = useCallback(async () => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          scenarioEditingMetadata: {
+            ...scenarioData.metadata.scenarioEditingMetadata,
+            tab: 'features',
+            subtab: 'features-fpf',
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+      },
+      onError: (err) => {
+        console.info(err);
+      },
+    });
+  }, [saveScenarioMutation, sid, scenarioData]);
+
   const onSubmit = useCallback((values) => {
     const { features } = values;
     const data = getFeaturesRecipe(features);
@@ -194,12 +224,13 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       onSuccess: () => {
         onSuccess();
         setSubmitting(false);
+        saveTabsStatus();
       },
       onError: () => {
         setSubmitting(false);
       },
     });
-  }, [sid, selectedFeaturesMutation, onSuccess, getFeaturesRecipe]);
+  }, [sid, selectedFeaturesMutation, onSuccess, getFeaturesRecipe, saveTabsStatus]);
 
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
