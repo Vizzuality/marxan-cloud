@@ -154,7 +154,17 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     // // Save current features
     selectedFeaturesMutation.mutate({
       id: `${sid}`,
-      data,
+      data: {
+        ...data,
+        metadata: {
+          scenarioEditingMetadata: {
+            'protected-areas': 'draft',
+            features: 'draft',
+            analysis: 'draft',
+            solutions: 'empty',
+          },
+        },
+      },
     }, {
       onSuccess: () => {
         onSuccess();
