@@ -19,6 +19,7 @@ import {
 } from './geo-feature-set.service';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
+import { ProcessingModule } from './processing';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { GeoFeaturePropertySetService } from './geo-feature-property-sets.servic
       apiConnections.geoprocessingDB.name,
     ),
     TypeOrmModule.forFeature([GeoFeature, Project, Scenario]),
+    ProcessingModule,
   ],
   providers: [
     GeoFeaturesService,
