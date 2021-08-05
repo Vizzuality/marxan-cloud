@@ -33,11 +33,12 @@ import { OutputFilesService } from './output-files/output-files.service';
 import { InputFilesService, InputFilesArchiverService } from './input-files';
 import { notFound, RunService } from './marxan-run';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
-import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { SimpleJobStatus } from './scenario.api.entity';
 import { assertDefined } from '@marxan/utils';
 import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-property-sets.service';
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
+import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
+import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from './planning-units/scenario-planning-units-protection-status-calculator-service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -62,10 +63,11 @@ export class ScenariosService {
     private readonly runService: RunService,
     private readonly inputFilesService: InputFilesService,
     private readonly outputFilesService: OutputFilesService,
-    private readonly geoFeaturesService: GeoFeaturesService,
     private readonly geoFeaturePropertySetService: GeoFeaturePropertySetService,
     private readonly inputArchiveService: InputFilesArchiverService,
     private readonly planningUnitsService: ScenarioPlanningUnitsService,
+    private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
+    private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,
   ) {}
 
   async findAllPaginated(
@@ -86,13 +88,25 @@ export class ScenariosService {
 
   async create(input: CreateScenarioDTO, info: AppInfoDTO) {
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
-    return this.crudService.create(validatedMetadata, info);
+    const scenario = await this.crudService.create(validatedMetadata, info);
+    await this.planningUnitsLinkerService.link(scenario);
+    await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
+      scenario,
+    );
+    return scenario;
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
     await this.assertScenario(scenarioId);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
-    return this.crudService.update(scenarioId, validatedMetadata);
+    const scenario = await this.crudService.update(
+      scenarioId,
+      validatedMetadata,
+    );
+    await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
+      scenario,
+    );
+    return scenario;
   }
 
   async getFeatures(scenarioId: string) {

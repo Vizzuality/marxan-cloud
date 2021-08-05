@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
-import { useQuery } from 'react-query';
-import { useSession } from 'next-auth/client';
 
+import { useQuery } from 'react-query';
+
+import { useSession } from 'next-auth/client';
 import { Country, Region } from 'types/country-model';
 
 import COUNTRIES from 'services/countries';
+
 import {
   UseCountriesProps,
   UseCountriesResponse,

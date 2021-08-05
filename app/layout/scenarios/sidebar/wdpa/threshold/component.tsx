@@ -1,6 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback, useMemo, useState, useEffect,
+} from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -8,6 +11,8 @@ import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories } from 'hooks/wdpa';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -19,7 +24,7 @@ import {
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
-import THRESHOLDING_IMG from 'images/img-thresholding.png';
+import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
 export interface WDPAThresholdCategories {
   readOnly?: boolean;
@@ -38,6 +43,10 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   const { pid, sid } = query;
 
   const { data: projectData } = useProject(pid);
+
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setWDPAThreshold } = scenarioSlice.actions;
+  const dispatch = useDispatch();
 
   const {
     data: scenarioData,
@@ -79,6 +88,11 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       wdpaIucnCategories: wdpaIucnCategories || [],
     };
   }, [scenarioData]);
+
+  useEffect(() => {
+    const { wdpaThreshold } = scenarioData;
+    dispatch(setWDPAThreshold(wdpaThreshold ? wdpaThreshold / 100 : 0.75));
+  }, [scenarioData]); //eslint-disable-line
 
   const onSubmit = useCallback(async (values) => {
     setSubmitting(true);
@@ -155,25 +169,28 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                           <InfoButton>
                             <div>
                               <h4 className="font-heading text-lg mb-2.5">What is a threshold?</h4>
-                              <div>
-                                Inside Marxan, planning units are considered as either
-                                protected
-                                or not protected. The threshold value represents a
-                                percentage of the area
-                                inside a planning unit. By setting the threshold you decide
-                                how much of a protected area needs to fall inside a
-                                planning unit to consider the whole planning unit
-                                as &quot;protected&quot;.
-                                <br />
-                                <br />
-
-                                The following
-                                image shows an example setting a threshold of 50%:
-                                <br />
-                                <br />
+                              <div className="space-y-2">
+                                <p>
+                                  Inside Marxan, planning units are considered as either
+                                  protected
+                                  or not protected.
+                                </p>
+                                <p>
+                                  The threshold value represents a
+                                  percentage of the area
+                                  inside a planning unit. By setting the threshold you decide
+                                  how much of a protected area needs to fall inside a
+                                  planning unit to consider the whole planning unit
+                                  as &quot;protected&quot;.
+                                </p>
+                                <p>
+                                  The following
+                                  image shows an example setting a threshold of 50%:
+                                </p>
                               </div>
 
-                              <img src={THRESHOLDING_IMG} alt="Thresholding" />
+                              <img src={THRESHOLD_IMG} alt="Threshold" />
+
                             </div>
                           </InfoButton>
                         </div>
@@ -194,8 +211,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                             style: 'percent',
                           }}
                           maxValue={1}
-                          minValue={0}
+                          minValue={0.01}
                           step={0.01}
+                          onChange={(s) => {
+                            flprops.input.onChange(s);
+                            dispatch(setWDPAThreshold(s));
+                          }}
                         />
                       </Field>
                     )}

@@ -14,6 +14,11 @@ export const createWorld = async () => {
   const { projectId, cleanup: cleanupProject } = await GivenProjectExists(
     app,
     jwt,
+    {
+      countryCode: 'BWA',
+      adminAreaLevel1Id: 'BWA.12_1',
+      adminAreaLevel2Id: 'BWA.12.1_1',
+    },
   );
   const scenario = await ScenariosTestUtils.createScenario(app, jwt, {
     ...E2E_CONFIG.scenarios.valid.minimal(),

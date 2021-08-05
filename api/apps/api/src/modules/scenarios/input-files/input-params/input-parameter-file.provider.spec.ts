@@ -131,7 +131,8 @@ describe(`when a scenario without parameters`, () => {
 
   // then
   it(`should return a file with only io settings and program control`, () => {
-    expect(parameterFile).toEqual(`INPUTDIR input
+    expect(parameterFile).toEqual(`NUMREPS 10
+INPUTDIR input
 PUNAME pu.dat
 SPECNAME spec.dat
 PUVSPRNAME puvspr.dat

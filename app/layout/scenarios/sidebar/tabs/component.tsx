@@ -4,11 +4,12 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { motion } from 'framer-motion';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import Pill from 'layout/pill';
+import { motion } from 'framer-motion';
+
 import HelpBeacon from 'layout/help/beacon';
+import Pill from 'layout/pill';
 
 import Tabs from 'components/tabs';
 
@@ -20,14 +21,16 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTab } = scenarioSlice.actions;
+  const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const onSelectedTab = useCallback((t) => {
+    const TAB = TABS.find((T) => T.id === t);
     dispatch(setTab(t));
-  }, [dispatch, setTab]);
+    dispatch(setSubTab(TAB.subtab));
+  }, [dispatch, setTab, setSubTab]);
 
   if (!sid) return null;
 
@@ -37,14 +40,15 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
       title="the marxan workflow"
       subtitle="Steps to follow for the analysis"
       content={(
-        <div>
-          This tab will show the steps needed to complete a
-          conservation plan using Marxan. The logical workflow
-          requires you to take some actions at each step
-          as follows:
-          <br />
-          <br />
-          <ul className="list-decimal pl-6">
+        <div className="space-y-2">
+          <p>
+            This tab will show the steps needed to complete a
+            conservation plan using Marxan. The logical workflow
+            requires you to take some actions at each step
+            as follows:
+          </p>
+
+          <ul className="pl-6 space-y-1 list-decimal">
             <li>
               First you will
               decide if you want to

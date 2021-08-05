@@ -11,6 +11,8 @@ import { useToasts } from 'hooks/toast';
 
 import cx from 'classnames';
 
+import HelpBeacon from 'layout/help/beacon';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
 
@@ -107,10 +109,12 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   }, [pid, sid, push, saveScenarioMutation, runScenarioMutation, addToast]);
 
   return (
+
     <FormRFF
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
+
       {({ handleSubmit }) => (
         <form
           className={cx({
@@ -121,61 +125,123 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
           onSubmit={handleSubmit}
         >
           <h2 className="px-10 text-2xl font-medium font-heading">Run scenario:</h2>
-          <div className="flex w-full px-10 pt-5 overflow-hidden" style={{ height: 475 }}>
 
-            <div className="flex flex-col flex-grow flex-shrink-0 space-y-6 overflow-hidden w-80">
-              <div className="relative flex flex-col flex-grow overflow-hidden">
-                <div className="absolute left-0 z-10 w-full h-6 pointer-events-none -top-1 bg-gradient-to-b from-white via-white" />
-                <div className="pr-10 overflow-x-hidden overflow-y-auto">
-                  <div className="py-6 space-y-10">
-                    {FIELDS
-                      .filter((f) => !f.advanced)
-                      .map((f) => <RunField key={f.id} {...f} />)}
-
-                    {FIELDS
-                      .filter((f) => !!advanced && !!f.advanced)
-                      .map((f) => <RunField key={f.id} {...f} />)}
-
-                    <Button
-                      theme={advanced ? 'secondary' : 'secondary-alt'}
-                      size="s"
-                      onClick={() => { setAdvanced(!advanced); }}
-                    >
-                      {advanced && 'Hide advanced settings'}
-                      {!advanced && 'Advanced settings'}
-                    </Button>
-                  </div>
+          <div className="flex w-full overflow-hidden" style={{ height: 475 }}>
+            <HelpBeacon
+              id="run-settings"
+              title="RUN OPTIONS"
+              subtitle="Marxan settings"
+              content={(
+                <div className="space-y-2">
+                  <p>
+                    Before you run Marxan, you can adjust some
+                    parameters.
+                  </p>
+                  <p>
+                    All settings are set to the default values recommended
+                    by the manual, but you can choose other allowed values.
+                  </p>
+                  <p>
+                    Some of these parameters have more implications that others.
+                    Particularly important is to decide teh Number of Runs,
+                    The Clumping and the Conservation Feature missing proportion.
+                  </p>
                 </div>
-                <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-white via-white" />
-              </div>
+              )}
+              beaconClassName="z-50"
+              modifiers={['flip']}
+              tooltipPlacement="right"
+            >
+              <div className="flex flex-col flex-grow flex-shrink-0 pt-5 space-y-6 overflow-hidden w-80">
+                <div className="relative flex flex-col flex-grow overflow-hidden">
+                  <div className="absolute left-0 z-10 w-full h-6 pointer-events-none -top-1 bg-gradient-to-b from-white via-white" />
+                  <div className="overflow-x-hidden overflow-y-auto">
+                    <div className="px-10 py-6 space-y-10">
+                      {FIELDS
+                        .filter((f) => !f.advanced)
+                        .map((f) => <RunField key={f.id} {...f} />)}
 
-              <div className="flex-shrink-0 pr-10">
-                <Button
-                  type="submit"
-                  theme="primary"
-                  size="base"
-                  className="w-full"
-                  disabled={submitting}
-                >
-                  <div className="flex items-center space-x-5">
-                    <div className="text-left">
-                      <div className="text-lg">Run scenario</div>
-                      <div className="text-sm text-gray-500">This will take 10 minutes</div>
+                      {FIELDS
+                        .filter((f) => !!advanced && !!f.advanced)
+                        .map((f) => <RunField key={f.id} {...f} />)}
+
+                      <Button
+                        theme={advanced ? 'secondary' : 'secondary-alt'}
+                        size="s"
+                        onClick={() => { setAdvanced(!advanced); }}
+                      >
+                        {advanced && 'Hide advanced settings'}
+                        {!advanced && 'Advanced settings'}
+                      </Button>
                     </div>
-
-                    <Icon icon={RUN_SVG} className="flex-shrink-0 w-7 h-7" />
                   </div>
-                </Button>
+                  <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-white via-white" />
+                </div>
+
+                <div className="flex-shrink-0 px-10">
+                  <Button
+                    type="submit"
+                    theme="primary"
+                    size="base"
+                    className="w-full"
+                    disabled={submitting}
+                  >
+                    <div className="flex items-center space-x-5">
+                      <div className="text-left">
+                        <div className="text-lg">Run scenario</div>
+                        {/*
+                          <div className="text-sm text-gray-500">This will take 10 minutes</div>
+                        */}
+                      </div>
+
+                      <Icon icon={RUN_SVG} className="flex-shrink-0 w-7 h-7" />
+                    </div>
+                  </Button>
+                </div>
               </div>
-            </div>
+            </HelpBeacon>
 
             <div className="w-full h-full">
-              <RunChart />
+              <HelpBeacon
+                id="run-chart"
+                title="RUN CHART"
+                subtitle="Marxan chart"
+                content={(
+                  <div className="space-y-2">
+                    <p>
+                      On this chart you can see the effect of
+                      using different BLM values on your final
+                      conservation plan.
+                    </p>
+                    <p>
+                      The recommended value represents the one that
+                      minimizes the boundary length and the cost.
+                    </p>
+                    <p>
+                      However, you may prefer to select a different value
+                      if your plan requires more or less aggregation of planning
+                      units. You can make that decision by
+                      looking at the images, where you can see the approximate
+                      distribution of your planning units with each BLM value.
+                    </p>
+                  </div>
+                )}
+                beaconClassName="z-50"
+                modifiers={['flip']}
+                tooltipPlacement="left"
+              >
+                <div className="w-full h-full">
+                  <RunChart />
+                </div>
+              </HelpBeacon>
             </div>
           </div>
         </form>
+
       )}
+
     </FormRFF>
+
   );
 };
 

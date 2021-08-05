@@ -1,5 +1,6 @@
 import { RemoteFeaturesData } from '../entities/remote-features-data.geo.entity';
-import { FeatureTags, ScenarioFeaturesData } from '@marxan/features';
+import { ScenarioFeaturesData } from '@marxan/features';
+import { FeatureTag } from '@marxan/features/domain';
 import { GeoFeature } from '../../geo-features/geo-feature.api.entity';
 
 const featureIdMet = `feature-uuid-1-criteria-met`;
@@ -62,13 +63,13 @@ export const getValidRemoteFeatureData = (): RemoteFeaturesData[] => [
 export const getValidGeoFeature = (): GeoFeature[] => [
   {
     description: 'feature-desc-1',
-    tag: FeatureTags.bioregional,
+    tag: FeatureTag.Bioregional,
     id: metaFeatureIdMet,
     alias: 'feature-alias-1',
   },
   {
     description: 'feature-desc-2',
-    tag: FeatureTags.species,
+    tag: FeatureTag.Species,
     id: metaFeatureIdFailed,
     alias: 'feature-alias-2',
   },

@@ -1,3 +1,7 @@
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
+
+import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
+
 export interface UseGeoJSONLayer {
   cache?: number;
   id: string;
@@ -29,10 +33,33 @@ export interface UseWDPAPreviewLayer {
   wdpaIucnCategories?: string[];
 }
 
+export interface UseFeaturePreviewLayer {
+  cache?: number;
+  active?: boolean;
+  bbox?: number[] | unknown;
+  id?: string;
+}
+
+export interface UseFeaturePreviewLayers {
+  cache?: number;
+  active?: boolean;
+  bbox?: number[] | unknown;
+  features?: SelectedItemProps[];
+  options?: {
+    featureHoverId?: string;
+  };
+}
+
 export interface UsePUGridLayer {
   cache?: number;
   sid?: string;
   active?: boolean;
-  type: 'default' | 'proyected-areas' | 'adjust-planning-units';
-  options?: Record<string, unknown>;
+  type: ScenarioSidebarTabs;
+  subtype: ScenarioSidebarSubTabs;
+  options?: {
+    wdpaThreshold?: number;
+    puAction?: string;
+    puIncludedValue?: string[];
+    puExcludedValue?: string[];
+  };
 }

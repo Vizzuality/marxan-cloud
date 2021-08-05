@@ -30,7 +30,8 @@ export class ScenariosPuPaDataGeo extends ScenariosPlanningUnitGeoEntity {
 
   @OneToOne(
     () => ScenariosPuCostDataGeo,
-    (scenariosPuCostDataGeo: ScenariosPuCostDataGeo) => scenariosPuCostDataGeo.scenariosPuDataId,
+    (scenariosPuCostDataGeo: ScenariosPuCostDataGeo) =>
+      scenariosPuCostDataGeo.scenariosPuDataId,
     {
       onDelete: 'CASCADE',
     },
@@ -41,10 +42,10 @@ export class ScenariosPuPaDataGeo extends ScenariosPlanningUnitGeoEntity {
   })
   costData?: ScenariosPuCostDataGeo | null;
 
-
   @OneToOne(
     () => ScenariosPuOutputGeoEntity,
-    (scenariosPuOutputGeoEntity: ScenariosPuOutputGeoEntity) => scenariosPuOutputGeoEntity.scenariosPuId,
+    (scenariosPuOutputGeoEntity: ScenariosPuOutputGeoEntity) =>
+      scenariosPuOutputGeoEntity.scenariosPuId,
     {
       onDelete: 'CASCADE',
     },
@@ -54,6 +55,4 @@ export class ScenariosPuPaDataGeo extends ScenariosPlanningUnitGeoEntity {
     name: 'id',
   })
   outputData?: ScenariosPuOutputGeoEntity | null;
-
-
 }

@@ -20,7 +20,7 @@ import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
-import { FeatureTags } from '@marxan/features';
+import { FeatureTag } from '@marxan/features/domain';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -91,7 +91,7 @@ export class GeoFeaturesService extends AppBaseService<
       alias: faker.random.words(8),
       propertyName: faker.random.words(8),
       intersection: [...Array(4)].map((_i) => faker.random.uuid()),
-      tag: faker.random.arrayElement(Object.values(FeatureTags)),
+      tag: faker.random.arrayElement(Object.values(FeatureTag)),
       properties: [...Array(6)].map((_i) => this._fakeGeoFeatureProperty()),
     };
   }

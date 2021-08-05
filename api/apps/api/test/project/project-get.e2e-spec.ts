@@ -85,8 +85,8 @@ describe(`When getting a single project`, () => {
         "description": null,
         "planningAreaId": "NAM.13.5_1",
         "planningAreaName": "Linyandi",
-        "planningUnitAreakm2": null,
-        "planningUnitGridShape": null,
+        "planningUnitAreakm2": 10,
+        "planningUnitGridShape": "hexagon",
       }
     `);
   });

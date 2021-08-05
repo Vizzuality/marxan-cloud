@@ -20,7 +20,11 @@ import { GivenProjectExists } from '../steps/given-project';
 export const createWorld = async () => {
   const app = await bootstrapApplication();
   const token = await GivenUserIsLoggedIn(app);
-  const { projectId, cleanup } = await GivenProjectExists(app, token);
+  const { projectId, cleanup } = await GivenProjectExists(app, token, {
+    countryCode: 'BWA',
+    adminAreaLevel1Id: 'BWA.12_1',
+    adminAreaLevel2Id: 'BWA.12.1_1',
+  });
   const scenario = await GivenScenarioExists(app, projectId, token);
   const filesToRemove: string[] = [];
 

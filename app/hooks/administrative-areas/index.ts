@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
-import { useQuery } from 'react-query';
-import { useSession } from 'next-auth/client';
 
+import { useQuery } from 'react-query';
+
+import { useSession } from 'next-auth/client';
 import { Region } from 'types/country-model';
 
 import ADMINISTRATIVE_AREAS from 'services/administrative-areas';

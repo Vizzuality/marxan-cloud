@@ -5,7 +5,7 @@ import {
   Header,
   Res,
   Query,
-  Logger
+  Logger,
 } from '@nestjs/common';
 import {
   ScenariosPUFilters,

@@ -38,5 +38,4 @@ export class ScenariosPuCostDataGeo {
   })
   @RelationId((spud: ScenariosPuCostDataGeo) => spud.scenariosPlanningUnit)
   scenariosPuDataId!: string;
-
 }

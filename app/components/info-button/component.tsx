@@ -1,4 +1,5 @@
 import React, { ReactElement } from 'react';
+
 import cx from 'classnames';
 
 import Icon from 'components/icon';
@@ -31,6 +32,7 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
     placement="right-start"
     trigger="click"
     maxWidth={350}
+    interactive
     content={(
       <div
         className="p-4 text-gray-500 bg-white rounded"

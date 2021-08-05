@@ -44,7 +44,9 @@ export interface ItemProps {
     value: string;
   }[];
   onIntersectSelected?: (id: string) => void;
-  onRemove?: (value) => void
+  onRemove?: (value) => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -68,6 +70,8 @@ export const Item: React.FC<ItemProps> = ({
 
   onIntersectSelected,
   onRemove,
+  onMouseEnter,
+  onMouseLeave,
 }: ItemProps) => {
   // EVENTS
   const onSplitChanged = useCallback(
@@ -113,6 +117,8 @@ export const Item: React.FC<ItemProps> = ({
         'bg-gray-700 text-white': true,
         [className]: !!className,
       })}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <header
         className={cx({
@@ -152,14 +158,18 @@ export const Item: React.FC<ItemProps> = ({
               <InfoButton>
                 <span>
                   <h4 className="font-heading text-lg mb-2.5">Split a feature</h4>
-                  You should split a dataset when you have several
-                  features together that you want to treat separately.
-
-                  For example, if you may want to treat each ecoregion
-                  within a dataset as a separate feature.
-                  You will be able to split your dataset
-                  by any of the available attributes in the feature.
-
+                  <div className="space-y-2">
+                    <p>
+                      You should split a dataset when you have several
+                      features together that you want to treat separately.
+                    </p>
+                    <p>
+                      For example, if you may want to treat each ecoregion
+                      within a dataset as a separate feature.
+                      You will be able to split your dataset
+                      by any of the available attributes in the feature.
+                    </p>
+                  </div>
                 </span>
               </InfoButton>
             </div>
@@ -193,16 +203,26 @@ export const Item: React.FC<ItemProps> = ({
               <InfoButton>
                 <span>
                   <h4 className="font-heading text-lg mb-2.5">Intersecting features</h4>
-                  You may want to intersect two or more features when
-                  you are interested in having a new feature that
-                  combines the information of both. For example,
-                  you may wish to ensure that Marxan identifies
-                  priority areas for a given feature across a
-                  range of habitats. In
-                  this case you can intersect a species
-                  distribution with a habitat or ecosystem
-                  layer thereby making your species features
-                  ecologically representative.
+                  <div className="space-y-2">
+                    <p>
+                      You may want to intersect two or more features when
+                      you are interested in having a new feature that
+                      combines the information of both.
+                    </p>
+                    <p>
+                      For example,
+                      you may wish to ensure that Marxan identifies
+                      priority areas for a given feature across a
+                      range of habitats.
+                    </p>
+                    <p>
+                      In
+                      this case you can intersect a species
+                      distribution with a habitat or ecosystem
+                      layer thereby making your species features
+                      ecologically representative.
+                    </p>
+                  </div>
 
                 </span>
               </InfoButton>
@@ -214,6 +234,7 @@ export const Item: React.FC<ItemProps> = ({
                 size="s"
                 onClick={() => {
                   onIntersectChanged(id);
+                  onMouseLeave();
                 }}
               >
                 <div className="flex items-center">

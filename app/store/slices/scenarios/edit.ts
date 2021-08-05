@@ -3,15 +3,23 @@ import { injectReducer } from 'store';
 
 interface ScenarioEditStateProps {
   tab: string,
+  subtab: string,
 
   // WDPA
   wdpaCategories: Record<string, any>;
+  wdpaThreshold: number;
+
+  // FEATURES
+  featureHoverId: string;
 
   // ADJUST PLANNING UNITS
   cache: number;
   puAction: string;
   puIncludedValue: string[];
   puExcludedValue: string[];
+  puTmpIncludedValue: string[];
+  puTmpExcludedValue: string[];
+
   clicking: boolean;
 
   drawing: string;
@@ -23,9 +31,14 @@ interface ScenarioEditStateProps {
 
 const initialState = {
   tab: 'protected-areas',
+  subtab: 'protected-areas-preview',
 
   // WDPA
   wdpaCategories: {},
+  wdpaThreshold: 0.75,
+
+  // FEATURES
+  featureHoverId: null,
 
   // ADJUST PLANNING UNITS
   cache: Date.now(),
@@ -33,6 +46,8 @@ const initialState = {
   clicking: false,
   puIncludedValue: [],
   puExcludedValue: [],
+  puTmpIncludedValue: [],
+  puTmpExcludedValue: [],
   drawing: null,
   drawingValue: null,
   uploading: false,
@@ -47,10 +62,21 @@ export function getScenarioEditSlice(id) {
       setTab: (state, action: PayloadAction<string>) => {
         state.tab = action.payload;
       },
+      setSubTab: (state, action: PayloadAction<string>) => {
+        state.subtab = action.payload;
+      },
 
       // WDPA
       setWDPACategories: (state, action: PayloadAction<Record<string, object>>) => {
         state.wdpaCategories = action.payload;
+      },
+      setWDPAThreshold: (state, action: PayloadAction<number>) => {
+        state.wdpaThreshold = action.payload;
+      },
+
+      // FEATURES
+      setFeatureHoverId: (state, action: PayloadAction<string>) => {
+        state.featureHoverId = action.payload;
       },
 
       // ADJUST PLANNING UNITS
@@ -65,6 +91,12 @@ export function getScenarioEditSlice(id) {
       },
       setPuExcludedValue: (state, action: PayloadAction<string[]>) => {
         state.puExcludedValue = action.payload;
+      },
+      setTmpPuIncludedValue: (state, action: PayloadAction<string[]>) => {
+        state.puTmpIncludedValue = action.payload;
+      },
+      setTmpPuExcludedValue: (state, action: PayloadAction<string[]>) => {
+        state.puTmpExcludedValue = action.payload;
       },
       setClicking: (state, action: PayloadAction<boolean>) => {
         state.clicking = action.payload;

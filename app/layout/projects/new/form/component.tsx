@@ -33,6 +33,8 @@ import {
 } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 
+import REGION_PU from 'images/info-buttons/img_planning_region_grid.png';
+
 import { DEFAULT_AREA } from './constants';
 import ProjectFormProps from './types';
 
@@ -132,14 +134,22 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
           <div className="grid h-full grid-cols-1 gap-0 overflow-hidden bg-gray-700 md:grid-cols-2 rounded-3xl">
             <HelpBeacon
               id="project-new-overview"
-              title="New project basic information"
-              subtitle=""
+              title="Basic information"
+              subtitle="New project overview"
               content={(
-                <div>
-                  Start by adding a name, description and planning area
-                  to your new project. You will be able to create a
-                  planning area from scratch or upload a file.
-
+                <div className="space-y-2">
+                  <p>
+                    To create a new project you need to add a name,
+                    a description, a planning region and
+                    a planning grid.
+                  </p>
+                  <p>
+                    You will be able to create a
+                    planning region and grid
+                    from scratch following some
+                    simple steps or you can upload
+                    your own files.
+                  </p>
                 </div>
               )}
               modifiers={['flip']}
@@ -169,11 +179,20 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
                               <InfoButton>
                                 <span>
-                                  A generic name for the project is
-                                  recommended (eg: the name of the planning region)
-                                  as well as a generic overview for the description.
-                                  In each Scenario you will be able
-                                  to provide specific details.
+                                  <h4 className="font-heading text-lg mb-2.5">Project Name</h4>
+                                  <div className="space-y-2">
+                                    <p>
+                                      One project can aggregate multiple scenarios
+                                      with the same planning region and grid.
+                                      Therefore, using a generic name for the project is
+                                      recommended (eg: the name of the planning region)
+                                      as well as a generic overview for the description.
+                                    </p>
+                                    <p>
+                                      In each Scenario you will be able
+                                      to provide more specific details.
+                                    </p>
+                                  </div>
                                 </span>
                               </InfoButton>
                             </div>
@@ -207,15 +226,32 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
                           <InfoButton>
                             <span>
-                              The planning area (or study region) is
-                              the outer boundary
-                              of the region where you want to create a
-                              plan. These regions
-                              often represent administrative units
-                              (such as countries or
-                              smaller regions), but you can also upload your
-                              own geometry.
+                              <h4 className="font-heading text-lg mb-2.5">Planning Area</h4>
+                              <div className="space-y-2">
+                                <p>
+                                  The planning area (also named planning
+                                  region, study region
+                                  or study area) is
+                                  the outer boundary
+                                  of the region where you want to create a
+                                  plan.
+                                </p>
+                                <p>
+                                  These regions
+                                  often represent administrative units
+                                  (such as countries or
+                                  smaller regions), but you can also upload your
+                                  own geometry.
+                                </p>
+                                <p>
+                                  The planning region is converted to a
+                                  grid of planning units, that are the
+                                  central pieces that Marxan uses in its analyses.
+                                </p>
+                                <img src={REGION_PU} alt="Region-PU" />
+                              </div>
                             </span>
+
                           </InfoButton>
                         </div>
                         <div className="flex flex-row">
@@ -311,12 +347,23 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
             <HelpBeacon
               id="project-new-map"
-              title="New project planning area and grid"
-              subtitle=""
+              title="MAP VIEW"
+              subtitle="New planning area and grid"
               content={(
-                <div>
-                  On the map you will be able to see your selected
-                  or uploaded planning area and grid.
+                <div className="space-y-2">
+                  <p>
+                    On the map you will be able to see your selected
+                    or uploaded planning area and grid.
+                  </p>
+                  <p>
+                    If you are creating a new grid,
+                    you can change the shape and
+                    size of the planning units
+                    and look at the different results
+                    here to find
+                    the best combination for
+                    your conservation plan.
+                  </p>
 
                 </div>
               )}

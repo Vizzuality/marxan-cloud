@@ -11,9 +11,9 @@ import { useRouter } from 'next/router';
 import { useSaveScenarioPU, useUploadScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
-import cx from 'classnames';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import cx from 'classnames';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -44,7 +44,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   const { setUploading, setUploadingValue, setCache } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
-  const { uploadingValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { uploadingValue, puIncludedValue, puExcludedValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -74,6 +74,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
     // Unmount
     return () => {
+      setSuccessFile(null);
       dispatch(setUploading(false));
       dispatch(setUploadingValue(null));
     };
@@ -166,6 +167,10 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     scenarioPUMutation.mutate({
       id: `${sid}`,
       data: {
+        byId: {
+          include: puIncludedValue,
+          exclude: puExcludedValue,
+        },
         byGeoJson: {
           [values.type]: [values.uploadingValue],
         },
@@ -176,12 +181,13 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         dispatch(setCache(Date.now()));
         dispatch(setUploading(false));
         dispatch(setUploadingValue(null));
+        setSuccessFile(null);
 
         addToast('adjust-planning-units-success', (
           <>
             <h2 className="font-medium">Success!</h2>
             <ul className="text-sm">
-              <li>Planning units saved</li>
+              <li>Planning units lock status saved</li>
             </ul>
           </>
         ), {
@@ -204,6 +210,8 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   }, [
     sid,
     scenarioPUMutation,
+    puIncludedValue,
+    puExcludedValue,
     onSelected,
     dispatch,
     setUploading,

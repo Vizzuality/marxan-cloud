@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
-import { FeatureTags } from '@marxan/features';
+import { FeatureTag } from '@marxan/features/domain';
 
 export const geoFeatureResource: BaseServiceResource = {
   className: 'GeoFeature',
@@ -54,7 +54,7 @@ export class GeoFeature {
 
   @ApiProperty()
   @Column('varchar')
-  tag!: FeatureTags;
+  tag!: FeatureTag;
 
   @ApiPropertyOptional()
   properties?: GeoFeatureProperty[];

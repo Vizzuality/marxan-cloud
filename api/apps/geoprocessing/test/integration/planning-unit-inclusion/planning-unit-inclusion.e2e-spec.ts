@@ -54,14 +54,14 @@ describe(`When planning units exist for a scenario`, () => {
         },
       } as unknown) as Job<JobInput>);
 
-      expect(await world.GetLockedInGeometries()).toEqual(
-        world.geoToBeIncluded(forCase),
+      expect(await world.GetLockedInPlanningUnits()).toEqual(
+        world.planningUnitsToBeIncluded(forCase),
       );
-      expect(await world.GetLockedOutGeometries()).toEqual(
-        world.geoToBeExcluded(forCase),
+      expect(await world.GetLockedOutPlanningUnits()).toEqual(
+        world.planningUnitsToBeExcluded(forCase),
       );
-      expect(await world.GetUnstatedGeometries()).toEqual(
-        world.geoToBeUntouched(forCase),
+      expect(await world.GetUnstatedPlanningUnits()).toEqual(
+        world.planningUnitsToBeUntouched(forCase),
       );
     }, 10000);
   });
@@ -89,14 +89,14 @@ describe(`When planning units exist for a scenario`, () => {
         },
       } as unknown) as Job<JobInput>);
 
-      expect(await world.GetLockedInGeometries()).toEqual(
-        world.geoToBeIncluded(forCase),
+      expect(await world.GetLockedInPlanningUnits()).toEqual(
+        world.planningUnitsToBeIncluded(forCase),
       );
-      expect(await world.GetLockedOutGeometries()).toEqual(
-        world.geoToBeExcluded(forCase),
+      expect(await world.GetLockedOutPlanningUnits()).toEqual(
+        world.planningUnitsToBeExcluded(forCase),
       );
-      expect(await world.GetUnstatedGeometries()).toEqual(
-        world.geoToBeUntouched(forCase),
+      expect(await world.GetUnstatedPlanningUnits()).toEqual(
+        world.planningUnitsToBeUntouched(forCase),
       );
     }, 10000);
   });

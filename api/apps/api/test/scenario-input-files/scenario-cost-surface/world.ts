@@ -25,6 +25,11 @@ export const createWorld = async () => {
   const { cleanup: projectCleanup, projectId } = await GivenProjectExists(
     app,
     jwt,
+    {
+      countryCode: 'BWA',
+      adminAreaLevel1Id: 'BWA.12_1',
+      adminAreaLevel2Id: 'BWA.12.1_1',
+    },
   );
   const scenarioId = (
     await ScenariosTestUtils.createScenario(app, jwt, {

@@ -1,10 +1,11 @@
 import { useMemo, useRef } from 'react';
+
 import {
   useInfiniteQuery,
 } from 'react-query';
-import { useSession } from 'next-auth/client';
 
 import flatten from 'lodash/flatten';
+import { useSession } from 'next-auth/client';
 
 import { ItemProps as RawItemProps } from 'components/gap-analysis/item/component';
 
