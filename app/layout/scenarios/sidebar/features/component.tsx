@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { useQueryClient } from 'react-query';
 import { useSelector, useDispatch } from 'react-redux';
@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import { useSelectedFeatures } from 'hooks/features';
-import { useScenario } from 'hooks/scenarios';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
@@ -57,6 +57,35 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
 
+  const mutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const handleSaveSuccess = useCallback(async (data) => {
+    mutation.mutate({
+      id: `${sid}`,
+      data: {
+        ...data,
+        metadata: {
+          scenarioEditingMetadata: {
+            'protected-areas': 'draft',
+            features: 'draft',
+            analysis: 'draft',
+            solutions: 'empty',
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+        push(`/projects/${pid}`);
+      },
+      onError: () => {
+      },
+    });
+  }, [mutation, sid, pid, push]);
+
   useEffect(() => {
     return () => {
       setStep(0);
@@ -64,24 +93,6 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   }, [tab]);
 
   if (!scenarioData || tab !== 'features') return null;
-
-  // const mutation = useSaveScenario({
-  //   requestConfig: {
-  //     method: 'POST',
-  //   },
-  // });
-
-  const handleSaveSuccess = () => {
-    push(`/projects/${pid}`);
-  // metadata: {
-  //   scenarioEditingMetadata: {
-  //     'protected-areas': 'draft',
-  //     features: 'draft',
-  //     analysis: 'draft',
-  //     solutions: 'empty',
-  //   },
-  // },
-  };
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
@@ -263,7 +274,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
                 }}
                 readOnly={readOnly}
-                onSuccess={() => handleSaveSuccess()}
+                onSuccess={handleSaveSuccess}
               />
             )}
           </Pill>

@@ -15,7 +15,7 @@ import Loading from 'components/loading';
 export interface ScenariosFeaturesListProps {
   readOnly?: boolean;
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess: any;
 }
 
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
