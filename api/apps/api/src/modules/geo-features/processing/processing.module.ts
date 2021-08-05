@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
+import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
 import {
   copyEventsFactoryProvider,
   copyQueueEventsProvider,
@@ -14,9 +15,10 @@ import {
 import { CopyEventsHandler } from './copy-events.handler';
 import { SplitEventsHandler } from './split-events.handler';
 import { StratificationEventsHandler } from './stratification-events.handler';
+import { RunService } from './run.service';
 
 @Module({
-  imports: [QueueApiEventsModule],
+  imports: [QueueApiEventsModule, ApiEventsModule],
   providers: [
     copyQueueProvider,
     copyQueueEventsProvider,
@@ -30,7 +32,8 @@ import { StratificationEventsHandler } from './stratification-events.handler';
     CopyEventsHandler,
     SplitEventsHandler,
     StratificationEventsHandler,
+    RunService,
   ],
-  exports: [],
+  exports: [RunService],
 })
 export class ProcessingModule {}
