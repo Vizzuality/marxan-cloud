@@ -124,7 +124,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
               title="Basic information"
               subtitle="New project overview"
               content={(
-                <div className="space-y-5">
+                <div className="space-y-2">
                   <p>
                     To create a new project you need to add a name,
                     a description, a planning region and
@@ -214,7 +214,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           <InfoButton>
                             <span>
                               <h4 className="font-heading text-lg mb-2.5">Planning Area</h4>
-                              <div className="space-y-5">
+                              <div className="space-y-2">
                                 <p>
                                   The planning area (also named planning
                                   region, study region
@@ -337,7 +337,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
               title="MAP VIEW"
               subtitle="New planning area and grid"
               content={(
-                <div className="space-y-5">
+                <div className="space-y-2">
                   <p>
                     On the map you will be able to see your selected
                     or uploaded planning area and grid.

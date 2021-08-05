@@ -10,7 +10,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import HelpBeacon from 'layout/help/beacon';
 
 import Map from 'components/map';
-
 // Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
@@ -74,7 +73,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
             title="Map view"
             subtitle="Visualize all elements"
             content={(
-              <div className="space-y-5">
+              <div className="space-y-2">
                 <p>
                   On this map you will be able to visualize all the
                   spatial components of the conservation plan.

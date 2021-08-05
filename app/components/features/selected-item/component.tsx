@@ -203,7 +203,7 @@ export const Item: React.FC<ItemProps> = ({
               <InfoButton>
                 <span>
                   <h4 className="font-heading text-lg mb-2.5">Intersecting features</h4>
-                  <div className="space-y-5">
+                  <div className="space-y-2">
                     <p>
                       You may want to intersect two or more features when
                       you are interested in having a new feature that

@@ -52,7 +52,7 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
         title="Solutions"
         subtitle="View the results"
         content={(
-          <div className="space-y-5">
+          <div className="space-y-2">
             <p>
               Under
               {' '}

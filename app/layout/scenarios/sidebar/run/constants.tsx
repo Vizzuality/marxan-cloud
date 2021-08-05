@@ -9,7 +9,7 @@ export const FIELDS = [
     id: 'NUMREPS',
     label: 'Number of Runs',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
         <h4 className="font-heading text-lg mb-2.5">Number of runs</h4>
         <p>
           The number of repeat runs you want Marxan to perform;
@@ -76,7 +76,7 @@ export const FIELDS = [
     id: 'BLM',
     label: 'Clumping',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
         <h4 className="font-heading text-lg mb-2.5">Boundary Length Modifier (BLM)</h4>
         <p>
           The BLM should be either ‘0’ or a positive number.
@@ -133,7 +133,7 @@ export const FIELDS = [
     id: 'MISSLEVEL',
     label: 'Conservation Feature missing proportion',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
         <h4 className="font-heading text-lg mb-2.5">Conservation Feature missing proportion</h4>
         <p>
           Amount or target below which a Conservation Feature
@@ -191,7 +191,7 @@ export const FIELDS = [
     id: 'PROP',
     label: 'Starting Proportion',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
         <h4 className="font-heading text-lg mb-2.5">Starting proportion</h4>
         <p>
           Proportion of planning units in initial
@@ -250,7 +250,7 @@ export const FIELDS = [
     id: 'RANDSEED',
     label: 'Random seed',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
         <p>
           It controls whether the same ‘random’
           selection of planning units is included
@@ -291,7 +291,7 @@ export const FIELDS = [
     id: 'BESTSCORE',
     label: 'Best Score Speedup',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
 
         <p>
           This variable tells Marxan not to
@@ -330,7 +330,7 @@ export const FIELDS = [
     id: 'NUMITNS',
     label: 'Number of Iterations',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
         <p>
           Required when RUNMODE = &quot;Simulated Annealing&quot;.
           Number of iterations for annealing
@@ -364,7 +364,7 @@ export const FIELDS = [
     id: 'STARTTEMP',
     label: 'Initial temperature',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
         <p>
           Required when RUNMODE = &quot;Simulated Annealing&quot;.
           Starting temperature for annealing.
@@ -401,7 +401,7 @@ export const FIELDS = [
     id: 'COOLFAC',
     label: 'Cooling factor',
     description:
-  <div className="space-y-5">
+  <div className="space-y-2">
     <p>Required when RUNMODE = &quot;Simulated Annealing&quot;. Cooling factor for annealing</p>
   </div>,
     category: {
@@ -433,7 +433,7 @@ export const FIELDS = [
     id: 'NUMTEMP',
     label: 'Temperature decreases for annealing',
     description:
-  <div className="space-y-5">
+  <div className="space-y-2">
     <p>
       Required when RUNMODE = &quot;Simulated Annealing&quot;.
       Number of temperature decreases for annealing
@@ -467,7 +467,7 @@ export const FIELDS = [
     id: 'COSTTHRESH',
     label: 'Cost threshold',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
         <h4 className="font-heading text-lg mb-2.5">Cost threshold</h4>
         <p>
           This variable can be included if you want Marxan
@@ -531,7 +531,7 @@ export const FIELDS = [
     id: 'THRESHPEN1',
     label: 'Size of cost threshold penalty',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
         <h4 className="font-heading text-lg mb-2.5">Size of cost threshold</h4>
         <p>
           This variable can be included if you want Marxan to
@@ -595,7 +595,7 @@ export const FIELDS = [
     id: 'THRESHPEN2',
     label: 'Shape of cost threshold penalty',
     description: (
-      <div className="space-y-5">
+      <div className="space-y-2">
         <h4 className="font-heading text-lg mb-2.5">Shape of cost threshold</h4>
         <p>
           This variable can be included if you

@@ -7,8 +7,6 @@ import {
   scaleLinear, line, curveMonotoneX, area,
 } from 'd3';
 
-import HelpBeacon from 'layout/help/beacon';
-
 import {
   VISUALIZATION_PADDING,
   X_AXIS_HEIGHT,
@@ -152,202 +150,173 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   return (
     <div ref={containerRef} className="w-full h-full">
       {containerRef.current && (
-        <HelpBeacon
-          id="blm"
-          title="Boundary Length Modifier"
-          subtitle="BLM optimizer"
-          content={(
-            <div className="space-y-5">
-              <p>
-                On this chart you can see the effect of
-                using different BLM values on your final
-                conservation plan.
-              </p>
-              <p>
-                The recommended value represents the one that
-                minimizes the boundary length and the cost.
-              </p>
-              <p>
-                However, you may prefer to select a different value
-                if your plan requires more or less aggregation of planning
-                units. You can make that decision by
-                looking at the images, where you can see the approximate
-                distribution of your planning units with each BLM value.
-              </p>
-            </div>
-            )}
-          modifiers={['flip']}
-          tooltipPlacement="left"
-        >
-          <svg width={width} height={height}>
-            <defs>
-              {/* Clip path used to round the corners of the area */}
-              <clipPath id="area-border-radius">
-                <rect
-                  x={xScale(xDomain[0])}
-                  y={yScale(yDomain[1]) - BORDER_RADIUS}
-                  width={xScale(xDomain[1]) - xScale(xDomain[0])}
-                  height={yScale(yDomain[0]) - yScale(yDomain[1]) + BORDER_RADIUS}
-                  rx={BORDER_RADIUS}
-                />
-              </clipPath>
-            </defs>
-            {/* Y axis */}
-            <g>
-              <g transform={`translate(${0} ${yScale(yDomain[1])})`}>
-                <text
-                  x={Y_AXIS_WIDTH}
-                  y="0"
-                  textAnchor="end"
-                  className="text-xs text-black transform translate-y-3 opacity-50"
-                >
-                  More
-                </text>
-              </g>
-              <g transform={`translate(${0} ${yScale(yDomain[1]) + 0.3 * (yScale(yDomain[0]) - yScale(yDomain[1]))})`}>
-                <text textAnchor="end" className="text-xs text-right text-gray-600 uppercase">
-                  <tspan x={Y_AXIS_WIDTH} y="0">Boundary</tspan>
-                  <tspan x={Y_AXIS_WIDTH} y="18">length</tspan>
-                </text>
-              </g>
-              <g transform={`translate(${0} ${yScale(yDomain[0])})`}>
-                <text
-                  x={Y_AXIS_WIDTH}
-                  y="0"
-                  textAnchor="end"
-                  className="text-xs text-black opacity-50"
-                >
-                  Less
-                </text>
-              </g>
-            </g>
-            {/* X axis */}
-            <g>
-              <g transform={`translate(${xScale(xDomain[0])} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
-                <text x="0" y="0" className="text-xs text-black opacity-50">Less</text>
-              </g>
-              <g transform={`translate(${(xScale(xDomain[0]) + xScale(xDomain[1])) / 2} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
-                <text
-                  x="0"
-                  y="0"
-                  textAnchor="middle"
-                  className="text-xs text-gray-600 uppercase"
-                >
-                  Cost
-                </text>
-              </g>
-              <g transform={`translate(${xScale(xDomain[1])} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
-                <text
-                  x="0"
-                  y="0"
-                  textAnchor="end"
-                  className="text-xs text-black opacity-50"
-                >
-                  More
-                </text>
-              </g>
-            </g>
-            {/* Area */}
-            <path
-              d={areaGenerator(data)}
-              clipPath="url(#area-border-radius)"
-              className="fill-current text-primary-500 opacity-20"
-            />
-            {/* Line */}
-            <path d={lineGenerator(data)} className="text-black stroke-current fill-none" />
-            {/* BLM indicator */}
-            {blmDataPoint && (
-            <g>
-              <g transform={`translate(${0} ${yScale(blmDataPoint.boundaryLength)})`}>
-                <text textAnchor="end" className="text-sm text-black transform translate-y-1">
-                  <tspan x={Y_AXIS_WIDTH} y="0">Recommended</tspan>
-                  <tspan x={Y_AXIS_WIDTH} y="21">(BLM)</tspan>
-                </text>
-              </g>
-              <line
-                x1={Y_AXIS_WIDTH + VISUALIZATION_PADDING / 2}
-                x2={xScale(blmDataPoint.cost)}
-                y1={yScale(blmDataPoint.boundaryLength)}
-                y2={yScale(blmDataPoint.boundaryLength)}
-                className="text-black stroke-current"
+        <svg width={width} height={height}>
+          <defs>
+            {/* Clip path used to round the corners of the area */}
+            <clipPath id="area-border-radius">
+              <rect
+                x={xScale(xDomain[0])}
+                y={yScale(yDomain[1]) - BORDER_RADIUS}
+                width={xScale(xDomain[1]) - xScale(xDomain[0])}
+                height={yScale(yDomain[0]) - yScale(yDomain[1]) + BORDER_RADIUS}
+                rx={BORDER_RADIUS}
               />
+            </clipPath>
+          </defs>
+          {/* Y axis */}
+          <g>
+            <g transform={`translate(${0} ${yScale(yDomain[1])})`}>
+              <text
+                x={Y_AXIS_WIDTH}
+                y="0"
+                textAnchor="end"
+                className="text-xs text-black transform translate-y-3 opacity-50"
+              >
+                More
+              </text>
             </g>
-            )}
-            {/* Thumbnails */}
-            <g>
-              {pointsWithVisibleThumbnail.map(({
-                cost, boundaryLength, isBlm, thumbnail,
-              }, index) => {
-                const {
-                  x,
-                  y,
-                  linePath,
-                } = getThumbnailPosition([cost, boundaryLength], xScale, yScale);
-
-                return (
-                // eslint-disable-next-line react/no-array-index-key
-                  <g key={index} transform={`translate(${x} ${y})`}>
-                    <path
-                      d={linePath}
-                      strokeDasharray="3"
-                      className="text-black stroke-current fill-none"
-                    />
-
-                    <foreignObject
-                      x={0}
-                      y={0}
-                      width={THUMBNAIL_SIZE}
-                      height={THUMBNAIL_SIZE}
-                    >
-                      <div
-                        className={classnames({
-                          'w-full h-full border-2 rounded-2xl bg-white bg-contain': true,
-                          'border-gray-800': !isBlm,
-                          'border-primary-500': isBlm,
-                        })}
-                        style={{ backgroundImage: `url(${thumbnail})` }}
-                      />
-                    </foreignObject>
-
-                  </g>
-                );
-              })}
+            <g transform={`translate(${0} ${yScale(yDomain[1]) + 0.3 * (yScale(yDomain[0]) - yScale(yDomain[1]))})`}>
+              <text textAnchor="end" className="text-xs text-right text-gray-600 uppercase">
+                <tspan x={Y_AXIS_WIDTH} y="0">Boundary</tspan>
+                <tspan x={Y_AXIS_WIDTH} y="18">length</tspan>
+              </text>
             </g>
-            {/* Points */}
-            <g>
-              {data.map(({
-                cost, boundaryLength, isBlm, thumbnail,
-              }, index) => (
-                <foreignObject
-                // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  x={xScale(cost)}
-                  y={yScale(boundaryLength)}
-                  className="w-3 h-3 transform -translate-x-1.5 -translate-y-1.5"
-                >
-                  <div
-                    className={classnames({
-                      'w-3 h-3 rounded-full border-black': true,
-                      'bg-white': !isBlm || !!hoveredPointCoords,
-                      'bg-primary-500': isBlm && !hoveredPointCoords,
-                      border: !isBlm,
-                      'border-2': isBlm,
-                      'cursor-pointer hover:bg-primary-500 hover:border-2': !!thumbnail,
-                    })}
-                    onMouseEnter={
-                    () => onMouseEnterPoint([xScale(cost), yScale(boundaryLength)], thumbnail)
-                  }
-                    onMouseLeave={
-                    () => onMouseLeavePoint([xScale(cost), yScale(boundaryLength)], thumbnail)
-                  }
+            <g transform={`translate(${0} ${yScale(yDomain[0])})`}>
+              <text
+                x={Y_AXIS_WIDTH}
+                y="0"
+                textAnchor="end"
+                className="text-xs text-black opacity-50"
+              >
+                Less
+              </text>
+            </g>
+          </g>
+          {/* X axis */}
+          <g>
+            <g transform={`translate(${xScale(xDomain[0])} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
+              <text x="0" y="0" className="text-xs text-black opacity-50">Less</text>
+            </g>
+            <g transform={`translate(${(xScale(xDomain[0]) + xScale(xDomain[1])) / 2} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
+              <text
+                x="0"
+                y="0"
+                textAnchor="middle"
+                className="text-xs text-gray-600 uppercase"
+              >
+                Cost
+              </text>
+            </g>
+            <g transform={`translate(${xScale(xDomain[1])} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
+              <text
+                x="0"
+                y="0"
+                textAnchor="end"
+                className="text-xs text-black opacity-50"
+              >
+                More
+              </text>
+            </g>
+          </g>
+          {/* Area */}
+          <path
+            d={areaGenerator(data)}
+            clipPath="url(#area-border-radius)"
+            className="fill-current text-primary-500 opacity-20"
+          />
+          {/* Line */}
+          <path d={lineGenerator(data)} className="text-black stroke-current fill-none" />
+          {/* BLM indicator */}
+          {blmDataPoint && (
+          <g>
+            <g transform={`translate(${0} ${yScale(blmDataPoint.boundaryLength)})`}>
+              <text textAnchor="end" className="text-sm text-black transform translate-y-1">
+                <tspan x={Y_AXIS_WIDTH} y="0">Recommended</tspan>
+                <tspan x={Y_AXIS_WIDTH} y="21">(BLM)</tspan>
+              </text>
+            </g>
+            <line
+              x1={Y_AXIS_WIDTH + VISUALIZATION_PADDING / 2}
+              x2={xScale(blmDataPoint.cost)}
+              y1={yScale(blmDataPoint.boundaryLength)}
+              y2={yScale(blmDataPoint.boundaryLength)}
+              className="text-black stroke-current"
+            />
+          </g>
+          )}
+          {/* Thumbnails */}
+          <g>
+            {pointsWithVisibleThumbnail.map(({
+              cost, boundaryLength, isBlm, thumbnail,
+            }, index) => {
+              const {
+                x,
+                y,
+                linePath,
+              } = getThumbnailPosition([cost, boundaryLength], xScale, yScale);
+
+              return (
+              // eslint-disable-next-line react/no-array-index-key
+                <g key={index} transform={`translate(${x} ${y})`}>
+                  <path
+                    d={linePath}
+                    strokeDasharray="3"
+                    className="text-black stroke-current fill-none"
                   />
-                </foreignObject>
-              ))}
-            </g>
-          </svg>
-        </HelpBeacon>
-      )}
 
+                  <foreignObject
+                    x={0}
+                    y={0}
+                    width={THUMBNAIL_SIZE}
+                    height={THUMBNAIL_SIZE}
+                  >
+                    <div
+                      className={classnames({
+                        'w-full h-full border-2 rounded-2xl bg-white bg-contain': true,
+                        'border-gray-800': !isBlm,
+                        'border-primary-500': isBlm,
+                      })}
+                      style={{ backgroundImage: `url(${thumbnail})` }}
+                    />
+                  </foreignObject>
+
+                </g>
+              );
+            })}
+          </g>
+          {/* Points */}
+          <g>
+            {data.map(({
+              cost, boundaryLength, isBlm, thumbnail,
+            }, index) => (
+              <foreignObject
+                  // eslint-disable-next-line react/no-array-index-key
+                key={index}
+                x={xScale(cost)}
+                y={yScale(boundaryLength)}
+                className="w-3 h-3 transform -translate-x-1.5 -translate-y-1.5"
+              >
+                <div
+                  className={classnames({
+                    'w-3 h-3 rounded-full border-black': true,
+                    'bg-white': !isBlm || !!hoveredPointCoords,
+                    'bg-primary-500': isBlm && !hoveredPointCoords,
+                    border: !isBlm,
+                    'border-2': isBlm,
+                    'cursor-pointer hover:bg-primary-500 hover:border-2': !!thumbnail,
+                  })}
+                  onMouseEnter={
+                      () => onMouseEnterPoint([xScale(cost), yScale(boundaryLength)], thumbnail)
+                    }
+                  onMouseLeave={
+                      () => onMouseLeavePoint([xScale(cost), yScale(boundaryLength)], thumbnail)
+                    }
+                />
+              </foreignObject>
+            ))}
+          </g>
+        </svg>
+      )}
     </div>
 
   );

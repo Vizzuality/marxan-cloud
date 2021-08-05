@@ -63,12 +63,12 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
         title="Analysis"
         subtitle="Fine tune your Marxan plan"
         content={(
-          <div className="space-y-5">
+          <div className="space-y-2">
             <p>
               This section helps you refine your
               plan by allowing you to:
             </p>
-            <ol className="pl-6 list-disc space-y-2">
+            <ol className="pl-6 space-y-2 list-disc">
               <li>
                 Evaluate your set targets by viewing the
                 current conservation status of your
