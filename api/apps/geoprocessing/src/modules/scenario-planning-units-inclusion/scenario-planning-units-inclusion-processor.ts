@@ -119,6 +119,18 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const uniquePuIdsToInclude = new Set(puIdsToInclude);
     const uniquePuIdsToExclude = new Set(puIdsToExclude);
 
+    if (
+      new Set(
+        [...uniquePuIdsToInclude].filter((i) =>
+          uniquePuIdsToExclude.has(i),
+        ),
+      ).size > 0
+    ) {
+      throw new Error(
+        'Contrasting claims for inclusion and exclusion have been made for some of the planning units: please check your selections.',
+      );
+    }
+
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
