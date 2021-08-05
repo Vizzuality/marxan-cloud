@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import { useScenario } from 'hooks/scenarios';
+
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
@@ -19,6 +21,12 @@ import { ScenariosSidebarTabsProps } from './types';
 export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { query } = useRouter();
   const { sid } = query;
+  const {
+    data: scenarioData,
+  } = useScenario(sid);
+
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata } = metadata || {};
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
@@ -100,6 +108,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
 
           <Tabs
             items={TABS}
+            statusData={scenarioEditingMetadata}
             selected={tab}
             onSelected={onSelectedTab}
           />
