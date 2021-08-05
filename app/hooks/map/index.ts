@@ -252,6 +252,7 @@ export function usePUGridLayer({
     if (type === 'analysis' && subtype === 'analysis-gap-analysis') return 'features';
     if (type === 'analysis' && subtype === 'analysis-cost-surface') return 'cost';
     if (type === 'analysis' && subtype === 'analysis-adjust-planning-units') return 'lock-status';
+    if (type === 'solutions') return 'results';
 
     return 'protection';
   }, [type, subtype]);
@@ -340,13 +341,15 @@ export function usePUGridLayer({
               type: 'fill',
               'source-layer': 'layer0',
               paint: {
-                'fill-color': {
-                  property: 'costValue',
-                  stops: [
-                    [0, '#FFBFB7'],
-                    [1, '#C21701'],
-                  ],
-                },
+                'fill-color': [
+                  'interpolate',
+                  ['linear'],
+                  ['get', 'costValue'],
+                  0,
+                  '#FFBFB7',
+                  1,
+                  '#C21701',
+                ],
                 'fill-opacity': 0.75,
               },
             },
@@ -385,6 +388,39 @@ export function usePUGridLayer({
               },
             },
           ] : [],
+
+          // SOLUTIONS - FREQUENCY
+          ...type === 'solutions' ? [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-color': [
+                  'interpolate',
+                  ['linear'],
+                  ['get', 'frequencyValue'],
+                  0,
+                  '#FCA107',
+                  100,
+                  '#7F3121',
+                ],
+                'fill-opacity': 0.75,
+              },
+            },
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              filter: [
+                'all',
+                ['in', '-2-', ['get', 'valuePosition']],
+              ],
+              paint: {
+                'fill-color': '#00F',
+                'fill-opacity': 0.75,
+              },
+            },
+          ] : [],
+
         ],
       },
     };
