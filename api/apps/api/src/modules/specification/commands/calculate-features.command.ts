@@ -1,5 +1,7 @@
-import { ICommand } from '@nestjs/cqrs';
+import { Command } from '@nestjs-architects/typed-cqrs';
 
-export class CalculateFeatures implements ICommand {
-  constructor(public readonly featureIds: string[]) {}
+export class CalculateFeatures extends Command<void> {
+  constructor(public readonly featureIds: string[]) {
+    super();
+  }
 }
