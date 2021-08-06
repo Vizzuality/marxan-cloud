@@ -22,6 +22,10 @@ const SCENARIO_STATES = {
     text: 'Fail Running Scenario',
     styles: 'text-red-500',
   },
+  'run-done': {
+    text: 'Runned Scenario',
+    styles: 'text-green-500',
+  },
   'pu-running': {
     text: 'Running PU inclusion',
     styles: 'text-white',
@@ -71,12 +75,12 @@ export const Item: React.FC<ItemProps> = ({
     const run = jobs.find((j) => j.kind === 'run');
     const planningUnitsInclusion = jobs.find((j) => j.kind === 'planningUnitsInclusion');
 
+    if (planningUnitsInclusion && planningUnitsInclusion.status === 'running') return 'pu-running';
+    if (planningUnitsInclusion && planningUnitsInclusion.status === 'failure') return 'pu-failure';
+
     if (run && run.status === 'running') return 'run-running';
     if (run && run.status === 'failure') return 'run-failure';
     if (run && run.status === 'done') return 'run-done';
-
-    if (planningUnitsInclusion && planningUnitsInclusion.status === 'running') return 'pu-running';
-    if (planningUnitsInclusion && planningUnitsInclusion.status === 'failure') return 'pu-failure';
 
     return 'draft';
   }, [jobs]);

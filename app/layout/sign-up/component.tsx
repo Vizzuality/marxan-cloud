@@ -2,13 +2,14 @@ import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
+import omit from 'lodash/omit';
+
 import Link from 'next/link';
 
-import { useToasts } from 'hooks/toast';
-
-import omit from 'lodash/omit';
 import { signIn } from 'next-auth/client';
-import AUTHENTICATION from 'services/authentication';
+import { usePlausible } from 'next-plausible';
+
+import { useToasts } from 'hooks/toast';
 
 import ConfirmSignUp from 'layout/sign-up/confirm';
 import Wrapper from 'layout/wrapper';
@@ -24,6 +25,8 @@ import {
 } from 'components/forms/validations';
 import Loading from 'components/loading';
 
+import AUTHENTICATION from 'services/authentication';
+
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
 import USER_SVG from 'svgs/ui/user.svg?sprite';
@@ -33,8 +36,9 @@ export interface SignUpProps {
 }
 
 export const SignUp: React.FC<SignUpProps> = () => {
-  const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
+  const plausible = usePlausible();
+  const [submitting, setSubmitting] = useState(false);
   const [confirm, setConfirm] = useState(false);
 
   const handleSubmit = useCallback(async (data) => {
@@ -51,6 +55,11 @@ export const SignUp: React.FC<SignUpProps> = () => {
       // where username is used for log in instead of email
       if (signUpResponse.status === 201) {
         setConfirm(true);
+        plausible('Sign up', {
+          props: {
+            userEmail: `${data.email}`,
+          },
+        });
         await signIn('credentials', { ...data, username: data.email });
       }
     } catch (error) {
@@ -75,7 +84,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
 
       setSubmitting(false);
     }
-  }, [addToast]);
+  }, [addToast, plausible]);
 
   return (
     <Wrapper>

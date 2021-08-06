@@ -1,16 +1,14 @@
 import React from 'react';
 
-import Head from 'next/head';
-
+import Head from 'layout/head';
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 
 const Custom404: React.FC = () => {
   return (
     <>
-      <Head>
-        <title>404 - Page Not Found</title>
-      </Head>
+
+      <Head title="404 - Page Not Found" />
 
       <MetaIcons />
 

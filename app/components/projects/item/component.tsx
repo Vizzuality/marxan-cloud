@@ -1,17 +1,21 @@
 import React, { useCallback, useState } from 'react';
+
 import cx from 'classnames';
+import { AnimatePresence, motion } from 'framer-motion';
+import { usePlausible } from 'next-plausible';
+import type { Project } from 'types/project-model';
+
+import { useMe } from 'hooks/me';
+import { useProject } from 'hooks/projects';
 
 import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
-import type { Project } from 'types/project-model';
-
-import { AnimatePresence, motion } from 'framer-motion';
-
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ItemProps extends Project {
+  id: string;
   className?: string;
   style?: Record<string, unknown>;
   lastUpdate: string;
@@ -23,6 +27,7 @@ export interface ItemProps extends Project {
 }
 
 export const Item: React.FC<ItemProps> = ({
+  id,
   className,
   name,
   area,
@@ -36,6 +41,9 @@ export const Item: React.FC<ItemProps> = ({
   onDelete,
 }: ItemProps) => {
   const [animate, setAnimate] = useState('leave');
+  const plausible = usePlausible();
+  const { data: project } = useProject(id);
+  const { user } = useMe();
 
   const handleMouseEnter = useCallback(() => {
     setAnimate('enter');
@@ -53,7 +61,15 @@ export const Item: React.FC<ItemProps> = ({
   const handleDownload = useCallback((e) => {
     e.stopPropagation();
     onDownload(e);
-  }, [onDownload]);
+    plausible('Download project', {
+      props: {
+        userId: `${user.id}`,
+        userEmail: `${user.email}`,
+        projectId: `${project.id}`,
+        projectName: `${project.name}`,
+      },
+    });
+  }, [onDownload, plausible, project, user]);
 
   const handleDuplicate = useCallback((e) => {
     e.stopPropagation();

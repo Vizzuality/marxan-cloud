@@ -42,20 +42,20 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
   useEffect(() => {
     const EDITOR = editorRef?.current;
 
-    if ((!drawing && !uploading) && !!EDITOR) {
-      EDITOR.deleteFeatures(drawingValue || uploadingValue);
+    if ((!drawing) && !!EDITOR) {
+      EDITOR.deleteFeatures(drawingValue);
       dispatch(setDrawingValue(null));
+    }
+  }, [drawing, drawingValue]); // eslint-disable-line
+
+  useEffect(() => {
+    const EDITOR = editorRef?.current;
+
+    if (!uploading && !!EDITOR) {
+      EDITOR.deleteFeatures(uploadingValue);
       dispatch(setUploadingValue(null));
     }
-  }, [
-    drawing,
-    uploading,
-    drawingValue,
-    uploadingValue,
-    dispatch,
-    setDrawingValue,
-    setUploadingValue,
-  ]);
+  }, [uploading, uploadingValue]); // eslint-disable-line
 
   // Delete feature as soon as you unmount this component
   useEffect(() => {
@@ -65,6 +65,7 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
       if (EDITOR) {
         EDITOR.deleteFeatures(drawingValue || uploadingValue);
         dispatch(setDrawingValue(null));
+        dispatch(setUploadingValue(null));
       }
     };
   }, []); // eslint-disable-line

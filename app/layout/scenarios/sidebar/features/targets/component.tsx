@@ -4,16 +4,16 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import { useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
-
 import cx from 'classnames';
+
+import { useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 
 import Button from 'components/button';
 import Item from 'components/features/target-spf-item';
 import Loading from 'components/loading';
 
 export interface ScenariosFeaturesListProps {
-  readOnly: boolean;
+  readOnly?: boolean;
   onBack: () => void;
   onSuccess: () => void;
 }

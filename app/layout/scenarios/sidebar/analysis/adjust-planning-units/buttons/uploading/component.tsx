@@ -8,12 +8,12 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useSaveScenarioPU, useUploadScenarioPU } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
+
+import { useSaveScenarioPU, useUploadScenarioPU } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -74,6 +74,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
     // Unmount
     return () => {
+      setSuccessFile(null);
       dispatch(setUploading(false));
       dispatch(setUploadingValue(null));
     };
@@ -180,12 +181,13 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         dispatch(setCache(Date.now()));
         dispatch(setUploading(false));
         dispatch(setUploadingValue(null));
+        setSuccessFile(null);
 
         addToast('adjust-planning-units-success', (
           <>
             <h2 className="font-medium">Success!</h2>
             <ul className="text-sm">
-              <li>Planning units saved</li>
+              <li>Planning units lock status saved</li>
             </ul>
           </>
         ), {

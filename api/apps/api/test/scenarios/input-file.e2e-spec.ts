@@ -54,7 +54,8 @@ describe(`when a user updates scenario with input data`, () => {
         '_CLOUD_GENERATED_AT __ISO_DATE__',
       ),
     ).toMatchInlineSnapshot(`
-      "INPUTDIR input
+      "NUMREPS 10
+      INPUTDIR input
       PUNAME pu.dat
       SPECNAME spec.dat
       PUVSPRNAME puvspr.dat
@@ -65,6 +66,7 @@ describe(`when a user updates scenario with input data`, () => {
       _CLOUD_ORGANIZATION Fresh Alaska array
       _CLOUD_GENERATED_AT __ISO_DATE__
       VERBOSITY 2
+      SCENNAME output
       SAVESOLUTIONSMATRIX 3
       SAVERUN 3
       SAVEBEST 3

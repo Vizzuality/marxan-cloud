@@ -103,7 +103,7 @@ export const HelpSpotlight = ({
       ref={canvasRef}
       width={canvasSize.width}
       height={canvasSize.height}
-      className="absolute top-0 left-0 z-10"
+      className="absolute top-0 left-0 z-50"
     />
   );
 };

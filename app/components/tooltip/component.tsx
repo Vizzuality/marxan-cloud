@@ -8,7 +8,7 @@ import Arrow from './arrow';
 import { TooltipProps } from './types';
 
 export const Tooltip: React.FC<TooltipProps> = ({
-  children, content, arrow, maxWidth, ...props
+  children, content, arrow, interactive, maxWidth, maxHeight, ...props
 }: TooltipProps) => {
   const tooltipRef = useRef(null);
   const springConfig: SpringOptions = { damping: 15, stiffness: 300 };
@@ -35,6 +35,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
   return (
     <Tippy
       ref={tooltipRef}
+      appendTo={typeof window !== 'undefined' ? document.body : 'parent'}
+      interactive={interactive}
       {...props}
       render={(attrs) => {
         if (typeof attrs['data-reference-hidden'] !== 'undefined') {
@@ -43,11 +45,26 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
         return (
           <motion.div
-            style={{ scale, opacity, maxWidth: maxWidth || 'none' }}
+            style={{
+              scale, opacity,
+            }}
             {...attrs}
           >
-            <div className="relative">
-              {content}
+            <div className="relative shadow-2xl">
+              <div className="relative flex flex-grow overflow-hidden flex-column" style={{ maxWidth: maxWidth || 'none', maxHeight: maxHeight || '100vh' }}>
+                {interactive && (
+                  <div className="absolute top-0 left-0 z-10 w-full h-5 pointer-events-none bg-gradient-to-b from-white via-white" />
+                )}
+
+                <div className="overflow-x-hidden overflow-y-auto">
+                  {content}
+                </div>
+
+                {interactive && (
+                  <div className="absolute bottom-0 left-0 z-10 w-full h-5 pointer-events-none bg-gradient-to-t from-white via-white" />
+                )}
+
+              </div>
 
               {arrow && <Arrow data-popper-arrow="" {...attrs} />}
             </div>

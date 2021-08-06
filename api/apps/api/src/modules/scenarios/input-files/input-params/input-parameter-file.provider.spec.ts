@@ -52,6 +52,7 @@ _CLOUD_PROJECT Project Name
 _CLOUD_ORGANIZATION NA
 _CLOUD_GENERATED_AT 2020-01-01T00:00:00.000Z
 VERBOSITY 2
+SCENNAME output
 SAVESOLUTIONSMATRIX 3
 SAVERUN 3
 SAVEBEST 3
@@ -100,6 +101,7 @@ _CLOUD_PROJECT Project Name
 _CLOUD_ORGANIZATION NA
 _CLOUD_GENERATED_AT 2020-01-01T00:00:00.000Z
 VERBOSITY 2
+SCENNAME output
 SAVESOLUTIONSMATRIX 3
 SAVERUN 3
 SAVEBEST 3
@@ -131,7 +133,8 @@ describe(`when a scenario without parameters`, () => {
 
   // then
   it(`should return a file with only io settings and program control`, () => {
-    expect(parameterFile).toEqual(`INPUTDIR input
+    expect(parameterFile).toEqual(`NUMREPS 10
+INPUTDIR input
 PUNAME pu.dat
 SPECNAME spec.dat
 PUVSPRNAME puvspr.dat
@@ -142,6 +145,7 @@ _CLOUD_PROJECT Project Name
 _CLOUD_ORGANIZATION NA
 _CLOUD_GENERATED_AT 2020-01-01T00:00:00.000Z
 VERBOSITY 2
+SCENNAME output
 SAVESOLUTIONSMATRIX 3
 SAVERUN 3
 SAVEBEST 3

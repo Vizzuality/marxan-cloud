@@ -10,7 +10,7 @@ export interface ScenariosSidebarAnalysisSectionProps {
   id: string;
   name: string;
   description: string;
-  readonly: boolean,
+  readonly?: boolean,
   onChangeSection: (s: string) => void;
 }
 

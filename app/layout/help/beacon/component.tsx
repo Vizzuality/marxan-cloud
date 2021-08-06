@@ -11,11 +11,11 @@ import { useResizeDetector } from 'react-resize-detector';
 
 import { useRouter } from 'next/router';
 
-import { useHelp } from 'hooks/help';
-
 import type { Placement } from '@popperjs/core';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
+
+import { useHelp } from 'hooks/help';
 
 import HelpSpotlight from 'layout/help/spotlight';
 import HelpTooltip from 'layout/help/tooltip';
@@ -64,6 +64,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   const { pathname } = useRouter();
 
   const updateTimeout = useRef(null);
+  const updateTime = useRef(5);
 
   const childrenRef = useRef(null);
   const [beaconRef, setBeaconRef] = useState(null);
@@ -87,8 +88,12 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
     updateTimeout.current = setTimeout(() => {
       if (active) {
         onUpdate();
+        updateTime.current += Math.log10(updateTime.current);
+      } else {
+        updateTime.current = 5;
+        clearTimeout(updateTimeout.current);
       }
-    }, 250);
+    }, updateTime.current);
   }, [active, onResize]);
 
   // 'usePopper'
@@ -106,13 +111,17 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
 
   useResizeDetector({
     targetRef: childrenRef,
-    onResize,
+    onResize: () => {
+      updateTime.current = 5;
+      onResize();
+    },
   });
 
   useEffect(() => {
     onUpdate();
 
     return () => {
+      updateTime.current = 5;
       clearTimeout(updateTimeout.current);
     };
   }, [onUpdate]);
@@ -155,7 +164,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
               exit={{ opacity: 0 }}
               ref={((el) => setBeaconRef(el))}
               className={cx({
-                'z-40': !beaconClassName,
+                'z-30': !beaconClassName,
                 [beaconClassName]: !!beaconClassName,
                 'visible pointer-events-auto': active,
                 'invisible pointer-events-none': !active || attributes?.popper?.['data-popper-reference-hidden'] || attributes?.popper?.['data-popper-escaped'],
@@ -166,7 +175,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
               <button
                 type="button"
                 className={cx({
-                  'relative beacon flex items-center justify-center w-6 h-6 bg-primary-500 border-2 border-gray-700 transition rounded-full focus:outline-none transform translate-x-1/2 translate-y-1/2': true,
+                  'relative beacon flex items-center justify-center w-6 h-6 bg-primary-500 border-2 border-gray-700 transition rounded-full focus:outline-none transform translate-y-3/4': true,
                 })}
                 onClick={() => {
                   setVisible(!visible);

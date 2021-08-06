@@ -1,9 +1,8 @@
 import React from 'react';
 
-import Head from 'next/head';
-
 import { withProtection, withUser } from 'hoc/auth';
 
+import Head from 'layout/head';
 import Header from 'layout/header';
 import Me from 'layout/me';
 import MetaIcons from 'layout/meta-icons';
@@ -14,9 +13,8 @@ export const getServerSideProps = withProtection(withUser());
 const MePage: React.FC = () => {
   return (
     <Protected>
-      <Head>
-        <title>Me</title>
-      </Head>
+
+      <Head title="Me" />
 
       <MetaIcons />
 

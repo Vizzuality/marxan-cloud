@@ -89,7 +89,7 @@ export class InputParameterFileProvider {
     const inputParameterFile = new InputParameterFile(
       this.ioSettings,
       scenario.boundaryLengthModifier,
-      scenario.numberOfRuns,
+      scenario.numberOfRuns ?? this.marxanDefaults.NUMREPS,
       {
         _CLOUD_SCENARIO: scenario.name,
         _CLOUD_PROJECT:
@@ -99,6 +99,7 @@ export class InputParameterFileProvider {
           this.marxanDefaults._CLOUD_ORGANIZATION,
         _CLOUD_GENERATED_AT: new Date().toISOString(),
         VERBOSITY: this.marxanDefaults.VERBOSITY,
+        SCENNAME: this.marxanDefaults.SCENNAME,
         SAVESOLUTIONSMATRIX: this.marxanDefaults.SAVESOLUTIONSMATRIX,
         SAVERUN: this.marxanDefaults.SAVERUN,
         SAVEBEST: this.marxanDefaults.SAVEBEST,

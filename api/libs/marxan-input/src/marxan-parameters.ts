@@ -57,6 +57,7 @@ export class MarxanParametersDefaults {
   _CLOUD_PROJECT = 'NA';
   _CLOUD_ORGANIZATION = 'NA';
   VERBOSITY = 2;
+  SCENNAME = 'output';
   SAVESOLUTIONSMATRIX = 3;
   SAVERUN = 3;
   SAVEBEST = 3;

@@ -4,10 +4,12 @@ import {
   useInfiniteQuery, useMutation, useQuery, useQueryClient,
 } from 'react-query';
 
+import flatten from 'lodash/flatten';
+import orderBy from 'lodash/orderBy';
+
 import { useRouter } from 'next/router';
 
 import { formatDistance } from 'date-fns';
-import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/client';
 
 import { ItemProps } from 'components/projects/item/component';
@@ -83,7 +85,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
   const { pages } = data || {};
 
   return useMemo(() => {
-    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
+    let parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
       const { data: { data: pageData } } = p;
 
       return pageData.map((d):ItemProps => {
@@ -131,6 +133,9 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
         };
       });
     })) : [];
+
+    // Sort
+    parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
 
     return {
       ...query,

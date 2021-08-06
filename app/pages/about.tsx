@@ -1,6 +1,5 @@
 import React from 'react';
 
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import { withUser } from 'hoc/auth';
@@ -8,6 +7,7 @@ import { withUser } from 'hoc/auth';
 import Utilities from 'layout/about/utilities';
 import Values from 'layout/about/values';
 import Footer from 'layout/footer';
+import Head from 'layout/head';
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
@@ -24,9 +24,7 @@ const About: React.FC = () => {
 
   return (
     <>
-      <Head>
-        <title>About</title>
-      </Head>
+      <Head title="About" />
 
       <MetaIcons />
 

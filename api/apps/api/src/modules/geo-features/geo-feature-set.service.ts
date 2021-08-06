@@ -18,6 +18,8 @@ import { GeoFeaturePropertySetService } from './geo-feature-property-sets.servic
 import { ScenarioFeaturesData } from '@marxan/features';
 import { flattenDeep } from 'lodash';
 import { GeoprocessingOpSplitV1 } from './types/geo-feature.geoprocessing-operations.type';
+import { RemoteFeaturesData } from '../scenarios-features/entities/remote-features-data.geo.entity';
+import { plainToClass } from 'class-transformer';
 
 export const EntityManagerToken = Symbol();
 
@@ -69,7 +71,7 @@ export class GeoFeatureSetService {
     const scenario = await this.scenarioRepository.findOneOrFail(id);
     await this.scenarioRepository.update(id, { featureSet: dto });
     // @todo: move to async job - this was just for simple tests
-    // await this.createFeaturesForScenario(id, dto.features);
+    await this.createFeaturesForScenario(id, dto.features);
     return await this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
       dto,
       scenario,
@@ -115,33 +117,37 @@ export class GeoFeatureSetService {
     scenarioId: string,
     featureSpecification: SpecForGeofeature[],
   ): Promise<
-    ({
+    {
       scenarioId: string;
       featuresDataId: string;
-      fpf: number;
-      prop: number | undefined;
-    } & ScenarioFeaturesData)[]
+      fpf?: number;
+      prop?: number;
+    }[][]
   > {
-    const repository = transactionalEntityManager.getRepository(
-      ScenarioFeaturesData,
-    );
-    return Promise.all(
+    const scenarioFeaturesData = Promise.all(
       featureSpecification
         .filter(
           (feature): feature is SpecForPlainGeoFeature =>
             feature.kind === 'plain',
         )
-        .map((feature) => {
-          return repository.save({
-            scenarioId,
-            featuresDataId: feature.featureId,
-            fpf:
-              feature.marxanSettings?.fpf ??
-              MarxanFeaturesMetadata.defaults.fpf,
-            prop: feature.marxanSettings?.prop,
-          });
+        .map(async (feature) => {
+          const featuresData: Partial<ScenarioFeaturesData>[] = await transactionalEntityManager
+            .find(RemoteFeaturesData, { featureId: feature.featureId })
+            .then((result) =>
+              result.map((fd) => ({
+                scenarioId,
+                featuresDataId: fd.id,
+                fpf:
+                  feature.marxanSettings?.fpf ??
+                  MarxanFeaturesMetadata.defaults.fpf,
+                prop: feature.marxanSettings?.prop,
+              })),
+            );
+
+          return transactionalEntityManager.save(plainToClass(ScenarioFeaturesData, featuresData));
         }),
     );
+    return scenarioFeaturesData;
   }
 
   /**

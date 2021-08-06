@@ -17,6 +17,9 @@ interface ScenarioEditStateProps {
   puAction: string;
   puIncludedValue: string[];
   puExcludedValue: string[];
+  puTmpIncludedValue: string[];
+  puTmpExcludedValue: string[];
+
   clicking: boolean;
 
   drawing: string;
@@ -43,6 +46,8 @@ const initialState = {
   clicking: false,
   puIncludedValue: [],
   puExcludedValue: [],
+  puTmpIncludedValue: [],
+  puTmpExcludedValue: [],
   drawing: null,
   drawingValue: null,
   uploading: false,
@@ -86,6 +91,12 @@ export function getScenarioEditSlice(id) {
       },
       setPuExcludedValue: (state, action: PayloadAction<string[]>) => {
         state.puExcludedValue = action.payload;
+      },
+      setTmpPuIncludedValue: (state, action: PayloadAction<string[]>) => {
+        state.puTmpIncludedValue = action.payload;
+      },
+      setTmpPuExcludedValue: (state, action: PayloadAction<string[]>) => {
+        state.puTmpExcludedValue = action.payload;
       },
       setClicking: (state, action: PayloadAction<boolean>) => {
         state.clicking = action.payload;
