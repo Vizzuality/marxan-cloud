@@ -28,7 +28,7 @@ const organization = await botClient.post('/organizations', {
 console.log(organization);
 
 const project = await botClient.post('/projects', {
-    name: 'test project ' + crypto.randomUUID(),
+    name: 'Adelaida-demo ' + crypto.randomUUID(),
     organizationId: organization.data.id,
     countryId: 'BWA',
     adminAreaLevel1Id: 'BWA.12_1',
