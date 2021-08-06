@@ -30,11 +30,11 @@ import: data/demo_data_features/features_demos
 			 DROP TABLE \"$${table_name}_feature\""; \
 	done
 
-data/demo_data_features/features_demos: data/demo_data_features/features_demos.zip
+data/demo_data_features/features_demos: data/demo_data_features/bioregions.zip
 	@unzip -o -u $< -d $@
 
-data/demo_data_features/features_demos.zip: data/demo_data_features
-	@cd $< && curl -O https://marxancloudtest.blob.core.windows.net/data-ingestion-test-00/data-demo/features_demos.zip
+data/demo_data_features/bioregions.zip: data/demo_data_features
+	@cd $< && curl -O https://marxancloudtest.blob.core.windows.net/data-ingestion-test-00/data-demo/bioregion/bioregions.zip
 
 data/demo_data_features:
 	@mkdir -p $@
