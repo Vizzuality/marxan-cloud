@@ -9,7 +9,7 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { getScenarioStatusMetaData } from 'utils/utils-scenarios';
+import { getScenarioStatusMetaData, getReloadTab } from 'utils/utils-scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -46,7 +46,6 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
 
   const { tabStatus } = scenarioEditingMetadata || {};
   const { subtab: refSubtab } = tabStatus || {};
-  console.log('REF SUB TAB', refSubtab);
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -79,9 +78,9 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
 
   useEffect(() => {
     return () => {
-      setSection(null);
+      setSection(refSubtab ? getReloadTab(refSubtab) : null);
     };
-  }, [tab]);
+  }, [tab, refSubtab]);
 
   if (!scenarioData || tab !== 'analysis') return null;
 
