@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { MultiPolygon, Polygon } from 'geojson';
-import { flatMap } from 'lodash';
+import { difference, flatMap, intersection } from 'lodash';
 import { Job } from 'bullmq';
 
 import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
@@ -84,26 +84,14 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
-    const puIdsToIncludeFromIds = new Set(job.data.include?.pu ?? []);
-    const puIdsToExcludeFromIds = new Set(job.data.exclude?.pu ?? []);
+    const puIdsToIncludeFromIds = job.data.include?.pu ?? [];
+    const puIdsToExcludeFromIds = job.data.exclude?.pu ?? [];
 
     // If there are overlaps between opposing claims byId and byGeoJSON, ignore the claims byId
-    const puIdsToIncludeFromIdsLessIdsToExcludeFromGeo = [
-      ...new Set(
-        [...puIdsToIncludeFromIds].filter(
-          (i) => !new Set(puIdsToExcludeFromGeo).has(i),
-        ),
-      ),
-    ];
-    const puIdsToExcludeFromIdsLessIdsToIncludeFromGeo = [
-      ...new Set(
-        [...puIdsToExcludeFromIds].filter(
-          (i) => !new Set(puIdsToIncludeFromGeo).has(i),
-        ),
-      ),
-    ];
+    const puIdsToIncludeFromIdsLessIdsToExcludeFromGeo = difference(puIdsToIncludeFromIds, puIdsToExcludeFromGeo);
+    const puIdsToExcludeFromIdsLessIdsToIncludeFromGeo = difference(puIdsToExcludeFromIds, puIdsToIncludeFromGeo);
 
-    // Union of claims byId and byGeoJSON, for inclusion and for exclusions
+    // Union of claims byId and byGeoJSON, for inclusions and for exclusions
     puIdsToInclude.push(
       ...[
         ...puIdsToIncludeFromIdsLessIdsToExcludeFromGeo,
@@ -119,11 +107,9 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const uniquePuIdsToInclude = new Set(puIdsToInclude);
     const uniquePuIdsToExclude = new Set(puIdsToExclude);
 
-    if (
-      new Set(
-        [...uniquePuIdsToInclude].filter((i) => uniquePuIdsToExclude.has(i)),
-      ).size > 0
-    ) {
+    const doInclusionAndExclusionIntersect = intersection([...uniquePuIdsToInclude], [...uniquePuIdsToExclude]).length > 0
+
+    if (doInclusionAndExclusionIntersect) {
       throw new Error(
         'Contrasting claims for inclusion and exclusion have been made for some of the planning units: please check your selections.',
       );
