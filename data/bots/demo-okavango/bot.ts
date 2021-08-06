@@ -20,7 +20,7 @@ const botClient = axiod.create({
 });
 
 const organization = await botClient.post('/organizations', {
-    name: "aliquip nulla ut " + crypto.randomUUID(),
+    name: "Adelaide University" + crypto.randomUUID(),
     description: "Duis aliquip nostrud sint",
     metadata: {}
 }).then(result => result.data).catch(e => { console.log(e) });
@@ -28,7 +28,7 @@ const organization = await botClient.post('/organizations', {
 console.log(organization);
 
 const project = await botClient.post('/projects', {
-    name: 'test project ' + crypto.randomUUID(),
+    name: 'Okavango demo project ' + crypto.randomUUID(),
     organizationId: organization.data.id,
     countryId: 'BWA',
     adminAreaLevel1Id: 'BWA.12_1',
@@ -58,6 +58,7 @@ const scenarioTook = Process.hrtime(scenarioStart);
 console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
 
 console.log(scenario);
+// this needs to be reworked on a loop that bears all features used per this scenario.
 
 const pantheraPardusFeature = await botClient.get(`/projects/${project.data.id}/features?q=pantherapardus`)
   .then(result => result.data).catch(e => { console.log(e); });

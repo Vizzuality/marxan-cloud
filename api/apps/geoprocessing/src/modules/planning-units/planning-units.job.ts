@@ -13,6 +13,7 @@ import { plainToClass } from 'class-transformer';
 const logger = new Logger('planning-units-job-processor');
 
 /**
+ * @deprecated Workers and jobs should be move to the new functionality
  * @description This function will take care of generating the regular-pu-grids in the area
  *
  * @TODO
@@ -47,7 +48,14 @@ const createPlanningUnitGridFromJobSpec = async (
         square: 'ST_SquareGrid',
         hexagon: 'ST_HexagonGrid',
       };
-      if (
+      if (job.data.planningAreaId){
+        subquery = `SELECT (${gridShape[job.data.planningUnitGridShape]}(${
+          Math.sqrt(job.data.planningUnitAreakm2) * 1000
+        }, ST_Transform(a.the_geom, 3410))).*
+                    FROM planning_areas a
+                    WHERE id = '${job.data.planningAreaId}'`;
+      }
+      else if (
         job.data.countryId ||
         job.data.adminAreaLevel1Id ||
         job.data.adminAreaLevel2Id
@@ -70,7 +78,7 @@ const createPlanningUnitGridFromJobSpec = async (
                     WHERE ${filterSQL.join(' AND ')}`;
       } else {
         throw new Error(
-          'Without valid administrative level a regular pu area cannot be created',
+          'Without valid administrative level or a custom planning Area a regular pu area cannot be created',
         );
       }
 

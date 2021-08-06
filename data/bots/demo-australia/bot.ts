@@ -1,3 +1,6 @@
+/**
+ * Demo setup for Australia.
+ */
 import axiod from "https://deno.land/x/axiod/mod.ts";
 import Process from 'https://deno.land/std@0.103.0/node/process.ts';
 
@@ -26,7 +29,7 @@ const organization = await botClient.post('/organizations', {
 }).then(result => result.data).catch(e => { console.log(e) });
 
 console.log(organization);
-
+// We will create a custom planning area and will attach it to the project
 const project = await botClient.post('/projects', {
     name: 'Adelaida-demo ' + crypto.randomUUID(),
     organizationId: organization.data.id,
