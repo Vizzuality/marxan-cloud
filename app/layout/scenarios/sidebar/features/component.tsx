@@ -11,6 +11,7 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { getScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -53,6 +54,8 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
+  const { metadata: { scenarioEditingMetadata } } = scenarioData || {};
+
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
@@ -111,22 +114,10 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          scenarioEditingMetadata: {
-            'protected-areas': 'draft',
-            features: 'draft',
-            analysis: 'empty',
-            solutions: 'empty',
-            tab: 'features',
-            subtab: 'features-preview',
-          },
-        },
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features', 'features-preview'),
       },
-    }, {
-      onSuccess: () => { },
-      onError: () => { },
     });
-  }, [saveScenarioMutation, sid]);
+  }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
 
   useEffect(() => {
     return () => {
