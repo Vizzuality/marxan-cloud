@@ -5,7 +5,7 @@ import { ICommand, ofType, Saga } from '@nestjs/cqrs';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { AssignCandidateSpecification } from '../command/assign-candidate-specification.command';
+import { AssignCandidateSpecification } from '../assign-candidate-specification.command';
 
 @Injectable()
 export class SpecificationCandidateCreatedSaga {
