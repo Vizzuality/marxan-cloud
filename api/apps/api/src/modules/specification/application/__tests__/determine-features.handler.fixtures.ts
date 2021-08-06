@@ -8,7 +8,7 @@ import {
   Specification,
 } from '../../domain';
 
-import { DetermineFeaturesForSpecification } from '../determine-features-for-scenario-specification.command';
+import { DetermineFeaturesForSpecification } from '../determine-features-for-specification.command';
 import { DetermineFeaturesForScenarioHandler } from '../determine-features-for-scenario.handler';
 import { SpecificationRepository } from '../specification.repository';
 
@@ -97,7 +97,7 @@ export const getFixtures = async () => {
     ThenNoEventIsPublished() {
       expect(events).toEqual([]);
     },
-    ThenErrorIsLogged() {
+    ThenErrorIsRaised() {
       console.log(logger.warn.mock.calls);
       expect(logger.warn.mock.calls[0][0]).toEqual(
         `Couldn't find specification: ${specificationId}`,

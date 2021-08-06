@@ -1,6 +1,7 @@
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { v4 } from 'uuid';
 import { Test } from '@nestjs/testing';
+import { Either } from 'fp-ts/Either';
 
 import {
   SpecificationGotReady,
@@ -8,11 +9,11 @@ import {
   Specification,
 } from '../../domain';
 
+import { SpecificationRepository } from '../specification.repository';
+import { SpecificationNotFound } from '../specification-action-errors';
+
 import { CalculateFeaturesForSpecification } from '../calculate-features-for-specification.command';
 import { CalculateFeaturesForSpecificationHandler } from '../calculate-features-for-specification.handler';
-import { SpecificationRepository } from '../specification.repository';
-
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 export const getFixtures = async () => {
   const events: IEvent[] = [];
@@ -24,7 +25,6 @@ export const getFixtures = async () => {
   const calculatedFeatureId = v4();
   const operation = SpecificationOperation.Split;
 
-  const logger = new FakeLogger();
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],
     providers: [
@@ -35,7 +35,6 @@ export const getFixtures = async () => {
       },
     ],
   }).compile();
-  sandbox.useLogger(logger);
   await sandbox.init();
 
   const sut = sandbox.get(CalculateFeaturesForSpecificationHandler);
@@ -74,13 +73,12 @@ export const getFixtures = async () => {
         (await repo.getById(specificationId))?.toSnapshot().readyToActivate,
       ).toEqual(false);
     },
-    async WhenAllFeaturesAreCalculated() {
-      await sut.execute(
+    WhenAllFeaturesAreCalculated: async () =>
+      sut.execute(
         new CalculateFeaturesForSpecification(specificationId, [
           nonCalculatedFeatureId,
         ]),
-      );
-    },
+      ),
     async ThenSpecificationIsSaved() {
       expect(repo.count()).toEqual(1);
       expect(
@@ -95,11 +93,8 @@ export const getFixtures = async () => {
     ThenNoEventIsPublished() {
       expect(events).toEqual([]);
     },
-    ThenErrorIsLogged() {
-      console.log(logger.warn.mock.calls);
-      expect(logger.warn.mock.calls[0][0]).toEqual(
-        `Couldn't find specification: ${specificationId}`,
-      );
+    ThenErrorIsRaised(result: Either<typeof SpecificationNotFound, void>) {
+      expect(result._tag).toEqual('Left');
     },
   };
 };
