@@ -87,6 +87,48 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     });
   }, [saveScenarioMutation, sid, pid, push]);
 
+  const saveScenarioStatusOnContinue = useCallback(async () => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          scenarioEditingMetadata: {
+            'protected-areas': 'draft',
+            features: 'draft',
+            analysis: 'empty',
+            solutions: 'empty',
+            tab: 'features',
+            subtab: 'features-fpf',
+          },
+        },
+      },
+    }, {
+      onSuccess: () => { },
+      onError: () => { },
+    });
+  }, [saveScenarioMutation, sid]);
+
+  const saveScenarioStatusOnBack = useCallback(async () => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          scenarioEditingMetadata: {
+            'protected-areas': 'draft',
+            features: 'draft',
+            analysis: 'empty',
+            solutions: 'empty',
+            tab: 'features',
+            subtab: 'features-preview',
+          },
+        },
+      },
+    }, {
+      onSuccess: () => { },
+      onError: () => { },
+    });
+  }, [saveScenarioMutation, sid]);
+
   useEffect(() => {
     return () => {
       setStep(0);
@@ -263,6 +305,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                 onSuccess={() => {
                   setStep(step + 1);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_FPF));
+                  saveScenarioStatusOnContinue();
                 }}
                 readOnly={readOnly}
               />
@@ -273,6 +316,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                 onBack={() => {
                   setStep(step - 1);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
+                  saveScenarioStatusOnBack();
                 }}
                 readOnly={readOnly}
                 onSuccess={saveScenarioStatus}
