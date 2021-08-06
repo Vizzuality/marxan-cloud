@@ -5,25 +5,23 @@ import {
 } from '@nestjs/cqrs';
 
 import { SpecificationRepository } from './specification.repository';
-import { DetermineFeatures } from './determine-features.command';
+import { CalculateFeatures } from './calculate-features.command';
 
-@CommandHandler(DetermineFeatures)
-export class DetermineFeaturesHandler
-  implements IInferredCommandHandler<DetermineFeatures> {
+@CommandHandler(CalculateFeatures)
+export class CalculateFeaturesHandler
+  implements IInferredCommandHandler<CalculateFeatures> {
   constructor(
     private readonly eventPublisher: EventPublisher,
     private readonly specificationRepository: SpecificationRepository,
   ) {}
 
-  async execute({ featuresConfig }: DetermineFeatures): Promise<void> {
+  async execute({ featureIds }: CalculateFeatures): Promise<void> {
     const specifications = await this.specificationRepository.transaction(
       async (repo) => {
-        const specifications = await repo.findAllRelatedToFeatureConfig(
-          featuresConfig,
-        );
+        const specifications = await repo.findAllRelatedToFeatures(featureIds);
 
         for (const spec of specifications) {
-          spec.determineFeatures([featuresConfig]);
+          spec.markAsCalculated(featureIds);
           await repo.save(spec);
         }
         return specifications;
