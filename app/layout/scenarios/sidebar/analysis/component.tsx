@@ -57,7 +57,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', 'analysis', `${subtab}`),
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', `${subtab}`),
       },
     }, {
       onSuccess: () => {

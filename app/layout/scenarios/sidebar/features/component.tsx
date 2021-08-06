@@ -73,7 +73,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', 'analysis', 'analysis-preview'),
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', 'analysis-preview'),
       },
     }, {
       onSuccess: () => {
@@ -87,7 +87,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features', 'features-fpf'),
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-fpf'),
       },
     }, {
       onSuccess: () => { },
@@ -99,7 +99,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features', 'features-preview'),
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
       },
     });
   }, [saveScenarioMutation, sid, scenarioEditingMetadata]);

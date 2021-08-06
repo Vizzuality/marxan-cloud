@@ -64,7 +64,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas', 'protected-areas-preview'),
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas-preview'),
       },
     });
   }, [saveScenarioMutation, sid, scenarioEditingMetadata]);

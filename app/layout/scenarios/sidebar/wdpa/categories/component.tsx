@@ -95,7 +95,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         ...values,
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas', 'protected-areas-percentage'),
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas-percentage'),
       },
     }, {
       onSuccess: () => {
@@ -132,7 +132,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         wdpaIucnCategories: null,
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features', 'features-preview'),
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
       },
     }, {
       onSuccess: () => {

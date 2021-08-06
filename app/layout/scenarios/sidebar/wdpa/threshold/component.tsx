@@ -107,7 +107,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       id: scenarioData.id,
       data: {
         wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features', 'features-preview'),
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
       },
     }, {
       onSuccess: () => {
