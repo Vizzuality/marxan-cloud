@@ -111,13 +111,10 @@ export class ScenarioPlanningUnitsLinkerService {
       this.isProjectUsingGadmPlanningArea(project) &&
       this.isProjectUsingCustomPlanningUnitGrid(project)
     ) {
-      const adminAreaId =
-        project.adminAreaLevel2Id ??
-        project.adminAreaLevel1Id ??
-        project.countryId;
-      const adminAreaLevel = AdminAreasService.levelFromId(adminAreaId);
       return {
-        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where gid_${adminAreaLevel} = '${adminAreaId}')`,
+        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions ${this.getQueryPartForAdminAreaSelectionByLevel(
+          project,
+        )})`,
         planningUnitSelectionQueryPart: `(select the_geom from planning_areas where project_id = ${project.id}`,
       };
     }
@@ -126,15 +123,40 @@ export class ScenarioPlanningUnitsLinkerService {
       this.isProjectUsingGadmPlanningArea(project) &&
       this.isProjectUsingRegularPlanningUnitGrid(project)
     ) {
-      const adminAreaId =
-        project.adminAreaLevel2Id ??
-        project.adminAreaLevel1Id ??
-        project.countryId;
-      const adminAreaLevel = AdminAreasService.levelFromId(adminAreaId);
       return {
-        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where gid_${adminAreaLevel} = '${adminAreaId}')`,
+        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions ${this.getQueryPartForAdminAreaSelectionByLevel(
+          project,
+        )})`,
         planningUnitSelectionQueryPart: `type = '${project.planningUnitGridShape}' and size = ${project.planningUnitAreakm2}`,
       };
+    }
+  }
+
+  /**
+   * @debt It could be used in ProtectedAreasService.setFilters()
+   */
+  private getQueryPartForAdminAreaSelectionByLevel(
+    adminAreaIds: Pick<
+      Project,
+      'countryId' | 'adminAreaLevel1Id' | 'adminAreaLevel2Id'
+    >,
+  ): string | undefined {
+    const adminAreaId =
+      adminAreaIds.adminAreaLevel2Id ??
+      adminAreaIds.adminAreaLevel1Id ??
+      adminAreaIds.countryId;
+    const adminAreaLevel = AdminAreasService.levelFromId(adminAreaId);
+
+    if (adminAreaLevel === 0) {
+      return `where gid_0 = '${adminAreaId}' and gid_1 is null and gid_2 is null`;
+    }
+
+    if (adminAreaLevel === 1) {
+      return `where gid_1 = '${adminAreaId}' and gid_2 is null`;
+    }
+
+    if (adminAreaLevel === 2) {
+      return `where gid_2 = '${adminAreaId}'`;
     }
   }
 
