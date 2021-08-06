@@ -50,7 +50,6 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     isFetching: scenarioIsFetching,
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
-
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
 
@@ -96,6 +95,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         ...values,
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas', 'protected-areas-percentage'),
       },
     }, {
       onSuccess: () => {
@@ -123,7 +123,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         });
       },
     });
-  }, [mutation, scenarioData?.id, addToast, onSuccess]);
+  }, [mutation, scenarioData?.id, addToast, onSuccess, scenarioEditingMetadata]);
 
   const onSkip = useCallback(() => {
     setSubmitting(true);

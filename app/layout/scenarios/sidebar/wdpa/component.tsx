@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { useProject } from 'hooks/projects';
-import { useScenario } from 'hooks/scenarios';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { getScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -39,12 +40,31 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   const dispatch = useDispatch();
 
   const { data: projectData } = useProject(pid);
+
   const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata } = metadata || {};
+
   const { data: wdpaData } = useWDPACategories(
     projectData?.adminAreaLevel2Id
     || projectData?.adminAreaLevel1Id
     || projectData?.countryId,
   );
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const saveScenarioPAStatusOnBack = useCallback(async () => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas', 'protected-areas-preview'),
+      },
+    });
+  }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
 
   useEffect(() => {
     return () => {
@@ -122,6 +142,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                 onBack={() => {
                   setStep(0);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));
+                  saveScenarioPAStatusOnBack();
                 }}
                 readOnly={readOnly}
               />
