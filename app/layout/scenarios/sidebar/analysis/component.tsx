@@ -9,6 +9,7 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { getScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -57,15 +58,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          scenarioEditingMetadata: {
-            ...scenarioData.metadata.scenarioEditingMetadata,
-            tabStatus: {
-              tab: 'analysis',
-              subtab: `${subtab}`,
-            },
-          },
-        },
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', 'analysis', `${subtab}`),
       },
     }, {
       onSuccess: () => {
@@ -74,7 +67,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
         console.info(err);
       },
     });
-  }, [saveScenarioMutation, sid, scenarioData]);
+  }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
