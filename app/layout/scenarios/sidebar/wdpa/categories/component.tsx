@@ -12,6 +12,8 @@ import { useWDPACategories } from 'hooks/wdpa';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { getScenarioStatusMetaData } from 'utils/utils-scenarios';
+
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
@@ -48,6 +50,9 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     isFetching: scenarioIsFetching,
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
+
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata } = metadata || {};
 
   const {
     data: wdpaData,
@@ -127,18 +132,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         wdpaIucnCategories: null,
-        metadata: {
-          scenarioEditingMetadata: {
-            'protected-areas': 'draft',
-            features: 'draft',
-            analysis: 'empty',
-            solutions: 'empty',
-            status: {
-              tab: 'features',
-              subtab: 'features-fpf',
-            },
-          },
-        },
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features', 'features-preview'),
       },
     }, {
       onSuccess: () => {
@@ -167,7 +161,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         });
       },
     });
-  }, [mutation, addToast, onDismiss, scenarioData?.id]);
+  }, [mutation, addToast, onDismiss, scenarioData?.id, scenarioEditingMetadata]);
 
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
