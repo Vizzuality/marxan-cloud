@@ -10,7 +10,7 @@ beforeEach(async () => {
 test(`calculate features`, async () => {
   await fixtures.GivenCreatedSpecificationWithWithFeaturesWasCreated();
   await fixtures.WhenAllFeaturesAreCalculated();
-  await fixtures.ThenSpecificationIsSaved();
+  await fixtures.ThenSpecificationsWithRelatedConfigAreSaved();
   await fixtures.ThenSpecificationIsReady();
 });
 

@@ -7,10 +7,11 @@ import { SubmitSpecificationHandler } from '../submit-specification.handler';
 
 import { SubmitSpecification } from '../submit-specification.command';
 import {
-  SpecificationOperation,
   SpecificationCandidateCreated,
-  Specification,
+  SpecificationOperation,
 } from '../../domain';
+
+import { InMemorySpecificationRepo } from './in-memory-specification.repo';
 
 export const getFixtures = async () => {
   const scenarioId = v4();
@@ -64,19 +65,3 @@ export const getFixtures = async () => {
     },
   };
 };
-
-class InMemorySpecificationRepo implements SpecificationRepository {
-  #memory: Record<string, Specification> = {};
-
-  async getById(id: string): Promise<Specification | undefined> {
-    return this.#memory[id];
-  }
-
-  async save(specification: Specification): Promise<void> {
-    this.#memory[specification.id] = specification;
-  }
-
-  count(): number {
-    return Object.keys(this.#memory).length;
-  }
-}
