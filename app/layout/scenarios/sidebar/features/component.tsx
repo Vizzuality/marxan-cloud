@@ -71,18 +71,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          scenarioEditingMetadata: {
-            'protected-areas': 'draft',
-            features: 'draft',
-            analysis: 'draft',
-            solutions: 'empty',
-            tabStatus: {
-              tab: 'analysis',
-              subtab: 'analysis-preview',
-            },
-          },
-        },
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', 'analysis', 'analysis-preview'),
       },
     }, {
       onSuccess: () => {
@@ -90,30 +79,19 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
       },
       onError: () => { },
     });
-  }, [saveScenarioMutation, sid, pid, push]);
+  }, [saveScenarioMutation, sid, pid, push, scenarioEditingMetadata]);
 
   const saveScenarioStatusOnContinue = useCallback(async () => {
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          scenarioEditingMetadata: {
-            'protected-areas': 'draft',
-            features: 'draft',
-            analysis: 'empty',
-            solutions: 'empty',
-            tabStatus: {
-              tab: 'features',
-              subtab: 'features-fpf',
-            },
-          },
-        },
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features', 'features-fpf'),
       },
     }, {
       onSuccess: () => { },
       onError: () => { },
     });
-  }, [saveScenarioMutation, sid]);
+  }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
 
   const saveScenarioStatusOnBack = useCallback(async () => {
     saveScenarioMutation.mutate({

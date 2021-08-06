@@ -60,8 +60,10 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
         metadata: {
           scenarioEditingMetadata: {
             ...scenarioData.metadata.scenarioEditingMetadata,
-            tab: 'analysis',
-            subtab: `${subtab}`,
+            tabStatus: {
+              tab: 'analysis',
+              subtab: `${subtab}`,
+            },
           },
         },
       },
