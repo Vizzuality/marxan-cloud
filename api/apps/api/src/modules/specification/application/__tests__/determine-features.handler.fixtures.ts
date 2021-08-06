@@ -1,6 +1,7 @@
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { v4 } from 'uuid';
 import { Test } from '@nestjs/testing';
+import { Either } from 'fp-ts/Either';
 
 import {
   SpecificationPublished,
@@ -9,10 +10,9 @@ import {
 } from '../../domain';
 
 import { DetermineFeaturesForSpecification } from '../determine-features-for-specification.command';
-import { DetermineFeaturesForScenarioHandler } from '../determine-features-for-scenario.handler';
+import { DetermineFeaturesForSpecificationHandler } from '../determine-features-for-specification.handler';
 import { SpecificationRepository } from '../specification.repository';
-
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { SpecificationNotFound } from '../specification-action-errors';
 
 export const getFixtures = async () => {
   const events: IEvent[] = [];
@@ -24,21 +24,19 @@ export const getFixtures = async () => {
   const calculatedFeatureId = v4();
   const operation = SpecificationOperation.Split;
 
-  const logger = new FakeLogger();
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],
     providers: [
-      DetermineFeaturesForScenarioHandler,
+      DetermineFeaturesForSpecificationHandler,
       {
         provide: SpecificationRepository,
         useClass: InMemorySpecificationRepo,
       },
     ],
   }).compile();
-  sandbox.useLogger(logger);
   await sandbox.init();
 
-  const sut = sandbox.get(DetermineFeaturesForScenarioHandler);
+  const sut = sandbox.get(DetermineFeaturesForSpecificationHandler);
   const systemEvents = sandbox.get(EventBus);
   const repo: InMemorySpecificationRepo = sandbox.get(SpecificationRepository);
 
@@ -66,7 +64,7 @@ export const getFixtures = async () => {
       ).toEqual(false);
     },
     async WhenAllFeaturesAreDetermined() {
-      await sut.execute(
+      return await sut.execute(
         new DetermineFeaturesForSpecification(specificationId, {
           features: [
             {
@@ -97,11 +95,8 @@ export const getFixtures = async () => {
     ThenNoEventIsPublished() {
       expect(events).toEqual([]);
     },
-    ThenErrorIsRaised() {
-      console.log(logger.warn.mock.calls);
-      expect(logger.warn.mock.calls[0][0]).toEqual(
-        `Couldn't find specification: ${specificationId}`,
-      );
+    ThenErrorIsRaised(result: Either<typeof SpecificationNotFound, void>) {
+      expect(result._tag).toEqual('Left');
     },
   };
 };
