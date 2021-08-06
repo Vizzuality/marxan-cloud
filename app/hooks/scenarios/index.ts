@@ -4,10 +4,11 @@ import {
   useQuery, useInfiniteQuery, useMutation, useQueryClient,
 } from 'react-query';
 
+import flatten from 'lodash/flatten';
+
 import { useRouter } from 'next/router';
 
 import { formatDistanceToNow } from 'date-fns';
-import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/client';
 
 import { ItemProps } from 'components/scenarios/item/component';
