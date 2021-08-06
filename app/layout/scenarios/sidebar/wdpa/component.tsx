@@ -45,6 +45,9 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
 
+  const { tabStatus } = scenarioEditingMetadata || {};
+  const { subtab: refSubtab } = tabStatus || {};
+
   const { data: wdpaData } = useWDPACategories(
     projectData?.adminAreaLevel2Id
     || projectData?.adminAreaLevel1Id
@@ -68,9 +71,10 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
 
   useEffect(() => {
     return () => {
-      setStep(0);
+      const reloadStep = refSubtab === 'protected-areas-preview' ? 0 : 1;
+      setStep(reloadStep);
     };
-  }, [tab]);
+  }, [tab, refSubtab]);
 
   if (!scenarioData || tab !== 'protected-areas') return null;
 

@@ -93,7 +93,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     });
   }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
 
-  const saveScenarioStatusOnBack = useCallback(async () => {
+  const saveScenarioFeaturesStatusOnBack = useCallback(async () => {
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
@@ -289,7 +289,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                 onBack={() => {
                   setStep(step - 1);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
-                  saveScenarioStatusOnBack();
+                  saveScenarioFeaturesStatusOnBack();
                 }}
                 readOnly={readOnly}
                 onSuccess={saveScenarioStatus}
