@@ -1,5 +1,5 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { getFixtures } from './calculate-features-for-specification.handler.fixtures';
+import { getFixtures } from './calculate-features.handler.fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -8,14 +8,13 @@ beforeEach(async () => {
 });
 
 test(`calculate features`, async () => {
-  await fixtures.GivenCreatedSpecificationWithWithFeaturesWasCreated();
+  await fixtures.GivenCreatedSpecificationsWithWithFeaturesWereCreated();
   await fixtures.WhenAllFeaturesAreCalculated();
   await fixtures.ThenSpecificationsWithRelatedConfigAreSaved();
   await fixtures.ThenSpecificationIsReady();
 });
 
-test(`calculate features on unknown specification`, async () => {
-  const result = await fixtures.WhenAllFeaturesAreCalculated();
-  fixtures.ThenErrorIsRaised(result);
+test(`calculate features for non related specifications`, async () => {
+  await fixtures.WhenAllFeaturesAreCalculated();
   fixtures.ThenNoEventIsPublished();
 });
