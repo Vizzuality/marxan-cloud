@@ -113,7 +113,7 @@ export class ScenarioPlanningUnitsLinkerService {
     ) {
       return {
         planningUnitSelectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
-        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions ${this.getQueryPartForAdminAreaSelectionByLevel(
+        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where ${this.getQueryPartForAdminAreaSelectionByLevel(
           project,
         )})`,
       };
@@ -125,7 +125,7 @@ export class ScenarioPlanningUnitsLinkerService {
     ) {
       return {
         planningUnitSelectionQueryPart: `type = '${project.planningUnitGridShape}' and size = ${project.planningUnitAreakm2}`,
-        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions ${this.getQueryPartForAdminAreaSelectionByLevel(
+        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where ${this.getQueryPartForAdminAreaSelectionByLevel(
           project,
         )})`,
       };
@@ -148,15 +148,15 @@ export class ScenarioPlanningUnitsLinkerService {
     const adminAreaLevel = AdminAreasService.levelFromId(adminAreaId);
 
     if (adminAreaLevel === 0) {
-      return `where gid_0 = '${adminAreaId}' and gid_1 is null and gid_2 is null`;
+      return `gid_0 = '${adminAreaId}' and gid_1 is null and gid_2 is null`;
     }
 
     if (adminAreaLevel === 1) {
-      return `where gid_1 = '${adminAreaId}' and gid_2 is null`;
+      return `gid_1 = '${adminAreaId}' and gid_2 is null`;
     }
 
     if (adminAreaLevel === 2) {
-      return `where gid_2 = '${adminAreaId}'`;
+      return `gid_2 = '${adminAreaId}'`;
     }
   }
 
