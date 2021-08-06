@@ -10,6 +10,8 @@ import { useToasts } from 'hooks/toast';
 import cx from 'classnames';
 import { motion } from 'framer-motion';
 
+import HelpBeacon from 'layout/help/beacon';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
@@ -153,7 +155,11 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                 In conservation planning, cost data reflects how much a
                 planning unit costs to include into a
                 conservation network. Typically, it reflects the
-                actual price of a parcel of land. However, cost
+                actual price of a parcel of land.
+              </p>
+              {' '}
+              <p>
+                However, cost
                 information is usually scarce and often the cost
                 surface is used to reflect any variety of
                 socioeconomic factors,
@@ -163,10 +169,10 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
               </p>
               <p>
                 For example, here you can see 2 examples of
-                cost surfaces terrestrial and marine environments:
+                cost surfaces in terrestrial and marine environments:
               </p>
-              <img src={COST_SEA_IMG} alt="Feature-Range" />
-              <img src={COST_LAND_IMG} alt="Feature-Range" />
+              <img src={COST_SEA_IMG} alt="Cost-Sea" />
+              <img src={COST_LAND_IMG} alt="Cost-Land" />
               <p>
                 The default value for cost will be the planning
                 unit area but you can upload a cost
@@ -176,7 +182,6 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                 This will be the cost that Marxan will use for
                 each planning unit.
               </p>
-              <img src={COST_LAND_IMG} alt="Feature-Range" />
 
             </div>
 
@@ -185,48 +190,102 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
       </header>
 
       <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden text-sm">
-        <div className="pt-2">
-          <h4 className="mb-2">1. Download the current cost surface</h4>
-          <Button
-            theme="primary-alt"
-            size="base"
-            className="w-full"
-            onClick={onDownload}
-          >
-            Template
-          </Button>
-        </div>
-        {!readOnly && (
-          <div className="pt-5">
-            <h4 className="mb-2">2. Upload your cost surface</h4>
-            <div
-              {...getRootProps()}
-              className={cx({
-                'dropzone px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
-                'bg-gray-500': isDragActive,
-                'border-green-800': isDragAccept,
-                'border-red-800': isDragReject,
-              })}
-            >
-              <input {...getInputProps()} />
 
-              <p className="text-sm text-gray-300">
-                Drag and drop your
-                {' '}
-                <b>polygon data file</b>
-                {' '}
-                or click here to upload
+        <HelpBeacon
+          id="cost-download"
+          title="Cost Surface"
+          subtitle="Download file"
+          content={(
+            <div className="space-y-2">
+              <p>
+                You can download here the
+                current cost surface
+                being used in this analysis.
+              </p>
+              <p>
+                You will get a shapefile with
+                your planning grid and a Cost
+                value for each grid cell.
               </p>
 
-              <Loading
-                visible={loading}
-                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-                iconClassName="w-5 h-5 text-primary-500"
-              />
-
-              <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 1 MB'}</p>
             </div>
+                )}
+          modifiers={['flip']}
+          tooltipPlacement="right"
+        >
+          <div className="pt-2">
+
+            <h4 className="mb-2">1. Download the current cost surface</h4>
+            <Button
+              theme="primary-alt"
+              size="base"
+              className="w-full"
+              onClick={onDownload}
+            >
+              Template
+            </Button>
+
           </div>
+        </HelpBeacon>
+        {!readOnly && (
+          <HelpBeacon
+            id="cost-upload"
+            title="Cost Surface"
+            subtitle="Upload file"
+            content={(
+              <div className="space-y-2">
+                <p>
+                  You can upload here the
+                  cost surface
+                  you want to be
+                  used in this analysis.
+                </p>
+                <p>
+                  Currently, the platform only supports
+                  the uploads of polygon data as shapefiles.
+                </p>
+                <p>
+                  The file you upload will be intersected
+                  with the planning unit grid and
+                  an individual value will be attached
+                  to each planning unit.
+                </p>
+              </div>
+            )}
+            modifiers={['flip']}
+            tooltipPlacement="right"
+          >
+            <div className="pt-5">
+              <h4 className="mb-2">2. Upload your cost surface</h4>
+              <div
+                {...getRootProps()}
+                className={cx({
+                  'dropzone px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
+                  'bg-gray-500': isDragActive,
+                  'border-green-800': isDragAccept,
+                  'border-red-800': isDragReject,
+                })}
+              >
+                <input {...getInputProps()} />
+
+                <p className="text-sm text-gray-300">
+                  Drag and drop your
+                  {' '}
+                  <b>polygon data file</b>
+                  {' '}
+                  or click here to upload
+                </p>
+
+                <Loading
+                  visible={loading}
+                  className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                  iconClassName="w-5 h-5 text-primary-500"
+                />
+
+                <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 1 MB'}</p>
+              </div>
+            </div>
+          </HelpBeacon>
         )}
       </div>
     </motion.div>

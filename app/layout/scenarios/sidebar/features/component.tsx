@@ -70,7 +70,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
       <HelpBeacon
         id="scenarios-features"
         title="Features"
-        subtitle="Add features to the conservation plan"
+        subtitle="Manage features"
         content={(
           <div className="space-y-2">
             <p>
@@ -205,14 +205,40 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
               </div>
 
               {step === 0 && !readOnly && (
-                <Button
-                  theme="primary"
-                  size="base"
-                  onClick={() => setModal(true)}
+
+                <HelpBeacon
+                  id="scenarios-add-features"
+                  title="Features"
+                  subtitle="Add features"
+                  content={(
+                    <div className="space-y-2">
+                      <p>
+                        Make use of publicly available features
+                        or upload you own shapefiles.
+                      </p>
+                      <p>
+                        You will be able to visualize all
+                        your features
+                        in the map view
+                      </p>
+
+                    </div>
+                  )}
+                  modifiers={['flip']}
+                  tooltipPlacement="left"
                 >
-                  <span className="mr-3">Add features</span>
-                  <Icon icon={PLUS_SVG} className="w-4 h-4" />
-                </Button>
+                  <div className="mr-3">
+                    <Button
+                      theme="primary"
+                      size="base"
+                      onClick={() => setModal(true)}
+                    >
+                      <span className="mr-3">Add features</span>
+                      <Icon icon={PLUS_SVG} className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </HelpBeacon>
+
               )}
             </header>
 

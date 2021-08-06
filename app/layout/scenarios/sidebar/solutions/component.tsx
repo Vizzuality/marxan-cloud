@@ -58,8 +58,13 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
               {' '}
               <b>Details</b>
               {' '}
-              you will find each of the
-              individual solutions as a table. You can select
+              you will find the information
+              for each of the
+              individual solutions as a table.
+              You can see all solutions or you can
+              filter to see only
+              the 5 most different ones.
+              You can select
               here which solution to view on the map and
               download the results.
             </p>
@@ -70,15 +75,7 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
               {' '}
               you can see
               how much your conservation network would improve
-              the current conservation of your features.
-            </p>
-            <p>
-              Under
-              {' '}
-              <b>Solutions</b>
-              {' '}
-              you can see each individual
-              solution and it&apos;s details
+              the current conservation status of your features.
             </p>
 
           </div>

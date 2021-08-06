@@ -10,6 +10,7 @@ import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { motion } from 'framer-motion';
 
+import HelpBeacon from 'layout/help/beacon';
 import SolutionFrequency from 'layout/solutions/frequency';
 import SolutionSelected from 'layout/solutions/selected';
 
@@ -100,34 +101,86 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
       <div className="flex flex-col flex-grow w-full min-h-0 overflow-hidden">
         <div className="px-0.5 overflow-x-visible overflow-y-auto">
           <div className="relative flex flex-col w-full mt-1 text-sm">
-            <p className="py-4 opacity-50">Description Lorem ipsum dolor sit amet, solutions consectetuer adipiscing elit.</p>
-            <Button
-              theme="primary"
-              size="base"
-              className="flex h-12 mb-4"
-              onClick={() => setShowTable(true)}
-            >
-              View solutions table
-              <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
-            </Button>
-            {!readOnly && (
-            <Button
-              theme="secondary"
-              size="base"
-              className="h-12"
-              onClick={() => onScheduleScenario()}
+            <p className="py-4 opacity-50">
+              {' '}
+              Explore your results by looking at
+              different solutions in the table and on the map.
+            </p>
+            <HelpBeacon
+              id="solutions-table"
+              title="Solutions Table"
+              subtitle="View the results"
+              content={(
+                <div className="space-y-2">
+                  <p>
+                    Here you will find the most
+                    relevant information
+                    for each of the
+                    individual solutions.
+                  </p>
+
+                </div>
+                )}
+              modifiers={['flip']}
+              tooltipPlacement="left"
             >
               <div className="flex flex-col justify-center">
-                Schedule scenario
-                {numberOfSchedules > 0 && (
-                  <span className="text-blue-400 text-xxs">
-                    {`${numberOfSchedules} schedule${numberOfSchedules > 1 ? 's' : ''}`}
-                  </span>
-                )}
+                <Button
+                  theme="primary"
+                  size="base"
+                  className="flex h-12 mb-4"
+                  onClick={() => setShowTable(true)}
+                >
+                  View solutions table
+                  <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
+                </Button>
               </div>
-              <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
-            </Button>
+            </HelpBeacon>
+            {!readOnly && (
+              <HelpBeacon
+                id="solutions-schedule"
+                title="Schedule scenario"
+                subtitle="Plan a partial implementation"
+                content={(
+                  <div className="space-y-2">
+                    <p>
+                      Here you will be able to explore options
+                      to make a partial
+                      implementation of your conservation network.
+                    </p>
+                    <p>
+                      You will be able to re-run this scenario but
+                      selecting and locking-in
+                      only some of the planning units included
+                      in the results.
+                    </p>
+
+                  </div>
+                )}
+                modifiers={['flip']}
+                tooltipPlacement="left"
+              >
+                <div className="flex flex-col justify-center">
+                  <Button
+                    theme="secondary"
+                    size="base"
+                    className="h-12"
+                    onClick={() => onScheduleScenario()}
+                  >
+                    <div className="flex flex-col justify-center">
+                      Schedule scenario
+                      {numberOfSchedules > 0 && (
+                      <span className="text-blue-400 text-xxs">
+                        {`${numberOfSchedules} schedule${numberOfSchedules > 1 ? 's' : ''}`}
+                      </span>
+                      )}
+                    </div>
+                    <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
+                  </Button>
+                </div>
+              </HelpBeacon>
             )}
+
             <Modal
               open={showTable}
               title="Solutions table"
@@ -144,6 +197,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           </div>
 
           <div className="w-full p-6 mt-12 border-t border-gray-600">
+
             <SolutionFrequency
               values={frequencyValues}
               onToggleFrequencyOnMap={onToggleFrequencyOnMap}

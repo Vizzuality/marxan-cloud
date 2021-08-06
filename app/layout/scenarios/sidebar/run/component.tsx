@@ -138,13 +138,23 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
                     parameters.
                   </p>
                   <p>
-                    All settings are set to the default values recommended
-                    by the manual, but you can choose other allowed values.
+                    Everything is pre-set to the default values recommended
+                    by the Marxan manual, but you can choose other allowed values.
                   </p>
                   <p>
                     Some of these parameters have more implications that others.
-                    Particularly important is to decide teh Number of Runs,
-                    The Clumping and the Conservation Feature missing proportion.
+                    Particularly important is to decide the
+                    {' '}
+                    <b>Number of Runs</b>
+                    ,
+                    the
+                    {' '}
+                    <b>Clumping</b>
+                    {' '}
+                    and the
+                    {' '}
+                    <b>Conservation Feature missing proportion</b>
+                    .
                   </p>
                 </div>
               )}
@@ -204,8 +214,8 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
             <div className="w-full h-full">
               <HelpBeacon
                 id="run-chart"
-                title="RUN CHART"
-                subtitle="Marxan chart"
+                title="BLM calibration"
+                subtitle="Find the optimum BLM"
                 content={(
                   <div className="space-y-2">
                     <p>
