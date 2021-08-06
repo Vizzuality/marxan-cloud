@@ -1,33 +1,39 @@
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { v4 } from 'uuid';
 import { Test } from '@nestjs/testing';
-import { Either } from 'fp-ts/Either';
 
 import {
-  SpecificationPublished,
-  SpecificationOperation,
+  FeatureConfigDefault,
   Specification,
+  SpecificationOperation,
+  SpecificationPublished,
 } from '../../domain';
 
-import { DetermineFeaturesForSpecification } from '../determine-features-for-specification.command';
-import { DetermineFeaturesForSpecificationHandler } from '../determine-features-for-specification.handler';
+import { DetermineFeatures } from '../determine-features.command';
+import { DetermineFeaturesHandler } from '../determine-features.handler';
 import { SpecificationRepository } from '../specification.repository';
-import { SpecificationNotFound } from '../specification-action-errors';
+
+import { InMemorySpecificationRepo } from './in-memory-specification.repo';
 
 export const getFixtures = async () => {
   const events: IEvent[] = [];
-  const specificationId = v4();
+  const specificationRelatedToGivenConfig = v4();
+  const anotherSpecificationRelatedToGivenConfig = v4();
+  const specificationWithoutRelationToGivenConfig = v4();
   const scenarioId = v4();
 
-  const baseFeatureId = v4();
   const nonCalculatedFeatureId = v4();
   const calculatedFeatureId = v4();
-  const operation = SpecificationOperation.Split;
+
+  const relatedConfig: FeatureConfigDefault = {
+    operation: SpecificationOperation.Split,
+    baseFeatureId: v4(),
+  };
 
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],
     providers: [
-      DetermineFeaturesForSpecificationHandler,
+      DetermineFeaturesHandler,
       {
         provide: SpecificationRepository,
         useClass: InMemorySpecificationRepo,
@@ -36,36 +42,61 @@ export const getFixtures = async () => {
   }).compile();
   await sandbox.init();
 
-  const sut = sandbox.get(DetermineFeaturesForSpecificationHandler);
+  const sut = sandbox.get(DetermineFeaturesHandler);
   const systemEvents = sandbox.get(EventBus);
   const repo: InMemorySpecificationRepo = sandbox.get(SpecificationRepository);
 
   systemEvents.subscribe((event) => events.push(event));
 
   return {
-    async GivenCreatedSpecificationWithUndeterminedFeaturesWasCreated() {
+    async GivenCreatedSpecificationsWithUndeterminedFeaturesWereCreated() {
       await repo.save(
         Specification.from({
-          id: specificationId,
+          id: specificationRelatedToGivenConfig,
           scenarioId,
           draft: false,
           config: [
             {
-              baseFeatureId,
-              operation,
+              ...relatedConfig,
               featuresDetermined: false,
               resultFeatures: [],
             },
           ],
         }),
       );
-      expect(
-        (await repo.getById(specificationId))?.toSnapshot().featuresDetermined,
-      ).toEqual(false);
+      await repo.save(
+        Specification.from({
+          id: anotherSpecificationRelatedToGivenConfig,
+          scenarioId,
+          draft: false,
+          config: [
+            {
+              ...relatedConfig,
+              featuresDetermined: false,
+              resultFeatures: [],
+            },
+          ],
+        }),
+      );
+      await repo.save(
+        Specification.from({
+          id: specificationWithoutRelationToGivenConfig,
+          scenarioId,
+          draft: false,
+          config: [
+            {
+              ...relatedConfig,
+              operation: SpecificationOperation.Copy,
+              featuresDetermined: false,
+              resultFeatures: [],
+            },
+          ],
+        }),
+      );
     },
-    async WhenAllFeaturesAreDetermined() {
+    async WhenFeaturesAreDetermined() {
       return await sut.execute(
-        new DetermineFeaturesForSpecification(specificationId, {
+        new DetermineFeatures({
           features: [
             {
               id: calculatedFeatureId,
@@ -76,43 +107,39 @@ export const getFixtures = async () => {
               calculated: false,
             },
           ],
-          baseFeatureId,
-          operation,
+          ...relatedConfig,
         }),
       );
     },
-    async ThenSpecificationIsSaved() {
-      expect(repo.count()).toEqual(1);
+    async ThenSpecificationsWithRelatedConfigAreSaved() {
+      expect(repo.count()).toEqual(3);
       expect(
-        (await repo.getById(specificationId))?.toSnapshot().featuresDetermined,
+        (await repo.getById(specificationRelatedToGivenConfig))?.toSnapshot()
+          .featuresDetermined,
       ).toEqual(true);
+      expect(
+        (
+          await repo.getById(anotherSpecificationRelatedToGivenConfig)
+        )?.toSnapshot().featuresDetermined,
+      ).toEqual(true);
+      expect(
+        (
+          await repo.getById(specificationWithoutRelationToGivenConfig)
+        )?.toSnapshot().featuresDetermined,
+      ).toEqual(false);
     },
     ThenSpecificationIsPublished() {
       expect(events).toEqual([
-        new SpecificationPublished(specificationId, [nonCalculatedFeatureId]),
+        new SpecificationPublished(specificationRelatedToGivenConfig, [
+          nonCalculatedFeatureId,
+        ]),
+        new SpecificationPublished(anotherSpecificationRelatedToGivenConfig, [
+          nonCalculatedFeatureId,
+        ]),
       ]);
     },
     ThenNoEventIsPublished() {
       expect(events).toEqual([]);
     },
-    ThenErrorIsRaised(result: Either<typeof SpecificationNotFound, void>) {
-      expect(result._tag).toEqual('Left');
-    },
   };
 };
-
-class InMemorySpecificationRepo implements SpecificationRepository {
-  #memory: Record<string, Specification> = {};
-
-  async getById(id: string): Promise<Specification | undefined> {
-    return this.#memory[id];
-  }
-
-  async save(specification: Specification): Promise<void> {
-    this.#memory[specification.id] = specification;
-  }
-
-  count(): number {
-    return Object.keys(this.#memory).length;
-  }
-}

@@ -8,14 +8,13 @@ beforeEach(async () => {
 });
 
 test(`determine features`, async () => {
-  await fixtures.GivenCreatedSpecificationWithUndeterminedFeaturesWasCreated();
-  await fixtures.WhenAllFeaturesAreDetermined();
-  await fixtures.ThenSpecificationIsSaved();
+  await fixtures.GivenCreatedSpecificationsWithUndeterminedFeaturesWereCreated();
+  await fixtures.WhenFeaturesAreDetermined();
+  await fixtures.ThenSpecificationsWithRelatedConfigAreSaved();
   await fixtures.ThenSpecificationIsPublished();
 });
 
 test(`determine features on unknown specification`, async () => {
-  const result = await fixtures.WhenAllFeaturesAreDetermined();
-  fixtures.ThenErrorIsRaised(result);
+  await fixtures.WhenFeaturesAreDetermined();
   fixtures.ThenNoEventIsPublished();
 });

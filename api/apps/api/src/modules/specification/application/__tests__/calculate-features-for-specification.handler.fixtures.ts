@@ -15,6 +15,8 @@ import { SpecificationNotFound } from '../specification-action-errors';
 import { CalculateFeaturesForSpecification } from '../calculate-features-for-specification.command';
 import { CalculateFeaturesForSpecificationHandler } from '../calculate-features-for-specification.handler';
 
+import { InMemorySpecificationRepo } from './in-memory-specification.repo';
+
 export const getFixtures = async () => {
   const events: IEvent[] = [];
   const specificationId = v4();
@@ -79,7 +81,7 @@ export const getFixtures = async () => {
           nonCalculatedFeatureId,
         ]),
       ),
-    async ThenSpecificationIsSaved() {
+    async ThenSpecificationsWithRelatedConfigAreSaved() {
       expect(repo.count()).toEqual(1);
       expect(
         (await repo.getById(specificationId))?.toSnapshot().readyToActivate,
@@ -98,19 +100,3 @@ export const getFixtures = async () => {
     },
   };
 };
-
-class InMemorySpecificationRepo implements SpecificationRepository {
-  #memory: Record<string, Specification> = {};
-
-  async getById(id: string): Promise<Specification | undefined> {
-    return this.#memory[id];
-  }
-
-  async save(specification: Specification): Promise<void> {
-    this.#memory[specification.id] = specification;
-  }
-
-  count(): number {
-    return Object.keys(this.#memory).length;
-  }
-}
