@@ -40,6 +40,11 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata } = metadata || {};
+
+  const { subtab: refSubtab } = scenarioEditingMetadata || {};
+  console.log(refSubtab);
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -148,27 +153,25 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
               )}
 
               {section === 'gap-analysis' && (
-              <GapAnalysis
-                key="gap-analysis"
-                onChangeSection={onChangeSection}
-
-              />
-
+                <GapAnalysis
+                  key="gap-analysis"
+                  onChangeSection={onChangeSection}
+                />
               )}
 
               {section === 'cost-surface' && (
-              <CostSurface
-                key="cost-surface"
-                readOnly={readOnly}
-                onChangeSection={onChangeSection}
-              />
+                <CostSurface
+                  key="cost-surface"
+                  readOnly={readOnly}
+                  onChangeSection={onChangeSection}
+                />
               )}
 
               {section === 'adjust-planning-units' && (
-              <AdjustPanningUnits
-                key="adjust-planning-units"
-                onChangeSection={onChangeSection}
-              />
+                <AdjustPanningUnits
+                  key="adjust-planning-units"
+                  onChangeSection={onChangeSection}
+                />
               )}
             </Pill>
 

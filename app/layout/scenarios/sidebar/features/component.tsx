@@ -82,8 +82,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
       onSuccess: () => {
         push(`/projects/${pid}`);
       },
-      onError: () => {
-      },
+      onError: () => { },
     });
   }, [saveScenarioMutation, sid, pid, push]);
 
