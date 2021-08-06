@@ -1,14 +1,10 @@
 import { Command } from '@nestjs-architects/typed-cqrs';
-import { FeatureConfigInput, FeatureState } from '../feature-config';
-
-export type DeterminedFeatures = FeatureConfigInput & {
-  features: FeatureState[];
-};
+import { DetermineFeaturesInput } from '../domain';
 
 export class DetermineFeaturesForSpecification extends Command<void> {
   constructor(
     public readonly specificationId: string,
-    public readonly featuresConfig: DeterminedFeatures,
+    public readonly featuresConfig: DetermineFeaturesInput,
   ) {
     super();
   }

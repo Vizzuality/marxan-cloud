@@ -1,5 +1,5 @@
 import { PromiseType } from 'utility-types';
-import { getFixtures } from './fixtures';
+import { getFixtures } from './submit-specification.handler.fixtures';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 

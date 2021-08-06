@@ -2,12 +2,14 @@ import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { v4 } from 'uuid';
 import { Test } from '@nestjs/testing';
 
-import { DetermineFeaturesForSpecification } from '../../../commands/determine-features-for-scenario-specification.command';
-import { SpecificationPublished } from '../../../events/specification-published.event';
-import { SpecificationOperation } from '../../../feature-config';
-import { Specification } from '../../../specification';
+import {
+  SpecificationGotReady,
+  SpecificationOperation,
+  Specification,
+} from '../../domain';
 
-import { DetermineFeaturesForScenarioHandler } from '../determine-features-for-scenario.handler';
+import { CalculateFeaturesForSpecification } from '../calculate-features-for-specification.command';
+import { CalculateFeaturesForSpecificationHandler } from '../calculate-features-for-specification.handler';
 import { SpecificationRepository } from '../specification.repository';
 
 import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
@@ -26,7 +28,7 @@ export const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],
     providers: [
-      DetermineFeaturesForScenarioHandler,
+      CalculateFeaturesForSpecificationHandler,
       {
         provide: SpecificationRepository,
         useClass: InMemorySpecificationRepo,
@@ -36,14 +38,14 @@ export const getFixtures = async () => {
   sandbox.useLogger(logger);
   await sandbox.init();
 
-  const sut = sandbox.get(DetermineFeaturesForScenarioHandler);
+  const sut = sandbox.get(CalculateFeaturesForSpecificationHandler);
   const systemEvents = sandbox.get(EventBus);
   const repo: InMemorySpecificationRepo = sandbox.get(SpecificationRepository);
 
   systemEvents.subscribe((event) => events.push(event));
 
   return {
-    async GivenCreatedSpecificationWithUndeterminedFeaturesWasCreated() {
+    async GivenCreatedSpecificationWithWithFeaturesWasCreated() {
       await repo.save(
         Specification.from({
           id: specificationId,
@@ -53,43 +55,41 @@ export const getFixtures = async () => {
             {
               baseFeatureId,
               operation,
-              featuresDetermined: false,
-              resultFeatures: [],
+              featuresDetermined: true,
+              resultFeatures: [
+                {
+                  id: nonCalculatedFeatureId,
+                  calculated: false,
+                },
+                {
+                  id: calculatedFeatureId,
+                  calculated: true,
+                },
+              ],
             },
           ],
         }),
       );
       expect(
-        (await repo.getById(specificationId))?.toSnapshot().featuresDetermined,
+        (await repo.getById(specificationId))?.toSnapshot().readyToActivate,
       ).toEqual(false);
     },
-    async WhenAllFeaturesAreDetermined() {
+    async WhenAllFeaturesAreCalculated() {
       await sut.execute(
-        new DetermineFeaturesForSpecification(specificationId, {
-          features: [
-            {
-              id: calculatedFeatureId,
-              calculated: true,
-            },
-            {
-              id: nonCalculatedFeatureId,
-              calculated: false,
-            },
-          ],
-          baseFeatureId,
-          operation,
-        }),
+        new CalculateFeaturesForSpecification(specificationId, [
+          nonCalculatedFeatureId,
+        ]),
       );
     },
     async ThenSpecificationIsSaved() {
       expect(repo.count()).toEqual(1);
       expect(
-        (await repo.getById(specificationId))?.toSnapshot().featuresDetermined,
+        (await repo.getById(specificationId))?.toSnapshot().readyToActivate,
       ).toEqual(true);
     },
-    ThenSpecificationIsPublished() {
+    ThenSpecificationIsReady() {
       expect(events).toEqual([
-        new SpecificationPublished(specificationId, [nonCalculatedFeatureId]),
+        new SpecificationGotReady(specificationId, scenarioId),
       ]);
     },
     ThenNoEventIsPublished() {

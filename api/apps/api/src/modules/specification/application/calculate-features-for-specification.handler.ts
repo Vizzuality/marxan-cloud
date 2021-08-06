@@ -7,7 +7,7 @@ import { Logger } from '@nestjs/common';
 
 import { SpecificationRepository } from './specification.repository';
 
-import { CalculateFeaturesForSpecification } from '../../commands/calculate-features-for-specification.command';
+import { CalculateFeaturesForSpecification } from './calculate-features-for-specification.command';
 
 @CommandHandler(CalculateFeaturesForSpecification)
 export class CalculateFeaturesForSpecificationHandler

@@ -5,11 +5,11 @@ import {
   SpecificationSnapshot,
   SpecificationSnapshotInput,
 } from './specification.snapshot';
-import { DeterminedFeatures } from './commands/determine-features.command';
 
 import { SpecificationGotReady } from './events/specification-got-ready.event';
 import { SpecificationPublished } from './events/specification-published.event';
 import { SpecificationCandidateCreated } from './events/specification-candidate-created.event';
+import { DetermineFeaturesInput } from './determine-features-input';
 
 export class Specification extends AggregateRoot {
   private constructor(
@@ -66,7 +66,7 @@ export class Specification extends AggregateRoot {
     };
   }
 
-  determineFeatures(features: DeterminedFeatures[]) {
+  determineFeatures(features: DetermineFeaturesInput[]) {
     features.forEach((feature) => {
       const configPiece = this.configuration.find(
         (featureConfig) =>

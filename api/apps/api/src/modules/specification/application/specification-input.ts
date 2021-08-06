@@ -8,7 +8,7 @@ import {
   IsUUID,
   ValidateNested,
 } from 'class-validator';
-import { SpecificationOperation } from '../feature-config';
+import { SpecificationOperation } from '../domain/feature-config';
 
 export class SpecificationInput {
   @IsUUID()
