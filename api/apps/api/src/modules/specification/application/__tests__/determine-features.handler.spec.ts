@@ -16,6 +16,6 @@ test(`determine features`, async () => {
 
 test(`determine features on unknown specification`, async () => {
   await fixtures.WhenAllFeaturesAreDetermined();
-  fixtures.ThenErrorIsLogged();
+  fixtures.ThenErrorIsRaised(result);
   fixtures.ThenNoEventIsPublished();
 });

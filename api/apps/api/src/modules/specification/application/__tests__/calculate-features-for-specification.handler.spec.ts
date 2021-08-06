@@ -15,7 +15,7 @@ test(`calculate features`, async () => {
 });
 
 test(`calculate features on unknown specification`, async () => {
-  await fixtures.WhenAllFeaturesAreCalculated();
-  fixtures.ThenErrorIsLogged();
+  const result = await fixtures.WhenAllFeaturesAreCalculated();
+  fixtures.ThenErrorIsRaised(result);
   fixtures.ThenNoEventIsPublished();
 });
