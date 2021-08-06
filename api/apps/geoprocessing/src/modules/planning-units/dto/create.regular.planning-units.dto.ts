@@ -35,6 +35,9 @@ export class PlanningUnitsJob {
   @IsOptional()
   adminAreaLevel2Id?: string;
 
+  @IsOptional()
+  planningAreaId?: string;
+
   @IsEnum(PlanningUnitGridShape)
   planningUnitGridShape!: PlanningUnitGridShape;
 
