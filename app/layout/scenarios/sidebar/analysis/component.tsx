@@ -44,7 +44,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   const { scenarioEditingMetadata } = metadata || {};
 
   const { subtab: refSubtab } = scenarioEditingMetadata || {};
-  console.log(refSubtab);
+  console.log('REF SUB TAB', refSubtab);
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {

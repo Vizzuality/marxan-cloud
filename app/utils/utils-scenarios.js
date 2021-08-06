@@ -3,7 +3,7 @@ export const getScenarioStatusMetaData = (obj, tabToDraft, tab, subtab) => {
     scenarioEditingMetadata: {
       ...obj,
       [tabToDraft]: 'draft',
-      status: {
+      tabStatus: {
         tab: `${tab}`,
         subtab: `${subtab}`,
       },

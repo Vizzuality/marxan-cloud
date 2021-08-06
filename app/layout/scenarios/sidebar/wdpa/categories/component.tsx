@@ -133,8 +133,10 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
             features: 'draft',
             analysis: 'empty',
             solutions: 'empty',
-            tab: 'features',
-            subtab: 'features-fpf',
+            status: {
+              tab: 'features',
+              subtab: 'features-fpf',
+            },
           },
         },
       },

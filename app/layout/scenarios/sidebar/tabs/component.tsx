@@ -28,8 +28,8 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
 
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-
-  const { tab: refTab, subtab: refSubtab } = scenarioEditingMetadata || {};
+  const { tabStatus } = scenarioEditingMetadata || {};
+  const { tab: refTab, subtab: refSubtab } = tabStatus || {};
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
