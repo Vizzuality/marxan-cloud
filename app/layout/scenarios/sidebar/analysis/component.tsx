@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useScenario } from 'hooks/scenarios';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
@@ -41,12 +41,40 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
 
   const { data: scenarioData } = useScenario(sid);
 
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const saveTabsStatus = useCallback(async (subtab) => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          scenarioEditingMetadata: {
+            ...scenarioData.metadata.scenarioEditingMetadata,
+            tab: 'analysis',
+            subtab: `${subtab}`,
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+      },
+      onError: (err) => {
+        console.info(err);
+      },
+    });
+  }, [saveScenarioMutation, sid, scenarioData]);
+
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
     const subtab = s ? `analysis-${s}` : 'analysis-preview';
     dispatch(setSubTab(subtab));
-  }, [dispatch, setSubTab]);
+    saveTabsStatus(subtab);
+  }, [dispatch, setSubTab, saveTabsStatus]);
 
   useEffect(() => {
     return () => {
