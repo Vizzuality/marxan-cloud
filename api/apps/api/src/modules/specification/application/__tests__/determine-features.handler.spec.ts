@@ -1,5 +1,5 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { getFixtures } from './fixtures';
+import { getFixtures } from './determine-features.handler.fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

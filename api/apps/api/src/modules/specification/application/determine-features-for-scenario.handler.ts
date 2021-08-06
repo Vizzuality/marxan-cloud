@@ -6,7 +6,7 @@ import {
 import { Logger } from '@nestjs/common';
 
 import { SpecificationRepository } from './specification.repository';
-import { DetermineFeaturesForSpecification } from '../../commands/determine-features-for-scenario-specification.command';
+import { DetermineFeaturesForSpecification } from './determine-features-for-scenario-specification.command';
 
 @CommandHandler(DetermineFeaturesForSpecification)
 export class DetermineFeaturesForScenarioHandler
