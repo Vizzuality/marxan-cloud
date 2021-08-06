@@ -40,7 +40,7 @@ export class ScenarioSpecification extends AggregateRoot {
       return left(NoCandidateToActivate);
     }
 
-    if (this.#candidate !== specificationId) {
+    if (!this.#candidate.equals(specificationId)) {
       return left(SpecificationIsNoLongerACandidate);
     }
 
