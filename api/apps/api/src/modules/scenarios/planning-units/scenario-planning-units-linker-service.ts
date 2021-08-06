@@ -56,8 +56,8 @@ export class ScenarioPlanningUnitsLinkerService {
     return (
       isNil(project.planningAreaGeometryId) &&
       !(
-        isNil(project.countryId) ||
-        isNil(project.adminAreaLevel1Id) ||
+        isNil(project.countryId) &&
+        isNil(project.adminAreaLevel1Id) &&
         isNil(project.adminAreaLevel2Id)
       )
     );
