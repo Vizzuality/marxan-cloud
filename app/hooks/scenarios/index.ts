@@ -195,6 +195,7 @@ export function useSaveScenario({
   const [session] = useSession();
 
   const saveScenario = ({ id, data }: SaveScenarioProps) => {
+    console.log('HOOKS DATA', data);
     return SCENARIOS.request({
       url: id ? `/${id}` : '/',
       data,

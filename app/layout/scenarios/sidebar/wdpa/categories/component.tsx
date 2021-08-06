@@ -95,7 +95,6 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     }, {
       onSuccess: () => {
         setSubmitting(false);
-
         addToast('save-scenario-wdpa', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -135,7 +134,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
             analysis: 'empty',
             solutions: 'empty',
             tab: 'features',
-            subtab: 'features-preview',
+            subtab: 'features-fpf',
           },
         },
       },
@@ -166,7 +165,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         });
       },
     });
-  }, [mutation, scenarioData?.id, addToast, onDismiss]);
+  }, [mutation, addToast, onDismiss, scenarioData?.id]);
 
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {

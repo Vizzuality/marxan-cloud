@@ -157,16 +157,6 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
             }),
           };
         }),
-        metadata: {
-          scenarioEditingMetadata: {
-            'protected-areas': 'draft',
-            features: 'draft',
-            analysis: 'draft',
-            solutions: 'empty',
-            tab: 'analysis',
-            subtab: 'analysis-preview',
-          },
-        },
       },
     }, {
       onSuccess: () => {

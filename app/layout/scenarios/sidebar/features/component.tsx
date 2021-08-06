@@ -57,17 +57,16 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
 
-  const mutation = useSaveScenario({
+  const saveScenarioMutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
     },
   });
 
-  const handleSaveSuccess = useCallback(async (data) => {
-    mutation.mutate({
+  const saveScenarioStatus = useCallback(async () => {
+    saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        ...data,
         metadata: {
           scenarioEditingMetadata: {
             'protected-areas': 'draft',
@@ -86,7 +85,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
       onError: () => {
       },
     });
-  }, [mutation, sid, pid, push]);
+  }, [saveScenarioMutation, sid, pid, push]);
 
   useEffect(() => {
     return () => {
@@ -276,7 +275,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
                 }}
                 readOnly={readOnly}
-                onSuccess={handleSaveSuccess}
+                onSuccess={saveScenarioStatus}
               />
             )}
           </Pill>
