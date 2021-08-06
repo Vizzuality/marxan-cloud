@@ -3,18 +3,15 @@ import {
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
-import { Logger } from '@nestjs/common';
+import { Either, left, right } from 'fp-ts/Either';
 
 import { SpecificationRepository } from './specification.repository';
-import { DetermineFeaturesForSpecification } from './determine-features-for-scenario-specification.command';
+import { DetermineFeaturesForSpecification } from './determine-features-for-specification.command';
+import { SpecificationNotFound } from './specification-action-errors';
 
 @CommandHandler(DetermineFeaturesForSpecification)
-export class DetermineFeaturesForScenarioHandler
+export class DetermineFeaturesForSpecificationHandler
   implements IInferredCommandHandler<DetermineFeaturesForSpecification> {
-  private readonly logger: Logger = new Logger(
-    DetermineFeaturesForSpecification.name,
-  );
-
   constructor(
     private readonly eventPublisher: EventPublisher,
     private readonly specificationRepository: SpecificationRepository,
@@ -23,18 +20,20 @@ export class DetermineFeaturesForScenarioHandler
   async execute({
     featuresConfig,
     specificationId,
-  }: DetermineFeaturesForSpecification): Promise<void> {
+  }: DetermineFeaturesForSpecification): Promise<
+    Either<typeof SpecificationNotFound, void>
+  > {
     let specification = await this.specificationRepository.getById(
       specificationId,
     );
     if (!specification) {
-      this.logger.warn(`Couldn't find specification: ${specificationId}`);
-      return;
+      return left(SpecificationNotFound);
     }
     specification = this.eventPublisher.mergeObjectContext(specification);
 
     specification.determineFeatures([featuresConfig]);
     await this.specificationRepository.save(specification);
     specification.commit();
+    return right(undefined);
   }
 }
