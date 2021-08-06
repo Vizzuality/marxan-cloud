@@ -22,6 +22,10 @@ const SCENARIO_STATES = {
     text: 'Fail Running Scenario',
     styles: 'text-red-500',
   },
+  'run-done': {
+    text: 'Runned Scenario',
+    styles: 'text-green-500',
+  },
   'pu-running': {
     text: 'Running PU inclusion',
     styles: 'text-white',
