@@ -70,11 +70,9 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
 
   useEffect(() => {
-    return () => {
-      const reloadStep = refSubtab === 'protected-areas-preview' ? 0 : 1;
-      setStep(reloadStep);
-    };
-  }, [tab, refSubtab]);
+    const reloadStep = refSubtab === 'protected-areas-preview' ? 0 : 1;
+    setStep(reloadStep);
+  }, [refSubtab]);
 
   if (!scenarioData || tab !== 'protected-areas') return null;
 

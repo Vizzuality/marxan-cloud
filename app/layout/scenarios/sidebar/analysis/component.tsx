@@ -77,10 +77,8 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   }, [dispatch, setSubTab, saveTabsStatus]);
 
   useEffect(() => {
-    return () => {
-      setSection(refSubtab ? getReloadTab(refSubtab) : null);
-    };
-  }, [tab, refSubtab]);
+    setSection(getReloadTab(refSubtab));
+  }, [refSubtab]);
 
   if (!scenarioData || tab !== 'analysis') return null;
 
