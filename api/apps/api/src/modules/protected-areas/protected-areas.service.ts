@@ -58,6 +58,10 @@ class ProtectedAreaFilters {
   @IsOptional()
   @IsUUID(4)
   adminAreaId?: string;
+
+  @IsOptional()
+  @IsUUID(4)
+  customAreaId?: string;
 }
 
 @Injectable()
@@ -112,6 +116,14 @@ export class ProtectedAreasService extends AppBaseService<
       }
       query.andWhere(`st_intersects(the_geom, (select the_geom from admin_regions a
         WHERE ${whereClause}))`);
+    } 
+    /**
+     * @debt  a bit of another dirty hack we need to validate that the user has access to that id
+     * 
+     */
+    if (filters?.customAreaId) {
+      query.andWhere(`st_intersects(the_geom, (select the_geom from planning_areas a
+        WHERE a.id = '${filters.customAreaId}'))`);
     }
 
     query = this._processBaseFilters<ProtectedAreaBaseFilters>(
