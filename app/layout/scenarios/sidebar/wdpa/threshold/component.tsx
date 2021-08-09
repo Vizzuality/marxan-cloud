@@ -7,12 +7,12 @@ import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories } from 'hooks/wdpa';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -58,11 +58,13 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     data: wdpaData,
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
-  } = useWDPACategories(
-    projectData?.adminAreaLevel2Id
-    || projectData?.adminAreaLevel1Id
-    || projectData?.countryId,
-  );
+  } = useWDPACategories({
+    adminAreaId: projectData?.adminAreaLevel2Id
+                 || projectData?.adminAreaLevel1I
+                 || projectData?.countryId,
+    customAreaId: projectData?.planningAreaId,
+  });
+
   const mutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',

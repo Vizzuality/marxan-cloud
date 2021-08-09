@@ -4,13 +4,13 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useProject } from 'hooks/projects';
-import { useScenario } from 'hooks/scenarios';
-import { useWDPACategories } from 'hooks/wdpa';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+
+import { useProject } from 'hooks/projects';
+import { useScenario } from 'hooks/scenarios';
+import { useWDPACategories } from 'hooks/wdpa';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -39,11 +39,12 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
 
   const { data: projectData } = useProject(pid);
   const { data: scenarioData } = useScenario(sid);
-  const { data: wdpaData } = useWDPACategories(
-    projectData?.adminAreaLevel2Id
-    || projectData?.adminAreaLevel1Id
-    || projectData?.countryId,
-  );
+  const { data: wdpaData } = useWDPACategories({
+    adminAreaId: projectData?.adminAreaLevel2Id
+                 || projectData?.adminAreaLevel1I
+                 || projectData?.countryId,
+    customAreaId: projectData?.planningAreaId,
+  });
 
   useEffect(() => {
     return () => {
