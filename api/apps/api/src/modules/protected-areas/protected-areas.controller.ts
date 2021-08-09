@@ -164,7 +164,7 @@ export class ProtectedAreasController {
       : undefined;
     
     const customAreaId = Array.isArray(fetchSpecification?.filter?.customAreaId)
-      ? fetchSpecification.filter!.adminAreaId[0]
+      ? fetchSpecification.filter!.customAreaId[0]
       : undefined;
     
     return await this.service.findAllProtectedAreaCategories({
