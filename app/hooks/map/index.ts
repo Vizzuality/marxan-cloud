@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
 
+import { LEGEND_LAYERS } from './constants';
 import {
   UseAdminPreviewLayer,
   UseFeaturePreviewLayer,
   UseFeaturePreviewLayers,
   UseGeoJSONLayer,
+  UseLegend,
   UsePUGridLayer,
   UsePUGridPreviewLayer,
   UseWDPAPreviewLayer,
@@ -425,4 +427,40 @@ export function usePUGridLayer({
       },
     };
   }, [cache, active, sid, type, subtype, options, include]);
+}
+
+// PUGrid
+export function useLegend({
+  type, subtype, options = {},
+}: UseLegend) {
+  const layers = useMemo(() => {
+    const { wdpaIucnCategories = [] } = options;
+
+    if (type === 'protected-areas' && subtype === 'protected-areas-preview' && !!wdpaIucnCategories.length) return ['wdpa-preview', 'pugrid'];
+    if (type === 'protected-areas' && subtype === 'protected-areas-percentage' && !!wdpaIucnCategories.length) return ['wdpa-percentage', 'pugrid'];
+    if (type === 'features') {
+      return [
+        ...wdpaIucnCategories.length ? ['wdpa-percentage'] : [],
+        'features',
+        'pugrid',
+      ];
+    }
+    if (type === 'analysis' && subtype === 'analysis-gap-analysis') return ['features', 'pugrid'];
+    if (type === 'analysis' && subtype === 'analysis-cost-surface') return ['cost', 'pugrid'];
+    if (type === 'analysis' && subtype === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
+    if (type === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
+    if (type === 'solutions') return ['frequency', 'solution', 'pugrid'];
+
+    return ['pugrid'];
+  }, [type, subtype, options]);
+
+  return useMemo(() => {
+    return layers
+      .map((l) => {
+        const L = LEGEND_LAYERS[l];
+        if (L) return L(options);
+        return null;
+      })
+      .filter((l) => !!l);
+  }, [layers, options]);
 }

@@ -28,7 +28,7 @@ export const Legend: React.FC<LegendProps> = ({
   sortable,
   onChangeOrder,
 }: LegendProps) => {
-  const [active, setActive] = useState(true);
+  const [active, setActive] = useState(false);
 
   const onToggleActive = useCallback(() => {
     setActive(!active);
@@ -37,7 +37,7 @@ export const Legend: React.FC<LegendProps> = ({
   return (
     <div
       className={cx({
-        'bg-black rounded-3xl flex flex-col flex-grow overflow-hidden': true,
+        'bg-black rounded-3xl flex flex-col flex-grow overflow-hidden w-full': true,
         [className]: !!className,
       })}
     >
@@ -69,18 +69,20 @@ export const Legend: React.FC<LegendProps> = ({
           <div
             className="overflow-x-hidden overflow-y-auto"
           >
-            {!!sortable && (
-              <SortableList
-                sortable={sortable}
-                onChangeOrder={onChangeOrder}
-              >
-                {children}
-              </SortableList>
-            )}
+            <div className="py-2 divide-y divide-gray-600 divide-opacity-50">
+              {!!sortable && (
+                <SortableList
+                  sortable={sortable}
+                  onChangeOrder={onChangeOrder}
+                >
+                  {children}
+                </SortableList>
+              )}
 
-            {!sortable && (
-              children
-            )}
+              {!sortable && (
+                children
+              )}
+            </div>
           </div>
           <div className="absolute bottom-0 left-0 z-10 w-full h-3 pointer-events-none bg-gradient-to-t from-black via-black" />
         </div>

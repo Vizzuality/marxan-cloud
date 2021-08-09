@@ -2,14 +2,9 @@ import React, {
   useCallback, useEffect, useState,
 } from 'react';
 
-// Map
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
-
-import { useSelectedFeatures } from 'hooks/features';
-import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'hooks/map';
-import { useProject } from 'hooks/projects';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
@@ -17,11 +12,24 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
 
+import { useSelectedFeatures } from 'hooks/features';
+import {
+  useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers, useLegend,
+} from 'hooks/map';
+import { useProject } from 'hooks/projects';
+
+// Map
 import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import ZoomControl from 'components/map/controls/zoom';
+import Legend from 'components/map/legend';
+import LegendItem from 'components/map/legend/item';
+import LegendTypeBasic from 'components/map/legend/types/basic';
+import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
+import LegendTypeGradient from 'components/map/legend/types/gradient';
+import LegendTypeMatrix from 'components/map/legend/types/matrix';
 
 import ScenariosDrawingManager from './drawing-manager';
 
@@ -91,6 +99,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     type: tab,
     subtype: subtab,
     options: {
+      ...wdpaCategories,
       wdpaThreshold,
       puAction,
       puIncludedValue: puTmpIncludedValue,
@@ -99,6 +108,18 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   });
 
   const LAYERS = [PUGridLayer, WDPApreviewLayer, ...FeaturePreviewLayers].filter((l) => !!l);
+
+  const LEGEND = useLegend({
+    type: tab,
+    subtype: subtab,
+    options: {
+      ...wdpaCategories,
+      wdpaThreshold,
+      puAction,
+      puIncludedValue: puTmpIncludedValue,
+      puExcludedValue: puTmpExcludedValue,
+    },
+  });
 
   useEffect(() => {
     setBounds({
@@ -219,6 +240,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
         }}
       </Map>
 
+      {/* Controls */}
       <Controls>
         <ZoomControl
           viewport={{
@@ -239,6 +261,31 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
           onFitBoundsChange={handleFitBoundsChange}
         />
       </Controls>
+
+      {/* Legend */}
+      <div className="absolute w-full max-w-xs bottom-10 right-2">
+        <Legend
+          className="w-full"
+          maxHeight={300}
+        >
+          {LEGEND.map((i) => {
+            const { type, items, intersections } = i;
+
+            return (
+              <LegendItem
+                sortable={false}
+                key={i.id}
+                {...i}
+              >
+                {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
+                {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
+                {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
+                {type === 'gradient' && <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />}
+              </LegendItem>
+            );
+          })}
+        </Legend>
+      </div>
     </div>
   );
 };
