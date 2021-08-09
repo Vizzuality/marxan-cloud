@@ -157,7 +157,7 @@ export class GeoFeaturesService extends AppBaseService<
           );
         });
       const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
-        .createQueryBuilder('geoFeatureGeometries')
+        .createQueryBuilder('geoFeatureGeometries').distinctOn(['"geoFeatureGeometries"."feature_id"'])
         .where(
           `st_intersects(
         st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
