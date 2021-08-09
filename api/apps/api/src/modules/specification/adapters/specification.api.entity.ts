@@ -1,0 +1,48 @@
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { SpecificationFeatureConfigApiEntity } from './specification-feature-config.api.entity';
+
+@Entity(`specification`)
+export class SpecificationApiEntity {
+  @PrimaryColumn({
+    type: `uuid`,
+  })
+  id!: string;
+
+  @OneToMany(
+    () => SpecificationFeatureConfigApiEntity,
+    (specificationFeaturesConfig) => specificationFeaturesConfig.specification,
+    {
+      cascade: true,
+      eager: true,
+    },
+  )
+  specificationFeaturesConfiguration?: SpecificationFeatureConfigApiEntity[];
+
+  @ManyToOne(() => Scenario, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'scenario_id',
+    referencedColumnName: 'id',
+  })
+  scenario?: Scenario;
+
+  @Column({
+    type: `uuid`,
+    name: `scenario_id`,
+  })
+  scenarioId!: string;
+
+  @Column({
+    type: `boolean`,
+  })
+  draft!: boolean;
+}
