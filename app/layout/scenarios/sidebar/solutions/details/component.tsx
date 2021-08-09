@@ -4,11 +4,11 @@ import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useSolution, useBestSolution } from 'hooks/solutions';
-
 import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { motion } from 'framer-motion';
+
+import { useSolution, useBestSolution } from 'hooks/solutions';
 
 import SolutionFrequency from 'layout/solutions/frequency';
 import SolutionSelected from 'layout/solutions/selected';
@@ -158,12 +158,12 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
               iconClassName="w-10 h-10 text-primary-500"
             />
             {(selectedSolutionData || bestSolutionData) && (
-            <SolutionSelected
-              best={isBestSolutionShown}
-              values={selectedSolutionData || bestSolutionData}
-              onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
-              selectedSolutionOnMap={selectedSolutionOnMap}
-            />
+              <SolutionSelected
+                best={isBestSolutionShown}
+                values={selectedSolutionData || bestSolutionData}
+                onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
+                selectedSolutionOnMap={selectedSolutionOnMap}
+              />
             )}
           </div>
         </div>

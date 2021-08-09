@@ -16,6 +16,7 @@ import { useSession } from 'next-auth/client';
 import { useSelectedFeatures } from 'hooks/features';
 import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'hooks/map';
 import { useProject } from 'hooks/projects';
+import { useSolution, useBestSolution } from 'hooks/solutions';
 
 import Map from 'components/map';
 // Controls
@@ -62,6 +63,15 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     puTmpExcludedValue,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
+  const { selectedSolutionId } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const {
+    data: selectedSolutionData,
+  } = useSolution(sid, selectedSolutionId);
+
+  const {
+    data: bestSolutionData,
+  } = useBestSolution(sid);
+
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
@@ -90,7 +100,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     sid: sid ? `${sid}` : null,
     type: tab,
     subtype: subtab,
-    runId: 2,
+    runId: selectedSolutionData?.runId || bestSolutionData?.runId,
     options: {
       wdpaThreshold,
       puAction,
