@@ -101,7 +101,12 @@ const paCategories = await botClient.get(`/protected-areas/iucn-categories?filte
 .catch((e) => {
   console.log(e);
 });
+
 console.log(paCategories);
+
+// const paCatList = await paCategories.forEach((element: {id:string, [key:string]:any}) => {return element!.id});
+
+// console.log(paCatList);
 
 const scenario = await botClient
   .post("/scenarios", {
@@ -133,7 +138,7 @@ const featureList = [
        "demo_thalurania_glaucopis",
 ]
 const features = await botClient
-  .get(`/projects/${project.data.id}/features?q=demo`)
+  .get(`/projects/${project.data.id}/features?q=demo_c`)
   .then((result) => result.data)
   .catch((e) => {
     console.log(e);
@@ -143,7 +148,7 @@ console.log(features);
 
 const geoFeatureSpecStart = Process.hrtime();
 
-// const featureRecipe = features.map( (x: Object) => { return {
+// const featureRecipe = features.forEach(element => element.id); { return {
 //     kind: "plain",
 //     featureId: x.id,
 //     marxanSettings: {
