@@ -88,46 +88,46 @@ export class ScenarioPlanningUnitsLinkerService {
      * the planning area.
      */
     if (
-      this.isProjectUsingCustomPlanningArea(project) &&
-      this.isProjectUsingCustomPlanningUnitGrid(project)
+      this.isProjectUsingCustomPlanningUnitGrid(project) &&
+      this.isProjectUsingCustomPlanningArea(project)
     ) {
       return {
-        planningUnitIntersectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
-        planningUnitSelectionQueryPart: `(select the_geom from planning_areas where project_id = ${project.id}`,
+        planningUnitSelectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
+        planningUnitIntersectionQueryPart: `(select the_geom from planning_areas where project_id = '${project.id}')`,
       };
     }
 
     if (
-      this.isProjectUsingCustomPlanningArea(project) &&
-      this.isProjectUsingRegularPlanningUnitGrid(project)
+      this.isProjectUsingRegularPlanningUnitGrid(project) &&
+      this.isProjectUsingCustomPlanningArea(project)
     ) {
       return {
-        planningUnitIntersectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
         planningUnitSelectionQueryPart: `type = '${project.planningUnitGridShape}' and size = ${project.planningUnitAreakm2}`,
+        planningUnitIntersectionQueryPart: `(select the_geom from planning_areas where project_id = '${project.id}')`,
       };
     }
 
     if (
-      this.isProjectUsingGadmPlanningArea(project) &&
-      this.isProjectUsingCustomPlanningUnitGrid(project)
+      this.isProjectUsingCustomPlanningUnitGrid(project) &&
+      this.isProjectUsingGadmPlanningArea(project)
     ) {
       return {
-        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions ${this.getQueryPartForAdminAreaSelectionByLevel(
+        planningUnitSelectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
+        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where ${this.getQueryPartForAdminAreaSelectionByLevel(
           project,
         )})`,
-        planningUnitSelectionQueryPart: `(select the_geom from planning_areas where project_id = ${project.id}`,
       };
     }
 
     if (
-      this.isProjectUsingGadmPlanningArea(project) &&
-      this.isProjectUsingRegularPlanningUnitGrid(project)
+      this.isProjectUsingRegularPlanningUnitGrid(project) &&
+      this.isProjectUsingGadmPlanningArea(project)
     ) {
       return {
-        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions ${this.getQueryPartForAdminAreaSelectionByLevel(
+        planningUnitSelectionQueryPart: `type = '${project.planningUnitGridShape}' and size = ${project.planningUnitAreakm2}`,
+        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where ${this.getQueryPartForAdminAreaSelectionByLevel(
           project,
         )})`,
-        planningUnitSelectionQueryPart: `type = '${project.planningUnitGridShape}' and size = ${project.planningUnitAreakm2}`,
       };
     }
   }
@@ -148,15 +148,15 @@ export class ScenarioPlanningUnitsLinkerService {
     const adminAreaLevel = AdminAreasService.levelFromId(adminAreaId);
 
     if (adminAreaLevel === 0) {
-      return `where gid_0 = '${adminAreaId}' and gid_1 is null and gid_2 is null`;
+      return `gid_0 = '${adminAreaId}' and gid_1 is null and gid_2 is null`;
     }
 
     if (adminAreaLevel === 1) {
-      return `where gid_1 = '${adminAreaId}' and gid_2 is null`;
+      return `gid_1 = '${adminAreaId}' and gid_2 is null`;
     }
 
     if (adminAreaLevel === 2) {
-      return `where gid_2 = '${adminAreaId}'`;
+      return `gid_2 = '${adminAreaId}'`;
     }
   }
 
