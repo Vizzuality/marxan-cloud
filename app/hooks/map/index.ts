@@ -104,7 +104,7 @@ export function useWDPAPreviewLayer({
               ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
             ],
             paint: {
-              'fill-color': '#00F',
+              'fill-color': COLORS.wdpa,
             },
           },
           {
@@ -143,7 +143,7 @@ export function useFeaturePreviewLayer({
             type: 'fill',
             'source-layer': 'layer0',
             paint: {
-              'fill-color': '#FFCC00',
+              'fill-color': COLORS.primary,
               'fill-opacity': 0.5,
             },
           },
@@ -190,7 +190,7 @@ export function useFeaturePreviewLayers({
                 type: 'fill',
                 'source-layer': 'layer0',
                 paint: {
-                  'fill-color': featureHoverId === id ? '#FF9900' : COLORS[type],
+                  'fill-color': featureHoverId === id ? COLORS[type].hover : COLORS[type].default,
                   'fill-opacity': featureHoverId === id ? 1 : 0.5,
                 },
               },
@@ -295,7 +295,7 @@ export function usePUGridLayer({
               type: 'fill',
               'source-layer': 'layer0',
               paint: {
-                'fill-color': '#00F',
+                'fill-color': COLORS.wdpa,
                 'fill-opacity': [
                   'case',
                   ['all',
@@ -315,7 +315,7 @@ export function usePUGridLayer({
               type: 'fill',
               'source-layer': 'layer0',
               paint: {
-                'fill-color': '#6F53F7',
+                'fill-color': COLORS.features,
                 'fill-opacity': [
                   'case',
                   ['any',
@@ -341,9 +341,9 @@ export function usePUGridLayer({
                   ['linear'],
                   ['get', 'costValue'],
                   0,
-                  '#FFBFB7',
+                  COLORS.cost[0],
                   1,
-                  '#C21701',
+                  COLORS.cost[1],
                 ],
                 'fill-opacity': 0.75,
               },
@@ -360,7 +360,7 @@ export function usePUGridLayer({
                 ['in', ['get', 'scenarioPuId'], ['literal', puIncludedValue]],
               ],
               paint: {
-                'line-color': '#0F0',
+                'line-color': COLORS.include,
                 'line-opacity': 1,
                 'line-width': 1.5,
                 'line-offset': 0.75,
@@ -376,7 +376,7 @@ export function usePUGridLayer({
                 ['in', ['get', 'scenarioPuId'], ['literal', puExcludedValue]],
               ],
               paint: {
-                'line-color': '#F00',
+                'line-color': COLORS.exclude,
                 'line-opacity': 1,
                 'line-width': 1.5,
                 'line-offset': 0.75,
@@ -395,13 +395,13 @@ export function usePUGridLayer({
                   ['linear'],
                   ['get', 'frequencyValue'],
                   0,
-                  '#0C2C32',
+                  COLORS.frequency[0],
                   33.33,
-                  '#006D83',
+                  COLORS.frequency[1],
                   66.66,
-                  '#008B8C',
+                  COLORS.frequency[2],
                   100,
-                  '#0BC6C2',
+                  COLORS.frequency[3],
                 ],
                 'fill-opacity': 0.75,
               },
@@ -438,7 +438,8 @@ export function useLegend({
     if (type === 'features') {
       return [
         ...wdpaIucnCategories.length ? ['wdpa-percentage'] : [],
-        'features',
+        'bioregional',
+        'species',
         'pugrid',
       ];
     }

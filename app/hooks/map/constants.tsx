@@ -7,8 +7,28 @@ import SQUARE_SVG from 'svgs/map/square.svg?sprite';
 
 export const COLORS = {
   primary: '#00BFFF',
-  species: '#FFCC00',
-  bioregional: '#03E7D1',
+  species: {
+    default: '#FFCC00',
+    hover: '#FF9900',
+  },
+  bioregional: {
+    default: '#03E7D1',
+    hover: '#03FDD1',
+  },
+  wdpa: '#00F',
+  features: '#6F53F7',
+  include: '#0F0',
+  exclude: '#F00',
+  cost: [
+    '#FFBFB7',
+    '#C21701',
+  ],
+  frequency: [
+    '#0C2C32',
+    '#006D83',
+    '#008B8C',
+    '#0BC6C2',
+  ],
 };
 
 export const LEGEND_LAYERS = {
@@ -23,12 +43,29 @@ export const LEGEND_LAYERS = {
   'wdpa-preview': () => ({
     id: 'wdpa-preview',
     name: 'Protected areas preview',
-    icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 text-blue-800" />,
+    icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.wdpa }} />,
   }),
   'wdpa-percentage': () => ({
     id: 'wdpa-percentage',
     name: 'Protected areas percentage',
-    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 text-blue-800 stroke-current stroke-2" />,
+    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.wdpa }} />,
+  }),
+
+  // Species
+  bioregional: () => ({
+    id: 'bioregional',
+    name: 'Bioregional',
+    icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.bioregional.default }} />,
+  }),
+  species: () => ({
+    id: 'species',
+    name: 'Species',
+    icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.species.default }} />,
+  }),
+  features: () => ({
+    id: 'features',
+    name: 'Features',
+    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.features }} />,
   }),
 
   // ANALYSIS
@@ -38,10 +75,10 @@ export const LEGEND_LAYERS = {
     type: 'gradient',
     items: [
       {
-        color: '#FFBFB7',
+        color: COLORS.cost[0],
         value: '0',
       }, {
-        color: '#C21701',
+        color: COLORS.cost[1],
         value: '100',
       },
     ],
@@ -52,7 +89,7 @@ export const LEGEND_LAYERS = {
     return ({
       id: 'lock-in',
       name: 'Included areas',
-      icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: '#0F0' }} />,
+      icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.include }} />,
       description: (
         <div className="pl-5">
           {puIncludedValue.length}
@@ -68,7 +105,7 @@ export const LEGEND_LAYERS = {
     return ({
       id: 'lock-out',
       name: 'Excluded areas',
-      icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: '#F00' }} />,
+      icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.exclude }} />,
       description: (
         <div className="pl-5">
           {puExcludedValue.length}
@@ -86,19 +123,19 @@ export const LEGEND_LAYERS = {
     type: 'gradient',
     items: [
       {
-        color: '#0C2C32',
+        color: COLORS.frequency[0],
         value: '0',
       },
       {
-        color: '#006D83',
+        color: COLORS.frequency[1],
         value: null,
       },
       {
-        color: '#008B8C',
+        color: COLORS.frequency[2],
         value: null,
       },
       {
-        color: '#0BC6C2',
+        color: COLORS.frequency[3],
         value: '100',
       },
     ],
@@ -106,6 +143,6 @@ export const LEGEND_LAYERS = {
   solution: () => ({
     id: 'solution',
     name: 'Solution selected',
-    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: '#00BFFF' }} />,
+    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.primary }} />,
   }),
 };

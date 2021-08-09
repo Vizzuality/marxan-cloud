@@ -5,12 +5,12 @@ import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories } from 'hooks/wdpa';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -54,7 +54,8 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
   } = useWDPACategories(
-    projectData?.adminAreaLevel2Id
+    projectData?.planningAreaId
+    || projectData?.adminAreaLevel2Id
     || projectData?.adminAreaLevel1Id
     || projectData?.countryId,
   );

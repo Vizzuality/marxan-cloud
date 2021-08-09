@@ -37,6 +37,7 @@ export interface ScenariosMapProps {
 }
 
 export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
+  const [open, setOpen] = useState(true);
   const [session] = useSession();
 
   const { query } = useRouter();
@@ -265,8 +266,10 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
       {/* Legend */}
       <div className="absolute w-full max-w-xs bottom-10 right-2">
         <Legend
+          open={open}
           className="w-full"
           maxHeight={300}
+          onChangeOpen={() => setOpen(!open)}
         >
           {LEGEND.map((i) => {
             const { type, items, intersections } = i;

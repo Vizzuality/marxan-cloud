@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 
 import cx from 'classnames';
 
@@ -10,6 +10,7 @@ import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import SortableList from './sortable/list';
 
 export interface LegendProps {
+  open: boolean;
   className?: string;
   children: React.ReactNode;
   maxHeight: string | number;
@@ -19,20 +20,21 @@ export interface LegendProps {
     handleIcon: React.ReactNode,
   };
   onChangeOrder?: (id: string[]) => void;
+  onChangeOpen?: (open: boolean) => void;
 }
 
 export const Legend: React.FC<LegendProps> = ({
+  open,
   children,
   className = '',
   maxHeight,
   sortable,
+  onChangeOpen,
   onChangeOrder,
 }: LegendProps) => {
-  const [active, setActive] = useState(false);
-
-  const onToggleActive = useCallback(() => {
-    setActive(!active);
-  }, [active]);
+  const onToggleOpen = useCallback(() => {
+    onChangeOpen(!open);
+  }, [open, onChangeOpen]);
 
   return (
     <div
@@ -44,7 +46,7 @@ export const Legend: React.FC<LegendProps> = ({
       <button
         type="button"
         className="relative flex items-center w-full px-5 py-3 space-x-2 text-xs text-white uppercase font-heading focus:outline-none"
-        onClick={onToggleActive}
+        onClick={onToggleOpen}
       >
         <Icon icon={LEGEND_SVG} className="w-4 h-4 text-gray-300" />
         <span>Legend</span>
@@ -53,12 +55,13 @@ export const Legend: React.FC<LegendProps> = ({
           icon={ARROW_DOWN_SVG}
           className={cx({
             'absolute w-3 h-3 transition-transform transform -translate-y-1/2 text-primary-500 top-1/2 right-5': true,
-            'rotate-180': active,
+            'rotate-180': !open,
+            'rotate-0': open,
           })}
         />
       </button>
 
-      {active && (
+      {open && (
         <div
           className="relative flex flex-col flex-grow"
           style={{
