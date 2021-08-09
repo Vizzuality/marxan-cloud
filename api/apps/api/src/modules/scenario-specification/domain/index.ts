@@ -2,8 +2,8 @@ export { SpecificationId } from './specification.id';
 
 export {
   ScenarioSpecification,
-  SpecificationIsNoLongerACandidate,
-  NoCandidateToActivate,
+  specificationIsNoLongerACandidate,
+  noCandidateToActivate,
 } from './scenario-specification';
 
 export { CandidateSpecificationChanged } from './events/candidate-specification-changed.event';

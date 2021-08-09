@@ -1,18 +1,18 @@
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/Either';
 import {
-  NoCandidateToActivate,
-  SpecificationIsNoLongerACandidate,
+  noCandidateToActivate,
+  specificationIsNoLongerACandidate,
 } from '../domain';
 
-export const ScenarioSpecificationNotFound = Symbol(
+export const scenarioSpecificationNotFound = Symbol(
   `scenario specification not found`,
 );
 
 export type ActivateError =
-  | typeof ScenarioSpecificationNotFound
-  | typeof NoCandidateToActivate
-  | typeof SpecificationIsNoLongerACandidate;
+  | typeof scenarioSpecificationNotFound
+  | typeof noCandidateToActivate
+  | typeof specificationIsNoLongerACandidate;
 
 export class ActivateCandidateSpecification extends Command<
   Either<ActivateError, void>
