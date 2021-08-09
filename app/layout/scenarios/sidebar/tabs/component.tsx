@@ -38,7 +38,6 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.info('---> HERE', refTab, refSubtab);
     dispatch(setTab(refTab));
     dispatch(setSubTab(refSubtab));
   // eslint-disable-next-line react-hooks/exhaustive-deps
