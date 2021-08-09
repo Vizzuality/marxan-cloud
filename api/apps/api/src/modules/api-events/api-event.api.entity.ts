@@ -69,7 +69,7 @@ export class ApiEvent {
    */
   @ApiProperty()
   @IsEnum(Object.values(API_EVENT_KINDS))
-  @Column('enum')
+  @Column('enum', { enum: API_EVENT_KINDS })
   kind!: string;
 
   /**
