@@ -6,7 +6,7 @@ import {
   SpecificationFeatureStratification,
   SpecificationInput,
 } from './specification-input';
-import { SpecificationOperation } from '../feature-config';
+import { SpecificationOperation } from '../domain/feature-config';
 
 test(`valid values`, () => {
   const errors = validateSync(

@@ -56,8 +56,8 @@ export class ScenarioPlanningUnitsLinkerService {
     return (
       isNil(project.planningAreaGeometryId) &&
       !(
-        isNil(project.countryId) ||
-        isNil(project.adminAreaLevel1Id) ||
+        isNil(project.countryId) &&
+        isNil(project.adminAreaLevel1Id) &&
         isNil(project.adminAreaLevel2Id)
       )
     );
@@ -88,53 +88,75 @@ export class ScenarioPlanningUnitsLinkerService {
      * the planning area.
      */
     if (
-      this.isProjectUsingCustomPlanningArea(project) &&
-      this.isProjectUsingCustomPlanningUnitGrid(project)
+      this.isProjectUsingCustomPlanningUnitGrid(project) &&
+      this.isProjectUsingCustomPlanningArea(project)
     ) {
       return {
-        planningUnitIntersectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
-        planningUnitSelectionQueryPart: `(select the_geom from planning_areas where project_id = ${project.id}`,
+        planningUnitSelectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
+        planningUnitIntersectionQueryPart: `(select the_geom from planning_areas where project_id = '${project.id}')`,
       };
     }
 
     if (
-      this.isProjectUsingCustomPlanningArea(project) &&
-      this.isProjectUsingRegularPlanningUnitGrid(project)
+      this.isProjectUsingRegularPlanningUnitGrid(project) &&
+      this.isProjectUsingCustomPlanningArea(project)
     ) {
       return {
-        planningUnitIntersectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
         planningUnitSelectionQueryPart: `type = '${project.planningUnitGridShape}' and size = ${project.planningUnitAreakm2}`,
+        planningUnitIntersectionQueryPart: `(select the_geom from planning_areas where project_id = '${project.id}')`,
       };
     }
 
     if (
-      this.isProjectUsingGadmPlanningArea(project) &&
-      this.isProjectUsingCustomPlanningUnitGrid(project)
+      this.isProjectUsingCustomPlanningUnitGrid(project) &&
+      this.isProjectUsingGadmPlanningArea(project)
     ) {
-      const adminAreaId =
-        project.adminAreaLevel2Id ??
-        project.adminAreaLevel1Id ??
-        project.countryId;
-      const adminAreaLevel = AdminAreasService.levelFromId(adminAreaId);
       return {
-        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where gid_${adminAreaLevel} = '${adminAreaId}')`,
-        planningUnitSelectionQueryPart: `(select the_geom from planning_areas where project_id = ${project.id}`,
+        planningUnitSelectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
+        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where ${this.getQueryPartForAdminAreaSelectionByLevel(
+          project,
+        )})`,
       };
     }
 
     if (
-      this.isProjectUsingGadmPlanningArea(project) &&
-      this.isProjectUsingRegularPlanningUnitGrid(project)
+      this.isProjectUsingRegularPlanningUnitGrid(project) &&
+      this.isProjectUsingGadmPlanningArea(project)
     ) {
-      const adminAreaId =
-        project.adminAreaLevel2Id ??
-        project.adminAreaLevel1Id ??
-        project.countryId;
-      const adminAreaLevel = AdminAreasService.levelFromId(adminAreaId);
       return {
-        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where gid_${adminAreaLevel} = '${adminAreaId}')`,
         planningUnitSelectionQueryPart: `type = '${project.planningUnitGridShape}' and size = ${project.planningUnitAreakm2}`,
+        planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where ${this.getQueryPartForAdminAreaSelectionByLevel(
+          project,
+        )})`,
       };
+    }
+  }
+
+  /**
+   * @debt It could be used in ProtectedAreasService.setFilters()
+   */
+  private getQueryPartForAdminAreaSelectionByLevel(
+    adminAreaIds: Pick<
+      Project,
+      'countryId' | 'adminAreaLevel1Id' | 'adminAreaLevel2Id'
+    >,
+  ): string | undefined {
+    const adminAreaId =
+      adminAreaIds.adminAreaLevel2Id ??
+      adminAreaIds.adminAreaLevel1Id ??
+      adminAreaIds.countryId;
+    const adminAreaLevel = AdminAreasService.levelFromId(adminAreaId);
+
+    if (adminAreaLevel === 0) {
+      return `gid_0 = '${adminAreaId}' and gid_1 is null and gid_2 is null`;
+    }
+
+    if (adminAreaLevel === 1) {
+      return `gid_1 = '${adminAreaId}' and gid_2 is null`;
+    }
+
+    if (adminAreaLevel === 2) {
+      return `gid_2 = '${adminAreaId}'`;
     }
   }
 

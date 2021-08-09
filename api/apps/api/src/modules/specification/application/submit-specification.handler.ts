@@ -3,8 +3,9 @@ import {
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
-import { SubmitSpecification } from '../commands/submit-specification.command';
-import { Specification } from '../specification';
+import { Specification } from '../domain';
+
+import { SubmitSpecification } from './submit-specification.command';
 import { SpecificationRepository } from './specification.repository';
 
 @CommandHandler(SubmitSpecification)
