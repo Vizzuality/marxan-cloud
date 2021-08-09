@@ -7,15 +7,15 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useSelectedFeatures } from 'hooks/features';
-import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'hooks/map';
-import { useProject } from 'hooks/projects';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
+
+import { useSelectedFeatures } from 'hooks/features';
+import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'hooks/map';
+import { useProject } from 'hooks/projects';
 
 import Map from 'components/map';
 // Controls
@@ -90,6 +90,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     sid: sid ? `${sid}` : null,
     type: tab,
     subtype: subtab,
+    runId: 2,
     options: {
       wdpaThreshold,
       puAction,
