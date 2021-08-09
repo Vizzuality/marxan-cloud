@@ -5,11 +5,17 @@ import Icon from 'components/icon';
 import HEXAGON_SVG from 'svgs/map/hexagon.svg?sprite';
 import SQUARE_SVG from 'svgs/map/square.svg?sprite';
 
+export const COLORS = {
+  primary: '#00BFFF',
+  species: '#FFCC00',
+  bioregional: '#03E7D1',
+};
+
 export const LEGEND_LAYERS = {
   pugrid: () => ({
     id: 'pugrid',
     name: 'PU grid',
-    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 text-blue-500 stroke-current stroke-2 fill-none" />,
+    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.primary }} />,
     description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus minus eligendi doloremque unde, atque maxime dolore officiis quia architecto fugiat, dolorem animi vel! Velit minus facere maxime consequuntur iure. Nisi!',
   }),
 
@@ -100,6 +106,6 @@ export const LEGEND_LAYERS = {
   solution: () => ({
     id: 'solution',
     name: 'Solution selected',
-    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: '#00F' }} />,
+    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: '#00BFFF' }} />,
   }),
 };

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { LEGEND_LAYERS } from './constants';
+import { COLORS, LEGEND_LAYERS } from './constants';
 import {
   UseAdminPreviewLayer,
   UseFeaturePreviewLayer,
@@ -163,13 +163,6 @@ export function useFeaturePreviewLayer({
 export function useFeaturePreviewLayers({
   active, bbox, features, cache = 0, options = {},
 }: UseFeaturePreviewLayers) {
-  const COLORS = useMemo(() => {
-    return {
-      species: '#FFCC00',
-      bioregional: '#03E7D1',
-    };
-  }, []);
-
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
     const FEATURES = [...features];
@@ -212,7 +205,7 @@ export function useFeaturePreviewLayers({
           },
         };
       });
-  }, [active, bbox, features, cache, options, COLORS]);
+  }, [active, bbox, features, cache, options]);
 }
 
 // PUGridpreview
@@ -235,7 +228,7 @@ export function usePUGridPreviewLayer({
             type: 'line',
             'source-layer': 'layer0',
             paint: {
-              'line-color': '#00BFFF',
+              'line-color': COLORS.primary,
               'line-opacity': 0.5,
             },
           },
@@ -289,7 +282,7 @@ export function usePUGridLayer({
             type: 'line',
             'source-layer': 'layer0',
             paint: {
-              'line-color': '#00BFFF',
+              'line-color': COLORS.primary,
               'line-opacity': 1,
               'line-width': 1,
               'line-offset': 0.5,
@@ -402,9 +395,13 @@ export function usePUGridLayer({
                   ['linear'],
                   ['get', 'frequencyValue'],
                   0,
-                  '#FCA107',
+                  '#0C2C32',
+                  33.33,
+                  '#006D83',
+                  66.66,
+                  '#008B8C',
                   100,
-                  '#7F3121',
+                  '#0BC6C2',
                 ],
                 'fill-opacity': 0.75,
               },
@@ -417,7 +414,7 @@ export function usePUGridLayer({
                 ['in', '-2-', ['get', 'valuePosition']],
               ],
               paint: {
-                'fill-color': '#00F',
+                'fill-color': COLORS.primary,
                 'fill-opacity': 0.75,
               },
             },
