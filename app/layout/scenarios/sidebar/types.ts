@@ -16,4 +16,6 @@ export enum ScenarioSidebarSubTabs {
   ANALYSIS_ADDJUST_PLANNING_UNITS = 'analysis-adjust-planning-units',
 
   SOLUTIONS_PREVIEW = 'solutions-preview',
+  SOLUTIONS_DETAILS = 'solutions-details',
+  SOLUTIONS_GAP_ANALYSIS = 'solutions-gap-analysis',
 }

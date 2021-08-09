@@ -4,11 +4,11 @@ import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useSolution, useBestSolution } from 'hooks/solutions';
-
 import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { motion } from 'framer-motion';
+
+import { useSolution, useBestSolution } from 'hooks/solutions';
 
 import SolutionFrequency from 'layout/solutions/frequency';
 import SolutionSelected from 'layout/solutions/selected';

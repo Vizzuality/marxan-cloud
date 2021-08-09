@@ -4,12 +4,12 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { getScenarioStatusMetaData, getReloadTab } from 'utils/utils-scenarios';
+
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -43,7 +43,6 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-
   const { tabStatus } = scenarioEditingMetadata || {};
   const { subtab: refSubtab } = tabStatus || {};
 

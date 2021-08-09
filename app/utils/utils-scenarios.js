@@ -19,6 +19,10 @@ export const getReloadTab = (tab) => {
     return 'cost-surface';
   } if (tab === 'analysis-adjust-planning-units') {
     return 'adjust-planning-units';
+  } if (tab === 'solutions-details') {
+    return 'details';
+  } if (tab === 'solutions-gap-analysis') {
+    return 'gap-analysis';
   }
   return null;
 };

@@ -1,12 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useScenario } from 'hooks/scenarios';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { getScenarioStatusMetaData, getReloadTab } from 'utils/utils-scenarios';
+
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -28,20 +31,50 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
   const { query } = useRouter();
   const { sid } = query;
 
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setSubTab } = scenarioSlice.actions;
+
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata } = metadata || {};
+  const { tabStatus } = scenarioEditingMetadata || {};
+  const { subtab: refSubtab } = tabStatus || {};
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const saveTabsStatus = useCallback(async (subtab) => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'solutions', `${subtab}`),
+      },
+    }, {
+      onSuccess: () => {
+      },
+      onError: (err) => {
+        console.info(err);
+      },
+    });
+  }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
-  }, []);
+    const subtab = s ? `solutions-${s}` : 'solutions-preview';
+    dispatch(setSubTab(subtab));
+    saveTabsStatus(subtab);
+  }, [dispatch, setSubTab, saveTabsStatus]);
 
   useEffect(() => {
-    return () => {
-      setSection(null);
-    };
-  }, [tab]);
+    setSection(getReloadTab(refSubtab));
+  }, [refSubtab]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.SOLUTIONS) return null;
 

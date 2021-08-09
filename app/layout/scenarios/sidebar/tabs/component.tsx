@@ -4,11 +4,11 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useScenario } from 'hooks/scenarios';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+
+import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -38,7 +38,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.info(refTab, refSubtab);
+    console.info('---> HERE', refTab, refSubtab);
     dispatch(setTab(refTab));
     dispatch(setSubTab(refSubtab));
   // eslint-disable-next-line react-hooks/exhaustive-deps
