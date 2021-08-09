@@ -11,6 +11,7 @@ import {
   excludeSampleWithSingleFeature,
   includeSample,
   includeSampleWithSingleFeature,
+  includeSampleOverlappingWithExclude,
 } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/__mocks__/include-sample';
 import { Job } from 'bullmq';
 
@@ -98,6 +99,45 @@ describe(`When planning units exist for a scenario`, () => {
       expect(await world.GetUnstatedPlanningUnits()).toEqual(
         world.planningUnitsToBeUntouched(forCase),
       );
+    }, 10000);
+  });
+
+  describe('When setting inclusions by id and exclusions by GeoJSON', () => {
+    it.todo(
+      'If there are overlaps between these, then exclusions set by GeoJSON should be applied',
+    );
+  });
+
+  describe('When setting exclusions by id and inclusions by GeoJSON', () => {
+    it.todo(
+      'If there are overlaps between these, then inclusions set by GeoJSON should be applied',
+    );
+  });
+
+  describe('When there are contrasting claims for inclusion and exclusion on one or more planning units', () => {
+    const forCase: ForCase = 'multipleFeatures';
+    beforeEach(async () => {
+      await world.GivenPlanningUnitsExist(forCase, areaUnitsSample(forCase));
+    });
+
+    afterEach(async () => {
+      await world?.cleanup('multipleFeatures');
+    });
+
+    it(`the operation should be rejected with an error`, async () => {
+      await expect(
+        sut.process(({
+          data: {
+            scenarioId: world.scenarioId,
+            include: {
+              geo: [includeSampleOverlappingWithExclude()],
+            },
+            exclude: {
+              geo: [excludeSample()],
+            },
+          },
+        } as unknown) as Job<JobInput>),
+      ).rejects.toThrow(/Contrasting claims/);
     }, 10000);
   });
 });

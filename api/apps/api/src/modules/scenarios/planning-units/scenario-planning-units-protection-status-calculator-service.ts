@@ -44,10 +44,15 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
 
     const query = `
   with pu as (
-    select spd.id,  (pug.area/spd.protected_area)*100 as perc_protection
-      from scenarios_pu_data spd
+    select spd.id,
+    case
+      when spd.protected_area <> 0 and spd.protected_area is not null
+        then (pug.area/spd.protected_area) * 100
+      else 0
+      end as perc_protection
+    from scenarios_pu_data spd
       inner join planning_units_geom pug on spd.pu_geom_id = pug.id
-      where scenario_id=$1),
+    where scenario_id=$1),
   pu_pa as (
     select pu.id, (CASE pu.perc_protection > $2 WHEN true THEN 2 else 0 end) as lockin_status
     from pu)

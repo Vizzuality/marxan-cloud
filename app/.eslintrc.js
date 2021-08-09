@@ -55,8 +55,9 @@ module.exports = {
             group: 'builtin',
           },
           {
-            pattern: 'lodash',
+            pattern: 'lodash/**',
             group: 'builtin',
+            position: 'after',
           },
           {
             pattern: 'next/**',
@@ -68,11 +69,6 @@ module.exports = {
             group: 'builtin',
           },
           {
-            pattern: 'hooks/**',
-            group: 'builtin',
-            position: 'after',
-          },
-          {
             pattern: 'hoc/**',
             group: 'external',
             position: 'before',
@@ -80,6 +76,11 @@ module.exports = {
           {
             pattern: 'store/**',
             group: 'external',
+            position: 'before',
+          },
+          {
+            pattern: 'hooks/**',
+            group: 'internal',
             position: 'before',
           },
           {

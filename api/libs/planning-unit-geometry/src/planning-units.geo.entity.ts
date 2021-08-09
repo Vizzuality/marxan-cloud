@@ -42,4 +42,15 @@ export class PlanningUnitsGeom {
     type: 'int',
   })
   size?: number | undefined | null;
+
+  /**
+   * For custom planning unit grids, this links back to the parent project
+   * where the custom grid is used.
+   */
+  @Column({
+    name: 'project_id',
+    nullable: true,
+    type: 'uuid'
+  })
+  projectId?: string | undefined | null;
 }
