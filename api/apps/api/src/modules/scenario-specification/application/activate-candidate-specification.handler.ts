@@ -8,7 +8,7 @@ import { Either, isLeft, left, right } from 'fp-ts/Either';
 import {
   ActivateCandidateSpecification,
   ActivateError,
-  ScenarioSpecificationNotFound,
+  scenarioSpecificationNotFound,
 } from './activate-candidate-specification.command';
 import { SpecificationId } from '../domain';
 
@@ -31,7 +31,7 @@ export class ActivateCandidateSpecificationHandler
     );
 
     if (!targetSpecification) {
-      return left(ScenarioSpecificationNotFound);
+      return left(scenarioSpecificationNotFound);
     }
     const scenarioSpecification = this.eventPublisher.mergeObjectContext(
       targetSpecification,

@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 import { Test } from '@nestjs/testing';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
-import { Either } from 'fp-ts/Either';
+import { Either, isLeft } from 'fp-ts/Either';
 
 import {
   SpecificationId,
@@ -88,7 +88,7 @@ export const getFixtures = async () => {
     ThenSpecificationIsNotActivated: async (
       result: Either<ActivateError, void>,
     ) => {
-      expect(result._tag).toEqual('Left');
+      expect(isLeft(result)).toBe(true);
       const scenarioSpecification = await scenarioSpecificationRepo.find(
         scenarioId,
       );

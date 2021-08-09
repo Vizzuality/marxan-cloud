@@ -4,10 +4,10 @@ import { SpecificationId } from './specification.id';
 import { CandidateSpecificationChanged } from './events/candidate-specification-changed.event';
 import { SpecificationActivated } from './events/specification-activated.event';
 
-export const NoCandidateToActivate = Symbol(
+export const noCandidateToActivate = Symbol(
   `No scenario candidate to activate`,
 );
-export const SpecificationIsNoLongerACandidate = Symbol(
+export const specificationIsNoLongerACandidate = Symbol(
   `Specification is no longer a candidate.`,
 );
 
@@ -33,15 +33,15 @@ export class ScenarioSpecification extends AggregateRoot {
   activateCandidateSpecification(
     specificationId: SpecificationId,
   ): Either<
-    typeof NoCandidateToActivate | typeof SpecificationIsNoLongerACandidate,
+    typeof noCandidateToActivate | typeof specificationIsNoLongerACandidate,
     void
   > {
     if (!this.#candidate) {
-      return left(NoCandidateToActivate);
+      return left(noCandidateToActivate);
     }
 
     if (!this.#candidate.equals(specificationId)) {
-      return left(SpecificationIsNoLongerACandidate);
+      return left(specificationIsNoLongerACandidate);
     }
 
     this.#active = this.#candidate;
