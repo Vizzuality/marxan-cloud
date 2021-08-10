@@ -7,14 +7,14 @@ import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories } from 'hooks/wdpa';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
-import { getScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -107,7 +107,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       id: scenarioData.id,
       data: {
         wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
+        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
       },
     }, {
       onSuccess: () => {

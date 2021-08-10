@@ -7,7 +7,7 @@ import { Form as FormRFF } from 'react-final-form';
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
-import { getScenarioStatusMetaData } from 'utils/utils-scenarios';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useRunScenario, useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -63,7 +63,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
     const data = {
       metadata: {
         marxanInputParameterFile: values,
-        scenarioEditingMetadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'solutions', 'solution-preview'),
+        scenarioEditingMetadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'solutions', 'solution-preview'),
       },
     };
 

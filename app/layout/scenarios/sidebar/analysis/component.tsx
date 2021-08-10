@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { getScenarioStatusMetaData, getReloadTab } from 'utils/utils-scenarios';
+import { mergeScenarioStatusMetaData, getReloadTab } from 'utils/utils-scenarios';
 
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
@@ -56,7 +56,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', `${subtab}`),
+        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', `${subtab}`),
       },
     }, {
       onSuccess: () => {

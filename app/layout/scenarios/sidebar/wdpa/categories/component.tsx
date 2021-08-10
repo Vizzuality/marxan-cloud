@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { getScenarioStatusMetaData } from 'utils/utils-scenarios';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
@@ -95,7 +95,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         ...values,
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas-percentage'),
+        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas-percentage'),
       },
     }, {
       onSuccess: () => {
@@ -132,7 +132,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         wdpaIucnCategories: null,
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
+        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
       },
     }, {
       onSuccess: () => {

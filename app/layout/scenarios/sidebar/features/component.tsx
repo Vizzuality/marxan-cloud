@@ -5,13 +5,13 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useSelectedFeatures } from 'hooks/features';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
-import { getScenarioStatusMetaData } from 'utils/utils-scenarios';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
+import { useSelectedFeatures } from 'hooks/features';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -73,7 +73,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', 'analysis-preview'),
+        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', 'analysis-preview'),
       },
     }, {
       onSuccess: () => {
@@ -87,7 +87,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-fpf'),
+        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-fpf'),
       },
     }, {
       onSuccess: () => { },
@@ -99,7 +99,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
+        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
       },
     });
   }, [saveScenarioMutation, sid, scenarioEditingMetadata]);

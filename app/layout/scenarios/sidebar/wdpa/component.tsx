@@ -4,14 +4,14 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useProject } from 'hooks/projects';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
-import { useWDPACategories } from 'hooks/wdpa';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
-import { getScenarioStatusMetaData } from 'utils/utils-scenarios';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
+import { useProject } from 'hooks/projects';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useWDPACategories } from 'hooks/wdpa';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -64,7 +64,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: getScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas-preview'),
+        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas-preview'),
       },
     });
   }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
