@@ -97,16 +97,15 @@ const scenarioStart = Process.hrtime();
 await sleep(5)
 
 // get the list of protected areas in the region and use all of them
-const paCategories = await botClient.get(`/protected-areas/iucn-categories?filter%5BcustomAreaId%5D=${planningAreaFile.id}`).then((result) => result.data)
-.catch((e) => {
-  console.log(e);
-});
+const paCategories = await botClient.get(`/protected-areas/iucn-categories?filter%5BcustomAreaId%5D=${planningAreaFile.id}`)
+          .then((result:{data:Array<{id:string, type:string, attributes:object}>}) => result.data)
+          .catch((e) => {
+            console.log(e);
+          });
 
 console.log(paCategories);
+console.log(paCategories.map((i): string => i.id));
 
-// const paCatList = await paCategories.forEach((element: {id:string, [key:string]:any}) => {return element!.id});
-
-// console.log(paCatList);
 
 const scenario = await botClient
   .post("/scenarios", {
@@ -138,7 +137,7 @@ const featureList = [
        "demo_thalurania_glaucopis",
 ]
 const features = await botClient
-  .get(`/projects/${project.data.id}/features?q=demo_c`)
+  .get(`/projects/${project.data.id}/features?q=demo_`)
   .then((result) => result.data)
   .catch((e) => {
     console.log(e);
@@ -159,7 +158,7 @@ const geoFeatureSpecStart = Process.hrtime();
 //   console.log(featureRecipe);
 const geoFeatureSpec = await botClient
   .post(`/scenarios/${scenario.data.id}/features/specification`, {
-    status: "created",
+    status: "draft",
     features: [
       {
         kind: "plain",
