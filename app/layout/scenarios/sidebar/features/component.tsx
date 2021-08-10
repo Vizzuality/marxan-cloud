@@ -56,7 +56,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const { subtab: refSubtab } = scenarioEditingMetadata || {};
+  const { subtab: statusSubtab } = scenarioEditingMetadata || {};
 
   const {
     data: selectedFeaturesData,
@@ -104,9 +104,9 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
 
   useEffect(() => {
-    const reloadStep = refSubtab === 'features-preview' ? 0 : 1;
+    const reloadStep = statusSubtab === 'features-preview' ? 0 : 1;
     setStep(reloadStep);
-  }, [refSubtab]);
+  }, [statusSubtab]);
 
   if (!scenarioData || tab !== 'features') return null;
 

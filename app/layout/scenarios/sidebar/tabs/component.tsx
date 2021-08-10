@@ -28,7 +28,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
 
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const { tab: refTab, subtab: refSubtab } = scenarioEditingMetadata || {};
+  const { tab: statusTab, subtab: statusSubtab } = scenarioEditingMetadata || {};
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
@@ -37,10 +37,10 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(setTab(refTab));
-    dispatch(setSubTab(refSubtab));
+    dispatch(setTab(statusTab));
+    dispatch(setSubTab(statusSubtab));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, refTab, refSubtab]);
+  }, [dispatch, statusTab, statusSubtab]);
 
   const onSelectedTab = useCallback((t) => {
     const TAB = TABS.find((T) => T.id === t);

@@ -43,7 +43,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const { subtab: refSubtab } = scenarioEditingMetadata || {};
+  const { subtab: statusSubtab } = scenarioEditingMetadata || {};
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -75,8 +75,8 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   }, [dispatch, setSubTab, saveTabsStatus]);
 
   useEffect(() => {
-    setSection(getReloadTab(refSubtab));
-  }, [refSubtab]);
+    setSection(getReloadTab(statusSubtab));
+  }, [statusSubtab]);
 
   if (!scenarioData || tab !== 'analysis') return null;
 
