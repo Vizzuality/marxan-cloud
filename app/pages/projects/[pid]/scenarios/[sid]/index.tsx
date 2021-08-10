@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
+
+import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
+
+import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
+
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
@@ -18,6 +24,37 @@ import Wrapper from 'layout/wrapper';
 export const getServerSideProps = withProtection(withUser());
 
 const ShowScenarioPage: React.FC = () => {
+  const { query } = useRouter();
+  const { sid } = query;
+  const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata } = metadata || {};
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+  const saveDefaultTabsStatus = useCallback(async () => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        ...scenarioData,
+        metadata: {
+          ...metadata,
+          scenarioEditingMetadata: SCENARIO_EDITING_META_DATA_DEFAULT_VALUES,
+        },
+      },
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saveScenarioMutation, sid, metadata]);
+
+  useEffect(() => {
+    if (!scenarioEditingMetadata) saveDefaultTabsStatus();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scenarioEditingMetadata]);
+
   return (
     <Protected>
       <Title title="Detail" />
