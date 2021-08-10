@@ -51,7 +51,9 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     adminAreaId: projectData?.adminAreaLevel2Id
                  || projectData?.adminAreaLevel1I
                  || projectData?.countryId,
-    customAreaId: projectData?.planningAreaId,
+    customAreaId: !projectData?.adminAreaLevel2Id
+                  && !projectData?.adminAreaLevel1I
+                  && !projectData?.countryId ? projectData?.planningAreaId : null,
   });
 
   const saveScenarioMutation = useSaveScenario({

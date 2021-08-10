@@ -65,7 +65,9 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     adminAreaId: projectData?.adminAreaLevel2Id
                  || projectData?.adminAreaLevel1I
                  || projectData?.countryId,
-    customAreaId: projectData?.planningAreaId,
+    customAreaId: !projectData?.adminAreaLevel2Id
+                  && !projectData?.adminAreaLevel1I
+                  && !projectData?.countryId ? projectData?.planningAreaId : null,
   });
 
   const mutation = useSaveScenario({
