@@ -4,13 +4,13 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import { motion } from 'framer-motion';
+import { usePlausible } from 'next-plausible';
+
 import { useMe } from 'hooks/me';
 import { useProject } from 'hooks/projects';
 import { useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
-
-import { motion } from 'framer-motion';
-import { usePlausible } from 'next-plausible';
 
 import Pill from 'layout/pill';
 
@@ -57,10 +57,10 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
             features: 'empty',
             analysis: 'empty',
             solutions: 'empty',
-            tabStatus: {
-              tab: 'protected-areas',
-              subtab: 'protected-areas-preview',
-            },
+
+            tab: 'protected-areas',
+            subtab: 'protected-areas-preview',
+
           },
         },
       },

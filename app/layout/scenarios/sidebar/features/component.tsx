@@ -56,8 +56,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const { tabStatus } = scenarioEditingMetadata || {};
-  const { subtab: refSubtab } = tabStatus || {};
+  const { subtab: refSubtab } = scenarioEditingMetadata || {};
 
   const {
     data: selectedFeaturesData,

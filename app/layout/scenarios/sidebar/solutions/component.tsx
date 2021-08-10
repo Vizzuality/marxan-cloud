@@ -40,8 +40,7 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const { tabStatus } = scenarioEditingMetadata || {};
-  const { subtab: refSubtab } = tabStatus || {};
+  const { subtab: refSubtab } = scenarioEditingMetadata || {};
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {

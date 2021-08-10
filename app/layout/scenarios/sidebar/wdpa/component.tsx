@@ -45,8 +45,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
 
-  const { tabStatus } = scenarioEditingMetadata || {};
-  const { subtab: refSubtab } = tabStatus || {};
+  const { subtab: refSubtab } = scenarioEditingMetadata || {};
 
   const { data: wdpaData } = useWDPACategories(
     projectData?.adminAreaLevel2Id

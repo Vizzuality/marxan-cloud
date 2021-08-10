@@ -3,10 +3,10 @@ export const mergeScenarioStatusMetaData = (obj, tab, subtab) => {
     scenarioEditingMetadata: {
       ...obj,
       [tab]: 'draft',
-      tabStatus: {
-        tab: `${tab}`,
-        subtab: `${subtab}`,
-      },
+
+      tab: `${tab}`,
+      subtab: `${subtab}`,
+
     },
   };
   return metadata;
