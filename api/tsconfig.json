@@ -90,6 +90,12 @@
       ],
       "@marxan/features/*": [
         "libs/features/src/*"
+      ],
+      "@marxan/geofeature-calculations": [
+        "libs/geofeature-calculations/src"
+      ],
+      "@marxan/geofeature-calculations/*": [
+        "libs/geofeature-calculations/src/*"
       ]
     }
   },

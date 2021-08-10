@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
 
+import { COLORS, LEGEND_LAYERS } from './constants';
 import {
   UseAdminPreviewLayer,
   UseFeaturePreviewLayer,
   UseFeaturePreviewLayers,
   UseGeoJSONLayer,
+  UseLegend,
   UsePUGridLayer,
   UsePUGridPreviewLayer,
   UseWDPAPreviewLayer,
@@ -102,7 +104,7 @@ export function useWDPAPreviewLayer({
               ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
             ],
             paint: {
-              'fill-color': '#00F',
+              'fill-color': COLORS.wdpa,
             },
           },
           {
@@ -141,7 +143,7 @@ export function useFeaturePreviewLayer({
             type: 'fill',
             'source-layer': 'layer0',
             paint: {
-              'fill-color': '#FFCC00',
+              'fill-color': COLORS.primary,
               'fill-opacity': 0.5,
             },
           },
@@ -161,13 +163,6 @@ export function useFeaturePreviewLayer({
 export function useFeaturePreviewLayers({
   active, bbox, features, cache = 0, options = {},
 }: UseFeaturePreviewLayers) {
-  const COLORS = useMemo(() => {
-    return {
-      species: '#FFCC00',
-      bioregional: '#03E7D1',
-    };
-  }, []);
-
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
     const FEATURES = [...features];
@@ -195,7 +190,7 @@ export function useFeaturePreviewLayers({
                 type: 'fill',
                 'source-layer': 'layer0',
                 paint: {
-                  'fill-color': featureHoverId === id ? '#FF9900' : COLORS[type],
+                  'fill-color': featureHoverId === id ? COLORS[type].hover : COLORS[type].default,
                   'fill-opacity': featureHoverId === id ? 1 : 0.5,
                 },
               },
@@ -210,7 +205,7 @@ export function useFeaturePreviewLayers({
           },
         };
       });
-  }, [active, bbox, features, cache, options, COLORS]);
+  }, [active, bbox, features, cache, options]);
 }
 
 // PUGridpreview
@@ -233,7 +228,7 @@ export function usePUGridPreviewLayer({
             type: 'line',
             'source-layer': 'layer0',
             paint: {
-              'line-color': '#00BFFF',
+              'line-color': COLORS.primary,
               'line-opacity': 0.5,
             },
           },
@@ -287,7 +282,7 @@ export function usePUGridLayer({
             type: 'line',
             'source-layer': 'layer0',
             paint: {
-              'line-color': '#00BFFF',
+              'line-color': COLORS.primary,
               'line-opacity': 1,
               'line-width': 1,
               'line-offset': 0.5,
@@ -300,7 +295,7 @@ export function usePUGridLayer({
               type: 'fill',
               'source-layer': 'layer0',
               paint: {
-                'fill-color': '#00F',
+                'fill-color': COLORS.wdpa,
                 'fill-opacity': [
                   'case',
                   ['all',
@@ -320,7 +315,7 @@ export function usePUGridLayer({
               type: 'fill',
               'source-layer': 'layer0',
               paint: {
-                'fill-color': '#6F53F7',
+                'fill-color': COLORS.features,
                 'fill-opacity': [
                   'case',
                   ['any',
@@ -346,9 +341,9 @@ export function usePUGridLayer({
                   ['linear'],
                   ['get', 'costValue'],
                   0,
-                  '#FFBFB7',
+                  COLORS.cost[0],
                   1,
-                  '#C21701',
+                  COLORS.cost[1],
                 ],
                 'fill-opacity': 0.75,
               },
@@ -365,7 +360,7 @@ export function usePUGridLayer({
                 ['in', ['get', 'scenarioPuId'], ['literal', puIncludedValue]],
               ],
               paint: {
-                'line-color': '#0F0',
+                'line-color': COLORS.include,
                 'line-opacity': 1,
                 'line-width': 1.5,
                 'line-offset': 0.75,
@@ -381,7 +376,7 @@ export function usePUGridLayer({
                 ['in', ['get', 'scenarioPuId'], ['literal', puExcludedValue]],
               ],
               paint: {
-                'line-color': '#F00',
+                'line-color': COLORS.exclude,
                 'line-opacity': 1,
                 'line-width': 1.5,
                 'line-offset': 0.75,
@@ -400,9 +395,13 @@ export function usePUGridLayer({
                   ['linear'],
                   ['get', 'frequencyValue'],
                   0,
-                  '#FCA107',
+                  COLORS.frequency[0],
+                  33.33,
+                  COLORS.frequency[1],
+                  66.66,
+                  COLORS.frequency[2],
                   100,
-                  '#7F3121',
+                  COLORS.frequency[3],
                 ],
                 'fill-opacity': 0.75,
               },
@@ -415,7 +414,7 @@ export function usePUGridLayer({
                 ['in', `-${runId}-`, ['get', 'valuePosition']],
               ],
               paint: {
-                'fill-color': '#00F',
+                'fill-color': COLORS.primary,
                 'fill-opacity': 0.75,
               },
             },
@@ -425,4 +424,41 @@ export function usePUGridLayer({
       },
     };
   }, [cache, active, sid, type, subtype, runId, options, include]);
+}
+
+// PUGrid
+export function useLegend({
+  type, subtype, options = {},
+}: UseLegend) {
+  const layers = useMemo(() => {
+    const { wdpaIucnCategories = [] } = options;
+
+    if (type === 'protected-areas' && subtype === 'protected-areas-preview' && !!wdpaIucnCategories.length) return ['wdpa-preview', 'pugrid'];
+    if (type === 'protected-areas' && subtype === 'protected-areas-percentage' && !!wdpaIucnCategories.length) return ['wdpa-percentage', 'pugrid'];
+    if (type === 'features') {
+      return [
+        ...wdpaIucnCategories.length ? ['wdpa-percentage'] : [],
+        'bioregional',
+        'species',
+        'pugrid',
+      ];
+    }
+    if (type === 'analysis' && subtype === 'analysis-gap-analysis') return ['features', 'pugrid'];
+    if (type === 'analysis' && subtype === 'analysis-cost-surface') return ['cost', 'pugrid'];
+    if (type === 'analysis' && subtype === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
+    if (type === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
+    if (type === 'solutions') return ['frequency', 'solution', 'pugrid'];
+
+    return ['pugrid'];
+  }, [type, subtype, options]);
+
+  return useMemo(() => {
+    return layers
+      .map((l) => {
+        const L = LEGEND_LAYERS[l];
+        if (L) return L(options);
+        return null;
+      })
+      .filter((l) => !!l);
+  }, [layers, options]);
 }
