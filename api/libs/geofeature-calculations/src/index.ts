@@ -7,6 +7,16 @@ export interface FeaturesJobData {
   scenarioId: string;
 }
 
+export type FeaturesJobCancelProgress = {
+  type: 'canceled';
+  canceled: boolean;
+} & FeaturesJobData;
+export type FeaturesJobProgress =
+  | {
+      type: 'empty';
+    }
+  | FeaturesJobCancelProgress;
+
 export type CopyJobData = FeaturesJobData;
 export type SplitJobData = FeaturesJobData;
 export type StratificationJobData = FeaturesJobData;
