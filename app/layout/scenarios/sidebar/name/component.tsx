@@ -53,14 +53,14 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
         projectId: pid,
         metadata: {
           scenarioEditingMetadata: {
-            'protected-areas': 'draft',
-            features: 'empty',
-            analysis: 'empty',
-            solutions: 'empty',
-
+            status: {
+              'protected-areas': 'draft',
+              features: 'empty',
+              analysis: 'empty',
+              solutions: 'empty',
+            },
             tab: 'protected-areas',
             subtab: 'protected-areas-preview',
-
           },
         },
       },

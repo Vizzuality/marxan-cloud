@@ -56,7 +56,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
   const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
 
   const {
     data: wdpaData,
@@ -107,7 +106,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       id: scenarioData.id,
       data: {
         wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
-        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
       },
     }, {
       onSuccess: () => {
@@ -136,7 +135,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         });
       },
     });
-  }, [mutation, scenarioData?.id, addToast, onSuccess, scenarioEditingMetadata]);
+  }, [mutation, scenarioData?.id, addToast, onSuccess, metadata]);
 
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {

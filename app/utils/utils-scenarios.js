@@ -1,12 +1,14 @@
-export const mergeScenarioStatusMetaData = (obj, tab, subtab) => {
+export const mergeScenarioStatusMetaData = (obj, { tab, subtab }) => {
+  const { scenarioEditingMetadata } = obj;
   const metadata = {
+    ...obj,
     scenarioEditingMetadata: {
-      ...obj,
-      [tab]: 'draft',
-
+      status: {
+        ...scenarioEditingMetadata.status,
+        [tab]: 'draft',
+      },
       tab: `${tab}`,
       subtab: `${subtab}`,
-
     },
   };
   return metadata;

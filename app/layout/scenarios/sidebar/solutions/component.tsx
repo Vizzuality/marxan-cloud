@@ -40,7 +40,7 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const { subtab: statusSubtab } = scenarioEditingMetadata || {};
+  const { subtab: metaSubtab } = scenarioEditingMetadata || {};
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -52,10 +52,10 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'solutions', `${subtab}`),
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'solutions', subtab: `${subtab}` }),
       },
     });
-  }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
+  }, [saveScenarioMutation, sid, metadata]);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
@@ -66,8 +66,8 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
   }, [dispatch, setSubTab, saveTabsStatus]);
 
   useEffect(() => {
-    setSection(getReloadSubtab(statusSubtab));
-  }, [statusSubtab]);
+    setSection(getReloadSubtab(metaSubtab));
+  }, [metaSubtab]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.SOLUTIONS) return null;
 

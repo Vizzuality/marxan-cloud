@@ -51,7 +51,6 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
   const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
 
   const {
     data: wdpaData,
@@ -95,7 +94,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         ...values,
-        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'protected-areas', 'protected-areas-percentage'),
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'protected-areas', subtab: 'protected-areas-percentage' }),
       },
     }, {
       onSuccess: () => {
@@ -123,7 +122,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         });
       },
     });
-  }, [mutation, scenarioData?.id, addToast, onSuccess, scenarioEditingMetadata]);
+  }, [mutation, scenarioData?.id, addToast, onSuccess, metadata]);
 
   const onSkip = useCallback(() => {
     setSubmitting(true);
@@ -132,7 +131,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         wdpaIucnCategories: null,
-        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
       },
     }, {
       onSuccess: () => {
@@ -161,7 +160,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         });
       },
     });
-  }, [mutation, addToast, onDismiss, scenarioData?.id, scenarioEditingMetadata]);
+  }, [mutation, addToast, onDismiss, scenarioData?.id, metadata]);
 
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {

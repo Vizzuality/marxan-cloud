@@ -56,7 +56,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const { subtab: statusSubtab } = scenarioEditingMetadata || {};
+  const { subtab: metaSubtab } = scenarioEditingMetadata || {};
 
   const {
     data: selectedFeaturesData,
@@ -72,37 +72,37 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'analysis', 'analysis-preview'),
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'analysis', subtab: 'analysis-preview' }),
       },
     }, {
       onSuccess: () => {
         push(`/projects/${pid}`);
       },
     });
-  }, [saveScenarioMutation, sid, pid, push, scenarioEditingMetadata]);
+  }, [saveScenarioMutation, sid, pid, push, metadata]);
 
   const saveScenarioStatusOnContinue = useCallback(async () => {
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-fpf'),
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-fpf' }),
       },
     });
-  }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
+  }, [saveScenarioMutation, sid, metadata]);
 
   const saveScenarioFeaturesStatusOnBack = useCallback(async () => {
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-preview'),
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
       },
     });
-  }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
+  }, [saveScenarioMutation, sid, metadata]);
 
   useEffect(() => {
-    const reloadStep = statusSubtab === 'features-preview' ? 0 : 1;
+    const reloadStep = metaSubtab === 'features-preview' ? 0 : 1;
     setStep(reloadStep);
-  }, [statusSubtab]);
+  }, [metaSubtab]);
 
   if (!scenarioData || tab !== 'features') return null;
 
