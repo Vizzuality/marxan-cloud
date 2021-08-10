@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { SpecificationFeatureConfigApiEntity } from './specification-feature-config.api.entity';
 
-@Entity(`specification_feature`)
+@Entity(`specification_features`)
 export class SpecificationFeatureApiEntity {
   @PrimaryGeneratedColumn(`uuid`)
   id!: string;

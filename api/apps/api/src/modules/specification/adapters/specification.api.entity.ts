@@ -9,7 +9,7 @@ import {
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { SpecificationFeatureConfigApiEntity } from './specification-feature-config.api.entity';
 
-@Entity(`specification`)
+@Entity(`specifications`)
 export class SpecificationApiEntity {
   @PrimaryColumn({
     type: `uuid`,
