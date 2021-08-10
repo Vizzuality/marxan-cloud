@@ -10,7 +10,7 @@ import { SpecificationApiEntity } from './specification.api.entity';
 import { SpecificationOperation } from '../domain';
 import { SpecificationFeatureApiEntity } from '@marxan-api/modules/specification/adapters/specification-feature.api.entity';
 
-@Entity(`specification_feature_config`)
+@Entity(`specification_feature_configs`)
 export class SpecificationFeatureConfigApiEntity {
   @PrimaryGeneratedColumn(`uuid`)
   id!: string;

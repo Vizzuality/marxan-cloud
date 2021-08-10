@@ -33,7 +33,7 @@ export class DbSpecificationRepository implements SpecificationRepository {
       .createQueryBuilder('spec')
       .select('spec.id')
       .leftJoin(
-        'specification_feature_config',
+        'specification_feature_configs',
         'config',
         'config.specification_id = spec.id',
       )
@@ -71,12 +71,12 @@ export class DbSpecificationRepository implements SpecificationRepository {
       .createQueryBuilder('spec')
       .select('spec.id')
       .leftJoin(
-        `specification_feature_config`,
+        `specification_feature_configs`,
         `config`,
         `config.specification_id = spec.id`,
       )
       .leftJoin(
-        `specification_feature`,
+        `specification_features`,
         `features`,
         `config.id = features.specification_feature_config_id`,
       )
@@ -107,7 +107,6 @@ export class DbSpecificationRepository implements SpecificationRepository {
     if (specification) {
       return this.#serialize(specification);
     }
-    return;
   }
 
   async save(specification: Specification): Promise<void> {
