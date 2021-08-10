@@ -1,3 +1,5 @@
+import { ValuesType } from 'utility-types';
+
 export enum API_EVENT_KINDS {
   user__signedUp__v1alpha1 = 'user.signedUp/v1alpha1',
   user__accountActivationTokenGenerated__v1alpha1 = 'user.accountActivationTokenGenerated/v1alpha1',
@@ -38,3 +40,13 @@ export type ScenarioEvents = Pick<
   typeof API_EVENT_KINDS,
   Extract<keyof typeof API_EVENT_KINDS, `scenario__${string}`>
 >;
+
+export type ScenarioGeoFeatureEventKeys = Extract<
+  keyof typeof API_EVENT_KINDS,
+  `scenario__geofeature${`Copy` | `Split` | `Stratification`}${string}`
+>;
+export type ScenarioGeofeatureEvents = Pick<
+  typeof API_EVENT_KINDS,
+  ScenarioGeoFeatureEventKeys
+>;
+export type ScenarioGeofeatureEventValues = ValuesType<ScenarioGeofeatureEvents>;

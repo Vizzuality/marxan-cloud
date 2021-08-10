@@ -1,10 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsUUID } from 'class-validator';
-import { API_EVENT_KINDS } from '@marxan/api-events';
-import {
-  ScenarioGeofeatureDataV1Alpha,
-  ScenarioGeofeatureEvents,
-} from '../events-data/scenario-geofeature-data-v1-alpha';
+import { API_EVENT_KINDS, ScenarioGeofeatureEvents } from '@marxan/api-events';
+import { ScenarioGeofeatureDataV1Alpha } from '../events-data/scenario-geofeature-data-v1-alpha';
 import { ValuesType } from 'utility-types';
 
 // it's guarded by typing, no mismatch possible
