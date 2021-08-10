@@ -78,7 +78,6 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
       onSuccess: () => {
         push(`/projects/${pid}`);
       },
-      onError: () => { },
     });
   }, [saveScenarioMutation, sid, pid, push, scenarioEditingMetadata]);
 
@@ -88,9 +87,6 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
       data: {
         metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'features', 'features-fpf'),
       },
-    }, {
-      onSuccess: () => { },
-      onError: () => { },
     });
   }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
 

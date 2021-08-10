@@ -54,12 +54,6 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
       data: {
         metadata: mergeScenarioStatusMetaData(scenarioEditingMetadata, 'solutions', `${subtab}`),
       },
-    }, {
-      onSuccess: () => {
-      },
-      onError: (err) => {
-        console.info(err);
-      },
     });
   }, [saveScenarioMutation, sid, scenarioEditingMetadata]);
 
