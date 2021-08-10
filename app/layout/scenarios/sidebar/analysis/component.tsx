@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { mergeScenarioStatusMetaData, getReloadTab } from 'utils/utils-scenarios';
+import { mergeScenarioStatusMetaData, getReloadSubtab } from 'utils/utils-scenarios';
 
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
@@ -75,7 +75,7 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   }, [dispatch, setSubTab, saveTabsStatus]);
 
   useEffect(() => {
-    setSection(getReloadTab(statusSubtab));
+    setSection(getReloadSubtab(statusSubtab));
   }, [statusSubtab]);
 
   if (!scenarioData || tab !== 'analysis') return null;

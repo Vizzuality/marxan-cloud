@@ -12,16 +12,16 @@ export const mergeScenarioStatusMetaData = (obj, tab, subtab) => {
   return metadata;
 };
 
-export const getReloadTab = (tab) => {
-  if (tab === 'analysis-gap-analysis') {
+export const getReloadSubtab = (subtab) => {
+  if (subtab === 'analysis-gap-analysis') {
     return 'gap-analysis';
-  } if (tab === 'analysis-cost-surface') {
+  } if (subtab === 'analysis-cost-surface') {
     return 'cost-surface';
-  } if (tab === 'analysis-adjust-planning-units') {
+  } if (subtab === 'analysis-adjust-planning-units') {
     return 'adjust-planning-units';
-  } if (tab === 'solutions-details') {
+  } if (subtab === 'solutions-details') {
     return 'details';
-  } if (tab === 'solutions-gap-analysis') {
+  } if (subtab === 'solutions-gap-analysis') {
     return 'gap-analysis';
   }
   return null;
