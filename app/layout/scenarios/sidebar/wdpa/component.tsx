@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useProject } from 'hooks/projects';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
 import HelpBeacon from 'layout/help/beacon';
@@ -47,11 +47,12 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
 
   const { subtab: metaSubtab } = scenarioEditingMetadata || {};
 
-  const { data: wdpaData } = useWDPACategories(
-    projectData?.adminAreaLevel2Id
-    || projectData?.adminAreaLevel1Id
-    || projectData?.countryId,
-  );
+  const { data: wdpaData } = useWDPACategories({
+    adminAreaId: projectData?.adminAreaLevel2Id
+                 || projectData?.adminAreaLevel1I
+                 || projectData?.countryId,
+    customAreaId: projectData?.planningAreaId,
+  });
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {

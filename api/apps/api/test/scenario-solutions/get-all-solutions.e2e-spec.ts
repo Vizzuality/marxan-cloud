@@ -26,16 +26,21 @@ describe(`When getting scenario solution results`, () => {
     expect(response.body.data.length).toEqual(11);
     expect(response.body.data[0].attributes).toMatchInlineSnapshot(
       {
+        costValue: expect.any(Number),
         id: expect.any(String),
+        missingValues: expect.any(Number),
+        planningUnits: expect.any(Number),
+        runId: expect.any(Number),
+        scoreValue: expect.any(Number),
       },
       `
       Object {
-        "costValue": 400,
+        "costValue": Any<Number>,
         "id": Any<String>,
-        "missingValues": 13,
-        "planningUnits": 17,
-        "runId": 1,
-        "scoreValue": 999,
+        "missingValues": Any<Number>,
+        "planningUnits": Any<Number>,
+        "runId": Any<Number>,
+        "scoreValue": Any<Number>,
       }
     `,
     );

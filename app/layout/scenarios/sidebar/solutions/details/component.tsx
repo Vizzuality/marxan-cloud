@@ -73,8 +73,9 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
     },
     {
       color: '#0BC6C2',
-      value: '10',
-    }];
+      value: '100',
+    },
+  ];
 
   return (
     <motion.div

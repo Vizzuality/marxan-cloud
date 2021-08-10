@@ -33,6 +33,7 @@ const Template: Story<LegendProps> = (args) => {
   return (
     <Legend
       {...args}
+      open
       sortable={sortable}
       maxHeight={300}
       onChangeOrder={onChangeOrder}
