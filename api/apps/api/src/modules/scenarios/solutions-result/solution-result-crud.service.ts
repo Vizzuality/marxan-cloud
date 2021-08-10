@@ -57,13 +57,6 @@ export class SolutionResultCrudService extends AppBaseService<
     _fetchSpecification?: FetchSpecification,
     _info?: AppInfoDTO,
   ): Promise<ScenariosOutputResultsApiEntity> {
-    // TODO implement
-    entity.scoreValue = 999;
-    entity.costValue = 400;
-    entity.planningUnits = 17;
-    entity.missingValues = 13;
-    entity.runId = 1;
-
     return entity;
   }
 }
