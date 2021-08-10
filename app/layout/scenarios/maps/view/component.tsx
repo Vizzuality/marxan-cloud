@@ -13,8 +13,7 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
 
-import { useSelectedFeatures } from 'hooks/features';
-import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'hooks/map';
+import { usePUGridLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 
@@ -38,10 +37,6 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { data = {} } = useProject(pid);
   const { bbox } = data;
 
-  const {
-    data: selectedFeaturesData,
-  } = useSelectedFeatures(sid, {});
-
   getScenarioSlice(sid);
   const { selectedSolutionId } = useSelector((state) => state[`/scenarios/${sid}`]);
 
@@ -58,11 +53,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     subtab,
     cache,
     // WDPA
-    wdpaCategories,
     wdpaThreshold,
-
-    // Features
-    featureHoverId,
     // Adjust planning units
     puAction,
     puTmpIncludedValue,
@@ -73,23 +64,6 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
-
-  const WDPApreviewLayer = useWDPAPreviewLayer({
-    ...wdpaCategories,
-    cache,
-    active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
-    bbox,
-  });
-
-  const FeaturePreviewLayers = useFeaturePreviewLayers({
-    features: selectedFeaturesData,
-    cache,
-    active: tab === 'features',
-    bbox,
-    options: {
-      featureHoverId,
-    },
-  });
 
   const PUGridLayer = usePUGridLayer({
     cache,
@@ -106,7 +80,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     },
   });
 
-  const LAYERS = [PUGridLayer, WDPApreviewLayer, ...FeaturePreviewLayers].filter((l) => !!l);
+  const LAYERS = [PUGridLayer].filter((l) => !!l);
 
   useEffect(() => {
     setBounds({
