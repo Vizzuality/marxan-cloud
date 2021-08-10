@@ -10,12 +10,6 @@ export interface TabsProps {
     warning?: boolean;
     requirements?: React.ReactNode;
   }[];
-  statusData: {
-    'protected-areas': string;
-    features: string;
-    analysis: string;
-    solutions: string;
-  };
   selected: string | number;
   className?: string;
   onSelected?: (selected: string | number) => void | unknown;
@@ -23,7 +17,6 @@ export interface TabsProps {
 
 export const Tabs: React.FC<TabsProps> = ({
   items = [],
-  statusData,
   selected,
   onSelected,
 }: TabsProps) => {
@@ -38,14 +31,14 @@ export const Tabs: React.FC<TabsProps> = ({
                 'relative focus:outline-none text-white text-opacity-50 text-sm': true,
                 'hover:text-opacity-75': tab.id !== selected,
                 'text-opacity-100': tab.id === selected,
-                invisible: statusData && statusData[tab.id] === 'empty',
+                invisible: tab.status === 'disabled',
               },
             )}
             onClick={() => onSelected(tab.id)}
           >
             {tab.name}
             {tab.warning && (
-            <div className="absolute w-2 h-2 bg-red-500 rounded-full -top-0 -right-3" />
+              <div className="absolute w-2 h-2 bg-red-500 rounded-full -top-0 -right-3" />
             )}
           </button>
         </li>

@@ -1,12 +1,16 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
+
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
 
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useScenario } from 'hooks/scenarios';
 
 import Header from 'layout/header';
 import Help from 'layout/help/button';
@@ -30,32 +34,20 @@ const EditScenarioPage: React.FC = () => {
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
+  const {
+    tab: metaTab,
+    subtab: metaSubtab,
+  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
 
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
-
-  const saveDefaultTabsStatus = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        ...scenarioData,
-        metadata: {
-          ...metadata,
-          scenarioEditingMetadata: SCENARIO_EDITING_META_DATA_DEFAULT_VALUES,
-        },
-      },
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [saveScenarioMutation, sid, metadata]);
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setTab, setSubTab } = scenarioSlice.actions;
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!scenarioEditingMetadata) saveDefaultTabsStatus();
-
+    if (metaTab) dispatch(setTab(metaTab));
+    if (metaTab) dispatch(setSubTab(metaSubtab));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scenarioEditingMetadata]);
+  }, [metaTab, metaSubtab]);
 
   return (
     <Protected>

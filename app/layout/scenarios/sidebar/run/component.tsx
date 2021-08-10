@@ -7,6 +7,7 @@ import { Form as FormRFF } from 'react-final-form';
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
+import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useRunScenario, useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -35,7 +36,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
 
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
+  const { scenarioEditingMetadata = SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } = metadata || {};
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {

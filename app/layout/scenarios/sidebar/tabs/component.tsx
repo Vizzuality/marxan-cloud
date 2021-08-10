@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useScenario } from 'hooks/scenarios';
 
@@ -14,6 +15,7 @@ import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 
 import Tabs from 'components/tabs';
+import { TabsProps } from 'components/tabs/component';
 
 import { TABS } from './constants';
 import { ScenariosSidebarTabsProps } from './types';
@@ -28,8 +30,9 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
 
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const { status } = scenarioEditingMetadata || {};
-  const { tab: metaTab, subtab: metaSubtab } = scenarioEditingMetadata || {};
+  const {
+    status: metaStatus,
+  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
@@ -37,12 +40,16 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    console.info('metaTab', metaTab, 'metaSubtab', metaSubtab);
-    dispatch(setTab(metaTab));
-    dispatch(setSubTab(metaSubtab));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, metaTab, metaSubtab]);
+  const TABS_PARSED = useMemo<TabsProps['items']>(() => {
+    if (!metaStatus) return [];
+
+    return TABS.map((t) => {
+      return {
+        ...t,
+        status: metaStatus[t.id] === 'empty' ? 'disabled' : 'active',
+      };
+    });
+  }, [metaStatus]);
 
   const onSelectedTab = useCallback((t) => {
     const TAB = TABS.find((T) => T.id === t);
@@ -120,8 +127,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
 
           {scenarioFetched && (
             <Tabs
-              items={TABS}
-              statusData={status}
+              items={TABS_PARSED}
               selected={tab}
               onSelected={onSelectedTab}
             />
