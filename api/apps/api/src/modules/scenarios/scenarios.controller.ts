@@ -210,6 +210,15 @@ export class ScenariosController {
   }
 
   @ApiOperation({ description: 'Create feature set for scenario' })
+  @Post(':id/features/specification/v2')
+  async createSpecification(
+    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    await this.service.createSpecification(id, dto);
+  }
+
+  @ApiOperation({ description: 'Create feature set for scenario' })
   @ApiCreatedResponse({ type: GeoFeatureSetResult })
   @Post(':id/features/specification')
   async createFeatureSetFor(

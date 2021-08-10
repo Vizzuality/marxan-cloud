@@ -29,6 +29,8 @@ import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/s
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
 import { AnalysisModule } from '@marxan-api/modules/analysis/analysis.module';
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
+import { SpecificationModule } from '@marxan-api/modules/specification';
+import { ScenarioSpecificationModule } from './modules/scenario-specification';
 
 @Module({
   imports: [
@@ -57,6 +59,8 @@ import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning
     PlanningUnitsProtectionLevelModule,
     AnalysisModule,
     PlanningUnitsModule,
+    SpecificationModule,
+    ScenarioSpecificationModule,
   ],
   controllers: [AppController, PingController],
   providers: [

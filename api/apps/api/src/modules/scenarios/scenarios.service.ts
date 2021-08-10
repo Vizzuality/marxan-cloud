@@ -3,8 +3,8 @@ import {
   HttpService,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
@@ -30,7 +30,7 @@ import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { OutputFilesService } from './output-files/output-files.service';
-import { InputFilesService, InputFilesArchiverService } from './input-files';
+import { InputFilesArchiverService, InputFilesService } from './input-files';
 import { notFound, RunService } from './marxan-run';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 import { SimpleJobStatus } from './scenario.api.entity';
@@ -39,6 +39,10 @@ import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-proper
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from './planning-units/scenario-planning-units-protection-status-calculator-service';
+import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { SubmitSpecification } from '@marxan-api/modules/specification';
+import { SpecificationOperation } from '@marxan-api/modules/specification/domain';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -68,6 +72,7 @@ export class ScenariosService {
     private readonly planningUnitsService: ScenarioPlanningUnitsService,
     private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
     private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,
+    private readonly commandBus: CommandBus,
   ) {}
 
   async findAllPaginated(
@@ -335,5 +340,19 @@ export class ScenariosService {
   async getPlanningUnits(scenarioId: string) {
     await this.assertScenario(scenarioId);
     return this.planningUnitsService.get(scenarioId);
+  }
+
+  async createSpecification(scenarioId: string, dto: CreateGeoFeatureSetDTO) {
+    await this.assertScenario(scenarioId);
+    await this.commandBus.execute(
+      new SubmitSpecification({
+        scenarioId,
+        draft: dto.status === SimpleJobStatus.draft,
+        features: dto.features.map((feature) => ({
+          baseFeatureId: feature.featureId,
+          operation: SpecificationOperation.Split,
+        })),
+      }),
+    );
   }
 }
