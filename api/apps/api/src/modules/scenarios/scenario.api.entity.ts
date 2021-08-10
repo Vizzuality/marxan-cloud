@@ -185,6 +185,20 @@ export class Scenario extends TimeUserEntityMetadata {
     default: false,
   })
   ranAtLeastOnce!: boolean;
+
+  @Column({
+    name: `candidate_specification_id`,
+    nullable: true,
+    type: `uuid`,
+  })
+  candidateSpecificationId?: string | null;
+
+  @Column({
+    name: `active_specification_id`,
+    nullable: true,
+    type: `uuid`,
+  })
+  activeSpecificationId?: string | null;
 }
 
 export class JSONAPIScenarioData {
