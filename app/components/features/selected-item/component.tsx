@@ -146,7 +146,7 @@ export const Item: React.FC<ItemProps> = ({
 
         {type === 'bioregional' && !readOnly && (
           <div>
-            <div className="flex items-center mt-3 tracking-wide font-heading">
+            <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <Icon icon={SPLIT_SVG} className="w-5 h-5 text-green-300" />
               <h4 className="ml-2 text-xs text-white uppercase">
                 You can

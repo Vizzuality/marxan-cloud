@@ -57,6 +57,19 @@ export interface UsePUGridLayer {
   type: ScenarioSidebarTabs;
   subtype: ScenarioSidebarSubTabs;
   options?: {
+    wdpaIucnCategories?: string[];
+    wdpaThreshold?: number;
+    puAction?: string;
+    puIncludedValue?: string[];
+    puExcludedValue?: string[];
+  };
+}
+
+export interface UseLegend {
+  type: ScenarioSidebarTabs;
+  subtype: ScenarioSidebarSubTabs;
+  options?: {
+    wdpaIucnCategories?: string[];
     wdpaThreshold?: number;
     puAction?: string;
     puIncludedValue?: string[];
