@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioSlice } from 'store/slices/scenarios/detail';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
@@ -17,7 +16,6 @@ import { useSession } from 'next-auth/client';
 import { useSelectedFeatures } from 'hooks/features';
 import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useSolution, useBestSolution } from 'hooks/solutions';
 
 import ScenariosDrawingManager from 'layout/scenarios/maps/drawing-manager';
 
@@ -47,17 +45,6 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { setTmpPuIncludedValue, setTmpPuExcludedValue } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
-
-  getScenarioSlice(sid);
-  const { selectedSolutionId } = useSelector((state) => state[`/scenarios/${sid}`]);
-
-  const {
-    data: selectedSolutionData,
-  } = useSolution(sid, selectedSolutionId);
-
-  const {
-    data: bestSolutionData,
-  } = useBestSolution(sid);
 
   const {
     tab,
@@ -104,7 +91,6 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     sid: sid ? `${sid}` : null,
     type: tab,
     subtype: subtab,
-    runId: selectedSolutionData?.runId || bestSolutionData?.runId,
     options: {
       wdpaThreshold,
       puAction,

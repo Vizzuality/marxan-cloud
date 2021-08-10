@@ -3,12 +3,11 @@ import React, {
 } from 'react';
 
 // Map
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { getScenarioSlice } from 'store/slices/scenarios/detail';
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -43,11 +42,6 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
 
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTmpPuIncludedValue, setTmpPuExcludedValue } = scenarioSlice.actions;
-
-  const dispatch = useDispatch();
-
   getScenarioSlice(sid);
   const { selectedSolutionId } = useSelector((state) => state[`/scenarios/${sid}`]);
 
@@ -70,7 +64,6 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     // Features
     featureHoverId,
     // Adjust planning units
-    clicking,
     puAction,
     puTmpIncludedValue,
     puTmpExcludedValue,
@@ -143,52 +136,8 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   }, []);
 
   const handleClick = useCallback((e) => {
-    if (e && e.features) {
-      console.info(e.features);
-    }
-
-    if (clicking) {
-      const { features = [] } = e;
-
-      const pUGridLayer = features.find((f) => f.source === `pu-grid-layer-${cache}`);
-
-      if (pUGridLayer) {
-        const { properties } = pUGridLayer;
-        const { scenarioPuId } = properties;
-
-        const newClickingValue = puAction === 'include' ? [...puTmpIncludedValue] : [...puTmpExcludedValue];
-        const newAction = puAction === 'include' ? setTmpPuIncludedValue : setTmpPuExcludedValue;
-
-        const newOpositeClickingValue = puAction !== 'include' ? [...puTmpIncludedValue] : [...puTmpExcludedValue];
-        const newOpositeAction = puAction !== 'include' ? setTmpPuIncludedValue : setTmpPuExcludedValue;
-
-        const index = newClickingValue.findIndex((s) => s === scenarioPuId);
-        const indexOposite = newOpositeClickingValue.findIndex((s) => s === scenarioPuId);
-
-        if (index > -1) {
-          newClickingValue.splice(index, 1);
-        } else {
-          newClickingValue.push(scenarioPuId);
-        }
-
-        if (indexOposite > -1) {
-          newOpositeClickingValue.splice(indexOposite, 1);
-          dispatch(newOpositeAction(newOpositeClickingValue));
-        }
-
-        dispatch(newAction(newClickingValue));
-      }
-    }
-  }, [
-    clicking,
-    puAction,
-    puTmpIncludedValue,
-    puTmpExcludedValue,
-    dispatch,
-    setTmpPuIncludedValue,
-    setTmpPuExcludedValue,
-    cache,
-  ]);
+    if (e && e.features) console.info(e.features);
+  }, []);
 
   const handleTransformRequest = (url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
