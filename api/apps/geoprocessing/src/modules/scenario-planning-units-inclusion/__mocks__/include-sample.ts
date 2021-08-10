@@ -39,12 +39,12 @@ export const excludeSample = (): FeatureCollection<Polygon | MultiPolygon> => ({
         type: 'Polygon',
         coordinates: [
           [
-            [-9.91117000579834, 51.65272325936179],
-            [-9.91110563278198, 51.65215080080787],
+            [-9.91007000579834, 51.65272325936179],
+            [-9.91000563278198, 51.65215080080787],
             [-9.907822608947754, 51.65220405307135],
             [-9.907844066619873, 51.6532957106858],
-            [-9.91110563278198, 51.65330902342127],
-            [-9.91117000579834, 51.65272325936179],
+            [-9.91000563278198, 51.65330902342127],
+            [-9.91007000579834, 51.65272325936179],
           ],
         ],
       },
@@ -53,6 +53,62 @@ export const excludeSample = (): FeatureCollection<Polygon | MultiPolygon> => ({
 });
 
 export const includeSample = (): FeatureCollection<Polygon | MultiPolygon> => ({
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      properties: {
+        stroke: '#555555',
+        'stroke-width': 2,
+        'stroke-opacity': 1,
+        fill: '#13be55',
+        'fill-opacity': 0.5,
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-9.908766746520996, 51.65438734200841],
+            [-9.90965723991394, 51.65394818592163],
+            [-9.908895492553711, 51.65398951669091],
+            [-9.906202554702759, 51.6539161423378],
+            [-9.905773401260376, 51.654413966834184],
+            [-9.906063079833984, 51.655252640839656],
+            [-9.908766746520996, 51.65438734200841],
+          ],
+        ],
+      },
+    },
+    {
+      type: 'Feature',
+      properties: {
+        stroke: '#555555',
+        'stroke-width': 2,
+        'stroke-opacity': 1,
+        fill: '#2cc33e',
+        'fill-opacity': 0.5,
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-9.914367198944092, 51.652417061499726],
+            [-9.91441011428833, 51.65064639851562],
+            [-9.909067153930664, 51.65087272771491],
+            [-9.91159915924072, 51.65137863595659],
+            [-9.911620616912842, 51.652829762481126],
+            [-9.914302825927734, 51.652869701086374],
+            [-9.914367198944092, 51.652417061499726],
+          ],
+        ],
+      },
+    },
+  ],
+});
+
+export const includeSampleOverlappingWithExclude = (): FeatureCollection<
+  Polygon | MultiPolygon
+> => ({
   type: 'FeatureCollection',
   features: [
     {
@@ -316,8 +372,8 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
           shouldBeIncluded: false,
         },
         multipleFeatures: {
-          shouldBeExcluded: true,
-          shouldBeIncluded: false,
+          shouldBeExcluded: false,
+          shouldBeIncluded: true,
         },
       },
       geometry: {
@@ -367,7 +423,7 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         },
         multipleFeatures: {
           shouldBeExcluded: false,
-          shouldBeIncluded: true,
+          shouldBeIncluded: false,
         },
       },
       geometry: {

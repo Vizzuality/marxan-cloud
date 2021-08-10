@@ -2,13 +2,17 @@ import { v4 } from 'uuid';
 import { Test } from '@nestjs/testing';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 
-import { SpecificationId } from '../../specification.id';
-import { ScenarioSpecification } from '../../scenario-specification';
-import { CandidateSpecificationChanged } from '../../events/candidate-specification-changed.event';
+import {
+  SpecificationId,
+  ScenarioSpecification,
+  CandidateSpecificationChanged,
+} from '../../domain';
 
 import { AssignCandidateSpecificationHandler } from '../assign-candidate-specification.handler';
 import { ScenarioSpecificationRepo } from '../scenario-specification.repo';
-import { AssignCandidateSpecification } from '../../command/assign-candidate-specification.command';
+import { AssignCandidateSpecification } from '../assign-candidate-specification.command';
+
+import { InMemoryScenarioSpecificationRepo } from './scenario-specification-in-memory.repo';
 
 export const getFixtures = async () => {
   const scenarioId = v4();
@@ -70,16 +74,3 @@ export const getFixtures = async () => {
     },
   };
 };
-
-class InMemoryScenarioSpecificationRepo implements ScenarioSpecificationRepo {
-  #memory: Record<string, ScenarioSpecification> = {};
-
-  async findOrCreate(scenarioId: string): Promise<ScenarioSpecification> {
-    this.#memory[scenarioId] ??= new ScenarioSpecification(scenarioId);
-    return this.#memory[scenarioId];
-  }
-
-  async save(scenarioSpecification: ScenarioSpecification): Promise<void> {
-    this.#memory[scenarioSpecification.scenarioId] = scenarioSpecification;
-  }
-}

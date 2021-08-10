@@ -1,16 +1,16 @@
 import { Either, isLeft } from 'fp-ts/Either';
 import { v4 } from 'uuid';
 import {
-  NoCandidateToActivate,
+  noCandidateToActivate,
   ScenarioSpecification,
-  SpecificationIsNoLongerACandidate,
+  specificationIsNoLongerACandidate,
 } from '../scenario-specification';
 import { SpecificationId } from '../specification.id';
 import { SpecificationActivated } from '../events/specification-activated.event';
 import { CandidateSpecificationChanged } from '../events/candidate-specification-changed.event';
 
 type ActivateResult = Either<
-  typeof NoCandidateToActivate | typeof SpecificationIsNoLongerACandidate,
+  typeof noCandidateToActivate | typeof specificationIsNoLongerACandidate,
   void
 >;
 
@@ -30,7 +30,7 @@ export const getFixtures = () => {
     ThenNoCandidateIsRaised(result: ActivateResult) {
       expect.assertions(1);
       if (isLeft(result)) {
-        expect(result.left).toEqual(NoCandidateToActivate);
+        expect(result.left).toEqual(noCandidateToActivate);
       }
     },
     GivenScenarioSpecificationWithCandidate(
@@ -41,7 +41,7 @@ export const getFixtures = () => {
     ThenNoLongerACandidateIsRaised(result: ActivateResult) {
       expect.assertions(1);
       if (isLeft(result)) {
-        expect(result.left).toEqual(SpecificationIsNoLongerACandidate);
+        expect(result.left).toEqual(specificationIsNoLongerACandidate);
       }
     },
     ThenSpecificationIsActivated(

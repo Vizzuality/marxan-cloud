@@ -53,12 +53,12 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     data: wdpaData,
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
-  } = useWDPACategories(
-    projectData?.planningAreaId
-    || projectData?.adminAreaLevel2Id
-    || projectData?.adminAreaLevel1Id
-    || projectData?.countryId,
-  );
+  } = useWDPACategories({
+    adminAreaId: projectData?.adminAreaLevel2Id
+                 || projectData?.adminAreaLevel1I
+                 || projectData?.countryId,
+    customAreaId: projectData?.planningAreaId,
+  });
 
   const { addToast } = useToasts();
 
