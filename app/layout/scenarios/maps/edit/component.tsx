@@ -19,13 +19,13 @@ import { useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers } from 'ho
 import { useProject } from 'hooks/projects';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 
+import ScenariosDrawingManager from 'layout/scenarios/maps/drawing-manager';
+
 import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import ZoomControl from 'components/map/controls/zoom';
-
-import ScenariosDrawingManager from './drawing-manager';
 
 export interface ScenariosMapProps {
 }
@@ -104,7 +104,7 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     sid: sid ? `${sid}` : null,
     type: tab,
     subtype: subtab,
-    runId: selectedSolutionData?.runId || bestSolutionData.runId,
+    runId: selectedSolutionData?.runId || bestSolutionData?.runId,
     options: {
       wdpaThreshold,
       puAction,

@@ -6,7 +6,7 @@ import Header from 'layout/header';
 import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
-import ScenariosMap from 'layout/scenarios/map';
+import ScenariosEditMap from 'layout/scenarios/maps/edit';
 import ScenariosSidebar from 'layout/scenarios/sidebar';
 import SidebarAnalysis from 'layout/scenarios/sidebar/analysis';
 import SidebarFeatures from 'layout/scenarios/sidebar/features';
@@ -39,7 +39,7 @@ const EditScenarioPage: React.FC = () => {
                 <SidebarAnalysis key={ScenarioSidebarTabs.ANALYSIS} />
                 <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
               </ScenariosSidebar>
-              <ScenariosMap />
+              <ScenariosEditMap />
             </div>
           </Wrapper>
         </div>

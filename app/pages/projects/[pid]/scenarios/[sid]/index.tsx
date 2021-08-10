@@ -5,7 +5,7 @@ import { withProtection, withUser } from 'hoc/auth';
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
-import ScenariosMap from 'layout/scenarios/map';
+import ScenariosViewMap from 'layout/scenarios/maps/view';
 import ScenariosSidebar from 'layout/scenarios/sidebar';
 import SidebarAnalysis from 'layout/scenarios/sidebar/analysis';
 import SidebarFeatures from 'layout/scenarios/sidebar/features';
@@ -36,7 +36,7 @@ const ShowScenarioPage: React.FC = () => {
                 <SidebarAnalysis key={ScenarioSidebarTabs.ANALYSIS} readOnly />
                 <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} readOnly />
               </ScenariosSidebar>
-              <ScenariosMap />
+              <ScenariosViewMap />
             </div>
           </Wrapper>
         </div>
