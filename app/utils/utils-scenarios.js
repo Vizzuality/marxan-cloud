@@ -1,3 +1,14 @@
+export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
+  status: {
+    'protected-areas': 'draft',
+    features: 'draft',
+    analysis: 'draft',
+    solutions: 'draft',
+  },
+  tab: 'protected-areas',
+  subtab: 'protected-areas-preview',
+};
+
 export const mergeScenarioStatusMetaData = (obj, { tab, subtab }) => {
   const { scenarioEditingMetadata } = obj;
   const metadata = {
