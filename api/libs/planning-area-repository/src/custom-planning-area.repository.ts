@@ -26,9 +26,9 @@ export class CustomPlanningAreaRepository {
       `
 INSERT INTO "planning_areas"("the_geom")
   SELECT ST_SetSRID(
-    ST_Collect(
+    ST_CollectionExtract(ST_Collect(
       ST_GeomFromGeoJSON(features->>'geometry')
-    ), 4326)::geometry
+    ),3), 4326)::geometry
   FROM (
     SELECT json_array_elements($1::json->'features') AS features
   ) AS f RETURNING

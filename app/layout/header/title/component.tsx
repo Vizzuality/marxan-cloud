@@ -1,16 +1,18 @@
 import React, { useCallback } from 'react';
 
+import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+
+import { useRouter } from 'next/router';
+
+import { AnimatePresence, motion } from 'framer-motion';
+
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
-import { useRouter } from 'next/router';
-import { AnimatePresence, motion } from 'framer-motion';
 
-import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import {
   composeValidators,
 } from 'components/forms/validations';
-
 import Tooltip from 'components/tooltip';
 
 export interface TitleProps {
@@ -22,6 +24,8 @@ export const Title: React.FC<TitleProps> = () => {
   const { pid, sid } = query;
   const { data: projectData, isLoading: projectIsLoading } = useProject(pid);
   const { data: scenarioData, isLoading: scenarioIsLoading } = useScenario(sid);
+
+  const { metadata } = scenarioData || {};
 
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({
@@ -87,7 +91,12 @@ export const Title: React.FC<TitleProps> = () => {
       }
     });
 
-    saveScenarioMutation.mutate({ id: scenarioData.id, data }, {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata,
+      },
+    }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('save-scenario-name', (
           <>
@@ -110,7 +119,7 @@ export const Title: React.FC<TitleProps> = () => {
         });
       },
     });
-  }, [scenarioData?.id, addToast, saveScenarioMutation]);
+  }, [sid, addToast, saveScenarioMutation, metadata]);
 
   return (
     <AnimatePresence>

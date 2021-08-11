@@ -6,20 +6,27 @@ import { useSession } from 'next-auth/client';
 
 import WDPA from 'services/wdpa';
 
-export function useWDPACategories(adminAreaId) {
+import { UseWDPACategoriesProps } from './types';
+
+export function useWDPACategories({ adminAreaId, customAreaId }: UseWDPACategoriesProps) {
   const [session] = useSession();
 
-  const query = useQuery(['wdpa-categories', adminAreaId], async () => WDPA.request({
+  const query = useQuery(['wdpa-categories', adminAreaId, customAreaId], async () => WDPA.request({
     method: 'GET',
     url: '/iucn-categories',
     params: {
-      'filter[adminAreaId]': adminAreaId,
+      ...adminAreaId && {
+        'filter[adminAreaId]': adminAreaId,
+      },
+      ...customAreaId && {
+        'filter[customAreaId]': customAreaId,
+      },
     },
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
   }), {
-    enabled: !!adminAreaId,
+    enabled: !!adminAreaId || !!customAreaId,
   });
 
   const { data } = query;

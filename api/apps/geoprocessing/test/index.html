@@ -77,7 +77,7 @@
               minzoom: 1,
               maxzoom: 20,
               tiles: [
-                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/1/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,22.980651855468746,-18.22935133838667,-19.202241064923044]',
+                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/50/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,22.980651855468746,-18.22935133838667,-19.202241064923044]',
               ],
             },
             'postgis-tilesPU2': {
@@ -85,7 +85,7 @@
               minzoom: 1,
               maxzoom: 20,
               tiles: [
-                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/10/tiles/{z}/{x}/{y}.mvt',
+                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/120/tiles/{z}/{x}/{y}.mvt',
               ],
             },
             'postgis-tilesFeatures': {
@@ -93,7 +93,7 @@
               minzoom: 1,
               maxzoom: 20,
               tiles: [
-                'http://localhost:3040/api/v1/geo-features/127a5016-c697-4a6c-ae2a-4fa29a2729be/preview/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,22.980651855468746,-18.22935133838667,-19.202241064923044]',
+                'http://localhost:3040/api/v1/geo-features/1e30e3b4-03b7-4380-9387-fa9b1ef98c53/preview/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,22.980651855468746,-18.22935133838667,-19.202241064923044]',
               ],
             },
 
@@ -255,16 +255,16 @@
         // map.on('click', 'postgis-tiles-layer2', function (e) {
         // console.log(e.features[0].properties)
         // });
-        map.on('click', 'postgis-tiles-layer-ScenarioPU', function (e) {
+        map.on('click', 'postgis-tiles-layer-features', function (e) {
         console.log(e.features[0].properties)
         });
         // Change the cursor to a pointer when the mouse is over the places layer.
-        map.on('mouseenter', 'postgis-tiles-layer-ScenarioPU', function () {
+        map.on('mouseenter', 'postgis-tiles-layer-features', function () {
         map.getCanvas().style.cursor = 'pointer';
         });
 
         // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'postgis-tiles-layer-ScenarioPU', function () {
+        map.on('mouseleave', 'postgis-tiles-layer-features', function () {
         map.getCanvas().style.cursor = '';
         });
     });

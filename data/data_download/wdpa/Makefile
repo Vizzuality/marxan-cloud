@@ -51,7 +51,7 @@ data/wdpa/simp/%: data/wdpa/geojson/%
 				-filter-slivers min-area=10000m2 remove-empty \
 >>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 				-clean rewind \
-				-o $@ format=geojson force
+				-o $@ format=geojson force ndjson
 	rm -rf $<
 
 # @debt

@@ -31,7 +31,7 @@ data/gadm/gadm36_simp.geojson: data/gadm/gadm36_0.shp data/gadm/gadm36_1.shp dat
 							: this.layer_name =="gadm36_2" ? "adm_2" \
 							: null' \
 				-merge-layers force name=test target=* \
-				-o $@ target=test format=geojson force
+				-o $@ target=test format=geojson force ndjson
 
 data/gadm/gadm36_0.shp data/gadm/gadm36_1.shp data/gadm/gadm36_2.shp: data/gadm/gadm36_levels_shp.zip
 	unzip -u $< -d data/gadm

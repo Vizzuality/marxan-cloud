@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
@@ -35,21 +36,32 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
   const dispatch = useDispatch();
 
   const { data: projectData } = useProject(pid);
+
   const { data: scenarioData } = useScenario(sid);
-  const { data: wdpaData } = useWDPACategories(
-    projectData?.adminAreaLevel2Id
-    || projectData?.adminAreaLevel1Id
-    || projectData?.countryId,
-  );
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata } = metadata || {};
+
+  const {
+    subtab: metaSubtab,
+  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
+
+  const { data: wdpaData } = useWDPACategories({
+    adminAreaId: projectData?.adminAreaLevel2Id
+                 || projectData?.adminAreaLevel1I
+                 || projectData?.countryId,
+    customAreaId: !projectData?.adminAreaLevel2Id
+                  && !projectData?.adminAreaLevel1I
+                  && !projectData?.countryId ? projectData?.planningAreaId : null,
+  });
 
   useEffect(() => {
-    return () => {
-      setStep(0);
-    };
-  }, [tab]);
+    const reloadStep = metaSubtab === 'protected-areas-preview' ? 0 : 1;
+    setStep(reloadStep);
+  }, [metaSubtab]);
 
   if (!scenarioData || tab !== 'protected-areas') return null;
 

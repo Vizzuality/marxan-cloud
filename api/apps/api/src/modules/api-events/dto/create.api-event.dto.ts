@@ -3,6 +3,7 @@ import { IsEnum, IsJSON, IsOptional, IsString, IsUUID } from 'class-validator';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import * as ApiEventsUserData from './apiEvents.user.data.dto';
 import { ScenarioRunProgressV1Alpha1DTO } from './scenario-run-progress-v1-alpha-1';
+import { ScenarioGeofeatureDataV1AlphaDTO } from './scenario-geofeature-data-v1-alpha';
 
 export class CreateApiEventDTO {
   /**
@@ -34,5 +35,6 @@ export class CreateApiEventDTO {
   data?:
     | Record<string, unknown>
     | ApiEventsUserData.ActivationTokenGeneratedV1Alpha1DTO
-    | ScenarioRunProgressV1Alpha1DTO;
+    | ScenarioRunProgressV1Alpha1DTO
+    | ScenarioGeofeatureDataV1AlphaDTO;
 }

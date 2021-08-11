@@ -51,6 +51,19 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
         ...data,
         type: 'marxan',
         projectId: pid,
+        metadata: {
+          ...data.metadata,
+          scenarioEditingMetadata: {
+            status: {
+              'protected-areas': 'draft',
+              features: 'empty',
+              analysis: 'empty',
+              solutions: 'empty',
+            },
+            tab: 'protected-areas',
+            subtab: 'protected-areas-preview',
+          },
+        },
       },
     }, {
       onSuccess: ({ data: { data: s } }) => {

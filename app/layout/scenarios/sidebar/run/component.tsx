@@ -7,6 +7,7 @@ import { Form as FormRFF } from 'react-final-form';
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
+import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useRunScenario, useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -34,6 +35,9 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   const { pid, sid } = query;
 
   const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata = SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } = metadata || {};
+
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
@@ -59,6 +63,14 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
     const data = {
       metadata: {
         marxanInputParameterFile: values,
+        scenarioEditingMetadata: {
+          status: {
+            ...scenarioEditingMetadata.status,
+            solutions: 'draft',
+          },
+          tab: 'solutions',
+          subtab: 'solution-preview',
+        },
       },
     };
 
@@ -106,7 +118,15 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
         });
       },
     });
-  }, [pid, sid, push, saveScenarioMutation, runScenarioMutation, addToast]);
+  }, [
+    pid,
+    sid,
+    push,
+    saveScenarioMutation,
+    runScenarioMutation,
+    addToast,
+    scenarioEditingMetadata,
+  ]);
 
   return (
 

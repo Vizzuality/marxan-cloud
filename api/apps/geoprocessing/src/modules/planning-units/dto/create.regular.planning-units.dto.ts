@@ -12,7 +12,7 @@ import {
 export enum PlanningUnitGridShape {
   square = 'square',
   hexagon = 'hexagon',
-  fromShapefile = 'from_shapefile',
+  fromShapefile = 'irregular',
 }
 
 /**
@@ -34,6 +34,9 @@ export class PlanningUnitsJob {
 
   @IsOptional()
   adminAreaLevel2Id?: string;
+
+  @IsOptional()
+  planningAreaId?: string;
 
   @IsEnum(PlanningUnitGridShape)
   planningUnitGridShape!: PlanningUnitGridShape;

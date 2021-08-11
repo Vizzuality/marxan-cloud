@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { useQueryClient } from 'react-query';
 import { useSelector, useDispatch } from 'react-redux';
@@ -8,9 +8,10 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { mergeScenarioStatusMetaData, SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useSelectedFeatures } from 'hooks/features';
-import { useScenario } from 'hooks/scenarios';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -53,15 +54,57 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata } = metadata || {};
+  const {
+    subtab: metaSubtab,
+  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
+
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
 
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const saveScenarioStatus = useCallback(async () => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'analysis', subtab: 'analysis-preview' }),
+      },
+    }, {
+      onSuccess: () => {
+        push(`/projects/${pid}`);
+      },
+    });
+  }, [saveScenarioMutation, sid, pid, push, metadata]);
+
+  const saveScenarioStatusOnContinue = useCallback(async () => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-fpf' }),
+      },
+    });
+  }, [saveScenarioMutation, sid, metadata]);
+
+  const saveScenarioFeaturesStatusOnBack = useCallback(async () => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
+      },
+    });
+  }, [saveScenarioMutation, sid, metadata]);
+
   useEffect(() => {
-    return () => {
-      setStep(0);
-    };
-  }, [tab]);
+    const reloadStep = metaSubtab === 'features-preview' ? 0 : 1;
+    setStep(reloadStep);
+  }, [metaSubtab]);
 
   if (!scenarioData || tab !== 'features') return null;
 
@@ -233,6 +276,7 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                 onSuccess={() => {
                   setStep(step + 1);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_FPF));
+                  saveScenarioStatusOnContinue();
                 }}
                 readOnly={readOnly}
               />
@@ -243,9 +287,10 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
                 onBack={() => {
                   setStep(step - 1);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
+                  saveScenarioFeaturesStatusOnBack();
                 }}
                 readOnly={readOnly}
-                onSuccess={() => push(`/projects/${pid}`)}
+                onSuccess={saveScenarioStatus}
               />
             )}
           </Pill>

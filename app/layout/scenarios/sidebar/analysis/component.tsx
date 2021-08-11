@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -7,8 +7,9 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useScenario } from 'hooks/scenarios';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -40,19 +41,30 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const saveTabsStatus = useCallback(async (subtab) => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'analysis', subtab: `${subtab}` }),
+      },
+    });
+  }, [saveScenarioMutation, sid, metadata]);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
     const subtab = s ? `analysis-${s}` : 'analysis-preview';
     dispatch(setSubTab(subtab));
-  }, [dispatch, setSubTab]);
-
-  useEffect(() => {
-    return () => {
-      setSection(null);
-    };
-  }, [tab]);
+    saveTabsStatus(subtab);
+  }, [dispatch, setSubTab, saveTabsStatus]);
 
   if (!scenarioData || tab !== 'analysis') return null;
 
@@ -120,27 +132,25 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
               )}
 
               {section === 'gap-analysis' && (
-              <GapAnalysis
-                key="gap-analysis"
-                onChangeSection={onChangeSection}
-
-              />
-
+                <GapAnalysis
+                  key="gap-analysis"
+                  onChangeSection={onChangeSection}
+                />
               )}
 
               {section === 'cost-surface' && (
-              <CostSurface
-                key="cost-surface"
-                readOnly={readOnly}
-                onChangeSection={onChangeSection}
-              />
+                <CostSurface
+                  key="cost-surface"
+                  readOnly={readOnly}
+                  onChangeSection={onChangeSection}
+                />
               )}
 
               {section === 'adjust-planning-units' && (
-              <AdjustPanningUnits
-                key="adjust-planning-units"
-                onChangeSection={onChangeSection}
-              />
+                <AdjustPanningUnits
+                  key="adjust-planning-units"
+                  onChangeSection={onChangeSection}
+                />
               )}
             </Pill>
 

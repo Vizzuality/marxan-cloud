@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { Children, isValidElement, ReactNode } from 'react';
 
 import cx from 'classnames';
 
@@ -31,10 +31,14 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   listeners,
   attributes,
 }: LegendItemProps) => {
+  const validChildren = Children.map(children, (Child) => {
+    return isValidElement(Child);
+  }).some((c) => !!c);
+
   return (
     <div
       key={id}
-      className="py-2.5 px-5"
+      className="px-5 py-2.5"
     >
       <header className="relative flex justify-between mb-1">
         <div
@@ -67,7 +71,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
         {description}
       </div>
 
-      {children && (
+      {validChildren && (
         <div className="mt-2.5">
           {children}
         </div>

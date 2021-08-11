@@ -133,6 +133,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/features/tsconfig.lib.json"
       }
+    },
+    "geofeature-calculations": {
+      "type": "library",
+      "root": "libs/geofeature-calculations",
+      "entryFile": "index",
+      "sourceRoot": "libs/geofeature-calculations/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/geofeature-calculations/tsconfig.lib.json"
+      }
     }
   }
 }

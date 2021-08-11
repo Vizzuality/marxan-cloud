@@ -3,8 +3,9 @@ import {
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
-import { AssignCandidateSpecification } from '../command/assign-candidate-specification.command';
-import { SpecificationId } from '../specification.id';
+import { SpecificationId } from '../domain';
+
+import { AssignCandidateSpecification } from './assign-candidate-specification.command';
 import { ScenarioSpecificationRepo } from './scenario-specification.repo';
 
 @CommandHandler(AssignCandidateSpecification)
@@ -27,6 +28,5 @@ export class AssignCandidateSpecificationHandler
     );
     await this.scenarioSpecificationRepo.save(scenarioSpecification);
     scenarioSpecification.commit();
-    return void 0;
   }
 }

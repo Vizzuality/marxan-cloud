@@ -4,9 +4,10 @@ import {
   useQuery, useInfiniteQuery, useMutation, useQueryClient,
 } from 'react-query';
 
-import Fuse from 'fuse.js';
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
+
+import Fuse from 'fuse.js';
 import { useSession } from 'next-auth/client';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
@@ -147,6 +148,8 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
 
   const query = useQuery(['selected-features', sid], fetchFeatures, {
     ...queryOptions,
+    refetchOnWindowFocus: false,
+    enabled: !!sid,
   });
 
   const { data } = query;

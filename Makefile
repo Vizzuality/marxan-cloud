@@ -4,12 +4,6 @@
 # If using the same variables in recipes that need to use a dotenv file other
 # than .env, remember to check that no values from .env are being used
 # inadvertently.
-<<<<<<< HEAD
-API_POSTGRES_USER := $(shell grep -e API_POSTGRES_USER .env | sed 's/^.*=//')
-API_POSTGRES_DB := $(shell grep -e API_POSTGRES_DB .env | sed 's/^.*=//')
-GEO_POSTGRES_USER := $(shell grep -e GEO_POSTGRES_USER .env | sed 's/^.*=//')
-GEO_POSTGRES_DB := $(shell grep -e GEO_POSTGRES_DB .env | sed 's/^.*=//')
-=======
 ENVFILE := $(if $(environment), .env-test-e2e, .env)
 CIENV := $(if $(filter $(environment), ci), -f docker-compose-test-e2e.ci.yml , -f docker-compose-test-e2e.local.yml)
 API_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-api, postgresql-api)
@@ -37,23 +31,12 @@ test-commands:
 	@echo $(CIENV)
 	@echo $(_API_POSTGRES_DB)
 	@echo $(_GEO_POSTGRES_USER)
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 
 # Start only API and Geoprocessing services
 #
 # Useful when developing on API components only, to avoid spinning up services
 # which may not be needed.
 start-api:
-<<<<<<< HEAD
-	docker-compose up --build api geoprocessing
-
-# Start all the services.
-start:
-	docker-compose up --build
-
-notebooks:
-	docker-compose -f ./data/docker-compose.yml up --build
-=======
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing
 
 # Start all the services.
@@ -62,21 +45,11 @@ start:
 
 notebooks:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose.yml up --build
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 
 notebooks-stop:
 	docker-compose -f ./data/docker-compose.yml stop
 
 stop:
-<<<<<<< HEAD
-	docker-compose stop
-
-psql-api:
-	docker-compose exec postgresql-api psql -U "${API_POSTGRES_USER}"
-
-psql-geo:
-	docker-compose exec postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"
-=======
 	docker-compose $(DOCKER_COMPOSE_FILE) stop
 
 psql-api:
@@ -90,7 +63,6 @@ redis-api:
 
 start-redis-commander:
 	docker-compose up --build redis-commander
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 
 # Stop all containers and remove the postgresql-api container and the named
 # Docker volume used to persists PostgreSQL data
@@ -98,17 +70,6 @@ start-redis-commander:
 # The use of `-f` flags in the `docker-compose rm` and `docker volume rm`
 # commands is to ignore errors if the container or volume being deleted
 # don't actually exist.
-<<<<<<< HEAD
-#
-# @debt We should ideally avoid hardcoding container and volume name so that
-# any changes here or in `docker-compose.yml` will not get things out of sync.
-# Or add a CI test that could catch this.
-clean-slate: stop
-	docker-compose rm -f postgresql-api
-	docker-compose rm -f postgresql-geo-api
-	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data
-	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data
-=======
 clean-slate-full-stop-and-cleanup:
 	docker-compose $(DOCKER_COMPOSE_FILE) down --volumes --remove-orphans
 	docker-compose $(DOCKER_COMPOSE_FILE) rm -f -v
@@ -117,33 +78,27 @@ clean-slate: stop clean-slate-full-stop-and-cleanup
 	$(DOCKER_CLEAN_VOLUMES)
 
 test-clean-slate: clean-slate-full-stop-and-cleanup
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 
+# setup full testing data
 seed-dbs: seed-api-with-test-data | seed-geoapi-with-test-data
 
-seed-api-with-test-data:
-<<<<<<< HEAD
-	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
-
-seed-geoapi-with-test-data:
-	USERID=$(shell docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from users limit 1"); \
-	sed -e "s/\$$user/$$USERID/g" api/test/fixtures/test-admin-data.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
-	sed -e "s/\$$user/$$USERID/g" api/test/fixtures/test-wdpa-data.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
-	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-features.sql
-	@for i in api/test/fixtures/features/*.sql; do \
-		table_name=`basename -s .sql "$$i"`; \
-		featureid=`docker-compose exec -T postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
-		echo "appending data for $${table_name} with id $${featureid}"; \
-		sed -e "s/\$$feature_id/$$featureid/g" api/test/fixtures/features/$${table_name}.sql | docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
-		done;
-
-
-=======
-	@echo "$(RED)seeding db:$(NC) $(API_DB_INSTANCE)"
+seed-api-with-test-data: seed-api-init-data | seed-geoapi-init-data
+	@echo "$(RED)seeding db with testing project and scenarios:$(NC) $(API_DB_INSTANCE)"
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-data.sql
 
+seed-api-init-data:
+	@echo "$(RED)seeding initial dbs:$(NC) $(API_DB_INSTANCE)"
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-init-apidb.sql
+
 seed-geoapi-with-test-data:
-	@echo "$(RED)seeding dbs:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE) and ${REDIS_INSTANCE}"
+	@echo "$(RED)seeding initial geodata for created projects and scenarios:$(NC) $(GEO_DB_INSTANCE)"
+	@SCENARIOID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
+	USERID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from users limit 1"); \
+	echo "appending data for scenario with id $${SCENARIOID} for user with id $${USERID}"; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/apps/api/test/fixtures/test-geodata.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
+
+seed-geoapi-init-data:
+	@echo "$(RED)seeding dbs with initial geodata:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE)"
 	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-admin-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}"; \
 	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-wdpa-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-features.sql
@@ -152,75 +107,11 @@ seed-geoapi-with-test-data:
 		featureid=`docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
 		echo "appending data for $${table_name} with id $${featureid}"; \
 		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}"; \
-		done; \
-	SCENARIOID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
-	USERID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from users limit 1"); \
-	echo "appending data for scenario with id $${SCENARIOID}"; \
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/apps/api/test/fixtures/test-geodata.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
+		done;
 
 # need notebook service to execute a expecific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
 	docker-compose -f ./data/docker-compose.yml exec -T marxan-science-notebooks papermill work/notebooks/Lab/convert_csv_sql.ipynb /dev/null
-<<<<<<< HEAD
-	mv -f -u -Z data/data/processed/test-wdpa-data.sql api/test/fixtures/test-wdpa-data.sql
-	mv -f -u -Z data/data/processed/test-admin-data.sql api/test/fixtures/test-admin-data.sql
-	mv -f -u -Z data/data/processed/test-features.sql api/test/fixtures/test-features.sql
-	rm -rf api/test/fixtures/features && mv -f -u -Z data/data/processed/features api/test/fixtures/features
-
-seed-geodb-data:
-	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
-
-test-e2e-api:
-	# start from clean slate, in case anything was left around from previous runs (mostly relevant locally, not in CI)
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e rm --stop --force test-e2e-postgresql-api test-e2e-postgresql-geo-api
-	# build API container
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e build api
-	# build geoprocessing container
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e build geoprocessing
-	# run migrations - API
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e run api run-migrations-for-e2e-tests
-	# run migrations - geoprocessing
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e run geoprocessing run-migrations-for-e2e-tests
-	# load test data - API
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-data.sql
-	# load test data - geoprocessing db
-	USERID=$(shell docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from users limit 1"); \
-	echo $$USERID; \
-	sed -e "s/\$$user/$$USERID/g" api/test/fixtures/test-admin-data.sql | docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
-	sed -e "s/\$$user/$$USERID/g" api/test/fixtures/test-wdpa-data.sql | docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-geo-api psql -U "${GEO_POSTGRES_USER}";
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-api psql -U "${API_POSTGRES_USER}" < api/test/fixtures/test-features.sql
-	@for i in api/test/fixtures/features/*.sql; do \
-		table_name=`basename -s .sql "$$i"`; \
-		featureid=`docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-api psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
-		echo "appending data for $${table_name} with id $${featureid}"; \
-		sed -e "s/\$$feature_id/$$featureid/g" api/test/fixtures/features/$${table_name}.sql | docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e exec -T test-e2e-postgresql-geo-api psql -U "${GEO_POSTGRES_USER}"; \
-		done;
-	# run tests
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e up --abort-on-container-exit --exit-code-from api api
-	# teardown
-	docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml --env-file .env-test-e2e rm --stop --force
-
-dump-geodb-data:
-	docker-compose exec -T postgresql-geo-api pg_dump -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
-
-dump-api-data:
-	docker-compose exec -T postgresql-api pg_dump -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
-
-upload-dump-data:
-	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps/ -s data/data/processed/db_dumps
-
-restore-dumps:
-	docker-compose -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
-
-extract-geo-test-data:
-	#This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
-	TEST_GEOMETRY=$(shell cat api/test/fixtures/test-geometry.json | jq 'tostring'); \
-	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM admin_regions WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_admin_regions_okavango.csv; \
-	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM wdpa WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_wdpa_okavango.csv; \
-	docker-compose exec -T postgresql-geo-api psql -U "${GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM features_data WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_features_data_okavango.csv;
-	docker-compose exec -T postgresql-api psql -U "${API_POSTGRES_USER}" -c "COPY (SELECT * FROM features) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/api_features_okavango.csv
-=======
 	mv -f -u -Z data/data/processed/test-wdpa-data.sql api/apps/api/test/fixtures/test-wdpa-data.sql
 	mv -f -u -Z data/data/processed/test-admin-data.sql api/apps/api/test/fixtures/test-admin-data.sql
 	mv -f -u -Z data/data/processed/test-features.sql api/apps/api/test/fixtures/test-features.sql
@@ -229,7 +120,7 @@ extract-geo-test-data:
 # Don't forget to run make clean-slate && make start-api before repopulating the whole db
 # This will delete all existing data and create tables/views/etc. through the migrations that
 # run when starting up the API service.
-seed-geodb-data: seed-api-with-test-data
+seed-geodb-data: seed-api-init-data
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
 
 test-start-services: clean-slate
@@ -280,6 +171,9 @@ dump-api-data:
 upload-dump-data:
 	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps -s data/data/processed/db_dumps
 
+upload-data-for-demo:
+	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/data-demo -s data/data/data_demo/organized
+
 restore-dumps:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
 
@@ -299,4 +193,4 @@ generate-export-shpfile:
 	-docker-compose exec -T postgresql-geo-api pgsql2shp -f ./testdataoutput2/test.shp -h localhost -p 5432 -r -g the_geom -u ${_GEO_POSTGRES_USER} ${_GEO_POSTGRES_DB} "SELECT the_geom, pug.id as uid, 1 as cost  FROM scenarios_pu_data spd inner join planning_units_geom pug on pug.id = spd.pu_geom_id ";
 	-mkdir data/data
 	-docker cp marxan-postgresql-geo-api:testdataoutput2 data/data
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
+

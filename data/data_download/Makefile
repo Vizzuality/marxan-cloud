@@ -1,10 +1,7 @@
 .DEFAULT_GOAL := seed-data
 
-<<<<<<< HEAD
-=======
 
->>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
-seed-data: seed-gadm seed-wdpa seed-iucn seed-ecosystems
+seed-data: seed-gadm seed-wdpa seed-ecosystems seed-demo-features-species seed-demo-features-bioregion
 
 seed-gadm:
 	@echo "Starting seeding gadm data... "
@@ -21,3 +18,12 @@ seed-iucn:
 seed-ecosystems:
 	@echo "Starting seeding ecosystems data... "
 	@time $(MAKE) -C ./world_terrestrial_ecosystems import
+
+seed-demo-features-species:
+	@echo "Starting seeding features from demo data... "
+	@time $(MAKE) -C ./demo_data_features_bioregion import
+
+seed-demo-features-bioregion:
+	@echo "Starting seeding features from demo data... "
+	@time $(MAKE) -C ./demo_data_features_species import
+

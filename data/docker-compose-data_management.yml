@@ -9,6 +9,8 @@ services:
     - './data/seed/wdpa/:/wdpa/data/'
     - './data/seed/iucn/:/iucn/data/'
     - './data/seed/world_terrestrial_ecosystems/:/world_terrestrial_ecosystems/data/'
+    - './data/seed/demo_data_features_species/:/demo_data_features_species/data/'
+    - './data/seed/demo_data_features_bioregion/:/demo_data_features_bioregion/data/'
     user: "$UID:$GID"
     command: make
     env_file:

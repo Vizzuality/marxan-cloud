@@ -14,6 +14,7 @@ import { useToasts } from 'hooks/toast';
 import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
+import Loading from 'components/loading';
 
 import LOCK_IN_OUT_IMG from 'images/info-buttons/img_lockin_lock_out.png';
 
@@ -80,17 +81,19 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       },
     }, {
       onSuccess: () => {
-        addToast('clear-planning-units-success', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <ul className="text-sm">
-              <li>Planning units cleared</li>
-            </ul>
-          </>
-        ), {
-          level: 'success',
-        });
-        setClearing(false);
+        setTimeout(() => {
+          addToast('clear-planning-units-success', (
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <ul className="text-sm">
+                <li>Planning units cleared</li>
+              </ul>
+            </>
+          ), {
+            level: 'success',
+          });
+          setClearing(false);
+        }, 2500);
       },
       onError: () => {
         addToast('clear-planning-units-error', (
@@ -127,6 +130,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
           <h4 className="text-xs uppercase font-heading">Adjust planning units</h4>
         </button>
+
         <InfoButton>
           <div>
             <h4 className="font-heading text-lg mb-2.5">Locked-in and locked-out planning units</h4>
@@ -175,6 +179,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         {PUData && (!!PUData.included.length || !!PUData.excluded.length) && (
           <div>
             <Button
+              className="relative"
               theme="secondary"
               size="s"
               disabled={clearing}
@@ -184,6 +189,13 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
                 <span>Clear</span>
                 <Icon icon={CLOSE_SVG} className="w-2 h-2" />
               </div>
+
+              <Loading
+                visible={clearing}
+                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90 rounded-3xl"
+                iconClassName="w-5 h-5 text-primary-500"
+              />
+
             </Button>
           </div>
         )}
