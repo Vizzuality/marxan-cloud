@@ -9,6 +9,8 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -53,6 +55,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     isFetching: scenarioIsFetching,
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
+  const { metadata } = scenarioData || {};
 
   const {
     data: wdpaData,
@@ -67,7 +70,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                   && !projectData?.countryId ? projectData?.planningAreaId : null,
   });
 
-  const mutation = useSaveScenario({
+  const saveScenarioMutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
     },
@@ -98,15 +101,17 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     dispatch(setWDPAThreshold(wdpaThreshold ? wdpaThreshold / 100 : 0.75));
   }, [scenarioData]); //eslint-disable-line
 
-  const onSubmit = useCallback(async (values) => {
+  // EVENTS
+  const handleSubmit = useCallback(async (values) => {
     setSubmitting(true);
 
     const { wdpaThreshold } = values;
 
-    mutation.mutate({
-      id: scenarioData.id,
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
       data: {
         wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
       },
     }, {
       onSuccess: () => {
@@ -135,7 +140,20 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         });
       },
     });
-  }, [mutation, scenarioData?.id, addToast, onSuccess]);
+  }, [saveScenarioMutation, sid, addToast, onSuccess, metadata]);
+
+  const handleBack = useCallback(async () => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'protected-areas', subtab: 'protected-areas-preview' }),
+      },
+    }, {
+      onSuccess: () => {
+        onBack();
+      },
+    });
+  }, [saveScenarioMutation, sid, metadata, onBack]);
 
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
@@ -150,11 +168,11 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   return (
     <FormRFF
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       initialValues={INITIAL_VALUES}
     >
-      {({ values, handleSubmit }) => (
-        <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow w-full overflow-hidden">
+      {({ values, handleSubmit: RFFhandleSubmit }) => (
+        <form onSubmit={RFFhandleSubmit} autoComplete="off" className="relative flex flex-col flex-grow w-full overflow-hidden">
           <div className="relative flex flex-col flex-grow overflow-hidden">
             <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
@@ -235,6 +253,8 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                     && INITIAL_VALUES.wdpaIucnCategories.map((w) => {
                       const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
 
+                      if (!wdpa) return null;
+
                       return (
                         <div
                           key={`${wdpa.value}`}
@@ -254,7 +274,14 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
           </div>
 
           <div className="flex justify-center mt-5 space-x-4">
-            <Button theme="secondary" size="lg" type="button" className="relative px-20" disabled={submitting} onClick={onBack}>
+            <Button
+              theme="secondary"
+              size="lg"
+              type="button"
+              className="relative px-20"
+              disabled={submitting}
+              onClick={handleBack}
+            >
               <span>Back</span>
             </Button>
 

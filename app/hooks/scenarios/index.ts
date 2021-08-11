@@ -139,6 +139,8 @@ export function useScenario(id) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+  }).then((response) => {
+    return response.data;
   }), {
     enabled: !!id,
   });
@@ -148,9 +150,9 @@ export function useScenario(id) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data?.data,
+      data: data?.data,
     };
-  }, [query, data?.data?.data]);
+  }, [query, data?.data]);
 }
 
 // SCENARIO STATUS
@@ -206,9 +208,9 @@ export function useSaveScenario({
 
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
-      const { id, projectId } = data;
+      const { id, projectId } = data?.data?.data;
       queryClient.invalidateQueries(['scenarios', projectId]);
-      queryClient.invalidateQueries(['scenarios', id]);
+      queryClient.setQueryData(['scenarios', id], data?.data);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

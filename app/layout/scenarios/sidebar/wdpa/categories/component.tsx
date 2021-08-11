@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -48,6 +50,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     isFetching: scenarioIsFetching,
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
+  const { metadata } = scenarioData || {};
 
   const {
     data: wdpaData,
@@ -94,11 +97,11 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         ...values,
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'protected-areas', subtab: 'protected-areas-percentage' }),
       },
     }, {
       onSuccess: () => {
         setSubmitting(false);
-
         addToast('save-scenario-wdpa', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -122,7 +125,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         });
       },
     });
-  }, [mutation, scenarioData?.id, addToast, onSuccess]);
+  }, [mutation, scenarioData?.id, addToast, onSuccess, metadata]);
 
   const onSkip = useCallback(() => {
     setSubmitting(true);
@@ -131,6 +134,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData.id,
       data: {
         wdpaIucnCategories: null,
+        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
       },
     }, {
       onSuccess: () => {
@@ -159,7 +163,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
         });
       },
     });
-  }, [mutation, scenarioData?.id, addToast, onDismiss]);
+  }, [mutation, addToast, onDismiss, scenarioData?.id, metadata]);
 
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
