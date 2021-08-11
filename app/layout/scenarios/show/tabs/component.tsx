@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
-import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useScenario } from 'hooks/scenarios';
 
@@ -15,7 +14,6 @@ import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 
 import Tabs from 'components/tabs';
-import { TabsProps } from 'components/tabs/component';
 
 import { TABS } from './constants';
 import { ScenariosSidebarTabsProps } from './types';
@@ -24,32 +22,14 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { query } = useRouter();
   const { sid } = query;
   const {
-    data: scenarioData,
     isFetched: scenarioFetched,
   } = useScenario(sid);
-
-  const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
-  const {
-    status: metaStatus,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
-
-  const TABS_PARSED = useMemo<TabsProps['items']>(() => {
-    if (!metaStatus) return [];
-
-    return TABS.map((t) => {
-      return {
-        ...t,
-        status: metaStatus[t.id] === 'empty' ? 'disabled' : 'active',
-      };
-    });
-  }, [metaStatus]);
 
   const onSelectedTab = useCallback((t) => {
     const TAB = TABS.find((T) => T.id === t);
@@ -127,7 +107,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
 
           {scenarioFetched && (
             <Tabs
-              items={TABS_PARSED}
+              items={TABS}
               selected={tab}
               onSelected={onSelectedTab}
             />

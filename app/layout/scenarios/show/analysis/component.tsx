@@ -7,9 +7,8 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -33,30 +32,13 @@ export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysis
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
-
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
-
-  const saveTabsStatus = useCallback(async (subtab) => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'analysis', subtab: `${subtab}` }),
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata]);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
     const subtab = s ? `analysis-${s}` : 'analysis-preview';
     dispatch(setSubTab(subtab));
-    saveTabsStatus(subtab);
-  }, [dispatch, setSubTab, saveTabsStatus]);
+  }, [dispatch, setSubTab]);
 
   if (!scenarioData || tab !== 'analysis') return null;
 
