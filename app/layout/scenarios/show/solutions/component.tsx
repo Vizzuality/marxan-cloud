@@ -18,8 +18,6 @@ import SolutionsGapAnalysis from 'layout/scenarios/show/solutions/gap-analysis';
 import SolutionsList from 'layout/scenarios/show/solutions/list';
 import Sections from 'layout/scenarios/show/solutions/sections';
 
-import Button from 'components/button';
-
 import { SolutionsSections } from './sections/types';
 import { ScenariosSidebarShowSolutionsProps } from './types';
 
@@ -134,66 +132,6 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
 
             </Pill>
 
-            {!section && (
-              <motion.div
-                key="run-scenario-button"
-                className="flex justify-center flex-shrink-0 mt-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <div className="">
-                  <HelpBeacon
-                    id="scenarios-rerun"
-                    title="Re-Run scenario"
-                    subtitle=""
-                    content={(
-                      <div className="space-y-2">
-                        <p>
-                          Once you have checked your solutions,
-                          you can go back to any of the previous tabs
-                          and make any needed
-                          adjustments.
-                          Use this button to run the Scenario again applying
-                          the changes you have made.
-                        </p>
-
-                        <p>
-                          <i>
-                            All the
-                            solutions of your previous run will be replaced
-                            by those of the new run.
-                            If you do not want to lose your results
-                            simply duplicate this scenario and make the
-                            changes in the new one.
-                          </i>
-                        </p>
-                      </div>
-                  )}
-                    modifiers={['flip']}
-                    tooltipPlacement="top"
-                  >
-                    <div>
-                      <Button
-                        theme="spacial"
-                        size="lg"
-                        onClick={() => console.info('Re-Run scenario - solutions')}
-                      >
-                        Re-Run scenario
-                      </Button>
-                    </div>
-                  </HelpBeacon>
-                </div>
-
-                {/* <Button
-                  className="ml-4"
-                  theme="primary"
-                  size="lg"
-                  onClick={() => console.info('Save scenario - solutions')}
-                >
-                  Save Scenario
-                </Button> */}
-              </motion.div>
-            )}
           </AnimatePresence>
         </motion.div>
       </HelpBeacon>
