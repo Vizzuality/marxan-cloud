@@ -42,7 +42,7 @@ import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from './plannin
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { SubmitSpecification } from '@marxan-api/modules/specification';
-import { SpecificationOperation } from '@marxan-api/modules/specification/domain';
+import { GeoFeatureDtoMapper } from './geo-features/geo-feature-dto.mapper';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -73,6 +73,7 @@ export class ScenariosService {
     private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
     private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,
     private readonly commandBus: CommandBus,
+    private readonly geoFeatureConfigMapper: GeoFeatureDtoMapper,
   ) {}
 
   async findAllPaginated(
@@ -348,10 +349,9 @@ export class ScenariosService {
       new SubmitSpecification({
         scenarioId,
         draft: dto.status === SimpleJobStatus.draft,
-        features: dto.features.map((feature) => ({
-          baseFeatureId: feature.featureId,
-          operation: SpecificationOperation.Split,
-        })),
+        features: dto.features.flatMap((feature) =>
+          this.geoFeatureConfigMapper.toFeatureConfig(feature),
+        ),
       }),
     );
   }
