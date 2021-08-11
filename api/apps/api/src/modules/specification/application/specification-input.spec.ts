@@ -2,7 +2,8 @@ import { v4 } from 'uuid';
 import { validateSync } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import {
-  SpecificationFeature,
+  SpecificationFeatureSplit,
+  SpecificationFeatureCopy,
   SpecificationFeatureStratification,
   SpecificationInput,
 } from './specification-input';
@@ -21,19 +22,22 @@ test(`valid values`, () => {
           operation: SpecificationOperation.Stratification,
           baseFeatureId: v4(),
           againstFeatureId: v4(),
+          splitByProperty: `split-property-stratification`,
         }),
-        plainToClass<SpecificationFeature, SpecificationFeature>(
-          SpecificationFeature,
+        plainToClass<SpecificationFeatureSplit, SpecificationFeatureSplit>(
+          SpecificationFeatureSplit,
           {
             operation: SpecificationOperation.Split,
             baseFeatureId: v4(),
+            splitByProperty: `split-property`,
           },
         ),
-        plainToClass<SpecificationFeature, SpecificationFeature>(
-          SpecificationFeature,
+        plainToClass<SpecificationFeatureCopy, SpecificationFeatureCopy>(
+          SpecificationFeatureCopy,
           {
             operation: SpecificationOperation.Copy,
             baseFeatureId: v4(),
+            selectSubSets: undefined as never,
           },
         ),
       ],
@@ -55,12 +59,14 @@ test(`invalid values / types`, () => {
           operation: SpecificationOperation.Stratification,
           baseFeatureId: `non-uuid-as-well`,
           againstFeatureId: (undefined as unknown) as string,
+          splitByProperty: `split-property-stratification`,
         }),
-        plainToClass<SpecificationFeature, SpecificationFeature>(
-          SpecificationFeature,
+        plainToClass<SpecificationFeatureCopy, SpecificationFeatureCopy>(
+          SpecificationFeatureCopy,
           {
             operation: (`invalid operation` as unknown) as SpecificationOperation.Copy,
             baseFeatureId: `non-uuid-as-well`,
+            selectSubSets: undefined as never,
           },
         ),
       ],
@@ -121,7 +127,7 @@ test(`invalid values / types`, () => {
       expect.objectContaining({
         property: `operation`,
         constraints: {
-          isIn: expect.anything(),
+          equals: expect.anything(),
         },
       }),
     ]),

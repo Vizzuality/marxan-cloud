@@ -14,12 +14,14 @@ export const getFixtures = () => {
   const splitConfig: FeatureConfigInput = {
     operation: SpecificationOperation.Split,
     baseFeatureId: baseFeatureId,
+    splitByProperty: `split-property`,
   };
 
   const stratificationConfig: FeatureConfigInput = {
     operation: SpecificationOperation.Stratification,
     baseFeatureId: baseFeatureId,
     againstFeatureId: stratificationFeatureId,
+    splitByProperty: `split-property-for-stratification`,
   };
 
   return {

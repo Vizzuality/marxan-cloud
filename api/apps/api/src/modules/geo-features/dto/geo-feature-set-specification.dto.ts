@@ -14,10 +14,6 @@ export abstract class SpecForGeofeature {
   @IsUUID()
   @ApiProperty()
   featureId!: string;
-
-  @IsEnum(['plain', 'withGeoprocessing'])
-  @ApiProperty()
-  kind!: 'plain' | 'withGeoprocessing';
 }
 
 export class SpecForPlainGeoFeature extends SpecForGeofeature {

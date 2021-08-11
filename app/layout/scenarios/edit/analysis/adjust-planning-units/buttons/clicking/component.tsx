@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import { Form as FormRFF } from 'react-final-form';
 import { useSelector, useDispatch } from 'react-redux';
@@ -14,6 +16,7 @@ import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
+import Loading from 'components/loading';
 
 import SELECT_PLANNING_UNITS_SVG from 'svgs/ui/planning-units.svg?sprite';
 
@@ -28,6 +31,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
   selected,
   onSelected,
 }: AnalysisAdjustClickingProps) => {
+  const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
 
@@ -73,6 +77,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
 
   // Callbacks
   const onSubmit = useCallback((values) => {
+    setSubmitting(true);
     // Save current clicked pu ids
     scenarioPUMutation.mutate({
       id: `${sid}`,
@@ -85,22 +90,27 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
       },
     }, {
       onSuccess: () => {
-        onSelected(null);
-        dispatch(setCache(Date.now()));
-        dispatch(setClicking(false));
+        // Let's wait unitl we can track fast async jobs
+        setTimeout(() => {
+          setSubmitting(false);
+          onSelected(null);
+          dispatch(setCache(Date.now()));
+          dispatch(setClicking(false));
 
-        addToast('adjust-planning-units-success', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <ul className="text-sm">
-              <li>Planning units lock status saved</li>
-            </ul>
-          </>
-        ), {
-          level: 'success',
-        });
+          addToast('adjust-planning-units-success', (
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <ul className="text-sm">
+                <li>Planning units lock status saved</li>
+              </ul>
+            </>
+          ), {
+            level: 'success',
+          });
+        }, 2500);
       },
       onError: () => {
+        setSubmitting(false);
         addToast('adjust-planning-units-error', (
           <>
             <h2 className="font-medium">Error!</h2>
@@ -143,7 +153,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
       initialValues={INITIAL_VALUES}
     >
       {({ handleSubmit }) => (
-        <form onSubmit={handleSubmit} autoComplete="off">
+        <form onSubmit={handleSubmit} autoComplete="off" className="relative">
           <div
             key="clicking"
             role="presentation"
@@ -185,12 +195,20 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
                     type="submit"
                     theme="primary"
                     size="s"
+                    disabled={submitting}
                   >
                     Save
                   </Button>
                 </div>
               )}
+
             </header>
+
+            <Loading
+              visible={submitting}
+              className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90 rounded-3xl"
+              iconClassName="w-5 h-5 text-primary-500"
+            />
 
             {selected && (
               <div className="pt-2">
