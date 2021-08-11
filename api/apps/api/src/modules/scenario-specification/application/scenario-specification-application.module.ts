@@ -4,6 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ActivateCandidateSpecificationHandler } from './activate-candidate-specification.handler';
 import { AssignCandidateSpecificationHandler } from './assign-candidate-specification.handler';
 import { SpecificationCandidateCreatedSaga } from './sagas/specification-candidate-created.saga';
+import { LastUpdatedSpecificationHandler } from './last-updated-specification.handler';
 
 @Module({})
 export class ScenarioSpecificationApplicationModule {
@@ -14,6 +15,7 @@ export class ScenarioSpecificationApplicationModule {
       providers: [
         ActivateCandidateSpecificationHandler,
         AssignCandidateSpecificationHandler,
+        LastUpdatedSpecificationHandler,
         SpecificationCandidateCreatedSaga,
       ],
     };

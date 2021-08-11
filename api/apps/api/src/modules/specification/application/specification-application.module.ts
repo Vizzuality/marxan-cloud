@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CalculateFeaturesHandler } from './calculate-features.handler';
 import { DetermineFeaturesHandler } from './determine-features.handler';
 import { SubmitSpecificationHandler } from './submit-specification.handler';
+import { GetSpecificationHandler } from './get-specification.handler';
 
 @Module({})
 export class SpecificationApplicationModule {
@@ -14,6 +15,7 @@ export class SpecificationApplicationModule {
         CalculateFeaturesHandler,
         DetermineFeaturesHandler,
         SubmitSpecificationHandler,
+        GetSpecificationHandler,
       ],
     };
   }
