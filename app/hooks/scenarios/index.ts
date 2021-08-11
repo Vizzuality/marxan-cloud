@@ -139,6 +139,8 @@ export function useScenario(id) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+  }).then((response) => {
+    return response.data;
   }), {
     enabled: !!id,
   });
@@ -148,9 +150,9 @@ export function useScenario(id) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data?.data,
+      data: data?.data,
     };
-  }, [query, data?.data?.data]);
+  }, [query, data?.data]);
 }
 
 // SCENARIO STATUS
@@ -206,9 +208,9 @@ export function useSaveScenario({
 
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
-      const { id, projectId } = data;
+      const { id, projectId } = data?.data?.data;
       queryClient.invalidateQueries(['scenarios', projectId]);
-      queryClient.invalidateQueries(['scenarios', id]);
+      queryClient.setQueryData(['scenarios', id], data?.data);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -426,7 +428,15 @@ export function useSaveScenarioPU({
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
       const { id } = variables;
-      queryClient.invalidateQueries(['scenarios-pu', id]);
+
+      // It's impossible to know from the API if the process of lockin has finsished or not,
+      // that's why this piece of sh*** is added here.
+      // If for some reason it takes more that 5000 seconds to process the lockin
+      // we are in troubles
+      // queryClient.invalidateQueries(['scenarios-pu', id]);
+      setTimeout(() => {
+        queryClient.invalidateQueries(['scenarios-pu', id]);
+      }, 2500);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);

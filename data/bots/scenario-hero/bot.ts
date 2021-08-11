@@ -34,7 +34,7 @@ const project = await botClient.post('/projects', {
     adminAreaLevel1Id: 'BWA.12_1',
     adminAreaLevel2Id: 'BWA.12.1_1',
     planningUnitGridShape: 'hexagon',
-    planningUnitAreakm2: 6,
+    planningUnitAreakm2: 16,
 }).then(result => result.data).catch(e => { console.log(e) });;
 
 console.log(project);

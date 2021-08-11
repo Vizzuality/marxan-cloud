@@ -1,4 +1,4 @@
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
 
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
 

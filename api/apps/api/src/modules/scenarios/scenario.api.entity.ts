@@ -66,7 +66,9 @@ export class Scenario extends TimeUserEntityMetadata {
   description?: string;
 
   @ApiProperty({ enum: ScenarioType, enumName: 'ScenarioType' })
-  @Column('enum')
+  @Column('enum', {
+    enum: ScenarioType,
+  })
   type!: ScenarioType;
 
   /**
@@ -151,7 +153,9 @@ export class Scenario extends TimeUserEntityMetadata {
    * @todo Check description.
    */
   @ApiProperty({ enum: JobStatus, enumName: 'JobStatus' })
-  @Column('enum')
+  @Column('enum', {
+    enum: JobStatus,
+  })
   status!: JobStatus;
 
   /**
@@ -181,6 +185,20 @@ export class Scenario extends TimeUserEntityMetadata {
     default: false,
   })
   ranAtLeastOnce!: boolean;
+
+  @Column({
+    name: `candidate_specification_id`,
+    nullable: true,
+    type: `uuid`,
+  })
+  candidateSpecificationId?: string | null;
+
+  @Column({
+    name: `active_specification_id`,
+    nullable: true,
+    type: `uuid`,
+  })
+  activeSpecificationId?: string | null;
 }
 
 export class JSONAPIScenarioData {

@@ -148,6 +148,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
 
   const query = useQuery(['selected-features', sid], fetchFeatures, {
     ...queryOptions,
+    refetchOnWindowFocus: false,
     enabled: !!sid,
   });
 

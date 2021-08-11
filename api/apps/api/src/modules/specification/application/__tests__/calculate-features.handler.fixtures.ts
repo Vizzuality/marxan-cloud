@@ -4,7 +4,7 @@ import { Test } from '@nestjs/testing';
 
 import {
   FeatureConfig,
-  FeatureConfigDefault,
+  FeatureConfigSplit,
   Specification,
   SpecificationGotReady,
   SpecificationOperation,
@@ -27,9 +27,10 @@ export const getFixtures = async () => {
   const nonCalculatedFeatureId = v4();
   const calculatedFeatureId = v4();
 
-  const config: FeatureConfigDefault = {
+  const config: FeatureConfigSplit = {
     operation: SpecificationOperation.Split,
     baseFeatureId: v4(),
+    splitByProperty: `property`,
   };
 
   const configWithOnlyCalculatedFeature: FeatureConfig = {

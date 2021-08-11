@@ -37,7 +37,6 @@ export const MetaIcons: React.FC<MetaIconsProps> = () => {
       <link rel="icon" type="image/png" sizes="32x32" href={FAVICON_M} />
       <link rel="icon" type="image/png" sizes="96x96" href={FAVICON_L} />
       <link rel="icon" type="image/png" sizes="16x16" href={FAVICON_S} />
-      <link rel="manifest" href="/manifest.json" />
       <meta name="msapplication-TileColor" content="#ffffff" />
       <meta name="msapplication-TileImage" content={PIN_ICON} />
       <meta name="theme-color" content="#ffffff" />

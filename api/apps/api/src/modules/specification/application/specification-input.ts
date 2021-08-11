@@ -3,12 +3,18 @@ import {
   IsArray,
   IsBoolean,
   IsDefined,
-  IsEnum,
-  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
   IsUUID,
   ValidateNested,
 } from 'class-validator';
-import { SpecificationOperation } from '../domain/feature-config';
+import {
+  FeatureConfigCopy,
+  FeatureConfigSplit,
+  FeatureConfigStratification,
+  SpecificationOperation,
+} from '../domain';
 
 export class SpecificationInput {
   @IsUUID()
@@ -22,22 +28,72 @@ export class SpecificationInput {
   @IsDefined()
   @IsArray()
   @ValidateNested()
-  features!: (SpecificationFeature | SpecificationFeatureStratification)[];
+  features!: (
+    | SpecificationFeatureCopy
+    | SpecificationFeatureSplit
+    | SpecificationFeatureStratification
+  )[];
 }
 
-export class SpecificationFeature {
-  @IsIn([SpecificationOperation.Split, SpecificationOperation.Copy])
+export class SpecificationFeatureCopy implements FeatureConfigCopy {
+  @Equals(SpecificationOperation.Copy)
   @IsDefined()
-  operation!: SpecificationOperation.Split | SpecificationOperation.Copy;
+  operation: SpecificationOperation.Copy = SpecificationOperation.Copy;
 
   @IsUUID()
   @IsDefined()
   baseFeatureId!: string;
+
+  selectSubSets!: never;
+
+  @IsNumber()
+  @IsOptional()
+  target?: number;
+
+  @IsNumber()
+  @IsOptional()
+  fpf?: number;
+
+  @IsNumber()
+  @IsOptional()
+  prop?: number;
 }
 
-export class SpecificationFeatureStratification {
+export class SpecificationFeatureSplit implements FeatureConfigSplit {
+  @Equals(SpecificationOperation.Split)
+  @IsDefined()
+  operation: SpecificationOperation.Split = SpecificationOperation.Split;
+
+  @IsUUID()
+  @IsDefined()
+  baseFeatureId!: string;
+
+  @IsString()
+  @IsDefined()
+  splitByProperty!: string;
+
+  @IsArray({ each: true })
+  @IsOptional()
+  selectSubSets?: FeatureSubSet[];
+
+  @IsNumber()
+  @IsOptional()
+  target?: number;
+
+  @IsNumber()
+  @IsOptional()
+  fpf?: number;
+
+  @IsNumber()
+  @IsOptional()
+  prop?: number;
+}
+
+export class SpecificationFeatureStratification
+  implements FeatureConfigStratification {
   @Equals(SpecificationOperation.Stratification)
-  operation = SpecificationOperation.Stratification;
+  operation: SpecificationOperation.Stratification =
+    SpecificationOperation.Stratification;
 
   @IsUUID()
   @IsDefined()
@@ -46,4 +102,42 @@ export class SpecificationFeatureStratification {
   @IsUUID()
   @IsDefined()
   againstFeatureId!: string;
+
+  @IsString()
+  @IsOptional()
+  splitByProperty?: string;
+
+  @IsArray({ each: true })
+  @IsOptional()
+  selectSubSets?: FeatureSubSet[];
+
+  @IsNumber()
+  @IsOptional()
+  target?: number;
+
+  @IsNumber()
+  @IsOptional()
+  fpf?: number;
+
+  @IsNumber()
+  @IsOptional()
+  prop?: number;
+}
+
+export class FeatureSubSet {
+  @IsString()
+  @IsDefined()
+  value!: string;
+
+  @IsNumber()
+  @IsOptional()
+  target?: number;
+
+  @IsNumber()
+  @IsOptional()
+  fpf?: number;
+
+  @IsNumber()
+  @IsOptional()
+  prop?: number;
 }
