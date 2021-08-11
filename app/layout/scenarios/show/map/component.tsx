@@ -33,10 +33,10 @@ import LegendTypeMatrix from 'components/map/legend/types/matrix';
 
 import ScenariosDrawingManager from './drawing-manager';
 
-export interface ScenariosMapProps {
+export interface ScenariosShowMapProps {
 }
 
-export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
+export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
   const [open, setOpen] = useState(true);
   const [session] = useSession();
 
@@ -293,4 +293,4 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   );
 };
 
-export default ScenariosMap;
+export default ScenariosShowMap;

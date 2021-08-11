@@ -22,13 +22,13 @@ import Run from 'layout/scenarios/show/run';
 import Button from 'components/button';
 import Modal from 'components/modal';
 
-export interface ScenariosSidebarAnalysisProps {
+export interface ScenariosSidebarShowAnalysisProps {
   readOnly?: boolean;
 }
 
-export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> = ({
+export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysisProps> = ({
   readOnly,
-}: ScenariosSidebarAnalysisProps) => {
+}: ScenariosSidebarShowAnalysisProps) => {
   const [section, setSection] = useState(null);
   const [runOpen, setRunOpen] = useState(false);
   const { query } = useRouter();
@@ -187,4 +187,4 @@ export const ScenariosSidebarAnalysis: React.FC<ScenariosSidebarAnalysisProps> =
   );
 };
 
-export default ScenariosSidebarAnalysis;
+export default ScenariosSidebarShowAnalysis;

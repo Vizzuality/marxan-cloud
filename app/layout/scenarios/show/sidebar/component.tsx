@@ -11,13 +11,13 @@ import Tabs from 'layout/scenarios/show/tabs';
 
 import Breadcrumb from 'components/breadcrumb';
 
-export interface ScenariosSidebarProps {
+export interface ScenariosShowSidebarProps {
   children: ReactNode
 }
 
-export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = ({
+export const ScenariosShowSidebar: React.FC<ScenariosShowSidebarProps> = ({
   children,
-}:ScenariosSidebarProps) => {
+}:ScenariosShowSidebarProps) => {
   const { push } = useRouter();
   const { query } = useRouter();
   const { pid } = query;
@@ -53,4 +53,4 @@ export const ScenariosSidebar: React.FC<ScenariosSidebarProps> = ({
   );
 };
 
-export default ScenariosSidebar;
+export default ScenariosShowSidebar;
