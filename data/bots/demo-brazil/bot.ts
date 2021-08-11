@@ -96,28 +96,55 @@ const scenarioStart = Process.hrtime();
 
 await sleep(5)
 
-const scenario = await botClient
+// Scenario creation with the bare minimum; From there we need to be doin patches to the same scenario
+let scenario = await botClient
   .post("/scenarios", {
     name: `Brazil scenario`,
     type: "marxan",
     projectId: project.data.id,
     description: "A Brazil scenario",
-    wdpaIucnCategories: ["Not Applicable"],
-    wdpaThreshold: 50,
     metadata: {
-      scenarioEditingMetadata: {
-        status: {
-          'protected-areas': 'draft',
-          features: 'draft',
-          analysis: 'draft',
-        },
-        tab: 'analysis',
-        subtab: 'analysis-preview',
-      }
-    }
+        scenarioEditingMetadata: {
+          status: {
+            'protected-areas': 'draft'
+          },
+          tab: 'analysis',
+          subtab: 'analysis-preview',
+        }
+      },
+    status: "draft"
   })
   .then((result) => result.data)
   .catch((e) => {
+    console.log(e);
+  });
+
+  console.log(scenario);
+
+// get the list of protected areas in the region and use all of them
+const paCategories:{data:Array<{id:string, type:string, attributes:object}>} = await botClient.get(`/protected-areas/iucn-categories?filter%5BcustomAreaId%5D=${planningAreaFile.id}`)
+          .then((result) =>  result.data)
+          .catch((e) => {
+            console.log(e);
+          });
+
+console.log(paCategories);
+
+await botClient
+  .patch(`/scenarios/${scenario!.data!.id}`, {
+    wdpaIucnCategories: paCategories!.data.map((i: {id:string, type:string, attributes:object}): string => i.id),
+  }).catch((e) => {
+    console.log(e);
+  });
+
+console.log(scenario);
+
+await sleep(5)
+
+await botClient
+  .patch(`/scenarios/${scenario!.data!.id}`, {
+    wdpaThreshold: 50,
+  }).catch((e) => {
     console.log(e);
   });
 
@@ -125,17 +152,22 @@ const scenarioTook = Process.hrtime(scenarioStart);
 console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
 
 console.log(scenario);
-const featureList = [
-       "demo_ecoregions_new_class_split",
-       "demo_buteogallus_urubitinga",
-       "demo_caluromys_philander",
-       "demo_chiroxiphia_caudata",
-       "demo_leopardus_pardalis",
-       "demo_megarynchus_pitangua",
-       "demo_phyllodytes_tuberculosus",
-       "demo_tapirus_terrestris",
-       "demo_thalurania_glaucopis",
-]
+
+await sleep(5)
+
+// Setup
+
+// const featureList = [
+//        "demo_ecoregions_new_class_split",
+//        "demo_buteogallus_urubitinga",
+//        "demo_caluromys_philander",
+//        "demo_chiroxiphia_caudata",
+//        "demo_leopardus_pardalis",
+//        "demo_megarynchus_pitangua",
+//        "demo_phyllodytes_tuberculosus",
+//        "demo_tapirus_terrestris",
+//        "demo_thalurania_glaucopis",
+// ]
 const features = await botClient
   .get(`/projects/${project.data.id}/features?q=demo`)
   .then((result) => result.data)
@@ -147,7 +179,7 @@ console.log(features);
 
 const geoFeatureSpecStart = Process.hrtime();
 
-// const featureRecipe = features.map( (x: Object) => { return {
+// const featureRecipe = features!.data.map( (x) => { return {
 //     kind: "plain",
 //     featureId: x.id,
 //     marxanSettings: {
@@ -156,29 +188,40 @@ const geoFeatureSpecStart = Process.hrtime();
 //     },
 //   }})
 //   console.log(featureRecipe);
-const geoFeatureSpec = await botClient
-  .post(`/scenarios/${scenario.data.id}/features/specification`, {
-    status: "created",
-    features: [
-      {
-        kind: "plain",
-        featureId: features.data[0].id,
-        marxanSettings: {
-          prop: 0.3,
-          fpf: 1,
-        },
-      },
-    ],
-  })
-  .then((result) => result.data)
-  .catch((e) => {
-    console.log(e);
-  });
+// const geoFeatureSpec = await botClient
+//   .post(`/scenarios/${scenario.data.id}/features/specification`, {
+//     status: "created",
+//     features: [
+//       {
+//         kind: "plain",
+//         featureId: features.data[0].id,
+//         marxanSettings: {
+//           prop: 0.3,
+//           fpf: 1,
+//         },
+//       },
+//     ],
+//   })
+//   .then((result) => result.data)
+//   .catch((e) => {
+//     console.log(e);
+//   });
+    // metadata: {
+    //     scenarioEditingMetadata: {
+    //         status: {
+    //           'protected-areas': 'draft',
+    //           features: 'draft',
+    //           analysis: 'draft',
+    //         },
+    //         tab: 'analysis',
+    //         subtab: 'analysis-preview',
+    //       }
+    //     },
 
-const geoFeatureSpecTook = Process.hrtime(geoFeatureSpecStart);
+// const geoFeatureSpecTook = Process.hrtime(geoFeatureSpecStart);
 
-console.log(
-  `Processing of features for scenario done in ${geoFeatureSpecTook[0]} seconds`
-);
+// console.log(
+//   `Processing of features for scenario done in ${geoFeatureSpecTook[0]} seconds`
+// );
 
-console.log(geoFeatureSpec);
+// console.log(geoFeatureSpec);
