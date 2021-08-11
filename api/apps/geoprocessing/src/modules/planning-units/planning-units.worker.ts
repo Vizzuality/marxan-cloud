@@ -6,6 +6,7 @@ import * as config from 'config';
 /**
  * @see https://docs.bullmq.io/guide/workers
  *
+ * @deprecated Workers and jobs should be move to the new functionality
  * @debt Bullmq is expected to be supported soon in the
  * nest.js bull wrapper. In the meanwhile we are using Bullmq
  * in the worker

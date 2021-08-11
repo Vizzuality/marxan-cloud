@@ -13,4 +13,8 @@ export class GeoFeatureGeometry {
   @ApiProperty()
   @Column('uuid', { name: 'feature_id' })
   featuresId!: string;
+
+  @ApiProperty()
+  @Column('jsonb', { name: 'properties' })
+  properties!: string;
 }

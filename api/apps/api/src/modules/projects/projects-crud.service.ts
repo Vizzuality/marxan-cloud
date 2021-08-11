@@ -188,6 +188,10 @@ export class ProjectsCrudService extends AppBaseService<
     createModel: UpdateProjectDTO,
     _info?: AppInfoDTO,
   ): Promise<void> {
+    /**
+     * @deprecated Workers and jobs should be move to the new functionality
+     */
+    
     if (
       createModel.planningUnitAreakm2 &&
       createModel.planningUnitGridShape &&
@@ -196,9 +200,6 @@ export class ProjectsCrudService extends AppBaseService<
         createModel.adminAreaLevel2Id ||
         createModel.planningAreaId)
     ) {
-      this.logger.debug(
-        'creating planning unit job and assigning project to area',
-      );
       await Promise.all([
         this.planningUnitsService.create(createModel),
         this.planningAreasService.assignProject({

@@ -65,7 +65,7 @@ export class FeatureService {
     bbox?: BBox,
   ): Promise<Buffer> {
     const { z, x, y, id } = tileSpecification;
-    const attributes = 'feature_id';
+    const attributes = 'feature_id, properties';
     const table = this.featuresRepository.metadata.tableName;
     const customQuery = this.buildFeaturesWhereQuery(id, bbox);
     return this.tileService.getTile({

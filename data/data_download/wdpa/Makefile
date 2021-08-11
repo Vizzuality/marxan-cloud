@@ -45,7 +45,7 @@ data/wdpa/simp/%: data/wdpa/geojson/%
 				-filter-islands min-vertices=3 min-area=10000m2 remove-empty \
 				-filter-slivers min-area=10000m2 remove-empty \
 				-clean rewind \
-				-o $@ format=geojson force
+				-o $@ format=geojson force ndjson
 	rm -rf $<
 
 # @debt
