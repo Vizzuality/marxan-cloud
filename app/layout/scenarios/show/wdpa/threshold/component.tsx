@@ -1,44 +1,26 @@
-import React, {
-  useCallback, useMemo, useState, useEffect,
-} from 'react';
+import React, { useMemo, useEffect } from 'react';
 
-import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
-
 import { useProject } from 'hooks/projects';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
+import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import Button from 'components/button';
-import Field from 'components/forms/field';
 import Label from 'components/forms/label';
-import Slider from 'components/forms/slider';
-import {
-  composeValidators,
-} from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
 import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
 export interface WDPAThresholdCategories {
-  onSuccess: () => void;
-  onBack: () => void;
+
 }
 
-export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
-  onSuccess,
-  onBack,
-}: WDPAThresholdCategories) => {
-  const [submitting, setSubmitting] = useState(false);
-  const { addToast } = useToasts();
+export const WDPAThreshold: React.FC<WDPAThresholdCategories> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -53,7 +35,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     isFetching: scenarioIsFetching,
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
-  const { metadata } = scenarioData || {};
 
   const {
     data: wdpaData,
@@ -67,14 +48,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                   && !projectData?.adminAreaLevel1I
                   && !projectData?.countryId ? projectData?.planningAreaId : null,
   });
-
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
-
-  const labelRef = React.useRef(null);
 
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
     if (!wdpaData) return [];
@@ -94,64 +67,13 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     };
   }, [scenarioData]);
 
+  console.log('scenarioData', scenarioData?.wdpaThreshold);
+
   useEffect(() => {
     const { wdpaThreshold } = scenarioData;
+
     dispatch(setWDPAThreshold(wdpaThreshold ? wdpaThreshold / 100 : 0.75));
   }, [scenarioData]); //eslint-disable-line
-
-  // EVENTS
-  const handleSubmit = useCallback(async (values) => {
-    setSubmitting(true);
-
-    const { wdpaThreshold } = values;
-
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
-      },
-    }, {
-      onSuccess: () => {
-        setSubmitting(false);
-
-        addToast('save-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario WDPA saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        onSuccess();
-      },
-      onError: () => {
-        setSubmitting(false);
-
-        addToast('error-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario WDPA not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [saveScenarioMutation, sid, addToast, onSuccess, metadata]);
-
-  const handleBack = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'protected-areas', subtab: 'protected-areas-preview' }),
-      },
-    }, {
-      onSuccess: () => {
-        onBack();
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata, onBack]);
 
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
@@ -165,89 +87,18 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   }
 
   return (
-    <FormRFF
-      onSubmit={handleSubmit}
-      initialValues={INITIAL_VALUES}
-    >
-      {({ values, handleSubmit: RFFhandleSubmit }) => (
-        <form onSubmit={RFFhandleSubmit} autoComplete="off" className="relative flex flex-col flex-grow w-full overflow-hidden">
-          <div className="relative flex flex-col flex-grow overflow-hidden">
-            <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
-            <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
-              <div className="py-6">
-                {/* WDPA */}
-                <div>
-                  <FieldRFF
-                    name="wdpaThreshold"
-                    validate={composeValidators([{ presence: true }])}
-                  >
-                    {(flprops) => (
-                      <Field id="scenario-wdpaThreshold" {...flprops}>
-                        <div className="flex items-center mb-3">
-                          <Label ref={labelRef} theme="dark" className="mr-3 uppercase">Set the threshold for protected areas</Label>
-                          <InfoButton>
-                            <div>
-                              <h4 className="font-heading text-lg mb-2.5">What is a threshold?</h4>
-                              <div className="space-y-2">
-                                <p>
-                                  Inside Marxan, planning units are considered as either
-                                  protected
-                                  or not protected.
-                                </p>
-                                <p>
-                                  The threshold value represents a
-                                  percentage of the area
-                                  inside a planning unit. By setting the threshold you decide
-                                  how much of a protected area needs to fall inside a
-                                  planning unit to consider the whole planning unit
-                                  as &quot;protected&quot;.
-                                </p>
-                                <p>
-                                  The following
-                                  image shows an example setting a threshold of 50%:
-                                </p>
-                              </div>
+    <div className="relative flex flex-col flex-grow overflow-hidden">
+      <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
-                              <img src={THRESHOLD_IMG} alt="Threshold" />
+      <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
+        <div className="py-8 space-y-6">
 
-                            </div>
-                          </InfoButton>
-                        </div>
+          <div>
+            <h3 className="text-sm uppercase">Selected protected areas:</h3>
 
-                        <p
-                          className="mb-3 text-sm text-gray-300"
-                        >
-                          Refers to what percentage of a planning unit must
-                          {' '}
-                          be covered by a protected area to be considered “protected”.
-                        </p>
-
-                        <Slider
-                          labelRef={labelRef}
-                          theme="dark"
-                          defaultValue={values.wdpaThreshold}
-                          formatOptions={{
-                            style: 'percent',
-                          }}
-                          maxValue={1}
-                          minValue={0.01}
-                          step={0.01}
-                          onChange={(s) => {
-                            flprops.input.onChange(s);
-                            dispatch(setWDPAThreshold(s));
-                          }}
-                        />
-                      </Field>
-                    )}
-                  </FieldRFF>
-                </div>
-
-                <div className="mt-10">
-                  <h3 className="text-sm">Selected protected areas:</h3>
-
-                  <div className="flex flex-wrap mt-2.5">
-                    {INITIAL_VALUES.wdpaIucnCategories
+            <div className="flex flex-wrap mt-2.5">
+              {INITIAL_VALUES.wdpaIucnCategories
                     && INITIAL_VALUES.wdpaIucnCategories.map((w) => {
                       const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
 
@@ -264,44 +115,53 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                         </div>
                       );
                     })}
-                  </div>
-                </div>
-              </div>
             </div>
-            <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
           </div>
 
-          <div className="flex justify-center mt-5 space-x-4">
-            <Button
-              theme="secondary"
-              size="lg"
-              type="button"
-              className="relative px-20"
-              disabled={submitting}
-              onClick={handleBack}
-            >
-              <span>Back</span>
-            </Button>
+          <div>
+            <div className="flex items-center mb-3">
+              <Label theme="dark" className="mr-3 text-sm uppercase">Threshold for protected areas:</Label>
+              <InfoButton>
+                <div>
+                  <h4 className="font-heading text-lg mb-2.5">What is a threshold?</h4>
+                  <div className="space-y-2">
+                    <p>
+                      Inside Marxan, planning units are considered as either
+                      protected
+                      or not protected.
+                    </p>
+                    <p>
+                      The threshold value represents a
+                      percentage of the area
+                      inside a planning unit. By setting the threshold you decide
+                      how much of a protected area needs to fall inside a
+                      planning unit to consider the whole planning unit
+                      as &quot;protected&quot;.
+                    </p>
+                    <p>
+                      The following
+                      image shows an example setting a threshold of 50%:
+                    </p>
+                  </div>
 
-            <Button
-              theme="primary"
-              size="lg"
-              type="submit"
-              className="relative px-20"
-              disabled={submitting}
-            >
-              <span>Save</span>
+                  <img src={THRESHOLD_IMG} alt="Threshold" />
 
-              <Loading
-                visible={submitting}
-                className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full"
-                iconClassName="w-5 h-5 text-white"
-              />
-            </Button>
+                </div>
+              </InfoButton>
+            </div>
+
+            <p className="mb-3 text-sm text-gray-300">
+              Refers to what percentage of a planning unit must
+              {' '}
+              be covered by a protected area to be considered “protected”.
+            </p>
+            <p>{`${scenarioData?.wdpaThreshold}%`}</p>
           </div>
-        </form>
-      )}
-    </FormRFF>
+        </div>
+      </div>
+      <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
+    </div>
+
   );
 };
 

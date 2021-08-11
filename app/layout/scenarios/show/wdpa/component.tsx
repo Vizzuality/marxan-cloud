@@ -1,64 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
 import { motion } from 'framer-motion';
-import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
-import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
-import { useWDPACategories } from 'hooks/wdpa';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
-import ScenariosSidebarWDPACategories from 'layout/scenarios/show/wdpa/categories';
 import ScenariosSidebarWDPAThreshold from 'layout/scenarios/show/wdpa/threshold';
-
-import Steps from 'components/steps';
 
 export interface ScenariosSidebarShowWDPAProps {
 }
 
 export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> = () => {
-  const [step, setStep] = useState(0);
   const { query } = useRouter();
-  const { pid, sid } = query;
-
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTab, setSubTab } = scenarioSlice.actions;
+  const { sid } = query;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
-  const dispatch = useDispatch();
-
-  const { data: projectData } = useProject(pid);
-
   const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
-
-  const {
-    subtab: metaSubtab,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
-
-  const { data: wdpaData } = useWDPACategories({
-    adminAreaId: projectData?.adminAreaLevel2Id
-                 || projectData?.adminAreaLevel1I
-                 || projectData?.countryId,
-    customAreaId: !projectData?.adminAreaLevel2Id
-                  && !projectData?.adminAreaLevel1I
-                  && !projectData?.countryId ? projectData?.planningAreaId : null,
-  });
-
-  useEffect(() => {
-    const reloadStep = metaSubtab === 'protected-areas-preview' ? 0 : 1;
-    setStep(reloadStep);
-  }, [metaSubtab]);
 
   if (!scenarioData || tab !== 'protected-areas') return null;
 
@@ -105,33 +68,11 @@ export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> =
 
           <Pill selected>
             <header className="flex items-baseline space-x-4">
-
               <h2 className="text-lg font-medium font-heading">Protected areas</h2>
-
-              {(wdpaData && !!wdpaData.length) && (
-                <Steps step={step + 1} length={2} />
-              )}
             </header>
 
-            {step === 0 && (
-              <ScenariosSidebarWDPACategories
-                onSuccess={() => {
-                  setStep(1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PERCENTAGE));
-                }}
-                onDismiss={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
-              />
-            )}
+            <ScenariosSidebarWDPAThreshold />
 
-            {step === 1 && (
-              <ScenariosSidebarWDPAThreshold
-                onSuccess={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
-                onBack={() => {
-                  setStep(0);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));
-                }}
-              />
-            )}
           </Pill>
         </motion.div>
       </HelpBeacon>
