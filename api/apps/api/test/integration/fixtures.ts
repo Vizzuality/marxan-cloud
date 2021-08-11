@@ -33,6 +33,8 @@ export const getFixtures = async () => {
   const calculatedForBothFeatureId = v4();
   const nonCalculatedFeatureId = v4();
 
+  const splitByProperty = `split-property`;
+
   return {
     cleanup: async () => {
       await ScenariosTestUtils.deleteScenario(app, jwtToken, scenario.id);
@@ -104,6 +106,7 @@ export const getFixtures = async () => {
       specificationRepository.findAllRelatedToFeatureConfig({
         operation: SpecificationOperation.Split,
         baseFeatureId: splitBaseFeatureId,
+        splitByProperty,
         againstFeatureId: undefined,
       }),
     WhenGettingSpecificationsForStratificationConfig: async (): Promise<
@@ -120,6 +123,7 @@ export const getFixtures = async () => {
       specificationRepository.findAllRelatedToFeatureConfig({
         operation: SpecificationOperation.Split,
         baseFeatureId: v4(),
+        splitByProperty,
       }),
     WhenGettingSpecificationsRelatedToFeature: async (): Promise<
       Specification[]

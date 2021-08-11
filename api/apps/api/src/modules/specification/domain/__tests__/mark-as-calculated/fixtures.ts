@@ -1,7 +1,8 @@
 import { v4 } from 'uuid';
 import { Specification } from '../../specification';
 import {
-  FeatureConfigInput,
+  FeatureConfigSplit,
+  FeatureConfigStratification,
   SpecificationOperation,
 } from '../../feature-config';
 import { SpecificationGotReady } from '../../events/specification-got-ready.event';
@@ -13,12 +14,13 @@ export const getFixtures = () => {
   const nonCalculatedFeatureOne = v4();
   const nonCalculatedFeatureTwo = v4();
 
-  const splitConfig: FeatureConfigInput = {
+  const splitConfig: FeatureConfigSplit = {
     operation: SpecificationOperation.Split,
     baseFeatureId: baseFeatureId,
+    splitByProperty: `split-prop`,
   };
 
-  const stratificationConfig: FeatureConfigInput = {
+  const stratificationConfig: FeatureConfigStratification = {
     operation: SpecificationOperation.Stratification,
     baseFeatureId: baseFeatureId,
     againstFeatureId: stratificationFeatureId,
