@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { mergeScenarioStatusMetaData, getReloadSubtab, SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
@@ -39,10 +39,6 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
 
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
-  const {
-    subtab: metaSubtab,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -66,10 +62,6 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
     dispatch(setSubTab(subtab));
     saveTabsStatus(subtab);
   }, [dispatch, setSubTab, saveTabsStatus]);
-
-  useEffect(() => {
-    setSection(getReloadSubtab(metaSubtab));
-  }, [metaSubtab]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.SOLUTIONS) return null;
 
