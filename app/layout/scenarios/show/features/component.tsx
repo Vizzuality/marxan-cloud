@@ -1,62 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-import { useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
-import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useSelectedFeatures } from 'hooks/features';
 import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import AddFeatures from 'layout/scenarios/show/features/add';
 import FeaturesAdded from 'layout/scenarios/show/features/added';
 
-import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
-import Modal from 'components/modal';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
 import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
 import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
 
 import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
-import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 export interface ScenariosSidebarShowFeaturesProps {
 
 }
 
 export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeaturesProps> = () => {
-  const [step, setStep] = useState(0);
-  const [modal, setModal] = useState(false);
   const { query } = useRouter();
-  const { pid, sid } = query;
-
-  const queryClient = useQueryClient();
+  const { sid } = query;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
-  const {
-    subtab: metaSubtab,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
 
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
-
-  useEffect(() => {
-    const reloadStep = metaSubtab === 'features-preview' ? 0 : 1;
-    setStep(reloadStep);
-  }, [metaSubtab]);
 
   if (!scenarioData || tab !== 'features') return null;
 
@@ -127,7 +107,6 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
 
                 <div className="flex items-center mt-2 space-x-2">
 
-                  {step === 0 && (
                   <>
                     <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
                     <div className="text-xs uppercase font-heading">
@@ -136,8 +115,7 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
                       {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
                     </div>
                   </>
-                  )}
-                  {step === 1 && (
+
                   <>
                     <InfoButton>
                       <div>
@@ -185,34 +163,11 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
                       </div>
                     </InfoButton>
                   </>
-                  )}
 
                 </div>
               </div>
 
-              {step === 0 && (
-                <Button
-                  theme="primary"
-                  size="base"
-                  onClick={() => setModal(true)}
-                >
-                  <span className="mr-3">Add features</span>
-                  <Icon icon={PLUS_SVG} className="w-4 h-4" />
-                </Button>
-              )}
             </header>
-
-            <Modal
-              title="All features"
-              open={modal}
-              size="narrow"
-              onDismiss={() => {
-                setModal(false);
-                queryClient.removeQueries(['all-features', pid]);
-              }}
-            >
-              <AddFeatures />
-            </Modal>
 
             <FeaturesAdded />
 
