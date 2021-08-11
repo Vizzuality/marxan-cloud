@@ -52,6 +52,7 @@ import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
+import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -201,5 +202,16 @@ export class ProjectsController {
     }
 
     return result.right;
+  }
+
+  @ApiOperation({
+    description: `Upload shapefiles of species or bioregional features.`,
+  })
+  @ApiOkResponse({ type: ShapefileUploadResponse })
+  @Post(`:id/features/shapefile`)
+  async uploadFeatures(
+    @Param('id') projectId: string,
+  ): Promise<ShapefileUploadResponse> {
+    return { success: true };
   }
 }
