@@ -78,6 +78,12 @@ export class GeoFeaturePropertySetService {
     scenario: Scenario,
   ): Promise<any> {
     const project = await this.projectRepository.findOne(scenario.projectId);
+    // Users can submit or request an empty specification; in this case we
+    // simply return it verbatim, as we won't have any features to extend with
+    // metadata.
+    if(specification.features.length === 0) {
+      return specification;
+    }
     const idsOfFeaturesInGeoprocessingOperations = new Set(
       flatten(
         specification.features
