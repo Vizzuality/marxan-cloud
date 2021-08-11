@@ -115,12 +115,15 @@ export class DbSpecificationRepository implements SpecificationRepository {
       this.specificationRepo.create({
         id: snapshot.id,
         draft: snapshot.draft,
+        raw: snapshot.raw,
         scenarioId: snapshot.scenarioId,
         specificationFeaturesConfiguration: this.specificationFeatureConfigRepo.create(
           snapshot.config.map((configuration) => ({
             againstFeatureId: configuration.againstFeatureId,
             baseFeatureId: configuration.baseFeatureId,
             operation: configuration.operation,
+            splitByProperty: configuration.splitByProperty,
+            selectSubSets: configuration.selectSubSets,
             features: configuration.resultFeatures.map((feature) =>
               this.specificationFeatureRepo.create({
                 calculated: feature.calculated,
@@ -156,6 +159,7 @@ export class DbSpecificationRepository implements SpecificationRepository {
     return Specification.from({
       id: specification.id,
       draft: specification.draft,
+      raw: specification.raw,
       scenarioId: specification.scenarioId,
       config:
         specification.specificationFeaturesConfiguration?.map(
@@ -165,6 +169,8 @@ export class DbSpecificationRepository implements SpecificationRepository {
             baseFeatureId: specificationFeature.baseFeatureId,
             operation: specificationFeature.operation,
             featuresDetermined: specificationFeature.featuresDetermined,
+            splitByProperty: specificationFeature.splitByProperty ?? undefined,
+            selectSubSets: specificationFeature.selectSubSets ?? undefined,
             resultFeatures:
               specificationFeature.features?.map((feature) => ({
                 id: feature.featureId,

@@ -45,6 +45,9 @@ export const getFixtures = async () => {
         id: v4(),
         draft: false,
         scenarioId: scenario.id,
+        raw: {
+          rawConfig: 1337,
+        },
         config: [
           {
             operation: SpecificationOperation.Split,

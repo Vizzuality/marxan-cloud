@@ -26,7 +26,9 @@ export const getFixtures = () => {
 
   return {
     WhenDraftWithTwoConfigurationsCreates: () =>
-      Specification.new(scenarioId, [splitConfig, stratificationConfig], true),
+      Specification.new(scenarioId, [splitConfig, stratificationConfig], true, {
+        rawConfig: 1337,
+      }),
     ThenSpecificationIsCreated(specification: Specification) {
       expect(specification.getUncommittedEvents()).toEqual([
         new SpecificationCandidateCreated(
@@ -39,6 +41,9 @@ export const getFixtures = () => {
         scenarioId: specification.scenarioId,
         draft: true,
         readyToActivate: false,
+        raw: {
+          rawConfig: 1337,
+        },
         config: [
           {
             ...splitConfig,

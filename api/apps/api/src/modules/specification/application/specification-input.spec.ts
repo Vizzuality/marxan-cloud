@@ -14,6 +14,7 @@ test(`valid values`, () => {
     plainToClass<SpecificationInput, SpecificationInput>(SpecificationInput, {
       scenarioId: v4(),
       draft: true,
+      raw: {},
       features: [
         plainToClass<
           SpecificationFeatureStratification,
@@ -51,6 +52,7 @@ test(`invalid values / types`, () => {
     plainToClass<SpecificationInput, SpecificationInput>(SpecificationInput, {
       scenarioId: `non-uuid`,
       draft: (`true` as unknown) as boolean,
+      raw: {},
       features: [
         plainToClass<
           SpecificationFeatureStratification,

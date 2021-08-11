@@ -26,6 +26,9 @@ export class SpecificationInput {
   draft!: boolean;
 
   @IsDefined()
+  raw!: Record<string, unknown>;
+
+  @IsDefined()
   @IsArray()
   @ValidateNested()
   features!: (

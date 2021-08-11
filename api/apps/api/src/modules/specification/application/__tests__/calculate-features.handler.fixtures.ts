@@ -84,6 +84,7 @@ export const getFixtures = async () => {
           scenarioId,
           draft: false,
           config: [configWithNonCalculatedFeature],
+          raw: {},
         }),
       );
       await repo.save(
@@ -92,6 +93,7 @@ export const getFixtures = async () => {
           scenarioId,
           draft: false,
           config: [configWithNonCalculatedFeature],
+          raw: {},
         }),
       );
       await repo.save(
@@ -100,6 +102,7 @@ export const getFixtures = async () => {
           scenarioId,
           draft: false,
           config: [configWithOnlyCalculatedFeature],
+          raw: {},
         }),
       );
     },
