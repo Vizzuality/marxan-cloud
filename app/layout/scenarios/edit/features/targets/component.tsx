@@ -13,13 +13,11 @@ import Item from 'components/features/target-spf-item';
 import Loading from 'components/loading';
 
 export interface ScenariosFeaturesListProps {
-  readOnly?: boolean;
   onBack: () => void;
   onSuccess: () => void;
 }
 
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
-  readOnly,
   onBack,
   onSuccess,
 }: ScenariosFeaturesListProps) => {
@@ -261,7 +259,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                 type="submit"
                 theme="primary"
                 size="lg"
-                disabled={submitting || readOnly}
+                disabled={submitting}
               >
                 Save
               </Button>

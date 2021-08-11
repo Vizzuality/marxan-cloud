@@ -21,12 +21,10 @@ import Loading from 'components/loading';
 import Modal from 'components/modal';
 
 export interface ScenariosFeaturesListProps {
-  readOnly?: boolean,
   onSuccess: () => void
 }
 
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
-  readOnly,
   onSuccess,
 }: ScenariosFeaturesListProps) => {
   const [submitting, setSubmitting] = useState(false);
@@ -244,7 +242,6 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                           >
                             <Item
                               {...item}
-                              readOnly={readOnly}
                               onSplitSelected={(s) => {
                                 onSplitSelected(item.id, s, input);
                               }}

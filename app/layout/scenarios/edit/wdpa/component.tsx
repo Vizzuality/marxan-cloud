@@ -22,12 +22,10 @@ import ScenariosSidebarWDPAThreshold from 'layout/scenarios/show/wdpa/threshold'
 import Steps from 'components/steps';
 
 export interface ScenariosSidebarEditWDPAProps {
-  readOnly?: boolean;
+
 }
 
-export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> = ({
-  readOnly,
-}: ScenariosSidebarEditWDPAProps) => {
+export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> = () => {
   const [step, setStep] = useState(0);
   const { query } = useRouter();
   const { pid, sid } = query;
@@ -123,7 +121,6 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
                   dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PERCENTAGE));
                 }}
                 onDismiss={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
-                readOnly={readOnly}
               />
             )}
 
@@ -134,7 +131,6 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
                   setStep(0);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));
                 }}
-                readOnly={readOnly}
               />
             )}
           </Pill>

@@ -34,12 +34,10 @@ import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 export interface ScenariosSidebarEditFeaturesProps {
-  readOnly?: boolean,
+
 }
 
-export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeaturesProps> = ({
-  readOnly,
-}: ScenariosSidebarEditFeaturesProps) => {
+export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeaturesProps> = () => {
   const [step, setStep] = useState(0);
   const [modal, setModal] = useState(false);
   const { query, push } = useRouter();
@@ -247,7 +245,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
                 </div>
               </div>
 
-              {step === 0 && !readOnly && (
+              {step === 0 && (
                 <Button
                   theme="primary"
                   size="base"
@@ -278,7 +276,6 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_FPF));
                   saveScenarioStatusOnContinue();
                 }}
-                readOnly={readOnly}
               />
             )}
 
@@ -289,7 +286,6 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
                   saveScenarioFeaturesStatusOnBack();
                 }}
-                readOnly={readOnly}
                 onSuccess={saveScenarioStatus}
               />
             )}

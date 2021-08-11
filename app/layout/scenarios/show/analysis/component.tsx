@@ -23,12 +23,9 @@ import Button from 'components/button';
 import Modal from 'components/modal';
 
 export interface ScenariosSidebarShowAnalysisProps {
-  readOnly?: boolean;
 }
 
-export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysisProps> = ({
-  readOnly,
-}: ScenariosSidebarShowAnalysisProps) => {
+export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysisProps> = () => {
   const [section, setSection] = useState(null);
   const [runOpen, setRunOpen] = useState(false);
   const { query } = useRouter();
@@ -126,7 +123,6 @@ export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysis
               {!section && (
               <Sections
                 key="sections"
-                readOnly={readOnly}
                 onChangeSection={onChangeSection}
               />
               )}
@@ -141,7 +137,6 @@ export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysis
               {section === 'cost-surface' && (
                 <CostSurface
                   key="cost-surface"
-                  readOnly={readOnly}
                   onChangeSection={onChangeSection}
                 />
               )}

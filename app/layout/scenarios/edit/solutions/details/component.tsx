@@ -30,7 +30,6 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   onChangeSection,
   onScheduleScenario,
   numberOfSchedules,
-  readOnly,
 }: ScenariosSolutionsDetailsProps) => {
   const { query } = useRouter();
   const { sid } = query;
@@ -111,7 +110,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
               View solutions table
               <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
             </Button>
-            {!readOnly && (
+
             <Button
               theme="secondary"
               size="base"
@@ -128,7 +127,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
               </div>
               <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
             </Button>
-            )}
+
             <Modal
               open={showTable}
               title="Solutions table"

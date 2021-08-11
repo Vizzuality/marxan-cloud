@@ -24,9 +24,7 @@ import Button from 'components/button';
 import { SolutionsSections } from './sections/types';
 import { ScenariosSidebarShowSolutionsProps } from './types';
 
-export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutionsProps> = ({
-  readOnly,
-}: ScenariosSidebarShowSolutionsProps) => {
+export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutionsProps> = () => {
   const [section, setSection] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
@@ -135,7 +133,6 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
                   onChangeSection={onChangeSection}
                   onScheduleScenario={() => console.info('Schedule scenario - solutions')}
                   numberOfSchedules={2}
-                  readOnly={readOnly}
                 />
               )}
 
