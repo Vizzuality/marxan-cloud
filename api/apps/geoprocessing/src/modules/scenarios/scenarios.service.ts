@@ -25,7 +25,7 @@ const includeSelections: IncludeSelections = {
   protection: {
     attributes: ', "percentageProtected"',
     select:
-      'round((test.protected_area/plan.area)::numeric*100)::int as "percentageProtected"',
+      'round((COALESCE(test.protected_area, 0)/plan.area)::numeric*100)::int as "percentageProtected"',
   },
   'lock-status': {
     attributes: ', "lockinStatus"',
@@ -40,7 +40,7 @@ const includeSelections: IncludeSelections = {
   },
   cost: {
     attributes: ', "costValue"',
-    select: 'cost as "costValue"',
+    select: 'COALESCE(cost,1) as "costValue"',
     table: 'scenarios_pu_cost_data',
     alias: 'cost',
     condition: 'test.id = cost.scenarios_pu_data_id',
