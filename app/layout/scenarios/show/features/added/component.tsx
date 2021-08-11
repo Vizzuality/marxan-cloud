@@ -2,14 +2,15 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-// import cx from 'classnames';
+import cx from 'classnames';
 
 import { useTargetedFeatures } from 'hooks/features';
 
-import Item from 'components/features/target-spf-item';
+import ShowTargetItem from 'components/features/show-target-spf-item';
 import Loading from 'components/loading';
 
 export interface ScenariosFeaturesListProps {
+
 }
 
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () => {
@@ -22,13 +23,6 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
     isFetched: targetedFeaturesIsFetched,
   } = useTargetedFeatures(sid);
 
-  // const INITIAL_VALUES = useMemo(() => {
-  //   return {
-  //     features: targetedFeaturesData,
-  //   };
-  // }, [targetedFeaturesData]);
-
-  // Render
   if (targetedFeaturesIsFetching && !targetedFeaturesIsFetched) {
     return (
       <Loading
@@ -41,11 +35,11 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
 
   return (
     <>
-      {/* {(!targetedFeaturesData || !targetedFeaturesData.length) && (
+      {(!targetedFeaturesData || !targetedFeaturesData.length) && (
       <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
         No results found
       </div>
-      )} */}
+      )}
 
       {!!targetedFeaturesData && !!targetedFeaturesData.length && (
       <div className="relative flex flex-col flex-grow overflow-hidden">
@@ -53,25 +47,23 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
         <div className="relative h-full px-0.5 overflow-x-visible overflow-y-auto">
 
           <div className="py-6">
-            <Item
-              id="all-targets"
-              defaultTarget={50}
-              defaultFPF={1}
-              isAllTargets
-            />
-
-            {/* {values.features.map((item, i) => {
+            { targetedFeaturesData instanceof Array && targetedFeaturesData.map((item, i) => {
+              const { id, spf, target } = item;
               return (
                 <div
                   className={cx({
                     'mt-1.5': i !== 0,
                   })}
-                  key={`${item.id}`}
+                  key={`${id}`}
                 >
-                  <Item {...item} />
+                  <ShowTargetItem
+                    fpf={spf}
+                    target={target}
+                    {...item}
+                  />
                 </div>
               );
-            })} */}
+            })}
           </div>
 
         </div>
