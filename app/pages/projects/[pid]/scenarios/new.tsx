@@ -6,9 +6,9 @@ import Header from 'layout/header';
 import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
-import ScenariosMap from 'layout/scenarios/map';
-import ScenariosSidebar from 'layout/scenarios/sidebar';
-import SidebarName from 'layout/scenarios/sidebar/name';
+import ScenariosMap from 'layout/scenarios/edit/map';
+import SidebarName from 'layout/scenarios/edit/name';
+import ScenariosSidebar from 'layout/scenarios/edit/sidebar';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
 
