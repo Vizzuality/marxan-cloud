@@ -13,11 +13,11 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import AdjustPanningUnits from 'layout/scenarios/show/analysis/adjust-planning-units';
-import CostSurface from 'layout/scenarios/show/analysis/cost-surface';
-import GapAnalysis from 'layout/scenarios/show/analysis/gap-analysis';
-import Sections from 'layout/scenarios/show/analysis/sections';
-import Run from 'layout/scenarios/show/run';
+import AdjustPanningUnits from 'layout/scenarios/edit/analysis/adjust-planning-units';
+import CostSurface from 'layout/scenarios/edit/analysis/cost-surface';
+import GapAnalysis from 'layout/scenarios/edit/analysis/gap-analysis';
+import Sections from 'layout/scenarios/edit/analysis/sections';
+import Run from 'layout/scenarios/edit/run';
 
 import Button from 'components/button';
 import Modal from 'components/modal';

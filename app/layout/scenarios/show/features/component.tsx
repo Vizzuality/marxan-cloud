@@ -1,30 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
 import { motion } from 'framer-motion';
-import { mergeScenarioStatusMetaData, SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
+import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useSelectedFeatures } from 'hooks/features';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 import AddFeatures from 'layout/scenarios/show/features/add';
-import ListFeatures from 'layout/scenarios/show/features/list';
-import TargetFeatures from 'layout/scenarios/show/features/targets';
-import { ScenarioSidebarSubTabs } from 'layout/scenarios/show/sidebar/types';
+import FeaturesAdded from 'layout/scenarios/show/features/added';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Modal from 'components/modal';
-import Steps from 'components/steps';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
 import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
@@ -40,16 +35,12 @@ export interface ScenariosSidebarShowFeaturesProps {
 export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeaturesProps> = () => {
   const [step, setStep] = useState(0);
   const [modal, setModal] = useState(false);
-  const { query, push } = useRouter();
+  const { query } = useRouter();
   const { pid, sid } = query;
 
   const queryClient = useQueryClient();
 
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setSubTab } = scenarioSlice.actions;
-
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-  const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
@@ -61,43 +52,6 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
-
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
-
-  const saveScenarioStatus = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'analysis', subtab: 'analysis-preview' }),
-      },
-    }, {
-      onSuccess: () => {
-        push(`/projects/${pid}`);
-      },
-    });
-  }, [saveScenarioMutation, sid, pid, push, metadata]);
-
-  const saveScenarioStatusOnContinue = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-fpf' }),
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata]);
-
-  const saveScenarioFeaturesStatusOnBack = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata]);
 
   useEffect(() => {
     const reloadStep = metaSubtab === 'features-preview' ? 0 : 1;
@@ -153,8 +107,7 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
             <header className="flex items-start justify-between flex-shrink-0">
               <div>
                 <div className="flex items-baseline space-x-4">
-                  <h2 className="text-lg font-medium font-heading">Features</h2>
-                  <Steps step={step + 1} length={2} />
+                  <h2 className="text-lg font-medium font-heading">Features Added</h2>
                   <InfoButton>
                     <div>
                       <h4 className="font-heading text-lg mb-2.5">What are features?</h4>
@@ -183,14 +136,6 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
                       {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
                     </div>
                   </>
-                  )}
-
-                  {step === 1 && (
-                  <div className="text-xs uppercase font-heading">
-                    Set the target and FPF for your features.
-
-                  </div>
-
                   )}
                   {step === 1 && (
                   <>
@@ -269,26 +214,8 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
               <AddFeatures />
             </Modal>
 
-            {step === 0 && (
-              <ListFeatures
-                onSuccess={() => {
-                  setStep(step + 1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_FPF));
-                  saveScenarioStatusOnContinue();
-                }}
-              />
-            )}
+            <FeaturesAdded />
 
-            {step === 1 && (
-              <TargetFeatures
-                onBack={() => {
-                  setStep(step - 1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
-                  saveScenarioFeaturesStatusOnBack();
-                }}
-                onSuccess={saveScenarioStatus}
-              />
-            )}
           </Pill>
         </motion.div>
       </HelpBeacon>

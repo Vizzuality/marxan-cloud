@@ -17,17 +17,12 @@ import AdjustPanningUnits from 'layout/scenarios/show/analysis/adjust-planning-u
 import CostSurface from 'layout/scenarios/show/analysis/cost-surface';
 import GapAnalysis from 'layout/scenarios/show/analysis/gap-analysis';
 import Sections from 'layout/scenarios/show/analysis/sections';
-import Run from 'layout/scenarios/show/run';
-
-import Button from 'components/button';
-import Modal from 'components/modal';
 
 export interface ScenariosSidebarShowAnalysisProps {
 }
 
 export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysisProps> = () => {
   const [section, setSection] = useState(null);
-  const [runOpen, setRunOpen] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
 
@@ -148,33 +143,8 @@ export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysis
                 />
               )}
             </Pill>
-
-            {!section && (
-            <motion.div
-              key="run-scenario-button"
-              className="flex justify-center flex-shrink-0 mt-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <Button
-                theme="spacial"
-                size="lg"
-                onClick={() => setRunOpen(true)}
-              >
-                Run scenario
-              </Button>
-            </motion.div>
-            )}
           </AnimatePresence>
 
-          <Modal
-            title="Run scenario"
-            open={runOpen}
-            size="wide"
-            onDismiss={() => setRunOpen(false)}
-          >
-            <Run />
-          </Modal>
         </motion.div>
       </HelpBeacon>
     </div>

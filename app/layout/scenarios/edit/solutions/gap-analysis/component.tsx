@@ -2,8 +2,8 @@ import React, { useState, useCallback } from 'react';
 
 import { motion } from 'framer-motion';
 
-import List from 'layout/scenarios/show/analysis/gap-analysis/list';
-import Toolbar from 'layout/scenarios/show/analysis/gap-analysis/toolbar';
+import List from 'layout/scenarios/edit/analysis/gap-analysis/list';
+import Toolbar from 'layout/scenarios/edit/analysis/gap-analysis/toolbar';
 
 import Button from 'components/button';
 import Icon from 'components/icon';

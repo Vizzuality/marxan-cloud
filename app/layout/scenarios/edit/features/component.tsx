@@ -15,10 +15,10 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import AddFeatures from 'layout/scenarios/show/features/add';
-import ListFeatures from 'layout/scenarios/show/features/list';
-import TargetFeatures from 'layout/scenarios/show/features/targets';
-import { ScenarioSidebarSubTabs } from 'layout/scenarios/show/sidebar/types';
+import AddFeatures from 'layout/scenarios/edit/features/add';
+import ListFeatures from 'layout/scenarios/edit/features/list';
+import TargetFeatures from 'layout/scenarios/edit/features/targets';
+import { ScenarioSidebarSubTabs } from 'layout/scenarios/edit/sidebar/types';
 
 import Button from 'components/button';
 import Icon from 'components/icon';

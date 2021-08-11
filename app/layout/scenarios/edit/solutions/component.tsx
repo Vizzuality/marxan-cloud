@@ -13,11 +13,11 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import { ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
-import SolutionsDetails from 'layout/scenarios/show/solutions/details';
-import SolutionsGapAnalysis from 'layout/scenarios/show/solutions/gap-analysis';
-import SolutionsList from 'layout/scenarios/show/solutions/list';
-import Sections from 'layout/scenarios/show/solutions/sections';
+import { ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
+import SolutionsDetails from 'layout/scenarios/edit/solutions/details';
+import SolutionsGapAnalysis from 'layout/scenarios/edit/solutions/gap-analysis';
+import SolutionsList from 'layout/scenarios/edit/solutions/list';
+import Sections from 'layout/scenarios/edit/solutions/sections';
 
 import Button from 'components/button';
 
