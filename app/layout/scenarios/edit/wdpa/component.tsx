@@ -15,9 +15,9 @@ import { useWDPACategories } from 'hooks/wdpa';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
-import ScenariosSidebarWDPACategories from 'layout/scenarios/show/wdpa/categories';
-import ScenariosSidebarWDPAThreshold from 'layout/scenarios/show/wdpa/threshold';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
+import ScenariosSidebarWDPACategories from 'layout/scenarios/edit/wdpa/categories';
+import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/wdpa/threshold';
 
 import Steps from 'components/steps';
 

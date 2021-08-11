@@ -10,7 +10,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import ScenariosSidebarWDPAThreshold from 'layout/scenarios/show/wdpa/threshold';
+import ScenariosSidebarShowWDPAContent from 'layout/scenarios/show/wdpa/content';
 
 export interface ScenariosSidebarShowWDPAProps {
 }
@@ -71,7 +71,7 @@ export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> =
               <h2 className="text-lg font-medium font-heading">Protected areas</h2>
             </header>
 
-            <ScenariosSidebarWDPAThreshold />
+            <ScenariosSidebarShowWDPAContent />
 
           </Pill>
         </motion.div>

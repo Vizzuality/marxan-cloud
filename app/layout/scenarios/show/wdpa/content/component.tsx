@@ -16,11 +16,13 @@ import Loading from 'components/loading';
 
 import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
-export interface WDPAThresholdCategories {
+export interface ScenariosSidebarShowWDPAContentProps {
 
 }
 
-export const WDPAThreshold: React.FC<WDPAThresholdCategories> = () => {
+export const ScenariosSidebarShowWDPAContent: React.FC<ScenariosSidebarShowWDPAContentProps> = (
+
+) => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -66,8 +68,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = () => {
       wdpaIucnCategories: wdpaIucnCategories || [],
     };
   }, [scenarioData]);
-
-  console.log('scenarioData', scenarioData?.wdpaThreshold);
 
   useEffect(() => {
     const { wdpaThreshold } = scenarioData;
@@ -165,4 +165,4 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = () => {
   );
 };
 
-export default WDPAThreshold;
+export default ScenariosSidebarShowWDPAContent;
