@@ -12,9 +12,8 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
 
-import { useSelectedFeatures } from 'hooks/features';
 import {
-  useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers, useLegend,
+  usePUGridLayer, useLegend,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
@@ -46,10 +45,6 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
   const { data = {} } = useProject(pid);
   const { bbox } = data;
 
-  const {
-    data: selectedFeaturesData,
-  } = useSelectedFeatures(sid, {});
-
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTmpPuIncludedValue, setTmpPuExcludedValue } = scenarioSlice.actions;
 
@@ -62,8 +57,6 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
     wdpaCategories,
     wdpaThreshold,
 
-    // Features
-    featureHoverId,
     // Adjust planning units
     clicking,
     puAction,
@@ -75,23 +68,6 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
-
-  const WDPApreviewLayer = useWDPAPreviewLayer({
-    ...wdpaCategories,
-    cache,
-    active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
-    bbox,
-  });
-
-  const FeaturePreviewLayers = useFeaturePreviewLayers({
-    features: selectedFeaturesData,
-    cache,
-    active: tab === 'features',
-    bbox,
-    options: {
-      featureHoverId,
-    },
-  });
 
   const PUGridLayer = usePUGridLayer({
     cache,
@@ -108,7 +84,7 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
     },
   });
 
-  const LAYERS = [PUGridLayer, WDPApreviewLayer, ...FeaturePreviewLayers].filter((l) => !!l);
+  const LAYERS = [PUGridLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
     type: tab,
@@ -209,7 +185,6 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
 
     return null;
   };
-
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
       <Map
