@@ -268,8 +268,10 @@ export class ScenariosService {
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
-    // TODO correct implementation
-    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+    return this.solutionsCrudService.findAllPaginated({
+      ...fetchSpecification,
+      filter: { ...fetchSpecification.filter, scenarioId },
+    });
   }
 
   /**
