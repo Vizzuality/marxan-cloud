@@ -22,11 +22,11 @@ import Sections from 'layout/scenarios/show/solutions/sections';
 import Button from 'components/button';
 
 import { SolutionsSections } from './sections/types';
-import { ScenariosSidebarSolutionsProps } from './types';
+import { ScenariosSidebarEditSolutionsProps } from './types';
 
-export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps> = ({
+export const ScenariosSidebarEditSolutions: React.FC<ScenariosSidebarEditSolutionsProps> = ({
   readOnly,
-}: ScenariosSidebarSolutionsProps) => {
+}: ScenariosSidebarEditSolutionsProps) => {
   const [section, setSection] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
@@ -222,4 +222,4 @@ export const ScenariosSidebarSolutions: React.FC<ScenariosSidebarSolutionsProps>
   );
 };
 
-export default ScenariosSidebarSolutions;
+export default ScenariosSidebarEditSolutions;

@@ -21,13 +21,13 @@ import ScenariosSidebarWDPAThreshold from 'layout/scenarios/show/wdpa/threshold'
 
 import Steps from 'components/steps';
 
-export interface ScenariosSidebarWDPAProps {
+export interface ScenariosSidebarEditWDPAProps {
   readOnly?: boolean;
 }
 
-export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
+export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> = ({
   readOnly,
-}: ScenariosSidebarWDPAProps) => {
+}: ScenariosSidebarEditWDPAProps) => {
   const [step, setStep] = useState(0);
   const { query } = useRouter();
   const { pid, sid } = query;
@@ -144,4 +144,4 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   );
 };
 
-export default ScenariosSidebarWDPA;
+export default ScenariosSidebarEditWDPA;

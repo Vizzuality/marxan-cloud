@@ -33,13 +33,13 @@ import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
 import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
-export interface ScenariosSidebarWDPAProps {
+export interface ScenariosSidebarEditFeaturesProps {
   readOnly?: boolean,
 }
 
-export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
+export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeaturesProps> = ({
   readOnly,
-}: ScenariosSidebarWDPAProps) => {
+}: ScenariosSidebarEditFeaturesProps) => {
   const [step, setStep] = useState(0);
   const [modal, setModal] = useState(false);
   const { query, push } = useRouter();
@@ -300,4 +300,4 @@ export const ScenariosSidebarWDPA: React.FC<ScenariosSidebarWDPAProps> = ({
   );
 };
 
-export default ScenariosSidebarWDPA;
+export default ScenariosSidebarEditFeatures;
