@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 import { Test } from '@nestjs/testing';
 
 import {
-  FeatureConfigDefault,
+  FeatureConfigSplit,
   Specification,
   SpecificationOperation,
   SpecificationPublished,
@@ -25,9 +25,10 @@ export const getFixtures = async () => {
   const nonCalculatedFeatureId = v4();
   const calculatedFeatureId = v4();
 
-  const relatedConfig: FeatureConfigDefault = {
+  const relatedConfig: FeatureConfigSplit = {
     operation: SpecificationOperation.Split,
     baseFeatureId: v4(),
+    splitByProperty: `split-prop`,
   };
 
   const sandbox = await Test.createTestingModule({
