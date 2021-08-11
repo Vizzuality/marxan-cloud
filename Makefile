@@ -82,7 +82,7 @@ test-clean-slate: clean-slate-full-stop-and-cleanup
 # setup full testing data
 seed-dbs: seed-api-with-test-data | seed-geoapi-with-test-data
 
-seed-api-with-test-data: seed-api-init-data | seed-geoapi-init-data
+seed-api-with-test-data: seed-api-init-data seed-geoapi-init-data
 	@echo "$(RED)seeding db with testing project and scenarios:$(NC) $(API_DB_INSTANCE)"
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-data.sql
 
