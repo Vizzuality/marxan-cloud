@@ -8,12 +8,12 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { useSaveScenarioPU, useUploadScenarioPU } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
-
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
+
+import { useSaveScenarioPU, useUploadScenarioPU } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -34,6 +34,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   selected,
   onSelected,
 }: AnalysisAdjustUploadingProps) => {
+  const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
@@ -163,6 +164,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
   // Callbacks
   const onSubmit = useCallback((values) => {
+    setSubmitting(true);
     // Save current uploaded shape
     scenarioPUMutation.mutate({
       id: `${sid}`,
@@ -177,24 +179,28 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
       },
     }, {
       onSuccess: () => {
-        onSelected(null);
-        dispatch(setCache(Date.now()));
-        dispatch(setUploading(false));
-        dispatch(setUploadingValue(null));
-        setSuccessFile(null);
+        setTimeout(() => {
+          setSubmitting(false);
+          onSelected(null);
+          dispatch(setCache(Date.now()));
+          dispatch(setUploading(false));
+          dispatch(setUploadingValue(null));
+          setSuccessFile(null);
 
-        addToast('adjust-planning-units-success', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <ul className="text-sm">
-              <li>Planning units lock status saved</li>
-            </ul>
-          </>
-        ), {
-          level: 'success',
-        });
+          addToast('adjust-planning-units-success', (
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <ul className="text-sm">
+                <li>Planning units lock status saved</li>
+              </ul>
+            </>
+          ), {
+            level: 'success',
+          });
+        }, 2500);
       },
       onError: () => {
+        setSubmitting(false);
         addToast('adjust-planning-units-error', (
           <>
             <h2 className="font-medium">Error!</h2>
@@ -271,6 +277,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
                     type="submit"
                     theme="primary"
                     size="s"
+                    disabled={submitting}
                   >
                     Save
                   </Button>
@@ -289,6 +296,12 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
                 </div>
               )}
             </header>
+
+            <Loading
+              visible={submitting}
+              className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90 rounded-3xl"
+              iconClassName="w-5 h-5 text-primary-500"
+            />
 
             {selected && (
               <>
