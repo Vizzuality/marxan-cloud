@@ -128,7 +128,7 @@ export class GeoFeatureSetService {
       featureSpecification
         .filter(
           (feature): feature is SpecForPlainGeoFeature =>
-            feature.kind === 'plain',
+            !('geoprocessingOperations' in feature),
         )
         .map(async (feature) => {
           const featuresData: Partial<ScenarioFeaturesData>[] = await transactionalEntityManager
@@ -144,7 +144,9 @@ export class GeoFeatureSetService {
               })),
             );
 
-          return transactionalEntityManager.save(plainToClass(ScenarioFeaturesData, featuresData));
+          return transactionalEntityManager.save(
+            plainToClass(ScenarioFeaturesData, featuresData),
+          );
         }),
     );
     return scenarioFeaturesData;
@@ -175,7 +177,7 @@ export class GeoFeatureSetService {
       featureSpecification
         .filter(
           (feature): feature is SpecForGeoFeatureWithGeoprocessing =>
-            feature.kind === 'withGeoprocessing',
+            'geoprocessingOperations' in feature,
         )
         .map((feature) => {
           const splitOperations = flattenDeep(

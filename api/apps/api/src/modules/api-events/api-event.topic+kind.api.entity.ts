@@ -12,7 +12,7 @@ export class ApiEventByTopicAndKind {
 
   @ApiProperty()
   @IsEnum(Object.values(API_EVENT_KINDS))
-  @PrimaryColumn('enum')
+  @PrimaryColumn('enum', { enum: API_EVENT_KINDS })
   kind!: API_EVENT_KINDS;
 
   @ApiProperty()

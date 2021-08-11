@@ -9,10 +9,13 @@ import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
 import {
   copyQueueNameProvider,
   copyWorkerBuilderProvider,
+  copyQueueEventsProvider,
   splitQueueNameProvider,
   splitWorkerBuilderProvider,
+  splitQueueEventsProvider,
   stratificationQueueNameProvider,
   stratificationWorkerBuilderProvider,
+  stratificationQueueEventsProvider,
 } from './processing/worker-builder.providers';
 import { ProcessingWorker } from './processing/processing.worker';
 
@@ -26,10 +29,13 @@ import { ProcessingWorker } from './processing/processing.worker';
     FeatureService,
     copyQueueNameProvider,
     copyWorkerBuilderProvider,
+    copyQueueEventsProvider,
     splitQueueNameProvider,
     splitWorkerBuilderProvider,
+    splitQueueEventsProvider,
     stratificationQueueNameProvider,
     stratificationWorkerBuilderProvider,
+    stratificationQueueEventsProvider,
     ProcessingWorker,
   ],
   controllers: [FeaturesController],

@@ -10,7 +10,7 @@ export abstract class SpecificationRepository {
   ): Promise<Specification[]>;
 
   abstract findAllRelatedToFeatureConfig(
-    configurations: FeatureConfigInput,
+    configuration: FeatureConfigInput,
   ): Promise<Specification[]>;
 
   abstract transaction(

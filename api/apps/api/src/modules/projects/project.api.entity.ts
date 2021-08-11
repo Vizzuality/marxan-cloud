@@ -101,7 +101,10 @@ export class Project extends TimeUserEntityMetadata {
    * to fromShapefile, and handle the upload of the shapefile separately.
    */
   @ApiProperty()
-  @Column('enum', { name: 'planning_unit_grid_shape' })
+  @Column('enum', {
+    name: 'planning_unit_grid_shape',
+    enum: PlanningUnitGridShape,
+  })
   planningUnitGridShape?: PlanningUnitGridShape;
 
   /**

@@ -2,25 +2,30 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
+import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
+import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useSession } from 'next-auth/client';
 
+import { useAdminPreviewLayer, usePUGridLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
+import { useScenarios } from 'hooks/scenarios';
 
-// Map
 import HelpBeacon from 'layout/help/beacon';
 
+// Map
 import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import ZoomControl from 'components/map/controls/zoom';
 
-// Guided help
-
 export interface ProjectMapProps {
 }
 
 export const ProjectMap: React.FC<ProjectMapProps> = () => {
+  const [session] = useSession();
+
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
@@ -29,7 +34,38 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
   const { data = {} } = useProject(pid);
-  const { id, bbox } = data;
+  const {
+    id, bbox, countryId, adminAreaLevel1Id, adminAreaLevel2Id,
+  } = data;
+
+  const {
+    data: rawScenariosData,
+    isFetched: rawScenariosIsFetched,
+  } = useScenarios(pid, {
+    filters: {
+      projectId: pid,
+    },
+  });
+
+  const PUGridLayer = usePUGridLayer({
+    active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length,
+    sid: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? `${rawScenariosData[0].id}` : null,
+    type: null,
+    subtype: null,
+    options: {
+    },
+  });
+
+  const AdminPreviewLayer = useAdminPreviewLayer({
+    active: (
+      rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length
+      && (countryId || adminAreaLevel1Id || adminAreaLevel2Id)),
+    country: countryId,
+    region: adminAreaLevel1Id,
+    subregion: adminAreaLevel2Id,
+  });
+
+  const LAYERS = [PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
 
   useEffect(() => {
     setBounds({
@@ -58,9 +94,22 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     setBounds(b);
   }, []);
 
+  const handleTransformRequest = (url) => {
+    if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
+      return {
+        url,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      };
+    }
+
+    return null;
+  };
+
   return (
     <AnimatePresence>
-      {id && (
+      {id && rawScenariosIsFetched && (
         <motion.div
           key="project-map"
           className="relative w-full h-full col-span-5 overflow-hidden rounded-4xl"
@@ -101,16 +150,17 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                 mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
                 mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
                 onMapViewportChange={handleViewportChange}
+                transformRequest={handleTransformRequest}
               >
-                {/* {(map) => {
-              return (
-                <LayerManager map={map} plugin={PluginMapboxGl}>
-                  {LAYERS.map((l) => (
-                    <Layer key={l.id} {...l} />
-                  ))}
-                </LayerManager>
-              );
-            }} */}
+                {(map) => {
+                  return (
+                    <LayerManager map={map} plugin={PluginMapboxGl}>
+                      {LAYERS.map((l) => (
+                        <Layer key={l.id} {...l} />
+                      ))}
+                    </LayerManager>
+                  );
+                }}
 
               </Map>
             </div>

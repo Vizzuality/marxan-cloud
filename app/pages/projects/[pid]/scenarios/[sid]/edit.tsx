@@ -16,13 +16,13 @@ import Header from 'layout/header';
 import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
-import ScenariosMap from 'layout/scenarios/map';
-import ScenariosSidebar from 'layout/scenarios/sidebar';
-import SidebarAnalysis from 'layout/scenarios/sidebar/analysis';
-import SidebarFeatures from 'layout/scenarios/sidebar/features';
-import SidebarSolutions from 'layout/scenarios/sidebar/solutions';
-import { ScenarioSidebarTabs } from 'layout/scenarios/sidebar/types';
-import SidebarWDPA from 'layout/scenarios/sidebar/wdpa';
+import SidebarEditAnalysis from 'layout/scenarios/edit/analysis';
+import SidebarEditFeatures from 'layout/scenarios/edit/features';
+import ScenarioEditsMap from 'layout/scenarios/edit/map';
+import ScenariosEditSidebar from 'layout/scenarios/edit/sidebar';
+import { ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
+import SidebarEditSolutions from 'layout/scenarios/edit/solutions';
+import SidebarEditWDPA from 'layout/scenarios/edit/wdpa';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
 
@@ -63,13 +63,13 @@ const EditScenarioPage: React.FC = () => {
         <div className="flex flex-col py-2.5 overflow-hidden flex-grow">
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
-              <ScenariosSidebar>
-                <SidebarWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} />
-                <SidebarFeatures key={ScenarioSidebarTabs.FEATURES} />
-                <SidebarAnalysis key={ScenarioSidebarTabs.ANALYSIS} />
-                <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
-              </ScenariosSidebar>
-              <ScenariosMap />
+              <ScenariosEditSidebar>
+                <SidebarEditWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} />
+                <SidebarEditFeatures key={ScenarioSidebarTabs.FEATURES} />
+                <SidebarEditAnalysis key={ScenarioSidebarTabs.ANALYSIS} />
+                <SidebarEditSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
+              </ScenariosEditSidebar>
+              <ScenarioEditsMap />
             </div>
           </Wrapper>
         </div>
