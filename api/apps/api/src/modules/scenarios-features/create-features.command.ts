@@ -1,13 +1,5 @@
-export enum SpecificationOperation {
-  Split = 'split',
-  Stratification = 'stratification',
-  Copy = 'copy',
-}
-
-export interface FeatureState {
-  id: string;
-  calculated: boolean;
-}
+import { Command } from '@nestjs-architects/typed-cqrs';
+import { SpecificationOperation } from '@marxan-api/modules/specification/domain';
 
 interface FeatureConfigBase {
   operation: SpecificationOperation;
@@ -28,7 +20,11 @@ export type FeatureConfigInput =
   | FeatureConfigStratification
   | FeatureConfigDefault;
 
-export interface FeatureConfig extends FeatureConfigBase {
-  featuresDetermined: boolean;
-  resultFeatures: FeatureState[];
+export class CreateFeaturesCommand extends Command<void> {
+  constructor(
+    public readonly scenarioId: string,
+    public readonly input: FeatureConfigInput,
+  ) {
+    super();
+  }
 }

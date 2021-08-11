@@ -49,6 +49,7 @@ export class Specification extends AggregateRoot {
       new SpecificationCandidateCreated(
         specification.scenarioId,
         specification.id,
+        input,
       ),
     );
     return specification;

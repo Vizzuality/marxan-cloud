@@ -38,20 +38,22 @@ export const getFixtures = async () => {
   });
 
   return {
-    WhenSubmitsValidSpecification: async () =>
-      (specificationId = await handler.execute(
+    input: [
+      {
+        operation: SpecificationOperation.Stratification,
+        baseFeatureId: v4(),
+        againstFeatureId: v4(),
+      },
+    ],
+    async WhenSubmitsValidSpecification() {
+      return (specificationId = await handler.execute(
         new SubmitSpecification({
           scenarioId,
           draft: true,
-          features: [
-            {
-              operation: SpecificationOperation.Stratification,
-              baseFeatureId: v4(),
-              againstFeatureId: v4(),
-            },
-          ],
+          features: this.input,
         }),
-      )),
+      ));
+    },
     ThenItSavesTheSpecification() {
       expect(specificationId).toBeDefined();
       expect(repo.getById(specificationId)).toBeDefined();
@@ -60,7 +62,11 @@ export const getFixtures = async () => {
     ThenItPublishesSpecificationCandidateCreated() {
       expect(specificationId).toBeDefined();
       expect(events).toEqual([
-        new SpecificationCandidateCreated(scenarioId, specificationId),
+        new SpecificationCandidateCreated(
+          scenarioId,
+          specificationId,
+          this.input,
+        ),
       ]);
     },
   };
