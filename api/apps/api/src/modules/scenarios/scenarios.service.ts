@@ -7,7 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
-import { classToClass } from 'class-transformer';
+import { classToClass, classToPlain } from 'class-transformer';
 import * as stream from 'stream';
 import { isLeft } from 'fp-ts/Either';
 import { pick } from 'lodash';
@@ -352,6 +352,7 @@ export class ScenariosService {
         features: dto.features.flatMap((feature) =>
           this.geoFeatureConfigMapper.toFeatureConfig(feature),
         ),
+        raw: classToPlain(dto),
       }),
     );
   }

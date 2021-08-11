@@ -9,17 +9,19 @@ export interface FeatureState {
   calculated: boolean;
 }
 
+export interface FeatureSubSet {
+  value: string;
+  target?: number;
+  fpf?: number;
+  prop?: number;
+}
+
 interface FeatureConfigBase {
   operation: SpecificationOperation;
   baseFeatureId: string;
   splitByProperty?: string;
   againstFeatureId?: string;
-  selectSubSets?: {
-    value: string;
-    target?: number;
-    fpf?: number;
-    prop?: number;
-  }[];
+  selectSubSets?: FeatureSubSet[];
   target?: number;
   fpf?: number;
   prop?: number;

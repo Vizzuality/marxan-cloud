@@ -56,6 +56,7 @@ export const getFixtures = async () => {
           id: specificationRelatedToGivenConfig,
           scenarioId,
           draft: false,
+          raw: {},
           config: [
             {
               ...relatedConfig,
@@ -70,6 +71,7 @@ export const getFixtures = async () => {
           id: anotherSpecificationRelatedToGivenConfig,
           scenarioId,
           draft: false,
+          raw: {},
           config: [
             {
               ...relatedConfig,
@@ -84,6 +86,7 @@ export const getFixtures = async () => {
           id: specificationWithoutRelationToGivenConfig,
           scenarioId,
           draft: false,
+          raw: {},
           config: [
             {
               ...relatedConfig,

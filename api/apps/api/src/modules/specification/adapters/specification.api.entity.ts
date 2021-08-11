@@ -45,4 +45,7 @@ export class SpecificationApiEntity {
     type: `boolean`,
   })
   draft!: boolean;
+
+  @Column(`jsonb`)
+  raw!: Record<string, unknown>;
 }

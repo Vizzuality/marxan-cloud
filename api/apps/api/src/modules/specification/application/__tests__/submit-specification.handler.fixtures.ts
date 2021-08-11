@@ -43,6 +43,7 @@ export const getFixtures = async () => {
         new SubmitSpecification({
           scenarioId,
           draft: true,
+          raw: {},
           features: [
             {
               operation: SpecificationOperation.Stratification,
