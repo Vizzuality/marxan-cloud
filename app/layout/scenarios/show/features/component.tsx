@@ -35,8 +35,6 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
 
-  console.log('selectedFeaturesData', selectedFeaturesData);
-
   if (!scenarioData || tab !== 'features') return null;
 
   return (
@@ -110,57 +108,6 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
                   </InfoButton>
                 </div>
 
-                <div className="flex items-center mt-2 space-x-2">
-
-                  <>
-                    <InfoButton>
-                      <div>
-                        <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
-                        <div className="space-y-2">
-                          <p>
-                            This value represents how much you want to conserve of a particular
-                            feature. In an ideal conservation, land or sea use plan,
-                            all your features meet their targets.
-                          </p>
-                          <p>
-                            You can set a default
-                            value for all of your features
-                            or you can set individual the targets separately for each feature.
-                            You can set your targets to 100% if you want the whole extent of
-                            your feature to be included in the solution.
-                          </p>
-                        </div>
-                      </div>
-                    </InfoButton>
-                    <InfoButton>
-                      <div>
-                        <h4 className="font-heading text-lg mb-2.5">What is the FPF?</h4>
-                        <div className="space-y-2">
-                          <p>
-                            FPF stands for
-                            {' '}
-                            <b>Feature Penalty Factor</b>
-                            .
-                            A higher FPF value forces the Marxan algorithm
-                            to choose the planning units where this feature
-                            is present by applying a penalty if the target
-                            is missed, thereby increasing
-                            the cost of the solution. It comes into play when
-                            some of your targets fail to be met.
-                          </p>
-                          <p>
-                            In a typical
-                            workflow you start out with all FPF values set at
-                            1 and after checking the results, increase the FPF
-                            values for the particular features where targets have
-                            been missed.
-                          </p>
-                        </div>
-                      </div>
-                    </InfoButton>
-                  </>
-
-                </div>
               </div>
 
             </header>
