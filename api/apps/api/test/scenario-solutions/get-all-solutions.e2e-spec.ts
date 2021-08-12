@@ -18,29 +18,24 @@ describe(`When getting scenario solution results`, () => {
       Object {
         "page": 1,
         "size": 25,
-        "totalItems": 11,
+        "totalItems": 1,
         "totalPages": 1,
       }
     `);
 
-    expect(response.body.data.length).toEqual(11);
+    expect(response.body.data.length).toEqual(1);
     expect(response.body.data[0].attributes).toMatchInlineSnapshot(
       {
-        costValue: expect.any(Number),
         id: expect.any(String),
-        missingValues: expect.any(Number),
-        planningUnits: expect.any(Number),
-        runId: expect.any(Number),
-        scoreValue: expect.any(Number),
       },
       `
       Object {
-        "costValue": Any<Number>,
+        "costValue": 2000,
         "id": Any<String>,
-        "missingValues": Any<Number>,
-        "planningUnits": Any<Number>,
-        "runId": Any<Number>,
-        "scoreValue": Any<Number>,
+        "missingValues": 1,
+        "planningUnits": 123,
+        "runId": 1,
+        "scoreValue": 4000,
       }
     `,
     );
