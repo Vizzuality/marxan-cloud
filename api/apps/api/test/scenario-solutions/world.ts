@@ -38,7 +38,7 @@ export const createWorld = async () => {
           scoreValue: 4000,
           costValue: 2000,
           missingValues: 1,
-          planningUnits: 123
+          planningUnits: 123,
         }),
       );
     },
