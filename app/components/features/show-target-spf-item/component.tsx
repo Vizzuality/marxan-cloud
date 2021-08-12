@@ -8,7 +8,6 @@ import { ShowTargetSPFItemProps, Type } from './types';
 
 export const TargetSPFItem: React.FC<ShowTargetSPFItemProps> = ({
   className,
-  isAllTargets,
   type,
   name,
   target,
@@ -32,18 +31,18 @@ export const TargetSPFItem: React.FC<ShowTargetSPFItemProps> = ({
         })}
       />
       <div className="flex items-start justify-between pb-2 pr-2">
-        <span className="pr-5 text-sm font-medium font-heading">{isAllTargets ? 'Set target and SPF in all features' : name}</span>
+        <span className="pr-5 text-sm font-medium font-heading">{name}</span>
 
       </div>
       <div className="flex">
         <div className="relative flex-col w-full pr-4">
           <Label className="mb-1 uppercase">
-            <span>{isAllTargets ? 'ALL TARGETS' : 'TARGET'}</span>
+            TARGET
           </Label>
           <p>{`${target}%`}</p>
         </div>
         <div className="flex flex-col justify-between w-24 px-4 border-l">
-          <span>{isAllTargets ? 'ALL SPF' : 'SPF'}</span>
+          <span>FPF</span>
           <p>{fpf}</p>
         </div>
       </div>

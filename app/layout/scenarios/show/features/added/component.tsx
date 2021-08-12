@@ -106,7 +106,9 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                 <div>
                   {f.intersectFeaturesSelected
                   && f.intersectFeaturesSelected.map((item, itemIndex) => {
-                    const { id, label, marxanSettings } = item;
+                    const {
+                      id, label, marxanSettings: { fpf, prop },
+                    } = item;
                     return (
                       <div
                         className={cx({
@@ -115,9 +117,10 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                         key={`${id}`}
                       >
                         <ShowTargetItem
-                          fpf={marxanSettings.fpf}
-                          target={marxanSettings.prop}
+                          fpf={fpf}
+                          target={prop}
                           name={label}
+                          type={f.type}
                           {...item}
                         />
                       </div>
