@@ -29,6 +29,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
+
   const dispatch = useDispatch();
 
   const onSelectedTab = useCallback((t) => {
