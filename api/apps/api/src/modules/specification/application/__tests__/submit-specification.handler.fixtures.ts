@@ -1,11 +1,15 @@
 import { v4 } from 'uuid';
 import { Test } from '@nestjs/testing';
-
+import { Either, isLeft, isRight, Right } from 'fp-ts/Either';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
+
 import { SpecificationRepository } from '../specification.repository';
 import { SubmitSpecificationHandler } from '../submit-specification.handler';
 
-import { SubmitSpecification } from '../submit-specification.command';
+import {
+  SubmitSpecification,
+  SubmitSpecificationError,
+} from '../submit-specification.command';
 import {
   SpecificationCandidateCreated,
   SpecificationOperation,
@@ -16,7 +20,6 @@ import { SpecificationFeatureStratification } from '../specification-input';
 
 export const getFixtures = async () => {
   const scenarioId = v4();
-  let specificationId: string;
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],
     providers: [
@@ -46,30 +49,55 @@ export const getFixtures = async () => {
         againstFeatureId: v4(),
       } as SpecificationFeatureStratification,
     ],
-    async WhenSubmitsValidSpecification() {
-      return (specificationId = await handler.execute(
+    async WhenValidSpecificationIsSubmitted(forScenario = scenarioId) {
+      return await handler.execute(
         new SubmitSpecification({
-          scenarioId,
+          scenarioId: forScenario,
           draft: true,
           raw: {},
           features: this.input,
         }),
-      ));
+      );
     },
-    ThenItSavesTheSpecification() {
-      expect(specificationId).toBeDefined();
-      expect(repo.getById(specificationId)).toBeDefined();
+    ThenItSavesTheSpecification(
+      result: Either<SubmitSpecificationError, string>,
+    ) {
+      expect(isRight(result));
+      expect(repo.getById((result as Right<string>).right)).toBeDefined();
       expect(repo.count()).toEqual(1);
     },
-    ThenItPublishesSpecificationCandidateCreated() {
-      expect(specificationId).toBeDefined();
+    ThenItPublishesSpecificationCandidateCreated(
+      result: Either<SubmitSpecificationError, string>,
+    ) {
+      expect(isRight(result));
       expect(events).toEqual([
         new SpecificationCandidateCreated(
           scenarioId,
-          specificationId,
+          (result as Right<string>).right,
           this.input,
         ),
       ]);
+    },
+    ThenNoEventsAreRaised() {
+      expect(events).toEqual([]);
+    },
+    WhenInvalidSpecificationIsSubmitted: () =>
+      handler.execute(
+        new SubmitSpecification({
+          scenarioId: repo.scenarioIdToCrashOnSave,
+          draft: true,
+          raw: {},
+          features: [
+            {
+              operation: SpecificationOperation.Stratification,
+              baseFeatureId: v4(),
+              againstFeatureId: v4(),
+            },
+          ],
+        }),
+      ),
+    ThenErrorIsReturned(result: Either<SubmitSpecificationError, string>) {
+      expect(isLeft(result)).toBeTruthy();
     },
   };
 };

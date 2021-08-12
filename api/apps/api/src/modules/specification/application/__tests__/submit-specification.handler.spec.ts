@@ -8,7 +8,13 @@ beforeEach(async () => {
 });
 
 test(`submitting valid specification`, async () => {
-  await fixtures.WhenSubmitsValidSpecification();
-  await fixtures.ThenItSavesTheSpecification();
-  await fixtures.ThenItPublishesSpecificationCandidateCreated();
+  const result = await fixtures.WhenValidSpecificationIsSubmitted();
+  await fixtures.ThenItSavesTheSpecification(result);
+  await fixtures.ThenItPublishesSpecificationCandidateCreated(result);
+});
+
+test(`submission failed`, async () => {
+  const result = await fixtures.WhenInvalidSpecificationIsSubmitted();
+  fixtures.ThenErrorIsReturned(result);
+  fixtures.ThenNoEventsAreRaised();
 });
