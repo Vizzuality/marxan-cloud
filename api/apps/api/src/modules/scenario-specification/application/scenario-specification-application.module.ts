@@ -5,6 +5,7 @@ import { ActivateCandidateSpecificationHandler } from './activate-candidate-spec
 import { AssignCandidateSpecificationHandler } from './assign-candidate-specification.handler';
 import { SpecificationCandidateCreatedSaga } from './sagas/specification-candidate-created.saga';
 import { LastUpdatedSpecificationHandler } from './last-updated-specification.handler';
+import { SpecificationCandidateReadyToActivateSaga } from './sagas/specification-candidate-ready-to-activate.saga';
 
 @Module({})
 export class ScenarioSpecificationApplicationModule {
@@ -17,6 +18,7 @@ export class ScenarioSpecificationApplicationModule {
         AssignCandidateSpecificationHandler,
         LastUpdatedSpecificationHandler,
         SpecificationCandidateCreatedSaga,
+        SpecificationCandidateReadyToActivateSaga,
       ],
     };
   }
