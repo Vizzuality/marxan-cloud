@@ -49,6 +49,12 @@
       "@marxan-jobs/planning-unit-geometry/*": [
         "libs/planning-unit-geometry/src/*"
       ],
+      "@marxan-jobs/planning-unit-protection-level": [
+        "libs/planning-unit-protection-level/src"
+      ],
+      "@marxan-jobs/planning-unit-protection-level/*": [
+        "libs/planning-unit-protection-level/src/*"
+      ],
       "@marxan/scenario-cost-surface": [
         "libs/scenario-cost-surface/src"
       ],
