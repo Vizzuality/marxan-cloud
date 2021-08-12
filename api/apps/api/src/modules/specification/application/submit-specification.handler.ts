@@ -3,9 +3,14 @@ import {
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
+import { Either, left, right } from 'fp-ts/Either';
 import { Specification } from '../domain';
 
-import { SubmitSpecification } from './submit-specification.command';
+import {
+  internalError,
+  SubmitSpecification,
+  SubmitSpecificationError,
+} from './submit-specification.command';
 import { SpecificationRepository } from './specification.repository';
 
 @CommandHandler(SubmitSpecification)
@@ -16,7 +21,9 @@ export class SubmitSpecificationHandler
     private readonly eventPublisher: EventPublisher,
   ) {}
 
-  async execute({ payload }: SubmitSpecification): Promise<string> {
+  async execute({
+    payload,
+  }: SubmitSpecification): Promise<Either<SubmitSpecificationError, string>> {
     const specification = this.eventPublisher.mergeObjectContext(
       Specification.new(
         payload.scenarioId,
@@ -26,9 +33,13 @@ export class SubmitSpecificationHandler
       ),
     );
 
-    await this.specificationRepository.save(specification);
+    try {
+      await this.specificationRepository.save(specification);
+    } catch {
+      return left(internalError);
+    }
 
     specification.commit();
-    return specification.id;
+    return right(specification.id);
   }
 }
