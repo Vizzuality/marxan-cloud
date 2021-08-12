@@ -477,10 +477,7 @@ export class ScenariosController {
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioFeatureResultDto> {
     const result = await this.service.getBestSolution(id, fetchSpecification);
-    return this.scenarioSolutionSerializer.serialize(
-      result.data,
-      result.metadata,
-    );
+    return this.scenarioSolutionSerializer.serialize(result[0]);
   }
 
   @ApiTags(marxanRunTag)
@@ -497,10 +494,7 @@ export class ScenariosController {
       id,
       fetchSpecification,
     );
-    return this.scenarioSolutionSerializer.serialize(
-      result.data,
-      result.metadata,
-    );
+    return this.scenarioSolutionSerializer.serialize(result[0]);
   }
 
   @ApiOkResponse({

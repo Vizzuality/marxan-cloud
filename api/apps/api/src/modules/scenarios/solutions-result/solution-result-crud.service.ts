@@ -11,7 +11,11 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { FetchSpecification } from 'nestjs-base-service';
 import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 
-const scenariosOutputResultsFilterKeyNames = ['scenarioId'] as const;
+const scenariosOutputResultsFilterKeyNames = [
+  'scenarioId',
+  'best',
+  'distinctFive',
+] as const;
 type ScenariosOutputResultsFilterKeys = keyof Pick<
   ScenariosOutputResultsApiEntity,
   typeof scenariosOutputResultsFilterKeyNames[number]
@@ -64,6 +68,16 @@ export class SolutionResultCrudService extends AppBaseService<
       throw new Error(
         'Scenario solutions have been requested but no scenarioId has been supplied. This is likely a bug.',
       );
+    }
+
+    if (filters?.best) {
+      query.andWhere(`${this.alias}.best is true`);
+      return query;
+    }
+
+    if (filters?.distinctFive) {
+      query.andWhere(`${this.alias}.distinctFive is true`);
+      return query;
     }
 
     return query;

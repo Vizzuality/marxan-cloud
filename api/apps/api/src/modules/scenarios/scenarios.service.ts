@@ -228,7 +228,7 @@ export class ScenariosService {
   async getOneSolution(
     scenarioId: string,
     runId: string,
-    fetchSpecification: FetchSpecification,
+    _fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
     // TODO permissions guard
@@ -241,9 +241,13 @@ export class ScenariosService {
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
-    // TODO correct implementation
-    fetchSpecification.filter = { ...fetchSpecification.filter, best: true };
-    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+    // TODO permissions guard
+    return await this.solutionsCrudService
+      .findAll({
+        ...fetchSpecification,
+        filter: { ...fetchSpecification.filter, best: true, scenarioId },
+      })
+      .then((results) => results[0]);
   }
 
   async getMostDifferentSolutions(
@@ -251,17 +255,11 @@ export class ScenariosService {
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
-    // TODO correct implementation
-    fetchSpecification.filter = {
-      ...fetchSpecification.filter,
-      distinctFive: true,
-    };
-    // TODO remove the following two lines once implementation is in place.
-    // The artificial limiting of response elements is only to serve (up to) the
-    // expected number of elements to frontend in the meanwhile.
-    fetchSpecification.pageSize = 5;
-    fetchSpecification.pageNumber = 1;
-    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+    // TODO permissions guard
+    return this.solutionsCrudService.findAll({
+      ...fetchSpecification,
+      filter: { ...fetchSpecification.filter, distinctFive: true, scenarioId },
+    });
   }
 
   async findAllSolutionsPaginated(
