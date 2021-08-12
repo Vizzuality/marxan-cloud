@@ -40,9 +40,7 @@ import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from './planning-units/scenario-planning-units-protection-status-calculator-service';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
-import { CommandBus } from '@nestjs/cqrs';
-import { SubmitSpecification } from '@marxan-api/modules/specification';
-import { GeoFeatureDtoMapper } from './geo-features/geo-feature-dto.mapper';
+import { SpecificationService } from './specification';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -72,8 +70,7 @@ export class ScenariosService {
     private readonly planningUnitsService: ScenarioPlanningUnitsService,
     private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
     private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,
-    private readonly commandBus: CommandBus,
-    private readonly geoFeatureConfigMapper: GeoFeatureDtoMapper,
+    private readonly specificationService: SpecificationService,
   ) {}
 
   async findAllPaginated(
@@ -344,15 +341,11 @@ export class ScenariosService {
   }
 
   async createSpecification(scenarioId: string, dto: CreateGeoFeatureSetDTO) {
-    await this.assertScenario(scenarioId);
-    await this.commandBus.execute(
-      new SubmitSpecification({
-        scenarioId,
-        draft: dto.status === SimpleJobStatus.draft,
-        features: dto.features.flatMap((feature) =>
-          this.geoFeatureConfigMapper.toFeatureConfig(feature),
-        ),
-      }),
+    const scenario = await this.assertScenario(scenarioId);
+    return await this.specificationService.submit(
+      scenarioId,
+      scenario.projectId,
+      dto,
     );
   }
 }

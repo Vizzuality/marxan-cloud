@@ -4,11 +4,11 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import { AnimatePresence, motion } from 'framer-motion';
+
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
-
-import { AnimatePresence, motion } from 'framer-motion';
 
 import {
   composeValidators,

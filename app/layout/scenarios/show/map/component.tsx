@@ -2,7 +2,8 @@ import React, {
   useCallback, useEffect, useState,
 } from 'react';
 
-import { useSelector/* , useDispatch */ } from 'react-redux';
+// Map
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -18,7 +19,6 @@ import {
 import { useProject } from 'hooks/projects';
 import { useScenario, useScenarioPU } from 'hooks/scenarios';
 
-// Map
 import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
@@ -34,7 +34,7 @@ import LegendTypeMatrix from 'components/map/legend/types/matrix';
 export interface ScenariosShowMapProps {
 }
 
-export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
+export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const [open, setOpen] = useState(true);
   const [session] = useSession();
 
@@ -182,7 +182,6 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
           onFitBoundsChange={handleFitBoundsChange}
         />
       </Controls>
-
       {/* Legend */}
       <div className="absolute w-full max-w-xs bottom-10 right-2">
         <Legend
@@ -209,8 +208,9 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
           })}
         </Legend>
       </div>
+
     </div>
   );
 };
 
-export default ScenariosShowMap;
+export default ScenariosMap;

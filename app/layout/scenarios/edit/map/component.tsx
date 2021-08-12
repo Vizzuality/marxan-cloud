@@ -18,6 +18,8 @@ import {
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
+import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
+
 // Map
 import Map from 'components/map';
 // Controls
@@ -30,8 +32,6 @@ import LegendTypeBasic from 'components/map/legend/types/basic';
 import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
-
-import ScenariosDrawingManager from './drawing-manager';
 
 export interface ScenariosEditMapProps {
 }
@@ -54,6 +54,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const { setTmpPuIncludedValue, setTmpPuExcludedValue } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
+
   const {
     tab,
     subtab,

@@ -214,8 +214,9 @@ export class ScenariosController {
   async createSpecification(
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<void> {
-    await this.service.createSpecification(id, dto);
+  ): Promise<GeoFeatureSetResult> {
+    const extendedDto = await this.service.createSpecification(id, dto);
+    return await this.geoFeatureSetSerializer.serialize(extendedDto);
   }
 
   @ApiOperation({ description: 'Create feature set for scenario' })
@@ -237,6 +238,13 @@ export class ScenariosController {
     @Body(new ValidationPipe()) dto: UpdateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
+    // TODO once `copy` is in place:
+    // 1 call command
+    // 2 enrich with
+    //  await this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
+    //            dto,
+    //            scenario,
+    //          );
     return await this.geoFeatureSetSerializer.serialize(
       await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
     );
@@ -248,6 +256,13 @@ export class ScenariosController {
   async getFeatureSetFor(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
+    // TODO
+    // 1 get specificationSnapshot.raw ->
+    // 2 enrich with ->
+    // await this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
+    //       dto,
+    //       scenario,
+    //     );
     return await this.geoFeatureSetSerializer.serialize(
       await this.service.getFeatureSetForScenario(id),
     );

@@ -65,6 +65,7 @@ export const getFixtures = () => {
         id: v4(),
         scenarioId,
         draft: true,
+        raw: {},
         config: [
           {
             ...splitConfig,
@@ -83,6 +84,7 @@ export const getFixtures = () => {
         id: v4(),
         scenarioId,
         draft: false,
+        raw: {},
         config: [
           {
             ...splitConfig,

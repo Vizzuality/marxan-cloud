@@ -38,13 +38,15 @@ import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { AdminAreasModule } from '../admin-areas/admin-areas.module';
 import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from './planning-units/scenario-planning-units-protection-status-calculator-service';
-import { GeoFeatureDtoMapper } from './geo-features/geo-feature-dto.mapper';
+
+import { SpecificationModule } from './specification';
 
 @Module({
   imports: [
     CqrsModule,
     GeoFeaturesModule,
     ProtectedAreasModule,
+    SpecificationModule,
     forwardRef(() => ProjectsModule),
     TypeOrmModule.forFeature([
       Project,
@@ -82,7 +84,6 @@ import { GeoFeatureDtoMapper } from './geo-features/geo-feature-dto.mapper';
     MarxanInput,
     ZipFilesSerializer,
     ScenarioPlanningUnitSerializer,
-    GeoFeatureDtoMapper,
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],

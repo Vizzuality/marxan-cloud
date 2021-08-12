@@ -240,7 +240,7 @@ export function usePUGridPreviewLayer({
 
 // PUGrid
 export function usePUGridLayer({
-  active, sid, type, subtype, options = {}, cache,
+  active, sid, type, subtype, runId, options = {}, cache,
 }: UsePUGridLayer) {
   const include = useMemo(() => {
     if (type === 'protected-areas' || type === 'features') return 'protection';
@@ -411,7 +411,7 @@ export function usePUGridLayer({
               'source-layer': 'layer0',
               filter: [
                 'all',
-                ['in', '-2-', ['get', 'valuePosition']],
+                ['in', `-${runId}-`, ['get', 'valuePosition']],
               ],
               paint: {
                 'fill-color': COLORS.primary,
@@ -423,7 +423,7 @@ export function usePUGridLayer({
         ],
       },
     };
-  }, [cache, active, sid, type, subtype, options, include]);
+  }, [cache, active, sid, type, subtype, runId, options, include]);
 }
 
 // PUGrid

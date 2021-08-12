@@ -85,6 +85,7 @@ test(`copy configuration`, () => {
     plainToClass<SpecForPlainGeoFeature, SpecForPlainGeoFeature>(
       SpecForPlainGeoFeature,
       {
+        kind: `plain`,
         featureId,
         marxanSettings: plainToClass<
           MarxanSettingsForGeoFeature,
