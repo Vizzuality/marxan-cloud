@@ -16,9 +16,10 @@ import { GeoFeature } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { Scenario } from '../scenarios/scenario.api.entity';
+import { JobStatus, Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -237,5 +238,30 @@ export class GeoFeaturesService extends AppBaseService<
         );
       });
     return [entitiesWithProperties, entitiesAndCount[1]];
+  }
+
+  /**
+   * @todo Extend result by adding the feature's property set (see
+   * `extendFindAllResults()` above) for singular queries.
+   */
+  async extendGetByIdResult(
+    entity: GeoFeature,
+    _fetchSpecification?: FetchSpecification,
+    _info?: AppInfoDTO,
+  ): Promise<GeoFeature> {
+    return entity;
+  }
+
+  public async createFeature(
+    projectId: string,
+    data: UploadShapefileDTO,
+  ): Promise<GeoFeature> {
+    return this.geoFeaturesRepository.save({
+      featureClassName: data.name,
+      description: data.description,
+      tag: data.type,
+      projectId,
+      creationStatus: JobStatus.done,
+    });
   }
 }
