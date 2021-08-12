@@ -141,8 +141,12 @@ await botClient
 
 const scenarioTook = Process.hrtime(scenarioStart);
 console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
-
-console.log(scenario);
+await botClient
+  .patch(`/scenarios/${scenario!.data!.id}`, {
+    wdpaIucnCategories: paCategories!.data.map((i: {id:string, type:string, attributes:object}): string => i.id),
+  }).then().catch((e) => {
+    console.log(e);
+  });
 
 await sleep(5)
 
