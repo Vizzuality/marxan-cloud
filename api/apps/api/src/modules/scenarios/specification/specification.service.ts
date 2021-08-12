@@ -1,15 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GeoFeaturePropertySetService } from '@marxan-api/modules/geo-features/geo-feature-property-sets.service';
 import { CreateGeoFeatureSetDTO } from '@marxan-api/modules/geo-features/dto/create.geo-feature-set.dto';
 import { SubmitSpecification } from '@marxan-api/modules/specification';
 import { SimpleJobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { classToPlain } from 'class-transformer';
+import { classToPlain, plainToClass } from 'class-transformer';
 import { Either, isLeft, right } from 'fp-ts/Either';
 import { PromiseType } from 'utility-types';
 
 import { GeoFeatureDtoMapper } from './geo-feature-dto.mapper';
 import { SubmitSpecificationError } from '@marxan-api/modules/specification/application/submit-specification.command';
+import {
+  LastUpdatedSpecification,
+  LastUpdatedSpecificationError,
+} from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
 
 @Injectable()
 export class SpecificationService {
@@ -17,6 +21,7 @@ export class SpecificationService {
     private readonly geoFeatureSetSerializer: GeoFeaturePropertySetService,
     private readonly geoFeatureConfigMapper: GeoFeatureDtoMapper,
     private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async submit(
@@ -51,6 +56,26 @@ export class SpecificationService {
     return right(
       await this.geoFeatureSetSerializer.extendGeoFeatureProcessingSpecification(
         dto,
+        {
+          projectId,
+        },
+      ),
+    );
+  }
+
+  async getLastUpdatedFor(
+    scenarioId: string,
+    projectId: string,
+  ): Promise<Either<LastUpdatedSpecificationError, CreateGeoFeatureSetDTO>> {
+    const result = await this.queryBus.execute(
+      new LastUpdatedSpecification(scenarioId),
+    );
+    if (isLeft(result)) {
+      return result;
+    }
+    return right(
+      await this.geoFeatureSetSerializer.extendGeoFeatureProcessingSpecification(
+        plainToClass(CreateGeoFeatureSetDTO, result.right.raw),
         {
           projectId,
         },
