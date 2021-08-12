@@ -48,14 +48,13 @@ const createPlanningUnitGridFromJobSpec = async (
         square: 'ST_SquareGrid',
         hexagon: 'ST_HexagonGrid',
       };
-      if (job.data.planningAreaId){
+      if (job.data.planningAreaId) {
         subquery = `SELECT (${gridShape[job.data.planningUnitGridShape]}(${
           Math.sqrt(job.data.planningUnitAreakm2) * 1000
         }, ST_Transform(a.the_geom, 3410))).*
                     FROM planning_areas a
                     WHERE id = '${job.data.planningAreaId}'`;
-      }
-      else if (
+      } else if (
         job.data.countryId ||
         job.data.adminAreaLevel1Id ||
         job.data.adminAreaLevel2Id

@@ -228,7 +228,8 @@ export class ScenariosService {
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
-    // TODO correct implementation
+    // TODO permissions guard
+    // TODO runId is part of scenarioId
     return this.solutionsCrudService.getById(runId);
   }
 

@@ -88,8 +88,14 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const puIdsToExcludeFromIds = job.data.exclude?.pu ?? [];
 
     // If there are overlaps between opposing claims byId and byGeoJSON, ignore the claims byId
-    const puIdsToIncludeFromIdsLessIdsToExcludeFromGeo = difference(puIdsToIncludeFromIds, puIdsToExcludeFromGeo);
-    const puIdsToExcludeFromIdsLessIdsToIncludeFromGeo = difference(puIdsToExcludeFromIds, puIdsToIncludeFromGeo);
+    const puIdsToIncludeFromIdsLessIdsToExcludeFromGeo = difference(
+      puIdsToIncludeFromIds,
+      puIdsToExcludeFromGeo,
+    );
+    const puIdsToExcludeFromIdsLessIdsToIncludeFromGeo = difference(
+      puIdsToExcludeFromIds,
+      puIdsToIncludeFromGeo,
+    );
 
     // Union of claims byId and byGeoJSON, for inclusions and for exclusions
     puIdsToInclude.push(
@@ -107,7 +113,9 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const uniquePuIdsToInclude = new Set(puIdsToInclude);
     const uniquePuIdsToExclude = new Set(puIdsToExclude);
 
-    const doInclusionAndExclusionIntersect = intersection([...uniquePuIdsToInclude], [...uniquePuIdsToExclude]).length > 0
+    const doInclusionAndExclusionIntersect =
+      intersection([...uniquePuIdsToInclude], [...uniquePuIdsToExclude])
+        .length > 0;
 
     if (doInclusionAndExclusionIntersect) {
       throw new Error(
