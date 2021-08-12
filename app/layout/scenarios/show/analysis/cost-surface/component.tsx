@@ -120,11 +120,6 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
           </Button>
         </div>
 
-        <div className="pt-5">
-          <h4 className="mb-2">Cost surface uploaded:</h4>
-          {/* IF THERE IS NOT EQUAL AREA SET THE NAME OF THE FILE UPLOADED */}
-        </div>
-
       </div>
     </motion.div>
   );
