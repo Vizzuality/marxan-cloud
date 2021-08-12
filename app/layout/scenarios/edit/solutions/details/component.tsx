@@ -159,12 +159,12 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
               iconClassName="w-10 h-10 text-primary-500"
             />
             {(selectedSolutionData || bestSolutionData) && (
-            <SolutionSelected
-              best={isBestSolutionShown}
-              values={selectedSolutionData || bestSolutionData}
-              onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
-              selectedSolutionOnMap={selectedSolutionOnMap}
-            />
+              <SolutionSelected
+                best={isBestSolutionShown}
+                values={selectedSolutionData || bestSolutionData}
+                onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
+                selectedSolutionOnMap={selectedSolutionOnMap}
+              />
             )}
           </div>
         </div>
