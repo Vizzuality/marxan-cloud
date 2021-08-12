@@ -214,8 +214,10 @@ export class ScenariosController {
   async createSpecification(
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<void> {
-    await this.service.createSpecification(id, dto);
+  ): Promise<GeoFeatureSetResult> {
+    const extendedDto = await this.service.createSpecification(id, dto);
+    console.log(extendedDto);
+    return await this.geoFeatureSetSerializer.serialize(extendedDto);
   }
 
   @ApiOperation({ description: 'Create feature set for scenario' })
