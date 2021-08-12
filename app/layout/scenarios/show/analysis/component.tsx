@@ -121,6 +121,7 @@ export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysis
               {section === 'adjust-planning-units' && (
                 <AdjustPanningUnitsShow
                   key="adjust-planning-units"
+                  onChangeSection={onChangeSection}
                 />
               )}
             </Pill>
