@@ -17,6 +17,7 @@ import {
   UseInterceptors,
   ValidationPipe,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -231,6 +232,8 @@ export class ScenariosController {
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
+    // TODO once `copy` is in place, replace with implementation as in
+    // id/features/specification/v2
     return await this.geoFeatureSetSerializer.serialize(
       await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
     );
@@ -243,13 +246,8 @@ export class ScenariosController {
     @Body(new ValidationPipe()) dto: UpdateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
-    // TODO once `copy` is in place:
-    // 1 call command
-    // 2 enrich with
-    //  await this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
-    //            dto,
-    //            scenario,
-    //          );
+    // TODO once `copy` is in place, replace with implementation as in
+    // id/features/specification/v2
     return await this.geoFeatureSetSerializer.serialize(
       await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
     );
@@ -261,16 +259,11 @@ export class ScenariosController {
   async getFeatureSetFor(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
-    // TODO
-    // 1 get specificationSnapshot.raw ->
-    // 2 enrich with ->
-    // await this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
-    //       dto,
-    //       scenario,
-    //     );
-    return await this.geoFeatureSetSerializer.serialize(
-      await this.service.getFeatureSetForScenario(id),
-    );
+    const result = await this.service.getLastUpdatedSpecification(id);
+    if (isLeft(result)) {
+      throw new NotFoundException();
+    }
+    return await this.geoFeatureSetSerializer.serialize(result.right);
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
