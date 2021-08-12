@@ -58,7 +58,7 @@ export const getFixtures = () => {
             featuresDetermined: true,
             resultFeatures: [
               {
-                id: v4(),
+                featureId: v4(),
                 calculated: true,
               },
             ],
@@ -68,11 +68,11 @@ export const getFixtures = () => {
             featuresDetermined: true,
             resultFeatures: [
               {
-                id: nonCalculatedFeatureOne,
+                featureId: nonCalculatedFeatureOne,
                 calculated: false,
               },
               {
-                id: nonCalculatedFeatureTwo,
+                featureId: nonCalculatedFeatureTwo,
                 calculated: false,
               },
             ],

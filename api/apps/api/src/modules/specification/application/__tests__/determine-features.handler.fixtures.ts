@@ -103,11 +103,11 @@ export const getFixtures = async () => {
         new DetermineFeatures({
           features: [
             {
-              id: calculatedFeatureId,
+              featureId: calculatedFeatureId,
               calculated: true,
             },
             {
-              id: nonCalculatedFeatureId,
+              featureId: nonCalculatedFeatureId,
               calculated: false,
             },
           ],
