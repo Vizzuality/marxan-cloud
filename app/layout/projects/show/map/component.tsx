@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -12,10 +14,10 @@ import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
+import { ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
 
-// Map
+import Select from 'components/forms/select';
 import Map from 'components/map';
-// Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import ZoomControl from 'components/map/controls/zoom';
@@ -31,6 +33,7 @@ export interface ProjectMapProps {
 
 export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const [open, setOpen] = useState(false);
+  const [selectedSid, setSelectedSid] = useState(null);
   const [session] = useSession();
 
   const minZoom = 2;
@@ -54,10 +57,16 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     },
   });
 
+  const sid = useMemo(() => {
+    if (selectedSid) return selectedSid;
+
+    return rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? `${rawScenariosData[0].id}` : null;
+  }, [selectedSid, rawScenariosData, rawScenariosIsFetched]);
+
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length,
-    sid: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? `${rawScenariosData[0].id}` : null,
-    type: null,
+    sid,
+    type: selectedSid ? ScenarioSidebarTabs.SOLUTIONS : null,
     subtype: null,
     options: {
     },
@@ -75,10 +84,25 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const LAYERS = [PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    type: null,
+    type: selectedSid ? ScenarioSidebarTabs.SOLUTIONS : null,
     subtype: null,
     options: {},
   });
+
+  const SCENARIOS_RUNNED = useMemo(() => {
+    return rawScenariosData
+      .map((s) => {
+        if (s.jobs.find((j) => j.kind === 'run' && j.status === 'done')) {
+          return {
+            label: s.name,
+            value: s.id,
+          };
+        }
+
+        return null;
+      })
+      .filter((s) => !!s);
+  }, [rawScenariosData]);
 
   useEffect(() => {
     setBounds({
@@ -226,6 +250,21 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
               })}
             </Legend>
           </div>
+
+          {!!SCENARIOS_RUNNED.length && (
+            <div className="absolute w-full max-w-xs top-10 left-2">
+              <Select
+                theme="dark"
+                size="base"
+                placeholder="Select scenario..."
+                clearSelectionActive
+                options={SCENARIOS_RUNNED}
+                onChange={(s) => {
+                  setSelectedSid(s);
+                }}
+              />
+            </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>
