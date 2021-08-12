@@ -13,14 +13,11 @@ import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 import FeaturesAdded from 'layout/scenarios/show/features/added';
 
-import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
 import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
 import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
-
-import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 
 export interface ScenariosSidebarShowFeaturesProps {
 
@@ -37,6 +34,8 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
+
+  console.log('selectedFeaturesData', selectedFeaturesData);
 
   if (!scenarioData || tab !== 'features') return null;
 
@@ -87,7 +86,13 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
             <header className="flex items-start justify-between flex-shrink-0">
               <div>
                 <div className="flex items-baseline space-x-4">
-                  <h2 className="text-lg font-medium font-heading">Features Added</h2>
+                  <h2 className="text-lg font-medium font-heading">
+                    Features Added:
+                    {' '}
+                    <span className="ml-1 text-gray-400">
+                      {selectedFeaturesData.length}
+                    </span>
+                  </h2>
                   <InfoButton>
                     <div>
                       <h4 className="font-heading text-lg mb-2.5">What are features?</h4>
@@ -106,15 +111,6 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
                 </div>
 
                 <div className="flex items-center mt-2 space-x-2">
-
-                  <>
-                    <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
-                    <div className="text-xs uppercase font-heading">
-                      Features added:
-                      {' '}
-                      {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
-                    </div>
-                  </>
 
                   <>
                     <InfoButton>
