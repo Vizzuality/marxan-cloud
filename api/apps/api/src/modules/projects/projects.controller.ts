@@ -53,6 +53,9 @@ import { JobStatusSerializer } from './dto/job-status.serializer';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
+import { ShapefileService } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.service';
+import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
+import { GeoFeaturesService } from '../geo-features/geo-features.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -62,8 +65,10 @@ export class ProjectsController {
   constructor(
     private readonly projectsService: ProjectsService,
     private readonly geoFeatureSerializer: GeoFeatureSerializer,
+    private readonly geoFeatureService: GeoFeaturesService,
     private readonly projectSerializer: ProjectSerializer,
     private readonly jobsStatusSerizalizer: JobStatusSerializer,
+    private readonly shapefileService: ShapefileService,
   ) {}
 
   @ApiOperation({
@@ -209,9 +214,37 @@ export class ProjectsController {
   })
   @ApiOkResponse({ type: ShapefileUploadResponse })
   @Post(`:id/features/shapefile`)
+  @UseInterceptors(
+    FileInterceptor('shapefile', {
+      ...uploadOptions,
+      limits: {
+        // TODO: fix hardcoded value
+        fileSize: 100 * 1024e2,
+      },
+    }),
+  )
   async uploadFeatures(
     @Param('id') projectId: string,
+    @UploadedFile() shapefile: Express.Multer.File,
+    @Body() body: UploadShapefileDTO,
   ): Promise<ShapefileUploadResponse> {
+    try {
+      // Create single row in features
+      const res = await this.geoFeatureService.createFeature(projectId, body);
+      console.log('AFTER CREATE!!');
+      console.log(res);
+
+      const { data } = await this.shapefileService.transformToGeoJson(
+        shapefile,
+      );
+      console.log('SHAPEFILE DATA: ');
+      console.log(data);
+
+      // TODO: Store geometries in features_data table
+    } catch (err) {
+      console.error(err);
+    }
+
     return { success: true };
   }
 }
