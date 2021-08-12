@@ -26,7 +26,9 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
    * for these.
    */
   private shouldSetDefaultInclusionStatus(scenario: Scenario): boolean {
-    return !isNil(scenario.wdpaIucnCategories) && !isNil(scenario.wdpaThreshold);
+    return (
+      !isNil(scenario.wdpaIucnCategories) && !isNil(scenario.wdpaThreshold)
+    );
   }
 
   /**
@@ -36,7 +38,7 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
   async calculatedProtectionStatusForPlanningUnitsIn(
     scenario: Scenario,
   ): Promise<void> {
-    if(!this.shouldSetDefaultInclusionStatus(scenario)) return;
+    if (!this.shouldSetDefaultInclusionStatus(scenario)) return;
 
     const wdpaIucnCategoriesForScenario = scenario.wdpaIucnCategories
       ?.map((i) => `'${i}'`)

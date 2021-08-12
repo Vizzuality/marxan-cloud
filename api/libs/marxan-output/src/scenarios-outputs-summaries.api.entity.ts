@@ -18,6 +18,7 @@ export class ScenariosOutputResultsApiEntity {
     name: `scenario_id`,
   })
   scenarioId!: string;
+
   /**
    * TODO describe/change
    */

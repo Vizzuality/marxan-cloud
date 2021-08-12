@@ -157,7 +157,8 @@ export class GeoFeaturesService extends AppBaseService<
           );
         });
       const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
-        .createQueryBuilder('geoFeatureGeometries').distinctOn(['"geoFeatureGeometries"."feature_id"'])
+        .createQueryBuilder('geoFeatureGeometries')
+        .distinctOn(['"geoFeatureGeometries"."feature_id"'])
         .where(
           `st_intersects(
         st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
@@ -179,8 +180,11 @@ export class GeoFeaturesService extends AppBaseService<
       // Only apply narrowing by intersection with project bbox if there are
       // features falling within said bbox; otherwise return an empty set
       // by short-circuiting the query.
-      if(geoFeaturesWithinProjectBbox?.length > 0) {
-        query.andWhere(`${this.alias}.id IN (:...geoFeaturesWithinProjectBbox)`, { geoFeaturesWithinProjectBbox });
+      if (geoFeaturesWithinProjectBbox?.length > 0) {
+        query.andWhere(
+          `${this.alias}.id IN (:...geoFeaturesWithinProjectBbox)`,
+          { geoFeaturesWithinProjectBbox },
+        );
       } else {
         query.andWhere('false');
       }
