@@ -16,6 +16,7 @@ import {
   UseGuards,
   UseInterceptors,
   ValidationPipe,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -70,6 +71,7 @@ import { UpdateGeoFeatureSetDTO } from '../geo-features/dto/update.geo-feature-s
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { GeoFeatureSetService } from '../geo-features/geo-feature-set.service';
 import { ScenarioPlanningUnitDto } from './dto/scenario-planning-unit.dto';
+import { isLeft } from 'fp-ts/Either';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -215,8 +217,11 @@ export class ScenariosController {
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
-    const extendedDto = await this.service.createSpecification(id, dto);
-    return await this.geoFeatureSetSerializer.serialize(extendedDto);
+    const result = await this.service.createSpecification(id, dto);
+    if (isLeft(result)) {
+      throw new InternalServerErrorException(result.left.description);
+    }
+    return await this.geoFeatureSetSerializer.serialize(result.right);
   }
 
   @ApiOperation({ description: 'Create feature set for scenario' })
