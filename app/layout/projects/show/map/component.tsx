@@ -7,7 +7,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/client';
 
-import { useAdminPreviewLayer, usePUGridLayer } from 'hooks/map';
+import { useAdminPreviewLayer, useLegend, usePUGridLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
@@ -19,11 +19,18 @@ import Map from 'components/map';
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import ZoomControl from 'components/map/controls/zoom';
+import Legend from 'components/map/legend';
+import LegendItem from 'components/map/legend/item';
+import LegendTypeBasic from 'components/map/legend/types/basic';
+import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
+import LegendTypeGradient from 'components/map/legend/types/gradient';
+import LegendTypeMatrix from 'components/map/legend/types/matrix';
 
 export interface ProjectMapProps {
 }
 
 export const ProjectMap: React.FC<ProjectMapProps> = () => {
+  const [open, setOpen] = useState(false);
   const [session] = useSession();
 
   const minZoom = 2;
@@ -66,6 +73,12 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   });
 
   const LAYERS = [PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
+
+  const LEGEND = useLegend({
+    type: null,
+    subtype: null,
+    options: {},
+  });
 
   useEffect(() => {
     setBounds({
@@ -186,6 +199,33 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
               onFitBoundsChange={handleFitBoundsChange}
             />
           </Controls>
+
+          {/* Legend */}
+          <div className="absolute w-full max-w-xs bottom-10 right-2">
+            <Legend
+              open={open}
+              className="w-full"
+              maxHeight={300}
+              onChangeOpen={() => setOpen(!open)}
+            >
+              {LEGEND.map((i) => {
+                const { type, items, intersections } = i;
+
+                return (
+                  <LegendItem
+                    sortable={false}
+                    key={i.id}
+                    {...i}
+                  >
+                    {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
+                    {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
+                    {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
+                    {type === 'gradient' && <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />}
+                  </LegendItem>
+                );
+              })}
+            </Legend>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
