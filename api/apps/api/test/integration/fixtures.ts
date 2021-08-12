@@ -55,11 +55,11 @@ export const getFixtures = async () => {
             baseFeatureId: splitBaseFeatureId,
             resultFeatures: [
               {
-                id: calculatedFeatureId,
+                featureId: calculatedFeatureId,
                 calculated: true,
               },
               {
-                id: calculatedForBothFeatureId,
+                featureId: calculatedForBothFeatureId,
                 calculated: true,
               },
             ],
@@ -71,11 +71,11 @@ export const getFixtures = async () => {
             baseFeatureId: stratificationBaseFeatureId,
             resultFeatures: [
               {
-                id: nonCalculatedFeatureId,
+                featureId: nonCalculatedFeatureId,
                 calculated: false,
               },
               {
-                id: calculatedForBothFeatureId,
+                featureId: calculatedForBothFeatureId,
                 calculated: true,
               },
             ],
