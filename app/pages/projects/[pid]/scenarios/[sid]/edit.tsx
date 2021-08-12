@@ -21,7 +21,6 @@ import SidebarEditFeatures from 'layout/scenarios/edit/features';
 import ScenarioEditsMap from 'layout/scenarios/edit/map';
 import ScenariosEditSidebar from 'layout/scenarios/edit/sidebar';
 import { ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
-import SidebarEditSolutions from 'layout/scenarios/edit/solutions';
 import SidebarEditWDPA from 'layout/scenarios/edit/wdpa';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
@@ -67,7 +66,6 @@ const EditScenarioPage: React.FC = () => {
                 <SidebarEditWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} />
                 <SidebarEditFeatures key={ScenarioSidebarTabs.FEATURES} />
                 <SidebarEditAnalysis key={ScenarioSidebarTabs.ANALYSIS} />
-                <SidebarEditSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
               </ScenariosEditSidebar>
               <ScenarioEditsMap />
             </div>

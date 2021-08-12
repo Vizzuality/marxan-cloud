@@ -5,6 +5,7 @@ import {
 } from 'react-query';
 
 import flatten from 'lodash/flatten';
+
 import { useSession } from 'next-auth/client';
 
 import SCENARIOS from 'services/scenarios';
@@ -13,7 +14,7 @@ import {
   UseSolutionsOptionsProps,
 } from './types';
 
-export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {}) {
+export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
   const [session] = useSession();
 
   const {
@@ -31,7 +32,7 @@ export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {})
 
   const fetchFeatures = ({ pageParam = 1 }) => SCENARIOS.request({
     method: 'GET',
-    url: `/${scenarioId}/marxan/solutions`,
+    url: `/${sid}/marxan/solutions`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
@@ -44,7 +45,7 @@ export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {})
     },
   });
 
-  const query = useInfiniteQuery(['solutions', scenarioId, JSON.stringify(options)], fetchFeatures, {
+  const query = useInfiniteQuery(['solutions', sid, JSON.stringify(options)], fetchFeatures, {
     keepPreviousData: true,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
@@ -90,12 +91,12 @@ export function useSolutions(scenarioId, options: UseSolutionsOptionsProps = {})
   }, [query, pages]);
 }
 
-export function useSolution(scenarioId, solutionId) {
+export function useSolution(sid, solutionId) {
   const [session] = useSession();
 
-  const query = useQuery(['scenarios', scenarioId, solutionId], async () => SCENARIOS.request({
+  const query = useQuery(['scenarios', sid, solutionId], async () => SCENARIOS.request({
     method: 'GET',
-    url: `/${scenarioId}/marxan/solutions/${solutionId}`,
+    url: `/${sid}/marxan/solutions/${solutionId}`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
@@ -115,7 +116,7 @@ export function useSolution(scenarioId, solutionId) {
   }, [query, data?.data]);
 }
 
-export function useMostDifferentSolutions(scenarioId, options: UseSolutionsOptionsProps = {}) {
+export function useMostDifferentSolutions(sid, options: UseSolutionsOptionsProps = {}) {
   const [session] = useSession();
 
   const {
@@ -130,9 +131,9 @@ export function useMostDifferentSolutions(scenarioId, options: UseSolutionsOptio
       };
     }, {});
 
-  const query = useQuery(['scenarios', scenarioId], async () => SCENARIOS.request({
+  const query = useQuery(['scenarios', sid], async () => SCENARIOS.request({
     method: 'GET',
-    url: `/${scenarioId}/marxan/solutions/most-different`,
+    url: `/${sid}/marxan/solutions/most-different`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
@@ -171,12 +172,12 @@ export function useMostDifferentSolutions(scenarioId, options: UseSolutionsOptio
   }, [query, data]);
 }
 
-export function useBestSolution(scenarioId) {
+export function useBestSolution(sid) {
   const [session] = useSession();
 
-  const query = useQuery(['scenarios', scenarioId], async () => SCENARIOS.request({
+  const query = useQuery(['scenarios', sid], async () => SCENARIOS.request({
     method: 'GET',
-    url: `/${scenarioId}/marxan/solutions/best`,
+    url: `/${sid}/marxan/solutions/best`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },

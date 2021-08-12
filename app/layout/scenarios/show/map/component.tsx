@@ -13,11 +13,11 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
 
-import { usePUGridLayer, useLegend } from 'hooks/map';
+import {
+  usePUGridLayer, useLegend,
+} from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useSolution, useBestSolution } from 'hooks/solutions';
-
-import ScenariosDrawingManager from 'layout/scenarios/show/map/drawing-manager';
+import { useScenario, useScenarioPU } from 'hooks/scenarios';
 
 import Map from 'components/map';
 // Controls
@@ -31,10 +31,10 @@ import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 
-export interface ScenariosMapProps {
+export interface ScenariosShowMapProps {
 }
 
-export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
+export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const [open, setOpen] = useState(true);
   const [session] = useSession();
 
@@ -44,29 +44,20 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const { data = {} } = useProject(pid);
   const { bbox } = data;
 
+  const { data: scenarioData } = useScenario(sid);
+
+  const { data: PUData } = useScenarioPU(sid);
+
+  const { included, excluded } = PUData || {};
+
+  const { wdpaIucnCategories, wdpaThreshold } = scenarioData || {};
+
   getScenarioSlice(sid);
-  const { selectedSolutionId } = useSelector((state) => state[`/scenarios/${sid}`]);
-
-  const {
-    data: selectedSolutionData,
-  } = useSolution(sid, selectedSolutionId);
-
-  const {
-    data: bestSolutionData,
-  } = useBestSolution(sid);
 
   const {
     tab,
     subtab,
-    cache,
-    // WDPA
-    wdpaCategories,
-    wdpaThreshold,
-    // Adjust planning units
-    puAction,
-    puTmpIncludedValue,
-    puTmpExcludedValue,
-  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const minZoom = 2;
   const maxZoom = 20;
@@ -74,17 +65,15 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
   const [bounds, setBounds] = useState(null);
 
   const PUGridLayer = usePUGridLayer({
-    cache,
     active: true,
     sid: sid ? `${sid}` : null,
     type: tab,
     subtype: subtab,
-    runId: selectedSolutionData?.runId || bestSolutionData?.runId,
     options: {
+      wdpaIucnCategories,
       wdpaThreshold,
-      puAction,
-      puIncludedValue: puTmpIncludedValue,
-      puExcludedValue: puTmpExcludedValue,
+      puIncludedValue: included,
+      puExcludedValue: excluded,
     },
   });
 
@@ -94,11 +83,10 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
     type: tab,
     subtype: subtab,
     options: {
-      ...wdpaCategories,
+      wdpaIucnCategories,
       wdpaThreshold,
-      puAction,
-      puIncludedValue: puTmpIncludedValue,
-      puExcludedValue: puTmpExcludedValue,
+      puIncludedValue: included,
+      puExcludedValue: excluded,
     },
   });
 
@@ -145,7 +133,6 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
 
     return null;
   };
-
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
       <Map
@@ -169,9 +156,6 @@ export const ScenariosMap: React.FC<ScenariosMapProps> = () => {
                   <Layer key={l.id} {...l} />
                 ))}
               </LayerManager>
-
-              {/* Drawing editor */}
-              <ScenariosDrawingManager />
             </>
           );
         }}

@@ -371,6 +371,7 @@ export function useScenarioPU(sid) {
     enabled: !!sid,
     refetchOnMount: 'always',
     refetchOnWindowFocus: false,
+    placeholderData: [],
   });
 
   const { data } = query;

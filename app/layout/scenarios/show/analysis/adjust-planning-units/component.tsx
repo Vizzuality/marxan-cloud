@@ -1,112 +1,30 @@
-import React, { useState, useCallback, useEffect } from 'react';
-
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
 import { motion } from 'framer-motion';
 
-import { useScenarioPU, useSaveScenarioPU } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
+import { useScenarioPU } from 'hooks/scenarios';
 
-import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
 import LOCK_IN_OUT_IMG from 'images/info-buttons/img_lockin_lock_out.png';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
-import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-import Buttons from './buttons';
-import Tabs from './tabs';
-
-export interface ScenariosSidebarAnalysisSectionsProps {
+export interface ScenariosAdjustPanningUnitsShowProps {
   onChangeSection: (s: string) => void;
 }
 
-export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysisSectionsProps> = ({
-  onChangeSection,
-}: ScenariosSidebarAnalysisSectionsProps) => {
-  const [clearing, setClearing] = useState(false);
-
+export const ScenariosAdjustPanningUnitsShow: React.FC<
+ScenariosAdjustPanningUnitsShowProps> = ({ onChangeSection }:
+ScenariosAdjustPanningUnitsShowProps) => {
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const {
-    setPUAction,
-    setPuIncludedValue,
-    setPuExcludedValue,
-    setTmpPuIncludedValue,
-    setTmpPuExcludedValue,
-  } = scenarioSlice.actions;
-  const dispatch = useDispatch();
-  const { puAction } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const { addToast } = useToasts();
-
-  const { data: PUData, isFetched: PUisFetched } = useScenarioPU(sid);
-  const scenarioPUMutation = useSaveScenarioPU({});
-
-  useEffect(() => {
-    if (PUData && PUisFetched) {
-      const { included, excluded } = PUData;
-      dispatch(setPuIncludedValue(included));
-      dispatch(setPuExcludedValue(excluded));
-      dispatch(setTmpPuIncludedValue(included));
-      dispatch(setTmpPuExcludedValue(excluded));
-    }
-  }, [PUData]); //eslint-disable-line
-
-  const onChangeTab = useCallback((t) => {
-    dispatch(setPUAction(t));
-  }, [dispatch, setPUAction]);
-
-  const onClear = useCallback(() => {
-    const { includedDefault, excludedDefault } = PUData;
-    setClearing(true);
-
-    // Save current clicked pu ids
-    scenarioPUMutation.mutate({
-      id: `${sid}`,
-      data: {
-        byId: {
-          include: includedDefault,
-          exclude: excludedDefault,
-        },
-      },
-    }, {
-      onSuccess: () => {
-        addToast('clear-planning-units-success', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <ul className="text-sm">
-              <li>Planning units cleared</li>
-            </ul>
-          </>
-        ), {
-          level: 'success',
-        });
-        setClearing(false);
-      },
-      onError: () => {
-        addToast('clear-planning-units-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              <li>Ooops! Something went wrong. Try again</li>
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-        setClearing(false);
-      },
-    });
-  }, [sid, PUData, scenarioPUMutation, addToast]);
+  const { data: PUData } = useScenarioPU(sid);
+  const { included, excluded } = PUData || {};
 
   return (
     <motion.div
@@ -116,6 +34,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+
       <header className="flex items-center pt-5 pb-1 space-x-3">
         <button
           type="button"
@@ -166,36 +85,27 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         </InfoButton>
       </header>
 
-      <div className="w-full flex items-center justify-between border-t border-gray-500 mt-2.5">
-        <Tabs
-          type={puAction}
-          onChange={onChangeTab}
-        />
-
-        {PUData && (!!PUData.included.length || !!PUData.excluded.length) && (
-          <div>
-            <Button
-              theme="secondary"
-              size="s"
-              disabled={clearing}
-              onClick={onClear}
-            >
-              <div className="flex items-center space-x-2">
-                <span>Clear</span>
-                <Icon icon={CLOSE_SVG} className="w-2 h-2" />
-              </div>
-            </Button>
-          </div>
-        )}
-      </div>
-
       <div className="relative flex flex-col flex-grow w-full min-h-0 overflow-hidden">
         <div className="absolute top-0 left-0 z-10 w-full h-3 bg-gradient-to-b from-gray-700 via-gray-700" />
         <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
-          <div className="py-3">
-            <Buttons
-              type={puAction}
-            />
+          <div className="py-3 space-y-6">
+            <div>
+              <h3 className="text-xs uppercase">
+                {' '}
+                Included areas (lock-in)
+                :
+
+              </h3>
+              <div className="flex flex-wrap mt-2.5">{included.length}</div>
+            </div>
+            <div>
+              <h3 className="text-xs uppercase">
+                {' '}
+                Excluded areas (lock-out)
+                :
+              </h3>
+              <div className="flex flex-wrap mt-2.5">{excluded.length}</div>
+            </div>
           </div>
         </div>
         <div className="absolute bottom-0 left-0 z-10 w-full h-3 bg-gradient-to-t from-gray-700 via-gray-700" />
@@ -205,4 +115,4 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   );
 };
 
-export default ScenariosSidebarAnalysisSections;
+export default ScenariosAdjustPanningUnitsShow;

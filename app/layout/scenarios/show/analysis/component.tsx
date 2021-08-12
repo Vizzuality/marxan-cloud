@@ -4,67 +4,41 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import AdjustPanningUnits from 'layout/scenarios/show/analysis/adjust-planning-units';
+import AdjustPanningUnitsShow from 'layout/scenarios/show/analysis/adjust-planning-units';
 import CostSurface from 'layout/scenarios/show/analysis/cost-surface';
 import GapAnalysis from 'layout/scenarios/show/analysis/gap-analysis';
 import Sections from 'layout/scenarios/show/analysis/sections';
-import Run from 'layout/scenarios/show/run';
-
-import Button from 'components/button';
-import Modal from 'components/modal';
 
 export interface ScenariosSidebarShowAnalysisProps {
-  readOnly?: boolean;
 }
 
-export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysisProps> = ({
-  readOnly,
-}: ScenariosSidebarShowAnalysisProps) => {
+export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysisProps> = () => {
   const [section, setSection] = useState(null);
-  const [runOpen, setRunOpen] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioEditSlice(sid);
+  const scenarioSlice = getScenarioSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
-
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
-
-  const saveTabsStatus = useCallback(async (subtab) => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'analysis', subtab: `${subtab}` }),
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata]);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
     const subtab = s ? `analysis-${s}` : 'analysis-preview';
     dispatch(setSubTab(subtab));
-    saveTabsStatus(subtab);
-  }, [dispatch, setSubTab, saveTabsStatus]);
+  }, [dispatch, setSubTab]);
 
   if (!scenarioData || tab !== 'analysis') return null;
 
@@ -126,7 +100,6 @@ export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysis
               {!section && (
               <Sections
                 key="sections"
-                readOnly={readOnly}
                 onChangeSection={onChangeSection}
               />
               )}
@@ -141,45 +114,19 @@ export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysis
               {section === 'cost-surface' && (
                 <CostSurface
                   key="cost-surface"
-                  readOnly={readOnly}
                   onChangeSection={onChangeSection}
                 />
               )}
 
               {section === 'adjust-planning-units' && (
-                <AdjustPanningUnits
+                <AdjustPanningUnitsShow
                   key="adjust-planning-units"
                   onChangeSection={onChangeSection}
                 />
               )}
             </Pill>
-
-            {!section && (
-            <motion.div
-              key="run-scenario-button"
-              className="flex justify-center flex-shrink-0 mt-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <Button
-                theme="spacial"
-                size="lg"
-                onClick={() => setRunOpen(true)}
-              >
-                Run scenario
-              </Button>
-            </motion.div>
-            )}
           </AnimatePresence>
 
-          <Modal
-            title="Run scenario"
-            open={runOpen}
-            size="wide"
-            onDismiss={() => setRunOpen(false)}
-          >
-            <Run />
-          </Modal>
         </motion.div>
       </HelpBeacon>
     </div>

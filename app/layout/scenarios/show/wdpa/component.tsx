@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
 import { motion } from 'framer-motion';
-import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
@@ -15,41 +12,34 @@ import { useWDPACategories } from 'hooks/wdpa';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
-import ScenariosSidebarWDPACategories from 'layout/scenarios/show/wdpa/categories';
-import ScenariosSidebarWDPAThreshold from 'layout/scenarios/show/wdpa/threshold';
 
-import Steps from 'components/steps';
+import Label from 'components/forms/label';
+import InfoButton from 'components/info-button';
+import Loading from 'components/loading';
+
+import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
 export interface ScenariosSidebarShowWDPAProps {
-  readOnly?: boolean;
 }
 
-export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> = ({
-  readOnly,
-}: ScenariosSidebarShowWDPAProps) => {
-  const [step, setStep] = useState(0);
+export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTab, setSubTab } = scenarioSlice.actions;
-
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const dispatch = useDispatch();
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const { data: projectData } = useProject(pid);
-
-  const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
+  const {
+    data: scenarioData,
+    isFetching: scenarioIsFetching,
+    isFetched: scenarioIsFetched,
+  } = useScenario(sid);
 
   const {
-    subtab: metaSubtab,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
-
-  const { data: wdpaData } = useWDPACategories({
+    data: wdpaData,
+    isFetching: wdpaIsFetching,
+    isFetched: wdpaIsFetched,
+  } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
                  || projectData?.adminAreaLevel1I
                  || projectData?.countryId,
@@ -58,12 +48,27 @@ export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> =
                   && !projectData?.countryId ? projectData?.planningAreaId : null,
   });
 
-  useEffect(() => {
-    const reloadStep = metaSubtab === 'protected-areas-preview' ? 0 : 1;
-    setStep(reloadStep);
-  }, [metaSubtab]);
+  const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
+    if (!wdpaData) return [];
+
+    return wdpaData.map((w) => ({
+      label: `IUCN ${w.iucnCategory}`,
+      value: w.id,
+    }));
+  }, [wdpaData]);
 
   if (!scenarioData || tab !== 'protected-areas') return null;
+
+  // Loading
+  if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
+    return (
+      <Loading
+        visible
+        className="relative flex items-center justify-center w-full h-16"
+        iconClassName="w-5 h-5 text-white"
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
@@ -108,35 +113,92 @@ export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> =
 
           <Pill selected>
             <header className="flex items-baseline space-x-4">
-
               <h2 className="text-lg font-medium font-heading">Protected areas</h2>
-
-              {(wdpaData && !!wdpaData.length) && (
-                <Steps step={step + 1} length={2} />
-              )}
             </header>
 
-            {step === 0 && (
-              <ScenariosSidebarWDPACategories
-                onSuccess={() => {
-                  setStep(1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PERCENTAGE));
-                }}
-                onDismiss={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
-                readOnly={readOnly}
-              />
-            )}
+            <div className="relative flex flex-col flex-grow overflow-hidden">
+              <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
-            {step === 1 && (
-              <ScenariosSidebarWDPAThreshold
-                onSuccess={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
-                onBack={() => {
-                  setStep(0);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));
-                }}
-                readOnly={readOnly}
-              />
-            )}
+              <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
+                <div className="py-8 space-y-6">
+
+                  {!scenarioData.wdpaIucnCategories && (
+                  <div>
+                    <p className="mb-3 text-sm text-gray-300">No protected areas has been selected.</p>
+                  </div>
+                  )}
+                  {scenarioData.wdpaIucnCategories && (
+                  <>
+                    <div>
+                      <h3 className="text-xs uppercase">Selected protected areas:</h3>
+                      <div className="flex flex-wrap mt-2.5">
+                        {scenarioData && scenarioData?.wdpaIucnCategories
+                    && scenarioData.wdpaIucnCategories.map((w) => {
+                      const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
+
+                      if (!wdpa) return null;
+
+                      return (
+                        <div
+                          key={`${wdpa.value}`}
+                          className="flex mb-2.5 mr-5"
+                        >
+                          <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
+                            {wdpa.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center mb-3">
+                        <Label theme="dark" className="mr-3 text-xs uppercase">Threshold for protected areas:</Label>
+                        <InfoButton>
+                          <div>
+                            <h4 className="font-heading text-lg mb-2.5">What is a threshold?</h4>
+                            <div className="space-y-2">
+                              <p>
+                                Inside Marxan, planning units are considered as either
+                                protected
+                                or not protected.
+                              </p>
+                              <p>
+                                The threshold value represents a
+                                percentage of the area
+                                inside a planning unit. By setting the threshold you decide
+                                how much of a protected area needs to fall inside a
+                                planning unit to consider the whole planning unit
+                                as &quot;protected&quot;.
+                              </p>
+                              <p>
+                                The following
+                                image shows an example setting a threshold of 50%:
+                              </p>
+                            </div>
+
+                            <img src={THRESHOLD_IMG} alt="Threshold" />
+
+                          </div>
+                        </InfoButton>
+                      </div>
+
+                      <p className="mb-3 text-sm text-gray-300">
+                        Refers to what percentage of a planning unit must
+                        {' '}
+                        be covered by a protected area to be considered “protected”.
+                      </p>
+                      <p>{`${scenarioData?.wdpaThreshold}%`}</p>
+                    </div>
+                  </>
+                  )}
+
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
+            </div>
+
           </Pill>
         </motion.div>
       </HelpBeacon>

@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+
+import { useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
+
+import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
@@ -18,6 +24,17 @@ import Wrapper from 'layout/wrapper';
 export const getServerSideProps = withProtection(withUser());
 
 const ShowScenarioPage: React.FC = () => {
+  const { query } = useRouter();
+  const { sid } = query;
+
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setTab, setSubTab } = scenarioSlice.actions;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setTab('solutions'));
+    dispatch(setSubTab(null));
+  }, [setTab, setSubTab, dispatch]);
   return (
     <Protected>
       <Title title="Detail" />
@@ -31,10 +48,10 @@ const ShowScenarioPage: React.FC = () => {
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
               <ScenariosShowSidebar>
-                <SidebarShowWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} readOnly />
-                <SidebarShowFeatures key={ScenarioSidebarTabs.FEATURES} readOnly />
-                <SidebarShowAnalysis key={ScenarioSidebarTabs.ANALYSIS} readOnly />
-                <SidebarShowSolutions key={ScenarioSidebarTabs.SOLUTIONS} readOnly />
+                <SidebarShowWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} />
+                <SidebarShowFeatures key={ScenarioSidebarTabs.FEATURES} />
+                <SidebarShowAnalysis key={ScenarioSidebarTabs.ANALYSIS} />
+                <SidebarShowSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
               </ScenariosShowSidebar>
               <ScenariosShowMap />
             </div>
