@@ -229,18 +229,27 @@ export class ProjectsController {
     @Body() body: UploadShapefileDTO,
   ): Promise<ShapefileUploadResponse> {
     try {
-      // Create single row in features
-      const res = await this.geoFeatureService.createFeature(projectId, body);
-      console.log('AFTER CREATE!!');
-      console.log(res);
+      // TODO: use DB transaction
 
-      const { data } = await this.shapefileService.transformToGeoJson(
+      // Validate shapefile before creating DB data
+      const shapefileData = await this.shapefileService.transformToGeoJson(
         shapefile,
       );
-      console.log('SHAPEFILE DATA: ');
-      console.log(data);
 
-      // TODO: Store geometries in features_data table
+      // Create single row in features
+      const geofeature = await this.geoFeatureService.createFeature(
+        projectId,
+        body,
+      );
+
+      // Store geometries in features_data table
+      for (const feature of shapefileData.data.features) {
+        await this.geoFeatureService.createFeatureData(
+          geofeature.id,
+          feature.geometry,
+          feature.properties,
+        );
+      }
     } catch (err) {
       console.error(err);
     }

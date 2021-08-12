@@ -6,8 +6,11 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import {
   GeoFeatureGeometry,
   geoFeatureResource,
+  SourceType,
 } from './geo-feature.geo.entity';
 import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
+
+import { Geometry } from 'geojson';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -262,6 +265,19 @@ export class GeoFeaturesService extends AppBaseService<
       tag: data.type,
       projectId,
       creationStatus: JobStatus.done,
+    });
+  }
+
+  public async createFeatureData(
+    featureId: string,
+    geometry: Geometry,
+    properties: Record<string, string | number>,
+  ): Promise<GeoFeatureGeometry> {
+    return this.geoFeaturesGeometriesRepository.save({
+      theGeom: geometry,
+      properties,
+      source: SourceType.user_imported,
+      featureId,
     });
   }
 }
