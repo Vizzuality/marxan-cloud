@@ -216,7 +216,6 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
     const extendedDto = await this.service.createSpecification(id, dto);
-    console.log(extendedDto);
     return await this.geoFeatureSetSerializer.serialize(extendedDto);
   }
 
