@@ -19,7 +19,7 @@ export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> =
   const { query } = useRouter();
   const { sid } = query;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const { data: scenarioData } = useScenario(sid);
 

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -26,10 +26,10 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioEditSlice(sid);
+  const scenarioSlice = getScenarioSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);

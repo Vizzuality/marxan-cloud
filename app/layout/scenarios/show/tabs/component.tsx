@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { motion } from 'framer-motion';
 
@@ -25,10 +25,10 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
     isFetched: scenarioFetched,
   } = useScenario(sid);
 
-  const scenarioSlice = getScenarioEditSlice(sid);
+  const scenarioSlice = getScenarioSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
   const dispatch = useDispatch();
 
   const onSelectedTab = useCallback((t) => {

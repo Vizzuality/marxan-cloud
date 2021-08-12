@@ -30,7 +30,7 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
   const { query } = useRouter();
   const { sid } = query;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const { data: scenarioData } = useScenario(sid);
 

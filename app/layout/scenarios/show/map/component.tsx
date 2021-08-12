@@ -2,11 +2,11 @@ import React, {
   useCallback, useEffect, useState,
 } from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector/* , useDispatch */ } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -16,6 +16,7 @@ import {
   usePUGridLayer, useLegend,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
+import { useScenario, useScenarioPU } from 'hooks/scenarios';
 
 // Map
 import Map from 'components/map';
@@ -30,8 +31,6 @@ import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 
-import ScenariosDrawingManager from './drawing-manager';
-
 export interface ScenariosShowMapProps {
 }
 
@@ -45,24 +44,20 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
   const { data = {} } = useProject(pid);
   const { bbox } = data;
 
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTmpPuIncludedValue, setTmpPuExcludedValue } = scenarioSlice.actions;
+  const { data: scenarioData } = useScenario(sid);
 
-  const dispatch = useDispatch();
+  const { data: PUData } = useScenarioPU(sid);
+
+  const { included, excluded } = PUData || {};
+
+  const { wdpaIucnCategories, wdpaThreshold } = scenarioData || {};
+
+  getScenarioSlice(sid);
+
   const {
     tab,
     subtab,
-    cache,
-    // WDPA
-    wdpaCategories,
-    wdpaThreshold,
-
-    // Adjust planning units
-    clicking,
-    puAction,
-    puTmpIncludedValue,
-    puTmpExcludedValue,
-  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const minZoom = 2;
   const maxZoom = 20;
@@ -70,17 +65,15 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
   const [bounds, setBounds] = useState(null);
 
   const PUGridLayer = usePUGridLayer({
-    cache,
     active: true,
     sid: sid ? `${sid}` : null,
     type: tab,
     subtype: subtab,
     options: {
-      ...wdpaCategories,
+      wdpaIucnCategories,
       wdpaThreshold,
-      puAction,
-      puIncludedValue: puTmpIncludedValue,
-      puExcludedValue: puTmpExcludedValue,
+      puIncludedValue: included,
+      puExcludedValue: excluded,
     },
   });
 
@@ -90,11 +83,10 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
     type: tab,
     subtype: subtab,
     options: {
-      ...wdpaCategories,
+      wdpaIucnCategories,
       wdpaThreshold,
-      puAction,
-      puIncludedValue: puTmpIncludedValue,
-      puExcludedValue: puTmpExcludedValue,
+      puIncludedValue: included,
+      puExcludedValue: excluded,
     },
   });
 
@@ -126,52 +118,8 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
   }, []);
 
   const handleClick = useCallback((e) => {
-    if (e && e.features) {
-      console.info(e.features);
-    }
-
-    if (clicking) {
-      const { features = [] } = e;
-
-      const pUGridLayer = features.find((f) => f.source === `pu-grid-layer-${cache}`);
-
-      if (pUGridLayer) {
-        const { properties } = pUGridLayer;
-        const { scenarioPuId } = properties;
-
-        const newClickingValue = puAction === 'include' ? [...puTmpIncludedValue] : [...puTmpExcludedValue];
-        const newAction = puAction === 'include' ? setTmpPuIncludedValue : setTmpPuExcludedValue;
-
-        const newOpositeClickingValue = puAction !== 'include' ? [...puTmpIncludedValue] : [...puTmpExcludedValue];
-        const newOpositeAction = puAction !== 'include' ? setTmpPuIncludedValue : setTmpPuExcludedValue;
-
-        const index = newClickingValue.findIndex((s) => s === scenarioPuId);
-        const indexOposite = newOpositeClickingValue.findIndex((s) => s === scenarioPuId);
-
-        if (index > -1) {
-          newClickingValue.splice(index, 1);
-        } else {
-          newClickingValue.push(scenarioPuId);
-        }
-
-        if (indexOposite > -1) {
-          newOpositeClickingValue.splice(indexOposite, 1);
-          dispatch(newOpositeAction(newOpositeClickingValue));
-        }
-
-        dispatch(newAction(newClickingValue));
-      }
-    }
-  }, [
-    clicking,
-    puAction,
-    puTmpIncludedValue,
-    puTmpExcludedValue,
-    dispatch,
-    setTmpPuIncludedValue,
-    setTmpPuExcludedValue,
-    cache,
-  ]);
+    if (e && e.features) console.info(e.features);
+  }, []);
 
   const handleTransformRequest = (url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
@@ -208,9 +156,6 @@ export const ScenariosShowMap: React.FC<ScenariosShowMapProps> = () => {
                   <Layer key={l.id} {...l} />
                 ))}
               </LayerManager>
-
-              {/* Drawing editor */}
-              <ScenariosDrawingManager />
             </>
           );
         }}

@@ -1,10 +1,6 @@
-import React, { useMemo, useEffect } from 'react';
-
-import { useDispatch } from 'react-redux';
+import React, { useMemo } from 'react';
 
 import { useRouter } from 'next/router';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
@@ -27,10 +23,6 @@ export const ScenariosSidebarShowWDPAContent: React.FC<ScenariosSidebarShowWDPAC
   const { pid, sid } = query;
 
   const { data: projectData } = useProject(pid);
-
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setWDPAThreshold } = scenarioSlice.actions;
-  const dispatch = useDispatch();
 
   const {
     data: scenarioData,
@@ -59,12 +51,6 @@ export const ScenariosSidebarShowWDPAContent: React.FC<ScenariosSidebarShowWDPAC
       value: w.id,
     }));
   }, [wdpaData]);
-
-  useEffect(() => {
-    const { wdpaThreshold } = scenarioData;
-
-    dispatch(setWDPAThreshold(wdpaThreshold ? wdpaThreshold / 100 : 0.75));
-  }, [scenarioData]); //eslint-disable-line
 
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {

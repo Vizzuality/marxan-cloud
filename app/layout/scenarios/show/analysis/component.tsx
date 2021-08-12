@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -12,7 +12,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import AdjustPanningUnits from 'layout/scenarios/show/analysis/adjust-planning-units';
+import AdjustPanningUnitsShow from 'layout/scenarios/show/analysis/adjust-planning-units';
 import CostSurface from 'layout/scenarios/show/analysis/cost-surface';
 import GapAnalysis from 'layout/scenarios/show/analysis/gap-analysis';
 import Sections from 'layout/scenarios/show/analysis/sections';
@@ -25,10 +25,10 @@ export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysis
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioEditSlice(sid);
+  const scenarioSlice = getScenarioSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
@@ -119,9 +119,8 @@ export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysis
               )}
 
               {section === 'adjust-planning-units' && (
-                <AdjustPanningUnits
+                <AdjustPanningUnitsShow
                   key="adjust-planning-units"
-                  onChangeSection={onChangeSection}
                 />
               )}
             </Pill>
