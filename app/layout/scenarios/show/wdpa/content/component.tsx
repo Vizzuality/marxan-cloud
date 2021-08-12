@@ -60,15 +60,6 @@ export const ScenariosSidebarShowWDPAContent: React.FC<ScenariosSidebarShowWDPAC
     }));
   }, [wdpaData]);
 
-  const INITIAL_VALUES = useMemo(() => {
-    const { wdpaThreshold, wdpaIucnCategories } = scenarioData;
-
-    return {
-      wdpaThreshold: wdpaThreshold ? wdpaThreshold / 100 : 0.75,
-      wdpaIucnCategories: wdpaIucnCategories || [],
-    };
-  }, [scenarioData]);
-
   useEffect(() => {
     const { wdpaThreshold } = scenarioData;
 
@@ -94,12 +85,18 @@ export const ScenariosSidebarShowWDPAContent: React.FC<ScenariosSidebarShowWDPAC
       <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
         <div className="py-8 space-y-6">
 
-          <div>
-            <h3 className="text-sm uppercase">Selected protected areas:</h3>
-
-            <div className="flex flex-wrap mt-2.5">
-              {INITIAL_VALUES.wdpaIucnCategories
-                    && INITIAL_VALUES.wdpaIucnCategories.map((w) => {
+          {!scenarioData.wdpaIucnCategories && (
+            <div>
+              <p className="mb-3 text-sm text-gray-300">No protected areas has been selected.</p>
+            </div>
+          )}
+          {scenarioData.wdpaIucnCategories && (
+            <>
+              <div>
+                <h3 className="text-xs uppercase">Selected protected areas:</h3>
+                <div className="flex flex-wrap mt-2.5">
+                  {scenarioData && scenarioData?.wdpaIucnCategories
+                    && scenarioData.wdpaIucnCategories.map((w) => {
                       const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
 
                       if (!wdpa) return null;
@@ -115,48 +112,51 @@ export const ScenariosSidebarShowWDPAContent: React.FC<ScenariosSidebarShowWDPAC
                         </div>
                       );
                     })}
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center mb-3">
-              <Label theme="dark" className="mr-3 text-sm uppercase">Threshold for protected areas:</Label>
-              <InfoButton>
-                <div>
-                  <h4 className="font-heading text-lg mb-2.5">What is a threshold?</h4>
-                  <div className="space-y-2">
-                    <p>
-                      Inside Marxan, planning units are considered as either
-                      protected
-                      or not protected.
-                    </p>
-                    <p>
-                      The threshold value represents a
-                      percentage of the area
-                      inside a planning unit. By setting the threshold you decide
-                      how much of a protected area needs to fall inside a
-                      planning unit to consider the whole planning unit
-                      as &quot;protected&quot;.
-                    </p>
-                    <p>
-                      The following
-                      image shows an example setting a threshold of 50%:
-                    </p>
-                  </div>
-
-                  <img src={THRESHOLD_IMG} alt="Threshold" />
-
                 </div>
-              </InfoButton>
-            </div>
+              </div>
 
-            <p className="mb-3 text-sm text-gray-300">
-              Refers to what percentage of a planning unit must
-              {' '}
-              be covered by a protected area to be considered “protected”.
-            </p>
-            <p>{`${scenarioData?.wdpaThreshold}%`}</p>
-          </div>
+              <div>
+                <div className="flex items-center mb-3">
+                  <Label theme="dark" className="mr-3 text-xs uppercase">Threshold for protected areas:</Label>
+                  <InfoButton>
+                    <div>
+                      <h4 className="font-heading text-lg mb-2.5">What is a threshold?</h4>
+                      <div className="space-y-2">
+                        <p>
+                          Inside Marxan, planning units are considered as either
+                          protected
+                          or not protected.
+                        </p>
+                        <p>
+                          The threshold value represents a
+                          percentage of the area
+                          inside a planning unit. By setting the threshold you decide
+                          how much of a protected area needs to fall inside a
+                          planning unit to consider the whole planning unit
+                          as &quot;protected&quot;.
+                        </p>
+                        <p>
+                          The following
+                          image shows an example setting a threshold of 50%:
+                        </p>
+                      </div>
+
+                      <img src={THRESHOLD_IMG} alt="Threshold" />
+
+                    </div>
+                  </InfoButton>
+                </div>
+
+                <p className="mb-3 text-sm text-gray-300">
+                  Refers to what percentage of a planning unit must
+                  {' '}
+                  be covered by a protected area to be considered “protected”.
+                </p>
+                <p>{`${scenarioData?.wdpaThreshold}%`}</p>
+              </div>
+            </>
+          )}
+
         </div>
       </div>
       <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
