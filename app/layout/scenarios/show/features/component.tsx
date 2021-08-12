@@ -6,8 +6,7 @@ import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
 
-import { useSelectedFeatures } from 'hooks/features';
-import { useScenario } from 'hooks/scenarios';
+import { useTargetedFeatures } from 'hooks/features';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
@@ -29,13 +28,11 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
 
-  const { data: scenarioData } = useScenario(sid);
-
   const {
-    data: selectedFeaturesData,
-  } = useSelectedFeatures(sid, {});
+    data: targetedFeaturesData,
+  } = useTargetedFeatures(sid);
 
-  if (!scenarioData || tab !== 'features') return null;
+  if (!targetedFeaturesData || tab !== 'features') return null;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
@@ -88,7 +85,7 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
                     Features Added:
                     {' '}
                     <span className="ml-1 text-gray-400">
-                      {selectedFeaturesData.length}
+                      {targetedFeaturesData.length}
                     </span>
                   </h2>
                   <InfoButton>

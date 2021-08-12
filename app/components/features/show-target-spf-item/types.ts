@@ -12,4 +12,5 @@ export interface ShowTargetSPFItemProps {
   fpf?: number;
   type?: Type;
   name?: string;
+  firstFeature?: boolean;
 }

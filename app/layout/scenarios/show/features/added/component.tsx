@@ -4,10 +4,9 @@ import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 
-import { useSelectedFeatures } from 'hooks/features';
+import { useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 
 import ShowTargetItem from 'components/features/show-target-spf-item';
-import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
 export interface ScenariosFeaturesListProps {
@@ -20,11 +19,15 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
 
   const {
     data: selectedFeaturesData,
-    isFetching: selectedFeaturesIsFetching,
-    isFetched: selectedFeaturesIsFetched,
   } = useSelectedFeatures(sid, {});
 
-  if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
+  const {
+    data: targetedFeaturesData,
+    isFetching: targetedFeaturesIsFetching,
+    isFetched: targetedFeaturesIsFetched,
+  } = useTargetedFeatures(sid);
+
+  if (targetedFeaturesIsFetching && !targetedFeaturesIsFetched) {
     return (
       <Loading
         visible
@@ -48,67 +51,13 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
         <div className="relative h-full px-0.5 overflow-x-visible overflow-y-auto">
 
           <div className="py-6">
-            {selectedFeaturesData && selectedFeaturesData.length
-            && selectedFeaturesData.map((f, i) => (
-              <div key={`${f.id}`} className="space-y-4">
-                <div className="flex items-baseline space-x-4">
-                  <p>{f.name}</p>
-                  {i === 0 && (
-                    <div className="flex items-center mt-2 space-x-2">
-                      <InfoButton>
-                        <div>
-                          <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
-                          <div className="space-y-2">
-                            <p>
-                              This value represents how much you want to conserve of a particular
-                              feature. In an ideal conservation, land or sea use plan,
-                              all your features meet their targets.
-                            </p>
-                            <p>
-                              You can set a default
-                              value for all of your features
-                              or you can set individual the targets separately for each feature.
-                              You can set your targets to 100% if you want the whole extent of
-                              your feature to be included in the solution.
-                            </p>
-                          </div>
-                        </div>
-                      </InfoButton>
-                      <InfoButton>
-                        <div>
-                          <h4 className="font-heading text-lg mb-2.5">What is the FPF?</h4>
-                          <div className="space-y-2">
-                            <p>
-                              FPF stands for
-                              {' '}
-                              <b>Feature Penalty Factor</b>
-                              .
-                              A higher FPF value forces the Marxan algorithm
-                              to choose the planning units where this feature
-                              is present by applying a penalty if the target
-                              is missed, thereby increasing
-                              the cost of the solution. It comes into play when
-                              some of your targets fail to be met.
-                            </p>
-                            <p>
-                              In a typical
-                              workflow you start out with all FPF values set at
-                              1 and after checking the results, increase the FPF
-                              values for the particular features where targets have
-                              been missed.
-                            </p>
-                          </div>
-                        </div>
-                      </InfoButton>
-                    </div>
-                  )}
-                </div>
-                <div>
-                  {f.intersectFeaturesSelected
-                  && f.intersectFeaturesSelected.map((item, itemIndex) => {
-                    const {
-                      id, label, marxanSettings: { fpf, prop },
-                    } = item;
+
+            <div className="space-y-4">
+              <div>
+                {targetedFeaturesData && targetedFeaturesData instanceof Array
+                  && targetedFeaturesData.map((item, itemIndex) => {
+                    const { id } = item;
+                    const firstFeature = itemIndex === 0;
                     return (
                       <div
                         className={cx({
@@ -117,18 +66,14 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                         key={`${id}`}
                       >
                         <ShowTargetItem
-                          fpf={fpf}
-                          target={prop}
-                          name={label}
-                          type={f.type}
+                          firstFeature={firstFeature}
                           {...item}
                         />
                       </div>
                     );
                   })}
-                </div>
               </div>
-            ))}
+            </div>
           </div>
 
         </div>
