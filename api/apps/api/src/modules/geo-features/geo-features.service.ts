@@ -2,7 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepReadonly } from 'utility-types';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  EntityManager,
+  getConnection,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import {
   GeoFeatureGeometry,
   geoFeatureResource,
@@ -23,6 +28,7 @@ import { JobStatus, Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -255,11 +261,67 @@ export class GeoFeaturesService extends AppBaseService<
     return entity;
   }
 
-  public async createFeature(
+  public async createFeaturesForShapefile(
+    projectId: string,
+    data: UploadShapefileDTO,
+    features: Record<string, any>[],
+  ): Promise<void> {
+    const [apiDbConnection, geoDbConnection] = Object.values(
+      DbConnections,
+    ).map((name) => getConnection(name));
+
+    const apiQueryRunner = apiDbConnection.createQueryRunner();
+    const geoQueryRunner = geoDbConnection.createQueryRunner();
+
+    await apiQueryRunner.connect();
+    await geoQueryRunner.connect();
+
+    await apiQueryRunner.startTransaction();
+    await geoQueryRunner.startTransaction();
+
+    try {
+      // Create single row in features
+      const geofeature = await this.createFeature(
+        apiQueryRunner.manager,
+        projectId,
+        data,
+      );
+
+      // Store geometries in features_data table
+      for (const feature of features) {
+        await this.createFeatureData(
+          geoQueryRunner.manager,
+          geofeature.id,
+          feature.geometry,
+          feature.properties,
+        );
+      }
+
+      await apiQueryRunner.commitTransaction();
+      await geoQueryRunner.commitTransaction();
+    } catch (err) {
+      await apiQueryRunner.rollbackTransaction();
+      await geoQueryRunner.rollbackTransaction();
+
+      this.logger.error(
+        'An error occurred creating features for shapefile (changes have been rolled back)',
+        String(err),
+      );
+
+      console.log(err);
+    } finally {
+      // you need to release a queryRunner which was manually instantiated
+      await apiQueryRunner.release();
+      await geoQueryRunner.release();
+    }
+  }
+
+  private async createFeature(
+    entityManager: EntityManager,
     projectId: string,
     data: UploadShapefileDTO,
   ): Promise<GeoFeature> {
-    return this.geoFeaturesRepository.save({
+    return entityManager.getRepository(GeoFeature).save({
       featureClassName: data.name,
       description: data.description,
       tag: data.type,
@@ -268,12 +330,13 @@ export class GeoFeaturesService extends AppBaseService<
     });
   }
 
-  public async createFeatureData(
+  private async createFeatureData(
+    entityManager: EntityManager,
     featureId: string,
     geometry: Geometry,
     properties: Record<string, string | number>,
   ): Promise<GeoFeatureGeometry> {
-    return this.geoFeaturesGeometriesRepository.save({
+    return entityManager.getRepository(GeoFeatureGeometry).save({
       theGeom: geometry,
       properties,
       source: SourceType.user_imported,
