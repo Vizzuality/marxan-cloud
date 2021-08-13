@@ -15,6 +15,7 @@ import { CostTemplateModule } from '@marxan-geoprocessing/modules/scenarios';
 import { PlanningAreaModule } from '@marxan-geoprocessing/modules/planning-area/planning-area.module';
 import { MarxanSandboxedRunnerModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandboxed-runner.module';
 import { ScenariosModule } from '@marxan-geoprocessing/modules/scenarios/scenarios.module';
+import { ScenarioProtectedAreaCalculationModule } from '@marxan-geoprocessing/modules/scenario-protected-area-calculation/scenario-protected-area-calculation.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ScenariosModule } from '@marxan-geoprocessing/modules/scenarios/scenari
     ApiEventsModule,
     SurfaceCostModule,
     ScenarioPlanningUnitsInclusionModule,
+    ScenarioProtectedAreaCalculationModule,
     PlanningAreaModule,
     MarxanSandboxedRunnerModule,
     ScenariosModule,
