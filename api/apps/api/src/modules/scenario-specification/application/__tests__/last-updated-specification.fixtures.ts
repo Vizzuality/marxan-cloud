@@ -16,6 +16,11 @@ import {
 
 import { InMemoryScenarioSpecificationRepo } from './scenario-specification-in-memory.repo';
 
+jest.mock('config', () => ({
+  get: (str: string) => `value_${str}`,
+  has: () => true,
+}));
+
 export const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],

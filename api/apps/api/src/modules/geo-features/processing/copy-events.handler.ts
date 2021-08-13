@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { FeaturesJobData } from '@marxan/geofeature-calculations';
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
@@ -9,6 +10,7 @@ import {
   QueueEventsAdapter,
 } from '@marxan-api/modules/queue-api-events';
 import { copyEventsFactoryToken } from './queue-providers';
+import { FeaturesCalculated } from './features-calculated.event';
 
 @Injectable()
 export class CopyEventsHandler implements EventFactory<FeaturesJobData> {
@@ -17,8 +19,12 @@ export class CopyEventsHandler implements EventFactory<FeaturesJobData> {
   constructor(
     @Inject(copyEventsFactoryToken)
     queueEventsFactory: CreateWithEventFactory<FeaturesJobData>,
+    private readonly eventBus: EventBus,
   ) {
     this.queueEvents = queueEventsFactory(this);
+    this.queueEvents.on(`completed`, async (data) => {
+      await this.completed(data);
+    });
   }
 
   async createCompletedEvent(
@@ -51,5 +57,10 @@ export class CopyEventsHandler implements EventFactory<FeaturesJobData> {
         featureId: data.featureId,
       },
     };
+  }
+
+  private async completed(event: EventData<FeaturesJobData>) {
+    const data = await event.data;
+    this.eventBus.publish(new FeaturesCalculated([data.featureId]));
   }
 }
