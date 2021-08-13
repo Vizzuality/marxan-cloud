@@ -25,8 +25,8 @@ export class ScenarioProtectedAreaCalculationProcessor
    */
   async process(job: Job<JobInput, true>): Promise<true> {
     const scenarioId = job.data.scenarioId;
-    const wdpaList = job.data.scenarioId;
-    const queryBuilder = this.scenarioPlanningUnitsRepo.createQueryBuilder(`spd`).query(
+    const wdpaList = job.data.protectedAreaFilterByIds;
+    const queryBuilder = this.scenarioPlanningUnitsRepo.query(
       `
       with pa as (select ST_MemUnion(the_geom) as the_geom from wdpa where id IN ($2)),
       pu as (
@@ -43,12 +43,12 @@ export class ScenarioProtectedAreaCalculationProcessor
           (SELECT protected_area
           FROM (select id, sum(pa_pu_area) as protected_area, max(pu_area) pu_area
                 from pu_pa group by id) as result
-           WHERE scenarios_pu_data.id = result.id);;
+           WHERE scenarios_pu_data.id = result.id);
     `,
       [scenarioId, wdpaList]
     );
 
-    await queryBuilder.getRawMany();
+    await queryBuilder;
 
 
     return true;
