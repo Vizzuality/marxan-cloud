@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Job } from 'bullmq';
@@ -12,6 +12,7 @@ import {
 @Injectable()
 export class ScenarioProtectedAreaCalculationProcessor
   implements WorkerProcessor<JobInput, true> {
+    private readonly logger: Logger = new Logger(ScenarioProtectedAreaCalculationProcessor.name);
   constructor(
     @InjectRepository(ScenariosPlanningUnitGeoEntity)
     private readonly scenarioPlanningUnitsRepo: Repository<ScenariosPlanningUnitGeoEntity>,
@@ -26,6 +27,8 @@ export class ScenarioProtectedAreaCalculationProcessor
   async process(job: Job<JobInput, true>): Promise<true> {
     const scenarioId = job.data.scenarioId;
     const wdpaList = job.data.protectedAreaFilterByIds;
+    this.logger.debug(scenarioId)
+    this.logger.debug(wdpaList)
     const queryBuilder = this.scenarioPlanningUnitsRepo.query(
       `
       with pa as (select ST_MemUnion(the_geom) as the_geom from wdpa where id IN ($2)),
@@ -33,7 +36,7 @@ export class ScenarioProtectedAreaCalculationProcessor
       select spd.id, pug.the_geom, pug.area as pu_area
       from scenarios_pu_data spd
       inner join planning_units_geom pug on spd.pu_geom_id = pug.id
-      where scenario_id='$1'),
+      where scenario_id=$1),
       pu_pa as (select pu.id, st_area(st_transform(st_intersection(pu.the_geom, pa.the_geom), 3410)) as pa_pu_area, 
                                        pu_area
                 from pu
@@ -47,8 +50,9 @@ export class ScenarioProtectedAreaCalculationProcessor
     `,
       [scenarioId, wdpaList]
     );
-
+    
     await queryBuilder;
+    this.logger.debug(queryBuilder)
 
 
     return true;
