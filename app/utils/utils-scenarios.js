@@ -3,24 +3,18 @@ export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
     'protected-areas': 'draft',
     features: 'draft',
     analysis: 'draft',
-    solutions: 'empty',
   },
   tab: 'analysis',
-  subtab: null,
+  subtab: 'analysis-preview',
 };
 
 export const STATUS_VALUES = {
   'protected-areas': {
     features: 'empty',
     analysis: 'empty',
-    solutions: 'empty',
   },
   features: {
     analysis: 'empty',
-    solutions: 'empty',
-  },
-  analysis: {
-    solutions: 'empty',
   },
 };
 

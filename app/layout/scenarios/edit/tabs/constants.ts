@@ -16,9 +16,4 @@ export const TABS = [
     subtab: ScenarioSidebarSubTabs.ANALYSIS_PREVIEW,
     name: 'Analysis',
   },
-  {
-    id: ScenarioSidebarTabs.SOLUTIONS,
-    subtab: ScenarioSidebarSubTabs.SOLUTIONS_PREVIEW,
-    name: 'Solutions',
-  },
 ];
