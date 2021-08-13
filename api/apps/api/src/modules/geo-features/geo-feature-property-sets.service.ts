@@ -1,4 +1,3 @@
-import { apiConnections } from '@marxan-api/ormconfig';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { flatten } from 'lodash';
@@ -9,14 +8,12 @@ import { Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
 import { GeoFeature } from './geo-feature.api.entity';
 import { GeoFeaturePropertySet } from './geo-feature.geo.entity';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class GeoFeaturePropertySetService {
   constructor(
-    @InjectRepository(
-      GeoFeaturePropertySet,
-      apiConnections.geoprocessingDB.name,
-    )
+    @InjectRepository(GeoFeaturePropertySet, DbConnections.geoprocessingDB)
     private readonly geoFeaturePropertySetsRepository: Repository<GeoFeaturePropertySet>,
     @InjectRepository(GeoFeature)
     private readonly geoFeaturesRepository: Repository<GeoFeature>,

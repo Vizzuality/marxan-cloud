@@ -38,13 +38,11 @@ export interface FeatureConfigStratification extends FeatureConfigBase {
 
 export interface FeatureConfigSplit extends FeatureConfigBase {
   operation: SpecificationOperation.Split;
-  baseFeatureId: string;
   splitByProperty: string;
 }
 
 export interface FeatureConfigCopy extends FeatureConfigBase {
   operation: SpecificationOperation.Copy;
-  baseFeatureId: string;
   selectSubSets: never;
 }
 
