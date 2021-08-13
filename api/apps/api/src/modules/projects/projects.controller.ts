@@ -20,7 +20,6 @@ import {
   projectResource,
   ProjectResultSingular,
 } from './project.api.entity';
-
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -209,6 +208,7 @@ export class ProjectsController {
     return result.right;
   }
 
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
     description: `Upload shapefiles of species or bioregional features.`,
   })
@@ -228,31 +228,15 @@ export class ProjectsController {
     @UploadedFile() shapefile: Express.Multer.File,
     @Body() body: UploadShapefileDTO,
   ): Promise<ShapefileUploadResponse> {
-    try {
-      // TODO: use DB transaction
+    const shapefileData = await this.shapefileService.transformToGeoJson(
+      shapefile,
+    );
 
-      // Validate shapefile before creating DB data
-      const shapefileData = await this.shapefileService.transformToGeoJson(
-        shapefile,
-      );
-
-      // Create single row in features
-      const geofeature = await this.geoFeatureService.createFeature(
-        projectId,
-        body,
-      );
-
-      // Store geometries in features_data table
-      for (const feature of shapefileData.data.features) {
-        await this.geoFeatureService.createFeatureData(
-          geofeature.id,
-          feature.geometry,
-          feature.properties,
-        );
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    await this.geoFeatureService.createFeaturesForShapefile(
+      projectId,
+      body,
+      shapefileData.data.features,
+    );
 
     return { success: true };
   }
