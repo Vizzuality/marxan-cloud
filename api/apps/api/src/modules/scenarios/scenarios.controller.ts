@@ -335,8 +335,10 @@ export class ScenariosController {
   async getScenarioFeatures(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<Partial<ScenarioFeaturesData>[]> {
+    const result = await this.service.getFeatures(id);
     return this.scenarioFeatureSerializer.serialize(
-      await this.service.getFeatures(id),
+      result.data,
+      result.metadata,
     );
   }
 
