@@ -114,13 +114,11 @@ export class ScenariosService {
 
   async getFeatures(scenarioId: string) {
     await this.assertScenario(scenarioId);
-    return (
-      await this.scenarioFeatures.findAll(undefined, {
-        params: {
-          scenarioId,
-        },
-      })
-    )[0];
+    return await this.scenarioFeatures.findAllPaginated(undefined, {
+      params: {
+        scenarioId,
+      },
+    });
   }
 
   async getInputParameterFile(scenarioId: string): Promise<string> {
