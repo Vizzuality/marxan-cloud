@@ -60,17 +60,18 @@ export const getValidRemoteFeatureData = (): RemoteFeaturesData[] => [
   },
 ];
 
-export const getValidGeoFeature = (): GeoFeature[] => [
-  {
-    description: 'feature-desc-1',
-    tag: FeatureTag.Bioregional,
-    id: metaFeatureIdMet,
-    alias: 'feature-alias-1',
-  },
-  {
-    description: 'feature-desc-2',
-    tag: FeatureTag.Species,
-    id: metaFeatureIdFailed,
-    alias: 'feature-alias-2',
-  },
-];
+export const getValidGeoFeature = (): GeoFeature[] => {
+  const entity1 = new GeoFeature();
+  entity1.id = metaFeatureIdMet;
+  entity1.alias = 'feature-alias-1';
+  entity1.description = 'feature-desc-1';
+  entity1.tag = FeatureTag.Bioregional;
+
+  const entity2 = new GeoFeature();
+  entity2.id = metaFeatureIdFailed;
+  entity2.alias = 'feature-alias-2';
+  entity2.description = 'feature-desc-2';
+  entity2.tag = FeatureTag.Species;
+
+  return [entity1, entity2];
+};
