@@ -28,33 +28,33 @@ export const getFixtures = () => {
 
   const featuresFromSplit = [
     {
-      id: v4(),
+      featureId: v4(),
       calculated: true,
     },
     {
-      id: v4(),
+      featureId: v4(),
       calculated: true,
     },
   ];
 
   const featuresFromStratificationSomeCalculated = [
     {
-      id: v4(),
+      featureId: v4(),
       calculated: true,
     },
     {
-      id: nonCalculatedFeature,
+      featureId: nonCalculatedFeature,
       calculated: false,
     },
   ];
 
   const featuresFromStratificationAllCalculated = [
     {
-      id: v4(),
+      featureId: v4(),
       calculated: true,
     },
     {
-      id: v4(),
+      featureId: v4(),
       calculated: true,
     },
   ];
