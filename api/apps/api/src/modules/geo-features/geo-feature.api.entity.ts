@@ -58,7 +58,7 @@ export class GeoFeature {
   tag!: FeatureTag;
 
   @Column('varchar', { name: 'creation_status' })
-  creationStatus!: JobStatus;
+  creationStatus?: JobStatus;
 
   @ApiPropertyOptional()
   properties?: GeoFeatureProperty[];
