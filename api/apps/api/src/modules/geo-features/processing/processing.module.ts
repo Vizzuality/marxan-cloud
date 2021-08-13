@@ -16,9 +16,10 @@ import { CopyEventsHandler } from './copy-events.handler';
 import { SplitEventsHandler } from './split-events.handler';
 import { StratificationEventsHandler } from './stratification-events.handler';
 import { RunService } from './run.service';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
-  imports: [QueueApiEventsModule, ApiEventsModule],
+  imports: [QueueApiEventsModule, ApiEventsModule, CqrsModule],
   providers: [
     copyQueueProvider,
     copyQueueEventsProvider,

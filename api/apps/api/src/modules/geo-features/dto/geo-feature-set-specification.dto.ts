@@ -11,6 +11,8 @@ import {
 import { MarxanSettingsForGeoFeature } from '../types/geo-feature.marxan-settings.type';
 
 export abstract class SpecForGeofeature {
+  @IsString()
+  kind!: string;
   @IsUUID()
   @ApiProperty()
   featureId!: string;

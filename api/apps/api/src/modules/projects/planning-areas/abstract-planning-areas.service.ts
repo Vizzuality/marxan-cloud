@@ -20,6 +20,14 @@ export type PlanningAreaBBoxResult =
   | NotFound
   | IdsMismatched;
 
+export type AreaOfPlanningAreaResult =
+  | {
+      area: number;
+    }
+  | NotSupported
+  | NotFound
+  | IdsMismatched;
+
 export type PlanningAreaIdAndNameResult =
   | PlanningAreaAndName
   | NotSupported
