@@ -11,7 +11,13 @@ import InfoButton from 'components/info-button';
 
 import LOCK_IN_OUT_IMG from 'images/info-buttons/img_lockin_lock_out.png';
 
+import HEXAGON_SVG from 'svgs/map/hexagon.svg?sprite';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
+
+export const COLORS = {
+  include: '#0F0',
+  exclude: '#F00',
+};
 
 export interface ScenariosAdjustPanningUnitsShowProps {
   onChangeSection: (s: string) => void;
@@ -90,21 +96,27 @@ ScenariosAdjustPanningUnitsShowProps) => {
         <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
           <div className="py-3 space-y-6">
             <div>
-              <h3 className="text-xs uppercase">
-                {' '}
-                Included areas (lock-in)
-                :
+              <div className="flex space-x-2">
+                <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.include }} />
+                <h3 className="text-sm">
+                  {' '}
+                  Included areas (Lock-in)
+                  :
 
-              </h3>
-              <div className="flex flex-wrap mt-2.5">{included.length}</div>
+                </h3>
+              </div>
+              <div className="flex flex-wrap mt-2.5 text-gray-300">{`${included.length} PU`}</div>
             </div>
             <div>
-              <h3 className="text-xs uppercase">
-                {' '}
-                Excluded areas (lock-out)
-                :
-              </h3>
-              <div className="flex flex-wrap mt-2.5">{excluded.length}</div>
+              <div className="flex space-x-2">
+                <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.exclude }} />
+                <h3 className="text-sm">
+                  {' '}
+                  Excluded areas (Lock-out)
+                  :
+                </h3>
+              </div>
+              <div className="flex flex-wrap mt-2.5 text-gray-300">{`${excluded.length} PU`}</div>
             </div>
           </div>
         </div>
