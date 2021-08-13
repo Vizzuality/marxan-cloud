@@ -49,7 +49,7 @@ export class InMemorySpecificationRepo implements SpecificationRepository {
       .flatMap((spec) =>
         spec.toSnapshot().config.flatMap((config) => ({
           specId: spec.id,
-          features: config.resultFeatures.map((feature) => feature.id),
+          features: config.resultFeatures.map((feature) => feature.featureId),
         })),
       )
       .filter(
