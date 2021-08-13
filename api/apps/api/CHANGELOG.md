@@ -18,6 +18,7 @@ Unreleased
 	- Tests for planning units generation.
 - Projects
 	- Job request for PU generation after project creation or update
+	- Endpoint to upload features from shapefiles [MARXAN-543].
 
 ### Changed
 
