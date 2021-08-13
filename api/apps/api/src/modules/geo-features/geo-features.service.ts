@@ -321,13 +321,16 @@ export class GeoFeaturesService extends AppBaseService<
     projectId: string,
     data: UploadShapefileDTO,
   ): Promise<GeoFeature> {
-    return entityManager.getRepository(GeoFeature).save({
-      featureClassName: data.name,
-      description: data.description,
-      tag: data.type,
-      projectId,
-      creationStatus: JobStatus.done,
-    });
+    const entity = entityManager.getRepository(GeoFeature).create();
+    entity.featureClassName = data.name;
+    entity.description = data.description;
+    entity.tag = data.type;
+    entity.projectId = projectId;
+    entity.creationStatus = JobStatus.done;
+
+    await entity.save();
+    await entity.reload();
+    return entity;
   }
 
   private async createFeatureData(
@@ -335,12 +338,13 @@ export class GeoFeaturesService extends AppBaseService<
     featureId: string,
     geometry: Geometry,
     properties: Record<string, string | number>,
-  ): Promise<GeoFeatureGeometry> {
-    return entityManager.getRepository(GeoFeatureGeometry).save({
-      theGeom: geometry,
-      properties,
-      source: SourceType.user_imported,
-      featureId,
-    });
+  ): Promise<void> {
+    await entityManager.query(
+      `INSERT INTO "features_data"
+      ("id", "the_geom", "properties", "source", "feature_id") 
+      VALUES 
+      (DEFAULT, ST_MakeValid(ST_GeomFromGeoJSON($1)::geometry), $2, $3, $4);`,
+      [geometry, properties, SourceType.user_imported, featureId],
+    );
   }
 }
