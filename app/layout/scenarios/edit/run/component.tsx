@@ -7,8 +7,11 @@ import { Form as FormRFF } from 'react-final-form';
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
+import { usePlausible } from 'next-plausible';
 import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
+import { useMe } from 'hooks/me';
+import { useProject } from 'hooks/projects';
 import { useRunScenario, useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -30,9 +33,14 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   const [advanced, setAdvanced] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
+  const plausible = usePlausible();
 
   const { query, push } = useRouter();
   const { pid, sid } = query;
+
+  const { user } = useMe();
+
+  const { data: projectData } = useProject(pid);
 
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
@@ -80,7 +88,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
           onSuccess: ({ data: { data: s } }) => {
             setSubmitting(false);
 
-            addToast('save-scenario-name', (
+            addToast('run-start', (
               <>
                 <h2 className="font-medium">Success!</h2>
                 <p className="text-sm">Run started</p>
@@ -90,11 +98,21 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
             });
             console.info('Scenario name saved succesfully', s);
             push(`/projects/${pid}`);
+            plausible('Run scenario', {
+              props: {
+                userId: `${user.id}`,
+                userEmail: `${user.email}`,
+                projectId: `${pid}`,
+                projectName: `${projectData.name}`,
+                scenarioId: `${sid}`,
+                scenarioName: `${scenarioData.name}`,
+              },
+            });
           },
           onError: () => {
             setSubmitting(false);
 
-            addToast('error-scenario-name', (
+            addToast('error-run-start', (
               <>
                 <h2 className="font-medium">Error!</h2>
                 <p className="text-sm">Scenario name not saved</p>
@@ -126,6 +144,11 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
     runScenarioMutation,
     addToast,
     scenarioEditingMetadata,
+    plausible,
+    projectData?.name,
+    user?.email,
+    user?.id,
+    scenarioData?.name,
   ]);
 
   return (
