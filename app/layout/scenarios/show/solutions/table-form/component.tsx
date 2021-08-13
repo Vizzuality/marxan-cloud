@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import useBottomScrollListener from 'hooks/scroll';
-import { useSolutions, useMostDifferentSolutions } from 'hooks/solutions';
+import { useSolutions, useBestSolution, useMostDifferentSolutions } from 'hooks/solutions';
 
 import { Button } from 'components/button/component';
 import Checkbox from 'components/forms/checkbox';
@@ -24,7 +24,7 @@ import SolutionsTable from '../table';
 import { SolutionsTableFormProps } from './types';
 
 export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
-  bestSolutionId, onCancel, setShowTable,
+  onCancel, setShowTable,
 }: SolutionsTableFormProps) => {
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
   const { query } = useRouter();
@@ -34,8 +34,13 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   const scenarioSlice = getScenarioSlice(sid);
   const { setSelectedSolution } = scenarioSlice.actions;
 
+  const {
+    data: bestSolutionData,
+
+  } = useBestSolution(sid);
+
   const { selectedSolutionId } = useSelector((state) => state[`/scenarios/${sid}`]);
-  const [selectedSolution, onSelectSolution] = useState(selectedSolutionId || bestSolutionId);
+  const [selectedSolution, onSelectSolution] = useState(selectedSolutionId || bestSolutionData?.id);
 
   const {
     data,
@@ -208,7 +213,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
         {(allSolutionsFetched || mostDifSolutionsIsSelected) && (
           <SolutionsTable
-            bestSolutionId={bestSolutionId}
+            bestSolutionId={bestSolutionData?.id}
             body={mostDifSolutionsIsSelected ? mostDifSolutionsData : data}
             selectedSolution={selectedSolution}
             onSelectSolution={(solution) => onSelectSolution(solution.id)}
