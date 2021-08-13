@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import { useProject } from 'hooks/projects';
 import {
-  useDeleteScenario, useScenarios, useDuplicateScenario,
+  useDeleteScenario, useScenarios, useDuplicateScenario, useCancelRunScenario,
 } from 'hooks/scenarios';
 import useBottomScrollListener from 'hooks/scroll';
 import { useToasts } from 'hooks/toast';
@@ -36,6 +36,9 @@ export interface ProjectScenariosProps {
 }
 
 export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
+  const queryClient = useQueryClient();
+  const { addToast } = useToasts();
+
   const [modal, setModal] = useState(false);
   const [deleteScenario, setDelete] = useState(null);
 
@@ -66,6 +69,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     isFetchingNextPage: allScenariosIsFetchingNextPage,
     isFetched: allScenariosIsFetched,
   } = useScenarios(pid, {
+
     search,
     filters: {
       projectId: pid,
@@ -83,10 +87,8 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   const loading = (projectIsFetching && !projectIsFetched)
     || (rawScenariosIsFetching && !rawScenariosIsFetched);
 
+  // DELETE
   const deleteMutation = useDeleteScenario({});
-  const queryClient = useQueryClient();
-
-  const { addToast } = useToasts();
 
   const onDelete = useCallback(() => {
     deleteMutation.mutate({ id: deleteScenario.id }, {
@@ -120,6 +122,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     });
   }, [deleteScenario, deleteMutation, queryClient, pid, addToast]);
 
+  // DUPLICATE
   const duplicateScenarioMutation = useDuplicateScenario({
     requestConfig: {
       method: 'POST',
@@ -166,6 +169,49 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
       },
     });
   }, [addToast, duplicateScenarioMutation]);
+
+  // CANCEL RUN
+  const cancelRunMutation = useCancelRunScenario({});
+  const onCancelRun = useCallback((scenarioId, scenarioName) => {
+    cancelRunMutation.mutate({ id: scenarioId }, {
+      onSuccess: ({ data: { data: s } }) => {
+        addToast('success-cancel-scenario', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">
+              Scenario
+              {' '}
+              {scenarioName}
+              {' '}
+              canceled
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
+
+        console.info('Scenario canceled succesfully', s);
+      },
+      onError: () => {
+        addToast('error-cancel-scenario', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              Scenario
+              {' '}
+              {scenarioName}
+              {' '}
+              not canceled
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+
+        console.error('Scenario not canceled');
+      },
+    });
+  }, [addToast, cancelRunMutation]);
 
   return (
     <AnimatePresence>
@@ -254,6 +300,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                             setDelete(s);
                           }}
                           onDuplicate={() => onDuplicate(s.id, s.name)}
+                          onCancelRun={() => onCancelRun(s.id, s.name)}
                           SettingsC={<ScenarioSettings sid={s.id} />}
                         />
 

@@ -63,14 +63,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
     const data = {
       metadata: {
         marxanInputParameterFile: values,
-        scenarioEditingMetadata: {
-          status: {
-            ...scenarioEditingMetadata.status,
-            solutions: 'draft',
-          },
-          tab: 'solutions',
-          subtab: 'solution-preview',
-        },
+        scenarioEditingMetadata,
       },
     };
 
