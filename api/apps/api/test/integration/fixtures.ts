@@ -50,31 +50,37 @@ export const getFixtures = async () => {
         },
         config: [
           {
+            id: v4(),
             operation: SpecificationOperation.Split,
             featuresDetermined: true,
             baseFeatureId: splitBaseFeatureId,
             resultFeatures: [
               {
+                id: v4(),
                 featureId: calculatedFeatureId,
                 calculated: true,
               },
               {
+                id: v4(),
                 featureId: calculatedForBothFeatureId,
                 calculated: true,
               },
             ],
           },
           {
+            id: v4(),
             operation: SpecificationOperation.Stratification,
             featuresDetermined: true,
             againstFeatureId: stratificationAgainstFeatureId,
             baseFeatureId: stratificationBaseFeatureId,
             resultFeatures: [
               {
+                id: v4(),
                 featureId: nonCalculatedFeatureId,
                 calculated: false,
               },
               {
+                id: v4(),
                 featureId: calculatedForBothFeatureId,
                 calculated: true,
               },
