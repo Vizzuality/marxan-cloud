@@ -29,14 +29,16 @@ interface FeatureConfigBase {
   prop?: number;
 }
 
-export interface FeatureConfigStratification extends FeatureConfigBase {
+export interface FeatureConfigStratification
+  extends Omit<FeatureConfigBase, 'target' | 'fpf' | 'prop'> {
   operation: SpecificationOperation.Stratification;
   baseFeatureId: string;
   againstFeatureId: string;
   splitByProperty?: string;
 }
 
-export interface FeatureConfigSplit extends FeatureConfigBase {
+export interface FeatureConfigSplit
+  extends Omit<FeatureConfigBase, 'target' | 'fpf' | 'prop'> {
   operation: SpecificationOperation.Split;
   splitByProperty: string;
 }

@@ -30,10 +30,12 @@ export const getFixtures = () => {
     {
       id: v4(),
       calculated: true,
+      featureId: v4(),
     },
     {
       id: v4(),
       calculated: true,
+      featureId: v4(),
     },
   ];
 
@@ -41,10 +43,12 @@ export const getFixtures = () => {
     {
       id: v4(),
       calculated: true,
+      featureId: v4(),
     },
     {
       id: nonCalculatedFeature,
       calculated: false,
+      featureId: v4(),
     },
   ];
 
@@ -52,10 +56,12 @@ export const getFixtures = () => {
     {
       id: v4(),
       calculated: true,
+      featureId: v4(),
     },
     {
       id: v4(),
       calculated: true,
+      featureId: v4(),
     },
   ];
 
