@@ -181,23 +181,16 @@ export function useBestSolution(sid) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+  }).then((response) => {
+    return response.data;
   }));
 
-  // const { data } = query;
+  const { data } = query;
 
   return useMemo(() => {
-    const mockBestSolution = {
-      id: 'c5a7ac37-3a88-4a08-9f23-bb83f0e8af11',
-      runId: 9,
-      scoreValue: 999,
-      costValue: 900,
-      missingValues: 19,
-      planningUnits: 19,
-    };
-
     return {
       ...query,
-      data: mockBestSolution,
+      data: data?.data,
     };
-  }, [query]);
+  }, [query, data]);
 }

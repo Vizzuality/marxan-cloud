@@ -60,7 +60,7 @@ export function useGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
   const query = useInfiniteQuery(['gap-analysis', sId, JSON.stringify(options)], fetchFeatures, {
     placeholderData: placeholderDataRef.current,
     getNextPageParam: (lastPage) => {
-      const { data: { meta = {} } } = lastPage;
+      const { data: { meta } } = lastPage;
       const { page, totalPages } = meta;
 
       const nextPage = page + 1 > totalPages ? null : page + 1;
