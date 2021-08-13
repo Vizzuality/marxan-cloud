@@ -55,6 +55,7 @@ import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { ShapefileService } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.service';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -218,8 +219,11 @@ export class ProjectsController {
     FileInterceptor('shapefile', {
       ...uploadOptions,
       limits: {
-        // TODO: fix hardcoded value
-        fileSize: 100 * 1024e2,
+        fileSize: (() =>
+          AppConfig.get<number>(
+            'fileUploads.limits.shapefileMaxSize',
+            100 * 1024e2,
+          ))(),
       },
     }),
   )
