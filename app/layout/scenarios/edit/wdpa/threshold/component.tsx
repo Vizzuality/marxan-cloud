@@ -29,13 +29,11 @@ import Loading from 'components/loading';
 import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
 export interface WDPAThresholdCategories {
-  readOnly?: boolean;
   onSuccess: () => void;
   onBack: () => void;
 }
 
 export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
-  readOnly,
   onSuccess,
   onBack,
 }: WDPAThresholdCategories) => {
@@ -290,7 +288,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
               size="lg"
               type="submit"
               className="relative px-20"
-              disabled={submitting || readOnly}
+              disabled={submitting}
             >
               <span>Save</span>
 

@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { SpecificationApiEntity } from './specification.api.entity';
-import { SpecificationOperation } from '../domain';
+import { FeatureSubSet, SpecificationOperation } from '../domain';
 import { SpecificationFeatureApiEntity } from '@marxan-api/modules/specification/adapters/specification-feature.api.entity';
 
 @Entity(`specification_feature_configs`)
@@ -64,4 +64,18 @@ export class SpecificationFeatureConfigApiEntity {
     name: `features_determined`,
   })
   featuresDetermined!: boolean;
+
+  @Column({
+    name: `split_by_property`,
+    nullable: true,
+    type: `varchar`,
+  })
+  splitByProperty?: string | null;
+
+  @Column({
+    type: `jsonb`,
+    name: `select_sub_sets`,
+    nullable: true,
+  })
+  selectSubSets?: FeatureSubSet[] | null;
 }

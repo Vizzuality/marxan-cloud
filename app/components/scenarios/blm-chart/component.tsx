@@ -247,7 +247,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
           {/* Thumbnails */}
           <g>
             {pointsWithVisibleThumbnail.map(({
-              cost, boundaryLength, isBlm, thumbnail,
+              cost, boundaryLength, /* isBlm, */ thumbnail,
             }, index) => {
               const {
                 x,
@@ -272,9 +272,9 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                   >
                     <div
                       className={classnames({
-                        'w-full h-full border-2 rounded-2xl bg-white bg-contain': true,
-                        'border-gray-800': !isBlm,
-                        'border-primary-500': isBlm,
+                        'w-full h-full rounded-2xl bg-white bg-contain': true,
+                        // 'border-gray-800 border-2': !isBlm,
+                        // 'border-primary-500 border-2': isBlm,
                       })}
                       style={{ backgroundImage: `url(${thumbnail})` }}
                     />

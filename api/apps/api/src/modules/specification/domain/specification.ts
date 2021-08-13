@@ -15,6 +15,7 @@ export class Specification extends AggregateRoot {
   private constructor(
     public readonly id: string,
     public readonly scenarioId: string,
+    public readonly raw: Record<string, unknown>,
     private configuration: FeatureConfig[] = [],
     private draft: boolean,
   ) {
@@ -25,6 +26,7 @@ export class Specification extends AggregateRoot {
     return new Specification(
       snapshot.id,
       snapshot.scenarioId,
+      snapshot.raw,
       snapshot.config,
       snapshot.draft,
     );
@@ -34,10 +36,12 @@ export class Specification extends AggregateRoot {
     forScenario: string,
     input: FeatureConfigInput[],
     draft: boolean,
+    raw: Record<string, unknown>,
   ): Specification {
     const specification = new Specification(
       v4(),
       forScenario,
+      raw,
       input.map((input) => ({
         ...input,
         featuresDetermined: false,
@@ -59,6 +63,7 @@ export class Specification extends AggregateRoot {
       id: this.id,
       scenarioId: this.scenarioId,
       draft: this.draft,
+      raw: this.raw,
       readyToActivate:
         this.allFeaturesDetermined() && this.allFeaturesCalculated(),
       config: this.configuration,

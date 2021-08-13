@@ -50,8 +50,12 @@ export class ResultParserService {
             shortfall: +shortfall,
             missingValues: +missingValues,
             mpm: +mpm,
-            best: false,
-            mostDifferent: false,
+            // TODO set actual best solution
+            best: +runId === 1,
+            // distinctFive should always be set to `false` here: the five most
+            // different solutions are tagged as such via
+            // `MostDifferentService`.
+            distinctFive: false,
           });
           if (validateSync(entry).length > 0) {
             throw new Error(

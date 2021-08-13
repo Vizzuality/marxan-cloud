@@ -49,5 +49,5 @@ export class ResultRow {
   best!: boolean;
 
   @IsBoolean()
-  mostDifferent!: boolean;
+  distinctFive!: boolean;
 }

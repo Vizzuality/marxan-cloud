@@ -1,19 +1,15 @@
-import React, { useCallback, useState } from 'react';
-
-import { useDropzone } from 'react-dropzone';
+import React, { useCallback } from 'react';
 
 import { useRouter } from 'next/router';
 
-import cx from 'classnames';
 import { motion } from 'framer-motion';
 
-import { useDownloadCostSurface, useUploadCostSurface } from 'hooks/scenarios';
+import { useDownloadCostSurface } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
-import Loading from 'components/loading';
 
 import COST_LAND_IMG from 'images/info-buttons/img_cost_surface_marine.png';
 import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
@@ -21,25 +17,17 @@ import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ScenariosCostSurfaceProps {
-  readOnly?: boolean,
   onChangeSection: (s: string) => void;
 }
 
 export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
-  readOnly,
   onChangeSection,
 }: ScenariosCostSurfaceProps) => {
-  const [loading, setLoading] = useState(false);
   const { addToast } = useToasts();
   const { query } = useRouter();
   const { sid } = query;
 
   const downloadMutation = useDownloadCostSurface({});
-  const uploadMutation = useUploadCostSurface({
-    requestConfig: {
-      method: 'POST',
-    },
-  });
 
   const onDownload = useCallback(() => {
     downloadMutation.mutate({ id: `${sid}` }, {
@@ -60,71 +48,6 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
       },
     });
   }, [sid, downloadMutation, addToast]);
-
-  const onDropAccepted = async (acceptedFiles) => {
-    setLoading(true);
-    const f = acceptedFiles[0];
-    console.info(f);
-
-    const data = new FormData();
-    data.append('file', f);
-
-    uploadMutation.mutate({ id: `${sid}`, data }, {
-      onSuccess: ({ data: { data: g } }) => {
-        setLoading(false);
-
-        addToast('success-upload-shapefile', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Cost surface uploaded</p>
-          </>
-        ), {
-          level: 'success',
-        });
-
-        console.info('Cost surface uploaded', g);
-      },
-      onError: () => {
-        setLoading(false);
-        addToast('error-upload-shapefile', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Cost surface could not be uploaded</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  };
-
-  const onDropRejected = (rejectedFiles) => {
-    const r = rejectedFiles[0];
-    const { errors } = r;
-
-    addToast('drop-error', (
-      <>
-        <h2 className="font-medium">Error!</h2>
-        <ul className="text-sm">
-          {errors.map((e) => (
-            <li key={`${e.code}`}>{e.message}</li>
-          ))}
-        </ul>
-      </>
-    ), {
-      level: 'error',
-    });
-  };
-
-  const {
-    getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject,
-  } = useDropzone({
-    // accept: 'image/*',
-    multiple: false,
-    maxSize: 1000000,
-    onDropAccepted,
-    onDropRejected,
-  });
 
   return (
     <motion.div
@@ -186,48 +109,17 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
 
       <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden text-sm">
         <div className="pt-2">
-          <h4 className="mb-2">1. Download the current cost surface</h4>
+          <h4 className="mb-2">Download the current cost surface</h4>
           <Button
             theme="primary-alt"
             size="base"
             className="w-full"
             onClick={onDownload}
           >
-            Template
+            DOWNLOAD EQUAL AREA
           </Button>
         </div>
-        {!readOnly && (
-          <div className="pt-5">
-            <h4 className="mb-2">2. Upload your cost surface</h4>
-            <div
-              {...getRootProps()}
-              className={cx({
-                'dropzone px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
-                'bg-gray-500': isDragActive,
-                'border-green-800': isDragAccept,
-                'border-red-800': isDragReject,
-              })}
-            >
-              <input {...getInputProps()} />
 
-              <p className="text-sm text-gray-300">
-                Drag and drop your
-                {' '}
-                <b>polygon data file</b>
-                {' '}
-                or click here to upload
-              </p>
-
-              <Loading
-                visible={loading}
-                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-                iconClassName="w-5 h-5 text-primary-500"
-              />
-
-              <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 1 MB'}</p>
-            </div>
-          </div>
-        )}
       </div>
     </motion.div>
   );

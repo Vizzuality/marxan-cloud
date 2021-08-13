@@ -50,7 +50,7 @@ export class PlanningUnitsGeom {
   @Column({
     name: 'project_id',
     nullable: true,
-    type: 'uuid'
+    type: 'uuid',
   })
   projectId?: string | undefined | null;
 }

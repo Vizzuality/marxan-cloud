@@ -31,12 +31,14 @@ export const createWorld = async () => {
 
   return {
     GivenScenarioHasSolutionsReady: async () => {
-      // TODO implement again once all stuff is in place
       await marxanOutputRepo.save(
         marxanOutputRepo.create({
           scenarioId: scenario.data.id,
-          runId: null,
+          runId: 1,
           scoreValue: 4000,
+          costValue: 2000,
+          missingValues: 1,
+          planningUnits: 123,
         }),
       );
     },

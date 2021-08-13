@@ -55,6 +55,7 @@ export interface UsePUGridLayer {
   sid?: string;
   active?: boolean;
   type: ScenarioSidebarTabs;
+  runId?: number;
   subtype: ScenarioSidebarSubTabs;
   options?: {
     wdpaIucnCategories?: string[];

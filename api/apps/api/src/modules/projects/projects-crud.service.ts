@@ -191,7 +191,7 @@ export class ProjectsCrudService extends AppBaseService<
     /**
      * @deprecated Workers and jobs should be move to the new functionality
      */
-    
+
     if (
       createModel.planningUnitAreakm2 &&
       createModel.planningUnitGridShape &&

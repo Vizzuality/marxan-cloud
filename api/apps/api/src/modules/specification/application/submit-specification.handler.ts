@@ -18,7 +18,12 @@ export class SubmitSpecificationHandler
 
   async execute({ payload }: SubmitSpecification): Promise<string> {
     const specification = this.eventPublisher.mergeObjectContext(
-      Specification.new(payload.scenarioId, payload.features, payload.draft),
+      Specification.new(
+        payload.scenarioId,
+        payload.features,
+        payload.draft,
+        payload.raw,
+      ),
     );
 
     await this.specificationRepository.save(specification);

@@ -40,9 +40,7 @@ import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from './planning-units/scenario-planning-units-protection-status-calculator-service';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
-import { CommandBus } from '@nestjs/cqrs';
-import { SubmitSpecification } from '@marxan-api/modules/specification';
-import { GeoFeatureDtoMapper } from './geo-features/geo-feature-dto.mapper';
+import { SpecificationService } from './specification';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -72,8 +70,7 @@ export class ScenariosService {
     private readonly planningUnitsService: ScenarioPlanningUnitsService,
     private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
     private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,
-    private readonly commandBus: CommandBus,
-    private readonly geoFeatureConfigMapper: GeoFeatureDtoMapper,
+    private readonly specificationService: SpecificationService,
   ) {}
 
   async findAllPaginated(
@@ -117,13 +114,11 @@ export class ScenariosService {
 
   async getFeatures(scenarioId: string) {
     await this.assertScenario(scenarioId);
-    return (
-      await this.scenarioFeatures.findAll(undefined, {
-        params: {
-          scenarioId,
-        },
-      })
-    )[0];
+    return await this.scenarioFeatures.findAllPaginated(undefined, {
+      params: {
+        scenarioId,
+      },
+    });
   }
 
   async getInputParameterFile(scenarioId: string): Promise<string> {
@@ -228,10 +223,11 @@ export class ScenariosService {
   async getOneSolution(
     scenarioId: string,
     runId: string,
-    fetchSpecification: FetchSpecification,
+    _fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
-    // TODO correct implementation
+    // TODO permissions guard
+    // TODO runId is part of scenarioId
     return this.solutionsCrudService.getById(runId);
   }
 
@@ -240,9 +236,13 @@ export class ScenariosService {
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
-    // TODO correct implementation
-    fetchSpecification.filter = { ...fetchSpecification.filter, best: true };
-    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+    // TODO permissions guard
+    return await this.solutionsCrudService
+      .findAll({
+        ...fetchSpecification,
+        filter: { ...fetchSpecification.filter, best: true, scenarioId },
+      })
+      .then((results) => results[0]);
   }
 
   async getMostDifferentSolutions(
@@ -250,17 +250,11 @@ export class ScenariosService {
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
-    // TODO correct implementation
-    fetchSpecification.filter = {
-      ...fetchSpecification.filter,
-      distinctFive: true,
-    };
-    // TODO remove the following two lines once implementation is in place.
-    // The artificial limiting of response elements is only to serve (up to) the
-    // expected number of elements to frontend in the meanwhile.
-    fetchSpecification.pageSize = 5;
-    fetchSpecification.pageNumber = 1;
-    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+    // TODO permissions guard
+    return this.solutionsCrudService.findAll({
+      ...fetchSpecification,
+      filter: { ...fetchSpecification.filter, distinctFive: true, scenarioId },
+    });
   }
 
   async findAllSolutionsPaginated(
@@ -268,8 +262,10 @@ export class ScenariosService {
     fetchSpecification: FetchSpecification,
   ) {
     await this.assertScenario(scenarioId);
-    // TODO correct implementation
-    return this.solutionsCrudService.findAllPaginated(fetchSpecification);
+    return this.solutionsCrudService.findAllPaginated({
+      ...fetchSpecification,
+      filter: { ...fetchSpecification.filter, scenarioId },
+    });
   }
 
   /**
@@ -344,15 +340,11 @@ export class ScenariosService {
   }
 
   async createSpecification(scenarioId: string, dto: CreateGeoFeatureSetDTO) {
-    await this.assertScenario(scenarioId);
-    await this.commandBus.execute(
-      new SubmitSpecification({
-        scenarioId,
-        draft: dto.status === SimpleJobStatus.draft,
-        features: dto.features.flatMap((feature) =>
-          this.geoFeatureConfigMapper.toFeatureConfig(feature),
-        ),
-      }),
+    const scenario = await this.assertScenario(scenarioId);
+    return await this.specificationService.submit(
+      scenarioId,
+      scenario.projectId,
+      dto,
     );
   }
 }

@@ -1,112 +1,38 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 
-import { useQueryClient } from 'react-query';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
 import { motion } from 'framer-motion';
-import { mergeScenarioStatusMetaData, SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
-import { useSelectedFeatures } from 'hooks/features';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useTargetedFeatures } from 'hooks/features';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import AddFeatures from 'layout/scenarios/show/features/add';
-import ListFeatures from 'layout/scenarios/show/features/list';
-import TargetFeatures from 'layout/scenarios/show/features/targets';
-import { ScenarioSidebarSubTabs } from 'layout/scenarios/show/sidebar/types';
+import FeaturesAdded from 'layout/scenarios/show/features/added';
 
-import Button from 'components/button';
-import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
-import Modal from 'components/modal';
-import Steps from 'components/steps';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
 import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
 import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
 
-import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
-import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
-
 export interface ScenariosSidebarShowFeaturesProps {
-  readOnly?: boolean,
+
 }
 
-export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeaturesProps> = ({
-  readOnly,
-}: ScenariosSidebarShowFeaturesProps) => {
-  const [step, setStep] = useState(0);
-  const [modal, setModal] = useState(false);
-  const { query, push } = useRouter();
-  const { pid, sid } = query;
+export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeaturesProps> = () => {
+  const { query } = useRouter();
+  const { sid } = query;
 
-  const queryClient = useQueryClient();
-
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setSubTab } = scenarioSlice.actions;
-
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-  const dispatch = useDispatch();
-
-  const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
-  const {
-    subtab: metaSubtab,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const {
-    data: selectedFeaturesData,
-  } = useSelectedFeatures(sid, {});
+    data: targetedFeaturesData,
+  } = useTargetedFeatures(sid);
 
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
-
-  const saveScenarioStatus = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'analysis', subtab: 'analysis-preview' }),
-      },
-    }, {
-      onSuccess: () => {
-        push(`/projects/${pid}`);
-      },
-    });
-  }, [saveScenarioMutation, sid, pid, push, metadata]);
-
-  const saveScenarioStatusOnContinue = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-fpf' }),
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata]);
-
-  const saveScenarioFeaturesStatusOnBack = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata]);
-
-  useEffect(() => {
-    const reloadStep = metaSubtab === 'features-preview' ? 0 : 1;
-    setStep(reloadStep);
-  }, [metaSubtab]);
-
-  if (!scenarioData || tab !== 'features') return null;
+  if (!targetedFeaturesData || tab !== 'features') return null;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
@@ -155,8 +81,13 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
             <header className="flex items-start justify-between flex-shrink-0">
               <div>
                 <div className="flex items-baseline space-x-4">
-                  <h2 className="text-lg font-medium font-heading">Features</h2>
-                  <Steps step={step + 1} length={2} />
+                  <h2 className="text-lg font-medium font-heading">
+                    Features Added:
+                    {' '}
+                    <span className="ml-1 text-gray-400">
+                      {targetedFeaturesData.length}
+                    </span>
+                  </h2>
                   <InfoButton>
                     <div>
                       <h4 className="font-heading text-lg mb-2.5">What are features?</h4>
@@ -174,125 +105,12 @@ export const ScenariosSidebarShowFeatures: React.FC<ScenariosSidebarShowFeatures
                   </InfoButton>
                 </div>
 
-                <div className="flex items-center mt-2 space-x-2">
-
-                  {step === 0 && (
-                  <>
-                    <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
-                    <div className="text-xs uppercase font-heading">
-                      Features added:
-                      {' '}
-                      {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
-                    </div>
-                  </>
-                  )}
-
-                  {step === 1 && (
-                  <div className="text-xs uppercase font-heading">
-                    Set the target and FPF for your features.
-
-                  </div>
-
-                  )}
-                  {step === 1 && (
-                  <>
-                    <InfoButton>
-                      <div>
-                        <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
-                        <div className="space-y-2">
-                          <p>
-                            This value represents how much you want to conserve of a particular
-                            feature. In an ideal conservation, land or sea use plan,
-                            all your features meet their targets.
-                          </p>
-                          <p>
-                            You can set a default
-                            value for all of your features
-                            or you can set individual the targets separately for each feature.
-                            You can set your targets to 100% if you want the whole extent of
-                            your feature to be included in the solution.
-                          </p>
-                        </div>
-                      </div>
-                    </InfoButton>
-                    <InfoButton>
-                      <div>
-                        <h4 className="font-heading text-lg mb-2.5">What is the FPF?</h4>
-                        <div className="space-y-2">
-                          <p>
-                            FPF stands for
-                            {' '}
-                            <b>Feature Penalty Factor</b>
-                            .
-                            A higher FPF value forces the Marxan algorithm
-                            to choose the planning units where this feature
-                            is present by applying a penalty if the target
-                            is missed, thereby increasing
-                            the cost of the solution. It comes into play when
-                            some of your targets fail to be met.
-                          </p>
-                          <p>
-                            In a typical
-                            workflow you start out with all FPF values set at
-                            1 and after checking the results, increase the FPF
-                            values for the particular features where targets have
-                            been missed.
-                          </p>
-                        </div>
-                      </div>
-                    </InfoButton>
-                  </>
-                  )}
-
-                </div>
               </div>
 
-              {step === 0 && !readOnly && (
-                <Button
-                  theme="primary"
-                  size="base"
-                  onClick={() => setModal(true)}
-                >
-                  <span className="mr-3">Add features</span>
-                  <Icon icon={PLUS_SVG} className="w-4 h-4" />
-                </Button>
-              )}
             </header>
 
-            <Modal
-              title="All features"
-              open={modal}
-              size="narrow"
-              onDismiss={() => {
-                setModal(false);
-                queryClient.removeQueries(['all-features', pid]);
-              }}
-            >
-              <AddFeatures />
-            </Modal>
+            <FeaturesAdded />
 
-            {step === 0 && (
-              <ListFeatures
-                onSuccess={() => {
-                  setStep(step + 1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_FPF));
-                  saveScenarioStatusOnContinue();
-                }}
-                readOnly={readOnly}
-              />
-            )}
-
-            {step === 1 && (
-              <TargetFeatures
-                onBack={() => {
-                  setStep(step - 1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
-                  saveScenarioFeaturesStatusOnBack();
-                }}
-                readOnly={readOnly}
-                onSuccess={saveScenarioStatus}
-              />
-            )}
           </Pill>
         </motion.div>
       </HelpBeacon>

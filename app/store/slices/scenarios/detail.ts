@@ -3,11 +3,13 @@ import { injectReducer } from 'store';
 
 interface ScenarioShowStateProps {
   tab: string,
+  subtab: string,
   selectedSolutionId: string;
 }
 
 const initialState = {
-  tab: 'protected-areas',
+  tab: 'solutions',
+  subtab: null,
   selectedSolutionId: null,
 } as ScenarioShowStateProps;
 
@@ -18,6 +20,9 @@ export function getScenarioSlice(id) {
     reducers: {
       setTab: (state, action: PayloadAction<string>) => {
         state.tab = action.payload;
+      },
+      setSubTab: (state, action: PayloadAction<string>) => {
+        state.subtab = action.payload;
       },
       setSelectedSolution: (state, action: PayloadAction<string>) => {
         state.selectedSolutionId = action.payload;

@@ -25,13 +25,11 @@ import Loading from 'components/loading';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface WDPACategoriesProps {
-  readOnly?: boolean;
   onSuccess: () => void,
   onDismiss: () => void,
 }
 
 export const WDPACategories:React.FC<WDPACategoriesProps> = ({
-  readOnly,
   onSuccess,
   onDismiss,
 }: WDPACategoriesProps) => {
@@ -218,78 +216,76 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
             <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
               <div className="py-6">
                 {/* WDPA */}
-                {!readOnly && (
-                  <div>
-                    <FieldRFF
-                      name="wdpaIucnCategories"
-                    >
-                      {(flprops) => (
-                        <Field id="scenario-wdpaIucnCategories" {...flprops}>
-                          <div className="flex items-center mb-3">
-                            <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
-                            <InfoButton>
-                              <span>
-                                <h4 className="font-heading text-lg mb-2.5">IUCN categrories</h4>
-                                <div className="space-y-2">
-                                  <p>
-                                    You can select to include protected areas
-                                    from any or all of the
-                                    IUCN categories that exist in your planning area:
-                                  </p>
 
-                                  <ul className="pl-6 space-y-1 list-disc">
-                                    <li>Ia: Strict Nature Reserve.</li>
-                                    <li>Ib: Wilderness Area.</li>
-                                    <li>II: National Park.</li>
-                                    <li>III: Natural Monument or Feature.</li>
-                                    <li>IV: Habitat/Species Management Area.</li>
-                                    <li>V: Protected Landscape/Seascape.</li>
+                <div>
+                  <FieldRFF
+                    name="wdpaIucnCategories"
+                  >
+                    {(flprops) => (
+                      <Field id="scenario-wdpaIucnCategories" {...flprops}>
+                        <div className="flex items-center mb-3">
+                          <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
+                          <InfoButton>
+                            <span>
+                              <h4 className="font-heading text-lg mb-2.5">IUCN categrories</h4>
+                              <div className="space-y-2">
+                                <p>
+                                  You can select to include protected areas
+                                  from any or all of the
+                                  IUCN categories that exist in your planning area:
+                                </p>
+
+                                <ul className="pl-6 space-y-1 list-disc">
+                                  <li>Ia: Strict Nature Reserve.</li>
+                                  <li>Ib: Wilderness Area.</li>
+                                  <li>II: National Park.</li>
+                                  <li>III: Natural Monument or Feature.</li>
+                                  <li>IV: Habitat/Species Management Area.</li>
+                                  <li>V: Protected Landscape/Seascape.</li>
                                     <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
-                                  </ul>
-                                </div>
-                              </span>
-                            </InfoButton>
-                          </div>
+                                </ul>
+                              </div>
+                            </span>
+                          </InfoButton>
+                        </div>
 
-                          {WDPA_CATEGORIES_OPTIONS.length === 1 && (
-                            <Select
-                              theme="dark"
-                              size="base"
-                              placeholder="Select..."
-                              clearSelectionActive
-                              selected={values.wdpaIucnCategories.length
-                                ? values.wdpaIucnCategories[0]
-                                : null}
-                              options={WDPA_CATEGORIES_OPTIONS}
-                              onChange={(v) => {
-                                if (v) {
-                                  flprops.input.onChange([v]);
-                                } else {
-                                  flprops.input.onChange([]);
-                                }
-                              }}
-                            />
-                          )}
+                        {WDPA_CATEGORIES_OPTIONS.length === 1 && (
+                        <Select
+                          theme="dark"
+                          size="base"
+                          placeholder="Select..."
+                          clearSelectionActive
+                          selected={values.wdpaIucnCategories.length
+                            ? values.wdpaIucnCategories[0]
+                            : null}
+                          options={WDPA_CATEGORIES_OPTIONS}
+                          onChange={(v) => {
+                            if (v) {
+                              flprops.input.onChange([v]);
+                            } else {
+                              flprops.input.onChange([]);
+                            }
+                          }}
+                        />
+                        )}
 
-                          {WDPA_CATEGORIES_OPTIONS.length > 1 && (
-                            <Select
-                              theme="dark"
-                              size="base"
-                              multiple
-                              placeholder="Select..."
-                              clearSelectionActive={false}
-                              batchSelectionActive
-                              batchSelectionLabel="All protected areas"
-                              selected={values.wdpaIucnCategories}
-                              options={WDPA_CATEGORIES_OPTIONS}
-                              disabled={readOnly}
-                            />
-                          )}
-                        </Field>
-                      )}
-                    </FieldRFF>
-                  </div>
-                )}
+                        {WDPA_CATEGORIES_OPTIONS.length > 1 && (
+                        <Select
+                          theme="dark"
+                          size="base"
+                          multiple
+                          placeholder="Select..."
+                          clearSelectionActive={false}
+                          batchSelectionActive
+                          batchSelectionLabel="All protected areas"
+                          selected={values.wdpaIucnCategories}
+                          options={WDPA_CATEGORIES_OPTIONS}
+                        />
+                        )}
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
 
                 {!!values.wdpaIucnCategories.length && (
                   <div className="mt-10">
@@ -309,20 +305,20 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                             <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
                               {wdpa.label}
                             </span>
-                            {!readOnly && (
-                              <button
-                                type="button"
-                                className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
-                                onClick={() => {
-                                  form.mutators.removeWDPAFilter(
-                                    wdpa.value,
-                                    values.wdpaIucnCategories,
-                                  );
-                                }}
-                              >
-                                <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
-                              </button>
-                            )}
+
+                            <button
+                              type="button"
+                              className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
+                              onClick={() => {
+                                form.mutators.removeWDPAFilter(
+                                  wdpa.value,
+                                  values.wdpaIucnCategories,
+                                );
+                              }}
+                            >
+                              <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
+                            </button>
+
                           </div>
                         );
                       })}

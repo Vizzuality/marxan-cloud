@@ -40,6 +40,38 @@ import {
   CancelRunScenarioProps,
 } from './types';
 
+// SCENARIO STATUS
+export function useScenariosStatus(pId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios-status', pId], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${pId}/scenarios/status`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!pId,
+    placeholderData: {
+      data: {
+        scenarios: [],
+      },
+    },
+    refetchInterval: 5000,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const [session] = useSession();
   const { push } = useRouter();
@@ -88,6 +120,9 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     },
   });
 
+  const { data: statusData } = useScenariosStatus(pId);
+  const { scenarios: statusScenarios } = statusData;
+
   const { data } = query;
   const { pages } = data || {};
 
@@ -99,6 +134,8 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
         const {
           id, projectId, name, lastModifiedAt,
         } = d;
+
+        const status = statusScenarios.find((s) => s.id === id);
 
         const lastUpdateDistance = () => {
           return formatDistanceToNow(
@@ -113,6 +150,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
           lastUpdate: lastModifiedAt,
           lastUpdateDistance: lastUpdateDistance(),
           warnings: false,
+          jobs: status?.jobs || [],
           onEdit: () => {
             push(`/projects/${projectId}/scenarios/${id}/edit`);
           },
@@ -127,7 +165,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
       ...query,
       data: parsedData,
     };
-  }, [query, pages, push]);
+  }, [query, pages, push, statusScenarios]);
 }
 
 export function useScenario(id) {
@@ -143,38 +181,6 @@ export function useScenario(id) {
     return response.data;
   }), {
     enabled: !!id,
-  });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data?.data]);
-}
-
-// SCENARIO STATUS
-export function useScenariosStatus(pId) {
-  const [session] = useSession();
-
-  const query = useQuery(['scenarios-status', pId], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pId}/scenarios/status`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!pId,
-    placeholderData: {
-      data: {
-        scenarios: [],
-      },
-    },
-    refetchInterval: 5000,
   });
 
   const { data } = query;
@@ -371,6 +377,7 @@ export function useScenarioPU(sid) {
     enabled: !!sid,
     refetchOnMount: 'always',
     refetchOnWindowFocus: false,
+    placeholderData: [],
   });
 
   const { data } = query;
