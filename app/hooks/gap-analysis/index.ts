@@ -5,11 +5,12 @@ import {
 } from 'react-query';
 
 import flatten from 'lodash/flatten';
+
 import { useSession } from 'next-auth/client';
 
 import { ItemProps as RawItemProps } from 'components/gap-analysis/item/component';
 
-import PROJECTS from 'services/projects';
+import SCENARIOS from 'services/scenarios';
 
 import {
   UseFeaturesOptionsProps,
@@ -17,7 +18,7 @@ import {
 
 interface AllItemProps extends RawItemProps {}
 
-export function useGapAnalysis(projectId, options: UseFeaturesOptionsProps = {}) {
+export function useGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
   const placeholderDataRef = useRef({
     pages: [],
     pageParams: [],
@@ -38,9 +39,9 @@ export function useGapAnalysis(projectId, options: UseFeaturesOptionsProps = {})
       };
     }, {});
 
-  const fetchFeatures = ({ pageParam = 1 }) => PROJECTS.request({
+  const fetchFeatures = ({ pageParam = 1 }) => SCENARIOS.request({
     method: 'GET',
-    url: `/${projectId}/features`,
+    url: `/${sId}/features`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
@@ -56,10 +57,10 @@ export function useGapAnalysis(projectId, options: UseFeaturesOptionsProps = {})
     },
   });
 
-  const query = useInfiniteQuery(['gap-analysis', projectId, JSON.stringify(options)], fetchFeatures, {
+  const query = useInfiniteQuery(['gap-analysis', sId, JSON.stringify(options)], fetchFeatures, {
     placeholderData: placeholderDataRef.current,
     getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
+      const { data: { meta = {} } } = lastPage;
       const { page, totalPages } = meta;
 
       const nextPage = page + 1 > totalPages ? null : page + 1;
