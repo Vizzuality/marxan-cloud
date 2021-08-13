@@ -62,7 +62,7 @@ export const Item: React.FC<ItemProps> = ({
   progress,
   lastUpdateDistance,
   className,
-  jobs,
+  jobs = [],
   onEdit,
   onView,
   onDelete,

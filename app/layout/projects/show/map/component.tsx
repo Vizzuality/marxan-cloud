@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -7,23 +9,31 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/client';
 
-import { useAdminPreviewLayer, usePUGridLayer } from 'hooks/map';
+import { useAdminPreviewLayer, useLegend, usePUGridLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
+import { ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
 
-// Map
+import Select from 'components/forms/select';
 import Map from 'components/map';
-// Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import ZoomControl from 'components/map/controls/zoom';
+import Legend from 'components/map/legend';
+import LegendItem from 'components/map/legend/item';
+import LegendTypeBasic from 'components/map/legend/types/basic';
+import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
+import LegendTypeGradient from 'components/map/legend/types/gradient';
+import LegendTypeMatrix from 'components/map/legend/types/matrix';
 
 export interface ProjectMapProps {
 }
 
 export const ProjectMap: React.FC<ProjectMapProps> = () => {
+  const [open, setOpen] = useState(false);
+  const [selectedSid, setSelectedSid] = useState(null);
   const [session] = useSession();
 
   const minZoom = 2;
@@ -47,10 +57,16 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     },
   });
 
+  const sid = useMemo(() => {
+    if (selectedSid) return selectedSid;
+
+    return rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? `${rawScenariosData[0].id}` : null;
+  }, [selectedSid, rawScenariosData, rawScenariosIsFetched]);
+
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length,
-    sid: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? `${rawScenariosData[0].id}` : null,
-    type: null,
+    sid,
+    type: selectedSid ? ScenarioSidebarTabs.SOLUTIONS : null,
     subtype: null,
     options: {
     },
@@ -66,6 +82,27 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   });
 
   const LAYERS = [PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
+
+  const LEGEND = useLegend({
+    type: selectedSid ? ScenarioSidebarTabs.SOLUTIONS : null,
+    subtype: null,
+    options: {},
+  });
+
+  const SCENARIOS_RUNNED = useMemo(() => {
+    return rawScenariosData
+      .map((s) => {
+        if (s.jobs.find((j) => j.kind === 'run' && j.status === 'done')) {
+          return {
+            label: s.name,
+            value: s.id,
+          };
+        }
+
+        return null;
+      })
+      .filter((s) => !!s);
+  }, [rawScenariosData]);
 
   useEffect(() => {
     setBounds({
@@ -186,6 +223,48 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
               onFitBoundsChange={handleFitBoundsChange}
             />
           </Controls>
+
+          {/* Legend */}
+          <div className="absolute w-full max-w-xs bottom-10 right-2">
+            <Legend
+              open={open}
+              className="w-full"
+              maxHeight={300}
+              onChangeOpen={() => setOpen(!open)}
+            >
+              {LEGEND.map((i) => {
+                const { type, items, intersections } = i;
+
+                return (
+                  <LegendItem
+                    sortable={false}
+                    key={i.id}
+                    {...i}
+                  >
+                    {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
+                    {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
+                    {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
+                    {type === 'gradient' && <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />}
+                  </LegendItem>
+                );
+              })}
+            </Legend>
+          </div>
+
+          {!!SCENARIOS_RUNNED.length && (
+            <div className="absolute w-full max-w-xs top-10 left-2">
+              <Select
+                theme="dark"
+                size="base"
+                placeholder="Select scenario..."
+                clearSelectionActive
+                options={SCENARIOS_RUNNED}
+                onChange={(s) => {
+                  setSelectedSid(s);
+                }}
+              />
+            </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

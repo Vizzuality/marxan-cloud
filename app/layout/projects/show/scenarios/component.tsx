@@ -5,15 +5,15 @@ import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import cx from 'classnames';
+import { AnimatePresence, motion } from 'framer-motion';
+
 import { useProject } from 'hooks/projects';
 import {
-  useDeleteScenario, useScenarios, useDuplicateScenario, useScenariosStatus,
+  useDeleteScenario, useScenarios, useDuplicateScenario,
 } from 'hooks/scenarios';
 import useBottomScrollListener from 'hooks/scroll';
 import { useToasts } from 'hooks/toast';
-
-import cx from 'classnames';
-import { AnimatePresence, motion } from 'framer-motion';
 
 import HelpBeacon from 'layout/help/beacon';
 import ScenarioSettings from 'layout/projects/show/scenarios/settings';
@@ -73,10 +73,6 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     },
     sort,
   });
-
-  const {
-    data: scenariosStatusData,
-  } = useScenariosStatus(pid);
 
   const scrollRef = useBottomScrollListener(
     () => {
@@ -226,12 +222,8 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-black via-black" />
               <div ref={scrollRef} className="relative z-0 flex flex-col flex-grow h-full py-6 overflow-x-hidden overflow-y-auto">
                 {!!allScenariosData.length
-                && scenariosStatusData
                 && allScenariosData.map((s, i) => {
                   const TAG = i === 0 ? HelpBeacon : Fragment;
-
-                  const { scenarios } = scenariosStatusData;
-                  const status = scenarios.find((st) => st.id === s.id);
 
                   return (
                     <TAG
@@ -258,7 +250,6 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                         <ScenarioItem
                           {...s}
                           status="draft"
-                          jobs={status?.jobs || []}
                           onDelete={() => {
                             setDelete(s);
                           }}
