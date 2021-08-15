@@ -31,12 +31,12 @@ export class ScenarioProtectedAreaCalculationProcessor
     this.logger.debug(wdpaList)
     const queryBuilder = this.scenarioPlanningUnitsRepo.query(
       `
-      with pa as (select ST_MemUnion(the_geom) as the_geom from wdpa where id IN ($2)),
+      with pa as (select ST_MemUnion(the_geom) as the_geom from wdpa where id IN ($2::uuid)),
       pu as (
       select spd.id, pug.the_geom, pug.area as pu_area
       from scenarios_pu_data spd
       inner join planning_units_geom pug on spd.pu_geom_id = pug.id
-      where scenario_id=$1),
+      where scenario_id=$1::uuid),
       pu_pa as (select pu.id, st_area(st_transform(st_intersection(pu.the_geom, pa.the_geom), 3410)) as pa_pu_area, 
                                        pu_area
                 from pu
