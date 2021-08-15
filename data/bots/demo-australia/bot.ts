@@ -136,17 +136,7 @@ const scenarioTook = Process.hrtime(scenarioStart);
 console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
 
 console.log(scenario);
-const featureList = [
-       "demo_ecoregions_new_class_split",
-       "demo_buteogallus_urubitinga",
-       "demo_caluromys_philander",
-       "demo_chiroxiphia_caudata",
-       "demo_leopardus_pardalis",
-       "demo_megarynchus_pitangua",
-       "demo_phyllodytes_tuberculosus",
-       "demo_tapirus_terrestris",
-       "demo_thalurania_glaucopis",
-]
+
 const features = await botClient
   .get(`/projects/${project.data.id}/features?q=demo_`)
   .then((result) => result.data)
