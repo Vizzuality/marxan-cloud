@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := seed-data
 
 
-seed-data: seed-gadm seed-wdpa seed-ecosystems seed-demo-features-species seed-demo-features-bioregion
+seed-data: seed-gadm seed-wdpa seed-demo-features-species seed-demo-features-bioregion
 
 seed-gadm:
 	@echo "Starting seeding gadm data... "
