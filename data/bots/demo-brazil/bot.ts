@@ -130,7 +130,7 @@ await botClient
 
 console.log(scenario);
 
-await sleep(5)
+await sleep(20)
 
 await botClient
   .patch(`/scenarios/${scenario!.data!.id}`, {
@@ -141,16 +141,15 @@ await botClient
 
 const scenarioTook = Process.hrtime(scenarioStart);
 console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
-await botClient
-  .patch(`/scenarios/${scenario!.data!.id}`, {
-    wdpaIucnCategories: paCategories!.data.map((i: {id:string, type:string, attributes:object}): string => i.id),
-  }).then().catch((e) => {
+
+const scenarioPaSettedUp = await botClient
+  .get(`/scenarios/${scenario!.data!.id}`).then((result) =>  console.log(result)).catch((e) => {
     console.log(e);
   });
 
 await sleep(5)
 
-// Setup 
+// Setup
 
 // const featureList = [
 //        "demo_ecoregions_new_class_split",
@@ -163,16 +162,16 @@ await sleep(5)
 //        "demo_tapirus_terrestris",
 //        "demo_thalurania_glaucopis",
 // ]
-const features = await botClient
-  .get(`/projects/${project.data.id}/features?q=demo`)
-  .then((result) => result.data)
-  .catch((e) => {
-    console.log(e);
-  });
+// const features = await botClient
+//   .get(`/projects/${project.data.id}/features?q=demo`)
+//   .then((result) => result.data)
+//   .catch((e) => {
+//     console.log(e);
+//   });
 
-console.log(features);
+// console.log(features);
 
-const geoFeatureSpecStart = Process.hrtime();
+// const geoFeatureSpecStart = Process.hrtime();
 
 // const featureRecipe = features!.data.map( (x) => { return {
 //     kind: "plain",
