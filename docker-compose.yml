@@ -80,6 +80,7 @@ services:
     build:
       context: ./postgresql
       dockerfile: Dockerfile
+      shm_size: 1gb
     container_name: marxan-postgresql-api
     ports:
       - "${POSTGRES_API_SERVICE_PORT}:5432"
