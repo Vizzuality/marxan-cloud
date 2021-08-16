@@ -151,14 +151,15 @@ await botClient
 const scenarioTook = Process.hrtime(scenarioStart);
 console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
 
-const scenarioPaSettedUp = await botClient
-  .get(`/scenarios/${scenario!.data!.id}`).then((result) =>  console.log(result)).catch((e) => {
+await botClient.get(`/scenarios/${scenario!.data!.id}`)
+    .then((result) =>  console.log(result.data))
+    .catch((e) => {
     console.log(e);
   });
 
 await sleep(5)
 
-// Setup
+// Setup features in the project
 
 // const featureList = [
 //        "demo_ecoregions_new_class_split",
