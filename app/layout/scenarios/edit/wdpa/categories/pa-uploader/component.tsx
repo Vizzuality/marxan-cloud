@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useDropzone } from 'react-dropzone';
 import { useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
 
 import {
   setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
@@ -11,6 +13,7 @@ import cx from 'classnames';
 import { motion } from 'framer-motion';
 
 import { useUploadProjectPA } from 'hooks/projects';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
@@ -32,6 +35,8 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   resetProtectedArea,
   form,
 }: ProtectedAreaUploaderProps) => {
+  const { query } = useRouter();
+  const { sid } = query;
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
@@ -40,9 +45,19 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
   const dispatch = useDispatch();
 
+  const {
+    data: scenarioData,
+  } = useScenario(sid);
+
   const uploadProjectPAMutation = useUploadProjectPA({
     requestConfig: {
       method: 'POST',
+    },
+  });
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
     },
   });
 
@@ -54,6 +69,16 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const updateCustomProtectedAreasIds = useCallback((PAid) => {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        ...scenarioData,
+        customProtectedAreaIds: scenarioData.customProtectedAreaIds.push(PAid),
+      },
+    });
+  }, [saveScenarioMutation, sid, scenarioData]);
 
   const onDropAccepted = async (acceptedFiles) => {
     setLoading(true);
@@ -90,7 +115,8 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         dispatch(setMinPuAreaSize(mockMinPuAreaSize));
         dispatch(setMaxPuAreaSize(mockMaxPuAreaSize));
 
-        console.info('Protected area uploaded', g);
+        updateCustomProtectedAreasIds(PAid);
+        console.info('Protected area uploaded', g, PAid);
       },
       onError: () => {
         setLoading(false);

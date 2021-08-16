@@ -11,7 +11,7 @@ export interface ProjectScenariosSettingsProps {
 
 export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> = ({
   sid,
-}:ProjectScenariosSettingsProps) => {
+}: ProjectScenariosSettingsProps) => {
   const {
     data: scenarioData,
     isFetching: scenarioIsFetching,
