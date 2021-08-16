@@ -2,14 +2,14 @@ import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
+import omit from 'lodash/omit';
+
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { useToasts } from 'hooks/toast';
-
-import omit from 'lodash/omit';
 import { signIn } from 'next-auth/client';
-import AUTHENTICATION from 'services/authentication';
+
+import { useToasts } from 'hooks/toast';
 
 import Wrapper from 'layout/wrapper';
 
@@ -21,6 +21,8 @@ import {
   composeValidators,
 } from 'components/forms/validations';
 import Loading from 'components/loading';
+
+import AUTHENTICATION from 'services/authentication';
 
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
@@ -70,7 +72,7 @@ export const SignIn: React.FC<SignInProps> = () => {
         {(props) => (
           <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex items-center justify-center h-full">
             <div className="w-full max-w-xs">
-              <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Get in Marxan!</h2>
+              <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Start planning!</h2>
 
               <Loading
                 visible={submitting}

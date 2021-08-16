@@ -24,7 +24,7 @@ const SignInPage: React.FC = () => {
       <MetaTags
         name="Marxan conservation Solutions"
         title="Sign in"
-        description="Get in Marxan!"
+        description="Start planning!"
         url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
         type="article"
         twitterCard="summary"
