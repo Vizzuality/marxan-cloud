@@ -18,7 +18,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
   search,
 }: ScenariosFeaturesAddListProps) => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { sid } = query;
 
   const {
     data: allFeaturesData,
@@ -27,7 +27,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
     isFetching: allFeaturesIsFetching,
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
-  } = useGapAnalysis(pid, {
+  } = useGapAnalysis(sid, {
     search,
   });
 
@@ -83,7 +83,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-gray-700 via-gray-700 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
 
       <div
         className={cx({
