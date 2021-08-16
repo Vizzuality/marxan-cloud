@@ -23,7 +23,7 @@ const SCENARIO_STATES = {
     styles: 'text-red-500',
   },
   'run-done': {
-    text: 'Runned Scenario',
+    text: 'Run Scenario',
     styles: 'text-green-500',
   },
   'pu-running': {

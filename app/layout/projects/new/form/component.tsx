@@ -148,7 +148,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                     planning region and grid
                     from scratch following some
                     simple steps or you can upload
-                    your own files.
+                    your own file.
                   </p>
                 </div>
               )}

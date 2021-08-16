@@ -1,12 +1,11 @@
 import React from 'react';
 
-import Wrapper from 'layout/wrapper';
-
 import { useRouter } from 'next/router';
 
-import Title from 'layout/projects/show/header/title';
 import Contributors from 'layout/projects/show/header/contributors';
+import Title from 'layout/projects/show/header/title';
 import Toolbar from 'layout/projects/show/header/toolbar';
+import Wrapper from 'layout/wrapper';
 
 import Breadcrumb from 'components/breadcrumb';
 
@@ -30,7 +29,7 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
       <div className="flex justify-between mt-5">
         <Title />
 
-        <div className="flex flex-col items-end space-y-6">
+        <div className="flex flex-col items-end flex-shrink-0 space-y-6">
           <Contributors />
           <Toolbar />
         </div>
