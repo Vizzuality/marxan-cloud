@@ -56,7 +56,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
   const { scenarioEditingMetadata } = metadata || {};
   const {
     subtab: metaSubtab,
-  } = scenarioEditingMetadata;
+  } = scenarioEditingMetadata || {};
 
   const {
     data: selectedFeaturesData,

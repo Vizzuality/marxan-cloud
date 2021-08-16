@@ -122,18 +122,18 @@ export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> =
               <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
                 <div className="py-8 space-y-6">
 
-                  {!scenarioData.wdpaIucnCategories && (
+                  {!scenarioData?.wdpaIucnCategories && (
                   <div>
                     <p className="mb-3 text-sm text-gray-300">No protected areas has been selected.</p>
                   </div>
                   )}
-                  {scenarioData.wdpaIucnCategories && (
+                  {scenarioData?.wdpaIucnCategories && (
                   <>
                     <div>
                       <h3 className="text-xs uppercase">Selected protected areas:</h3>
                       <div className="flex flex-wrap mt-2.5">
                         {scenarioData && scenarioData?.wdpaIucnCategories
-                    && scenarioData.wdpaIucnCategories.map((w) => {
+                    && scenarioData?.wdpaIucnCategories.map((w) => {
                       const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
 
                       if (!wdpa) return null;

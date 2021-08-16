@@ -97,7 +97,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
                 projectId: `${pid}`,
                 projectName: `${projectData.name}`,
                 scenarioId: `${sid}`,
-                scenarioName: `${scenarioData.name}`,
+                scenarioName: `${scenarioData?.name}`,
               },
             });
           },

@@ -92,7 +92,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     setSubmitting(true);
 
     mutation.mutate({
-      id: scenarioData.id,
+      id: scenarioData?.id,
       data: {
         ...values,
         metadata: mergeScenarioStatusMetaData(metadata, { tab: 'protected-areas', subtab: 'protected-areas-percentage' }),
@@ -129,7 +129,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     setSubmitting(true);
 
     mutation.mutate({
-      id: scenarioData.id,
+      id: scenarioData?.id,
       data: {
         wdpaIucnCategories: null,
         metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
