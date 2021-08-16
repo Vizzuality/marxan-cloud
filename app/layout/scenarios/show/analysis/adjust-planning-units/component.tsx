@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
 
+import { COLORS } from 'hooks/map/constants';
 import { useScenarioPU } from 'hooks/scenarios';
 
 import Icon from 'components/icon';
@@ -13,11 +14,6 @@ import LOCK_IN_OUT_IMG from 'images/info-buttons/img_lockin_lock_out.png';
 
 import HEXAGON_SVG from 'svgs/map/hexagon.svg?sprite';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
-
-export const COLORS = {
-  include: '#0F0',
-  exclude: '#F00',
-};
 
 export interface ScenariosAdjustPanningUnitsShowProps {
   onChangeSection: (s: string) => void;
