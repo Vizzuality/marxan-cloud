@@ -51,6 +51,7 @@ export interface ItemProps {
   className?: string;
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onView: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onCancelRun?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDelete?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDuplicate?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   SettingsC?: ReactNode;
@@ -65,6 +66,7 @@ export const Item: React.FC<ItemProps> = ({
   jobs = [],
   onEdit,
   onView,
+  onCancelRun,
   onDelete,
   onDuplicate,
   SettingsC,
@@ -149,24 +151,39 @@ export const Item: React.FC<ItemProps> = ({
                 </div>
               </section>
 
-              <Button
-                className="flex-shrink-0"
-                size="s"
-                theme={settings ? 'white' : 'secondary'}
-                onClick={onSettings}
-              >
-                {settings && 'Close'}
-                {!settings && 'Settings'}
-              </Button>
+              {status !== 'run-running' && (
+                <>
+                  <Button
+                    className="flex-shrink-0"
+                    size="s"
+                    theme={settings ? 'white' : 'secondary'}
+                    onClick={onSettings}
+                  >
+                    {settings && 'Close'}
+                    {!settings && 'Settings'}
+                  </Button>
 
-              <Button
-                className="flex-shrink-0"
-                size="s"
-                theme="primary"
-                onClick={onEdit}
-              >
-                Edit
-              </Button>
+                  <Button
+                    className="flex-shrink-0"
+                    size="s"
+                    theme="primary"
+                    onClick={onEdit}
+                  >
+                    Edit
+                  </Button>
+                </>
+              )}
+
+              {status === 'run-running' && (
+                <Button
+                  className="flex-shrink-0"
+                  size="s"
+                  theme="danger-alt"
+                  onClick={onCancelRun}
+                >
+                  Cancel run
+                </Button>
+              )}
             </div>
           </div>
           {status.includes('running') && progress && <ProgressBar progress={progress} />}
