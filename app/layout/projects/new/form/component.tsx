@@ -6,16 +6,16 @@ import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { useMe } from 'hooks/me';
-import { useOrganizations } from 'hooks/organizations';
-import { useSaveProject } from 'hooks/projects';
-import { useToasts } from 'hooks/toast';
-
 import {
   setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingPlanningArea,
 } from 'store/slices/projects/new';
 
 import { usePlausible } from 'next-plausible';
+
+import { useMe } from 'hooks/me';
+import { useOrganizations } from 'hooks/organizations';
+import { useSaveProject } from 'hooks/projects';
+import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
 import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
@@ -148,7 +148,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                     planning region and grid
                     from scratch following some
                     simple steps or you can upload
-                    your own files.
+                    your own file.
                   </p>
                 </div>
               )}

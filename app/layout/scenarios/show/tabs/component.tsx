@@ -48,48 +48,38 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
       content={(
         <div className="space-y-2">
           <p>
-            This tab will show the steps needed to complete a
-            conservation plan using Marxan. The logical workflow
-            requires you to take some actions at each step
-            as follows:
+            This tab represents the steps needed to set up a
+            conservation plan using Marxan:
           </p>
 
           <ul className="pl-6 space-y-1 list-decimal">
             <li>
-              First you will
-              decide if you want to
-              include existing conservation areas in
+              Decide if you want to lock existing
               <b> Protected areas</b>
-              .
+              , or other conservation areas,
+              into your Marxan solution.
             </li>
             <li>
-              Then you will
-              add all the features you want to conserve
-              and decide how much to conserve of each
-              in
+              Add the
               {' '}
-              <b> Features</b>
-              .
+              <b>Features</b>
+              {' '}
+              you want to consider in your
+              Marxan analysis, and set targets for each one of them.
             </li>
             <li>
-              Next you will be able to see the current
-              conservation state of your features, add a cost
-              surface and decide
-              if there are any other areas that
-              you would like to exclude or
-              include in
+              Run a gap analysis, assign a cost surface,
+              or adjust planning units inside of your
               {' '}
               <b> Analysis</b>
               .
             </li>
             <li>
-              Finally, you will
-              run Marxan and view the results in
+              After running a Marxan analysis,
+              you can come back to the
               {' '}
               <b> Solutions</b>
-              .
-              You can then go back to the other tabs to make
-              modifications and run Marxan again
+              tab any time to view the results
             </li>
           </ul>
 
