@@ -75,7 +75,7 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
 
         return {
           id,
-          run: runId,
+          runId,
           score: scoreValue,
           cost: costValue,
           planningUnits,
@@ -144,7 +144,7 @@ export function useMostDifferentSolutions(sid) {
 
       return {
         id,
-        run: runId,
+        runId,
         score: scoreValue,
         cost: costValue,
         planningUnits,

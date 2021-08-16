@@ -63,7 +63,7 @@ export interface UsePUGridLayer {
     puAction?: string;
     puIncludedValue?: string[];
     puExcludedValue?: string[];
-    solution?: string;
+    runId?: string;
   };
 }
 
@@ -76,6 +76,6 @@ export interface UseLegend {
     puAction?: string;
     puIncludedValue?: string[];
     puExcludedValue?: string[];
-    solution?: string;
+    runId?: string;
   };
 }

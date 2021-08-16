@@ -64,7 +64,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const {
     tab,
     subtab,
-    selectedSolutionId,
+    selectedSolution,
   } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const minZoom = 2;
@@ -82,7 +82,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       wdpaThreshold,
       puIncludedValue: included,
       puExcludedValue: excluded,
-      solution: selectedSolutionId || bestSolution.id,
+      runId: selectedSolution?.runId || bestSolution?.runId,
     },
   });
 
@@ -96,7 +96,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       wdpaThreshold,
       puIncludedValue: included,
       puExcludedValue: excluded,
-      solution: selectedSolutionId || bestSolution.id,
+      runId: selectedSolution?.runId || bestSolution?.runId,
     },
   });
 

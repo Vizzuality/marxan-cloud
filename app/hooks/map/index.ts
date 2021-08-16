@@ -240,7 +240,7 @@ export function usePUGridPreviewLayer({
 
 // PUGrid
 export function usePUGridLayer({
-  active, sid, type, subtype, runId, options = {}, cache,
+  active, sid, type, subtype, options = {}, cache,
 }: UsePUGridLayer) {
   const include = useMemo(() => {
     if (type === 'protected-areas' || type === 'features') return 'protection';
@@ -259,7 +259,7 @@ export function usePUGridLayer({
       wdpaThreshold = 0,
       puIncludedValue,
       puExcludedValue,
-      solution,
+      runId,
     } = options;
 
     return {
@@ -424,26 +424,10 @@ export function usePUGridLayer({
               },
             },
           ] : [],
-          ...type === 'solutions' && !!solution ? [
-            {
-              type: 'line',
-              'source-layer': 'layer0',
-              filter: [
-                'all',
-                ['in', ['get', 'scenarioPuId'], ['literal', solution]],
-              ],
-              paint: {
-                'line-color': '#ff0000',
-                'line-opacity': 1,
-                'line-width': 1.5,
-                'line-offset': 0.75,
-              },
-            },
-          ] : [],
         ],
       },
     };
-  }, [cache, active, sid, type, subtype, runId, options, include]);
+  }, [cache, active, sid, type, subtype, options, include]);
 }
 
 // PUGrid

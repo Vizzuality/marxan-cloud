@@ -38,13 +38,13 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   const [frequencyOnMap, onToggleFrequencyOnMap] = useState<boolean>(false);
 
   getScenarioSlice(sid);
-  const { selectedSolutionId } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const {
     data: selectedSolutionData,
     isFetching: selectedSolutionisFetching,
     isFetched: selectedSolutionisFetched,
-  } = useSolution(sid, selectedSolutionId);
+  } = useSolution(sid, selectedSolution?.id);
 
   const {
     data: bestSolutionData,
@@ -52,10 +52,14 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
     isFetched: bestSolutionisFetched,
   } = useBestSolution(sid);
 
-  const isBestSolutionShown = selectedSolutionId === bestSolutionData?.id || !selectedSolutionId;
+  const isBestSolution = selectedSolution
+                         && bestSolutionData
+                         && selectedSolution?.id === bestSolutionData?.id;
 
-  const solutionIsLoading = bestSolutionisFetching && !bestSolutionisFetched
-    && selectedSolutionisFetching && !selectedSolutionisFetched;
+  const solutionIsLoading = (
+    bestSolutionisFetching && !bestSolutionisFetched)
+    || (selectedSolutionisFetching && !selectedSolutionisFetched
+    );
 
   const frequencyValues = [
     {
@@ -158,7 +162,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
             />
             {(selectedSolutionData || bestSolutionData) && (
               <SolutionSelected
-                best={isBestSolutionShown}
+                best={isBestSolution}
                 values={selectedSolutionData || bestSolutionData}
                 onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
                 selectedSolutionOnMap={selectedSolutionOnMap}
