@@ -30,12 +30,14 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
     <div className="w-full">
       <div className="flex justify-between">
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="relative w-3.5 h-4 bg-blue-700" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
-            <p className="pl-1 mr-4 text-sm text-white font-heading">
-              {`Run ${runId}`}
-            </p>
-          </div>
+          {runId && (
+            <div className="flex items-center space-x-2">
+              <div className="relative w-3.5 h-4 bg-blue-700" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+              <p className="pl-1 mr-4 text-sm text-white font-heading">
+                {`Run ${runId}`}
+              </p>
+            </div>
+          )}
           {best && (
             <div className="flex items-center">
               <p className="text-sm text-blue-400">Best solution</p>

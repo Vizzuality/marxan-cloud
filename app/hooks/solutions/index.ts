@@ -119,7 +119,7 @@ export function useSolution(sid, solutionId) {
 export function useMostDifferentSolutions(sid) {
   const [session] = useSession();
 
-  const query = useQuery(['solutions', sid], async () => SCENARIOS.request({
+  const query = useQuery(['scenarios', sid], async () => SCENARIOS.request({
     method: 'GET',
     url: `/${sid}/marxan/solutions/most-different`,
     headers: {
