@@ -82,13 +82,13 @@ export function useGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
       return pageData.map((d):AllItemProps => {
         const {
           id,
-          alias,
-          featureClassName,
+          name,
         } = d;
 
+        // TODO: use data from API
         return {
           id,
-          name: alias || featureClassName,
+          name,
           current: {
             percent: 0.5,
             value: 400,
