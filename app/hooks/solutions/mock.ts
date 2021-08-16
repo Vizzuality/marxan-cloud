@@ -3,7 +3,7 @@ import { Solution } from 'types/project-model';
 const ITEMS: Solution[] = [
   {
     id: '1',
-    run: 1,
+    runId: 1,
     score: 5,
     cost: 100,
     planningUnits: 10,
@@ -11,7 +11,7 @@ const ITEMS: Solution[] = [
   },
   {
     id: '2',
-    run: 2,
+    runId: 2,
     score: 10,
     cost: 10,
     planningUnits: 1,
@@ -19,7 +19,7 @@ const ITEMS: Solution[] = [
   },
   {
     id: '3',
-    run: 3,
+    runId: 3,
     score: 3,
     cost: 13,
     planningUnits: 3,

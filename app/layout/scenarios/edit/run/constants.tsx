@@ -695,35 +695,6 @@ export const FIELDS = [
     ],
   },
   {
-    id: 'MISSLEVEL',
-    label: 'Conservation Feature missing proportion',
-    description: (<p>Amount or target below which a Conservation Feature is counted as ‘missing’.This is the proportion of the target a conservation feature must reach in order for it to be reported as met. There are situations where Marxan can get extremely close to the target (e.g. 99% of the desired level) without actually meeting the target. You can specify a level for which you are pragmatically satisfied that the amount of representation is close enough to the target to report it as met. This value should always be high, i.e. greater than or equal to ‘0.95’. If you are setting it lower than ‘0.95’, you should probably think about changing your targets.</p>),
-    category: {
-      id: 'program-control',
-      label: 'Program control',
-    },
-    default: 1,
-    required: false,
-    advanced: true,
-    input: {
-      className: 'text-2xl',
-      min: 0,
-      max: 1000000,
-      type: 'number',
-      step: '1',
-    },
-    validations: [
-      {
-        presence: true,
-        numericality: {
-          onlyInteger: true,
-          greaterThanOrEqualTo: 0,
-          lessThanOrEqualTo: 1000000,
-        },
-      },
-    ],
-  },
-  {
     id: 'RUNMODE',
     label: 'Run option',
     description: (

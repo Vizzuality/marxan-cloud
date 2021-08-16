@@ -1,16 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { injectReducer } from 'store';
+import { Solution } from 'types/project-model';
 
 interface ScenarioShowStateProps {
   tab: string,
   subtab: string,
-  selectedSolutionId: string;
+  selectedSolution: Solution;
 }
 
 const initialState = {
   tab: 'solutions',
   subtab: null,
-  selectedSolutionId: null,
+  selectedSolution: null,
 } as ScenarioShowStateProps;
 
 export function getScenarioSlice(id) {
@@ -24,8 +25,8 @@ export function getScenarioSlice(id) {
       setSubTab: (state, action: PayloadAction<string>) => {
         state.subtab = action.payload;
       },
-      setSelectedSolution: (state, action: PayloadAction<string>) => {
-        state.selectedSolutionId = action.payload;
+      setSelectedSolution: (state, action: PayloadAction<Solution>) => {
+        state.selectedSolution = action.payload;
       },
     },
   });

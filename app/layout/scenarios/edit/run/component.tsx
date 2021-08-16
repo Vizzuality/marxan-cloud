@@ -8,7 +8,6 @@ import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 import { usePlausible } from 'next-plausible';
-import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useMe } from 'hooks/me';
 import { useProject } from 'hooks/projects';
@@ -44,7 +43,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
 
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata = SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } = metadata || {};
+  const { scenarioEditingMetadata } = metadata || {};
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {

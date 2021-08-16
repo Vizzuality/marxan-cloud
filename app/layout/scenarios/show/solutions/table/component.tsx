@@ -48,7 +48,7 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
     },
     {
       label: 'RUN',
-      id: 'run',
+      id: 'runId',
     },
     {
       label: 'Score',

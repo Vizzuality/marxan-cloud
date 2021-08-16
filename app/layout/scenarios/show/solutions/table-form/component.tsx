@@ -39,8 +39,10 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   } = useBestSolution(sid);
 
-  const { selectedSolutionId } = useSelector((state) => state[`/scenarios/${sid}`]);
-  const [selectedSolution, onSelectSolution] = useState(selectedSolutionId || bestSolutionData?.id);
+  const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const [selectSolution, setSelectSolution] = useState(
+    selectedSolution?.id || bestSolutionData?.id,
+  );
 
   const {
     data,
@@ -76,9 +78,9 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   );
 
   const onSave = useCallback(() => {
-    dispatch(setSelectedSolution(selectedSolution));
+    dispatch(setSelectedSolution(selectSolution));
     setShowTable(false);
-  }, [dispatch, selectedSolution, setSelectedSolution, setShowTable]);
+  }, [dispatch, selectSolution, setSelectedSolution, setShowTable]);
 
   return (
     <div className="text-gray-800">
@@ -215,8 +217,8 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           <SolutionsTable
             bestSolutionId={bestSolutionData?.id}
             body={mostDifSolutionsIsSelected ? mostDifSolutionsData : data}
-            selectedSolution={selectedSolution}
-            onSelectSolution={(solution) => onSelectSolution(solution.id)}
+            selectedSolution={selectSolution}
+            onSelectSolution={(solution) => setSelectSolution(solution)}
           />
         )}
         <LoadingMore visible={isFetchingNextPage} />
