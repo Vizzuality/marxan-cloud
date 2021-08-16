@@ -116,36 +116,25 @@ export function useSolution(sid, solutionId) {
   }, [query, data?.data]);
 }
 
-export function useMostDifferentSolutions(sid, options: UseSolutionsOptionsProps = {}) {
+export function useMostDifferentSolutions(sid) {
   const [session] = useSession();
 
-  const {
-    filters = {},
-  } = options;
-
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k],
-      };
-    }, {});
-
-  const query = useQuery(['scenarios', sid], async () => SCENARIOS.request({
+  const query = useQuery(['solutions', sid], async () => SCENARIOS.request({
     method: 'GET',
     url: `/${sid}/marxan/solutions/most-different`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
-    params: {
-      ...parsedFilters,
-    },
-  }));
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!sid,
+  });
 
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data.data.data) ? data.data.data.map((d) => {
+    const parsedData = Array.isArray(data.data) ? data.data.map((d) => {
       const {
         id,
         runId,
