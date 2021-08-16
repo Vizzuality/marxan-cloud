@@ -96,15 +96,13 @@ const scenarioStart = Process.hrtime();
 
 await sleep(5)
 
-// get the list of protected areas in the region and use all of them
-const paCategories = await botClient.get(`/protected-areas/iucn-categories?filter%5BcustomAreaId%5D=${planningAreaFile.id}`)
-          .then((result:{data:Array<{id:string, type:string, attributes:object}>}) => result.data)
+const paCategories:{data:Array<{id:string, type:string, attributes:object}>} = await botClient.get(`/protected-areas/iucn-categories?filter%5BcustomAreaId%5D=${planningAreaFile.id}`)
+          .then((result) =>  result.data)
           .catch((e) => {
             console.log(e);
           });
 
 console.log(paCategories);
-console.log(paCategories.map((i): string => i.id));
 
 
 const scenario = await botClient
@@ -113,14 +111,11 @@ const scenario = await botClient
     type: "marxan",
     projectId: project.data.id,
     description: "An Australia scenario",
-    wdpaIucnCategories: ["Not Applicable"],
-    wdpaThreshold: 50,
     metadata: {
       scenarioEditingMetadata: {
         status: {
           'protected-areas': 'draft',
           features: 'draft',
-          analysis: 'draft',
         },
         tab: 'analysis',
         subtab: 'analysis-preview',
@@ -131,14 +126,42 @@ const scenario = await botClient
   .catch((e) => {
     console.log(e);
   });
+  await sleep(5)
+// get the list of protected areas in the region and use all of them
+
+await botClient
+  .patch(`/scenarios/${scenario!.data!.id}`, {
+    wdpaIucnCategories: paCategories!.data.map((i: {id:string, type:string, attributes:object}): string => i.id),
+  }).catch((e) => {
+    console.log(e);
+  });
+
+console.log(scenario);
+
+await sleep(20)
+
+await botClient
+  .patch(`/scenarios/${scenario!.data!.id}`, {
+    wdpaThreshold: 50,
+  }).catch((e) => {
+    console.log(e);
+  });
 
 const scenarioTook = Process.hrtime(scenarioStart);
 console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
 
-console.log(scenario);
+await botClient.get(`/scenarios/${scenario!.data!.id}`)
+    .then((result) =>  console.log(result.data))
+    .catch((e) => {
+    console.log(e);
+  });
+
+await sleep(5)
+
+// Setup features in the project
 
 const features = await botClient
-  .get(`/projects/${project.data.id}/features?q=demo_`)
+  .get(`/projects/${project.data.id}/features?q=demo`)
   .then((result) => result.data)
   .catch((e) => {
     console.log(e);
@@ -148,28 +171,19 @@ console.log(features);
 
 const geoFeatureSpecStart = Process.hrtime();
 
-// const featureRecipe = features.forEach(element => element.id); { return {
-//     kind: "plain",
-//     featureId: x.id,
-//     marxanSettings: {
-//       prop: 0.3,
-//       fpf: 1,
-//     },
-//   }})
-//   console.log(featureRecipe);
+const featureRecipe = features!.data.map((x: {id:string, type:string, attributes:object}) => { return {
+    kind: "plain",
+    featureId: x.id,
+    marxanSettings: {
+      prop: 0.3,
+      fpf: 1,
+    },
+  }})
+console.log(featureRecipe);
 const geoFeatureSpec = await botClient
   .post(`/scenarios/${scenario.data.id}/features/specification`, {
-    status: "draft",
-    features: [
-      {
-        kind: "plain",
-        featureId: features.data[0].id,
-        marxanSettings: {
-          prop: 0.3,
-          fpf: 1,
-        },
-      },
-    ],
+    status: "created",
+    features: featureRecipe
   })
   .then((result) => result.data)
   .catch((e) => {
@@ -182,4 +196,4 @@ console.log(
   `Processing of features for scenario done in ${geoFeatureSpecTook[0]} seconds`
 );
 
-console.log(geoFeatureSpec);
+// console.log(geoFeatureSpec);
