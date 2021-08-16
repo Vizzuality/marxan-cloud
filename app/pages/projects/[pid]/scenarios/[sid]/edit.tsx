@@ -5,10 +5,9 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
+import { withScenario } from 'hoc/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
-import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useScenario } from 'hooks/scenarios';
 
@@ -25,7 +24,7 @@ import SidebarEditWDPA from 'layout/scenarios/edit/wdpa';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
 
-export const getServerSideProps = withProtection(withUser());
+export const getServerSideProps = withProtection(withUser(withScenario()));
 
 const EditScenarioPage: React.FC = () => {
   const { query } = useRouter();
@@ -36,7 +35,7 @@ const EditScenarioPage: React.FC = () => {
   const {
     tab: metaTab,
     subtab: metaSubtab,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
+  } = scenarioEditingMetadata || {};
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
@@ -44,7 +43,7 @@ const EditScenarioPage: React.FC = () => {
 
   useEffect(() => {
     if (metaTab) dispatch(setTab(metaTab));
-    if (metaTab) dispatch(setSubTab(metaSubtab));
+    if (metaSubtab) dispatch(setSubTab(metaSubtab));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [metaTab, metaSubtab]);
 

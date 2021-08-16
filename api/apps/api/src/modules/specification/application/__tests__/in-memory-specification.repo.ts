@@ -1,15 +1,21 @@
 import { SpecificationRepository } from '../specification.repository';
 import { FeatureConfigInput, Specification } from '../../domain';
 import { intersection } from 'lodash';
+import { v4 } from 'uuid';
 
 export class InMemorySpecificationRepo implements SpecificationRepository {
   #memory: Record<string, Specification> = {};
+
+  public readonly scenarioIdToCrashOnSave = v4();
 
   async getById(id: string): Promise<Specification | undefined> {
     return this.#memory[id];
   }
 
   async save(specification: Specification): Promise<void> {
+    if (specification.scenarioId === this.scenarioIdToCrashOnSave) {
+      throw new Error(`Database error`);
+    }
     this.#memory[specification.id] = specification;
   }
 
@@ -49,7 +55,7 @@ export class InMemorySpecificationRepo implements SpecificationRepository {
       .flatMap((spec) =>
         spec.toSnapshot().config.flatMap((config) => ({
           specId: spec.id,
-          features: config.resultFeatures.map((feature) => feature.id),
+          features: config.resultFeatures.map((feature) => feature.featureId),
         })),
       )
       .filter(

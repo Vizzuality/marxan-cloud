@@ -347,4 +347,12 @@ export class ScenariosService {
       dto,
     );
   }
+
+  async getLastUpdatedSpecification(scenarioId: string) {
+    const scenario = await this.assertScenario(scenarioId);
+    return await this.specificationService.getLastUpdatedFor(
+      scenarioId,
+      scenario.projectId,
+    );
+  }
 }

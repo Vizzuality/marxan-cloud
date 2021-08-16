@@ -75,7 +75,7 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
 
         return {
           id,
-          run: runId,
+          runId,
           score: scoreValue,
           cost: costValue,
           planningUnits,
@@ -94,7 +94,7 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
 export function useSolution(sid, solutionId) {
   const [session] = useSession();
 
-  const query = useQuery(['scenarios', sid, solutionId], async () => SCENARIOS.request({
+  const query = useQuery(['solution-id', sid, solutionId], async () => SCENARIOS.request({
     method: 'GET',
     url: `/${sid}/marxan/solutions/${solutionId}`,
     headers: {
@@ -116,36 +116,23 @@ export function useSolution(sid, solutionId) {
   }, [query, data?.data]);
 }
 
-export function useMostDifferentSolutions(sid, options: UseSolutionsOptionsProps = {}) {
+export function useMostDifferentSolutions(sid) {
   const [session] = useSession();
 
-  const {
-    filters = {},
-  } = options;
-
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k],
-      };
-    }, {});
-
-  const query = useQuery(['scenarios', sid], async () => SCENARIOS.request({
+  const query = useQuery(['solutions-different', sid], async () => SCENARIOS.request({
     method: 'GET',
     url: `/${sid}/marxan/solutions/most-different`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
-    params: {
-      ...parsedFilters,
-    },
+  }).then((response) => {
+    return response.data;
   }));
 
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data.data.data) ? data.data.data.map((d) => {
+    const parsedData = Array.isArray(data?.data) ? data.data.map((d) => {
       const {
         id,
         runId,
@@ -157,7 +144,7 @@ export function useMostDifferentSolutions(sid, options: UseSolutionsOptionsProps
 
       return {
         id,
-        run: runId,
+        runId,
         score: scoreValue,
         cost: costValue,
         planningUnits,
@@ -175,29 +162,22 @@ export function useMostDifferentSolutions(sid, options: UseSolutionsOptionsProps
 export function useBestSolution(sid) {
   const [session] = useSession();
 
-  const query = useQuery(['scenarios', sid], async () => SCENARIOS.request({
+  const query = useQuery(['solutions-best', sid], async () => SCENARIOS.request({
     method: 'GET',
     url: `/${sid}/marxan/solutions/best`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+  }).then((response) => {
+    return response.data;
   }));
 
-  // const { data } = query;
+  const { data } = query;
 
   return useMemo(() => {
-    const mockBestSolution = {
-      id: 'c5a7ac37-3a88-4a08-9f23-bb83f0e8af11',
-      runId: 9,
-      scoreValue: 999,
-      costValue: 900,
-      missingValues: 19,
-      planningUnits: 19,
-    };
-
     return {
       ...query,
-      data: mockBestSolution,
+      data: data?.data,
     };
-  }, [query]);
+  }, [query, data]);
 }

@@ -1,12 +1,7 @@
-import React, { useEffect } from 'react';
-
-import { useDispatch } from 'react-redux';
-
-import { useRouter } from 'next/router';
+import React from 'react';
 
 import { withProtection, withUser } from 'hoc/auth';
-
-import { getScenarioSlice } from 'store/slices/scenarios/detail';
+import { withScenario } from 'hoc/scenarios';
 
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
@@ -21,20 +16,9 @@ import SidebarShowWDPA from 'layout/scenarios/show/wdpa';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
 
-export const getServerSideProps = withProtection(withUser());
+export const getServerSideProps = withProtection(withUser(withScenario()));
 
 const ShowScenarioPage: React.FC = () => {
-  const { query } = useRouter();
-  const { sid } = query;
-
-  const scenarioSlice = getScenarioSlice(sid);
-  const { setTab, setSubTab } = scenarioSlice.actions;
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(setTab('solutions'));
-    dispatch(setSubTab(null));
-  }, [setTab, setSubTab, dispatch]);
   return (
     <Protected>
       <Title title="Detail" />

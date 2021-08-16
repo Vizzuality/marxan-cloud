@@ -5,7 +5,8 @@ export enum SpecificationOperation {
 }
 
 export interface FeatureState {
-  id: string;
+  id?: string;
+  featureId: string;
   calculated: boolean;
 }
 
@@ -17,6 +18,7 @@ export interface FeatureSubSet {
 }
 
 interface FeatureConfigBase {
+  id?: string;
   operation: SpecificationOperation;
   baseFeatureId: string;
   splitByProperty?: string;
@@ -36,13 +38,11 @@ export interface FeatureConfigStratification extends FeatureConfigBase {
 
 export interface FeatureConfigSplit extends FeatureConfigBase {
   operation: SpecificationOperation.Split;
-  baseFeatureId: string;
   splitByProperty: string;
 }
 
 export interface FeatureConfigCopy extends FeatureConfigBase {
   operation: SpecificationOperation.Copy;
-  baseFeatureId: string;
   selectSubSets: never;
 }
 

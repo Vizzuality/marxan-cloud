@@ -16,11 +16,11 @@ import {
 import { GeoFeature, GeoFeatureProperty } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 import { FeatureTag } from '@marxan/features/domain';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -45,7 +45,7 @@ export class GeoFeaturesService extends AppBaseService<
   AppInfoDTO
 > {
   constructor(
-    @InjectRepository(GeoFeatureGeometry, apiConnections.geoprocessingDB.name)
+    @InjectRepository(GeoFeatureGeometry, DbConnections.geoprocessingDB)
     private readonly geoFeaturesGeometriesRepository: Repository<GeoFeatureGeometry>,
     @InjectRepository(GeoFeature)
     private readonly geoFeaturesRepository: Repository<GeoFeature>,

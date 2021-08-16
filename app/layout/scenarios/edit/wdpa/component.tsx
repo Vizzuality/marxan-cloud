@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
-import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
@@ -45,7 +44,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
 
   const {
     subtab: metaSubtab,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
+  } = scenarioEditingMetadata;
 
   const { data: wdpaData } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id

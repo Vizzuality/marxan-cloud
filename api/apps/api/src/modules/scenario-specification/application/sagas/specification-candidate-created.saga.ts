@@ -1,4 +1,4 @@
-import { SpecificationCandidateCreated } from '@marxan-api/modules/specification/domain/events/specification-candidate-created.event';
+import { SpecificationCandidateCreated } from '@marxan-api/modules/specification/domain';
 
 import { Injectable } from '@nestjs/common';
 import { ICommand, ofType, Saga } from '@nestjs/cqrs';

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
 import {
@@ -18,7 +19,7 @@ import { StratificationEventsHandler } from './stratification-events.handler';
 import { RunService } from './run.service';
 
 @Module({
-  imports: [QueueApiEventsModule, ApiEventsModule],
+  imports: [QueueApiEventsModule, ApiEventsModule, CqrsModule],
   providers: [
     copyQueueProvider,
     copyQueueEventsProvider,

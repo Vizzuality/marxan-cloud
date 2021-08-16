@@ -9,7 +9,6 @@ import {
 
 import { GeoFeaturesController } from './geo-features.controller';
 import { GeoFeaturesService } from './geo-features.service';
-import { apiConnections } from '../../ormconfig';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeatureSetSerializer } from './geo-feature-set.serializer';
@@ -20,12 +19,13 @@ import {
 import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 import { ProcessingModule } from './processing';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature(
       [GeoFeatureGeometry, GeoFeaturePropertySet, ScenarioFeaturesData],
-      apiConnections.geoprocessingDB.name,
+      DbConnections.geoprocessingDB,
     ),
     TypeOrmModule.forFeature([GeoFeature, Project, Scenario]),
     ProcessingModule,
@@ -38,7 +38,7 @@ import { ProcessingModule } from './processing';
     ProxyService,
     {
       provide: EntityManagerToken,
-      useExisting: getEntityManagerToken(apiConnections.geoprocessingDB.name),
+      useExisting: getEntityManagerToken(DbConnections.geoprocessingDB),
     },
   ],
   controllers: [GeoFeaturesController],

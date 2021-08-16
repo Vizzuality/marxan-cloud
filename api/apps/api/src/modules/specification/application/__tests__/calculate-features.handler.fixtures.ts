@@ -38,7 +38,7 @@ export const getFixtures = async () => {
     featuresDetermined: true,
     resultFeatures: [
       {
-        id: calculatedFeatureId,
+        featureId: calculatedFeatureId,
         calculated: true,
       },
     ],
@@ -48,11 +48,11 @@ export const getFixtures = async () => {
     featuresDetermined: true,
     resultFeatures: [
       {
-        id: calculatedFeatureId,
+        featureId: calculatedFeatureId,
         calculated: true,
       },
       {
-        id: nonCalculatedFeatureId,
+        featureId: nonCalculatedFeatureId,
         calculated: false,
       },
     ],

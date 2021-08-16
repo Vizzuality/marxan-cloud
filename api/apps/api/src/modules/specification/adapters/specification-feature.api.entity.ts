@@ -14,6 +14,7 @@ export class SpecificationFeatureApiEntity {
 
   @ManyToOne(() => SpecificationFeatureConfigApiEntity, {
     onDelete: 'CASCADE',
+    orphanedRowAction: 'delete',
   })
   @JoinColumn({
     name: 'specification_feature_config_id',

@@ -116,7 +116,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
             className="w-full"
             onClick={onDownload}
           >
-            DOWNLOAD EQUAL AREA
+            Download
           </Button>
         </div>
 

@@ -34,6 +34,7 @@ export const getFixtures = () => {
         new SpecificationCandidateCreated(
           specification.scenarioId,
           specification.id,
+          [splitConfig, stratificationConfig],
         ),
       ]);
       expect(specification.toSnapshot()).toEqual({

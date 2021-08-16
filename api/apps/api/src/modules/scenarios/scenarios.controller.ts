@@ -16,6 +16,8 @@ import {
   UseGuards,
   UseInterceptors,
   ValidationPipe,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -70,6 +72,7 @@ import { UpdateGeoFeatureSetDTO } from '../geo-features/dto/update.geo-feature-s
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { GeoFeatureSetService } from '../geo-features/geo-feature-set.service';
 import { ScenarioPlanningUnitDto } from './dto/scenario-planning-unit.dto';
+import { isLeft } from 'fp-ts/Either';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -215,8 +218,11 @@ export class ScenariosController {
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
-    const extendedDto = await this.service.createSpecification(id, dto);
-    return await this.geoFeatureSetSerializer.serialize(extendedDto);
+    const result = await this.service.createSpecification(id, dto);
+    if (isLeft(result)) {
+      throw new InternalServerErrorException(result.left.description);
+    }
+    return await this.geoFeatureSetSerializer.serialize(result.right);
   }
 
   @ApiOperation({ description: 'Create feature set for scenario' })
@@ -226,6 +232,8 @@ export class ScenariosController {
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
+    // TODO once `copy` is in place, replace with implementation as in
+    // id/features/specification/v2
     return await this.geoFeatureSetSerializer.serialize(
       await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
     );
@@ -238,13 +246,8 @@ export class ScenariosController {
     @Body(new ValidationPipe()) dto: UpdateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
-    // TODO once `copy` is in place:
-    // 1 call command
-    // 2 enrich with
-    //  await this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
-    //            dto,
-    //            scenario,
-    //          );
+    // TODO once `copy` is in place, replace with implementation as in
+    // id/features/specification/v2
     return await this.geoFeatureSetSerializer.serialize(
       await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
     );
@@ -256,16 +259,11 @@ export class ScenariosController {
   async getFeatureSetFor(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeoFeatureSetResult> {
-    // TODO
-    // 1 get specificationSnapshot.raw ->
-    // 2 enrich with ->
-    // await this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
-    //       dto,
-    //       scenario,
-    //     );
-    return await this.geoFeatureSetSerializer.serialize(
-      await this.service.getFeatureSetForScenario(id),
-    );
+    const result = await this.service.getLastUpdatedSpecification(id);
+    if (isLeft(result)) {
+      throw new NotFoundException();
+    }
+    return await this.geoFeatureSetSerializer.serialize(result.right);
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })

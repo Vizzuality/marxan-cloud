@@ -2,6 +2,7 @@ import { QueryClient } from 'react-query';
 
 import { getSession } from 'next-auth/client';
 import { dehydrate } from 'react-query/hydration';
+
 import PROJECTS from 'services/projects';
 
 import { mergeDehydratedState } from './utils';

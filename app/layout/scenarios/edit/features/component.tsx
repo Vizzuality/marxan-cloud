@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
-import { mergeScenarioStatusMetaData, SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSelectedFeatures } from 'hooks/features';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
@@ -40,7 +40,7 @@ export interface ScenariosSidebarEditFeaturesProps {
 export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeaturesProps> = () => {
   const [step, setStep] = useState(0);
   const [modal, setModal] = useState(false);
-  const { query, push } = useRouter();
+  const { query } = useRouter();
   const { pid, sid } = query;
 
   const queryClient = useQueryClient();
@@ -56,7 +56,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
   const { scenarioEditingMetadata } = metadata || {};
   const {
     subtab: metaSubtab,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
+  } = scenarioEditingMetadata;
 
   const {
     data: selectedFeaturesData,
@@ -74,12 +74,8 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
       data: {
         metadata: mergeScenarioStatusMetaData(metadata, { tab: 'analysis', subtab: 'analysis-preview' }),
       },
-    }, {
-      onSuccess: () => {
-        push(`/projects/${pid}`);
-      },
     });
-  }, [saveScenarioMutation, sid, pid, push, metadata]);
+  }, [saveScenarioMutation, sid, metadata]);
 
   const saveScenarioStatusOnContinue = useCallback(async () => {
     saveScenarioMutation.mutate({
@@ -139,7 +135,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
             </p>
 
           </div>
-          )}
+        )}
         modifiers={['flip']}
         tooltipPlacement="left"
       >
@@ -175,71 +171,71 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
                 <div className="flex items-center mt-2 space-x-2">
 
                   {step === 0 && (
-                  <>
-                    <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
+                    <>
+                      <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
+                      <div className="text-xs uppercase font-heading">
+                        Features added:
+                        {' '}
+                        {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
+                      </div>
+                    </>
+                  )}
+
+                  {step === 1 && (
                     <div className="text-xs uppercase font-heading">
-                      Features added:
-                      {' '}
-                      {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
+                      Set the target and FPF for your features.
+
                     </div>
-                  </>
-                  )}
-
-                  {step === 1 && (
-                  <div className="text-xs uppercase font-heading">
-                    Set the target and FPF for your features.
-
-                  </div>
 
                   )}
                   {step === 1 && (
-                  <>
-                    <InfoButton>
-                      <div>
-                        <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
-                        <div className="space-y-2">
-                          <p>
-                            This value represents how much you want to conserve of a particular
-                            feature. In an ideal conservation, land or sea use plan,
-                            all your features meet their targets.
-                          </p>
-                          <p>
-                            You can set a default
-                            value for all of your features
-                            or you can set individual the targets separately for each feature.
-                            You can set your targets to 100% if you want the whole extent of
-                            your feature to be included in the solution.
-                          </p>
+                    <>
+                      <InfoButton>
+                        <div>
+                          <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
+                          <div className="space-y-2">
+                            <p>
+                              This value represents how much you want to conserve of a particular
+                              feature. In an ideal conservation, land or sea use plan,
+                              all your features meet their targets.
+                            </p>
+                            <p>
+                              You can set a default
+                              value for all of your features
+                              or you can set individual the targets separately for each feature.
+                              You can set your targets to 100% if you want the whole extent of
+                              your feature to be included in the solution.
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </InfoButton>
-                    <InfoButton>
-                      <div>
-                        <h4 className="font-heading text-lg mb-2.5">What is the FPF?</h4>
-                        <div className="space-y-2">
-                          <p>
-                            FPF stands for
-                            {' '}
-                            <b>Feature Penalty Factor</b>
-                            .
-                            A higher FPF value forces the Marxan algorithm
-                            to choose the planning units where this feature
-                            is present by applying a penalty if the target
-                            is missed, thereby increasing
-                            the cost of the solution. It comes into play when
-                            some of your targets fail to be met.
-                          </p>
-                          <p>
-                            In a typical
-                            workflow you start out with all FPF values set at
-                            1 and after checking the results, increase the FPF
-                            values for the particular features where targets have
-                            been missed.
-                          </p>
+                      </InfoButton>
+                      <InfoButton>
+                        <div>
+                          <h4 className="font-heading text-lg mb-2.5">What is the FPF?</h4>
+                          <div className="space-y-2">
+                            <p>
+                              FPF stands for
+                              {' '}
+                              <b>Feature Penalty Factor</b>
+                              .
+                              A higher FPF value forces the Marxan algorithm
+                              to choose the planning units where this feature
+                              is present by applying a penalty if the target
+                              is missed, thereby increasing
+                              the cost of the solution. It comes into play when
+                              some of your targets fail to be met.
+                            </p>
+                            <p>
+                              In a typical
+                              workflow you start out with all FPF values set at
+                              1 and after checking the results, increase the FPF
+                              values for the particular features where targets have
+                              been missed.
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </InfoButton>
-                  </>
+                      </InfoButton>
+                    </>
                   )}
 
                 </div>

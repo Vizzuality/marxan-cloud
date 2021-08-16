@@ -19,9 +19,9 @@ import { FetchSpecification, FetchUtils } from 'nestjs-base-service';
 import { omit } from 'lodash';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { apiConnections } from '../../ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { AdminArea } from '@marxan/admin-regions';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 /**
  * Supported admin area levels (sub-national): either level 1 or level 2.
@@ -58,7 +58,7 @@ export class AdminAreasService extends AppBaseService<
   AppInfoDTO
 > {
   constructor(
-    @InjectRepository(AdminArea, apiConnections.geoprocessingDB.name)
+    @InjectRepository(AdminArea, DbConnections.geoprocessingDB)
     private readonly adminAreasRepository: Repository<AdminArea>,
   ) {
     super(adminAreasRepository, 'admin_area', 'admin_areas', {

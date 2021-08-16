@@ -53,6 +53,7 @@ export class Specification extends AggregateRoot {
       new SpecificationCandidateCreated(
         specification.scenarioId,
         specification.id,
+        input,
       ),
     );
     return specification;
@@ -106,7 +107,7 @@ export class Specification extends AggregateRoot {
   markAsCalculated(featureIds: string[]): void {
     this.configuration.forEach((featureConfig) =>
       featureConfig.resultFeatures.forEach((feature) => {
-        if (featureIds.includes(feature.id)) {
+        if (featureIds.includes(feature.featureId)) {
           feature.calculated = true;
         }
       }),
@@ -137,7 +138,7 @@ export class Specification extends AggregateRoot {
     return this.configuration.flatMap((featureConfig) =>
       featureConfig.resultFeatures
         .filter((feature) => !feature.calculated)
-        .map((feature) => feature.id),
+        .map((feature) => feature.featureId),
     );
   }
 }

@@ -31,7 +31,7 @@ export interface Area {
 
 export interface Solution {
   id: string;
-  run: number;
+  runId: number;
   score: number;
   cost: number;
   planningUnits: number;
