@@ -120,8 +120,8 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     },
   });
 
-  const { data: statusData } = useScenariosStatus(pId);
-  const { scenarios: statusScenarios } = statusData || {};
+  const { data: statusData = { scenarios: [] } } = useScenariosStatus(pId);
+  const { scenarios: statusScenarios = [] } = statusData;
 
   const { data } = query;
   const { pages } = data || {};
