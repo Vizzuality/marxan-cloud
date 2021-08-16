@@ -49,11 +49,11 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>Runs:</dt>
-        <dd>{numberOfRuns || '-'}</dd>
+        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(numberOfRuns || []).length || '-'}</dd>
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>BLM:</dt>
-        <dd>{boundaryLengthModifier || '-'}</dd>
+        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(boundaryLengthModifier || []).length || '-'}</dd>
       </div>
       {/* <div className="flex space-x-2 text-sm">
         <dt>Schedules:</dt>
