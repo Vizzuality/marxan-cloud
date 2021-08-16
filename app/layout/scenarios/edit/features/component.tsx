@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
-import { mergeScenarioStatusMetaData, SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSelectedFeatures } from 'hooks/features';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
@@ -56,7 +56,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
   const { scenarioEditingMetadata } = metadata || {};
   const {
     subtab: metaSubtab,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
+  } = scenarioEditingMetadata;
 
   const {
     data: selectedFeaturesData,

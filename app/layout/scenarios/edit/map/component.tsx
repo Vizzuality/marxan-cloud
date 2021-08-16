@@ -17,6 +17,7 @@ import {
   useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers, useLegend,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
+import { useScenario } from 'hooks/scenarios';
 
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 
@@ -47,6 +48,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const { bbox } = data;
 
   const {
+    data: scenarioData,
+  } = useScenario(sid);
+
+  const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
 
@@ -59,6 +64,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     tab,
     subtab,
     cache,
+
     // WDPA
     wdpaCategories,
     wdpaThreshold,
@@ -101,8 +107,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     type: tab,
     subtype: subtab,
     options: {
-      ...wdpaCategories,
-      wdpaThreshold,
+      wdpaIucnCategories: tab === 'protected-areas' && subtab === 'protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData.wdpaIucnCategories,
+      wdpaThreshold: tab === 'protected-areas' && subtab === 'protected-areas-percentage' ? wdpaThreshold : scenarioData.wdpaThreshold,
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
@@ -115,8 +121,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     type: tab,
     subtype: subtab,
     options: {
-      ...wdpaCategories,
-      wdpaThreshold,
+      wdpaIucnCategories: tab === 'protected-areas' && subtab === 'protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData.wdpaIucnCategories,
+      wdpaThreshold: tab === 'protected-areas' && subtab === 'protected-areas-percentage' ? wdpaThreshold : scenarioData.wdpaThreshold,
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
