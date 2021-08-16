@@ -144,7 +144,7 @@ export class ScenariosController {
     name: 'id',
     description: 'Scenario id',
     type: String,
-    required: false,
+    required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
   @ApiParam({
@@ -174,7 +174,7 @@ export class ScenariosController {
       'one of `protection`, `lock-status`, `features`, `cost`, `results`',
     type: Array,
     required: false,
-    example: 35,
+    example: 'protection',
   })
   @Get(':id/planning-units/tiles/:z/:x/:y.mvt')
   async proxyProtectedAreaTile(

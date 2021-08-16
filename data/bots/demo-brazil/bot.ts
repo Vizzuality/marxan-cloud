@@ -142,14 +142,15 @@ await botClient
 const scenarioTook = Process.hrtime(scenarioStart);
 console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
 
-const scenarioPaSettedUp = await botClient
-  .get(`/scenarios/${scenario!.data!.id}`).then((result) =>  console.log(result)).catch((e) => {
+await botClient.get(`/scenarios/${scenario!.data!.id}`)
+    .then((result) =>  console.log(result.data))
+    .catch((e) => {
     console.log(e);
   });
 
 await sleep(5)
 
-// Setup
+// Setup features in the project
 
 // const featureList = [
 //        "demo_ecoregions_new_class_split",
@@ -162,49 +163,40 @@ await sleep(5)
 //        "demo_tapirus_terrestris",
 //        "demo_thalurania_glaucopis",
 // ]
-// const features = await botClient
-//   .get(`/projects/${project.data.id}/features?q=demo`)
-//   .then((result) => result.data)
-//   .catch((e) => {
-//     console.log(e);
-//   });
+const features = await botClient
+  .get(`/projects/${project.data.id}/features?q=demo`)
+  .then((result) => result.data)
+  .catch((e) => {
+    console.log(e);
+  });
 
-// console.log(features);
+console.log(features);
 
-// const geoFeatureSpecStart = Process.hrtime();
+const geoFeatureSpecStart = Process.hrtime();
 
-// const featureRecipe = features!.data.map( (x) => { return {
-//     kind: "plain",
-//     featureId: x.id,
-//     marxanSettings: {
-//       prop: 0.3,
-//       fpf: 1,
-//     },
-//   }})
-//   console.log(featureRecipe);
-// const geoFeatureSpec = await botClient
-//   .post(`/scenarios/${scenario.data.id}/features/specification`, {
-//     status: "created",
-//     features: [
-//       {
-//         kind: "plain",
-//         featureId: features.data[0].id,
-//         marxanSettings: {
-//           prop: 0.3,
-//           fpf: 1,
-//         },
-//       },
-//     ],
-//   })
-//   .then((result) => result.data)
-//   .catch((e) => {
-//     console.log(e);
-//   });
+const featureRecipe = features!.data.map((x: {id:string, type:string, attributes:object}) => { return {
+    kind: "plain",
+    featureId: x.id,
+    marxanSettings: {
+      prop: 0.3,
+      fpf: 1,
+    },
+  }})
+console.log(featureRecipe);
+const geoFeatureSpec = await botClient
+  .post(`/scenarios/${scenario.data.id}/features/specification`, {
+    status: "created",
+    features: featureRecipe
+  })
+  .then((result) => result.data)
+  .catch((e) => {
+    console.log(e);
+  });
 
-// const geoFeatureSpecTook = Process.hrtime(geoFeatureSpecStart);
+const geoFeatureSpecTook = Process.hrtime(geoFeatureSpecStart);
 
-// console.log(
-//   `Processing of features for scenario done in ${geoFeatureSpecTook[0]} seconds`
-// );
+console.log(
+  `Processing of features for scenario done in ${geoFeatureSpecTook[0]} seconds`
+);
 
 // console.log(geoFeatureSpec);
