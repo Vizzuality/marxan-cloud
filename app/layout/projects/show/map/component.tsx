@@ -168,8 +168,8 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                   You will
                   be able to visualize your planning region,
                   your features and, once you have run Marxan,
-                  you will also be able to visualize here the
-                  results.
+                  you will also be able to visualize the
+                  results here.
                 </p>
               </div>
             )}
