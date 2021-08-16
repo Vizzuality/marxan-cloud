@@ -7,7 +7,11 @@ export enum JobType {
   CostSurface = 'scenario.costSurface',
   Run = 'scenario.run',
   PlanningUnitInclusion = 'scenario.planningUnitsInclusion',
+<<<<<<< HEAD
   GeoprocessingCopy = 'scenario.geofeatureCopy',
   GeoprocessingSplit = 'scenario.geofeatureSplit',
   GeoprocessingStratification = 'scenario.geofeatureStratification',
+=======
+  PlanningUnitPACalculation = 'scenario.planningAreaProtectedCalculation',
+>>>>>>> added some fixes to job status
 }
