@@ -74,7 +74,6 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         ];
 
         setLoading(false);
-        setSuccessFile({ id: PAid, name: f.name });
         input.onChange(PAid);
 
         addToast('success-upload-protected-area', (

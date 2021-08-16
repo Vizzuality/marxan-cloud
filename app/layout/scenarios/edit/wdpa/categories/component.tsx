@@ -289,7 +289,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                   </FieldRFF>
                 </div>
 
-                <p className="py-8 text-sm text-center">or</p>
+                <p className="py-4 text-sm text-center">or</p>
                 <FieldRFF
                   name="protectedAreaId"
                 // validate={composeValidators([{ presence: true }])}

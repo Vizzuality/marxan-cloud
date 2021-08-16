@@ -121,7 +121,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   });
 
   const { data: statusData } = useScenariosStatus(pId);
-  const { scenarios: statusScenarios } = statusData;
+  const { scenarios: statusScenarios } = statusData || {};
 
   const { data } = query;
   const { pages } = data || {};
@@ -130,12 +130,12 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
       const { data: { data: pageData } } = p;
 
-      return pageData.map((d):ItemProps => {
+      return pageData.map((d): ItemProps => {
         const {
           id, projectId, name, lastModifiedAt,
         } = d;
 
-        const status = statusScenarios.find((s) => s.id === id);
+        const status = statusScenarios && statusScenarios.find((s) => s.id === id);
 
         const lastUpdateDistance = () => {
           return formatDistanceToNow(
