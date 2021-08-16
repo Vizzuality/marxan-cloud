@@ -35,7 +35,7 @@ const EditScenarioPage: React.FC = () => {
   const {
     tab: metaTab,
     subtab: metaSubtab,
-  } = scenarioEditingMetadata;
+  } = scenarioEditingMetadata || {};
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;

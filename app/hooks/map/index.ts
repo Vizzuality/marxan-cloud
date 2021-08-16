@@ -290,24 +290,28 @@ export function usePUGridLayer({
           },
 
           // PROTECTED AREAS
-          ...(type === 'protected-areas' && subtype === 'protected-areas-percentage') || type === 'features' ? [
-            {
-              type: 'fill',
-              'source-layer': 'layer0',
-              paint: {
-                'fill-color': COLORS.wdpa,
-                'fill-opacity': [
-                  'case',
-                  ['all',
-                    ['has', 'percentageProtected'],
-                    ['>=', ['get', 'percentageProtected'], (wdpaThreshold * 100)],
+          ...(
+            type === 'protected-areas' && subtype === 'protected-areas-percentage')
+            || type === 'features'
+            || (type === 'analysis' && subtype === 'analysis-preview'
+            ) ? [
+              {
+                type: 'fill',
+                'source-layer': 'layer0',
+                paint: {
+                  'fill-color': COLORS.wdpa,
+                  'fill-opacity': [
+                    'case',
+                    ['all',
+                      ['has', 'percentageProtected'],
+                      ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
+                    ],
+                    0.5,
+                    0,
                   ],
-                  0.5,
-                  0,
-                ],
+                },
               },
-            },
-          ] : [],
+            ] : [],
 
           // ANALYSIS - GAP ANALYSIS
           ...type === 'analysis' && subtype === 'analysis-gap-analysis' ? [

@@ -154,7 +154,10 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   }, [saveScenarioMutation, sid, metadata, onBack]);
 
   // Loading
-  if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
+  if (
+    (!!scenarioData && scenarioIsFetching && !scenarioIsFetched)
+    || (!!wdpaData && wdpaIsFetching && !wdpaIsFetched)
+  ) {
     return (
       <Loading
         visible

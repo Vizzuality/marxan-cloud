@@ -31,7 +31,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { scenarioEditingMetadata } = metadata || {};
   const {
     status: metaStatus,
-  } = scenarioEditingMetadata;
+  } = scenarioEditingMetadata || {};
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
