@@ -259,6 +259,7 @@ export function usePUGridLayer({
       wdpaThreshold = 0,
       puIncludedValue,
       puExcludedValue,
+      solution,
     } = options;
 
     return {
@@ -423,7 +424,22 @@ export function usePUGridLayer({
               },
             },
           ] : [],
-
+          ...type === 'solutions' && !!solution ? [
+            {
+              type: 'line',
+              'source-layer': 'layer0',
+              filter: [
+                'all',
+                ['in', ['get', 'scenarioPuId'], ['literal', solution]],
+              ],
+              paint: {
+                'line-color': '#ff0000',
+                'line-opacity': 1,
+                'line-width': 1.5,
+                'line-offset': 0.75,
+              },
+            },
+          ] : [],
         ],
       },
     };

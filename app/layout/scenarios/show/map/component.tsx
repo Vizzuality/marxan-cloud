@@ -18,6 +18,7 @@ import {
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenario, useScenarioPU } from 'hooks/scenarios';
+import { useBestSolution } from 'hooks/solutions';
 
 import Map from 'components/map';
 // Controls
@@ -52,11 +53,18 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
 
   const { wdpaIucnCategories, wdpaThreshold } = scenarioData || {};
 
+  const {
+    data: bestSolutionData,
+  } = useBestSolution(sid);
+
+  const bestSolution = bestSolutionData || {};
+
   getScenarioSlice(sid);
 
   const {
     tab,
     subtab,
+    selectedSolutionId,
   } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const minZoom = 2;
@@ -74,6 +82,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       wdpaThreshold,
       puIncludedValue: included,
       puExcludedValue: excluded,
+      solution: selectedSolutionId || bestSolution.id,
     },
   });
 
@@ -87,6 +96,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       wdpaThreshold,
       puIncludedValue: included,
       puExcludedValue: excluded,
+      solution: selectedSolutionId || bestSolution.id,
     },
   });
 
