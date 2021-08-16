@@ -14,6 +14,8 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories } from 'hooks/wdpa';
 
+import ProtectedAreaUploader from 'layout/scenarios/edit/wdpa/categories/pa-uploader';
+
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
@@ -29,7 +31,7 @@ export interface WDPACategoriesProps {
   onDismiss: () => void,
 }
 
-export const WDPACategories:React.FC<WDPACategoriesProps> = ({
+export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   onSuccess,
   onDismiss,
 }: WDPACategoriesProps) => {
@@ -56,11 +58,11 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     isFetched: wdpaIsFetched,
   } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
-                 || projectData?.adminAreaLevel1I
-                 || projectData?.countryId,
+      || projectData?.adminAreaLevel1I
+      || projectData?.countryId,
     customAreaId: !projectData?.adminAreaLevel2Id
-                  && !projectData?.adminAreaLevel1I
-                  && !projectData?.countryId ? projectData?.planningAreaId : null,
+      && !projectData?.adminAreaLevel1I
+      && !projectData?.countryId ? projectData?.planningAreaId : null,
   });
 
   const { addToast } = useToasts();
@@ -242,7 +244,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                                   <li>III: Natural Monument or Feature.</li>
                                   <li>IV: Habitat/Species Management Area.</li>
                                   <li>V: Protected Landscape/Seascape.</li>
-                                    <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
+                                  <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
                                 </ul>
                               </div>
                             </span>
@@ -250,42 +252,58 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                         </div>
 
                         {WDPA_CATEGORIES_OPTIONS.length === 1 && (
-                        <Select
-                          theme="dark"
-                          size="base"
-                          placeholder="Select..."
-                          clearSelectionActive
-                          selected={values.wdpaIucnCategories.length
-                            ? values.wdpaIucnCategories[0]
-                            : null}
-                          options={WDPA_CATEGORIES_OPTIONS}
-                          onChange={(v) => {
-                            if (v) {
-                              flprops.input.onChange([v]);
-                            } else {
-                              flprops.input.onChange([]);
-                            }
-                          }}
-                        />
+                          <Select
+                            theme="dark"
+                            size="base"
+                            placeholder="Select..."
+                            clearSelectionActive
+                            selected={values.wdpaIucnCategories.length
+                              ? values.wdpaIucnCategories[0]
+                              : null}
+                            options={WDPA_CATEGORIES_OPTIONS}
+                            onChange={(v) => {
+                              if (v) {
+                                flprops.input.onChange([v]);
+                              } else {
+                                flprops.input.onChange([]);
+                              }
+                            }}
+                          />
                         )}
 
                         {WDPA_CATEGORIES_OPTIONS.length > 1 && (
-                        <Select
-                          theme="dark"
-                          size="base"
-                          multiple
-                          placeholder="Select..."
-                          clearSelectionActive={false}
-                          batchSelectionActive
-                          batchSelectionLabel="All protected areas"
-                          selected={values.wdpaIucnCategories}
-                          options={WDPA_CATEGORIES_OPTIONS}
-                        />
+                          <Select
+                            theme="dark"
+                            size="base"
+                            multiple
+                            placeholder="Select..."
+                            clearSelectionActive={false}
+                            batchSelectionActive
+                            batchSelectionLabel="All protected areas"
+                            selected={values.wdpaIucnCategories}
+                            options={WDPA_CATEGORIES_OPTIONS}
+                          />
                         )}
                       </Field>
                     )}
                   </FieldRFF>
                 </div>
+
+                <p className="py-8 text-sm text-center">or</p>
+                <FieldRFF
+                  name="protectedAreaId"
+                // validate={composeValidators([{ presence: true }])}
+                >
+                  {(fprops) => {
+                    return (
+                      <ProtectedAreaUploader
+                        {...fprops}
+                        // resetProtectedArea={resetProtectedArea}
+                        form={form}
+                      />
+                    );
+                  }}
+                </FieldRFF>
 
                 {!!values.wdpaIucnCategories.length && (
                   <div className="mt-10">

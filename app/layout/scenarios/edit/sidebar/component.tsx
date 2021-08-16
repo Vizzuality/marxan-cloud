@@ -17,7 +17,7 @@ export interface ScenariosEditSidebarProps {
 
 export const ScenariosEditSidebar: React.FC<ScenariosEditSidebarProps> = ({
   children,
-}:ScenariosEditSidebarProps) => {
+}: ScenariosEditSidebarProps) => {
   const { push } = useRouter();
   const { query } = useRouter();
   const { pid } = query;

@@ -48,11 +48,11 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
 
   const { data: wdpaData } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
-                 || projectData?.adminAreaLevel1I
-                 || projectData?.countryId,
+      || projectData?.adminAreaLevel1I
+      || projectData?.countryId,
     customAreaId: !projectData?.adminAreaLevel2Id
-                  && !projectData?.adminAreaLevel1I
-                  && !projectData?.countryId ? projectData?.planningAreaId : null,
+      && !projectData?.adminAreaLevel1I
+      && !projectData?.countryId ? projectData?.planningAreaId : null,
   });
 
   useEffect(() => {
