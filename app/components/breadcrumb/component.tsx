@@ -29,7 +29,7 @@ export const Breadcrum: React.FC<BreadcrumProps> = ({
   >
     <Icon className="flex-shrink-0 w-3 h-3" icon={ARROW_LEFT_SVG} />
     <Icon className="flex-shrink-0 w-5 h-5 ml-1" icon={FOLDER_SVG} />
-    <div className="w-full ml-3 overflow-hidden whitespace-nowrap overflow-ellipsis">{children}</div>
+    <div className="ml-3 overflow-hidden whitespace-nowrap overflow-ellipsis">{children}</div>
   </button>
 );
 

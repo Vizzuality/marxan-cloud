@@ -96,8 +96,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
   }, [saveScenarioMutation, sid, metadata]);
 
   useEffect(() => {
-    const reloadStep = metaSubtab === 'features-preview' ? 0 : 1;
-    setStep(reloadStep);
+    setStep(metaSubtab === 'features-fpf' ? 1 : 0);
   }, [metaSubtab]);
 
   if (!scenarioData || tab !== 'features') return null;
