@@ -28,7 +28,6 @@ import { JobStatus, Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -341,9 +340,9 @@ export class GeoFeaturesService extends AppBaseService<
   ): Promise<void> {
     await entityManager.query(
       `INSERT INTO "features_data"
-      ("id", "the_geom", "properties", "source", "feature_id") 
-      VALUES 
-      (DEFAULT, ST_MakeValid(ST_GeomFromGeoJSON($1)::geometry), $2, $3, $4);`,
+       ("id", "the_geom", "properties", "source", "feature_id")
+       VALUES (DEFAULT, ST_MakeValid(ST_GeomFromGeoJSON($1)::geometry), $2, $3,
+               $4);`,
       [geometry, properties, SourceType.user_imported, featureId],
     );
   }
