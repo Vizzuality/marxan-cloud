@@ -89,15 +89,6 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
     uploadProjectPAMutation.mutate({ data }, {
       onSuccess: ({ data: { data: g, id: PAid } }) => {
-        const mockMinPuAreaSize = 251;
-        const mockMaxPuAreaSize = 2311631;
-        const mockBbox = [
-          4.21875,
-          14.150390625,
-          2.8113711933311403,
-          12.811801316582619,
-        ];
-
         setLoading(false);
         input.onChange(PAid);
 
@@ -111,9 +102,9 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         });
 
         dispatch(setUploadingPlanningArea(g));
-        dispatch(setBbox(mockBbox));
-        dispatch(setMinPuAreaSize(mockMinPuAreaSize));
-        dispatch(setMaxPuAreaSize(mockMaxPuAreaSize));
+        dispatch(setBbox(g.box));
+        dispatch(setMinPuAreaSize(g.marxanMetadata.minPuAreaSize));
+        dispatch(setMaxPuAreaSize(g.marxanMetadata.maxPuAreaSize));
 
         updateCustomProtectedAreasIds(PAid);
         console.info('Protected area uploaded', g, PAid);
