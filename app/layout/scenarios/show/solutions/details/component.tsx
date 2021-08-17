@@ -8,8 +8,10 @@ import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { motion } from 'framer-motion';
 
+import { useLegend } from 'hooks/map';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 
+import { ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
 import SolutionFrequency from 'layout/solutions/frequency';
 import SolutionSelected from 'layout/solutions/selected';
 
@@ -53,32 +55,21 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   } = useBestSolution(sid);
 
   const isBestSolution = selectedSolution
-                         && bestSolutionData
-                         && selectedSolution?.id === bestSolutionData?.id;
+    && bestSolutionData
+    && selectedSolution?.id === bestSolutionData?.id;
 
   const solutionIsLoading = (
     bestSolutionisFetching && !bestSolutionisFetched)
     || (selectedSolutionisFetching && !selectedSolutionisFetched
     );
 
-  const frequencyValues = [
-    {
-      color: '#0C2C32',
-      value: '0',
-    },
-    {
-      color: '#006D83',
-      value: null,
-    },
-    {
-      color: '#008B8C',
-      value: null,
-    },
-    {
-      color: '#0BC6C2',
-      value: '100',
-    },
-  ];
+  const LEGEND = useLegend({
+    type: ScenarioSidebarTabs.SOLUTIONS,
+    subtype: null,
+    options: {},
+  });
+
+  const frequencyLegendValues = LEGEND.find((l) => l.id === 'frequency').items;
 
   return (
     <motion.div
@@ -148,7 +139,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
 
           <div className="w-full p-6 mt-12 border-t border-gray-600">
             <SolutionFrequency
-              values={frequencyValues}
+              values={frequencyLegendValues}
               onToggleFrequencyOnMap={onToggleFrequencyOnMap}
               frequencyOnMap={frequencyOnMap}
             />
