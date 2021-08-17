@@ -182,7 +182,7 @@ const featureRecipe = features!.data.map((x: {id:string, type:string, attributes
 console.log(featureRecipe);
 const geoFeatureSpec = await botClient
   .post(`/scenarios/${scenario.data.id}/features/specification`, {
-    status: "created",
+    status: "draft",
     features: featureRecipe
   })
   .then((result) => result.data)
