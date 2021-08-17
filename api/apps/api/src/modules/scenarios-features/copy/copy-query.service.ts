@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { isDefined } from '@marxan/utils';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { FeatureConfigCopy } from '@marxan-api/modules/specification';
 import { CreateFeaturesCommand } from '../create-features.command';
 
 @Injectable()
 export class CopyQuery {
   public prepareStatement(
-    command: CreateFeaturesCommand,
+    command: CreateFeaturesCommand & { input: FeatureConfigCopy },
     planningAreaLocation: { id: string; tableName: string } | undefined,
     protectedAreaFilterByIds: string[],
     project: Pick<Project, 'bbox'>,
