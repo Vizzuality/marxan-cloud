@@ -38,12 +38,13 @@ export class ScenarioProtectedAreaCalculationProcessor
      pa as (select the_geom as the_geom from wdpa ${wdpaFilter}),
      pu_pa_union as (select pu.id, pu.the_geom as pu_the_geom, pa.the_geom as pa_the_geom, pu_area
       from pu
-      inner join pa on pu.the_geom && pa.the_geom),
-pu_pa_agg as (select id,pu_the_geom, st_makevalid(ST_Union(pa_the_geom)) as pa_the_geom, min(pu_area) as pu_area
+      left join pa on pu.the_geom && pa.the_geom),
+     pu_pa_agg as (select id, pu_the_geom, st_makevalid(ST_Union(pa_the_geom)) as pa_the_geom
       from pu_pa_union
       group by id, pu_the_geom),
-      result as (select id, round((st_area(st_transform(st_intersection(pu_the_geom, pa_the_geom), 3410))/pu_area)*100) as protected_area
-  from pu_pa_agg)
+     result as (select id,
+      round(st_area(st_transform(st_intersection(pu_the_geom, pa_the_geom), 3410))) as protected_area
+      from pu_pa_agg)
     UPDATE scenarios_pu_data
       SET (protected_area) = (SELECT protected_area
           FROM result
