@@ -13,6 +13,7 @@ import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 import { CreateFeaturesSaga } from './create-features.saga';
 import { CreateFeaturesHandler } from './create-features.handler';
 import { CopyDataProvider, CopyOperation, CopyQuery } from './copy';
+import { SplitDataProvider, SplitOperation, SplitQuery } from './split';
 
 @Module({
   imports: [
@@ -32,6 +33,9 @@ import { CopyDataProvider, CopyOperation, CopyQuery } from './copy';
     CopyQuery,
     CopyDataProvider,
     CopyOperation,
+    SplitQuery,
+    SplitDataProvider,
+    SplitOperation,
   ],
   exports: [ScenarioFeaturesService],
 })
