@@ -6,7 +6,7 @@ export { SubmitSpecification } from './application/submit-specification.command'
 
 export {
   notFound,
-  GetSpecification,
+  GetLastUpdatedSpecification,
   GetSpecificationError,
 } from './application/get-specification.query';
 

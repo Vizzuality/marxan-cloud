@@ -157,6 +157,17 @@ export class DbSpecificationRepository implements SpecificationRepository {
     });
   }
 
+  async getLastUpdated(ids: string[]): Promise<Specification | undefined> {
+    const specs = await this.specificationRepo.findByIds(ids, {
+      take: 1,
+      order: {
+        lastModifiedAt: 'DESC',
+      },
+    });
+    const foundSpec = specs[0];
+    return foundSpec && this.#serialize(foundSpec);
+  }
+
   #serialize = (specification: SpecificationApiEntity): Specification => {
     return Specification.from({
       id: specification.id,

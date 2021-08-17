@@ -6,10 +6,10 @@ export const notFound = Symbol(`specification not found`);
 
 export type GetSpecificationError = typeof notFound;
 
-export class GetSpecification extends Query<
+export class GetLastUpdatedSpecification extends Query<
   Either<GetSpecificationError, SpecificationSnapshot>
 > {
-  constructor(public readonly id: string) {
+  constructor(public readonly ids: string[]) {
     super();
   }
 }

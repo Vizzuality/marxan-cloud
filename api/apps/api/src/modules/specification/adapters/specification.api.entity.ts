@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { SpecificationFeatureConfigApiEntity } from './specification-feature-config.api.entity';
@@ -48,4 +49,10 @@ export class SpecificationApiEntity {
 
   @Column(`jsonb`)
   raw!: Record<string, unknown>;
+
+  @UpdateDateColumn({
+    name: 'last_modified_at',
+    type: 'timestamp without time zone',
+  })
+  lastModifiedAt!: Date;
 }
