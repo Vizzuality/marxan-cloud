@@ -9,6 +9,7 @@ import { IsString, IsArray, IsIn, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
+import { string } from 'fp-ts';
 
 interface SelectionsProperties {
   attributes: string;
@@ -21,7 +22,7 @@ interface IncludeSelections {
   [key: string]: SelectionsProperties;
 }
 
-const includeSelections: IncludeSelections = {
+let includeSelections: IncludeSelections = {
   protection: {
     attributes: ', "percentageProtected"',
     select:
@@ -103,7 +104,7 @@ export class ScenariosService {
      * @todo: provide features id array
      * @todo: provide results/output data
      */
-    const sql = this.selectJoins(
+    const sql = this.selectJoins(id,
       this.ScenariosPlanningUnitGeoEntityRepository.createQueryBuilder('test')
         .addSelect('plan.the_geom')
         .leftJoin('planning_units_geom', 'plan', `test.pu_geom_id = plan.id`)
@@ -128,9 +129,29 @@ export class ScenariosService {
    * @returns qB
    */
   private selectJoins(
+    id: string,
     qB: SelectQueryBuilder<ScenariosPuPaDataGeo>,
     _filters?: ScenariosPUFilters,
   ): SelectQueryBuilder<ScenariosPuPaDataGeo> {
+    // This is a temporal fix
+    // includeSelections.features.table = `(SELECT pu.scenario_id,
+    //   pu.id AS scenario_pu_id,
+    //   string_agg(species.feature_id::text, ','::text) AS feature_list
+    //  FROM ( SELECT sfd.scenario_id,
+    //           fd.the_geom,
+    //           fd.feature_id
+    //          FROM scenario_features_data sfd
+    //            INNER JOIN features_data fd ON sfd.feature_class_id = fd.id where "scenario_id" = '${id}') species,
+    //   ( SELECT pug.the_geom,
+    //           spd.id,
+    //           spd.scenario_id
+    //          FROM planning_units_geom pug
+    //            INNER JOIN scenarios_pu_data spd ON pug.id = spd.pu_geom_id
+    //            WHERE "scenario_id" = '${id}'
+    //         ORDER BY spd.puid) pu
+    // WHERE st_intersects(species.the_geom, pu.the_geom)
+    // GROUP BY pu.scenario_id, pu.id)`;
+
     if (_filters?.include && _filters.include.length > 0) {
       _filters.include.forEach((element: string) => {
         if (includeSelections[element].select) {
