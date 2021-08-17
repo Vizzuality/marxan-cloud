@@ -49,7 +49,7 @@ let includeSelections: IncludeSelections = {
   results: {
     attributes: ', "frequencyValue", "valuePosition"',
     select: `'-'||array_to_string(array_positions(output.value, true),'-,-')||'-' as "valuePosition", \
-          round((output.included_count/array_length(output.value, 1))::numeric*100)::int as "frequencyValue"`,
+          round((output.included_count/array_length(output.value, 1)::numeric)*100) as "frequencyValue"`,
     table: 'output_scenarios_pu_data',
     alias: 'output',
     condition: 'test.id = output.scenario_pu_id',
@@ -133,25 +133,6 @@ export class ScenariosService {
     qB: SelectQueryBuilder<ScenariosPuPaDataGeo>,
     _filters?: ScenariosPUFilters,
   ): SelectQueryBuilder<ScenariosPuPaDataGeo> {
-    // This is a temporal fix
-    // includeSelections.features.table = `(SELECT pu.scenario_id,
-    //   pu.id AS scenario_pu_id,
-    //   string_agg(species.feature_id::text, ','::text) AS feature_list
-    //  FROM ( SELECT sfd.scenario_id,
-    //           fd.the_geom,
-    //           fd.feature_id
-    //          FROM scenario_features_data sfd
-    //            INNER JOIN features_data fd ON sfd.feature_class_id = fd.id where "scenario_id" = '${id}') species,
-    //   ( SELECT pug.the_geom,
-    //           spd.id,
-    //           spd.scenario_id
-    //          FROM planning_units_geom pug
-    //            INNER JOIN scenarios_pu_data spd ON pug.id = spd.pu_geom_id
-    //            WHERE "scenario_id" = '${id}'
-    //         ORDER BY spd.puid) pu
-    // WHERE st_intersects(species.the_geom, pu.the_geom)
-    // GROUP BY pu.scenario_id, pu.id)`;
-
     if (_filters?.include && _filters.include.length > 0) {
       _filters.include.forEach((element: string) => {
         if (includeSelections[element].select) {
