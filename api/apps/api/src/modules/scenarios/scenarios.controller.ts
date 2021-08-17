@@ -17,7 +17,6 @@ import {
   UseInterceptors,
   ValidationPipe,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -261,7 +260,7 @@ export class ScenariosController {
   ): Promise<GeoFeatureSetResult> {
     const result = await this.service.getLastUpdatedSpecification(id);
     if (isLeft(result)) {
-      throw new NotFoundException();
+      return this.geoFeatureSetSerializer.emptySpecification();
     }
     return await this.geoFeatureSetSerializer.serialize(result.right);
   }
