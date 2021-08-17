@@ -168,7 +168,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
         saveScenarioMutation.mutate({
           id: `${sid}`,
           data: {
-            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-fpf' }),
+            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'analysis', subtab: 'analysis-preview' }),
           },
         }, {
           onSuccess: () => {

@@ -212,14 +212,32 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       data,
     }, {
       onSuccess: () => {
-        onSuccess();
-        setSubmitting(false);
+        saveScenarioMutation.mutate({
+          id: `${sid}`,
+          data: {
+            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-fpf' }),
+          },
+        }, {
+          onSuccess: () => {
+            onSuccess();
+            setSubmitting(false);
+          },
+          onError: () => {
+            setSubmitting(false);
+          },
+        });
       },
       onError: () => {
         setSubmitting(false);
       },
     });
-  }, [sid, selectedFeaturesMutation, onSuccess, getFeaturesRecipe]);
+  }, [sid,
+    metadata,
+    selectedFeaturesMutation,
+    saveScenarioMutation,
+    onSuccess,
+    getFeaturesRecipe,
+  ]);
 
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
