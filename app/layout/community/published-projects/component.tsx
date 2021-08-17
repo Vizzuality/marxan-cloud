@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
-import { usePublishedProjects } from 'hooks/projects';
-
 import { setSearch } from 'store/slices/community/projects';
 
 import { useDebouncedCallback } from 'use-debounce';
+
+import { usePublishedProjects } from 'hooks/projects';
 
 import Wrapper from 'layout/wrapper';
 
@@ -43,14 +43,14 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
   }, [dispatch]);
 
   return (
-    <div className="bg-white text-black pt-12">
+    <div className="pt-12 text-black bg-white">
       <Wrapper>
         <div className="w-full max-w-5xl pb-20 mx-auto">
           <Search
             id="project-search"
             defaultValue={search}
             size="base"
-            placeholder="Search by project name, planning area, creators..."
+            placeholder="Search by project name, planning area..."
             aria-label="Search"
             onChange={onChangeSearchDebounced}
             theme="light"
@@ -84,7 +84,7 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
                       <h4 className="text-sm text-left">Planning area</h4>
                     </th>
                     <th className="py-12 font-normal w-44">
-                      <h4 className="text-sm text-left">Creator</h4>
+                      {/* <h4 className="text-sm text-left">Creators</h4> */}
                     </th>
                     <th className="py-12 font-normal w-72">
                       <div className="flex flex-row">
