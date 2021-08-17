@@ -13,15 +13,14 @@ export class WdpaAreaCalculationService {
    */
   private readonly watchedChangeProperties: (keyof InputChange)[] = [
     'customProtectedAreaIds',
-    'wdpaIucnCategories',
-    'wdpaThreshold',
+    'wdpaIucnCategories'
   ];
 
   /**
    * and new entity state consists (i.e. are present) of all of the below
    */
   private readonly requiredToTriggerChange: (keyof Scenario)[] = [
-    'wdpaThreshold',
+    'wdpaIucnCategories'
   ];
 
   /**
