@@ -2,9 +2,9 @@ import React, { useCallback, useState } from 'react';
 
 import Link from 'next/link';
 
-import { useMe } from 'hooks/me';
-
 import { signOut } from 'next-auth/client';
+
+import { useMe } from 'hooks/me';
 
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';
@@ -52,7 +52,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
           <header className="w-full px-8 py-4 bg-black bg-opacity-5">
             <h2 className="mb-1">{displayName}</h2>
             <Link href="/me">
-              <a href="/me" className="text-gray-400">View my profile</a>
+              <a href="/me" className="text-gray-400 hover:underline">View my profile</a>
             </Link>
           </header>
 
@@ -70,7 +70,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
             className="flex w-full px-8 py-5 border-t border-gray-300"
           >
             <Icon icon={SIGN_OUT_SVG} className="w-5 h-5 mr-2 text-gray-500" />
-            <span>Log out</span>
+            <span className="hover:underline">Log out</span>
           </button>
         </div>
       )}
