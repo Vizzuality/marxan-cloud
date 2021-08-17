@@ -2,23 +2,23 @@ import { IInferredQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Either, left, right } from 'fp-ts/Either';
 import { SpecificationSnapshot } from '../domain';
 import {
-  GetSpecification,
+  GetLastUpdatedSpecification,
   GetSpecificationError,
   notFound,
 } from './get-specification.query';
 import { SpecificationRepository } from './specification.repository';
 
-@QueryHandler(GetSpecification)
+@QueryHandler(GetLastUpdatedSpecification)
 export class GetSpecificationHandler
-  implements IInferredQueryHandler<GetSpecification> {
+  implements IInferredQueryHandler<GetLastUpdatedSpecification> {
   constructor(private readonly specificationsRepo: SpecificationRepository) {}
 
   async execute({
-    id,
-  }: GetSpecification): Promise<
+    ids,
+  }: GetLastUpdatedSpecification): Promise<
     Either<GetSpecificationError, SpecificationSnapshot>
   > {
-    const specification = await this.specificationsRepo.getById(id);
+    const specification = await this.specificationsRepo.getLastUpdated(ids);
     if (!specification) {
       return left(notFound);
     }
