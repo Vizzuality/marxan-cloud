@@ -29,7 +29,7 @@ interface ScenarioEditStateProps {
   uploadingValue: Record<string, object>
 
   // OPACITY SETTINGS
-  protectedAreasPreviewOpacity: number,
+  wdpaOpacity: number,
   frequencyOpacity: number,
 }
 
@@ -58,7 +58,7 @@ const initialState = {
   uploadingValue: null,
 
   // OPACITY SETTINGS
-  protectedAreasPreviewOpacity: null,
+  wdpaOpacity: null,
   frequencyOpacity: null,
 } as ScenarioEditStateProps;
 
@@ -123,8 +123,8 @@ export function getScenarioEditSlice(id) {
       },
 
       // OPACITY SETTINGS
-      setProtectedAreasPreviewOpacity: (state, action: PayloadAction<number>) => {
-        state.protectedAreasPreviewOpacity = action.payload;
+      setWdpaOpacity: (state, action: PayloadAction<number>) => {
+        state.wdpaOpacity = action.payload;
       },
       setFrequencyOpacity: (state, action: PayloadAction<number>) => {
         state.frequencyOpacity = action.payload;

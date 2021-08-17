@@ -62,7 +62,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const bestSolution = bestSolutionData || {};
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setProtectedAreasPreviewOpacity, setFrequencyOpacity } = scenarioSlice.actions;
+  const { setWdpaOpacity, setFrequencyOpacity } = scenarioSlice.actions;
 
   const {
     tab,
@@ -148,9 +148,9 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   };
 
   const onChangeOpacity = useCallback((opacity, name) => {
-    if (name === 'Protected areas preview') dispatch(setProtectedAreasPreviewOpacity(opacity));
+    if (name === 'Protected areas preview') dispatch(setWdpaOpacity(opacity));
     if (name === 'Frequency') dispatch(setFrequencyOpacity(opacity));
-  }, [setProtectedAreasPreviewOpacity, dispatch, setFrequencyOpacity]);
+  }, [setWdpaOpacity, dispatch, setFrequencyOpacity]);
 
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">

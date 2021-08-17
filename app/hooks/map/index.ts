@@ -105,6 +105,7 @@ export function useWDPAPreviewLayer({
             ],
             paint: {
               'fill-color': COLORS.wdpa,
+              // 'fill-opacity': wdpaOpacity,
             },
           },
           {

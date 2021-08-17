@@ -6,7 +6,7 @@ interface ScenarioShowStateProps {
   tab: string,
   subtab: string,
   selectedSolution: Solution,
-  protectedAreasPreviewOpacity: number,
+  wdpaOpacity: number,
   frequencyOpacity: number,
 }
 
@@ -14,7 +14,7 @@ const initialState = {
   tab: 'solutions',
   subtab: null,
   selectedSolution: null,
-  protectedAreasPreviewOpacity: null,
+  wdpaOpacity: null,
   frequencyOpacity: null,
 } as ScenarioShowStateProps;
 
@@ -32,8 +32,8 @@ export function getScenarioSlice(id) {
       setSelectedSolution: (state, action: PayloadAction<Solution>) => {
         state.selectedSolution = action.payload;
       },
-      setProtectedAreasPreviewOpacity: (state, action: PayloadAction<number>) => {
-        state.protectedAreasPreviewOpacity = action.payload;
+      setWdpaOpacity: (state, action: PayloadAction<number>) => {
+        state.wdpaOpacity = action.payload;
       },
       setFrequencyOpacity: (state, action: PayloadAction<number>) => {
         state.frequencyOpacity = action.payload;

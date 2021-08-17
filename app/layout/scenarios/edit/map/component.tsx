@@ -59,7 +59,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const {
     setTmpPuIncludedValue,
     setTmpPuExcludedValue,
-    setProtectedAreasPreviewOpacity,
+    setWdpaOpacity,
     setFrequencyOpacity,
   } = scenarioSlice.actions;
 
@@ -223,9 +223,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   };
 
   const onChangeOpacity = useCallback((opacity, name) => {
-    if (name === 'Protected areas preview') dispatch(setProtectedAreasPreviewOpacity(opacity));
+    if (name === 'Protected areas preview') dispatch(setWdpaOpacity(opacity));
     if (name === 'Frequency') dispatch(setFrequencyOpacity(opacity));
-  }, [setProtectedAreasPreviewOpacity, dispatch, setFrequencyOpacity]);
+  }, [setWdpaOpacity, dispatch, setFrequencyOpacity]);
 
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
