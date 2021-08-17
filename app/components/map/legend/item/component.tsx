@@ -25,7 +25,7 @@ export interface LegendItemProps {
   listeners?: Record<string, unknown>;
   attributes?: Record<string, unknown>;
   opacityManager?: boolean;
-  onOpacityChange?: () => void;
+  onChangeOpacity?: () => void;
 }
 
 export const LegendItem: React.FC<LegendItemProps> = ({
@@ -38,7 +38,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   listeners,
   attributes,
   opacityManager,
-  onOpacityChange,
+  onChangeOpacity,
 }: LegendItemProps) => {
   const validChildren = Children.map(children, (Child) => {
     return isValidElement(Child);
@@ -101,7 +101,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                   maxValue={1}
                   minValue={0.01}
                   step={0.01}
-                  onChange={onOpacityChange}
+                  onChange={onChangeOpacity}
                 />
               </div>
             )}

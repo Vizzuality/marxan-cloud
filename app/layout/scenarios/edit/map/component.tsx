@@ -217,6 +217,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     return null;
   };
 
+  const onChangeOpacity = (opacity, name) => {
+    if (name === 'Protected areas preview') console.log('LA OPASIDÁ DE PU', opacity);
+    if (name === 'Frequency') console.log('LA OPASIDÁ DE FREQUENCY', opacity);
+  };
+
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
       <Map
@@ -279,13 +284,16 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
           onChangeOpen={() => setOpen(!open)}
         >
           {LEGEND.map((i) => {
-            const { type, items, intersections } = i;
+            const {
+              type, items, intersections, name,
+            } = i;
 
             return (
               <LegendItem
                 sortable={false}
                 key={i.id}
                 opacityManager={i.opacityManager}
+                onChangeOpacity={(opacity) => onChangeOpacity(opacity, name)}
                 {...i}
               >
                 {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
