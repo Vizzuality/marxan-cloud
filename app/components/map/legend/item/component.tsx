@@ -1,9 +1,13 @@
-import React, { Children, isValidElement, ReactNode } from 'react';
+import React, {
+  Children, isValidElement, ReactNode,
+} from 'react';
 
 import cx from 'classnames';
 
 import Icon from 'components/icon';
+import Tooltip from 'components/tooltip';
 
+import OPACITY_SVG from 'svgs/map/opacity.svg?sprite';
 import DRAG_SVG from 'svgs/ui/drag.svg?sprite';
 
 export interface LegendItemProps {
@@ -19,6 +23,7 @@ export interface LegendItemProps {
   };
   listeners?: Record<string, unknown>;
   attributes?: Record<string, unknown>;
+  opacityManager?: boolean;
 }
 
 export const LegendItem: React.FC<LegendItemProps> = ({
@@ -30,6 +35,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   sortable,
   listeners,
   attributes,
+  opacityManager = true,
 }: LegendItemProps) => {
   const validChildren = Children.map(children, (Child) => {
     return isValidElement(Child);
@@ -70,6 +76,34 @@ export const LegendItem: React.FC<LegendItemProps> = ({
       <div className="text-sm text-gray-300">
         {description}
       </div>
+
+      {opacityManager && (
+        <div className="mt-2.5">
+          <Tooltip
+            arrow
+            placement="right-start"
+            trigger="click"
+            maxWidth={350}
+            interactive
+            content={(
+              <div
+                className="p-4 text-gray-500 bg-white rounded"
+                style={{
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+                }}
+              >
+                Slider goes here
+              </div>
+            )}
+          >
+            <button
+              type="button"
+            >
+              <Icon className="w-5" icon={OPACITY_SVG} />
+            </button>
+          </Tooltip>
+        </div>
+      )}
 
       {validChildren && (
         <div className="mt-2.5">

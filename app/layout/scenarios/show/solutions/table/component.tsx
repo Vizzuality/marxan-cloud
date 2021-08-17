@@ -15,7 +15,7 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
 }: SolutionsTableProps) => {
   const [selectedRowId, setSelectedRowId] = useState<string>(selectedSolution || bestSolutionId);
 
-  const solutionsArrayWithBestProperty = body.map((obj) => {
+  const solutionsBest = body.map((obj) => {
     if (obj.id === bestSolutionId) {
       return ({ ...obj, best: true });
     }
@@ -77,7 +77,7 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
   return (
     <Table
       headers={headers}
-      body={solutionsArrayWithBestProperty}
+      body={solutionsBest}
       selectedRowId={selectedRowId}
     />
   );
