@@ -5,8 +5,10 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Button from 'components/button';
 import Item from 'components/features/target-spf-item';
@@ -25,6 +27,13 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   const { query } = useRouter();
   const { sid } = query;
 
+  const selectedFeaturesMutation = useSaveSelectedFeatures({});
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
@@ -35,7 +44,8 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     isFetched: targetedFeaturesIsFetched,
   } = useTargetedFeatures(sid);
 
-  const selectedFeaturesMutation = useSaveSelectedFeatures({});
+  const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -155,8 +165,20 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       data,
     }, {
       onSuccess: () => {
-        onSuccess();
-        setSubmitting(false);
+        saveScenarioMutation.mutate({
+          id: `${sid}`,
+          data: {
+            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-fpf' }),
+          },
+        }, {
+          onSuccess: () => {
+            onSuccess();
+            setSubmitting(false);
+          },
+          onError: () => {
+            setSubmitting(false);
+          },
+        });
       },
       onError: () => {
         setSubmitting(false);
@@ -164,7 +186,13 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     });
 
     // onSuccess();
-  }, [sid, selectedFeaturesData, selectedFeaturesMutation, onSuccess]);
+  }, [sid,
+    metadata,
+    selectedFeaturesData,
+    selectedFeaturesMutation,
+    saveScenarioMutation,
+    onSuccess,
+  ]);
 
   // Render
   if (targetedFeaturesIsFetching && !targetedFeaturesIsFetched) {

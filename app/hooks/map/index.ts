@@ -284,7 +284,7 @@ export function usePUGridLayer({
             'source-layer': 'layer0',
             paint: {
               'line-color': COLORS.primary,
-              'line-opacity': 1,
+              'line-opacity': 0.5,
               'line-width': 1,
               'line-offset': 0.5,
             },

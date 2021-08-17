@@ -10,8 +10,10 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 import { useDebouncedCallback } from 'use-debounce';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import IntersectFeatures from 'layout/scenarios/edit/features/intersect';
 
@@ -40,6 +42,14 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   const queryClient = useQueryClient();
 
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
 
   const {
     data: selectedFeaturesData,
@@ -163,13 +173,25 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       data,
     }, {
       onSuccess: () => {
-        setSubmitting(false);
+        saveScenarioMutation.mutate({
+          id: `${sid}`,
+          data: {
+            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
+          },
+        }, {
+          onSuccess: () => {
+            setSubmitting(false);
+          },
+          onError: () => {
+            setSubmitting(false);
+          },
+        });
       },
       onError: () => {
         setSubmitting(false);
       },
     });
-  }, [sid, getFeaturesRecipe, selectedFeaturesMutation]);
+  }, [sid, metadata, getFeaturesRecipe, selectedFeaturesMutation, saveScenarioMutation]);
 
   const onEnter = useDebouncedCallback((id) => {
     dispatch(setFeatureHoverId(id));
