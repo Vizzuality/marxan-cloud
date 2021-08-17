@@ -1,9 +1,10 @@
 import React from 'react';
-import cx from 'classnames';
-import { useSliderState } from '@react-stately/slider';
-import { useSlider } from '@react-aria/slider';
+
 import { useNumberFormatter } from '@react-aria/i18n';
 import { setInteractionModality } from '@react-aria/interactions';
+import { useSlider } from '@react-aria/slider';
+import { useSliderState } from '@react-stately/slider';
+import cx from 'classnames';
 
 import Thumb from './thumb';
 
@@ -134,7 +135,7 @@ export const Slider: React.FC<SliderProps> = ({
   // component's status isn't updated
   // Calling `setInteractionModality` make sure the component is in the focus status
   React.useEffect(() => {
-    const label = labelRef.current;
+    const label = labelRef?.current;
     // Why `'keyboard'`? This is based on React Aria's on code:
     // https://github.com/adobe/react-spectrum/blob/main/packages/%40react-aria/slider/src/useSlider.ts#L178-L181
     const handler = () => setInteractionModality('keyboard');

@@ -4,6 +4,7 @@ import React, {
 
 import cx from 'classnames';
 
+import Slider from 'components/forms/slider';
 import Icon from 'components/icon';
 import Tooltip from 'components/tooltip';
 
@@ -24,6 +25,7 @@ export interface LegendItemProps {
   listeners?: Record<string, unknown>;
   attributes?: Record<string, unknown>;
   opacityManager?: boolean;
+  onOpacityChange?: () => void;
 }
 
 export const LegendItem: React.FC<LegendItemProps> = ({
@@ -35,7 +37,8 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   sortable,
   listeners,
   attributes,
-  opacityManager = true,
+  opacityManager,
+  onOpacityChange,
 }: LegendItemProps) => {
   const validChildren = Children.map(children, (Child) => {
     return isValidElement(Child);
@@ -78,21 +81,28 @@ export const LegendItem: React.FC<LegendItemProps> = ({
       </div>
 
       {opacityManager && (
-        <div className="mt-2.5">
+        <div className="mt-2.5 flex">
           <Tooltip
             arrow
             placement="right-start"
             trigger="click"
-            maxWidth={350}
             interactive
             content={(
               <div
-                className="p-4 text-gray-500 bg-white rounded"
-                style={{
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
-                }}
+                className="px-4 py-3.5 text-gray-500 bg-white rounded w-60"
               >
-                Slider
+                <Slider
+                  labelRef={null}
+                  theme="light"
+                  defaultValue={0.5}
+                  formatOptions={{
+                    style: 'percent',
+                  }}
+                  maxValue={1}
+                  minValue={0.01}
+                  step={0.01}
+                  onChange={onOpacityChange}
+                />
               </div>
             )}
           >

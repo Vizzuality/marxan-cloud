@@ -441,7 +441,7 @@ export function useLegend({
     if (type === 'protected-areas' && subtype === 'protected-areas-percentage' && !!wdpaIucnCategories.length) return ['wdpa-percentage', 'pugrid'];
     if (type === 'features') {
       return [
-        ...wdpaIucnCategories.length ? ['wdpa-percentage'] : [],
+        ...wdpaIucnCategories?.length ? ['wdpa-percentage'] : [],
         'bioregional',
         'species',
         'pugrid',
