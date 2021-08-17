@@ -92,7 +92,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                   boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
                 }}
               >
-                Slider goes here
+                Slider
               </div>
             )}
           >
