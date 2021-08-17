@@ -68,6 +68,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     tab,
     subtab,
     selectedSolution,
+    frequencyOpacity,
   } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const minZoom = 2;
@@ -80,6 +81,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     sid: sid ? `${sid}` : null,
     type: tab,
     subtype: subtab,
+    frequencyOpacity,
     options: {
       wdpaIucnCategories,
       wdpaThreshold,

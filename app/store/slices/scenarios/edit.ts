@@ -30,7 +30,6 @@ interface ScenarioEditStateProps {
 
   // OPACITY SETTINGS
   wdpaOpacity: number,
-  frequencyOpacity: number,
 }
 
 const initialState = {
@@ -59,7 +58,6 @@ const initialState = {
 
   // OPACITY SETTINGS
   wdpaOpacity: null,
-  frequencyOpacity: null,
 } as ScenarioEditStateProps;
 
 export function getScenarioEditSlice(id) {
@@ -125,9 +123,6 @@ export function getScenarioEditSlice(id) {
       // OPACITY SETTINGS
       setWdpaOpacity: (state, action: PayloadAction<number>) => {
         state.wdpaOpacity = action.payload;
-      },
-      setFrequencyOpacity: (state, action: PayloadAction<number>) => {
-        state.frequencyOpacity = action.payload;
       },
     },
   });

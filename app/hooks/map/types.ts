@@ -31,6 +31,7 @@ export interface UseWDPAPreviewLayer {
   active?: boolean;
   bbox?: number[] | unknown;
   wdpaIucnCategories?: string[];
+  wdpaOpacity?: number;
 }
 
 export interface UseFeaturePreviewLayer {
@@ -57,6 +58,7 @@ export interface UsePUGridLayer {
   type: ScenarioSidebarTabs;
   runId?: number;
   subtype: ScenarioSidebarSubTabs;
+  frequencyOpacity?: number;
   options?: {
     wdpaIucnCategories?: string[];
     wdpaThreshold?: number;

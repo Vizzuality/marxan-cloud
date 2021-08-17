@@ -83,7 +83,7 @@ export function useAdminPreviewLayer({
 
 // WDPApreview
 export function useWDPAPreviewLayer({
-  active, bbox, wdpaIucnCategories, cache = 0,
+  active, bbox, wdpaIucnCategories, cache = 0, wdpaOpacity,
 }: UseWDPAPreviewLayer) {
   return useMemo(() => {
     if (!active || !bbox) return null;
@@ -105,7 +105,7 @@ export function useWDPAPreviewLayer({
             ],
             paint: {
               'fill-color': COLORS.wdpa,
-              // 'fill-opacity': wdpaOpacity,
+              'fill-opacity': wdpaOpacity,
             },
           },
           {
@@ -121,7 +121,7 @@ export function useWDPAPreviewLayer({
         ],
       },
     };
-  }, [active, bbox, wdpaIucnCategories, cache]);
+  }, [active, bbox, wdpaIucnCategories, cache, wdpaOpacity]);
 }
 
 // Featurepreview
@@ -241,7 +241,7 @@ export function usePUGridPreviewLayer({
 
 // PUGrid
 export function usePUGridLayer({
-  active, sid, type, subtype, options = {}, cache,
+  active, sid, type, subtype, options = {}, cache, frequencyOpacity,
 }: UsePUGridLayer) {
   const include = useMemo(() => {
     if (type === 'protected-areas' || type === 'features') return 'protection';
@@ -409,7 +409,7 @@ export function usePUGridLayer({
                   100,
                   COLORS.frequency[3],
                 ],
-                'fill-opacity': 0.75,
+                'fill-opacity': frequencyOpacity || 0.75,
               },
             },
             {
@@ -428,7 +428,7 @@ export function usePUGridLayer({
         ],
       },
     };
-  }, [cache, active, sid, type, subtype, options, include]);
+  }, [cache, active, sid, type, subtype, options, include, frequencyOpacity]);
 }
 
 // PUGrid
