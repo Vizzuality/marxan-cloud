@@ -56,8 +56,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
   });
 
   useEffect(() => {
-    const reloadStep = metaSubtab === 'protected-areas-preview' ? 0 : 1;
-    setStep(reloadStep);
+    setStep(metaSubtab === 'protected-areas-percentage' ? 1 : 0);
   }, [metaSubtab]);
 
   if (!scenarioData || tab !== 'protected-areas') return null;

@@ -17,7 +17,7 @@ const SignInPage: React.FC = () => {
 
   return (
     <>
-      <Head title="Sign up" />
+      <Head title="Sign in" />
 
       <MetaIcons />
 
