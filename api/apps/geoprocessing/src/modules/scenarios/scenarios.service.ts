@@ -98,8 +98,6 @@ export class ScenariosService {
        'valuePosition,featureList' as "parseKeys"`,
       _filters,
     );
-
-    this.logger.debug(attributes);
     /**
      * @todo: avoid sql injection in the scenario Id.
      * @todo: provide features id array

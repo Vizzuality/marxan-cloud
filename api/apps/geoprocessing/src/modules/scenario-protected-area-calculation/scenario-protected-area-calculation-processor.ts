@@ -25,24 +25,28 @@ export class ScenarioProtectedAreaCalculationProcessor
    * we should update the area intersected.
    */
   async process(job: Job<JobInput, true>): Promise<true> {
+    this.logger.debug(`start processing pa for scenario: ${job.data.scenarioId}`)
     const scenarioId = job.data.scenarioId;
     const wdpaList = job.data.protectedAreaFilterByIds!.join(`','`);
+    const wdpaFilter = (job.data.protectedAreaFilterByIds! && job.data.protectedAreaFilterByIds!.length>0) ? `where id IN ('${wdpaList}')`: ``
     const query = `
-      with pa as (select st_makevalid(ST_union(the_geom)) as the_geom from wdpa where id IN ('${wdpaList}')),
-      pu as (
+    with pu as (
       select spd.id, pug.the_geom, pug.area as pu_area
       from scenarios_pu_data spd
       inner join planning_units_geom pug on spd.pu_geom_id = pug.id
-      where scenario_id=$1::uuid),
-      pu_pa as (select pu.id, st_area(st_transform(st_intersection(pu.the_geom, pa.the_geom), 3410)) as pa_pu_area,
-                                      pu_area
-                from pu
-                left join pa on pu.the_geom && pa.the_geom)
-      UPDATE scenarios_pu_data
-      SET (protected_area) =
-          (SELECT protected_area
-          FROM (select id, sum(pa_pu_area) as protected_area, max(pu_area) pu_area
-                from pu_pa group by id) as result
+      where scenario_id=$1),
+     pa as (select the_geom as the_geom from wdpa ${wdpaFilter}),
+     pu_pa_union as (select pu.id, pu.the_geom as pu_the_geom, pa.the_geom as pa_the_geom, pu_area
+      from pu
+      inner join pa on pu.the_geom && pa.the_geom),
+pu_pa_agg as (select id,pu_the_geom, st_makevalid(ST_Union(pa_the_geom)) as pa_the_geom, min(pu_area) as pu_area
+      from pu_pa_union
+      group by id, pu_the_geom),
+      result as (select id, round((st_area(st_transform(st_intersection(pu_the_geom, pa_the_geom), 3410))/pu_area)*100) as protected_area
+  from pu_pa_agg)
+    UPDATE scenarios_pu_data
+      SET (protected_area) = (SELECT protected_area
+          FROM result
           WHERE scenarios_pu_data.id = result.id);
     `;
     const queryBuilder = this.scenarioPlanningUnitsRepo.query(

@@ -7,7 +7,7 @@ import {
 } from "https://deno.land/std@0.103.0/path/mod.ts";
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
-import { sleep } from "https://deno.land/x/sleep/mod.ts";
+import { sleep } from "https://deno.land/x/sleep@v1.2.0/mod.ts";
 
 const scriptPath = dirname(relative(Deno.cwd(), fromFileUrl(import.meta.url)));
 
@@ -94,7 +94,7 @@ console.log(project);
 
 const scenarioStart = Process.hrtime();
 
-await sleep(5)
+await sleep(10)
 
 // Scenario creation with the bare minimum; From there we need to be doin patches to the same scenario
 let scenario = await botClient
@@ -103,6 +103,7 @@ let scenario = await botClient
     type: "marxan",
     projectId: project.data.id,
     description: "A Brazil scenario",
+<<<<<<< HEAD
     metadata: {
         scenarioEditingMetadata: {
           status: {
@@ -113,6 +114,9 @@ let scenario = await botClient
         }
       },
     status: "draft"
+=======
+    status: "draft",
+>>>>>>> done some fixes
   })
   .then((result) => result.data)
   .catch((e) => {
@@ -139,11 +143,22 @@ await botClient
 
 console.log(scenario);
 
-await sleep(20)
+await sleep(30)
 
 await botClient
   .patch(`/scenarios/${scenario!.data!.id}`, {
     wdpaThreshold: 50,
+    metadata: {
+    scenarioEditingMetadata: {
+        status: {
+          'protected-areas': 'draft',
+          features: 'draft',
+          analysis: 'draft',
+        },
+        tab: 'analysis',
+        subtab: 'analysis-preview',
+      }
+    }
   }).catch((e) => {
     console.log(e);
   });
@@ -151,13 +166,13 @@ await botClient
 const scenarioTook = Process.hrtime(scenarioStart);
 console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
 
-await botClient.get(`/scenarios/${scenario!.data!.id}`)
-    .then((result) =>  console.log(result.data))
-    .catch((e) => {
-    console.log(e);
-  });
+// await botClient.get(`/scenarios/${scenario!.data!.id}`)
+//     .then((result) =>  console.log(result.data))
+//     .catch((e) => {
+//     console.log(e);
+//   });
 
-await sleep(5)
+// await sleep(10)
 
 // Setup features in the project
 
