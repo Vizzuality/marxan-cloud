@@ -149,6 +149,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
   const query = useQuery(['selected-features', sid], fetchFeatures, {
     ...queryOptions,
     refetchOnWindowFocus: false,
+    retry: false,
     enabled: !!sid,
   });
 
@@ -341,7 +342,7 @@ export function useTargetedFeatures(sid) {
 
 export function useSaveSelectedFeatures({
   requestConfig = {
-    method: 'PUT',
+    method: 'POST',
   },
 }: UseSaveSelectedFeaturesProps) {
   const queryClient = useQueryClient();
@@ -349,7 +350,7 @@ export function useSaveSelectedFeatures({
 
   const saveFeature = ({ id, data }: SaveSelectedFeaturesProps) => {
     return SCENARIOS.request({
-      url: `/${id}/features/specification`,
+      url: `/${id}/features/specification/v2`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
