@@ -8,7 +8,7 @@ import { Specification, SpecificationSnapshot } from '../../domain';
 import { GetSpecificationHandler } from '../get-specification.handler';
 import { SpecificationRepository } from '../specification.repository';
 import {
-  GetSpecification,
+  GetLastUpdatedSpecification,
   GetSpecificationError,
 } from '../get-specification.query';
 
@@ -30,8 +30,8 @@ export const getFixtures = async () => {
   const repo = sandbox.get(SpecificationRepository);
 
   return {
-    WhenGettingSpecificationById: (id: string = v4()) =>
-      sut.execute(new GetSpecification(id)),
+    WhenGettingLastSpecificationByIds: (ids: string[] = [v4()]) =>
+      sut.execute(new GetLastUpdatedSpecification(ids)),
     ThenItIsNotFound(
       result: Either<GetSpecificationError, SpecificationSnapshot>,
     ) {

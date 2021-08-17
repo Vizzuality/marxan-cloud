@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { CqrsModule, IInferredQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Either, isLeft, isRight, Right, right } from 'fp-ts/Either';
 
-import { GetSpecification } from '@marxan-api/modules/specification';
+import { GetLastUpdatedSpecification } from '@marxan-api/modules/specification';
 import { SpecificationSnapshot } from '@marxan-api/modules/specification/domain';
 
 import { ScenarioSpecification, SpecificationId } from '../../domain';
@@ -60,10 +60,10 @@ export const getFixtures = async () => {
       repo.save(scenarioSpec);
 
       specificationQueryHandler.mock.mockImplementationOnce(
-        async (query: GetSpecification) =>
+        async (query: GetLastUpdatedSpecification) =>
           right({
             iAmASnapShot: true,
-            id: query.id,
+            id: query.ids[0],
           }),
       );
 
@@ -84,12 +84,12 @@ export const getFixtures = async () => {
   };
 };
 
-@QueryHandler(GetSpecification)
+@QueryHandler(GetLastUpdatedSpecification)
 class FakeGetSpecificationHandler
-  implements IInferredQueryHandler<GetSpecification> {
+  implements IInferredQueryHandler<GetLastUpdatedSpecification> {
   mock = jest.fn();
 
-  execute(query: GetSpecification) {
+  execute(query: GetLastUpdatedSpecification) {
     return this.mock(query);
   }
 }
