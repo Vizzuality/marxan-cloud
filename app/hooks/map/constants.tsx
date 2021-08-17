@@ -36,6 +36,7 @@ export const LEGEND_LAYERS = {
     id: 'pugrid',
     name: 'PU grid',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.primary }} />,
+
   }),
 
   // WDPA
@@ -43,6 +44,7 @@ export const LEGEND_LAYERS = {
     id: 'wdpa-preview',
     name: 'Protected areas preview',
     icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.wdpa }} />,
+    opacityManager: true,
   }),
   'wdpa-percentage': () => ({
     id: 'wdpa-percentage',
@@ -120,6 +122,7 @@ export const LEGEND_LAYERS = {
     id: 'frequency',
     name: 'Frequency',
     type: 'gradient',
+    opacityManager: true,
     items: [
       {
         color: COLORS.frequency[0],

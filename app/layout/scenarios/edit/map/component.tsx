@@ -285,6 +285,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
               <LegendItem
                 sortable={false}
                 key={i.id}
+                opacityManager={i.opacityManager}
                 {...i}
               >
                 {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
