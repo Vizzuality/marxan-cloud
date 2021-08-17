@@ -49,7 +49,7 @@ let includeSelections: IncludeSelections = {
   results: {
     attributes: ', "frequencyValue", "valuePosition"',
     select: `'-'||array_to_string(array_positions(output.value, true),'-,-')||'-' as "valuePosition", \
-          round((output.included_count/array_length(output.value, 1)::numeric)*100) as "frequencyValue"`,
+          round((output.included_count/array_length(output.value, 1)::numeric)*100)::int as "frequencyValue"`,
     table: 'output_scenarios_pu_data',
     alias: 'output',
     condition: 'test.id = output.scenario_pu_id',
