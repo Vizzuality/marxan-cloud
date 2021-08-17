@@ -27,6 +27,10 @@ interface ScenarioEditStateProps {
 
   uploading: boolean;
   uploadingValue: Record<string, object>
+
+  // OPACITY SETTINGS
+  protectedAreasPreviewOpacity: number,
+  frequencyOpacity: number,
 }
 
 const initialState = {
@@ -52,6 +56,10 @@ const initialState = {
   drawingValue: null,
   uploading: false,
   uploadingValue: null,
+
+  // OPACITY SETTINGS
+  protectedAreasPreviewOpacity: null,
+  frequencyOpacity: null,
 } as ScenarioEditStateProps;
 
 export function getScenarioEditSlice(id) {
@@ -112,6 +120,14 @@ export function getScenarioEditSlice(id) {
       },
       setUploadingValue: (state, action: PayloadAction<Record<string, object>>) => {
         state.uploadingValue = action.payload;
+      },
+
+      // OPACITY SETTINGS
+      setProtectedAreasPreviewOpacity: (state, action: PayloadAction<number>) => {
+        state.protectedAreasPreviewOpacity = action.payload;
+      },
+      setFrequencyOpacity: (state, action: PayloadAction<number>) => {
+        state.frequencyOpacity = action.payload;
       },
     },
   });
