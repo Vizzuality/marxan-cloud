@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 
 // Map
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -39,6 +39,8 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const [open, setOpen] = useState(true);
   const [session] = useSession();
 
+  const dispatch = useDispatch();
+
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -59,7 +61,8 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
 
   const bestSolution = bestSolutionData || {};
 
-  getScenarioSlice(sid);
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setProtectedAreasPreviewOpacity, setFrequencyOpacity } = scenarioSlice.actions;
 
   const {
     tab,
@@ -144,10 +147,10 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     return null;
   };
 
-  const onChangeOpacity = (opacity, name) => {
-    if (name === 'Protected areas preview') console.log('LA OPASIDÁ DE PU', opacity);
-    if (name === 'Frequency') console.log('LA OPASIDÁ DE FREQUENCY', opacity);
-  };
+  const onChangeOpacity = useCallback((opacity, name) => {
+    if (name === 'Protected areas preview') dispatch(setProtectedAreasPreviewOpacity(opacity));
+    if (name === 'Frequency') dispatch(setFrequencyOpacity(opacity));
+  }, [setProtectedAreasPreviewOpacity, dispatch, setFrequencyOpacity]);
 
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
