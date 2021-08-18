@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
 import { CalculatePlanningUnitsProtectionLevelHandler } from './calculate-planning-units-protection-level.handler';
 import { QueueModule } from '../queue/queue.module';
 import { queueName } from './queue.name';
@@ -21,6 +22,7 @@ import { queueName } from './queue.name';
     QueueModule.register({
       name: queueName,
     }),
+    ApiEventsModule,
   ],
   providers: [CalculatePlanningUnitsProtectionLevelHandler],
 })

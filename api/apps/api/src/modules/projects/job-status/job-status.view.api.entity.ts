@@ -76,32 +76,26 @@ export class ScenarioJobStatus {
 const eventToJobStatusMapping: Record<ValuesType<ScenarioEvents>, JobStatus> = {
   [API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1]:
     JobStatus.failure,
-  [API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1]:
-  JobStatus.done,
+  [API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1]: JobStatus.done,
   [API_EVENT_KINDS.scenario__costSurface__shapeConversionFailed__v1_alpha1]:
     JobStatus.failure,
   [API_EVENT_KINDS.scenario__costSurface__shapeConverted__v1_alpha1]:
     JobStatus.running,
   [API_EVENT_KINDS.scenario__costSurface__submitted__v1_alpha1]:
     JobStatus.running,
-  [API_EVENT_KINDS.scenario__run__progress__v1__alpha1]:
-    JobStatus.running,
+  [API_EVENT_KINDS.scenario__run__progress__v1__alpha1]: JobStatus.running,
   [API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1]:
     JobStatus.failure,
   [API_EVENT_KINDS.scenario__planningUnitsInclusion__finished__v1__alpha1]:
     JobStatus.done,
   [API_EVENT_KINDS.scenario__planningUnitsInclusion__submitted__v1__alpha1]:
     JobStatus.running,
-  [API_EVENT_KINDS.scenario__run__submitted__v1__alpha1]:
-    JobStatus.running,
-  [API_EVENT_KINDS.scenario__run__finished__v1__alpha1]:
-    JobStatus.running,
-  [API_EVENT_KINDS.scenario__run__failed__v1__alpha1]:
-    JobStatus.failure,
+  [API_EVENT_KINDS.scenario__run__submitted__v1__alpha1]: JobStatus.running,
+  [API_EVENT_KINDS.scenario__run__finished__v1__alpha1]: JobStatus.running,
+  [API_EVENT_KINDS.scenario__run__failed__v1__alpha1]: JobStatus.failure,
   [API_EVENT_KINDS.scenario__run__outputSaveFailed__v1__alpha1]:
     JobStatus.failure,
-  [API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1]:
-    JobStatus.done,
+  [API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1]: JobStatus.done,
   [API_EVENT_KINDS.scenario__geofeatureCopy__submitted__v1__alpha1]:
     JobStatus.running,
   [API_EVENT_KINDS.scenario__geofeatureCopy__failed__v1__alpha1]:
@@ -120,6 +114,8 @@ const eventToJobStatusMapping: Record<ValuesType<ScenarioEvents>, JobStatus> = {
     JobStatus.failure,
   [API_EVENT_KINDS.scenario__geofeatureStratification__finished__v1__alpha1]:
     JobStatus.done,
+  [API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__submitted__v1__alpha1]:
+    JobStatus.running,
   [API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__failed__v1__alpha1]:
     JobStatus.failure,
   [API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__finished__v1__alpha1]:
