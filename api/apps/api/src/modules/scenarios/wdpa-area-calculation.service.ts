@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { pick } from 'lodash';
+import { omit, pick } from 'lodash';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { Scenario } from './scenario.api.entity';
@@ -13,14 +13,14 @@ export class WdpaAreaCalculationService {
    */
   private readonly watchedChangeProperties: (keyof InputChange)[] = [
     'customProtectedAreaIds',
-    'wdpaIucnCategories'
+    'wdpaIucnCategories',
   ];
 
   /**
    * and new entity state consists (i.e. are present) of all of the below
    */
   private readonly requiredToTriggerChange: (keyof Scenario)[] = [
-    'wdpaIucnCategories'
+    'wdpaIucnCategories',
   ];
 
   /**
@@ -31,7 +31,10 @@ export class WdpaAreaCalculationService {
       return false;
     }
 
-    return this.areRequiredFieldsAvailable(scenario);
+    return this.areRequiredFieldsAvailable({
+      ...scenario,
+      ...omit(changeSet, 'metadata'),
+    });
   }
 
   private intendsToChangeWatchedProperty(changeSet: InputChange): boolean {
