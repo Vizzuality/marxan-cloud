@@ -28,8 +28,9 @@ interface ScenarioEditStateProps {
   uploading: boolean;
   uploadingValue: Record<string, object>
 
-  // OPACITY SETTINGS
+  // SETTINGS
   wdpaOpacity: number,
+  layerSettings: Record<string, Record<string, unknown>>
 }
 
 const initialState = {
@@ -56,8 +57,9 @@ const initialState = {
   uploading: false,
   uploadingValue: null,
 
-  // OPACITY SETTINGS
+  // SETTINGS
   wdpaOpacity: null,
+  layerSettings: {},
 } as ScenarioEditStateProps;
 
 export function getScenarioEditSlice(id) {
@@ -123,6 +125,20 @@ export function getScenarioEditSlice(id) {
       // OPACITY SETTINGS
       setWdpaOpacity: (state, action: PayloadAction<number>) => {
         state.wdpaOpacity = action.payload;
+      },
+      setLayerSettings: (state, action: PayloadAction<{
+        id: string,
+        settings: Record<string, unknown>
+      }>) => {
+        const { id: layerId, settings } = action.payload;
+        const newSettings = {
+          ...state.layerSettings,
+          [layerId]: {
+            ...state.layerSettings[layerId],
+            ...settings,
+          },
+        };
+        state.layerSettings = newSettings;
       },
     },
   });

@@ -31,7 +31,7 @@ export interface UseWDPAPreviewLayer {
   active?: boolean;
   bbox?: number[] | unknown;
   wdpaIucnCategories?: string[];
-  wdpaOpacity?: number;
+  options?: Record<string, unknown>;
 }
 
 export interface UseFeaturePreviewLayer {
@@ -66,6 +66,14 @@ export interface UsePUGridLayer {
     puIncludedValue?: string[];
     puExcludedValue?: string[];
     runId?: string;
+    settings?: {
+      pugrid?: {
+        opacity?: number;
+      },
+      'lock-in'?: {
+        opacity?: number;
+      },
+    };
   };
 }
 
@@ -79,5 +87,6 @@ export interface UseLegend {
     puIncludedValue?: string[];
     puExcludedValue?: string[];
     runId?: string;
+    layerSettings?: Record<string, unknown>;
   };
 }

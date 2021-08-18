@@ -96,6 +96,7 @@ export const LEGEND_LAYERS = {
       id: 'lock-in',
       name: 'Included areas',
       icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.include }} />,
+      opacityManager: true,
       description: (
         <div className="pl-5">
           {puIncludedValue.length}
@@ -112,6 +113,7 @@ export const LEGEND_LAYERS = {
       id: 'lock-out',
       name: 'Excluded areas',
       icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.exclude }} />,
+      opacityManager: true,
       description: (
         <div className="pl-5">
           {puExcludedValue.length}

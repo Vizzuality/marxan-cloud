@@ -25,6 +25,9 @@ export interface LegendItemProps {
   listeners?: Record<string, unknown>;
   attributes?: Record<string, unknown>;
   opacityManager?: boolean;
+  settings?: {
+    opacity: number,
+  }
   onChangeOpacity?: () => void;
 }
 
@@ -38,11 +41,14 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   listeners,
   attributes,
   opacityManager,
+  settings,
   onChangeOpacity,
 }: LegendItemProps) => {
   const validChildren = Children.map(children, (Child) => {
     return isValidElement(Child);
   }).some((c) => !!c);
+
+  const { opacity = 1 } = settings || {};
 
   return (
     <div
@@ -94,12 +100,12 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                 <Slider
                   labelRef={null}
                   theme="dark-small"
-                  defaultValue={0.5}
+                  defaultValue={opacity}
                   formatOptions={{
                     style: 'percent',
                   }}
                   maxValue={1}
-                  minValue={0.01}
+                  minValue={0}
                   step={0.01}
                   onChange={onChangeOpacity}
                 />

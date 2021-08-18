@@ -83,14 +83,16 @@ export function useAdminPreviewLayer({
 
 // WDPApreview
 export function useWDPAPreviewLayer({
-  active, bbox, wdpaIucnCategories, cache = 0, wdpaOpacity,
+  active, bbox, wdpaIucnCategories, cache = 0, options,
 }: UseWDPAPreviewLayer) {
+  const { opacity = 1 } = options || {};
   return useMemo(() => {
     if (!active || !bbox) return null;
 
     return {
       id: `wdpa-preview-layer-${cache}`,
       type: 'vector',
+      opacity,
       source: {
         type: 'vector',
         tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
@@ -105,7 +107,6 @@ export function useWDPAPreviewLayer({
             ],
             paint: {
               'fill-color': COLORS.wdpa,
-              'fill-opacity': wdpaOpacity,
             },
           },
           {
@@ -121,7 +122,7 @@ export function useWDPAPreviewLayer({
         ],
       },
     };
-  }, [active, bbox, wdpaIucnCategories, cache, wdpaOpacity]);
+  }, [active, bbox, wdpaIucnCategories, cache, opacity]);
 }
 
 // Featurepreview
@@ -261,8 +262,15 @@ export function usePUGridLayer({
       puIncludedValue,
       puExcludedValue,
       runId,
+      settings = {},
     } = options;
 
+    const {
+      pugrid: PUgridSettings = {},
+      'lock-in': LockInSettings = {},
+    } = settings;
+    const { opacity: PUgridOpacity = 1 } = PUgridSettings;
+    const { opacity: LockInOpacity = 1 } = LockInSettings;
     return {
       id: `pu-grid-layer-${cache}`,
       type: 'vector',
@@ -285,7 +293,7 @@ export function usePUGridLayer({
             'source-layer': 'layer0',
             paint: {
               'line-color': COLORS.primary,
-              'line-opacity': 1,
+              'line-opacity': 1 * PUgridOpacity,
               'line-width': 1,
               'line-offset': 0.5,
             },
@@ -296,7 +304,8 @@ export function usePUGridLayer({
             type === 'protected-areas' && subtype === 'protected-areas-percentage')
             || type === 'features'
             || (type === 'analysis' && subtype === 'analysis-preview'
-            ) ? [
+            )
+            ? [
               {
                 type: 'fill',
                 'source-layer': 'layer0',
@@ -367,7 +376,7 @@ export function usePUGridLayer({
               ],
               paint: {
                 'line-color': COLORS.include,
-                'line-opacity': 1,
+                'line-opacity': 1 * LockInOpacity,
                 'line-width': 1.5,
                 'line-offset': 0.75,
               },
@@ -458,10 +467,17 @@ export function useLegend({
   }, [type, subtype, options]);
 
   return useMemo(() => {
+    const { layerSettings = {} } = options;
     return layers
       .map((l) => {
         const L = LEGEND_LAYERS[l];
-        if (L) return L(options);
+        if (L) {
+          return {
+            ...L(options),
+            settings: layerSettings[l],
+          };
+        }
+
         return null;
       })
       .filter((l) => !!l);

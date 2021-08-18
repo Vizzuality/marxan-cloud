@@ -59,7 +59,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const {
     setTmpPuIncludedValue,
     setTmpPuExcludedValue,
-    setWdpaOpacity,
+    setLayerSettings,
   } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
@@ -81,8 +81,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     puTmpIncludedValue,
     puTmpExcludedValue,
 
-    // Opacity settings
-    wdpaOpacity,
+    // Settings
+    layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const minZoom = 2;
@@ -95,7 +95,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     cache,
     active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
     bbox,
-    wdpaOpacity,
+    options: {
+      ...layerSettings['wdpa-preview'],
+    },
   });
 
   const FeaturePreviewLayers = useFeaturePreviewLayers({
@@ -120,6 +122,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
+      settings: {
+        pugrid: layerSettings.pugrid,
+        'lock-in': layerSettings['lock-in'],
+      },
     },
   });
 
@@ -134,6 +140,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
+      layerSettings,
     },
   });
 
@@ -225,9 +232,12 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     return null;
   };
 
-  const onChangeOpacity = useCallback((opacity, name) => {
-    if (name === 'Protected areas preview') dispatch(setWdpaOpacity(opacity));
-  }, [setWdpaOpacity, dispatch]);
+  const onChangeOpacity = useCallback((opacity, id) => {
+    dispatch(setLayerSettings({
+      id,
+      settings: { opacity },
+    }));
+  }, [setLayerSettings, dispatch]);
 
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
@@ -292,7 +302,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         >
           {LEGEND.map((i) => {
             const {
-              type, items, intersections, name,
+              type, items, intersections, id,
             } = i;
 
             return (
@@ -300,7 +310,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
                 sortable={false}
                 key={i.id}
                 opacityManager={i.opacityManager}
-                onChangeOpacity={(opacity) => onChangeOpacity(opacity, name)}
+                onChangeOpacity={(opacity) => onChangeOpacity(opacity, id)}
                 {...i}
               >
                 {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
