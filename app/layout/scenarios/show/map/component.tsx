@@ -37,6 +37,7 @@ export interface ScenariosShowMapProps {
 
 export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const [open, setOpen] = useState(true);
+  const [shownMap, setshownMap] = useState(true);
   const [session] = useSession();
 
   const dispatch = useDispatch();
@@ -165,6 +166,14 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     }));
   }, [setLayerSettings, dispatch]);
 
+  const onChangeVisibility = useCallback((id) => {
+    setshownMap(!shownMap);
+    dispatch(setLayerSettings({
+      id,
+      settings: { visibility: shownMap },
+    }));
+  }, [setLayerSettings, dispatch, shownMap]);
+
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
       <Map
@@ -233,6 +242,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
                 key={i.id}
                 settingsManager={i.settingsManager}
                 onChangeOpacity={(opacity) => onChangeOpacity(opacity, id)}
+                onChangeVisibility={() => onChangeVisibility(id)}
                 {...i}
               >
                 {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}

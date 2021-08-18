@@ -34,7 +34,7 @@ const THEME = {
   },
   'dark-small': {
     thumb:
-      'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+      'cursor-pointer absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
     status: {
       default: 'border-white',
       dragging: 'border-white opacity-80',
