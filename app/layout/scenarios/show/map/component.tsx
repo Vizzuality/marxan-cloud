@@ -110,6 +110,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       puIncludedValue: included,
       puExcludedValue: excluded,
       runId: selectedSolution?.runId || bestSolution?.runId,
+      layerSettings,
     },
   });
 
@@ -223,7 +224,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
         >
           {LEGEND.map((i) => {
             const {
-              type, items, intersections, name,
+              type, items, intersections, id,
             } = i;
 
             return (
@@ -231,7 +232,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
                 sortable={false}
                 key={i.id}
                 opacityManager={i.opacityManager}
-                onChangeOpacity={(opacity) => onChangeOpacity(opacity, name)}
+                onChangeOpacity={(opacity) => onChangeOpacity(opacity, id)}
                 {...i}
               >
                 {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
