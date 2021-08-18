@@ -34,10 +34,8 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
   const {
     wdpaIucnCategories,
     numberOfRuns,
-    metadata,
+    boundaryLengthModifier,
   } = scenarioData;
-
-  const { marxanInputParameterFile = {} } = metadata;
 
   return (
     <dl className="flex flex-col space-y-2">
@@ -55,7 +53,7 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>BLM:</dt>
-        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(marxanInputParameterFile?.BLM || '-')}</dd>
+        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(boundaryLengthModifier || '-')}</dd>
       </div>
       {/* <div className="flex space-x-2 text-sm">
         <dt>Schedules:</dt>
