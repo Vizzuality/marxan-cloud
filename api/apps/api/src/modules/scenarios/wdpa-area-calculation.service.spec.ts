@@ -44,14 +44,14 @@ describe(`when scenario has complete data`, () => {
     });
   });
 
-  describe(`when input changes contain watched property`, () => {
+  describe(`when input changes contain watched property, but no required is available`, () => {
     it(`should tell to trigger calculations`, () => {
       expect(
         sut.shouldTrigger(
           scenarioWithAllWatchedPresent(),
           thresholdChangeSet(),
         ),
-      ).toEqual(true);
+      ).toEqual(false);
     });
   });
   describe(`when input changes contain all watched properties`, () => {
