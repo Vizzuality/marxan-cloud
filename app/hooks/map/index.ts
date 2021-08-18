@@ -242,7 +242,7 @@ export function usePUGridPreviewLayer({
 
 // PUGrid
 export function usePUGridLayer({
-  active, sid, type, subtype, options = {}, cache, frequencyOpacity,
+  active, sid, type, subtype, options = {}, cache,
 }: UsePUGridLayer) {
   const include = useMemo(() => {
     if (type === 'protected-areas' || type === 'features') return 'protection';
@@ -267,10 +267,21 @@ export function usePUGridLayer({
 
     const {
       pugrid: PUgridSettings = {},
+      'wdpa-percentage': WdpaPercentageSettings = {},
+      cost: CostSettings = {},
       'lock-in': LockInSettings = {},
+      'lock-out': LockOutSettings = {},
+      frequency: FrequencySettings = {},
+      solution: SolutionSettings = {},
     } = settings;
+
     const { opacity: PUgridOpacity = 1 } = PUgridSettings;
+    const { opacity: WdpaPercentageOpacity = 0.5 } = WdpaPercentageSettings;
+    const { opacity: CostOpacity = 0.75 } = CostSettings;
     const { opacity: LockInOpacity = 1 } = LockInSettings;
+    const { opacity: LockOutOpacity = 1 } = LockOutSettings;
+    const { opacity: FrequencyOpacity = 0.75 } = FrequencySettings;
+    const { opacity: SolutionOpacity = 0.75 } = SolutionSettings;
     return {
       id: `pu-grid-layer-${cache}`,
       type: 'vector',
@@ -317,7 +328,7 @@ export function usePUGridLayer({
                       ['has', 'percentageProtected'],
                       ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
                     ],
-                    0.5,
+                    0.5 * WdpaPercentageOpacity,
                     0,
                   ],
                 },
@@ -360,7 +371,7 @@ export function usePUGridLayer({
                   1,
                   COLORS.cost[1],
                 ],
-                'fill-opacity': 0.75,
+                'fill-opacity': 0.75 * CostOpacity,
               },
             },
           ] : [],
@@ -392,7 +403,7 @@ export function usePUGridLayer({
               ],
               paint: {
                 'line-color': COLORS.exclude,
-                'line-opacity': 1,
+                'line-opacity': 1 * LockOutOpacity,
                 'line-width': 1.5,
                 'line-offset': 0.75,
               },
@@ -418,7 +429,7 @@ export function usePUGridLayer({
                   100,
                   COLORS.frequency[3],
                 ],
-                'fill-opacity': frequencyOpacity || 0.75,
+                'fill-opacity': 0.75 * FrequencyOpacity,
               },
             },
             {
@@ -430,14 +441,14 @@ export function usePUGridLayer({
               ],
               paint: {
                 'fill-color': COLORS.primary,
-                'fill-opacity': 0.75,
+                'fill-opacity': 0.75 * SolutionOpacity,
               },
             },
           ] : [],
         ],
       },
     };
-  }, [cache, active, sid, type, subtype, options, include, frequencyOpacity]);
+  }, [cache, active, sid, type, subtype, options, include]);
 }
 
 // PUGrid

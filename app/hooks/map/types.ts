@@ -70,7 +70,22 @@ export interface UsePUGridLayer {
       pugrid?: {
         opacity?: number;
       },
+      'wdpa-percentage'?: {
+        opacity?: number;
+      },
+      cost?: {
+        opacity?: number;
+      },
       'lock-in'?: {
+        opacity?: number;
+      },
+      'lock-out'?: {
+        opacity?: number;
+      },
+      frequency?: {
+        opacity?: number;
+      },
+      solution?: {
         opacity?: number;
       },
     };

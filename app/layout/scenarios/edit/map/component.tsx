@@ -124,7 +124,12 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puExcludedValue: puTmpExcludedValue,
       settings: {
         pugrid: layerSettings.pugrid,
+        'wdpa-percentage': layerSettings['wdpa-percentage'],
+        cost: layerSettings.cost,
         'lock-in': layerSettings['lock-in'],
+        'lock-out': layerSettings['lock-out'],
+        frequency: layerSettings.frequency,
+        solution: layerSettings.solution,
       },
     },
   });
