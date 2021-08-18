@@ -314,10 +314,6 @@ export function usePUGridLayer({
     return {
       id: `pu-grid-layer-${cache}`,
       type: 'vector',
-      layout: {
-        // ver
-        visibility: getLayerVisibility(PUgridVisibility),
-      },
       source: {
         type: 'vector',
         tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/planning-units/tiles/{z}/{x}/{y}.mvt?include=${include}`],
@@ -327,6 +323,9 @@ export function usePUGridLayer({
           {
             type: 'fill',
             'source-layer': 'layer0',
+            layout: {
+              visibility: getLayerVisibility(PUgridVisibility),
+            },
             paint: {
               'fill-color': '#000',
               'fill-opacity': 0,
@@ -335,6 +334,9 @@ export function usePUGridLayer({
           {
             type: 'line',
             'source-layer': 'layer0',
+            layout: {
+              visibility: getLayerVisibility(PUgridVisibility),
+            },
             paint: {
               'line-color': COLORS.primary,
               'line-opacity': 0.5 * PUgridOpacity,
