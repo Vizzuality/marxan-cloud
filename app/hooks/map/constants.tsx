@@ -36,7 +36,10 @@ export const LEGEND_LAYERS = {
     id: 'pugrid',
     name: 'PU grid',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.primary }} />,
-    opacityManager: true,
+    settingsManager: {
+      opacity: true,
+      shown: true,
+    },
   }),
 
   // WDPA
@@ -44,13 +47,19 @@ export const LEGEND_LAYERS = {
     id: 'wdpa-preview',
     name: 'Protected areas preview',
     icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.wdpa }} />,
-    opacityManager: true,
+    settingsManager: {
+      opacity: true,
+      shown: true,
+    },
   }),
   'wdpa-percentage': () => ({
     id: 'wdpa-percentage',
     name: 'Protected areas percentage',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.wdpa }} />,
-    opacityManager: true,
+    settingsManager: {
+      opacity: true,
+      shown: true,
+    },
   }),
 
   // Species
@@ -58,19 +67,28 @@ export const LEGEND_LAYERS = {
     id: 'bioregional',
     name: 'Bioregional',
     icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.bioregional.default }} />,
-    opacityManager: true,
+    settingsManager: {
+      opacity: true,
+      shown: true,
+    },
   }),
   species: () => ({
     id: 'species',
     name: 'Species',
     icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.species.default }} />,
-    opacityManager: true,
+    settingsManager: {
+      opacity: true,
+      shown: true,
+    },
   }),
   features: () => ({
     id: 'features',
     name: 'Features',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.features }} />,
-    opacityManager: true,
+    settingsManager: {
+      opacity: true,
+      shown: true,
+    },
   }),
 
   // ANALYSIS
@@ -78,7 +96,10 @@ export const LEGEND_LAYERS = {
     id: 'cost',
     name: 'Cost surface',
     type: 'gradient',
-    opacityManager: true,
+    settingsManager: {
+      opacity: true,
+      shown: true,
+    },
     items: [
       {
         color: COLORS.cost[0],
@@ -96,7 +117,10 @@ export const LEGEND_LAYERS = {
       id: 'lock-in',
       name: 'Included areas',
       icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.include }} />,
-      opacityManager: true,
+      settingsManager: {
+        opacity: true,
+        shown: true,
+      },
       description: (
         <div className="pl-5">
           {puIncludedValue.length}
@@ -113,7 +137,10 @@ export const LEGEND_LAYERS = {
       id: 'lock-out',
       name: 'Excluded areas',
       icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.exclude }} />,
-      opacityManager: true,
+      settingsManager: {
+        opacity: true,
+        shown: true,
+      },
       description: (
         <div className="pl-5">
           {puExcludedValue.length}
@@ -129,7 +156,10 @@ export const LEGEND_LAYERS = {
     id: 'frequency',
     name: 'Frequency',
     type: 'gradient',
-    opacityManager: true,
+    settingsManager: {
+      opacity: true,
+      shown: true,
+    },
     items: [
       {
         color: COLORS.frequency[0],
@@ -153,6 +183,9 @@ export const LEGEND_LAYERS = {
     id: 'solution',
     name: 'Solution selected',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.primary }} />,
-    opacityManager: true,
+    settingsManager: {
+      opacity: true,
+      shown: true,
+    },
   }),
 };

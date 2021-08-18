@@ -265,7 +265,6 @@ export function usePUGridLayer({
       settings = {},
     } = options;
 
-    console.log('%cSETTINGS', 'color:pink', settings);
     const {
       pugrid: PUgridSettings = {},
       'wdpa-percentage': WdpaPercentageSettings = {},

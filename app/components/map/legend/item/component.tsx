@@ -24,7 +24,10 @@ export interface LegendItemProps {
   };
   listeners?: Record<string, unknown>;
   attributes?: Record<string, unknown>;
-  opacityManager?: boolean;
+  settingsManager?: {
+    opacity: boolean,
+    shown: boolean,
+  }
   settings?: {
     opacity: number,
   }
@@ -40,7 +43,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   sortable,
   listeners,
   attributes,
-  opacityManager,
+  settingsManager,
   settings,
   onChangeOpacity,
 }: LegendItemProps) => {
@@ -86,7 +89,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
         {description}
       </div>
 
-      {opacityManager && (
+      {settingsManager?.opacity && (
         <div className="mt-2.5 flex">
           <Tooltip
             arrow

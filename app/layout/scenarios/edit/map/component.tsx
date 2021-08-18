@@ -314,7 +314,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
               <LegendItem
                 sortable={false}
                 key={i.id}
-                opacityManager={i.opacityManager}
+                settingsManager={i.settingsManager}
                 onChangeOpacity={(opacity) => onChangeOpacity(opacity, id)}
                 {...i}
               >
