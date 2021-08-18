@@ -68,24 +68,31 @@ export interface UsePUGridLayer {
     settings?: {
       pugrid?: {
         opacity?: number;
+        visibility?: boolean;
       },
       'wdpa-percentage'?: {
         opacity?: number;
+        visibility?: boolean;
       },
       cost?: {
         opacity?: number;
+        visibility?: boolean;
       },
       'lock-in'?: {
         opacity?: number;
+        visibility?: boolean;
       },
       'lock-out'?: {
         opacity?: number;
+        visibility?: boolean;
       },
       frequency?: {
         opacity?: number;
+        visibility?: boolean;
       },
       solution?: {
         opacity?: number;
+        visibility?: boolean;
       },
     };
   };

@@ -265,8 +265,6 @@ export function usePUGridLayer({
       settings = {},
     } = options;
 
-    console.log('%cSETTINGS', 'color:pink', settings);
-
     const {
       pugrid: PUgridSettings = {},
       'wdpa-percentage': WdpaPercentageSettings = {},
@@ -277,16 +275,49 @@ export function usePUGridLayer({
       solution: SolutionSettings = {},
     } = settings;
 
-    const { opacity: PUgridOpacity = 1 } = PUgridSettings;
-    const { opacity: WdpaPercentageOpacity = 0.5 } = WdpaPercentageSettings;
-    const { opacity: CostOpacity = 0.75 } = CostSettings;
-    const { opacity: LockInOpacity = 1 } = LockInSettings;
-    const { opacity: LockOutOpacity = 1 } = LockOutSettings;
-    const { opacity: FrequencyOpacity = 0.75 } = FrequencySettings;
-    const { opacity: SolutionOpacity = 0.75 } = SolutionSettings;
+    const {
+      opacity: PUgridOpacity = 1,
+      visibility: PUgridVisibility = true,
+    } = PUgridSettings;
+    const {
+      opacity: WdpaPercentageOpacity = 0.5,
+      visibility: WdpaPercentageVisibility = true,
+    } = WdpaPercentageSettings;
+    const {
+      opacity: CostOpacity = 0.75,
+      visibility: CostVisibility = true,
+    } = CostSettings;
+    const {
+      opacity: LockInOpacity = 1,
+      visibility: LockInVisibility = true,
+    } = LockInSettings;
+    const {
+      opacity: LockOutOpacity = 1,
+      visibility: LockOutVisibility = true,
+    } = LockOutSettings;
+    const {
+      opacity: FrequencyOpacity = 0.75,
+      visibility: FrequencyVisibility = true,
+    } = FrequencySettings;
+    const {
+      opacity: SolutionOpacity = 0.75,
+      visibility: SolutionVisibility = true,
+    } = SolutionSettings;
+
+    const getLayerVisibility = (layer) => {
+      if (!layer) {
+        return 'none';
+      }
+      return 'visible';
+    };
+
     return {
       id: `pu-grid-layer-${cache}`,
       type: 'vector',
+      layout: {
+        // ver
+        visibility: getLayerVisibility(PUgridVisibility),
+      },
       source: {
         type: 'vector',
         tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/planning-units/tiles/{z}/{x}/{y}.mvt?include=${include}`],
@@ -322,6 +353,9 @@ export function usePUGridLayer({
               {
                 type: 'fill',
                 'source-layer': 'layer0',
+                layout: {
+                  visibility: getLayerVisibility(WdpaPercentageVisibility),
+                },
                 paint: {
                   'fill-color': COLORS.wdpa,
                   'fill-opacity': [
@@ -363,6 +397,9 @@ export function usePUGridLayer({
             {
               type: 'fill',
               'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(CostVisibility),
+              },
               paint: {
                 'fill-color': [
                   'interpolate',
@@ -383,6 +420,9 @@ export function usePUGridLayer({
             {
               type: 'line',
               'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(LockInVisibility),
+              },
               filter: [
                 'all',
                 ['in', ['get', 'scenarioPuId'], ['literal', puIncludedValue]],
@@ -399,6 +439,9 @@ export function usePUGridLayer({
             {
               type: 'line',
               'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(LockOutVisibility),
+              },
               filter: [
                 'all',
                 ['in', ['get', 'scenarioPuId'], ['literal', puExcludedValue]],
@@ -417,6 +460,9 @@ export function usePUGridLayer({
             {
               type: 'fill',
               'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(FrequencyVisibility),
+              },
               paint: {
                 'fill-color': [
                   'interpolate',
@@ -437,6 +483,7 @@ export function usePUGridLayer({
             {
               type: 'fill',
               'source-layer': 'layer0',
+              visibility: SolutionVisibility,
               filter: [
                 'all',
                 ['in', `-${runId}-`, ['get', 'valuePosition']],
