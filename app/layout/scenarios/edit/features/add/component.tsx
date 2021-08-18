@@ -4,7 +4,10 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
 import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import List from 'layout/scenarios/edit/features/add/list';
 import Toolbar from 'layout/scenarios/edit/features/add/toolbar';
@@ -28,6 +31,14 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   const { pid, sid } = query;
 
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
 
   const {
     data: selectedFeaturesData,
@@ -97,21 +108,42 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
           return {
             featureId: s,
             kind: geoprocessingOperations ? 'withGeoprocessing' : 'plain',
-            ...!!marxanSettings && { marxanSettings },
+            marxanSettings: marxanSettings || {
+              fpf: 1,
+              prop: 0.5,
+            },
             ...!!geoprocessingOperations && { geoprocessingOperations },
           };
         }),
       },
     }, {
       onSuccess: () => {
-        onDismiss();
-        setSubmitting(false);
+        saveScenarioMutation.mutate({
+          id: `${sid}`,
+          data: {
+            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
+          },
+        }, {
+          onSuccess: () => {
+            onDismiss();
+            setSubmitting(false);
+          },
+          onError: () => {
+            setSubmitting(false);
+          },
+        });
       },
       onError: () => {
         setSubmitting(false);
       },
     });
-  }, [sid, selectedFeaturesData, selectedFeaturesMutation, onDismiss]);
+  }, [sid,
+    metadata,
+    selectedFeaturesData,
+    selectedFeaturesMutation,
+    saveScenarioMutation,
+    onDismiss,
+  ]);
 
   const onCancel = useCallback(() => {
     onDismiss();

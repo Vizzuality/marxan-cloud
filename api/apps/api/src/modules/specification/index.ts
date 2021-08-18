@@ -6,11 +6,16 @@ export { SubmitSpecification } from './application/submit-specification.command'
 
 export {
   notFound,
-  GetSpecification,
+  GetLastUpdatedSpecification,
   GetSpecificationError,
 } from './application/get-specification.query';
 
 export { SpecificationCandidateCreated } from './domain/events/specification-candidate-created.event';
 export { SpecificationGotReady } from './domain/events/specification-got-ready.event';
 export { SpecificationPublished } from './domain/events/specification-published.event';
-export { FeatureConfigInput, SpecificationOperation } from './domain';
+export {
+  FeatureConfigInput,
+  SpecificationOperation,
+  FeatureConfigSplit,
+  FeatureConfigCopy,
+} from './domain';

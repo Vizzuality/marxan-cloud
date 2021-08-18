@@ -1,7 +1,7 @@
 import { SimpleJobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { Equals, IsEnum, IsUUID, ValidateNested } from 'class-validator';
 import { GeoFeature } from '../geo-feature.api.entity';
 import {
   GeoprocessingOp,
@@ -17,7 +17,7 @@ export abstract class SpecForGeofeature {
 }
 
 export class SpecForPlainGeoFeature extends SpecForGeofeature {
-  @IsString()
+  @Equals('plain')
   kind!: 'plain';
 
   @ValidateNested()
@@ -34,6 +34,9 @@ export class SpecForPlainGeoFeatureWithFeatureMetadata extends SpecForPlainGeoFe
 }
 
 export class SpecForGeoFeatureWithGeoprocessing extends SpecForGeofeature {
+  @Equals('withGeoprocessing')
+  kind!: 'withGeoprocessing';
+
   @IsUUID()
   @ApiProperty()
   featureId!: string;

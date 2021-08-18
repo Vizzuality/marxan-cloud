@@ -68,25 +68,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
     },
   });
 
-  const saveScenarioStatus = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'analysis', subtab: 'analysis-preview' }),
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata]);
-
-  const saveScenarioStatusOnContinue = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-fpf' }),
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata]);
-
-  const saveScenarioFeaturesStatusOnBack = useCallback(async () => {
+  const saveScenarioStatusOnBack = useCallback(async () => {
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
@@ -269,7 +251,6 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
                 onSuccess={() => {
                   setStep(step + 1);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_FPF));
-                  saveScenarioStatusOnContinue();
                 }}
               />
             )}
@@ -279,9 +260,11 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
                 onBack={() => {
                   setStep(step - 1);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
-                  saveScenarioFeaturesStatusOnBack();
+                  saveScenarioStatusOnBack();
                 }}
-                onSuccess={saveScenarioStatus}
+                onSuccess={() => {
+                  console.info('success');
+                }}
               />
             )}
           </Pill>

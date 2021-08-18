@@ -16,4 +16,6 @@ export abstract class SpecificationRepository {
   abstract transaction(
     code: (repo: SpecificationRepository) => Promise<Specification[]>,
   ): Promise<Specification[]>;
+
+  abstract getLastUpdated(ids: string[]): Promise<Specification | undefined>;
 }

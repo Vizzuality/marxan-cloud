@@ -20,6 +20,7 @@ import SidebarEditFeatures from 'layout/scenarios/edit/features';
 import ScenarioEditsMap from 'layout/scenarios/edit/map';
 import ScenariosEditSidebar from 'layout/scenarios/edit/sidebar';
 import { ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
+import ScenarioStatus from 'layout/scenarios/edit/status';
 import SidebarEditWDPA from 'layout/scenarios/edit/wdpa';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
@@ -70,6 +71,8 @@ const EditScenarioPage: React.FC = () => {
             </div>
           </Wrapper>
         </div>
+
+        <ScenarioStatus />
       </main>
     </Protected>
   );

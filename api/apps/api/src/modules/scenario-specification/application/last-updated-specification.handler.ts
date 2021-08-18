@@ -2,7 +2,7 @@ import { SpecificationSnapshot } from '@marxan-api/modules/specification/domain'
 import { IInferredQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 
-import { GetSpecification } from '@marxan-api/modules/specification';
+import { GetLastUpdatedSpecification } from '@marxan-api/modules/specification';
 
 import {
   LastUpdatedSpecification,
@@ -10,6 +10,7 @@ import {
   notFound,
 } from './last-updated-specification.query';
 import { ScenarioSpecificationRepo } from './scenario-specification.repo';
+import { isDefined } from '@marxan/utils';
 
 @QueryHandler(LastUpdatedSpecification)
 export class LastUpdatedSpecificationHandler
@@ -31,16 +32,17 @@ export class LastUpdatedSpecificationHandler
       return left(notFound);
     }
 
-    const specificationId =
-      scenarioSpecification.currentActiveSpecification?.value ??
-      scenarioSpecification.currentCandidateSpecification?.value;
+    const specificationIds = [
+      scenarioSpecification.currentActiveSpecification?.value,
+      scenarioSpecification.currentCandidateSpecification?.value,
+    ].filter(isDefined);
 
-    if (!specificationId) {
+    if (specificationIds.length === 0) {
       return left(notFound);
     }
 
     const specificationResult = await this.queryBus.execute(
-      new GetSpecification(specificationId),
+      new GetLastUpdatedSpecification(specificationIds),
     );
 
     if (isLeft(specificationResult)) {
