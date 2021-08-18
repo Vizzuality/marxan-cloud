@@ -1,6 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
+
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
@@ -22,6 +26,15 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const {
+    setCache,
+  } = scenarioSlice.actions;
+
+  const dispatch = useDispatch();
+
+  const JOBREF = useRef(null);
+
   const { data } = useScenarioStatus(pid, sid);
 
   const JOB = useMemo(() => {
@@ -35,6 +48,13 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
     }
     return null;
   }, [JOB]);
+
+  useEffect(() => {
+    if (JOBREF.current && !JOB) {
+      dispatch(setCache(Date.now()));
+    }
+    JOBREF.current = JOB;
+  }, [JOB]); // eslint-disable-line
 
   return (
     <div className="absolute top-0 left-0 z-50 flex flex-col justify-end w-full h-full pointer-events-none">
