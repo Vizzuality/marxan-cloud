@@ -62,13 +62,13 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const bestSolution = bestSolutionData || {};
 
   const scenarioSlice = getScenarioSlice(sid);
-  const { setWdpaOpacity, setFrequencyOpacity } = scenarioSlice.actions;
+  const { setLayerSettings } = scenarioSlice.actions;
 
   const {
     tab,
     subtab,
     selectedSolution,
-    frequencyOpacity,
+    layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const minZoom = 2;
@@ -81,13 +81,21 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     sid: sid ? `${sid}` : null,
     type: tab,
     subtype: subtab,
-    frequencyOpacity,
     options: {
       wdpaIucnCategories,
       wdpaThreshold,
       puIncludedValue: included,
       puExcludedValue: excluded,
       runId: selectedSolution?.runId || bestSolution?.runId,
+      settings: {
+        pugrid: layerSettings.pugrid,
+        'wdpa-percentage': layerSettings['wdpa-percentage'],
+        cost: layerSettings.cost,
+        'lock-in': layerSettings['lock-in'],
+        'lock-out': layerSettings['lock-out'],
+        frequency: layerSettings.frequency,
+        solution: layerSettings.solution,
+      },
     },
   });
 
@@ -149,10 +157,12 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     return null;
   };
 
-  const onChangeOpacity = useCallback((opacity, name) => {
-    if (name === 'Protected areas preview') dispatch(setWdpaOpacity(opacity));
-    if (name === 'Frequency') dispatch(setFrequencyOpacity(opacity));
-  }, [setWdpaOpacity, dispatch, setFrequencyOpacity]);
+  const onChangeOpacity = useCallback((opacity, id) => {
+    dispatch(setLayerSettings({
+      id,
+      settings: { opacity },
+    }));
+  }, [setLayerSettings, dispatch]);
 
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">

@@ -6,16 +6,14 @@ interface ScenarioShowStateProps {
   tab: string,
   subtab: string,
   selectedSolution: Solution,
-  wdpaOpacity: number,
-  frequencyOpacity: number,
+  layerSettings: Record<string, Record<string, unknown>>
 }
 
 const initialState = {
   tab: 'solutions',
   subtab: null,
   selectedSolution: null,
-  wdpaOpacity: null,
-  frequencyOpacity: null,
+  layerSettings: {},
 } as ScenarioShowStateProps;
 
 export function getScenarioSlice(id) {
@@ -32,11 +30,21 @@ export function getScenarioSlice(id) {
       setSelectedSolution: (state, action: PayloadAction<Solution>) => {
         state.selectedSolution = action.payload;
       },
-      setWdpaOpacity: (state, action: PayloadAction<number>) => {
-        state.wdpaOpacity = action.payload;
-      },
-      setFrequencyOpacity: (state, action: PayloadAction<number>) => {
-        state.frequencyOpacity = action.payload;
+
+      // SETTINGS
+      setLayerSettings: (state, action: PayloadAction<{
+        id: string,
+        settings: Record<string, unknown>
+      }>) => {
+        const { id: layerId, settings } = action.payload;
+        const newSettings = {
+          ...state.layerSettings,
+          [layerId]: {
+            ...state.layerSettings[layerId],
+            ...settings,
+          },
+        };
+        state.layerSettings = newSettings;
       },
     },
   });

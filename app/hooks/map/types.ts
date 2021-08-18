@@ -58,7 +58,6 @@ export interface UsePUGridLayer {
   type: ScenarioSidebarTabs;
   runId?: number;
   subtype: ScenarioSidebarSubTabs;
-  frequencyOpacity?: number;
   options?: {
     wdpaIucnCategories?: string[];
     wdpaThreshold?: number;
