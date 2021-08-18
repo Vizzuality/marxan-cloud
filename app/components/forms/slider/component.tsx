@@ -23,6 +23,13 @@ const THEME = {
     filledTrack: 'absolute left-0 h-1.5 bg-gray-800 rounded',
     track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
   },
+  'dark-small': {
+    base: 'w-full h-12 pt-8 touch-action-none',
+    output:
+      'absolute bottom-1 transform -translate-y-full -translate-x-1/2 text-xs text-black',
+    filledTrack: 'absolute left-0 h-1.5 bg-black rounded',
+    track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
+  },
 };
 
 export interface SliderProps {
@@ -33,7 +40,7 @@ export interface SliderProps {
   /**
    * Theme of the component
    */
-  theme?: 'dark' | 'light';
+  theme?: 'dark' | 'light' | 'dark-small';
   /**
    * Validation status of the input. If the `disabled` prop is set to `true`, it is overwritten to
    * `'disabled'`.

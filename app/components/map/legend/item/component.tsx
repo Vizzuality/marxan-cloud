@@ -84,16 +84,16 @@ export const LegendItem: React.FC<LegendItemProps> = ({
         <div className="mt-2.5 flex">
           <Tooltip
             arrow
-            placement="right-start"
+            placement="top-start"
             trigger="click"
             interactive
             content={(
               <div
-                className="px-4 py-3.5 text-gray-500 bg-white rounded w-60"
+                className="px-4 pt-1.5 pb-4 text-gray-500 bg-white rounded w-60"
               >
                 <Slider
                   labelRef={null}
-                  theme="light"
+                  theme="dark-small"
                   defaultValue={0.5}
                   formatOptions={{
                     style: 'percent',

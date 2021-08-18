@@ -1,10 +1,11 @@
 import React from 'react';
-import cx from 'classnames';
-import { SliderState } from '@react-stately/slider';
-import { useSliderThumb } from '@react-aria/slider';
+
 import { useFocusRing } from '@react-aria/focus';
-import { VisuallyHidden } from '@react-aria/visually-hidden';
+import { useSliderThumb } from '@react-aria/slider';
 import { mergeProps } from '@react-aria/utils';
+import { VisuallyHidden } from '@react-aria/visually-hidden';
+import { SliderState } from '@react-stately/slider';
+import cx from 'classnames';
 
 const THEME = {
   dark: {
@@ -31,10 +32,22 @@ const THEME = {
       disabled: 'border-white',
     },
   },
+  'dark-small': {
+    thumb:
+      'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+    status: {
+      default: 'border-white',
+      dragging: 'border-white opacity-80',
+      focused: 'border-white ring-2 ring-primary-500',
+      valid: 'border-green-500',
+      error: 'border-red-500',
+      disabled: 'border-white',
+    },
+  },
 };
 
 export interface ThumbProps {
-  theme: 'dark' | 'light';
+  theme: 'dark' | 'light' | 'dark-small';
   status: 'none' | 'valid' | 'error' | 'disabled';
   sliderState: SliderState;
   trackRef: React.MutableRefObject<HTMLElement | null>;
