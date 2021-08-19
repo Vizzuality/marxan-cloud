@@ -528,7 +528,9 @@ export function usePUGridLayer({
             {
               type: 'fill',
               'source-layer': 'layer0',
-              visibility: SolutionVisibility,
+              layout: {
+                visibility: getLayerVisibility(SolutionVisibility),
+              },
               filter: [
                 'all',
                 ['in', `-${runId}-`, ['get', 'valuePosition']],
