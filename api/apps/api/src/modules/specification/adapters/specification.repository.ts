@@ -137,6 +137,9 @@ export class DbSpecificationRepository implements SpecificationRepository {
           })),
         ),
       }),
+      {
+        chunk: 10000,
+      },
     );
     return;
   }
