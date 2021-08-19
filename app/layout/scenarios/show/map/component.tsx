@@ -124,8 +124,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     type: tab,
     subtype: subtab,
     options: {
-      wdpaIucnCategories,
-      wdpaThreshold,
+      wdpaThreshold: scenarioData?.wdpaThreshold,
       puIncludedValue: included,
       puExcludedValue: excluded,
       runId: selectedSolution?.runId || bestSolution?.runId,
