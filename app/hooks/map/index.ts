@@ -310,11 +310,11 @@ export function usePUGridLayer({
       visibility: PUgridVisibility = true,
     } = PUgridSettings;
     const {
-      opacity: WdpaPercentageOpacity = 0.5,
+      opacity: WdpaPercentageOpacity = 1,
       visibility: WdpaPercentageVisibility = true,
     } = WdpaPercentageSettings;
     const {
-      opacity: CostOpacity = 0.75,
+      opacity: CostOpacity = 1,
       visibility: CostVisibility = true,
     } = CostSettings;
     const {
@@ -326,11 +326,11 @@ export function usePUGridLayer({
       visibility: LockOutVisibility = true,
     } = LockOutSettings;
     const {
-      opacity: FrequencyOpacity = 0.75,
+      opacity: FrequencyOpacity = 1,
       visibility: FrequencyVisibility = true,
     } = FrequencySettings;
     const {
-      opacity: SolutionOpacity = 0.75,
+      opacity: SolutionOpacity = 1,
       visibility: SolutionVisibility = true,
     } = SolutionSettings;
 
