@@ -219,4 +219,3 @@ export class ScenarioResult {
   @ApiProperty()
   data!: JSONAPIScenarioData;
 }
-//custom_protected_area_ids
