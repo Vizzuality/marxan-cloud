@@ -67,8 +67,8 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length,
     sid,
-    include: 'results',
-    sublayers: selectedSid ? ['solutions'] : [],
+    type: selectedSid ? ScenarioSidebarTabs.SOLUTIONS : null,
+    subtype: null,
     options: {
     },
   });

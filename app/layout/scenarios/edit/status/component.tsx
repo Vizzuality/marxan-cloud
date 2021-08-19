@@ -60,13 +60,11 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
     <div className="absolute top-0 left-0 z-50 flex flex-col justify-end w-full h-full pointer-events-none">
       {JOB && (
         <motion.div
-          className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-75 pointer-events-auto"
+          className="absolute top-0 left-0 z-10 w-full h-full pointer-events-auto bg-blur"
           key="status-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-        >
-          <div className="absolute top-0 left-0 z-10 w-full h-full pointer-events-auto bg-blur" />
-        </motion.div>
+        />
       )}
 
       {JOB && (
