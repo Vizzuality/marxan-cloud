@@ -27,6 +27,9 @@ interface ScenarioEditStateProps {
 
   uploading: boolean;
   uploadingValue: Record<string, object>
+
+  // SETTINGS
+  layerSettings: Record<string, Record<string, unknown>>
 }
 
 const initialState = {
@@ -52,6 +55,9 @@ const initialState = {
   drawingValue: null,
   uploading: false,
   uploadingValue: null,
+
+  // SETTINGS
+  layerSettings: {},
 } as ScenarioEditStateProps;
 
 export function getScenarioEditSlice(id) {
@@ -112,6 +118,22 @@ export function getScenarioEditSlice(id) {
       },
       setUploadingValue: (state, action: PayloadAction<Record<string, object>>) => {
         state.uploadingValue = action.payload;
+      },
+
+      // SETTINGS
+      setLayerSettings: (state, action: PayloadAction<{
+        id: string,
+        settings: Record<string, unknown>
+      }>) => {
+        const { id: layerId, settings } = action.payload;
+        const newSettings = {
+          ...state.layerSettings,
+          [layerId]: {
+            ...state.layerSettings[layerId],
+            ...settings,
+          },
+        };
+        state.layerSettings = newSettings;
       },
     },
   });

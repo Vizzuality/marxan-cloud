@@ -83,14 +83,16 @@ export function useAdminPreviewLayer({
 
 // WDPApreview
 export function useWDPAPreviewLayer({
-  active, bbox, wdpaIucnCategories, cache = 0,
+  active, bbox, wdpaIucnCategories, cache = 0, options,
 }: UseWDPAPreviewLayer) {
+  const { opacity = 1 } = options || {};
   return useMemo(() => {
     if (!active || !bbox) return null;
 
     return {
       id: `wdpa-preview-layer-${cache}`,
       type: 'vector',
+      opacity,
       source: {
         type: 'vector',
         tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
@@ -120,7 +122,7 @@ export function useWDPAPreviewLayer({
         ],
       },
     };
-  }, [active, bbox, wdpaIucnCategories, cache]);
+  }, [active, bbox, wdpaIucnCategories, cache, opacity]);
 }
 
 // Featurepreview
@@ -166,16 +168,49 @@ export function useFeaturePreviewLayers({
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
     const FEATURES = [...features];
-    const { featureHoverId } = options;
+    const { featureHoverId, settings = {} } = options;
 
     const currentFeatureHoverIndex = FEATURES.findIndex((f) => f.id === featureHoverId);
     if (currentFeatureHoverIndex > -1) {
       FEATURES.splice(0, 0, FEATURES.splice(currentFeatureHoverIndex, 1)[0]);
     }
 
+    // Layer settings
+    const {
+      bioregional: BioregionalSettings = {},
+      species: SpeciesSettings = {},
+    } = settings;
+
+    const {
+      opacity: BioregionalOpacity,
+      visibility: BioregionalVisibility = true,
+    } = BioregionalSettings;
+    const {
+      opacity: SpeciesOpacity,
+      visibility: SpeciesVisibility = true,
+    } = SpeciesSettings;
+
+    const Types = {
+      bioregional: BioregionalVisibility,
+      species: SpeciesVisibility,
+    };
+
+    const getLayerVisibility = (type) => {
+      if (Types[type]) {
+        return 'visible';
+      }
+      return 'none';
+    };
+
     return FEATURES
       .map((f) => {
         const { id, type } = f;
+
+        const getLayerOpacity = () => {
+          if (type === 'bioregional') return BioregionalOpacity;
+          if (type === 'species') return SpeciesOpacity;
+          return 0.5;
+        };
 
         return {
           id: `feature-${id}-preview-layer-${cache}`,
@@ -189,9 +224,12 @@ export function useFeaturePreviewLayers({
               {
                 type: 'fill',
                 'source-layer': 'layer0',
+                layout: {
+                  visibility: getLayerVisibility(type),
+                },
                 paint: {
                   'fill-color': featureHoverId === id ? COLORS[type].hover : COLORS[type].default,
-                  'fill-opacity': featureHoverId === id ? 1 : 0.5,
+                  'fill-opacity': featureHoverId === id ? 1 : 0.5 * getLayerOpacity(),
                 },
               },
               {
@@ -199,6 +237,10 @@ export function useFeaturePreviewLayers({
                 'source-layer': 'layer0',
                 paint: {
                   'line-color': '#000',
+                  'line-opacity': getLayerOpacity(),
+                },
+                layout: {
+                  visibility: getLayerVisibility(type),
                 },
               },
             ],
@@ -250,7 +292,54 @@ export function usePUGridLayer({
       puIncludedValue,
       puExcludedValue,
       runId,
+      settings = {},
     } = options;
+
+    const {
+      pugrid: PUgridSettings = {},
+      'wdpa-percentage': WdpaPercentageSettings = {},
+      cost: CostSettings = {},
+      'lock-in': LockInSettings = {},
+      'lock-out': LockOutSettings = {},
+      frequency: FrequencySettings = {},
+      solution: SolutionSettings = {},
+    } = settings;
+
+    const {
+      opacity: PUgridOpacity = 1,
+      visibility: PUgridVisibility = true,
+    } = PUgridSettings;
+    const {
+      opacity: WdpaPercentageOpacity = 0.75,
+      visibility: WdpaPercentageVisibility = true,
+    } = WdpaPercentageSettings;
+    const {
+      opacity: CostOpacity = 0.75,
+      visibility: CostVisibility = true,
+    } = CostSettings;
+    const {
+      opacity: LockInOpacity = 1,
+      visibility: LockInVisibility = true,
+    } = LockInSettings;
+    const {
+      opacity: LockOutOpacity = 1,
+      visibility: LockOutVisibility = true,
+    } = LockOutSettings;
+    const {
+      opacity: FrequencyOpacity = 0.75,
+      visibility: FrequencyVisibility = true,
+    } = FrequencySettings;
+    const {
+      opacity: SolutionOpacity = 0.75,
+      visibility: SolutionVisibility = true,
+    } = SolutionSettings;
+
+    const getLayerVisibility = (layer) => {
+      if (!layer) {
+        return 'none';
+      }
+      return 'visible';
+    };
 
     return {
       id: `pu-grid-layer-${cache}`,
@@ -264,6 +353,9 @@ export function usePUGridLayer({
           {
             type: 'fill',
             'source-layer': 'layer0',
+            layout: {
+              visibility: getLayerVisibility(PUgridVisibility),
+            },
             paint: {
               'fill-color': '#000',
               'fill-opacity': 0,
@@ -272,20 +364,27 @@ export function usePUGridLayer({
           {
             type: 'line',
             'source-layer': 'layer0',
+            layout: {
+              visibility: getLayerVisibility(PUgridVisibility),
+            },
             paint: {
               'line-color': COLORS.primary,
-              'line-opacity': 0.5,
+              'line-opacity': 0.5 * PUgridOpacity,
               'line-width': 1,
               'line-offset': 0.5,
             },
           },
 
           // PROTECTED AREAS
+
           ...sublayers.includes('wdpa-percentage')
             ? [
               {
                 type: 'fill',
                 'source-layer': 'layer0',
+                layout: {
+                  visibility: getLayerVisibility(WdpaPercentageVisibility),
+                },
                 paint: {
                   'fill-color': COLORS.wdpa,
                   'fill-opacity': [
@@ -295,7 +394,7 @@ export function usePUGridLayer({
                       ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
                     ],
                     0.5,
-                    0,
+                    0.75 * WdpaPercentageOpacity,
                   ],
                 },
               },
@@ -327,6 +426,9 @@ export function usePUGridLayer({
             {
               type: 'fill',
               'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(CostVisibility),
+              },
               paint: {
                 'fill-color': [
                   'interpolate',
@@ -337,7 +439,7 @@ export function usePUGridLayer({
                   1,
                   COLORS.cost[1],
                 ],
-                'fill-opacity': 0.75,
+                'fill-opacity': 0.75 * CostOpacity,
               },
             },
           ] : [],
@@ -347,13 +449,16 @@ export function usePUGridLayer({
             {
               type: 'line',
               'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(LockInVisibility),
+              },
               filter: [
                 'all',
                 ['in', ['get', 'scenarioPuId'], ['literal', puIncludedValue]],
               ],
               paint: {
                 'line-color': COLORS.include,
-                'line-opacity': 1,
+                'line-opacity': 1 * LockInOpacity,
                 'line-width': 1.5,
                 'line-offset': 0.75,
               },
@@ -363,13 +468,16 @@ export function usePUGridLayer({
             {
               type: 'line',
               'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(LockOutVisibility),
+              },
               filter: [
                 'all',
                 ['in', ['get', 'scenarioPuId'], ['literal', puExcludedValue]],
               ],
               paint: {
                 'line-color': COLORS.exclude,
-                'line-opacity': 1,
+                'line-opacity': 1 * LockOutOpacity,
                 'line-width': 1.5,
                 'line-offset': 0.75,
               },
@@ -381,6 +489,9 @@ export function usePUGridLayer({
             {
               type: 'fill',
               'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(FrequencyVisibility),
+              },
               paint: {
                 'fill-color': [
                   'interpolate',
@@ -395,19 +506,22 @@ export function usePUGridLayer({
                   100,
                   COLORS.frequency[3],
                 ],
-                'fill-opacity': 0.75,
+                'fill-opacity': 0.75 * FrequencyOpacity,
               },
             },
             {
               type: 'fill',
               'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(SolutionVisibility),
+              },
               filter: [
                 'all',
                 ['in', `-${runId}-`, ['get', 'valuePosition']],
               ],
               paint: {
                 'fill-color': COLORS.primary,
-                'fill-opacity': 0.75,
+                'fill-opacity': 0.75 * SolutionOpacity,
               },
             },
           ] : [],
@@ -428,7 +542,7 @@ export function useLegend({
     if (type === 'protected-areas' && subtype === 'protected-areas-percentage' && !!wdpaIucnCategories.length) return ['wdpa-percentage', 'pugrid'];
     if (type === 'features') {
       return [
-        ...wdpaIucnCategories.length ? ['wdpa-percentage'] : [],
+        ...wdpaIucnCategories?.length ? ['wdpa-percentage'] : [],
         'bioregional',
         'species',
         'pugrid',
@@ -444,10 +558,17 @@ export function useLegend({
   }, [type, subtype, options]);
 
   return useMemo(() => {
+    const { layerSettings = {} } = options;
     return layers
       .map((l) => {
         const L = LEGEND_LAYERS[l];
-        if (L) return L(options);
+        if (L) {
+          return {
+            ...L(options),
+            settings: layerSettings[l],
+          };
+        }
+
         return null;
       })
       .filter((l) => !!l);

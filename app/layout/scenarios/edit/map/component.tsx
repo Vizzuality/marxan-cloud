@@ -57,7 +57,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   } = useSelectedFeatures(sid, {});
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTmpPuIncludedValue, setTmpPuExcludedValue } = scenarioSlice.actions;
+  const {
+    setTmpPuIncludedValue,
+    setTmpPuExcludedValue,
+    setLayerSettings,
+  } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
 
@@ -77,6 +81,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     puAction,
     puTmpIncludedValue,
     puTmpExcludedValue,
+
+    // Settings
+    layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const minZoom = 2;
@@ -109,6 +116,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     cache,
     active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
     bbox,
+    options: {
+      ...layerSettings['wdpa-preview'],
+    },
   });
 
   const FeaturePreviewLayers = useFeaturePreviewLayers({
@@ -118,6 +128,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     bbox,
     options: {
       featureHoverId,
+      settings: {
+        bioregional: layerSettings.bioregional,
+        species: layerSettings.species,
+      },
     },
   });
 
@@ -133,6 +147,15 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
+      settings: {
+        pugrid: layerSettings.pugrid,
+        'wdpa-percentage': layerSettings['wdpa-percentage'],
+        cost: layerSettings.cost,
+        'lock-in': layerSettings['lock-in'],
+        'lock-out': layerSettings['lock-out'],
+        frequency: layerSettings.frequency,
+        solution: layerSettings.solution,
+      },
     },
   });
 
@@ -147,6 +170,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
+      layerSettings,
     },
   });
 
@@ -238,6 +262,21 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     return null;
   };
 
+  const onChangeOpacity = useCallback((opacity, id) => {
+    dispatch(setLayerSettings({
+      id,
+      settings: { opacity },
+    }));
+  }, [setLayerSettings, dispatch]);
+
+  const onChangeVisibility = useCallback((id) => {
+    const { visibility = true } = layerSettings[id] || {};
+    dispatch(setLayerSettings({
+      id,
+      settings: { visibility: !visibility },
+    }));
+  }, [setLayerSettings, dispatch, layerSettings]);
+
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
       <Map
@@ -300,12 +339,17 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
           onChangeOpen={() => setOpen(!open)}
         >
           {LEGEND.map((i) => {
-            const { type, items, intersections } = i;
+            const {
+              type, items, intersections, id,
+            } = i;
 
             return (
               <LegendItem
                 sortable={false}
                 key={i.id}
+                settingsManager={i.settingsManager}
+                onChangeOpacity={(opacity) => onChangeOpacity(opacity, id)}
+                onChangeVisibility={() => onChangeVisibility(id)}
                 {...i}
               >
                 {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}

@@ -2,10 +2,10 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
+import { format } from 'd3';
+
 import { usePublishedProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
-
-import { format } from 'd3';
 
 import PublishedProjectMap from 'layout/community/published-projects/detail/map';
 import Share from 'layout/community/published-projects/detail/share';
@@ -13,7 +13,7 @@ import DuplicateButton from 'layout/community/published-projects/duplicate-butto
 import Backlink from 'layout/statics/backlink';
 import Wrapper from 'layout/wrapper';
 
-import Avatar from 'components/avatar';
+// import Avatar from 'components/avatar';
 import Loading from 'components/loading';
 
 export interface CommunityProjectsDetailProps {
@@ -40,13 +40,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   });
 
   const {
-    id, description, name, planningAreaName, timesDuplicated, contributors,
+    id, description, name, planningAreaName, timesDuplicated, /* contributors, */
   } = publishedProject || {};
 
   const scenarios = publishedProjectScenarios || [];
 
   return (
-    <div className="bg-primary-50 text-black">
+    <div className="text-black bg-primary-50">
       <Wrapper>
         <div className="w-full max-w-5xl mx-auto my-32">
 
@@ -99,7 +99,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                   <div className="grid grid-cols-2 grid-rows-2 gap-y-11 gap-x-9">
 
-                    <div>
+                    {/* <div>
                       <h3 className="mb-5 text-sm font-semibold">Creators</h3>
                       {!!contributors?.length && (
                         <div className="space-y-4">
@@ -111,7 +111,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                           ))}
                         </div>
                       )}
-                    </div>
+                    </div> */}
 
                     <div>
                       <h3 className="mb-6 text-sm font-semibold">Planning area</h3>
