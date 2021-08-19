@@ -49,7 +49,7 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
     select spd.id,
     case
       when spd.protected_area <> 0 and spd.protected_area is not null
-        then (pug.area/spd.protected_area) * 100
+        then round((COALESCE(spd.protected_area, 0)/pug.area)::numeric*100)::int
       else 0
       end as perc_protection
     from scenarios_pu_data spd
