@@ -72,6 +72,40 @@ export function useScenariosStatus(pId) {
   }, [query, data?.data]);
 }
 
+export function useScenarioStatus(pId, sId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios-status', pId, sId], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${pId}/scenarios/status`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!pId,
+    placeholderData: {
+      data: {
+        scenarios: [],
+      },
+    },
+    refetchInterval: 1000,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    const scenarios = data?.data?.scenarios || [];
+    const CURRENT = scenarios.find((s) => s.id === sId);
+
+    return {
+      ...query,
+      data: CURRENT || {},
+    };
+  }, [query, data?.data, sId]);
+}
+
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const [session] = useSession();
   const { push } = useRouter();

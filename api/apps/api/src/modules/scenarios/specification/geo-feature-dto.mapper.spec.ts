@@ -28,6 +28,7 @@ test(`split configuration`, () => {
       SpecForGeoFeatureWithGeoprocessing
     >(SpecForGeoFeatureWithGeoprocessing, {
       featureId,
+      kind: 'withGeoprocessing',
       geoprocessingOperations: [
         plainToClass<
           GeoprocessingOpStratificationV1,

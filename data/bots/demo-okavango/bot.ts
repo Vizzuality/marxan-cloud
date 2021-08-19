@@ -50,7 +50,7 @@ async function sendData(url: string, data: Blob) {
 
 const organization = await botClient
   .post("/organizations", {
-    name: "Corsika " + crypto.randomUUID(),
+    name: "Corsika organization",
     description: "Duis aliquip nostrud sint",
     metadata: {},
   })
@@ -74,7 +74,7 @@ const planningUnitAreakm2 = 25;
 
 const project = await botClient
   .post("/projects", {
-    name: "Corsika " + crypto.randomUUID(),
+    name: "Corsika project",
     organizationId: organization.data.id,
     planningUnitGridShape: "hexagon",
     planningUnitAreakm2: planningUnitAreakm2,
@@ -95,7 +95,7 @@ ${planningUnitAreakm2} as size from (
   SELECT (ST_HexagonGrid(${Math.sqrt(planningUnitAreakm2) * 1e3},
     ST_Transform(a.the_geom, 3410))).*
     FROM planning_areas a
-    WHERE project_id = '${project.data.id}'          
+    WHERE project_id = '${project.data.id}'
 ) grid
 ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO NOTHING;`);
 await pgClient.end();
@@ -108,12 +108,23 @@ const scenarioStart = Process.hrtime();
 
 const scenario = await botClient
   .post("/scenarios", {
-    name: `Corsika ${project.data.attributes.name}`,
+    name: `Corsika scenario`,
     type: "marxan",
     projectId: project.data.id,
     description: "A Corsika scenario",
     wdpaIucnCategories: ["Not Applicable"],
     wdpaThreshold: 30,
+    metadata: {
+      scenarioEditingMetadata: {
+        status: {
+          'protected-areas': 'draft',
+          features: 'draft',
+          analysis: 'draft',
+        },
+        tab: 'analysis',
+        subtab: 'analysis-preview',
+      }
+    }
   })
   .then((result) => result.data)
   .catch((e) => {

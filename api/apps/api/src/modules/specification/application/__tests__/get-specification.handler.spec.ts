@@ -8,12 +8,14 @@ beforeEach(async () => {
 });
 
 test(`find specification with unknown id`, async () => {
-  const result = await fixtures.WhenGettingSpecificationById();
+  const result = await fixtures.WhenGettingLastSpecificationByIds();
   fixtures.ThenItIsNotFound(result);
 });
 
 test(`find specification with known id`, async () => {
   const specificationId = fixtures.GivenSpecificationWasCreated();
-  const result = await fixtures.WhenGettingSpecificationById(specificationId);
+  const result = await fixtures.WhenGettingLastSpecificationByIds([
+    specificationId,
+  ]);
   fixtures.ThenSpecificationSnapshotIsReturned(result);
 });

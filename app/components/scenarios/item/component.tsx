@@ -26,12 +26,28 @@ const SCENARIO_STATES = {
     text: 'Run Scenario',
     styles: 'text-green-500',
   },
+  'pa-running': {
+    text: 'Running PA percentage',
+    styles: 'text-white',
+  },
+  'pa-failure': {
+    text: 'Fail PA percentage',
+    styles: 'text-red-500',
+  },
   'pu-running': {
     text: 'Running PU inclusion',
     styles: 'text-white',
   },
   'pu-failure': {
     text: 'Fail PU inclusion',
+    styles: 'text-red-500',
+  },
+  'features-running': {
+    text: 'Running Features',
+    styles: 'text-white',
+  },
+  'features-failure': {
+    text: 'Fail Features',
     styles: 'text-red-500',
   },
   draft: {
@@ -74,12 +90,36 @@ export const Item: React.FC<ItemProps> = ({
   const [settings, setSettings] = useState(false);
 
   const status = useMemo(() => {
-    const run = jobs.find((j) => j.kind === 'run');
+    const planningAreaProtectedCalculation = jobs.find((j) => j.kind === 'planningAreaProtectedCalculation');
     const planningUnitsInclusion = jobs.find((j) => j.kind === 'planningUnitsInclusion');
+    const geofeatureCopy = jobs.find((j) => j.kind === 'geofeatureCopy');
+    const geofeatureSplit = jobs.find((j) => j.kind === 'geofeatureSplit');
+    const geofeatureStratification = jobs.find((j) => j.kind === 'geofeatureStratification');
 
+    const run = jobs.find((j) => j.kind === 'run');
+
+    // PROTECTED AREAS
+    if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'running') return 'pa-running';
+    if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'failure') return 'pa-failure';
+
+    // PLANNING UNITS LOCK
     if (planningUnitsInclusion && planningUnitsInclusion.status === 'running') return 'pu-running';
     if (planningUnitsInclusion && planningUnitsInclusion.status === 'failure') return 'pu-failure';
 
+    // GEO FEATURES
+    if (
+      (geofeatureCopy && geofeatureCopy.status === 'running')
+      || (geofeatureSplit && geofeatureSplit.status === 'running')
+      || (geofeatureStratification && geofeatureStratification.status === 'running')
+    ) return 'features-running';
+    if (
+      (geofeatureCopy && geofeatureCopy.status === 'failure')
+      || (geofeatureSplit && geofeatureSplit.status === 'failure')
+      || (geofeatureStratification && geofeatureStratification.status === 'failure')
+
+    ) return 'features-failure';
+
+    // RUN
     if (run && run.status === 'running') return 'run-running';
     if (run && run.status === 'failure') return 'run-failure';
     if (run && run.status === 'done') return 'run-done';

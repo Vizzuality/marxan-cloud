@@ -7,4 +7,7 @@ export enum JobType {
   CostSurface = 'scenario.costSurface',
   Run = 'scenario.run',
   PlanningUnitInclusion = 'scenario.planningUnitsInclusion',
+  GeoprocessingCopy = 'scenario.geofeatureCopy',
+  GeoprocessingSplit = 'scenario.geofeatureSplit',
+  GeoprocessingStratification = 'scenario.geofeatureStratification',
 }

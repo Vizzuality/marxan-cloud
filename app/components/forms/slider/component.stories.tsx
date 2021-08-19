@@ -1,8 +1,10 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
 
-import Slider, { SliderProps } from './component';
 import Label from '../label';
+
+import Slider, { SliderProps } from './component';
 
 export default {
   title: 'Components/Forms/Slider',
@@ -12,7 +14,7 @@ export default {
     theme: {
       control: {
         type: 'select',
-        options: ['dark', 'light'],
+        options: ['dark', 'light', 'light-small'],
       },
     },
     status: {

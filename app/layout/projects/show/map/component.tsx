@@ -55,6 +55,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     filters: {
       projectId: pid,
     },
+    sort: '-lastModifiedAt',
   });
 
   const sid = useMemo(() => {
@@ -66,8 +67,8 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length,
     sid,
-    type: selectedSid ? ScenarioSidebarTabs.SOLUTIONS : null,
-    subtype: null,
+    include: 'results',
+    sublayers: selectedSid ? ['solutions'] : [],
     options: {
     },
   });
