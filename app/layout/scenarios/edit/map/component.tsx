@@ -108,6 +108,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     bbox,
     options: {
       featureHoverId,
+      settings: {
+        bioregional: layerSettings.bioregional,
+        species: layerSettings.species,
+        features: layerSettings.features,
+      },
     },
   });
 

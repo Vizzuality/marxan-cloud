@@ -48,6 +48,20 @@ export interface UseFeaturePreviewLayers {
   features?: SelectedItemProps[];
   options?: {
     featureHoverId?: string;
+    settings?: {
+      bioregional?: {
+        opacity?: number;
+        visibility?: boolean;
+      },
+      species?: {
+        opacity?: number;
+        visibility?: boolean;
+      },
+      features?: {
+        opacity?: number;
+        visibility?: boolean;
+      }
+    }
   };
 }
 
