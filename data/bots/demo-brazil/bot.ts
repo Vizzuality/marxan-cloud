@@ -51,7 +51,7 @@ async function sendData(url: string, data: Blob) {
 
 const organization = await botClient
   .post("/organizations", {
-    name: "Brazil - Atlantic forest " + crypto.randomUUID(),
+    name: "Brazil - Atlantic forest organization",
     description: "Duis aliquip nostrud sint",
     metadata: {},
   })
@@ -75,7 +75,7 @@ const planningUnitAreakm2 = 50;
 
 const project = await botClient
   .post("/projects", {
-    name: "Brazil " + crypto.randomUUID(),
+    name: "Brazil project",
     organizationId: organization.data.id,
     planningUnitGridShape: "hexagon",
     planningUnitAreakm2: planningUnitAreakm2,
@@ -98,12 +98,23 @@ await sleep(5)
 
 const scenario = await botClient
   .post("/scenarios", {
-    name: `Brazil ${project.data.attributes.name}`,
+    name: `Brazil scenario`,
     type: "marxan",
     projectId: project.data.id,
     description: "A Brazil scenario",
     wdpaIucnCategories: ["Not Applicable"],
     wdpaThreshold: 50,
+    metadata: {
+      scenarioEditingMetadata: {
+        status: {
+          'protected-areas': 'draft',
+          features: 'draft',
+          analysis: 'draft',
+        },
+        tab: 'analysis',
+        subtab: 'analysis-preview',
+      }
+    }
   })
   .then((result) => result.data)
   .catch((e) => {
