@@ -56,8 +56,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
     return isValidElement(Child);
   }).some((c) => !!c);
 
-  const { opacity = 1 } = settings || {};
-  const { visibility } = settings || {};
+  const { opacity = 1, visibility = true } = settings || {};
 
   return (
     <div
