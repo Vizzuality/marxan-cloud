@@ -237,6 +237,7 @@ export function useFeaturePreviewLayers({
                 'source-layer': 'layer0',
                 paint: {
                   'line-color': '#000',
+                  'line-opacity': getLayerOpacity(),
                 },
                 layout: {
                   visibility: getLayerVisibility(type),
@@ -319,7 +320,7 @@ export function usePUGridLayer({
       visibility: PUgridVisibility = true,
     } = PUgridSettings;
     const {
-      opacity: WdpaPercentageOpacity = 0.5,
+      opacity: WdpaPercentageOpacity = 0.75,
       visibility: WdpaPercentageVisibility = true,
     } = WdpaPercentageSettings;
     const {
@@ -405,8 +406,8 @@ export function usePUGridLayer({
                       ['has', 'percentageProtected'],
                       ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
                     ],
-                    0.5 * WdpaPercentageOpacity,
-                    0,
+                    0.5,
+                    0.75 * WdpaPercentageOpacity,
                   ],
                 },
               },
