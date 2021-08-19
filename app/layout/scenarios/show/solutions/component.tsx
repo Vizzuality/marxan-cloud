@@ -15,11 +15,22 @@ import Pill from 'layout/pill';
 import { ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
 import SolutionsDetails from 'layout/scenarios/show/solutions/details';
 import SolutionsGapAnalysis from 'layout/scenarios/show/solutions/gap-analysis';
-import SolutionsList from 'layout/scenarios/show/solutions/list';
-import Sections from 'layout/scenarios/show/solutions/sections';
+import Sections from 'layout/sections';
 
-import { SolutionsSections } from './sections/types';
 import { ScenariosSidebarShowSolutionsProps } from './types';
+
+export const SECTIONS = [
+  {
+    id: 'details',
+    name: 'Details',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
+  },
+  {
+    id: 'gap-analysis',
+    name: 'Gap Analysis',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
+  },
+];
 
 export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutionsProps> = () => {
   const [section, setSection] = useState(null);
@@ -103,33 +114,26 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
               {!section && (
                 <Sections
                   key="sections"
+                  sections={SECTIONS}
                   onChangeSection={onChangeSection}
                 />
               )}
 
-              {section === SolutionsSections.DETAILS && (
+              {section === 'details' && (
                 <SolutionsDetails
-                  key={SolutionsSections.DETAILS}
+                  key="details"
                   onChangeSection={onChangeSection}
                   onScheduleScenario={() => console.info('Schedule scenario - solutions')}
                   numberOfSchedules={2}
                 />
               )}
 
-              {section === SolutionsSections.GAP_ANALYSIS && (
+              {section === 'gap-analysis' && (
                 <SolutionsGapAnalysis
-                  key={SolutionsSections.GAP_ANALYSIS}
+                  key="gap-analysis"
                   onChangeSection={onChangeSection}
                 />
               )}
-
-              {section === SolutionsSections.SOLUTIONS && (
-                <SolutionsList
-                  key={SolutionsSections.SOLUTIONS}
-                  onChangeSection={onChangeSection}
-                />
-              )}
-
             </Pill>
 
           </AnimatePresence>
