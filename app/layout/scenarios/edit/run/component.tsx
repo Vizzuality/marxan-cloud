@@ -68,6 +68,8 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
     setSubmitting(true);
 
     const data = {
+      numberOfRuns: values.NUMREPS,
+      boundaryLengthModifier: values.BLM,
       metadata: {
         marxanInputParameterFile: values,
         scenarioEditingMetadata,

@@ -1,9 +1,9 @@
 import React, {
-  useCallback, useEffect, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 
 // Map
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -13,8 +13,9 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
 
+import { useSelectedFeatures } from 'hooks/features';
 import {
-  usePUGridLayer, useLegend,
+  usePUGridLayer, useLegend, useFeaturePreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenario, useScenarioPU } from 'hooks/scenarios';
@@ -39,6 +40,8 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const [open, setOpen] = useState(true);
   const [session] = useSession();
 
+  const dispatch = useDispatch();
+
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -46,6 +49,10 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const { bbox } = data;
 
   const { data: scenarioData } = useScenario(sid);
+
+  const {
+    data: selectedFeaturesData,
+  } = useSelectedFeatures(sid, {});
 
   const { data: PUData } = useScenarioPU(sid);
 
@@ -59,12 +66,15 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
 
   const bestSolution = bestSolutionData || {};
 
-  getScenarioSlice(sid);
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setLayerSettings } = scenarioSlice.actions;
 
   const {
     tab,
     subtab,
+    cache,
     selectedSolution,
+    layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const minZoom = 2;
@@ -72,31 +82,74 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
 
+  const include = useMemo(() => {
+    if (tab === 'protected-areas' || tab === 'features') return 'protection';
+    if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return 'features';
+    if (tab === 'analysis' && subtab === 'analysis-cost-surface') return 'cost';
+    if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return 'lock-status,protection';
+    if (tab === 'solutions') return 'results';
+
+    return 'protection';
+  }, [tab, subtab]);
+
+  const sublayers = useMemo(() => {
+    if (tab === 'protected-areas') return ['wdpa-percentage'];
+    if (tab === 'analysis' && subtab === 'analysis-preview') return ['wdpa-percentage', 'features'];
+    if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features'];
+    if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost'];
+    if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out'];
+    if (tab === 'solutions') return ['solutions'];
+
+    return [];
+  }, [tab, subtab]);
+
+  const FeaturePreviewLayers = useFeaturePreviewLayers({
+    features: selectedFeaturesData,
+    cache,
+    active: tab === 'features',
+    bbox,
+    options: {
+      settings: {
+        bioregional: layerSettings.bioregional,
+        species: layerSettings.species,
+      },
+    },
+  });
+
   const PUGridLayer = usePUGridLayer({
     active: true,
     sid: sid ? `${sid}` : null,
-    type: tab,
-    subtype: subtab,
+    include,
+    sublayers,
     options: {
       wdpaIucnCategories,
       wdpaThreshold,
       puIncludedValue: included,
       puExcludedValue: excluded,
       runId: selectedSolution?.runId || bestSolution?.runId,
+      settings: {
+        pugrid: layerSettings.pugrid,
+        'wdpa-percentage': layerSettings['wdpa-percentage'],
+        cost: layerSettings.cost,
+        'lock-in': layerSettings['lock-in'],
+        'lock-out': layerSettings['lock-out'],
+        frequency: layerSettings.frequency,
+        solution: layerSettings.solution,
+      },
     },
   });
 
-  const LAYERS = [PUGridLayer].filter((l) => !!l);
+  const LAYERS = [PUGridLayer, ...FeaturePreviewLayers].filter((l) => !!l);
 
   const LEGEND = useLegend({
     type: tab,
     subtype: subtab,
     options: {
-      wdpaIucnCategories,
-      wdpaThreshold,
+      wdpaThreshold: scenarioData?.wdpaThreshold,
       puIncludedValue: included,
       puExcludedValue: excluded,
       runId: selectedSolution?.runId || bestSolution?.runId,
+      layerSettings,
     },
   });
 
@@ -143,6 +196,22 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
 
     return null;
   };
+
+  const onChangeOpacity = useCallback((opacity, id) => {
+    dispatch(setLayerSettings({
+      id,
+      settings: { opacity },
+    }));
+  }, [setLayerSettings, dispatch]);
+
+  const onChangeVisibility = useCallback((id) => {
+    const { visibility = true } = layerSettings[id] || {};
+    dispatch(setLayerSettings({
+      id,
+      settings: { visibility: !visibility },
+    }));
+  }, [setLayerSettings, dispatch, layerSettings]);
+
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
       <Map
@@ -201,12 +270,17 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
           onChangeOpen={() => setOpen(!open)}
         >
           {LEGEND.map((i) => {
-            const { type, items, intersections } = i;
+            const {
+              type, items, intersections, id,
+            } = i;
 
             return (
               <LegendItem
                 sortable={false}
                 key={i.id}
+                settingsManager={i.settingsManager}
+                onChangeOpacity={(opacity) => onChangeOpacity(opacity, id)}
+                onChangeVisibility={() => onChangeVisibility(id)}
                 {...i}
               >
                 {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}

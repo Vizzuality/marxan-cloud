@@ -80,7 +80,7 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
             </p>
 
           </div>
-          )}
+        )}
         modifiers={['flip']}
         tooltipPlacement="left"
       >

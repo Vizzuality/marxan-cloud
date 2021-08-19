@@ -15,7 +15,7 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
   name,
   description,
   area,
-  contributors = [],
+  // contributors = [],
   timesDuplicated,
 }: PublishedItemProps) => {
   return (
@@ -31,7 +31,8 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
         <p className="text-sm">{area}</p>
       </td>
       <td className="pr-6">
-        {!!contributors.length && contributors?.map((c) => <p key={`${c.id}`} className="text-sm">{c.name}</p>)}
+        {/* {!!contributors.length && contributors?.map((c) =>
+          <p key={`${c.id}`} className="text-sm">{c.name}</p>)} */}
       </td>
       <td className="">
         <div className="flex flex-row justify-between pl-10">

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-import Contributors from 'layout/projects/show/header/contributors';
+// import Contributors from 'layout/projects/show/header/contributors';
 import Title from 'layout/projects/show/header/title';
 import Toolbar from 'layout/projects/show/header/toolbar';
 import Wrapper from 'layout/wrapper';
@@ -30,7 +30,7 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
         <Title />
 
         <div className="flex flex-col items-end flex-shrink-0 space-y-6">
-          <Contributors />
+          {/* <Contributors /> */}
           <Toolbar />
         </div>
       </div>

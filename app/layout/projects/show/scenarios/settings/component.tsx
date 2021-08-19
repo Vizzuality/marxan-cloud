@@ -11,7 +11,7 @@ export interface ProjectScenariosSettingsProps {
 
 export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> = ({
   sid,
-}:ProjectScenariosSettingsProps) => {
+}: ProjectScenariosSettingsProps) => {
   const {
     data: scenarioData,
     isFetching: scenarioIsFetching,
@@ -53,7 +53,7 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>BLM:</dt>
-        <dd>{boundaryLengthModifier || '-'}</dd>
+        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(boundaryLengthModifier || '-')}</dd>
       </div>
       {/* <div className="flex space-x-2 text-sm">
         <dt>Schedules:</dt>
