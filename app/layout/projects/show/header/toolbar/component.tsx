@@ -2,11 +2,11 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useMe } from 'hooks/me';
-import { useProject } from 'hooks/projects';
-
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
+
+import { useMe } from 'hooks/me';
+import { useProject } from 'hooks/projects';
 
 import HelpBeacon from 'layout/help/beacon';
 
@@ -67,10 +67,11 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
               subtitle=""
               content={(
                 <div>
-                  You can download all the files from any of your projects in the standard marxan
-                  format.This may be helpful if you need to prepare your files with more specific
-                  spatial operations.After doing so you can upload your files back into the
-                  platform to continue with the analysis
+                  You can download all the files from your project in the standard Marxan
+                  format. This will allow you to edit your project outside of the Marxan
+                  Cloud platform.
+                  After doing so you can continue working inside Marxan Cloud by
+                  re-uploading your files back into the platform.
 
                 </div>
               )}

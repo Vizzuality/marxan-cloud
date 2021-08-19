@@ -34,9 +34,8 @@ export const COLORS = {
 export const LEGEND_LAYERS = {
   pugrid: () => ({
     id: 'pugrid',
-    name: 'PU grid',
+    name: 'Planning unit grid',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.primary }} />,
-    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus minus eligendi doloremque unde, atque maxime dolore officiis quia architecto fugiat, dolorem animi vel! Velit minus facere maxime consequuntur iure. Nisi!',
   }),
 
   // WDPA
@@ -47,14 +46,14 @@ export const LEGEND_LAYERS = {
   }),
   'wdpa-percentage': () => ({
     id: 'wdpa-percentage',
-    name: 'Protected areas percentage',
+    name: 'Protected areas',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.wdpa }} />,
   }),
 
   // Species
   bioregional: () => ({
     id: 'bioregional',
-    name: 'Bioregional',
+    name: 'Bioregion',
     icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.bioregional.default }} />,
   }),
   species: () => ({
