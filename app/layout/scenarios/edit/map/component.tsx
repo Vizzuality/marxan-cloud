@@ -38,7 +38,6 @@ export interface ScenariosEditMapProps {
 }
 
 export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
-  const [shownMap, setshownMap] = useState(true);
   const [open, setOpen] = useState(true);
   const [session] = useSession();
 
@@ -111,7 +110,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       settings: {
         bioregional: layerSettings.bioregional,
         species: layerSettings.species,
-        features: layerSettings.features,
       },
     },
   });
@@ -251,12 +249,12 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   }, [setLayerSettings, dispatch]);
 
   const onChangeVisibility = useCallback((id) => {
-    setshownMap(!shownMap);
+    const { visibility = true } = layerSettings[id] || {};
     dispatch(setLayerSettings({
       id,
-      settings: { visibility: shownMap },
+      settings: { visibility: !visibility },
     }));
-  }, [setLayerSettings, dispatch, shownMap]);
+  }, [setLayerSettings, dispatch, layerSettings]);
 
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">

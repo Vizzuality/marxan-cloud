@@ -38,7 +38,7 @@ export const LEGEND_LAYERS = {
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.primary }} />,
     settingsManager: {
       opacity: true,
-      shown: true,
+      visibility: true,
     },
   }),
 
@@ -49,7 +49,7 @@ export const LEGEND_LAYERS = {
     icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.wdpa }} />,
     settingsManager: {
       opacity: true,
-      shown: true,
+      visibility: true,
     },
   }),
   'wdpa-percentage': () => ({
@@ -58,7 +58,7 @@ export const LEGEND_LAYERS = {
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.wdpa }} />,
     settingsManager: {
       opacity: true,
-      shown: true,
+      visibility: true,
     },
   }),
 
@@ -69,7 +69,7 @@ export const LEGEND_LAYERS = {
     icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.bioregional.default }} />,
     settingsManager: {
       opacity: true,
-      shown: true,
+      visibility: true,
     },
   }),
   species: () => ({
@@ -78,7 +78,7 @@ export const LEGEND_LAYERS = {
     icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.species.default }} />,
     settingsManager: {
       opacity: true,
-      shown: true,
+      visibility: true,
     },
   }),
   features: () => ({
@@ -87,7 +87,7 @@ export const LEGEND_LAYERS = {
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.features }} />,
     settingsManager: {
       opacity: true,
-      shown: true,
+      visibility: true,
     },
   }),
 
@@ -98,7 +98,7 @@ export const LEGEND_LAYERS = {
     type: 'gradient',
     settingsManager: {
       opacity: true,
-      shown: true,
+      visibility: true,
     },
     items: [
       {
@@ -119,7 +119,7 @@ export const LEGEND_LAYERS = {
       icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.include }} />,
       settingsManager: {
         opacity: true,
-        shown: true,
+        visibility: true,
       },
       description: (
         <div className="pl-5">
@@ -139,7 +139,7 @@ export const LEGEND_LAYERS = {
       icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.exclude }} />,
       settingsManager: {
         opacity: true,
-        shown: true,
+        visibility: true,
       },
       description: (
         <div className="pl-5">
@@ -158,7 +158,7 @@ export const LEGEND_LAYERS = {
     type: 'gradient',
     settingsManager: {
       opacity: true,
-      shown: true,
+      visibility: true,
     },
     items: [
       {
@@ -185,7 +185,7 @@ export const LEGEND_LAYERS = {
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.primary }} />,
     settingsManager: {
       opacity: true,
-      shown: true,
+      visibility: true,
     },
   }),
 };

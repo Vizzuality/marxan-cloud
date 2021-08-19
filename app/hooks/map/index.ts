@@ -179,7 +179,6 @@ export function useFeaturePreviewLayers({
     const {
       bioregional: BioregionalSettings = {},
       species: SpeciesSettings = {},
-      features: FeaturesSettings = {},
     } = settings;
 
     const {
@@ -190,10 +189,18 @@ export function useFeaturePreviewLayers({
       opacity: SpeciesOpacity,
       visibility: SpeciesVisibility = true,
     } = SpeciesSettings;
-    const {
-      opacity: FeaturesOpacity,
-      visibility: FeaturesVisibility = true,
-    } = FeaturesSettings;
+
+    const Types = {
+      bioregional: BioregionalVisibility,
+      species: SpeciesVisibility,
+    };
+
+    const getLayerVisibility = (type) => {
+      if (Types[type]) {
+        return 'visible';
+      }
+      return 'none';
+    };
 
     return FEATURES
       .map((f) => {
@@ -202,21 +209,7 @@ export function useFeaturePreviewLayers({
         const getLayerOpacity = () => {
           if (type === 'bioregional') return BioregionalOpacity;
           if (type === 'species') return SpeciesOpacity;
-          if (type === 'features') return FeaturesOpacity;
           return 0.5;
-        };
-
-        const Types = {
-          bioregional: BioregionalVisibility,
-          species: SpeciesVisibility,
-          features: FeaturesVisibility,
-        };
-
-        const getLayerVisibility = (layer) => {
-          if (Types[layer]) {
-            return 'visible';
-          }
-          return 'none';
         };
 
         return {

@@ -28,7 +28,7 @@ export interface LegendItemProps {
   attributes?: Record<string, unknown>;
   settingsManager?: {
     opacity: boolean,
-    shown: boolean,
+    visibility: boolean,
   }
   settings?: {
     opacity: number,
@@ -128,7 +128,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
           </div>
         )}
 
-        {settingsManager?.shown && (
+        {settingsManager?.visibility && (
           <div className="mt-2.5 flex">
             <button
               type="button"
