@@ -92,6 +92,7 @@ export class ScenariosCrudService extends AppBaseService<
         'description',
         'type',
         'protectedAreaFilterByIds',
+        'customProtectedAreaIds',
         'wdpaIucnCategories',
         'wdpaThreshold',
         'numberOfRuns',
