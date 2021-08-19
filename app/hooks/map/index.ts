@@ -393,6 +393,7 @@ export function usePUGridLayer({
                       ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
                     ],
                     0.5 * WdpaPercentageOpacity,
+                    0,
                   ],
                 },
               },
