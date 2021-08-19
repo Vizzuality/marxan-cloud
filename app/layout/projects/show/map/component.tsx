@@ -2,7 +2,11 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
+import { useSelector, useDispatch } from 'react-redux';
+
 import { useRouter } from 'next/router';
+
+import { setLayerSettings } from 'store/slices/projects/[id]';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -58,6 +62,13 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     sort: '-lastModifiedAt',
   });
 
+  const {
+    // Settings
+    layerSettings,
+  } = useSelector((state) => state['/projects/[id]']);
+
+  const dispatch = useDispatch();
+
   const sid = useMemo(() => {
     if (selectedSid) return selectedSid;
 
@@ -70,6 +81,15 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     include: 'results',
     sublayers: selectedSid ? ['solutions'] : [],
     options: {
+      settings: {
+        pugrid: layerSettings.pugrid,
+        'wdpa-percentage': layerSettings['wdpa-percentage'],
+        cost: layerSettings.cost,
+        'lock-in': layerSettings['lock-in'],
+        'lock-out': layerSettings['lock-out'],
+        frequency: layerSettings.frequency,
+        solution: layerSettings.solution,
+      },
     },
   });
 
@@ -144,6 +164,21 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
     return null;
   };
+
+  const onChangeOpacity = useCallback((opacity, lid) => {
+    dispatch(setLayerSettings({
+      id: lid,
+      settings: { opacity },
+    }));
+  }, [dispatch]);
+
+  const onChangeVisibility = useCallback((lid) => {
+    const { visibility = true } = layerSettings[lid] || {};
+    dispatch(setLayerSettings({
+      id: lid,
+      settings: { visibility: !visibility },
+    }));
+  }, [dispatch, layerSettings]);
 
   return (
     <AnimatePresence>
@@ -240,6 +275,9 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                   <LegendItem
                     sortable={false}
                     key={i.id}
+                    settingsManager={i.settingsManager}
+                    onChangeOpacity={(opacity) => onChangeOpacity(opacity, i.id)}
+                    onChangeVisibility={() => onChangeVisibility(i.id)}
                     {...i}
                   >
                     {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
