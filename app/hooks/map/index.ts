@@ -240,18 +240,8 @@ export function usePUGridPreviewLayer({
 
 // PUGrid
 export function usePUGridLayer({
-  active, sid, type, subtype, options = {}, cache,
+  active, sid, include, sublayers, options = {}, cache,
 }: UsePUGridLayer) {
-  const include = useMemo(() => {
-    if (type === 'protected-areas' || type === 'features') return 'protection';
-    if (type === 'analysis' && subtype === 'analysis-gap-analysis') return 'features';
-    if (type === 'analysis' && subtype === 'analysis-cost-surface') return 'cost';
-    if (type === 'analysis' && subtype === 'analysis-adjust-planning-units') return 'lock-status';
-    if (type === 'solutions') return 'results';
-
-    return 'protection';
-  }, [type, subtype]);
-
   return useMemo(() => {
     if (!active || !sid) return null;
 
@@ -291,11 +281,8 @@ export function usePUGridLayer({
           },
 
           // PROTECTED AREAS
-          ...(
-            type === 'protected-areas' && subtype === 'protected-areas-percentage')
-            || type === 'features'
-            || (type === 'analysis' && subtype === 'analysis-preview'
-            ) ? [
+          ...sublayers.includes('wdpa-percentage')
+            ? [
               {
                 type: 'fill',
                 'source-layer': 'layer0',
@@ -315,7 +302,7 @@ export function usePUGridLayer({
             ] : [],
 
           // ANALYSIS - GAP ANALYSIS
-          ...type === 'analysis' && subtype === 'analysis-gap-analysis' ? [
+          ...sublayers.includes('features') ? [
             {
               type: 'fill',
               'source-layer': 'layer0',
@@ -336,7 +323,7 @@ export function usePUGridLayer({
           ] : [],
 
           // ANALYSIS - COST SURFACE
-          ...type === 'analysis' && subtype === 'analysis-cost-surface' ? [
+          ...sublayers.includes('cost') ? [
             {
               type: 'fill',
               'source-layer': 'layer0',
@@ -356,7 +343,7 @@ export function usePUGridLayer({
           ] : [],
 
           // ANALYSIS - ADJUST PLANNING UNITS
-          ...type === 'analysis' && subtype === 'analysis-adjust-planning-units' && !!puIncludedValue ? [
+          ...sublayers.includes('lock-in') && !!puIncludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
@@ -372,7 +359,7 @@ export function usePUGridLayer({
               },
             },
           ] : [],
-          ...type === 'analysis' && subtype === 'analysis-adjust-planning-units' && !!puExcludedValue ? [
+          ...sublayers.includes('lock-out') && !!puExcludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
@@ -390,7 +377,7 @@ export function usePUGridLayer({
           ] : [],
 
           // SOLUTIONS - FREQUENCY
-          ...type === 'solutions' ? [
+          ...sublayers.includes('solutions') ? [
             {
               type: 'fill',
               'source-layer': 'layer0',
@@ -427,7 +414,7 @@ export function usePUGridLayer({
         ],
       },
     };
-  }, [cache, active, sid, type, subtype, options, include]);
+  }, [cache, active, sid, options, include, sublayers]);
 }
 
 // PUGrid
