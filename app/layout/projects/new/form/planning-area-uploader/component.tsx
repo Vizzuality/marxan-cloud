@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useDispatch } from 'react-redux';
 
-import { useUploadProjectPA } from 'hooks/projects';
-import { useToasts } from 'hooks/toast';
-
 import {
   setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
 } from 'store/slices/projects/new';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
+
+import { useUploadProjectPA } from 'hooks/projects';
+import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
@@ -52,7 +52,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
       input.onChange(null);
       dispatch(setUploadingPlanningArea(null));
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onDropAccepted = async (acceptedFiles) => {

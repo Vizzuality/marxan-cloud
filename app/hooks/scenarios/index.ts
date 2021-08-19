@@ -30,6 +30,8 @@ import {
   UploadScenarioCostSurfaceProps,
   UseUploadScenarioPUProps,
   UploadScenarioPUProps,
+  UploadScenarioPAProps,
+  UseUploadScenarioPAProps,
   UseSaveScenarioPUProps,
   SaveScenarioPUProps,
   UseDuplicateScenarioProps,
@@ -309,6 +311,36 @@ export function useUploadScenarioPU({
   };
 
   return useMutation(uploadScenarioPUShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUploadScenarioPA({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadScenarioPAProps) {
+  const [session] = useSession();
+
+  const uploadScenarioPAShapefile = ({ id, data }: UploadScenarioPAProps) => {
+    return UPLOADS.request({
+      url: `/projects/${id}/protected-areas/shapefile`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadScenarioPAShapefile, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
     },

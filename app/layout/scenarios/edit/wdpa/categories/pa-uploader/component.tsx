@@ -12,8 +12,7 @@ import {
 import cx from 'classnames';
 import { motion } from 'framer-motion';
 
-import { useUploadProjectPA } from 'hooks/projects';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useUploadScenarioPA, useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
@@ -36,7 +35,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   form,
 }: ProtectedAreaUploaderProps) => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
@@ -49,7 +48,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     data: scenarioData,
   } = useScenario(sid);
 
-  const uploadProjectPAMutation = useUploadProjectPA({
+  const uploadScenarioPAMutation = useUploadScenarioPA({
     requestConfig: {
       method: 'POST',
     },
@@ -74,10 +73,12 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        ...scenarioData,
-        customProtectedAreaIds: scenarioData.customProtectedAreaIds.push(PAid),
+        customProtectedAreaIds: scenarioData.customProtectedAreaIds
+          ? scenarioData.customProtectedAreaIds.push(PAid)
+          : [PAid],
       },
     });
+    return null;
   }, [saveScenarioMutation, sid, scenarioData]);
 
   const onDropAccepted = async (acceptedFiles) => {
@@ -87,7 +88,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadProjectPAMutation.mutate({ data }, {
+    uploadScenarioPAMutation.mutate({ id: `${pid}`, data }, {
       onSuccess: ({ data: { data: g, id: PAid } }) => {
         setLoading(false);
         input.onChange(PAid);
@@ -107,7 +108,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         dispatch(setMaxPuAreaSize(g.marxanMetadata.maxPuAreaSize));
 
         updateCustomProtectedAreasIds(PAid);
-        console.info('Protected area uploaded', g, PAid);
+        console.info('Protected area shapefile uploaded', g);
       },
       onError: () => {
         setLoading(false);
