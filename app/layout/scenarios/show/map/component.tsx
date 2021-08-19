@@ -13,8 +13,9 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
 
+import { useSelectedFeatures } from 'hooks/features';
 import {
-  usePUGridLayer, useLegend,
+  usePUGridLayer, useLegend, useFeaturePreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenario, useScenarioPU } from 'hooks/scenarios';
@@ -49,6 +50,10 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
 
   const { data: scenarioData } = useScenario(sid);
 
+  const {
+    data: selectedFeaturesData,
+  } = useSelectedFeatures(sid, {});
+
   const { data: PUData } = useScenarioPU(sid);
 
   const { included, excluded } = PUData || {};
@@ -67,6 +72,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const {
     tab,
     subtab,
+    cache,
     selectedSolution,
     layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}`]);
@@ -75,6 +81,19 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
+
+  const FeaturePreviewLayers = useFeaturePreviewLayers({
+    features: selectedFeaturesData,
+    cache,
+    active: tab === 'features',
+    bbox,
+    options: {
+      settings: {
+        bioregional: layerSettings.bioregional,
+        species: layerSettings.species,
+      },
+    },
+  });
 
   const PUGridLayer = usePUGridLayer({
     active: true,
@@ -99,7 +118,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     },
   });
 
-  const LAYERS = [PUGridLayer].filter((l) => !!l);
+  const LAYERS = [PUGridLayer, ...FeaturePreviewLayers].filter((l) => !!l);
 
   const LEGEND = useLegend({
     type: tab,

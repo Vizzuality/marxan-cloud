@@ -238,6 +238,9 @@ export function useFeaturePreviewLayers({
                 paint: {
                   'line-color': '#000',
                 },
+                layout: {
+                  visibility: getLayerVisibility(type),
+                },
               },
             ],
           },
