@@ -34,8 +34,8 @@ export class SplitQuery {
       featureId: `$${parameters.push(command.input.baseFeatureId)}`,
       bbox: [
         `$${parameters.push(project.bbox[0])}`,
-        `$${parameters.push(project.bbox[1])}`,
         `$${parameters.push(project.bbox[2])}`,
+        `$${parameters.push(project.bbox[1])}`,
         `$${parameters.push(project.bbox[3])}`,
       ],
       totalArea: isDefined(planningAreaLocation)
@@ -99,8 +99,8 @@ export class SplitQuery {
               ${protectedAreaJoin}
             where st_intersects(st_makeenvelope(
                 ${fields.bbox[0]},
-                ${fields.bbox[1]},
                 ${fields.bbox[2]},
+                ${fields.bbox[1]},
                 ${fields.bbox[3]},
                 4326
               ), fd.the_geom)

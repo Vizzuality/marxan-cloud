@@ -39,12 +39,9 @@ export class ScenarioProtectedAreaCalculationProcessor
      pu_pa_union as (select pu.id, pu.the_geom as pu_the_geom, pa.the_geom as pa_the_geom, pu_area
       from pu
       left join pa on pu.the_geom && pa.the_geom),
-     pu_pa_agg as (select id, pu_the_geom, st_makevalid(ST_Union(pa_the_geom)) as pa_the_geom
-      from pu_pa_union
-      group by id, pu_the_geom),
-     result as (select id,
-      round(st_area(st_transform(st_intersection(pu_the_geom, pa_the_geom), 3410))) as protected_area
-      from pu_pa_agg)
+     pu_pa_agg as (select id, st_transform(st_makevalid(st_intersection(pu_the_geom, pa_the_geom)), 3410) as pa_the_geom
+      from pu_pa_union where st_intersects(pu_the_geom, pa_the_geom)),
+     result as (select id, round(st_area(ST_Union(pa_the_geom))) as protected_area from pu_pa_agg group by id)
     UPDATE scenarios_pu_data
       SET (protected_area) = (SELECT protected_area
           FROM result
@@ -55,8 +52,8 @@ export class ScenarioProtectedAreaCalculationProcessor
       [scenarioId]
     );
     await queryBuilder.catch((err) =>{
-      this.logger.debug(queryBuilder);
-      this.logger.debug(err);
+      this.logger.error(queryBuilder);
+      this.logger.error(err);
       throw err;
     })
 
