@@ -1,10 +1,11 @@
 import React from 'react';
-import cx from 'classnames';
 
-import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
 
+import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
+
+import { useProject } from 'hooks/projects';
 
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';

@@ -166,7 +166,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
       const {
         featureId,
         geoprocessingOperations,
-        metadata,
+        metadata = {},
       } = d;
 
       const {

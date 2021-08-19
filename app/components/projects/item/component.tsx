@@ -8,7 +8,7 @@ import type { Project } from 'types/project-model';
 import { useMe } from 'hooks/me';
 import { useProject } from 'hooks/projects';
 
-import Avatar from 'components/avatar';
+// import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
@@ -33,7 +33,7 @@ export const Item: React.FC<ItemProps> = ({
   area,
   description,
   lastUpdateDistance,
-  contributors = [],
+  // contributors = [],
   style,
   onClick,
   onDownload,
@@ -166,7 +166,7 @@ export const Item: React.FC<ItemProps> = ({
         </header>
 
         {/* CONTRIBUTORS */}
-        {!!contributors.length && (
+        {/* {!!contributors.length && (
           <div className="flex items-center mt-4 text-sm">
             <p>Contributors:</p>
             <ul className="flex ml-1">
@@ -184,7 +184,7 @@ export const Item: React.FC<ItemProps> = ({
               })}
             </ul>
           </div>
-        )}
+        )} */}
 
         <footer className="mt-7">
           <div className="flex">
