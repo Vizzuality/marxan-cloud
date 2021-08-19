@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect, useState,
+  useCallback, useEffect, useState, useMemo,
 } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -90,6 +90,26 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
 
+  const include = useMemo(() => {
+    if (tab === 'protected-areas' || tab === 'features') return 'protection';
+    if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return 'features';
+    if (tab === 'analysis' && subtab === 'analysis-cost-surface') return 'cost';
+    if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return 'lock-status,protection';
+    if (tab === 'solutions') return 'results';
+
+    return 'protection';
+  }, [tab, subtab]);
+
+  const sublayers = useMemo(() => {
+    if (tab === 'protected-areas' && subtab === 'protected-areas-percentage') return ['wdpa-percentage'];
+    if (tab === 'analysis' && subtab === 'analysis-preview') return ['wdpa-percentage', 'features'];
+    if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features'];
+    if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost'];
+    if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out'];
+
+    return [];
+  }, [tab, subtab]);
+
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
     cache,
@@ -118,8 +138,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     cache,
     active: true,
     sid: sid ? `${sid}` : null,
-    type: tab,
-    subtype: subtab,
+    include,
+    sublayers,
     options: {
       wdpaIucnCategories: tab === 'protected-areas' && subtab === 'protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
       wdpaThreshold: tab === 'protected-areas' && subtab === 'protected-areas-percentage' ? wdpaThreshold * 100 : scenarioData?.wdpaThreshold,
