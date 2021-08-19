@@ -51,7 +51,7 @@ async function sendData(url: string, data: Blob) {
 
 const organization = await botClient
   .post("/organizations", {
-    name: "Australia - Kimberley " + crypto.randomUUID(),
+    name: "Australia - Kimberley organization",
     description: "Duis aliquip nostrud sint",
     metadata: {},
   })
@@ -75,7 +75,7 @@ const planningUnitAreakm2 = 50;
 
 const project = await botClient
   .post("/projects", {
-    name: "Australia - Kimberley " + crypto.randomUUID(),
+    name: "Australia - Kimberley project",
     organizationId: organization.data.id,
     planningUnitGridShape: "hexagon",
     planningUnitAreakm2: planningUnitAreakm2,
@@ -109,12 +109,23 @@ console.log(paCategories.map((i): string => i.id));
 
 const scenario = await botClient
   .post("/scenarios", {
-    name: `Kimberley ${project.data.attributes.name}`,
+    name: `Kimberley scenario`,
     type: "marxan",
     projectId: project.data.id,
     description: "An Australia scenario",
     wdpaIucnCategories: ["Not Applicable"],
     wdpaThreshold: 50,
+    metadata: {
+      scenarioEditingMetadata: {
+        status: {
+          'protected-areas': 'draft',
+          features: 'draft',
+          analysis: 'draft',
+        },
+        tab: 'analysis',
+        subtab: 'analysis-preview',
+      }
+    }
   })
   .then((result) => result.data)
   .catch((e) => {

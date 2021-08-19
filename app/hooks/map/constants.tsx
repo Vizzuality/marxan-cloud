@@ -34,7 +34,7 @@ export const COLORS = {
 export const LEGEND_LAYERS = {
   pugrid: () => ({
     id: 'pugrid',
-    name: 'PU grid',
+    name: 'Planning unit grid',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2 fill-none" style={{ color: COLORS.primary }} />,
     settingsManager: {
       opacity: true,
@@ -54,7 +54,7 @@ export const LEGEND_LAYERS = {
   }),
   'wdpa-percentage': () => ({
     id: 'wdpa-percentage',
-    name: 'Protected areas percentage',
+    name: 'Protected areas',
     icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.wdpa }} />,
     settingsManager: {
       opacity: true,
@@ -65,7 +65,7 @@ export const LEGEND_LAYERS = {
   // Species
   bioregional: () => ({
     id: 'bioregional',
-    name: 'Bioregional',
+    name: 'Bioregion',
     icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.bioregional.default }} />,
     settingsManager: {
       opacity: true,

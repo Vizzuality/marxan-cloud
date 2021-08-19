@@ -55,6 +55,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     filters: {
       projectId: pid,
     },
+    sort: '-lastModifiedAt',
   });
 
   const sid = useMemo(() => {

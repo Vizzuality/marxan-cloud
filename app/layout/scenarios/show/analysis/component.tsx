@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -32,6 +32,15 @@ export const ScenariosSidebarShowAnalysis: React.FC<ScenariosSidebarShowAnalysis
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
+
+  // EFFECTS
+  useEffect(() => {
+    return () => {
+      if (tab !== 'analysis') {
+        setSection(null);
+      }
+    };
+  }, [tab]);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
