@@ -69,9 +69,9 @@ export interface UsePUGridLayer {
   cache?: number;
   sid?: string;
   active?: boolean;
-  type: ScenarioSidebarTabs;
   runId?: number;
-  subtype: ScenarioSidebarSubTabs;
+  include?: string;
+  sublayers: string[];
   options?: {
     wdpaIucnCategories?: string[];
     wdpaThreshold?: number;
