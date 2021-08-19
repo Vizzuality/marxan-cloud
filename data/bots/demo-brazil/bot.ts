@@ -128,7 +128,6 @@ let scenario = await botClient
     type: "marxan",
     projectId: project.data.id,
     description: "A Brazil scenario",
-<<<<<<< HEAD
     metadata: {
         scenarioEditingMetadata: {
           status: {
@@ -139,9 +138,6 @@ let scenario = await botClient
         }
       },
     status: "draft"
-=======
-    status: "draft",
->>>>>>> done some fixes
   })
   .then((result) => result.data)
   .catch((e) => {
