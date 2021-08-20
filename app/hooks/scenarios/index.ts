@@ -30,8 +30,8 @@ import {
   UploadScenarioCostSurfaceProps,
   UseUploadScenarioPUProps,
   UploadScenarioPUProps,
-  UploadScenarioPAProps,
-  UseUploadScenarioPAProps,
+  UploadPAProps,
+  UseUploadPAProps,
   UseSaveScenarioPUProps,
   SaveScenarioPUProps,
   UseDuplicateScenarioProps,
@@ -325,10 +325,10 @@ export function useUploadPA({
   requestConfig = {
     method: 'POST',
   },
-}: UseUploadScenarioPAProps) {
+}: UseUploadPAProps) {
   const [session] = useSession();
 
-  const uploadScenarioPAShapefile = ({ id, data }: UploadScenarioPAProps) => {
+  const uploadPAShapefile = ({ id, data }: UploadPAProps) => {
     return UPLOADS.request({
       url: `/projects/${id}/protected-areas/shapefile`,
       data,
@@ -340,7 +340,7 @@ export function useUploadPA({
     });
   };
 
-  return useMutation(uploadScenarioPAShapefile, {
+  return useMutation(uploadPAShapefile, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
     },

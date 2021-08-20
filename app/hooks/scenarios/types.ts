@@ -31,10 +31,10 @@ export interface UploadScenarioPUProps {
   id?: string,
   data: any,
 }
-export interface UseUploadScenarioPAProps {
+export interface UseUploadPAProps {
   requestConfig?: AxiosRequestConfig
 }
-export interface UploadScenarioPAProps {
+export interface UploadPAProps {
   id?: string,
   data: any,
 }
