@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useDropzone } from 'react-dropzone';
 import { useDispatch } from 'react-redux';
@@ -12,7 +12,7 @@ import {
 import cx from 'classnames';
 import { motion } from 'framer-motion';
 
-import { useUploadPA, useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useUploadPA } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
@@ -44,16 +44,16 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
   const dispatch = useDispatch();
 
-  const {
-    data: scenarioData,
-  } = useScenario(sid);
+  // const {
+  //   data: scenarioData,
+  // } = useScenario(sid);
 
-  const { customProtectedAreaIds = [] } = scenarioData;
+  // const { customProtectedAreaIds = [] } = scenarioData;
 
   const scenarioSlice = getScenarioEditSlice(sid);
 
   const {
-    setUploadingProtectedArea,
+    setCache,
   } = scenarioSlice.actions;
 
   const uploadPAMutation = useUploadPA({
@@ -62,31 +62,30 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     },
   });
 
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
+  // const saveScenarioMutation = useSaveScenario({
+  //   requestConfig: {
+  //     method: 'PATCH',
+  //   },
+  // });
 
   // Effects
   useEffect(() => {
     return () => {
       input.onChange(null);
-      dispatch(setUploadingProtectedArea(null));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateCustomProtectedAreasIds = useCallback((PAid) => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        customProtectedAreaIds: customProtectedAreaIds
-          ? customProtectedAreaIds.push(PAid) : [PAid],
-      },
-    });
-    return null;
-  }, [saveScenarioMutation, sid, customProtectedAreaIds]);
+  // const updateCustomProtectedAreasIds = useCallback((PAid) => {
+  //   saveScenarioMutation.mutate({
+  //     id: `${sid}`,
+  //     data: {
+  //       customProtectedAreaIds: customProtectedAreaIds
+  //         ? customProtectedAreaIds.push(PAid) : [PAid],
+  //     },
+  //   });
+  //   return null;
+  // }, [saveScenarioMutation, sid, customProtectedAreaIds]);
 
   const onDropAccepted = async (acceptedFiles) => {
     setLoading(true);
@@ -109,8 +108,9 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
           level: 'success',
         });
 
-        dispatch(setUploadingProtectedArea(PAdata));
-        updateCustomProtectedAreasIds(PAid);
+        dispatch(setCache(Date.now()));
+
+        // updateCustomProtectedAreasIds(PAid);
         console.info('Protected area shapefile uploaded', PAdata);
       },
       onError: () => {
