@@ -108,7 +108,9 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
       </header>
 
       <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden text-sm">
-        <div className="pt-2">
+        <p className="pt-2">By default all projects have an equal area cost surface which means that planning units with the same area have the same cost</p>
+
+        <div className="pt-5">
           <h4 className="mb-2">Download the current cost surface</h4>
           <Button
             theme="primary-alt"
