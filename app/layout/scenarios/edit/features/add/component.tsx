@@ -114,10 +114,9 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadFeaturesShapefileMutation.mutate({ data }, {
+    uploadFeaturesShapefileMutation.mutate({ data, id: `${pid}` }, {
       onSuccess: ({ data: { data: g, id: shapefileId } }) => {
         setLoading(false);
-        input.onChange(shapefileId);
 
         addToast('success-upload-feature-shapefile', (
           <>
@@ -128,7 +127,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
           level: 'success',
         });
 
-        console.info('Shapefile uploaded', g);
+        console.info('Shapefile uploaded', g, 'shapefileId', shapefileId);
       },
       onError: () => {
         setLoading(false);
@@ -226,9 +225,9 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   const {
     getRootProps,
     getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
+    // isDragActive,
+    // isDragAccept,
+    // isDragReject,
   } = useDropzone({
     multiple: false,
     maxSize: 1000000,
@@ -259,9 +258,9 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
               {...getRootProps()}
               className={cx({
                 'text-xs dropzone py-1 w-full hover:bg-gray-500 cursor-pointer': true,
-                'bg-gray-500': isDragActive,
-                'bg-green-800': isDragAccept,
-                'bg-red-800': isDragReject,
+                // 'bg-gray-500': isDragActive,
+                // 'bg-green-800': isDragAccept,
+                // 'bg-red-800': isDragReject,
               })}
               theme="secondary"
               size="base"
