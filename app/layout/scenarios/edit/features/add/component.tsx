@@ -1,9 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { useDropzone } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import cx from 'classnames';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
@@ -13,7 +15,10 @@ import List from 'layout/scenarios/edit/features/add/list';
 import Toolbar from 'layout/scenarios/edit/features/add/toolbar';
 
 import Button from 'components/button';
+import Icon from 'components/icon';
 import Loading from 'components/loading';
+
+import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
 export interface ScenariosFeaturesAddProps {
   onSuccess?: () => void;
@@ -149,6 +154,16 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
     onDismiss();
   }, [onDismiss]);
 
+  const {
+    getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject,
+  } = useDropzone({
+    // accept: 'image/*',
+    multiple: false,
+    maxSize: 1000000,
+    // onDropAccepted,
+    // onDropRejected,
+  });
+
   return (
     <FormRFF
       key="features-list"
@@ -164,6 +179,29 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
             className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
             iconClassName="w-10 h-10 text-primary-500"
           />
+
+          {/* Field to upload */}
+          <div className="mx-8 mt-3 mb-5">
+
+            <Button
+              {...getRootProps()}
+              className={cx({
+                'text-xs dropzone py-1 w-full hover:bg-gray-500 cursor-pointer': true,
+                'bg-gray-500': isDragActive,
+                'bg-green-800': isDragAccept,
+                'border-red-800': isDragReject,
+              })}
+              theme="secondary"
+              size="base"
+            >
+              Upload your own features
+              <Icon className="absolute w-4 h-4 text-white right-6" icon={UPLOAD_SVG} />
+
+              <input {...getInputProps()} />
+
+            </Button>
+
+          </div>
 
           <Toolbar
             search={search}
@@ -197,6 +235,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
                 theme="secondary"
                 size="lg"
                 onClick={onCancel}
+
               >
                 Cancel
               </Button>
