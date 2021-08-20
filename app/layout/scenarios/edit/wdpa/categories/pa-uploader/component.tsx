@@ -6,8 +6,8 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import {
-  setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
-} from 'store/slices/projects/new';
+  getScenarioEditSlice,
+} from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
@@ -48,6 +48,14 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     data: scenarioData,
   } = useScenario(sid);
 
+  const { customProtectedAreaIds = [] } = scenarioData;
+
+  const scenarioSlice = getScenarioEditSlice(sid);
+
+  const {
+    setUploadingProtectedArea,
+  } = scenarioSlice.actions;
+
   const uploadScenarioPAMutation = useUploadScenarioPA({
     requestConfig: {
       method: 'POST',
@@ -64,7 +72,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   useEffect(() => {
     return () => {
       input.onChange(null);
-      dispatch(setUploadingPlanningArea(null));
+      dispatch(setUploadingProtectedArea(null));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -73,13 +81,12 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        customProtectedAreaIds: scenarioData.customProtectedAreaIds
-          ? scenarioData.customProtectedAreaIds.push(PAid)
-          : [PAid],
+        customProtectedAreaIds: customProtectedAreaIds
+          ? customProtectedAreaIds.push(PAid) : [PAid],
       },
     });
     return null;
-  }, [saveScenarioMutation, sid, scenarioData]);
+  }, [saveScenarioMutation, sid, customProtectedAreaIds]);
 
   const onDropAccepted = async (acceptedFiles) => {
     setLoading(true);
@@ -102,11 +109,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
           level: 'success',
         });
 
-        dispatch(setUploadingPlanningArea(g));
-        dispatch(setBbox(g.box));
-        dispatch(setMinPuAreaSize(g.marxanMetadata.minPuAreaSize));
-        dispatch(setMaxPuAreaSize(g.marxanMetadata.maxPuAreaSize));
-
+        dispatch(setUploadingProtectedArea(g));
         updateCustomProtectedAreasIds(PAid);
         console.info('Protected area shapefile uploaded', g);
       },

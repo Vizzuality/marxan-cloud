@@ -20,6 +20,9 @@ import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Select from 'components/forms/select';
+import {
+  composeValidators,
+} from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
@@ -292,7 +295,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                 <p className="py-4 text-sm text-center">or</p>
                 <FieldRFF
                   name="protectedAreaId"
-                // validate={composeValidators([{ presence: true }])}
+                  validate={composeValidators([{ presence: true }])}
                 >
                   {(fprops) => {
                     return (

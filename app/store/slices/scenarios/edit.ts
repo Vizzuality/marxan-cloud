@@ -8,6 +8,7 @@ interface ScenarioEditStateProps {
   // WDPA
   wdpaCategories: Record<string, any>;
   wdpaThreshold: number;
+  uploadingProtectedArea: Record<string, object>
 
   // FEATURES
   featureHoverId: string;
@@ -39,6 +40,7 @@ const initialState = {
   // WDPA
   wdpaCategories: {},
   wdpaThreshold: 0.75,
+  uploadingProtectedArea: null,
 
   // FEATURES
   featureHoverId: null,
@@ -78,6 +80,9 @@ export function getScenarioEditSlice(id) {
       },
       setWDPAThreshold: (state, action: PayloadAction<number>) => {
         state.wdpaThreshold = action.payload;
+      },
+      setUploadingProtectedArea: (state, action: PayloadAction<Record<string, object>>) => {
+        state.uploadingProtectedArea = action.payload;
       },
 
       // FEATURES
