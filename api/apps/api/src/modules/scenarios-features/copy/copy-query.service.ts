@@ -35,7 +35,7 @@ export class CopyQuery {
               .join(', ')
           : undefined,
       protectedArea:
-        protectedAreaFilterByIds.length > 0 ? 'protected.area' : 'NULL',
+        protectedAreaFilterByIds.length > 0 ? 'st_area(st_transform(st_intersection(st_intersection(pa.the_geom, fd.the_geom), protected.area),3410))' : 'NULL',
       featureId: `$${parameters.push(command.input.baseFeatureId)}`,
       bbox: [
         `$${parameters.push(project.bbox[0])}`,
@@ -44,12 +44,12 @@ export class CopyQuery {
         `$${parameters.push(project.bbox[3])}`,
       ],
       totalArea: isDefined(planningAreaLocation)
-        ? `st_area(st_intersection(pa.the_geom, fd.the_geom))`
+        ? `st_area(st_transform(st_intersection(pa.the_geom, fd.the_geom), 3410))`
         : `NULL`,
     };
     const protectedAreaJoin = fields.protectedAreaIds
       ? `cross join (
-           select st_area(st_union(wdpa.the_geom)) as area
+           select st_union(wdpa.the_geom) as area
            from wdpa where st_intersects(st_makeenvelope(
             ${project.bbox[0]},
             ${project.bbox[2]},
@@ -90,8 +90,6 @@ export class CopyQuery {
             ), fd.the_geom)
           returning sfd.id as id;
         `;
-
-    logger.debug(query)
     return { parameters, query };
   }
 }
