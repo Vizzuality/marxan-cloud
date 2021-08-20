@@ -30,6 +30,8 @@ import {
   UploadScenarioCostSurfaceProps,
   UseUploadScenarioPUProps,
   UploadScenarioPUProps,
+  UseUploadFeaturesShapefileProps,
+  UploadFeaturesShapefileProps,
   UseSaveScenarioPUProps,
   SaveScenarioPUProps,
   UseDuplicateScenarioProps,
@@ -164,7 +166,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
       const { data: { data: pageData } } = p;
 
-      return pageData.map((d):ItemProps => {
+      return pageData.map((d): ItemProps => {
         const {
           id, projectId, name, lastModifiedAt,
         } = d;
@@ -299,6 +301,36 @@ export function useUploadScenarioPU({
   const uploadScenarioPUShapefile = ({ id, data }: UploadScenarioPUProps) => {
     return UPLOADS.request({
       url: `/scenarios/${id}/planning-unit-shapefile`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadScenarioPUShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUploadFeaturesShapefile({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadFeaturesShapefileProps) {
+  const [session] = useSession();
+
+  const uploadScenarioPUShapefile = ({ id, data }: UploadFeaturesShapefileProps) => {
+    return UPLOADS.request({
+      url: `/projects/${id}/features/shapefile`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,

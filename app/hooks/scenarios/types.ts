@@ -31,6 +31,16 @@ export interface UploadScenarioPUProps {
   id?: string,
   data: any,
 }
+
+export interface UseUploadFeaturesShapefileProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface UploadFeaturesShapefileProps {
+  id?: string,
+  data: any,
+}
+
 export interface UseDownloadScenarioCostSurfaceProps {
   requestConfig?: AxiosRequestConfig
 }
