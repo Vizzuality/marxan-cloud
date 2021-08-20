@@ -21,30 +21,41 @@ export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
     }
   };
   return (
-    <div className="mt-6">
-      <div className="flex items-center">
-        <Label theme="dark" className="mr-2 uppercase text-xxs">Planning unit grid</Label>
-        <InfoButton>
-          <span>
-            <h4 className="font-heading text-lg mb-2.5">Planning unit shape</h4>
-            <div className="space-y-2">
-              <p>
-                The planning area needs to be divided
-                into smaller spatial units, called planning units.
-              </p>
-              <p>
-                This division can be made with a regular grid (hexagons or squares)
-                or with an irreglular grid (for example using management or
-                ecological land units).
-              </p>
-              <p>
-                The planning units are central to a
-                Marxan analysis and
-                deciding an appropriate shape and size is important.
-              </p>
-            </div>
-          </span>
-        </InfoButton>
+    <div className="flex flex-col justify-between mt-3">
+      <h2 className="text-lg font-medium font-heading">Add a planning unit grid</h2>
+      <InfoButton>
+        <span>
+          <h4 className="font-heading text-lg mb-2.5">Planning unit grid</h4>
+          <div className="space-y-2 flex flex-col justify-between mt-3">
+            <p>
+              The planning area needs to be divided
+              into smaller spatial units, called planning units.
+            </p>
+            <p>
+              The planning units are central to a
+              Marxan analysis and
+              deciding an appropriate shape and size is important.
+            </p>
+          </div>
+        </span>
+      </InfoButton>
+      <div className="mt-1">
+        <div className="flex items-center">
+
+          <Label theme="dark" className="mr-2 uppercase text-xxs">Planning unit shape</Label>
+          <InfoButton>
+            <span>
+              <h4 className="font-heading text-lg mb-2.5">Planning unit shape</h4>
+              <div className="space-y-2">
+                <p>
+                  The planning units can have a regular shape (hexagons or squares)
+                  or an irregular shape (for example using management or
+                  ecological land units).
+                </p>
+              </div>
+            </span>
+          </InfoButton>
+        </div>
       </div>
 
       <div className="flex mt-4">
