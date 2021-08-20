@@ -164,7 +164,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
       const { data: { data: pageData } } = p;
 
-      return pageData.map((d):ItemProps => {
+      return pageData.map((d): ItemProps => {
         const {
           id, projectId, name, lastModifiedAt,
         } = d;
