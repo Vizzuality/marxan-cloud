@@ -107,7 +107,9 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const LEGEND = useLegend({
     type: selectedSid ? ScenarioSidebarTabs.SOLUTIONS : null,
     subtype: null,
-    options: {},
+    options: {
+      layerSettings,
+    },
   });
 
   const SCENARIOS_RUNNED = useMemo(() => {

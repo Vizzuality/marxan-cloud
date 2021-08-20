@@ -8,19 +8,22 @@ import Arrow from './arrow';
 import { TooltipProps } from './types';
 
 export const Tooltip: React.FC<TooltipProps> = ({
-  children, content, arrow, interactive, maxWidth, maxHeight, ...props
+  children, content, arrow, interactive, maxWidth, maxHeight, onHide, onMount, ...props
 }: TooltipProps) => {
   const tooltipRef = useRef(null);
   const springConfig: SpringOptions = { damping: 15, stiffness: 300 };
   const opacity = useSpring(0, springConfig);
   const scale = useSpring(0.95, springConfig);
 
-  function onMount() {
+  function handleMount(targets) {
     scale.set(1);
     opacity.set(1);
+
+    if (onMount) onMount(targets);
   }
 
-  function onHide({ unmount }) {
+  function handleHide(targets) {
+    const { unmount } = targets;
     const cleanup = scale.onChange((value) => {
       if (value <= 0.95) {
         cleanup();
@@ -30,6 +33,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
     scale.set(0.95);
     opacity.set(0);
+
+    if (onHide) onHide(targets);
   }
 
   return (
@@ -72,8 +77,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
         );
       }}
       animation
-      onMount={onMount}
-      onHide={onHide}
+      onMount={handleMount}
+      onHide={handleHide}
     >
       {children}
     </Tippy>

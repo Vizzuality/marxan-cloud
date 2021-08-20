@@ -1,7 +1,9 @@
 import React, {
   Children, isValidElement, ReactNode,
+  useState,
 } from 'react';
 
+import { useNumberFormatter } from '@react-aria/i18n';
 import cx from 'classnames';
 
 import Slider from 'components/forms/slider';
@@ -52,11 +54,16 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   onChangeOpacity,
   onChangeVisibility,
 }: LegendItemProps) => {
+  const [openOpacity, setOpenOpacity] = useState(false);
+
   const validChildren = Children.map(children, (Child) => {
     return isValidElement(Child);
   }).some((c) => !!c);
 
   const { opacity = 1, visibility = true } = settings || {};
+  const { format } = useNumberFormatter({
+    style: 'percent',
+  });
 
   return (
     <div
@@ -71,22 +78,22 @@ export const LegendItem: React.FC<LegendItemProps> = ({
           })}
         >
           {icon && (
-            <div className="absolute top-0 left-0">
-              {icon}
-            </div>
+          <div className="absolute top-0 left-0">
+            {icon}
+          </div>
           )}
           <div className="text-sm text-white font-heading">{name}</div>
         </div>
 
         {sortable?.handle && (
-          <button
-            type="button"
-            className="text-gray-400 cursor-pointer hover:text-white"
-            {...listeners}
-            {...attributes}
-          >
-            <Icon className="w-4 " icon={DRAG_SVG} />
-          </button>
+        <button
+          type="button"
+          className="text-gray-400 cursor-pointer hover:text-white"
+          {...listeners}
+          {...attributes}
+        >
+          <Icon className="w-4 " icon={DRAG_SVG} />
+        </button>
         )}
       </header>
 
@@ -96,54 +103,95 @@ export const LegendItem: React.FC<LegendItemProps> = ({
 
       <div className="flex space-x-3">
         {settingsManager?.opacity && (
-          <div className="mt-2.5 flex">
-            <Tooltip
-              arrow
-              placement="top-start"
-              trigger="click"
-              interactive
-              content={(
-                <div
-                  className="px-6 pt-1.5 pb-4 text-gray-500 bg-white rounded w-60"
-                >
-                  <Slider
-                    labelRef={null}
-                    theme="dark-small"
-                    defaultValue={opacity}
-                    formatOptions={{
-                      style: 'percent',
-                    }}
-                    maxValue={1}
-                    minValue={0}
-                    step={0.01}
-                    onChange={onChangeOpacity}
-                  />
-                </div>
+        <div className="mt-2.5 flex">
+          <Tooltip
+            arrow
+            placement="top"
+            trigger={openOpacity ? 'manual' : 'mouseenter focus'}
+            content={(
+              <div
+                className="p-2 text-gray-500 bg-white rounded"
+              >
+                Opacity (
+                {format(opacity)}
+                )
+              </div>
               )}
-            >
-              <button type="button">
-                <Icon className="w-5" icon={OPACITY_SVG} />
-              </button>
-            </Tooltip>
-          </div>
+          >
+            <div>
+              <Tooltip
+                arrow
+                placement="top-start"
+                trigger="click"
+                interactive
+                onShow={() => { setOpenOpacity(true); }}
+                onHide={() => { setOpenOpacity(false); }}
+                content={(
+                  <div
+                    className="px-6 pt-1.5 pb-4 text-gray-500 bg-white rounded w-60"
+                  >
+                    <Slider
+                      labelRef={null}
+                      theme="dark-small"
+                      defaultValue={opacity}
+                      formatOptions={{
+                        style: 'percent',
+                      }}
+                      maxValue={1}
+                      minValue={0}
+                      step={0.01}
+                      onChange={onChangeOpacity}
+                    />
+                  </div>
+                  )}
+              >
+                <button
+                  type="button"
+                  className={cx({
+                    block: true,
+                    'text-gray-300': opacity !== 1,
+                  })}
+                >
+                  <Icon className="w-5 h-5" icon={OPACITY_SVG} />
+                </button>
+              </Tooltip>
+            </div>
+          </Tooltip>
+        </div>
         )}
 
         {settingsManager?.visibility && (
-          <div className="mt-2.5 flex">
+        <div className="mt-2.5 flex">
+          <Tooltip
+            arrow
+            placement="top"
+            content={(
+              <div
+                className="p-2 text-gray-500 bg-white rounded"
+              >
+                Visibility
+              </div>
+                )}
+          >
             <button
               type="button"
               onClick={onChangeVisibility}
+              className={cx({
+                block: true,
+                'text-gray-300': !visibility,
+              })}
             >
-              <Icon className="w-5" icon={visibility ? SHOW_SVG : HIDE_SVG} />
+              <Icon className="w-5 h-5" icon={visibility ? SHOW_SVG : HIDE_SVG} />
             </button>
-          </div>
+          </Tooltip>
+        </div>
         )}
       </div>
 
       {validChildren && (
-        <div className="mt-2.5">
-          {children}
-        </div>
+      <div className="mt-2.5">
+        {children}
+      </div>
       )}
     </div>
   );
