@@ -321,7 +321,7 @@ export function useUploadScenarioPU({
   });
 }
 
-export function useUploadScenarioPA({
+export function useUploadPA({
   requestConfig = {
     method: 'POST',
   },

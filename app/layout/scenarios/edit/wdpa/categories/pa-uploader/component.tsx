@@ -12,7 +12,7 @@ import {
 import cx from 'classnames';
 import { motion } from 'framer-motion';
 
-import { useUploadScenarioPA, useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useUploadPA, useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
@@ -56,7 +56,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     setUploadingProtectedArea,
   } = scenarioSlice.actions;
 
-  const uploadScenarioPAMutation = useUploadScenarioPA({
+  const uploadPAMutation = useUploadPA({
     requestConfig: {
       method: 'POST',
     },
@@ -95,8 +95,8 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadScenarioPAMutation.mutate({ id: `${pid}`, data }, {
-      onSuccess: ({ data: { data: g, id: PAid } }) => {
+    uploadPAMutation.mutate({ id: `${pid}`, data }, {
+      onSuccess: ({ data: { data: PAdata, id: PAid } }) => {
         setLoading(false);
         input.onChange(PAid);
 
@@ -109,9 +109,9 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
           level: 'success',
         });
 
-        dispatch(setUploadingProtectedArea(g));
+        dispatch(setUploadingProtectedArea(PAdata));
         updateCustomProtectedAreasIds(PAid);
-        console.info('Protected area shapefile uploaded', g);
+        console.info('Protected area shapefile uploaded', PAdata);
       },
       onError: () => {
         setLoading(false);
