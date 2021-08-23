@@ -28,6 +28,8 @@
     "@marxan/marxan-output": "<rootDir>/../../libs/marxan-output/src",
     "@marxan/planning-area-repository/(.*)": "<rootDir>/../../libs/planning-area-repository/src/$1",
     "@marxan/planning-area-repository": "<rootDir>/../../libs/planning-area-repository/src",
+    "@marxan/planning-unit-protection-level/(.*)": "<rootDir>/../../../libs/planning-unit-protection-level/src/$1",
+    "@marxan/planning-unit-protection-level": "<rootDir>/../../../libs/planning-unit-protection-level/src",
     "@marxan/scenario-run-queue/(.*)": "<rootDir>/../../libs/scenario-run-queue/src/$1",
     "@marxan/scenario-run-queue": "<rootDir>/../../libs/scenario-run-queue/src",
     "@marxan/features/(.*)": "<rootDir>/../../libs/features/src/$1",
