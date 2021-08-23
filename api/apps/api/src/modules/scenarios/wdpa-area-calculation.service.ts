@@ -20,8 +20,7 @@ export class WdpaAreaCalculationService {
    * and new entity state consists (i.e. are present) of all of the below
    */
   private readonly requiredToTriggerChange: (keyof Scenario)[] = [
-    'wdpaIucnCategories',
-    'customProtectedAreaIds'
+    'wdpaIucnCategories'
   ];
 
   /**

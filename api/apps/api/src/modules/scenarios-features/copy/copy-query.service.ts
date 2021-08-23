@@ -39,8 +39,8 @@ export class CopyQuery {
       featureId: `$${parameters.push(command.input.baseFeatureId)}`,
       bbox: [
         `$${parameters.push(project.bbox[0])}`,
-        `$${parameters.push(project.bbox[2])}`,
         `$${parameters.push(project.bbox[1])}`,
+        `$${parameters.push(project.bbox[2])}`,
         `$${parameters.push(project.bbox[3])}`,
       ],
       totalArea: isDefined(planningAreaLocation)
