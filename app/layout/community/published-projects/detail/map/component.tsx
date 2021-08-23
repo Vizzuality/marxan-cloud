@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { useRouter } from 'next/router';
+
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { usePublishedProject } from 'hooks/projects';
-import { useRouter } from 'next/router';
 
 // Map
 import Map from 'components/map';
@@ -18,7 +19,9 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
   const { data = {} } = usePublishedProject(pid);
-  const { id, bbox } = data;
+  const {
+    id, bbox,
+  } = data;
 
   useEffect(() => {
     setBounds({
