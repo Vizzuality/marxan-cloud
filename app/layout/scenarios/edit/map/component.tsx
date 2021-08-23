@@ -102,6 +102,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const sublayers = useMemo(() => {
     if (tab === 'protected-areas' && subtab === 'protected-areas-percentage') return ['wdpa-percentage'];
+    if (tab === 'features') return ['wdpa-percentage'];
     if (tab === 'analysis' && subtab === 'analysis-preview') return ['wdpa-percentage', 'features'];
     if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features'];
     if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost'];

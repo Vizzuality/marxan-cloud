@@ -1,14 +1,15 @@
 import React from 'react';
-import cx from 'classnames';
-
-import { useRouter } from 'next/router';
 
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+import cx from 'classnames';
+
 import Icon from 'components/icon';
 
-import SCENARIO_MARXAN_SVG from 'svgs/scenario-types/marxan.svg?sprite';
-import SCENARIO_MARXAN_WITH_ZONES_SVG from 'svgs/scenario-types/marxan-with-zones.svg?sprite';
 import SCENARIO_MARXAN_WITH_CONNECTIVITY_SVG from 'svgs/scenario-types/marxan-with-connectivity.svg?sprite';
+import SCENARIO_MARXAN_WITH_ZONES_SVG from 'svgs/scenario-types/marxan-with-zones.svg?sprite';
+import SCENARIO_MARXAN_SVG from 'svgs/scenario-types/marxan.svg?sprite';
 
 const SCENARIO_TYPES = [
   {
@@ -20,8 +21,8 @@ const SCENARIO_TYPES = [
       width: 32,
       height: 20,
     },
-    subtitle: 'Prioritizes for a single action',
-    disclaimer: 'If just starting out, we recommend Marxan to help you familiarize yourself with the process',
+    subtitle: 'Optimization for a standard conservation plan',
+    disclaimer: 'If just starting out, we recommend Marxan to help you familiarize yourself with the process.',
   },
   {
     id: 'marxan-with-zones',
@@ -32,7 +33,7 @@ const SCENARIO_TYPES = [
       width: 42,
       height: 20,
     },
-    subtitle: 'Prioritizes for multiple actions simultaneously',
+    subtitle: 'Optimization for a conservation plan considering multiple zones or priority levels.',
     disabled: true,
   },
   {
@@ -44,7 +45,7 @@ const SCENARIO_TYPES = [
       width: 42,
       height: 20,
     },
-    subtitle: 'Prioritizes for one action at a time while accounting for ecological processes and flows.',
+    subtitle: 'Optimization for a conservation plan accounting for ecological processes and flows.',
     disabled: true,
   },
 ];
