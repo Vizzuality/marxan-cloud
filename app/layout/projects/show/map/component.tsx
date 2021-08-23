@@ -52,8 +52,6 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     id, bbox, countryId, adminAreaLevel1Id, adminAreaLevel2Id,
   } = data;
 
-  console.log(id, bbox, countryId, adminAreaLevel1Id, adminAreaLevel2Id);
-
   const {
     data: rawScenariosData,
     isFetched: rawScenariosIsFetched,

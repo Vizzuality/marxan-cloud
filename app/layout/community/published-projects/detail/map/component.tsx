@@ -2,14 +2,18 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
+import { useSelector } from 'react-redux';
+
 import { useRouter } from 'next/router';
 
+import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
+import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
+import { usePUGridLayer } from 'hooks/map';
 import { usePublishedProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
-// Map
 import Map from 'components/map';
 
 export interface PublishedProjectMapProps {
@@ -21,6 +25,10 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
 
   const { query } = useRouter();
   const { pid } = query;
+
+  const minZoom = 2;
+  const maxZoom = 20;
+
   const { data = {} } = usePublishedProject(pid);
   const {
     id, bbox,
@@ -35,6 +43,10 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
     },
     sort: '-lastModifiedAt',
   });
+
+  const {
+    layerSettings,
+  } = useSelector((state) => state['/projects/[id]']);
 
   const firstSidRunned = useMemo(() => {
     return scenariosData
@@ -52,7 +64,25 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
 
   const sid = scenariosIsFetched && scenariosData && !!scenariosData.length ? firstSidRunned || `${scenariosData[0].id}` : null;
 
-  console.log('sid------->', sid);
+  const PUGridLayer = usePUGridLayer({
+    active: scenariosIsFetched && scenariosData && !!scenariosData.length,
+    sid: `${sid}`,
+    include: 'results',
+    sublayers: firstSidRunned ? ['solutions'] : [],
+    options: {
+      settings: {
+        pugrid: layerSettings.pugrid,
+        'wdpa-percentage': layerSettings['wdpa-percentage'],
+        cost: layerSettings.cost,
+        'lock-in': layerSettings['lock-in'],
+        'lock-out': layerSettings['lock-out'],
+        frequency: layerSettings.frequency,
+        solution: layerSettings.solution,
+      },
+    },
+  });
+
+  const LAYERS = [PUGridLayer].filter((l) => !!l);
 
   useEffect(() => {
     setBounds({
@@ -82,13 +112,26 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
             bounds={bounds}
             width="100%"
             height="100%"
+            minZoom={minZoom}
+            maxZoom={maxZoom}
             viewport={viewport}
             mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
             mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
             onMapViewportChange={handleViewportChange}
-            doubleClickZoom={false}
-            dragPan={false}
-          />
+          // doubleClickZoom={false}
+          // dragPan={false}
+          >
+            {(map) => {
+              return (
+                <LayerManager map={map} plugin={PluginMapboxGl}>
+                  {LAYERS.map((l) => (
+                    <Layer key={l.id} {...l} />
+                  ))}
+                </LayerManager>
+              );
+            }}
+
+          </Map>
 
         </motion.div>
       )}
