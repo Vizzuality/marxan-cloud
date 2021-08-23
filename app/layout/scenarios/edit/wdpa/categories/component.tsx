@@ -88,41 +88,47 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
   }, [scenarioData?.wdpaIucnCategories]);
 
   // Submit
-  const onSubmit = useCallback((values) => {
-    setSubmitting(true);
+  const onSubmit = useCallback((values, form) => {
+    const { modified } = form.getState();
 
-    mutation.mutate({
-      id: scenarioData?.id,
-      data: {
-        ...values,
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'protected-areas', subtab: 'protected-areas-percentage' }),
-      },
-    }, {
-      onSuccess: () => {
-        setSubmitting(false);
-        addToast('save-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario WDPA saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        onSuccess();
-      },
-      onError: () => {
-        setSubmitting(false);
+    if (modified.wdpaIucnCategories) {
+      setSubmitting(true);
 
-        addToast('error-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario WDPA not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+      mutation.mutate({
+        id: scenarioData?.id,
+        data: {
+          ...values,
+          metadata: mergeScenarioStatusMetaData(metadata, { tab: 'protected-areas', subtab: 'protected-areas-percentage' }),
+        },
+      }, {
+        onSuccess: () => {
+          setSubmitting(false);
+          addToast('save-scenario-wdpa', (
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">Scenario WDPA saved</p>
+            </>
+          ), {
+            level: 'success',
+          });
+          onSuccess();
+        },
+        onError: () => {
+          setSubmitting(false);
+
+          addToast('error-scenario-wdpa', (
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">Scenario WDPA not saved</p>
+            </>
+          ), {
+            level: 'error',
+          });
+        },
+      });
+    } else {
+      onSuccess();
+    }
   }, [mutation, scenarioData?.id, addToast, onSuccess, metadata]);
 
   const onSkip = useCallback(() => {
