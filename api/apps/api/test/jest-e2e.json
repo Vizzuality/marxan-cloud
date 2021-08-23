@@ -20,7 +20,7 @@
       "<rootDir>/../../../libs/utils/src"
     ],
     "^@marxan/utils/(.*)$": [
-      "<rootDir>/../../..//libs/utils/src/$1"
+      "<rootDir>/../../../libs/utils/src/$1"
     ],
     "^@marxan/scenarios-planning-unit": [
       "<rootDir>/../../../libs/scenarios-planning-unit/src"

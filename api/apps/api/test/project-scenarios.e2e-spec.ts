@@ -87,7 +87,7 @@ describe('ScenariosModule (e2e)', () => {
       aScenario = response.body.data;
       expect(aScenario.type).toBe('scenarios');
       /**
-       * @todo: there is an error on this test that i'm figuring out
+       * @todo: there is an error on this test
       */
       // expect(job).toBeDefined();
       // expect(job.name).toMatch(/calculate-planning-units-protection-level/);
