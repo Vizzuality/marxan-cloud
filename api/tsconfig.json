@@ -102,6 +102,12 @@
       ],
       "@marxan/geofeature-calculations/*": [
         "libs/geofeature-calculations/src/*"
+      ],
+      "@marxan/iucn": [
+        "libs/iucn/src"
+      ],
+      "@marxan/iucn/*": [
+        "libs/iucn/src/*"
       ]
     }
   },
