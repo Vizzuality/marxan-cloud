@@ -7,6 +7,7 @@ import {
 import {
   emptyWatchedChangeSet,
   fullWatchedChangeSet,
+  partialWatchedChangeSet,
 
 } from './__mocks__/input-change.data';
 
@@ -39,6 +40,16 @@ describe(`when scenario has complete data`, () => {
           emptyWatchedChangeSet(),
         ),
       ).toEqual(false);
+    });
+  });
+  describe(`when input changes contain partial watched properties`, () => {
+    it(`should tell to trigger calculations`, () => {
+      expect(
+        sut.shouldTrigger(
+          scenarioWithAllWatchedPresent(),
+          partialWatchedChangeSet(),
+        ),
+      ).toEqual(true);
     });
   });
 

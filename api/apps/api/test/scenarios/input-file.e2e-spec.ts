@@ -295,6 +295,7 @@ async function getFixtures() {
             numberOfRuns: null,
             projectId: expect.any(String),
             protectedAreaFilterByIds: null,
+            customProtectedAreaIds: null,
             ranAtLeastOnce: false,
             status: null,
             type: 'marxan',

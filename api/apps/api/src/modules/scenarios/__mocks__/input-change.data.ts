@@ -6,6 +6,10 @@ export const emptyWatchedChangeSet = (): UpdateScenarioDTO => ({
   wdpaIucnCategories: undefined
 });
 
+export const partialWatchedChangeSet = (): UpdateScenarioDTO => ({
+  wdpaIucnCategories: [IUCNCategory.III]
+});
+
 export const fullWatchedChangeSet = (): UpdateScenarioDTO => ({
   customProtectedAreaIds: ['20000000-2000-2000-2000-200000000000'],
   wdpaIucnCategories: [IUCNCategory.III]
