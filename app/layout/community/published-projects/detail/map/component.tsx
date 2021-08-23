@@ -87,7 +87,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
     active: scenariosAreFetched && scenariosData && !!scenariosData.length,
     sid,
     include: 'results',
-    sublayers: [],
+    sublayers: ['solutions', 'features'],
     options: {
       settings: {
         pugrid: layerSettings.pugrid,
