@@ -81,13 +81,19 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
 
   // change this to firstSidRunned.id after integrate with the API as
   // published project need to have at least 1 scenario runned
-  const sid = scenariosAreFetched && scenariosData && !!scenariosData.length ? `${firstSidRunned[0]?.id}` || `${scenariosData[0].id}` : null;
+
+  const sidMap = useMemo(() => {
+    if (scenariosAreFetched && scenariosData && !!scenariosData.length) {
+      return firstSidRunned[0]?.id || scenariosData[0].id;
+    }
+    return null;
+  }, [scenariosAreFetched, scenariosData, firstSidRunned]);
 
   const PUGridLayer = usePUGridLayer({
     active: scenariosAreFetched && scenariosData && !!scenariosData.length,
-    sid,
+    sid: `${sidMap}`,
     include: 'results',
-    sublayers: ['solutions', 'features'],
+    sublayers: ['solutions'],
     options: {
       settings: {
         pugrid: layerSettings.pugrid,
@@ -99,7 +105,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
   const LAYERS = [PUGridLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    type: 'published',
+    type: null,
     subtype: null,
     options: {
       layerSettings,

@@ -284,6 +284,7 @@ export function usePUGridPreviewLayer({
 export function usePUGridLayer({
   active, sid, include, sublayers, options = {}, cache,
 }: UsePUGridLayer) {
+  console.log('ID', sid);
   return useMemo(() => {
     if (!active || !sid) return null;
 
@@ -552,7 +553,6 @@ export function useLegend({
     if (type === 'analysis' && subtype === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
     if (type === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
     if (type === 'solutions') return ['frequency', 'solution', 'pugrid'];
-    if (type === 'published') return ['frequency', 'features', 'pugrid'];
 
     return ['pugrid'];
   }, [type, subtype, options]);
