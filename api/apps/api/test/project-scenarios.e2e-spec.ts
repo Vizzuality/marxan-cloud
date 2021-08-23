@@ -82,11 +82,13 @@ describe('ScenariosModule (e2e)', () => {
         .set('Authorization', `Bearer ${jwtToken}`)
         .send(createScenarioDTO)
         .expect(201);
+      const job = Object.values(queue.jobs)[0];
 
       aScenario = response.body.data;
       expect(aScenario.type).toBe('scenarios');
-      logger.debug(queue.jobs)
-      const job = Object.values(queue.jobs)[0];
+      console.log('sdesefsdf')
+      console.log(queue.jobs)
+
       expect(job).toBeDefined();
       expect(job.name).toMatch(/calculate-planning-units-protection-level/);
       expect(job.data?.scenarioId).toBeDefined();
