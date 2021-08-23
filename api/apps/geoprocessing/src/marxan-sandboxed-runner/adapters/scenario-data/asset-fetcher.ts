@@ -15,16 +15,22 @@ export class AssetFetcher {
   }
 
   async fetch(sourceUri: string, output: WriteStream): Promise<void> {
-    const assetStream = await this.httpService
-      .get(sourceUri, {
-        responseType: 'stream',
-        headers: {
-          'x-api-key': this.config.secret,
-        },
-      })
-      .toPromise();
+    try {
+      const assetStream = await this.httpService
+        .get(sourceUri, {
+          responseType: 'stream',
+          headers: {
+            'x-api-key': this.config.secret,
+          },
+          cancelToken: this.#cancelTokenSource.token,
+        })
+        .toPromise();
 
-    assetStream.data.pipe(output);
+      assetStream.data.pipe(output);
+    } catch (error) {
+      output.end();
+      return;
+    }
   }
 
   cancel(): void {
