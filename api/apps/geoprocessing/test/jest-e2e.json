@@ -33,6 +33,8 @@
     "@marxan/features/(.*)": "<rootDir>/../../libs/features/src/$1",
     "@marxan/features": "<rootDir>/../../libs/features/src",
     "@marxan/geofeature-calculations/(.*)": "<rootDir>/../../libs/geofeature-calculations/src/$1",
-    "@marxan/geofeature-calculations": "<rootDir>/../../libs/geofeature-calculations/src"
+    "@marxan/geofeature-calculations": "<rootDir>/../../libs/geofeature-calculations/src",
+    "@marxan/iucn/(.*)": "<rootDir>/../../libs/iucn/src/$1",
+    "@marxan/iucn": "<rootDir>/../../libs/iucn/src"
   }
 }

@@ -1,5 +1,5 @@
+import { IUCNCategory } from '@marxan/iucn';
 import { UpdateScenarioDTO } from '../dto/update.scenario.dto';
-import { IUCNCategory } from '../../protected-areas/protected-area.geo.entity';
 
 export const emptyWatchedChangeSet = (): UpdateScenarioDTO => ({
   customProtectedAreaIds: undefined,
