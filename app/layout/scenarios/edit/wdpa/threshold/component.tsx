@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+import { mergeScenarioStatusEditingMetaData } from 'utils/utils-scenarios';
 
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
@@ -100,58 +100,87 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   }, [scenarioData]); //eslint-disable-line
 
   // EVENTS
-  const handleSubmit = useCallback(async (values) => {
-    setSubmitting(true);
+  const handleSubmit = useCallback((values, form) => {
+    const { modified } = form.getState();
 
-    const { wdpaThreshold } = values;
+    if (modified.wdpaThreshold) {
+      setSubmitting(true);
 
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
-      },
-    }, {
-      onSuccess: () => {
-        setSubmitting(false);
+      const { wdpaThreshold } = values;
 
-        addToast('save-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario WDPA saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        onSuccess();
-      },
-      onError: () => {
-        setSubmitting(false);
+      saveScenarioMutation.mutate({
+        id: `${sid}`,
+        data: {
+          wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
+          metadata: mergeScenarioStatusEditingMetaData(
+            metadata,
+            {
+              tab: 'features',
+              subtab: 'features-preview',
+              status: {
+                'protected-areas': 'draft',
+                features: 'draft',
+                analysis: 'empty',
+              },
+            },
+          ),
+        },
+      }, {
+        onSuccess: () => {
+          setSubmitting(false);
 
-        addToast('error-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario WDPA not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+          addToast('save-scenario-wdpa', (
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">Scenario WDPA threshold saved</p>
+            </>
+          ), {
+            level: 'success',
+          });
+          onSuccess();
+        },
+        onError: () => {
+          setSubmitting(false);
+
+          addToast('error-scenario-wdpa', (
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">Scenario WDPA threshold not saved</p>
+            </>
+          ), {
+            level: 'error',
+          });
+        },
+      });
+    } else {
+      setSubmitting(true);
+
+      saveScenarioMutation.mutate({
+        id: `${sid}`,
+        data: {
+          metadata: mergeScenarioStatusEditingMetaData(
+            metadata,
+            {
+              tab: 'features',
+              subtab: 'features-preview',
+            },
+          ),
+        },
+      }, {
+        onSuccess: () => {
+          setSubmitting(false);
+          onSuccess();
+        },
+        onError: () => {
+          setSubmitting(false);
+        },
+      });
+    }
   }, [saveScenarioMutation, sid, addToast, onSuccess, metadata]);
 
-  const handleBack = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'protected-areas', subtab: 'protected-areas-preview' }),
-      },
-    }, {
-      onSuccess: () => {
-        onBack();
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata, onBack]);
+  const handleBack = useCallback(() => {
+    onBack();
+  }, [onBack]);
 
   // Loading
   if (

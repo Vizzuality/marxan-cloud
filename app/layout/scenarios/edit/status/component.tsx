@@ -46,6 +46,11 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
     if (JOB && TEXTS[JOB.kind]) {
       return TEXTS[JOB.kind]();
     }
+
+    if (JOB && !TEXTS[JOB.kind]) {
+      console.warn(`${JOB.kind} does not have a proper TEXT`);
+    }
+
     return null;
   }, [JOB]);
 
