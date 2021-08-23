@@ -1,4 +1,5 @@
 import React from 'react';
+
 import cx from 'classnames';
 
 export interface ControlsProps {
@@ -7,7 +8,7 @@ export interface ControlsProps {
 }
 
 export const Controls: React.FC<ControlsProps> = ({
-  className = 'absolute bottom-10 left-2',
+  className = 'absolute bottom-14 left-5',
   children,
 }: ControlsProps) => {
   return (

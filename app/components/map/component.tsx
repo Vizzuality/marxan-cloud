@@ -1,22 +1,20 @@
 import React, {
   useEffect, useState, useRef, useCallback,
 } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
-
-import cx from 'classnames';
-
-import isEmpty from 'lodash/isEmpty';
 
 import ReactMapGL, {
   FlyToInterpolator,
   TRANSITION_EVENTS,
   ViewportProps,
 } from 'react-map-gl';
-import { InteractiveMapProps } from 'react-map-gl/src/components/interactive-map';
+
+import isEmpty from 'lodash/isEmpty';
 
 import { fitBounds } from '@math.gl/web-mercator';
-
+import cx from 'classnames';
 import { easeCubic } from 'd3-ease';
+import { InteractiveMapProps } from 'react-map-gl/src/components/interactive-map';
+import { useDebouncedCallback } from 'use-debounce';
 
 export interface MapProps extends InteractiveMapProps {
   /** A function that returns the map instance */
