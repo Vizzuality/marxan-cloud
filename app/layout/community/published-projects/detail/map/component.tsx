@@ -1,10 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { usePublishedProject } from 'hooks/projects';
+import { useScenarios } from 'hooks/scenarios';
 
 // Map
 import Map from 'components/map';
@@ -22,6 +25,34 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
   const {
     id, bbox,
   } = data;
+
+  const {
+    data: scenariosData,
+    isFetched: scenariosIsFetched,
+  } = useScenarios(pid, {
+    filters: {
+      projectId: pid,
+    },
+    sort: '-lastModifiedAt',
+  });
+
+  const firstSidRunned = useMemo(() => {
+    return scenariosData
+      .map((s) => {
+        if (s.jobs.find((j) => j.kind === 'run' && j.status === 'done')) {
+          return {
+            id: s.id,
+          };
+        }
+
+        return null;
+      })
+      .filter((s) => !!s);
+  }, [scenariosData]);
+
+  const sid = scenariosIsFetched && scenariosData && !!scenariosData.length ? firstSidRunned || `${scenariosData[0].id}` : null;
+
+  console.log('sid------->', sid);
 
   useEffect(() => {
     setBounds({
