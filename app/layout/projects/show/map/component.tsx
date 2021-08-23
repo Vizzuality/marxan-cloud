@@ -263,11 +263,11 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </Controls>
 
           {/* Legend */}
-          <div className="absolute w-full max-w-xs bottom-10 right-2">
+          <div className="absolute w-full max-w-xs bottom-14 right-5">
             <Legend
               open={open}
               className="w-full"
-              maxHeight={300}
+              maxHeight={325}
               onChangeOpen={() => setOpen(!open)}
             >
               {LEGEND.map((i) => {
@@ -293,7 +293,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </div>
 
           {!!SCENARIOS_RUNNED.length && (
-            <div className="absolute w-full max-w-xs top-10 left-2">
+            <div className="absolute w-full max-w-xs top-5 left-5">
               <Select
                 theme="dark"
                 size="base"

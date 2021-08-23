@@ -71,6 +71,15 @@
         "tsConfigPath": "libs/planning-unit-geometry/tsconfig.lib.json"
       }
     },
+    "planning-unit-protection-level": {
+      "type": "library",
+      "root": "libs/planning-unit-protection-level",
+      "entryFile": "index",
+      "sourceRoot": "libs/planning-unit-protection-level/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/planning-unit-protection-level/tsconfig.lib.json"
+      }
+    },
     "scenario-cost-surface": {
       "type": "library",
       "root": "libs/scenario-cost-surface",

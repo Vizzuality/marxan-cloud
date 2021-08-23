@@ -49,14 +49,14 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
     select spd.id,
     case
       when spd.protected_area <> 0 and spd.protected_area is not null
-        then (pug.area/spd.protected_area) * 100
+        then round((COALESCE(spd.protected_area, 0)/pug.area)::numeric*100)::int
       else 0
       end as perc_protection
     from scenarios_pu_data spd
       inner join planning_units_geom pug on spd.pu_geom_id = pug.id
     where scenario_id=$1),
   pu_pa as (
-    select pu.id, (CASE pu.perc_protection > $2 WHEN true THEN 2 else 0 end) as lockin_status
+    select pu.id, (CASE pu.perc_protection >= $2 WHEN true THEN 1 else 0 end) as lockin_status
     from pu)
   UPDATE scenarios_pu_data
       SET (lockin_status) =

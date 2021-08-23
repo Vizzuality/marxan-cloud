@@ -331,11 +331,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       </Controls>
 
       {/* Legend */}
-      <div className="absolute w-full max-w-xs bottom-10 right-2">
+      <div className="absolute w-full max-w-xs bottom-14 right-5">
         <Legend
           open={open}
           className="w-full"
-          maxHeight={300}
+          maxHeight={325}
           onChangeOpen={() => setOpen(!open)}
         >
           {LEGEND.map((i) => {
