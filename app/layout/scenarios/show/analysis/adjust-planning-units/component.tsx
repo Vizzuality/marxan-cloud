@@ -19,9 +19,9 @@ export interface ScenariosAdjustPanningUnitsShowProps {
   onChangeSection: (s: string) => void;
 }
 
-export const ScenariosAdjustPanningUnitsShow: React.FC<
-ScenariosAdjustPanningUnitsShowProps> = ({ onChangeSection }:
-ScenariosAdjustPanningUnitsShowProps) => {
+export const ScenariosAdjustPanningUnitsShow: React.FC<ScenariosAdjustPanningUnitsShowProps> = ({
+  onChangeSection,
+}: ScenariosAdjustPanningUnitsShowProps) => {
   const { query } = useRouter();
   const { sid } = query;
 
@@ -46,7 +46,7 @@ ScenariosAdjustPanningUnitsShowProps) => {
           }}
         >
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading">Adjust planning units</h4>
+          <h4 className="text-xs uppercase font-heading text-primary-500">Adjust planning units</h4>
         </button>
         <InfoButton>
           <div>
