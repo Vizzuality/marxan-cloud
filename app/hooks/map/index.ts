@@ -534,6 +534,7 @@ export function usePUGridLayer({
 export function useLegend({
   type, subtype, options = {},
 }: UseLegend) {
+  console.log('options', options);
   const layers = useMemo(() => {
     const { wdpaIucnCategories = [] } = options;
 
