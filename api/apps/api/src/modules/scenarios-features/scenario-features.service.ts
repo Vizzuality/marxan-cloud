@@ -60,7 +60,7 @@ export class ScenarioFeaturesService extends AppBaseService<
       return entitiesAndCount;
     }
     /**
-     * (geo)scenario_feature_data.featureClassId -> (api)feature.id
+     * (geo)scenario_feature_data.featureClassId -> feature_data.id --feature_data.feature_id -> (api)feature.id
      */
     const featureRelations: Record<string, string> = {};
     const featureData = await this.remoteFeature.find({

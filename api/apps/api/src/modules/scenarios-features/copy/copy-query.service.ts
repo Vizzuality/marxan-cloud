@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger} from '@nestjs/common';
 import { isDefined } from '@marxan/utils';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { FeatureConfigCopy } from '@marxan-api/modules/specification';
 import { CreateFeaturesCommand } from '../create-features.command';
 
+const logger = new Logger('copy query')
 @Injectable()
 export class CopyQuery {
   public prepareStatement(
@@ -34,7 +35,7 @@ export class CopyQuery {
               .join(', ')
           : undefined,
       protectedArea:
-        protectedAreaFilterByIds.length > 0 ? 'protected.area' : 'NULL',
+        protectedAreaFilterByIds.length > 0 ? 'st_area(st_transform(st_intersection(st_intersection(pa.the_geom, fd.the_geom), protected.area),3410))' : 'NULL',
       featureId: `$${parameters.push(command.input.baseFeatureId)}`,
       bbox: [
         `$${parameters.push(project.bbox[0])}`,
@@ -43,13 +44,19 @@ export class CopyQuery {
         `$${parameters.push(project.bbox[3])}`,
       ],
       totalArea: isDefined(planningAreaLocation)
-        ? `st_area(st_intersection(pa.the_geom, fd.the_geom))`
+        ? `st_area(st_transform(st_intersection(pa.the_geom, fd.the_geom), 3410))`
         : `NULL`,
     };
     const protectedAreaJoin = fields.protectedAreaIds
       ? `cross join (
-           select st_area(st_union(wdpa.the_geom)) as area
-           from wdpa where wdpa.id in (${fields.protectedAreaIds})
+           select st_union(wdpa.the_geom) as area
+           from wdpa where st_intersects(st_makeenvelope(
+            ${project.bbox[0]},
+            ${project.bbox[2]},
+            ${project.bbox[1]},
+            ${project.bbox[3]},
+            4326
+          ), wdpa.the_geom) and wdpa.id in (${fields.protectedAreaIds})
          ) as protected`
       : '';
     const planningAreaJoin = isDefined(planningAreaLocation)
@@ -76,8 +83,8 @@ export class CopyQuery {
           where feature_id = ${fields.featureId}
             and st_intersects(st_makeenvelope(
               ${fields.bbox[0]},
-              ${fields.bbox[1]},
               ${fields.bbox[2]},
+              ${fields.bbox[1]},
               ${fields.bbox[3]},
               4326
             ), fd.the_geom)

@@ -7,7 +7,8 @@ import {
 import {
   emptyWatchedChangeSet,
   fullWatchedChangeSet,
-  thresholdChangeSet,
+  partialWatchedChangeSet,
+
 } from './__mocks__/input-change.data';
 
 let sut: WdpaAreaCalculationService;
@@ -23,8 +24,6 @@ beforeEach(async () => {
 describe(`when scenario has insufficient watched data`, () => {
   test.each([
     emptyWatchedChangeSet(),
-    fullWatchedChangeSet(),
-    thresholdChangeSet(),
   ])(`should not tell to trigger calculations`, (input) => {
     expect(
       sut.shouldTrigger(scenarioWithRequiredWatchedEmpty(), input),
@@ -43,17 +42,17 @@ describe(`when scenario has complete data`, () => {
       ).toEqual(false);
     });
   });
-
-  describe(`when input changes contain watched property`, () => {
+  describe(`when input changes contain partial watched properties`, () => {
     it(`should tell to trigger calculations`, () => {
       expect(
         sut.shouldTrigger(
           scenarioWithAllWatchedPresent(),
-          thresholdChangeSet(),
+          partialWatchedChangeSet(),
         ),
       ).toEqual(true);
     });
   });
+
   describe(`when input changes contain all watched properties`, () => {
     it(`should tell to trigger calculations`, () => {
       expect(

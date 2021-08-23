@@ -8,7 +8,7 @@ import: data/demo_data_features/features_demos
 		table_name=`basename -s .shp "$$i" | tr -d ' \t\n\r' | tr [:upper:] [:lower:]`; \
 		spec_name=`basename -s .shp "$$i"`; \
 		echo "creating temporal table $${table_name}_feature..."; \
-		ogr2ogr -makevalid \
+		ogr2ogr -t_srs EPSG:4326 -makevalid \
 			-nln "$${table_name}_feature" -nlt PROMOTE_TO_MULTI \
 			-lco GEOMETRY_NAME=the_geom -lco OVERWRITE=yes \
 			-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
