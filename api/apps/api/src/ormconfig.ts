@@ -35,7 +35,7 @@ export const apiConnections: Record<
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
     // logging.
-    logging: 'all',
+    logging: ['error'],
     cache: false,
     migrations: [__dirname + '/migrations/api/**/*.ts'],
     /** Migrations will run automatically on startup, unless the
@@ -65,7 +65,7 @@ export const apiConnections: Record<
       path.join(__dirname, '/modules/**/*.geo.entity.{ts,js}'),
       path.join(__dirname, '../../../libs/**/*.geo.entity.{ts,js}'),
     ],
-    logging: 'all',
+    logging: ['error'],
     cache: false,
     // Migrations for this db/data source are handled in the geoprocessing
     // service
