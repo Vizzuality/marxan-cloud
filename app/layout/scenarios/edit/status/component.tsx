@@ -17,7 +17,10 @@ export interface ScenarioStatusProps {
 
 const TEXTS = {
   planningAreaProtectedCalculation: () => 'The scenario is calculating the protected areas percentages',
+  specification: () => 'The scenario is processing the features',
   geofeatureCopy: () => 'The scenario is processing the features',
+  geofeatureSplit: () => 'The scenario is processing the features',
+  geofeatureStrat: () => 'The scenario is processing the features',
   planningUnitsInclusion: () => 'The scenario is processing the inclusion/exclusion planning units',
   run: () => 'The scenario is running Marxan',
 };
@@ -82,7 +85,14 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
           <div className="w-full max-w-md p-10 text-center">
             {TEXT}
 
-            <div className="flex justify-center mt-5 ">
+            <div className="flex justify-center mt-5 space-x-2">
+              {/* <Button
+                theme="danger"
+                size="base"
+              >
+                Cancel
+              </Button> */}
+
               <Button
                 theme="primary-alt"
                 size="base"
