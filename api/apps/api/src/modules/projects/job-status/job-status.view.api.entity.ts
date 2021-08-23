@@ -114,6 +114,12 @@ const eventToJobStatusMapping: Record<ValuesType<ScenarioEvents>, JobStatus> = {
     JobStatus.failure,
   [API_EVENT_KINDS.scenario__geofeatureStratification__finished__v1__alpha1]:
     JobStatus.done,
+  [API_EVENT_KINDS.scenario__specification__submitted__v1__alpha1]:
+    JobStatus.running,
+  [API_EVENT_KINDS.scenario__specification__failed__v1__alpha1]:
+    JobStatus.failure,
+  [API_EVENT_KINDS.scenario__specification__finished__v1__alpha1]:
+    JobStatus.done,
   [API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__submitted__v1__alpha1]:
     JobStatus.running,
   [API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__failed__v1__alpha1]:
