@@ -30,18 +30,18 @@ console.log(organization);
 const project = await botClient.post('/projects', {
     name: 'test project ' + crypto.randomUUID(),
     organizationId: organization.data.id,
-    countryId: 'BWA',
-    adminAreaLevel1Id: 'BWA.12_1',
-    adminAreaLevel2Id: 'BWA.12.1_1',
+    countryId: 'AGO',
+    // adminAreaLevel1Id: 'BWA.12_1',
+    // adminAreaLevel2Id: 'BWA.12.1_1',
     planningUnitGridShape: 'hexagon',
-    planningUnitAreakm2: 16,
+    planningUnitAreakm2: 200,
 }).then(result => result.data).catch(e => { console.log(e) });;
 
 console.log(project);
 
 // wait a bit for async job to be picked up and processed
 // @DEBT we should check the actual job status
-await new Promise(r => setTimeout(r, 30e3))
+await new Promise(r => setTimeout(r, 10e3))
 
 const scenarioStart = Process.hrtime();
 
@@ -59,10 +59,10 @@ console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
 
 console.log(scenario);
 
-const pantheraPardusFeature = await botClient.get(`/projects/${project.data.id}/features?q=pantherapardus`)
+const demoGiraffaCamelopardalisFeature = await botClient.get(`/projects/${project.data.id}/features?q=iraffa`)
   .then(result => result.data).catch(e => { console.log(e); });
 
-console.log(pantheraPardusFeature);
+console.log(demoGiraffaCamelopardalisFeature);
 
 const geoFeatureSpecStart = Process.hrtime();
 
@@ -71,17 +71,19 @@ const geoFeatureSpec = await botClient.post(`/scenarios/${scenario.data.id}/feat
     features: [
       {
         kind: "plain",
-        featureId: pantheraPardusFeature.data[0].id,
+        featureId: demoGiraffaCamelopardalisFeature.data[0].id,
         marxanSettings: {
             prop: 0.3,
             fpf: 1
         }
       },
     ]
-  }).then(result => result.data).catch(e => { console.log(e); });
+  }).then(result => result.data).catch(e => { console.log(JSON.stringify(e?.response.data?.errors)); });
 
   const geoFeatureSpecTook = Process.hrtime(geoFeatureSpecStart);
 
   console.log(`Processing of features for scenario done in ${geoFeatureSpecTook[0]} seconds`);
 
   console.log(geoFeatureSpec);
+
+await botClient.post(`/scenarios/${scenario.data.id}/marxan`);
