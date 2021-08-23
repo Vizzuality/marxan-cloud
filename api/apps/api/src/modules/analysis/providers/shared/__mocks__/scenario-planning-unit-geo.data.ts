@@ -11,6 +11,7 @@ export const validDataWithGivenPuIds = (
   puids.map((id, index) => ({
     lockStatus: LockStatus.Unstated,
     planningUnitMarxanId: index++,
+    protectedByDefault: false,
     scenarioId,
     puGeometryId: v4(),
     id: id,
