@@ -1,4 +1,4 @@
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
+import { ScenarioSidebarSubTabs } from 'layout/scenarios/show/sidebar/types';
 
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
 
@@ -113,7 +113,7 @@ export interface UsePUGridLayer {
 }
 
 export interface UseLegend {
-  type: ScenarioSidebarTabs;
+  type: string;
   subtype: ScenarioSidebarSubTabs;
   options?: {
     wdpaIucnCategories?: string[];

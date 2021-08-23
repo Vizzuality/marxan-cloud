@@ -18,7 +18,6 @@ import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
-import { ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
 
 import Map from 'components/map';
 import Controls from 'components/map/controls';
@@ -105,7 +104,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
   const LAYERS = [PUGridLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    type: ScenarioSidebarTabs.SOLUTIONS,
+    type: 'published',
     subtype: null,
     options: {
       layerSettings,
