@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
+import { Either, isLeft, left, right } from 'fp-ts/Either';
+import { assertDefined } from '@marxan/utils';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
@@ -11,6 +13,8 @@ import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { PlanningAreasService } from './planning-areas';
+import { CanReadError, ProjectAclService } from './acl';
+import { PromiseType } from 'utility-types';
 
 export { validationFailed } from './planning-areas';
 
@@ -22,6 +26,7 @@ export class ProjectsService {
     private readonly protectedAreaShapefile: ProtectedAreasFacade,
     private readonly jobStatusService: JobStatusService,
     private readonly planningAreaService: PlanningAreasService,
+    private readonly acl: ProjectAclService,
   ) {}
 
   async findAllGeoFeatures(
@@ -32,25 +37,57 @@ export class ProjectsService {
     return this.geoCrud.findAllPaginated(fetchSpec, appInfo);
   }
 
-  async findAll(fetchSpec: FetchSpecification, info?: ProjectsInfoDTO) {
-    // /ACL slot/
-    return this.projectsCrud.findAllPaginated(fetchSpec, info);
+  async findAll(
+    fetchSpec: FetchSpecification,
+    info: ProjectsInfoDTO,
+  ): Promise<
+    Either<
+      any,
+      PromiseType<ReturnType<ProjectsCrudService['findAllPaginated']>>
+    >
+  > {
+    assertDefined(info.authenticatedUser?.id);
+    const ownProjectIds = await this.acl.getOwn(info.authenticatedUser.id);
+    // TODO check if provided any IDs are missing within ownProjectIds - error
+    // TODO if provided IDs are missing, attach them to FetchSpec
+    return right(await this.projectsCrud.findAllPaginated(fetchSpec, info));
   }
 
-  async findOne(id: string) {
-    // /ACL slot/
-    return this.projectsCrud.getById(id);
+  async findOne(
+    id: string,
+    userId: string,
+  ): Promise<Either<CanReadError, Project>> {
+    const result = await this.acl.canRead(id, userId);
+    if (isLeft(result)) {
+      return result;
+    }
+    return right(await this.projectsCrud.getById(id));
   }
 
-  // TODO debt: shouldn't use API's DTO - avoid relating service to given access layer (Rest)
-  async create(input: CreateProjectDTO, info: AppInfoDTO) {
+  async create(
+    input: CreateProjectDTO,
+    info: AppInfoDTO,
+  ): Promise<Either<any, Project>> {
+    assertDefined(info.authenticatedUser?.id);
+    const project = await this.projectsCrud.create(input, info);
+    const result = await this.acl.assignOwner(
+      project.id,
+      info.authenticatedUser.id,
+    );
+    if (isLeft(result)) {
+      return left(``);
+    }
+    return right(project);
+  }
+
+  async update(
+    projectId: string,
+    input: UpdateProjectDTO,
+  ): Promise<
+    Either<any, PromiseType<ReturnType<ProjectsCrudService['update']>>>
+  > {
     // /ACL slot - can?/
-    return this.projectsCrud.create(input, info);
-  }
-
-  async update(projectId: string, input: UpdateProjectDTO) {
-    // /ACL slot - can?/
-    return this.projectsCrud.update(projectId, input);
+    return right(await this.projectsCrud.update(projectId, input));
   }
 
   async remove(projectId: string) {

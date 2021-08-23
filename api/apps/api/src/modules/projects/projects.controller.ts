@@ -137,12 +137,14 @@ export class ProjectsController {
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Req() req: RequestWithAuthenticatedUser,
     @Query('q') namesSearch?: string,
   ): Promise<ProjectResultPlural> {
     const results = await this.projectsService.findAll(fetchSpecification, {
       params: {
         namesSearch,
       },
+      authenticatedUser: req.user,
     });
     return this.projectSerializer.serialize(results.data, results.metadata);
   }
@@ -153,9 +155,12 @@ export class ProjectsController {
     entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
   })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ProjectResultSingular> {
+  async findOne(
+    @Param('id') id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ProjectResultSingular> {
     return await this.projectSerializer.serialize(
-      await this.projectsService.findOne(id),
+      await this.projectsService.findOne(id, req.user.id),
     );
   }
 
@@ -166,9 +171,10 @@ export class ProjectsController {
     @Body() dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResultSingular> {
-    return await this.projectSerializer.serialize(
-      await this.projectsService.create(dto, { authenticatedUser: req.user }),
-    );
+    const result = await this.projectsService.create(dto, {
+      authenticatedUser: req.user,
+    });
+    return await this.projectSerializer.serialize(result);
   }
 
   @ApiOperation({ description: 'Update project' })

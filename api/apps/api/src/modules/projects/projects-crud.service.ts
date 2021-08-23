@@ -162,6 +162,11 @@ export class ProjectsCrudService extends AppBaseService<
     createModel: CreateProjectDTO,
     _info?: AppInfoDTO,
   ): Promise<void> {
+    // debt: role assignment should come within transaction that creates the
+    // project (AppBaseService limitations)
+
+    // TODO assign a role to given project;
+
     if (
       createModel.planningUnitAreakm2 &&
       createModel.planningUnitGridShape &&

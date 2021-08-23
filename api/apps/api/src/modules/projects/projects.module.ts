@@ -20,6 +20,8 @@ import { JobStatusService } from './job-status/job-status.service';
 import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
 import { PlanningAreasModule } from './planning-areas';
 
+import { ProjectAclModule } from './acl';
+
 @Module({
   imports: [
     AdminAreasModule,
@@ -32,6 +34,7 @@ import { PlanningAreasModule } from './planning-areas';
     PlanningUnitsModule,
     ProtectedAreasModule,
     ApiEventsModule,
+    ProjectAclModule,
   ],
   providers: [
     ProjectsCrudService,
