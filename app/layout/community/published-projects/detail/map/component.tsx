@@ -87,16 +87,11 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
     active: scenariosAreFetched && scenariosData && !!scenariosData.length,
     sid,
     include: 'results',
-    sublayers: ['solutions'],
+    sublayers: [],
     options: {
       settings: {
         pugrid: layerSettings.pugrid,
-        'wdpa-percentage': layerSettings['wdpa-percentage'],
-        cost: layerSettings.cost,
-        'lock-in': layerSettings['lock-in'],
-        'lock-out': layerSettings['lock-out'],
         frequency: layerSettings.frequency,
-        solution: layerSettings.solution,
       },
     },
   });

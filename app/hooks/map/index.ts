@@ -552,7 +552,7 @@ export function useLegend({
     if (type === 'analysis' && subtype === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
     if (type === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
     if (type === 'solutions') return ['frequency', 'solution', 'pugrid'];
-    if (type === 'published') return ['wdpa-percentage', 'frequency', 'features', 'pugrid'];
+    if (type === 'published') return ['frequency', 'features', 'pugrid'];
 
     return ['pugrid'];
   }, [type, subtype, options]);
