@@ -6,7 +6,7 @@ import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateProtectedAreaDTO } from './dto/create.protected-area.dto';
 import { UpdateProtectedAreaDTO } from './dto/update.protected-area.dto';
-import { IUCNCategory, ProtectedArea } from './protected-area.geo.entity';
+import { ProtectedArea } from './protected-area.geo.entity';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 
 import {
@@ -23,6 +23,7 @@ import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.s
 import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
 import { apiConnections } from '../../ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { IUCNCategory } from '@marxan/iucn';
 
 const protectedAreaFilterKeyNames = [
   'fullName',
