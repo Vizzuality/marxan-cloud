@@ -21,10 +21,11 @@ export class WdpaAreaCalculationService {
    */
   private readonly requiredToTriggerChange: (keyof Scenario)[] = [
     'wdpaIucnCategories',
+    'customProtectedAreaIds'
   ];
 
   /**
-   * Every post update that affects this 3 elements (when threshold is not null)
+   * Every post update that affects this 2 elements (when threshold is not null)
    */
   shouldTrigger(scenario: Scenario, changeSet: InputChange): boolean {
     if (!this.intendsToChangeWatchedProperty(changeSet)) {

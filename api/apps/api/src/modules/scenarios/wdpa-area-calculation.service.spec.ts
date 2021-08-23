@@ -23,7 +23,6 @@ beforeEach(async () => {
 describe(`when scenario has insufficient watched data`, () => {
   test.each([
     emptyWatchedChangeSet(),
-    fullWatchedChangeSet(),
   ])(`should not tell to trigger calculations`, (input) => {
     expect(
       sut.shouldTrigger(scenarioWithRequiredWatchedEmpty(), input),
