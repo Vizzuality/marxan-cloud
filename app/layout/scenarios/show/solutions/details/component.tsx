@@ -88,7 +88,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           }}
         >
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading">Details</h4>
+          <h4 className="text-xs uppercase font-heading text-primary-500">Details</h4>
         </button>
       </header>
 

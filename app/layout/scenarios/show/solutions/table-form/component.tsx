@@ -60,10 +60,10 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   } = useMostDifferentSolutions(sid);
 
   const allSolutionsFetched = (!isFetching || isFetchingNextPage)
-  && data && data.length > 0 && !mostDifSolutions;
+    && data && data.length > 0 && !mostDifSolutions;
 
   const mostDifSolutionsIsSelected = mostDifSolutions
-  && mostDifSolutionsData && mostDifSolutionsData.length > 0;
+    && mostDifSolutionsData && mostDifSolutionsData.length > 0;
 
   const noSolutionResults = ((!isFetching && (!data || !data.length)) || (!mostDifSolutionsisFetched
     && (!mostDifSolutionsData || !mostDifSolutionsData.length)));
@@ -84,21 +84,10 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   return (
     <div className="text-gray-800">
-      <div className="flex items-center px-8 pb-8 space-x-6">
-        <div className="flex items-center justify-start">
-          <Button
-            theme="secondary"
-            size="base"
-            className="flex items-center justify-between pl-4 pr-4"
-            onClick={() => console.info('click - download solutions')}
-          >
-            Download solutions
-            <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
-          </Button>
-          <InfoButton
-            theme="secondary"
-
-          >
+      <div className="items-center px-8 pb-8 space-y-6 flex-column">
+        <div className="flex space-x-3">
+          <h2 className="text-2xl font-heading">Solutions Table:</h2>
+          <InfoButton theme="secondary">
             <div>
               <h4 className="font-heading text-lg mb-2.5">Solutions</h4>
               <div className="space-y-2">
@@ -153,42 +142,51 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             </div>
           </InfoButton>
         </div>
-        <div className="flex items-center">
-          <Checkbox
-            theme="light"
-            id="checkbox-5-dif-solutions"
-            className="block w-4 h-4 text-green-300 form-checkbox-dark"
-            onChange={(event) => setMostDifSolutions(event.target.checked)}
-          />
-          <Label className="mx-2 text-sm text-gray-700">
-            View 5 most different solutions
-          </Label>
-
-          <InfoButton
+        <div className="flex items-center space-x-8">
+          <Button
             theme="secondary"
+            size="base"
+            className="flex items-center justify-between pl-4 pr-4"
+            onClick={() => console.info('click - download solutions')}
           >
-            <div>
-              <h4 className="font-heading text-lg mb-2.5">5 most different solutions</h4>
-              <div className="space-y-2">
-                <p>
-                  Marxan calculates a range of possible good solutions,
-                  instead of a unique solution.
-                </p>
-                <p>
-                  It is useful to see
-                  how much the solutions differ by assessing
-                  the 5 most extreme cases. These are obtained by
-                  creating a distance matrix of all solutions by
-                  applying the Jaccard similarity index and
-                  then by grouping the results in 5 clusters.
-                  The solutions that are more similar to each
-                  other will fall in the same cluster. Finally,
-                  for each cluster, the solution with the lowest
-                  score is used as the representative solution of the group.
-                </p>
+            Download solutions
+            <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
+          </Button>
+          <div className="flex items-center">
+            <Checkbox
+              theme="light"
+              id="checkbox-5-dif-solutions"
+              className="block w-4 h-4 text-green-300 form-checkbox-dark"
+              onChange={(event) => setMostDifSolutions(event.target.checked)}
+            />
+            <Label className="mx-2 text-sm text-gray-700">
+              View 5 most different solutions
+            </Label>
+
+            <InfoButton theme="secondary">
+              <div>
+                <h4 className="font-heading text-lg mb-2.5">5 most different solutions</h4>
+                <div className="space-y-2">
+                  <p>
+                    Marxan calculates a range of possible good solutions,
+                    instead of a unique solution.
+                  </p>
+                  <p>
+                    It is useful to see
+                    how much the solutions differ by assessing
+                    the 5 most extreme cases. These are obtained by
+                    creating a distance matrix of all solutions by
+                    applying the Jaccard similarity index and
+                    then by grouping the results in 5 clusters.
+                    The solutions that are more similar to each
+                    other will fall in the same cluster. Finally,
+                    for each cluster, the solution with the lowest
+                    score is used as the representative solution of the group.
+                  </p>
+                </div>
               </div>
-            </div>
-          </InfoButton>
+            </InfoButton>
+          </div>
         </div>
       </div>
       <div
