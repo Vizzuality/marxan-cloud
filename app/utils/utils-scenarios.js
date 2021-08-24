@@ -34,3 +34,15 @@ export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
   };
   return metadata;
 };
+
+export const mergeScenarioStatusEditingMetaData = (obj = {}, newObj = { }) => {
+  const { scenarioEditingMetadata = {} } = obj;
+  const metadata = {
+    ...obj,
+    scenarioEditingMetadata: {
+      ...scenarioEditingMetadata,
+      ...newObj,
+    },
+  };
+  return metadata;
+};

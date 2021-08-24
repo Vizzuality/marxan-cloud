@@ -95,6 +95,7 @@ export const Item: React.FC<ItemProps> = ({
     const geofeatureCopy = jobs.find((j) => j.kind === 'geofeatureCopy');
     const geofeatureSplit = jobs.find((j) => j.kind === 'geofeatureSplit');
     const geofeatureStratification = jobs.find((j) => j.kind === 'geofeatureStratification');
+    const specification = jobs.find((j) => j.kind === 'specification');
 
     const run = jobs.find((j) => j.kind === 'run');
 
@@ -111,12 +112,13 @@ export const Item: React.FC<ItemProps> = ({
       (geofeatureCopy && geofeatureCopy.status === 'running')
       || (geofeatureSplit && geofeatureSplit.status === 'running')
       || (geofeatureStratification && geofeatureStratification.status === 'running')
+      || (specification && specification.status === 'running')
     ) return 'features-running';
     if (
       (geofeatureCopy && geofeatureCopy.status === 'failure')
       || (geofeatureSplit && geofeatureSplit.status === 'failure')
       || (geofeatureStratification && geofeatureStratification.status === 'failure')
-
+      || (specification && specification.status === 'failure')
     ) return 'features-failure';
 
     // RUN
