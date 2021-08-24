@@ -1,14 +1,12 @@
-import { Injectable, Logger} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { isDefined } from '@marxan/utils';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { FeatureConfigCopy } from '@marxan-api/modules/specification';
-import { CreateFeaturesCommand } from '../create-features.command';
 
-const logger = new Logger('copy query')
 @Injectable()
 export class CopyQuery {
   public prepareStatement(
-    command: CreateFeaturesCommand & { input: FeatureConfigCopy },
+    command: { scenarioId: string; input: FeatureConfigCopy },
     planningAreaLocation: { id: string; tableName: string } | undefined,
     protectedAreaFilterByIds: string[],
     project: Pick<Project, 'bbox'>,
@@ -35,7 +33,9 @@ export class CopyQuery {
               .join(', ')
           : undefined,
       protectedArea:
-        protectedAreaFilterByIds.length > 0 ? 'st_area(st_transform(st_intersection(st_intersection(pa.the_geom, fd.the_geom), protected.area),3410))' : 'NULL',
+        protectedAreaFilterByIds.length > 0
+          ? 'st_area(st_transform(st_intersection(st_intersection(pa.the_geom, fd.the_geom), protected.area),3410))'
+          : 'NULL',
       featureId: `$${parameters.push(command.input.baseFeatureId)}`,
       bbox: [
         `$${parameters.push(project.bbox[0])}`,
