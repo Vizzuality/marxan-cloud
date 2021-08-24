@@ -236,9 +236,9 @@ export const Item: React.FC<ItemProps> = ({
           onClick={onView}
           disabled={status.includes('running')}
           className={cx({
-            'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl focus:outline-blue': true,
+            'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl': true,
             'rounded-br-none': settings,
-            'text-primary-500': status === 'run-done',
+            'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:outline-none focus:bg-primary-300 focus:text-black': status === 'run-done',
             'text-gray-400 pointer-events-none': status !== 'run-done',
           })}
         >
