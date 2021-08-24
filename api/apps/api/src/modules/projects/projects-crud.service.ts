@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { isDefined } from '@marxan/utils';
+import { assertDefined, isDefined } from '@marxan/utils';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -23,6 +23,8 @@ import {
   MultiplePlanningAreaIds,
   PlanningAreasService,
 } from './planning-areas';
+import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
+import { Roles } from '@marxan-api/modules/users/role.api.entity';
 
 const projectFilterKeyNames = [
   'name',
@@ -63,6 +65,8 @@ export class ProjectsCrudService extends AppBaseService<
     @Inject(PlanningUnitsService)
     private readonly planningUnitsService: PlanningUnitsService,
     private readonly planningAreasService: PlanningAreasService,
+    @InjectRepository(UsersProjectsApiEntity)
+    private readonly userProjects: Repository<UsersProjectsApiEntity>,
   ) {
     super(repository, 'project', 'projects', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -155,6 +159,16 @@ export class ProjectsCrudService extends AppBaseService<
     }
 
     return project;
+  }
+
+  async assignCreatorRole(projectId: string, userId: string): Promise<void> {
+    await this.userProjects.save(
+      this.userProjects.create({
+        projectId,
+        userId,
+        roleName: Roles.project_owner,
+      }),
+    );
   }
 
   async actionAfterCreate(
@@ -250,7 +264,15 @@ export class ProjectsCrudService extends AppBaseService<
     fetchSpecification: FetchSpecification,
     info?: ProjectsInfoDTO,
   ): Promise<SelectQueryBuilder<Project>> {
+    assertDefined(info?.authenticatedUser);
     const { namesSearch } = info?.params ?? {};
+
+    query.leftJoin(
+      UsersProjectsApiEntity,
+      `acl`,
+      `${this.alias}.id = acl.project_id`,
+    );
+
     if (namesSearch) {
       const nameSearchFilterField = 'nameSearchFilter' as const;
       query.leftJoin(
@@ -272,7 +294,30 @@ export class ProjectsCrudService extends AppBaseService<
       );
     }
 
+    query
+      .andWhere(`acl.user_id = :userId`, {
+        userId: info?.authenticatedUser?.id,
+      })
+      .andWhere(`acl.role_id = :roleId`, {
+        roleId: Roles.project_owner,
+      });
+
     return query;
+  }
+
+  /**
+   * Could be that entity-relations in codebase are wrong
+   * https://github.com/typeorm/typeorm/blob/master/docs/many-to-many-relations.md#many-to-many-relations-with-custom-properties
+   *
+   * Thus, when using `remove(EntityInstance)` it complains on missing
+   * `user_id`.
+   *
+   * `delete` seems to omit code-declarations and use db's cascades
+   */
+  async remove(id: string): Promise<void> {
+    await this.repository.delete({
+      id,
+    });
   }
 
   async extendFindAllResults(
