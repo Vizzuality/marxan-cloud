@@ -46,6 +46,7 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
     return {
       attributes: [
         'scenarioId',
+        'featureId',
         'onTarget',
         'metArea',
         'met',
