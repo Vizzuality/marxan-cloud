@@ -18,16 +18,17 @@ create view scenario_features_gap_data as
   select
     scenario_id,
     feature_id,
-    total_area,
-    met_area,
+    sum(total_area) as total_area,
+    sum(met_area) as met_area,
     case 
-      when total_area > 0 then round((met_area/total_area)*100)
+      when sum(total_area) > 0 then round((sum(met_area)/sum(total_area))*100)
       else 0
     end as met,
-    total_area * coverage_target as coverage_target_area,
-    coverage_target,
-    met_area >= (total_area * coverage_target) as on_target
-  from gap_data;
+    sum(total_area) * min(coverage_target) as coverage_target_area,
+    min(coverage_target) as coverage_target,
+    sum(met_area) >= (sum(total_area) * min(coverage_target)) as on_target
+  from gap_data
+  group by feature_id, scenario_id;
     `);
 
     await queryRunner.query(`
