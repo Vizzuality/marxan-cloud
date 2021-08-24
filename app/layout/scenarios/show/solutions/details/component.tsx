@@ -8,10 +8,9 @@ import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { motion } from 'framer-motion';
 
-import { useLegend } from 'hooks/map';
+import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 
-import { ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
 import SolutionFrequency from 'layout/solutions/frequency';
 import SolutionSelected from 'layout/solutions/selected';
 
@@ -63,13 +62,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
     || (selectedSolutionisFetching && !selectedSolutionisFetched
     );
 
-  const LEGEND = useLegend({
-    type: ScenarioSidebarTabs.SOLUTIONS,
-    subtype: null,
-    options: {},
-  });
-
-  const frequencyLegendValues = LEGEND.find((l) => l.id === 'frequency').items;
+  const frequencyLegendValues = LEGEND_LAYERS.frequency().items;
 
   return (
     <motion.div

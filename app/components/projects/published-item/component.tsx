@@ -18,6 +18,8 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
   // contributors = [],
   timesDuplicated,
 }: PublishedItemProps) => {
+  const planningArea = area || 'Custom';
+
   return (
     <tr key={id} className="border-b border-white border-opacity-20 last:border-transparent">
       <td className="pr-6 py-7">
@@ -28,7 +30,7 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
       </td>
 
       <td className="pr-6">
-        <p className="text-sm">{area}</p>
+        <p className="text-sm">{planningArea}</p>
       </td>
       <td className="pr-6">
         {/* {!!contributors.length && contributors?.map((c) =>

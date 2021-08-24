@@ -45,6 +45,8 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
   const scenarios = publishedProjectScenarios || [];
 
+  const planningArea = planningAreaName || 'Custom';
+
   return (
     <div className="text-black bg-primary-50">
       <Wrapper>
@@ -115,7 +117,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                     <div>
                       <h3 className="mb-6 text-sm font-semibold">Planning area</h3>
-                      <p className="text-lg">{planningAreaName}</p>
+                      <p className="text-lg">{planningArea}</p>
                     </div>
 
                     <div>
