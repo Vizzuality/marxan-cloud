@@ -30,7 +30,7 @@ export class CreateFeaturesHandler
       }
       case SpecificationOperation.Copy: {
         const ids = await this.copyOperation.copy({
-          ...command,
+          scenarioId: command.scenarioId,
           input: command.input,
         });
         this.eventBus.publish(

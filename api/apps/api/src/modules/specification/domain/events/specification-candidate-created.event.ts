@@ -6,5 +6,6 @@ export class SpecificationCandidateCreated implements IEvent {
     public readonly scenarioId: string,
     public readonly specificationId: string,
     public readonly input: FeatureConfigInput[],
+    public readonly draft: boolean,
   ) {}
 }
