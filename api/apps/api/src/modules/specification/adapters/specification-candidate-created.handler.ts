@@ -9,6 +9,7 @@ export class SpecificationCandidateCreatedHandler
   constructor(private readonly apiEvents: ApiEventsService) {}
 
   async handle(event: SpecificationCandidateCreated) {
+    if (event.draft) return;
     await this.apiEvents.create({
       kind: API_EVENT_KINDS.scenario__specification__submitted__v1__alpha1,
       topic: event.scenarioId,
