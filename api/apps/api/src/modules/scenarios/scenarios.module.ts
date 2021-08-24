@@ -40,6 +40,7 @@ import { AdminAreasModule } from '../admin-areas/admin-areas.module';
 import { ProtectionStatusModule } from '@marxan/scenarios-planning-unit';
 
 import { SpecificationModule } from './specification';
+import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { SpecificationModule } from './specification';
     ScenarioPlanningUnitsLinkerService,
     ScenarioSerializer,
     ScenarioFeatureSerializer,
+    ScenarioFeaturesGapDataSerializer,
     SolutionResultCrudService,
     ScenarioSolutionSerializer,
     MarxanInput,
