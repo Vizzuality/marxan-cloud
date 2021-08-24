@@ -4,7 +4,6 @@ import { assertDefined } from '@marxan/utils';
 import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.service';
 import { FeatureConfigSplit } from '@marxan-api/modules/specification';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { CreateFeaturesCommand } from '../create-features.command';
 
 export class SplitDataProvider {
   constructor(
@@ -13,18 +12,15 @@ export class SplitDataProvider {
     private readonly projects: ProjectsCrudService,
   ) {}
 
-  async prepareData(
-    command: CreateFeaturesCommand & { input: FeatureConfigSplit },
-  ) {
+  async prepareData(data: { scenarioId: string; input: FeatureConfigSplit }) {
     const scenario = await this.apiEntityManager
       .getRepository(Scenario)
-      .findOne(command.scenarioId, {
+      .findOne(data.scenarioId, {
         relations: ['project'],
       });
     assertDefined(scenario);
     const { project } = scenario;
     assertDefined(project);
-    const input = command.input;
 
     const protectedAreaFilterByIds = scenario.protectedAreaFilterByIds ?? [];
 
@@ -34,6 +30,6 @@ export class SplitDataProvider {
       countryId: project.countryId,
       planningAreaGeometryId: project.planningAreaGeometryId,
     });
-    return { project, input, protectedAreaFilterByIds, planningAreaLocation };
+    return { project, protectedAreaFilterByIds, planningAreaLocation };
   }
 }
