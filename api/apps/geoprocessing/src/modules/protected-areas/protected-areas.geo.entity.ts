@@ -5,20 +5,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Check, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { MultiPolygon } from 'geojson';
 import { defaultSrid } from '@marxan/utils/geo';
+import { IUCNCategory } from '@marxan/iucn';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
-
-export enum IUCNCategory {
-  Ia = 'Ia',
-  Ib = 'Ib',
-  II = 'II',
-  III = 'III',
-  IV = 'IV',
-  V = 'V',
-  VI = 'VI',
-  NotApplicable = 'Not Applicable',
-  NotAssigned = 'Not Assigned',
-  NotReported = 'Not Reported',
-}
 
 @Entity('wdpa')
 export class ProtectedArea extends TimeUserEntityMetadata {
