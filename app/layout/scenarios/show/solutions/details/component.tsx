@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -36,10 +36,15 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   const { sid } = query;
   const [showTable, setShowTable] = useState<boolean>(false);
   const [selectedSolutionOnMap, onToggleSelectedSolutionOnMap] = useState<boolean>(false);
-  const [frequencyOnMap, onToggleFrequencyOnMap] = useState<boolean>(false);
 
   getScenarioSlice(sid);
-  const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setLayerSettings } = scenarioSlice.actions;
+
+  const { selectedSolution, layerSettings } = useSelector((state) => state[`/scenarios/${sid}`]);
+
+  console.log('layerSettings', layerSettings);
+  const dispatch = useDispatch();
 
   const {
     data: selectedSolutionData,
@@ -63,6 +68,14 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
     );
 
   const frequencyLegendValues = LEGEND_LAYERS.frequency().items;
+
+  const onChangeVisibility = useCallback((lid) => {
+    const { visibility = true } = layerSettings[lid] || {};
+    dispatch(setLayerSettings({
+      id: lid,
+      settings: { visibility: !visibility },
+    }));
+  }, [dispatch, setLayerSettings, layerSettings]);
 
   return (
     <motion.div
@@ -88,7 +101,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
       <div className="flex flex-col flex-grow w-full min-h-0 overflow-hidden">
         <div className="px-0.5 overflow-x-visible overflow-y-auto">
           <div className="relative flex flex-col w-full mt-1 text-sm">
-            <p className="py-4 opacity-50">Description Lorem ipsum dolor sit amet, solutions consectetuer adipiscing elit.</p>
+            <p className="py-4 opacity-50">Each solution gives an alternative answer to your planning problem. The result of each solution reflects whether a planning unit is selected or not in the conservation network.</p>
             <Button
               theme="primary"
               size="base"
@@ -133,8 +146,8 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           <div className="w-full p-6 mt-12 border-t border-gray-600">
             <SolutionFrequency
               values={frequencyLegendValues}
-              onToggleFrequencyOnMap={onToggleFrequencyOnMap}
-              frequencyOnMap={frequencyOnMap}
+              onChangeVisibility={() => onChangeVisibility('frequency')}
+              settings={layerSettings.frequency}
             />
           </div>
 

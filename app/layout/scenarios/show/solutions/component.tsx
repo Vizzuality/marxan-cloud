@@ -28,7 +28,7 @@ export const SECTIONS = [
   {
     id: 'gap-analysis',
     name: 'Gap Analysis',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
+    description: 'A gap analysis calculates how much of each feature is under the existing protected area network and then summarises the representation as a percentage.',
   },
 ];
 
