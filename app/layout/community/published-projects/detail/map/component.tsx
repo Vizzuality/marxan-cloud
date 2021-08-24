@@ -65,35 +65,20 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
 
   const dispatch = useDispatch();
 
-  const firstSidRunned = useMemo(() => {
-    return scenariosData
-      .map((s) => {
-        if (s.jobs.find((j) => j.kind === 'run' && j.status === 'done')) {
-          return {
-            id: s.id,
-          };
-        }
+  const sid = useMemo(() => {
+    const first = scenariosData
+      .find((s) => {
+        return s.jobs.find((j) => j.kind === 'run' && j.status === 'done');
+      });
 
-        return null;
-      })
-      .filter((s) => !!s);
+    return first?.id;
   }, [scenariosData]);
 
-  // change this to firstSidRunned.id after integrate with the API as
-  // published project need to have at least 1 scenario runned
-
-  const sidMap = useMemo(() => {
-    if (scenariosAreFetched && scenariosData && !!scenariosData.length) {
-      return firstSidRunned[0]?.id || scenariosData[0].id;
-    }
-    return null;
-  }, [scenariosAreFetched, scenariosData, firstSidRunned]);
-
   const PUGridLayer = usePUGridLayer({
-    active: scenariosAreFetched && scenariosData && !!scenariosData.length,
-    sid: `${sidMap}`,
+    active: !!sid,
+    sid: `${sid}`,
     include: 'results',
-    sublayers: ['features', 'solutions'],
+    sublayers: sid ? ['solutions'] : [],
     options: {
       settings: {
         pugrid: layerSettings.pugrid,
@@ -105,7 +90,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
   const LAYERS = [PUGridLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    layers: ['frequency', 'features', 'pugrid'],
+    layers: ['frequency', 'pugrid'],
     options: {
       layerSettings,
     },
