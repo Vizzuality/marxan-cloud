@@ -111,6 +111,25 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     return [];
   }, [tab, subtab]);
 
+  const layers = useMemo(() => {
+    if (tab === 'protected-areas' && subtab === 'protected-areas-preview' && !!wdpaCategories?.wdpaIucnCategories?.length) return ['wdpa-preview', 'pugrid'];
+    if (tab === 'protected-areas' && subtab === 'protected-areas-percentage' && !!wdpaCategories?.wdpaIucnCategories?.length) return ['wdpa-percentage', 'pugrid'];
+    if (tab === 'features') {
+      return [
+        ...wdpaCategories.wdpaIucnCategories?.length ? ['wdpa-percentage'] : [],
+        'bioregional',
+        'species',
+        'pugrid',
+      ];
+    }
+    if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features', 'pugrid'];
+    if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost', 'pugrid'];
+    if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
+    if (tab === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
+
+    return ['pugrid'];
+  }, [tab, subtab, wdpaCategories.wdpaIucnCategories?.length]);
+
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
     cache,
@@ -162,8 +181,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const LAYERS = [PUGridLayer, WDPApreviewLayer, ...FeaturePreviewLayers].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    type: tab,
-    subtype: subtab,
+    // type: tab,
+    // subtype: subtab,
+    layers,
     options: {
       wdpaIucnCategories: tab === 'protected-areas' && subtab === 'protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
       wdpaThreshold: tab === 'protected-areas' && subtab === 'protected-areas-percentage' ? wdpaThreshold : scenarioData?.wdpaThreshold,
@@ -331,11 +351,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       </Controls>
 
       {/* Legend */}
-      <div className="absolute w-full max-w-xs bottom-10 right-2">
+      <div className="absolute w-full max-w-xs bottom-14 right-5">
         <Legend
           open={open}
           className="w-full"
-          maxHeight={300}
+          maxHeight={325}
           onChangeOpen={() => setOpen(!open)}
         >
           {LEGEND.map((i) => {

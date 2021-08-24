@@ -88,21 +88,21 @@
                 'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/120/tiles/{z}/{x}/{y}.mvt',
               ],
             },
-            'postgis-tilesFeatures': {
-              type: 'vector',
-              minzoom: 1,
-              maxzoom: 20,
-              tiles: [
-                'http://localhost:3040/api/v1/geo-features/1e30e3b4-03b7-4380-9387-fa9b1ef98c53/preview/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,22.980651855468746,-18.22935133838667,-19.202241064923044]',
-              ],
-            },
+            // 'postgis-tilesFeatures': {
+            //   type: 'vector',
+            //   minzoom: 1,
+            //   maxzoom: 20,
+            //   tiles: [
+            //     'http://localhost:3040/api/v1/geo-features/1e30e3b4-03b7-4380-9387-fa9b1ef98c53/preview/tiles/{z}/{x}/{y}.mvt',
+            //   ],
+            // },
 
             'postgis-tilesScenarioPu': {
               type: 'vector',
               minzoom: 1,
               maxzoom: 20,
               tiles: [
-                `http://localhost:3040/api/v1/scenarios/a861a58f-97c9-4bec-9192-d3216acd24d0/planning-units/tiles/{z}/{x}/{y}.mvt?include=results,protection`,
+                `http://localhost:3040/api/v1/scenarios/a9cabc9a-7747-44f1-9905-f3b7b5401036/planning-units/tiles/{z}/{x}/{y}.mvt?include=protection,features`,
               ],
             },
 
@@ -122,16 +122,11 @@
               minzoom: 1,
               maxzoom: 22,
             },
-
             {
               id: 'postgis-tiles-layer-ScenarioPU',
               type: 'fill',
               source: 'postgis-tilesScenarioPu',
               'source-layer': 'layer0',
-              filter:[
-                'all',
-                ['in', "-1-", ['get', 'valuePosition']],
-              ],
               paint: {
                 'fill-outline-color': 'yellow',
                 'fill-color': 'red',
@@ -183,17 +178,17 @@
                 'fill-opacity': 0.3,
               },
             },
-            {
-            id: 'postgis-tiles-layer-features',
-              type: 'fill',
-              source: 'postgis-tilesFeatures',
-              'source-layer': 'layer0',
-              paint: {
-                'fill-outline-color': 'pink',
-                'fill-color': 'pink',
-                'fill-opacity': 0.3,
-              },
-            },
+            // {
+            // id: 'postgis-tiles-layer-features',
+            //   type: 'fill',
+            //   source: 'postgis-tilesFeatures',
+            //   'source-layer': 'layer0',
+            //   paint: {
+            //     'fill-outline-color': 'pink',
+            //     'fill-color': 'pink',
+            //     'fill-opacity': 0.3,
+            //   },
+            // },
             {
               id: 'postgis-tiles-layer-PU',
               type: 'fill',
@@ -255,16 +250,16 @@
         // map.on('click', 'postgis-tiles-layer2', function (e) {
         // console.log(e.features[0].properties)
         // });
-        map.on('click', 'postgis-tiles-layer-features', function (e) {
+        map.on('click', 'postgis-tiles-layer-ScenarioPU', function (e) {
         console.log(e.features[0].properties)
         });
         // Change the cursor to a pointer when the mouse is over the places layer.
-        map.on('mouseenter', 'postgis-tiles-layer-features', function () {
+        map.on('mouseenter', 'postgis-tiles-layer-ScenarioPU', function () {
         map.getCanvas().style.cursor = 'pointer';
         });
 
         // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'postgis-tiles-layer-features', function () {
+        map.on('mouseleave', 'postgis-tiles-layer-ScenarioPU', function () {
         map.getCanvas().style.cursor = '';
         });
     });

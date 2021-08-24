@@ -9,7 +9,7 @@ import {
 } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { CreateUserDTO } from '@marxan-api/modules/users/dto/create.user.dto';
 import { UpdateUserDTO } from '@marxan-api/modules/users/dto/update.user.dto';
-import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
+import { IUCNCategory } from '@marxan/iucn';
 
 interface CountryCodeInput {
   countryCode?: string;
@@ -182,7 +182,6 @@ export const E2E_CONFIG: {
         metadata: {},
         numberOfRuns: 100,
         boundaryLengthModifier: 0,
-        wdpaThreshold: 40,
         wdpaIucnCategories: [IUCNCategory.IV],
         status: JobStatus.created,
       }),

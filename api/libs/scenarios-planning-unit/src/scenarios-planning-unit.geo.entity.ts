@@ -75,5 +75,32 @@ export class ScenariosPlanningUnitGeoEntity {
    */
   lockStatus!: LockStatus;
 
+  @Column({
+    type: 'float8',
+    nullable: true,
+  })
+  xloc?: number | null;
+
+  @Column({
+    type: 'float8',
+    nullable: true,
+  })
+  yloc?: number | null;
+
+  @Column({
+    type: 'float8',
+    nullable: true,
+    name: `protected_area`,
+  })
+  protectedArea?: number | null;
+
+  @Column({
+    type: `boolean`,
+    nullable: false,
+    default: false,
+    name: `protected_by_default`,
+  })
+  protectedByDefault!: boolean;
+
   // relations not defined yet until it is necessary
 }

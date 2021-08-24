@@ -126,9 +126,20 @@ export class ScenarioPlanningUnitsInclusionProcessor
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
+        protectedByDefault: false,
       },
       {
         lockStatus: LockStatus.Unstated,
+      },
+    );
+
+    await this.scenarioPlanningUnitsRepo.update(
+      {
+        scenarioId,
+        protectedByDefault: true,
+      },
+      {
+        lockStatus: LockStatus.LockedIn,
       },
     );
 

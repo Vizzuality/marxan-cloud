@@ -1,5 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { IUCNCategory, ProtectedArea } from '../protected-area.geo.entity';
+import { ProtectedArea } from '../protected-area.geo.entity';
+import { IUCNCategory } from '@marxan/iucn';
 
 export class IUCNProtectedAreaCategoryDTO extends PickType(ProtectedArea, [
   'iucnCategory',

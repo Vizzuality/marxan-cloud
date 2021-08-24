@@ -7,7 +7,7 @@ import {
 } from "https://deno.land/std@0.103.0/path/mod.ts";
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
-import { sleep } from "https://deno.land/x/sleep/mod.ts";
+import { sleep } from "https://deno.land/x/sleep@v1.2.0/mod.ts";
 
 const scriptPath = dirname(relative(Deno.cwd(), fromFileUrl(import.meta.url)));
 
@@ -49,6 +49,32 @@ async function sendData(url: string, data: Blob) {
   return response;
 }
 
+// const MAX_TRYS = 10; TRY_TIMEOUT = 500;
+// function toTry() {
+//     return new Promise((ok, fail) => {
+//         setTimeout(() => Math.random() < 0.05 ? ok("OK!") : fail("Error"), TRY_TIMEOUT);
+//     });
+// }
+// async function tryNTimes(toTry, count = MAX_TRYS) {
+//     if (count > 0) {
+//         const result = await toTry().catch(e => e);
+//         if (result === "Error") { return await tryNTimes(toTry, count - 1) }
+//         return result
+//     }
+//     return `Tried ${MAX_TRYS} times and failed`;
+// }
+
+// tryNTimes(toTry).then(console.log);
+
+
+async function checkScenarioStatus(id: string) {
+    return await botClient.get(`/projects​/${id}​/scenarios​/status`, {})
+    .then((result) => result.data)
+    .catch((e) => {
+        console.log(e);
+    });
+}
+
 const organization = await botClient
   .post("/organizations", {
     name: "Brazil - Atlantic forest organization",
@@ -87,67 +113,116 @@ const project = await botClient
   });
 
 console.log(project);
-
 // wait a bit for async job to be picked up and processed
 // @DEBT we should check the actual job status
 // await new Promise((r) => setTimeout(r, 30e3));
 
 const scenarioStart = Process.hrtime();
 
-await sleep(5)
+await sleep(10)
 
-const scenario = await botClient
+// Scenario creation with the bare minimum; From there we need to be doin patches to the same scenario
+let scenario = await botClient
   .post("/scenarios", {
     name: `Brazil scenario`,
     type: "marxan",
     projectId: project.data.id,
     description: "A Brazil scenario",
-    wdpaIucnCategories: ["Not Applicable"],
-    wdpaThreshold: 50,
     metadata: {
-      scenarioEditingMetadata: {
-        status: {
-          'protected-areas': 'draft',
-          features: 'draft',
-          analysis: 'draft',
-        },
-        tab: 'analysis',
-        subtab: 'analysis-preview',
-      }
-    }
+        scenarioEditingMetadata: {
+          status: {
+            'protected-areas': 'draft'
+          },
+          tab: 'analysis',
+          subtab: 'analysis-preview',
+        }
+      },
+    status: "draft"
   })
   .then((result) => result.data)
   .catch((e) => {
     console.log(e);
   });
 
-const scenarioTook = Process.hrtime(scenarioStart);
-console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
+  console.log(scenario);
 
-console.log(scenario);
-const featureList = [
-       "demo_ecoregions_new_class_split",
-       "demo_buteogallus_urubitinga",
-       "demo_caluromys_philander",
-       "demo_chiroxiphia_caudata",
-       "demo_leopardus_pardalis",
-       "demo_megarynchus_pitangua",
-       "demo_phyllodytes_tuberculosus",
-       "demo_tapirus_terrestris",
-       "demo_thalurania_glaucopis",
-]
-const features = await botClient
-  .get(`/projects/${project.data.id}/features?q=demo`)
-  .then((result) => result.data)
-  .catch((e) => {
-    console.log(e);
-  });
 
-console.log(features);
+  console.log(await checkScenarioStatus(project!.data!.id));
 
-const geoFeatureSpecStart = Process.hrtime();
+// get the list of protected areas in the region and use all of them
+// const paCategories:{data:Array<{id:string, type:string, attributes:object}>} = await botClient.get(`/protected-areas/iucn-categories?filter%5BcustomAreaId%5D=${planningAreaFile.id}`)
+//           .then((result) =>  result.data)
+//           .catch((e) => {
+//             console.log(e);
+//           });
 
-// const featureRecipe = features.map( (x: Object) => { return {
+// console.log(paCategories);
+
+// await botClient
+//   .patch(`/scenarios/${scenario!.data!.id}`, {
+//     wdpaIucnCategories: paCategories!.data.map((i: {id:string, type:string, attributes:object}): string => i.id),
+//   }).catch((e) => {
+//     console.log(e);
+//   });
+
+// console.log(scenario);
+
+// await sleep(30)
+
+// await botClient
+//   .patch(`/scenarios/${scenario!.data!.id}`, {
+//     wdpaThreshold: 50,
+//     metadata: {
+//     scenarioEditingMetadata: {
+//         status: {
+//           'protected-areas': 'draft',
+//           features: 'draft',
+//           analysis: 'draft',
+//         },
+//         tab: 'analysis',
+//         subtab: 'analysis-preview',
+//       }
+//     }
+//   }).catch((e) => {
+//     console.log(e);
+//   });
+
+// const scenarioTook = Process.hrtime(scenarioStart);
+// console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
+
+// await botClient.get(`/scenarios/${scenario!.data!.id}`)
+//     .then((result) =>  console.log(result.data))
+//     .catch((e) => {
+//     console.log(e);
+//   });
+
+// await sleep(10)
+
+// Setup features in the project
+
+// const featureList = [
+//        "demo_ecoregions_new_class_split",
+//        "demo_buteogallus_urubitinga",
+//        "demo_caluromys_philander",
+//        "demo_chiroxiphia_caudata",
+//        "demo_leopardus_pardalis",
+//        "demo_megarynchus_pitangua",
+//        "demo_phyllodytes_tuberculosus",
+//        "demo_tapirus_terrestris",
+//        "demo_thalurania_glaucopis",
+// ]
+// const features = await botClient
+//   .get(`/projects/${project.data.id}/features?q=demo`)
+//   .then((result) => result.data)
+//   .catch((e) => {
+//     console.log(e);
+//   });
+
+// console.log(features);
+
+// const geoFeatureSpecStart = Process.hrtime();
+
+// const featureRecipe = features!.data.map( (x) => { return {
 //     kind: "plain",
 //     featureId: x.id,
 //     marxanSettings: {
@@ -156,29 +231,40 @@ const geoFeatureSpecStart = Process.hrtime();
 //     },
 //   }})
 //   console.log(featureRecipe);
-const geoFeatureSpec = await botClient
-  .post(`/scenarios/${scenario.data.id}/features/specification`, {
-    status: "created",
-    features: [
-      {
-        kind: "plain",
-        featureId: features.data[0].id,
-        marxanSettings: {
-          prop: 0.3,
-          fpf: 1,
-        },
-      },
-    ],
-  })
-  .then((result) => result.data)
-  .catch((e) => {
-    console.log(e);
-  });
+// const geoFeatureSpec = await botClient
+//   .post(`/scenarios/${scenario.data.id}/features/specification`, {
+//     status: "created",
+//     features: [
+//       {
+//         kind: "plain",
+//         featureId: features.data[0].id,
+//         marxanSettings: {
+//           prop: 0.3,
+//           fpf: 1,
+//         },
+//       },
+//     ],
+//   })
+//   .then((result) => result.data)
+//   .catch((e) => {
+//     console.log(e);
+//   });
+    // metadata: {
+    //     scenarioEditingMetadata: {
+    //         status: {
+    //           'protected-areas': 'draft',
+    //           features: 'draft',
+    //           analysis: 'draft',
+    //         },
+    //         tab: 'analysis',
+    //         subtab: 'analysis-preview',
+    //       }
+    //     },
 
-const geoFeatureSpecTook = Process.hrtime(geoFeatureSpecStart);
+// const geoFeatureSpecTook = Process.hrtime(geoFeatureSpecStart);
 
-console.log(
-  `Processing of features for scenario done in ${geoFeatureSpecTook[0]} seconds`
-);
+// console.log(
+//   `Processing of features for scenario done in ${geoFeatureSpecTook[0]} seconds`
+// );
 
-console.log(geoFeatureSpec);
+// console.log(geoFeatureSpec);
