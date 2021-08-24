@@ -16,8 +16,8 @@ create view scenario_features_gap_data as
     inner join features_data fd on sfd.feature_class_id=fd.id 
     group by fd.feature_id, feature_class_id, scenario_id)
   select
-    feature_id,
     scenario_id,
+    feature_id,
     total_area,
     met_area,
     case 
@@ -45,6 +45,8 @@ create view scenario_features_output_gap_data as
     inner join scenario_features_data sfd on osfd.feature_scenario_id=sfd.id
     inner join features_data fd on sfd.feature_class_id=fd.id)
   select
+    scenario_id,
+    feature_id,
     sum(amount) as met_area,
     case
       when sum(total_area) <> 0 and sum(total_area) is not null then
@@ -55,10 +57,10 @@ create view scenario_features_output_gap_data as
     sum(occurrences) as met_occurrences,
     sum(total_area) * min(coverage_target) as coverage_target_area,
     min(coverage_target) as coverage_target,
-    run_id,
-    feature_id
+    sum(amount) >= (sum(total_area) * min(coverage_target)) as on_target,
+    run_id
   from gap_data
-  group by run_id, feature_id;
+  group by run_id, feature_id, scenario_id;
     `);
   }
 
