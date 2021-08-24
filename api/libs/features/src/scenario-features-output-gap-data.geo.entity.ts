@@ -35,38 +35,38 @@ import { Column, ViewEntity } from 'typeorm';
 })
 export class ScenarioFeaturesOutputGapData {
   @ApiProperty()
-  @Column('scenario_id')
+  @Column({ name: 'scenario_id' })
   scenarioId!: string;
 
   @ApiProperty()
-  @Column('feature_id')
+  @Column({ name: 'feature_id' })
   featureId!: string;
 
   @ApiProperty()
-  @Column('met_area')
+  @Column({ name: 'met_area' })
   metArea!: number;
 
   @ApiProperty()
-  @Column('met')
+  @Column({ name: 'met' })
   met!: number;
 
   @ApiProperty()
-  @Column('met_occurrences')
+  @Column({ name: 'met_occurrences' })
   metOccurrences!: number;
 
   @ApiProperty()
-  @Column('coverage_target_area')
+  @Column({ name: 'coverage_target_area' })
   coverageTargetArea!: number;
 
   @ApiProperty()
-  @Column('coverage_target')
+  @Column({ name: 'coverage_target' })
   coverageTarget!: number;
 
   @ApiProperty()
-  @Column('on_target')
+  @Column({ name: 'on_target' })
   onTarget!: boolean;
 
   @ApiProperty()
-  @Column('run_id')
+  @Column({ name: 'run_id' })
   runId!: number;
 }

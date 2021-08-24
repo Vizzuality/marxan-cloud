@@ -29,34 +29,34 @@ import { Column, ViewEntity } from 'typeorm';
 })
 export class ScenarioFeaturesGapData {
   @ApiProperty()
-  @Column('scenario_id')
+  @Column({ name: 'scenario_id' })
   scenarioId!: string;
 
   @ApiProperty()
-  @Column('feature_id')
+  @Column({ name: 'feature_id' })
   featureId!: string;
 
   @ApiProperty()
-  @Column('total_area')
+  @Column({ name: 'total_area' })
   totalArea!: number;
 
   @ApiProperty()
-  @Column('met_area')
+  @Column({ name: 'met_area' })
   metArea!: number;
 
   @ApiProperty()
-  @Column('met')
+  @Column({ name: 'met' })
   met!: number;
 
   @ApiProperty()
-  @Column('coverage_target_area')
+  @Column({ name: 'coverage_target_area' })
   coverageTargetArea!: number;
 
   @ApiProperty()
-  @Column('coverage_target')
+  @Column({ name: 'coverage_target' })
   coverageTarget!: number;
 
   @ApiProperty()
-  @Column('on_target')
+  @Column({ name: 'on_target' })
   onTarget!: boolean;
 }

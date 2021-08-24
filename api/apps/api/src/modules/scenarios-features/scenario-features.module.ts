@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 
-import { ScenarioFeaturesData } from '@marxan/features';
+import { ScenarioFeaturesData, ScenarioFeaturesGapData, ScenarioFeaturesOutputGapData } from '@marxan/features';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -14,13 +14,14 @@ import { CreateFeaturesSaga } from './create-features.saga';
 import { CreateFeaturesHandler } from './create-features.handler';
 import { CopyDataProvider, CopyOperation, CopyQuery } from './copy';
 import { SplitDataProvider, SplitOperation, SplitQuery } from './split';
+import { ScenarioFeaturesGapDataService } from './scenario-features-gap-data.service';
 
 @Module({
   imports: [
     CqrsModule,
     TypeOrmModule.forFeature([GeoFeature]),
     TypeOrmModule.forFeature(
-      [ScenarioFeaturesData, RemoteFeaturesData],
+      [ScenarioFeaturesData, ScenarioFeaturesGapData, ScenarioFeaturesOutputGapData, RemoteFeaturesData],
       DbConnections.geoprocessingDB,
     ),
     ProjectsModule,
@@ -28,6 +29,7 @@ import { SplitDataProvider, SplitOperation, SplitQuery } from './split';
   ],
   providers: [
     ScenarioFeaturesService,
+    ScenarioFeaturesGapDataService,
     CreateFeaturesSaga,
     CreateFeaturesHandler,
     CopyQuery,
@@ -37,6 +39,6 @@ import { SplitDataProvider, SplitOperation, SplitQuery } from './split';
     SplitDataProvider,
     SplitOperation,
   ],
-  exports: [ScenarioFeaturesService],
+  exports: [ScenarioFeaturesService, ScenarioFeaturesGapDataService],
 })
 export class ScenarioFeaturesModule {}
