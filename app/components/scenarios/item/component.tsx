@@ -95,6 +95,7 @@ export const Item: React.FC<ItemProps> = ({
     const geofeatureCopy = jobs.find((j) => j.kind === 'geofeatureCopy');
     const geofeatureSplit = jobs.find((j) => j.kind === 'geofeatureSplit');
     const geofeatureStratification = jobs.find((j) => j.kind === 'geofeatureStratification');
+    const specification = jobs.find((j) => j.kind === 'specification');
 
     const run = jobs.find((j) => j.kind === 'run');
 
@@ -111,12 +112,13 @@ export const Item: React.FC<ItemProps> = ({
       (geofeatureCopy && geofeatureCopy.status === 'running')
       || (geofeatureSplit && geofeatureSplit.status === 'running')
       || (geofeatureStratification && geofeatureStratification.status === 'running')
+      || (specification && specification.status === 'running')
     ) return 'features-running';
     if (
       (geofeatureCopy && geofeatureCopy.status === 'failure')
       || (geofeatureSplit && geofeatureSplit.status === 'failure')
       || (geofeatureStratification && geofeatureStratification.status === 'failure')
-
+      || (specification && specification.status === 'failure')
     ) return 'features-failure';
 
     // RUN
@@ -234,9 +236,9 @@ export const Item: React.FC<ItemProps> = ({
           onClick={onView}
           disabled={status.includes('running')}
           className={cx({
-            'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl focus:outline-blue': true,
+            'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl': true,
             'rounded-br-none': settings,
-            'text-primary-500': status === 'run-done',
+            'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:outline-none focus:bg-primary-300 focus:text-black': status === 'run-done',
             'text-gray-400 pointer-events-none': status !== 'run-done',
           })}
         >

@@ -18,7 +18,6 @@ import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
-import { ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
 
 import Select from 'components/forms/select';
 import Map from 'components/map';
@@ -105,8 +104,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const LAYERS = [PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    type: selectedSid ? ScenarioSidebarTabs.SOLUTIONS : null,
-    subtype: null,
+    layers: selectedSid ? ['frequency', 'solution', 'pugrid'] : ['pugrid'],
     options: {
       layerSettings,
     },

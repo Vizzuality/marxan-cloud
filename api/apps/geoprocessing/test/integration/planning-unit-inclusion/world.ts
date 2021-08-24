@@ -65,13 +65,17 @@ export const createWorld = async (app: INestApplication) => {
       const toInclude = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
         planningUnits.features.filter(
-          (f) => f.properties[forCase].shouldBeIncluded,
+          (f) =>
+            f.properties[forCase].shouldBeIncluded ||
+            f.properties[forCase].protectedByDefault,
         ),
       );
       const toExclude = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
         planningUnits.features.filter(
-          (f) => f.properties[forCase].shouldBeExcluded,
+          (f) =>
+            f.properties[forCase].shouldBeExcluded &&
+            !f.properties[forCase].protectedByDefault,
         ),
       );
       const untouched = await insertPuGeometryFromGeoJson(
@@ -79,7 +83,8 @@ export const createWorld = async (app: INestApplication) => {
         planningUnits.features.filter(
           (f) =>
             !f.properties[forCase].shouldBeExcluded &&
-            !f.properties[forCase].shouldBeIncluded,
+            !f.properties[forCase].shouldBeIncluded &&
+            !f.properties[forCase].protectedByDefault,
         ),
       );
 
@@ -109,6 +114,7 @@ export const createWorld = async (app: INestApplication) => {
               puGeometryId: id,
               scenarioId,
               planningUnitMarxanId: index++,
+              protectedByDefault: true,
             }),
           ),
         )

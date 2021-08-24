@@ -104,6 +104,26 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     return [];
   }, [tab, subtab]);
 
+  const layers = useMemo(() => {
+    if (tab === 'protected-areas' && subtab === 'protected-areas-preview' && !!wdpaIucnCategories?.length) return ['wdpa-preview', 'pugrid'];
+    if (tab === 'protected-areas' && subtab === 'protected-areas-percentage' && !!wdpaIucnCategories?.length) return ['wdpa-percentage', 'pugrid'];
+    if (tab === 'features') {
+      return [
+        ...wdpaIucnCategories?.length ? ['wdpa-percentage'] : [],
+        'bioregional',
+        'species',
+        'pugrid',
+      ];
+    }
+    if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features', 'pugrid'];
+    if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost', 'pugrid'];
+    if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
+    if (tab === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
+    if (tab === 'solutions') return ['frequency', 'solution', 'pugrid'];
+
+    return ['pugrid'];
+  }, [tab, subtab, wdpaIucnCategories?.length]);
+
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
     cache,
@@ -143,8 +163,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const LAYERS = [PUGridLayer, ...FeaturePreviewLayers].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    type: tab,
-    subtype: subtab,
+    layers,
     options: {
       wdpaThreshold: scenarioData?.wdpaThreshold,
       puIncludedValue: included,
@@ -263,7 +282,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
         />
       </Controls>
       {/* Legend */}
-      <div className="absolute w-full max-w-xs bottom-10 right-5">
+      <div className="absolute w-full max-w-xs bottom-14 right-5">
         <Legend
           open={open}
           className="w-full"

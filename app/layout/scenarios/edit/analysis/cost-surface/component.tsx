@@ -151,7 +151,10 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                 In conservation planning, cost data reflects how much a
                 planning unit costs to include into a
                 conservation network. Typically, it reflects the
-                actual price of a parcel of land. However, cost
+                actual price of a parcel of land.
+              </p>
+              <p>
+                However, cost
                 information is usually scarce and often the cost
                 surface is used to reflect any variety of
                 socioeconomic factors,
@@ -161,10 +164,10 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
               </p>
               <p>
                 For example, here you can see 2 examples of
-                cost surfaces terrestrial and marine environments:
+                cost surfaces in terrestrial and marine environments:
               </p>
-              <img src={COST_SEA_IMG} alt="Feature-Range" />
-              <img src={COST_LAND_IMG} alt="Feature-Range" />
+              <img src={COST_SEA_IMG} alt="Cost sea" />
+              <img src={COST_LAND_IMG} alt="Cost Land" />
               <p>
                 The default value for cost will be the planning
                 unit area but you can upload a cost
@@ -174,8 +177,6 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                 This will be the cost that Marxan will use for
                 each planning unit.
               </p>
-              <img src={COST_LAND_IMG} alt="Feature-Range" />
-
             </div>
 
           </div>
