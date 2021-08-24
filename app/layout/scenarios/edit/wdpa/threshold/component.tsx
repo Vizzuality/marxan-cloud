@@ -102,8 +102,9 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   // EVENTS
   const handleSubmit = useCallback((values, form) => {
     const { modified } = form.getState();
+    const { scenarioEditingMetadata } = metadata;
 
-    if (modified.wdpaThreshold) {
+    if (modified.wdpaThreshold || scenarioEditingMetadata.tab === 'protected-areas') {
       setSubmitting(true);
 
       const { wdpaThreshold } = values;
