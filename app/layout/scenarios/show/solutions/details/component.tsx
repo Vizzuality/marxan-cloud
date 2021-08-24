@@ -35,7 +35,6 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   const { query } = useRouter();
   const { sid } = query;
   const [showTable, setShowTable] = useState<boolean>(false);
-  const [selectedSolutionOnMap, onToggleSelectedSolutionOnMap] = useState<boolean>(false);
 
   getScenarioSlice(sid);
   const scenarioSlice = getScenarioSlice(sid);
@@ -43,7 +42,6 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
 
   const { selectedSolution, layerSettings } = useSelector((state) => state[`/scenarios/${sid}`]);
 
-  console.log('layerSettings', layerSettings);
   const dispatch = useDispatch();
 
   const {
@@ -161,8 +159,8 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
               <SolutionSelected
                 best={isBestSolution}
                 values={selectedSolutionData || bestSolutionData}
-                onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
-                selectedSolutionOnMap={selectedSolutionOnMap}
+                onChangeVisibility={() => onChangeVisibility('solution')}
+                settings={layerSettings.solution}
               />
             )}
           </div>
