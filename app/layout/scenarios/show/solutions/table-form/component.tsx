@@ -45,12 +45,12 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   );
 
   const {
-    data,
+    data: solutionsData,
     fetchNextPage,
     hasNextPage,
-    isFetching,
+    isFetching: solutionsAreFetching,
     isFetchingNextPage,
-    isFetched,
+    isFetched: solutionsAreFetched,
   } = useSolutions(sid);
 
   const {
@@ -59,17 +59,12 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     isFetched: mostDifSolutionsisFetched,
   } = useMostDifferentSolutions(sid);
 
-  const allSolutionsFetched = (!isFetching || isFetchingNextPage)
-    && data && data.length > 0 && !mostDifSolutions;
+  const allSolutionsFetched = solutionsAreFetched || isFetchingNextPage;
 
-  const mostDifSolutionsIsSelected = mostDifSolutions
-    && mostDifSolutionsData && mostDifSolutionsData.length > 0;
+  const noSolutionResults = (!solutionsAreFetching && !solutionsData.length)
+    || (!mostDifSolutionsisFetched && !mostDifSolutionsData.length);
 
-  const noSolutionResults = ((!isFetching && (!data || !data.length)) || (!mostDifSolutionsisFetched
-    && (!mostDifSolutionsData || !mostDifSolutionsData.length)));
-
-  const solutionsAreLoading = ((isFetching && !isFetched)
-    || (mostDifSolutionsisFetching && !mostDifSolutionsisFetched));
+  const solutionsAreLoading = solutionsAreFetching || mostDifSolutionsisFetching;
 
   const scrollRef = useBottomScrollListener(
     () => {
@@ -192,7 +187,6 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
       <div
         ref={scrollRef}
         className="relative overflow-x-hidden overflow-y-auto"
-        style={{ height: '400px' }}
       >
         {solutionsAreLoading && (
           <div className="absolute top-0 left-0 z-30 flex flex-col items-center justify-center w-full h-full">
@@ -211,10 +205,10 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           </div>
         )}
 
-        {(allSolutionsFetched || mostDifSolutionsIsSelected) && (
+        {allSolutionsFetched && (
           <SolutionsTable
             bestSolutionId={bestSolutionData?.id}
-            body={mostDifSolutionsIsSelected ? mostDifSolutionsData : data}
+            body={mostDifSolutions ? mostDifSolutionsData : solutionsData}
             selectedSolution={selectSolution}
             onSelectSolution={(solution) => setSelectSolution(solution)}
           />

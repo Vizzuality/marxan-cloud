@@ -28,7 +28,7 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
     runId, scoreValue, costValue, missingValues, planningUnits,
   } = values;
   const { visibility = true } = settings || {};
-  console.log('visibility', visibility);
+
   return (
     <div className="w-full">
       <div className="flex justify-between">

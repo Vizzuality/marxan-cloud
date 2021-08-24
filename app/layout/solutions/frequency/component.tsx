@@ -18,7 +18,7 @@ export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
   values, settings, onChangeVisibility,
 }: SolutionFrequencyProps) => {
   const { visibility = true } = settings || {};
-  console.log('visibility', visibility);
+
   return (
     <div className="w-full pb-6">
       <div className="flex items-center justify-between pb-4">
