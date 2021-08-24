@@ -93,7 +93,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
     active: scenariosAreFetched && scenariosData && !!scenariosData.length,
     sid: `${sidMap}`,
     include: 'results',
-    sublayers: ['solutions'],
+    sublayers: ['features', 'solutions'],
     options: {
       settings: {
         pugrid: layerSettings.pugrid,
@@ -105,8 +105,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
   const LAYERS = [PUGridLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    type: null,
-    subtype: null,
+    layers: ['frequency', 'features', 'pugrid'],
     options: {
       layerSettings,
     },
