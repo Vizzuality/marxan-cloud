@@ -50,7 +50,7 @@ import {
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import { ScenarioFeaturesData, ScenarioFeaturesGapData } from '@marxan/features';
+import { ScenarioFeaturesData, ScenarioFeaturesGapData, ScenarioFeaturesOutputGapData } from '@marxan/features';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
@@ -73,6 +73,8 @@ import { ScenarioPlanningUnitDto } from './dto/scenario-planning-unit.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ScenarioFeaturesGapDataService } from '../scenarios-features/scenario-features-gap-data.service';
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
+import { ScenarioFeaturesOutputGapDataService } from '../scenarios-features/scenario-features-output-gap-data.service';
+import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -88,10 +90,12 @@ export class ScenariosController {
   constructor(
     public readonly service: ScenariosService,
     private readonly scenarioFeaturesGapDataService: ScenarioFeaturesGapDataService,
+    private readonly scenarioFeaturesOutputGapDataService: ScenarioFeaturesOutputGapDataService,
     private readonly geoFeatureSetSerializer: GeoFeatureSetSerializer,
     private readonly geoFeatureSetService: GeoFeatureSetService,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeaturesGapData: ScenarioFeaturesGapDataSerializer,
+    private readonly scenarioFeaturesOutputGapData: ScenarioFeaturesOutputGapDataSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
     private readonly proxyService: ProxyService,
@@ -530,6 +534,25 @@ export class ScenariosController {
       fetchSpecification,
     );
     return this.scenarioSolutionSerializer.serialize(result[0]);
+  }
+
+  @ApiOperation({ description: `Retrieve Marxan protection data for the features of a scenario.` })
+  @ApiOkResponse({
+    type: ScenarioFeaturesOutputGapData,
+  })
+  @Get(`${solutionsSubPath}/gap-data`)
+  async getScenarioFeaturesOutputGapData(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
+    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(undefined, {
+      params: {
+        scenarioId: id,
+      },
+    });
+    return this.scenarioFeaturesOutputGapData.serialize(
+      result.data,
+      result.metadata,
+    );
   }
 
   @ApiOkResponse({

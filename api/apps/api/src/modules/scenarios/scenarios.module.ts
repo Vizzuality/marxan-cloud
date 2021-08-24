@@ -41,6 +41,7 @@ import { ProtectionStatusModule } from '@marxan/scenarios-planning-unit';
 
 import { SpecificationModule } from './specification';
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
+import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-da
     ScenarioSerializer,
     ScenarioFeatureSerializer,
     ScenarioFeaturesGapDataSerializer,
+    ScenarioFeaturesOutputGapDataSerializer,
     SolutionResultCrudService,
     ScenarioSolutionSerializer,
     MarxanInput,

@@ -7,21 +7,21 @@ import {
   JSONAPISerializerConfig,
 } from '../../utils/app-base.service';
 
-import { ScenarioFeaturesGapData } from '@marxan/features';
+import { ScenarioFeaturesOutputGapData } from '@marxan/features';
 import { UserSearchCriteria } from './search-criteria';
 import { AppConfig } from '../../utils/config.utils';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
-export class ScenarioFeaturesGapDataService extends AppBaseService<
-  ScenarioFeaturesGapData,
+export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
+  ScenarioFeaturesOutputGapData,
   never,
   never,
   UserSearchCriteria
 > {
   constructor(
-    @InjectRepository(ScenarioFeaturesGapData, DbConnections.geoprocessingDB)
-    private readonly gapData: Repository<ScenarioFeaturesGapData>,
+    @InjectRepository(ScenarioFeaturesOutputGapData, DbConnections.geoprocessingDB)
+    private readonly gapData: Repository<ScenarioFeaturesOutputGapData>,
   ) {
     super(gapData, 'scenario_features', 'scenario_feature', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -29,10 +29,10 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
   }
 
   setFilters(
-    query: SelectQueryBuilder<ScenarioFeaturesGapData>,
+    query: SelectQueryBuilder<ScenarioFeaturesOutputGapData>,
     filters?: FiltersSpecification['filter'],
     info?: UserSearchCriteria,
-  ): SelectQueryBuilder<ScenarioFeaturesGapData> {
+  ): SelectQueryBuilder<ScenarioFeaturesOutputGapData> {
     const scenarioId = info?.params?.scenarioId;
     if (scenarioId) {
       return query.andWhere(`${this.alias}.scenarioId = :scenarioId`, {
@@ -42,14 +42,13 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
     return query;
   }
 
-  get serializerConfig(): JSONAPISerializerConfig<ScenarioFeaturesGapData> {
+  get serializerConfig(): JSONAPISerializerConfig<ScenarioFeaturesOutputGapData> {
     return {
       attributes: [
         'scenarioId',
         'onTarget',
         'metArea',
         'met',
-        'totalArea',
         'coverageTargetArea',
         'coverageTarget',
       ],

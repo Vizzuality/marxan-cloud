@@ -15,6 +15,7 @@ import { CreateFeaturesHandler } from './create-features.handler';
 import { CopyDataProvider, CopyOperation, CopyQuery } from './copy';
 import { SplitDataProvider, SplitOperation, SplitQuery } from './split';
 import { ScenarioFeaturesGapDataService } from './scenario-features-gap-data.service';
+import { ScenarioFeaturesOutputGapDataService } from './scenario-features-output-gap-data.service';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ScenarioFeaturesGapDataService } from './scenario-features-gap-data.ser
   providers: [
     ScenarioFeaturesService,
     ScenarioFeaturesGapDataService,
+    ScenarioFeaturesOutputGapDataService,
     CreateFeaturesSaga,
     CreateFeaturesHandler,
     CopyQuery,
@@ -39,6 +41,6 @@ import { ScenarioFeaturesGapDataService } from './scenario-features-gap-data.ser
     SplitDataProvider,
     SplitOperation,
   ],
-  exports: [ScenarioFeaturesService, ScenarioFeaturesGapDataService],
+  exports: [ScenarioFeaturesService, ScenarioFeaturesGapDataService, ScenarioFeaturesOutputGapDataService],
 })
 export class ScenarioFeaturesModule {}
