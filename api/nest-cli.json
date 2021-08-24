@@ -151,6 +151,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/geofeature-calculations/tsconfig.lib.json"
       }
+    },
+    "iucn": {
+      "type": "library",
+      "root": "libs/iucn",
+      "entryFile": "index",
+      "sourceRoot": "libs/iucn/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/iucn/tsconfig.lib.json"
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication, Logger } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { tearDown } from './utils/tear-down';
@@ -9,11 +9,11 @@ import { E2E_CONFIG } from './e2e.config';
 import { OrganizationsTestUtils } from './utils/organizations.test.utils';
 import { ProjectsTestUtils } from './utils/projects.test.utils';
 import { ScenariosTestUtils } from './utils/scenarios.test.utils';
-import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 import { bootstrapApplication } from './utils/api-application';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { FeaturesTestUtils } from './utils/features.test.utils';
+import { IUCNCategory } from '@marxan/iucn';
 
 afterAll(async () => {
   await tearDown();
