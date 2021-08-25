@@ -115,7 +115,7 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<ScenarioFeaturesOutputGapData> {
     return {
-      transform: (item: ScenarioFeaturesOutputGapData) => ({ ...item, id: item.featureId }),
+      transform: (item: ScenarioFeaturesOutputGapData) => ({ ...item, id: `${item.featureId}_run${item.runId}` }),
       attributes: [
         'scenarioId',
         'featureId',
