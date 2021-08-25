@@ -99,7 +99,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
               {/* <Button
                 theme="danger"
                 size="base"
-                className="w-full"
+                className="w-1/2"
               >
                 Cancel
               </Button> */}
@@ -108,7 +108,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
                 theme="primary-alt"
                 size="base"
                 href={`/projects/${pid}`}
-                className="w-full"
+                className="w-1/2"
               >
                 Go to project
               </Button>
