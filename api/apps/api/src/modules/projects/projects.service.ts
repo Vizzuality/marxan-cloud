@@ -34,6 +34,10 @@ export class ProjectsService {
   }
 
   async findAll(fetchSpec: FetchSpecification, info?: ProjectsInfoDTO) {
+    return this.projectsCrud.findAllPaginated(fetchSpec, info);
+  }
+
+  async findAllPublic(fetchSpec: FetchSpecification, info?: ProjectsInfoDTO) {
     // /ACL slot/
     return this.projectsCrud.findAllPaginated(fetchSpec, info);
   }
