@@ -18,7 +18,6 @@ import {
 import {
   Project,
   projectResource,
-  ProjectResultPlural,
   ProjectResultSingular,
 } from './project.api.entity';
 
@@ -28,7 +27,6 @@ import {
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -113,40 +111,6 @@ export class ProjectsController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Project> {
     return this.projectsService.importLegacyProject(file);
-  }
-
-  @ApiOperation({
-    description: 'Find all projects',
-  })
-  @ApiOkResponse({ type: ProjectResultPlural })
-  @JSONAPIQueryParams({
-    entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
-    availableFilters: [
-      { name: 'name' },
-      { name: 'organizationId' },
-      { name: 'countryId' },
-      { name: 'adminAreaLevel1Id' },
-      { name: 'adminAreaLevel21Id' },
-    ],
-  })
-  @ApiQuery({
-    name: 'q',
-    required: false,
-    description: `A free search over names`,
-  })
-  @Get()
-  async findAll(
-    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-    @Req() req: RequestWithAuthenticatedUser,
-    @Query('q') namesSearch?: string,
-  ): Promise<ProjectResultPlural> {
-    const results = await this.projectsService.findAll(fetchSpecification, {
-      params: {
-        namesSearch,
-      },
-      authenticatedUser: req.user,
-    });
-    return this.projectSerializer.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find project by id' })
