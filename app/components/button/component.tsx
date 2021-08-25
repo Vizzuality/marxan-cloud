@@ -40,7 +40,7 @@ const SIZE = {
 };
 
 export interface AnchorButtonProps {
-  theme: 'primary' | 'primary-alt' | 'white'| 'secondary' | 'secondary-alt' | 'tertiary' | 'danger' | 'danger-alt' | 'spacial' | 'dark' | 'dark-alt' | 'transparent-black' | 'transparent-white' | 'clear';
+  theme: 'primary' | 'primary-alt' | 'white' | 'secondary' | 'secondary-alt' | 'tertiary' | 'danger' | 'danger-alt' | 'spacial' | 'dark' | 'dark-alt' | 'transparent-black' | 'transparent-white' | 'clear';
   size: 'xs' | 's' | 'base' | 'lg' | 'xl';
   className?: string;
 }
@@ -176,7 +176,7 @@ export const Button: FC<ButtonProps> = ({
 export const LinkButton: Overload = (props: ButtonProps | AnchorProps) => {
   // We consider a link button when href attribute exits
   if (hasHref(props)) {
-    if (props.href.startsWith('http')) {
+    if (props.href?.startsWith('http')) {
       return (
         <Anchor {...props} />
       );
