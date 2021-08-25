@@ -200,6 +200,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
 
         <div className="pt-5">
           <h4 className="mb-2">2. Upload your cost surface</h4>
+
           <div
             {...getRootProps()}
             className={cx({

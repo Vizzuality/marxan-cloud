@@ -17,6 +17,7 @@ import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 import { UploaderProps } from './types';
 
 export const Uploader: React.FC<UploaderProps> = ({
+  caption,
   input,
   form,
   loading,
@@ -58,7 +59,7 @@ export const Uploader: React.FC<UploaderProps> = ({
         size="base"
         onClick={() => setModal(true)}
       >
-        Upload shapefile
+        {caption}
         <Icon className="absolute w-4 h-4 text-white right-6" icon={UPLOAD_SVG} />
       </Button>
       <Modal

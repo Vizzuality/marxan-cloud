@@ -1,4 +1,5 @@
 export interface UploaderProps {
+  caption: string;
   input: any;
   form: any;
   loading: boolean;

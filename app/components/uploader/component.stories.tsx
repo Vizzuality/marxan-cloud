@@ -9,15 +9,31 @@ export default {
   component: Uploader,
   parameters: { actions: { argTypesRegex: '^on.*' } },
   argTypes: {
-    open: {
-      control: {
-        disable: true,
-      },
+    caption: {
+      table: { category: 'UI' },
     },
-    onDismiss: {
+    maxSize: {
+    },
+    multiple: {
+      description: 'If true, it will be possible to upload more than one file',
+    },
+    setSuccessFile: {
       control: {
         disable: true,
       },
+      table: { category: 'Events' },
+    },
+    onDropAccepted: {
+      control: {
+        disable: true,
+      },
+      table: { category: 'Events' },
+    },
+    onDropRejected: {
+      control: {
+        disable: true,
+      },
+      table: { category: 'Events' },
     },
   },
 };
@@ -34,5 +50,5 @@ const Template: Story<UploaderProps> = ({ ...args }: UploaderProps) => {
 
 export const Default: Story<UploaderProps> = Template.bind({});
 Default.args = {
-
+  caption: 'Upload file',
 };

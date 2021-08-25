@@ -111,6 +111,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   return (
     <div className="mt-3 mb-5">
       <Uploader
+        caption="Upload shapefile"
         form={form}
         input={input}
         loading={loading}
