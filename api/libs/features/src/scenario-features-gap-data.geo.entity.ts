@@ -26,7 +26,7 @@ import { FeatureTag } from './domain';
     total_area * coverage_target as coverage_target_area,
     coverage_target,
     met_area >= (total_area * coverage_target) as on_target
-  from gap_data;`
+  from gap_data;`,
 })
 export class ScenarioFeaturesGapData {
   @ApiProperty()

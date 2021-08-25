@@ -8,7 +8,9 @@ export class ScenarioFeaturesGapDataSerializer {
   constructor(private readonly crudService: ScenarioFeaturesGapDataService) {}
 
   async serialize(
-    entities: Partial<ScenarioFeaturesGapData> | (Partial<ScenarioFeaturesGapData> | undefined)[],
+    entities:
+      | Partial<ScenarioFeaturesGapData>
+      | (Partial<ScenarioFeaturesGapData> | undefined)[],
     paginationMeta?: PaginationMeta,
   ): Promise<any> {
     return this.crudService.serialize(entities, paginationMeta);

@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class GapAnalysisViews1629791478000
-  implements MigrationInterface {
+export class GapAnalysisViews1629791478000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
 create view scenario_features_gap_data as
