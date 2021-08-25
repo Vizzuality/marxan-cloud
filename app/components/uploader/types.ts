@@ -4,7 +4,12 @@ export interface UploaderProps {
   loading: boolean;
   maxSize?: number;
   multiple?: boolean;
-  onDropAccepted: () => void;
-  onDropRejected: () => void;
+  successFile: {
+    id: string;
+    name: string;
+  };
+  setSuccessFile: (successFile) => void;
+  onDropAccepted: (acceptedFiles) => void;
+  onDropRejected: (rejectedFiles) => void;
   reset: (form) => void;
 }
