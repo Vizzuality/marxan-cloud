@@ -347,7 +347,7 @@ export class ScenariosController {
 
   @ApiOperation({ description: `Retrieve protection gap data for the features of a scenario.` })
   @ApiOkResponse({
-    type: ScenarioFeaturesData,
+    type: ScenarioFeaturesGapData,
   })
   @Get(':id/features/gap-data')
   async getScenarioFeaturesGapData(
