@@ -291,7 +291,7 @@ export function usePUGridLayer({
       wdpaThreshold = 0,
       puIncludedValue,
       puExcludedValue,
-      features,
+      features = [],
       runId,
       settings = {},
     } = options;

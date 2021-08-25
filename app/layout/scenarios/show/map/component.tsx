@@ -14,6 +14,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
 
 import { useSelectedFeatures } from 'hooks/features';
+import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
   usePUGridLayer, useLegend, useFeaturePreviewLayers,
 } from 'hooks/map';
@@ -45,27 +46,6 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const { data = {} } = useProject(pid);
-  const { bbox } = data;
-
-  const { data: scenarioData } = useScenario(sid);
-
-  const {
-    data: selectedFeaturesData,
-  } = useSelectedFeatures(sid, {});
-
-  const { data: PUData } = useScenarioPU(sid);
-
-  const { included, excluded } = PUData || {};
-
-  const { wdpaIucnCategories, wdpaThreshold } = scenarioData || {};
-
-  const {
-    data: bestSolutionData,
-  } = useBestSolution(sid);
-
-  const bestSolution = bestSolutionData || {};
-
   const scenarioSlice = getScenarioSlice(sid);
   const { setLayerSettings } = scenarioSlice.actions;
 
@@ -77,6 +57,36 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}`]);
 
+  const {
+    data = {},
+  } = useProject(pid);
+  const { bbox } = data;
+
+  const {
+    data: scenarioData,
+  } = useScenario(sid);
+  const { wdpaIucnCategories, wdpaThreshold } = scenarioData || {};
+
+  const {
+    data: selectedFeaturesData,
+  } = useSelectedFeatures(sid, {});
+
+  const {
+    data: PUData,
+  } = useScenarioPU(sid);
+  const { included, excluded } = PUData || {};
+
+  const {
+    data: bestSolutionData,
+  } = useBestSolution(sid);
+  const bestSolution = bestSolutionData || {};
+
+  const {
+    data: allGapAnalysisData,
+  } = useAllGapAnalysis(sid, {
+    enabled: !!sid,
+  });
+
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
@@ -84,6 +94,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
 
   const include = useMemo(() => {
     if (tab === 'protected-areas' || tab === 'features') return 'protection';
+    if (tab === 'analysis' && subtab === 'analysis-preview') return 'protection,features';
     if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return 'features';
     if (tab === 'analysis' && subtab === 'analysis-cost-surface') return 'cost';
     if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return 'lock-status,protection';
@@ -124,6 +135,10 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     return ['pugrid'];
   }, [tab, subtab, wdpaIucnCategories?.length]);
 
+  const featuresIds = useMemo(() => {
+    return allGapAnalysisData.map((g) => g.featureId);
+  }, [allGapAnalysisData]);
+
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
     cache,
@@ -147,6 +162,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       wdpaThreshold,
       puIncludedValue: included,
       puExcludedValue: excluded,
+      features: featuresIds,
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
         pugrid: layerSettings.pugrid,
