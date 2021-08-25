@@ -136,7 +136,10 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   }, [tab, subtab, wdpaIucnCategories?.length]);
 
   const featuresIds = useMemo(() => {
-    return allGapAnalysisData.map((g) => g.featureId);
+    if (allGapAnalysisData) {
+      return allGapAnalysisData.map((g) => g.featureId);
+    }
+    return [];
   }, [allGapAnalysisData]);
 
   const FeaturePreviewLayers = useFeaturePreviewLayers({
