@@ -99,7 +99,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
       <div className="flex flex-col flex-grow w-full min-h-0 overflow-hidden">
         <div className="px-0.5 overflow-x-visible overflow-y-auto">
           <div className="relative flex flex-col w-full mt-1 text-sm">
-            <p className="py-4 opacity-50">Each solution gives an alternative answer to your planning problem. The result of each solution reflects whether a planning unit is selected or not in the conservation network.</p>
+            <p className="py-4 opacity-50">Description Lorem ipsum dolor sit amet, solutions consectetuer adipiscing elit.</p>
             <Button
               theme="primary"
               size="base"
