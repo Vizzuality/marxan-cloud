@@ -32,7 +32,7 @@ import { ScenarioFeaturesGapData } from './scenario-features-gap-data.geo.entity
     sum(amount) >= (sum(total_area) * min(coverage_target)) as on_target,
     run_id
   from gap_data
-  group by run_id, feature_id, scenario_id;`
+  group by run_id, feature_id, scenario_id;`,
 })
 export class ScenarioFeaturesOutputGapData extends ScenarioFeaturesGapData {
   @ApiProperty()

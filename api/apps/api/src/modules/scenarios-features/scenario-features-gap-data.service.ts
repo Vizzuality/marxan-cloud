@@ -53,9 +53,7 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
      * metadata (name, etc.) from apidb.
      */
     const scenarioFeaturesData: ScenarioFeaturesGapData[] = entitiesAndCount[0] as ScenarioFeaturesGapData[];
-    const featureIds: string[] = scenarioFeaturesData.map(
-      (i) => i.featureId,
-    );
+    const featureIds: string[] = scenarioFeaturesData.map((i) => i.featureId);
 
     if (featureIds.length === 0) {
       return entitiesAndCount;
@@ -97,7 +95,10 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<ScenarioFeaturesGapData> {
     return {
-      transform: (item: ScenarioFeaturesGapData) => ({ ...item, id: item.featureId }),
+      transform: (item: ScenarioFeaturesGapData) => ({
+        ...item,
+        id: item.featureId,
+      }),
       attributes: [
         'scenarioId',
         'featureId',
@@ -120,7 +121,6 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
     base: ScenarioFeaturesGapData,
     assign: GeoFeature,
   ): ScenarioFeaturesGapData => {
-
     return {
       ...base,
       featureClassName: assign.featureClassName ?? undefined,

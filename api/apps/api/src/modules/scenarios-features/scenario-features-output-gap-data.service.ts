@@ -13,14 +13,15 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 import { isInt, isPositive } from 'class-validator';
 
-const scenarioFeaturesOutputGapDataFilterKeyNames = [
-  'runId',
-] as const;
+const scenarioFeaturesOutputGapDataFilterKeyNames = ['runId'] as const;
 type ScenarioFeaturesOutputGapDataFilterKeys = keyof Pick<
-ScenarioFeaturesOutputGapData,
+  ScenarioFeaturesOutputGapData,
   typeof scenarioFeaturesOutputGapDataFilterKeyNames[number]
 >;
-type ScenarioFeaturesOutputGapDataBaseFilters = Record<ScenarioFeaturesOutputGapDataFilterKeys, string[]>;
+type ScenarioFeaturesOutputGapDataBaseFilters = Record<
+  ScenarioFeaturesOutputGapDataFilterKeys,
+  string[]
+>;
 
 @Injectable()
 export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
@@ -32,7 +33,10 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
   constructor(
     @InjectRepository(GeoFeature)
     private readonly features: Repository<GeoFeature>,
-    @InjectRepository(ScenarioFeaturesOutputGapData, DbConnections.geoprocessingDB)
+    @InjectRepository(
+      ScenarioFeaturesOutputGapData,
+      DbConnections.geoprocessingDB,
+    )
     private readonly gapData: Repository<ScenarioFeaturesOutputGapData>,
   ) {
     super(gapData, 'scenario_features', 'scenario_feature', {
@@ -45,11 +49,13 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
     filters?: ScenarioFeaturesOutputGapDataBaseFilters,
     info?: UserSearchCriteria,
   ): SelectQueryBuilder<ScenarioFeaturesOutputGapData> {
-    if(filters?.runId) {
-      const runIds = filters.runId.map(i => +i);
-      const invalidRunIds = runIds.filter(i => !(isInt(i) && isPositive(i)));
-      if(invalidRunIds.length > 0) {
-        throw new BadRequestException(`Invalid runId provided as filter value: all runIds must be positive integer values.`);
+    if (filters?.runId) {
+      const runIds = filters.runId.map((i) => +i);
+      const invalidRunIds = runIds.filter((i) => !(isInt(i) && isPositive(i)));
+      if (invalidRunIds.length > 0) {
+        throw new BadRequestException(
+          `Invalid runId provided as filter value: all runIds must be positive integer values.`,
+        );
       }
       query.andWhere(`${this.alias}.runId in (:...runIds)`, { runIds });
     }
@@ -71,9 +77,7 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
      * metadata (name, etc.) from apidb.
      */
     const scenarioFeaturesData: ScenarioFeaturesOutputGapData[] = entitiesAndCount[0] as ScenarioFeaturesOutputGapData[];
-    const featureIds: string[] = scenarioFeaturesData.map(
-      (i) => i.featureId,
-    );
+    const featureIds: string[] = scenarioFeaturesData.map((i) => i.featureId);
 
     if (featureIds.length === 0) {
       return entitiesAndCount;
@@ -115,7 +119,10 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<ScenarioFeaturesOutputGapData> {
     return {
-      transform: (item: ScenarioFeaturesOutputGapData) => ({ ...item, id: `${item.featureId}_run${item.runId}` }),
+      transform: (item: ScenarioFeaturesOutputGapData) => ({
+        ...item,
+        id: `${item.featureId}_run${item.runId}`,
+      }),
       attributes: [
         'scenarioId',
         'featureId',
@@ -139,7 +146,6 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
     base: ScenarioFeaturesOutputGapData,
     assign: GeoFeature,
   ): ScenarioFeaturesOutputGapData => {
-
     return {
       ...base,
       featureClassName: assign.featureClassName ?? undefined,

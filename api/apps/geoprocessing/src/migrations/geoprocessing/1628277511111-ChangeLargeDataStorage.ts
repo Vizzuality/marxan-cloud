@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class ChangeLargeDataStorage1628277511111
-  implements MigrationInterface {
+export class ChangeLargeDataStorage1628277511111 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
     -- Change the storage type
