@@ -349,11 +349,13 @@ export class ScenariosController {
   @ApiOkResponse({
     type: ScenarioFeaturesGapData,
   })
+  @JSONAPISingleEntityQueryParams()
   @Get(':id/features/gap-data')
   async getScenarioFeaturesGapData(
     @Param('id', ParseUUIDPipe) id: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<Partial<ScenarioFeaturesGapData>[]> {
-    const result = await this.scenarioFeaturesGapDataService.findAllPaginated(undefined, {
+    const result = await this.scenarioFeaturesGapDataService.findAllPaginated(fetchSpecification, {
       params: {
         scenarioId: id,
       },
@@ -540,11 +542,13 @@ export class ScenariosController {
   @ApiOkResponse({
     type: ScenarioFeaturesOutputGapData,
   })
+  @JSONAPISingleEntityQueryParams()
   @Get(`${solutionsSubPath}/gap-data`)
   async getScenarioFeaturesOutputGapData(
     @Param('id', ParseUUIDPipe) id: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
-    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(undefined, {
+    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(fetchSpecification, {
       params: {
         scenarioId: id,
       },

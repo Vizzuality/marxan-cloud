@@ -13,6 +13,15 @@ import { AppConfig } from '../../utils/config.utils';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 
+const scenarioFeaturesOutputGapDataFilterKeyNames = [
+  'runId',
+] as const;
+type ScenarioFeaturesOutputGapDataFilterKeys = keyof Pick<
+ScenarioFeaturesOutputGapData,
+  typeof scenarioFeaturesOutputGapDataFilterKeyNames[number]
+>;
+type ScenarioFeaturesOutputGapDataBaseFilters = Record<ScenarioFeaturesOutputGapDataFilterKeys, string[]>;
+
 @Injectable()
 export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
   ScenarioFeaturesOutputGapData,
@@ -33,9 +42,13 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
 
   setFilters(
     query: SelectQueryBuilder<ScenarioFeaturesOutputGapData>,
-    filters?: FiltersSpecification['filter'],
+    filters?: ScenarioFeaturesOutputGapDataBaseFilters,
     info?: UserSearchCriteria,
   ): SelectQueryBuilder<ScenarioFeaturesOutputGapData> {
+    if(filters?.runId) {
+      query.andWhere(`${this.alias}.runId in (:...runId)`, { runId: filters.runId.map(i => +i) });
+    }
+
     const scenarioId = info?.params?.scenarioId;
     if (scenarioId) {
       return query.andWhere(`${this.alias}.scenarioId = :scenarioId`, {
@@ -101,6 +114,7 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
       attributes: [
         'scenarioId',
         'featureId',
+        'runId',
         'onTarget',
         'metArea',
         'met',
