@@ -128,7 +128,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
           }}
         >
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading">Adjust planning units</h4>
+          <h4 className="text-xs uppercase font-heading text-primary-500">Adjust planning units</h4>
         </button>
 
         <InfoButton>

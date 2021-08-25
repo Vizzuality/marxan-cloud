@@ -75,6 +75,7 @@ export const getFixtures = async () => {
           scenarioId,
           (result as Right<string>).right,
           this.input,
+          true,
         ),
       ]);
     },

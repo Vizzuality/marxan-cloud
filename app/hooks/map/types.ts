@@ -1,5 +1,3 @@
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
-
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
 
 export interface UseGeoJSONLayer {
@@ -79,6 +77,7 @@ export interface UsePUGridLayer {
     puIncludedValue?: string[];
     puExcludedValue?: string[];
     runId?: string;
+    features?: string[];
     settings?: {
       pugrid?: {
         opacity?: number;
@@ -113,8 +112,7 @@ export interface UsePUGridLayer {
 }
 
 export interface UseLegend {
-  type: ScenarioSidebarTabs;
-  subtype: ScenarioSidebarSubTabs;
+  layers: string[];
   options?: {
     wdpaIucnCategories?: string[];
     wdpaThreshold?: number;

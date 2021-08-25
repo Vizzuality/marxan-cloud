@@ -20,7 +20,7 @@
       "<rootDir>/../../../libs/utils/src"
     ],
     "^@marxan/utils/(.*)$": [
-      "<rootDir>/../../..//libs/utils/src/$1"
+      "<rootDir>/../../../libs/utils/src/$1"
     ],
     "^@marxan/scenarios-planning-unit": [
       "<rootDir>/../../../libs/scenarios-planning-unit/src"
@@ -53,6 +53,8 @@
     "@marxan/marxan-output": "<rootDir>/../../../libs/marxan-output/src",
     "@marxan/planning-area-repository/(.*)": "<rootDir>/../../../libs/planning-area-repository/src/$1",
     "@marxan/planning-area-repository": "<rootDir>/../../../libs/planning-area-repository/src",
+    "@marxan/planning-unit-protection-level/(.*)": "<rootDir>/../../../libs/planning-unit-protection-level/src/$1",
+    "@marxan/planning-unit-protection-level": "<rootDir>/../../../libs/planning-unit-protection-level/src",
     "@marxan/scenario-puvspr/(.*)": "<rootDir>/../../../libs/scenario-puvspr/src/$1",
     "@marxan/scenario-puvspr": "<rootDir>/../../../libs/scenario-puvspr/src",
     "@marxan/scenario-run-queue/(.*)": "<rootDir>/../../../libs/scenario-run-queue/src/$1",
@@ -60,6 +62,8 @@
     "@marxan/features/(.*)": "<rootDir>/../../../libs/features/src/$1",
     "@marxan/features": "<rootDir>/../../../libs/features/src",
     "@marxan/geofeature-calculations/(.*)": "<rootDir>/../../../libs/geofeature-calculations/src/$1",
-    "@marxan/geofeature-calculations": "<rootDir>/../../../libs/geofeature-calculations/src"
+    "@marxan/geofeature-calculations": "<rootDir>/../../../libs/geofeature-calculations/src",
+    "@marxan/iucn/(.*)": "<rootDir>/../../../libs/iucn/src/$1",
+    "@marxan/iucn": "<rootDir>/../../../libs/iucn/src"
   }
 }

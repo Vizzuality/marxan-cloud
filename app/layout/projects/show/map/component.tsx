@@ -2,7 +2,11 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
+import { useSelector, useDispatch } from 'react-redux';
+
 import { useRouter } from 'next/router';
+
+import { setLayerSettings } from 'store/slices/projects/[id]';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -14,7 +18,6 @@ import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
-import { ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
 
 import Select from 'components/forms/select';
 import Map from 'components/map';
@@ -58,6 +61,13 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     sort: '-lastModifiedAt',
   });
 
+  const {
+    // Settings
+    layerSettings,
+  } = useSelector((state) => state['/projects/[id]']);
+
+  const dispatch = useDispatch();
+
   const sid = useMemo(() => {
     if (selectedSid) return selectedSid;
 
@@ -70,6 +80,15 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     include: 'results',
     sublayers: selectedSid ? ['solutions'] : [],
     options: {
+      settings: {
+        pugrid: layerSettings.pugrid,
+        'wdpa-percentage': layerSettings['wdpa-percentage'],
+        cost: layerSettings.cost,
+        'lock-in': layerSettings['lock-in'],
+        'lock-out': layerSettings['lock-out'],
+        frequency: layerSettings.frequency,
+        solution: layerSettings.solution,
+      },
     },
   });
 
@@ -85,9 +104,10 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const LAYERS = [PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    type: selectedSid ? ScenarioSidebarTabs.SOLUTIONS : null,
-    subtype: null,
-    options: {},
+    layers: selectedSid ? ['frequency', 'solution', 'pugrid'] : ['pugrid'],
+    options: {
+      layerSettings,
+    },
   });
 
   const SCENARIOS_RUNNED = useMemo(() => {
@@ -144,6 +164,21 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
     return null;
   };
+
+  const onChangeOpacity = useCallback((opacity, lid) => {
+    dispatch(setLayerSettings({
+      id: lid,
+      settings: { opacity },
+    }));
+  }, [dispatch]);
+
+  const onChangeVisibility = useCallback((lid) => {
+    const { visibility = true } = layerSettings[lid] || {};
+    dispatch(setLayerSettings({
+      id: lid,
+      settings: { visibility: !visibility },
+    }));
+  }, [dispatch, layerSettings]);
 
   return (
     <AnimatePresence>
@@ -226,11 +261,11 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </Controls>
 
           {/* Legend */}
-          <div className="absolute w-full max-w-xs bottom-10 right-2">
+          <div className="absolute w-full max-w-xs bottom-14 right-5">
             <Legend
               open={open}
               className="w-full"
-              maxHeight={300}
+              maxHeight={325}
               onChangeOpen={() => setOpen(!open)}
             >
               {LEGEND.map((i) => {
@@ -240,6 +275,9 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                   <LegendItem
                     sortable={false}
                     key={i.id}
+                    settingsManager={i.settingsManager}
+                    onChangeOpacity={(opacity) => onChangeOpacity(opacity, i.id)}
+                    onChangeVisibility={() => onChangeVisibility(i.id)}
                     {...i}
                   >
                     {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
@@ -253,7 +291,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </div>
 
           {!!SCENARIOS_RUNNED.length && (
-            <div className="absolute w-full max-w-xs top-10 left-2">
+            <div className="absolute w-full max-w-xs top-5 left-5">
               <Select
                 theme="dark"
                 size="base"

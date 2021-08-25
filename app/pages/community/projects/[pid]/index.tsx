@@ -2,10 +2,10 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-import { usePublishedProject } from 'hooks/projects';
-
 import { withUser } from 'hoc/auth';
 import { withPublishedProject } from 'hoc/projects';
+
+import { usePublishedProject } from 'hooks/projects';
 
 import ProjectDetail from 'layout/community/published-projects/detail';
 import Footer from 'layout/footer';

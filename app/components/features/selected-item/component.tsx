@@ -8,6 +8,10 @@ import Select from 'components/forms/select';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
+import STRAT_1_IMG from 'images/info-buttons/img_strat_1.png';
+import STRAT_2_IMG from 'images/info-buttons/img_strat_2.png';
+import STRAT_3_IMG from 'images/info-buttons/img_strat_3.png';
+
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
@@ -153,14 +157,14 @@ export const Item: React.FC<ItemProps> = ({
                   <h4 className="font-heading text-lg mb-2.5">Split a feature</h4>
                   <div className="space-y-2">
                     <p>
-                      You should split a dataset when you have several
+                      You can split a dataset when you have several
                       features together that you want to treat separately.
                     </p>
                     <p>
-                      For example, if you may want to treat each ecoregion
+                      For example, you may want to treat each ecoregion
                       within a dataset as a separate feature.
                       You will be able to split your dataset
-                      by any of the available attributes in the feature.
+                      by any of its attributes.
                     </p>
                   </div>
                 </span>
@@ -198,23 +202,33 @@ export const Item: React.FC<ItemProps> = ({
                   <h4 className="font-heading text-lg mb-2.5">Intersecting features</h4>
                   <div className="space-y-2">
                     <p>
-                      You may want to intersect two or more features when
-                      you are interested in having a new feature that
-                      combines the information of both.
+                      Stratification is the process of intersecting a
+                      single feature into multiple features. This is
+                      helpful for setting more specific targets for
+                      important features like species distributions,
+                      where you want to replicate and distribute priority
+                      areas more evenly across your planning area.
                     </p>
                     <p>
-                      For example,
-                      you may wish to ensure that Marxan identifies
-                      priority areas for a given feature across a
-                      range of habitats.
+                      For example, if you have a species range across
+                      the landscape and you set a 30% target, it is
+                      possible that the 30% will be met in one type
+                      of ecosystem.
                     </p>
+                    <p>See this example with the Giant Anteater&apos;s range:</p>
+                    <img src={STRAT_1_IMG} alt="Stratification_1" />
+
                     <p>
-                      In
-                      this case you can intersect a species
-                      distribution with a habitat or ecosystem
-                      layer thereby making your species features
-                      ecologically representative.
+                      This is problematic because only one ecosystem is
+                      conserved for the species. In reality,
+                      we want to ensure all important habitats
+                      within the species range benefit from conservation.
+                      To address this, we can &apos;stratify&apos; the species
+                      range by ecosystem and create new features for
+                      setting targets.
                     </p>
+                    <img src={STRAT_2_IMG} alt="Stratification_2" />
+                    <img src={STRAT_3_IMG} alt="Stratification_3" />
                   </div>
 
                 </span>

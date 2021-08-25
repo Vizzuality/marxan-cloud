@@ -11,7 +11,7 @@
   "moduleNameMapper": {
     "@marxan-geoprocessing/(.*)": "<rootDir>/src/$1",
     "^@marxan/utils": ["<rootDir>/../../libs/utils/src"],
-    "^@marxan/utils/(.*)$": ["<rootDir>/../..//libs/utils/src/$1"],
+    "^@marxan/utils/(.*)$": ["<rootDir>/../../libs/utils/src/$1"],
     "^@marxan/scenarios-planning-unit": ["<rootDir>/../../libs/scenarios-planning-unit/src"],
     "^@marxan/scenarios-planning-unit/(.*)$": ["<rootDir>/../../libs/scenarios-planning-unit/src/$1"],
     "^@marxan/admin-regions": ["<rootDir>/../../libs/admin-regions/src"],
@@ -20,6 +20,8 @@
     "^@marxan/api-events/(.*)$": ["<rootDir>/../../libs/api-events/src/$1"],
     "^@marxan-jobs/planning-unit-geometry": ["<rootDir>/../../libs/planning-unit-geometry/src"],
     "^@marxan-jobs/planning-unit-geometry/(.*)$": ["<rootDir>/../../libs/planning-unit-geometry/src/$1"],
+    "^@marxan-jobs/planning-unit-protection-level/(.*)": ["<rootDir>/../../libs/planning-unit-protection-level/src/$1"],
+    "^@marxan-jobs/planning-unit-protection-level": ["<rootDir>/../../libs/planning-unit-protection-level/src"],
     "@marxan/scenario-cost-surface/(.*)": "<rootDir>/../../libs/scenario-cost-surface/src/$1",
     "@marxan/scenario-cost-surface": "<rootDir>/../../libs/scenario-cost-surface/src",
     "@marxan/marxan-input/(.*)": "<rootDir>/../../libs/marxan-input/src/$1",
@@ -33,6 +35,8 @@
     "@marxan/features/(.*)": "<rootDir>/../../libs/features/src/$1",
     "@marxan/features": "<rootDir>/../../libs/features/src",
     "@marxan/geofeature-calculations/(.*)": "<rootDir>/../../libs/geofeature-calculations/src/$1",
-    "@marxan/geofeature-calculations": "<rootDir>/../../libs/geofeature-calculations/src"
+    "@marxan/geofeature-calculations": "<rootDir>/../../libs/geofeature-calculations/src",
+    "@marxan/iucn/(.*)": "<rootDir>/../../libs/iucn/src/$1",
+    "@marxan/iucn": "<rootDir>/../../libs/iucn/src"
   }
 }

@@ -25,7 +25,6 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 import { GeoFeatureSetResult } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
-import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 
 import {
   ApiAcceptedResponse,
@@ -51,7 +50,7 @@ import {
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import { ScenarioFeaturesData } from '@marxan/features';
+import { ScenarioFeaturesData, ScenarioFeaturesGapData, ScenarioFeaturesOutputGapData } from '@marxan/features';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
@@ -72,6 +71,10 @@ import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-s
 import { GeoFeatureSetService } from '../geo-features/geo-feature-set.service';
 import { ScenarioPlanningUnitDto } from './dto/scenario-planning-unit.dto';
 import { isLeft } from 'fp-ts/Either';
+import { ScenarioFeaturesGapDataService } from '../scenarios-features/scenario-features-gap-data.service';
+import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
+import { ScenarioFeaturesOutputGapDataService } from '../scenarios-features/scenario-features-output-gap-data.service';
+import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -86,10 +89,13 @@ const marxanRunFiles = 'Marxan Run - Files';
 export class ScenariosController {
   constructor(
     public readonly service: ScenariosService,
-    private readonly geoFeaturesService: GeoFeaturesService,
+    private readonly scenarioFeaturesGapDataService: ScenarioFeaturesGapDataService,
+    private readonly scenarioFeaturesOutputGapDataService: ScenarioFeaturesOutputGapDataService,
     private readonly geoFeatureSetSerializer: GeoFeatureSetSerializer,
     private readonly geoFeatureSetService: GeoFeatureSetService,
     private readonly scenarioSerializer: ScenarioSerializer,
+    private readonly scenarioFeaturesGapData: ScenarioFeaturesGapDataSerializer,
+    private readonly scenarioFeaturesOutputGapData: ScenarioFeaturesOutputGapDataSerializer,
     private readonly scenarioFeatureSerializer: ScenarioFeatureSerializer,
     private readonly scenarioSolutionSerializer: ScenarioSolutionSerializer,
     private readonly proxyService: ProxyService,
@@ -144,7 +150,7 @@ export class ScenariosController {
     name: 'id',
     description: 'Scenario id',
     type: String,
-    required: false,
+    required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
   @ApiParam({
@@ -174,7 +180,7 @@ export class ScenariosController {
       'one of `protection`, `lock-status`, `features`, `cost`, `results`',
     type: Array,
     required: false,
-    example: 35,
+    example: 'protection',
   })
   @Get(':id/planning-units/tiles/:z/:x/:y.mvt')
   async proxyProtectedAreaTile(
@@ -334,6 +340,25 @@ export class ScenariosController {
   ): Promise<Partial<ScenarioFeaturesData>[]> {
     const result = await this.service.getFeatures(id);
     return this.scenarioFeatureSerializer.serialize(
+      result.data,
+      result.metadata,
+    );
+  }
+
+  @ApiOperation({ description: `Retrieve protection gap data for the features of a scenario.` })
+  @ApiOkResponse({
+    type: ScenarioFeaturesData,
+  })
+  @Get(':id/features/gap-data')
+  async getScenarioFeaturesGapData(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Partial<ScenarioFeaturesGapData>[]> {
+    const result = await this.scenarioFeaturesGapDataService.findAllPaginated(undefined, {
+      params: {
+        scenarioId: id,
+      },
+    });
+    return this.scenarioFeaturesGapData.serialize(
       result.data,
       result.metadata,
     );
@@ -509,6 +534,25 @@ export class ScenariosController {
       fetchSpecification,
     );
     return this.scenarioSolutionSerializer.serialize(result[0]);
+  }
+
+  @ApiOperation({ description: `Retrieve Marxan protection data for the features of a scenario.` })
+  @ApiOkResponse({
+    type: ScenarioFeaturesOutputGapData,
+  })
+  @Get(`${solutionsSubPath}/gap-data`)
+  async getScenarioFeaturesOutputGapData(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
+    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(undefined, {
+      params: {
+        scenarioId: id,
+      },
+    });
+    return this.scenarioFeaturesOutputGapData.serialize(
+      result.data,
+      result.metadata,
+    );
   }
 
   @ApiOkResponse({

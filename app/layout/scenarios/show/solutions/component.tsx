@@ -28,7 +28,7 @@ export const SECTIONS = [
   {
     id: 'gap-analysis',
     name: 'Gap Analysis',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
+    description: 'A gap analysis calculates how much of each feature is under the existing protected area network and then summarises the representation as a percentage.',
   },
 ];
 
@@ -67,10 +67,13 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
               {' '}
               <b>Details</b>
               {' '}
-              you will find each of the
-              individual solutions as a table. You can select
-              here which solution to view on the map and
-              download the results.
+              you will find the information
+              for each of the
+              individual solutions as a table.
+              You can see all solutions or you can
+              filter to see only
+              the 5 most different ones.
+              You can select here which solution to view on the map and download the results.
             </p>
             <p>
               Under
@@ -80,14 +83,6 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
               you can see
               how much your conservation network would improve
               the current conservation of your features.
-            </p>
-            <p>
-              Under
-              {' '}
-              <b>Solutions</b>
-              {' '}
-              you can see each individual
-              solution and it&apos;s details
             </p>
 
           </div>

@@ -10,9 +10,9 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { IUCNCategory } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 import { JobStatus, ScenarioType } from '../scenario.api.entity';
 import { ScenarioMetadataDto } from './scenario-metadata.dto';
+import { IUCNCategory } from '@marxan/iucn';
 
 export class CreateScenarioDTO {
   @ApiProperty()
