@@ -97,6 +97,7 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<ScenarioFeaturesGapData> {
     return {
+      transform: (item: ScenarioFeaturesGapData) => ({ ...item, id: item.featureId }),
       attributes: [
         'scenarioId',
         'featureId',
