@@ -11,18 +11,21 @@ import { motion } from 'framer-motion';
 import { useScenarioStatus } from 'hooks/scenarios';
 
 import Button from 'components/button';
+import Icon from 'components/icon';
+
+import PROCESSING_SVG from 'svgs/ui/processing.svg?sprite';
 
 export interface ScenarioStatusProps {
 }
 
 const TEXTS = {
-  planningAreaProtectedCalculation: () => 'The scenario is calculating the protected areas percentages',
-  specification: () => 'The scenario is processing the features',
-  geofeatureCopy: () => 'The scenario is processing the features',
-  geofeatureSplit: () => 'The scenario is processing the features',
-  geofeatureStrat: () => 'The scenario is processing the features',
-  planningUnitsInclusion: () => 'The scenario is processing the inclusion/exclusion planning units',
-  run: () => 'The scenario is running Marxan',
+  planningAreaProtectedCalculation: () => 'Calculating the protected areas percentages...',
+  specification: () => 'Processing the features...',
+  geofeatureCopy: () => 'Processing the features...',
+  geofeatureSplit: () => 'Processing the features...',
+  geofeatureStrat: () => 'Processing the features...',
+  planningUnitsInclusion: () => 'Processing inclusion/exclusion of planning units...',
+  run: () => 'Running Marxan...',
 };
 
 export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
@@ -82,13 +85,21 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
           initial={{ opacity: 0, y: '-60%', x: '-50%' }}
           animate={{ opacity: 1, y: '-50%', x: '-50%' }}
         >
-          <div className="w-full max-w-md p-10 text-center">
-            {TEXT}
+          <div className="w-full max-w-md p-10 space-y-5 text-center">
+            <h3 className="text-xs tracking-wide uppercase font-heading">{TEXT}</h3>
 
-            <div className="flex justify-center mt-5 space-x-2">
+            <Icon icon={PROCESSING_SVG} className="m-auto" style={{ width: 40, height: 10 }} />
+
+            <p className="text-xs tracking-wide text-center font-heading">
+              This task may take some time.
+              <br />
+              Meanwhile, you can go to the project and do some other stuff.
+            </p>
+            <div className="flex justify-center space-x-2">
               {/* <Button
                 theme="danger"
                 size="base"
+                className="w-full"
               >
                 Cancel
               </Button> */}
@@ -97,6 +108,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
                 theme="primary-alt"
                 size="base"
                 href={`/projects/${pid}`}
+                className="w-full"
               >
                 Go to project
               </Button>
