@@ -21,6 +21,7 @@ import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
 import { PlanningAreasModule } from './planning-areas';
 import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
 import { ProjectsListingController } from './projects-listing.controller';
+import { ProjectDetailsController } from './project-details.controller';
 
 @Module({
   imports: [
@@ -51,7 +52,11 @@ import { ProjectsListingController } from './projects-listing.controller';
    * Order is important due to `GET projects/published` clash with
    * `GET projects/:id`
    */
-  controllers: [ProjectsListingController, ProjectsController],
+  controllers: [
+    ProjectsListingController,
+    ProjectDetailsController,
+    ProjectsController,
+  ],
   exports: [ProjectsCrudService],
 })
 export class ProjectsModule {}
