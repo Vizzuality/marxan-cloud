@@ -1,17 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, /* useEffect, */ useState } from 'react';
 
 import { useDropzone } from 'react-dropzone';
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 
-import {
-  setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
-} from 'store/slices/projects/new';
+// import {
+//   setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
+// } from 'store/slices/projects/new';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
 
-import { useUploadProjectPA } from 'hooks/projects';
-import { useToasts } from 'hooks/toast';
+// import { useUploadProjectPA } from 'hooks/projects';
+// import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -22,108 +22,108 @@ import Modal from 'components/modal';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
-export interface PlanningAreUploaderProps {
-  input: any;
-  form: any;
-  resetPlanningArea: (form) => void;
-}
+import { UploaderProps } from './types';
 
-export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
+export const Uploader: React.FC<UploaderProps> = ({
   input,
   form,
-  resetPlanningArea,
-}: PlanningAreUploaderProps) => {
-  const [loading, setLoading] = useState(false);
+  loading,
+  maxSize = 3000000,
+  multiple = false,
+  onDropAccepted,
+  onDropRejected,
+  reset,
+}: UploaderProps) => {
+  // const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
   const [modal, setModal] = useState(false);
-  const { addToast } = useToasts();
+  // const { addToast } = useToasts();
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  const uploadProjectPAMutation = useUploadProjectPA({
-    requestConfig: {
-      method: 'POST',
-    },
-  });
+  // const uploadProjectPAMutation = useUploadProjectPA({
+  //   requestConfig: {
+  //     method: 'POST',
+  //   },
+  // });
 
-  // Effects
-  useEffect(() => {
-    return () => {
-      input.onChange(null);
-      dispatch(setUploadingPlanningArea(null));
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     input.onChange(null);
+  //     dispatch(setUploadingPlanningArea(null));
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
-  const onDropAccepted = async (acceptedFiles) => {
-    setLoading(true);
-    const f = acceptedFiles[0];
+  // const onDropAccepted = async (acceptedFiles) => {
+  //   setLoading(true);
+  //   const f = acceptedFiles[0];
 
-    const data = new FormData();
-    data.append('file', f);
+  //   const data = new FormData();
+  //   data.append('file', f);
 
-    uploadProjectPAMutation.mutate({ data }, {
-      onSuccess: ({ data: { data: g, id: PAid } }) => {
-        setLoading(false);
-        setSuccessFile({ id: PAid, name: f.name });
-        input.onChange(PAid);
+  //   uploadProjectPAMutation.mutate({ data }, {
+  //     onSuccess: ({ data: { data: g, id: PAid } }) => {
+  //       setLoading(false);
+  //       setSuccessFile({ id: PAid, name: f.name });
+  //       input.onChange(PAid);
 
-        addToast('success-upload-shapefile', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Shapefile uploaded</p>
-          </>
-        ), {
-          level: 'success',
-        });
+  //       addToast('success-upload-shapefile', (
+  //         <>
+  //           <h2 className="font-medium">Success!</h2>
+  //           <p className="text-sm">Shapefile uploaded</p>
+  //         </>
+  //       ), {
+  //         level: 'success',
+  //       });
 
-        dispatch(setUploadingPlanningArea(g));
-        dispatch(setBbox(g.bbox));
-        dispatch(setMinPuAreaSize(g.marxanMetadata.minPuAreaSize));
-        dispatch(setMaxPuAreaSize(g.marxanMetadata.maxPuAreaSize));
+  //       dispatch(setUploadingPlanningArea(g));
+  //       dispatch(setBbox(g.bbox));
+  //       dispatch(setMinPuAreaSize(g.marxanMetadata.minPuAreaSize));
+  //       dispatch(setMaxPuAreaSize(g.marxanMetadata.maxPuAreaSize));
 
-        console.info('Shapefile uploaded', g);
-      },
-      onError: () => {
-        setLoading(false);
-        setSuccessFile(null);
+  //       console.info('Shapefile uploaded', g);
+  //     },
+  //     onError: () => {
+  //       setLoading(false);
+  //       setSuccessFile(null);
 
-        addToast('error-upload-shapefile', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Shapefile could not be uploaded</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  };
+  //       addToast('error-upload-shapefile', (
+  //         <>
+  //           <h2 className="font-medium">Error!</h2>
+  //           <p className="text-sm">Shapefile could not be uploaded</p>
+  //         </>
+  //       ), {
+  //         level: 'error',
+  //       });
+  //     },
+  //   });
+  // };
 
-  const onDropRejected = (rejectedFiles) => {
-    const r = rejectedFiles[0];
-    const { errors } = r;
+  // const onDropRejected = (rejectedFiles) => {
+  //   const r = rejectedFiles[0];
+  //   const { errors } = r;
 
-    addToast('drop-error', (
-      <>
-        <h2 className="font-medium">Error!</h2>
-        <ul className="text-sm">
-          {errors.map((e) => (
-            <li key={`${e.code}`}>{e.message}</li>
-          ))}
-        </ul>
-      </>
-    ), {
-      level: 'error',
-    });
-  };
+  //   addToast('drop-error', (
+  //     <>
+  //       <h2 className="font-medium">Error!</h2>
+  //       <ul className="text-sm">
+  //         {errors.map((e) => (
+  //           <li key={`${e.code}`}>{e.message}</li>
+  //         ))}
+  //       </ul>
+  //     </>
+  //   ), {
+  //     level: 'error',
+  //   });
+  // };
 
   const handleCancel = useCallback(() => {
     setSuccessFile(null);
     input.onChange(null);
-    resetPlanningArea(form);
+    reset(form);
     setModal(false);
-  }, [form, input, resetPlanningArea]);
+  }, [form, input, reset]);
 
   const {
     getRootProps,
@@ -132,8 +132,8 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    multiple: false,
-    maxSize: 3000000,
+    multiple,
+    maxSize,
     onDropAccepted,
     onDropRejected,
   });
@@ -232,7 +232,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                     onClick={() => {
                       setSuccessFile(null);
                       input.onChange(null);
-                      resetPlanningArea(form);
+                      reset(form);
                     }}
                   >
                     <Icon
@@ -270,4 +270,4 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   );
 };
 
-export default PlanningAreUploader;
+export default Uploader;
