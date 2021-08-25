@@ -1,11 +1,12 @@
 import { useMemo, useRef } from 'react';
 
 import {
-  useInfiniteQuery,
+  useInfiniteQuery, useQuery,
 } from 'react-query';
 
 import flatten from 'lodash/flatten';
 
+import { format } from 'd3';
 import { useSession } from 'next-auth/client';
 
 import { ItemProps as RawItemProps } from 'components/gap-analysis/item/component';
@@ -17,6 +18,38 @@ import {
 } from './types';
 
 interface AllItemProps extends RawItemProps {}
+
+export function useAllGapAnalysis(sId, queryOptions) {
+  const [session] = useSession();
+
+  const query = useQuery('all-gap-analysis', async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${sId}/features/gap-data`,
+    params: {
+      disablePagination: true,
+      fields: 'featureId',
+    },
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    placeholderData: {
+      data: [],
+    },
+    ...queryOptions,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
 
 export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
   const placeholderDataRef = useRef({
@@ -83,21 +116,23 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
         const {
           id,
           name,
+          met,
+          metArea,
+          coverageTarget,
+          coverageTargetArea,
         } = d;
-
-        console.log(d);
 
         return {
           id,
           name: name || 'Metadata name',
           current: {
-            percent: 0.5,
-            value: 400,
+            percent: met / 100,
+            value: format('.3s')(metArea / 1000),
             unit: 'km2',
           },
           target: {
-            percent: 0.40,
-            value: 350,
+            percent: coverageTarget / 100,
+            value: format('.3s')(coverageTargetArea / 1000),
             unit: 'km2',
           },
         };
@@ -176,20 +211,23 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
         const {
           id,
           name,
+          met,
+          metArea,
+          coverageTarget,
+          coverageTargetArea,
         } = d;
 
-        // TODO: use data from API
         return {
           id,
-          name,
+          name: name || 'Metadata name',
           current: {
-            percent: 0.5,
-            value: 400,
+            percent: met / 100,
+            value: format('.3s')(metArea / 1000),
             unit: 'km2',
           },
           target: {
-            percent: 0.40,
-            value: 350,
+            percent: coverageTarget / 100,
+            value: format('.3s')(coverageTargetArea / 1000),
             unit: 'km2',
           },
         };

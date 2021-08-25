@@ -291,6 +291,7 @@ export function usePUGridLayer({
       wdpaThreshold = 0,
       puIncludedValue,
       puExcludedValue,
+      features,
       runId,
       settings = {},
     } = options;
@@ -409,7 +410,7 @@ export function usePUGridLayer({
                 'fill-opacity': [
                   'case',
                   ['any',
-                    ...(['69088d67-a699-4080-9c2e-d076540c27e0', '70502e30-b6dd-4e40-8bca-1803a6ad5f5f'].map((id) => {
+                    ...(features.map((id) => {
                       return ['in', id, ['get', 'featureList']];
                     })),
                   ],
