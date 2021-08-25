@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import InfoButton, { InfoButtonProps } from './component';
 
 export default {
@@ -9,7 +11,7 @@ export default {
     size: {
       control: {
         type: 'select',
-        options: ['xs', 's', 'base', 'lg'],
+        options: ['s', 'base', 'lg'],
       },
     },
     theme: {

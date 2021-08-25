@@ -18,13 +18,28 @@ const THEME = {
   },
 };
 
+const SIZE = {
+  icon: {
+    s: 'w-2 h-2',
+    base: 'w-3 h-3',
+    lg: 'w-4 h-4',
+  },
+  button: {
+    s: 'w-4 h-4',
+    base: 'w-5 h-5',
+    lg: 'w-6 h-6',
+  },
+};
+
 export interface InfoButtonProps {
   children: ReactElement;
   theme?: 'primary' | 'secondary'
+  size?: 's' | 'base' | 'lg';
 }
 
 export const InfoButton: React.FC<InfoButtonProps> = ({
   children,
+  size = 'base',
   theme = 'primary',
 }: InfoButtonProps) => (
   <Tooltip
@@ -46,16 +61,17 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
   >
     <button
       className={cx({
-        'flex flex-shrink-0 items-center justify-center w-5 h-5 transition rounded-full bg-opacity-50 focus:outline-none hover:bg-opacity-75 focus:bg-opacity-90': true,
+        'flex flex-shrink-0 items-center justify-center transition rounded-full bg-opacity-50 focus:outline-none hover:bg-opacity-75 focus:bg-opacity-90': true,
         [THEME[theme].button]: true,
+        [SIZE.button[size]]: true,
       })}
       type="button"
     >
       <Icon
         icon={INFO_SVG}
         className={cx({
-          'w-3 h-3': true,
           [THEME[theme].icon]: true,
+          [SIZE.icon[size]]: true,
         })}
       />
     </button>

@@ -245,8 +245,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
       </div>
 
       {/* NEW FEAT */}
-      <div className="mt-3 mb-5 ">
-
+      <div className="mt-3 mb-5">
         <Button
           className="w-full py-1 text-xs cursor-pointer dropzone hover:bg-gray-500"
           theme="secondary"
@@ -255,15 +254,53 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
         >
           Upload shapefile
           <Icon className="absolute w-4 h-4 text-white right-6" icon={UPLOAD_SVG} />
-
         </Button>
         <Modal
-          title="Hello"
           open={modal}
-          size="wide"
+          size="narrow"
           onDismiss={() => setModal(false)}
         >
-          <p className="text-black"> dragger </p>
+
+          <div className="p-9">
+            <h4 className="text-lg text-black font-heading">Upload shapefile</h4>
+
+            <div className="flex items-center space-x-3">
+              <h5 className="text-xs text-gray-400">Supported formats and size</h5>
+              <InfoButton
+                size="s"
+                theme="secondary"
+              >
+                <span>
+                  {' '}
+                  <h4 className="font-heading text-lg mb-2.5">
+                    List of supported file formats:
+                  </h4>
+                  <ul>
+                    Zipped: .shp (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)
+                  </ul>
+                </span>
+              </InfoButton>
+            </div>
+
+            <div className="flex space-x-6">
+              <Button
+                disabled
+                theme="secondary"
+                size="xl"
+                onClick={() => setModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                disabled
+                theme="primary"
+                size="xl"
+                type="submit"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
         </Modal>
 
       </div>
