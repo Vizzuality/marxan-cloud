@@ -40,7 +40,7 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
           }}
         >
           <Icon icon={ARROW_RIGHT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading">GAP ANALYSIS</h4>
+          <h4 className="text-xs uppercase font-heading text-primary-500">Gap analysis</h4>
         </button>
         <InfoButton
           theme="primary"
