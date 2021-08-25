@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, ViewEntity } from 'typeorm';
+import { FeatureTag } from './domain';
 
 @ViewEntity('scenario_features_gap_data', {
   expression: `
@@ -59,4 +60,23 @@ export class ScenarioFeaturesGapData {
   @ApiProperty()
   @Column({ name: 'on_target' })
   onTarget!: boolean;
+
+  // Properties added via extend
+  @ApiPropertyOptional()
+  featureClassName?: string | null;
+
+  @ApiProperty({
+    enum: FeatureTag,
+  })
+  tag!: FeatureTag;
+
+  @ApiPropertyOptional({
+    description: `Name of the feature, for example \`Lion in Deserts\`.`,
+  })
+  name?: string | null;
+
+  @ApiPropertyOptional({
+    description: `Description of the feature.`,
+  })
+  description?: string | null;
 }

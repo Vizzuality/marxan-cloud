@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, ViewEntity } from 'typeorm';
+import { ScenarioFeaturesGapData } from './scenario-features-gap-data.geo.entity';
 
 @ViewEntity('scenario_features_output_gap_data', {
   expression: `
@@ -33,38 +34,10 @@ import { Column, ViewEntity } from 'typeorm';
   from gap_data
   group by run_id, feature_id, scenario_id;`
 })
-export class ScenarioFeaturesOutputGapData {
-  @ApiProperty()
-  @Column({ name: 'scenario_id' })
-  scenarioId!: string;
-
-  @ApiProperty()
-  @Column({ name: 'feature_id' })
-  featureId!: string;
-
-  @ApiProperty()
-  @Column({ name: 'met_area' })
-  metArea!: number;
-
-  @ApiProperty()
-  @Column({ name: 'met' })
-  met!: number;
-
+export class ScenarioFeaturesOutputGapData extends ScenarioFeaturesGapData {
   @ApiProperty()
   @Column({ name: 'met_occurrences' })
   metOccurrences!: number;
-
-  @ApiProperty()
-  @Column({ name: 'coverage_target_area' })
-  coverageTargetArea!: number;
-
-  @ApiProperty()
-  @Column({ name: 'coverage_target' })
-  coverageTarget!: number;
-
-  @ApiProperty()
-  @Column({ name: 'on_target' })
-  onTarget!: boolean;
 
   @ApiProperty()
   @Column({ name: 'run_id' })
