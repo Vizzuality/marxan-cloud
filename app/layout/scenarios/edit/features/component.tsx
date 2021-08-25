@@ -88,7 +88,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
       <HelpBeacon
         id="scenarios-features"
         title="Features"
-        subtitle="Add features to the conservation plan"
+        subtitle="Manage features"
         content={(
           <div className="space-y-2">
             <p>

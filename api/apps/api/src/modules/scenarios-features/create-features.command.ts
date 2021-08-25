@@ -4,6 +4,7 @@ import { FeatureConfigInput } from '@marxan-api/modules/specification';
 export class CreateFeaturesCommand extends Command<void> {
   constructor(
     public readonly scenarioId: string,
+    public readonly specificationId: string,
     public readonly input: FeatureConfigInput,
   ) {
     super();

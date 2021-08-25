@@ -13,9 +13,9 @@ export abstract class SpecificationRepository {
     configuration: FeatureConfigInput,
   ): Promise<Specification[]>;
 
-  abstract transaction(
-    code: (repo: SpecificationRepository) => Promise<Specification[]>,
-  ): Promise<Specification[]>;
+  abstract transaction<T>(
+    code: (repo: SpecificationRepository) => Promise<T>,
+  ): Promise<T>;
 
   abstract getLastUpdated(ids: string[]): Promise<Specification | undefined>;
 }

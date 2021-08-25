@@ -35,7 +35,7 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }:GuideReq
 
         <Icon icon={GUIDE_REQUEST_SVG} className="w-40" />
         <div className="w-72">
-          <p className="text-lg text-center text-gray-600 font-heading">Would you like to follow our guided Marxan workflow?</p>
+          <p className="text-lg text-center text-gray-600 font-heading">Would you like to get some guidance on Marxan&apos;s workflow?</p>
         </div>
         <div className="flex space-x-4 w-72">
 

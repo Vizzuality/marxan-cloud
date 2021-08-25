@@ -115,6 +115,14 @@ export const getFixtures = () => {
         },
       ]);
     },
+    WhenDeterminesFeaturesOnlyForFirstConfig(specification: Specification) {
+      specification.determineFeatures([
+        {
+          ...splitConfig,
+          features: featuresFromSplit,
+        },
+      ]);
+    },
     ThenSpecificationWasNotPublished(specification: Specification) {
       expect(specification.getUncommittedEvents()).toEqual([]);
     },

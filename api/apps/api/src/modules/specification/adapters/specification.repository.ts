@@ -144,9 +144,9 @@ export class DbSpecificationRepository implements SpecificationRepository {
     return;
   }
 
-  transaction(
-    code: (repo: SpecificationRepository) => Promise<Specification[]>,
-  ): Promise<Specification[]> {
+  transaction<T>(
+    code: (repo: SpecificationRepository) => Promise<T>,
+  ): Promise<T> {
     return this.entityManager.transaction((transactionEntityManager) => {
       const transactionalRepository = new DbSpecificationRepository(
         transactionEntityManager.getRepository(SpecificationApiEntity),

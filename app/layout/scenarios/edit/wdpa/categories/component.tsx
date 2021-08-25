@@ -1,4 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
@@ -7,7 +9,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+import { mergeScenarioStatusEditingMetaData } from 'utils/utils-scenarios';
 
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
@@ -38,7 +40,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
   const { pid, sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setWDPACategories } = scenarioSlice.actions;
+  const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
   const { data: projectData } = useProject(pid);
@@ -87,42 +89,66 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     };
   }, [scenarioData?.wdpaIucnCategories]);
 
+  useEffect(() => {
+    const { wdpaThreshold } = scenarioData;
+    if (wdpaThreshold) {
+      dispatch(setWDPAThreshold(wdpaThreshold / 100));
+    }
+  }, [scenarioData]); //eslint-disable-line
+
   // Submit
-  const onSubmit = useCallback((values) => {
-    setSubmitting(true);
+  const onSubmit = useCallback((values, form) => {
+    const { modified } = form.getState();
 
-    mutation.mutate({
-      id: scenarioData?.id,
-      data: {
-        ...values,
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'protected-areas', subtab: 'protected-areas-percentage' }),
-      },
-    }, {
-      onSuccess: () => {
-        setSubmitting(false);
-        addToast('save-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario WDPA saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        onSuccess();
-      },
-      onError: () => {
-        setSubmitting(false);
+    if (modified.wdpaIucnCategories) {
+      setSubmitting(true);
 
-        addToast('error-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario WDPA not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+      mutation.mutate({
+        id: scenarioData?.id,
+        data: {
+          ...values,
+          metadata: mergeScenarioStatusEditingMetaData(
+            metadata,
+            {
+              tab: 'protected-areas',
+              subtab: 'protected-areas-percentage',
+              status: {
+                'protected-areas': 'draft',
+                features: 'empty',
+                analysis: 'empty',
+              },
+            },
+          ),
+        },
+      }, {
+        onSuccess: () => {
+          setSubmitting(false);
+          addToast('save-scenario-wdpa', (
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">Scenario WDPA saved</p>
+            </>
+          ), {
+            level: 'success',
+          });
+          onSuccess();
+        },
+        onError: () => {
+          setSubmitting(false);
+
+          addToast('error-scenario-wdpa', (
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">Scenario WDPA not saved</p>
+            </>
+          ), {
+            level: 'error',
+          });
+        },
+      });
+    } else {
+      onSuccess();
+    }
   }, [mutation, scenarioData?.id, addToast, onSuccess, metadata]);
 
   const onSkip = useCallback(() => {
@@ -132,7 +158,18 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
       id: scenarioData?.id,
       data: {
         wdpaIucnCategories: null,
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
+        metadata: mergeScenarioStatusEditingMetaData(
+          metadata,
+          {
+            tab: 'features',
+            subtab: 'features-preview',
+            status: {
+              'protected-areas': 'draft',
+              features: 'draft',
+              analysis: 'empty',
+            },
+          },
+        ),
       },
     }, {
       onSuccess: () => {

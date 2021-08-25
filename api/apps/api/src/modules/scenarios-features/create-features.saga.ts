@@ -1,7 +1,7 @@
 import { ICommand, ofType, Saga } from '@nestjs/cqrs';
 import { Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { filter, mergeMap } from 'rxjs/operators';
 import { SpecificationCandidateCreated } from '../specification';
 import { CreateFeaturesCommand } from './create-features.command';
 
@@ -13,9 +13,15 @@ export class CreateFeaturesSaga {
   ): Observable<ICommand> => {
     return events$.pipe(
       ofType(SpecificationCandidateCreated),
+      filter((event) => !event.draft),
       mergeMap((event) =>
         event.input.map(
-          (input) => new CreateFeaturesCommand(event.scenarioId, input),
+          (input) =>
+            new CreateFeaturesCommand(
+              event.scenarioId,
+              event.specificationId,
+              input,
+            ),
         ),
       ),
     );
