@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useDropzone } from 'react-dropzone';
 import { useDispatch } from 'react-redux';
@@ -121,6 +121,13 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
       level: 'error',
     });
   };
+
+  const handleCancel = useCallback(() => {
+    setSuccessFile(null);
+    input.onChange(null);
+    resetPlanningArea(form);
+    setModal(false);
+  }, [form, input, resetPlanningArea]);
 
   const {
     getRootProps,
@@ -262,40 +269,75 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
         >
 
           <div className="p-9">
-            <h4 className="text-lg text-black font-heading">Upload shapefile</h4>
+            <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center mb-5 space-x-3">
               <h5 className="text-xs text-gray-400">Supported formats and size</h5>
               <InfoButton
                 size="s"
                 theme="secondary"
               >
-                <span>
+                <span className="text-xs">
                   {' '}
-                  <h4 className="font-heading text-lg mb-2.5">
+                  <h4 className="font-heading mb-2.5">
                     List of supported file formats:
                   </h4>
                   <ul>
-                    Zipped: .shp (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)
+                    Zipped: .shp (zipped shapefiles must include
+                    <br />
+                    .shp, .shx, .dbf, and .prj files)
                   </ul>
                 </span>
               </InfoButton>
             </div>
 
-            <div className="flex space-x-6">
+            <div
+              {...getRootProps()}
+              className={cx({
+                'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted hover:bg-gray-100 cursor-pointer': true,
+                'bg-gray-500': isDragActive,
+                'border-green-800': isDragAccept,
+                'border-red-800': isDragReject,
+              })}
+            >
+
+              <input {...getInputProps()} />
+
+              <p className="text-sm text-center text-gray-300">
+                Drag and drop your polygon data file
+                <br />
+                or
+                {' '}
+                <b>click here</b>
+                {' '}
+                to upload
+              </p>
+
+              <p className="mt-2 text-center text-gray-300 text-xxs">{'Recommended file size < 3 MB'}</p>
+
+              <Loading
+                visible={loading}
+                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                iconClassName="w-5 h-5 text-primary-500"
+              />
+
+            </div>
+
+            <div className="flex justify-center mt-16 space-x-6">
               <Button
-                disabled
+                disabled={!successFile}
                 theme="secondary"
                 size="xl"
-                onClick={() => setModal(false)}
+                onClick={handleCancel}
               >
                 Cancel
               </Button>
               <Button
-                disabled
+                disabled={!successFile}
                 theme="primary"
                 size="xl"
                 type="submit"
+                onClick={() => successFile && setModal(false)}
               >
                 Save
               </Button>
