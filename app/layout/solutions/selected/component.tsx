@@ -15,16 +15,19 @@ export interface SelectedSolutionProps {
     missingValues: number,
     planningUnits: number,
   };
-  selectedSolutionOnMap?: boolean;
-  onToggleSelectedSolutionOnMap?: (onMap: boolean) => void;
+  settings?: {
+    visibility: boolean,
+  }
+  onChangeVisibility?: () => void;
 }
 
 export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
-  best = false, values, selectedSolutionOnMap, onToggleSelectedSolutionOnMap,
+  best = false, values, settings, onChangeVisibility,
 }: SelectedSolutionProps) => {
   const {
     runId, scoreValue, costValue, missingValues, planningUnits,
   } = values;
+  const { visibility = true } = settings || {};
 
   return (
     <div className="w-full">
@@ -48,10 +51,10 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
         <button
           type="button"
           className="flex items-center justify-between flex-shrink-0 px-2 py-1 text-xs text-white border border-transparent focus:border-white rounded-4xl"
-          onClick={() => onToggleSelectedSolutionOnMap(!selectedSolutionOnMap)}
+          onClick={onChangeVisibility}
         >
-          {selectedSolutionOnMap ? 'Hide from map' : 'View on map'}
-          <Icon icon={selectedSolutionOnMap ? HIDE_SVG : SHOW_SVG} className="w-5 h-6 ml-3" />
+          {visibility ? 'View on map' : 'Hide from map'}
+          <Icon icon={visibility ? SHOW_SVG : HIDE_SVG} className="w-5 h-6 ml-3" />
         </button>
       </div>
       <div className="grid grid-cols-2 pt-5 pl-1 pr-32 text-sm text-white gap-y-6 gap-x-5">

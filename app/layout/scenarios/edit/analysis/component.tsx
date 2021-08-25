@@ -108,7 +108,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
               </li>
             </ol>
           </div>
-         )}
+        )}
         modifiers={['flip']}
         tooltipPlacement="left"
       >
@@ -130,11 +130,11 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
               </header>
 
               {!section && (
-              <Sections
-                key="sections"
-                sections={SECTIONS}
-                onChangeSection={onChangeSection}
-              />
+                <Sections
+                  key="sections"
+                  sections={SECTIONS}
+                  onChangeSection={onChangeSection}
+                />
               )}
 
               {section === 'gap-analysis' && (
@@ -160,20 +160,20 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
             </Pill>
 
             {!section && (
-            <motion.div
-              key="run-scenario-button"
-              className="flex justify-center flex-shrink-0 mt-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <Button
-                theme="spacial"
-                size="lg"
-                onClick={() => setRunOpen(true)}
+              <motion.div
+                key="run-scenario-button"
+                className="flex justify-center flex-shrink-0 mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
               >
-                Run scenario
-              </Button>
-            </motion.div>
+                <Button
+                  theme="spacial"
+                  size="lg"
+                  onClick={() => setRunOpen(true)}
+                >
+                  Run scenario
+                </Button>
+              </motion.div>
             )}
           </AnimatePresence>
 

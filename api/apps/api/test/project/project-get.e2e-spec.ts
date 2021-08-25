@@ -19,45 +19,6 @@ beforeAll(async () => {
   }
 });
 
-describe(`When getting all projects`, () => {
-  it(`should return relevant data`, async () => {
-    const currentProjects = [
-      world.projectWithCountry,
-      world.projectWithGid1,
-      world.projectWithGid2,
-    ];
-    const response = await request(app.getHttpServer())
-      .get(`/api/v1/projects?disablePagination=true`)
-      .set('Authorization', `Bearer ${jwtToken}`)
-      .expect(200);
-
-    const testProjects = response.body.data.filter((project: any) =>
-      currentProjects.includes(project.id),
-    );
-
-    expect(
-      testProjects.map((project: any) =>
-        pick(project.attributes, ['planningAreaId', 'planningAreaName']),
-      ),
-    ).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "planningAreaId": "NAM",
-          "planningAreaName": "Namibia",
-        },
-        Object {
-          "planningAreaId": "NAM.13_1",
-          "planningAreaName": "Zambezi",
-        },
-        Object {
-          "planningAreaId": "NAM.13.5_1",
-          "planningAreaName": "Linyandi",
-        },
-      ]
-    `);
-  });
-});
-
 describe(`When getting a single project`, () => {
   it(`should return its details`, async () => {
     const response = await request(app.getHttpServer())

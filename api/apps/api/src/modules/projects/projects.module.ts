@@ -19,6 +19,7 @@ import { JobStatusSerializer } from './dto/job-status.serializer';
 import { JobStatusService } from './job-status/job-status.service';
 import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
 import { PlanningAreasModule } from './planning-areas';
+import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
 
 @Module({
   imports: [
@@ -27,7 +28,11 @@ import { PlanningAreasModule } from './planning-areas';
     PlanningAreasModule,
     GeoFeaturesModule,
     forwardRef(() => ScenariosModule),
-    TypeOrmModule.forFeature([Project, ScenarioJobStatus]),
+    TypeOrmModule.forFeature([
+      Project,
+      ScenarioJobStatus,
+      UsersProjectsApiEntity,
+    ]),
     UsersModule,
     PlanningUnitsModule,
     ProtectedAreasModule,

@@ -61,6 +61,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   }).some((c) => !!c);
 
   const { opacity = 1, visibility = true } = settings || {};
+
   const { format } = useNumberFormatter({
     style: 'percent',
   });

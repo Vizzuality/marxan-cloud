@@ -137,12 +137,14 @@ export class ProjectsController {
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Req() req: RequestWithAuthenticatedUser,
     @Query('q') namesSearch?: string,
   ): Promise<ProjectResultPlural> {
     const results = await this.projectsService.findAll(fetchSpecification, {
       params: {
         namesSearch,
       },
+      authenticatedUser: req.user,
     });
     return this.projectSerializer.serialize(results.data, results.metadata);
   }

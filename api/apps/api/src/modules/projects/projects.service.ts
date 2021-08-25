@@ -11,6 +11,7 @@ import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { PlanningAreasService } from './planning-areas';
+import { assertDefined } from '@marxan/utils';
 
 export { validationFailed } from './planning-areas';
 
@@ -44,8 +45,13 @@ export class ProjectsService {
 
   // TODO debt: shouldn't use API's DTO - avoid relating service to given access layer (Rest)
   async create(input: CreateProjectDTO, info: AppInfoDTO) {
-    // /ACL slot - can?/
-    return this.projectsCrud.create(input, info);
+    assertDefined(info.authenticatedUser);
+    const project = await this.projectsCrud.create(input, info);
+    await this.projectsCrud.assignCreatorRole(
+      project.id,
+      info.authenticatedUser.id,
+    );
+    return project;
   }
 
   async update(projectId: string, input: UpdateProjectDTO) {
