@@ -1,7 +1,6 @@
 import { In, Repository, SelectQueryBuilder } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FiltersSpecification } from 'nestjs-base-service';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -12,6 +11,7 @@ import { UserSearchCriteria } from './search-criteria';
 import { AppConfig } from '../../utils/config.utils';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
+import { isInt, isPositive } from 'class-validator';
 
 const scenarioFeaturesOutputGapDataFilterKeyNames = [
   'runId',
@@ -46,7 +46,12 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
     info?: UserSearchCriteria,
   ): SelectQueryBuilder<ScenarioFeaturesOutputGapData> {
     if(filters?.runId) {
-      query.andWhere(`${this.alias}.runId in (:...runId)`, { runId: filters.runId.map(i => +i) });
+      const runIds = filters.runId.map(i => +i);
+      const invalidRunIds = runIds.filter(i => !(isInt(i) && isPositive(i)));
+      if(invalidRunIds.length > 0) {
+        throw new BadRequestException(`Invalid runId provided as filter value: all runIds must be positive integer values.`);
+      }
+      query.andWhere(`${this.alias}.runId in (:...runIds)`, { runIds });
     }
 
     const scenarioId = info?.params?.scenarioId;
