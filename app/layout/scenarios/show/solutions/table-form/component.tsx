@@ -55,16 +55,16 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   const {
     data: mostDifSolutionsData,
-    isFetching: mostDifSolutionsisFetching,
-    isFetched: mostDifSolutionsisFetched,
+    isFetching: mostDifSolutionsAreFetching,
+    isFetched: mostDifSolutionsAreFetched,
   } = useMostDifferentSolutions(sid);
 
-  const allSolutionsFetched = solutionsAreFetched || isFetchingNextPage;
+  const allSolutionsFetched = solutionsAreFetched || mostDifSolutionsAreFetched;
 
-  const noSolutionResults = (!solutionsAreFetching && !solutionsData.length)
-    || (!mostDifSolutionsisFetched && !mostDifSolutionsData.length);
+  const noSolutionResults = (solutionsAreFetched && !solutionsData.length)
+    || (mostDifSolutionsAreFetched && !mostDifSolutionsData.length);
 
-  const solutionsAreLoading = solutionsAreFetching || mostDifSolutionsisFetching;
+  const solutionsAreLoading = solutionsAreFetching || mostDifSolutionsAreFetching;
 
   const scrollRef = useBottomScrollListener(
     () => {
