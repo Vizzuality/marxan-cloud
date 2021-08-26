@@ -15,7 +15,7 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
   return (
     <div className="relative text-gray-800 bg-primary-50">
       <Wrapper>
-        <div className="w-full max-w-5xl py-10 m-auto md:py-36">
+        <div className="relative z-10 w-full max-w-5xl py-10 m-auto md:py-36">
           <div className="lg:pr-96">
             <h1
               className="pb-8 text-5xl font-semibold leading-tight"
@@ -52,7 +52,7 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
       </Wrapper>
 
       <Media greaterThanOrEqual="lg">
-        <div className="absolute top-0 left-0 w-full h-full">
+        <div className="absolute top-0 left-0 z-0 w-full h-full">
           <Wrapper>
             <div className="relative flex justify-end flex-shrink-0 w-full top-14">
               <img
