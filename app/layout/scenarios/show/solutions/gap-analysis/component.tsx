@@ -2,9 +2,6 @@ import React, { useState, useCallback } from 'react';
 
 import { motion } from 'framer-motion';
 
-import List from 'layout/scenarios/show/analysis/gap-analysis/list';
-import Toolbar from 'layout/scenarios/show/analysis/gap-analysis/toolbar';
-
 import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
@@ -12,6 +9,8 @@ import InfoButton from 'components/info-button';
 // Icons
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
+import List from './list';
+import Toolbar from './toolbar';
 import { ScenariosSolutionsGapAnalysisProps } from './types';
 
 export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalysisProps> = ({
@@ -40,7 +39,7 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
           }}
         >
           <Icon icon={ARROW_RIGHT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading">GAP ANALYSIS</h4>
+          <h4 className="text-xs uppercase font-heading text-primary-500">Gap analysis</h4>
         </button>
         <InfoButton
           theme="primary"

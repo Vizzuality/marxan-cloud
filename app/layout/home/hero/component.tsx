@@ -12,23 +12,23 @@ export interface HomeHeroProps {
 
 export const HomeHero: React.FC<HomeHeroProps> = () => {
   return (
-    <div className="bg-primary-50 text-gray-800">
+    <div className="relative text-gray-800 bg-primary-50">
       <Wrapper>
-        <div className="flex gap-48">
-          <div className="w-full py-26 pl-32">
+        <div className="w-full max-w-5xl m-auto py-36">
+          <div className="lg:pr-96">
             <h1
-              className="pb-8 font-semibold leading-tight text-5xl"
+              className="pb-8 text-5xl font-semibold leading-tight"
             >
               Spatial conservation planning in the cloud
             </h1>
 
-            <p className="">
+            <p className="pr-40">
               This platform supports decision-making for biodiversity
               {' '}
               and people on land, freshwater and ocean systems.
             </p>
 
-            <div className="flex mt-18 space-x-4">
+            <div className="flex space-x-4 mt-18">
               <Button
                 className="w-40"
                 theme="dark"
@@ -47,7 +47,12 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
               </Button>
             </div>
           </div>
-          <div className="flex-shrink-0 relative top-14">
+        </div>
+      </Wrapper>
+
+      <div className="absolute top-0 left-0 w-full h-full">
+        <Wrapper>
+          <div className="relative flex justify-end flex-shrink-0 w-full top-14">
             <img
               alt=""
               src={HERO_IMAGE}
@@ -58,8 +63,8 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
               }}
             />
           </div>
-        </div>
-      </Wrapper>
+        </Wrapper>
+      </div>
     </div>
   );
 };

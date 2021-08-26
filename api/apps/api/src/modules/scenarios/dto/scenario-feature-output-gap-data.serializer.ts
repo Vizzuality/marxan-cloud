@@ -5,10 +5,14 @@ import { ScenarioFeaturesOutputGapData } from '@marxan/features';
 
 @Injectable()
 export class ScenarioFeaturesOutputGapDataSerializer {
-  constructor(private readonly crudService: ScenarioFeaturesOutputGapDataService) {}
+  constructor(
+    private readonly crudService: ScenarioFeaturesOutputGapDataService,
+  ) {}
 
   async serialize(
-    entities: Partial<ScenarioFeaturesOutputGapData> | (Partial<ScenarioFeaturesOutputGapData> | undefined)[],
+    entities:
+      | Partial<ScenarioFeaturesOutputGapData>
+      | (Partial<ScenarioFeaturesOutputGapData> | undefined)[],
     paginationMeta?: PaginationMeta,
   ): Promise<any> {
     return this.crudService.serialize(entities, paginationMeta);

@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := seed-data
 
 
-seed-data: seed-gadm seed-wdpa seed-demo-features-species seed-demo-features-bioregion
+seed-data: seed-wdpa seed-demo-features-species
 
 seed-gadm:
 	@echo "Starting seeding gadm data... "
@@ -21,9 +21,9 @@ seed-ecosystems:
 
 seed-demo-features-species:
 	@echo "Starting seeding features from demo data... "
-	@time $(MAKE) -C ./demo_data_features_bioregion import
+	@time $(MAKE) -C ./demo_data_features_species import
 
 seed-demo-features-bioregion:
 	@echo "Starting seeding features from demo data... "
-	@time $(MAKE) -C ./demo_data_features_species import
+	@time $(MAKE) -C ./demo_data_features_bioregion import
 
