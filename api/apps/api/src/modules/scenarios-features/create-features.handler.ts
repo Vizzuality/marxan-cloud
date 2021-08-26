@@ -31,6 +31,7 @@ export class CreateFeaturesHandler
       case SpecificationOperation.Copy: {
         const ids = await this.copyOperation.copy({
           scenarioId: command.scenarioId,
+          specificationId: command.specificationId,
           input: command.input,
         });
         this.eventBus.publish(
@@ -43,7 +44,8 @@ export class CreateFeaturesHandler
       }
       case SpecificationOperation.Split: {
         const ids = await this.splitOperation.split({
-          ...command,
+          scenarioId: command.scenarioId,
+          specificationId: command.specificationId,
           input: command.input,
         });
         this.eventBus.publish(

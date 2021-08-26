@@ -20,6 +20,8 @@ import { CopyDataProvider, CopyOperation, CopyQuery } from './copy';
 import { SplitDataProvider, SplitOperation, SplitQuery } from './split';
 import { ScenarioFeaturesGapDataService } from './scenario-features-gap-data.service';
 import { ScenarioFeaturesOutputGapDataService } from './scenario-features-output-gap-data.service';
+import { MoveDataFromPreparationSaga } from './move-data-from-preparation.saga';
+import { MoveDataFromPreparationHandler } from './move-data-from-preparation.handler';
 
 @Module({
   imports: [
@@ -49,6 +51,8 @@ import { ScenarioFeaturesOutputGapDataService } from './scenario-features-output
     SplitQuery,
     SplitDataProvider,
     SplitOperation,
+    MoveDataFromPreparationSaga,
+    MoveDataFromPreparationHandler,
   ],
   exports: [
     ScenarioFeaturesService,
