@@ -25,6 +25,12 @@ test(`'created' specification determines features with some being non calculated
   fixtures.ThenSpecificationIsPublished(specification);
 });
 
+test(`'created' specification determines features with all being calculated for only one config`, () => {
+  const specification = fixtures.GivenCandidateWasCreated();
+  fixtures.WhenDeterminesFeaturesOnlyForFirstConfig(specification);
+  fixtures.ThenSpecificationWasNotCalculated(specification);
+});
+
 test(`'created' specification determines features with all being calculated`, () => {
   const specification = fixtures.GivenCandidateWasCreated();
   fixtures.WhenDeterminesFeatures(specification, true);

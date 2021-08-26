@@ -9,6 +9,7 @@ import { IsString, IsArray, IsIn, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
+import { string } from 'fp-ts';
 
 interface SelectionsProperties {
   attributes: string;
@@ -21,11 +22,11 @@ interface IncludeSelections {
   [key: string]: SelectionsProperties;
 }
 
-const includeSelections: IncludeSelections = {
+let includeSelections: IncludeSelections = {
   protection: {
     attributes: ', "percentageProtected"',
     select:
-      'round((test.protected_area/plan.area)::numeric*100)::int as "percentageProtected"',
+      'round((COALESCE(test.protected_area, 0)/plan.area)::numeric*100)::int as "percentageProtected"',
   },
   'lock-status': {
     attributes: ', "lockinStatus"',
@@ -40,7 +41,7 @@ const includeSelections: IncludeSelections = {
   },
   cost: {
     attributes: ', "costValue"',
-    select: 'cost as "costValue"',
+    select: 'COALESCE(cost,1) as "costValue"',
     table: 'scenarios_pu_cost_data',
     alias: 'cost',
     condition: 'test.id = cost.scenarios_pu_data_id',
@@ -48,7 +49,7 @@ const includeSelections: IncludeSelections = {
   results: {
     attributes: ', "frequencyValue", "valuePosition"',
     select: `'-'||array_to_string(array_positions(output.value, true),'-,-')||'-' as "valuePosition", \
-          round((output.included_count/array_length(output.value, 1))::numeric*100)::int as "frequencyValue"`,
+          round((output.included_count/array_length(output.value, 1)::numeric)*100)::int as "frequencyValue"`,
     table: 'output_scenarios_pu_data',
     alias: 'output',
     condition: 'test.id = output.scenario_pu_id',
@@ -98,14 +99,12 @@ export class ScenariosService {
        'valuePosition,featureList' as "parseKeys"`,
       _filters,
     );
-
-    this.logger.debug(attributes);
     /**
      * @todo: avoid sql injection in the scenario Id.
      * @todo: provide features id array
      * @todo: provide results/output data
      */
-    const sql = this.selectJoins(
+    const sql = this.selectJoins(id,
       this.ScenariosPlanningUnitGeoEntityRepository.createQueryBuilder('test')
         .addSelect('plan.the_geom')
         .leftJoin('planning_units_geom', 'plan', `test.pu_geom_id = plan.id`)
@@ -130,6 +129,7 @@ export class ScenariosService {
    * @returns qB
    */
   private selectJoins(
+    id: string,
     qB: SelectQueryBuilder<ScenariosPuPaDataGeo>,
     _filters?: ScenariosPUFilters,
   ): SelectQueryBuilder<ScenariosPuPaDataGeo> {

@@ -1,11 +1,11 @@
 name: Product e2e Tests
 
 on:
-  push:
-    branches:
-      - develop
-  schedule:
-    - cron: '0 7 * * *'
+  # push:
+  #   branches:
+  #     - develop
+  # schedule:
+  #   - cron: '0 7 * * *'
   workflow_dispatch:
 
 jobs:

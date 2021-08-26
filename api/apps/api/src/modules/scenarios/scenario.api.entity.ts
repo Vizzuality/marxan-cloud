@@ -9,11 +9,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { IUCNCategory } from '@marxan/iucn';
 import { User } from '../users/user.api.entity';
 import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
-import { IUCNCategory } from '../protected-areas/protected-area.geo.entity';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 
 export const scenarioResource: BaseServiceResource = {
@@ -92,7 +92,10 @@ export class Scenario extends TimeUserEntityMetadata {
   @ApiPropertyOptional()
   @Column('varchar', { name: 'wdpa_iucn_categories', array: true })
   wdpaIucnCategories?: IUCNCategory[];
-
+  /** */
+  @ApiPropertyOptional()
+  @Column('varchar', { name: 'custom_protected_area_ids', array: true })
+  customProtectedAreaIds?: string[];
   /**
    * List of ids of protected areas associated to the scenario.
    */

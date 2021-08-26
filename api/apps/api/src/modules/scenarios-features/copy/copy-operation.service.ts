@@ -5,7 +5,6 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { FeatureConfigCopy } from '@marxan-api/modules/specification';
-import { CreateFeaturesCommand } from '../create-features.command';
 import { CopyQuery } from './copy-query.service';
 import { CopyDataProvider } from './copy-data-provider.service';
 
@@ -19,11 +18,12 @@ export class CopyOperation {
     private readonly events: ApiEventsService,
   ) {}
 
-  async copy(
-    command: CreateFeaturesCommand & { input: FeatureConfigCopy },
-  ): Promise<{ id: string }[]> {
+  async copy(data: {
+    scenarioId: string;
+    input: FeatureConfigCopy;
+  }): Promise<{ id: string }[]> {
     await this.events.create({
-      topic: command.scenarioId,
+      topic: data.scenarioId,
       kind: API_EVENT_KINDS.scenario__geofeatureCopy__submitted__v1__alpha1,
     });
     try {
@@ -31,9 +31,9 @@ export class CopyOperation {
         project,
         protectedAreaFilterByIds,
         planningAreaLocation,
-      } = await this.copyDataProvider.prepareData(command);
+      } = await this.copyDataProvider.prepareData(data);
       const { parameters, query } = this.copyQuery.prepareStatement(
-        command,
+        data,
         planningAreaLocation,
         protectedAreaFilterByIds,
         project,
@@ -43,13 +43,13 @@ export class CopyOperation {
         parameters,
       );
       await this.events.create({
-        topic: command.scenarioId,
+        topic: data.scenarioId,
         kind: API_EVENT_KINDS.scenario__geofeatureCopy__finished__v1__alpha1,
       });
       return ids;
     } catch (error) {
       await this.events.create({
-        topic: command.scenarioId,
+        topic: data.scenarioId,
         kind: API_EVENT_KINDS.scenario__geofeatureCopy__failed__v1__alpha1,
       });
       throw error;

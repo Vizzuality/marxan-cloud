@@ -37,9 +37,11 @@ import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.ser
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { AdminAreasModule } from '../admin-areas/admin-areas.module';
-import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from './planning-units/scenario-planning-units-protection-status-calculator-service';
+import { ProtectionStatusModule } from '@marxan/scenarios-planning-unit';
 
 import { SpecificationModule } from './specification';
+import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
+import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
 
 @Module({
   imports: [
@@ -57,6 +59,7 @@ import { SpecificationModule } from './specification';
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],
       DbConnections.geoprocessingDB,
     ),
+    ProtectionStatusModule.for(DbConnections.geoprocessingDB),
     UsersModule,
     ScenarioFeaturesModule,
     AnalysisModule,
@@ -76,9 +79,10 @@ import { SpecificationModule } from './specification';
     WdpaAreaCalculationService,
     ScenarioPlanningUnitsService,
     ScenarioPlanningUnitsLinkerService,
-    ScenarioPlanningUnitsProtectedStatusCalculatorService,
     ScenarioSerializer,
     ScenarioFeatureSerializer,
+    ScenarioFeaturesGapDataSerializer,
+    ScenarioFeaturesOutputGapDataSerializer,
     SolutionResultCrudService,
     ScenarioSolutionSerializer,
     MarxanInput,

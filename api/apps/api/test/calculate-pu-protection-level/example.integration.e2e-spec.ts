@@ -24,10 +24,11 @@ afterAll(async () => {
 
 describe(`when requesting update`, () => {
   const scenarioId = v4();
+  const protectedAreaFilterByIds = [v4()];
   beforeEach(async () => {
     // could have the whole setup of seeds etc and shoot to API
     await commandBus.execute(
-      new CalculatePlanningUnitsProtectionLevel(scenarioId),
+      new CalculatePlanningUnitsProtectionLevel(scenarioId, protectedAreaFilterByIds),
     );
   });
 

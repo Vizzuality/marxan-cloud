@@ -28,7 +28,7 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
   }, [minPuAreaSize]);
 
   return (
-    <div className="mt-6">
+    <div>
       <div className="flex items-center">
         <Label theme="dark" className="mr-2 uppercase text-xxs">Planning unit area size</Label>
         <InfoButton>

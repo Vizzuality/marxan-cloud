@@ -16,7 +16,9 @@ export class ScenarioPlanningUnitSerializer {
       units.map((unit) => ({
         id: unit.id,
         inclusionStatus: unit.lockStatus,
-        defaultStatus: LockStatus.Unstated, // TODO https://vizzuality.atlassian.net/browse/MARXAN-584
+        defaultStatus: unit.protectedByDefault
+          ? LockStatus.LockedIn
+          : LockStatus.Unstated,
       })),
     );
   }

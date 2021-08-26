@@ -10,4 +10,6 @@ export enum JobType {
   GeoprocessingCopy = 'scenario.geofeatureCopy',
   GeoprocessingSplit = 'scenario.geofeatureSplit',
   GeoprocessingStratification = 'scenario.geofeatureStratification',
+  Specification = 'scenario.specification',
+  PlanningUnitPACalculation = 'scenario.planningAreaProtectedCalculation',
 }

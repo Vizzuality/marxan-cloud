@@ -27,7 +27,7 @@ export class ScenarioFeaturesData {
 
   @Column({ name: 'current_pa' })
   /**
-   *  total area of the feature in the study area
+   *  total area of the feature which is protected within the study area
    */
   currentArea!: number;
 

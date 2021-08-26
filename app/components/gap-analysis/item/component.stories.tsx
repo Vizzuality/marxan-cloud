@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import Item, { ItemProps } from './component';
 
 export default {
@@ -18,12 +20,12 @@ Default.args = {
   name: 'Lion in Deserts and Xeric Shrublands',
   current: {
     percent: 0.05,
-    value: 22,
+    value: '22M',
     unit: 'km²',
   },
   target: {
     percent: 0.17,
-    value: 30,
+    value: '30M',
     unit: 'km²',
   },
   onMap: false,

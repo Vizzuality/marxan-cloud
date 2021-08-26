@@ -29,9 +29,9 @@ export class InMemorySpecificationRepo implements SpecificationRepository {
     return Object.keys(this.#memory).length;
   }
 
-  async transaction(
-    execute: (repo: InMemorySpecificationRepo) => Promise<Specification[]>,
-  ): Promise<Specification[]> {
+  async transaction<T>(
+    execute: (repo: InMemorySpecificationRepo) => Promise<T>,
+  ): Promise<T> {
     return execute(this);
   }
 

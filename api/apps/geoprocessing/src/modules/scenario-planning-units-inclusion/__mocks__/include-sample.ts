@@ -228,6 +228,7 @@ export type AreaUnitSampleGeometryProps = {
   [k in ForCase]: {
     shouldBeExcluded: boolean;
     shouldBeIncluded: boolean;
+    protectedByDefault?: boolean;
   };
 };
 
@@ -495,6 +496,7 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: false,
+          protectedByDefault: true,
         },
         multipleFeatures: {
           shouldBeExcluded: false,

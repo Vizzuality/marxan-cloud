@@ -26,7 +26,10 @@ export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => 
           .catch((err) => {
             if (!(
               err instanceof FlickingError
-              && err.code === ERROR_CODE.ANIMATION_ALREADY_PLAYING
+              && (
+                err.code === ERROR_CODE.ANIMATION_ALREADY_PLAYING
+                || err.code === ERROR_CODE.ANIMATION_INTERRUPTED
+              )
             )) {
               throw err;
             }
@@ -45,7 +48,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => 
     >
       <div
         role="presentation"
-        className="bg-black rounded-3xl overflow-hidden"
+        className="overflow-hidden bg-black rounded-3xl"
         style={{
           boxShadow: '0px 50px 50px rgba(0, 0, 0, 0.5)',
         }}

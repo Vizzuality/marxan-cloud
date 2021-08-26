@@ -5,7 +5,6 @@ import { assertDefined } from '@marxan/utils';
 import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { CreateFeaturesCommand } from '../create-features.command';
 
 @Injectable()
 export class CopyDataProvider {
@@ -15,16 +14,16 @@ export class CopyDataProvider {
     private readonly projects: ProjectsCrudService,
   ) {}
 
-  async prepareData(
-    command: CreateFeaturesCommand,
-  ): Promise<{
+  async prepareData(data: {
+    scenarioId: string;
+  }): Promise<{
     protectedAreaFilterByIds: string[];
     planningAreaLocation: { id: string; tableName: string } | undefined;
     project: Project;
   }> {
     const scenario = await this.apiEntityManager
       .getRepository(Scenario)
-      .findOne(command.scenarioId, {
+      .findOne(data.scenarioId, {
         relations: ['project'],
       });
     assertDefined(scenario);

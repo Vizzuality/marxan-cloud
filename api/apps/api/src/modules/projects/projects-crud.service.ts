@@ -1,7 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { isDefined } from '@marxan/utils';
+import { assertDefined, isDefined } from '@marxan/utils';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
@@ -23,6 +22,9 @@ import {
   MultiplePlanningAreaIds,
   PlanningAreasService,
 } from './planning-areas';
+import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
+import { Roles } from '@marxan-api/modules/users/role.api.entity';
+import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
 const projectFilterKeyNames = [
   'name',
@@ -48,7 +50,7 @@ export class ProjectsCrudService extends AppBaseService<
   Project,
   CreateProjectDTO,
   UpdateProjectDTO,
-  AppInfoDTO
+  ProjectsInfoDTO
 > {
   constructor(
     @InjectRepository(Project)
@@ -63,6 +65,8 @@ export class ProjectsCrudService extends AppBaseService<
     @Inject(PlanningUnitsService)
     private readonly planningUnitsService: PlanningUnitsService,
     private readonly planningAreasService: PlanningAreasService,
+    @InjectRepository(UsersProjectsApiEntity)
+    private readonly userProjects: Repository<UsersProjectsApiEntity>,
   ) {
     super(repository, 'project', 'projects', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -122,7 +126,7 @@ export class ProjectsCrudService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<Project>,
     filters: ProjectFilters,
-    _info?: AppInfoDTO,
+    _info?: ProjectsInfoDTO,
   ): SelectQueryBuilder<Project> {
     this._processBaseFilters<ProjectFilters>(
       query,
@@ -134,8 +138,9 @@ export class ProjectsCrudService extends AppBaseService<
 
   async setDataCreate(
     create: CreateProjectDTO,
-    info?: AppInfoDTO,
+    info?: ProjectsInfoDTO,
   ): Promise<Project> {
+    assertDefined(info?.authenticatedUser?.id);
     /**
      * @debt Temporary setup. I think we should remove TimeUserEntityMetadata
      * from entities and just use a separate event log, and a view to obtain the
@@ -143,7 +148,7 @@ export class ProjectsCrudService extends AppBaseService<
      * modified) from that log, kind of event sourcing way.
      */
     const project = await super.setDataCreate(create, info);
-    project.createdBy = info?.authenticatedUser?.id!;
+    project.createdBy = info.authenticatedUser?.id;
     project.planningAreaGeometryId = create.planningAreaId;
 
     const bbox = await this.planningAreasService.getPlanningAreaBBox({
@@ -157,10 +162,20 @@ export class ProjectsCrudService extends AppBaseService<
     return project;
   }
 
+  async assignCreatorRole(projectId: string, userId: string): Promise<void> {
+    await this.userProjects.save(
+      this.userProjects.create({
+        projectId,
+        userId,
+        roleName: Roles.project_owner,
+      }),
+    );
+  }
+
   async actionAfterCreate(
     model: Project,
     createModel: CreateProjectDTO,
-    _info?: AppInfoDTO,
+    _info?: ProjectsInfoDTO,
   ): Promise<void> {
     if (
       createModel.planningUnitAreakm2 &&
@@ -186,7 +201,7 @@ export class ProjectsCrudService extends AppBaseService<
   async actionAfterUpdate(
     model: Project,
     createModel: UpdateProjectDTO,
-    _info?: AppInfoDTO,
+    _info?: ProjectsInfoDTO,
   ): Promise<void> {
     /**
      * @deprecated Workers and jobs should be move to the new functionality
@@ -213,7 +228,7 @@ export class ProjectsCrudService extends AppBaseService<
   async setDataUpdate(
     model: Project,
     update: UpdateProjectDTO,
-    _?: AppInfoDTO,
+    _?: ProjectsInfoDTO,
   ): Promise<Project> {
     const bbox = await this.planningAreasService.getPlanningAreaBBox({
       ...update,
@@ -232,7 +247,7 @@ export class ProjectsCrudService extends AppBaseService<
   async extendGetByIdResult(
     entity: Project,
     _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
+    _info?: ProjectsInfoDTO,
   ): Promise<Project> {
     const ids: MultiplePlanningAreaIds = entity;
     const idAndName = await this.planningAreasService.getPlanningAreaIdAndName(
@@ -245,12 +260,48 @@ export class ProjectsCrudService extends AppBaseService<
     return entity;
   }
 
+  extendGetByIdQuery(
+    query: SelectQueryBuilder<Project>,
+    fetchSpecification?: FetchSpecification,
+    info?: ProjectsInfoDTO,
+  ): SelectQueryBuilder<Project> {
+    const loggedUser = Boolean(info?.authenticatedUser);
+    query.leftJoin(
+      UsersProjectsApiEntity,
+      `acl`,
+      `${this.alias}.id = acl.project_id`,
+    );
+
+    if (loggedUser) {
+      query
+        .andWhere(`acl.user_id = :userId`, {
+          userId: info?.authenticatedUser?.id,
+        })
+        .andWhere(`acl.role_id = :roleId`, {
+          roleId: Roles.project_owner,
+        });
+    } else {
+      query.andWhere(`${this.alias}.is_public = true`);
+    }
+
+    return query;
+  }
+
   async extendFindAllQuery(
     query: SelectQueryBuilder<Project>,
     fetchSpecification: FetchSpecification,
     info?: ProjectsInfoDTO,
   ): Promise<SelectQueryBuilder<Project>> {
+    const loggedUser = Boolean(info?.authenticatedUser);
+
     const { namesSearch } = info?.params ?? {};
+
+    query.leftJoin(
+      UsersProjectsApiEntity,
+      `acl`,
+      `${this.alias}.id = acl.project_id`,
+    );
+
     if (namesSearch) {
       const nameSearchFilterField = 'nameSearchFilter' as const;
       query.leftJoin(
@@ -272,13 +323,40 @@ export class ProjectsCrudService extends AppBaseService<
       );
     }
 
+    if (loggedUser) {
+      query
+        .andWhere(`acl.user_id = :userId`, {
+          userId: info?.authenticatedUser?.id,
+        })
+        .andWhere(`acl.role_id = :roleId`, {
+          roleId: Roles.project_owner,
+        });
+    } else {
+      query.andWhere(`${this.alias}.is_public = true`);
+    }
+
     return query;
+  }
+
+  /**
+   * Could be that entity-relations in codebase are wrong
+   * https://github.com/typeorm/typeorm/blob/master/docs/many-to-many-relations.md#many-to-many-relations-with-custom-properties
+   *
+   * Thus, when using `remove(EntityInstance)` it complains on missing
+   * `user_id`.
+   *
+   * `delete` seems to omit code-declarations and use db's cascades
+   */
+  async remove(id: string): Promise<void> {
+    await this.repository.delete({
+      id,
+    });
   }
 
   async extendFindAllResults(
     entitiesAndCount: [Project[], number],
     _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
+    _info?: ProjectsInfoDTO,
   ): Promise<[Project[], number]> {
     const extendedEntities: Promise<Project>[] = entitiesAndCount[0].map(
       (entity) => this.extendGetByIdResult(entity),

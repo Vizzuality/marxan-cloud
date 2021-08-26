@@ -83,7 +83,7 @@ export const Table: React.FC<TableProps> = ({
                 <div className="flex items-center">
                   {header.label}
                   {headerSelected?.id === header.id
-                  && <Icon icon={headerSelected.order === Direction.DESC ? ARROW_DOWN_SVG : ARROW_UP_SVG} className="w-4 h-4 pl-2" />}
+                    && <Icon icon={headerSelected.order === Direction.DESC ? ARROW_DOWN_SVG : ARROW_UP_SVG} className="w-4 h-4 pl-2" />}
                 </div>
               </th>
             );
@@ -99,9 +99,9 @@ export const Table: React.FC<TableProps> = ({
             <tr
               key={row.id}
               className={cx({
-                'bg-gray-100': !rowIsSelected && (rowIndex + 1) % 2 === 0,
+                'bg-gray-100 bg-opacity-50': !rowIsSelected && (rowIndex + 1) % 2 === 0,
                 'bg-white': !rowIsSelected && (rowIndex + 1) % 2 === 1,
-                'bg-primary-500': rowIsSelected,
+                'bg-primary-300 bg-opacity-30': rowIsSelected,
               })}
             >
               {
