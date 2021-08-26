@@ -104,7 +104,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const LAYERS = [PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    layers: selectedSid ? ['frequency', 'solution', 'pugrid'] : ['pugrid'],
+    layers: selectedSid ? ['frequency', 'pugrid'] : ['pugrid'],
     options: {
       layerSettings,
     },

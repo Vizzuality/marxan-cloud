@@ -28,6 +28,7 @@ export function useAllGapAnalysis(sId, queryOptions) {
     params: {
       disablePagination: true,
       fields: 'featureId',
+      omitFields: 'featureClassName,tag',
     },
     headers: {
       Authorization: `Bearer ${session.accessToken}`,

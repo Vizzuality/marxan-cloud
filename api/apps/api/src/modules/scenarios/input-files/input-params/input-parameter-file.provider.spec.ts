@@ -225,6 +225,7 @@ async function getFixtures() {
           createdBy: '',
           countryId: '',
           bbox: [0, 0, 0, 0, 0, 0],
+          isPublic: false,
         },
         status: JobStatus.done,
         type: ScenarioType.marxanWithZones,

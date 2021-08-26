@@ -92,7 +92,7 @@ export class Scenario extends TimeUserEntityMetadata {
   @ApiPropertyOptional()
   @Column('varchar', { name: 'wdpa_iucn_categories', array: true })
   wdpaIucnCategories?: IUCNCategory[];
-/** */
+  /** */
   @ApiPropertyOptional()
   @Column('varchar', { name: 'custom_protected_area_ids', array: true })
   customProtectedAreaIds?: string[];
