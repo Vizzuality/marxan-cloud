@@ -3,6 +3,8 @@ import { Geometry } from 'geojson';
 import { Column, Entity, PrimaryColumn, ViewEntity } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 
+import { GeometrySource } from './geometry-source.enum';
+
 export const geoFeatureResource: BaseServiceResource = {
   className: 'GeoFeature',
   name: {
@@ -11,14 +13,6 @@ export const geoFeatureResource: BaseServiceResource = {
   },
   moduleControllerPrefix: 'geo-features',
 };
-
-export enum SourceType {
-  user_imported = 'user_imported',
-  gbif = 'gbif',
-  iucn = 'iucn',
-  ecoregions = 'ecoregions',
-  intersection = 'intersection',
-}
 
 @Entity('features_data')
 export class GeoFeatureGeometry {
@@ -32,8 +26,11 @@ export class GeoFeatureGeometry {
   @Column('jsonb')
   properties?: Record<string, string | number>;
 
-  @Column('enum')
-  source?: SourceType;
+  @Column(`enum`, {
+    enum: GeometrySource,
+    nullable: true,
+  })
+  source?: GeometrySource | null;
 
   @ApiProperty()
   @Column('uuid', { name: 'feature_id' })
