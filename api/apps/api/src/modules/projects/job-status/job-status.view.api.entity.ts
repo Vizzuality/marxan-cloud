@@ -1,4 +1,5 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
+import { isDefined } from '@marxan/utils';
 import { JobType } from '@marxan-api/modules/projects/job-status/jobs.enum';
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import {
@@ -62,7 +63,8 @@ export class ScenarioJobStatus {
   get publicEventData(): { fractionalProgress: number } | undefined {
     const data: KnownEventsData | undefined = this.data;
     if (
-      data &&
+      isDefined(data) &&
+      typeof data === 'object' &&
       'kind' in data &&
       data.kind === API_EVENT_KINDS.scenario__run__progress__v1__alpha1
     ) {
