@@ -8,7 +8,6 @@ import type { AppProps } from 'next/app';
 import { OverlayProvider } from '@react-aria/overlays';
 import { Provider as AuthenticationProvider } from 'next-auth/client';
 import PlausibleProvider from 'next-plausible';
-import { ReactQueryDevtools } from 'react-query/devtools';
 import { Hydrate } from 'react-query/hydration';
 import store from 'store';
 
@@ -28,7 +27,6 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
   return (
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClientRef.current}>
-        <ReactQueryDevtools />
         <Hydrate state={pageProps.dehydratedState}>
           <AuthenticationProvider
             session={pageProps.session}
