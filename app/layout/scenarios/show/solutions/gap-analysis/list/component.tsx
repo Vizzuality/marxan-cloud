@@ -1,11 +1,16 @@
 import React from 'react';
 
+import { useSelector } from 'react-redux';
+
 import { useRouter } from 'next/router';
+
+import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import cx from 'classnames';
 
 import { usePostGapAnalysis } from 'hooks/gap-analysis';
 import useBottomScrollListener from 'hooks/scroll';
+import { useBestSolution } from 'hooks/solutions';
 
 import Item from 'components/gap-analysis/item';
 import Loading from 'components/loading';
@@ -20,6 +25,14 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
   const { query } = useRouter();
   const { sid } = query;
 
+  getScenarioSlice(sid);
+
+  const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}`]);
+
+  const {
+    data: bestSolutionData,
+  } = useBestSolution(sid);
+
   const {
     data: allFeaturesData,
     fetchNextPage: allFeaturesfetchNextPage,
@@ -29,6 +42,9 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
     isFetched: allFeaturesIsFetched,
   } = usePostGapAnalysis(sid, {
     search,
+    filters: {
+      runId: selectedSolution?.runId || bestSolutionData?.runId,
+    },
   });
 
   const scrollRef = useBottomScrollListener(
