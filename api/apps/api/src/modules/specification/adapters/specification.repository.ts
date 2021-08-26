@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
+import { keyBy } from 'lodash';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
@@ -13,6 +14,8 @@ import { SpecificationFeatureApiEntity } from './specification-feature.api.entit
 
 @Injectable()
 export class DbSpecificationRepository implements SpecificationRepository {
+  private inTransaction = false;
+
   constructor(
     @InjectRepository(SpecificationApiEntity)
     private readonly specificationRepo: Repository<SpecificationApiEntity>,
@@ -54,12 +57,13 @@ export class DbSpecificationRepository implements SpecificationRepository {
     } else {
       builder.andWhere(`config.against_feature_id is null`);
     }
-    const specIds = await builder.getRawMany<{
-      spec_id: string;
-    }>();
-    const specifications = await this.specificationRepo.findByIds(
-      specIds.map((row) => row.spec_id),
-    );
+    const specIds = (
+      await builder.getRawMany<{
+        spec_id: string;
+      }>()
+    ).map((row) => row.spec_id);
+
+    const specifications = await this.findByIdsWithLock(specIds);
 
     return specifications.map((specification) =>
       this.#serialize(specification),
@@ -87,7 +91,7 @@ export class DbSpecificationRepository implements SpecificationRepository {
         spec_id: string;
       }>();
 
-    const specifications = await this.specificationRepo.findByIds(
+    const specifications = await this.findByIdsWithLock(
       specIds.map((row) => row.spec_id),
     );
 
@@ -156,6 +160,7 @@ export class DbSpecificationRepository implements SpecificationRepository {
         transactionEntityManager.getRepository(SpecificationFeatureApiEntity),
         transactionEntityManager,
       );
+      transactionalRepository.inTransaction = true;
       return code(transactionalRepository);
     });
   }
@@ -198,4 +203,48 @@ export class DbSpecificationRepository implements SpecificationRepository {
         ) ?? [],
     });
   };
+
+  private async findByIdsWithLock(specIds: string[]) {
+    const lock = this.inTransaction
+      ? { mode: 'pessimistic_write' as const }
+      : undefined;
+    const specifications = await this.specificationRepo.findByIds(specIds, {
+      lock,
+      loadEagerRelations: false,
+    });
+
+    const specificationLookup = keyBy(
+      specifications,
+      (specification) => specification.id,
+    );
+
+    const configs = await this.specificationFeatureConfigRepo.find({
+      where: { specificationId: In(specIds) },
+      lock,
+      loadEagerRelations: false,
+    });
+
+    const configLookup = keyBy(configs, (config) => config.id);
+
+    const features = await this.specificationFeatureRepo.find({
+      where: {
+        specificationFeatureConfigId: In(configs.map((config) => config.id)),
+      },
+      lock,
+      loadEagerRelations: false,
+    });
+
+    for (const feature of features) {
+      const config = configLookup[feature.specificationFeatureConfigId];
+      config.features ??= [];
+      config.features.push(feature);
+    }
+
+    for (const config of configs) {
+      const specification = specificationLookup[config.specificationId];
+      specification.specificationFeaturesConfiguration ??= [];
+      specification.specificationFeaturesConfiguration.push(config);
+    }
+    return specifications;
+  }
 }
