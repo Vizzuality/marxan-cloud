@@ -5,7 +5,7 @@ import { Job } from 'bullmq';
 import { FakeGeometryExtractor } from './__mocks__/geometry-extractor';
 import { createJob } from './__mocks__/job';
 
-import { ShapefileService } from '../../shapefiles/shapefiles.service';
+import { ShapefileService } from '@marxan/shapefile-converter';
 import { ProtectedAreaProcessor } from './protected-area-processor';
 import { GeometryExtractor } from './geometry-extractor';
 import { ProtectedAreasJobInput } from './worker-input';

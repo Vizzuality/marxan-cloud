@@ -108,6 +108,12 @@
       ],
       "@marxan/iucn/*": [
         "libs/iucn/src/*"
+      ],
+      "@marxan/shapefile-converter": [
+        "libs/shapefile-converter/src"
+      ],
+      "@marxan/shapefile-converter/*": [
+        "libs/shapefile-converter/src/*"
       ]
     }
   },

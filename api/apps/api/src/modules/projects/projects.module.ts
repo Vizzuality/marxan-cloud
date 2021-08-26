@@ -11,7 +11,6 @@ import { CountriesModule } from '@marxan-api/modules/countries/countries.module'
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
 import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
-import { ShapefilesModule } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.module';
 import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
 import { ProjectsService } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
@@ -23,6 +22,7 @@ import { PlanningAreasModule } from './planning-areas';
 import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
 import { ProjectsListingController } from './projects-listing.controller';
 import { ProjectDetailsController } from './project-details.controller';
+import { ShapefilesModule } from '@marxan/shapefile-converter';
 
 @Module({
   imports: [

@@ -160,6 +160,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/iucn/tsconfig.lib.json"
       }
+    },
+    "shapefile-converter": {
+      "type": "library",
+      "root": "libs/shapefile-converter",
+      "entryFile": "index",
+      "sourceRoot": "libs/shapefile-converter/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shapefile-converter/tsconfig.lib.json"
+      }
     }
   }
 }

@@ -52,10 +52,10 @@ import { JobStatusSerializer } from './dto/job-status.serializer';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
-import { ShapefileService } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.service';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { ShapefileService } from '@marxan/shapefile-converter';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -216,7 +216,7 @@ export class ProjectsController {
   @ApiOkResponse({ type: ShapefileUploadResponse })
   @Post(`:id/features/shapefile`)
   @UseInterceptors(
-    FileInterceptor('shapefile', {
+    FileInterceptor('file', {
       ...uploadOptions,
       limits: {
         fileSize: (() =>

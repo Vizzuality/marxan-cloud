@@ -4,7 +4,7 @@ import { Job } from 'bullmq';
 
 import { WorkerProcessor } from '../../worker';
 import { ProtectedAreasJobInput } from './worker-input';
-import { ShapefileService } from '../../shapefiles/shapefiles.service';
+import { ShapefileService } from '@marxan/shapefile-converter';
 import { ProtectedArea } from '../protected-areas.geo.entity';
 import { GeoJSON } from 'geojson';
 import { GeometryExtractor } from './geometry-extractor';
