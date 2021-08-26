@@ -82,7 +82,7 @@ export const getFixtures = async () => {
     },
     ThenSpecificationIsActivated: () => {
       expect(events).toEqual([
-        new SpecificationActivated(currentCandidateSpecificationId),
+        new SpecificationActivated(scenarioId, currentCandidateSpecificationId),
       ]);
     },
     ThenSpecificationIsNotActivated: async (

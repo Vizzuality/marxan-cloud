@@ -52,6 +52,7 @@ export const getFixtures = () => {
         expect(result.right).toEqual(void 0);
         expect(scenarioSpecification.getUncommittedEvents()).toEqual([
           new SpecificationActivated(
+            scenarioSpecification.scenarioId,
             scenarioSpecification.currentActiveSpecification!,
           ),
         ]);
