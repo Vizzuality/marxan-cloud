@@ -80,7 +80,13 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
               </div>
 
-              {arrow && <Arrow data-popper-arrow="" {...attrs} className={arrowClassName} />}
+              {arrow && (
+                <Arrow
+                  className={arrowClassName}
+                  data-popper-arrow=""
+                  {...attrs}
+                />
+              )}
             </div>
           </motion.div>
         );

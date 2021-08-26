@@ -40,12 +40,7 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
       <td className="">
         <div className="flex flex-row justify-between pl-10">
           <p className="w-6 text-sm">{timesDuplicated && (format('.3s')(timesDuplicated))}</p>
-          <ComingSoon
-            className={{
-              arrow: 'bg-gray-500',
-              box: 'text-red-500 bg-gray-500',
-            }}
-          >
+          <ComingSoon theme="dark">
             <DuplicateButton
               id={id}
               name={name}

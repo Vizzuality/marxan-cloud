@@ -7,18 +7,25 @@ import cx from 'classnames';
 
 import Tooltip from 'components/tooltip';
 
+const THEME = {
+  dark: {
+    base: 'px-4 py-1.5 text-xs text-white bg-gray-500 rounded',
+    arrow: 'bg-gray-500',
+  },
+  light: {
+    base: 'px-4 py-1.5 text-xs text-gray-500 bg-white rounded',
+    arrow: 'bg-white',
+  },
+};
 export interface ComingSoonProps {
   children: ReactElement;
-  className?: {
-    arrow?: string;
-    box?: string;
-  }
   placement?: string;
+  theme?: 'dark' | 'light';
 }
 
 export const ComingSoon: React.FC<ComingSoonProps> = ({
   children,
-  className,
+  theme = 'light',
 }: ComingSoonProps) => {
   const childrenRef = useRef(null);
 
@@ -30,15 +37,14 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
     <Tooltip
       arrow
       arrowClassName={cx({
-        [className?.arrow]: !!className?.arrow,
+        [THEME[theme].arrow]: true,
       })}
       placement="bottom"
       maxWidth={350}
       content={(
         <div
           className={cx({
-            'px-4 py-1.5 text-xs text-gray-500 bg-white rounded': true,
-            [className?.box]: !!className?.box,
+            [THEME[theme].base]: true,
           })}
         >
           <span>Feature coming soon!</span>
