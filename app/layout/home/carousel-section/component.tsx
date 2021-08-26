@@ -60,7 +60,7 @@ export const HomeCarousel: React.FC<HomeCarouselProps> = () => {
       </Media>
 
       <Wrapper>
-        <div className="relative flex justify-center w-full max-w-4xl pb-8 md:px-10 md:-top-8">
+        <div className="relative flex justify-center w-full max-w-4xl pb-8 m-auto md:px-10 md:-top-8">
           {!!imgs.length && (
             <Carousel
               images={imgs}
