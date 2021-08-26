@@ -32,7 +32,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
                 </div>
               );
             })}
-            <div className="w-full mt-20 place-self-center">
+            <div className="w-full md:mt-20 place-self-center">
               <ButtonLink caption="Explore planning Examples" href="/community/projects" />
             </div>
           </div>
