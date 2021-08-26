@@ -8,7 +8,16 @@ import Arrow from './arrow';
 import { TooltipProps } from './types';
 
 export const Tooltip: React.FC<TooltipProps> = ({
-  children, content, arrow, interactive, maxWidth, maxHeight, onHide, onMount, ...props
+  children,
+  content,
+  arrow,
+  arrowClassName,
+  interactive,
+  maxWidth,
+  maxHeight,
+  onHide,
+  onMount,
+  ...props
 }: TooltipProps) => {
   const tooltipRef = useRef(null);
   const springConfig: SpringOptions = { damping: 15, stiffness: 300 };
@@ -71,7 +80,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
               </div>
 
-              {arrow && <Arrow data-popper-arrow="" {...attrs} />}
+              {arrow && <Arrow data-popper-arrow="" {...attrs} className={arrowClassName} />}
             </div>
           </motion.div>
         );

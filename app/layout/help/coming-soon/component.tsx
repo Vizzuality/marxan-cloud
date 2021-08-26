@@ -3,18 +3,22 @@ import React, {
   useRef,
 } from 'react';
 
-import type { Placement } from '@popperjs/core';
+import cx from 'classnames';
 
 import Tooltip from 'components/tooltip';
 
 export interface ComingSoonProps {
   children: ReactElement;
-  placement?: Placement;
+  className?: {
+    arrow?: string;
+    box?: string;
+  }
+  placement?: string;
 }
 
 export const ComingSoon: React.FC<ComingSoonProps> = ({
   children,
-  placement = 'bottom',
+  className,
 }: ComingSoonProps) => {
   const childrenRef = useRef(null);
 
@@ -23,24 +27,30 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
   });
 
   return (
-    <>
-      <Tooltip
-        arrow
-        placement={placement}
-        maxWidth={350}
-        content={(
-          <div className="px-4 py-1.5 text-xs text-gray-500 bg-white rounded">
-            <span>Feature coming soon!</span>
-          </div>
-        )}
-      >
-        <div className="opacity-60">
-          <div className="pointer-events-none">
-            {CHILDREN}
-          </div>
+    <Tooltip
+      arrow
+      arrowClassName={cx({
+        [className?.arrow]: !!className?.arrow,
+      })}
+      placement="bottom"
+      maxWidth={350}
+      content={(
+        <div
+          className={cx({
+            'px-4 py-1.5 text-xs text-gray-500 bg-white rounded': true,
+            [className?.box]: !!className?.box,
+          })}
+        >
+          <span>Feature coming soon!</span>
         </div>
-      </Tooltip>
-    </>
+      )}
+    >
+      <div className="opacity-60">
+        <div className="pointer-events-none">
+          {CHILDREN}
+        </div>
+      </div>
+    </Tooltip>
   );
 };
 
