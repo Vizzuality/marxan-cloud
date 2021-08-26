@@ -1,7 +1,7 @@
 export interface UploaderProps {
   caption: string;
-  input: any;
-  form: any;
+  input?: any;
+  form?: any;
   loading: boolean;
   maxSize?: number;
   multiple?: boolean;

@@ -1,10 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
-
 import { useRouter } from 'next/router';
 
-import cx from 'classnames';
 import { motion } from 'framer-motion';
 
 import { useDownloadCostSurface, useUploadCostSurface } from 'hooks/scenarios';
@@ -13,7 +10,7 @@ import { useToasts } from 'hooks/toast';
 import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
-import Loading from 'components/loading';
+import Uploader from 'components/uploader';
 
 import COST_LAND_IMG from 'images/info-buttons/img_cost_surface_marine.png';
 import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
@@ -28,9 +25,12 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
   onChangeSection,
 }: ScenariosCostSurfaceProps) => {
   const [loading, setLoading] = useState(false);
+  const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
   const { query } = useRouter();
   const { sid } = query;
+
+  const uploadingMaxSize = 1000000;
 
   const downloadMutation = useDownloadCostSurface({});
   const uploadMutation = useUploadCostSurface({
@@ -96,6 +96,10 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     });
   };
 
+  const resetCustomArea = () => {
+
+  };
+
   const onDropRejected = (rejectedFiles) => {
     const r = rejectedFiles[0];
     const { errors } = r;
@@ -113,16 +117,6 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
       level: 'error',
     });
   };
-
-  const {
-    getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject,
-  } = useDropzone({
-    // accept: 'image/*',
-    multiple: false,
-    maxSize: 1000000,
-    onDropAccepted,
-    onDropRejected,
-  });
 
   return (
     <motion.div
@@ -201,32 +195,19 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
         <div className="pt-5">
           <h4 className="mb-2">2. Upload your cost surface</h4>
 
-          <div
-            {...getRootProps()}
-            className={cx({
-              'dropzone px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
-              'bg-gray-500': isDragActive,
-              'border-green-800': isDragAccept,
-              'border-red-800': isDragReject,
-            })}
-          >
-            <input {...getInputProps()} />
-
-            <p className="text-sm text-gray-300">
-              Drag and drop your
-              {' '}
-              <b>polygon data file</b>
-              {' '}
-              or click here to upload
-            </p>
-
-            <Loading
-              visible={loading}
-              className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-              iconClassName="w-5 h-5 text-primary-500"
+          <div className="mt-3 mb-5">
+            <Uploader
+              caption="Upload cost surface"
+              // form={form}
+              // input={input}
+              loading={loading}
+              maxSize={uploadingMaxSize}
+              reset={resetCustomArea}
+              onDropAccepted={onDropAccepted}
+              onDropRejected={onDropRejected}
+              successFile={successFile}
+              setSuccessFile={setSuccessFile}
             />
-
-            <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 1 MB'}</p>
           </div>
         </div>
 
