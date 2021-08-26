@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -8,10 +8,9 @@ import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import { motion } from 'framer-motion';
 
-import { useLegend } from 'hooks/map';
+import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 
-import { ScenarioSidebarTabs } from 'layout/scenarios/show/sidebar/types';
 import SolutionFrequency from 'layout/solutions/frequency';
 import SolutionSelected from 'layout/solutions/selected';
 
@@ -36,11 +35,14 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   const { query } = useRouter();
   const { sid } = query;
   const [showTable, setShowTable] = useState<boolean>(false);
-  const [selectedSolutionOnMap, onToggleSelectedSolutionOnMap] = useState<boolean>(false);
-  const [frequencyOnMap, onToggleFrequencyOnMap] = useState<boolean>(false);
 
   getScenarioSlice(sid);
-  const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const scenarioSlice = getScenarioSlice(sid);
+  const { setLayerSettings } = scenarioSlice.actions;
+
+  const { selectedSolution, layerSettings } = useSelector((state) => state[`/scenarios/${sid}`]);
+
+  const dispatch = useDispatch();
 
   const {
     data: selectedSolutionData,
@@ -63,13 +65,15 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
     || (selectedSolutionisFetching && !selectedSolutionisFetched
     );
 
-  const LEGEND = useLegend({
-    type: ScenarioSidebarTabs.SOLUTIONS,
-    subtype: null,
-    options: {},
-  });
+  const frequencyLegendValues = LEGEND_LAYERS.frequency().items;
 
-  const frequencyLegendValues = LEGEND.find((l) => l.id === 'frequency').items;
+  const onChangeVisibility = useCallback((lid) => {
+    const { visibility = true } = layerSettings[lid] || {};
+    dispatch(setLayerSettings({
+      id: lid,
+      settings: { visibility: !visibility },
+    }));
+  }, [dispatch, setLayerSettings, layerSettings]);
 
   return (
     <motion.div
@@ -88,7 +92,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           }}
         >
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading">Details</h4>
+          <h4 className="text-xs uppercase font-heading text-primary-500">Details</h4>
         </button>
       </header>
 
@@ -140,8 +144,8 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           <div className="w-full p-6 mt-12 border-t border-gray-600">
             <SolutionFrequency
               values={frequencyLegendValues}
-              onToggleFrequencyOnMap={onToggleFrequencyOnMap}
-              frequencyOnMap={frequencyOnMap}
+              onChangeVisibility={() => onChangeVisibility('frequency')}
+              settings={layerSettings.frequency}
             />
           </div>
 
@@ -155,8 +159,8 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
               <SolutionSelected
                 best={isBestSolution}
                 values={selectedSolutionData || bestSolutionData}
-                onToggleSelectedSolutionOnMap={onToggleSelectedSolutionOnMap}
-                selectedSolutionOnMap={selectedSolutionOnMap}
+                onChangeVisibility={() => onChangeVisibility('solution')}
+                settings={layerSettings.solution}
               />
             )}
           </div>

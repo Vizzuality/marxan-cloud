@@ -67,7 +67,7 @@ export class ScenariosCrudService extends AppBaseService<
   ): Promise<void> {
     if (this.wdpaCalculationsDetector.shouldTrigger(model, createModel)) {
       await this.commandBus.execute(
-        new CalculatePlanningUnitsProtectionLevel(model.id),
+        new CalculatePlanningUnitsProtectionLevel(model.id, model.protectedAreaFilterByIds),
       );
     }
   }
@@ -79,7 +79,7 @@ export class ScenariosCrudService extends AppBaseService<
   ): Promise<void> {
     if (this.wdpaCalculationsDetector.shouldTrigger(model, updateModel)) {
       await this.commandBus.execute(
-        new CalculatePlanningUnitsProtectionLevel(model.id),
+        new CalculatePlanningUnitsProtectionLevel(model.id, model.protectedAreaFilterByIds),
       );
     }
   }
@@ -92,6 +92,7 @@ export class ScenariosCrudService extends AppBaseService<
         'description',
         'type',
         'protectedAreaFilterByIds',
+        'customProtectedAreaIds',
         'wdpaIucnCategories',
         'wdpaThreshold',
         'numberOfRuns',
@@ -104,6 +105,7 @@ export class ScenariosCrudService extends AppBaseService<
         'createdAt',
         'createdByUser',
         'lastModifiedAt',
+        'ranAtLeastOnce',
       ],
       keyForAttribute: 'camelCase',
       project: {

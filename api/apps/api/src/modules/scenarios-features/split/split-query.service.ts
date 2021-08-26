@@ -2,13 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { isDefined } from '@marxan/utils';
 import { FeatureConfigSplit } from '@marxan-api/modules/specification';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { CreateFeaturesCommand } from '../create-features.command';
 
 @Injectable()
 export class SplitQuery {
   prepareQuery(
     input: FeatureConfigSplit,
-    command: CreateFeaturesCommand,
+    scenarioId: string,
     planningAreaLocation: { id: string; tableName: string } | undefined,
     protectedAreaFilterByIds: string[],
     project: Pick<Project, 'bbox'>,
@@ -19,7 +18,7 @@ export class SplitQuery {
         (s) => `$${parameters.push(s.value)}`,
       ),
       splitByProperty: `$${parameters.push(input.splitByProperty)}`,
-      scenarioId: `$${parameters.push(command.scenarioId)}`,
+      scenarioId: `$${parameters.push(scenarioId)}`,
       planningAreaId: isDefined(planningAreaLocation)
         ? `$${parameters.push(planningAreaLocation.id)}`
         : `NULL`,
@@ -31,11 +30,11 @@ export class SplitQuery {
           : undefined,
       protectedArea:
         protectedAreaFilterByIds.length > 0 ? 'protected.area' : 'NULL',
-      featureId: `$${parameters.push(command.input.baseFeatureId)}`,
+      featureId: `$${parameters.push(input.baseFeatureId)}`,
       bbox: [
         `$${parameters.push(project.bbox[0])}`,
-        `$${parameters.push(project.bbox[1])}`,
         `$${parameters.push(project.bbox[2])}`,
+        `$${parameters.push(project.bbox[1])}`,
         `$${parameters.push(project.bbox[3])}`,
       ],
       totalArea: isDefined(planningAreaLocation)
@@ -99,8 +98,8 @@ export class SplitQuery {
               ${protectedAreaJoin}
             where st_intersects(st_makeenvelope(
                 ${fields.bbox[0]},
-                ${fields.bbox[1]},
                 ${fields.bbox[2]},
+                ${fields.bbox[1]},
                 ${fields.bbox[3]},
                 4326
               ), fd.the_geom)

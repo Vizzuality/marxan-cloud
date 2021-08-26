@@ -28,7 +28,7 @@ beforeEach(async () => {
 
 describe(`given input data is delayed`, () => {
   beforeEach(() => {
-    fixtures.GivenInputFilesAreAvailable(5000);
+    fixtures.GivenInputFilesAreAvailable(500000);
   });
 
   test(`cancelling marxan run during fetching assets`, async (done) => {

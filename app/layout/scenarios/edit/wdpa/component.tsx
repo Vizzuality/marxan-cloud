@@ -59,6 +59,15 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
     setStep(metaSubtab === 'protected-areas-percentage' ? 1 : 0);
   }, [metaSubtab]);
 
+  // EFFECTS
+  useEffect(() => {
+    return () => {
+      if (tab !== 'protected-areas') {
+        setStep(0);
+      }
+    };
+  }, [tab]);
+
   if (!scenarioData || tab !== 'protected-areas') return null;
 
   return (

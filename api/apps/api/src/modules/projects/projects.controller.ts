@@ -18,7 +18,6 @@ import {
 import {
   Project,
   projectResource,
-  ProjectResultPlural,
   ProjectResultSingular,
 } from './project.api.entity';
 
@@ -28,7 +27,6 @@ import {
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -37,10 +35,7 @@ import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 
-import {
-  JSONAPIQueryParams,
-  JSONAPISingleEntityQueryParams,
-} from '@marxan-api/decorators/json-api-parameters.decorator';
+import { JSONAPIQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
@@ -115,50 +110,6 @@ export class ProjectsController {
     return this.projectsService.importLegacyProject(file);
   }
 
-  @ApiOperation({
-    description: 'Find all projects',
-  })
-  @ApiOkResponse({ type: ProjectResultPlural })
-  @JSONAPIQueryParams({
-    entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
-    availableFilters: [
-      { name: 'name' },
-      { name: 'organizationId' },
-      { name: 'countryId' },
-      { name: 'adminAreaLevel1Id' },
-      { name: 'adminAreaLevel21Id' },
-    ],
-  })
-  @ApiQuery({
-    name: 'q',
-    required: false,
-    description: `A free search over names`,
-  })
-  @Get()
-  async findAll(
-    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-    @Query('q') namesSearch?: string,
-  ): Promise<ProjectResultPlural> {
-    const results = await this.projectsService.findAll(fetchSpecification, {
-      params: {
-        namesSearch,
-      },
-    });
-    return this.projectSerializer.serialize(results.data, results.metadata);
-  }
-
-  @ApiOperation({ description: 'Find project by id' })
-  @ApiOkResponse({ type: ProjectResultSingular })
-  @JSONAPISingleEntityQueryParams({
-    entitiesAllowedAsIncludes: projectResource.entitiesAllowedAsIncludes,
-  })
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ProjectResultSingular> {
-    return await this.projectSerializer.serialize(
-      await this.projectsService.findOne(id),
-    );
-  }
-
   @ApiOperation({ description: 'Create project' })
   @ApiOkResponse({ type: ProjectResultSingular })
   @Post()
@@ -197,8 +148,11 @@ export class ProjectsController {
   @Get(`:id/scenarios/status`)
   async getJobsForProjectScenarios(
     @Param('id') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectJobsStatusDto> {
-    const scenarios = await this.projectsService.getJobStatusFor(projectId);
+    const scenarios = await this.projectsService.getJobStatusFor(projectId, {
+      authenticatedUser: req.user,
+    });
     return this.jobsStatusSerizalizer.serialize(projectId, scenarios);
   }
 
@@ -212,8 +166,11 @@ export class ProjectsController {
   async shapefileForProtectedArea(
     @Param('id') projectId: string,
     @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
-    const outcome = await this.projectsService.addShapeFor(projectId, file);
+    const outcome = await this.projectsService.addShapeFor(projectId, file, {
+      authenticatedUser: req.user,
+    });
     if (outcome) {
       throw new NotFoundException();
     }

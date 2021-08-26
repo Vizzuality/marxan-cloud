@@ -45,31 +45,26 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   );
 
   const {
-    data,
+    data: solutionsData,
     fetchNextPage,
     hasNextPage,
-    isFetching,
+    isFetching: solutionsAreFetching,
     isFetchingNextPage,
-    isFetched,
+    isFetched: solutionsAreFetched,
   } = useSolutions(sid);
 
   const {
     data: mostDifSolutionsData,
-    isFetching: mostDifSolutionsisFetching,
-    isFetched: mostDifSolutionsisFetched,
+    isFetching: mostDifSolutionsAreFetching,
+    isFetched: mostDifSolutionsAreFetched,
   } = useMostDifferentSolutions(sid);
 
-  const allSolutionsFetched = (!isFetching || isFetchingNextPage)
-  && data && data.length > 0 && !mostDifSolutions;
+  const allSolutionsFetched = solutionsAreFetched || mostDifSolutionsAreFetched;
 
-  const mostDifSolutionsIsSelected = mostDifSolutions
-  && mostDifSolutionsData && mostDifSolutionsData.length > 0;
+  const noSolutionResults = (solutionsAreFetched && !solutionsData.length)
+    || (mostDifSolutionsAreFetched && !mostDifSolutionsData.length);
 
-  const noSolutionResults = ((!isFetching && (!data || !data.length)) || (!mostDifSolutionsisFetched
-    && (!mostDifSolutionsData || !mostDifSolutionsData.length)));
-
-  const solutionsAreLoading = ((isFetching && !isFetched)
-    || (mostDifSolutionsisFetching && !mostDifSolutionsisFetched));
+  const solutionsAreLoading = solutionsAreFetching || mostDifSolutionsAreFetching;
 
   const scrollRef = useBottomScrollListener(
     () => {
@@ -83,25 +78,14 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   }, [dispatch, selectSolution, setSelectedSolution, setShowTable]);
 
   return (
-    <div className="text-gray-800">
-      <div className="flex items-center px-8 pb-8 space-x-6">
-        <div className="flex items-center justify-start">
-          <Button
-            theme="secondary"
-            size="base"
-            className="flex items-center justify-between pl-4 pr-4"
-            onClick={() => console.info('click - download solutions')}
-          >
-            Download solutions
-            <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
-          </Button>
-          <InfoButton
-            theme="secondary"
+    <div className="relative flex flex-col flex-grow overflow-hidden text-gray-800">
 
-          >
-            <div>
-              <h4 className="font-heading text-lg mb-2.5">Solutions</h4>
-              <div className="space-y-2">
+      <div className="relative flex flex-col flex-grow mt-8 overflow-hidden overflow-x-hidden overflow-y-auto">
+        <div className="items-center px-8 pb-8 space-y-12 flex-column">
+          <div className="flex space-x-3">
+            <div className="flex-col">
+              <h2 className="mb-4 text-2xl font-heading">Solutions Table:</h2>
+              <div className="mr-20 space-y-4">
                 <p>
                   Each solution gives an alternative answer to your planning problem.
                   The result of each solution reflects whether a planning unit is
@@ -151,78 +135,87 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
                 </p>
               </div>
             </div>
-          </InfoButton>
-        </div>
-        <div className="flex items-center">
-          <Checkbox
-            theme="light"
-            id="checkbox-5-dif-solutions"
-            className="block w-4 h-4 text-green-300 form-checkbox-dark"
-            onChange={(event) => setMostDifSolutions(event.target.checked)}
-          />
-          <Label className="mx-2 text-sm text-gray-700">
-            View 5 most different solutions
-          </Label>
+          </div>
+          <div className="flex items-center space-x-8">
+            <Button
+              theme="secondary"
+              size="base"
+              className="flex items-center justify-between pl-4 pr-4"
+              onClick={() => console.info('click - download solutions')}
+            >
+              Download solutions
+              <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
+            </Button>
+            <div className="flex items-center">
+              <Checkbox
+                theme="light"
+                id="checkbox-5-dif-solutions"
+                className="block w-4 h-4 text-green-300 form-checkbox-dark"
+                onChange={(event) => setMostDifSolutions(event.target.checked)}
+              />
+              <Label className="mx-2 text-sm text-gray-700">
+                View 5 most different solutions
+              </Label>
 
-          <InfoButton
-            theme="secondary"
-          >
-            <div>
-              <h4 className="font-heading text-lg mb-2.5">5 most different solutions</h4>
-              <div className="space-y-2">
-                <p>
-                  Marxan calculates a range of possible good solutions,
-                  instead of a unique solution.
-                </p>
-                <p>
-                  It is useful to see
-                  how much the solutions differ by assessing
-                  the 5 most extreme cases. These are obtained by
-                  creating a distance matrix of all solutions by
-                  applying the Jaccard similarity index and
-                  then by grouping the results in 5 clusters.
-                  The solutions that are more similar to each
-                  other will fall in the same cluster. Finally,
-                  for each cluster, the solution with the lowest
-                  score is used as the representative solution of the group.
-                </p>
-              </div>
+              <InfoButton theme="secondary">
+                <div>
+                  <h4 className="font-heading text-lg mb-2.5">5 most different solutions</h4>
+                  <div className="space-y-2">
+                    <p>
+                      Marxan calculates a range of possible good solutions,
+                      instead of a unique solution.
+                    </p>
+                    <p>
+                      It is useful to see
+                      how much the solutions differ by assessing
+                      the 5 most extreme cases. These are obtained by
+                      creating a distance matrix of all solutions by
+                      applying the Jaccard similarity index and
+                      then by grouping the results in 5 clusters.
+                      The solutions that are more similar to each
+                      other will fall in the same cluster. Finally,
+                      for each cluster, the solution with the lowest
+                      score is used as the representative solution of the group.
+                    </p>
+                  </div>
+                </div>
+              </InfoButton>
             </div>
-          </InfoButton>
+          </div>
+        </div>
+        <div
+          ref={scrollRef}
+          className=""
+        >
+          {solutionsAreLoading && (
+            <div className="absolute top-0 left-0 z-30 flex flex-col items-center justify-center w-full h-full">
+              <Loading
+                visible
+                className="z-40 flex items-center justify-center w-full "
+                iconClassName="w-5 h-5 text-primary-500"
+              />
+              <div className="mt-5 text-xs uppercase font-heading">Loading Solutions</div>
+            </div>
+          )}
+
+          {noSolutionResults && (
+            <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
+              No results found
+            </div>
+          )}
+
+          {allSolutionsFetched && (
+            <SolutionsTable
+              bestSolutionId={bestSolutionData?.id}
+              body={mostDifSolutions ? mostDifSolutionsData : solutionsData}
+              selectedSolution={selectSolution}
+              onSelectSolution={(solution) => setSelectSolution(solution)}
+            />
+          )}
+          <LoadingMore visible={isFetchingNextPage} />
         </div>
       </div>
-      <div
-        ref={scrollRef}
-        className="relative overflow-x-hidden overflow-y-auto"
-        style={{ height: '400px' }}
-      >
-        {solutionsAreLoading && (
-          <div className="absolute top-0 left-0 z-30 flex flex-col items-center justify-center w-full h-full">
-            <Loading
-              visible
-              className="z-40 flex items-center justify-center w-full "
-              iconClassName="w-5 h-5 text-primary-500"
-            />
-            <div className="mt-5 text-xs uppercase font-heading">Loading Solutions</div>
-          </div>
-        )}
 
-        {noSolutionResults && (
-          <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
-            No results found
-          </div>
-        )}
-
-        {(allSolutionsFetched || mostDifSolutionsIsSelected) && (
-          <SolutionsTable
-            bestSolutionId={bestSolutionData?.id}
-            body={mostDifSolutionsIsSelected ? mostDifSolutionsData : data}
-            selectedSolution={selectSolution}
-            onSelectSolution={(solution) => setSelectSolution(solution)}
-          />
-        )}
-        <LoadingMore visible={isFetchingNextPage} />
-      </div>
       <div className="flex items-center justify-center w-full pt-8">
         <Button
           theme="secondary"

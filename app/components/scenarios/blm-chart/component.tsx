@@ -228,26 +228,26 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
           <path d={lineGenerator(data)} className="text-black stroke-current fill-none" />
           {/* BLM indicator */}
           {blmDataPoint && (
-          <g>
-            <g transform={`translate(${0} ${yScale(blmDataPoint.boundaryLength)})`}>
-              <text textAnchor="end" className="text-sm text-black transform translate-y-1">
-                <tspan x={Y_AXIS_WIDTH} y="0">Recommended</tspan>
-                <tspan x={Y_AXIS_WIDTH} y="21">(BLM)</tspan>
-              </text>
+            <g>
+              <g transform={`translate(${0} ${yScale(blmDataPoint.boundaryLength)})`}>
+                <text textAnchor="end" className="text-sm text-black transform translate-y-1">
+                  <tspan x={Y_AXIS_WIDTH} y="0">Recommended</tspan>
+                  <tspan x={Y_AXIS_WIDTH} y="21">(BLM)</tspan>
+                </text>
+              </g>
+              <line
+                x1={Y_AXIS_WIDTH + VISUALIZATION_PADDING / 2}
+                x2={xScale(blmDataPoint.cost)}
+                y1={yScale(blmDataPoint.boundaryLength)}
+                y2={yScale(blmDataPoint.boundaryLength)}
+                className="text-black stroke-current"
+              />
             </g>
-            <line
-              x1={Y_AXIS_WIDTH + VISUALIZATION_PADDING / 2}
-              x2={xScale(blmDataPoint.cost)}
-              y1={yScale(blmDataPoint.boundaryLength)}
-              y2={yScale(blmDataPoint.boundaryLength)}
-              className="text-black stroke-current"
-            />
-          </g>
           )}
           {/* Thumbnails */}
           <g>
             {pointsWithVisibleThumbnail.map(({
-              cost, boundaryLength, /* isBlm, */ thumbnail,
+              cost, boundaryLength, isBlm, thumbnail,
             }, index) => {
               const {
                 x,
@@ -256,7 +256,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
               } = getThumbnailPosition([cost, boundaryLength], xScale, yScale);
 
               return (
-              // eslint-disable-next-line react/no-array-index-key
+                // eslint-disable-next-line react/no-array-index-key
                 <g key={index} transform={`translate(${x} ${y})`}>
                   <path
                     d={linePath}
@@ -273,8 +273,8 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                     <div
                       className={classnames({
                         'w-full h-full rounded-2xl bg-white bg-contain': true,
-                        // 'border-gray-800 border-2': !isBlm,
-                        // 'border-primary-500 border-2': isBlm,
+                        'border-gray-800 border-2': !isBlm,
+                        'border-primary-500 border-2': isBlm,
                       })}
                       style={{ backgroundImage: `url(${thumbnail})` }}
                     />
@@ -290,7 +290,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
               cost, boundaryLength, isBlm, thumbnail,
             }, index) => (
               <foreignObject
-                  // eslint-disable-next-line react/no-array-index-key
+                // eslint-disable-next-line react/no-array-index-key
                 key={index}
                 x={xScale(cost)}
                 y={yScale(boundaryLength)}
@@ -306,11 +306,11 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                     'cursor-pointer hover:bg-primary-500 hover:border-2': !!thumbnail,
                   })}
                   onMouseEnter={
-                      () => onMouseEnterPoint([xScale(cost), yScale(boundaryLength)], thumbnail)
-                    }
+                    () => onMouseEnterPoint([xScale(cost), yScale(boundaryLength)], thumbnail)
+                  }
                   onMouseLeave={
-                      () => onMouseLeavePoint([xScale(cost), yScale(boundaryLength)], thumbnail)
-                    }
+                    () => onMouseLeavePoint([xScale(cost), yScale(boundaryLength)], thumbnail)
+                  }
                 />
               </foreignObject>
             ))}

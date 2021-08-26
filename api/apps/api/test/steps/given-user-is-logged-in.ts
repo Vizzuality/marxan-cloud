@@ -4,10 +4,11 @@ import { E2E_CONFIG } from '../e2e.config';
 
 export const GivenUserIsLoggedIn = async (
   app: INestApplication,
+  type: `aa` | `bb` = `aa`,
 ): Promise<string> =>
   (
     await request(app.getHttpServer()).post('/auth/sign-in').send({
-      username: E2E_CONFIG.users.basic.aa.username,
-      password: E2E_CONFIG.users.basic.aa.password,
+      username: E2E_CONFIG.users.basic[type].username,
+      password: E2E_CONFIG.users.basic[type].password,
     })
   ).body.accessToken;

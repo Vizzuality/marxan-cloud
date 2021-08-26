@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { pick } from 'lodash';
+import { omit, pick } from 'lodash';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { Scenario } from './scenario.api.entity';
@@ -14,25 +14,28 @@ export class WdpaAreaCalculationService {
   private readonly watchedChangeProperties: (keyof InputChange)[] = [
     'customProtectedAreaIds',
     'wdpaIucnCategories',
-    'wdpaThreshold',
   ];
 
   /**
    * and new entity state consists (i.e. are present) of all of the below
    */
   private readonly requiredToTriggerChange: (keyof Scenario)[] = [
-    'wdpaThreshold',
+    'wdpaIucnCategories',
+    'customProtectedAreaIds',
   ];
 
   /**
-   * Every post update that affects this 3 elements (when threshold is not null)
+   * Every post or update that affects this 2 elements (when threshold is not null)
    */
   shouldTrigger(scenario: Scenario, changeSet: InputChange): boolean {
     if (!this.intendsToChangeWatchedProperty(changeSet)) {
       return false;
     }
 
-    return this.areRequiredFieldsAvailable(scenario);
+    return this.areRequiredFieldsAvailable({
+      ...scenario,
+      ...omit(changeSet, 'metadata'),
+    });
   }
 
   private intendsToChangeWatchedProperty(changeSet: InputChange): boolean {
@@ -42,7 +45,7 @@ export class WdpaAreaCalculationService {
   }
 
   private areRequiredFieldsAvailable(scenario: Scenario): boolean {
-    return Object.entries(pick(scenario, this.requiredToTriggerChange)).every(
+    return Object.entries(pick(scenario, this.requiredToTriggerChange)).some(
       ([, value]) => value,
     );
   }

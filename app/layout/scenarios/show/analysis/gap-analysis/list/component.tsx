@@ -4,19 +4,19 @@ import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 
-import { useGapAnalysis } from 'hooks/gap-analysis';
+import { usePreGapAnalysis } from 'hooks/gap-analysis';
 import useBottomScrollListener from 'hooks/scroll';
 
 import Item from 'components/gap-analysis/item';
 import Loading from 'components/loading';
 
-export interface ScenariosFeaturesAddListProps {
+export interface ScenariosPreGapAnalysisListProps {
   search?: string;
 }
 
-export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> = ({
+export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListProps> = ({
   search,
-}: ScenariosFeaturesAddListProps) => {
+}: ScenariosPreGapAnalysisListProps) => {
   const { query } = useRouter();
   const { sid } = query;
 
@@ -27,7 +27,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
     isFetching: allFeaturesIsFetching,
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
-  } = useGapAnalysis(sid, {
+  } = usePreGapAnalysis(sid, {
     search,
   });
 
@@ -98,4 +98,4 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
   );
 };
 
-export default ScenariosFeaturesAddList;
+export default ScenariosPreGapAnalysisList;

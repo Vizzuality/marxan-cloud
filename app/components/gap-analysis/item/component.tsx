@@ -1,6 +1,7 @@
 import React, { MouseEventHandler } from 'react';
-import classnames from 'classnames';
+
 import { useNumberFormatter } from '@react-aria/i18n';
+import classnames from 'classnames';
 
 import Icon from 'components/icon';
 
@@ -12,12 +13,12 @@ export interface ItemProps {
   name: string;
   current: {
     percent: number;
-    value: number;
+    value: string;
     unit: string;
   }
   target: {
     percent: number;
-    value: number;
+    value: string;
     unit: string;
   }
   className?: string;
@@ -32,7 +33,7 @@ export const Item: React.FC<ItemProps> = ({
   name, current, target, className, onMap, onToggleOnMap, muted, onMouseEnter, onMouseLeave,
 }: ItemProps) => {
   const percentFormatter = useNumberFormatter({ style: 'percent' });
-  const decimalFormatter = useNumberFormatter({ style: 'decimal' });
+
   return (
     <div
       className={classnames({
@@ -65,7 +66,7 @@ export const Item: React.FC<ItemProps> = ({
             {percentFormatter.format(current.percent)}
             {' '}
             (
-            {decimalFormatter.format(current.value)}
+            {current.value}
             {' '}
             {current.unit}
             )
@@ -79,7 +80,7 @@ export const Item: React.FC<ItemProps> = ({
             {percentFormatter.format(target.percent)}
             {' '}
             (
-            {decimalFormatter.format(target.value)}
+            {target.value}
             {' '}
             {target.unit}
             )

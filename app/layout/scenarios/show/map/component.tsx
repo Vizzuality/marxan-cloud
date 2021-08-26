@@ -14,6 +14,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useSession } from 'next-auth/client';
 
 import { useSelectedFeatures } from 'hooks/features';
+import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
   usePUGridLayer, useLegend, useFeaturePreviewLayers,
 } from 'hooks/map';
@@ -45,27 +46,6 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const { data = {} } = useProject(pid);
-  const { bbox } = data;
-
-  const { data: scenarioData } = useScenario(sid);
-
-  const {
-    data: selectedFeaturesData,
-  } = useSelectedFeatures(sid, {});
-
-  const { data: PUData } = useScenarioPU(sid);
-
-  const { included, excluded } = PUData || {};
-
-  const { wdpaIucnCategories, wdpaThreshold } = scenarioData || {};
-
-  const {
-    data: bestSolutionData,
-  } = useBestSolution(sid);
-
-  const bestSolution = bestSolutionData || {};
-
   const scenarioSlice = getScenarioSlice(sid);
   const { setLayerSettings } = scenarioSlice.actions;
 
@@ -77,6 +57,36 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}`]);
 
+  const {
+    data = {},
+  } = useProject(pid);
+  const { bbox } = data;
+
+  const {
+    data: scenarioData,
+  } = useScenario(sid);
+  const { wdpaIucnCategories, wdpaThreshold } = scenarioData || {};
+
+  const {
+    data: selectedFeaturesData,
+  } = useSelectedFeatures(sid, {});
+
+  const {
+    data: PUData,
+  } = useScenarioPU(sid);
+  const { included, excluded } = PUData || {};
+
+  const {
+    data: bestSolutionData,
+  } = useBestSolution(sid);
+  const bestSolution = bestSolutionData || {};
+
+  const {
+    data: allGapAnalysisData,
+  } = useAllGapAnalysis(sid, {
+    enabled: !!sid,
+  });
+
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
@@ -84,6 +94,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
 
   const include = useMemo(() => {
     if (tab === 'protected-areas' || tab === 'features') return 'protection';
+    if (tab === 'analysis' && subtab === 'analysis-preview') return 'protection,features';
     if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return 'features';
     if (tab === 'analysis' && subtab === 'analysis-cost-surface') return 'cost';
     if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return 'lock-status,protection';
@@ -94,6 +105,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
 
   const sublayers = useMemo(() => {
     if (tab === 'protected-areas') return ['wdpa-percentage'];
+    if (tab === 'features') return ['wdpa-percentage'];
     if (tab === 'analysis' && subtab === 'analysis-preview') return ['wdpa-percentage', 'features'];
     if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features'];
     if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost'];
@@ -102,6 +114,33 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
 
     return [];
   }, [tab, subtab]);
+
+  const layers = useMemo(() => {
+    if (tab === 'protected-areas' && subtab === 'protected-areas-preview' && !!wdpaIucnCategories?.length) return ['wdpa-preview', 'pugrid'];
+    if (tab === 'protected-areas' && subtab === 'protected-areas-percentage' && !!wdpaIucnCategories?.length) return ['wdpa-percentage', 'pugrid'];
+    if (tab === 'features') {
+      return [
+        ...wdpaIucnCategories?.length ? ['wdpa-percentage'] : [],
+        'bioregional',
+        'species',
+        'pugrid',
+      ];
+    }
+    if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features', 'pugrid'];
+    if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost', 'pugrid'];
+    if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
+    if (tab === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
+    if (tab === 'solutions') return ['frequency', 'solution', 'pugrid'];
+
+    return ['pugrid'];
+  }, [tab, subtab, wdpaIucnCategories?.length]);
+
+  const featuresIds = useMemo(() => {
+    if (allGapAnalysisData) {
+      return allGapAnalysisData.map((g) => g.featureId);
+    }
+    return [];
+  }, [allGapAnalysisData]);
 
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
@@ -126,6 +165,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       wdpaThreshold,
       puIncludedValue: included,
       puExcludedValue: excluded,
+      features: featuresIds,
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
         pugrid: layerSettings.pugrid,
@@ -142,8 +182,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const LAYERS = [PUGridLayer, ...FeaturePreviewLayers].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    type: tab,
-    subtype: subtab,
+    layers,
     options: {
       wdpaThreshold: scenarioData?.wdpaThreshold,
       puIncludedValue: included,
@@ -262,7 +301,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
         />
       </Controls>
       {/* Legend */}
-      <div className="absolute w-full max-w-xs bottom-10 right-2">
+      <div className="absolute w-full max-w-xs bottom-14 right-5">
         <Legend
           open={open}
           className="w-full"

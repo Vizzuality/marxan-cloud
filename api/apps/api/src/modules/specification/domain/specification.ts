@@ -54,6 +54,7 @@ export class Specification extends AggregateRoot {
         specification.scenarioId,
         specification.id,
         input,
+        draft,
       ),
     );
     return specification;
@@ -129,9 +130,12 @@ export class Specification extends AggregateRoot {
   }
 
   private allFeaturesCalculated(): boolean {
-    return this.configuration
-      .flatMap((configuration) => configuration.resultFeatures)
-      .every((feature) => feature.calculated);
+    return (
+      this.allFeaturesDetermined() &&
+      this.configuration
+        .flatMap((configuration) => configuration.resultFeatures)
+        .every((feature) => feature.calculated)
+    );
   }
 
   private relatedSubFeaturesRequiringCalculations(): string[] {
