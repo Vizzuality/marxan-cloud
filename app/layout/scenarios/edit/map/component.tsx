@@ -139,7 +139,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   }, [tab, subtab, wdpaCategories.wdpaIucnCategories?.length]);
 
   const featuresIds = useMemo(() => {
-    return allGapAnalysisData.map((g) => g.featureId);
+    if (allGapAnalysisData) {
+      return allGapAnalysisData.map((g) => g.featureId);
+    }
+    return [];
   }, [allGapAnalysisData]);
 
   const WDPApreviewLayer = useWDPAPreviewLayer({

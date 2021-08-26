@@ -50,7 +50,11 @@ import {
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import { ScenarioFeaturesData, ScenarioFeaturesGapData, ScenarioFeaturesOutputGapData } from '@marxan/features';
+import {
+  ScenarioFeaturesData,
+  ScenarioFeaturesGapData,
+  ScenarioFeaturesOutputGapData,
+} from '@marxan/features';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
@@ -345,23 +349,27 @@ export class ScenariosController {
     );
   }
 
-  @ApiOperation({ description: `Retrieve protection gap data for the features of a scenario.` })
-  @ApiOkResponse({
-    type: ScenarioFeaturesData,
+  @ApiOperation({
+    description: `Retrieve protection gap data for the features of a scenario.`,
   })
+  @ApiOkResponse({
+    type: ScenarioFeaturesGapData,
+  })
+  @JSONAPIQueryParams()
   @Get(':id/features/gap-data')
   async getScenarioFeaturesGapData(
     @Param('id', ParseUUIDPipe) id: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<Partial<ScenarioFeaturesGapData>[]> {
-    const result = await this.scenarioFeaturesGapDataService.findAllPaginated(undefined, {
-      params: {
-        scenarioId: id,
+    const result = await this.scenarioFeaturesGapDataService.findAllPaginated(
+      fetchSpecification,
+      {
+        params: {
+          scenarioId: id,
+        },
       },
-    });
-    return this.scenarioFeaturesGapData.serialize(
-      result.data,
-      result.metadata,
     );
+    return this.scenarioFeaturesGapData.serialize(result.data, result.metadata);
   }
 
   @ApiTags(marxanRunFiles)
@@ -536,19 +544,34 @@ export class ScenariosController {
     return this.scenarioSolutionSerializer.serialize(result[0]);
   }
 
-  @ApiOperation({ description: `Retrieve Marxan protection data for the features of a scenario.` })
+  @ApiOperation({
+    description: `Retrieve Marxan protection data for the features of a scenario.`,
+  })
   @ApiOkResponse({
     type: ScenarioFeaturesOutputGapData,
+  })
+  @JSONAPIQueryParams({
+    availableFilters: [
+      {
+        name: 'runId',
+        description: 'Filter by one or more Marxan runIds',
+        examples: ['filter[runId]=1,2,3'],
+      },
+    ],
   })
   @Get(`${solutionsSubPath}/gap-data`)
   async getScenarioFeaturesOutputGapData(
     @Param('id', ParseUUIDPipe) id: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
-    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(undefined, {
-      params: {
-        scenarioId: id,
+    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(
+      fetchSpecification,
+      {
+        params: {
+          scenarioId: id,
+        },
       },
-    });
+    );
     return this.scenarioFeaturesOutputGapData.serialize(
       result.data,
       result.metadata,
