@@ -36,7 +36,6 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   const { sid } = query;
   const [showTable, setShowTable] = useState<boolean>(false);
 
-  getScenarioSlice(sid);
   const scenarioSlice = getScenarioSlice(sid);
   const { setLayerSettings } = scenarioSlice.actions;
 
