@@ -27,6 +27,7 @@ import { JobStatus, Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { GeometrySource } from './geometry-source.enum';
+import { v4 } from 'uuid';
 import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
 
 const geoFeatureFilterKeyNames = [
@@ -265,9 +266,10 @@ export class GeoFeaturesService extends AppBaseService<
     data: UploadShapefileDTO,
     features: Record<string, any>[],
   ): Promise<void> {
-    const [apiDbConnection, geoDbConnection] = Object.values(
-      DbConnections,
-    ).map((name) => getConnection(name));
+    const [apiDbConnection, geoDbConnection] = [
+      getConnection(DbConnections.default),
+      getConnection(DbConnections.geoprocessingDB),
+    ];
 
     const apiQueryRunner = apiDbConnection.createQueryRunner();
     const geoQueryRunner = geoDbConnection.createQueryRunner();
@@ -306,8 +308,7 @@ export class GeoFeaturesService extends AppBaseService<
         'An error occurred creating features for shapefile (changes have been rolled back)',
         String(err),
       );
-
-      console.log(err);
+      throw err;
     } finally {
       // you need to release a queryRunner which was manually instantiated
       await apiQueryRunner.release();
@@ -320,16 +321,17 @@ export class GeoFeaturesService extends AppBaseService<
     projectId: string,
     data: UploadShapefileDTO,
   ): Promise<GeoFeature> {
-    const entity = entityManager.getRepository(GeoFeature).create();
-    entity.featureClassName = data.name;
-    entity.description = data.description;
-    entity.tag = data.type;
-    entity.projectId = projectId;
-    entity.creationStatus = JobStatus.done;
-
-    await entity.save();
-    await entity.reload();
-    return entity;
+    const repo = entityManager.getRepository(GeoFeature);
+    return await repo.save(
+      repo.create({
+        id: v4(),
+        featureClassName: data.name,
+        description: data.description,
+        tag: data.type,
+        projectId,
+        creationStatus: JobStatus.done,
+      }),
+    );
   }
 
   private async createFeatureData(

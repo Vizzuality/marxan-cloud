@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PlanningAreaRepositoryModule } from '@marxan/planning-area-repository';
-import { ShapefilesModule } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.module';
+import { ShapefilesModule } from '@marxan/shapefile-converter';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { PlanningAreaService } from './planning-area.service';
 import { PlanningAreaController } from './planning-area.controller';
