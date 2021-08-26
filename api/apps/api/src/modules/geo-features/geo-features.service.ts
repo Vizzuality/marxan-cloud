@@ -11,7 +11,6 @@ import {
 import {
   GeoFeatureGeometry,
   geoFeatureResource,
-  SourceType,
 } from './geo-feature.geo.entity';
 import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
 
@@ -27,6 +26,7 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { JobStatus, Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { GeometrySource } from './geometry-source.enum';
 import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
 
 const geoFeatureFilterKeyNames = [
@@ -343,7 +343,7 @@ export class GeoFeaturesService extends AppBaseService<
        ("id", "the_geom", "properties", "source", "feature_id")
        VALUES (DEFAULT, ST_MakeValid(ST_GeomFromGeoJSON($1)::geometry), $2, $3,
                $4);`,
-      [geometry, properties, SourceType.user_imported, featureId],
+      [geometry, properties, GeometrySource.user_imported, featureId],
     );
   }
 }
