@@ -48,8 +48,15 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                       '-ml-3': i !== 0,
                     })}
                   >
-                    <Avatar className="text-sm text-white uppercase bg-primary-700" bgImage={u.avatarDataUrl} name={u.displayName}>
+                    {/* <Avatar
+                    className="text-sm text-white uppercase bg-primary-700"
+                    bgImage={u.avatarDataUrl}
+                    name={u.displayName}
+                    >
                       {!u.avatarDataUrl && u.displayName.slice(0, 2)}
+                    </Avatar> */}
+                    <Avatar className="text-sm text-white uppercase bg-gray-500">
+                      <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
                     </Avatar>
                   </li>
                 );

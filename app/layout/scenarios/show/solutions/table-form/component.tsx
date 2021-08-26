@@ -9,6 +9,8 @@ import { getScenarioSlice } from 'store/slices/scenarios/detail';
 import useBottomScrollListener from 'hooks/scroll';
 import { useSolutions, useBestSolution, useMostDifferentSolutions } from 'hooks/solutions';
 
+import ComingSoon from 'layout/help/coming-soon';
+
 import { Button } from 'components/button/component';
 import Checkbox from 'components/forms/checkbox';
 import Label from 'components/forms/label';
@@ -137,15 +139,17 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             </div>
           </div>
           <div className="flex items-center space-x-8">
-            <Button
-              theme="secondary"
-              size="base"
-              className="flex items-center justify-between pl-4 pr-4"
-              onClick={() => console.info('click - download solutions')}
-            >
-              Download solutions
-              <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
-            </Button>
+            <ComingSoon theme="dark">
+              <Button
+                theme="secondary"
+                size="base"
+                className="flex items-center justify-between pl-4 pr-4"
+                onClick={() => console.info('click - download solutions')}
+              >
+                Download solutions
+                <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
+              </Button>
+            </ComingSoon>
             <div className="flex items-center">
               <Checkbox
                 theme="light"

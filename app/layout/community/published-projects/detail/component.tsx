@@ -10,11 +10,15 @@ import { useScenarios } from 'hooks/scenarios';
 import PublishedProjectMap from 'layout/community/published-projects/detail/map';
 import Share from 'layout/community/published-projects/detail/share';
 import DuplicateButton from 'layout/community/published-projects/duplicate-button';
+import ComingSoon from 'layout/help/coming-soon';
 import Backlink from 'layout/statics/backlink';
 import Wrapper from 'layout/wrapper';
 
-// import Avatar from 'components/avatar';
+import Avatar from 'components/avatar';
+import Icon from 'components/icon';
 import Loading from 'components/loading';
+
+import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 
 export interface CommunityProjectsDetailProps {
 
@@ -40,7 +44,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   });
 
   const {
-    id, description, name, planningAreaName, timesDuplicated, /* contributors, */
+    id, description, name, planningAreaName, timesDuplicated, contributors,
   } = publishedProject || {};
 
   const scenarios = publishedProjectScenarios || [];
@@ -100,20 +104,24 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                   </div>
 
                   <div className="grid grid-cols-2 grid-rows-2 gap-y-11 gap-x-9">
-
-                    {/* <div>
-                      <h3 className="mb-5 text-sm font-semibold">Creators</h3>
-                      {!!contributors?.length && (
-                        <div className="space-y-4">
-                          {contributors.map((c) => (
-                            <div key={c.id} className="flex flex-row items-center">
-                              <Avatar bgImage={c.bgImage || '/images/avatar.png'} size="s" />
-                              <p className="ml-2.5 text-sm">{c.name}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div> */}
+                    <ComingSoon>
+                      <div>
+                        <h3 className="mb-5 text-sm font-semibold">Creators</h3>
+                        {!!contributors?.length && (
+                          <div className="space-y-4">
+                            {contributors.map((c) => (
+                              <div key={c.id} className="flex flex-row items-center">
+                                {/* <Avatar bgImage={c.bgImage} size="s" /> */}
+                                <Avatar className="text-sm text-white uppercase bg-gray-500">
+                                  <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
+                                </Avatar>
+                                <p className="ml-2.5 text-sm">{c.name}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </ComingSoon>
 
                     <div>
                       <h3 className="mb-6 text-sm font-semibold">Planning area</h3>
