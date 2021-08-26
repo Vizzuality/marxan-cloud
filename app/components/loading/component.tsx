@@ -1,9 +1,11 @@
 import React from 'react';
+
 import cx from 'classnames';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import Icon from 'components/icon';
-import LOADING_SVG from 'svgs/ui/loading.svg?sprite';
-import { motion, AnimatePresence } from 'framer-motion';
+
+import LOADING_SVG from 'svgs/ui/processing.svg?sprite';
 
 import { LoadingProps } from './types';
 
