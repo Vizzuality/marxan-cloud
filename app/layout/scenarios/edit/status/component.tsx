@@ -25,6 +25,7 @@ const TEXTS = {
   geofeatureSplit: () => 'Processing the features...',
   geofeatureStrat: () => 'Processing the features...',
   planningUnitsInclusion: () => 'Processing inclusion/exclusion of planning units...',
+  costSurface: () => 'Processing cost surface...',
   run: () => 'Running Marxan...',
 };
 
