@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Media } from 'layout/media';
 import Wrapper from 'layout/wrapper';
 
 import Button from 'components/button';
@@ -28,7 +29,7 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
               and people on land, freshwater and ocean systems.
             </p>
 
-            <div className="flex space-x-4 mt-18">
+            <div className="space-y-4 xs:flex xs:space-x-4 mt-18">
               <Button
                 className="w-40"
                 theme="dark"
@@ -50,21 +51,23 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
         </div>
       </Wrapper>
 
-      <div className="absolute top-0 left-0 w-full h-full">
-        <Wrapper>
-          <div className="relative flex justify-end flex-shrink-0 w-full top-14">
-            <img
-              alt=""
-              src={HERO_IMAGE}
-              style={{
-                width: '384px',
-                height: 'auto',
-                filter: 'drop-shadow(0px 8px 15px rgba(0, 0, 0, .35))',
-              }}
-            />
-          </div>
-        </Wrapper>
-      </div>
+      <Media greaterThanOrEqual="lg">
+        <div className="absolute top-0 left-0 w-full h-full">
+          <Wrapper>
+            <div className="relative flex justify-end flex-shrink-0 w-full top-14">
+              <img
+                alt=""
+                src={HERO_IMAGE}
+                style={{
+                  width: '384px',
+                  height: 'auto',
+                  filter: 'drop-shadow(0px 8px 15px rgba(0, 0, 0, .35))',
+                }}
+              />
+            </div>
+          </Wrapper>
+        </div>
+      </Media>
     </div>
   );
 };
