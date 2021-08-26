@@ -52,13 +52,15 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
               )}
             >
               <div>
-                <Button
-                  theme="secondary"
-                  size="base"
-                >
-                  <span className="mr-2.5">Upload new Scenario</span>
-                  <Icon icon={UPLOAD_SVG} />
-                </Button>
+                <ComingSoon>
+                  <Button
+                    theme="secondary"
+                    size="base"
+                  >
+                    <span className="mr-2.5">Upload new Scenario</span>
+                    <Icon icon={UPLOAD_SVG} />
+                  </Button>
+                </ComingSoon>
               </div>
             </HelpBeacon>
 

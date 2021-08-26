@@ -9,6 +9,8 @@ import { useMe } from 'hooks/me';
 import { useProject } from 'hooks/projects';
 
 // import Avatar from 'components/avatar';
+import ComingSoon from 'layout/help/coming-soon';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
 
@@ -188,23 +190,28 @@ export const Item: React.FC<ItemProps> = ({
 
         <footer className="mt-7">
           <div className="flex">
-            <Button
-              className=""
-              theme="secondary"
-              size="xs"
-              onClick={handleDownload}
-            >
-              Download
-            </Button>
 
-            <Button
-              className="ml-3"
-              theme="secondary"
-              size="xs"
-              onClick={handleDuplicate}
-            >
-              Duplicate
-            </Button>
+            <ComingSoon>
+              <Button
+                className=""
+                theme="secondary"
+                size="xs"
+                onClick={handleDownload}
+              >
+                Download
+              </Button>
+            </ComingSoon>
+
+            <ComingSoon>
+              <Button
+                className="ml-3"
+                theme="secondary"
+                size="xs"
+                onClick={handleDuplicate}
+              >
+                Duplicate
+              </Button>
+            </ComingSoon>
 
             <Button
               className="ml-3"
@@ -214,6 +221,7 @@ export const Item: React.FC<ItemProps> = ({
             >
               Delete
             </Button>
+
           </div>
         </footer>
 

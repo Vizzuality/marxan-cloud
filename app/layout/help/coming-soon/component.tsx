@@ -14,7 +14,7 @@ export interface ComingSoonProps {
 
 export const ComingSoon: React.FC<ComingSoonProps> = ({
   children,
-  placement = 'top',
+  placement = 'bottom',
 }: ComingSoonProps) => {
   const childrenRef = useRef(null);
 
@@ -29,14 +29,13 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
         placement={placement}
         maxWidth={350}
         content={(
-          <div className="px-2 py-1 text-gray-500 bg-white rounded">
-            <span>Coming soon</span>
+          <div className="px-4 py-1.5 text-xs text-gray-500 bg-white rounded">
+            <span>Feature coming soon!</span>
           </div>
         )}
-
       >
-        <div className="opacity-50">
-          <div className="">
+        <div className="opacity-60">
+          <div className="pointer-events-none">
             {CHILDREN}
           </div>
         </div>
