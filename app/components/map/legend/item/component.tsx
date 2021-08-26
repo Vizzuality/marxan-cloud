@@ -153,7 +153,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                       'text-gray-300': opacity !== 1,
                     })}
                   >
-                    <Icon className="w-5 h-5" icon={OPACITY_SVG} />
+                    <Icon className="w-5 h-5 pt-px" icon={OPACITY_SVG} />
                   </button>
                 </Tooltip>
               </div>
