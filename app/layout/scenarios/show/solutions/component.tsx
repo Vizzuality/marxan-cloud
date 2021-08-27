@@ -23,7 +23,7 @@ export const SECTIONS = [
   {
     id: 'details',
     name: 'Details',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit quis quisquam, reiciendis neque, facere perspiciatis.',
+    description: 'Each solution gives an alternative answer to your planning problem. The result of each solution reflects whether a planning unit is selected or not in the conservation network.',
   },
   {
     id: 'gap-analysis',
