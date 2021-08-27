@@ -7,7 +7,10 @@ import { useRouter } from 'next/router';
 import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import useBottomScrollListener from 'hooks/scroll';
-import { useSolutions, useBestSolution, useMostDifferentSolutions } from 'hooks/solutions';
+import {
+  useSolutions, useBestSolution, useMostDifferentSolutions, useDownloadSolutions,
+} from 'hooks/solutions';
+import { useToasts } from 'hooks/toast';
 
 import { Button } from 'components/button/component';
 import Checkbox from 'components/forms/checkbox';
@@ -26,13 +29,15 @@ import { SolutionsTableFormProps } from './types';
 export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   onCancel, setShowTable,
 }: SolutionsTableFormProps) => {
+  const { addToast } = useToasts();
+
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
   const { query } = useRouter();
   const { sid } = query;
-  const dispatch = useDispatch();
 
   const scenarioSlice = getScenarioSlice(sid);
   const { setSelectedSolution } = scenarioSlice.actions;
+  const dispatch = useDispatch();
 
   const {
     data: bestSolutionData,
@@ -72,10 +77,32 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     },
   );
 
+  const downloadSolutionsMutation = useDownloadSolutions({});
+
   const onSave = useCallback(() => {
     dispatch(setSelectedSolution(selectSolution));
     setShowTable(false);
   }, [dispatch, selectSolution, setSelectedSolution, setShowTable]);
+
+  const onDownload = useCallback(() => {
+    downloadSolutionsMutation.mutate({ id: `${sid}` }, {
+      onSuccess: () => {
+
+      },
+      onError: () => {
+        addToast('download-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <ul className="text-sm">
+              Template not downloaded
+            </ul>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [sid, downloadSolutionsMutation, addToast]);
 
   return (
     <div className="relative flex flex-col flex-grow overflow-hidden text-gray-800">
@@ -136,16 +163,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-8">
-            <Button
-              theme="secondary"
-              size="base"
-              className="flex items-center justify-between pl-4 pr-4"
-              onClick={() => console.info('click - download solutions')}
-            >
-              Download solutions
-              <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
-            </Button>
+          <div className="flex items-center justify-between space-x-8">
             <div className="flex items-center">
               <Checkbox
                 theme="light"
@@ -181,6 +199,16 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
                 </div>
               </InfoButton>
             </div>
+
+            <Button
+              theme="secondary"
+              size="base"
+              className="flex items-center justify-between pl-4 pr-4"
+              onClick={onDownload}
+            >
+              Download solutions
+              <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
+            </Button>
           </div>
         </div>
         <div
