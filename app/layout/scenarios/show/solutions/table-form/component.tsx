@@ -80,9 +80,9 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   }, [dispatch, selectSolution, setSelectedSolution, setShowTable]);
 
   return (
-    <div className="relative flex flex-col flex-grow overflow-hidden text-gray-800">
+    <div className="relative flex flex-col flex-grow mt-8 overflow-hidden text-gray-800">
 
-      <div className="relative flex flex-col flex-grow mt-8 overflow-hidden overflow-x-hidden overflow-y-auto">
+      <div className="relative flex flex-col flex-grow overflow-hidden overflow-x-hidden overflow-y-auto">
         <div className="items-center px-8 pb-8 space-y-12 flex-column">
           <div className="flex space-x-3">
             <div className="flex-col">
