@@ -42,6 +42,7 @@ import { ProtectionStatusModule } from '@marxan/scenarios-planning-unit';
 import { SpecificationModule } from './specification';
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
+import { CostRangeService } from './cost-range-service';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-
     MarxanInput,
     ZipFilesSerializer,
     ScenarioPlanningUnitSerializer,
+    CostRangeService,
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],
