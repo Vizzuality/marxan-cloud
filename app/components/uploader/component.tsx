@@ -100,7 +100,7 @@ export const Uploader: React.FC<UploaderProps> = ({
               <div
                 {...getRootProps()}
                 className={cx({
-                  'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted hover:bg-gray-100 cursor-pointer': true,
+                  'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
                   'bg-gray-500': isDragActive,
                   'border-green-800': isDragAccept,
                   'border-red-800': isDragReject,
@@ -109,7 +109,7 @@ export const Uploader: React.FC<UploaderProps> = ({
 
                 <input {...getInputProps()} />
 
-                <p className="text-sm text-center text-gray-300">
+                <p className="text-sm text-center text-gray-500">
                   Drag and drop your polygon data file
                   <br />
                   or
@@ -119,7 +119,7 @@ export const Uploader: React.FC<UploaderProps> = ({
                   to upload
                 </p>
 
-                <p className="mt-2 text-center text-gray-300 text-xxs">{`Recommended file size < ${bytesToMb(maxSize)} MB`}</p>
+                <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMb(maxSize)} MB`}</p>
 
                 <Loading
                   visible={loading}

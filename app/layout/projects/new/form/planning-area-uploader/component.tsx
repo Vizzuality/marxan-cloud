@@ -6,10 +6,15 @@ import {
   setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
 } from 'store/slices/projects/new';
 
+import { motion } from 'framer-motion';
+
 import { useUploadProjectPA } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
+import Icon from 'components/icon';
 import Uploader from 'components/uploader';
+
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface PlanningAreUploaderProps {
   input: any;
@@ -110,18 +115,52 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
 
   return (
     <div className="mt-3 mb-5">
-      <Uploader
-        caption="Upload shapefile"
-        form={form}
-        input={input}
-        loading={loading}
-        maxSize={maxSize}
-        reset={resetPlanningArea}
-        onDropAccepted={onDropAccepted}
-        onDropRejected={onDropRejected}
-        successFile={successFile}
-        setSuccessFile={setSuccessFile}
-      />
+
+      {successFile && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div className="flex flex-col w-full py-5 space-y-6 cursor-pointer">
+            <div className="flex items-center space-x-2">
+              <label className="px-3 py-1 bg-blue-100 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                <p className="text-sm text-primary-500">{successFile.name}</p>
+              </label>
+              <button
+                id="cancel-shapefile-btn"
+                type="button"
+                className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-black"
+                onClick={() => {
+                  setSuccessFile(null);
+                  resetPlanningArea(form);
+                  // input.onChange(null);
+                }}
+              >
+                <Icon
+                  className="w-1.5 h-1.5 text-white group-hover:text-white"
+                  icon={CLOSE_SVG}
+                />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {!successFile && (
+        <Uploader
+          caption="Upload shapefile"
+          form={form}
+          input={input}
+          loading={loading}
+          maxSize={maxSize}
+          reset={resetPlanningArea}
+          onDropAccepted={onDropAccepted}
+          onDropRejected={onDropRejected}
+          successFile={successFile}
+          setSuccessFile={setSuccessFile}
+        />
+      )}
     </div>
   );
 };
