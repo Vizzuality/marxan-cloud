@@ -8,6 +8,10 @@ import {
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import { sleep } from "https://deno.land/x/sleep@v1.2.0/mod.ts";
+import { createBot } from '../lib/libbot/init.ts';
+import { ScenarioJobStatus} from '../lib/libbot/scenario-status.ts';
+
+const bot = await createBot();
 
 const scriptPath = dirname(relative(Deno.cwd(), fromFileUrl(import.meta.url)));
 
