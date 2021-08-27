@@ -7,8 +7,6 @@ import { signOut } from 'next-auth/client';
 import { useSaveMePassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 
-import ComingSoon from 'layout/help/coming-soon';
-
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
@@ -150,11 +148,9 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
                 </div>
 
                 <div className="mt-5">
-                  <ComingSoon>
-                    <Button theme="primary" size="s" type="submit" disabled={submitting}>
-                      Change password
-                    </Button>
-                  </ComingSoon>
+                  <Button theme="primary" size="s" type="submit" disabled={submitting}>
+                    Change password
+                  </Button>
                 </div>
 
               </div>
