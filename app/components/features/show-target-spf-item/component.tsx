@@ -1,7 +1,7 @@
 import React from 'react';
 
 import cx from 'classnames';
-import { percentageFormatter } from 'utils/numbers';
+import { format } from 'd3';
 
 import Label from 'components/forms/label';
 import InfoButton from 'components/info-button';
@@ -12,7 +12,7 @@ export const TargetSPFItem: React.FC<ShowTargetSPFItemProps> = ({
   className,
   type,
   name,
-  target,
+  target = 0,
   fpf,
   id,
   firstFeature,
@@ -67,7 +67,7 @@ export const TargetSPFItem: React.FC<ShowTargetSPFItemProps> = ({
             )}
           </div>
 
-          <p>{target && percentageFormatter(target)}</p>
+          <p>{format('.2~%')(target / 100)}</p>
         </div>
         <div className="flex flex-col justify-between w-24 px-4 border-l">
           <div className="flex items-baseline space-x-3">
