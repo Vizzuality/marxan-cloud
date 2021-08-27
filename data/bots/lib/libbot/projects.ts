@@ -17,7 +17,7 @@ export class Projects {
     this.baseHttpClient = httpClient.baseHttpClient;
   }
   
-  async createInOrganization(project: Project, organizationId: string) {
+  async createInOrganization(organizationId: string, project: Project) {
     return await this.baseHttpClient.post('/projects', { ...project, organizationId })
       .then(result => result.data)
       .catch(e => console.log(e));
