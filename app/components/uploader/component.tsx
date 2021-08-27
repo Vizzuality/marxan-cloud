@@ -21,7 +21,7 @@ export const Uploader: React.FC<UploaderProps> = ({
   input,
   form,
   loading,
-  maxSize = 3000000,
+  maxSize = 3000000, // bytes
   multiple = false,
   successFile,
   setSuccessFile,
@@ -51,6 +51,10 @@ export const Uploader: React.FC<UploaderProps> = ({
     onDropRejected,
   });
 
+  const bytesToMb = (bytes) => {
+    return (bytes / 1048576).toFixed(0);
+  };
+
   return (
     <div className="mt-3 mb-5">
       <Button
@@ -72,7 +76,7 @@ export const Uploader: React.FC<UploaderProps> = ({
           <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
 
           <div className="flex items-center mb-5 space-x-3">
-            <h5 className="text-xs text-gray-400">Supported formats and size</h5>
+            <h5 className="text-xs text-gray-400">Supported formats</h5>
             <InfoButton
               size="s"
               theme="secondary"
@@ -115,7 +119,7 @@ export const Uploader: React.FC<UploaderProps> = ({
                   to upload
                 </p>
 
-                <p className="mt-2 text-center text-gray-300 text-xxs">{'Recommended file size < 3 MB'}</p>
+                <p className="mt-2 text-center text-gray-300 text-xxs">{`Recommended file size < ${bytesToMb(maxSize)} MB`}</p>
 
                 <Loading
                   visible={loading}
