@@ -1,5 +1,5 @@
 import { EntityManager, In } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { MetadataArchiver } from './metadata/data-archiver.service';
 import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
@@ -14,6 +14,7 @@ import {
 import { readFileSync } from 'fs';
 import { ScenarioFeaturesDataService } from './scenario-features';
 import { RunDirectories } from '../run-directories';
+import { chunk } from 'lodash';
 
 @Injectable()
 export class GeoOutputRepository {
@@ -24,6 +25,7 @@ export class GeoOutputRepository {
     private readonly planningUnitsStateCalculator: PlanningUnitSelectionCalculatorService,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
+    private readonly logger: Logger = new Logger(GeoOutputRepository.name),
   ) {}
 
   async save(
@@ -53,28 +55,77 @@ export class GeoOutputRepository {
     );
 
     return this.entityManager.transaction(async (transaction) => {
-      await transaction.delete(OutputScenariosPuDataGeoEntity, {
-        scenarioPuId: In(Object.keys(planningUnitsState)),
-      });
+      // We chunk delete and insert operations as the generated SQL statements
+      // could otherwise easily end up including tens of thousands of
+      // parameters, risking to hit PostgreSQL' limit for this when processing
+      // large numbers of features and planning units (times the columns of data
+      // to insert -- for insert operations).
+      // Moreover, TypeORM seems to use up a disproportionate amount of memory
+      // and CPU time when assembling large queries with tens of thousands or
+      // parameters, which makes non-chunked operations block the event loop
+      // for unacceptable amounts of time here.
 
-      await transaction.delete(OutputScenariosFeaturesDataGeoEntity, {
-        featureScenarioId: In(
-          scenarioFeatureDataFromAllRuns.map((e) => e.featureScenarioId),
-        ),
-      });
+      const CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS = 1000;
 
-      await transaction.insert(
-        OutputScenariosFeaturesDataGeoEntity,
+      this.logger.debug(
+        `Deleting ${Object.keys(planningUnitsState).length} output scenario planning units...`,
+      );
+      for (const [index, ospuChunk] of chunk(
+        Object.keys(planningUnitsState),
+        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+      ).entries()) {
+        this.logger.debug(`Deleting chunk #${index} (${ospuChunk.length} items)...`);
+        await transaction.delete(OutputScenariosPuDataGeoEntity, {
+          scenarioPuId: In(ospuChunk),
+        });
+      }
+
+      this.logger.debug(
+        `Deleting ${scenarioFeatureDataFromAllRuns.length} output scenario features...`,
+      );
+      for (const [index, osfdChunk] of chunk(
         scenarioFeatureDataFromAllRuns,
+        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+      ).entries()) {
+        this.logger.debug(`Deleting chunk #${index} (${osfdChunk.length} items)...`);
+        await transaction.delete(OutputScenariosFeaturesDataGeoEntity, {
+          featureScenarioId: In(osfdChunk.map((e) => e.featureScenarioId)),
+        });
+      }
+
+      this.logger.debug(
+        `Inserting ${scenarioFeatureDataFromAllRuns.length} output scenario features...`,
+      );
+      for (const [index, osfdChunk] of chunk(
+        scenarioFeatureDataFromAllRuns,
+        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+      ).entries()) {
+        this.logger.debug(`Inserting chunk #${index} (${osfdChunk.length} items)...`);
+        await transaction.insert(
+          OutputScenariosFeaturesDataGeoEntity,
+          osfdChunk,
+        );
+      }
+
+      const chunkedOutputScenariosPuData = chunk(
+        Object.entries(planningUnitsState),
+        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
       );
 
+      this.logger.debug(
+        `Inserting ${Object.keys(planningUnitsState).length} output scenario planning units...`,
+      );
       await Promise.all(
-        Object.entries(planningUnitsState).map(([scenarioPuId, data]) =>
-          transaction.insert(OutputScenariosPuDataGeoEntity, {
-            scenarioPuId,
-            values: data.values,
-            includedCount: data.usedCount,
-          }),
+        chunkedOutputScenariosPuData.map((ospuChunk, index) => {
+          this.logger.debug(`Inserting chunk #${index} (${ospuChunk.length} items)...`);
+          return ospuChunk.map(([scenarioPuId, data]) =>
+            transaction.insert(OutputScenariosPuDataGeoEntity, {
+              scenarioPuId,
+              values: data.values,
+              includedCount: data.usedCount,
+            }),
+          )
+        }
         ),
       );
 
