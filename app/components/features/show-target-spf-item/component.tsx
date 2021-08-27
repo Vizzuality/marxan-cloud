@@ -1,6 +1,7 @@
 import React from 'react';
 
 import cx from 'classnames';
+import { percentageFormatter } from 'utils/numbers';
 
 import Label from 'components/forms/label';
 import InfoButton from 'components/info-button';
@@ -44,29 +45,29 @@ export const TargetSPFItem: React.FC<ShowTargetSPFItemProps> = ({
               TARGET
             </Label>
             {firstFeature && (
-            <InfoButton>
-              <div>
-                <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
-                <div className="space-y-2">
-                  <p>
-                    This value represents how much you want to conserve of a particular
-                    feature. In an ideal conservation, land or sea use plan,
-                    all your features meet their targets.
-                  </p>
-                  <p>
-                    You can set a default
-                    value for all of your features
-                    or you can set individual the targets separately for each feature.
-                    You can set your targets to 100% if you want the whole extent of
-                    your feature to be included in the solution.
-                  </p>
+              <InfoButton>
+                <div>
+                  <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
+                  <div className="space-y-2">
+                    <p>
+                      This value represents how much you want to conserve of a particular
+                      feature. In an ideal conservation, land or sea use plan,
+                      all your features meet their targets.
+                    </p>
+                    <p>
+                      You can set a default
+                      value for all of your features
+                      or you can set individual the targets separately for each feature.
+                      You can set your targets to 100% if you want the whole extent of
+                      your feature to be included in the solution.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </InfoButton>
+              </InfoButton>
             )}
           </div>
 
-          <p>{`${target}%`}</p>
+          <p>{target && percentageFormatter(target)}</p>
         </div>
         <div className="flex flex-col justify-between w-24 px-4 border-l">
           <div className="flex items-baseline space-x-3">
