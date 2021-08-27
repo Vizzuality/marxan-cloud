@@ -169,11 +169,11 @@ export const Item: React.FC<ItemProps> = ({
         </header>
 
         {/* CONTRIBUTORS */}
-        <ComingSoon>
-          {!!contributors.length && (
+        <div className="inline-flex">
+          <ComingSoon>
             <div className="flex items-center mt-4 text-sm">
               <p>Contributors:</p>
-              <ul className="flex ml-1">
+              <ul className="flex ml-2">
                 {contributors.map((c, i) => {
                   return (
                     <li
@@ -188,10 +188,21 @@ export const Item: React.FC<ItemProps> = ({
                     </li>
                   );
                 })}
+
+                <li
+                  key="add-contributor"
+                  className={cx({
+                    'ml-2': true,
+                  })}
+                >
+                  <Avatar className="text-sm text-white uppercase bg-gray-500">
+                    <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
+                  </Avatar>
+                </li>
               </ul>
             </div>
-          )}
-        </ComingSoon>
+          </ComingSoon>
+        </div>
 
         <footer className="mt-7">
           <div className="flex">

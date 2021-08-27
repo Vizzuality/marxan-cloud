@@ -114,10 +114,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
           description,
           lastUpdate,
           lastUpdateDistance: lastUpdateDistance(),
-          contributors: [
-            { id: 1, name: '', bgImage: '' },
-            { id: 2, name: '', bgImage: '' },
-          ],
+          contributors: [],
           onClick: () => {
             push(`/projects/${id}`);
           },
