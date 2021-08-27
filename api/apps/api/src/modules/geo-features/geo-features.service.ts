@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DeepReadonly } from 'utility-types';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import {
@@ -7,19 +8,16 @@ import {
   geoFeatureResource,
 } from './geo-feature.geo.entity';
 import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
-
-import * as faker from 'faker';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
-import { GeoFeature, GeoFeatureProperty } from './geo-feature.api.entity';
+import { GeoFeature } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
-import { FeatureTag } from '@marxan/features/domain';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 const geoFeatureFilterKeyNames = [
@@ -37,12 +35,16 @@ type GeoFeatureFilterKeys = keyof Pick<
 >;
 type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
 
+type ServiceRequestInfo = AppInfoDTO & {
+  forProject?: Project;
+};
+
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
   GeoFeature,
   GeoFeatureSetSpecification,
   GeoFeatureSetSpecification,
-  AppInfoDTO
+  ServiceRequestInfo
 > {
   constructor(
     @InjectRepository(GeoFeatureGeometry, DbConnections.geoprocessingDB)
@@ -65,8 +67,6 @@ export class GeoFeaturesService extends AppBaseService<
     );
   }
 
-  private forProject?: Project | null;
-
   get serializerConfig(): JSONAPISerializerConfig<GeoFeature> {
     return {
       attributes: [
@@ -83,33 +83,13 @@ export class GeoFeaturesService extends AppBaseService<
     };
   }
 
-  async fakeFindOne(_id: string): Promise<GeoFeature> {
-    return {
-      ...new GeoFeature(),
-      id: faker.random.uuid(),
-      featureClassName: faker.random.alphaNumeric(15),
-      alias: faker.random.words(8),
-      propertyName: faker.random.words(8),
-      intersection: [...Array(4)].map((_i) => faker.random.uuid()),
-      tag: faker.random.arrayElement(Object.values(FeatureTag)),
-      properties: [...Array(6)].map((_i) => this._fakeGeoFeatureProperty()),
-    };
-  }
-
-  private _fakeGeoFeatureProperty(): GeoFeatureProperty {
-    return {
-      key: faker.random.word(),
-      distinctValues: [...Array(8)].map((_i) => faker.random.words(6)),
-    };
-  }
-
   /**
    * Apply service-specific filters.
    */
   setFilters(
     query: SelectQueryBuilder<GeoFeature>,
     filters: GeoFeatureFilters,
-    info?: AppInfoDTO,
+    info?: ServiceRequestInfo,
   ): SelectQueryBuilder<GeoFeature> {
     this._processBaseFilters<GeoFeatureFilters>(
       query,
@@ -125,7 +105,7 @@ export class GeoFeaturesService extends AppBaseService<
   async extendFindAllQuery(
     query: SelectQueryBuilder<GeoFeature>,
     fetchSpecification: FetchSpecification,
-    info: AppInfoDTO,
+    info: ServiceRequestInfo,
   ): Promise<SelectQueryBuilder<GeoFeature>> {
     /**
      * We should either list only "public" features (i.e. they are not from a
@@ -148,7 +128,7 @@ export class GeoFeaturesService extends AppBaseService<
       (info?.params?.projectId as string) ??
       (fetchSpecification?.filter?.projectId as string);
     if (projectId) {
-      this.forProject = await this.projectRepository
+      const relatedProject = await this.projectRepository
         .findOneOrFail(projectId)
         .then((project) => project)
         .catch((_error) => {
@@ -165,10 +145,10 @@ export class GeoFeaturesService extends AppBaseService<
         "geoFeatureGeometries".the_geom
       )`,
           {
-            xmin: this.forProject.bbox[1],
-            ymin: this.forProject.bbox[3],
-            xmax: this.forProject.bbox[0],
-            ymax: this.forProject.bbox[2],
+            xmin: relatedProject.bbox[1],
+            ymin: relatedProject.bbox[3],
+            xmax: relatedProject.bbox[0],
+            ymax: relatedProject.bbox[2],
           },
         )
         .getMany()
@@ -219,8 +199,8 @@ export class GeoFeaturesService extends AppBaseService<
    */
   async extendFindAllResults(
     entitiesAndCount: [any[], number],
-    fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
+    fetchSpecification?: DeepReadonly<FetchSpecification>,
+    info?: ServiceRequestInfo,
   ): Promise<[any[], number]> {
     /**
      * Short-circuit if there's no result to extend, or if the API client has
@@ -249,7 +229,7 @@ export class GeoFeaturesService extends AppBaseService<
     );
 
     const entitiesWithProperties = await this.geoFeaturesPropertySet
-      .getFeaturePropertySetsForFeatures(geoFeatureIds, this.forProject)
+      .getFeaturePropertySetsForFeatures(geoFeatureIds, info?.forProject)
       .then((results) => {
         return this.geoFeaturesPropertySet.extendGeoFeaturesWithPropertiesFromPropertySets(
           entitiesAndCount[0],
@@ -257,17 +237,5 @@ export class GeoFeaturesService extends AppBaseService<
         );
       });
     return [entitiesWithProperties, entitiesAndCount[1]];
-  }
-
-  /**
-   * @todo Extend result by adding the feature's property set (see
-   * `extendFindAllResults()` above) for singular queries.
-   */
-  async extendGetByIdResult(
-    entity: GeoFeature,
-    _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
-  ): Promise<GeoFeature> {
-    return entity;
   }
 }
