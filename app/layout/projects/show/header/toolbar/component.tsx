@@ -9,6 +9,7 @@ import { useMe } from 'hooks/me';
 import { useProject } from 'hooks/projects';
 
 import HelpBeacon from 'layout/help/beacon';
+import ComingSoon from 'layout/help/coming-soon';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -51,13 +52,15 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
               )}
             >
               <div>
-                <Button
-                  theme="secondary"
-                  size="base"
-                >
-                  <span className="mr-2.5">Upload new Scenario</span>
-                  <Icon icon={UPLOAD_SVG} />
-                </Button>
+                <ComingSoon>
+                  <Button
+                    theme="secondary"
+                    size="base"
+                  >
+                    <span className="mr-2.5">Upload new Scenario</span>
+                    <Icon icon={UPLOAD_SVG} />
+                  </Button>
+                </ComingSoon>
               </div>
             </HelpBeacon>
 
@@ -77,21 +80,23 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
               )}
             >
               <div>
-                <Button
-                  theme="secondary"
-                  size="base"
-                  onClick={() => plausible('Download project', {
-                    props: {
-                      userId: `${user.id}`,
-                      userEmail: `${user.email}`,
-                      projectId: `${pid}`,
-                      projectName: `${data.name}`,
-                    },
-                  })}
-                >
-                  <span className="mr-2.5">Download project</span>
-                  <Icon icon={DOWNLOAD_SVG} />
-                </Button>
+                <ComingSoon>
+                  <Button
+                    theme="secondary"
+                    size="base"
+                    onClick={() => plausible('Download project', {
+                      props: {
+                        userId: `${user.id}`,
+                        userEmail: `${user.email}`,
+                        projectId: `${pid}`,
+                        projectName: `${data.name}`,
+                      },
+                    })}
+                  >
+                    <span className="mr-2.5">Download project</span>
+                    <Icon icon={DOWNLOAD_SVG} />
+                  </Button>
+                </ComingSoon>
               </div>
             </HelpBeacon>
 

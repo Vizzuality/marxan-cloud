@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 
+import ComingSoon from 'layout/help/coming-soon';
 import SolutionFrequency from 'layout/solutions/frequency';
 import SolutionSelected from 'layout/solutions/selected';
 
@@ -98,7 +99,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
       <div className="flex flex-col flex-grow w-full min-h-0 overflow-hidden">
         <div className="px-0.5 overflow-x-visible overflow-y-auto">
           <div className="relative flex flex-col w-full mt-1 text-sm">
-            <p className="py-4 opacity-50">Description Lorem ipsum dolor sit amet, solutions consectetuer adipiscing elit.</p>
+            <p className="py-4 opacity-50">The result of each solution reflects whether a planning unit is selected or not in the conservation network.</p>
             <Button
               theme="primary"
               size="base"
@@ -109,22 +110,25 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
               <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
             </Button>
 
-            <Button
-              theme="secondary"
-              size="base"
-              className="h-12"
-              onClick={() => onScheduleScenario()}
-            >
-              <div className="flex flex-col justify-center">
-                Schedule scenario
-                {numberOfSchedules > 0 && (
-                  <span className="text-blue-400 text-xxs">
-                    {`${numberOfSchedules} schedule${numberOfSchedules > 1 ? 's' : ''}`}
-                  </span>
-                )}
-              </div>
-              <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
-            </Button>
+            <ComingSoon>
+              <Button
+                theme="secondary"
+                size="base"
+                className="w-full h-12"
+                onClick={() => onScheduleScenario()}
+              >
+                <div className="flex flex-col justify-center">
+                  Schedule scenario
+                  {numberOfSchedules > 0 && (
+                    <span className="text-blue-400 text-xxs">
+                      {`${numberOfSchedules} schedule${numberOfSchedules > 1 ? 's' : ''}`}
+                    </span>
+                  )}
+                </div>
+                <Icon icon={CLOCK_SVG} className="absolute w-4 h-4 right-8" />
+              </Button>
+
+            </ComingSoon>
 
             <Modal
               open={showTable}

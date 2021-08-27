@@ -2,10 +2,10 @@ import React, { useCallback, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 
+import cx from 'classnames';
+
 import { useProjects, useDeleteProject, useDuplicateProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
-
-import cx from 'classnames';
 
 import HelpBeacon from 'layout/help/beacon';
 import Wrapper from 'layout/wrapper';
