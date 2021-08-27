@@ -71,7 +71,7 @@ export function withUser(getServerSidePropsFunc?: Function) {
       },
     })
       .then((response) => {
-        if (response.status > 400) {
+        if (response.status > 500) {
           return new Error('prefetchQuery "me" error');
         }
         return response.data;
