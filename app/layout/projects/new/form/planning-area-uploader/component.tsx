@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useDispatch } from 'react-redux';
 
-import { useUploadProjectPA } from 'hooks/projects';
-import { useToasts } from 'hooks/toast';
-
 import {
   setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
 } from 'store/slices/projects/new';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
+
+import { useUploadProjectPA } from 'hooks/projects';
+import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
@@ -181,7 +181,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
             <Loading
               visible={loading}
               className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-              iconClassName="w-5 h-5 text-primary-500"
+              iconClassName="w-10 h-10 text-primary-500"
             />
 
           </div>

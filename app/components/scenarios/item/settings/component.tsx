@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react';
 
+import ComingSoon from 'layout/help/coming-soon';
+
 import Button from 'components/button';
 
 export interface ItemSettingsProps {
@@ -18,14 +20,16 @@ export const Item: React.FC<ItemSettingsProps> = ({
       {children}
 
       <div className="flex justify-end w-full space-x-1 mt-2.5">
-        <Button
-          className="flex-shrink-0"
-          size="s"
-          theme="secondary"
-          onClick={onDuplicate}
-        >
-          Duplicate
-        </Button>
+        <ComingSoon>
+          <Button
+            className="flex-shrink-0"
+            size="s"
+            theme="secondary"
+            onClick={onDuplicate}
+          >
+            Duplicate
+          </Button>
+        </ComingSoon>
 
         <Button
           className="flex-shrink-0"

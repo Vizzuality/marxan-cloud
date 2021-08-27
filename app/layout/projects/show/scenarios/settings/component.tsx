@@ -18,21 +18,21 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
   } = useScenario(sid);
 
   const {
-    data: selectedFeaturesData,
+    data: selectedFeaturesData = [],
   } = useSelectedFeatures(sid, {});
 
   if (scenarioIsFetching) {
     return (
       <Loading
         visible
-        className="z-40 flex items-center justify-center w-full h-12 bg-transparent bg-opacity-90"
-        iconClassName="w-5 h-5 text-primary-500"
+        className="z-40 flex items-center justify-center w-full bg-transparent h-26 bg-opacity-90"
+        iconClassName="w-10 h-10 text-primary-500"
       />
     );
   }
 
   const {
-    wdpaIucnCategories,
+    wdpaIucnCategories = [],
     numberOfRuns,
     boundaryLengthModifier,
   } = scenarioData;
@@ -41,19 +41,19 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
     <dl className="flex flex-col space-y-2">
       <div className="flex space-x-2 text-sm">
         <dt>Protected areas:</dt>
-        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(wdpaIucnCategories || []).length || '-'}</dd>
+        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{wdpaIucnCategories?.length || '-'}</dd>
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>Features:</dt>
-        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(selectedFeaturesData || []).length || '-'}</dd>
+        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{selectedFeaturesData?.length || '-'}</dd>
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>Runs:</dt>
-        <dd>{numberOfRuns || '-'}</dd>
+        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{numberOfRuns || '-'}</dd>
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>BLM:</dt>
-        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{(boundaryLengthModifier || '-')}</dd>
+        <dd className="px-1.5 text-blue-400 bg-blue-400 bg-opacity-30 rounded">{boundaryLengthModifier || '-'}</dd>
       </div>
       {/* <div className="flex space-x-2 text-sm">
         <dt>Schedules:</dt>

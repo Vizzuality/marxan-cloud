@@ -88,7 +88,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
     let parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
       const { data: { data: pageData } } = p;
 
-      return pageData.map((d):ItemProps => {
+      return pageData.map((d): ItemProps => {
         const {
           id, name, description, lastModifiedAt, scenarios, planningAreaName,
         } = d;
@@ -114,10 +114,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
           description,
           lastUpdate,
           lastUpdateDistance: lastUpdateDistance(),
-          contributors: [
-            { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
-            { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
-          ],
+          contributors: [],
           onClick: () => {
             push(`/projects/${id}`);
           },
@@ -319,14 +316,14 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
       const { data: { data: pageData } } = p;
 
-      return pageData.map((d):PublishedItemProps => {
+      return pageData.map((d): PublishedItemProps => {
         const {
           id, name, description, planningAreaName, timesDuplicated,
         } = d;
 
         const contributors = [
-          { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
-          { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
+          { id: 1, name: '', bgImage: '' },
+          { id: 2, name: '', bgImage: '' },
         ];
 
         return {
@@ -369,8 +366,8 @@ export function usePublishedProject(id) {
 
   return useMemo(() => {
     const contributors = [
-      { id: 1, name: 'Miguel Barrenechea', bgImage: '/images/avatar.png' },
-      { id: 2, name: 'Ariadna Martínez', bgImage: '/images/avatar.png' },
+      { id: 1, name: '', bgImage: '' },
+      { id: 2, name: '', bgImage: '' },
     ];
     const parsedData = { ...data?.data, contributors } || {};
 

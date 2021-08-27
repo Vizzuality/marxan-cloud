@@ -2,10 +2,10 @@ import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
+import { signOut } from 'next-auth/client';
+
 import { useSaveMePassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
-
-import { signOut } from 'next-auth/client';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';

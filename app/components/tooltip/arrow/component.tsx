@@ -1,12 +1,14 @@
 import React from 'react';
+
 import cx from 'classnames';
 
 export interface ArrowProps {
-  'data-placement'?: string
+  className?: string;
+  'data-placement'?: string;
 }
 
 export const Arrow: React.FC<ArrowProps> = (props: ArrowProps) => {
-  const { 'data-placement': placement } = props;
+  const { 'data-placement': placement, className } = props;
 
   return (
     <div
@@ -21,6 +23,7 @@ export const Arrow: React.FC<ArrowProps> = (props: ArrowProps) => {
       <div
         className={cx({
           'w-2 h-2 bg-white transform rotate-45': true,
+          [className]: !!className,
         })}
       />
     </div>

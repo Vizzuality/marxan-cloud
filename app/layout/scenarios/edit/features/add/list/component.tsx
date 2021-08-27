@@ -67,7 +67,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
             <Loading
               visible
               className="z-40 flex items-center justify-center w-full "
-              iconClassName="w-5 h-5 text-primary-500"
+              iconClassName="w-10 h-10 text-primary-500"
             />
             <div className="mt-5 text-xs uppercase font-heading">Loading features</div>
           </div>

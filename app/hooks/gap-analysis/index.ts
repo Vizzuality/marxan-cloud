@@ -187,6 +187,7 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
   });
 
   const query = useInfiniteQuery(['post-gap-analysis', sId, JSON.stringify(options)], fetchFeatures, {
+    enabled: !!filters.runId,
     placeholderData: placeholderDataRef.current,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
