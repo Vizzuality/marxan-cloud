@@ -71,59 +71,34 @@ async function sendData(url: string, data: Blob) {
 // tryNTimes(toTry).then(console.log);
 
 
-async function checkScenarioStatus(id: string) {
-    return await botClient.get(`/projects​/${id}​/scenarios​/status`, {})
-    .then((result) => result.data)
-    .catch((e) => {
-        console.log(e);
-    });
-}
-
-const organization = await botClient
-  .post("/organizations", {
-    name: "Brazil - Atlantic forest organization",
-    description: "Duis aliquip nostrud sint",
-    metadata: {},
-  })
-  .then((result) => result.data)
-  .catch((e) => {
-    console.log(e);
-  });
+const organization = await bot.organizations.create({
+  name: '[BotTest] Brazil ' + crypto.randomUUID(),
+  description: '',
+});
 
 console.log(organization);
 
-const planningAreaFile = await (
-  await sendData(
-    settings.apiUrl + "/api/v1/projects/planning-area/shapefile",
-    new Blob([await Deno.readFile(scriptPath + "/test_mata.zip")])
-  )
-).json();
-
-console.log(planningAreaFile);
-
 const planningUnitAreakm2 = 50;
 
-const project = await botClient
-  .post("/projects", {
-    name: "Brazil project",
-    organizationId: organization.data.id,
-    planningUnitGridShape: "hexagon",
-    planningUnitAreakm2: planningUnitAreakm2,
-    planningAreaId: planningAreaFile.id,
-  })
-  .then((result) => result.data)
-  .catch((e) => {
-    console.log(e);
-  });
+const project = await bot.projects.createInOrganization(organization.id, {
+  name: 'test project ' + crypto.randomUUID(),
+  countryId: 'BRA',
+  adminAreaLevel1Id: 'BRA.16_1',
+  adminAreaLevel2Id: 'BRA.16.194_1',
+  planningUnitGridShape: 'hexagon',
+  planningUnitAreakm2: 50,
+}).then(result => result.data).catch(e => { console.log(e) });;
+
 
 console.log(project);
-// wait a bit for async job to be picked up and processed
-// @DEBT we should check the actual job status
-// await new Promise((r) => setTimeout(r, 30e3));
+
+await sleep(15);
+
+await new ScenarioJobStatus().waitFor({
+  jobKind: 
+})
 
 const scenarioStart = Process.hrtime();
-
-await sleep(10)
 
 // Scenario creation with the bare minimum; From there we need to be doin patches to the same scenario
 let scenario = await botClient
@@ -151,7 +126,7 @@ let scenario = await botClient
   console.log(scenario);
 
 
-  console.log(await checkScenarioStatus(project!.data!.id));
+//  console.log(await checkScenarioStatus(project!.data!.id));
 
 // get the list of protected areas in the region and use all of them
 const paCategories:{data:Array<{id:string, type:string, attributes:object}>} = await botClient.get(`/protected-areas/iucn-categories?filter%5BcustomAreaId%5D=${planningAreaFile.id}`)
@@ -204,7 +179,7 @@ await sleep(10)
 
 //Setup features in the project
 
-// const featureList = [
+const featureList = [
 //        "demo_ecoregions_new_class_split",
 //        "demo_buteogallus_urubitinga",
 //        "demo_caluromys_philander",
@@ -212,9 +187,9 @@ await sleep(10)
 //        "demo_leopardus_pardalis",
 //        "demo_megarynchus_pitangua",
 //        "demo_phyllodytes_tuberculosus",
-//        "demo_tapirus_terrestris",
+      "demo_tapirus_terrestris",
 //        "demo_thalurania_glaucopis",
-// ]
+]
 const features = await botClient
   .get(`/projects/${project.data.id}/features?q=demo`)
   .then((result) => result.data)
