@@ -4,14 +4,14 @@ import {
   fromFileUrl,
   relative,
 } from "https://deno.land/std@0.103.0/path/mod.ts";
-import { BotHttpClient } from './marxan-bot.ts';
+import { BotHttpClient, MarxanBotConfig } from './marxan-bot.ts';
 import { Organizations } from './organizations.ts';
 import { Projects } from './projects.ts';
 import { Scenarios } from './scenarios.ts';
 
 const scriptPath = dirname(relative(Deno.cwd(), fromFileUrl(import.meta.url)));
 
-export const createBot = async () => {
+export const createBot = async (botConfig?: MarxanBotConfig) => {
   const { API_URL, USERNAME, PASSWORD, POSTGRES_URL } = config({
     path: scriptPath + "/.env",
   });
