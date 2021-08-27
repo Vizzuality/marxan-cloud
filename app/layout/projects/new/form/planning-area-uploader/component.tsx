@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -29,7 +29,6 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
 }: PlanningAreUploaderProps) => {
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
-  const [geometryData, setGeometryData] = useState(null);
   const { addToast } = useToasts();
 
   const dispatch = useDispatch();
@@ -54,7 +53,6 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   }, []);
 
   const onDropAccepted = async (acceptedFiles) => {
-    setLoading(true);
     const f = acceptedFiles[0];
 
     const data = new FormData();
@@ -65,7 +63,6 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
         setLoading(false);
         setSuccessFile({ id: PAid, name: f.name });
         input.onChange(PAid);
-        setGeometryData(g);
 
         addToast('success-upload-shapefile', (
           <>
@@ -76,10 +73,10 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
           level: 'success',
         });
 
-        // dispatch(setUploadingPlanningArea(geometryData));
-        // dispatch(setBbox(geometryData.bbox));
-        // dispatch(setMinPuAreaSize(geometryData.marxanMetadata.minPuAreaSize));
-        // dispatch(setMaxPuAreaSize(geometryData.marxanMetadata.maxPuAreaSize));
+        dispatch(setUploadingPlanningArea(g));
+        dispatch(setBbox(g.bbox));
+        dispatch(setMinPuAreaSize(g.marxanMetadata.minPuAreaSize));
+        dispatch(setMaxPuAreaSize(g.marxanMetadata.maxPuAreaSize));
         console.info('Shapefile uploaded', g);
       },
       onError: () => {
@@ -97,13 +94,6 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
       },
     });
   };
-
-  const uploadPlanningAreaSubmit = useCallback(() => {
-    dispatch(setUploadingPlanningArea(geometryData));
-    dispatch(setBbox(geometryData.bbox));
-    dispatch(setMinPuAreaSize(geometryData.marxanMetadata.minPuAreaSize));
-    dispatch(setMaxPuAreaSize(geometryData.marxanMetadata.maxPuAreaSize));
-  }, [dispatch, geometryData]);
 
   const onDropRejected = (rejectedFiles) => {
     const r = rejectedFiles[0];
@@ -163,7 +153,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
           input={input}
           loading={loading}
           maxSize={maxSize}
-          handleSubmit={uploadPlanningAreaSubmit}
+          // handleSubmit={uploadPlanningAreaSubmit}
           reset={resetPlanningArea}
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}

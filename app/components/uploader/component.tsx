@@ -7,6 +7,9 @@ import cx from 'classnames';
 import { motion } from 'framer-motion';
 
 import Button from 'components/button';
+import {
+  composeValidators,
+} from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
@@ -25,7 +28,6 @@ export const Uploader: React.FC<UploaderProps> = ({
   maxSize = 3000000, // bytes
   multiple = false,
   successFile,
-  handleSubmit,
   setSuccessFile,
   onDropAccepted,
   onDropRejected,
@@ -56,11 +58,14 @@ export const Uploader: React.FC<UploaderProps> = ({
   const bytesToMb = (bytes) => {
     return (bytes / 1048576).toFixed(0);
   };
+  const handleSubmit = useCallback(async (data) => {
+    console.log('Submit', data);
+  }, []);
 
   return (
     <FormRFF onSubmit={handleSubmit}>
-      {({ handleSubmit: uploadHandleSubmit }) => (
-        <form onSubmit={uploadHandleSubmit} autoComplete="off">
+      {(props) => (
+        <form onSubmit={props.handleSubmit} autoComplete="off">
 
           <div className="mt-3 mb-5">
             <Button
@@ -103,8 +108,11 @@ export const Uploader: React.FC<UploaderProps> = ({
 
                 {!successFile
                   && (
-                    <FieldRFF name="pa-shapefile">
-                      {() => (
+                    <FieldRFF
+                      name="pa-shapefile"
+                      validate={composeValidators([{ presence: true }])}
+                    >
+                      {(fprops) => (
                         <div
                           {...getRootProps()}
                           className={cx({
@@ -115,7 +123,7 @@ export const Uploader: React.FC<UploaderProps> = ({
                           })}
                         >
 
-                          <input {...getInputProps()} />
+                          <input {...getInputProps()} {...fprops} />
 
                           <p className="text-sm text-center text-gray-500">
                             Drag and drop your polygon data file
