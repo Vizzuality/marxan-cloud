@@ -15,7 +15,7 @@ export class ScenarioPlanningUnitSerializer {
       ScenarioPlanningUnitDto,
       units.map((unit) => ({
         id: unit.id,
-        inclusionStatus: unit.lockStatus,
+        inclusionStatus: unit.lockStatus ?? LockStatus.Unstated,
         defaultStatus: unit.protectedByDefault
           ? LockStatus.LockedIn
           : LockStatus.Unstated,
