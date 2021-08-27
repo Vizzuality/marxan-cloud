@@ -177,27 +177,25 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         />
 
         {PUData && (!!PUData.included.length || !!PUData.excluded.length) && (
-          <div>
-            <Button
-              className="relative"
-              theme="secondary"
-              size="s"
-              disabled={clearing}
-              onClick={onClear}
-            >
-              <div className="flex items-center space-x-2">
-                <span>Clear</span>
-                <Icon icon={CLOSE_SVG} className="w-2 h-2" />
-              </div>
+          <Button
+            className="relative"
+            theme="secondary"
+            size="s"
+            disabled={clearing}
+            onClick={onClear}
+          >
+            <div className="flex items-center space-x-2">
+              <span>Clear</span>
+              <Icon icon={CLOSE_SVG} className="w-2 h-2" />
+            </div>
 
-              <Loading
-                visible={clearing}
-                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90 rounded-3xl"
-                iconClassName="w-5 h-5 text-primary-500"
-              />
+            <Loading
+              visible={clearing}
+              className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90 rounded-3xl"
+              iconClassName="w-10 h-5 text-primary-500"
+            />
 
-            </Button>
-          </div>
+          </Button>
         )}
       </div>
 
