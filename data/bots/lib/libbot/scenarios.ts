@@ -44,7 +44,7 @@ export class Scenarios {
     this.baseHttpClient = httpClient.baseHttpClient;
   }
 
-  async createInProject(scenario: Scenario, projectId: string) {
+  async createInProject(projectId: string, scenario: Scenario) {
     return await this.baseHttpClient.post('/scenarios', { ...scenario, projectId })
       .then(result => result.data)
       .catch(e => console.log(e))
