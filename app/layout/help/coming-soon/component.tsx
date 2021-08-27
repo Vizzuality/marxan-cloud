@@ -51,7 +51,7 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
         </div>
       )}
     >
-      <div className="opacity-40">
+      <div className="opacity-30">
         <div className="pointer-events-none">
           {CHILDREN}
         </div>
