@@ -65,7 +65,7 @@ export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> =
       <Loading
         visible
         className="relative flex items-center justify-center w-full h-16"
-        iconClassName="w-5 h-5 text-white"
+        iconClassName="w-10 h-10 text-white"
       />
     );
   }

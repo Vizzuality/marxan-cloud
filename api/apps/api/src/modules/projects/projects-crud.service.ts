@@ -1,7 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { assertDefined, isDefined } from '@marxan/utils';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
@@ -25,6 +24,7 @@ import {
 } from './planning-areas';
 import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/users/role.api.entity';
+import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
 const projectFilterKeyNames = [
   'name',
@@ -50,7 +50,7 @@ export class ProjectsCrudService extends AppBaseService<
   Project,
   CreateProjectDTO,
   UpdateProjectDTO,
-  AppInfoDTO
+  ProjectsInfoDTO
 > {
   constructor(
     @InjectRepository(Project)
@@ -126,7 +126,7 @@ export class ProjectsCrudService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<Project>,
     filters: ProjectFilters,
-    _info?: AppInfoDTO,
+    _info?: ProjectsInfoDTO,
   ): SelectQueryBuilder<Project> {
     this._processBaseFilters<ProjectFilters>(
       query,
@@ -138,8 +138,9 @@ export class ProjectsCrudService extends AppBaseService<
 
   async setDataCreate(
     create: CreateProjectDTO,
-    info?: AppInfoDTO,
+    info?: ProjectsInfoDTO,
   ): Promise<Project> {
+    assertDefined(info?.authenticatedUser?.id);
     /**
      * @debt Temporary setup. I think we should remove TimeUserEntityMetadata
      * from entities and just use a separate event log, and a view to obtain the
@@ -147,7 +148,7 @@ export class ProjectsCrudService extends AppBaseService<
      * modified) from that log, kind of event sourcing way.
      */
     const project = await super.setDataCreate(create, info);
-    project.createdBy = info?.authenticatedUser?.id!;
+    project.createdBy = info.authenticatedUser?.id;
     project.planningAreaGeometryId = create.planningAreaId;
 
     const bbox = await this.planningAreasService.getPlanningAreaBBox({
@@ -174,7 +175,7 @@ export class ProjectsCrudService extends AppBaseService<
   async actionAfterCreate(
     model: Project,
     createModel: CreateProjectDTO,
-    _info?: AppInfoDTO,
+    _info?: ProjectsInfoDTO,
   ): Promise<void> {
     if (
       createModel.planningUnitAreakm2 &&
@@ -200,7 +201,7 @@ export class ProjectsCrudService extends AppBaseService<
   async actionAfterUpdate(
     model: Project,
     createModel: UpdateProjectDTO,
-    _info?: AppInfoDTO,
+    _info?: ProjectsInfoDTO,
   ): Promise<void> {
     /**
      * @deprecated Workers and jobs should be move to the new functionality
@@ -227,7 +228,7 @@ export class ProjectsCrudService extends AppBaseService<
   async setDataUpdate(
     model: Project,
     update: UpdateProjectDTO,
-    _?: AppInfoDTO,
+    _?: ProjectsInfoDTO,
   ): Promise<Project> {
     const bbox = await this.planningAreasService.getPlanningAreaBBox({
       ...update,
@@ -246,7 +247,7 @@ export class ProjectsCrudService extends AppBaseService<
   async extendGetByIdResult(
     entity: Project,
     _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
+    _info?: ProjectsInfoDTO,
   ): Promise<Project> {
     const ids: MultiplePlanningAreaIds = entity;
     const idAndName = await this.planningAreasService.getPlanningAreaIdAndName(
@@ -259,12 +260,40 @@ export class ProjectsCrudService extends AppBaseService<
     return entity;
   }
 
+  extendGetByIdQuery(
+    query: SelectQueryBuilder<Project>,
+    fetchSpecification?: FetchSpecification,
+    info?: ProjectsInfoDTO,
+  ): SelectQueryBuilder<Project> {
+    const loggedUser = Boolean(info?.authenticatedUser);
+    query.leftJoin(
+      UsersProjectsApiEntity,
+      `acl`,
+      `${this.alias}.id = acl.project_id`,
+    );
+
+    if (loggedUser) {
+      query
+        .andWhere(`acl.user_id = :userId`, {
+          userId: info?.authenticatedUser?.id,
+        })
+        .andWhere(`acl.role_id = :roleId`, {
+          roleId: Roles.project_owner,
+        });
+    } else {
+      query.andWhere(`${this.alias}.is_public = true`);
+    }
+
+    return query;
+  }
+
   async extendFindAllQuery(
     query: SelectQueryBuilder<Project>,
     fetchSpecification: FetchSpecification,
     info?: ProjectsInfoDTO,
   ): Promise<SelectQueryBuilder<Project>> {
-    assertDefined(info?.authenticatedUser);
+    const loggedUser = Boolean(info?.authenticatedUser);
+
     const { namesSearch } = info?.params ?? {};
 
     query.leftJoin(
@@ -294,13 +323,17 @@ export class ProjectsCrudService extends AppBaseService<
       );
     }
 
-    query
-      .andWhere(`acl.user_id = :userId`, {
-        userId: info?.authenticatedUser?.id,
-      })
-      .andWhere(`acl.role_id = :roleId`, {
-        roleId: Roles.project_owner,
-      });
+    if (loggedUser) {
+      query
+        .andWhere(`acl.user_id = :userId`, {
+          userId: info?.authenticatedUser?.id,
+        })
+        .andWhere(`acl.role_id = :roleId`, {
+          roleId: Roles.project_owner,
+        });
+    } else {
+      query.andWhere(`${this.alias}.is_public = true`);
+    }
 
     return query;
   }
@@ -323,7 +356,7 @@ export class ProjectsCrudService extends AppBaseService<
   async extendFindAllResults(
     entitiesAndCount: [Project[], number],
     _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
+    _info?: ProjectsInfoDTO,
   ): Promise<[Project[], number]> {
     const extendedEntities: Promise<Project>[] = entitiesAndCount[0].map(
       (entity) => this.extendGetByIdResult(entity),

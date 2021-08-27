@@ -3,6 +3,7 @@ const colors = require('tailwindcss/colors');
 
 // PLUGINS
 const lineClamp = require('./styles/line-clamp');
+const SCREENS = require('./utils/media');
 
 module.exports = {
   purge: {
@@ -34,13 +35,13 @@ module.exports = {
         },
       },
     }),
-    screens: {
-      sm: '640px',
-      md: '768px',
-      lg: '1024px',
-      xl: '1280px',
-      '2xl': '1536px',
-    },
+    screens: Object.keys(SCREENS).reduce((acc, k) => {
+      const SCREEN_TEXT = `${SCREENS[k]}px`;
+      return {
+        ...acc,
+        [k]: SCREEN_TEXT,
+      };
+    }, {}),
     colors: {
       transparent: 'transparent',
       current: 'currentColor',

@@ -46,7 +46,7 @@ export class ScenarioSpecification extends AggregateRoot {
 
     this.#active = this.#candidate;
     this.#candidate = undefined;
-    this.apply(new SpecificationActivated(this.#active));
+    this.apply(new SpecificationActivated(this.scenarioId, this.#active));
     return right(void 0);
   }
 

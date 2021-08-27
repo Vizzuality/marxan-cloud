@@ -15,17 +15,17 @@ import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 export interface ContributorsProps {
 }
 
-const USERS = [
-  { id: 1, avatarDataUrl: '/images/avatar.png', displayName: 'Hello' },
-  { id: 2, avatarDataUrl: null, displayName: 'Hello 2' },
-  { id: 3, avatarDataUrl: null, displayName: 'Hello 3' },
-];
+// const USERS = [
+//   { id: 1, avatarDataUrl: '/images/avatar.png', displayName: 'Hello' },
+//   { id: 2, avatarDataUrl: null, displayName: 'Hello 2' },
+//   { id: 3, avatarDataUrl: null, displayName: 'Hello 3' },
+// ];
 
 export const Contributors: React.FC<ContributorsProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
   const { data = {} } = useProject(pid);
-  const { users = USERS } = data;
+  const { users = [] } = data;
 
   return (
     <AnimatePresence>
@@ -40,7 +40,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
             <div className="text-sm">Contributors to this project:</div>
 
             <ul className="flex ml-2.5">
-              {!!users && users.length && users.map((u, i) => {
+              {!!users && !!users.length && users.map((u, i) => {
                 return (
                   <li
                     key={u.id}
@@ -48,8 +48,15 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                       '-ml-3': i !== 0,
                     })}
                   >
-                    <Avatar className="text-sm text-white uppercase bg-primary-700" bgImage={u.avatarDataUrl} name={u.displayName}>
+                    {/* <Avatar
+                    className="text-sm text-white uppercase bg-primary-700"
+                    bgImage={u.avatarDataUrl}
+                    name={u.displayName}
+                    >
                       {!u.avatarDataUrl && u.displayName.slice(0, 2)}
+                    </Avatar> */}
+                    <Avatar className="text-sm text-white uppercase bg-gray-500">
+                      <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
                     </Avatar>
                   </li>
                 );
