@@ -1,6 +1,6 @@
 import axiod from "https://deno.land/x/axiod@0.22/mod.ts";
 
-interface MarxanBotConfig {
+export interface MarxanBotConfig {
   apiUrl: string,
   credentials: {
     username: string,
