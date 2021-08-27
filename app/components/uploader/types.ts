@@ -9,8 +9,9 @@ export interface UploaderProps {
     id: string;
     name: string;
   };
+  handleSubmit?: (acceptedFiles) => void;
   setSuccessFile: (successFile) => void;
-  onDropAccepted: (acceptedFiles) => void;
+  onDropAccepted?: (acceptedFiles) => void;
   onDropRejected: (rejectedFiles) => void;
   reset: (form) => void;
 }
