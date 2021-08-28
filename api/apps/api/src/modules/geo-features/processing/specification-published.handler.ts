@@ -35,18 +35,21 @@ export class SpecificationPublishedHandler
           await this.runService.runCopy({
             featureId: feature.id,
             scenarioId: feature.scenarioId,
+            specificationId: event.id,
           });
           break;
         case OperationType.Split:
           await this.runService.runSplit({
             featureId: feature.id,
             scenarioId: feature.scenarioId,
+            specificationId: event.id,
           });
           break;
         case OperationType.Stratification:
           await this.runService.runStratification({
             featureId: feature.id,
             scenarioId: feature.scenarioId,
+            specificationId: event.id,
           });
           break;
       }

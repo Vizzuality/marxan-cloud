@@ -61,6 +61,8 @@ export class CopyEventsHandler implements EventFactory<FeaturesJobData> {
 
   private async completed(event: EventData<FeaturesJobData>) {
     const data = await event.data;
-    this.eventBus.publish(new FeaturesCalculated([data.featureId]));
+    this.eventBus.publish(
+      new FeaturesCalculated([data.featureId], data.specificationId),
+    );
   }
 }

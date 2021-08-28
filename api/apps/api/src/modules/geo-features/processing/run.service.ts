@@ -110,6 +110,7 @@ export class RunService {
         canceled: true,
         featureId: data.featureId,
         scenarioId: data.scenarioId,
+        specificationId: data.specificationId,
       };
       await job.updateProgress(cancellingProgress);
     }
