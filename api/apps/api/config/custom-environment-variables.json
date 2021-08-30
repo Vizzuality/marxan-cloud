@@ -5,11 +5,11 @@
   "postgresApi": {
     "url": "API_POSTGRES_URL",
     "runMigrationsOnStartup": "API_RUN_MIGRATIONS_ON_STARTUP"
-   },
-   "postgresGeoApi": {
-    "url": "GEO_POSTGRES_URL",
+  },
+  "postgresGeoApi": {
+    "url": "GEOPROCESSING_POSTGRES_URL",
     "runMigrationsOnStartup": "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP"
-   },
+  },
   "network": {
     "cors": {
       "origins_extra": "NETWORK_CORS_ORIGINS"
@@ -24,9 +24,9 @@
     }
   },
   "redisApi": {
-   "connection": {
-     "host": "REDIS_HOST"
-   }
+    "connection": {
+      "host": "REDIS_HOST"
+    }
   },
   "api": {
     "url": "API_SERVICE_URL"

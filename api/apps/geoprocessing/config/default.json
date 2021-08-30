@@ -6,8 +6,8 @@
       "duration": 1000
     },
     "connection": {
-      "host": "marxan-redis",
-      "port": "6379"
+      "host": "localhost",
+      "port": "3050"
     }
   },
   "api": {

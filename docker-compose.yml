@@ -10,6 +10,7 @@ services:
         UPLOADS_TEMP_DIR: "/tmp/storage"
     ports:
       - "${API_SERVICE_PORT}:3000"
+      - "9229:9229"
     container_name: marxan-api
     command: develop
     user: "5000:5000"
@@ -174,6 +175,9 @@ services:
     depends_on:
       - postgresql-airflow
       - airflow-scheduler
+
+networks:
+  default:
 
 volumes:
   marxan-cloud-postgresql-api-data:

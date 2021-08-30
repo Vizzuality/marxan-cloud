@@ -8,8 +8,8 @@
   },
   "redisApi": {
    "connection": {
-     "host": "marxan-redis",
-     "port": 6379
+     "host": "localhost",
+     "port": 3050
      },
    "concurrency": 50
    },

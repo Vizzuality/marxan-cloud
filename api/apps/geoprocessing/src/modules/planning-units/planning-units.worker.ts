@@ -18,7 +18,7 @@ export class PlanningUnitsProcessor {
   private readonly logger: Logger = new Logger(PlanningUnitsProcessor.name);
   public readonly worker: Worker = new Worker(
     this.queueName,
-    join(__dirname, '/planning-units.job.ts'),
+    join(__dirname, '/planning-units.job.js'),
     config.get('redisApi'),
   );
   private scheduler: QueueScheduler = new QueueScheduler(

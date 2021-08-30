@@ -4,7 +4,7 @@
     "runMigrationsOnStartup": "API_RUN_MIGRATIONS_ON_STARTUP"
   },
   "postgresGeoApi": {
-    "url": "GEO_POSTGRES_URL",
+    "url": "GEOPROCESSING_POSTGRES_URL",
     "runMigrationsOnStartup": "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP"
   },
   "network": {

@@ -24,7 +24,8 @@
     "geoprocessing:test:e2e": "jest --config ./apps/geoprocessing/test/jest-e2e.json",
     "ts-coverage": "typescript-coverage-report",
     "api:typeorm": "NODE_CONFIG_DIR=apps/api/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/api/ormconfig.ts",
-    "geoprocessing:typeorm": "NODE_CONFIG_DIR=apps/geoprocessing/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/geoprocessing/ormconfig.ts"
+    "geoprocessing:typeorm": "NODE_CONFIG_DIR=apps/geoprocessing/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/geoprocessing/ormconfig.ts",
+    "profile:dist": "cd api && source ../.env && NODE_CONFIG_DIR=apps/api/config ./node_modules/.bin/0x --  node dist/apps/api/apps/api/src/main.js"
   },
   "husky": {
     "hooks": {
@@ -40,6 +41,7 @@
     "node": "^14"
   },
   "dependencies": {
+    "0x": "4.11.0",
     "@nestjs-architects/typed-cqrs": "0.1.1",
     "@nestjs/common": "7.6.18",
     "@nestjs/core": "7.6.18",
@@ -58,6 +60,7 @@
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "config": "^3.3.3",
+    "dotenv": "10.0.0",
     "express": "^4.17.1",
     "faker": "^5.1.0",
     "fp-ts": "2.10.5",

@@ -28,4 +28,6 @@ COPY --chown=$USER:$USER libs ./libs
 RUN yarn prestart:prod
 
 EXPOSE 3000
+EXPOSE 9229
+EXPOSE 6379
 ENTRYPOINT ["./apps/api/entrypoint.sh"]
