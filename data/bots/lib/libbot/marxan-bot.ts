@@ -8,14 +8,6 @@ export interface MarxanBotConfig {
   }
 }
 
-interface FileUpload {
-  url: string,
-  formField: string,
-  data: Blob,
-  fileName: string,
-  headers: [string, string][],
-}
-
 const marxanBotBaseSettings = {
   baseUrl: '/api/v1',
 }
@@ -28,9 +20,12 @@ export class BotHttpClient {
         Authorization: "Bearer " + jwt,
       },
     });
+
+    this.currentJwt = jwt;
   }
 
   public baseHttpClient;
+  public currentJwt;
 
   static async init(config: MarxanBotConfig) {
     const jwt = await axiod
@@ -38,18 +33,5 @@ export class BotHttpClient {
       .then((result) => result.data.accessToken);
 
     return new BotHttpClient(config, jwt);
-  }
-
-  async sendData(config: FileUpload) {
-    const formData = new FormData();
-    formData.append(config.formField, config.data, config.fileName);
-  
-    const response = await fetch(config.url, {
-      method: "POST",
-      body: formData,
-      headers: config.headers,
-    });
-  
-    return response;
   }
 }
