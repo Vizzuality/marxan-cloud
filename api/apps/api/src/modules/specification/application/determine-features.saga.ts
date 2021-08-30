@@ -11,13 +11,16 @@ export class DetermineFeaturesSaga {
       ofType(FeaturesCreated),
       map(
         (event) =>
-          new DetermineFeatures({
-            ...event.input,
-            features: event.input.features.map((feature) => ({
-              featureId: feature.id,
-              calculated: feature.calculated,
-            })),
-          }),
+          new DetermineFeatures(
+            {
+              ...event.input,
+              features: event.input.features.map((feature) => ({
+                featureId: feature.id,
+                calculated: feature.calculated,
+              })),
+            },
+            event.specificationId,
+          ),
       ),
     );
 }

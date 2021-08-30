@@ -1,17 +1,18 @@
 import React, { useRef } from 'react';
-import cx from 'classnames';
 
 // react aria
+import { useButton } from '@react-aria/button'; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { useSearchField } from '@react-aria/searchfield';
 import { useSearchFieldState } from '@react-stately/searchfield';
-import { useButton } from '@react-aria/button'; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // react types
 import { AriaSearchFieldProps } from '@react-types/searchfield';
+import cx from 'classnames';
 
 import Icon from 'components/icon';
-import SEARCH_SVG from 'svgs/ui/search.svg?sprite';
+
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite'; // eslint-disable-line @typescript-eslint/no-unused-vars
+import SEARCH_SVG from 'svgs/ui/search.svg?sprite';
 
 const THEME = {
   dark: 'text-white',
@@ -76,7 +77,12 @@ export const Search: React.FC<SearchProps> = ({
       />
 
       {state.value !== '' && (
-        <button className="relative flex items-center self-center justify-center w-5 h-5" type="button" {...buttonProps}>
+        <button
+          aria-label="close"
+          className="relative flex items-center self-center justify-center w-5 h-5"
+          type="button"
+          {...buttonProps}
+        >
           <Icon
             icon={CLOSE_SVG}
             className="inline-block w-2 h-2"

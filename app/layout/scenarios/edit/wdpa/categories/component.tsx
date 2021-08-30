@@ -31,7 +31,7 @@ export interface WDPACategoriesProps {
   onDismiss: () => void,
 }
 
-export const WDPACategories:React.FC<WDPACategoriesProps> = ({
+export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   onSuccess,
   onDismiss,
 }: WDPACategoriesProps) => {
@@ -58,11 +58,11 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     isFetched: wdpaIsFetched,
   } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
-                 || projectData?.adminAreaLevel1I
-                 || projectData?.countryId,
+      || projectData?.adminAreaLevel1I
+      || projectData?.countryId,
     customAreaId: !projectData?.adminAreaLevel2Id
-                  && !projectData?.adminAreaLevel1I
-                  && !projectData?.countryId ? projectData?.planningAreaId : null,
+      && !projectData?.adminAreaLevel1I
+      && !projectData?.countryId ? projectData?.planningAreaId : null,
   });
 
   const { addToast } = useToasts();
@@ -98,9 +98,9 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
 
   // Submit
   const onSubmit = useCallback((values, form) => {
-    const { modified } = form.getState();
+    const { modified, dirtyFields } = form.getState();
 
-    if (modified.wdpaIucnCategories) {
+    if (modified.wdpaIucnCategories || dirtyFields.wdpaIucnCategories) {
       setSubmitting(true);
 
       mutation.mutate({
@@ -245,6 +245,12 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
     >
       {({ form, values, handleSubmit }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow w-full overflow-hidden">
+          <Loading
+            visible={submitting}
+            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+            iconClassName="w-10 h-10 text-white"
+          />
+
           <FormSpyRFF onChange={(state) => dispatch(setWDPACategories(state.values))} />
 
           <div className="relative flex flex-col flex-grow overflow-hidden">
@@ -279,7 +285,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                                   <li>III: Natural Monument or Feature.</li>
                                   <li>IV: Habitat/Species Management Area.</li>
                                   <li>V: Protected Landscape/Seascape.</li>
-                                    <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
+                                  <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
                                 </ul>
                               </div>
                             </span>
@@ -287,37 +293,37 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                         </div>
 
                         {WDPA_CATEGORIES_OPTIONS.length === 1 && (
-                        <Select
-                          theme="dark"
-                          size="base"
-                          placeholder="Select..."
-                          clearSelectionActive
-                          selected={values.wdpaIucnCategories.length
-                            ? values.wdpaIucnCategories[0]
-                            : null}
-                          options={WDPA_CATEGORIES_OPTIONS}
-                          onChange={(v) => {
-                            if (v) {
-                              flprops.input.onChange([v]);
-                            } else {
-                              flprops.input.onChange([]);
-                            }
-                          }}
-                        />
+                          <Select
+                            theme="dark"
+                            size="base"
+                            placeholder="Select..."
+                            clearSelectionActive
+                            selected={values.wdpaIucnCategories.length
+                              ? values.wdpaIucnCategories[0]
+                              : null}
+                            options={WDPA_CATEGORIES_OPTIONS}
+                            onChange={(v) => {
+                              if (v) {
+                                flprops.input.onChange([v]);
+                              } else {
+                                flprops.input.onChange([]);
+                              }
+                            }}
+                          />
                         )}
 
                         {WDPA_CATEGORIES_OPTIONS.length > 1 && (
-                        <Select
-                          theme="dark"
-                          size="base"
-                          multiple
-                          placeholder="Select..."
-                          clearSelectionActive={false}
-                          batchSelectionActive
-                          batchSelectionLabel="All protected areas"
-                          selected={values.wdpaIucnCategories}
-                          options={WDPA_CATEGORIES_OPTIONS}
-                        />
+                          <Select
+                            theme="dark"
+                            size="base"
+                            multiple
+                            placeholder="Select..."
+                            clearSelectionActive={false}
+                            batchSelectionActive
+                            batchSelectionLabel="All protected areas"
+                            selected={values.wdpaIucnCategories}
+                            options={WDPA_CATEGORIES_OPTIONS}
+                          />
                         )}
                       </Field>
                     )}
@@ -344,6 +350,7 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
                             </span>
 
                             <button
+                              aria-label="remove"
                               type="button"
                               className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
                               onClick={() => {
@@ -383,12 +390,6 @@ export const WDPACategories:React.FC<WDPACategoriesProps> = ({
               {!values.wdpaIucnCategories.length && (
                 <span>Skip to features</span>
               )}
-
-              <Loading
-                visible={submitting}
-                className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full"
-                iconClassName="w-10 h-10 text-white"
-              />
             </Button>
           </div>
         </form>

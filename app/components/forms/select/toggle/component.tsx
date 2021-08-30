@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
+
 import cx from 'classnames';
 
-import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
+import THEME from 'components/forms/select/constants/theme';
+import { SelectToggleProps } from 'components/forms/select/types';
 import Icon from 'components/icon';
 
-import THEME from 'components/forms/select/constants/theme';
-
-import { SelectToggleProps } from 'components/forms/select/types';
+import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
 export const SelectToggle: React.FC<SelectToggleProps> = ({
   options,
@@ -25,7 +25,7 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
     return options.filter((o) => !o.disabled && o.enabled);
   }, [options]);
 
-  const labelDefaultFormatter:() => string = useCallback(() => {
+  const labelDefaultFormatter: () => string = useCallback(() => {
     if (!selectedItems.length) return placeholder;
     if (selectedItems.length === 1) return selectedItems[0].label;
     if (selectedItems.length === getEnabledOptions.length) return 'All items selected';
@@ -34,6 +34,7 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
 
   return (
     <button
+      aria-label="select"
       type="button"
       disabled={disabled}
       className={cx({

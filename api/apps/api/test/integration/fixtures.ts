@@ -33,8 +33,6 @@ export const getFixtures = async () => {
   const calculatedForBothFeatureId = v4();
   const nonCalculatedFeatureId = v4();
 
-  const splitByProperty = `split-property`;
-
   return {
     cleanup: async () => {
       await ScenariosTestUtils.deleteScenario(app, jwtToken, scenario.id);
@@ -56,12 +54,10 @@ export const getFixtures = async () => {
             baseFeatureId: splitBaseFeatureId,
             resultFeatures: [
               {
-                id: v4(),
                 featureId: calculatedFeatureId,
                 calculated: true,
               },
               {
-                id: v4(),
                 featureId: calculatedForBothFeatureId,
                 calculated: true,
               },
@@ -75,12 +71,10 @@ export const getFixtures = async () => {
             baseFeatureId: stratificationBaseFeatureId,
             resultFeatures: [
               {
-                id: v4(),
                 featureId: nonCalculatedFeatureId,
                 calculated: false,
               },
               {
-                id: v4(),
                 featureId: calculatedForBothFeatureId,
                 calculated: true,
               },
@@ -109,36 +103,5 @@ export const getFixtures = async () => {
       expect(specifications.length).toEqual(1);
       this.ThenTheyAreEqual(specification, specifications[0]);
     },
-    WhenGettingSpecificationsForSplitConfig: async (): Promise<
-      Specification[]
-    > =>
-      specificationRepository.findAllRelatedToFeatureConfig({
-        operation: SpecificationOperation.Split,
-        baseFeatureId: splitBaseFeatureId,
-        splitByProperty,
-        againstFeatureId: undefined,
-      }),
-    WhenGettingSpecificationsForStratificationConfig: async (): Promise<
-      Specification[]
-    > =>
-      specificationRepository.findAllRelatedToFeatureConfig({
-        operation: SpecificationOperation.Stratification,
-        baseFeatureId: stratificationBaseFeatureId,
-        againstFeatureId: stratificationAgainstFeatureId,
-      }),
-    WhenGettingSpecificationsNonExistingConfig: async (): Promise<
-      Specification[]
-    > =>
-      specificationRepository.findAllRelatedToFeatureConfig({
-        operation: SpecificationOperation.Split,
-        baseFeatureId: v4(),
-        splitByProperty,
-      }),
-    WhenGettingSpecificationsRelatedToFeature: async (): Promise<
-      Specification[]
-    > =>
-      specificationRepository.findAllRelatedToFeatures([
-        nonCalculatedFeatureId,
-      ]),
   };
 };

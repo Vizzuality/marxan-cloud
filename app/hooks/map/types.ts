@@ -78,6 +78,10 @@ export interface UsePUGridLayer {
     puExcludedValue?: string[];
     runId?: string;
     features?: string[];
+    cost?: {
+      min: number;
+      max: number,
+    }
     settings?: {
       pugrid?: {
         opacity?: number;
@@ -116,6 +120,10 @@ export interface UseLegend {
   options?: {
     wdpaIucnCategories?: string[];
     wdpaThreshold?: number;
+    cost?: {
+      min: number;
+      max: number,
+    };
     puAction?: string;
     puIncludedValue?: string[];
     puExcludedValue?: string[];

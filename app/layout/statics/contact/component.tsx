@@ -1,7 +1,8 @@
 import React from 'react';
 
-import Button from 'components/button';
 import Wrapper from 'layout/wrapper';
+
+import Button from 'components/button';
 
 export interface StaticContactProps {
 
@@ -19,7 +20,14 @@ export const StaticContact: React.FC<StaticContactProps> = () => {
             Help us strengthen Marxan.
           </p>
           <div className="w-44">
-            <Button href="mailto:marxancloud@gmail.com" size="lg" target="_blank" theme="transparent-black" type="submit" className="w-full">
+            <Button
+              href="mailto:marxancloud@gmail.com"
+              size="lg"
+              target="_blank"
+              theme="transparent-black"
+              type="submit"
+              className="w-full"
+            >
               Contact Us
             </Button>
           </div>

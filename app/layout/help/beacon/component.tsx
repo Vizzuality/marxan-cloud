@@ -173,6 +173,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
               {...attributes.popper}
             >
               <button
+                aria-label="manage-visibility"
                 type="button"
                 className={cx({
                   'relative beacon flex items-center justify-center w-6 h-6 bg-primary-500 border-2 border-gray-700 transition rounded-full focus:outline-none transform translate-y-3/4': true,

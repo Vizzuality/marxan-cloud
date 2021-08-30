@@ -15,21 +15,21 @@ export class CalculateFeaturesHandler
     private readonly specificationRepository: SpecificationRepository,
   ) {}
 
-  async execute({ featureIds }: CalculateFeatures): Promise<void> {
-    const specifications = await this.specificationRepository.transaction(
+  async execute({
+    featureIds,
+    specificationId,
+  }: CalculateFeatures): Promise<void> {
+    const specification = await this.specificationRepository.transaction(
       async (repo) => {
-        const specifications = await repo.findAllRelatedToFeatures(featureIds);
-
-        for (const spec of specifications) {
-          spec.markAsCalculated(featureIds);
-          await repo.save(spec);
-        }
-        return specifications;
+        const specification = await repo.getById(specificationId);
+        if (!specification) return;
+        specification.markAsCalculated(featureIds);
+        await repo.save(specification);
+        return specification;
       },
     );
 
-    specifications.forEach((specification) =>
-      this.eventPublisher.mergeObjectContext(specification).commit(),
-    );
+    if (!specification) return;
+    this.eventPublisher.mergeObjectContext(specification).commit();
   }
 }

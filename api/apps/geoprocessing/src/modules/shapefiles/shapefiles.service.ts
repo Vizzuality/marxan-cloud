@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { readdir } from 'fs/promises';
+import { readdir, readFile, unlink } from 'fs/promises';
 import { GeoJSON } from 'geojson';
 import { FileService } from '../files/files.service';
 import * as path from 'path';
@@ -23,16 +23,23 @@ export class ShapefileService {
         'Shapefile data is not usable: one or more required files are missing.',
       );
     }
-    const outputKey = `shapefile-${new Date().getTime()}.geojson`;
+    const baseDirectory = fileInfo.path.replace(/\.zip$/, '');
+    const outputFile = path.join(
+      baseDirectory,
+      `shapefile-${new Date().getTime()}.geojson`,
+    );
 
-    const _geoJson = await mapshaper.applyCommands(
+    await mapshaper.runCommandsXL(
       `-i no-topology snap ${fileInfo.path.replace(
         '.zip',
         '',
-      )}/*.shp -proj EPSG:4326 -clean rewind -info -o ${outputKey}`,
+      )}/*.shp -proj EPSG:4326 -clean rewind -info -o ${outputFile}`,
     );
 
-    return JSON.parse(_geoJson[outputKey].toString('utf-8'));
+    const geoJsonBuffer = await readFile(outputFile);
+    await unlink(outputFile);
+
+    return JSON.parse(geoJsonBuffer.toString('utf-8'));
   }
 
   async areRequiredShapefileFilesInFolder(filePath: string): Promise<boolean> {

@@ -25,6 +25,7 @@ export const Tabs: React.FC<TabsProps> = ({
       {items.map((tab) => (
         <li key={tab.id}>
           <button
+            aria-label="select-tab"
             type="button"
             className={cx(
               {

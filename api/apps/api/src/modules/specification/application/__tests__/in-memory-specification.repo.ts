@@ -1,6 +1,5 @@
 import { SpecificationRepository } from '../specification.repository';
-import { FeatureConfigInput, Specification } from '../../domain';
-import { intersection } from 'lodash';
+import { Specification } from '../../domain';
 import { v4 } from 'uuid';
 
 export class InMemorySpecificationRepo implements SpecificationRepository {
@@ -33,42 +32,6 @@ export class InMemorySpecificationRepo implements SpecificationRepository {
     execute: (repo: InMemorySpecificationRepo) => Promise<T>,
   ): Promise<T> {
     return execute(this);
-  }
-
-  async findAllRelatedToFeatureConfig(
-    configuration: FeatureConfigInput,
-  ): Promise<Specification[]> {
-    return Object.values(this.#memory)
-      .flatMap(({ specification }) =>
-        specification.toSnapshot().config.flatMap((config) => ({
-          specId: specification.id,
-          operation: config.operation,
-          baseFeatureId: config.baseFeatureId,
-          againstFeatureId: config.againstFeatureId,
-        })),
-      )
-      .filter(
-        (specFeatures) =>
-          specFeatures.baseFeatureId === configuration.baseFeatureId &&
-          specFeatures.againstFeatureId === configuration.againstFeatureId &&
-          specFeatures.operation === configuration.operation,
-      )
-      .map((specFeature) => this.#memory[specFeature.specId]?.specification);
-  }
-
-  async findAllRelatedToFeatures(features: string[]): Promise<Specification[]> {
-    return Object.values(this.#memory)
-      .flatMap(({ specification }) =>
-        specification.toSnapshot().config.flatMap((config) => ({
-          specId: specification.id,
-          features: config.resultFeatures.map((feature) => feature.featureId),
-        })),
-      )
-      .filter(
-        (specFeatures) =>
-          intersection(features, specFeatures.features).length > 0,
-      )
-      .map((specFeature) => this.#memory[specFeature.specId]?.specification);
   }
 
   async getLastUpdated(ids: string[]): Promise<Specification | undefined> {

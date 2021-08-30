@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 
 import { useDropzone } from 'react-dropzone';
+
+import { motion } from 'framer-motion';
+
 import { useMe } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';
-
-import { motion } from 'framer-motion';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import IMAGE_SVG from 'svgs/ui/image.svg?sprite';
@@ -24,7 +25,7 @@ const toBase64 = (file) => new Promise((resolve, reject) => {
   reader.onerror = (error) => reject(error);
 });
 
-export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }:AvatarMeProps) => {
+export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }: AvatarMeProps) => {
   const { user } = useMe();
   const { addToast } = useToasts();
   const [preview, setPreview] = useState(value);
@@ -121,6 +122,7 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }:AvatarMePr
 
           {preview && (
             <button
+              aria-label="remove"
               type="button"
               className="absolute p-1 transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full top-1 right-1"
               onClickCapture={onRemove}
