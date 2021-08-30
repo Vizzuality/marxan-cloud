@@ -98,9 +98,9 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
   // Submit
   const onSubmit = useCallback((values, form) => {
-    const { modified } = form.getState();
+    const { modified, dirtyFields } = form.getState();
 
-    if (modified.wdpaIucnCategories) {
+    if (modified.wdpaIucnCategories || dirtyFields.wdpaIucnCategories) {
       setSubmitting(true);
 
       mutation.mutate({
@@ -245,6 +245,12 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     >
       {({ form, values, handleSubmit }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow w-full overflow-hidden">
+          <Loading
+            visible={submitting}
+            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+            iconClassName="w-10 h-10 text-white"
+          />
+
           <FormSpyRFF onChange={(state) => dispatch(setWDPACategories(state.values))} />
 
           <div className="relative flex flex-col flex-grow overflow-hidden">
@@ -384,12 +390,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               {!values.wdpaIucnCategories.length && (
                 <span>Skip to features</span>
               )}
-
-              <Loading
-                visible={submitting}
-                className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full"
-                iconClassName="w-10 h-10 text-white"
-              />
             </Button>
           </div>
         </form>

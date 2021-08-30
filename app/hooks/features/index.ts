@@ -191,7 +191,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
           };
         });
 
-        if (geoprocessingOperations && geoprocessingOperations[0].kind === 'split/v1') {
+        if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
           splitSelected = geoprocessingOperations[0].splitByProperty;
 
           splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
@@ -212,7 +212,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
       let intersectFeaturesSelected = [];
 
       if (tag === 'species') {
-        if (geoprocessingOperations && geoprocessingOperations[0].kind === 'stratification/v1') {
+        if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'stratification/v1')) {
           intersectFeaturesSelected = flatten(geoprocessingOperations
             .map((ifs) => {
               return ifs.splits.map((v) => {
