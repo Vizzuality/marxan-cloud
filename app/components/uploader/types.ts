@@ -13,5 +13,5 @@ export interface UploaderProps {
   onDropAccepted?: (acceptedFiles) => void;
   onDropRejected: (rejectedFiles) => void;
   reset: (form) => void;
-  uploadPlanningAreaSubmit: () => void;
+  uploadFileSubmit?: () => void;
 }

@@ -29,7 +29,7 @@ export const Uploader: React.FC<UploaderProps> = ({
   onDropAccepted,
   onDropRejected,
   reset,
-  uploadPlanningAreaSubmit,
+  uploadFileSubmit,
 }: UploaderProps) => {
   const [modal, setModal] = useState(false);
 
@@ -75,7 +75,7 @@ export const Uploader: React.FC<UploaderProps> = ({
         onDismiss={() => setModal(false)}
       >
         <Form
-          onSubmit={uploadPlanningAreaSubmit}
+          onSubmit={uploadFileSubmit}
           render={({ handleSubmit }) => {
             return (
               <form onSubmit={handleSubmit}>
