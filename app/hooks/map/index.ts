@@ -292,6 +292,7 @@ export function usePUGridLayer({
       puIncludedValue,
       puExcludedValue,
       features = [],
+      highlightFeatures = [],
       runId,
       settings = {},
     } = options;
@@ -419,6 +420,26 @@ export function usePUGridLayer({
                   'case',
                   ['any',
                     ...(features.map((id) => {
+                      return ['in', id, ['get', 'featureList']];
+                    })),
+                  ],
+                  0.5 * PreGapAnalysisOpacity,
+                  0,
+                ],
+              },
+            },
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(PreGapAnalysisVisibility),
+              },
+              paint: {
+                'fill-color': COLORS.highlightFeatures,
+                'fill-opacity': [
+                  'case',
+                  ['any',
+                    ...(highlightFeatures.map((id) => {
                       return ['in', id, ['get', 'featureList']];
                     })),
                   ],

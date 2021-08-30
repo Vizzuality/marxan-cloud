@@ -29,7 +29,6 @@ Default.args = {
     unit: 'km²',
   },
   onMap: false,
-  onToggleOnMap: (onMap) => console.info(onMap),
   muted: false,
   onMouseEnter: (e) => console.info(e),
   onMouseLeave: (e) => console.info(e),

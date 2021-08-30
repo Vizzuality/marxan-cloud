@@ -65,6 +65,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
     // Features
     featureHoverId,
+    highlightFeatures,
     // Adjust planning units
     clicking,
     puAction,
@@ -182,6 +183,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
       features: featuresIds,
+      highlightFeatures,
       settings: {
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],

@@ -78,6 +78,7 @@ export interface UsePUGridLayer {
     puExcludedValue?: string[];
     runId?: string;
     features?: string[];
+    highlightFeatures?: Array<string>;
     settings?: {
       pugrid?: {
         opacity?: number;
