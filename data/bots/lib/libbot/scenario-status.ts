@@ -1,5 +1,5 @@
 import { BotHttpClient } from './marxan-bot.ts';
-import sleep from "https://deno.land/x/sleep@v1.2.0/mod.ts";
+import { sleep } from "https://deno.land/x/sleep@v1.2.0/mod.ts";
 import _ from 'https://deno.land/x/lodash@4.17.15-es/lodash.js';
 import { ms } from 'https://deno.land/x/ms@v0.1.0/ms.ts';
 
@@ -60,13 +60,16 @@ export class ScenarioJobStatus {
 
   async waitFor(job: JobSpecification, until: JobStatuses, retryOptions: RetryOptions): Promise<void> {
     if(retryOptions?.delay) {
-      sleep(ms(retryOptions.delay) ?? 0 * 10e3);
+      const delay = ms(retryOptions.delay ?? '0') as number;
+      sleep(delay / 10e3);
     }
+
+    const interval = ms(retryOptions.interval) as number;
 
     for(const i of [...Array(retryOptions.maxTries)]) {
       const status = await this.get(job);
       if(status === until) { return; }
-      sleep(ms(retryOptions.interval) / 10e3);
+      sleep(interval / 10e3);
     }
   }
 }
