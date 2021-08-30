@@ -47,6 +47,12 @@ export class Scenarios {
   async createInProject(projectId: string, scenario: Scenario) {
     return await this.baseHttpClient.post('/scenarios', { ...scenario, projectId })
       .then(result => result.data)
-      .catch(e => console.log(e))
+      .catch(e => console.log(e));
+  }
+
+  async update(scenarioId: string, scenario: Partial<Scenario>) {
+    return await this.baseHttpClient.patch(`/scenarios/${scenarioId}`, scenario)
+    .then(result => result.data)
+    .catch(e => console.log(e));
   }
 }
