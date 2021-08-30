@@ -37,6 +37,8 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
     },
   );
 
+  console.log('allFeaturesData', allFeaturesData);
+
   return (
     <div className="relative flex flex-col flex-grow overflow-hidden" style={{ minHeight: 200 }}>
       <div className="absolute left-0 z-10 w-full h-6 -top-1 bg-gradient-to-b from-gray-700 via-gray-700" />
@@ -76,6 +78,7 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
                 <Item
                   {...item}
                   scrollRoot={scrollRef}
+                  onHighlight={() => console.log('id to highlight', item.id)}
                 />
               </div>
             );

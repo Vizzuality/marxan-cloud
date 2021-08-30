@@ -23,14 +23,14 @@ export interface ItemProps {
   }
   className?: string;
   onMap?: boolean;
-  onToggleOnMap?: (onMap: boolean) => void;
+  onHighlight?: () => void;
   muted?: boolean;
   onMouseEnter?: MouseEventHandler<HTMLDivElement>;
   onMouseLeave?: MouseEventHandler<HTMLDivElement>;
 }
 
 export const Item: React.FC<ItemProps> = ({
-  name, current, target, className, onMap, onToggleOnMap, muted, onMouseEnter, onMouseLeave,
+  name, current, target, className, onMap, muted, onMouseEnter, onMouseLeave, onHighlight,
 }: ItemProps) => {
   const percentFormatter = useNumberFormatter({ style: 'percent' });
 
@@ -51,9 +51,9 @@ export const Item: React.FC<ItemProps> = ({
         <button
           type="button"
           className="flex items-center justify-between flex-shrink-0 px-2 py-1 text-xs border border-transparent focus:border-white rounded-4xl"
-          onClick={() => onToggleOnMap(!onMap)}
+          onClick={onHighlight}
         >
-          {onMap ? 'Hide from map' : 'View on map'}
+          {onMap ? 'Lowlight on map' : 'Highlight on map'}
           <Icon icon={onMap ? HIDE_SVG : SHOW_SVG} className="w-5 h-5 ml-3" />
         </button>
       </div>
