@@ -23,6 +23,12 @@ export class Projects {
       .catch(e => console.log(e));
   }
 
+  async update(projectId: string, project: Partial<Project>) {
+    return await this.baseHttpClient.patch(`/projects/${projectId}`, project)
+    .then(result => result.data)
+    .catch(e => console.log(e));
+  }
+
   async checkStatus(id: string) {
     return await this.baseHttpClient.get(`/projects​/${id}​/scenarios​/status`, {})
     .then((result) => result.data)
