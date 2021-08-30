@@ -200,8 +200,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const LAYERS = [PUGridLayer, WDPApreviewLayer, ...FeaturePreviewLayers].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    // type: tab,
-    // subtype: subtab,
     layers,
     options: {
       wdpaIucnCategories: tab === 'protected-areas' && subtab === 'protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,

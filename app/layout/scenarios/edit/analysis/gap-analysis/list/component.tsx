@@ -59,6 +59,13 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
     dispatch(setHighlightFeatures(newHighlightFeatures));
   }, [dispatch, setHighlightFeatures, highlightFeatures]);
 
+  const onMap = (id) => {
+    if (!highlightFeatures.includes(id)) {
+      return false;
+    }
+    return true;
+  };
+
   useEffect(() => {
     return () => {
       dispatch(setHighlightFeatures([]));
@@ -106,6 +113,7 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
                   {...item}
                   scrollRoot={scrollRef}
                   onHighlight={() => toggleHighlight(item.id)}
+                  onMap={onMap(item.id)}
                 />
               </div>
             );

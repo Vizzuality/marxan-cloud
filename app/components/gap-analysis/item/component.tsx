@@ -22,7 +22,7 @@ export interface ItemProps {
     unit: string;
   }
   className?: string;
-  onMap?: boolean;
+  onMap?: () => void;
   onHighlight?: () => void;
   muted?: boolean;
   onMouseEnter?: MouseEventHandler<HTMLDivElement>;
