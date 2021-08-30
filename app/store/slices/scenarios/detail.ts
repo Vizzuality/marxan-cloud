@@ -6,10 +6,8 @@ interface ScenarioShowStateProps {
   tab: string,
   subtab: string,
   selectedSolution: Solution,
-
   // FEATURES
-  highlightFeatures: string[];
-
+  highlightFeatures: string[],
   // SETTINGS
   layerSettings: Record<string, Record<string, unknown>>
 }
@@ -18,10 +16,8 @@ const initialState = {
   tab: 'solutions',
   subtab: null,
   selectedSolution: null,
-
   // FEATURES
   highlightFeatures: [],
-
   // SETTINGS
   layerSettings: {},
 } as ScenarioShowStateProps;
