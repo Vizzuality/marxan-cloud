@@ -18,7 +18,7 @@ import {
   useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers, useLegend,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useScenario } from 'hooks/scenarios';
+import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
 
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 
@@ -87,6 +87,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
+
+  const {
+    data: costSurfaceRangeData,
+  } = useCostSurfaceRange(sid);
 
   const {
     data: allGapAnalysisData,
@@ -185,6 +189,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puExcludedValue: puTmpExcludedValue,
       features: featuresIds,
       highlightFeatures,
+      cost: costSurfaceRangeData,
       settings: {
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],
@@ -205,6 +210,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     options: {
       wdpaIucnCategories: tab === 'protected-areas' && subtab === 'protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
       wdpaThreshold: tab === 'protected-areas' && subtab === 'protected-areas-percentage' ? wdpaThreshold : scenarioData?.wdpaThreshold,
+      cost: costSurfaceRangeData,
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
