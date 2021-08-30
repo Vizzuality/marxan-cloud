@@ -65,6 +65,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
           </nav>
 
           <button
+            aria-label="log-out"
             type="button"
             onClick={handleSignOut}
             className="flex w-full px-8 py-5 border-t border-gray-300 hover:underline focus:outline-none"
