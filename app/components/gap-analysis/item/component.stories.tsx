@@ -28,7 +28,6 @@ Default.args = {
     value: '30M',
     unit: 'km²',
   },
-  onMap: false,
   muted: false,
   onMouseEnter: (e) => console.info(e),
   onMouseLeave: (e) => console.info(e),
