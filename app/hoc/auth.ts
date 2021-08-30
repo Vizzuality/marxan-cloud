@@ -69,9 +69,13 @@ export function withUser(getServerSidePropsFunc?: Function) {
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
-    }).then((response) => {
-      return response.data;
-    }));
+    })
+      .then((response) => {
+        if (response.status > 500) {
+          return new Error('prefetchQuery "me" error');
+        }
+        return response.data;
+      }));
 
     if (getServerSidePropsFunc) {
       const SSPF = await getServerSidePropsFunc(context) || {};

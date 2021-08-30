@@ -41,6 +41,7 @@ import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { SpecificationService } from './specification';
+import { CostRange, CostRangeService } from './cost-range-service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -71,6 +72,7 @@ export class ScenariosService {
     private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
     private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,
     private readonly specificationService: SpecificationService,
+    private readonly costService: CostRangeService,
   ) {}
 
   async findAllPaginated(
@@ -354,5 +356,9 @@ export class ScenariosService {
       scenarioId,
       scenario.projectId,
     );
+  }
+
+  getCostRange(scenarioId: string): Promise<CostRange> {
+    return this.costService.getRange(scenarioId);
   }
 }

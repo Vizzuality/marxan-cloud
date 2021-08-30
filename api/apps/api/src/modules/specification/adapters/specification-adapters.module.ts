@@ -6,7 +6,6 @@ import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.modul
 import { DbSpecificationRepository } from './specification.repository';
 import { SpecificationApiEntity } from './specification.api.entity';
 import { SpecificationFeatureConfigApiEntity } from './specification-feature-config.api.entity';
-import { SpecificationFeatureApiEntity } from './specification-feature.api.entity';
 import { SpecificationCandidateCreatedHandler } from './specification-candidate-created.handler';
 
 import { SpecificationRepository } from '../application/specification.repository';
@@ -16,7 +15,6 @@ import { SpecificationRepository } from '../application/specification.repository
     TypeOrmModule.forFeature([
       SpecificationApiEntity,
       SpecificationFeatureConfigApiEntity,
-      SpecificationFeatureApiEntity,
     ]),
     ApiEventsModule,
   ],

@@ -35,7 +35,7 @@ export class CreateFeaturesHandler
           input: command.input,
         });
         this.eventBus.publish(
-          new FeaturesCreated(command.scenarioId, {
+          new FeaturesCreated(command.scenarioId, command.specificationId, {
             ...command.input,
             features: ids.map(({ id }) => ({ id, calculated: true })),
           }),
@@ -49,7 +49,7 @@ export class CreateFeaturesHandler
           input: command.input,
         });
         this.eventBus.publish(
-          new FeaturesCreated(command.scenarioId, {
+          new FeaturesCreated(command.scenarioId, command.specificationId, {
             ...command.input,
             features: ids.map(({ id }) => ({ id, calculated: true })),
           }),

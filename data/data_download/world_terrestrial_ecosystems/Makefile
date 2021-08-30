@@ -18,7 +18,7 @@ import: data/ecosystems/World_Ecosystems_simp.geojson
 		VALUES ('$${table_name}', 'World terrestrial ecoregions','[\"dn\", \"w_ecosystm\"]'::jsonb,'w_ecosystm', 'bioregional','created','$(MarxanUser)') RETURNING id;"`; \
 	psql "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@marxan-postgresql-geo-api:5432/$$GEO_POSTGRES_DB" \
 	-c "insert into features_data(the_geom, properties, source, feature_id) \
-		(SELECT the_geom, row_to_json(t)::jsonb - '{the_geom}'::text[] as properties, 'ecoregions' as source, '$$feature_id' as feature_id from (select * from \"$${table_name}_feature\") t); \
+		(SELECT (st_dump(the_geom)).geom as the_geom, row_to_json(t)::jsonb - '{the_geom}'::text[] as properties, 'ecoregions' as source, '$$feature_id' as feature_id from (select * from \"$${table_name}_feature\") t); \
 			DROP TABLE \"$${table_name}_feature\"";
 
 

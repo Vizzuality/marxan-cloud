@@ -1,18 +1,17 @@
 import React, {
   useCallback, useEffect, useRef,
 } from 'react';
+
 import cx from 'classnames';
-
-import SUCCESS_SVG from 'svgs/notifications/success.svg?sprite';
-import ERROR_SVG from 'svgs/notifications/error.svg?sprite';
-import WARNING_SVG from 'svgs/notifications/warning.svg?sprite';
-import INFO_SVG from 'svgs/notifications/info.svg?sprite';
-
-import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
+import { motion, useAnimation } from 'framer-motion';
 
 import Icon from 'components/icon';
 
-import { motion, useAnimation } from 'framer-motion';
+import ERROR_SVG from 'svgs/notifications/error.svg?sprite';
+import INFO_SVG from 'svgs/notifications/info.svg?sprite';
+import SUCCESS_SVG from 'svgs/notifications/success.svg?sprite';
+import WARNING_SVG from 'svgs/notifications/warning.svg?sprite';
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 import { ToastProps, ToastTheme } from './types';
 
@@ -127,6 +126,7 @@ export const Toast: React.FC<ToastProps> = ({
           </div>
 
           <button
+            aria-label="close"
             type="button"
             className="flex items-center justify-center flex-shrink-0 w-10 h-10 ml-5"
             onClick={handleDismiss}

@@ -25,9 +25,14 @@ export class OutputRepository {
     const entities: Omit<ScenariosOutputResultsApiEntity, 'id'>[] = output.map(
       (row) => ({
         ...row,
+        scoreValue: row.score,
+        costValue: row.cost,
         scenarioId: data.scenarioId,
       }),
     );
+    await this.outputs.delete({
+      scenarioId: data.scenarioId,
+    });
     await this.outputs.save(entities);
   }
 }

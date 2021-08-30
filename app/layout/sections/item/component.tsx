@@ -26,49 +26,50 @@ export const ScenariosSidebarAnalysisSection: React.FC<ScenariosSidebarAnalysisS
   return (
     !readonly && (
 
-    <button
-      type="button"
-      className="relative w-full py-5 pr-20 text-left focus:outline-none"
-      onMouseEnter={() => setAnimate('enter')}
-      onMouseLeave={() => setAnimate('leave')}
-      onClick={() => onChangeSection(id)}
-    >
-      <h4 className="text-xs uppercase font-heading">{name}</h4>
-      <p className="mt-1 text-sm text-gray-300">{description}</p>
+      <button
+        aria-label="change-section"
+        type="button"
+        className="relative w-full py-5 pr-20 text-left focus:outline-none"
+        onMouseEnter={() => setAnimate('enter')}
+        onMouseLeave={() => setAnimate('leave')}
+        onClick={() => onChangeSection(id)}
+      >
+        <h4 className="text-xs uppercase font-heading">{name}</h4>
+        <p className="mt-1 text-sm text-gray-300">{description}</p>
 
-      <motion.div
-        className="absolute transform -translate-y-1/2 right-4 top-1/2"
-        initial={{
-          opacity: 1,
-          x: 0,
-          y: '-50%',
-        }}
-        animate={animate}
-        variants={{
-          enter: {
-            opacity: 1,
-            x: 5,
-            y: '-50%',
-            transition: {
-              ease: 'easeInOut',
-              repeat: Infinity,
-              repeatType: 'mirror',
-              duration: 0.4,
-            },
-          },
-          leave: {
+        <motion.div
+          className="absolute transform -translate-y-1/2 right-4 top-1/2"
+          initial={{
             opacity: 1,
             x: 0,
             y: '-50%',
-            transition: {
-              ease: 'easeInOut',
+          }}
+          animate={animate}
+          variants={{
+            enter: {
+              opacity: 1,
+              x: 5,
+              y: '-50%',
+              transition: {
+                ease: 'easeInOut',
+                repeat: Infinity,
+                repeatType: 'mirror',
+                duration: 0.4,
+              },
             },
-          },
-        }}
-      >
-        <Icon icon={ARROW_RIGHT_2_SVG} className="w-5 h-5 opacity-75 text-primary-500" />
-      </motion.div>
-    </button>
+            leave: {
+              opacity: 1,
+              x: 0,
+              y: '-50%',
+              transition: {
+                ease: 'easeInOut',
+              },
+            },
+          }}
+        >
+          <Icon icon={ARROW_RIGHT_2_SVG} className="w-5 h-5 opacity-75 text-primary-500" />
+        </motion.div>
+      </button>
     )
   );
 };

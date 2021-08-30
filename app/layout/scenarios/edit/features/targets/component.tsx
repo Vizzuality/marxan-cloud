@@ -110,7 +110,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   }, []);
 
   const onSubmit = useCallback((values) => {
-    // setSubmitting(true);
+    setSubmitting(true);
     const { features } = values;
 
     const data = {
@@ -213,6 +213,12 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     >
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow overflow-hidden">
+          <Loading
+            visible={submitting || targetedFeaturesIsFetching}
+            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+            iconClassName="w-10 h-10 text-white"
+          />
+
           {(!targetedFeaturesData || !targetedFeaturesData.length) && (
             <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
               No results found

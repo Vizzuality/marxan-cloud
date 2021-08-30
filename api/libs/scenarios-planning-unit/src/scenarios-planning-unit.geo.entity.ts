@@ -73,7 +73,7 @@ export class ScenariosPlanningUnitGeoEntity {
    * 1 - locked-in (included)
    * 2 - locked-out (excluded)
    */
-  lockStatus!: LockStatus;
+  lockStatus?: LockStatus | null;
 
   @Column({
     type: 'float8',

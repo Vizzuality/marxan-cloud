@@ -64,6 +64,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
 
               <li className="ml-3">
                 <button
+                  aria-label="add-contributor"
                   type="button"
                   onClick={() => {
                     console.info('Add contributor');

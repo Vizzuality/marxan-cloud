@@ -17,9 +17,8 @@ import { InMemorySpecificationRepo } from './in-memory-specification.repo';
 
 export const getFixtures = async () => {
   const events: IEvent[] = [];
-  const specificationRelatedToGivenConfig = v4();
-  const anotherSpecificationRelatedToGivenConfig = v4();
-  const specificationWithoutRelationToGivenConfig = v4();
+  const specificationId = v4();
+  const anotherSpecificationId = v4();
   const scenarioId = v4();
 
   const nonCalculatedFeatureId = v4();
@@ -53,7 +52,7 @@ export const getFixtures = async () => {
     async GivenCreatedSpecificationsWithUndeterminedFeaturesWereCreated() {
       await repo.save(
         Specification.from({
-          id: specificationRelatedToGivenConfig,
+          id: specificationId,
           scenarioId,
           draft: false,
           raw: {},
@@ -68,22 +67,7 @@ export const getFixtures = async () => {
       );
       await repo.save(
         Specification.from({
-          id: anotherSpecificationRelatedToGivenConfig,
-          scenarioId,
-          draft: false,
-          raw: {},
-          config: [
-            {
-              ...relatedConfig,
-              featuresDetermined: false,
-              resultFeatures: [],
-            },
-          ],
-        }),
-      );
-      await repo.save(
-        Specification.from({
-          id: specificationWithoutRelationToGivenConfig,
+          id: anotherSpecificationId,
           scenarioId,
           draft: false,
           raw: {},
@@ -100,46 +84,37 @@ export const getFixtures = async () => {
     },
     async WhenFeaturesAreDetermined() {
       return await sut.execute(
-        new DetermineFeatures({
-          features: [
-            {
-              featureId: calculatedFeatureId,
-              calculated: true,
-            },
-            {
-              featureId: nonCalculatedFeatureId,
-              calculated: false,
-            },
-          ],
-          ...relatedConfig,
-        }),
+        new DetermineFeatures(
+          {
+            features: [
+              {
+                featureId: calculatedFeatureId,
+                calculated: true,
+              },
+              {
+                featureId: nonCalculatedFeatureId,
+                calculated: false,
+              },
+            ],
+            ...relatedConfig,
+          },
+          specificationId,
+        ),
       );
     },
-    async ThenSpecificationsWithRelatedConfigAreSaved() {
-      expect(repo.count()).toEqual(3);
+    async ThenSpecificationIsSaved() {
+      expect(repo.count()).toEqual(2);
       expect(
-        (await repo.getById(specificationRelatedToGivenConfig))?.toSnapshot()
+        (await repo.getById(specificationId))?.toSnapshot().featuresDetermined,
+      ).toEqual(true);
+      expect(
+        (await repo.getById(anotherSpecificationId))?.toSnapshot()
           .featuresDetermined,
-      ).toEqual(true);
-      expect(
-        (
-          await repo.getById(anotherSpecificationRelatedToGivenConfig)
-        )?.toSnapshot().featuresDetermined,
-      ).toEqual(true);
-      expect(
-        (
-          await repo.getById(specificationWithoutRelationToGivenConfig)
-        )?.toSnapshot().featuresDetermined,
       ).toEqual(false);
     },
     ThenSpecificationIsPublished() {
       expect(events).toEqual([
-        new SpecificationPublished(specificationRelatedToGivenConfig, [
-          nonCalculatedFeatureId,
-        ]),
-        new SpecificationPublished(anotherSpecificationRelatedToGivenConfig, [
-          nonCalculatedFeatureId,
-        ]),
+        new SpecificationPublished(specificationId, [nonCalculatedFeatureId]),
       ]);
     },
     ThenNoEventIsPublished() {

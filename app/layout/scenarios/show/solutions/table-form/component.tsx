@@ -108,11 +108,12 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     <div className="relative flex flex-col flex-grow mt-8 overflow-hidden text-gray-800">
 
       <div className="relative flex flex-col flex-grow overflow-hidden overflow-x-hidden overflow-y-auto">
-        <div className="items-center px-8 pb-8 space-y-12 flex-column">
-          <div className="flex space-x-3">
-            <div className="flex-col">
-              <h2 className="mb-4 text-2xl font-heading">Solutions Table:</h2>
-              <div className="mr-20 space-y-4">
+        <div className="items-center px-8 pb-8 space-y-6 flex-column">
+
+          <div className="flex items-center space-x-3">
+            <h2 className="text-2xl font-heading">Solutions Table:</h2>
+            <InfoButton theme="secondary">
+              <div>
                 <p>
                   Each solution gives an alternative answer to your planning problem.
                   The result of each solution reflects whether a planning unit is
@@ -161,8 +162,9 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
                   </i>
                 </p>
               </div>
-            </div>
+            </InfoButton>
           </div>
+
           <div className="flex items-center justify-between space-x-8">
             <div className="flex items-center">
               <Checkbox
