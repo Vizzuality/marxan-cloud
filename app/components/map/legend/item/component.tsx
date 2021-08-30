@@ -88,6 +88,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
 
         {sortable?.handle && (
           <button
+            aria-label="drag"
             type="button"
             className="text-gray-400 cursor-pointer hover:text-white"
             {...listeners}
@@ -147,6 +148,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                   )}
                 >
                   <button
+                    aria-label="manage-opacity"
                     type="button"
                     className={cx({
                       'block text-white': true,
@@ -175,6 +177,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
               )}
             >
               <button
+                aria-label="manage-visibility"
                 type="button"
                 onClick={onChangeVisibility}
                 className={cx({

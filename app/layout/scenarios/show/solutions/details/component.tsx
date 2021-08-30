@@ -85,6 +85,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
     >
       <header>
         <button
+          aria-label="return"
           type="button"
           className="flex items-center w-full pt-5 pb-1 space-x-2 text-left focus:outline-none"
           onClick={() => {

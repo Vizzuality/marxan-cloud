@@ -134,6 +134,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     >
       <header className="flex items-center pt-5 pb-1 space-x-3">
         <button
+          aria-label="return"
           type="button"
           className="flex items-center w-full space-x-2 text-left focus:outline-none"
           onClick={() => {

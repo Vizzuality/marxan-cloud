@@ -23,7 +23,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
             <div className="grid w-full grid-cols-1 px-24 md:grid-cols-2 gap-y-20">
               {FOUNDING_LOGOS.map((fl) => (
                 <a href={fl.hyperlink} key={fl.id} rel="noreferrer" target="_blank" className="place-self-center">
-                  <img alt={fl.alt} src={fl.src} />
+                  <img alt={fl.alt} src={fl.src} height="auto" width="auto" />
                 </a>
               ))}
             </div>
@@ -36,7 +36,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
             <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-y-20">
               {PARTNERSHIP_LOGOS.map((fl) => (
                 <a href={fl.hyperlink} key={fl.id} rel="noreferrer" target="_blank" className="place-self-center">
-                  <img alt={fl.alt} src={fl.src} />
+                  <img alt={fl.alt} src={fl.src} height="auto" width="auto" />
                 </a>
               ))}
             </div>
@@ -51,7 +51,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
             <div className="grid w-full grid-cols-1 px-32 pt-24 md:px-0 md:grid-cols-5 gap-y-24 md:gap-y-0 md:gap-x-16">
               {ADDITIONAL_SUPPORT_LOGOS.map((sl) => (
                 <a href={sl.hyperlink} key={sl.id} rel="noreferrer" target="_blank" className="place-self-center">
-                  <img alt={sl.alt} src={sl.src} />
+                  <img alt={sl.alt} src={sl.src} height="auto" width="auto" />
                 </a>
               ))}
             </div>
@@ -66,7 +66,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
             <div className="grid w-full grid-cols-1 pt-20 md:grid-cols-1 gap-x-16">
               {INITIATIVE_LOGOS.map((sl) => (
                 <a href={sl.hyperlink} key={sl.id} rel="noreferrer" target="_blank" className="place-self-center">
-                  <img alt={sl.alt} src={sl.src} />
+                  <img alt={sl.alt} src={sl.src} height="auto" width="auto" />
                 </a>
               ))}
             </div>

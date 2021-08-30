@@ -32,6 +32,7 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
     >
       <header className="flex items-center pt-5 pb-1">
         <button
+          aria-label="return"
           type="button"
           className="flex items-center w-full mr-2 space-x-2 text-left focus:outline-none"
           onClick={() => {
