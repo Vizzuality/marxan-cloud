@@ -27,10 +27,10 @@ interface Scenario {
   type: 'marxan',
   description: string,
   wdpaIucnCategories?: IUCNCategory[],
-  wdpaThreshold: number,
+  wdpaThreshold?: number,
   boundaryLengthModifier?: number,
   // @todo probably not: check
-  customProtectedAreaIds: string,
+  customProtectedAreaIds?: string,
   metadata?: {
     marxanInputParameterFile?: Record<string, string | number>,
     scenarioEditingMetadata?: Record<string, unknown>,
