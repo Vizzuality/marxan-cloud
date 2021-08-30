@@ -77,6 +77,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
       )}
     >
       <button
+        aria-label="open-menu"
         type="button"
         className="flex items-center justify-start space-x-1 focus:outline-none"
         onClick={handleClick}
