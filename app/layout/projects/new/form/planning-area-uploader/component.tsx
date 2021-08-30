@@ -92,13 +92,6 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     });
   };
 
-  const uploadPlanningAreaSubmit = useCallback(() => {
-    dispatch(setUploadingPlanningArea(geoData));
-    dispatch(setBbox(geoData.bbox));
-    dispatch(setMinPuAreaSize(geoData.marxanMetadata.minPuAreaSize));
-    dispatch(setMaxPuAreaSize(geoData.marxanMetadata.maxPuAreaSize));
-  }, [dispatch, geoData]);
-
   const onDropRejected = (rejectedFiles) => {
     const r = rejectedFiles[0];
     const { errors } = r;
@@ -117,6 +110,20 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     });
   };
 
+  const uploadPlanningAreaSubmit = useCallback(() => {
+    dispatch(setUploadingPlanningArea(geoData));
+    dispatch(setBbox(geoData.bbox));
+    dispatch(setMinPuAreaSize(geoData.marxanMetadata.minPuAreaSize));
+    dispatch(setMaxPuAreaSize(geoData.marxanMetadata.maxPuAreaSize));
+  }, [dispatch, geoData]);
+
+  const cancelPlanningAreaUpload = useCallback((f) => {
+    setSuccessFile(null);
+    resetPlanningArea(f);
+    input.onChange(null);
+    dispatch(setUploadingPlanningArea(null));
+  }, [dispatch, input, resetPlanningArea]);
+
   return (
     <div className="mt-3 mb-5">
       {!!uploadingPlanningArea && (
@@ -134,11 +141,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                 id="cancel-shapefile-btn"
                 type="button"
                 className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-black"
-                onClick={() => {
-                  setSuccessFile(null);
-                  resetPlanningArea(form);
-                  // input.onChange(null);
-                }}
+                onClick={() => cancelPlanningAreaUpload(form)}
               >
                 <Icon
                   className="w-1.5 h-1.5 text-white group-hover:text-white"

@@ -26,11 +26,12 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
   const {
     minPuAreaSize,
     maxPuAreaSize,
+    uploadingPlanningArea,
   } = useSelector((state) => state['/projects/new']);
 
   return (
     <div>
-      {(!!countryId || !!planningAreaId) && (
+      {(!!countryId || !!planningAreaId) && uploadingPlanningArea && (
         <div className="flex items-center mt-6 space-x-2">
           <h2 className="text-lg font-medium font-heading">Add a planning unit grid</h2>
           <InfoButton>
@@ -52,7 +53,7 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
         </div>
       )}
 
-      {(!!countryId || !!planningAreaId) && (
+      {(!!countryId || !!planningAreaId) && uploadingPlanningArea && (
         <div className="flex mt-5">
           <div className="flex w-1/2">
             <FieldRFF
