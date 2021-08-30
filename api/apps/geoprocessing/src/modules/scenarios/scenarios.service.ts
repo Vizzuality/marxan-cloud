@@ -35,7 +35,6 @@ let includeSelections: IncludeSelections = {
   features: {
     attributes: ', "featureList"',
     select: 'feature_list as "featureList"',
-    table: 'scenario_pu_features_entity',
     alias: 'features',
     condition: 'test.id = features.scenario_pu_id',
   },
@@ -104,7 +103,7 @@ export class ScenariosService {
      * @todo: provide features id array
      * @todo: provide results/output data
      */
-    const sql = this.selectJoins(id,
+    const sql = this.selectJoins(id, z,x,y,
       this.ScenariosPlanningUnitGeoEntityRepository.createQueryBuilder('test')
         .addSelect('plan.the_geom')
         .leftJoin('planning_units_geom', 'plan', `test.pu_geom_id = plan.id`)
@@ -130,6 +129,9 @@ export class ScenariosService {
    */
   private selectJoins(
     id: string,
+    z: number,
+    x: number,
+    y: number,
     qB: SelectQueryBuilder<ScenariosPuPaDataGeo>,
     _filters?: ScenariosPUFilters,
   ): SelectQueryBuilder<ScenariosPuPaDataGeo> {
@@ -137,6 +139,22 @@ export class ScenariosService {
       _filters.include.forEach((element: string) => {
         if (includeSelections[element].select) {
           qB.addSelect(includeSelections[element].select!);
+        }
+        if (element == 'features'){
+          includeSelections.features.table = `(select pu.scenario_id,
+            pu.id AS scenario_pu_id,
+            string_agg(DISTINCT species.feature_id::text, ','::text) AS feature_list from (SELECT sfd.scenario_id,
+                    (st_dump(fd.the_geom)).geom AS the_geom,
+                    fd.feature_id
+                   FROM scenario_features_data sfd
+                   inner JOIN features_data fd ON sfd.feature_class_id = fd.id) species, (SELECT pug.the_geom,
+                    spd.id,
+                    spd.scenario_id
+                   FROM planning_units_geom pug
+                     inner JOIN scenarios_pu_data spd ON pug.id = spd.pu_geom_id
+                  ORDER BY spd.puid) as pu where st_intersects(species.the_geom, pu.the_geom)
+                 and species.scenario_id='${id}'::uuid
+                and st_intersects(pu.the_geom, st_transform(ST_TileEnvelope(${z}, ${x}, ${y}),4326)) group by 1,2)`;
         }
         if (includeSelections[element].table) {
           qB.leftJoin(
