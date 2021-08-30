@@ -30,6 +30,9 @@ export class OutputRepository {
         scenarioId: data.scenarioId,
       }),
     );
+    await this.outputs.delete({
+      scenarioId: data.scenarioId,
+    });
     await this.outputs.save(entities);
   }
 }
