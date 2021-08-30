@@ -16,6 +16,7 @@ import COST_LAND_IMG from 'images/info-buttons/img_cost_surface_marine.png';
 import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface ScenariosCostSurfaceProps {
   onChangeSection: (s: string) => void;
@@ -61,8 +62,10 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
 
   const onDropAccepted = async (acceptedFiles) => {
     setLoading(true);
+
     const f = acceptedFiles[0];
     console.info(f);
+    setSuccessFile({ name: f.name });
 
     const data = new FormData();
     data.append('file', f);
@@ -70,7 +73,6 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     uploadMutation.mutate({ id: `${sid}`, data }, {
       onSuccess: ({ data: { data: g } }) => {
         setLoading(false);
-
         addToast('success-upload-shapefile', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -96,10 +98,6 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     });
   };
 
-  const resetCustomArea = () => {
-
-  };
-
   const onDropRejected = (rejectedFiles) => {
     const r = rejectedFiles[0];
     const { errors } = r;
@@ -117,6 +115,18 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
       level: 'error',
     });
   };
+
+  const resetCustomArea = () => {
+    setSuccessFile(null);
+  };
+
+  const uploadCostSurfaceSubmit = () => {
+  };
+
+  const cancelCostSurfaceUpload = useCallback(() => {
+    setSuccessFile(null);
+    // resetCustomArea();
+  }, []);
 
   return (
     <motion.div
@@ -196,18 +206,45 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
           <h4 className="mb-2">2. Upload your cost surface</h4>
 
           <div className="mt-3 mb-5">
-            <Uploader
-              caption="Upload cost surface"
-              // form={form}
-              // input={input}
-              loading={loading}
-              maxSize={uploadingMaxSize}
-              reset={resetCustomArea}
-              onDropAccepted={onDropAccepted}
-              onDropRejected={onDropRejected}
-              successFile={successFile}
-              setSuccessFile={setSuccessFile}
-            />
+            {!successFile && (
+              <Uploader
+                caption="Upload cost surface"
+                loading={loading}
+                maxSize={uploadingMaxSize}
+                reset={resetCustomArea}
+                onDropAccepted={onDropAccepted}
+                onDropRejected={onDropRejected}
+                successFile={successFile}
+                setSuccessFile={setSuccessFile}
+                uploadFileSubmit={uploadCostSurfaceSubmit}
+              />
+            )}
+            {successFile && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="flex flex-col w-full py-5 space-y-6 cursor-pointer">
+                  <div className="flex items-center space-x-2">
+                    <label className="px-3 py-1 bg-blue-100 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                      <p className="text-sm text-primary-500">{successFile.name}</p>
+                    </label>
+                    <button
+                      id="cancel-shapefile-btn"
+                      type="button"
+                      className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-black"
+                      onClick={cancelCostSurfaceUpload}
+                    >
+                      <Icon
+                        className="w-4.5 h-1.5 text-white group-hover:text-white"
+                        icon={CLOSE_SVG}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </div>
         </div>
 
