@@ -54,6 +54,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     subtab,
     cache,
     selectedSolution,
+    highlightFeatures,
     layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}`]);
 
@@ -166,6 +167,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       puIncludedValue: included,
       puExcludedValue: excluded,
       features: featuresIds,
+      highlightFeatures,
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
         pugrid: layerSettings.pugrid,

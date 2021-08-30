@@ -66,6 +66,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     // Features
     featureHoverId,
     highlightFeatures,
+
     // Adjust planning units
     clicking,
     puAction,

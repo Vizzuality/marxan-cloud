@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
+
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
+
+import { getScenarioSlice } from 'store/slices/scenarios/detail';
 
 import cx from 'classnames';
 
@@ -20,6 +24,13 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
   const { query } = useRouter();
   const { sid } = query;
 
+  const scenarioSlice = getScenarioSlice(sid);
+  const {
+    setHighlightFeatures,
+  } = scenarioSlice.actions;
+  const dispatch = useDispatch();
+  const { highlightFeatures } = useSelector((state) => state[`/scenarios/${sid}`]);
+
   const {
     data: allFeaturesData,
     fetchNextPage: allFeaturesfetchNextPage,
@@ -36,6 +47,31 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
       if (hasNextPage) allFeaturesfetchNextPage();
     },
   );
+
+  const toggleHighlight = useCallback((id) => {
+    const newHighlightFeatures = [...highlightFeatures];
+    if (!newHighlightFeatures.includes(id)) {
+      newHighlightFeatures.push(id);
+    } else {
+      const i = newHighlightFeatures.indexOf(id);
+      newHighlightFeatures.splice(i, 1);
+    }
+    dispatch(setHighlightFeatures(newHighlightFeatures));
+  }, [dispatch, setHighlightFeatures, highlightFeatures]);
+
+  const onMap = (id) => {
+    if (!highlightFeatures.includes(id)) {
+      return false;
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    return () => {
+      dispatch(setHighlightFeatures([]));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="relative flex flex-col flex-grow overflow-hidden" style={{ minHeight: 200 }}>
@@ -76,6 +112,8 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
                 <Item
                   {...item}
                   scrollRoot={scrollRef}
+                  onHighlight={() => toggleHighlight(item.id)}
+                  onMap={onMap(item.id)}
                 />
               </div>
             );
