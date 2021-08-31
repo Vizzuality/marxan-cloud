@@ -6,14 +6,14 @@ import { ms } from 'https://deno.land/x/ms@v0.1.0/ms.ts';
 const DEFAULT_WATCH_TIMEOUT = 1800;
 
 export enum ScenarioJobKinds {
-  'geofeatureCopy',
-  'planningAreaProtectedCalculation',
-  'specification',
+  geoFeatureCopy = 'geofeatureCopy',
+  planningAreaProtectedCalculation = 'planningAreaProtectedCalculation',
+  specification = 'specification',
 }
 
 enum JobStatuses {
-  'running',
-  'done',
+  running = 'running',
+  done = 'done',
 }
 
 interface JobStatus {
