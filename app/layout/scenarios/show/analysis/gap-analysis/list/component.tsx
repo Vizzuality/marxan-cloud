@@ -59,12 +59,12 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
     dispatch(setHighlightFeatures(newHighlightFeatures));
   }, [dispatch, setHighlightFeatures, highlightFeatures]);
 
-  const onMap = (id) => {
+  const isHighlighted = useCallback((id) => {
     if (!highlightFeatures.includes(id)) {
       return false;
     }
     return true;
-  };
+  }, [highlightFeatures]);
 
   useEffect(() => {
     return () => {
@@ -112,8 +112,8 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
                 <Item
                   {...item}
                   scrollRoot={scrollRef}
+                  highlighted={isHighlighted(item.id)}
                   onHighlight={() => toggleHighlight(item.id)}
-                  onMap={onMap(item.id)}
                 />
               </div>
             );
