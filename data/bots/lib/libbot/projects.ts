@@ -3,6 +3,7 @@ import { BotHttpClient, getJsonApiDataFromResponse } from './marxan-bot.ts';
 
 interface Project {
   name: string,
+  description: string,
   countryId?: string,
   adminAreaLevel1Id?: string,
   adminAreaLevel2Id?: string,
