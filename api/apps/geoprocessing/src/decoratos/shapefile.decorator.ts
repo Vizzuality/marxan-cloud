@@ -5,7 +5,7 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
-import { ShapefileGeoJSONResponseDTO } from '../modules/shapefiles/dto/shapefile.geojson.response.dto';
+import { ShapefileGeoJSONResponseDTO } from '../types/shapefile.geojson.response.dto';
 
 export function ApiConsumesShapefile() {
   return applyDecorators(

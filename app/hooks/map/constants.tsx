@@ -17,6 +17,7 @@ export const COLORS = {
   },
   wdpa: '#00F',
   features: '#6F53F7',
+  highlightFeatures: '#37297B',
   include: '#0F0',
   exclude: '#F00',
   cost: [
@@ -92,24 +93,33 @@ export const LEGEND_LAYERS = {
   }),
 
   // ANALYSIS
-  cost: () => ({
-    id: 'cost',
-    name: 'Cost surface',
-    type: 'gradient',
-    settingsManager: {
-      opacity: true,
-      visibility: true,
-    },
-    items: [
-      {
-        color: COLORS.cost[0],
-        value: '0',
-      }, {
-        color: COLORS.cost[1],
-        value: '100',
+  cost: (options) => {
+    const {
+      cost = {
+        min: 0,
+        max: 1,
       },
-    ],
-  }),
+    } = options;
+
+    return {
+      id: 'cost',
+      name: 'Cost surface',
+      type: 'gradient',
+      settingsManager: {
+        opacity: true,
+        visibility: true,
+      },
+      items: [
+        {
+          color: COLORS.cost[0],
+          value: `${cost.min === cost.max ? 0 : cost.min}`,
+        }, {
+          color: COLORS.cost[1],
+          value: `${cost.max}`,
+        },
+      ],
+    };
+  },
   'lock-in': (options) => {
     const { puIncludedValue } = options;
 

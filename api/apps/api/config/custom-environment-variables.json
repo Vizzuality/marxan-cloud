@@ -49,5 +49,10 @@
         }
       }
     }
+  },
+  "fileUploads": {
+    "limits": {
+      "shapefileMaxSize": "API_UPLOAD_SHAPEFILE_MAX_SIZE"
+    }
   }
 }
