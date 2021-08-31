@@ -8,7 +8,11 @@ import { BotHttpClient, MarxanBotConfig } from './marxan-bot.ts';
 import { Organizations } from './organizations.ts';
 import { Projects } from './projects.ts';
 import { Scenarios } from './scenarios.ts';
+import { ScenarioEditingMetadata } from './scenario-editing-metadata.ts';
 import { PlanningAreaShapefiles } from './planning-area-shapefiles.ts';
+import { ProtectedAreas } from './protected-areas.ts';
+import { GeoFeatureSpecifications } from './geo-feature-specifications.ts';
+import { GeoFeatures } from './geo-features.ts';
 
 const scriptPath = dirname(relative(Deno.cwd(), fromFileUrl(import.meta.url)));
 
@@ -16,31 +20,30 @@ export interface Bot {
   organizations: Organizations;
   projects: Projects;
   scenarios: Scenarios;
+  geoFeatures: GeoFeatures;
+  geoFeatureSpecifications: GeoFeatureSpecifications;
   planningAreaUploader: PlanningAreaShapefiles;
+  protectedAreas: ProtectedAreas;
+  metadata: ScenarioEditingMetadata;
 }
 
-export const createBot = async (botConfig?: MarxanBotConfig): Promise<Bot> => {
-  const { API_URL, USERNAME, PASSWORD, POSTGRES_URL } = config({
-    path: scriptPath + "/.env",
-  });
-  
+export const createBot = async (botConfig: MarxanBotConfig): Promise<Bot> => {
   const httpClient = await BotHttpClient.init({
-    apiUrl: API_URL,
+    apiUrl: botConfig?.apiUrl,
     credentials: {
-      username: USERNAME,
-      password: PASSWORD,
+      username: botConfig?.credentials.username,
+      password: botConfig?.credentials.password,
     }
   });
 
-  const organizations = new Organizations(httpClient);
-  const projects = new Projects(httpClient);
-  const scenarios = new Scenarios(httpClient);
-  const planningAreaUploader = new PlanningAreaShapefiles(httpClient, API_URL);
-
   return {
-    organizations,
-    projects,
-    scenarios,
-    planningAreaUploader,
+    organizations: new Organizations(httpClient),
+    projects: new Projects(httpClient),
+    scenarios: new Scenarios(httpClient),
+    planningAreaUploader: new PlanningAreaShapefiles(httpClient, botConfig.apiUrl),
+    protectedAreas: new ProtectedAreas(httpClient),
+    geoFeatures: new GeoFeatures(httpClient),
+    geoFeatureSpecifications: new GeoFeatureSpecifications(httpClient),
+    metadata: new ScenarioEditingMetadata(),
   }
 }
