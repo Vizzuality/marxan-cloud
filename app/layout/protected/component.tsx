@@ -2,9 +2,9 @@ import React, { ReactNode, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useMe } from 'hooks/me';
-
 import { useSession } from 'next-auth/client';
+
+import { useMe } from 'hooks/me';
 
 import GuideRequest from 'layout/guide-request';
 
@@ -44,6 +44,7 @@ const Protected: React.FC = ({ children }: ProtectedProps) => {
   return (
     <>
       {children}
+
       <Modal
         dismissable={false}
         title="Hello"

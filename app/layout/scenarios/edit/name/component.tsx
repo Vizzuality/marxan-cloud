@@ -144,7 +144,7 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
                   <Loading
                     visible={submitting}
                     className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full"
-                    iconClassName="w-5 h-5 text-white"
+                    iconClassName="w-10 h-10 text-white"
                   />
                 </Button>
               </div>

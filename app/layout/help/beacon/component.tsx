@@ -11,11 +11,11 @@ import { useResizeDetector } from 'react-resize-detector';
 
 import { useRouter } from 'next/router';
 
-import { useHelp } from 'hooks/help';
-
 import type { Placement } from '@popperjs/core';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
+
+import { useHelp } from 'hooks/help';
 
 import HelpSpotlight from 'layout/help/spotlight';
 import HelpTooltip from 'layout/help/tooltip';
@@ -173,6 +173,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
               {...attributes.popper}
             >
               <button
+                aria-label="manage-visibility"
                 type="button"
                 className={cx({
                   'relative beacon flex items-center justify-center w-6 h-6 bg-primary-500 border-2 border-gray-700 transition rounded-full focus:outline-none transform translate-y-3/4': true,

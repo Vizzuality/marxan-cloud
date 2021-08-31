@@ -2,9 +2,9 @@ import React from 'react';
 
 import Link from 'next/link';
 
-import { useMe } from 'hooks/me';
-
 import cx from 'classnames';
+
+import { useMe } from 'hooks/me';
 
 import MyProjects from 'layout/header/my-projects';
 import Title from 'layout/header/title';
@@ -37,7 +37,7 @@ const SIZE = {
   },
 };
 
-export const Header: React.FC<HeaderProps> = ({ published = false, size, theme = 'dark' }:HeaderProps) => {
+export const Header: React.FC<HeaderProps> = ({ published = false, size, theme = 'dark' }: HeaderProps) => {
   const { user } = useMe();
 
   return (

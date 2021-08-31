@@ -8,10 +8,13 @@ import type { Project } from 'types/project-model';
 import { useMe } from 'hooks/me';
 import { useProject } from 'hooks/projects';
 
-// import Avatar from 'components/avatar';
+import ComingSoon from 'layout/help/coming-soon';
+
+import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
+import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ItemProps extends Project {
@@ -33,7 +36,7 @@ export const Item: React.FC<ItemProps> = ({
   area,
   description,
   lastUpdateDistance,
-  // contributors = [],
+  contributors = [],
   style,
   onClick,
   onDownload,
@@ -166,45 +169,65 @@ export const Item: React.FC<ItemProps> = ({
         </header>
 
         {/* CONTRIBUTORS */}
-        {/* {!!contributors.length && (
-          <div className="flex items-center mt-4 text-sm">
-            <p>Contributors:</p>
-            <ul className="flex ml-1">
-              {contributors.map((c, i) => {
-                return (
-                  <li
-                    key={`${c.id}`}
-                    className={cx({
-                      '-ml-3': i !== 0,
-                    })}
-                  >
-                    <Avatar bgImage="/images/avatar.png" />
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )} */}
+        <div className="inline-flex">
+          <ComingSoon>
+            <div className="flex items-center mt-4 text-sm">
+              <p>Contributors:</p>
+              <ul className="flex ml-2">
+                {contributors.map((c, i) => {
+                  return (
+                    <li
+                      key={`${c.id}`}
+                      className={cx({
+                        '-ml-3': i !== 0,
+                      })}
+                    >
+                      <Avatar className="text-sm text-white uppercase bg-gray-500">
+                        <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
+                      </Avatar>
+                    </li>
+                  );
+                })}
+
+                <li
+                  key="add-contributor"
+                  className={cx({
+                    'ml-2': true,
+                  })}
+                >
+                  <Avatar className="text-sm text-white uppercase bg-gray-500">
+                    <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
+                  </Avatar>
+                </li>
+              </ul>
+            </div>
+          </ComingSoon>
+        </div>
 
         <footer className="mt-7">
           <div className="flex">
-            <Button
-              className=""
-              theme="secondary"
-              size="xs"
-              onClick={handleDownload}
-            >
-              Download
-            </Button>
 
-            <Button
-              className="ml-3"
-              theme="secondary"
-              size="xs"
-              onClick={handleDuplicate}
-            >
-              Duplicate
-            </Button>
+            <ComingSoon>
+              <Button
+                className=""
+                theme="secondary"
+                size="xs"
+                onClick={handleDownload}
+              >
+                Download
+              </Button>
+            </ComingSoon>
+
+            <ComingSoon>
+              <Button
+                className="ml-3"
+                theme="secondary"
+                size="xs"
+                onClick={handleDuplicate}
+              >
+                Duplicate
+              </Button>
+            </ComingSoon>
 
             <Button
               className="ml-3"
@@ -214,6 +237,7 @@ export const Item: React.FC<ItemProps> = ({
             >
               Delete
             </Button>
+
           </div>
         </footer>
 

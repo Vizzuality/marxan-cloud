@@ -17,9 +17,9 @@ import {
   tileSpecification,
 } from './planning-units.service';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
-import { ShapefileService } from '../shapefiles/shapefiles.service';
+import { ShapefileService } from '@marxan/shapefile-converter';
 import { ApiConsumesShapefile } from '../../decoratos/shapefile.decorator';
-import { ShapefileGeoJSONResponseDTO } from '../shapefiles/dto/shapefile.geojson.response.dto';
+import { ShapefileGeoJSONResponseDTO } from '../../types/shapefile.geojson.response.dto';
 
 import {
   ApiOperation,

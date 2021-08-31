@@ -3,11 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
+import { setBbox, setMinPuAreaSize, setMaxPuAreaSize } from 'store/slices/projects/new';
+
+import { RegionLevel } from 'types/country-model';
+
 import { useAdministrativeAreas } from 'hooks/administrative-areas';
 import { useCountries, useCountryRegions } from 'hooks/countries';
-
-import { setBbox, setMinPuAreaSize, setMaxPuAreaSize } from 'store/slices/projects/new';
-import { RegionLevel } from 'types/country-model';
 
 import Field from 'components/forms/field';
 import Select from 'components/forms/select';
@@ -166,7 +167,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
           || (isFetchingRegions && !isFetchedRegions)
           || (isFetchingSubRegions && !isFetchedSubRegions)}
         className="z-40 flex items-center justify-center w-full h-12 bg-transparent bg-opacity-90"
-        iconClassName="w-5 h-5 text-primary-500"
+        iconClassName="w-10 h-10 text-primary-500"
         transition={{
           duration: 0,
         }}

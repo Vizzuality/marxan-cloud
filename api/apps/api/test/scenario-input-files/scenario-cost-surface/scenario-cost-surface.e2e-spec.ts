@@ -19,10 +19,10 @@ describe(`When scenario has PUs with cost and lock status`, () => {
     expect(headers).toEqual('id\tcost\tstatus');
     expect(costAndStatus).toMatchInlineSnapshot(`
       Array [
-        "0	200	",
+        "0	200	0",
         "1	400	1",
         "2	600	2",
-        "3	800	2",
+        "3	800	0",
       ]
     `);
   });
@@ -48,7 +48,7 @@ describe(`When scenario has PUs with cost and lock status`, () => {
       {
         defaultStatus: 'unstated',
         id: expect.any(String),
-        inclusionStatus: 'locked-out',
+        inclusionStatus: 'unstated',
       },
     ]);
   });

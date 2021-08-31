@@ -192,7 +192,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       <Loading
         visible
         className="relative flex items-center justify-center w-full h-16"
-        iconClassName="w-5 h-5 text-white"
+        iconClassName="w-10 h-10 text-white"
       />
     );
   }
@@ -204,6 +204,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     >
       {({ values, handleSubmit: RFFhandleSubmit }) => (
         <form onSubmit={RFFhandleSubmit} autoComplete="off" className="relative flex flex-col flex-grow w-full overflow-hidden">
+          <Loading
+            visible={submitting}
+            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+            iconClassName="w-10 h-10 text-white"
+          />
+
           <div className="relative flex flex-col flex-grow overflow-hidden">
             <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
@@ -324,12 +330,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
               disabled={submitting}
             >
               <span>Save</span>
-
-              <Loading
-                visible={submitting}
-                className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full"
-                iconClassName="w-5 h-5 text-white"
-              />
             </Button>
           </div>
         </form>

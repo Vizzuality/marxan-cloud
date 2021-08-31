@@ -45,6 +45,7 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
     )}
   >
     <button
+      aria-label="info-button"
       className={cx({
         'flex flex-shrink-0 items-center justify-center w-5 h-5 transition rounded-full bg-opacity-50 focus:outline-none hover:bg-opacity-75 focus:bg-opacity-90': true,
         [THEME[theme].button]: true,

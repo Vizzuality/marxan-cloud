@@ -207,7 +207,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
             <Loading
               visible={submitting}
               className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90 rounded-3xl"
-              iconClassName="w-5 h-5 text-primary-500"
+              iconClassName="w-10 h-5 text-primary-500"
             />
 
             {selected && (

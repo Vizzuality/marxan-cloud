@@ -83,6 +83,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
       settings: {
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],
+        features: layerSettings.features,
         cost: layerSettings.cost,
         'lock-in': layerSettings['lock-in'],
         'lock-out': layerSettings['lock-out'],

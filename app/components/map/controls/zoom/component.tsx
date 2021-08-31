@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
+
+import { ViewportProps } from 'react-map-gl';
+
 import cx from 'classnames';
 
 import Icon from 'components/icon';
-
-import { ViewportProps } from 'react-map-gl';
 
 import ZOOM_IN_SVG from 'svgs/map/zoom-in.svg?sprite';
 import ZOOM_OUT_SVG from 'svgs/map/zoom-out.svg?sprite';
@@ -47,6 +48,7 @@ export const ZoomControl = ({
       })}
     >
       <button
+        aria-label="zoom-in"
         className={cx({
           'mb-0.5 p-0.5 rounded-t-4xl text-white bg-black focus:outline-none': true,
           'hover:bg-gray-700 active:bg-gray-600': zoom !== maxZoom,
@@ -59,6 +61,7 @@ export const ZoomControl = ({
         <Icon icon={ZOOM_IN_SVG} />
       </button>
       <button
+        aria-label="zoom-out"
         className={cx({
           'p-0.5 rounded-b-4xl text-white bg-black focus:outline-none': true,
           'hover:bg-gray-700 active:bg-gray-600': zoom !== minZoom,

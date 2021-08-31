@@ -134,6 +134,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     >
       <header className="flex items-center pt-5 pb-1 space-x-3">
         <button
+          aria-label="return"
           type="button"
           className="flex items-center w-full space-x-2 text-left focus:outline-none"
           onClick={() => {
@@ -222,7 +223,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
             <Loading
               visible={loading}
               className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-              iconClassName="w-5 h-5 text-primary-500"
+              iconClassName="w-10 h-5 text-primary-500"
             />
 
             <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 1 MB'}</p>

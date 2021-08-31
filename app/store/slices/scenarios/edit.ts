@@ -11,6 +11,7 @@ interface ScenarioEditStateProps {
 
   // FEATURES
   featureHoverId: string;
+  highlightFeatures: string[];
 
   // ADJUST PLANNING UNITS
   cache: number;
@@ -42,6 +43,7 @@ const initialState = {
 
   // FEATURES
   featureHoverId: null,
+  highlightFeatures: [],
 
   // ADJUST PLANNING UNITS
   cache: Date.now(),
@@ -83,6 +85,9 @@ export function getScenarioEditSlice(id) {
       // FEATURES
       setFeatureHoverId: (state, action: PayloadAction<string>) => {
         state.featureHoverId = action.payload;
+      },
+      setHighlightFeatures: (state, action: PayloadAction<string[]>) => {
+        state.highlightFeatures = action.payload;
       },
 
       // ADJUST PLANNING UNITS

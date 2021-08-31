@@ -1,7 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import { FeatureTag } from '@marxan/features/domain';
+import { JobStatus } from '../scenarios/scenario.api.entity';
 
 export const geoFeatureResource: BaseServiceResource = {
   className: 'GeoFeature',
@@ -18,7 +19,7 @@ export interface GeoFeatureProperty {
 }
 
 @Entity('features')
-export class GeoFeature {
+export class GeoFeature extends BaseEntity {
   @ApiProperty()
   @PrimaryColumn()
   id!: string;
@@ -55,6 +56,9 @@ export class GeoFeature {
   @ApiProperty()
   @Column('varchar')
   tag!: FeatureTag;
+
+  @Column('varchar', { name: 'creation_status' })
+  creationStatus?: JobStatus;
 
   @ApiPropertyOptional()
   properties?: GeoFeatureProperty[];

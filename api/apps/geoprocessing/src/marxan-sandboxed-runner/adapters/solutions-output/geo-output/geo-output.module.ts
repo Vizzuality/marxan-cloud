@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   MarxanExecutionMetadataGeoEntity,
@@ -27,6 +27,7 @@ import { ScenarioFeaturesModule } from './scenario-features';
     ScenarioFeaturesModule,
   ],
   providers: [
+    Logger,
     GeoOutputRepository,
     MetadataArchiver,
     MarxanDirectory,

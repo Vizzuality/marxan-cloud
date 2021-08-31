@@ -227,7 +227,7 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
                 className="w-full"
                 theme="primary"
                 size="lg"
-                disabled={submitting}
+                disabled={submitting || !values.selected.length}
               >
                 Save
               </Button>

@@ -92,6 +92,13 @@ export const createWorld = async () => {
         )
       ).identifiers;
 
+      const lockStatuses: Record<number, LockStatus | null> = {
+        0: LockStatus.Unstated,
+        1: LockStatus.LockedIn,
+        2: LockStatus.LockedOut,
+        3: null,
+      };
+
       geometries.push(...geoRows.map((geo) => geo.id));
       const scenarioPuData = await scenarioPuDataRepo.save(
         geometries.map((id, index) =>
@@ -99,12 +106,7 @@ export const createWorld = async () => {
             puGeometryId: id,
             scenarioId,
             planningUnitMarxanId: index,
-            lockStatus:
-              index === 0
-                ? LockStatus.Unstated
-                : index === 1
-                ? LockStatus.LockedIn
-                : LockStatus.LockedOut,
+            lockStatus: lockStatuses[index] ?? null,
           }),
         ),
       );

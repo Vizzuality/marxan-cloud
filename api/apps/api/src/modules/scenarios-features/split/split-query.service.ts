@@ -8,6 +8,7 @@ export class SplitQuery {
   prepareQuery(
     input: FeatureConfigSplit,
     scenarioId: string,
+    specificationId: string,
     planningAreaLocation: { id: string; tableName: string } | undefined,
     protectedAreaFilterByIds: string[],
     project: Pick<Project, 'bbox'>,
@@ -19,6 +20,7 @@ export class SplitQuery {
       ),
       splitByProperty: `$${parameters.push(input.splitByProperty)}`,
       scenarioId: `$${parameters.push(scenarioId)}`,
+      specificationId: `$${parameters.push(specificationId)}`,
       planningAreaId: isDefined(planningAreaLocation)
         ? `$${parameters.push(planningAreaLocation.id)}`
         : `NULL`,
@@ -53,13 +55,14 @@ export class SplitQuery {
 
     const hasSubSetFilter = (input.selectSubSets ?? []).length > 0;
     const query = `
-            insert into scenario_features_data as sfd (feature_class_id,
-                                                     scenario_id,
-                                                     fpf,
-                                                     target,
-                                                     prop,
-                                                     total_area,
-                                                     current_pa)
+            insert into scenario_features_preparation as sfp (feature_class_id,
+                                                              scenario_id,
+                                                              specification_id,
+                                                              fpf,
+                                                              target,
+                                                              prop,
+                                                              total_area,
+                                                              current_pa)
             WITH split as (
               WITH subsets as (
               select value as sub_value, target, fpf, prop
@@ -86,6 +89,7 @@ export class SplitQuery {
               )
             select fd.id,
                    ${fields.scenarioId},
+                   ${fields.specificationId},
                    split.fpf,
                    split.target,
                    split.prop,
@@ -103,7 +107,7 @@ export class SplitQuery {
                 ${fields.bbox[3]},
                 4326
               ), fd.the_geom)
-            returning sfd.id as id;
+            returning sfp.id as id;
           `;
     return { parameters, query };
   }

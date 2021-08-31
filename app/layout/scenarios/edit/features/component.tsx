@@ -196,7 +196,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
                               your feature to be included in the solution.
                             </p>
                           </div>
-                          <h4 className="font-heading text-lg mb-2.5">What is the FPF?</h4>
+                          <h4 className="font-heading text-lg mt-5 mb-2.5">What is the FPF?</h4>
                           <div className="space-y-2">
                             <p>
                               FPF stands for

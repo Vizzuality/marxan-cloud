@@ -15,23 +15,22 @@ export class DetermineFeaturesHandler
     private readonly specificationRepository: SpecificationRepository,
   ) {}
 
-  async execute({ featuresConfig }: DetermineFeatures): Promise<void> {
-    const specifications = await this.specificationRepository.transaction(
+  async execute({
+    featuresConfig,
+    specificationId,
+  }: DetermineFeatures): Promise<void> {
+    const specification = await this.specificationRepository.transaction(
       async (repo) => {
-        const specifications = await repo.findAllRelatedToFeatureConfig(
-          featuresConfig,
-        );
+        const specification = await repo.getById(specificationId);
+        if (!specification) return;
 
-        for (const spec of specifications) {
-          spec.determineFeatures([featuresConfig]);
-          await repo.save(spec);
-        }
-        return specifications;
+        specification.determineFeatures([featuresConfig]);
+        await repo.save(specification);
+        return specification;
       },
     );
 
-    specifications.forEach((specification) =>
-      this.eventPublisher.mergeObjectContext(specification).commit(),
-    );
+    if (!specification) return;
+    this.eventPublisher.mergeObjectContext(specification).commit();
   }
 }

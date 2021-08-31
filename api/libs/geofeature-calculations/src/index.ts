@@ -5,6 +5,7 @@ export const stratificationQueueName = 'geofeatures-stratification';
 export interface FeaturesJobData {
   featureId: string;
   scenarioId: string;
+  specificationId: string;
 }
 
 export type FeaturesJobCancelProgress = {

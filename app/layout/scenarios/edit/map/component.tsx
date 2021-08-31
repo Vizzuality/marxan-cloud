@@ -18,7 +18,7 @@ import {
   useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers, useLegend,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useScenario } from 'hooks/scenarios';
+import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
 
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 
@@ -65,6 +65,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
     // Features
     featureHoverId,
+    highlightFeatures,
+
     // Adjust planning units
     clicking,
     puAction,
@@ -85,6 +87,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
+
+  const {
+    data: costSurfaceRangeData,
+  } = useCostSurfaceRange(sid);
 
   const {
     data: allGapAnalysisData,
@@ -182,9 +188,12 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
       features: featuresIds,
+      highlightFeatures,
+      cost: costSurfaceRangeData,
       settings: {
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],
+        features: layerSettings.features,
         cost: layerSettings.cost,
         'lock-in': layerSettings['lock-in'],
         'lock-out': layerSettings['lock-out'],
@@ -197,12 +206,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const LAYERS = [PUGridLayer, WDPApreviewLayer, ...FeaturePreviewLayers].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    // type: tab,
-    // subtype: subtab,
     layers,
     options: {
       wdpaIucnCategories: tab === 'protected-areas' && subtab === 'protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
       wdpaThreshold: tab === 'protected-areas' && subtab === 'protected-areas-percentage' ? wdpaThreshold : scenarioData?.wdpaThreshold,
+      cost: costSurfaceRangeData,
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
