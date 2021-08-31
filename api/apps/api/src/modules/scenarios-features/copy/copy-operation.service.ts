@@ -20,6 +20,7 @@ export class CopyOperation {
 
   async copy(data: {
     scenarioId: string;
+    specificationId: string;
     input: FeatureConfigCopy;
   }): Promise<{ id: string }[]> {
     await this.events.create({

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 import { WorkerModule } from '../../worker';
-import { ShapefilesModule } from '../../shapefiles/shapefiles.module';
+import { ShapefilesModule } from '@marxan/shapefile-converter';
 import { ProtectedArea } from '../protected-areas.geo.entity';
 
 import { ProtectedAreaProcessor } from './protected-area-processor';

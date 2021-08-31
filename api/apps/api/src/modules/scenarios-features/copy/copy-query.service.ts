@@ -6,7 +6,11 @@ import { FeatureConfigCopy } from '@marxan-api/modules/specification';
 @Injectable()
 export class CopyQuery {
   public prepareStatement(
-    command: { scenarioId: string; input: FeatureConfigCopy },
+    command: {
+      scenarioId: string;
+      specificationId: string;
+      input: FeatureConfigCopy;
+    },
     planningAreaLocation: { id: string; tableName: string } | undefined,
     protectedAreaFilterByIds: string[],
     project: Pick<Project, 'bbox'>,
@@ -14,6 +18,7 @@ export class CopyQuery {
     const parameters: (string | number)[] = [];
     const fields = {
       scenarioId: `$${parameters.push(command.scenarioId)}`,
+      specificationId: `$${parameters.push(command.specificationId)}`,
       fpf: isDefined(command.input.fpf)
         ? `$${parameters.push(command.input.fpf)}`
         : `NULL`,
@@ -63,15 +68,17 @@ export class CopyQuery {
       ? `left join ${planningAreaLocation.tableName} as pa on pa.id = ${fields.planningAreaId}`
       : ``;
     const query = `
-          insert into scenario_features_data as sfd (feature_class_id,
-                                                     scenario_id,
-                                                     fpf,
-                                                     target,
-                                                     prop,
-                                                     total_area,
-                                                     current_pa)
+          insert into scenario_features_preparation as sfp (feature_class_id,
+                                                            scenario_id,
+                                                            specification_id,
+                                                            fpf,
+                                                            target,
+                                                            prop,
+                                                            total_area,
+                                                            current_pa)
           select fd.id,
                  ${fields.scenarioId},
+                 ${fields.specificationId},
                  ${fields.fpf},
                  ${fields.target},
                  ${fields.prop},
@@ -88,7 +95,7 @@ export class CopyQuery {
               ${fields.bbox[3]},
               4326
             ), fd.the_geom)
-          returning sfd.id as id;
+          returning sfp.id as id;
         `;
     return { parameters, query };
   }

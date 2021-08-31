@@ -40,6 +40,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 
@@ -79,6 +80,7 @@ import { ScenarioFeaturesGapDataService } from '../scenarios-features/scenario-f
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
 import { ScenarioFeaturesOutputGapDataService } from '../scenarios-features/scenario-features-output-gap-data.service';
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
+import { CostRangeDto } from './dto/cost-range.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -283,6 +285,13 @@ export class ScenariosController {
     @Req() request: Request,
   ): Promise<void> {
     this.service.processCostSurfaceShapefile(scenarioId, request.file);
+  }
+
+  @Get(`:id/cost-surface`)
+  @ApiOkResponse({ type: CostRangeDto })
+  async getCostRange(@Param('id') scenarioId: string): Promise<CostRangeDto> {
+    const range = await this.service.getCostRange(scenarioId);
+    return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, range);
   }
 
   @ApiConsumesShapefile()

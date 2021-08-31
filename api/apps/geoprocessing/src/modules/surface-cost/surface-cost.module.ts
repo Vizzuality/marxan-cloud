@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import { CqrsModule } from '@nestjs/cqrs';
 import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
-import { ShapefilesModule } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.module';
+import { ShapefilesModule } from '@marxan/shapefile-converter';
 
 import { SurfaceCostProcessor } from './application/surface-cost-processor';
 import { SurfaceCostWorker } from './application/surface-cost-worker';

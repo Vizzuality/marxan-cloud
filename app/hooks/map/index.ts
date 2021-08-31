@@ -289,9 +289,13 @@ export function usePUGridLayer({
 
     const {
       wdpaThreshold = 0,
+      features = [],
+      cost = {
+        min: 0,
+        max: 1,
+      },
       puIncludedValue,
       puExcludedValue,
-      features = [],
       runId,
       settings = {},
     } = options;
@@ -434,9 +438,9 @@ export function usePUGridLayer({
                   'interpolate',
                   ['linear'],
                   ['get', 'costValue'],
-                  0,
+                  cost.min === cost.max ? 0 : cost.min,
                   COLORS.cost[0],
-                  1,
+                  cost.max,
                   COLORS.cost[1],
                 ],
                 'fill-opacity': 0.75 * CostOpacity,

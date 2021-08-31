@@ -102,18 +102,19 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                   <div className="grid grid-cols-2 grid-rows-2 gap-y-11 gap-x-9">
 
                     {/* <div>
-                      <h3 className="mb-5 text-sm font-semibold">Creators</h3>
-                      {!!contributors?.length && (
-                        <div className="space-y-4">
-                          {contributors.map((c) => (
-                            <div key={c.id} className="flex flex-row items-center">
-                              <Avatar bgImage={c.bgImage || '/images/avatar.png'} size="s" />
-                              <p className="ml-2.5 text-sm">{c.name}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div> */}
+                        <h3 className="mb-5 text-sm font-semibold">Creators</h3>
+                        {!!contributors?.length && (
+                          <div className="space-y-4">
+                            {contributors.map((c) => (
+                              <div key={c.id} className="flex flex-row items-center">
+                                <Avatar bgImage={c.bgImage} size="s" />
+                                <p className="ml-2.5 text-sm">{c.name}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    */}
 
                     <div>
                       <h3 className="mb-6 text-sm font-semibold">Planning area</h3>

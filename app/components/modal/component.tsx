@@ -108,7 +108,7 @@ export const Modal: React.FC<ModalProps> = ({
                   }}
                 >
                   {dismissable && (
-                    <div className="relative">
+                    <div className="relative z-10">
                       <button
                         type="button"
                         onClick={onDismiss}

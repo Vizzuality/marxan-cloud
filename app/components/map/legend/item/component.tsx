@@ -88,6 +88,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
 
         {sortable?.handle && (
           <button
+            aria-label="drag"
             type="button"
             className="text-gray-400 cursor-pointer hover:text-white"
             {...listeners}
@@ -147,13 +148,14 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                   )}
                 >
                   <button
+                    aria-label="manage-opacity"
                     type="button"
                     className={cx({
                       'block text-white': true,
                       'text-gray-300': opacity !== 1,
                     })}
                   >
-                    <Icon className="w-5 h-5" icon={OPACITY_SVG} />
+                    <Icon className="w-5 h-5 pt-px" icon={OPACITY_SVG} />
                   </button>
                 </Tooltip>
               </div>
@@ -175,6 +177,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
               )}
             >
               <button
+                aria-label="manage-visibility"
                 type="button"
                 onClick={onChangeVisibility}
                 className={cx({

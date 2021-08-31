@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useDispatch } from 'react-redux';
 
-import { useUploadProjectPA } from 'hooks/projects';
-import { useToasts } from 'hooks/toast';
-
 import {
   setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
 } from 'store/slices/projects/new';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
+
+import { useUploadProjectPA } from 'hooks/projects';
+import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
@@ -52,7 +52,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
       input.onChange(null);
       dispatch(setUploadingPlanningArea(null));
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onDropAccepted = async (acceptedFiles) => {
@@ -181,7 +181,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
             <Loading
               visible={loading}
               className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-              iconClassName="w-5 h-5 text-primary-500"
+              iconClassName="w-10 h-10 text-primary-500"
             />
 
           </div>
@@ -218,6 +218,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                 <p className="text-sm text-blue-500">{successFile.name}</p>
               </label>
               <button
+                aria-label="remove"
                 id="cancel-shapefile-btn"
                 type="button"
                 className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-white border-opacity-20"

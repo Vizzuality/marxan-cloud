@@ -42,9 +42,11 @@ export class CostSurfaceViewService {
         lockin_status: number | null;
         spucd_cost: number | null;
       }) => {
-        const tsvRow = [data.puid, data.spucd_cost, data.lockin_status].join(
-          this.#separator,
-        );
+        const tsvRow = [
+          data.puid,
+          data.spucd_cost ?? 0,
+          data.lockin_status ?? 0,
+        ].join(this.#separator);
         responseStream.write(`\n`);
         responseStream.write(tsvRow);
       },

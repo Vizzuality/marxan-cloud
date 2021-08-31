@@ -319,6 +319,38 @@ export function useUploadScenarioPU({
   });
 }
 
+export function useCostSurfaceRange(id) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenarios-cost-surface', id], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${id}/cost-surface`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => {
+      try {
+        return JSON.parse(data);
+      } catch (error) {
+        return data;
+      }
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!id,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data,
+    };
+  }, [query, data]);
+}
+
 export function useDownloadCostSurface({
   requestConfig = {
     method: 'GET',

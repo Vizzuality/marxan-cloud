@@ -100,12 +100,4 @@ export class GeoFeaturesController {
   async proxyFeaturesTile(@Req() request: Request, @Res() response: Response) {
     return this.proxyService.proxyTileRequest(request, response);
   }
-
-  @ApiOperation({ description: 'Find geo feature by id' })
-  @ApiOkResponse({ type: GeoFeatureResult })
-  @JSONAPISingleEntityQueryParams()
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<GeoFeatureResult> {
-    return await this.service.serialize(await this.service.fakeFindOne(id));
-  }
 }

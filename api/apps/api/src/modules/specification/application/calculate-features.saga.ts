@@ -9,6 +9,9 @@ export class CalculateFeaturesSaga {
   featuresCalculated = (events$: Observable<any>): Observable<ICommand> =>
     events$.pipe(
       ofType(FeaturesCalculated),
-      map((event) => new CalculateFeatures(event.featureIds)),
+      map(
+        (event) =>
+          new CalculateFeatures(event.featureIds, event.specificationId),
+      ),
     );
 }

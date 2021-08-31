@@ -1,26 +1,34 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DeepReadonly } from 'utility-types';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  EntityManager,
+  getConnection,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import {
   GeoFeatureGeometry,
   geoFeatureResource,
 } from './geo-feature.geo.entity';
 import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
 
-import * as faker from 'faker';
+import { Geometry } from 'geojson';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
-import { GeoFeature, GeoFeatureProperty } from './geo-feature.api.entity';
+import { GeoFeature } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { Scenario } from '../scenarios/scenario.api.entity';
+import { JobStatus, Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
-import { FeatureTag } from '@marxan/features/domain';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { GeometrySource } from './geometry-source.enum';
+import { v4 } from 'uuid';
+import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -37,12 +45,16 @@ type GeoFeatureFilterKeys = keyof Pick<
 >;
 type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
 
+type ServiceRequestInfo = AppInfoDTO & {
+  forProject?: Project;
+};
+
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
   GeoFeature,
   GeoFeatureSetSpecification,
   GeoFeatureSetSpecification,
-  AppInfoDTO
+  ServiceRequestInfo
 > {
   constructor(
     @InjectRepository(GeoFeatureGeometry, DbConnections.geoprocessingDB)
@@ -65,8 +77,6 @@ export class GeoFeaturesService extends AppBaseService<
     );
   }
 
-  private forProject?: Project | null;
-
   get serializerConfig(): JSONAPISerializerConfig<GeoFeature> {
     return {
       attributes: [
@@ -83,33 +93,13 @@ export class GeoFeaturesService extends AppBaseService<
     };
   }
 
-  async fakeFindOne(_id: string): Promise<GeoFeature> {
-    return {
-      ...new GeoFeature(),
-      id: faker.random.uuid(),
-      featureClassName: faker.random.alphaNumeric(15),
-      alias: faker.random.words(8),
-      propertyName: faker.random.words(8),
-      intersection: [...Array(4)].map((_i) => faker.random.uuid()),
-      tag: faker.random.arrayElement(Object.values(FeatureTag)),
-      properties: [...Array(6)].map((_i) => this._fakeGeoFeatureProperty()),
-    };
-  }
-
-  private _fakeGeoFeatureProperty(): GeoFeatureProperty {
-    return {
-      key: faker.random.word(),
-      distinctValues: [...Array(8)].map((_i) => faker.random.words(6)),
-    };
-  }
-
   /**
    * Apply service-specific filters.
    */
   setFilters(
     query: SelectQueryBuilder<GeoFeature>,
     filters: GeoFeatureFilters,
-    info?: AppInfoDTO,
+    info?: ServiceRequestInfo,
   ): SelectQueryBuilder<GeoFeature> {
     this._processBaseFilters<GeoFeatureFilters>(
       query,
@@ -125,7 +115,7 @@ export class GeoFeaturesService extends AppBaseService<
   async extendFindAllQuery(
     query: SelectQueryBuilder<GeoFeature>,
     fetchSpecification: FetchSpecification,
-    info: AppInfoDTO,
+    info: ServiceRequestInfo,
   ): Promise<SelectQueryBuilder<GeoFeature>> {
     /**
      * We should either list only "public" features (i.e. they are not from a
@@ -148,7 +138,7 @@ export class GeoFeaturesService extends AppBaseService<
       (info?.params?.projectId as string) ??
       (fetchSpecification?.filter?.projectId as string);
     if (projectId) {
-      this.forProject = await this.projectRepository
+      const relatedProject = await this.projectRepository
         .findOneOrFail(projectId)
         .then((project) => project)
         .catch((_error) => {
@@ -165,10 +155,10 @@ export class GeoFeaturesService extends AppBaseService<
         "geoFeatureGeometries".the_geom
       )`,
           {
-            xmin: this.forProject.bbox[1],
-            ymin: this.forProject.bbox[3],
-            xmax: this.forProject.bbox[0],
-            ymax: this.forProject.bbox[2],
+            xmin: relatedProject.bbox[1],
+            ymin: relatedProject.bbox[3],
+            xmax: relatedProject.bbox[0],
+            ymax: relatedProject.bbox[2],
           },
         )
         .getMany()
@@ -219,8 +209,8 @@ export class GeoFeaturesService extends AppBaseService<
    */
   async extendFindAllResults(
     entitiesAndCount: [any[], number],
-    fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
+    fetchSpecification?: DeepReadonly<FetchSpecification>,
+    info?: ServiceRequestInfo,
   ): Promise<[any[], number]> {
     /**
      * Short-circuit if there's no result to extend, or if the API client has
@@ -249,7 +239,7 @@ export class GeoFeaturesService extends AppBaseService<
     );
 
     const entitiesWithProperties = await this.geoFeaturesPropertySet
-      .getFeaturePropertySetsForFeatures(geoFeatureIds, this.forProject)
+      .getFeaturePropertySetsForFeatures(geoFeatureIds, info?.forProject)
       .then((results) => {
         return this.geoFeaturesPropertySet.extendGeoFeaturesWithPropertiesFromPropertySets(
           entitiesAndCount[0],
@@ -269,5 +259,93 @@ export class GeoFeaturesService extends AppBaseService<
     _info?: AppInfoDTO,
   ): Promise<GeoFeature> {
     return entity;
+  }
+
+  public async createFeaturesForShapefile(
+    projectId: string,
+    data: UploadShapefileDTO,
+    features: Record<string, any>[],
+  ): Promise<void> {
+    const [apiDbConnection, geoDbConnection] = [
+      getConnection(DbConnections.default),
+      getConnection(DbConnections.geoprocessingDB),
+    ];
+
+    const apiQueryRunner = apiDbConnection.createQueryRunner();
+    const geoQueryRunner = geoDbConnection.createQueryRunner();
+
+    await apiQueryRunner.connect();
+    await geoQueryRunner.connect();
+
+    await apiQueryRunner.startTransaction();
+    await geoQueryRunner.startTransaction();
+
+    try {
+      // Create single row in features
+      const geofeature = await this.createFeature(
+        apiQueryRunner.manager,
+        projectId,
+        data,
+      );
+
+      // Store geometries in features_data table
+      for (const feature of features) {
+        await this.createFeatureData(
+          geoQueryRunner.manager,
+          geofeature.id,
+          feature.geometry,
+          feature.properties,
+        );
+      }
+
+      await apiQueryRunner.commitTransaction();
+      await geoQueryRunner.commitTransaction();
+    } catch (err) {
+      await apiQueryRunner.rollbackTransaction();
+      await geoQueryRunner.rollbackTransaction();
+
+      this.logger.error(
+        'An error occurred creating features for shapefile (changes have been rolled back)',
+        String(err),
+      );
+      throw err;
+    } finally {
+      // you need to release a queryRunner which was manually instantiated
+      await apiQueryRunner.release();
+      await geoQueryRunner.release();
+    }
+  }
+
+  private async createFeature(
+    entityManager: EntityManager,
+    projectId: string,
+    data: UploadShapefileDTO,
+  ): Promise<GeoFeature> {
+    const repo = entityManager.getRepository(GeoFeature);
+    return await repo.save(
+      repo.create({
+        id: v4(),
+        featureClassName: data.name,
+        description: data.description,
+        tag: data.type,
+        projectId,
+        creationStatus: JobStatus.done,
+      }),
+    );
+  }
+
+  private async createFeatureData(
+    entityManager: EntityManager,
+    featureId: string,
+    geometry: Geometry,
+    properties: Record<string, string | number>,
+  ): Promise<void> {
+    await entityManager.query(
+      `INSERT INTO "features_data"
+       ("id", "the_geom", "properties", "source", "feature_id")
+       VALUES (DEFAULT, ST_MakeValid(ST_GeomFromGeoJSON($1)::geometry), $2, $3,
+               $4);`,
+      [geometry, properties, GeometrySource.user_imported, featureId],
+    );
   }
 }

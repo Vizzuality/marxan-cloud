@@ -3,12 +3,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { SpecificationApiEntity } from './specification.api.entity';
 import { FeatureSubSet, SpecificationOperation } from '../domain';
-import { SpecificationFeatureApiEntity } from '@marxan-api/modules/specification/adapters/specification-feature.api.entity';
+import { SpecificationFeature } from './specification-feature';
 
 @Entity(`specification_feature_configs`)
 export class SpecificationFeatureConfigApiEntity {
@@ -31,15 +30,11 @@ export class SpecificationFeatureConfigApiEntity {
   })
   specificationId!: string;
 
-  @OneToMany(
-    () => SpecificationFeatureApiEntity,
-    (specificationFeature) => specificationFeature.specificationFeatureConfig,
-    {
-      cascade: true,
-      eager: true,
-    },
-  )
-  features?: SpecificationFeatureApiEntity[];
+  @Column({
+    type: 'jsonb',
+    name: 'features',
+  })
+  features?: SpecificationFeature[];
 
   @Column({
     type: `uuid`,

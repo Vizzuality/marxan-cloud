@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { GeoJSON } from 'geojson';
 import * as uuid from 'uuid';
 import { CustomPlanningAreaRepository } from '@marxan/planning-area-repository';
-import { ShapefileService } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.service';
+import { ShapefileService } from '@marxan/shapefile-converter';
 import { GarbageCollectorConfig } from '@marxan-geoprocessing/modules/planning-area/garbage-collector-config';
 import { SaveGeoJsonResult } from '@marxan/planning-area-repository/custom-planning-area.repository';
 

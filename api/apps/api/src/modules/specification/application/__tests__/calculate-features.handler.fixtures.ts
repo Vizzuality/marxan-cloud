@@ -20,7 +20,6 @@ import { InMemorySpecificationRepo } from './in-memory-specification.repo';
 export const getFixtures = async () => {
   const events: IEvent[] = [];
   const specificationRelatedToIncomingCalculatedFeature = v4();
-  const anotherSpecificationRelatedToIncomingCalculatedFeature = v4();
   const specificationWithoutRelationToIncomingCalculatedFeature = v4();
   const scenarioId = v4();
 
@@ -89,15 +88,6 @@ export const getFixtures = async () => {
       );
       await repo.save(
         Specification.from({
-          id: anotherSpecificationRelatedToIncomingCalculatedFeature,
-          scenarioId,
-          draft: false,
-          config: [configWithNonCalculatedFeature],
-          raw: {},
-        }),
-      );
-      await repo.save(
-        Specification.from({
           id: specificationWithoutRelationToIncomingCalculatedFeature,
           scenarioId,
           draft: false,
@@ -107,19 +97,17 @@ export const getFixtures = async () => {
       );
     },
     WhenAllFeaturesAreCalculated: async () =>
-      sut.execute(new CalculateFeatures([nonCalculatedFeatureId])),
-    async ThenSpecificationsWithRelatedConfigAreSaved() {
-      expect(repo.count()).toEqual(3);
+      sut.execute(
+        new CalculateFeatures(
+          [nonCalculatedFeatureId],
+          specificationRelatedToIncomingCalculatedFeature,
+        ),
+      ),
+    async ThenSpecificationIsSaved() {
+      expect(repo.count()).toEqual(2);
       expect(
         (
           await repo.getById(specificationRelatedToIncomingCalculatedFeature)
-        )?.toSnapshot().readyToActivate,
-      ).toEqual(true);
-      expect(
-        (
-          await repo.getById(
-            anotherSpecificationRelatedToIncomingCalculatedFeature,
-          )
         )?.toSnapshot().readyToActivate,
       ).toEqual(true);
     },
@@ -127,10 +115,6 @@ export const getFixtures = async () => {
       expect(events).toEqual([
         new SpecificationGotReady(
           specificationRelatedToIncomingCalculatedFeature,
-          scenarioId,
-        ),
-        new SpecificationGotReady(
-          anotherSpecificationRelatedToIncomingCalculatedFeature,
           scenarioId,
         ),
       ]);

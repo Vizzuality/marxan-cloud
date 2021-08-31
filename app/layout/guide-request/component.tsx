@@ -3,8 +3,6 @@ import React, { useCallback } from 'react';
 import { useHelp } from 'hooks/help';
 import { useMe } from 'hooks/me';
 
-import Wrapper from 'layout/wrapper';
-
 import Button from 'components/button';
 import Icon from 'components/icon';
 
@@ -27,42 +25,38 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }:GuideReq
   }, [onActive, onDismiss, user]);
 
   return (
-    <Wrapper>
+    <div className="flex flex-col items-center justify-center py-10 space-y-10">
 
-      <div className="flex flex-col items-center justify-center p-10 space-y-10">
+      <h2 className="text-lg font-medium text-center text-gray-600 font-heading">First things first...</h2>
 
-        <h2 className="text-lg font-medium text-center text-gray-600 font-heading">First things first...</h2>
+      <Icon icon={GUIDE_REQUEST_SVG} className="w-40" />
+      <div className="w-72">
+        <p className="text-lg text-center text-gray-600 font-heading">Would you like to get some guidance on Marxan&apos;s workflow?</p>
+      </div>
+      <div className="flex space-x-4 w-72">
 
-        <Icon icon={GUIDE_REQUEST_SVG} className="w-40" />
-        <div className="w-72">
-          <p className="text-lg text-center text-gray-600 font-heading">Would you like to get some guidance on Marxan&apos;s workflow?</p>
-        </div>
-        <div className="flex space-x-4 w-72">
+        <Button
+          theme="tertiary"
+          size="lg"
+          type="submit"
+          className="w-full"
+          onClick={() => handleActiveRequestGuide(false)}
+        >
+          No
+        </Button>
 
-          <Button
-            theme="tertiary"
-            size="lg"
-            type="submit"
-            className="w-full"
-            onClick={() => handleActiveRequestGuide(false)}
-          >
-            No
-          </Button>
-
-          <Button
-            theme="primary"
-            size="lg"
-            type="submit"
-            className="w-full"
-            onClick={() => handleActiveRequestGuide(true)}
-          >
-            Yes
-          </Button>
-        </div>
-
+        <Button
+          theme="primary"
+          size="lg"
+          type="submit"
+          className="w-full"
+          onClick={() => handleActiveRequestGuide(true)}
+        >
+          Yes
+        </Button>
       </div>
 
-    </Wrapper>
+    </div>
   );
 };
 

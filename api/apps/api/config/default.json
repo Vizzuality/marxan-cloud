@@ -48,6 +48,11 @@
         }
       }
     }
+  },
+  "fileUploads": {
+    "limits": {
+      "shapefileMaxSize": 10240000
+    }
   }
 }
 

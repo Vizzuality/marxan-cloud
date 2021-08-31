@@ -6,6 +6,7 @@ import { format } from 'd3';
 import type { Project } from 'types/project-model';
 
 import DuplicateButton from 'layout/community/published-projects/duplicate-button/component';
+import ComingSoon from 'layout/help/coming-soon';
 
 export interface PublishedItemProps extends Project {
   timesDuplicated?: number;
@@ -39,10 +40,12 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
       <td className="">
         <div className="flex flex-row justify-between pl-10">
           <p className="w-6 text-sm">{timesDuplicated && (format('.3s')(timesDuplicated))}</p>
-          <DuplicateButton
-            id={id}
-            name={name}
-          />
+          <ComingSoon theme="dark">
+            <DuplicateButton
+              id={id}
+              name={name}
+            />
+          </ComingSoon>
         </div>
       </td>
     </tr>

@@ -18,7 +18,11 @@ export class SplitOperation {
     private readonly events: ApiEventsService,
   ) {}
 
-  async split(data: { scenarioId: string; input: FeatureConfigSplit }) {
+  async split(data: {
+    scenarioId: string;
+    specificationId: string;
+    input: FeatureConfigSplit;
+  }) {
     await this.events.create({
       topic: data.scenarioId,
       kind: API_EVENT_KINDS.scenario__geofeatureSplit__submitted__v1__alpha1,
@@ -36,6 +40,7 @@ export class SplitOperation {
       const { parameters, query } = this.splitQuery.prepareQuery(
         data.input,
         data.scenarioId,
+        data.specificationId,
         planningAreaLocation,
         protectedAreaFilterByIds,
         project,
