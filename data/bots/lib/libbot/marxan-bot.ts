@@ -1,4 +1,5 @@
 import axiod from "https://deno.land/x/axiod@0.22/mod.ts";
+import { IAxiodResponse } from "https://deno.land/x/axiod@0.22/interfaces.ts";
 
 export interface MarxanBotConfig {
   apiUrl: string,
@@ -10,6 +11,10 @@ export interface MarxanBotConfig {
 
 const marxanBotBaseSettings = {
   baseUrl: '/api/v1',
+}
+
+export const getJsonApiDataFromResponse = (response: IAxiodResponse) => {
+  return response?.data?.data;
 }
 
 export class BotHttpClient {

@@ -1,4 +1,4 @@
-import { BotHttpClient } from './marxan-bot.ts';
+import { BotHttpClient, getJsonApiDataFromResponse } from './marxan-bot.ts';
 import { sleep } from "https://deno.land/x/sleep@v1.2.0/mod.ts";
 import _ from 'https://deno.land/x/lodash@4.17.15-es/lodash.js';
 import { ms } from 'https://deno.land/x/ms@v0.1.0/ms.ts';
@@ -53,7 +53,7 @@ export class ScenarioJobStatus {
 
   async get(job: JobSpecification): Promise<JobStatuses | undefined> {
     const projectStatus: ProjectStatus = await this.baseHttpClient.get(`/projects/${job.forProject}/scenarios/status`)
-      .then(result => result.data.attributes)
+      .then(getJsonApiDataFromResponse)
       .catch(e => console.log(e));
     return projectStatus.scenarios.find(i => i.id === job.forScenario)?.jobs.find(i => i.kind === job.jobKind)?.status;
   }

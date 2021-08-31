@@ -1,4 +1,5 @@
-import { BotHttpClient } from './marxan-bot.ts';
+import { BotHttpClient, getJsonApiDataFromResponse } from './marxan-bot.ts';
+import { logError } from './logger.ts';
 
 /**
  * The kind of Marxan scenario (standard, Marxan with Zones, and possibly other
@@ -46,13 +47,13 @@ export class Scenarios {
 
   async createInProject(projectId: string, scenario: Scenario) {
     return await this.baseHttpClient.post('/scenarios', { ...scenario, projectId })
-      .then(result => result.data)
-      .catch(e => console.log(e));
+      .then(getJsonApiDataFromResponse)
+      .catch(logError);
   }
 
   async update(scenarioId: string, scenario: Partial<Scenario>) {
     return await this.baseHttpClient.patch(`/scenarios/${scenarioId}`, scenario)
-    .then(result => result.data)
-    .catch(e => console.log(e));
+    .then(getJsonApiDataFromResponse)
+    .catch(logError);
   }
 }

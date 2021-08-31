@@ -1,4 +1,5 @@
-import { BotHttpClient } from './marxan-bot.ts';
+import { BotHttpClient, getJsonApiDataFromResponse } from './marxan-bot.ts';
+import { logError } from './logger.ts';
 
 interface Organization {
   name: string,
@@ -15,7 +16,7 @@ export class Organizations {
 
   async create(organization: Organization) {
     return await this.baseHttpClient.post('/organizations', organization)
-      .then(result => result.data)
-      .catch(e => console.log(e));
+      .then(getJsonApiDataFromResponse)
+      .catch(logError);
   }
 }
