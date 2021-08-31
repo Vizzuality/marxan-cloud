@@ -6,6 +6,9 @@ interface ScenarioShowStateProps {
   tab: string,
   subtab: string,
   selectedSolution: Solution,
+  // FEATURES
+  highlightFeatures: string[],
+  // SETTINGS
   layerSettings: Record<string, Record<string, unknown>>
 }
 
@@ -13,6 +16,9 @@ const initialState = {
   tab: 'solutions',
   subtab: null,
   selectedSolution: null,
+  // FEATURES
+  highlightFeatures: [],
+  // SETTINGS
   layerSettings: {},
 } as ScenarioShowStateProps;
 
@@ -29,6 +35,11 @@ export function getScenarioSlice(id) {
       },
       setSelectedSolution: (state, action: PayloadAction<Solution>) => {
         state.selectedSolution = action.payload;
+      },
+
+      // FEATURES
+      setHighlightFeatures: (state, action: PayloadAction<string[]>) => {
+        state.highlightFeatures = action.payload;
       },
 
       // SETTINGS

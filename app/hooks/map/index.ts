@@ -289,13 +289,14 @@ export function usePUGridLayer({
 
     const {
       wdpaThreshold = 0,
-      features = [],
       cost = {
         min: 0,
         max: 1,
       },
       puIncludedValue,
       puExcludedValue,
+      features = [],
+      highlightFeatures = [],
       runId,
       settings = {},
     } = options;
@@ -303,6 +304,7 @@ export function usePUGridLayer({
     const {
       pugrid: PUgridSettings = {},
       'wdpa-percentage': WdpaPercentageSettings = {},
+      features: PreGapAnalysisSettings = {},
       cost: CostSettings = {},
       'lock-in': LockInSettings = {},
       'lock-out': LockOutSettings = {},
@@ -318,6 +320,10 @@ export function usePUGridLayer({
       opacity: WdpaPercentageOpacity = 1,
       visibility: WdpaPercentageVisibility = true,
     } = WdpaPercentageSettings;
+    const {
+      opacity: PreGapAnalysisOpacity = 1,
+      visibility: PreGapAnalysisVisibility = true,
+    } = PreGapAnalysisSettings;
     const {
       opacity: CostOpacity = 1,
       visibility: CostVisibility = true,
@@ -409,6 +415,9 @@ export function usePUGridLayer({
             {
               type: 'fill',
               'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(PreGapAnalysisVisibility),
+              },
               paint: {
                 'fill-color': COLORS.features,
                 'fill-opacity': [
@@ -418,7 +427,27 @@ export function usePUGridLayer({
                       return ['in', id, ['get', 'featureList']];
                     })),
                   ],
-                  0.5,
+                  0.5 * PreGapAnalysisOpacity,
+                  0,
+                ],
+              },
+            },
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(PreGapAnalysisVisibility),
+              },
+              paint: {
+                'fill-color': COLORS.highlightFeatures,
+                'fill-opacity': [
+                  'case',
+                  ['any',
+                    ...(highlightFeatures.map((id) => {
+                      return ['in', id, ['get', 'featureList']];
+                    })),
+                  ],
+                  0.5 * PreGapAnalysisOpacity,
                   0,
                 ],
               },
