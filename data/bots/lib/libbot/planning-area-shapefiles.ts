@@ -1,5 +1,6 @@
 import { BotHttpClient } from './marxan-bot.ts';
 import { ShapefileUploader } from './shapefile-uploader.ts';
+import { logError } from './logger.ts';
 
 interface FileUpload {
   url: string,
@@ -27,8 +28,8 @@ export class PlanningAreaShapefiles extends ShapefileUploader {
       headers: [['Authorization', `Bearer ${this.currentJwt}`]],
     }))
     .json()
-    .then(result => result.data.id)
-    .catch(e => console.log(e));
+    .then(data => data?.id)
+    .catch(logError);
 
     return planningAreaId;
   }
