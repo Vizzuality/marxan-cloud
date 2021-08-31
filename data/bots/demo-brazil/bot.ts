@@ -1,4 +1,3 @@
-import axiod from "https://deno.land/x/axiod@0.22/mod.ts";
 import Process from "https://deno.land/std@0.103.0/node/process.ts";
 import {
   dirname,
@@ -6,12 +5,12 @@ import {
   relative,
 } from "https://deno.land/std@0.103.0/path/mod.ts";
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
-import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import { sleep } from "https://deno.land/x/sleep@v1.2.0/mod.ts";
 import { createBot } from '../lib/libbot/init.ts';
-import { ScenarioJobStatus} from '../lib/libbot/scenario-status.ts';
-
-const bot = await createBot();
+import { SpecificationStatus} from '../lib/libbot/geo-feature-specifications.ts';
+import { logInfo, logDebug } from '../lib/libbot/logger.ts';
+import _ from 'https://deno.land/x/lodash@4.17.15-es/lodash.js';
+import { ScenarioJobKinds, JobStatuses } from '../lib/libbot/scenario-status.ts';
 
 const scriptPath = dirname(relative(Deno.cwd(), fromFileUrl(import.meta.url)));
 
@@ -27,223 +26,112 @@ const settings = {
   },
 };
 
-const jwt = await axiod
-  .post(`${settings.apiUrl}/auth/sign-in/`, settings.credentials)
-  .then((result) => result.data.accessToken);
-
-// const pgClient = new Client(POSTGRES_URL);
-
-const botClient = axiod.create({
-  baseURL: settings.apiUrl + "/api/v1",
-  headers: {
-    Authorization: "Bearer " + jwt,
-  },
-});
-
-async function sendData(url: string, data: Blob) {
-  const formData = new FormData();
-  formData.append("file", data, "test_mata.zip");
-
-  const response = await fetch(url, {
-    method: "POST",
-    body: formData,
-    headers: [["authorization", "Bearer " + jwt]],
-  });
-
-  return response;
-}
-
-// const MAX_TRYS = 10; TRY_TIMEOUT = 500;
-// function toTry() {
-//     return new Promise((ok, fail) => {
-//         setTimeout(() => Math.random() < 0.05 ? ok("OK!") : fail("Error"), TRY_TIMEOUT);
-//     });
-// }
-// async function tryNTimes(toTry, count = MAX_TRYS) {
-//     if (count > 0) {
-//         const result = await toTry().catch(e => e);
-//         if (result === "Error") { return await tryNTimes(toTry, count - 1) }
-//         return result
-//     }
-//     return `Tried ${MAX_TRYS} times and failed`;
-// }
-
-// tryNTimes(toTry).then(console.log);
-
+const bot = await createBot(settings);
 
 const organization = await bot.organizations.create({
   name: '[BotTest] Brazil ' + crypto.randomUUID(),
   description: '',
 });
 
-console.log(organization);
+logInfo('Organization created');
+logDebug(organization);
 
-const planningUnitAreakm2 = 50;
+const planningUnitAreakm2 = 1500;
+
+const planningAreaId = await bot.planningAreaUploader.uploadFromFile(`${scriptPath}/test_mata.zip`);
+
+logDebug(planningAreaId);
 
 const project = await bot.projects.createInOrganization(organization.id, {
   name: 'test project ' + crypto.randomUUID(),
-  countryId: 'BRA',
-  adminAreaLevel1Id: 'BRA.16_1',
-  adminAreaLevel2Id: 'BRA.16.194_1',
+  description: '',
+  planningAreaId: planningAreaId,
   planningUnitGridShape: 'hexagon',
-  planningUnitAreakm2: 50,
-}).then(result => result.data).catch(e => { console.log(e) });;
+  planningUnitAreakm2,
+});
 
-
-console.log(project);
-
-await sleep(15);
-
-await new ScenarioJobStatus().waitFor({
-  jobKind: 
-})
+logInfo('Project created');
+logDebug(project);
 
 const scenarioStart = Process.hrtime();
 
 // Scenario creation with the bare minimum; From there we need to be doin patches to the same scenario
-let scenario = await botClient
-  .post("/scenarios", {
+const scenario = await bot.scenarios.createInProject(project.id, {
     name: `Brazil scenario`,
     type: "marxan",
-    projectId: project.data.id,
     description: "A Brazil scenario",
-    metadata: {
-        scenarioEditingMetadata: {
-          status: {
-            'protected-areas': 'draft'
-          },
-          tab: 'analysis',
-          subtab: 'analysis-preview',
-        }
-      },
-    status: "draft"
-  })
-  .then((result) => result.data)
-  .catch((e) => {
-    console.log(e);
+    metadata: bot.metadata.analysisPreview(),
   });
 
-  console.log(scenario);
-
-
-//  console.log(await checkScenarioStatus(project!.data!.id));
+logDebug(scenario);
 
 // get the list of protected areas in the region and use all of them
-const paCategories:{data:Array<{id:string, type:string, attributes:object}>} = await botClient.get(`/protected-areas/iucn-categories?filter%5BcustomAreaId%5D=${planningAreaFile.id}`)
-          .then((result) =>  result.data)
-          .catch((e) => {
-            console.log(e);
-          });
+const paCategories = await bot.protectedAreas.getIucnCategoriesForPlanningAreaWithId(planningAreaId);
 
-console.log(paCategories);
+logDebug(paCategories);
 
-await botClient
-  .patch(`/scenarios/${scenario!.data!.id}`, {
-    wdpaIucnCategories: paCategories!.data.map((i: {id:string, type:string, attributes:object}): string => i.id),
-  }).catch((e) => {
-    console.log(e);
-  });
+const scenarioWithWdpaIucnCategories = await bot.scenarios.update(scenario.id, {
+  wdpaIucnCategories: paCategories,
+});
 
-console.log(scenario);
+logDebug(scenarioWithWdpaIucnCategories);
 
-await sleep(30)
+// await sleep(30)
 
-await botClient
-  .patch(`/scenarios/${scenario!.data!.id}`, {
-    wdpaThreshold: 50,
-    metadata: {
-    scenarioEditingMetadata: {
-        status: {
-          'protected-areas': 'draft',
-          features: 'draft',
-          analysis: 'draft',
-        },
-        tab: 'analysis',
-        subtab: 'analysis-preview',
-      }
-    }
-  }).catch((e) => {
-    console.log(e);
-  });
+const scenarioWithThresholdApplied = await bot.scenarios.update(scenario.id, {
+  wdpaThreshold: 50,
+  metadata: bot.metadata.analysisPreview(),
+});
+
+await bot.scenarioStatus.waitForPlanningAreaProtectedCalculationFor(project.id, scenario.id, 'short');
 
 const scenarioTook = Process.hrtime(scenarioStart);
-console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
+logInfo(`Scenario creation done in ${scenarioTook[0]} seconds`);
 
-await botClient.get(`/scenarios/${scenario!.data!.id}`)
-    .then((result) =>  console.log(result.data))
-    .catch((e) => {
-    console.log(e);
-  });
+logDebug(scenarioWithThresholdApplied);
 
-await sleep(10)
+// await sleep(10)
 
 //Setup features in the project
-
-const featureList = [
-//        "demo_ecoregions_new_class_split",
-//        "demo_buteogallus_urubitinga",
-//        "demo_caluromys_philander",
-//        "demo_chiroxiphia_caudata",
-//        "demo_leopardus_pardalis",
-//        "demo_megarynchus_pitangua",
-//        "demo_phyllodytes_tuberculosus",
-      "demo_tapirus_terrestris",
-//        "demo_thalurania_glaucopis",
-]
-const features = await botClient
-  .get(`/projects/${project.data.id}/features?q=demo`)
-  .then((result) => result.data)
-  .catch((e) => {
-    console.log(e);
-  });
-
-console.log(features);
+const wantedFeatures = [
+  // "demo_ecoregions_new_class_split",
+  // "buteogallus_urubitinga",
+  // "caluromys_philander",
+  // "chiroxiphia_caudata",
+  // "leopardus_pardalis",
+  // "megarynchus_pitangua",
+  // "phyllodytes_tuberculosus",
+  // "priodontes_maximus",
+  // "proceratophrys_bigibbosa",
+  // "tapirus_terrestris",
+  "thalurania_glaucopis",
+];
 
 const geoFeatureSpecStart = Process.hrtime();
 
-const featureRecipe = features!.data.map((x: {id:string, type:string, attributes:object}) => { return {
-    kind: "plain",
-    featureId: x.id,
-    marxanSettings: {
-      prop: 0.3,
-      fpf: 1,
-    },
-  }})
-  console.log(featureRecipe);
-const geoFeatureSpec = await botClient
-  .post(`/scenarios/${scenario.data.id}/features/specification/v2`, {
-    status: "created",
-    features: [
-      {
-        kind: "plain",
-        featureId: features.data[0].id,
-        marxanSettings: {
-          prop: 0.3,
-          fpf: 1,
-        },
-      },
-    ],
-  })
-  .then((result) => result.data)
-  .catch((e) => {
-    console.log(e);
-  });
-    // metadata: {
-    //     scenarioEditingMetadata: {
-    //         status: {
-    //           'protected-areas': 'draft',
-    //           features: 'draft',
-    //           analysis: 'draft',
-    //         },
-    //         tab: 'analysis',
-    //         subtab: 'analysis-preview',
-    //       }
-    //     },
+const geoFeatureIds = await Promise.all(wantedFeatures.map(async f => (await bot.geoFeatures.getIdFromQueryStringInProject(project.id, f))[0]));
+
+logDebug(geoFeatureIds);
+
+const featuresForSpecification = geoFeatureIds.map(i => ({
+  kind: "plain",
+  featureId: i.id,
+  marxanSettings: {
+    prop: 0.3,
+    fpf: 1,
+  },
+}));
+
+const geoFeatureSpec = await bot.geoFeatureSpecifications.submitForScenario(scenario.id, featuresForSpecification, SpecificationStatus.created);
+
+await bot.scenarioStatus.waitForFeatureSpecificationCalculationFor(project.id, scenario.id, 'short');
 
 const geoFeatureSpecTook = Process.hrtime(geoFeatureSpecStart);
 
-console.log(
+logInfo(
   `Processing of features for scenario done in ${geoFeatureSpecTook[0]} seconds`
 );
 
-console.log(geoFeatureSpec);
+logDebug(geoFeatureSpec);
+
+await bot.marxanExecutor.runForScenario(scenario.id);
