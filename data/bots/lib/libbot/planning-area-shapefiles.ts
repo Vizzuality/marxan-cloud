@@ -24,7 +24,7 @@ export class PlanningAreaShapefiles extends ShapefileUploader {
       url: this.url,
       formField: 'file',
       data,
-      fileName: `${crypto.randomUUID}.zip`,
+      fileName: `${crypto.randomUUID()}.zip`,
       headers: [['Authorization', `Bearer ${this.currentJwt}`]],
     }))
     .json()
