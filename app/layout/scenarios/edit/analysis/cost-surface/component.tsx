@@ -65,7 +65,6 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
 
     const f = acceptedFiles[0];
     console.info(f);
-    setSuccessFile({ name: f.name });
 
     const data = new FormData();
     data.append('file', f);
@@ -73,6 +72,8 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     uploadMutation.mutate({ id: `${sid}`, data }, {
       onSuccess: ({ data: { data: g } }) => {
         setLoading(false);
+        setSuccessFile({ name: f.name });
+
         addToast('success-upload-shapefile', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -86,6 +87,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
       },
       onError: () => {
         setLoading(false);
+        setSuccessFile(null);
         addToast('error-upload-shapefile', (
           <>
             <h2 className="font-medium">Error!</h2>
