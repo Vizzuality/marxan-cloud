@@ -78,6 +78,7 @@ export interface UsePUGridLayer {
     puExcludedValue?: string[];
     runId?: string;
     features?: string[];
+    highlightFeatures?: Array<string>;
     cost?: {
       min: number;
       max: number,
@@ -88,6 +89,10 @@ export interface UsePUGridLayer {
         visibility?: boolean;
       },
       'wdpa-percentage'?: {
+        opacity?: number;
+        visibility?: boolean;
+      },
+      features?: {
         opacity?: number;
         visibility?: boolean;
       },
