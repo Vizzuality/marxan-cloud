@@ -132,7 +132,7 @@ const scenario = await botClient
   });
 
 const scenarioTook = Process.hrtime(scenarioStart);
-console.log(`Scenario creation done in ${scenarioTook[0]} seconds`);
+console.log(`Scenario creation done in ${scenarioTook[0]}ms`);
 
 console.log(scenario);
 
@@ -169,7 +169,7 @@ const geoFeatureSpec = await botClient
 const geoFeatureSpecTook = Process.hrtime(geoFeatureSpecStart);
 
 console.log(
-  `Processing of features for scenario done in ${geoFeatureSpecTook[0]} seconds`
+  `Processing of features for scenario done in ${geoFeatureSpecTook[0]}ms`
 );
 
 console.log(geoFeatureSpec);
