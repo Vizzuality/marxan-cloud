@@ -1,9 +1,3 @@
-import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
-import {
-  dirname,
-  fromFileUrl,
-  relative,
-} from "https://deno.land/std@0.103.0/path/mod.ts";
 import { BotHttpClient, MarxanBotConfig } from "./marxan-bot.ts";
 import { Organizations } from "./organizations.ts";
 import { Projects } from "./projects.ts";
@@ -15,8 +9,6 @@ import { GeoFeatureSpecifications } from "./geo-feature-specifications.ts";
 import { GeoFeatures } from "./geo-features.ts";
 import { MarxanCalculations } from "./marxan-calculations.ts";
 import { ScenarioJobStatus } from "./scenario-status.ts";
-
-const scriptPath = dirname(relative(Deno.cwd(), fromFileUrl(import.meta.url)));
 
 export interface Bot {
   organizations: Organizations;
