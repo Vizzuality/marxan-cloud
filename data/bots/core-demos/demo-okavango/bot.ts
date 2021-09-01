@@ -64,7 +64,7 @@ console.log(organization);
 const planningAreaFile = await (
   await sendData(
     API_URL + "/api/v1/projects/planning-area/shapefile",
-    new Blob([await Deno.readFile(scriptPath + "/corsica.zip")])
+    new Blob([await Deno.readFile(scriptPath + "/corsica.zip")]),
   )
 ).json();
 
@@ -87,8 +87,9 @@ const project = await botClient
 
 console.log(project);
 
-await pgClient.connect()
-await pgClient.queryArray(`INSERT INTO planning_units_geom (the_geom, type, size)
+await pgClient.connect();
+await pgClient.queryArray(
+  `INSERT INTO planning_units_geom (the_geom, type, size)
 select st_transform(geom, 4326) as the_geom,
 'hexagon' as type,
 ${planningUnitAreakm2} as size from (
@@ -97,7 +98,8 @@ ${planningUnitAreakm2} as size from (
     FROM planning_areas a
     WHERE project_id = '${project.data.id}'
 ) grid
-ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO NOTHING;`);
+ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO NOTHING;`,
+);
 await pgClient.end();
 
 // wait a bit for async job to be picked up and processed
@@ -117,14 +119,14 @@ const scenario = await botClient
     metadata: {
       scenarioEditingMetadata: {
         status: {
-          'protected-areas': 'draft',
-          features: 'draft',
-          analysis: 'draft',
+          "protected-areas": "draft",
+          features: "draft",
+          analysis: "draft",
         },
-        tab: 'analysis',
-        subtab: 'analysis-preview',
-      }
-    }
+        tab: "analysis",
+        subtab: "analysis-preview",
+      },
+    },
   })
   .then((result) => result.data)
   .catch((e) => {
@@ -169,7 +171,7 @@ const geoFeatureSpec = await botClient
 const geoFeatureSpecTook = Process.hrtime(geoFeatureSpecStart);
 
 console.log(
-  `Processing of features for scenario done in ${geoFeatureSpecTook[0]}ms`
+  `Processing of features for scenario done in ${geoFeatureSpecTook[0]}ms`,
 );
 
 console.log(geoFeatureSpec);

@@ -22,7 +22,11 @@ export class Users {
 
     const result = await this.baseHttpClient.post(
       "/auth/sign-up",
-      { email: this.credentials.username, password: this.credentials.password, displayName: this.credentials.username },
+      {
+        email: this.credentials.username,
+        password: this.credentials.password,
+        displayName: this.credentials.username,
+      },
     )
       .then(getJsonApiDataFromResponse)
       .catch(logError);
