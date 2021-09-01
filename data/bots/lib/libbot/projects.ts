@@ -1,5 +1,7 @@
-import { logError } from './logger.ts';
+import Process from "https://deno.land/std@0.103.0/node/process.ts";
+import { logDebug, logInfo, logError } from './logger.ts';
 import { BotHttpClient, getJsonApiDataFromResponse } from './marxan-bot.ts';
+import { tookMs } from './util/perf.ts';
 
 interface Project {
   name: string,
@@ -20,15 +22,29 @@ export class Projects {
   }
   
   async createInOrganization(organizationId: string, project: Project) {
-    return await this.baseHttpClient.post('/projects', { ...project, organizationId })
+    const opStart = Process.hrtime();
+
+    const result = await this.baseHttpClient.post('/projects', { ...project, organizationId })
       .then(getJsonApiDataFromResponse)
       .catch(logError);
+
+    logInfo(`Project was created in ${tookMs(Process.hrtime(opStart))}ms.`);
+    logDebug(`Project:\n${Deno.inspect(result)}`);
+
+    return result;
   }
 
   async update(projectId: string, project: Partial<Project>) {
-    return await this.baseHttpClient.patch(`/projects/${projectId}`, project)
+    const opStart = Process.hrtime();
+
+    const result = await this.baseHttpClient.patch(`/projects/${projectId}`, project)
     .then(getJsonApiDataFromResponse)
     .catch(logError);
+
+    logInfo(`Project was updated in ${tookMs(Process.hrtime(opStart))}ms.`);
+    logDebug(`Project:\n${Deno.inspect(result)}`);
+
+    return result;
   }
 
   async checkStatus(id: string) {

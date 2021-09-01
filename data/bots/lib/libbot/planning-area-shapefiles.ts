@@ -1,6 +1,8 @@
+import Process from "https://deno.land/std@0.103.0/node/process.ts";
 import { BotHttpClient } from './marxan-bot.ts';
 import { ShapefileUploader } from './shapefile-uploader.ts';
-import { logError } from './logger.ts';
+import { logDebug, logInfo, logError } from './logger.ts';
+import { tookMs } from './util/perf.ts';
 
 interface FileUpload {
   url: string,
@@ -19,6 +21,8 @@ export class PlanningAreaShapefiles extends ShapefileUploader {
   }
 
   async uploadFromFile(localFilePath: string): Promise<string> {
+    const opStart = Process.hrtime();
+
     const data = new Blob([await Deno.readFile(localFilePath)])
     const planningAreaId: string = await (await this.sendData({
       url: this.url,
@@ -31,6 +35,8 @@ export class PlanningAreaShapefiles extends ShapefileUploader {
     .then(data => data?.id)
     .catch(logError);
 
+    logInfo(`Custom planning ares shapefile uploaded in ${tookMs(Process.hrtime(opStart))}ms.`)
+    logDebug(`Planning area id: ${planningAreaId}`);
     return planningAreaId;
   }
 }
