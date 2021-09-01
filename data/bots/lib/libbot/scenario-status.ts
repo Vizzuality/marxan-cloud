@@ -32,6 +32,7 @@ export enum ScenarioJobKinds {
   geoFeatureCopy = 'geofeatureCopy',
   planningAreaProtectedCalculation = 'planningAreaProtectedCalculation',
   specification = 'specification',
+  marxanRun = 'run',
 }
 
 export enum JobStatuses {
@@ -101,30 +102,76 @@ export class ScenarioJobStatus {
         logInfo(`Current status is ${status}.`);
         return true;
       }
-      logInfo(`Current status is ${status}: waiting for ${interval / 10e2}s`);
-      await sleep(interval / 10e2);
+      logInfo(`Current status is ${status}: waiting for ${interval / 1e3}s`);
+      await sleep(interval / 1e3);
     }
 
     return false;
   }
 
   async waitForPlanningAreaProtectedCalculationFor(projectId: string, scenarioId: string, waitForTime: keyof typeof WaitForTime = 'short'): Promise<boolean> {
-    return await this.waitFor({
+    const opStart = Process.hrtime();
+
+    const waitResult = await this.waitFor({
       jobKind: ScenarioJobKinds.planningAreaProtectedCalculation,
       forProject: projectId,
       forScenario: scenarioId,
     },
     JobStatuses.done,
     WaitForTime[waitForTime]);
+
+    const tookSeconds = tookMs(Process.hrtime(opStart));
+
+    if(waitResult) {
+      logInfo(`Protected area calculations done in ${tookSeconds}ms.`);
+    } else {
+      logInfo(`Waited for ${tookSeconds}s for protected area calculations, but operation is still ongoing.`);
+    }
+
+    return waitResult;
   }
 
   async waitForFeatureSpecificationCalculationFor(projectId: string, scenarioId: string, waitForTime: keyof typeof WaitForTime = 'some'): Promise<boolean> {
-    return await this.waitFor({
+    const opStart = Process.hrtime();
+
+    const waitResult = await this.waitFor({
       jobKind: ScenarioJobKinds.specification,
       forProject: projectId,
       forScenario: scenarioId,
     },
     JobStatuses.done,
     WaitForTime[waitForTime]);
+
+    const tookSeconds = tookMs(Process.hrtime(opStart));
+
+    if(waitResult) {
+      logInfo(`Geofeature specification calculations done in ${tookSeconds}ms.`);
+    } else {
+      logInfo(`Waited for ${tookSeconds}s for geofeature specification calculations, but operation is still ongoing.`);
+    }
+
+    return waitResult;
+  }
+
+  async waitForMarxanCalculationsFor(projectId: string, scenarioId: string, waitForTime: keyof typeof WaitForTime = 'some'): Promise<boolean> {
+    const opStart = Process.hrtime();
+
+    const waitResult = await this.waitFor({
+      jobKind: ScenarioJobKinds.marxanRun,
+      forProject: projectId,
+      forScenario: scenarioId,
+    },
+    JobStatuses.done,
+    WaitForTime[waitForTime]);
+
+    const tookSeconds = tookMs(Process.hrtime(opStart));
+
+    if(waitResult) {
+      logInfo(`Marxan calculations done in ${tookSeconds}ms.`);
+    } else {
+      logInfo(`Waited for ${tookSeconds}s for Marxan calculations, but operation is still ongoing.`);
+    }
+
+    return waitResult;
   }
 }
