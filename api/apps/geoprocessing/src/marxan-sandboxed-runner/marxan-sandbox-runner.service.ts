@@ -79,7 +79,7 @@ export class MarxanSandboxRunnerService {
           marxanRun.stdError,
         );
         await workspace.cleanup();
-        reject(result);
+        reject(JSON.stringify(result));
       });
       marxanRun.on('finished', async () => {
         try {
