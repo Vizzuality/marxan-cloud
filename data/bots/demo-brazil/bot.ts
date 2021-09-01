@@ -7,7 +7,6 @@ import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 import { sleep } from "https://deno.land/x/sleep@v1.2.0/mod.ts";
 import { createBot } from '../lib/libbot/init.ts';
 import { SpecificationStatus} from '../lib/libbot/geo-feature-specifications.ts';
-import _ from 'https://deno.land/x/lodash@4.17.15-es/lodash.js';
 import { getDemoFeatureSpecificationFromFeatureNamesForProject } from './lib.ts';
 
 const scriptPath = dirname(relative(Deno.cwd(), fromFileUrl(import.meta.url)));
