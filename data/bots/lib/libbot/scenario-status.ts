@@ -80,7 +80,7 @@ export class ScenarioJobStatus {
       .then(getJsonApiDataFromResponse)
       .then(data => data.attributes)
       .catch(logError);
-    logDebug(`Project status:\n${projectStatus}`);
+    logDebug(`Project status:\n${Deno.inspect(projectStatus, { depth: 8 })}`);
     return projectStatus?.scenarios.find(i => i.id === job.forScenario)?.jobs.find(i => i.kind === job.jobKind)?.status;
   }
 
@@ -89,7 +89,7 @@ export class ScenarioJobStatus {
 
     if(retryOptions?.delay) {
       const delay = ms(retryOptions.delay ?? '0') as number;
-      logDebug(`Waiting for ${delay / 1e3}ms before starting to poll status...`)
+      logDebug(`Waiting for ${delay / 1e3}s before starting to poll status...`)
       await sleep(delay / 1e3);
     }
 
@@ -120,12 +120,12 @@ export class ScenarioJobStatus {
     JobStatuses.done,
     WaitForTime[waitForTime]);
 
-    const tookSeconds = tookMs(Process.hrtime(opStart));
+    const took = tookMs(Process.hrtime(opStart));
 
     if(waitResult) {
-      logInfo(`Protected area calculations done in ${tookSeconds}ms.`);
+      logInfo(`Protected area calculations done in ${took}s.`);
     } else {
-      logInfo(`Waited for ${tookSeconds}s for protected area calculations, but operation is still ongoing.`);
+      logInfo(`Waited for ${took}s for protected area calculations, but operation is still ongoing.`);
     }
 
     return waitResult;
