@@ -1,10 +1,10 @@
-import { BotHttpClient, getJsonApiDataFromResponse } from './marxan-bot.ts';
-import { logError } from './logger.ts';
+import { BotHttpClient, getJsonApiDataFromResponse } from "./marxan-bot.ts";
+import { logError } from "./logger.ts";
 
-export enum SpecificationStatus { 
-  draft = 'draft',
-  created = 'created'
-};
+export enum SpecificationStatus {
+  draft = "draft",
+  created = "created",
+}
 
 export class GeoFeatureSpecifications {
   private baseHttpClient;
@@ -16,13 +16,17 @@ export class GeoFeatureSpecifications {
   async submitForScenario(
     scenarioId: string,
     featuresForSpecification: Record<string, unknown>[],
-    status: SpecificationStatus = SpecificationStatus.draft): Promise<void> {
+    status: SpecificationStatus = SpecificationStatus.draft,
+  ): Promise<void> {
     const specification = {
       status,
-      features: featuresForSpecification
+      features: featuresForSpecification,
     };
 
-    return await this.baseHttpClient.post(`/scenarios/${scenarioId}/features/specification/v2`, specification)
+    return await this.baseHttpClient.post(
+      `/scenarios/${scenarioId}/features/specification/v2`,
+      specification,
+    )
       .then(getJsonApiDataFromResponse)
       .catch(logError);
   }

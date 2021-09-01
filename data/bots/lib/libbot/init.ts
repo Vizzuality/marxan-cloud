@@ -4,17 +4,17 @@ import {
   fromFileUrl,
   relative,
 } from "https://deno.land/std@0.103.0/path/mod.ts";
-import { BotHttpClient, MarxanBotConfig } from './marxan-bot.ts';
-import { Organizations } from './organizations.ts';
-import { Projects } from './projects.ts';
-import { Scenarios } from './scenarios.ts';
-import { ScenarioEditingMetadata } from './scenario-editing-metadata.ts';
-import { PlanningAreaShapefiles } from './planning-area-shapefiles.ts';
-import { ProtectedAreas } from './protected-areas.ts';
-import { GeoFeatureSpecifications } from './geo-feature-specifications.ts';
-import { GeoFeatures } from './geo-features.ts';
-import { MarxanCalculations } from './marxan-calculations.ts';
-import { ScenarioJobStatus } from './scenario-status.ts';
+import { BotHttpClient, MarxanBotConfig } from "./marxan-bot.ts";
+import { Organizations } from "./organizations.ts";
+import { Projects } from "./projects.ts";
+import { Scenarios } from "./scenarios.ts";
+import { ScenarioEditingMetadata } from "./scenario-editing-metadata.ts";
+import { PlanningAreaShapefiles } from "./planning-area-shapefiles.ts";
+import { ProtectedAreas } from "./protected-areas.ts";
+import { GeoFeatureSpecifications } from "./geo-feature-specifications.ts";
+import { GeoFeatures } from "./geo-features.ts";
+import { MarxanCalculations } from "./marxan-calculations.ts";
+import { ScenarioJobStatus } from "./scenario-status.ts";
 
 const scriptPath = dirname(relative(Deno.cwd(), fromFileUrl(import.meta.url)));
 
@@ -37,7 +37,7 @@ export const createBot = async (botConfig: MarxanBotConfig): Promise<Bot> => {
     credentials: {
       username: botConfig?.credentials.username,
       password: botConfig?.credentials.password,
-    }
+    },
   });
 
   return {
@@ -45,11 +45,14 @@ export const createBot = async (botConfig: MarxanBotConfig): Promise<Bot> => {
     projects: new Projects(httpClient),
     scenarios: new Scenarios(httpClient),
     scenarioStatus: new ScenarioJobStatus(httpClient),
-    planningAreaUploader: new PlanningAreaShapefiles(httpClient, botConfig.apiUrl),
+    planningAreaUploader: new PlanningAreaShapefiles(
+      httpClient,
+      botConfig.apiUrl,
+    ),
     protectedAreas: new ProtectedAreas(httpClient),
     geoFeatures: new GeoFeatures(httpClient),
     geoFeatureSpecifications: new GeoFeatureSpecifications(httpClient),
     marxanExecutor: new MarxanCalculations(httpClient),
     metadata: new ScenarioEditingMetadata(),
-  }
-}
+  };
+};

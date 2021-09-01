@@ -1,5 +1,5 @@
-import { BotHttpClient, getJsonApiDataFromResponse } from './marxan-bot.ts';
-import { logError } from './logger.ts';
+import { BotHttpClient, getJsonApiDataFromResponse } from "./marxan-bot.ts";
+import { logError } from "./logger.ts";
 
 export class MarxanCalculations {
   private baseHttpClient;
