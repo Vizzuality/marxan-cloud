@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ShapefileService } from '@marxan-geoprocessing/modules/shapefiles/shapefiles.service';
+import { ShapefileService } from '@marxan/shapefile-converter';
 
 @Injectable()
 export class FakeShapefileService

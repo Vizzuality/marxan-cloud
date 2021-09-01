@@ -20,7 +20,6 @@ import {
   projectResource,
   ProjectResultSingular,
 } from './project.api.entity';
-
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -52,6 +51,11 @@ import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
+import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
+import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
+import { GeoFeaturesService } from '../geo-features/geo-features.service';
+import { AppConfig } from '@marxan-api/utils/config.utils';
+import { ShapefileService } from '@marxan/shapefile-converter';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -61,8 +65,10 @@ export class ProjectsController {
   constructor(
     private readonly projectsService: ProjectsService,
     private readonly geoFeatureSerializer: GeoFeatureSerializer,
+    private readonly geoFeatureService: GeoFeaturesService,
     private readonly projectSerializer: ProjectSerializer,
     private readonly jobsStatusSerizalizer: JobStatusSerializer,
+    private readonly shapefileService: ShapefileService,
   ) {}
 
   @ApiOperation({
@@ -201,5 +207,41 @@ export class ProjectsController {
     }
 
     return result.right;
+  }
+
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @ApiOperation({
+    description: `Upload shapefiles of species or bioregional features.`,
+  })
+  @ApiOkResponse({ type: ShapefileUploadResponse })
+  @Post(`:id/features/shapefile`)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      ...uploadOptions,
+      limits: {
+        fileSize: (() =>
+          AppConfig.get<number>(
+            'fileUploads.limits.shapefileMaxSize',
+            100 * 1024e2,
+          ))(),
+      },
+    }),
+  )
+  async uploadFeatures(
+    @Param('id') projectId: string,
+    @UploadedFile() shapefile: Express.Multer.File,
+    @Body() body: UploadShapefileDTO,
+  ): Promise<ShapefileUploadResponse> {
+    const shapefileData = await this.shapefileService.transformToGeoJson(
+      shapefile,
+    );
+
+    await this.geoFeatureService.createFeaturesForShapefile(
+      projectId,
+      body,
+      shapefileData.data.features,
+    );
+
+    return { success: true };
   }
 }
