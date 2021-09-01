@@ -142,6 +142,9 @@ test(`failed job`, async () => {
   await fixtures.ThenEventCreatedIfNotExisted(
     API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
     `eventid1`,
+    {
+      reason: 'fail description',
+    },
   );
 });
 
@@ -261,8 +264,10 @@ async function getFixtures() {
   const fakeAssets = {
     forScenario: jest.fn(),
   };
+
   class FakeOutputRepository implements FieldsOf<OutputRepository> {
     db: ScenariosOutputResultsApiEntity[] = [];
+
     async saveOutput(job: {
       returnvalue: ExecutionResult | undefined;
       data: { scenarioId: string };
@@ -275,6 +280,7 @@ async function getFixtures() {
       });
     }
   }
+
   const testingModule = await Test.createTestingModule({
     providers: [
       RunHandler,
@@ -500,6 +506,7 @@ async function getFixtures() {
           data: {
             scenarioId: `scenario-1`,
           },
+          failedReason: `fail description`,
         };
       });
     },
