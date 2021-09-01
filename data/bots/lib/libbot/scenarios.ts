@@ -1,5 +1,7 @@
+import Process from "https://deno.land/std@0.103.0/node/process.ts";
 import { BotHttpClient, getJsonApiDataFromResponse } from './marxan-bot.ts';
-import { logError } from './logger.ts';
+import { logDebug, logInfo, logError } from './logger.ts';
+import { tookMs } from './util/perf.ts';
 
 /**
  * The kind of Marxan scenario (standard, Marxan with Zones, and possibly other
@@ -46,14 +48,26 @@ export class Scenarios {
   }
 
   async createInProject(projectId: string, scenario: Scenario) {
-    return await this.baseHttpClient.post('/scenarios', { ...scenario, projectId })
+    const opStart = Process.hrtime();
+
+    const result = await this.baseHttpClient.post('/scenarios', { ...scenario, projectId })
       .then(getJsonApiDataFromResponse)
       .catch(logError);
+
+    logInfo(`Scenario was created in ${tookMs(Process.hrtime(opStart))}ms.`);
+    logDebug(`Scenario:\n${Deno.inspect(result)}`);
+    return result;
   }
 
   async update(scenarioId: string, scenario: Partial<Scenario>) {
-    return await this.baseHttpClient.patch(`/scenarios/${scenarioId}`, scenario)
-    .then(getJsonApiDataFromResponse)
-    .catch(logError);
+    const opStart = Process.hrtime();
+
+    const result = await this.baseHttpClient.patch(`/scenarios/${scenarioId}`, scenario)
+      .then(getJsonApiDataFromResponse)
+      .catch(logError);
+
+    logInfo(`Scenario was updated in ${tookMs(Process.hrtime(opStart))}ms.`);
+    logDebug(`Scenario:\n${Deno.inspect(result)}`);
+    return result;
   }
 }

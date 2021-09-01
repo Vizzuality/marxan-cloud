@@ -1,8 +1,10 @@
+import Process from "https://deno.land/std@0.103.0/node/process.ts";
 import { BotHttpClient, getJsonApiDataFromResponse } from './marxan-bot.ts';
 import { sleep } from "https://deno.land/x/sleep@v1.2.0/mod.ts";
 import _ from 'https://deno.land/x/lodash@4.17.15-es/lodash.js';
 import { ms } from 'https://deno.land/x/ms@v0.1.0/ms.ts';
 import { logError, logInfo, logDebug } from './logger.ts';
+import { tookMs } from './util/perf.ts';
 
 const DEFAULT_WATCH_TIMEOUT = 1800;
 
@@ -77,7 +79,7 @@ export class ScenarioJobStatus {
       .then(getJsonApiDataFromResponse)
       .then(data => data.attributes)
       .catch(logError);
-    logDebug(projectStatus);
+    logDebug(`Project status:\n${projectStatus}`);
     return projectStatus?.scenarios.find(i => i.id === job.forScenario)?.jobs.find(i => i.kind === job.jobKind)?.status;
   }
 
@@ -86,8 +88,8 @@ export class ScenarioJobStatus {
 
     if(retryOptions?.delay) {
       const delay = ms(retryOptions.delay ?? '0') as number;
-      logDebug(`Waiting for ${delay / 10e2} seconds before starting to poll status...`)
-      await sleep(delay / 10e2);
+      logDebug(`Waiting for ${delay / 1e3}ms before starting to poll status...`)
+      await sleep(delay / 1e3);
     }
 
     const interval = ms(retryOptions.interval) as number;
