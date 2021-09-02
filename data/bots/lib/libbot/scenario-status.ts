@@ -38,6 +38,7 @@ export enum ScenarioJobKinds {
 export enum JobStatuses {
   running = "running",
   done = "done",
+  failure =  "failure",
 }
 
 interface JobStatus {
@@ -110,6 +111,10 @@ export class ScenarioJobStatus {
       if (status === until) {
         logInfo(`Current status is ${status}.`);
         return true;
+      }
+      if(status === JobStatuses.failure) {
+        logError(`Operation failed.`);
+        return false;
       }
       logInfo(`Current status is ${status}: waiting for ${interval / 1e3}s`);
       await sleep(interval / 1e3);
