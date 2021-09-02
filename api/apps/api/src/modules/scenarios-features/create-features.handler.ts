@@ -33,6 +33,7 @@ export class CreateFeaturesHandler
           scenarioId: command.scenarioId,
           specificationId: command.specificationId,
           input: command.input,
+          doNotCalculateAreas: command.doNotCalculateAreas,
         });
         this.eventBus.publish(
           new FeaturesCreated(command.scenarioId, command.specificationId, {

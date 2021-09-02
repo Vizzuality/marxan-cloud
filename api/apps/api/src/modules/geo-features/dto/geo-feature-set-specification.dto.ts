@@ -1,7 +1,14 @@
 import { SimpleJobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { Equals, IsEnum, IsUUID, ValidateNested } from 'class-validator';
+import {
+  Equals,
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsUUID,
+  ValidateNested,
+} from 'class-validator';
 import { GeoFeature } from '../geo-feature.api.entity';
 import {
   GeoprocessingOp,
@@ -87,4 +94,9 @@ export class GeoFeatureSetSpecification {
     },
   })
   features!: Array<SpecForPlainGeoFeature | SpecForGeoFeatureWithGeoprocessing>;
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  doNotCalculateAreas?: boolean;
 }

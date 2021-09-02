@@ -21,6 +21,7 @@ export class CreateFeaturesSaga {
               event.scenarioId,
               event.specificationId,
               input,
+              event.doNotCalculateAreas,
             ),
         ),
       ),

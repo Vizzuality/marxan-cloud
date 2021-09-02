@@ -46,6 +46,7 @@ export class SpecificationService {
           this.geoFeatureConfigMapper.toFeatureConfig(feature),
         ),
         raw: classToPlain(dto),
+        doNotCalculateAreas: dto.doNotCalculateAreas,
       }),
     );
 

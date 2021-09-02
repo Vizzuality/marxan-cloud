@@ -22,6 +22,7 @@ export class CopyOperation {
     scenarioId: string;
     specificationId: string;
     input: FeatureConfigCopy;
+    doNotCalculateAreas?: boolean;
   }): Promise<{ id: string }[]> {
     await this.events.create({
       topic: data.scenarioId,
