@@ -30,4 +30,24 @@ export class ProtectedAreas {
     logDebug(`IUCN categories within planning area:\n${Deno.inspect(result)}`);
     return result;
   }
+
+  async getIucnCategoriesForAdminAreaWithId(
+    adminAreaId: string,
+  ): Promise<IUCNCategory[]> {
+    const opStart = Process.hrtime();
+
+    const result = await this.baseHttpClient.get(
+      `/protected-areas/iucn-categories?filter[adminAreaId]=${adminAreaId}`,
+    )
+      .then((result) =>
+        result?.data.data?.map((i: { id: IUCNCategory }) => i.id)
+      )
+      .catch(logError);
+
+    logInfo(
+      `Lookup of IUCN categories done in ${tookMs(Process.hrtime(opStart))}ms.`,
+    );
+    logDebug(`IUCN categories within admin area:\n${Deno.inspect(result)}`);
+    return result;
+  }
 }
