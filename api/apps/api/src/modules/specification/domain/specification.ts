@@ -37,6 +37,7 @@ export class Specification extends AggregateRoot {
     input: FeatureConfigInput[],
     draft: boolean,
     raw: Record<string, unknown>,
+    doNotCalculateAreas?: boolean,
   ): Specification {
     const specification = new Specification(
       v4(),
@@ -55,6 +56,7 @@ export class Specification extends AggregateRoot {
         specification.id,
         input,
         draft,
+        doNotCalculateAreas,
       ),
     );
     return specification;

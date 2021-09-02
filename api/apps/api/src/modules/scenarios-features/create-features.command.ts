@@ -6,6 +6,7 @@ export class CreateFeaturesCommand extends Command<void> {
     public readonly scenarioId: string,
     public readonly specificationId: string,
     public readonly input: FeatureConfigInput,
+    public readonly doNotCalculateAreas?: boolean,
   ) {
     super();
   }
