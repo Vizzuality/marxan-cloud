@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsDefined,
   IsEmail,
@@ -16,6 +16,7 @@ import {
 export class SignUpDto {
   @IsOptional()
   @IsString()
+  @ApiPropertyOptional()
   displayName?: string;
 
   @IsEmail()
