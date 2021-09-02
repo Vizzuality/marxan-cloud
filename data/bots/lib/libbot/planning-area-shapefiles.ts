@@ -36,7 +36,7 @@ export class PlanningAreaShapefiles extends ShapefileUploader {
       .catch(logError);
 
     logInfo(
-      `Custom planning ares shapefile uploaded in ${
+      `Custom planning area shapefile uploaded in ${
         tookMs(Process.hrtime(opStart))
       }ms.`,
     );
