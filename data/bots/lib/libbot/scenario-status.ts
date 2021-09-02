@@ -135,13 +135,13 @@ export class ScenarioJobStatus {
       WaitForTime[waitForTime],
     );
 
-    const took = tookMs(Process.hrtime(opStart));
+    const tookSeconds = tookMs(Process.hrtime(opStart)) / 1e3;
 
     if (waitResult) {
-      logInfo(`Protected area calculations done in ${took}s.`);
+      logInfo(`Protected area calculations done in ${tookSeconds}s.`);
     } else {
       logInfo(
-        `Waited for ${took}s for protected area calculations, but operation is still ongoing.`,
+        `Waited for ${tookSeconds}s for protected area calculations, but operation is still ongoing.`,
       );
     }
 
@@ -165,11 +165,11 @@ export class ScenarioJobStatus {
       WaitForTime[waitForTime],
     );
 
-    const tookSeconds = tookMs(Process.hrtime(opStart));
+    const tookSeconds = tookMs(Process.hrtime(opStart)) / 1e3;
 
     if (waitResult) {
       logInfo(
-        `Geofeature specification calculations done in ${tookSeconds}ms.`,
+        `Geofeature specification calculations done in ${tookSeconds}s.`,
       );
     } else {
       logInfo(
@@ -197,10 +197,10 @@ export class ScenarioJobStatus {
       WaitForTime[waitForTime],
     );
 
-    const tookSeconds = tookMs(Process.hrtime(opStart));
+    const tookSeconds = tookMs(Process.hrtime(opStart)) / 1e3;
 
     if (waitResult) {
-      logInfo(`Marxan calculations done in ${tookSeconds}ms.`);
+      logInfo(`Marxan calculations done in ${tookSeconds}s.`);
     } else {
       logInfo(
         `Waited for ${tookSeconds}s for Marxan calculations, but operation is still ongoing.`,
