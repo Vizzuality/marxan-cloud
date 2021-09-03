@@ -54,7 +54,6 @@ export class GeoOutputRepository {
       scenarioId,
     );
 
-    console.log(`--- ge output transaction start..`);
     return this.entityManager.transaction(async (transaction) => {
       // We chunk delete and insert operations as the generated SQL statements
       // could otherwise easily end up including tens of thousands of
@@ -67,8 +66,8 @@ export class GeoOutputRepository {
       // for unacceptable amounts of time here.
 
       const CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS = 1000;
+      const CHUNK_SIZE_FOR_BATCH_SUMMARY = 1000;
 
-      console.log(`--- > delete previous outs`);
       this.logger.debug(
         `Deleting ${
           Object.keys(planningUnitsState).length
@@ -86,7 +85,6 @@ export class GeoOutputRepository {
         });
       }
 
-      console.log(`--- > delete sfd`);
       this.logger.debug(
         `Deleting ${scenarioFeatureDataFromAllRuns.length} output scenario features...`,
       );
@@ -102,7 +100,6 @@ export class GeoOutputRepository {
         });
       }
 
-      console.log(`--- > add outs`);
       this.logger.debug(
         `Inserting ${scenarioFeatureDataFromAllRuns.length} output scenario features...`,
       );
@@ -121,10 +118,9 @@ export class GeoOutputRepository {
 
       const chunkedOutputScenariosPuData = chunk(
         Object.entries(planningUnitsState),
-        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+        CHUNK_SIZE_FOR_BATCH_SUMMARY,
       );
 
-      console.log(`--- > add output pus `);
       this.logger.debug(
         `Inserting ${
           Object.keys(planningUnitsState).length
@@ -145,7 +141,6 @@ export class GeoOutputRepository {
         }),
       );
 
-      console.log(`--- > save execution meta`);
       await transaction.save(
         transaction.create(MarxanExecutionMetadataGeoEntity, {
           scenarioId,

@@ -34,13 +34,11 @@ export class SubmitSpecificationHandler
     );
 
     try {
-      console.log(`---1`);
       await this.specificationRepository.save(specification);
     } catch {
       return left(internalError);
     }
 
-    console.log(`---2`);
     specification.commit();
     return right(specification.id);
   }

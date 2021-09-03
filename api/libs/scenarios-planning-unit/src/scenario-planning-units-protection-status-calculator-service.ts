@@ -52,12 +52,10 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
   ): Promise<void> {
     if (!this.shouldSetDefaultInclusionStatus(scenario, input)) return;
 
-    console.log(`---pu status 1`);
     const puRepo = this.entityManager.getRepository<ScenariosPlanningUnitGeoEntity>(
       ScenariosPlanningUnitGeoEntity,
     );
 
-    console.log(`---pu status 2`);
     const query = `
       with pu as (
         select spd.id,
@@ -93,7 +91,6 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
               )
       where scenario_id = $3;
     `;
-    console.log(`---pu status 3`, query);
     await puRepo.query(query, [
       scenario.id,
       scenario.wdpaThreshold,

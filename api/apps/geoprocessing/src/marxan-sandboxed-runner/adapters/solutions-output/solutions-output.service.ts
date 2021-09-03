@@ -52,20 +52,15 @@ export class SolutionsOutputService implements Cancellable {
         `Output (solutions matrix) is missing from the marxan run.`,
       );
     }
-    console.log(`--- geo output..`);
     await this.geoOutputRepository.save(scenarioId, runDirectories, {
       stdOutput,
       stdError: stdErr,
     });
 
-    console.log(`--- reading summary..`);
     const runsSummary = (
       await promises.readFile(runDirectories.output + `/output_sum.csv`)
     ).toString();
-    console.log(`---- summary read`);
-    const parsed = await this.resultParserService.parse(runsSummary);
-    console.log(`---- summary parsed`);
-    return parsed;
+    return await this.resultParserService.parse(runsSummary);
   }
 
   async dumpFailure(

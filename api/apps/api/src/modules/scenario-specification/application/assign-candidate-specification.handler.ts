@@ -26,7 +26,6 @@ export class AssignCandidateSpecificationHandler
     scenarioSpecification.assignCandidateSpecification(
       new SpecificationId(specificationId),
     );
-    console.log(`---3`);
     await this.scenarioSpecificationRepo.save(scenarioSpecification);
     scenarioSpecification.commit();
   }

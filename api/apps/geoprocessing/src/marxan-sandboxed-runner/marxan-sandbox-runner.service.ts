@@ -64,10 +64,8 @@ export class MarxanSandboxRunnerService {
     };
 
     await interruptIfKilled();
-    console.log(`--- downloading files..`);
     await inputFiles.include(workspace, assets);
     await interruptIfKilled();
-    console.log(`--- creating workspace..`);
     await workspace.arrangeOutputSpace();
     await interruptIfKilled();
 
@@ -86,17 +84,13 @@ export class MarxanSandboxRunnerService {
       marxanRun.on('finished', async () => {
         try {
           await interruptIfKilled();
-          console.log(`--- dump results`);
           const output = await outputFilesRepository.dump(
             workspace,
             forScenarioId,
             marxanRun.stdOut,
             marxanRun.stdError,
           );
-          console.log(`---- results dumped, cleaning up`);
           await workspace.cleanup();
-          console.log(`---- cleaning done`);
-          console.log(`---- resolving`, output.length);
           resolve(output);
         } catch (error) {
           reject(error);
@@ -118,9 +112,7 @@ export class MarxanSandboxRunnerService {
 
       try {
         await interruptIfKilled();
-        console.log(`--- execute marxan..`);
         marxanRun.executeIn(workspace);
-        console.log(`--- execute marxan.. queued`);
       } catch (error) {
         this.clearAbortController(forScenarioId);
         reject(error);

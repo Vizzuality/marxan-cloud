@@ -17,22 +17,18 @@ export class SharedStorage implements TemporaryDirectory {
   ) {}
 
   async cleanup(directory: string): Promise<void> {
-    console.log(`---clean 1`);
     if (this.#hasPoisonNullByte(directory)) {
       throw new Error(`Hacking is not allowed.`);
     }
 
-    console.log(`---clean 2`);
     if (this.#isDirectoryTraversal(directory, this.tempDirectory)) {
       throw new Error(`Directory traversal is not allowed.`);
     }
 
-    console.log(`---clean 3`);
     await promises.rm(directory, {
       recursive: true,
       force: true,
     });
-    console.log(`---clean 4`);
     return;
   }
 
