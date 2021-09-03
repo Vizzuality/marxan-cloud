@@ -97,20 +97,26 @@ export class ScenariosService {
     await this.planningUnitsLinkerService.link(scenario);
     await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
       scenario,
+      input,
     );
     return scenario;
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
     await this.assertScenario(scenarioId);
+    console.log(`---- up 1`);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
+    console.log(`---- up 2`);
     const scenario = await this.crudService.update(
       scenarioId,
       validatedMetadata,
     );
+    console.log(`---- up 3`);
     await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
       scenario,
+      input,
     );
+    console.log(`---- up 4`);
     return scenario;
   }
 

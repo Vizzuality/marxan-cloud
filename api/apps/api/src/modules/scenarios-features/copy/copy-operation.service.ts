@@ -33,22 +33,26 @@ export class CopyOperation {
         protectedAreaFilterByIds,
         planningAreaLocation,
       } = await this.copyDataProvider.prepareData(data);
+      console.log(`--- copy -- 1`);
       const { parameters, query } = this.copyQuery.prepareStatement(
         data,
         planningAreaLocation,
         protectedAreaFilterByIds,
         project,
       );
+      console.log(`--- copy -- 2`);
       const ids: { id: string }[] = await this.geoEntityManager.query(
         query,
         parameters,
       );
+      console.log(`--- copy -- 3`);
       await this.events.create({
         topic: data.scenarioId,
         kind: API_EVENT_KINDS.scenario__geofeatureCopy__finished__v1__alpha1,
       });
       return ids;
     } catch (error) {
+      console.log(`--- copy -- 4`, error);
       await this.events.create({
         topic: data.scenarioId,
         kind: API_EVENT_KINDS.scenario__geofeatureCopy__failed__v1__alpha1,

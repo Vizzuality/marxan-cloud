@@ -4,6 +4,8 @@ import { isNil } from 'lodash';
 import { IUCNCategory } from '@marxan/iucn';
 
 import { ScenariosPlanningUnitGeoEntity } from './scenarios-planning-unit.geo.entity';
+import { UpdateScenarioDTO } from '@marxan-api/modules/scenarios/dto/update.scenario.dto';
+import { isDefined } from '@marxan/utils';
 
 export const ProtectionStatusEntityManagerToken = Symbol();
 
@@ -28,21 +30,34 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
    * @TODO We'll need to handle custom protected areas here once we add support
    * for these.
    */
-  private shouldSetDefaultInclusionStatus(scenario: ScenarioMetadata): boolean {
-    return (
-      !isNil(scenario.wdpaIucnCategories) && !isNil(scenario.wdpaThreshold)
+  private shouldSetDefaultInclusionStatus(
+    scenario: ScenarioMetadata,
+    input: UpdateScenarioDTO | undefined,
+  ): boolean {
+    const isUpdatingWdpa =
+      isDefined(input?.wdpaThreshold) || isDefined(input?.wdpaIucnCategories);
+
+    if (isDefined(input)) {
+      return isUpdatingWdpa;
+    }
+
+    return Boolean(
+      !isNil(scenario.wdpaIucnCategories) && !isNil(scenario.wdpaThreshold),
     );
   }
 
   async calculatedProtectionStatusForPlanningUnitsIn(
     scenario: ScenarioMetadata,
+    input?: UpdateScenarioDTO,
   ): Promise<void> {
-    if (!this.shouldSetDefaultInclusionStatus(scenario)) return;
+    if (!this.shouldSetDefaultInclusionStatus(scenario, input)) return;
 
+    console.log(`---pu status 1`);
     const puRepo = this.entityManager.getRepository<ScenariosPlanningUnitGeoEntity>(
       ScenariosPlanningUnitGeoEntity,
     );
 
+    console.log(`---pu status 2`);
     const query = `
       with pu as (
         select spd.id,
@@ -78,6 +93,7 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
               )
       where scenario_id = $3;
     `;
+    console.log(`---pu status 3`, query);
     await puRepo.query(query, [
       scenario.id,
       scenario.wdpaThreshold,
