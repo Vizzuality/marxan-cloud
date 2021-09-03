@@ -73,7 +73,7 @@ test(`returns full query with all parameters`, async () => {
 
         cross join md5(
             row (
-                pa.id, fd.id,
+                pa.hash, fd.id,
                 $6::double precision,
                 $8::double precision,
                 $7::double precision,
@@ -160,7 +160,7 @@ test(`returns full query with no wdpa`, async () => {
 
         cross join md5(
             row (
-                pa.id, fd.id,
+                pa.hash, fd.id,
                 $7::double precision,
                 $9::double precision,
                 $8::double precision,

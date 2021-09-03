@@ -199,7 +199,7 @@ export class CopyQuery {
         return (usedJoins.md5HashJoin ??= `
         cross join md5(
             row (
-                ${isDefined(planningAreaLocation) ? `pa.id,` : ''} fd.id,
+                ${isDefined(planningAreaLocation) ? `pa.hash,` : ''} fd.id,
                 ${fields.bbox[0]}::double precision,
                 ${fields.bbox[2]}::double precision,
                 ${fields.bbox[1]}::double precision,
