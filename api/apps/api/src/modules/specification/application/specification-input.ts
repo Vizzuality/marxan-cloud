@@ -36,10 +36,6 @@ export class SpecificationInput {
     | SpecificationFeatureSplit
     | SpecificationFeatureStratification
   )[];
-
-  @IsOptional()
-  @IsBoolean()
-  doNotCalculateAreas?: boolean;
 }
 
 export class SpecificationFeatureCopy implements FeatureConfigCopy {
