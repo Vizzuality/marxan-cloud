@@ -34,7 +34,6 @@ export class CopyQuery {
       scenarioId: string;
       specificationId: string;
       input: Input;
-      doNotCalculateAreas?: boolean;
     },
     planningAreaLocation: { id: string; tableName: string } | undefined,
     protectedAreaFilterByIds: string[],
@@ -49,40 +48,8 @@ export class CopyQuery {
       protectedAreaFilterByIds,
       project,
     );
-    const cacheInsertion = () =>
-      command.doNotCalculateAreas
-        ? ''
-        : `
-        with inserted_cache as (
-          insert into areas_cache (total_area, current_pa, hash)
-            select ${fields.totalArea},
-                   ${fields.protectedArea},
-                   md5hash
-            from features_data as fd
-            ${joins.planningAreaJoin} ${joins.protectedAreaJoin}
-            ${joins.md5HashJoin}
-            left join areas_cache as current_cache on current_cache.hash = md5hash
-            where feature_id = ${fields.featureId} and current_cache.hash is null
-            and st_intersects(st_makeenvelope(
-            ${fields.bbox[0]}, ${fields.bbox[2]},
-            ${fields.bbox[1]}, ${fields.bbox[3]}, 4326), fd.the_geom)
-            on conflict do nothing returning hash, total_area, current_pa
-        )`;
-    const cacheInsertionJoin = () =>
-      command.doNotCalculateAreas
-        ? ''
-        : `left join inserted_cache on inserted_cache.hash = md5hash`;
-    const areasSelect = command.doNotCalculateAreas
-      ? `
-        areas_cache.total_area,
-        areas_cache.current_pa
-      `
-      : `
-      coalesce(inserted_cache.total_area, areas_cache.total_area),
-      coalesce(inserted_cache.current_pa, areas_cache.current_pa)
-    `;
     const query = `
-        ${cacheInsertion()}
+      with inserted_sfp as (
         insert into scenario_features_preparation as sfp (feature_class_id,
                                                           scenario_id,
                                                           specification_id,
@@ -90,26 +57,34 @@ export class CopyQuery {
                                                           target,
                                                           prop,
                                                           total_area,
-                                                          current_pa)
-        select fd.id,
-               ${fields.scenarioId},
-               ${fields.specificationId},
-               ${fields.fpf},
-               ${fields.target},
-               ${fields.prop},
-               ${areasSelect}
-        from features_data as fd
-            ${joins.planningAreaJoin}
-            ${joins.md5HashJoin}
-            left join areas_cache on areas_cache.hash = md5hash
-            ${cacheInsertionJoin()}
-        where feature_id = ${fields.featureId}
+                                                          current_pa,
+                                                          hash)
+          select fd.id,
+                 ${fields.scenarioId},
+                 ${fields.specificationId},
+                 ${fields.fpf},
+                 ${fields.target},
+                 ${fields.prop},
+                 coalesce(areas_cache.total_area, ${fields.totalArea}),
+                 coalesce(areas_cache.current_pa, ${fields.protectedArea}),
+                 md5hash
+          from features_data as fd
+          ${joins.planningAreaJoin}
+          ${joins.md5HashJoin}
+          left join areas_cache on areas_cache.hash = md5hash
+          where feature_id = ${fields.featureId}
           and st_intersects(st_makeenvelope(
-            ${fields.bbox[0]},
-            ${fields.bbox[2]},
-            ${fields.bbox[1]},
-            ${fields.bbox[3]}, 4326), fd.the_geom)
-        returning sfp.id as id;
+          ${fields.bbox[0]},
+          ${fields.bbox[2]},
+          ${fields.bbox[1]},
+          ${fields.bbox[3]}, 4326), fd.the_geom)
+          returning sfp.id as id, sfp.hash as hash, sfp.total_area as total_area, sfp.current_pa as current_pa
+      ), inserted_cache as (
+          insert into areas_cache (hash, total_area, current_pa)
+          select hash, total_area, current_pa from inserted_sfp
+          on conflict do nothing
+      )
+      select id from inserted_sfp
     `;
     return { parameters, query };
   }
@@ -168,7 +143,16 @@ export class CopyQuery {
       get protectedArea() {
         return (usedFields.protectedArea ??=
           protectedAreaFilterByIds.length > 0
-            ? 'st_area(st_transform(st_intersection(st_intersection(pa.the_geom, fd.the_geom), protected.area),3410))'
+            ? `st_area(st_transform(st_intersection(st_intersection(pa.the_geom, fd.the_geom), (
+                 select st_union(wdpa.the_geom) as area
+                 from wdpa where st_intersects(st_makeenvelope(
+                  ${fields.bbox[0]},
+                  ${fields.bbox[2]},
+                  ${fields.bbox[1]},
+                  ${fields.bbox[3]},
+                  4326
+                ), wdpa.the_geom) and wdpa.id in (${fields.protectedAreaIds})
+            )),3410))`
             : 'NULL');
       },
       get featureId() {

@@ -7,6 +7,5 @@ export class SpecificationCandidateCreated implements IEvent {
     public readonly specificationId: string,
     public readonly input: FeatureConfigInput[],
     public readonly draft: boolean,
-    public readonly doNotCalculateAreas?: boolean,
   ) {}
 }

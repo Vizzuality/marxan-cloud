@@ -30,7 +30,6 @@ export class SubmitSpecificationHandler
         payload.features,
         payload.draft,
         payload.raw,
-        payload.doNotCalculateAreas,
       ),
     );
 
