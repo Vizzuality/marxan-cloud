@@ -22,7 +22,7 @@ import { RunService } from './run.service';
 import { AssetsService } from './assets.service';
 import { blmDefaultToken, runEventsToken, runQueueToken } from './tokens';
 import { RunHandler } from './run.handler';
-import { CancelHandler, notFound } from './cancel.handler';
+import { CancelHandler } from './cancel.handler';
 import { EventsHandler } from './events.handler';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
@@ -99,11 +99,15 @@ test(`canceling job`, async () => {
 });
 
 test(`canceling job`, async () => {
+  fixtures.setupForCancelingNotFoundJob();
   fixtures.GivenNoJobsInQueue();
 
   const result = await runService.cancel(`scenario-1`);
 
-  expect(result).toStrictEqual(left(notFound));
+  expect(result).toStrictEqual(right(void 0));
+  await fixtures.ThenEventCreated(
+    API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
+  );
 });
 
 test(`canceling active job`, async () => {
@@ -375,6 +379,9 @@ async function getFixtures() {
       fakeApiEvents.createIfNotExists.mockImplementation(() => {
         return right({});
       });
+    },
+    setupForCancelingNotFoundJob() {
+      fakeApiEvents.create.mockImplementation(() => ({}));
     },
     setupMocksForCompletedJob() {
       fakeApiEvents.createIfNotExists.mockImplementation(() => {
