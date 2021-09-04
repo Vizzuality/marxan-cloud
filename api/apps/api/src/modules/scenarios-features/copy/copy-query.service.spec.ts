@@ -72,13 +72,12 @@ test(`returns full query with all parameters`, async () => {
           left join planning_area_table as pa on pa.id = $12
 
         cross join md5(
-            row (
-                pa.hash, fd.id,
-                $6::double precision,
-                $8::double precision,
-                $7::double precision,
+                pa.hash || '|' || fd.id || '|' ||
+                $6::double precision || '|' ||
+                $8::double precision || '|' ||
+                $7::double precision || '|' ||
                 $9::double precision
-                ,$10::uuid, $11::uuid)::text
+                || '|' ||$10::text ||  $11::text
             ) as md5hash
 
           left join areas_cache on areas_cache.hash = md5hash
@@ -159,13 +158,12 @@ test(`returns full query with no wdpa`, async () => {
           left join planning_area_table as pa on pa.id = $6
 
         cross join md5(
-            row (
-                pa.hash, fd.id,
-                $7::double precision,
-                $9::double precision,
-                $8::double precision,
+                pa.hash || '|' || fd.id || '|' ||
+                $7::double precision || '|' ||
+                $9::double precision || '|' ||
+                $8::double precision || '|' ||
                 $10::double precision
-                )::text
+
             ) as md5hash
 
           left join areas_cache on areas_cache.hash = md5hash
@@ -271,13 +269,12 @@ test(`returns full query with no planning area location`, async () => {
 
 
         cross join md5(
-            row (
-                 fd.id,
-                $6::double precision,
-                $8::double precision,
-                $7::double precision,
+                 fd.id || '|' ||
+                $6::double precision || '|' ||
+                $8::double precision || '|' ||
+                $7::double precision || '|' ||
                 $9::double precision
-                ,$10::uuid, $11::uuid)::text
+                || '|' ||$10::text ||  $11::text
             ) as md5hash
 
           left join areas_cache on areas_cache.hash = md5hash
