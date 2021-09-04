@@ -198,15 +198,21 @@ export class CopyQuery {
       get md5HashJoin() {
         return (usedJoins.md5HashJoin ??= `
         cross join md5(
-            row (
-                ${isDefined(planningAreaLocation) ? `pa.hash,` : ''} fd.id,
-                ${fields.bbox[0]}::double precision,
-                ${fields.bbox[2]}::double precision,
-                ${fields.bbox[1]}::double precision,
+                ${
+                  isDefined(planningAreaLocation) ? `pa.hash || '|' ||` : ''
+                } fd.id || '|' ||
+                ${fields.bbox[0]}::double precision || '|' ||
+                ${fields.bbox[2]}::double precision || '|' ||
+                ${fields.bbox[1]}::double precision || '|' ||
                 ${fields.bbox[3]}::double precision
                 ${
-                  fields.protectedAreaIds ? ',' + fields.protectedAreaIds : ''
-                })::text
+                  fields.protectedAreaIds
+                    ? `|| '|' ||` +
+                      fields.protectedAreaIds
+                        .replace(/::uuid/g, '::text')
+                        .replace(/,/g, ` || `)
+                    : ''
+                }
             ) as md5hash
     `);
       },
