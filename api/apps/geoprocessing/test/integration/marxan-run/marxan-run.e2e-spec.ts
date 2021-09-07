@@ -75,7 +75,7 @@ describe(`given input data is available`, () => {
         done(`Shouldn't finish Marxan run.`);
       })
       .catch((error) => {
-        expect(error.signal).toEqual('SIGTERM');
+        expect(JSON.parse(error).signal).toEqual('SIGTERM');
         done();
       });
 

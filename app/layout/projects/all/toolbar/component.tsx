@@ -87,9 +87,9 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
             subtitle="Project list"
             content={(
               <div>
-                You can upload an existing marxan project.
+                You can upload an existing Marxan project.
                 You will need to compress your input files
-                as a zipfile and you will need to add your panning unit grid
+                as a zipfile and you will need to add your planning unit grid
                 as a shapefile. Optionally you can include your output files
                 to visualize the results.
 

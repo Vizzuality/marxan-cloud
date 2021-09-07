@@ -37,13 +37,10 @@ export class MarxanRun extends MarxanRunEmitter implements Cancellable {
     this.#process = spawn(workspace.marxanBinaryPath, {
       cwd: workspace.workingDirectory,
     });
-
     assertDefined(this.#process);
-
     this.#process.stderr.on('data', (chunk) => {
       this.#stdError.push(chunk.toString());
     });
-
     const progressWatcher = new Progress();
     this.#process.stdout.on('data', (chunk) => {
       const currentProgress = progressWatcher.read(chunk);
@@ -51,6 +48,27 @@ export class MarxanRun extends MarxanRunEmitter implements Cancellable {
       this.#stdOut.push(chunk.toString());
     });
 
+    this.#process.on(
+      `error`,
+      (
+        error:
+          | Error
+          | {
+              errno: number;
+              code: number;
+              path: string;
+              syscall: string;
+              spawnargs: string[];
+            },
+      ) => {
+        this.emit('error', {
+          signal: undefined,
+          code: 'code' in error ? error.code : undefined,
+          stdError: ['message' in error ? error.message : ''],
+        });
+        return;
+      },
+    );
     this.#process.on('exit', (code, signal) => {
       if (signal) {
         this.emit('error', {

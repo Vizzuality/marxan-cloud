@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { useDropzone } from 'react-dropzone';
-import { useDispatch } from 'react-redux';
+import { Form, Field } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
   setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
@@ -13,32 +14,37 @@ import { motion } from 'framer-motion';
 import { useUploadProjectPA } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
+import Button from 'components/button';
+import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
+import Uploader from 'components/uploader';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface PlanningAreUploaderProps {
   input: any;
-  meta: any;
-  resetPlanningArea: any,
-  form: any,
+  form: any;
+  resetPlanningArea: (form) => void;
 }
 
 export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   input,
-  meta,
-  resetPlanningArea,
   form,
+  resetPlanningArea,
 }: PlanningAreUploaderProps) => {
+  const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
+
   const { addToast } = useToasts();
 
-  const { submitFailed, valid } = meta;
-
   const dispatch = useDispatch();
+
+  const bytesToMb = (bytes) => {
+    return (bytes / 1048576).toFixed(0);
+  };
 
   const uploadProjectPAMutation = useUploadProjectPA({
     requestConfig: {
@@ -46,17 +52,11 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     },
   });
 
-  // Effects
-  useEffect(() => {
-    return () => {
-      input.onChange(null);
-      dispatch(setUploadingPlanningArea(null));
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const maxSize = 3000000;
+
+  const { uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
 
   const onDropAccepted = async (acceptedFiles) => {
-    setLoading(true);
     const f = acceptedFiles[0];
 
     const data = new FormData();
@@ -65,8 +65,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     uploadProjectPAMutation.mutate({ data }, {
       onSuccess: ({ data: { data: g, id: PAid } }) => {
         setLoading(false);
-        setSuccessFile({ id: PAid, name: f.name });
-        input.onChange(PAid);
+        setSuccessFile({ id: PAid, name: f.name, geom: g });
 
         addToast('success-upload-shapefile', (
           <>
@@ -76,12 +75,6 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
         ), {
           level: 'success',
         });
-
-        dispatch(setUploadingPlanningArea(g));
-        dispatch(setBbox(g.bbox));
-        dispatch(setMinPuAreaSize(g.marxanMetadata.minPuAreaSize));
-        dispatch(setMaxPuAreaSize(g.marxanMetadata.maxPuAreaSize));
-
         console.info('Shapefile uploaded', g);
       },
       onError: () => {
@@ -118,6 +111,21 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     });
   };
 
+  const onUploadSubmit = useCallback(() => {
+    input.onChange(successFile.id);
+    dispatch(setUploadingPlanningArea(successFile.geom));
+    dispatch(setBbox(successFile.geom.bbox));
+    dispatch(setMinPuAreaSize(successFile.geom.marxanMetadata.minPuAreaSize));
+    dispatch(setMaxPuAreaSize(successFile.geom.marxanMetadata.maxPuAreaSize));
+  }, [dispatch, successFile, input]);
+
+  const onUploadRemove = useCallback((f) => {
+    input.onChange(null);
+    setSuccessFile(null);
+    resetPlanningArea(f);
+    dispatch(setUploadingPlanningArea(null));
+  }, [dispatch, input, resetPlanningArea]);
+
   const {
     getRootProps,
     getInputProps,
@@ -126,116 +134,170 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     isDragReject,
   } = useDropzone({
     multiple: false,
-    maxSize: 3000000,
+    maxSize,
     onDropAccepted,
     onDropRejected,
   });
 
   return (
-    <div
-      key="uploading"
-      role="presentation"
-      className={cx({
-        'border text-sm py-2.5 focus:outline-none relative transition rounded-3xl  cursor-pointer mt-6 text-white': true,
-        'border-transparent': (!submitFailed && valid) || (submitFailed && valid),
-        'border-red-500 bg-gray-600 px-5': submitFailed && !valid,
-        'bg-gray-600 px-5': !submitFailed && !valid,
-      })}
-    >
-      <header className="relative flex justify-between w-full">
-
-        <div
-          className={cx({
-            'text-left': true,
-            'text-gray-300': !submitFailed && valid,
-          })}
-        >
-          {successFile ? 'Uploaded shapefile' : 'Upload shapefile'}
-        </div>
-      </header>
-
-      {!successFile && (
-        <div className="pt-2">
-          <div
-            {...getRootProps()}
-            className={cx({
-              'relative px-5 py-3 w-full border border-dotted hover:bg-gray-500 cursor-pointer': true,
-              'bg-gray-500': isDragActive,
-              'border-green-800': isDragAccept,
-              'border-red-800': isDragReject,
-            })}
-          >
-
-            <input {...getInputProps()} />
-
-            <p className="text-sm text-gray-300">
-              Drag and drop your
-              {' '}
-              <b>polygon data file</b>
-              {' '}
-              or click here to upload
-            </p>
-
-            <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 3 MB'}</p>
-
-            <Loading
-              visible={loading}
-              className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-              iconClassName="w-10 h-10 text-primary-500"
-            />
-
-          </div>
-
-          <p className="flex items-center space-x-2 text-xs text-gray-300 mt-2.5">
-            <span>Learn more about supported file formats</span>
-            <InfoButton
-              theme="secondary"
-            >
-              <div className="text-sm">
-                <h3 className="font-semibold">List of supported file formats:</h3>
-                <ul className="pl-4 mt-2 space-y-1 list-disc list-outside">
-                  <li>
-                    Zipped: .shp
-                    (zipped shapefiles must include .shp, .shx, .dbf, and .prj files)
-                  </li>
-                </ul>
-              </div>
-            </InfoButton>
-          </p>
-
-        </div>
-      )}
-
-      {successFile && (
+    <div className="mt-3 mb-5">
+      {!!uploadingPlanningArea && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div className="flex items-center w-full py-5 space-x-8 cursor-pointer">
-            <div className="flex items-center space-x-2 ">
-              <label className="px-2.5 py-px bg-blue-500 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
-                <p className="text-sm text-blue-500">{successFile.name}</p>
+          <div className="flex flex-col w-full space-y-6 cursor-pointer">
+            <div className="flex items-center space-x-2">
+              <label className="px-3 py-1 bg-blue-100 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                <p className="text-sm text-primary-500">{successFile.name}</p>
               </label>
               <button
                 aria-label="remove"
                 id="cancel-shapefile-btn"
                 type="button"
-                className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-white border-opacity-20"
-                onClick={() => {
-                  setSuccessFile(null);
-                  input.onChange(null);
-                  resetPlanningArea(form);
-                }}
+                className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-black"
+                onClick={() => onUploadRemove(form)}
               >
                 <Icon
-                  className="w-1.5 h-1.5 text-white group-hover:text-black"
+                  className="w-1.5 h-1.5 text-white group-hover:text-white"
                   icon={CLOSE_SVG}
                 />
               </button>
             </div>
           </div>
         </motion.div>
+      )}
+
+      {!uploadingPlanningArea && (
+        <Uploader
+          caption="Upload shapefile"
+          open={opened}
+          onOpen={() => setOpened(true)}
+          onClose={() => setOpened(false)}
+        >
+          <Form
+            onSubmit={onUploadSubmit}
+            render={({ handleSubmit }) => {
+              return (
+                <form onSubmit={handleSubmit}>
+                  <div className="p-9">
+                    <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
+
+                    {!successFile && (
+                      <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
+                        {(props) => (
+                          <div>
+                            <div className="flex items-center mb-2.5 space-x-3">
+                              <h5 className="text-xs text-gray-400">Supported formats</h5>
+                              <InfoButton
+                                size="s"
+                                theme="secondary"
+                              >
+                                <span className="text-xs">
+                                  {' '}
+                                  <h4 className="font-heading mb-2.5">
+                                    List of supported file formats:
+                                  </h4>
+                                  <ul>
+                                    Zipped: .shp (zipped shapefiles must include
+                                    <br />
+                                    .shp, .shx, .dbf, and .prj files)
+                                  </ul>
+                                </span>
+                              </InfoButton>
+                            </div>
+
+                            <div
+                              {...props}
+                              {...getRootProps()}
+                              className={cx({
+                                'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
+                                'bg-gray-500': isDragActive,
+                                'border-green-800': isDragAccept,
+                                'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
+                              })}
+                            >
+
+                              <input {...getInputProps()} />
+
+                              <p className="text-sm text-center text-gray-500">
+                                Drag and drop your polygon data file
+                                <br />
+                                or
+                                {' '}
+                                <b>click here</b>
+                                {' '}
+                                to upload
+                              </p>
+
+                              <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMb(maxSize)} MB`}</p>
+
+                              <Loading
+                                visible={loading}
+                                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                                iconClassName="w-5 h-5 text-primary-500"
+                              />
+
+                            </div>
+                          </div>
+                        )}
+                      </Field>
+                    )}
+
+                    {successFile && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <div className="flex flex-col w-full space-y-3 cursor-pointer">
+                          <h5 className="text-xs text-black uppercase">Uploaded file:</h5>
+                          <div className="flex items-center space-x-2">
+                            <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                              <p className="text-sm text-black">{successFile.name}</p>
+                            </label>
+                            <button
+                              id="cancel-shapefile-btn"
+                              type="button"
+                              className="flex items-center justify-center w-5 h-5 border border-black rounded-full group hover:bg-black"
+                              onClick={() => {
+                                setSuccessFile(null);
+                              }}
+                            >
+                              <Icon
+                                className="w-1.5 h-1.5 text-black group-hover:text-white"
+                                icon={CLOSE_SVG}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    <div className="flex justify-center mt-16 space-x-6">
+                      <Button
+                        theme="secondary"
+                        size="xl"
+                        onClick={() => setOpened(false)}
+                      >
+                        Cancel
+                      </Button>
+
+                      <Button
+                        theme="primary"
+                        size="xl"
+                        type="submit"
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                </form>
+              );
+            }}
+          />
+        </Uploader>
       )}
     </div>
   );

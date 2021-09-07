@@ -227,20 +227,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                           <Label ref={labelRef} theme="dark" className="mr-3 uppercase">Set the threshold for protected areas</Label>
                           <InfoButton>
                             <div>
-                              <h4 className="font-heading text-lg mb-2.5">What is a threshold?</h4>
+                              <h4 className="font-heading text-lg mb-2.5">Threshold for Protected Areas</h4>
                               <div className="space-y-2">
                                 <p>
-                                  Inside Marxan, planning units are considered as either
-                                  protected
-                                  or not protected.
-                                </p>
-                                <p>
-                                  The threshold value represents a
-                                  percentage of the area
-                                  inside a planning unit. By setting the threshold you decide
-                                  how much of a protected area needs to fall inside a
-                                  planning unit to consider the whole planning unit
-                                  as &quot;protected&quot;.
+                                  Refers to what percentage of a planning
+                                  unit must be covered by a protected area
+                                  to be considered &quot;protected&quot; by Marxan.
                                 </p>
                                 <p>
                                   The following

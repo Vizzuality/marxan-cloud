@@ -102,6 +102,9 @@ export class EventsHandler {
     await this.apiEvents.createIfNotExists({
       topic: job.data.scenarioId,
       kind,
+      data: {
+        reason: job.failedReason,
+      },
       externalId: eventId,
     });
   }
