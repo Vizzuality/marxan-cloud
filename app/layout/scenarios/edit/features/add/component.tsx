@@ -113,6 +113,8 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
 
     const data = new FormData();
     data.append('file', f);
+    data.append('name', `Testing-${Date.now()}`);
+    data.append('type', 'species');
 
     uploadFeaturesShapefileMutation.mutate({ data, id: `${pid}` }, {
       onSuccess: ({ data: { data: g, id: shapefileId } }) => {

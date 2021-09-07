@@ -406,7 +406,7 @@ export function useUploadFeaturesShapefile({
 }: UseUploadFeaturesShapefileProps) {
   const [session] = useSession();
 
-  const uploadScenarioPUShapefile = ({ id, data }: UploadFeaturesShapefileProps) => {
+  const uploadFeatureShapefile = ({ id, data }: UploadFeaturesShapefileProps) => {
     return UPLOADS.request({
       url: `/projects/${id}/features/shapefile`,
       data,
@@ -418,7 +418,7 @@ export function useUploadFeaturesShapefile({
     });
   };
 
-  return useMutation(uploadScenarioPUShapefile, {
+  return useMutation(uploadFeatureShapefile, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
     },

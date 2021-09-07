@@ -35,6 +35,10 @@ If we want to add a custom grid we will need an endpoint similiar to this one. T
 #### 'POST' `​/api​/v1​/scenarios/{sid}/duplicate`
 Same as duplicate project
 
+## Features
+#### 'POST' `​/api​/v1​/projects​/{id}​/features​/shapefile`
+Upload custom features. We need to change a little bit the UI to allow the user to add a name and a tag when you upload a custom feature.
+
 ## Cost surface
 If someone uploads a cost surface, they should be able to download the cost surface uploaded and the template. For doing this we need:
 
