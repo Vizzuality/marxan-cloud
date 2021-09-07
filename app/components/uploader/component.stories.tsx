@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Story } from '@storybook/react/types-6-0';
 
@@ -8,43 +8,21 @@ export default {
   title: 'Components/Uploader',
   component: Uploader,
   parameters: { actions: { argTypesRegex: '^on.*' } },
-  argTypes: {
-    caption: {
-      table: { category: 'UI' },
-    },
-    maxSize: {
-    },
-    multiple: {
-      description: 'If true, it will be possible to upload more than one file',
-    },
-    setSuccessFile: {
-      control: {
-        disable: true,
-      },
-      table: { category: 'Events' },
-    },
-    onDropAccepted: {
-      control: {
-        disable: true,
-      },
-      table: { category: 'Events' },
-    },
-    onDropRejected: {
-      control: {
-        disable: true,
-      },
-      table: { category: 'Events' },
-    },
-  },
+  argTypes: {},
 };
 
 const Template: Story<UploaderProps> = ({ ...args }: UploaderProps) => {
+  const [open, setOpen] = useState(false);
+
   return (
-    <>
-      <Uploader
-        {...args}
-      />
-    </>
+    <Uploader
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      {...args}
+    >
+      <div>You should render a form here</div>
+    </Uploader>
   );
 };
 
