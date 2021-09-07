@@ -219,7 +219,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                 onDropRejected={onDropRejected}
                 successFile={successFile}
                 setSuccessFile={setSuccessFile}
-                uploadFileSubmit={uploadCostSurfaceSubmit}
+                onUploadSubmit={uploadCostSurfaceSubmit}
               />
             )}
             {successFile && (
