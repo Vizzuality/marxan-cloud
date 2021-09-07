@@ -22,6 +22,7 @@ export const runWorkerQueueNameProvider: ValueProvider<string> = {
 export class RunWorker {
   private worker: Worker<JobData, ExecutionResult>;
   private queueEvents: QueueEvents;
+
   constructor(
     queueEventsBuilder: QueueEventsBuilder,
     workerBuilder: WorkerBuilder,
@@ -29,7 +30,13 @@ export class RunWorker {
     private readonly marxanRunner: MarxanSandboxRunnerService,
   ) {
     this.worker = workerBuilder.build<JobData, ExecutionResult>(queueName, {
-      process: (job) => this.run(job),
+      process: async (job) => {
+        try {
+          return await this.run(job);
+        } catch (error) {
+          throw new Error(JSON.stringify(error));
+        }
+      },
     });
     this.queueEvents = queueEventsBuilder.buildQueueEvents(queueName);
     this.queueEvents.on(`progress`, ({ data }: { data: ProgressData }) => {

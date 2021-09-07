@@ -43,9 +43,17 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
                   into smaller spatial units, called planning units.
                 </p>
                 <p>
+                  Planning units are the building blocks of any conservation
+                  or zoning plan. They convert the world into smaller more
+                  manageable pieces that can be treated separately from
+                  one another, similar to a jigsaw puzzle.
+                  Each planning unit contains information about
+                  their corresponding location on Earth.
+                </p>
+                <p>
                   The planning units are central to a
-                  Marxan analysis and
-                  deciding an appropriate shape and size is important.
+                  Marxan analysis and choosing an appropriate
+                  shape and size is important.
                 </p>
               </div>
             </span>
