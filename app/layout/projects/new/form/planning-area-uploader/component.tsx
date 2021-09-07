@@ -15,6 +15,7 @@ import { useUploadProjectPA } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
+import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
@@ -184,7 +185,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                     <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
 
                     {!successFile && (
-                      <Field name="dropFile">
+                      <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
                         {(props) => (
                           <div>
                             <div className="flex items-center mb-2.5 space-x-3">
@@ -214,7 +215,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                                 'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
                                 'bg-gray-500': isDragActive,
                                 'border-green-800': isDragAccept,
-                                'border-red-800': isDragReject,
+                                'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
                               })}
                             >
 
