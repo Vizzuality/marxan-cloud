@@ -23,6 +23,7 @@ import { UsersProjectsApiEntity } from './control-level/users-projects.api.entit
 import { ProjectsListingController } from './projects-listing.controller';
 import { ProjectDetailsController } from './project-details.controller';
 import { ShapefilesModule } from '@marxan/shapefile-converter';
+import { PlanningUnitGridModule } from './planning-unit-grid';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ShapefilesModule } from '@marxan/shapefile-converter';
     ProtectedAreasModule,
     ApiEventsModule,
     ShapefilesModule,
+    PlanningUnitGridModule,
   ],
   providers: [
     ProjectsCrudService,
