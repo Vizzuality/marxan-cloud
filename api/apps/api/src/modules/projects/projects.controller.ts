@@ -22,6 +22,7 @@ import {
 } from './project.api.entity';
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiOkResponse,
@@ -53,10 +54,12 @@ import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
+import { ProjectGridRequestDto } from './dto/project-grid-request.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { isFeatureCollection } from '@marxan/utils';
+import { plainToClass } from 'class-transformer';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -146,6 +149,29 @@ export class ProjectsController {
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
     return await this.projectsService.remove(id);
+  }
+
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @ApiOperation({
+    description: 'Upload shapefile for project-specific protected areas',
+  })
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiCreatedResponse({ type: ProjectGridRequestDto })
+  @Post(`:id/grid`)
+  async setProjectGrid(
+    @Param('id') projectId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const result = await this.projectsService.setGrid(projectId, file);
+    if (isLeft(result)) {
+      throw new InternalServerErrorException(result.left);
+    }
+    return plainToClass<ProjectGridRequestDto, ProjectGridRequestDto>(
+      ProjectGridRequestDto,
+      {
+        id: result.right.value,
+      },
+    );
   }
 
   @ApiOperation({
