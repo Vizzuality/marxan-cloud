@@ -169,6 +169,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/shapefile-converter/tsconfig.lib.json"
       }
+    },
+    "planning-units-grid": {
+      "type": "library",
+      "root": "libs/planning-units-grid",
+      "entryFile": "index",
+      "sourceRoot": "libs/planning-units-grid/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/planning-units-grid/tsconfig.lib.json"
+      }
     }
   }
 }

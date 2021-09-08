@@ -56,6 +56,7 @@ import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ShapefileService } from '@marxan/shapefile-converter';
+import { isFeatureCollection } from '@marxan/utils';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -232,14 +233,16 @@ export class ProjectsController {
     @UploadedFile() shapefile: Express.Multer.File,
     @Body() body: UploadShapefileDTO,
   ): Promise<ShapefileUploadResponse> {
-    const shapefileData = await this.shapefileService.transformToGeoJson(
-      shapefile,
-    );
+    const { data } = await this.shapefileService.transformToGeoJson(shapefile);
+
+    if (!isFeatureCollection(data)) {
+      throw new BadRequestException(`Only FeatureCollection is supported.`);
+    }
 
     await this.geoFeatureService.createFeaturesForShapefile(
       projectId,
       body,
-      shapefileData.data.features,
+      data.features,
     );
 
     return { success: true };
