@@ -44,6 +44,7 @@ export const getFixtures = async () => {
         data: plainToClass<JobInput, JobInput>(JobInput, {
           projectId,
           shapefile: input,
+          requestId: v4(),
         }),
       } as unknown) as Job<JobInput, JobOutput>);
     },
