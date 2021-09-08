@@ -39,6 +39,8 @@
     "@marxan/iucn/(.*)": "<rootDir>/../../libs/iucn/src/$1",
     "@marxan/iucn": "<rootDir>/../../libs/iucn/src",
     "@marxan/shapefile-converter/(.*)": "<rootDir>/../../libs/shapefile-converter/src/$1",
-    "@marxan/shapefile-converter": "<rootDir>/../../libs/shapefile-converter/src"
+    "@marxan/shapefile-converter": "<rootDir>/../../libs/shapefile-converter/src",
+    "@marxan/planning-units-grid/(.*)": "<rootDir>/../../libs/planning-units-grid/src/$1",
+    "@marxan/planning-units-grid": "<rootDir>/../../libs/planning-units-grid/src"
   }
 }
