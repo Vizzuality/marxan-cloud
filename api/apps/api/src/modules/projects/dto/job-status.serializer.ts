@@ -1,19 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { Scenario } from '../job-status';
+import { ProjectWithScenarios } from '../job-status';
 import { ProjectJobsStatusDto } from './project-jobs-status.dto';
 
 @Injectable()
 export class JobStatusSerializer {
   serialize(
     projectId: string,
-    scenarioWithJobs: Scenario[],
+    scenarioWithJobs: ProjectWithScenarios,
   ): ProjectJobsStatusDto {
     return {
       data: {
         type: 'project-jobs',
         id: projectId,
         attributes: {
-          scenarios: scenarioWithJobs.map((scenario) => ({
+          jobs: scenarioWithJobs.project.jobs,
+          scenarios: scenarioWithJobs.scenarios.map((scenario) => ({
             id: scenario.scenarioId,
             jobs: scenario.jobs,
           })),

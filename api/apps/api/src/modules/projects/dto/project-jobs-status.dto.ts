@@ -50,6 +50,12 @@ export class ProjectStatus {
     type: ScenarioStatus,
   })
   scenarios!: ScenarioStatus[];
+
+  @ApiProperty({
+    isArray: true,
+    type: ScenarioJobStatus,
+  })
+  jobs!: ScenarioJobStatus[];
 }
 
 export class JSONAPIProjectJobStatusData {

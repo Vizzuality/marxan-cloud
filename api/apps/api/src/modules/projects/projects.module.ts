@@ -18,6 +18,7 @@ import { ProjectSerializer } from './dto/project.serializer';
 import { JobStatusSerializer } from './dto/job-status.serializer';
 import { JobStatusService } from './job-status/job-status.service';
 import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
+import { ProjectJobStatus } from './job-status/project-status.view.api.entity';
 import { PlanningAreasModule } from './planning-areas';
 import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
 import { ProjectsListingController } from './projects-listing.controller';
@@ -35,6 +36,7 @@ import { PlanningUnitGridModule } from './planning-unit-grid';
     TypeOrmModule.forFeature([
       Project,
       ScenarioJobStatus,
+      ProjectJobStatus,
       UsersProjectsApiEntity,
     ]),
     UsersModule,
