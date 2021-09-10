@@ -64,7 +64,7 @@ export const getFixtures = async () => {
                      from (
                        select the_geom
                        from planning_units_geom
-                       where type = 'irregular'
+                       where type = 'from_shapefile'
                          and project_id = $1
                      ) as t(geom)
           `,
