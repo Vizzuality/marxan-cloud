@@ -32,6 +32,12 @@ export const createWorld = async (app: INestApplication) => {
     projectId,
     scenarioIdWithPendingJob: () => scenarioIdWithPendingJob,
     scenarioIdWithCostSurfaceFinished: () => scenarioIdWithCostSurfaceFinished,
+    GivenGridSettingInProgress: async () =>
+      GivenApiEvent(
+        app,
+        projectId,
+        API_EVENT_KINDS.project__grid__submitted__v1__alpha,
+      ),
     GivenScenarioPlanningInclusionInProgress: async () => {
       const scenario = await GivenScenarioExists(app, projectId, token);
       scenarios.push(scenario.id);
