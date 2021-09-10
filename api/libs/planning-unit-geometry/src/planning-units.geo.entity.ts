@@ -7,6 +7,7 @@ export enum ShapeType {
   Square = 'square',
   Hexagon = 'hexagon',
   Irregular = 'irregular',
+  FromShapefile = 'from_shapefile',
 }
 
 @Entity('planning_units_geom')

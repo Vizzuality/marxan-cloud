@@ -48,15 +48,15 @@ export class PlanningUnitsGridProcessor
         SELECT ST_SetSRID(
                  ST_GeomFromGeoJSON(features ->> 'geometry'),
                  4326)::geometry,
-               $2,
+               $2::shape_type,
                $3
         FROM (
                SELECT json_array_elements($1::json -> 'features') AS features
              ) AS f
-        ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO UPDATE SET type = 'irregular'
+        ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO UPDATE SET type = 'from_shapefile'::shape_type
         RETURNING "id"
       `,
-      [result.right, ShapeType.Irregular, projectId],
+      [result.right, ShapeType.FromShapefile, projectId],
     );
     const output = plainToClass<JobOutput, JobOutput>(JobOutput, {
       geometryIds: puGeometriesIds.map((row) => row.id),
