@@ -1,4 +1,5 @@
 export interface ModalProps {
+  id?: string;
   /**
    * Title used by screen readers
    */

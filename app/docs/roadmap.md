@@ -91,7 +91,7 @@ It should return a .zip file if the user has already uploaded one. Otherwise nul
 Migrate the current endpoint that is returning the min and max to this one. Just a naming change
 
 
-## Adjust plaanning units
+## Adjust planning units
 Everything is don here but, I ned to put a timeout of 500 milliseconds due to the lack of tracking async jobs. It would be a good point to start working with the async jobs ids.
 
 
