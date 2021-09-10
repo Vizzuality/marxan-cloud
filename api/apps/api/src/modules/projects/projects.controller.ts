@@ -183,10 +183,16 @@ export class ProjectsController {
     @Param('id') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectJobsStatusDto> {
-    const scenarios = await this.projectsService.getJobStatusFor(projectId, {
-      authenticatedUser: req.user,
-    });
-    return this.jobsStatusSerizalizer.serialize(projectId, scenarios);
+    const projectWithScenarios = await this.projectsService.getJobStatusFor(
+      projectId,
+      {
+        authenticatedUser: req.user,
+      },
+    );
+    return this.jobsStatusSerizalizer.serialize(
+      projectId,
+      projectWithScenarios,
+    );
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
