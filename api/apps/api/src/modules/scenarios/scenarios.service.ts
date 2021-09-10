@@ -97,6 +97,7 @@ export class ScenariosService {
     await this.planningUnitsLinkerService.link(scenario);
     await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
       scenario,
+      input,
     );
     return scenario;
   }
@@ -110,6 +111,7 @@ export class ScenariosService {
     );
     await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
       scenario,
+      input,
     );
     return scenario;
   }

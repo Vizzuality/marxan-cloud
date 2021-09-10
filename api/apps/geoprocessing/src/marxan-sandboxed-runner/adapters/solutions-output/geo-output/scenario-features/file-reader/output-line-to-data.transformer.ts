@@ -17,7 +17,7 @@ export class OutputLineToDataTransformer extends Transform<
     });
   }
 
-  _transform(
+  async _transform(
     chunk: string,
     encoding: BufferEncoding,
     callback: TransformCallback,
@@ -50,7 +50,7 @@ export class OutputLineToDataTransformer extends Transform<
       runId: +runId,
     });
 
-    const errors = validateSync(data);
+    const errors = await validateSync(data);
     if (errors.length > 0) {
       return callback(
         new Error(

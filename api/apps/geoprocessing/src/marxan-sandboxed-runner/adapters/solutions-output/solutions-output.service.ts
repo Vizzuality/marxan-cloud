@@ -60,8 +60,7 @@ export class SolutionsOutputService implements Cancellable {
     const runsSummary = (
       await promises.readFile(runDirectories.output + `/output_sum.csv`)
     ).toString();
-
-    return this.resultParserService.parse(runsSummary);
+    return await this.resultParserService.parse(runsSummary);
   }
 
   async dumpFailure(

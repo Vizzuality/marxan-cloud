@@ -21,7 +21,12 @@ export class WorkerBuilder implements OnModuleDestroy {
     this._worker = new Worker<Input, Output>(
       queueName,
       (job: Job) => processor.process(job),
-      this.config.redis,
+      {
+        ...this.config.redis,
+        lockDuration: 60000,
+        lockRenewTime: 10000,
+        concurrency: 10,
+      },
     );
     return this._worker;
   }

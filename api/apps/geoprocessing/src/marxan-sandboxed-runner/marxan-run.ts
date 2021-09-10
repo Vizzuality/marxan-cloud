@@ -37,10 +37,13 @@ export class MarxanRun extends MarxanRunEmitter implements Cancellable {
     this.#process = spawn(workspace.marxanBinaryPath, {
       cwd: workspace.workingDirectory,
     });
+
     assertDefined(this.#process);
+
     this.#process.stderr.on('data', (chunk) => {
       this.#stdError.push(chunk.toString());
     });
+
     const progressWatcher = new Progress();
     this.#process.stdout.on('data', (chunk) => {
       const currentProgress = progressWatcher.read(chunk);
