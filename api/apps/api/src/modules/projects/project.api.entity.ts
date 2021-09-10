@@ -27,7 +27,7 @@ export const projectResource: BaseServiceResource = {
 export enum PlanningUnitGridShape {
   square = 'square',
   hexagon = 'hexagon',
-  fromShapefile = 'irregular',
+  fromShapefile = 'from_shapefile',
 }
 
 @Entity('projects')
