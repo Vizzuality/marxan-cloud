@@ -10,7 +10,7 @@ upload.
 * once set, shape cannot be changed or removed from project
 * only `FeatureCollection` with `Polygon` features can be uploaded
 * custom planning unit grid geometry belongs to given project
-* custom planning unit grid geometry has a type of `irregular`
+* custom planning unit grid geometry has a type of `from_shapefile`
 * project with custom planning unit grid geometry cannot use other shape types
 * uploaded shapefile will be processed asynchronously
 * until processed, any action on project/underlying scenarios shouldn't be
