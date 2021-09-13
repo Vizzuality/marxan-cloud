@@ -262,6 +262,17 @@ export class ProjectsCrudService extends AppBaseService<
       entity.planningAreaId = idAndName.planningAreaId;
       entity.planningAreaName = idAndName.planningAreaName;
     }
+
+    const customProtectedAreas = await this.protectedAreas.find({
+      where: {
+        projectId: entity.id,
+      },
+    });
+    entity.customProtectedAreas = customProtectedAreas.map((area) => ({
+      name: area.fullName ?? undefined,
+      id: area.id,
+    }));
+
     return entity;
   }
 
