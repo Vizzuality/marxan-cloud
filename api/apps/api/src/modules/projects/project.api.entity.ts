@@ -161,6 +161,11 @@ export class Project extends TimeUserEntityMetadata {
     description: "Display name of Country / Gid1 / Gid2 of project's area",
   })
   planningAreaName?: string;
+
+  @ApiPropertyOptional({
+    isArray: true,
+  })
+  customProtectedAreas?: string[];
 }
 
 export class JSONAPIProjectData {

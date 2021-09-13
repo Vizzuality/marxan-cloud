@@ -1,8 +1,5 @@
 import { Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-/**
- * duplicated in API - except the relations
- */
 export abstract class TimeUserEntityMetadata {
   @CreateDateColumn({
     name: 'created_at',

@@ -178,6 +178,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/planning-units-grid/tsconfig.lib.json"
       }
+    },
+    "protected-areas": {
+      "type": "library",
+      "root": "libs/protected-areas",
+      "entryFile": "index",
+      "sourceRoot": "libs/protected-areas/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/protected-areas/tsconfig.lib.json"
+      }
     }
   }
 }

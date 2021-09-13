@@ -1,12 +1,9 @@
-/**
- * @todo We are replicating the same code that we have in the api. If we update something here we should also replicate it in the api side.
- */
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Check, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { MultiPolygon } from 'geojson';
 import { defaultSrid } from '@marxan/utils/geo';
 import { IUCNCategory } from '@marxan/iucn';
-import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
+import { TimeUserEntityMetadata } from '@marxan/utils';
 
 @Entity('wdpa')
 export class ProtectedArea extends TimeUserEntityMetadata {
@@ -24,7 +21,7 @@ export class ProtectedArea extends TimeUserEntityMetadata {
   /**
    * geometry column.
    */
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Index(`wdpa_geom_idx`, {
     spatial: true,
   })
@@ -38,6 +35,7 @@ export class ProtectedArea extends TimeUserEntityMetadata {
   })
   theGeom?: MultiPolygon | null;
 
+  @ApiPropertyOptional()
   @Column({
     type: 'float8',
     name: 'wdpaid',
@@ -45,6 +43,7 @@ export class ProtectedArea extends TimeUserEntityMetadata {
   })
   wdpaId?: number | null;
 
+  @ApiPropertyOptional()
   @Column({
     name: 'full_name',
     type: 'varchar',
@@ -52,6 +51,7 @@ export class ProtectedArea extends TimeUserEntityMetadata {
   })
   fullName?: string | null;
 
+  @ApiPropertyOptional()
   @Column({
     type: 'varchar',
     name: 'iucn_cat',
@@ -59,6 +59,7 @@ export class ProtectedArea extends TimeUserEntityMetadata {
   })
   iucnCategory?: IUCNCategory | null;
 
+  @ApiPropertyOptional()
   @Column({
     type: 'float8',
     name: 'shape_leng',
@@ -66,6 +67,9 @@ export class ProtectedArea extends TimeUserEntityMetadata {
   })
   shapeLength?: number | null;
 
+  @ApiPropertyOptional({
+    description: `Total area of the protected area's shape.`,
+  })
   @Column({
     type: 'float8',
     name: 'shape_area',
@@ -73,6 +77,7 @@ export class ProtectedArea extends TimeUserEntityMetadata {
   })
   shapeArea?: number | null;
 
+  @ApiPropertyOptional()
   @Column({
     type: 'text',
     name: 'desig',
@@ -85,6 +90,7 @@ export class ProtectedArea extends TimeUserEntityMetadata {
    *
    * This references the admin_regions.gid_0 column.
    */
+  @ApiPropertyOptional()
   @Column({
     type: 'character varying',
     name: 'iso3',

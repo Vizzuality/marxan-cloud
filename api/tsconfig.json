@@ -120,6 +120,12 @@
       ],
       "@marxan/planning-units-grid/*": [
         "libs/planning-units-grid/src/*"
+      ],
+      "@marxan/protected-areas": [
+        "libs/protected-areas/src"
+      ],
+      "@marxan/protected-areas/*": [
+        "libs/protected-areas/src/*"
       ]
     }
   },
