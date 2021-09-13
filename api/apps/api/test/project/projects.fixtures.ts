@@ -85,6 +85,7 @@ export const getFixtures = async () => {
             countryId: null,
             description: null,
             createdAt: expect.any(String),
+            customProtectedAreas: [],
             lastModifiedAt: expect.any(String),
             name: expect.any(String),
             planningUnitAreakm2: expect.any(Number),
