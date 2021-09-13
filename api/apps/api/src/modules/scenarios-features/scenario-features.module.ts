@@ -22,6 +22,7 @@ import { ScenarioFeaturesGapDataService } from './scenario-features-gap-data.ser
 import { ScenarioFeaturesOutputGapDataService } from './scenario-features-output-gap-data.service';
 import { MoveDataFromPreparationSaga } from './move-data-from-preparation.saga';
 import { MoveDataFromPreparationHandler } from './move-data-from-preparation.handler';
+import { IntersectWithPuModule } from './intersect-with-pu/intersect-with-pu.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { MoveDataFromPreparationHandler } from './move-data-from-preparation.han
     ),
     ProjectsModule,
     ApiEventsModule,
+    IntersectWithPuModule,
   ],
   providers: [
     ScenarioFeaturesService,

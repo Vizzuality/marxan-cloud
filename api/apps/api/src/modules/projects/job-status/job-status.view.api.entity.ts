@@ -26,9 +26,10 @@ import { ValuesType } from 'utility-types';
       FROM
       'scenario.#"[^.]*#"%' FOR '#'
       ) AS job_type
-    ORDER BY job_type,
-             api_events.topic,
-             api_events.timestamp DESC;
+    ORDER BY
+      job_type,
+      api_events.topic,
+      api_events.timestamp DESC;
   `,
 })
 export class ScenarioJobStatus {
@@ -128,5 +129,11 @@ const eventToJobStatusMapping: Record<ValuesType<ScenarioEvents>, JobStatus> = {
   [API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__failed__v1__alpha1]:
     JobStatus.failure,
   [API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__finished__v1__alpha1]:
+    JobStatus.done,
+  [API_EVENT_KINDS.scenario__featuresWithPuIntersection__submitted__v1__alpha1]:
+    JobStatus.running,
+  [API_EVENT_KINDS.scenario__featuresWithPuIntersection__failed__v1__alpha1]:
+    JobStatus.failure,
+  [API_EVENT_KINDS.scenario__featuresWithPuIntersection__finished__v1__alpha1]:
     JobStatus.done,
 };
