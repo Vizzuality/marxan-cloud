@@ -25,6 +25,8 @@ import { ProjectsListingController } from './projects-listing.controller';
 import { ProjectDetailsController } from './project-details.controller';
 import { ShapefilesModule } from '@marxan/shapefile-converter';
 import { PlanningUnitGridModule } from './planning-unit-grid';
+import { ProtectedArea } from '@marxan/protected-areas';
+import { apiConnections } from '@marxan-api/ormconfig';
 
 @Module({
   imports: [
@@ -39,6 +41,10 @@ import { PlanningUnitGridModule } from './planning-unit-grid';
       ProjectJobStatus,
       UsersProjectsApiEntity,
     ]),
+    TypeOrmModule.forFeature(
+      [ProtectedArea],
+      apiConnections.geoprocessingDB.name,
+    ),
     UsersModule,
     PlanningUnitsModule,
     ProtectedAreasModule,

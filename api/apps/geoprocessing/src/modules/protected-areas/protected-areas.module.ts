@@ -5,7 +5,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ProtectedAreasController } from './protected-areas.controller';
 import { ProtectedAreasService } from './protected-areas.service';
 import { TileModule } from '@marxan-geoprocessing/modules/tile/tile.module';
-import { ProtectedArea } from '@marxan-geoprocessing/modules/protected-areas/protected-areas.geo.entity';
+import { ProtectedArea } from '@marxan/protected-areas';
 import { ProtectedAreaWorkerModule } from './worker/protected-area-worker.module';
 
 @Module({

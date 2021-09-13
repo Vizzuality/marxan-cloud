@@ -25,6 +25,8 @@ import {
 import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/users/role.api.entity';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { ProtectedArea } from '@marxan/protected-areas';
 
 const projectFilterKeyNames = [
   'name',
@@ -67,6 +69,8 @@ export class ProjectsCrudService extends AppBaseService<
     private readonly planningAreasService: PlanningAreasService,
     @InjectRepository(UsersProjectsApiEntity)
     private readonly userProjects: Repository<UsersProjectsApiEntity>,
+    @InjectRepository(ProtectedArea, DbConnections.geoprocessingDB)
+    private readonly protectedAreas: Repository<ProtectedArea>,
   ) {
     super(repository, 'project', 'projects', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -90,6 +94,7 @@ export class ProjectsCrudService extends AppBaseService<
         'planningAreaId',
         'planningAreaName',
         'bbox',
+        'customProtectedAreas',
       ],
       keyForAttribute: 'camelCase',
       users: {

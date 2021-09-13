@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { Job } from 'bullmq';
 
-import { ProtectedAreasJobInput } from '../../../../src/modules/protected-areas/worker/worker-input';
-import { ProtectedArea } from '../../../../src/modules/protected-areas/protected-areas.geo.entity';
+import { ProtectedAreasJobInput } from '@marxan-geoprocessing/modules/protected-areas/worker/worker-input';
+import { ProtectedArea } from '@marxan/protected-areas';
 
 export const createWorld = (
   app: INestApplication,

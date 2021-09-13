@@ -2,13 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { Job } from 'bullmq';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { GeoJSON } from 'geojson';
 
 import { ShapefileService } from '@marxan/shapefile-converter';
 
 import { WorkerProcessor } from '../../worker';
 import { ProtectedAreasJobInput } from './worker-input';
-import { ProtectedArea } from '../protected-areas.geo.entity';
+import { ProtectedArea } from '@marxan/protected-areas';
 
 @Injectable()
 export class ProtectedAreaProcessor

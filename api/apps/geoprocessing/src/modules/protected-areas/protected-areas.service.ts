@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-import { ProtectedArea } from '@marxan-geoprocessing/modules/protected-areas/protected-areas.geo.entity';
+import { ProtectedArea } from '@marxan/protected-areas';
 import { BBox } from 'geojson';
 import { Transform } from 'class-transformer';
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
