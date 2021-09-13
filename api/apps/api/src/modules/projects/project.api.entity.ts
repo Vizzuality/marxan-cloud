@@ -14,6 +14,7 @@ import { Organization } from '../organizations/organization.api.entity';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { BBox } from 'geojson';
+import { ProtectedAreaDto } from '@marxan-api/modules/projects/dto/protected-area.dto';
 
 export const projectResource: BaseServiceResource = {
   className: 'Project',
@@ -126,7 +127,10 @@ export class Project extends TimeUserEntityMetadata {
   /**
    * Bbox of the custom extent
    */
-  @ApiProperty()
+  @ApiProperty({
+    isArray: true,
+    type: Number,
+  })
   @Column('jsonb', { name: 'bbox' })
   bbox!: BBox;
 
@@ -164,18 +168,23 @@ export class Project extends TimeUserEntityMetadata {
 
   @ApiPropertyOptional({
     isArray: true,
+    type: ProtectedAreaDto,
   })
-  customProtectedAreas?: string[];
+  customProtectedAreas?: ProtectedAreaDto[];
 }
 
 export class JSONAPIProjectData {
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+  })
   type = 'projects';
 
   @ApiProperty()
   id!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Project,
+  })
   attributes!: Project;
 
   @ApiPropertyOptional()
@@ -183,7 +192,10 @@ export class JSONAPIProjectData {
 }
 
 export class ProjectResultPlural {
-  @ApiProperty()
+  @ApiProperty({
+    isArray: true,
+    type: JSONAPIProjectData,
+  })
   data!: JSONAPIProjectData[];
 }
 
