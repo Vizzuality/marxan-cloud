@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import {
+  LockStatus,
+  ScenariosPlanningUnitGeoEntity,
+} from '@marxan/scenarios-planning-unit';
 
 @Injectable()
 export class ScenarioPlanningUnitsService {
@@ -13,6 +16,8 @@ export class ScenarioPlanningUnitsService {
       DbConnections.geoprocessingDB,
     )
     private readonly puRepo: Repository<ScenariosPlanningUnitGeoEntity>,
+    @InjectEntityManager(DbConnections.geoprocessingDB)
+    private readonly entityManager: EntityManager,
   ) {}
 
   async get(scenarioId: string): Promise<ScenariosPlanningUnitGeoEntity[]> {
@@ -20,6 +25,32 @@ export class ScenarioPlanningUnitsService {
       where: {
         scenarioId,
       },
+    });
+  }
+
+  async resetLockStatus(scenarioId: string): Promise<void> {
+    return await this.entityManager.transaction(async (manager) => {
+      await manager.update(
+        ScenariosPlanningUnitGeoEntity,
+        {
+          scenarioId,
+          protectedByDefault: false,
+        },
+        {
+          lockStatus: LockStatus.Unstated,
+        },
+      );
+
+      await manager.update(
+        ScenariosPlanningUnitGeoEntity,
+        {
+          scenarioId,
+          protectedByDefault: true,
+        },
+        {
+          lockStatus: LockStatus.LockedIn,
+        },
+      );
     });
   }
 }
