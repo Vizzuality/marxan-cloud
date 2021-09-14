@@ -153,7 +153,7 @@ export class ProjectsController {
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
-    description: 'Upload shapefile for project-specific protected areas',
+    description: 'Upload shapefile for project-specific planning unit grid',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @ApiCreatedResponse({ type: ProjectGridRequestDto })
