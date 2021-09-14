@@ -363,4 +363,9 @@ export class ScenariosService {
   getCostRange(scenarioId: string): Promise<CostRange> {
     return this.costService.getRange(scenarioId);
   }
+
+  async resetLockStatus(scenarioId: string) {
+    await this.assertScenario(scenarioId);
+    await this.planningUnitsService.resetLockStatus(scenarioId);
+  }
 }

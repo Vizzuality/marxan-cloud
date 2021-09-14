@@ -333,6 +333,15 @@ export class ScenariosController {
     return;
   }
 
+  @Delete(`:id/planning-units`)
+  @ApiOkResponse()
+  async resetPlanningUnitsLockStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    await this.service.resetLockStatus(id);
+    return;
+  }
+
   @Get(':id/planning-units')
   @ApiOkResponse({ type: ScenarioPlanningUnitDto, isArray: true })
   async getPlanningUnits(
