@@ -1,8 +1,5 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import {
-  TileService,
-  TileRequest,
-} from '@marxan-geoprocessing/modules/tile/tile.service';
+import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { ApiProperty } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,6 +16,7 @@ import { Transform } from 'class-transformer';
 import { BBox } from 'geojson';
 import { AdminArea } from '@marxan/admin-regions';
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
+import { TileRequest } from '@marxan/tiles';
 
 export class TileSpecification extends TileRequest {
   @ApiProperty()
@@ -47,6 +45,7 @@ export class AdminAreasFilters {
 @Injectable()
 export class AdminAreasService {
   private readonly logger: Logger = new Logger(AdminAreasService.name);
+
   constructor(
     @InjectRepository(AdminArea)
     private readonly adminAreasRepository: Repository<AdminArea>,

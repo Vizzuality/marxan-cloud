@@ -187,6 +187,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/protected-areas/tsconfig.lib.json"
       }
+    },
+    "tiles": {
+      "type": "library",
+      "root": "libs/tiles",
+      "entryFile": "index",
+      "sourceRoot": "libs/tiles/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/tiles/tsconfig.lib.json"
+      }
     }
   }
 }
