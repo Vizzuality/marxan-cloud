@@ -1,15 +1,17 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { VectorTile } from '@mapbox/vector-tile';
-import Protobuf from 'pbf';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const VectorTile = require('@mapbox/vector-tile').VectorTile;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Protobuf = require('pbf');
+
 import { GeoJSON } from 'geojson';
 
-export const toVectorTile = (
+export const decodeMvt = (
   buffer: Buffer,
 ): {
   layers: Record<
     string,
     {
+      _features: unknown[];
       feature: (
         index: number,
       ) => {

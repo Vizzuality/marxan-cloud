@@ -1,15 +1,12 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
-import {
-  TileService,
-  TileRequest,
-} from '@marxan-geoprocessing/modules/tile/tile.service';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { IsString, IsArray, IsIn, IsOptional } from 'class-validator';
+import { IsArray, IsIn, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
-import { string } from 'fp-ts';
+import { TileRequest } from '@marxan/tiles';
 
 interface SelectionsProperties {
   attributes: string;
@@ -18,11 +15,12 @@ interface SelectionsProperties {
   alias?: string;
   condition?: string;
 }
+
 interface IncludeSelections {
   [key: string]: SelectionsProperties;
 }
 
-let includeSelections: IncludeSelections = {
+const includeSelections: IncludeSelections = {
   protection: {
     attributes: ', "percentageProtected"',
     select:
@@ -64,13 +62,16 @@ export class ScenariosPUFilters {
   @Transform((value: string) => value.split(','))
   include?: Array<string>;
 }
+
 export class ScenariosTileRequest extends TileRequest {
   @IsString()
   id!: string;
 }
+
 @Injectable()
 export class ScenariosService {
   private readonly logger: Logger = new Logger(ScenariosService.name);
+
   constructor(
     @InjectRepository(ScenariosPuPaDataGeo)
     private readonly ScenariosPlanningUnitGeoEntityRepository: Repository<ScenariosPuPaDataGeo>,
@@ -103,7 +104,11 @@ export class ScenariosService {
      * @todo: provide features id array
      * @todo: provide results/output data
      */
-    const sql = this.selectJoins(id, z,x,y,
+    const sql = this.selectJoins(
+      id,
+      z,
+      x,
+      y,
       this.ScenariosPlanningUnitGeoEntityRepository.createQueryBuilder('test')
         .addSelect('plan.the_geom')
         .leftJoin('planning_units_geom', 'plan', `test.pu_geom_id = plan.id`)
@@ -121,6 +126,7 @@ export class ScenariosService {
       attributes,
     });
   }
+
   /**
    * @description this will control the logic to properly build the includes.
    * @param qB
@@ -140,7 +146,7 @@ export class ScenariosService {
         if (includeSelections[element].select) {
           qB.addSelect(includeSelections[element].select!);
         }
-        if (element == 'features'){
+        if (element == 'features') {
           includeSelections.features.table = `(select pu.scenario_id,
             pu.id AS scenario_pu_id,
             string_agg(DISTINCT species.feature_id::text, ','::text) AS feature_list from (SELECT sfd.scenario_id,

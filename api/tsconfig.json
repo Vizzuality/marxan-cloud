@@ -126,6 +126,12 @@
       ],
       "@marxan/protected-areas/*": [
         "libs/protected-areas/src/*"
+      ],
+      "@marxan/tiles": [
+        "libs/tiles/src"
+      ],
+      "@marxan/tiles/*": [
+        "libs/tiles/src/*"
       ]
     }
   },
