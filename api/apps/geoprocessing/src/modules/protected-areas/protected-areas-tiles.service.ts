@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
+
 import { ProtectedAreaTileRequest } from './protected-area-tile-request';
 import { ProtectedArea } from './protected-areas.geo.entity';
 
@@ -25,9 +26,9 @@ export class ProtectedAreasTilesService {
   }
 
   private async getTiles({
+    z,
     x,
     y,
-    z,
     protectedAreaId,
     projectId,
     bbox,
@@ -43,11 +44,12 @@ export class ProtectedAreasTilesService {
       .select(`ST_AsMVT(tile.*, 'layer0', ${extent}, 'mvt_geom')`, 'mvt')
       .from((subQuery) => {
         subQuery.select(
-          `${attributes}, ST_AsMVTGeom(ST_Transform(${this.tileService.geometrySimplification(
-            z,
-            `the_geom`,
-          )}, 3857),
-            ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom`,
+          `${attributes}, ST_AsMVTGeom(
+          ST_Transform(the_geom,3857),
+          ST_TileEnvelope(${z}, ${x}, ${y}),
+          ${extent},
+          ${buffer},
+          true) AS mvt_geom`,
         );
         subQuery
           .from(table, 'data')
@@ -56,7 +58,6 @@ export class ProtectedAreasTilesService {
             { z, x, y },
           );
 
-        console.log(`adding where to subquery?`, projectId);
         if (projectId) {
           subQuery.andWhere(
             new Brackets((orBuilder) =>
@@ -84,10 +85,8 @@ export class ProtectedAreasTilesService {
           subQuery.andWhere(`id = :protectedAreaId`, { protectedAreaId });
         }
 
-        console.log(subQuery.getQueryAndParameters());
-
         return subQuery;
       }, 'tile');
-    return (await query.getRawMany())[0];
+    return await query.getRawOne();
   }
 }

@@ -70,6 +70,8 @@
     "@marxan/planning-units-grid/(.*)": "<rootDir>/../../../libs/planning-units-grid/src/$1",
     "@marxan/planning-units-grid": "<rootDir>/../../../libs/planning-units-grid/src",
     "@marxan/protected-areas/(.*)": "<rootDir>/../../../libs/protected-areas/src/$1",
-    "@marxan/protected-areas": "<rootDir>/../../../libs/protected-areas/src"
+    "@marxan/protected-areas": "<rootDir>/../../../libs/protected-areas/src",
+    "@marxan/tiles/(.*)": "<rootDir>/../../../libs/tiles/src/$1",
+    "@marxan/tiles": "<rootDir>/../../../libs/tiles/src"
   }
 }

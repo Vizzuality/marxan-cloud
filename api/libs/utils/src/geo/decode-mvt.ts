@@ -17,7 +17,7 @@ export const decodeMvt = (
       ) => {
         properties: Record<string, unknown>;
         extent: number;
-        toGeoJSON: () => GeoJSON;
+        toGeoJSON: (x: number, y: number, z: number) => GeoJSON;
         bbox: () => [number, number, number, number];
         loadGeometry: () => Array<Array<{ x: number; y: number }>>; // actually
         // Point class of point-geometry from mapbox

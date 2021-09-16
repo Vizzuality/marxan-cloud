@@ -4,6 +4,7 @@ import {
   ApiOkResponse,
   ApiParam,
   ApiQuery,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 export const TilesOpenApi = () =>
@@ -46,6 +47,7 @@ export const TilesOpenApi = () =>
         type: String,
       }),
       ApiBadRequestResponse(),
+      ApiUnauthorizedResponse(),
       Header('Content-Type', 'application/x-protobuf'),
       Header('Content-Disposition', 'attachment'),
       Header('Access-Control-Allow-Origin', '*'),
