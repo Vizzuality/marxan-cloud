@@ -70,9 +70,8 @@ export const getFixtures = async () => {
         (feature) => feature.properties.full_name === customPa.name,
       );
 
-      // TODO: fixme: original mvt creation produces multiplied layers
-      expect(customFeature.length).toBeGreaterThanOrEqual(1);
-      // expect(features.length).toEqual(10);
+      expect(customFeature.length).toEqual(1);
+      expect(features.length).toEqual(7);
 
       /**
        * TODO maybe:

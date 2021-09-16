@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, getConnection } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 
@@ -38,7 +38,7 @@ export class ProtectedAreasTilesService {
     const inputProjection = 4326;
     const attributes = 'full_name, status, wdpaid, iucn_cat';
     const table = 'wdpa';
-    const query = getConnection().createQueryBuilder();
+    const query = this.areas.manager.createQueryBuilder();
 
     query
       .select(`ST_AsMVT(tile.*, 'layer0', ${extent}, 'mvt_geom')`, 'mvt')
