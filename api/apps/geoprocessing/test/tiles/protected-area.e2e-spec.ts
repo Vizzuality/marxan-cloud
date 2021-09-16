@@ -16,3 +16,9 @@ test(`Getting tile for project`, async () => {
   const mvt = await fixtures.WhenRequestingTileForProject(fixtures.projectId);
   await fixtures.ThenItContainsCustomProtectedArea(mvt, customPa);
 });
+
+test(`Getting tile`, async () => {
+  const customPa = await fixtures.GivenCustomProtectedAreaWasCreated();
+  const mvt = await fixtures.WhenRequestingTile();
+  await fixtures.ThenItHidesCustomProtectedArea(mvt, customPa);
+});
