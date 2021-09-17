@@ -13,16 +13,22 @@ afterEach(async () => {
 });
 
 test(`creating multiple projects should have different protectedAreaFilterByIds`, async () => {
-  const projectIdOne: string = await fixtures.WhenProjectIsCreated(`BWA`);
-  const scenarioIdOne: string = await fixtures.WhenScenarioIsCreated(
+  const projectIdOne: string = await fixtures.GivenProjectWasCreated(`BWA`);
+  const scenarioIdOne: string = await fixtures.GivenScenarioWasCreated(
     projectIdOne,
-    [IUCNCategory.NotApplicable],
   );
-  const projectIdTwo: string = await fixtures.WhenProjectIsCreated(`ZMB`);
-  const scenarioIdTwo: string = await fixtures.WhenScenarioIsCreated(
+  const projectIdTwo: string = await fixtures.GivenProjectWasCreated(`ZMB`);
+  const scenarioIdTwo: string = await fixtures.GivenScenarioWasCreated(
     projectIdTwo,
-    [IUCNCategory.NotReported],
   );
+
+  await fixtures.WhenScenarioIsUpdated(scenarioIdOne, [
+    IUCNCategory.NotApplicable,
+  ]);
+  await fixtures.WhenScenarioIsUpdated(scenarioIdTwo, [
+    IUCNCategory.NotReported,
+  ]);
+
   await fixtures.ThenProtectedAreaFiltersAreDifferent(
     scenarioIdOne,
     scenarioIdTwo,

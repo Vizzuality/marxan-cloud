@@ -32,7 +32,7 @@ export const getFixtures = async () => {
       );
       await app.close();
     },
-    WhenProjectIsCreated: async (countryId: string) => {
+    GivenProjectWasCreated: async (countryId: string) => {
       const projectId = (
         await ProjectsTestUtils.createProject(app, token, {
           name: `Project name ${Date.now()}`,
@@ -44,18 +44,24 @@ export const getFixtures = async () => {
       addedProjects.push(projectId);
       return projectId;
     },
-    WhenScenarioIsCreated: async (
-      projectId: string,
-      categories: IUCNCategory[],
-    ) =>
+    GivenScenarioWasCreated: async (projectId: string) =>
       (
         await ScenariosTestUtils.createScenario(app, token, {
           name: `Scenario for ${projectId} ${Date.now()}`,
           projectId,
           type: ScenarioType.marxan,
-          wdpaIucnCategories: categories,
         })
       ).data.id,
+    WhenScenarioIsUpdated: async (
+      scenarioId: string,
+      categories: IUCNCategory[],
+    ) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/scenarios/${scenarioId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          wdpaIucnCategories: categories,
+        }),
     ThenProtectedAreaFiltersAreDifferent: async (
       scenarioIdOne: string,
       scenarioIdTwo: string,
