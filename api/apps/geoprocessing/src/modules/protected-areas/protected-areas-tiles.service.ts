@@ -5,8 +5,8 @@ import { Brackets, Repository } from 'typeorm';
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 
+import { ProtectedArea } from '@marxan/protected-areas';
 import { ProtectedAreaTileRequest } from './protected-area-tile-request';
-import { ProtectedArea } from './protected-areas.geo.entity';
 
 type QueryResult = { mvt: Buffer };
 

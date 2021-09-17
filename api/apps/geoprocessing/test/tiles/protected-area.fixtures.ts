@@ -5,8 +5,7 @@ import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import { v4 } from 'uuid';
-
-import { ProtectedArea } from '@marxan-geoprocessing/modules/protected-areas/protected-areas.geo.entity';
+import { ProtectedArea } from '@marxan/protected-areas';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
