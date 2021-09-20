@@ -1,27 +1,23 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import cx from 'classnames';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import {
-  useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures, useUploadFeaturesShapefile,
+  useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures,
 } from 'hooks/features';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
 
 import List from 'layout/scenarios/edit/features/add/list';
 import Toolbar from 'layout/scenarios/edit/features/add/toolbar';
 
 import Button from 'components/button';
-import Icon from 'components/icon';
 import Loading from 'components/loading';
 
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
+import Uploader from './uploader';
 
 export interface ScenariosFeaturesAddProps {
   onSuccess?: () => void;
@@ -35,9 +31,6 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   const [search, setSearch] = useState(null);
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const { addToast } = useToasts();
 
   const { query } = useRouter();
   const { pid, sid } = query;
@@ -62,12 +55,6 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
     search,
     filters,
     sort,
-  });
-
-  const uploadFeaturesShapefileMutation = useUploadFeaturesShapefile({
-    requestConfig: {
-      method: 'POST',
-    },
   });
 
   const INITIAL_VALUES = useMemo(() => {
@@ -106,45 +93,6 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   const onSort = useCallback((s) => {
     setSort(s);
   }, []);
-
-  const onDropAccepted = async (acceptedFiles) => {
-    setLoading(true);
-    const f = acceptedFiles[0];
-
-    const data = new FormData();
-    data.append('file', f);
-    data.append('name', `Testing-${Date.now()}`);
-    data.append('type', 'species');
-
-    uploadFeaturesShapefileMutation.mutate({ data, id: `${pid}` }, {
-      onSuccess: ({ data: { data: g, id: shapefileId } }) => {
-        setLoading(false);
-
-        addToast('success-upload-feature-shapefile', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Shapefile uploaded</p>
-          </>
-        ), {
-          level: 'success',
-        });
-
-        console.info('Shapefile uploaded', g, 'shapefileId', shapefileId);
-      },
-      onError: () => {
-        setLoading(false);
-
-        addToast('error-upload-feature-shapefile', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Shapefile could not be uploaded</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  };
 
   const onSubmit = useCallback((values) => {
     const { selected } = values;
@@ -206,37 +154,6 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
     onDismiss();
   }, [onDismiss]);
 
-  const onDropRejected = (rejectedFiles) => {
-    const r = rejectedFiles[0];
-    const { errors } = r;
-
-    addToast('drop-error', (
-      <>
-        <h2 className="font-medium">Error!</h2>
-        <ul className="text-sm">
-          {errors.map((e) => (
-            <li key={`${e.code}`}>{e.message}</li>
-          ))}
-        </ul>
-      </>
-    ), {
-      level: 'error',
-    });
-  };
-
-  const {
-    getRootProps,
-    getInputProps,
-    // isDragActive,
-    // isDragAccept,
-    // isDragReject,
-  } = useDropzone({
-    multiple: false,
-    maxSize: 1000000,
-    onDropAccepted,
-    onDropRejected,
-  });
-
   return (
     <FormRFF
       key="features-list"
@@ -248,32 +165,14 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
           <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">Add features to your planning area</h2>
 
           <Loading
-            visible={submitting || loading}
+            visible={submitting}
             className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
             iconClassName="w-10 h-10 text-primary-500"
           />
 
           {/* Field to upload */}
           <div className="mx-8 mt-3 mb-5">
-
-            <Button
-              {...getRootProps()}
-              className={cx({
-                'text-xs dropzone py-1 w-full hover:bg-gray-500 cursor-pointer': true,
-                // 'bg-gray-500': isDragActive,
-                // 'bg-green-800': isDragAccept,
-                // 'bg-red-800': isDragReject,
-              })}
-              theme="secondary"
-              size="base"
-            >
-              Upload your own features
-              <Icon className="absolute w-4 h-4 text-white right-6" icon={UPLOAD_SVG} />
-
-              <input {...getInputProps()} />
-
-            </Button>
-
+            <Uploader />
           </div>
 
           <Toolbar
