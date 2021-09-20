@@ -56,7 +56,7 @@ export const Modal: React.FC<ModalProps> = ({
   usePreventScroll({ isDisabled: !open });
 
   const { modals, addMultipleModal, removeMultipleModal } = useMultipleModal();
-  const { visible } = modals.find((m) => m.id === id) || {};
+  const { visible = true } = modals.find((m) => m.id === id) || {};
 
   useEffect(() => {
     if (id && open) {
