@@ -20,14 +20,25 @@ export class SpecDataTsvFile {
   #optionalColumns = new Set<OptionalKeys<SpecDataEntry>>([
     'target2',
     'targetocc',
-    'name',
     'sepnum',
     'sepdistance',
   ]);
 
   #rows: SpecDataEntry[] = [];
 
-  addRow(data: ScenarioFeaturesData) {
+  addRow(
+    data: Pick<
+      ScenarioFeaturesData,
+      | 'featureId'
+      | 'target'
+      | 'prop'
+      | 'fpf'
+      | 'target2'
+      | 'targetocc'
+      | 'sepNum'
+      | 'metadata'
+    >,
+  ) {
     let sepdistance: string | undefined;
     if (typeof data.metadata?.sepdistance === 'number')
       sepdistance = data.metadata.sepdistance.toFixed(2);
@@ -41,7 +52,6 @@ export class SpecDataTsvFile {
       spf: data.fpf?.toFixed(2),
       target2: data.target2?.toFixed(2),
       targetocc: data.targetocc?.toFixed(2),
-      name: data.name ?? undefined,
       sepnum: data.sepNum?.toFixed(2),
       sepdistance: sepdistance,
     };

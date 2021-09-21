@@ -21,7 +21,7 @@ describe(`when getting input.zip`, () => {
 describe(`when getting spec.dat`, () => {
   it(`should resolve text/*`, async () => {
     expect((await world.WhenGettingSpecDat()).text).toMatchInlineSnapshot(
-      `"id	target	prop	spf	target2	targetocc	name	sepnum	sepdistance"`,
+      `"id	target	prop	spf	target2	targetocc	sepnum	sepdistance"`,
     );
   });
 });
