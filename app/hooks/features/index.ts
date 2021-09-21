@@ -404,6 +404,7 @@ export function useUploadFeaturesShapefile({
     method: 'POST',
   },
 }: UseUploadFeaturesShapefileProps) {
+  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const uploadFeatureShapefile = ({ id, data }: UploadFeaturesShapefileProps) => {
@@ -420,6 +421,7 @@ export function useUploadFeaturesShapefile({
 
   return useMutation(uploadFeatureShapefile, {
     onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries(['all-features']);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
