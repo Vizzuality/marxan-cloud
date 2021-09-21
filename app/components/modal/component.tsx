@@ -1,4 +1,6 @@
-import React, { Children, cloneElement, isValidElement } from 'react';
+import React, {
+  Children, cloneElement, isValidElement, useEffect,
+} from 'react';
 
 import { useDialog } from '@react-aria/dialog';
 import { FocusScope } from '@react-aria/focus';
@@ -10,6 +12,8 @@ import {
 } from '@react-aria/overlays';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
+
+import { useMultipleModal } from 'hooks/modal';
 
 import Icon from 'components/icon';
 
@@ -27,6 +31,7 @@ const CONTENT_CLASSES = {
 const OVERLAY_CLASSES = 'z-40 fixed inset-0 bg-black bg-blur';
 
 export const Modal: React.FC<ModalProps> = ({
+  id,
   title,
   open,
   dismissable = true,
@@ -50,6 +55,30 @@ export const Modal: React.FC<ModalProps> = ({
 
   usePreventScroll({ isDisabled: !open });
 
+  const { modals, addMultipleModal, removeMultipleModal } = useMultipleModal();
+  const { visible = true } = modals.find((m) => m.id === id) || {};
+
+  useEffect(() => {
+    if (id && open) {
+      addMultipleModal({
+        id,
+        visible: open,
+      });
+    }
+
+    if (id && !open) {
+      removeMultipleModal({
+        id,
+      });
+    }
+
+    return () => {
+      removeMultipleModal({
+        id,
+      });
+    };
+  }, [id, open]); // eslint-disable-line
+
   return (
     <AnimatePresence>
       {open && (
@@ -60,7 +89,7 @@ export const Modal: React.FC<ModalProps> = ({
               opacity: 0,
             }}
             animate={{
-              opacity: 1,
+              opacity: visible ? 1 : 0,
               transition: {
                 delay: 0,
               },

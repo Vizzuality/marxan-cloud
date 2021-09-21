@@ -9,6 +9,7 @@ import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 import { UploaderProps } from './types';
 
 export const Uploader: React.FC<UploaderProps> = ({
+  id,
   open,
   caption,
   children,
@@ -28,6 +29,7 @@ export const Uploader: React.FC<UploaderProps> = ({
       </Button>
 
       <Modal
+        id={id}
         open={open}
         size="narrow"
         onDismiss={onClose}

@@ -239,6 +239,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
             </header>
 
             <Modal
+              id="all-feaures"
               title="All features"
               open={modal}
               size="narrow"
