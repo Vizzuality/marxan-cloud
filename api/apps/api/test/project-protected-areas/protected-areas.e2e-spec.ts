@@ -3,7 +3,6 @@ import * as request from 'supertest';
 import { E2E_CONFIG } from '../e2e.config';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
 import { IUCNProtectedAreaCategoryDTO } from '@marxan-api/modules/protected-areas/dto/iucn-protected-area-category.dto';
-import { ProtectedArea } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
@@ -16,6 +15,7 @@ import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { IUCNCategory } from '@marxan/iucn';
+import { ProtectedArea } from '@marxan/protected-areas';
 
 afterAll(async () => {
   await tearDown();

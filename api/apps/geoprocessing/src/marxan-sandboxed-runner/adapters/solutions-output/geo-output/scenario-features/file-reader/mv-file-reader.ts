@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { createReadStream, readdirSync } from 'fs';
 import { obj as multistream } from 'multistream';
-import { createInterface } from 'readline';
-import { PassThrough, TransformCallback } from 'stream';
+import { TransformCallback } from 'stream';
 import { Transform } from 'stronger-typed-streams';
 import { isDefined } from '@marxan/utils';
+import { createStream as lineStream } from 'byline';
 
 @Injectable()
 export class MvFileReader {
@@ -26,25 +26,12 @@ export class MvFileReader {
         return undefined;
       })
       .filter(isDefined);
-
     return multistream(
-      files.map(({ runId, path }) => {
-        const stream = new PassThrough({
+      files.map(({ runId, path }) =>
+        lineStream(createReadStream(path), {
           objectMode: true,
-        });
-        const lineReaderEmitter = createInterface({
-          input: createReadStream(path),
-          crlfDelay: Infinity,
-          // output: stream seems to hang forever...
-        });
-        lineReaderEmitter.on('line', (line) => {
-          stream.push(line);
-        });
-        lineReaderEmitter.on('close', () => {
-          stream.end();
-        });
-        return stream.pipe(new InjectRunId(runId));
-      }),
+        }).pipe(new InjectRunId(runId)),
+      ),
     );
   }
 }
@@ -58,7 +45,7 @@ class InjectRunId extends Transform<string, string> {
     });
   }
 
-  _transform(
+  async _transform(
     chunk: string,
     encoding: BufferEncoding,
     callback: TransformCallback,
@@ -67,6 +54,7 @@ class InjectRunId extends Transform<string, string> {
       this.#headerSkip = false;
       return callback(null, undefined);
     }
+    await void 0;
     callback(null, `${this.runId},${chunk}`);
   }
 }

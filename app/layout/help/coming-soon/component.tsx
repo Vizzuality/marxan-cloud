@@ -1,6 +1,5 @@
 import React, {
-  ReactElement, cloneElement,
-  useRef,
+  ReactChild,
 } from 'react';
 
 import cx from 'classnames';
@@ -18,7 +17,7 @@ const THEME = {
   },
 };
 export interface ComingSoonProps {
-  children: ReactElement;
+  children: ReactChild;
   placement?: string;
   theme?: 'dark' | 'light';
 }
@@ -27,12 +26,6 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
   children,
   theme = 'light',
 }: ComingSoonProps) => {
-  const childrenRef = useRef(null);
-
-  const CHILDREN = cloneElement(children, {
-    ref: childrenRef,
-  });
-
   return (
     <Tooltip
       arrow
@@ -53,7 +46,7 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
     >
       <div className="opacity-30">
         <div className="pointer-events-none">
-          {CHILDREN}
+          {children}
         </div>
       </div>
     </Tooltip>

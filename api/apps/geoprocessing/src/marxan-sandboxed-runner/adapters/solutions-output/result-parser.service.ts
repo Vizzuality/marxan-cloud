@@ -3,6 +3,7 @@ import { plainToClass } from 'class-transformer';
 import { ExecutionResult, ResultRow } from '@marxan/marxan-output';
 import { isDefined } from '@marxan/utils';
 import { validateSync } from 'class-validator';
+import { chunk } from 'lodash';
 
 import { MostDifferentService } from './most-different.service';
 
@@ -10,7 +11,62 @@ import { MostDifferentService } from './most-different.service';
 export class ResultParserService {
   constructor(private readonly mostDifferentSolutions: MostDifferentService) {}
 
-  parse(csvContent: string): ExecutionResult {
+  async parse(csvContent: string): Promise<ExecutionResult> {
+    const chunks = chunk(csvContent.split('\n').slice(1), 100);
+
+    const results: ExecutionResult = [];
+    for (const batch of chunks) {
+      for (const row of batch) {
+        if (row === '') {
+          continue;
+        }
+        const [
+          runId,
+          score,
+          cost,
+          planningUnits,
+          connectivity,
+          connectivityTotal,
+          connectivityIn,
+          connectivityEdge,
+          connectivityOut,
+          connectivityInFraction,
+          penalty,
+          shortfall,
+          missingValues,
+          mpm,
+        ] = row.split(',');
+        const entry = await plainToClass<ResultRow, ResultRow>(ResultRow, {
+          runId: +runId,
+          score: +score,
+          cost: +cost,
+          planningUnits: +planningUnits,
+          connectivity: +connectivity,
+          connectivityTotal: +connectivityTotal,
+          connectivityIn: +connectivityIn,
+          connectivityEdge: +connectivityEdge,
+          connectivityOut: +connectivityOut,
+          connectivityInFraction: +connectivityInFraction,
+          penalty: +penalty,
+          shortfall: +shortfall,
+          missingValues: +missingValues,
+          mpm: +mpm,
+          // TODO set actual best solution
+          best: +runId === 1,
+          // distinctFive should always be set to `false` here: the five most
+          // different solutions are tagged as such via
+          // `MostDifferentService`.
+          distinctFive: false,
+        });
+        if (validateSync(entry).length > 0) {
+          throw new Error(
+            `Unexpected values in Marxan output at value [${row}]`,
+          );
+        }
+        results.push(entry);
+      }
+    }
+
     return this.mostDifferentSolutions.map(
       csvContent
         .split('\n')

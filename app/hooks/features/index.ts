@@ -17,15 +17,18 @@ import { ItemProps as SelectedItemProps } from 'components/features/selected-ite
 import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
+import UPLOADS from 'services/uploads';
 
 import {
   UseFeaturesFiltersProps,
   UseFeaturesOptionsProps,
   UseSaveSelectedFeaturesProps,
   SaveSelectedFeaturesProps,
+  UseUploadFeaturesShapefileProps,
+  UploadFeaturesShapefileProps,
 } from './types';
 
-interface AllItemProps extends IntersectItemProps, RawItemProps {}
+interface AllItemProps extends IntersectItemProps, RawItemProps { }
 
 export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
   const [session] = useSession();
@@ -81,7 +84,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
       const { data: { data: pageData } } = p;
 
-      return pageData.map((d):AllItemProps => {
+      return pageData.map((d): AllItemProps => {
         const {
           id,
           alias,
@@ -162,7 +165,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
       features = [],
     } = parsedData;
 
-    parsedData = features.map((d):SelectedItemProps => {
+    parsedData = features.map((d): SelectedItemProps => {
       const {
         featureId,
         geoprocessingOperations,
@@ -394,4 +397,36 @@ export function useFeature(id) {
       data: data?.data?.data,
     };
   }, [query, data?.data?.data]);
+}
+
+export function useUploadFeaturesShapefile({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadFeaturesShapefileProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const uploadFeatureShapefile = ({ id, data }: UploadFeaturesShapefileProps) => {
+    return UPLOADS.request({
+      url: `/projects/${id}/features/shapefile`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadFeatureShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries(['all-features']);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
 }

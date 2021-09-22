@@ -3,10 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { ProtectedAreasController } from './protected-areas.controller';
-import { ProtectedAreasService } from './protected-areas.service';
 import { TileModule } from '@marxan-geoprocessing/modules/tile/tile.module';
-import { ProtectedArea } from '@marxan-geoprocessing/modules/protected-areas/protected-areas.geo.entity';
+import { ProtectedArea } from '@marxan/protected-areas';
 import { ProtectedAreaWorkerModule } from './worker/protected-area-worker.module';
+import { ProtectedAreasTilesService } from './protected-areas-tiles.service';
 
 @Module({
   imports: [
@@ -15,8 +15,8 @@ import { ProtectedAreaWorkerModule } from './worker/protected-area-worker.module
     ProtectedAreaWorkerModule,
     CqrsModule,
   ],
-  providers: [ProtectedAreasService],
+  providers: [ProtectedAreasTilesService],
   controllers: [ProtectedAreasController],
-  exports: [ProtectedAreasService, TypeOrmModule],
+  exports: [],
 })
 export class ProtectedAreasModule {}

@@ -14,6 +14,7 @@ import { Organization } from '../organizations/organization.api.entity';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { BBox } from 'geojson';
+import { ProtectedAreaDto } from '@marxan-api/modules/projects/dto/protected-area.dto';
 
 export const projectResource: BaseServiceResource = {
   className: 'Project',
@@ -27,7 +28,7 @@ export const projectResource: BaseServiceResource = {
 export enum PlanningUnitGridShape {
   square = 'square',
   hexagon = 'hexagon',
-  fromShapefile = 'irregular',
+  fromShapefile = 'from_shapefile',
 }
 
 @Entity('projects')
@@ -126,7 +127,10 @@ export class Project extends TimeUserEntityMetadata {
   /**
    * Bbox of the custom extent
    */
-  @ApiProperty()
+  @ApiProperty({
+    isArray: true,
+    type: Number,
+  })
   @Column('jsonb', { name: 'bbox' })
   bbox!: BBox;
 
@@ -161,16 +165,26 @@ export class Project extends TimeUserEntityMetadata {
     description: "Display name of Country / Gid1 / Gid2 of project's area",
   })
   planningAreaName?: string;
+
+  @ApiPropertyOptional({
+    isArray: true,
+    type: ProtectedAreaDto,
+  })
+  customProtectedAreas?: ProtectedAreaDto[];
 }
 
 export class JSONAPIProjectData {
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+  })
   type = 'projects';
 
   @ApiProperty()
   id!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Project,
+  })
   attributes!: Project;
 
   @ApiPropertyOptional()
@@ -178,7 +192,10 @@ export class JSONAPIProjectData {
 }
 
 export class ProjectResultPlural {
-  @ApiProperty()
+  @ApiProperty({
+    isArray: true,
+    type: JSONAPIProjectData,
+  })
   data!: JSONAPIProjectData[];
 }
 

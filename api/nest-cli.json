@@ -169,6 +169,33 @@
       "compilerOptions": {
         "tsConfigPath": "libs/shapefile-converter/tsconfig.lib.json"
       }
+    },
+    "planning-units-grid": {
+      "type": "library",
+      "root": "libs/planning-units-grid",
+      "entryFile": "index",
+      "sourceRoot": "libs/planning-units-grid/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/planning-units-grid/tsconfig.lib.json"
+      }
+    },
+    "protected-areas": {
+      "type": "library",
+      "root": "libs/protected-areas",
+      "entryFile": "index",
+      "sourceRoot": "libs/protected-areas/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/protected-areas/tsconfig.lib.json"
+      }
+    },
+    "tiles": {
+      "type": "library",
+      "root": "libs/tiles",
+      "entryFile": "index",
+      "sourceRoot": "libs/tiles/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/tiles/tsconfig.lib.json"
+      }
     }
   }
 }

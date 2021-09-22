@@ -270,7 +270,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                           <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
                           <InfoButton>
                             <span>
-                              <h4 className="font-heading text-lg mb-2.5">IUCN categrories</h4>
+                              <h4 className="font-heading text-lg mb-2.5">IUCN categories</h4>
                               <div className="space-y-2">
                                 <p>
                                   You can select to include protected areas

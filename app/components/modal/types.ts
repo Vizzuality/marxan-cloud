@@ -1,8 +1,9 @@
 export interface ModalProps {
+  id?: string;
   /**
    * Title used by screen readers
    */
-  title: string;
+  title?: string;
   /**
    * Whether the modal is opened
    */

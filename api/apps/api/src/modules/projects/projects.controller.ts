@@ -22,6 +22,7 @@ import {
 } from './project.api.entity';
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiOkResponse,
@@ -53,9 +54,12 @@ import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
+import { ProjectGridRequestDto } from './dto/project-grid-request.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ShapefileService } from '@marxan/shapefile-converter';
+import { isFeatureCollection } from '@marxan/utils';
+import { plainToClass } from 'class-transformer';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -147,6 +151,29 @@ export class ProjectsController {
     return await this.projectsService.remove(id);
   }
 
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @ApiOperation({
+    description: 'Upload shapefile for project-specific planning unit grid',
+  })
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiCreatedResponse({ type: ProjectGridRequestDto })
+  @Post(`:id/grid`)
+  async setProjectGrid(
+    @Param('id') projectId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const result = await this.projectsService.setGrid(projectId, file);
+    if (isLeft(result)) {
+      throw new InternalServerErrorException(result.left);
+    }
+    return plainToClass<ProjectGridRequestDto, ProjectGridRequestDto>(
+      ProjectGridRequestDto,
+      {
+        id: result.right.value,
+      },
+    );
+  }
+
   @ApiOperation({
     description: `Find running jobs for each scenario under given project`,
   })
@@ -156,10 +183,16 @@ export class ProjectsController {
     @Param('id') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectJobsStatusDto> {
-    const scenarios = await this.projectsService.getJobStatusFor(projectId, {
-      authenticatedUser: req.user,
-    });
-    return this.jobsStatusSerizalizer.serialize(projectId, scenarios);
+    const projectWithScenarios = await this.projectsService.getJobStatusFor(
+      projectId,
+      {
+        authenticatedUser: req.user,
+      },
+    );
+    return this.jobsStatusSerizalizer.serialize(
+      projectId,
+      projectWithScenarios,
+    );
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
@@ -232,14 +265,16 @@ export class ProjectsController {
     @UploadedFile() shapefile: Express.Multer.File,
     @Body() body: UploadShapefileDTO,
   ): Promise<ShapefileUploadResponse> {
-    const shapefileData = await this.shapefileService.transformToGeoJson(
-      shapefile,
-    );
+    const { data } = await this.shapefileService.transformToGeoJson(shapefile);
+
+    if (!isFeatureCollection(data)) {
+      throw new BadRequestException(`Only FeatureCollection is supported.`);
+    }
 
     await this.geoFeatureService.createFeaturesForShapefile(
       projectId,
       body,
-      shapefileData.data.features,
+      data.features,
     );
 
     return { success: true };

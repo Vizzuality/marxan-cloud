@@ -25,7 +25,7 @@ const SECTIONS = [
   {
     id: 'gap-analysis',
     name: 'Gap analysis',
-    description: 'A gap analysis calculates how much of each feature is under the existing protected area network and then summarises the representation as a percentage',
+    description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network (the conservation areas that were added in Protected Areas) and will inform you of the amount of conservation action still needed to achieve your targets.',
   },
   {
     id: 'cost-surface',

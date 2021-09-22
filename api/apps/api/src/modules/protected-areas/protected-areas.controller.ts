@@ -3,9 +3,9 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
-  UseGuards,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { ProtectedAreaResult } from './protected-area.geo.entity';
 import {
@@ -35,6 +35,7 @@ import {
 import { IUCNProtectedAreaCategoryResult } from './dto/iucn-protected-area-category.dto';
 import { Request, Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
+import { TilesOpenApi } from '@marxan/tiles';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -71,52 +72,30 @@ export class ProtectedAreasController {
     return this.service.serialize(results.data, results.metadata);
   }
 
+  @TilesOpenApi()
   @ApiOperation({
     description: 'Get tile for protected areas.',
   })
-  /**
-   *@todo Change ApiOkResponse mvt type
-   */
-  @ApiOkResponse({
-    description: 'Binary protobuffer mvt tile',
-    type: String,
-  })
-  @ApiUnauthorizedResponse()
-  @ApiForbiddenResponse()
-  @ApiParam({
-    name: 'z',
-    description: 'The zoom level ranging from 0 - 20',
-    type: Number,
-    required: true,
-  })
-  @ApiParam({
-    name: 'x',
-    description: 'The tile x offset on Mercator Projection',
-    type: Number,
-    required: true,
-  })
-  @ApiParam({
-    name: 'y',
-    description: 'The tile y offset on Mercator Projection',
-    type: Number,
-    required: true,
-  })
-  @ApiQuery({
-    name: 'id',
-    description: 'Id of WDPA area',
-    type: String,
-    required: false,
-    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
-  })
-  @ApiQuery({
-    name: 'bbox',
-    description: 'Bounding box of the project [xMin, xMax, yMin, yMax]',
-    type: [Number],
-    required: false,
-    example: [-1, 40, 1, 42],
-  })
   @Get('/preview/tiles/:z/:x/:y.mvt')
   async proxyProtectedAreaTile(
+    @Req() request: Request,
+    @Res() response: Response,
+  ) {
+    return this.proxyService.proxyTileRequest(request, response);
+  }
+
+  @TilesOpenApi()
+  @ApiOperation({
+    description: 'Get tile for protected areas.',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Project ID to include its Protected Areas',
+    type: Number,
+    required: true,
+  })
+  @Get(':projectId/preview/tiles/:z/:x/:y.mvt')
+  async proxyProtectedAreaTileForProject(
     @Req() request: Request,
     @Res() response: Response,
   ) {

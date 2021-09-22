@@ -66,15 +66,20 @@ export class GeoOutputRepository {
       // for unacceptable amounts of time here.
 
       const CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS = 1000;
+      const CHUNK_SIZE_FOR_BATCH_SUMMARY = 1000;
 
       this.logger.debug(
-        `Deleting ${Object.keys(planningUnitsState).length} output scenario planning units...`,
+        `Deleting ${
+          Object.keys(planningUnitsState).length
+        } output scenario planning units...`,
       );
       for (const [index, ospuChunk] of chunk(
         Object.keys(planningUnitsState),
         CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
       ).entries()) {
-        this.logger.debug(`Deleting chunk #${index} (${ospuChunk.length} items)...`);
+        this.logger.debug(
+          `Deleting chunk #${index} (${ospuChunk.length} items)...`,
+        );
         await transaction.delete(OutputScenariosPuDataGeoEntity, {
           scenarioPuId: In(ospuChunk),
         });
@@ -87,7 +92,9 @@ export class GeoOutputRepository {
         scenarioFeatureDataFromAllRuns,
         CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
       ).entries()) {
-        this.logger.debug(`Deleting chunk #${index} (${osfdChunk.length} items)...`);
+        this.logger.debug(
+          `Deleting chunk #${index} (${osfdChunk.length} items)...`,
+        );
         await transaction.delete(OutputScenariosFeaturesDataGeoEntity, {
           featureScenarioId: In(osfdChunk.map((e) => e.featureScenarioId)),
         });
@@ -100,7 +107,9 @@ export class GeoOutputRepository {
         scenarioFeatureDataFromAllRuns,
         CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
       ).entries()) {
-        this.logger.debug(`Inserting chunk #${index} (${osfdChunk.length} items)...`);
+        this.logger.debug(
+          `Inserting chunk #${index} (${osfdChunk.length} items)...`,
+        );
         await transaction.insert(
           OutputScenariosFeaturesDataGeoEntity,
           osfdChunk,
@@ -109,24 +118,27 @@ export class GeoOutputRepository {
 
       const chunkedOutputScenariosPuData = chunk(
         Object.entries(planningUnitsState),
-        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+        CHUNK_SIZE_FOR_BATCH_SUMMARY,
       );
 
       this.logger.debug(
-        `Inserting ${Object.keys(planningUnitsState).length} output scenario planning units...`,
+        `Inserting ${
+          Object.keys(planningUnitsState).length
+        } output scenario planning units...`,
       );
       await Promise.all(
         chunkedOutputScenariosPuData.map((ospuChunk, index) => {
-          this.logger.debug(`Inserting chunk #${index} (${ospuChunk.length} items)...`);
+          this.logger.debug(
+            `Inserting chunk #${index} (${ospuChunk.length} items)...`,
+          );
           return ospuChunk.map(([scenarioPuId, data]) =>
             transaction.insert(OutputScenariosPuDataGeoEntity, {
               scenarioPuId,
               values: data.values,
               includedCount: data.usedCount,
             }),
-          )
-        }
-        ),
+          );
+        }),
       );
 
       await transaction.save(

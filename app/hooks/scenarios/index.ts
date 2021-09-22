@@ -164,7 +164,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
       const { data: { data: pageData } } = p;
 
-      return pageData.map((d):ItemProps => {
+      return pageData.map((d): ItemProps => {
         const {
           id, projectId, name, lastModifiedAt,
         } = d;
@@ -398,9 +398,11 @@ export function useUploadCostSurface({
 }: UseUploadScenarioCostSurfaceProps) {
   const [session] = useSession();
 
-  const uploadScenarioCostSurface = ({ id }: UploadScenarioCostSurfaceProps) => {
+  const uploadScenarioCostSurface = ({ id, data }: UploadScenarioCostSurfaceProps) => {
+    console.log('data--->', data);
     return UPLOADS.request({
       url: `/scenarios/${id}/cost-surface/shapefile`,
+      data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
         'Content-Type': 'multipart/form-data',

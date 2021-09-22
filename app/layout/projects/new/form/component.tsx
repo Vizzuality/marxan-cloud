@@ -295,7 +295,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                     )}
 
                     {hasPlanningArea && (
-                      <>
+                      <div className="mt-3">
                         <FieldRFF
                           name="planningAreaId"
                           validate={composeValidators([{ presence: true }])}
@@ -313,7 +313,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                         <PlanningAreaSelector
                           values={values}
                         />
-                      </>
+                      </div>
                     )}
                   </div>
                   <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />

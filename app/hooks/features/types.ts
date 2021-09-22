@@ -26,3 +26,12 @@ export interface UseFeaturesOptionsProps {
   sort?: string;
   filters?: Record<string, unknown>
 }
+
+export interface UseUploadFeaturesShapefileProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface UploadFeaturesShapefileProps {
+  id?: string,
+  data: any,
+}

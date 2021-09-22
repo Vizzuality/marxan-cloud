@@ -7,7 +7,7 @@ import { ScenarioJobStatus } from '@marxan-api/modules/projects/job-status/job-s
 import { ApiEvent } from '@marxan-api/modules/api-events/api-event.api.entity';
 import {
   JobStatusService,
-  Scenario,
+  ProjectWithScenarios,
 } from '@marxan-api/modules/projects/job-status';
 import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
@@ -26,7 +26,7 @@ afterEach(async () => {
 });
 
 describe(`when has two projects with scenarios and events`, () => {
-  let result: Scenario[];
+  let result: ProjectWithScenarios;
   let scenarioIds: string[];
   let projectId: string;
   beforeEach(async () => {
@@ -40,7 +40,7 @@ describe(`when has two projects with scenarios and events`, () => {
   });
 
   it(`should return last events of every job for scenarios of the project`, () => {
-    expect(result).toEqual(
+    expect(result.scenarios).toEqual(
       [
         {
           jobs: [

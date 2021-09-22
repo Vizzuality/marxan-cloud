@@ -91,6 +91,7 @@ export const ScenarioFeaturesAddToolbar: React.FC<ScenarioFeaturesAddToolbarProp
         </button>
 
         <Modal
+          id="all-features-filters"
           title="All features filters"
           open={open}
           size="narrow"

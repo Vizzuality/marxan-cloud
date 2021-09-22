@@ -158,8 +158,10 @@ describe('ProxyVectorTilesModule (e2e)', () => {
     describe('WDPA preview vector tiles.', () => {
       test('Should give back a valid request for wdpa preview tile', async () => {
         await request(app.getHttpServer())
-          .get('/api/v1/protected-areas/preview/tiles/6/30/25.mvt')
+          .get('/api/v1/protected-areas/preview/tiles/3/4/4.mvt')
           .set('Authorization', `Bearer ${jwtToken}`)
+          .responseType('blob')
+          .buffer()
           .expect(HttpStatus.OK);
       });
       test('User should be able to filter by bbox', async () => {

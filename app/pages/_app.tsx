@@ -12,6 +12,7 @@ import { Hydrate } from 'react-query/hydration';
 import store from 'store';
 
 import { HelpProvider } from 'hooks/help';
+import { MultipleModalProvider } from 'hooks/modal';
 import { ToastProvider } from 'hooks/toast';
 
 import { MediaContextProvider } from 'layout/media';
@@ -37,19 +38,21 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
           >
             <MediaContextProvider>
               <OverlayProvider>
-                <ToastProvider
-                  placement="top-right"
-                  defaultAutoDismiss
-                  defaultAutoDismissTime={5000}
-                >
-                  <HelpProvider>
-                    <PlausibleProvider domain="marxan.vercel.app">
-                      <div className="bg-black">
-                        <Component {...pageProps} />
-                      </div>
-                    </PlausibleProvider>
-                  </HelpProvider>
-                </ToastProvider>
+                <MultipleModalProvider>
+                  <ToastProvider
+                    placement="top-right"
+                    defaultAutoDismiss
+                    defaultAutoDismissTime={5000}
+                  >
+                    <HelpProvider>
+                      <PlausibleProvider domain="marxan.vercel.app">
+                        <div className="bg-black">
+                          <Component {...pageProps} />
+                        </div>
+                      </PlausibleProvider>
+                    </HelpProvider>
+                  </ToastProvider>
+                </MultipleModalProvider>
               </OverlayProvider>
             </MediaContextProvider>
           </AuthenticationProvider>

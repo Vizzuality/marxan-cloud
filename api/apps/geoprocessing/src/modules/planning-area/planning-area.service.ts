@@ -35,7 +35,7 @@ export class PlanningAreaService {
       const removedCount = await this.collectGarbage();
       this.logger.log(
         `garbage collection ${gcId} finished, removed ${
-          removedCount ?? 'N/A'
+          removedCount.affected ?? 'N/A'
         } entities older than ${this.config.maxAgeInMs}`,
       );
     });
