@@ -399,7 +399,6 @@ export function useUploadCostSurface({
   const [session] = useSession();
 
   const uploadScenarioCostSurface = ({ id, data }: UploadScenarioCostSurfaceProps) => {
-    console.log('data--->', data);
     return UPLOADS.request({
       url: `/scenarios/${id}/cost-surface/shapefile`,
       data,
