@@ -16,11 +16,14 @@ export class ScenarioFeatureIdMapper {
       where: {
         scenarioId,
       },
-      select: ['id', 'featureId'],
+      select: ['id', 'featureId', 'prop'],
     });
     return planningUnits[0].reduce<FeatureIdToScenarioFeatureData>(
       (previousValue, sfd) => {
-        previousValue[sfd.featureId] = sfd.id;
+        previousValue[sfd.featureId] = {
+          id: sfd.id,
+          prop: sfd.prop ?? 0.5,
+        };
         return previousValue;
       },
       {},

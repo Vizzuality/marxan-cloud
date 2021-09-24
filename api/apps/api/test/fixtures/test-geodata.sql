@@ -19,7 +19,7 @@ select spd.id, pug.the_geom, pug.area as pu_area
 from scenarios_pu_data spd
 inner join planning_units_geom pug on spd.pu_geom_id = pug.id
 where scenario_id='$scenario'),
-pu_pa as (select pu.id, st_area(st_transform(st_intersection(pu.the_geom, pa.the_geom), 3410)) as pa_pu_area, 
+pu_pa as (select pu.id, st_area(st_transform(st_intersection(pu.the_geom, pa.the_geom), 3410)) as pa_pu_area,
                                  pu_area
           from pu
           left join pa on pu.the_geom && pa.the_geom)
@@ -108,7 +108,10 @@ WITH RECURSIVE nums (n) AS (
     SELECT n+1 FROM nums WHERE n+1 <= 10
 )
 INSERT INTO output_scenarios_features_data
-(run_id, feature_scenario_id, amount, occurrences, separation, target, mpm)
-SELECT n as run_id, scenario_features_data.id, round(random()*53592) amount, round(random()*100) occurrences, 0 as separation, true as target,1 as mpm
+(run_id, feature_scenario_id, amount, occurrences, separation, target, mpm,
+ total_area)
+SELECT n as run_id, scenario_features_data.id, round(random()*53592) amount,
+       round(random()*100) occurrences, 0 as separation, true as target,1 as
+         mpm, round((random() + 1)*53592) total_area
 FROM nums, scenario_features_data
 where scenario_features_data.scenario_id='$scenario';
