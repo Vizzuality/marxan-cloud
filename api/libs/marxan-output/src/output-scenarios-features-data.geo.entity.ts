@@ -25,6 +25,13 @@ export class OutputScenariosFeaturesDataGeoEntity {
 
   @Column({
     type: `float8`,
+    name: `total_area`,
+    default: 0,
+  })
+  totalArea?: number;
+
+  @Column({
+    type: `float8`,
     name: `occurrences`,
   })
   occurrences?: number;
