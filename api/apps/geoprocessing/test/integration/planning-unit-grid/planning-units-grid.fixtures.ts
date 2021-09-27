@@ -5,10 +5,11 @@ import { plainToClass } from 'class-transformer';
 import { v4 } from 'uuid';
 import { Job } from 'bullmq';
 import { Repository } from 'typeorm';
+import { booleanEqual } from '@turf/turf';
+import { FeatureCollection } from 'geojson';
 
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
-
 import { JobInput, JobOutput } from '@marxan/planning-units-grid';
 import { PlanningUnitsGridProcessor } from '@marxan-geoprocessing/modules/planning-units-grid/planning-units-grid.processor';
 
@@ -21,6 +22,9 @@ export const getFixtures = async () => {
   const projectId = v4();
   return {
     cleanup: async () => {
+      await puGeoRepo.delete({
+        projectId,
+      });
       await app.close();
     },
     projectId,
@@ -55,27 +59,32 @@ export const getFixtures = async () => {
         }),
       );
 
-      const geoJsonFromGeometries = (
+      const geoJsonFromGeometries: FeatureCollection = (
         await puGeoRepo.query(
           `
             select json_build_object(
                      'type', 'FeatureCollection',
-                     'features', json_agg(ST_AsGeoJSON((t.*)::record, '', 15)::json)
-                       )
-                     from (
-                       select the_geom
-                       from planning_units_geom
-                       where type = 'from_shapefile'
-                         and project_id = $1
-                     ) as t(geom)
+                     'features',
+                     json_agg(ST_AsGeoJSON((t.*)::record, '', 15)::json)
+                     )
+            from (
+                   select the_geom
+                   from planning_units_geom
+                   where type = 'from_shapefile'
+                     and project_id = $1
+                 ) as t(geom)
           `,
           [projectId],
         )
       )[0].json_build_object;
 
-      expect(underlyingGeoJson.features).toEqual(
-        expect.arrayContaining(geoJsonFromGeometries.features),
-      );
+      for (const geo of underlyingGeoJson.features) {
+        expect(
+          geoJsonFromGeometries.features.some((geoFromJson) =>
+            booleanEqual(geoFromJson, geo),
+          ),
+        ).toBeTruthy();
+      }
 
       expect(output.projectId).toEqual(projectId);
       expect(output.geometryIds.length).toEqual(
