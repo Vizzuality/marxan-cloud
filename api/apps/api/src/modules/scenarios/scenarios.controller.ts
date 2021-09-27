@@ -278,13 +278,14 @@ export class ScenariosController {
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
   @ApiNoContentResponse()
   @Post(`:id/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
     @Param('id') scenarioId: string,
-    @Req() request: Request,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<void> {
-    this.service.processCostSurfaceShapefile(scenarioId, request.file);
+    this.service.processCostSurfaceShapefile(scenarioId, file);
   }
 
   @Get(`:id/cost-surface`)

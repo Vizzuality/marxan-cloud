@@ -27,9 +27,8 @@ export class SurfaceCostProcessor
     const scenarioPlanningUnitIds = (
       await this.availablePlanningUnits.get(job.data.scenarioId)
     ).ids;
-
     const { errors } = canPlanningUnitsBeLocked(
-      surfaceCosts.map((cost) => cost.puId),
+      surfaceCosts.map((cost) => cost.puid),
       scenarioPlanningUnitIds,
     );
     if (errors.length > 0) {
