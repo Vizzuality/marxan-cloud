@@ -26,7 +26,7 @@ export class OutputLineToDataTransformer extends Transform<
       runId, //  this isn't originally within file content
       featureId,
       _featureName,
-      _target,
+      target,
       amountHeld,
       _occurrenceTarget,
       occurrencesHeld,
@@ -35,12 +35,15 @@ export class OutputLineToDataTransformer extends Transform<
       targetMet,
       mpm,
     ] = chunk.split(',');
+    const featureScenarioId: string | undefined = this.idMap[+featureId]?.id;
+    const totalArea = Number(target) * (1 / this.idMap[+featureId]?.prop ?? 1);
     const data: ScenarioFeatureRunData = plainToClass<
       ScenarioFeatureRunData,
       ScenarioFeatureRunData
     >(ScenarioFeatureRunData, {
       amount: isDefined(amountHeld) ? +amountHeld : undefined,
-      featureScenarioId: this.idMap[+featureId],
+      featureScenarioId,
+      totalArea,
       occurrences: isDefined(occurrencesHeld) ? +occurrencesHeld : undefined,
       mpm: isDefined(mpm) ? +mpm : undefined,
       target: isDefined(targetMet) ? targetMet === `yes` : undefined,

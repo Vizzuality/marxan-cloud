@@ -11,7 +11,7 @@ import { ScenarioFeaturesGapData } from './scenario-features-gap-data.geo.entity
       run_id,
       fd.feature_id,
       sfd.scenario_id,
-      sfd.total_area,
+      osfd.total_area,
       sfd.prop as coverage_target
     from output_scenarios_features_data osfd
     inner join scenario_features_data sfd on osfd.feature_scenario_id=sfd.id

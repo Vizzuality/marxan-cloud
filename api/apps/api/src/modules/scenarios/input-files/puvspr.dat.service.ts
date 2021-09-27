@@ -1,4 +1,4 @@
-import { Connection, getConnection } from 'typeorm';
+import { Connection } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { InjectConnection } from '@nestjs/typeorm';
@@ -25,9 +25,10 @@ export class PuvsprDatService {
     select pu.scenario_id as scenario_id, puid as pu_id, feature_id, ST_Area(ST_Transform(st_intersection(species.the_geom, pu.the_geom),3410)) as amount
     from
     (
-        select scenario_id, the_geom, sfd.feature_id
+        select st_union(the_geom) as the_geom, min(sfd.feature_id) as feature_id
         from scenario_features_data sfd
         inner join features_data fd on sfd.feature_class_id = fd.id where sfd.scenario_id = '${scenarioId}'
+        group by fd.feature_id
     ) species,
     (
         select the_geom, spd.puid, spd.scenario_id
