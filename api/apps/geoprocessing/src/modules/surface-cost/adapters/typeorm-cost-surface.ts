@@ -1,7 +1,7 @@
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { In, Repository } from 'typeorm';
-import { flatten } from 'lodash';
+import { EntityManager, In, Repository } from 'typeorm';
+import { chunk } from 'lodash';
 
 import { CostSurfacePersistencePort } from '../ports/persistence/cost-surface-persistence.port';
 import { PlanningUnitCost } from '../ports/planning-unit-cost';
@@ -9,7 +9,6 @@ import {
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuCostDataGeo,
 } from '@marxan/scenarios-planning-unit';
-import { isDefined } from '@marxan/utils';
 
 @Injectable()
 export class TypeormCostSurface implements CostSurfacePersistencePort {
@@ -18,6 +17,7 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
     private readonly costs: Repository<ScenariosPuCostDataGeo>,
     @InjectRepository(ScenariosPlanningUnitGeoEntity)
     private readonly scenarioDataRepo: Repository<ScenariosPlanningUnitGeoEntity>,
+    @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {
     //
   }
@@ -26,61 +26,26 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
     const scenarioData = await this.scenarioDataRepo.find({
       where: {
         scenarioId,
-        puGeometryId: In(values.map((pair) => pair.puId)),
+        id: In(values.map((pair) => pair.puid)),
       },
     });
+    const puDataIds = scenarioData.map((sd) => sd.id);
+    await this.entityManager.transaction(async (manager) => {
+      for (const [, ids] of chunk(puDataIds, 100).entries()) {
+        await manager.delete(ScenariosPuCostDataGeo, {
+          scenariosPuDataId: In(ids),
+        });
+      }
 
-    const pairs = this.getUpdatePairs(scenarioData, values);
-
-    await this.costs.query(
-      `
-    UPDATE scenarios_pu_cost_data as spd
-    set "cost" = pucd.new_cost
-    from (values
-        ${this.generateParametrizedValues(pairs)}
-    ) as pucd(id, new_cost)
-    where pucd.id = spd.scenarios_pu_data_id
-    `,
-      flatten(pairs),
-    );
-    return;
+      for (const [, rows] of chunk(values, 100).entries()) {
+        await manager.insert(
+          ScenariosPuCostDataGeo,
+          rows.map((row) => ({
+            cost: row.cost,
+            scenariosPuDataId: row.puid,
+          })),
+        );
+      }
+    });
   }
-
-  /**
-   *
-   * generates parametrized input for:
-   * ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, 5000::float)
-   *
-   * in form of:
-   * ($1::uuid, $2::float),
-   * ($3::uuid, $4::float),
-   * ($5::uuid, $6::float),
-   * ...
-   *
-   */
-  private generateParametrizedValues(pairs: [string, number][]): string {
-    return pairs
-      .map(
-        (_, index) =>
-          `($${(index + 1) * 2 - 1}::uuid, $${(index + 1) * 2}::float)`,
-      )
-      .join(',');
-  }
-
-  private getUpdatePairs(
-    rows: ScenariosPlanningUnitGeoEntity[],
-    values: PlanningUnitCost[],
-  ): [string, number][] {
-    return rows
-      .map<[string, number | undefined]>((scenarioDataEntry) => [
-        scenarioDataEntry.id,
-        values.find((pair) => pair.puId === scenarioDataEntry.puGeometryId)
-          ?.cost,
-      ])
-      .filter(this.hasCostDefined);
-  }
-
-  private hasCostDefined = (
-    pair: [string, number | undefined],
-  ): pair is [string, number] => isDefined(pair[1]);
 }

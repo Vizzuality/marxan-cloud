@@ -58,7 +58,7 @@ const getShapefileForPlanningUnits = async (
   const fileName = 'shape-with-cost';
   const fileFullPath = `${baseDir}/${fileName}.zip`;
   const features: Feature<Polygon, PlanningUnitCost>[] = ids.map(
-    (puId, index) => ({
+    (puid, index) => ({
       type: 'Feature',
       bbox: [0, 0, 0, 0, 0, 0],
       geometry: {
@@ -72,7 +72,7 @@ const getShapefileForPlanningUnits = async (
           ],
         ],
       },
-      properties: { cost: costs[index], puId },
+      properties: { cost: costs[index], puid },
     }),
   );
   await convert(features, fileFullPath, options);

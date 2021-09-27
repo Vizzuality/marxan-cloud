@@ -16,7 +16,6 @@ export class FileService {
       stream.on('error', (error: Error) =>
         reject(new Error(`${fileName} could not be extracted: ` + error)),
       );
-
       stream
         .pipe(
           Extract({
