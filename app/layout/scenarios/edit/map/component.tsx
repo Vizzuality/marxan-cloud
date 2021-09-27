@@ -64,6 +64,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     wdpaThreshold,
 
     // Features
+    features: featuresRecipe,
     featureHoverId,
     highlightFeatures,
 
@@ -167,6 +168,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     active: tab === 'features',
     bbox,
     options: {
+      featuresRecipe,
       featureHoverId,
       settings: {
         bioregional: layerSettings.bioregional,

@@ -45,6 +45,7 @@ export interface UseFeaturePreviewLayers {
   bbox?: number[] | unknown;
   features?: SelectedItemProps[];
   options?: {
+    featuresRecipe?: Record<string, any>[],
     featureHoverId?: string;
     settings?: {
       bioregional?: {

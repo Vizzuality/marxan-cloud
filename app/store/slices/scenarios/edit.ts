@@ -10,6 +10,7 @@ interface ScenarioEditStateProps {
   wdpaThreshold: number;
 
   // FEATURES
+  features: Record<string, any>;
   featureHoverId: string;
   highlightFeatures: string[];
 
@@ -42,6 +43,7 @@ const initialState = {
   wdpaThreshold: 0.75,
 
   // FEATURES
+  features: [],
   featureHoverId: null,
   highlightFeatures: [],
 
@@ -83,6 +85,9 @@ export function getScenarioEditSlice(id) {
       },
 
       // FEATURES
+      setFeatures: (state, action: PayloadAction<Record<string, any>>) => {
+        state.features = action.payload;
+      },
       setFeatureHoverId: (state, action: PayloadAction<string>) => {
         state.featureHoverId = action.payload;
       },
