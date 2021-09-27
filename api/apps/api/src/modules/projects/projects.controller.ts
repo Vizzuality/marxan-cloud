@@ -54,12 +54,14 @@ import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
-import { ProjectGridRequestDto } from './dto/project-grid-request.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { isFeatureCollection } from '@marxan/utils';
-import { plainToClass } from 'class-transformer';
+import {
+  AsyncJobDto,
+  JsonApiAsyncJobMeta,
+} from '@marxan-api/dto/async-job.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -129,6 +131,8 @@ export class ProjectsController {
   ): Promise<ProjectResultSingular> {
     return await this.projectSerializer.serialize(
       await this.projectsService.create(dto, { authenticatedUser: req.user }),
+      undefined,
+      true,
     );
   }
 
@@ -141,6 +145,8 @@ export class ProjectsController {
   ): Promise<ProjectResultSingular> {
     return await this.projectSerializer.serialize(
       await this.projectsService.update(id, dto),
+      undefined,
+      true,
     );
   }
 
@@ -156,22 +162,17 @@ export class ProjectsController {
     description: 'Upload shapefile for project-specific planning unit grid',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiCreatedResponse({ type: ProjectGridRequestDto })
+  @ApiCreatedResponse({ type: JsonApiAsyncJobMeta })
   @Post(`:id/grid`)
   async setProjectGrid(
     @Param('id') projectId: string,
     @UploadedFile() file: Express.Multer.File,
-  ) {
+  ): Promise<JsonApiAsyncJobMeta> {
     const result = await this.projectsService.setGrid(projectId, file);
     if (isLeft(result)) {
       throw new InternalServerErrorException(result.left);
     }
-    return plainToClass<ProjectGridRequestDto, ProjectGridRequestDto>(
-      ProjectGridRequestDto,
-      {
-        id: result.right.value,
-      },
-    );
+    return AsyncJobDto.forProject([result.right.value]).asJsonApiMetadata();
   }
 
   @ApiOperation({
@@ -206,14 +207,14 @@ export class ProjectsController {
     @Param('id') projectId: string,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<void> {
+  ): Promise<JsonApiAsyncJobMeta> {
     const outcome = await this.projectsService.addShapeFor(projectId, file, {
       authenticatedUser: req.user,
     });
     if (outcome) {
       throw new NotFoundException();
     }
-    return;
+    return AsyncJobDto.forProject().asJsonApiMetadata();
   }
 
   @ApiConsumesShapefile({

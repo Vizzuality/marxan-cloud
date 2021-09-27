@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
+import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
 
 export const geoFeatureResource: BaseServiceResource = {
   className: 'GeoFeature',
@@ -31,7 +32,7 @@ export class JSONAPIGeoFeatureSetsData {
   attributes!: GeoFeatureSetSpecification;
 }
 
-export class GeoFeatureSetResult {
+export class GeoFeatureSetResult extends JsonApiAsyncJobMeta {
   @ApiProperty()
   data!: JSONAPIGeoFeatureSetsData;
 }
