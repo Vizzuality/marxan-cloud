@@ -26,9 +26,10 @@ describe(`when project is not available`, () => {
 
 describe(`when project is available`, () => {
   it(`submits shapefile to the system`, async () => {
-    expect(
-      (await world.WhenSubmittingShapefileFor(world.projectId)).status,
-    ).toEqual(201);
+    const result = await world.WhenSubmittingShapefileFor(world.projectId);
+
+    expect(result.status).toEqual(201);
+    expect(result.body.meta.started).toBeTruthy();
     const job = world.GetSubmittedJobs()[0];
     expect(job).toMatchObject({
       name: `protected-areas-for-${world.projectId}`,

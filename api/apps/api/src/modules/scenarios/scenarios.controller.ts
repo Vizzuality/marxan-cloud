@@ -4,19 +4,19 @@ import {
   Delete,
   Get,
   Header,
+  InternalServerErrorException,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
-  Query,
   Put,
+  Query,
   Req,
   Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -81,6 +81,10 @@ import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-da
 import { ScenarioFeaturesOutputGapDataService } from '../scenarios-features/scenario-features-output-gap-data.service';
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
 import { CostRangeDto } from './dto/cost-range.dto';
+import {
+  AsyncJobDto,
+  JsonApiAsyncJobMeta,
+} from '@marxan-api/dto/async-job.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -220,6 +224,8 @@ export class ScenariosController {
   ): Promise<ScenarioResult> {
     return await this.scenarioSerializer.serialize(
       await this.service.create(dto, { authenticatedUser: req.user }),
+      undefined,
+      true,
     );
   }
 
@@ -233,7 +239,11 @@ export class ScenariosController {
     if (isLeft(result)) {
       throw new InternalServerErrorException(result.left.description);
     }
-    return await this.geoFeatureSetSerializer.serialize(result.right);
+    return await this.geoFeatureSetSerializer.serialize(
+      result.right,
+      undefined,
+      true,
+    );
   }
 
   @ApiOperation({ description: 'Create feature set for scenario' })
@@ -284,8 +294,9 @@ export class ScenariosController {
   async processCostSurfaceShapefile(
     @Param('id') scenarioId: string,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<JsonApiAsyncJobMeta> {
     this.service.processCostSurfaceShapefile(scenarioId, file);
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
   @Get(`:id/cost-surface`)
@@ -314,6 +325,8 @@ export class ScenariosController {
   ): Promise<ScenarioResult> {
     return await this.scenarioSerializer.serialize(
       await this.service.update(id, dto),
+      undefined,
+      true,
     );
   }
 
@@ -329,9 +342,9 @@ export class ScenariosController {
   async changePlanningUnits(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateScenarioPlanningUnitLockStatusDto,
-  ): Promise<void> {
+  ): Promise<JsonApiAsyncJobMeta> {
     await this.service.changeLockStatus(id, input);
-    return;
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
   @Delete(`:id/planning-units`)
@@ -509,14 +522,15 @@ export class ScenariosController {
     type: Number,
   })
   @ApiAcceptedResponse({
-    description: `No content.`,
+    type: JsonApiAsyncJobMeta,
   })
   @Post(`:id/marxan`)
   async executeMarxanRun(
     @Param(`id`, ParseUUIDPipe) id: string,
     @Query(`blm`) blm?: number,
-  ) {
+  ): Promise<JsonApiAsyncJobMeta> {
     await this.service.run(id, blm);
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
   @ApiOperation({

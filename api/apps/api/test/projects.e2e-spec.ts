@@ -96,6 +96,7 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultSingular = response.body;
       completeProject = await Deserializer.deserialize(response.body);
       expect(jsonAPIResponse.data.type).toBe('projects');
+      expect(jsonAPIResponse.meta.started).toBeTruthy();
 
       const createScenarioDTO: Partial<CreateScenarioDTO> = {
         ...E2E_CONFIG.scenarios.valid.minimal(),

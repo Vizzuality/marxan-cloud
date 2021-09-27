@@ -31,10 +31,17 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${token}`)
         .attach(`file`, __dirname + '/grid-nam-shapefile.zip'),
     ThenShapefileIsSubmittedToProcessing: async (body: any) => {
-      expect(body.id).toBeDefined();
+      expect(body.meta).toEqual({
+        started: true,
+        ids: expect.any(Array),
+        isoDate: expect.any(String),
+        type: `project`,
+      });
       await waitForExpect(async () => {
         // using implementation details...
-        const job = Object.values(queue.jobs).find((j) => j.id === body.id);
+        const job = Object.values(queue.jobs).find(
+          (j) => j.id === body.meta.ids[0],
+        );
         expect(job).toBeDefined();
         expect(job!.data?.projectId).toBeDefined();
         expect(job!.data?.shapefile.filename).toMatch(/grid-nam-shapefile.zip/);
