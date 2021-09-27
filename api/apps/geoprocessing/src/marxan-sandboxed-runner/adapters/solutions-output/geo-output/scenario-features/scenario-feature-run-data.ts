@@ -13,6 +13,10 @@ export class ScenarioFeatureRunData
   @IsNumber()
   amount?: number;
 
+  @IsOptional()
+  @IsNumber()
+  totalArea?: number;
+
   @IsUUID()
   featureScenarioId!: string;
 

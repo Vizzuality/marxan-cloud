@@ -20,7 +20,7 @@ beforeEach(async () => {
       {
         provide: token,
         useValue: {
-          find: jest.fn(),
+          query: jest.fn(),
         } as any,
       },
     ],
@@ -32,18 +32,18 @@ beforeEach(async () => {
 
 describe(`when there are no rows`, () => {
   beforeEach(() => {
-    dataRepo.find.mockImplementationOnce(async () => []);
+    dataRepo.query.mockImplementationOnce(async () => []);
   });
 
   it(`should return headers only`, async () => {
     expect(await sut.getSpecDatContent('scenario-id')).toEqual(
-      `id\ttarget\tprop\tspf\ttarget2\ttargetocc\tname\tsepnum\tsepdistance`,
+      `id\ttarget\tprop\tspf\ttarget2\ttargetocc\tsepnum\tsepdistance`,
     );
   });
 });
 describe(`when there is data available`, () => {
   beforeEach(() => {
-    dataRepo.find.mockImplementationOnce(async () => [
+    dataRepo.query.mockImplementationOnce(async () => [
       {
         scenarioId: 'id',
         featureId: 0,
@@ -79,7 +79,7 @@ describe(`when there is data available`, () => {
 
 describe(`when there is data available`, () => {
   beforeEach(() => {
-    dataRepo.find.mockImplementationOnce(async () => [
+    dataRepo.query.mockImplementationOnce(async () => [
       {
         scenarioId: 'id',
         featureId: 1,
@@ -90,7 +90,6 @@ describe(`when there is data available`, () => {
         target2: 32,
         sepNum: 10,
         targetocc: 999,
-        name: 'entry',
         metadata: {
           sepdistance: 4000,
         },
@@ -100,8 +99,8 @@ describe(`when there is data available`, () => {
 
   it(`should return content`, async () => {
     expect(await sut.getSpecDatContent('scenario-id')).toMatchInlineSnapshot(`
-      "id	target	prop	spf	target2	targetocc	name	sepnum	sepdistance
-      1	30.00	0.25	1.66	32.00	999.00	entry	10.00	4000.00"
+      "id	target	prop	spf	target2	targetocc	sepnum	sepdistance
+      1	30.00	0.25	1.66	32.00	999.00	10.00	4000.00"
     `);
   });
 });
