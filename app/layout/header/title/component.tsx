@@ -94,6 +94,7 @@ export const Title: React.FC<TitleProps> = () => {
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
+        ...data,
         metadata,
       },
     }, {
