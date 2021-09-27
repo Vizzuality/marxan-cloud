@@ -92,6 +92,10 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
               splits: splitFeaturesSelected.map((sf) => {
                 return {
                   value: sf.id,
+                  marxanSettings: sf.marxanSettings || {
+                    fpf: 1,
+                    prop: 0.5,
+                  },
                 };
               }),
             },

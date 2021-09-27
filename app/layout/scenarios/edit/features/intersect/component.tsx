@@ -10,6 +10,7 @@ import List from 'layout/scenarios/edit/features/intersect/list';
 import Toolbar from 'layout/scenarios/edit/features/intersect/toolbar';
 
 import Button from 'components/button';
+import { composeValidators } from 'components/forms/validations';
 
 export interface ScenariosFeaturesIntersectProps {
   intersecting: string;
@@ -126,21 +127,13 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
       data: {
         status: 'draft',
         features: selectedFeaturesData.map((sf) => {
-          const { featureId, marxanSettings, geoprocessingOperations } = sf;
-          if (featureId !== intersecting) {
-            return {
-              featureId,
-              kind: geoprocessingOperations ? 'withGeoprocessing' : 'plain',
-              ...!!marxanSettings && { marxanSettings },
-              ...!!geoprocessingOperations && { geoprocessingOperations },
-            };
-          }
+          const { featureId } = sf;
 
           return {
             featureId,
             kind: 'withGeoprocessing',
             geoprocessingOperations: selected.map((s) => {
-              const { splitSelected, splitFeaturesSelected } = s;
+              const { splitSelected, splitFeaturesSelected = [] } = s;
 
               return {
                 kind: 'stratification/v1',
@@ -151,6 +144,10 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
                 splits: splitFeaturesSelected.map((sfs) => {
                   return {
                     value: sfs.id,
+                    marxanSettings: {
+                      fpf: 1,
+                      prop: 0.5,
+                    },
                   };
                 }),
               };
@@ -167,11 +164,26 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
         setSubmitting(false);
       },
     });
-  }, [sid, intersecting, selectedFeaturesData, selectedFeaturesMutation, onDismiss]);
+  }, [sid, selectedFeaturesData, selectedFeaturesMutation, onDismiss]);
 
   const onCancel = useCallback(() => {
     onDismiss();
   }, [onDismiss]);
+
+  const onValidateBioregional = useCallback((value) => {
+    if (!value) {
+      return true;
+    }
+
+    if (!value.length) {
+      return true;
+    }
+    const errors = value.some((v) => {
+      return !v.splitSelected || !v.splitFeaturesSelected || !v.splitFeaturesSelected.length;
+    });
+
+    return errors;
+  }, []);
 
   return (
     <FormRFF
@@ -179,62 +191,65 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
+      {({ handleSubmit, form, values }) => {
+        const { valid } = form.getState();
+        return (
+          <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
+            <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">
+              Interesect with
+              {' '}
+              <span className="px-1 bg-green-300">bioregional</span>
+              {' '}
+              features
+            </h2>
+            <Toolbar search={search} onSearch={onSearch} />
 
-      {({ handleSubmit, values }) => (
-        <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
-          <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">
-            Interesect with
-            {' '}
-            <span className="px-1 bg-green-300">bioregional</span>
-            {' '}
-            features
-          </h2>
-          <Toolbar search={search} onSearch={onSearch} />
+            <FieldRFF
+              name="selected"
+              validate={composeValidators([{ presence: true }, onValidateBioregional])}
+            >
+              {({ input }) => (
+                <List
+                  search={search}
+                  selected={values.selected}
+                  onSelected={(id) => {
+                    onSelected(id, input);
+                  }}
+                  onSplitSelected={(id, key) => {
+                    onSplitSelected(id, key, input);
+                  }}
+                  onSplitFeaturesSelected={(id, key) => {
+                    onSplitFeaturesSelected(id, key, input);
+                  }}
+                />
+              )}
+            </FieldRFF>
 
-          <FieldRFF
-            name="selected"
-          >
-            {({ input }) => (
-              <List
-                search={search}
-                selected={values.selected}
-                onSelected={(id) => {
-                  onSelected(id, input);
-                }}
-                onSplitSelected={(id, key) => {
-                  onSplitSelected(id, key, input);
-                }}
-                onSplitFeaturesSelected={(id, key) => {
-                  onSplitFeaturesSelected(id, key, input);
-                }}
-              />
+            {allFeaturesIsFetched && (
+              <div className="flex justify-center flex-shrink-0 px-8 space-x-3">
+                <Button
+                  className="w-full"
+                  theme="secondary"
+                  size="lg"
+                  onClick={onCancel}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  theme="primary"
+                  size="lg"
+                  disabled={submitting || !valid}
+                >
+                  Save
+                </Button>
+              </div>
             )}
-          </FieldRFF>
-
-          {allFeaturesIsFetched && (
-            <div className="flex justify-center flex-shrink-0 px-8 space-x-3">
-              <Button
-                className="w-full"
-                theme="secondary"
-                size="lg"
-                onClick={onCancel}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="submit"
-                className="w-full"
-                theme="primary"
-                size="lg"
-                disabled={submitting || !values.selected.length}
-              >
-                Save
-              </Button>
-            </div>
-          )}
-        </form>
-      )}
+          </form>
+        );
+      }}
     </FormRFF>
   );
 };
