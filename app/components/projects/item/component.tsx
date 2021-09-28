@@ -6,7 +6,6 @@ import { usePlausible } from 'next-plausible';
 import type { Project } from 'types/project-model';
 
 import { useMe } from 'hooks/me';
-import { useProject } from 'hooks/projects';
 
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -45,7 +44,6 @@ export const Item: React.FC<ItemProps> = ({
 }: ItemProps) => {
   const [animate, setAnimate] = useState('leave');
   const plausible = usePlausible();
-  const { data: project } = useProject(id);
   const { user } = useMe();
 
   const handleMouseEnter = useCallback(() => {
@@ -68,11 +66,11 @@ export const Item: React.FC<ItemProps> = ({
       props: {
         userId: `${user.id}`,
         userEmail: `${user.email}`,
-        projectId: `${project.id}`,
-        projectName: `${project.name}`,
+        projectId: `${id}`,
+        projectName: `${name}`,
       },
     });
-  }, [onDownload, plausible, project, user]);
+  }, [onDownload, plausible, id, name, user]);
 
   const handleDuplicate = useCallback((e) => {
     e.stopPropagation();
