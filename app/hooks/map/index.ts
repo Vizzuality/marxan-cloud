@@ -168,7 +168,7 @@ export function useFeaturePreviewLayers({
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
     const FEATURES = [...features];
-    const { featureHoverId, settings = {} } = options;
+    const { featuresRecipe = [], featureHoverId, settings = {} } = options;
 
     const currentFeatureHoverIndex = FEATURES.findIndex((f) => f.id === featureHoverId);
     if (currentFeatureHoverIndex > -1) {
@@ -212,6 +212,8 @@ export function useFeaturePreviewLayers({
           return 0.5;
         };
 
+        const F = featuresRecipe.find((fr) => fr.id === id) || f;
+
         return {
           id: `feature-${id}-preview-layer-${cache}`,
           type: 'vector',
@@ -224,6 +226,12 @@ export function useFeaturePreviewLayers({
               {
                 type: 'fill',
                 'source-layer': 'layer0',
+                ...F.splitSelected && {
+                  filter: [
+                    'all',
+                    ['in', ['get', F.splitSelected], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
+                  ],
+                },
                 layout: {
                   visibility: getLayerVisibility(type),
                 },
@@ -235,12 +243,18 @@ export function useFeaturePreviewLayers({
               {
                 type: 'line',
                 'source-layer': 'layer0',
-                paint: {
-                  'line-color': '#000',
-                  'line-opacity': getLayerOpacity(),
+                ...F.splitSelected && {
+                  filter: [
+                    'all',
+                    ['in', ['get', F.splitSelected], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
+                  ],
                 },
                 layout: {
                   visibility: getLayerVisibility(type),
+                },
+                paint: {
+                  'line-color': '#000',
+                  'line-opacity': getLayerOpacity(),
                 },
               },
             ],
