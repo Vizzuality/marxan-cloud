@@ -143,7 +143,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
 
     return ['pugrid'];
-  }, [tab, subtab, wdpaCategories.wdpaIucnCategories?.length]);
+  }, [tab, subtab, wdpaCategories]);
 
   const featuresIds = useMemo(() => {
     if (allGapAnalysisData) {
