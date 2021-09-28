@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 
@@ -35,7 +35,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   const { pid, sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setFeatureHoverId } = scenarioSlice.actions;
+  const { setFeatures, setFeatureHoverId } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
 
@@ -266,6 +266,8 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
 
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow overflow-hidden">
+          <FormSpyRFF onChange={(state) => dispatch(setFeatures(state.values.features))} />
+
           <Loading
             visible={submitting || selectedFeaturesIsFetching}
             className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
