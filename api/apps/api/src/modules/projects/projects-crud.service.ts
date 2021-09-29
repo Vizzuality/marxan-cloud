@@ -194,7 +194,12 @@ export class ProjectsCrudService extends AppBaseService<
         'creating planning unit job and assigning project to area',
       );
       await Promise.all([
-        this.planningUnitsService.create(createModel),
+        this.planningUnitsService.create({
+          ...createModel,
+          planningUnitAreakm2: createModel.planningUnitAreakm2,
+          planningUnitGridShape: createModel.planningUnitGridShape,
+          projectId: model.id,
+        }),
         this.planningAreasService.assignProject({
           projectId: model.id,
           planningAreaGeometryId: createModel.planningAreaId,
@@ -221,7 +226,12 @@ export class ProjectsCrudService extends AppBaseService<
         createModel.planningAreaId)
     ) {
       await Promise.all([
-        this.planningUnitsService.create(createModel),
+        this.planningUnitsService.create({
+          ...createModel,
+          planningUnitAreakm2: createModel.planningUnitAreakm2,
+          planningUnitGridShape: createModel.planningUnitGridShape,
+          projectId: model.id,
+        }),
         this.planningAreasService.assignProject({
           projectId: model.id,
           planningAreaGeometryId: createModel.planningAreaId,
