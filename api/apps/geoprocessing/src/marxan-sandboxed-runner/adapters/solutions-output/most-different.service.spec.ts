@@ -13,9 +13,11 @@ beforeEach(async () => {
 
 describe(`when given result rows`, () => {
   it(`marks those with most different under particular criteria`, () => {
-    expect(sut.map(subjectRows)).toMatchInlineSnapshot(`
+    const output = sut.map(subjectRows);
+    expect(output.filter((row) => row.distinctFive).length).toEqual(5);
+    expect(output).toMatchInlineSnapshot(`
       Array [
-        Object {
+        ResultRow {
           "best": false,
           "connectivity": 0,
           "connectivityEdge": 0,
@@ -24,7 +26,7 @@ describe(`when given result rows`, () => {
           "connectivityOut": 0,
           "connectivityTotal": 0,
           "cost": 5,
-          "distinctFive": true,
+          "distinctFive": false,
           "missingValues": 0,
           "mpm": 0,
           "penalty": 0,
@@ -33,7 +35,7 @@ describe(`when given result rows`, () => {
           "score": 1000,
           "shortfall": 0,
         },
-        Object {
+        ResultRow {
           "best": false,
           "connectivity": 0,
           "connectivityEdge": 0,
@@ -51,7 +53,7 @@ describe(`when given result rows`, () => {
           "score": 2000,
           "shortfall": 0,
         },
-        Object {
+        ResultRow {
           "best": false,
           "connectivity": 0,
           "connectivityEdge": 0,
@@ -69,7 +71,7 @@ describe(`when given result rows`, () => {
           "score": 5000,
           "shortfall": 0,
         },
-        Object {
+        ResultRow {
           "best": false,
           "connectivity": 0,
           "connectivityEdge": 0,
@@ -87,7 +89,7 @@ describe(`when given result rows`, () => {
           "score": 6000,
           "shortfall": 0,
         },
-        Object {
+        ResultRow {
           "best": false,
           "connectivity": 0,
           "connectivityEdge": 0,
@@ -105,7 +107,7 @@ describe(`when given result rows`, () => {
           "score": 15000,
           "shortfall": 0,
         },
-        Object {
+        ResultRow {
           "best": false,
           "connectivity": 0,
           "connectivityEdge": 0,
@@ -121,6 +123,24 @@ describe(`when given result rows`, () => {
           "planningUnits": 4,
           "runId": 6,
           "score": 2000,
+          "shortfall": 0,
+        },
+        ResultRow {
+          "best": false,
+          "connectivity": 0,
+          "connectivityEdge": 0,
+          "connectivityIn": 0,
+          "connectivityInFraction": 0,
+          "connectivityOut": 0,
+          "connectivityTotal": 0,
+          "cost": 5,
+          "distinctFive": true,
+          "missingValues": 0,
+          "mpm": 0,
+          "penalty": 0,
+          "planningUnits": 4,
+          "runId": 7,
+          "score": 10,
           "shortfall": 0,
         },
       ]
