@@ -85,6 +85,8 @@ import {
   AsyncJobDto,
   JsonApiAsyncJobMeta,
 } from '@marxan-api/dto/async-job.dto';
+import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
+import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -217,6 +219,7 @@ export class ScenariosController {
 
   @ApiOperation({ description: 'Create scenario' })
   @ApiCreatedResponse({ type: ScenarioResult })
+  @ApiTags(asyncJobTag)
   @Post()
   async create(
     @Body(new ValidationPipe()) dto: CreateScenarioDTO,
@@ -230,6 +233,7 @@ export class ScenariosController {
   }
 
   @ApiOperation({ description: 'Create feature set for scenario' })
+  @ApiTags(asyncJobTag)
   @Post(':id/features/specification/v2')
   async createSpecification(
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
@@ -289,7 +293,7 @@ export class ScenariosController {
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiNoContentResponse()
+  @ApiTags(asyncJobTag)
   @Post(`:id/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
     @Param('id') scenarioId: string,
@@ -307,6 +311,7 @@ export class ScenariosController {
   }
 
   @ApiConsumesShapefile()
+  @ApiTags(inlineJobTag)
   @Post(':id/planning-unit-shapefile')
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   async uploadLockInShapeFile(
@@ -318,6 +323,7 @@ export class ScenariosController {
 
   @ApiOperation({ description: 'Update scenario' })
   @ApiOkResponse({ type: ScenarioResult })
+  @ApiTags(asyncJobTag)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -337,8 +343,9 @@ export class ScenariosController {
     return await this.service.remove(id);
   }
 
-  @Patch(':id/planning-units')
+  @ApiTags(asyncJobTag)
   @ApiOkResponse()
+  @Patch(':id/planning-units')
   async changePlanningUnits(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateScenarioPlanningUnitLockStatusDto,
@@ -515,7 +522,7 @@ export class ScenariosController {
     description: `Request start of the Marxan execution.`,
     summary: `Request start of the Marxan execution.`,
   })
-  @ApiTags(marxanRunTag)
+  @ApiTags(marxanRunTag, asyncJobTag)
   @ApiQuery({
     name: `blm`,
     required: false,
