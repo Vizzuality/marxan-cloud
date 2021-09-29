@@ -2785,6 +2785,11 @@ acorn@^8.0.4:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.0.4.tgz#7a3ae4191466a6984eee0fe3407a4f3aa9db8354"
   integrity sha512-XNP0PqF1XD19ZlLKvB7cMmnZswW4C/03pRHgirB30uSJTaS3A3V1/P4sS3HPvFmjoriPCJQs+JDSbm4bL1TxGQ==
 
+agglo@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/agglo/-/agglo-0.0.1.tgz#f86ef114ff658a7c347d01a67f5a70320927f385"
+  integrity sha1-+G7xFP9linw0fQGmf1pwMgkn84U=
+
 aggregate-error@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/aggregate-error/-/aggregate-error-3.1.0.tgz#92670ff50f5359bdb7a3e0d40d0ec30c5737687a"
@@ -4482,6 +4487,11 @@ es-to-primitive@^1.2.1:
     is-date-object "^1.0.1"
     is-symbol "^1.0.2"
 
+es6-promise@^3.0.2:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-3.3.1.tgz#a08cdde84ccdbf34d027a1451bc91d4bcd28a613"
+  integrity sha1-oIzd6EzNvzTQJ6FFG8kdS80ophM=
+
 escalade@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/escalade/-/escalade-3.1.1.tgz#d8cfdc7000965c5a0174b4a82eaa5c0552742e40"
@@ -6141,6 +6151,13 @@ iterare@1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/iterare/-/iterare-1.2.1.tgz#139c400ff7363690e33abffa33cbba8920f00042"
   integrity sha512-RKYVTCjAnRthyJes037NX/IiqeidgN1xc3j1RjFfECFp28A1GVwK9nA+i0rJPaHqSZwygLzRnFlzUuHFoWWy+Q==
+
+jaccard-index@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/jaccard-index/-/jaccard-index-0.2.0.tgz#636a8db9eab0b85ee53adbbbf3c5ce4108436636"
+  integrity sha1-Y2qNueqwuF7lOtu788XOQQhDZjY=
+  dependencies:
+    promisen "^0.1.1"
 
 jest-changed-files@^26.6.2:
   version "26.6.2"
@@ -8200,6 +8217,13 @@ promise@^8.0.0:
   integrity sha512-W04AqnILOL/sPRXziNicCjSNRruLAuIHEOVBazepu0545DDNGYHz7ar9ZgZ1fMU8/MA4mVxp5rkBWRi6OXIy3Q==
   dependencies:
     asap "~2.0.6"
+
+promisen@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/promisen/-/promisen-0.1.1.tgz#29e113fec03722fd94399df59d1ca6f2ec728bbf"
+  integrity sha1-KeET/sA3Iv2UOZ31nRym8uxyi78=
+  dependencies:
+    es6-promise "^3.0.2"
 
 prompts@^2.0.1:
   version "2.4.0"
