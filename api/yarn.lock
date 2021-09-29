@@ -353,6 +353,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@greenelab/hclust@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@greenelab/hclust/-/hclust-0.0.1.tgz#92c3750fea00b6ac712169ed49ddc5614aad7421"
+  integrity sha512-zVKQDcBHESkAg+hvRuTfjzaoqsDlxoJpM0z+x4FgcMood1XZjTCv8Zww0CZFX9g8eLXB7zzG1aas4cwb+2nnMg==
+
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.5.0.tgz#1407967d4c6eecd7388f83acf1eaf4d0c6e58ef9"
