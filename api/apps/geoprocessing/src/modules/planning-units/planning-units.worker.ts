@@ -1,12 +1,15 @@
-import { Logger, Injectable } from '@nestjs/common';
-import { Worker, QueueScheduler } from 'bullmq';
-import { join } from 'path';
-import * as config from 'config';
+import { Injectable, Logger } from '@nestjs/common';
+import { Worker } from 'bullmq';
+import { WorkerBuilder } from '@marxan-geoprocessing/modules/worker';
+import { PlanningUnitsJobProcessor } from './planning-units.job';
+import {
+  createQueueName,
+  PlanningUnitsJob,
+} from '@marxan-jobs/planning-unit-geometry';
 
 /**
  * @see https://docs.bullmq.io/guide/workers
  *
- * @deprecated Workers and jobs should be move to the new functionality
  * @debt Bullmq is expected to be supported soon in the
  * nest.js bull wrapper. In the meanwhile we are using Bullmq
  * in the worker
@@ -14,29 +17,22 @@ import * as config from 'config';
  **/
 @Injectable()
 export class PlanningUnitsProcessor {
-  private readonly queueName: string = 'planning-units';
   private readonly logger: Logger = new Logger(PlanningUnitsProcessor.name);
-  public readonly worker: Worker = new Worker(
-    this.queueName,
-    join(__dirname, '/planning-units.job.ts'),
-    config.get('redisApi'),
-  );
-  private scheduler: QueueScheduler = new QueueScheduler(
-    this.queueName,
-    config.get('redisApi'),
-  );
+  private readonly worker: Worker<PlanningUnitsJob, void>;
 
-  constructor() {
-    this.logger.debug('worker');
-    this.worker.on('completed', async (job) => {
-      this.logger.debug(`Job finished ${JSON.stringify(job)}`);
+  constructor(
+    private readonly workerBuilder: WorkerBuilder,
+    processor: PlanningUnitsJobProcessor,
+  ) {
+    this.worker = workerBuilder.build<PlanningUnitsJob, void>(
+      createQueueName,
+      processor,
+    );
+    this.worker.on(`completed`, (job) => {
+      this.logger.log(`Planning units job #${job.id} completed`);
     });
-  }
-
-  public async onModuleDestroy(): Promise<void> {
-    await this.scheduler.close();
-    await this.scheduler.disconnect();
-    await this.worker.close();
-    await this.worker.disconnect();
+    this.worker.on(`failed`, (job) => {
+      this.logger.log(`Planning units job #${job.id} failed`);
+    });
   }
 }

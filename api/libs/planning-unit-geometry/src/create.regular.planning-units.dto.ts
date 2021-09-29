@@ -3,6 +3,7 @@ import {
   IsISO31661Alpha3,
   IsEnum,
   IsPositive,
+  IsUUID,
 } from 'class-validator';
 
 /**
@@ -43,4 +44,7 @@ export class PlanningUnitsJob {
 
   @IsPositive()
   planningUnitAreakm2!: number;
+
+  @IsUUID()
+  projectId!: string;
 }

@@ -58,4 +58,9 @@ const eventToJobStatusMapping: Record<ValuesType<ProjectEvents>, JobStatus> = {
     JobStatus.done,
   [API_EVENT_KINDS.project__protectedAreas__submitted__v1__alpha]:
     JobStatus.running,
+  [API_EVENT_KINDS.project__planningUnits__submitted__v1__alpha]:
+    JobStatus.running,
+  [API_EVENT_KINDS.project__planningUnits__finished__v1__alpha]: JobStatus.done,
+  [API_EVENT_KINDS.project__planningUnits__failed__v1__alpha]:
+    JobStatus.failure,
 };

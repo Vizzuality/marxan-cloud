@@ -31,6 +31,12 @@ test(`job statuses for project`, async () => {
       status: 'running',
       isoDate: expect.any(String),
     },
+    {
+      data: null,
+      kind: 'planningUnits',
+      status: 'running',
+      isoDate: expect.any(String),
+    },
   ]);
   expect(result.body.data.attributes.scenarios).toEqual([
     {
