@@ -1,136 +1,95 @@
 import { Injectable } from '@nestjs/common';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const Jaccard = require('jaccard-index');
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const agglo = require('agglo');
-
+import { plainToClass } from 'class-transformer';
+import { minBy } from 'lodash';
 import { ResultRow } from '@marxan/marxan-output';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { clusterData, averageDistance } from '@greenelab/hclust';
+import { isDefined } from '@marxan/utils';
+
+type TargetCluster<T = ResultRow[]> = [T, T, T, T, T];
+type SolutionPerClusterGroup<T = ResultRow> = TargetCluster<T>;
 
 @Injectable()
 export class MostDifferentService {
   map(fromState: ResultRow[]): ResultRow[] {
-    const mostDifferent: number[] = [];
-
-    const jaccardDistanceIndexMatrix = [];
-
-    console.log(
-      `Given scores:`,
-      fromState.map((s) => `#${s.runId} => ${s.score}`),
-    );
-
-    for (const solution of fromState) {
-      const solutionItems = solution.score.toString().split('');
-      jaccardDistanceIndexMatrix.push(
-        fromState.map((compareToSolution) => {
-          // const u = jaccard.index(
-          //   solutionItems,
-          //   compareToSolution.score.toString().split(''),
-          // );
-
-          /**
-           * TODO (?) enhance calcSim to base on objects like
-           * {
-           *   runId: number,
-           *   value: (score or whatever we want)
-           * }
-           *
-           * but does it make sense? runId would be also used in clustering..
-           *
-           */
-          return calcSim(
-            solutionItems,
-            compareToSolution.score.toString().split(''),
-          );
+    if (fromState.length <= 5) {
+      return fromState.map((state) =>
+        plainToClass(ResultRow, {
+          ...state,
+          distinctFive: true,
         }),
       );
     }
 
-    // console.log(jaccardDistanceIndexMatrix);
+    const targetCluster = this.#getClusterOfFiveGroup(fromState);
 
-    // given the distance matrix, we can cluster the solutions
-
-    /**
-     * TODO think about getting:
-     * - 5 solutions (no need to calculate?)
-     * - less than 5 - can't get 5 most different?
-     */
-    const clusters: { clusters: any[] }[] = agglo(jaccardDistanceIndexMatrix, {
-      indexes: false,
-    });
-
-    const res = clusterData({
-      data: fromState.map((state) => ({
-        raw: state,
-      })),
-      key: 'raw',
-      distance: (setA: ResultRow, setB: ResultRow) => {
-        const itemsA = setA.score.toString().split('');
-        const itemsB = setB.score.toString().split('');
-        return calcSim(itemsA, itemsB);
-      },
-      linkage: (setA: number[], setB: number[], distanceMatrix: number[][]) => {
-        // use default one; provided one just for examination purposes
-        return averageDistance(setA, setB, distanceMatrix);
-      },
-    });
-    console.log(`res`, res);
-    console.log(`5-sets`, res.clustersGivenK[5]);
-
-    const targetClusters = clusters.find(
-      (cluster) => cluster.clusters.length === 5,
+    if (!targetCluster) {
+      // TODO @alicia @andrea - what if desired cluster was not found?
+      // for whatever reason, library couldn't divide it and a cluster of 5
+      // groups was not resolved
+      return fromState;
+    }
+    const selectedSolutions = this.#getSolutionsFromCluster(targetCluster)?.map(
+      (solution) => solution.runId,
     );
 
-    // console.log(`targetClusters`, JSON.stringify(clusters));
+    // TODO @alicia @andrea - what if we couldn't get the 'desired' item
+    //  from group? (very unlikely but possible - group has 0 members)
+    if (!selectedSolutions) {
+      return fromState;
+    }
 
-    return fromState.map((row) =>
-      Object.assign<ResultRow, Pick<ResultRow, 'distinctFive'>>(row, {
-        distinctFive: mostDifferent.includes(row.runId),
+    return fromState.map((state) =>
+      plainToClass(ResultRow, {
+        ...state,
+        distinctFive: selectedSolutions.includes(state.runId),
       }),
     );
   }
-}
 
-function calcSim(arr1: string[], arr2: string[]) {
-  // Assuming each array is an array of integers which may contain duplicates
-  // Can assume radix sort for Integers is O(n)
-  let sorted1 = arr1.sort(); // O(n)
-  let sorted2 = arr2.sort(); // O(m)
+  #getClusterOfFiveGroup = (
+    solutions: ResultRow[],
+  ): TargetCluster | undefined => {
+    const clusters = clusterData({
+      data: solutions.map((state) => ({
+        raw: state,
+      })),
+      key: 'raw',
+      distance: (setA: ResultRow, setB: ResultRow) =>
+        Math.abs(setA.score - setB.score),
+      linkage: (setA: number[], setB: number[], distanceMatrix: number[][]) =>
+        averageDistance(setA, setB, distanceMatrix),
+    });
 
-  sorted1 = sorted1.filter(function (x, i, a) {
-    return x !== a[i - 1];
-  }); // O(n)
-  sorted2 = sorted2.filter(function (x, i, a) {
-    return x !== a[i - 1];
-  }); // O(m)
-  let i = 0,
-    j = 0,
-    intersection = 0,
-    item1 = null,
-    item2 = null;
+    const fiveGroups = clusters.clustersGivenK[5];
 
-  while (i < sorted1.length && j < sorted2.length) {
-    // O(MAX(m,n))
+    if (!fiveGroups) {
+      return;
+    }
 
-    item1 = sorted1[i];
-    item2 = sorted2[j];
+    return fiveGroups.map((indices: number[]) =>
+      indices.map((index) => solutions[index]),
+    );
+  };
 
-    if (item1 === item2) {
-      intersection += 1;
-      i++;
-      j++;
-    } else if (item1 < item2) i++;
-    // item2 > item1
-    else j++;
-  }
+  #getSolutionsFromCluster = (
+    cluster: TargetCluster,
+  ): SolutionPerClusterGroup | undefined => {
+    // .map works on generic arrays, fixed-sized ones types are lost (TS 4.1.2)
+    const selectedSolutions = cluster.map((group) =>
+      minBy(group, (element) => element.score),
+    ) as SolutionPerClusterGroup<ResultRow | undefined>;
 
-  const total = sorted1.length + sorted2.length, // O(1)
-    union = total - intersection; // O(1)
+    if (this.#hasResultRows(selectedSolutions)) {
+      return selectedSolutions;
+    }
+    return;
+  };
 
-  return intersection / union;
+  #hasResultRows = (
+    cluster: SolutionPerClusterGroup<ResultRow | undefined>,
+  ): cluster is SolutionPerClusterGroup =>
+    cluster.every((element) => isDefined(element));
 }
