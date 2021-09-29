@@ -8,12 +8,15 @@ const agglo = require('agglo');
 
 import { ResultRow } from '@marxan/marxan-output';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { clusterData, averageDistance } from '@greenelab/hclust';
+
 @Injectable()
 export class MostDifferentService {
   map(fromState: ResultRow[]): ResultRow[] {
     const mostDifferent: number[] = [];
 
-    const jaccard = new Jaccard();
     const jaccardDistanceIndexMatrix = [];
 
     console.log(
@@ -48,7 +51,7 @@ export class MostDifferentService {
       );
     }
 
-    console.log(jaccardDistanceIndexMatrix);
+    // console.log(jaccardDistanceIndexMatrix);
 
     // given the distance matrix, we can cluster the solutions
 
@@ -58,19 +61,32 @@ export class MostDifferentService {
      * - less than 5 - can't get 5 most different?
      */
     const clusters: { clusters: any[] }[] = agglo(jaccardDistanceIndexMatrix, {
-      maxLinkage: 5,
+      indexes: false,
     });
+
+    const res = clusterData({
+      data: fromState.map((state) => ({
+        raw: state,
+      })),
+      key: 'raw',
+      distance: (setA: ResultRow, setB: ResultRow) => {
+        const itemsA = setA.score.toString().split('');
+        const itemsB = setB.score.toString().split('');
+        return calcSim(itemsA, itemsB);
+      },
+      linkage: (setA: number[], setB: number[], distanceMatrix: number[][]) => {
+        // use default one; provided one just for examination purposes
+        return averageDistance(setA, setB, distanceMatrix);
+      },
+    });
+    console.log(`res`, res);
+    console.log(`5-sets`, res.clustersGivenK[5]);
 
     const targetClusters = clusters.find(
       (cluster) => cluster.clusters.length === 5,
-    )?.clusters;
-
-    console.log(`targetClusters`, targetClusters);
-
-    console.log(
-      `each cluster items:`,
-      targetClusters?.map((c) => c.length),
     );
+
+    // console.log(`targetClusters`, JSON.stringify(clusters));
 
     return fromState.map((row) =>
       Object.assign<ResultRow, Pick<ResultRow, 'distinctFive'>>(row, {
