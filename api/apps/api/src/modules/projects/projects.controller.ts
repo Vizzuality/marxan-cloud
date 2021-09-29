@@ -62,6 +62,8 @@ import {
   AsyncJobDto,
   JsonApiAsyncJobMeta,
 } from '@marxan-api/dto/async-job.dto';
+import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
+import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -124,6 +126,7 @@ export class ProjectsController {
 
   @ApiOperation({ description: 'Create project' })
   @ApiOkResponse({ type: ProjectResultSingular })
+  @ApiTags(asyncJobTag)
   @Post()
   async create(
     @Body() dto: CreateProjectDTO,
@@ -138,6 +141,7 @@ export class ProjectsController {
 
   @ApiOperation({ description: 'Update project' })
   @ApiOkResponse({ type: ProjectResultSingular })
+  @ApiTags(asyncJobTag)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -163,6 +167,7 @@ export class ProjectsController {
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @ApiCreatedResponse({ type: JsonApiAsyncJobMeta })
+  @ApiTags(asyncJobTag)
   @Post(`:id/grid`)
   async setProjectGrid(
     @Param('id') projectId: string,
@@ -201,7 +206,7 @@ export class ProjectsController {
     description: 'Upload shapefile for project-specific protected areas',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiNoContentResponse()
+  @ApiTags(asyncJobTag)
   @Post(':id/protected-areas/shapefile')
   async shapefileForProtectedArea(
     @Param('id') projectId: string,
@@ -223,6 +228,7 @@ export class ProjectsController {
     description: 'Upload shapefile with project planning-area',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiTags(inlineJobTag)
   @Post('planning-area/shapefile')
   async shapefileWithProjectPlanningArea(
     @UploadedFile() file: Express.Multer.File,
@@ -248,6 +254,7 @@ export class ProjectsController {
     description: `Upload shapefiles of species or bioregional features.`,
   })
   @ApiOkResponse({ type: ShapefileUploadResponse })
+  @ApiTags(inlineJobTag)
   @Post(`:id/features/shapefile`)
   @UseInterceptors(
     FileInterceptor('file', {
