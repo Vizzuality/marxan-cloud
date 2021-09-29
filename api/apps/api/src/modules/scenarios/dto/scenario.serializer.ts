@@ -14,9 +14,16 @@ export class ScenarioSerializer {
     paginationMeta?: PaginationMeta,
     asyncJobTriggered?: boolean,
   ): Promise<ScenarioResult> {
+    const result = await this.scenariosCrudService.serialize(
+      entities,
+      paginationMeta,
+    );
     return plainToClass(ScenarioResult, {
-      ...(await this.scenariosCrudService.serialize(entities, paginationMeta)),
-      meta: asyncJobTriggered ? AsyncJobDto.forScenario() : undefined,
+      ...result,
+      meta: {
+        ...(result?.meta ?? {}),
+        ...(asyncJobTriggered ? AsyncJobDto.forScenario() : {}),
+      },
     });
   }
 }
