@@ -45,7 +45,8 @@ export class ScenarioProtectedAreaCalculationProcessor
     UPDATE scenarios_pu_data
       SET (protected_area) = (SELECT protected_area
           FROM result
-          WHERE scenarios_pu_data.id = result.id);
+          WHERE scenarios_pu_data.id = result.id)
+      WHERE scenario_id = $1;
     `;
     const queryBuilder = this.scenarioPlanningUnitsRepo.query(
       query,
