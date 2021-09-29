@@ -21,7 +21,7 @@ export class ProjectSerializer {
     return {
       ...result,
       meta: {
-        ...result.meta,
+        ...(result?.meta ?? {}),
         ...(asyncJobTriggered ? AsyncJobDto.forProject() : {}),
       },
     };
