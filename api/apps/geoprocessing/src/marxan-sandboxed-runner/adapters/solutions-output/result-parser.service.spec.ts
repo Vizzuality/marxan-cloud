@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { ResultRow } from '@marxan/marxan-output';
 import { ResultParserService } from './result-parser.service';
 import { MostDifferentService } from './most-different.service';
+import { BestSolutionService } from './best-solution.service';
 
 let sut: ResultParserService;
 
@@ -9,6 +10,12 @@ beforeEach(async () => {
   const sandbox = await Test.createTestingModule({
     providers: [
       ResultParserService,
+      {
+        provide: BestSolutionService,
+        useValue: {
+          map: (source: ResultRow[]) => source,
+        },
+      },
       {
         provide: MostDifferentService,
         useValue: {
