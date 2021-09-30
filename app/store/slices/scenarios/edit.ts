@@ -32,6 +32,9 @@ interface ScenarioEditStateProps {
 
   // SETTINGS
   layerSettings: Record<string, Record<string, unknown>>
+
+  // JOBS
+  lastJobTimestamp: number;
 }
 
 const initialState = {
@@ -62,6 +65,9 @@ const initialState = {
 
   // SETTINGS
   layerSettings: {},
+
+  // ASYNC
+  lastJobTimestamp: null,
 } as ScenarioEditStateProps;
 
 export function getScenarioEditSlice(id) {
@@ -144,6 +150,11 @@ export function getScenarioEditSlice(id) {
           },
         };
         state.layerSettings = newSettings;
+      },
+
+      // ASYNC JOBS
+      setJob: (state, action: PayloadAction<number>) => {
+        state.lastJobTimestamp = action.payload;
       },
     },
   });

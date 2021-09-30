@@ -62,6 +62,7 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
             },
             tab: 'protected-areas',
             subtab: 'protected-areas-preview',
+            lastJobCheck: Date.now(),
           },
         },
       },

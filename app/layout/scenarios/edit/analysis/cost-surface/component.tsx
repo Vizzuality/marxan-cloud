@@ -2,8 +2,11 @@ import React, { useCallback, useState } from 'react';
 
 import { useDropzone } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
@@ -37,6 +40,12 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
   const { addToast } = useToasts();
   const { query } = useRouter();
   const { sid } = query;
+
+  const dispatch = useDispatch();
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const {
+    setJob,
+  } = scenarioSlice.actions;
 
   const maxSize = 1000000;
 
@@ -81,7 +90,8 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     data.append('file', f);
 
     uploadMutation.mutate({ id: `${sid}`, data }, {
-      onSuccess: ({ data: { data: g } }) => {
+      onSuccess: ({ data: { data: g, meta } }) => {
+        dispatch(setJob(new Date(meta.isoDate).getTime()));
         setLoading(false);
         setSuccessFile({ name: f.name });
 

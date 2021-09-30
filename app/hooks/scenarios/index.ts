@@ -507,7 +507,7 @@ export function useSaveScenarioPU({
 
       // It's impossible to know from the API if the process of lockin has finsished or not,
       // that's why this piece of sh*** is added here.
-      // If for some reason it takes more that 5000 seconds to process the lockin
+      // If for some reason it takes more that 2500 seconds to process the lockin
       // we are in troubles
       // queryClient.invalidateQueries(['scenarios-pu', id]);
       setTimeout(() => {
