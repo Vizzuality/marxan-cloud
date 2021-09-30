@@ -13,6 +13,7 @@ export { Status };
 export interface Job {
   kind: JobType;
   status: Status;
+  isoDate?: string;
 }
 
 export type ProgressJob = Job & {
@@ -68,6 +69,7 @@ export class JobStatusService {
         kind: status.jobType,
         status: jobStatus,
         data: status.publicEventData,
+        isoDate: new Date(status.timestamp).toISOString(),
       });
     }
 
@@ -79,6 +81,7 @@ export class JobStatusService {
           status: job.jobStatus!, // guard, or even types, do not play well
           // with getters
           data: job.data,
+          isoDate: new Date(job.timestamp).toISOString(),
         })),
       },
     };

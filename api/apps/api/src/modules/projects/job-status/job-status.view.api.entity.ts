@@ -12,25 +12,23 @@ import { ValuesType } from 'utility-types';
 
 @ViewEntity({
   expression: `
-    SELECT
-      DISTINCT ON (job_type, topic) job_type,
-      api_events.topic AS scenario_id,
-      projects.id AS project_id,
-      api_events.kind,
-      api_events.data
-    FROM
-      api_events
-      INNER JOIN scenarios ON api_events.topic = scenarios.id
-      INNER JOIN projects ON projects.id = scenarios.project_id
-      CROSS JOIN LATERAL SUBSTRING(
-        api_events.kind
-        FROM
-          'scenario.#"[^.]*#"%' FOR '#'
+    SELECT DISTINCT ON (job_type, topic) job_type,
+                                         api_events.topic AS scenario_id,
+                                         projects.id      AS project_id,
+                                         api_events.kind,
+                                         api_events.data,
+                                         api_events.timestamp
+    FROM api_events
+           INNER JOIN scenarios ON api_events.topic = scenarios.id
+           INNER JOIN projects ON projects.id = scenarios.project_id
+           CROSS JOIN LATERAL SUBSTRING(
+      api_events.kind
+      FROM
+      'scenario.#"[^.]*#"%' FOR '#'
       ) AS job_type
-    ORDER BY
-      job_type,
-      api_events.topic,
-      api_events.timestamp DESC;
+    ORDER BY job_type,
+             api_events.topic,
+             api_events.timestamp DESC;
   `,
 })
 export class ScenarioJobStatus {
@@ -59,6 +57,9 @@ export class ScenarioJobStatus {
 
   @ViewColumn()
   data!: ApiEvent['data'];
+
+  @ViewColumn()
+  timestamp!: Date;
 
   get publicEventData(): { fractionalProgress: number } | undefined {
     const data: KnownEventsData | undefined = this.data;

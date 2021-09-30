@@ -29,6 +29,9 @@ export class ScenarioJobStatus {
     oneOf: [{ $ref: getSchemaPath(ProgressJobDTO) }],
   })
   data?: ProgressJobDTO;
+
+  @ApiPropertyOptional()
+  isoDate?: string;
 }
 
 export class ScenarioStatus {

@@ -1,6 +1,5 @@
 import { INestApplication } from '@nestjs/common';
 import { PromiseType } from 'utility-types';
-import * as request from 'supertest';
 
 import { createWorld } from './world';
 import { bootstrapApplication } from '../utils/api-application';
@@ -30,6 +29,7 @@ test(`job statuses for project`, async () => {
       data: null,
       kind: 'grid',
       status: 'running',
+      isoDate: expect.any(String),
     },
   ]);
   expect(result.body.data.attributes.scenarios).toEqual([
@@ -39,6 +39,7 @@ test(`job statuses for project`, async () => {
         {
           kind: 'costSurface',
           status: 'done',
+          isoDate: expect.any(String),
         },
       ],
     },
@@ -48,6 +49,7 @@ test(`job statuses for project`, async () => {
         {
           kind: 'planningUnitsInclusion',
           status: 'running',
+          isoDate: expect.any(String),
         },
       ],
     },
