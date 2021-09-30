@@ -31,6 +31,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
     setCache,
+    setJob,
   } = scenarioSlice.actions;
   const { lastJobTimestamp } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
@@ -116,12 +117,19 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: Date.now(),
+            lastJobCheck: new Date().getTime(),
           },
         },
       },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+      },
+      onError: () => {
+
+      },
     });
-  }, [sid, scenarioMutation, scenarioData?.metadata]);
+  }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob]);
 
   return (
     <div className="absolute top-0 left-0 z-50 flex flex-col justify-end w-full h-full pointer-events-none">
