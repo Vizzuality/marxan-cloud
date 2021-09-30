@@ -17,6 +17,7 @@ import {
   UseGuards,
   UseInterceptors,
   ValidationPipe,
+  ConflictException,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -31,7 +32,6 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -61,7 +61,7 @@ import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ScenariosService } from './scenarios.service';
+import { ProjectNotReady, ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
@@ -225,8 +225,15 @@ export class ScenariosController {
     @Body(new ValidationPipe()) dto: CreateScenarioDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ScenarioResult> {
+    const result = await this.service.create(dto, {
+      authenticatedUser: req.user,
+    });
+    if (isLeft(result)) {
+      const _exhaustiveCheck: ProjectNotReady = result.left;
+      throw new ConflictException();
+    }
     return await this.scenarioSerializer.serialize(
-      await this.service.create(dto, { authenticatedUser: req.user }),
+      result.right,
       undefined,
       true,
     );
