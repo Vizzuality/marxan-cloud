@@ -33,7 +33,7 @@ export class ShapefileService {
     );
 
     await mapshaper.runCommandsXL(
-      `-i no-topology snap ${fileInfo.path.replace(
+      `-i snap ${fileInfo.path.replace(
         '.zip',
         '',
       )}/*.shp -proj EPSG:4326 -clean rewind -info -o ${outputFile}`,

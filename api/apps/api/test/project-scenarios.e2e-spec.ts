@@ -88,7 +88,7 @@ describe('ScenariosModule (e2e)', () => {
       expect(aScenario.type).toBe('scenarios');
       /**
        * @todo: there is an error on this test
-      */
+       */
       // expect(job).toBeDefined();
       // expect(job.name).toMatch(/calculate-planning-units-protection-level/);
       // expect(job.data?.scenarioId).toBeDefined();
@@ -103,6 +103,12 @@ describe('ScenariosModule (e2e)', () => {
       const resources = response.body.data;
 
       expect(resources[0].type).toBe('scenarios');
+      expect(response.body.meta).toEqual({
+        page: expect.any(Number),
+        size: expect.any(Number),
+        totalItems: expect.any(Number),
+        totalPages: expect.any(Number),
+      });
     });
 
     it('Gets scenarios (paginated; pages of up to 5 items, no explicit page number - should default to 1)', async () => {

@@ -15,6 +15,7 @@ import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { BBox } from 'geojson';
 import { ProtectedAreaDto } from '@marxan-api/modules/projects/dto/protected-area.dto';
+import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
 
 export const projectResource: BaseServiceResource = {
   className: 'Project',
@@ -199,7 +200,7 @@ export class ProjectResultPlural {
   data!: JSONAPIProjectData[];
 }
 
-export class ProjectResultSingular {
+export class ProjectResultSingular extends JsonApiAsyncJobMeta {
   @ApiProperty()
   data!: JSONAPIProjectData;
 }

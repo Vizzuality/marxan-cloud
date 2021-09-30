@@ -94,6 +94,7 @@ export const getFixtures = async () => {
           id: publicProjectId,
           type: 'projects',
         },
+        meta: {},
       });
     },
     WhenGettingProject: async (projectId: string) =>
