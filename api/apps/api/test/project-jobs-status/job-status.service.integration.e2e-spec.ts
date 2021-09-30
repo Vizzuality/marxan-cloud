@@ -47,10 +47,12 @@ describe(`when has two projects with scenarios and events`, () => {
             {
               kind: 'costSurface',
               status: 'done',
+              isoDate: expect.any(String),
             },
             {
               kind: 'planningUnitsInclusion',
               status: 'failure',
+              isoDate: expect.any(String),
             },
           ],
           scenarioId: scenarioIds[0],
@@ -60,6 +62,7 @@ describe(`when has two projects with scenarios and events`, () => {
             {
               kind: 'costSurface',
               status: 'running',
+              isoDate: expect.any(String),
             },
           ],
           scenarioId: scenarioIds[1],

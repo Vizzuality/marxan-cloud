@@ -10,7 +10,8 @@ import { ValuesType } from 'utility-types';
     SELECT DISTINCT ON (job_type, topic) job_type,
                                          api_events.topic AS project_id,
                                          api_events.kind,
-                                         api_events.data
+                                         api_events.data,
+                                         api_events.timestamp
     FROM api_events
            CROSS JOIN LATERAL SUBSTRING(
       api_events.kind
@@ -42,6 +43,9 @@ export class ProjectJobStatus {
 
   @ViewColumn()
   data!: ApiEvent['data'];
+
+  @ViewColumn()
+  timestamp!: Date;
 }
 
 const eventToJobStatusMapping: Record<ValuesType<ProjectEvents>, JobStatus> = {
