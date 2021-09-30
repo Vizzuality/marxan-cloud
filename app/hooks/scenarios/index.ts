@@ -249,8 +249,10 @@ export function useSaveScenario({
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
       const { id, projectId } = data?.data?.data;
+      // const { isoDate, started } = data?.data?.meta;
       queryClient.invalidateQueries(['scenarios', projectId]);
       queryClient.setQueryData(['scenarios', id], data?.data);
+
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -399,7 +401,6 @@ export function useUploadCostSurface({
   const [session] = useSession();
 
   const uploadScenarioCostSurface = ({ id, data }: UploadScenarioCostSurfaceProps) => {
-    console.log('data--->', data);
     return UPLOADS.request({
       url: `/scenarios/${id}/cost-surface/shapefile`,
       data,
