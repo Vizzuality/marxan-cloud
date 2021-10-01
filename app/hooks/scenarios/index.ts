@@ -486,7 +486,6 @@ export function useSaveScenarioPU({
     method: 'PATCH',
   },
 }: UseSaveScenarioPUProps) {
-  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const saveScenario = ({ id, data }: SaveScenarioPUProps) => {
@@ -503,16 +502,6 @@ export function useSaveScenarioPU({
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
-      const { id } = variables;
-
-      // It's impossible to know from the API if the process of lockin has finsished or not,
-      // that's why this piece of sh*** is added here.
-      // If for some reason it takes more that 2500 seconds to process the lockin
-      // we are in troubles
-      // queryClient.invalidateQueries(['scenarios-pu', id]);
-      setTimeout(() => {
-        queryClient.invalidateQueries(['scenarios-pu', id]);
-      }, 2500);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);

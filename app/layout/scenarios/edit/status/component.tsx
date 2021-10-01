@@ -2,7 +2,7 @@ import React, {
   useCallback, useEffect, useMemo, useRef,
 } from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -18,6 +18,8 @@ import Icon from 'components/icon';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import PROCESSING_SVG from 'svgs/ui/processing.svg?sprite';
 
+import { useScenarioStatusDone } from './actions/done';
+import { useScenarioStatusFailure } from './actions/failure';
 import { TEXTS_FAILURE, TEXTS_RUNNING } from './constants';
 
 export interface ScenarioStatusProps {
@@ -27,15 +29,8 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const dispatch = useDispatch();
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const {
-    setCache,
-    setJob,
-  } = scenarioSlice.actions;
+  getScenarioEditSlice(sid);
   const { lastJobTimestamp } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const JOB_RUNNINGREF = useRef(null);
 
   const { data: scenarioData } = useScenario(sid);
   const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
@@ -45,6 +40,9 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
       method: 'PATCH',
     },
   });
+
+  const DONE = useScenarioStatusDone();
+  const FAILURE = useScenarioStatusFailure();
 
   // Running
   const JOB_RUNNING = useMemo(() => {
@@ -63,6 +61,16 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
 
     return null;
   }, [JOB_RUNNING]);
+
+  // Done
+  const JOB_DONE_REF = useRef(null);
+  const JOB_DONE = useMemo(() => {
+    const { jobs = [] } = scenarioStatusData || {};
+    return jobs.find((j) => {
+      const jobTimestamp = new Date(j.isoDate).getTime();
+      return j.status === 'done' && jobTimestamp > scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck;
+    });
+  }, [scenarioStatusData, scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck]);
 
   // Failure
   const JOB_FAILURE = useMemo(() => {
@@ -86,13 +94,6 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   }, [JOB_FAILURE]);
 
   useEffect(() => {
-    if (JOB_RUNNINGREF.current && !JOB_RUNNING) {
-      dispatch(setCache(Date.now()));
-    }
-    JOB_RUNNINGREF.current = JOB_RUNNING;
-  }, [JOB_RUNNING]); // eslint-disable-line
-
-  useEffect(() => {
     if (lastJobTimestamp) {
       scenarioMutation.mutate({
         id: `${sid}`,
@@ -109,27 +110,16 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
     }
   }, [lastJobTimestamp]); // eslint-disable-line
 
-  const onTryAgain = useCallback(() => {
-    scenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
-          },
-        },
-      },
-    }, {
-      onSuccess: () => {
-        dispatch(setJob(null));
-      },
-      onError: () => {
+  useEffect(() => {
+    if (JOB_DONE && !JOB_DONE_REF.current) {
+      JOB_DONE_REF.current = JOB_DONE;
+      DONE[JOB_DONE.kind](JOB_DONE_REF);
+    }
+  }, [DONE, JOB_DONE]);
 
-      },
-    });
-  }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob]);
+  const onTryAgain = useCallback(() => {
+    FAILURE[JOB_FAILURE.kind]();
+  }, [FAILURE, JOB_FAILURE?.kind]);
 
   return (
     <div className="absolute top-0 left-0 z-50 flex flex-col justify-end w-full h-full pointer-events-none">
