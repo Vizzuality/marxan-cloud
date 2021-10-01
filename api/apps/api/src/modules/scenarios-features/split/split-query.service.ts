@@ -79,11 +79,13 @@ export class SplitQuery {
               subsets.target
               from feature_properties_kv fpkv
               left join subsets
-              on fpkv.value::TEXT = subsets.sub_value:: varchar
+              on fpkv.value::TEXT = subsets.sub_value::varchar
               where fpkv.feature_id = ${fields.featureId}
               and fpkv.key = ${fields.splitByProperty} ${
       hasSubSetFilter
-        ? `and fpkv.value IN(${fields.filterByValues.join(',')})`
+        ? `and fpkv.value IN(${fields.filterByValues
+            .map((e) => `(select to_jsonb(${e}::text))`)
+            .join(',')})`
         : ``
     }
               )
@@ -102,8 +104,8 @@ export class SplitQuery {
               ${protectedAreaJoin}
             where st_intersects(st_makeenvelope(
                 ${fields.bbox[0]},
-                ${fields.bbox[2]},
                 ${fields.bbox[1]},
+                ${fields.bbox[2]},
                 ${fields.bbox[3]},
                 4326
               ), fd.the_geom)
