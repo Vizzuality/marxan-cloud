@@ -44,24 +44,6 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   const DONE = useScenarioStatusDone();
   const FAILURE = useScenarioStatusFailure();
 
-  // Running
-  const JOB_RUNNING = useMemo(() => {
-    const { jobs = [] } = scenarioStatusData || {};
-    return jobs.find((j) => j.status === 'running');
-  }, [scenarioStatusData]);
-
-  const TEXT_RUNNING = useMemo(() => {
-    if (JOB_RUNNING && TEXTS_RUNNING[JOB_RUNNING.kind]) {
-      return TEXTS_RUNNING[JOB_RUNNING.kind]();
-    }
-
-    if (JOB_RUNNING && !TEXTS_RUNNING[JOB_RUNNING.kind]) {
-      console.warn(`${JOB_RUNNING.kind} does not have a proper TEXT`);
-    }
-
-    return null;
-  }, [JOB_RUNNING]);
-
   // Done
   const JOB_DONE_REF = useRef(null);
   const JOB_DONE = useMemo(() => {
@@ -71,6 +53,36 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
       return j.status === 'done' && jobTimestamp > scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck;
     });
   }, [scenarioStatusData, scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck]);
+
+  const TEXT_DONE = useMemo(() => {
+    if (JOB_DONE && TEXTS_RUNNING[JOB_DONE.kind]) {
+      return TEXTS_RUNNING[JOB_DONE.kind || JOB_DONE_REF?.current?.kind]();
+    }
+
+    if (JOB_DONE && !TEXTS_RUNNING[JOB_DONE.kind]) {
+      console.warn(`${JOB_DONE.kind} does not have a proper TEXT`);
+    }
+
+    return null;
+  }, [JOB_DONE]);
+
+  // Running
+  const JOB_RUNNING = useMemo(() => {
+    const { jobs = [] } = scenarioStatusData || {};
+    return jobs.find((j) => j.status === 'running');
+  }, [scenarioStatusData]);
+
+  const TEXT_RUNNING = useMemo(() => {
+    if (JOB_RUNNING && TEXTS_RUNNING[JOB_RUNNING.kind]) {
+      return TEXTS_RUNNING[JOB_RUNNING.kind || JOB_DONE_REF?.current?.kind]();
+    }
+
+    if (JOB_RUNNING && !TEXTS_RUNNING[JOB_RUNNING.kind]) {
+      console.warn(`${JOB_RUNNING.kind} does not have a proper TEXT`);
+    }
+
+    return null;
+  }, [JOB_RUNNING]);
 
   // Failure
   const JOB_FAILURE = useMemo(() => {
@@ -123,7 +135,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
 
   return (
     <div className="absolute top-0 left-0 z-50 flex flex-col justify-end w-full h-full pointer-events-none">
-      {(JOB_RUNNING || JOB_FAILURE) && (
+      {(JOB_RUNNING || JOB_FAILURE || JOB_DONE) && (
         <motion.div
           className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-75 pointer-events-auto"
           key="status-overlay"
@@ -132,7 +144,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
         />
       )}
 
-      {JOB_RUNNING && (
+      {(JOB_RUNNING || JOB_DONE) && (
         <motion.div
           className="absolute z-10 pointer-events-auto top-1/2 left-1/2"
           key="status-text"
@@ -140,7 +152,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
           animate={{ opacity: 1, y: '-50%', x: '-50%' }}
         >
           <div className="w-full max-w-md p-10 space-y-5 text-center">
-            <h3 className="text-xs tracking-wide uppercase font-heading">{TEXT_RUNNING}</h3>
+            <h3 className="text-xs tracking-wide uppercase font-heading">{TEXT_RUNNING || TEXT_DONE}</h3>
 
             <Icon icon={PROCESSING_SVG} className="m-auto" style={{ width: 40, height: 10 }} />
 

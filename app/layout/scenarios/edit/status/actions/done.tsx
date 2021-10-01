@@ -138,7 +138,6 @@ export const useScenarioStatusDone = () => {
     }, {
       onSuccess: () => {
         dispatch(setJob(null));
-        dispatch(setCache(Date.now()));
         queryClient.invalidateQueries(['scenarios-pu', sid]);
         JOB_REF.current = null;
       },
@@ -158,7 +157,6 @@ export const useScenarioStatusDone = () => {
     scenarioData?.metadata,
     dispatch,
     setJob,
-    setCache,
     addToast,
     queryClient,
   ]);

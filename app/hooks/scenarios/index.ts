@@ -486,6 +486,7 @@ export function useSaveScenarioPU({
     method: 'PATCH',
   },
 }: UseSaveScenarioPUProps) {
+  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const saveScenario = ({ id, data }: SaveScenarioPUProps) => {
@@ -502,6 +503,8 @@ export function useSaveScenarioPU({
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
+      const { id } = variables;
+      queryClient.invalidateQueries(['scenarios-pu', id]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
