@@ -61,6 +61,49 @@ export const useScenarioStatusFailure = () => {
     });
   }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob, addToast]);
 
+  // Features
+  const onFeaturesFailure = useCallback(() => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          ...scenarioData?.metadata,
+          scenarioEditingMetadata: {
+            ...scenarioData?.metadata?.scenarioEditingMetadata,
+            tab: 'features',
+            subtab: 'features-preview',
+            status: {
+              'protected-areas': 'draft',
+              features: 'draft',
+              analysis: 'empty',
+            },
+            lastJobCheck: new Date().getTime(),
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+      },
+      onError: () => {
+        addToast('onPlanningAreaProtectedCalculationDone', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    sid,
+    scenarioMutation,
+    scenarioData?.metadata,
+    dispatch,
+    setJob,
+    addToast,
+  ]);
+
   // Cost surface
   const onCostSurfaceFailure = useCallback(() => {
     scenarioMutation.mutate({
@@ -120,6 +163,7 @@ export const useScenarioStatusFailure = () => {
   }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob, addToast]);
 
   return {
+    features: onFeaturesFailure,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationFailure,
     costSurface: onCostSurfaceFailure,
     planningUnitsInclusion: onPlanningUnitsInclusionFailure,

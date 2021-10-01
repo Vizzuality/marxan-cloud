@@ -81,6 +81,43 @@ export const useScenarioStatusDone = () => {
     addToast,
   ]);
 
+  const onFeaturesDone = useCallback((JOB_REF) => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          ...scenarioData?.metadata,
+          scenarioEditingMetadata: {
+            ...scenarioData?.metadata?.scenarioEditingMetadata,
+            lastJobCheck: new Date().getTime(),
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+        dispatch(setCache(Date.now()));
+        JOB_REF.current = null;
+      },
+      onError: () => {
+        addToast('onCostSurfaceDone', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    sid,
+    scenarioMutation,
+    scenarioData?.metadata,
+    dispatch,
+    setJob,
+    setCache,
+    addToast,
+  ]);
   // Cost surface
   const onCostSurfaceDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
@@ -162,6 +199,7 @@ export const useScenarioStatusDone = () => {
   ]);
 
   return {
+    features: onFeaturesDone,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationDone,
     costSurface: onCostSurfaceDone,
     planningUnitsInclusion: onPlanningUnitsInclusionDone,

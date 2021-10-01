@@ -4,6 +4,8 @@ import React, {
 
 import { useSelector } from 'react-redux';
 
+import groupBy from 'lodash/groupBy';
+
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
@@ -44,15 +46,65 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   const DONE = useScenarioStatusDone();
   const FAILURE = useScenarioStatusFailure();
 
+  const getStatus = useCallback((arr) => {
+    if (arr.some(((d) => d.status === 'failure'))) return 'failure';
+    if (arr.some(((d) => d.status === 'running'))) return 'running';
+    return 'done';
+  }, []);
+
+  const JOBS = useMemo(() => {
+    const { jobs = [] } = scenarioStatusData || {};
+
+    const groups = groupBy(jobs, (j) => {
+      if (['specification', 'geofeatureCopy', 'geofeatureSplit', 'geofeatureStrat'].includes(j.kind)) {
+        return 'features';
+      }
+
+      return j.kind;
+    });
+
+    return Object.keys(groups).map((k) => {
+      const status = getStatus(groups[k]);
+      const isoDate = groups[k].reduce((a, b) => {
+        return (a.isoDate > b.isoDate) ? a.isoDate : b.isoDate;
+      }, 0);
+
+      return {
+        kind: k,
+        isoDate,
+        status,
+      };
+    });
+  }, [scenarioStatusData, getStatus]);
+
+  // Failure
+  const JOB_FAILURE = useMemo(() => {
+    return JOBS.find((j) => {
+      const jobTimestamp = new Date(j.isoDate).getTime();
+      return j.status === 'failure' && jobTimestamp > scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck;
+    });
+  }, [JOBS, scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck]);
+
+  const TEXT_FAILURE = useMemo(() => {
+    if (JOB_FAILURE && TEXTS_FAILURE[JOB_FAILURE.kind]) {
+      return TEXTS_FAILURE[JOB_FAILURE.kind]();
+    }
+
+    if (JOB_FAILURE && !TEXTS_FAILURE[JOB_FAILURE.kind]) {
+      console.warn(`${JOB_FAILURE.kind} does not have a proper TEXT`);
+    }
+
+    return null;
+  }, [JOB_FAILURE]);
+
   // Done
   const JOB_DONE_REF = useRef(null);
   const JOB_DONE = useMemo(() => {
-    const { jobs = [] } = scenarioStatusData || {};
-    return jobs.find((j) => {
+    return JOBS.find((j) => {
       const jobTimestamp = new Date(j.isoDate).getTime();
       return j.status === 'done' && jobTimestamp > scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck;
     });
-  }, [scenarioStatusData, scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck]);
+  }, [JOBS, scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck]);
 
   const TEXT_DONE = useMemo(() => {
     if (JOB_DONE && TEXTS_RUNNING[JOB_DONE.kind]) {
@@ -68,9 +120,8 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
 
   // Running
   const JOB_RUNNING = useMemo(() => {
-    const { jobs = [] } = scenarioStatusData || {};
-    return jobs.find((j) => j.status === 'running');
-  }, [scenarioStatusData]);
+    return !JOB_FAILURE && JOBS.find((j) => j.status === 'running');
+  }, [JOBS, JOB_FAILURE]);
 
   const TEXT_RUNNING = useMemo(() => {
     if (JOB_RUNNING && TEXTS_RUNNING[JOB_RUNNING.kind]) {
@@ -83,27 +134,6 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
 
     return null;
   }, [JOB_RUNNING]);
-
-  // Failure
-  const JOB_FAILURE = useMemo(() => {
-    const { jobs = [] } = scenarioStatusData || {};
-    return jobs.find((j) => {
-      const jobTimestamp = new Date(j.isoDate).getTime();
-      return j.status === 'failure' && jobTimestamp > scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck;
-    });
-  }, [scenarioStatusData, scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck]);
-
-  const TEXT_FAILURE = useMemo(() => {
-    if (JOB_FAILURE && TEXTS_FAILURE[JOB_FAILURE.kind]) {
-      return TEXTS_FAILURE[JOB_FAILURE.kind]();
-    }
-
-    if (JOB_FAILURE && !TEXTS_FAILURE[JOB_FAILURE.kind]) {
-      console.warn(`${JOB_FAILURE.kind} does not have a proper TEXT`);
-    }
-
-    return null;
-  }, [JOB_FAILURE]);
 
   useEffect(() => {
     if (lastJobTimestamp) {
@@ -144,7 +174,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
         />
       )}
 
-      {(JOB_RUNNING || JOB_DONE) && (
+      {((JOB_RUNNING || JOB_DONE) && !JOB_FAILURE) && (
         <motion.div
           className="absolute z-10 pointer-events-auto top-1/2 left-1/2"
           key="status-text"
