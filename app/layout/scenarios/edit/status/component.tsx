@@ -1,10 +1,8 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef,
+  useCallback, useEffect, useRef,
 } from 'react';
 
 import { useSelector } from 'react-redux';
-
-import groupBy from 'lodash/groupBy';
 
 import { useRouter } from 'next/router';
 
@@ -20,9 +18,17 @@ import Icon from 'components/icon';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import PROCESSING_SVG from 'svgs/ui/processing.svg?sprite';
 
-import { useScenarioStatusDone } from './actions/done';
-import { useScenarioStatusFailure } from './actions/failure';
-import { TEXTS_FAILURE, TEXTS_RUNNING } from './constants';
+import { useScenarioActionsDone } from './actions/done';
+import { useScenarioActionsFailure } from './actions/failure';
+import {
+  useScenarioJobs,
+  useScenarioJobFailure,
+  useScenarioTextFailure,
+  useScenarioJobDone,
+  useScenarioTextDone,
+  useScenarioJobRunning,
+  useScenarioTextRunning,
+} from './utils';
 
 export interface ScenarioStatusProps {
 }
@@ -36,6 +42,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
 
   const { data: scenarioData } = useScenario(sid);
   const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
+  const { jobs = [] } = scenarioStatusData || {};
 
   const scenarioMutation = useSaveScenario({
     requestConfig: {
@@ -43,97 +50,31 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
     },
   });
 
-  const DONE = useScenarioStatusDone();
-  const FAILURE = useScenarioStatusFailure();
-
-  const getStatus = useCallback((arr) => {
-    if (arr.some(((d) => d.status === 'failure'))) return 'failure';
-    if (arr.some(((d) => d.status === 'running'))) return 'running';
-    return 'done';
-  }, []);
-
-  const JOBS = useMemo(() => {
-    const { jobs = [] } = scenarioStatusData || {};
-
-    const groups = groupBy(jobs, (j) => {
-      if (['specification', 'geofeatureCopy', 'geofeatureSplit', 'geofeatureStrat'].includes(j.kind)) {
-        return 'features';
-      }
-
-      return j.kind;
-    });
-
-    return Object.keys(groups).map((k) => {
-      const status = getStatus(groups[k]);
-      const isoDate = groups[k].reduce((a, b) => {
-        return (a.isoDate > b.isoDate) ? a.isoDate : b.isoDate;
-      }, 0);
-
-      return {
-        kind: k,
-        isoDate,
-        status,
-      };
-    });
-  }, [scenarioStatusData, getStatus]);
+  // Jobs
+  const JOBS = useScenarioJobs(jobs);
 
   // Failure
-  const JOB_FAILURE = useMemo(() => {
-    return JOBS.find((j) => {
-      const jobTimestamp = new Date(j.isoDate).getTime();
-      return j.status === 'failure' && jobTimestamp > scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck;
-    });
-  }, [JOBS, scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck]);
-
-  const TEXT_FAILURE = useMemo(() => {
-    if (JOB_FAILURE && TEXTS_FAILURE[JOB_FAILURE.kind]) {
-      return TEXTS_FAILURE[JOB_FAILURE.kind]();
-    }
-
-    if (JOB_FAILURE && !TEXTS_FAILURE[JOB_FAILURE.kind]) {
-      console.warn(`${JOB_FAILURE.kind} does not have a proper TEXT`);
-    }
-
-    return null;
-  }, [JOB_FAILURE]);
+  const JOB_FAILURE = useScenarioJobFailure(
+    JOBS,
+    scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck,
+  );
+  const TEXT_FAILURE = useScenarioTextFailure(JOB_FAILURE);
 
   // Done
   const JOB_DONE_REF = useRef(null);
-  const JOB_DONE = useMemo(() => {
-    return JOBS.find((j) => {
-      const jobTimestamp = new Date(j.isoDate).getTime();
-      return j.status === 'done' && jobTimestamp > scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck;
-    });
-  }, [JOBS, scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck]);
-
-  const TEXT_DONE = useMemo(() => {
-    if (JOB_DONE && TEXTS_RUNNING[JOB_DONE.kind]) {
-      return TEXTS_RUNNING[JOB_DONE.kind || JOB_DONE_REF?.current?.kind]();
-    }
-
-    if (JOB_DONE && !TEXTS_RUNNING[JOB_DONE.kind]) {
-      console.warn(`${JOB_DONE.kind} does not have a proper TEXT`);
-    }
-
-    return null;
-  }, [JOB_DONE]);
+  const JOB_DONE = useScenarioJobDone(
+    JOBS,
+    scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck,
+  );
+  const TEXT_DONE = useScenarioTextDone(JOB_DONE, JOB_DONE_REF);
 
   // Running
-  const JOB_RUNNING = useMemo(() => {
-    return !JOB_FAILURE && JOBS.find((j) => j.status === 'running');
-  }, [JOBS, JOB_FAILURE]);
+  const JOB_RUNNING = useScenarioJobRunning(JOBS, JOB_FAILURE);
+  const TEXT_RUNNING = useScenarioTextRunning(JOB_RUNNING, JOB_DONE_REF);
 
-  const TEXT_RUNNING = useMemo(() => {
-    if (JOB_RUNNING && TEXTS_RUNNING[JOB_RUNNING.kind]) {
-      return TEXTS_RUNNING[JOB_RUNNING.kind || JOB_DONE_REF?.current?.kind]();
-    }
-
-    if (JOB_RUNNING && !TEXTS_RUNNING[JOB_RUNNING.kind]) {
-      console.warn(`${JOB_RUNNING.kind} does not have a proper TEXT`);
-    }
-
-    return null;
-  }, [JOB_RUNNING]);
+  // Actions
+  const ACTIONS_DONE = useScenarioActionsDone();
+  const ACTIONS_FAILURE = useScenarioActionsFailure();
 
   useEffect(() => {
     if (lastJobTimestamp) {
@@ -153,15 +94,20 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   }, [lastJobTimestamp]); // eslint-disable-line
 
   useEffect(() => {
+    // If there is a job done execute the actions associated to it
     if (JOB_DONE && !JOB_DONE_REF.current) {
+      // Assign the job done to the ref so we can
+      // show the correct text while the actions are triggered
       JOB_DONE_REF.current = JOB_DONE;
-      DONE[JOB_DONE.kind](JOB_DONE_REF);
+
+      // Execute the action
+      ACTIONS_DONE[JOB_DONE.kind](JOB_DONE_REF);
     }
-  }, [DONE, JOB_DONE]);
+  }, [ACTIONS_DONE, JOB_DONE]);
 
   const onTryAgain = useCallback(() => {
-    FAILURE[JOB_FAILURE.kind]();
-  }, [FAILURE, JOB_FAILURE?.kind]);
+    ACTIONS_FAILURE[JOB_FAILURE.kind]();
+  }, [ACTIONS_FAILURE, JOB_FAILURE?.kind]);
 
   return (
     <div className="absolute top-0 left-0 z-50 flex flex-col justify-end w-full h-full pointer-events-none">

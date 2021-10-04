@@ -11,7 +11,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
-export const useScenarioStatusFailure = () => {
+export const useScenarioActionsFailure = () => {
   const { query } = useRouter();
   const { sid } = query;
 
