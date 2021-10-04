@@ -55,62 +55,62 @@ export class SplitQuery {
 
     const hasSubSetFilter = (input.selectSubSets ?? []).length > 0;
     const query = `
-            insert into scenario_features_preparation as sfp (feature_class_id,
-                                                              scenario_id,
-                                                              specification_id,
-                                                              fpf,
-                                                              target,
-                                                              prop,
-                                                              total_area,
-                                                              current_pa)
-            WITH split as (
-              WITH subsets as (
-              select value as sub_value, target, fpf, prop
-              from json_to_recordset('${JSON.stringify(
-                input.selectSubSets ?? [],
-              )}') as x(value varchar, target float8, fpf float8,
-              prop float8)
-              )
-              SELECT distinct fpkv.feature_data_id,
-              fpkv.key,
-              fpkv.value,
-              subsets.fpf,
-              subsets.prop,
-              subsets.target
-              from feature_properties_kv fpkv
-              left join subsets
-              on fpkv.value::TEXT = subsets.sub_value::varchar
-              where fpkv.feature_id = ${fields.featureId}
-              and fpkv.key = ${fields.splitByProperty} ${
+      insert into scenario_features_preparation as sfp (feature_class_id,
+                                                        scenario_id,
+                                                        specification_id,
+                                                        fpf,
+                                                        target,
+                                                        prop,
+                                                        total_area,
+                                                        current_pa)
+      WITH split as (
+        WITH subsets as (
+          select value as sub_value, target, fpf, prop
+          from json_to_recordset('${JSON.stringify(
+            input.selectSubSets ?? [],
+          )}') as x(value varchar, target float8, fpf float8,
+                    prop float8)
+        )
+        SELECT distinct fpkv.feature_data_id,
+                        fpkv.key,
+                        fpkv.value,
+                        subsets.fpf,
+                        subsets.prop,
+                        subsets.target
+        from feature_properties_kv fpkv
+               left join subsets
+                         on trim('"' FROM fpkv.value::TEXT) = trim('"' FROM subsets
+                           .sub_value::text)
+        where fpkv.feature_id = ${fields.featureId}
+          and fpkv.key = ${fields.splitByProperty} ${
       hasSubSetFilter
         ? `and fpkv.value IN(${fields.filterByValues
             .map((e) => `(select to_jsonb(${e}::text))`)
             .join(',')})`
         : ``
     }
-              )
-            select fd.id,
-                   ${fields.scenarioId},
-                   ${fields.specificationId},
-                   split.fpf,
-                   split.target,
-                   split.prop,
-                   ${fields.totalArea},
-                   ${fields.protectedArea}
-            from split
-                   join features_data as fd
-                        on (split.feature_data_id = fd.id)
-              ${planningAreaJoin}
-              ${protectedAreaJoin}
-            where st_intersects(st_makeenvelope(
-                ${fields.bbox[0]},
-                ${fields.bbox[1]},
-                ${fields.bbox[2]},
-                ${fields.bbox[3]},
-                4326
-              ), fd.the_geom)
-            returning sfp.id as id;
-          `;
+      )
+      select fd.id,
+             ${fields.scenarioId},
+             ${fields.specificationId},
+             split.fpf,
+             split.target,
+             split.prop,
+             ${fields.totalArea},
+             ${fields.protectedArea}
+      from split
+             join features_data as fd
+                  on (split.feature_data_id = fd.id)
+        ${planningAreaJoin} ${protectedAreaJoin}
+      where st_intersects(st_makeenvelope( ${fields.bbox[0]}
+          , ${fields.bbox[1]}
+          , ${fields.bbox[2]}
+          , ${fields.bbox[3]}
+          , 4326
+        )
+          , fd.the_geom)
+        returning sfp.id as id;
+    `;
     return { parameters, query };
   }
 }
