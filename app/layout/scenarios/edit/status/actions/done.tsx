@@ -198,10 +198,47 @@ export const useScenarioActionsDone = () => {
     queryClient,
   ]);
 
+  const onRunDone = useCallback((JOB_REF) => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          ...scenarioData?.metadata,
+          scenarioEditingMetadata: {
+            ...scenarioData?.metadata?.scenarioEditingMetadata,
+            lastJobCheck: new Date().getTime(),
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+        JOB_REF.current = null;
+      },
+      onError: () => {
+        addToast('onRunRone', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    sid,
+    scenarioMutation,
+    scenarioData?.metadata,
+    dispatch,
+    setJob,
+    addToast,
+  ]);
+
   return {
     features: onFeaturesDone,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationDone,
     costSurface: onCostSurfaceDone,
     planningUnitsInclusion: onPlanningUnitsInclusionDone,
+    run: onRunDone,
   };
 };
