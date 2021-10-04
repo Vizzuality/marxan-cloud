@@ -62,7 +62,8 @@ export interface ItemProps {
   warnings: boolean;
   progress?: number;
   lastUpdate: string;
-  jobs?: Record<string, unknown>[];
+  lastJobCheck: number;
+  jobs?: Record<string, any>[];
   lastUpdateDistance: string;
   className?: string;
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -78,6 +79,7 @@ export const Item: React.FC<ItemProps> = ({
   warnings,
   progress,
   lastUpdateDistance,
+  lastJobCheck,
   className,
   jobs = [],
   onEdit,
@@ -96,7 +98,6 @@ export const Item: React.FC<ItemProps> = ({
     const geofeatureSplit = jobs.find((j) => j.kind === 'geofeatureSplit');
     const geofeatureStratification = jobs.find((j) => j.kind === 'geofeatureStratification');
     const specification = jobs.find((j) => j.kind === 'specification');
-
     const run = jobs.find((j) => j.kind === 'run');
 
     // PROTECTED AREAS
@@ -124,10 +125,10 @@ export const Item: React.FC<ItemProps> = ({
     // RUN
     if (run && run.status === 'running') return 'run-running';
     if (run && run.status === 'failure') return 'run-failure';
-    if (run && run.status === 'done') return 'run-done';
+    if (run && run.status === 'done' && new Date(run.isoDate).getTime() > lastJobCheck) return 'run-done';
 
     return 'draft';
-  }, [jobs]);
+  }, [jobs, lastJobCheck]);
 
   const onSettings = useCallback(() => {
     setSettings(!settings);

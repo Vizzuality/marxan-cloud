@@ -166,7 +166,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 
       return pageData.map((d): ItemProps => {
         const {
-          id, projectId, name, lastModifiedAt,
+          id, projectId, name, lastModifiedAt, metadata,
         } = d;
 
         const status = statusScenarios.find((s) => s.id === id);
@@ -178,11 +178,14 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
           );
         };
 
+        const { lastJobCheck } = metadata?.scenarioEditingMetadata || {};
+
         return {
           id,
           name,
           lastUpdate: lastModifiedAt,
           lastUpdateDistance: lastUpdateDistance(),
+          lastJobCheck,
           warnings: false,
           jobs: status?.jobs || [],
           onEdit: () => {
