@@ -5,12 +5,10 @@ import { Queue } from 'bullmq';
 import { assertDefined } from '@marxan/utils';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { JobInput } from '@marxan/planning-unit-features';
 
 import { IntersectWithPlanningUnits } from './intersect-with-planning-units.command';
-import {
-  intersectFeaturesWithPuQueueToken,
-  JobInput,
-} from './intersect-queue.providers';
+import { intersectFeaturesWithPuQueueToken } from './intersect-queue.providers';
 
 @CommandHandler(IntersectWithPlanningUnits)
 export class IntersectWithPuHandler

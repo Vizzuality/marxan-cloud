@@ -7,11 +7,9 @@ import {
   QueueEventsAdapter,
 } from '@marxan-api/modules/queue-api-events';
 
-import {
-  intersectFeaturesWithPuQueueEventsFactoryToken,
-  JobInput,
-} from './intersect-queue.providers';
+import { intersectFeaturesWithPuQueueEventsFactoryToken } from './intersect-queue.providers';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { JobInput } from '@marxan/planning-unit-features';
 
 @Injectable()
 export class IntersectWithPuEventsService implements EventFactory<JobInput> {
