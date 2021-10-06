@@ -39,7 +39,10 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
-    setClicking, setCache, setTmpPuIncludedValue, setTmpPuExcludedValue,
+    setJob,
+    setClicking,
+    setTmpPuIncludedValue,
+    setTmpPuExcludedValue,
   } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
@@ -89,25 +92,22 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
         },
       },
     }, {
-      onSuccess: () => {
-        // Let's wait unitl we can track fast async jobs
-        setTimeout(() => {
-          setSubmitting(false);
-          onSelected(null);
-          dispatch(setCache(Date.now()));
-          dispatch(setClicking(false));
+      onSuccess: ({ data: { meta } }) => {
+        dispatch(setJob(new Date(meta.isoDate).getTime()));
+        setSubmitting(false);
+        onSelected(null);
+        dispatch(setClicking(false));
 
-          addToast('adjust-planning-units-success', (
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <ul className="text-sm">
-                <li>Planning units lock status saved</li>
-              </ul>
-            </>
-          ), {
-            level: 'success',
-          });
-        }, 2500);
+        addToast('adjust-planning-units-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <ul className="text-sm">
+              <li>Planning units lock status saved</li>
+            </ul>
+          </>
+        ), {
+          level: 'success',
+        });
       },
       onError: () => {
         setSubmitting(false);
@@ -128,7 +128,7 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
     onSelected,
     dispatch,
     setClicking,
-    setCache,
+    setJob,
     addToast,
   ]);
 

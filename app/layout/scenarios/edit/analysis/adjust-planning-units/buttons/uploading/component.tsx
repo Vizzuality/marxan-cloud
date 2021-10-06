@@ -42,7 +42,11 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setUploading, setUploadingValue, setCache } = scenarioSlice.actions;
+  const {
+    setUploading,
+    setUploadingValue,
+    setJob,
+  } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
   const { uploadingValue, puIncludedValue, puExcludedValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
@@ -178,26 +182,24 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         },
       },
     }, {
-      onSuccess: () => {
-        setTimeout(() => {
-          setSubmitting(false);
-          onSelected(null);
-          dispatch(setCache(Date.now()));
-          dispatch(setUploading(false));
-          dispatch(setUploadingValue(null));
-          setSuccessFile(null);
+      onSuccess: ({ data: { meta } }) => {
+        dispatch(setJob(new Date(meta.isoDate).getTime()));
+        setSubmitting(false);
+        onSelected(null);
+        dispatch(setUploading(false));
+        dispatch(setUploadingValue(null));
+        setSuccessFile(null);
 
-          addToast('adjust-planning-units-success', (
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <ul className="text-sm">
-                <li>Planning units lock status saved</li>
-              </ul>
-            </>
-          ), {
-            level: 'success',
-          });
-        }, 2500);
+        addToast('adjust-planning-units-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <ul className="text-sm">
+              <li>Planning units lock status saved</li>
+            </ul>
+          </>
+        ), {
+          level: 'success',
+        });
       },
       onError: () => {
         setSubmitting(false);
@@ -222,7 +224,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     dispatch,
     setUploading,
     setUploadingValue,
-    setCache,
+    setJob,
     addToast,
   ]);
 

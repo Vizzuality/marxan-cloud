@@ -38,6 +38,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
+    setJob,
     setPUAction,
     setPuIncludedValue,
     setPuExcludedValue,
@@ -80,20 +81,19 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         },
       },
     }, {
-      onSuccess: () => {
-        setTimeout(() => {
-          addToast('clear-planning-units-success', (
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <ul className="text-sm">
-                <li>Planning units cleared</li>
-              </ul>
-            </>
-          ), {
-            level: 'success',
-          });
-          setClearing(false);
-        }, 2500);
+      onSuccess: ({ data: { meta } }) => {
+        dispatch(setJob(new Date(meta.isoDate).getTime()));
+        addToast('clear-planning-units-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <ul className="text-sm">
+              <li>Planning units cleared</li>
+            </ul>
+          </>
+        ), {
+          level: 'success',
+        });
+        setClearing(false);
       },
       onError: () => {
         addToast('clear-planning-units-error', (
@@ -109,7 +109,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         setClearing(false);
       },
     });
-  }, [sid, PUData, scenarioPUMutation, addToast]);
+  }, [sid, PUData, scenarioPUMutation, addToast, dispatch, setJob]);
 
   return (
     <motion.div
