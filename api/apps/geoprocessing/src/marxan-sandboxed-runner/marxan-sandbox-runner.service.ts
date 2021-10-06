@@ -93,7 +93,6 @@ export class MarxanSandboxRunnerService {
           await workspace.cleanup();
           resolve(output);
         } catch (error) {
-          reject(error);
           await outputFilesRepository
             .dumpFailure(
               workspace,
@@ -104,6 +103,7 @@ export class MarxanSandboxRunnerService {
             .catch((error) => {
               this.#logger.error(error);
             });
+          reject(error);
         } finally {
           this.clearAbortController(forScenarioId);
         }
