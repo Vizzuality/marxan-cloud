@@ -17,6 +17,7 @@ import { MarxanSandboxedRunnerModule } from '@marxan-geoprocessing/marxan-sandbo
 import { ScenariosModule } from '@marxan-geoprocessing/modules/scenarios/scenarios.module';
 import { ScenarioProtectedAreaCalculationModule } from '@marxan-geoprocessing/modules/scenario-protected-area-calculation/scenario-protected-area-calculation.module';
 import { PlanningUnitsGridModule } from '@marxan-geoprocessing/modules/planning-units-grid';
+import { ScenarioPlanningUnitsFeaturesAggregateModule } from '@marxan-geoprocessing/modules/scenario-planning-units-features-aggregate/scenario-planning-units-features-aggregate.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { PlanningUnitsGridModule } from '@marxan-geoprocessing/modules/planning-
     MarxanSandboxedRunnerModule,
     ScenariosModule,
     PlanningUnitsGridModule,
+    ScenarioPlanningUnitsFeaturesAggregateModule,
   ],
   controllers: [AppController],
   providers: [AppService],
