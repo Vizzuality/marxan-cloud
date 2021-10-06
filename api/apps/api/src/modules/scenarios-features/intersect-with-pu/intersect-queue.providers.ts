@@ -5,11 +5,7 @@ import {
   CreateWithEventFactory,
   QueueEventsAdapterFactory,
 } from '@marxan-api/modules/queue-api-events';
-
-// TODO replace with proper type
-export type JobInput = { scenarioId: string };
-// TODO replace with proper queueName
-const queueName = `${Date.now()}`;
+import { queueName, JobInput } from '@marxan/planning-unit-features';
 
 export const intersectFeaturesWithPuQueueToken = Symbol(
   `intersect features with pu queue token`,

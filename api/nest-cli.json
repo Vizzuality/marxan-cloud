@@ -196,6 +196,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/tiles/tsconfig.lib.json"
       }
+    },
+    "planning-unit-features": {
+      "type": "library",
+      "root": "libs/planning-unit-features",
+      "entryFile": "index",
+      "sourceRoot": "libs/planning-unit-features/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/planning-unit-features/tsconfig.lib.json"
+      }
     }
   }
 }
