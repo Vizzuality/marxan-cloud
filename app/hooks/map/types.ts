@@ -121,6 +121,13 @@ export interface UsePUGridLayer {
   };
 }
 
+export interface UsePUCompareLayer {
+  cache?: number;
+  active?: boolean;
+  sid1?: string;
+  sid2?: string;
+}
+
 export interface UseLegend {
   layers: string[];
   options?: {

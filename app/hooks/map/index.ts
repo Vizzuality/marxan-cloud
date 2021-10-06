@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import chroma from 'chroma-js';
+
 import { COLORS, LEGEND_LAYERS } from './constants';
 import {
   UseAdminPreviewLayer,
@@ -7,6 +9,7 @@ import {
   UseFeaturePreviewLayers,
   UseGeoJSONLayer,
   UseLegend,
+  UsePUCompareLayer,
   UsePUGridLayer,
   UsePUGridPreviewLayer,
   UseWDPAPreviewLayer,
@@ -576,6 +579,150 @@ export function usePUGridLayer({
       },
     };
   }, [cache, active, sid, options, include, sublayers]);
+}
+
+export function usePUCompareLayer({
+  active, sid1, sid2, cache = 0,
+}: UsePUCompareLayer) {
+  const COLOR_NUMBER = 10;
+
+  const COLOR_RAMP = useMemo(() => {
+    if (!active) return null;
+
+    const COLOR_ARRAY = [...Array(COLOR_NUMBER).keys()];
+    /*
+      COLORS.compare:
+      [
+        [a1,a2,a3,a4],
+        [b1,b2,b3,b4],
+        [c1,c2,c3,c4],
+        [d1,d2,d3,d4],
+      ]
+    */
+
+    const COLOR_RAMPS_X = COLORS.compare.map((ramp) => {
+      return chroma.scale(ramp).colors(COLOR_NUMBER);
+    });
+    // Result:
+    /*
+      [
+        [a1,a2,a3,a4,a5,a6,a7,a8,a9,a10],
+        [b1,b2,b3,b4,b5,b6,b7,b8,b9,b10],
+        [c1,c2,c3,c4,c5,c6,c7,c8,c9,c10],
+        [d1,d2,d3,d4,d5,d6,d7,d8,d9,d10],
+      ]
+    */
+
+    // Get the opsite COLOR_NUMBER ramp of colors
+    const COLOR_RAMPS_Y = COLOR_ARRAY.map((key) => {
+      return chroma.scale([].concat(...COLOR_RAMPS_X.map((c) => c.filter((cx, j) => {
+        return j === key;
+      })))).colors(COLOR_NUMBER);
+    });
+    // Result:
+    /*
+      [
+        [a1,a1.2,a1.3,b1,b1.2,b1.3,c1,c1.2,c1.3,d1],
+        [a2,a2.2,a2.3,b2,b2.2,b2.3,c2,c2.2,c2.3,d2],
+        [a3,a3.2,a3.3,b3,b3.2,b3.3,c3,c3.2,c3.3,d3],
+        [a4,a4.2,a4.3,b4,b4.2,b4.3,c4,c4.2,c4.3,d4],
+        [a5,a5.2,a5.3,b5,b5.2,b5.3,c5,c5.2,c5.3,d5],
+        [a6,a6.2,a6.3,b6,b6.2,b6.3,c6,c6.2,c6.3,d6],
+        [a7,a7.2,a7.3,b7,b7.2,b7.3,c7,c7.2,c7.3,d7],
+        [a8,a8.2,a8.3,b8,b8.2,b8.3,c8,c8.2,c8.3,d8],
+        [a9,a9.2,a9.3,b9,b9.2,b9.3,c9,c9.2,c9.3,d9],
+        [a10,a10.2,a10.3,b10,b10.2,b10.3,c10,c10.2,c10.3,d10],
+      ]
+    */
+
+    const COLOR_RAMPS = [].concat(...COLOR_ARRAY.map((key) => {
+      return [].concat(...COLOR_RAMPS_Y.map((c) => c.filter((cx, j) => {
+        return j === key;
+      })));
+    }));
+    // Result:
+    /*
+      [
+        [a1,a2,a3,a4,a5,a6,a7,a8,a9,a10],
+        [a1.2,a2.2,a3.2,a4.2,a5.2,a6.2,a7.2,a8.2,a9.2,a10.2],
+        [a1.3,a2.3,a3.3,a4.3,a5.3,a6.3,a7.3,a8.3,a9.3,a10.3],
+        [b1,b2,b3,b4,b5,b6,b7,b8,b9,b10],
+        [b1.2,b2.2,b3.2,b4.2,b5.2,b6.2,b7.2,b8.2,b9.2,b10.2],
+        [b1.3,b2.3,b3.3,b4.3,b5.3,b6.3,b7.3,b8.3,b9.3,b10.3],
+        [c1,c2,c3,c4,c5,c6,c7,c8,c9,c10],
+        [c1.2,c2.2,c3.2,c4.2,c5.2,c6.2,c7.2,c8.2,c9.2,c10.2],
+        [c1.3,c2.3,c3.3,c4.3,c5.3,c6.3,c7.3,c8.3,c9.3,c10.3],
+        [d1,d2,d3,d4,d5,d6,d7,d8,d9,d10],
+      ]
+    */
+
+    const RESULT = [].concat(
+      ...COLOR_RAMPS.map((c, i) => {
+        return [
+          `${Math.floor((i / COLOR_NUMBER) % COLOR_NUMBER)}${i % COLOR_NUMBER}`, c,
+        ];
+      }),
+    );
+    /*
+      [
+        '00',a1,'01',a2,'02',a3,'03',a4,'04',a5,'05',a6,'06',a7,'07',a8,'08',a9,'09',a10,
+        '10',a1.2,'11',a2.2,'12',a3.2,'13',a4.2,'14',a5.2,...
+        '20',a1.3,'21',a2.3,'22',a3.3,'23',a4.3,'24',a5.3,...
+        '30',b1,'31',b2,'32',b3,'33',b4,'34',b5,...
+        '40',b1.2,'41',b2.2,'42',b3.2,'43',b4.2,'44',b5.2,...
+        '50',b1.3,'51',b2.3,'52',b3.3,'53',b4.3,'54',b5.3,...
+        '60',c1,'61',c2,'62',c3,'63',c4,'64',c5,...
+        '70',c1.2,'71',c2.2,'72',c3.2,'73',c4.2,'74',c5.2,...
+        '80',c1.3,'71',c2.3,'72',c3.3,'73',c4.3,'74',c5.3,...
+        '90',d1,'71',d2,'72',d3,'73',d4,'74',d5,...
+      ]
+    */
+
+    return RESULT;
+  }, [active]);
+
+  return useMemo(() => {
+    if (!active) return null;
+
+    return {
+      id: `pu-grid-layer-${sid1}-${sid2}-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        // Use correct tiles whenever the API return the compare endpoint
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid1}/planning-units/tiles/{z}/{x}/{y}.mvt?include=results`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'fill',
+            'source-layer': 'layer0',
+            paint: {
+              'fill-color': [
+                'match',
+                [
+                  'concat',
+                  ['round', ['/', ['get', 'frequencyValue'], 100 / COLOR_NUMBER]],
+                  ['round', ['/', ['get', 'frequencyValue'], 100 / COLOR_NUMBER]],
+                ],
+                ...COLOR_RAMP,
+                '#FFF',
+              ],
+              'fill-opacity': 1,
+            },
+          },
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-color': '#000',
+              'line-opacity': 0,
+            },
+          },
+        ],
+      },
+    };
+  }, [active, sid1, sid2, cache, COLOR_RAMP]);
 }
 
 // PUGrid

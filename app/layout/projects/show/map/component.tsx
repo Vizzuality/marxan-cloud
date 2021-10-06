@@ -13,7 +13,9 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/client';
 
-import { useAdminPreviewLayer, useLegend, usePUGridLayer } from 'hooks/map';
+import {
+  useAdminPreviewLayer, useLegend, usePUCompareLayer, usePUGridLayer,
+} from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
@@ -93,6 +95,12 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     },
   });
 
+  const PUCompareLayer = usePUCompareLayer({
+    active: !!selectedSid,
+    sid1: selectedSid,
+    sid2: selectedSid,
+  });
+
   const AdminPreviewLayer = useAdminPreviewLayer({
     active: (
       rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length
@@ -102,7 +110,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     subregion: adminAreaLevel2Id,
   });
 
-  const LAYERS = [PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
+  const LAYERS = [PUCompareLayer, PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
     layers: selectedSid ? ['frequency', 'pugrid'] : ['pugrid'],
