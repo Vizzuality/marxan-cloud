@@ -15,4 +15,5 @@ export const validDataWithGivenPuIds = (
     scenarioId,
     puGeometryId: v4(),
     id: id,
+    featureList: [],
   }));
