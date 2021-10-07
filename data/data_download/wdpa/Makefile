@@ -14,17 +14,21 @@ LIST = 0 1 2
 targets = $(addprefix exec, $(LIST))
 
 import: $(targets)
-
 $(targets): exec%: data/wdpa/simp/%
 	for i in $</*.json; do \
-		ogr2ogr -makevalid -update -append \
-		-nln wdpa -nlt PROMOTE_TO_MULTI \
-		-geomfield the_geom \
-		-t_srs EPSG:4326 -a_srs EPSG:4326 \
-		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
-		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD schemas=myshapefiles" "$$i" \
-		-sql "select *,'$(MarxanUser)' as created_by from \"$$(basename -s .json "$$i")\""; \
+		echo "$$i"; \
 	done;
+
+# $(targets): exec%: data/wdpa/simp/%
+# 	for i in $</*.json; do \
+# 		ogr2ogr -makevalid -update -append \
+# 		-nln wdpa -nlt PROMOTE_TO_MULTI \
+# 		-geomfield the_geom \
+# 		-t_srs EPSG:4326 -a_srs EPSG:4326 \
+# 		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
+# 		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD schemas=myshapefiles" "$$i" \
+# 		-sql "select *,'$(MarxanUser)' as created_by from \"$$(basename -s .json "$$i")\""; \
+# 	done;
 
 merge-original: data/wdpa/WDPA_WDOECM_wdpa_shp0/ data/wdpa/WDPA_WDOECM_wdpa_shp1/ data/wdpa/WDPA_WDOECM_wdpa_shp2/
 	mapshaper-xl 16gb -i data/wdpa/WDPA_WDOECM_wdpa_shp0/*-polygons.shp data/wdpa/WDPA_WDOECM_wdpa_shp1/*-polygons.shp data/wdpa/WDPA_WDOECM_wdpa_shp2/*-polygons.shp snap combine-files \
@@ -51,14 +55,14 @@ data/wdpa/simp/%: data/wdpa/geojson/%
 # @debt
 # need to review a better way to split the files than using the iucn category
 data/wdpa/geojson/%: data/wdpa/data
-	@for f in data/wdpa/data/*.shp; \
+	@for f in $</*.shp; \
 		do filename=`(basename -s .shp "$$f")`; \
 		readarray -td '_' a < <(echo "$${filename}_"); unset 'a[-1]'; \
 		declare -p a; \
 		echo "$${a[-1]}"; \
 		mkdir -p $@; \
 		mapshaper-xl 16gb -i $$f name="$$filename" \
-						-split IUCN_CAT \
+						-split ISO3 \
 						-o $@ format=geojson precision=0.0000001; \
 	done
 	rm -rf $<
