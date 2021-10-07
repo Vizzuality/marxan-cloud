@@ -41,7 +41,11 @@ export default {
     valid: '',
   },
   sizes: {
-    base: 'pl-4 pr-10 py-3 text-sm',
-    s: 'pl-4 pr-10 py-1 text-sm',
+    base: 'pl-4 pr-10 text-sm',
+    s: 'pl-4 pr-10 text-sm',
+    label: {
+      base: 'py-3',
+      s: 'py-1',
+    },
   },
 };

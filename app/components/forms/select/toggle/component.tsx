@@ -56,8 +56,9 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
       )}
 
       <span className={cx({
-        'text-sm leading-none': true,
+        'text-sm leading-none whitespace-nowrap overflow-hidden overflow-ellipsis': true,
         [THEME[theme].prefix.base]: selectedItems.length,
+        [THEME.sizes.label[size]]: true,
       })}
       >
         {labelDefaultFormatter()}
