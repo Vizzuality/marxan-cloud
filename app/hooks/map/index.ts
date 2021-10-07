@@ -405,7 +405,7 @@ export function usePUGridLayer({
           },
 
           // PROTECTED AREAS
-          ...sublayers.includes('wdpa-percentage')
+          ...sublayers.includes('wdpa-percentage') && wdpaThreshold !== null
             ? [
               {
                 type: 'fill',

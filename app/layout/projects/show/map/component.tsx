@@ -149,8 +149,6 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     };
   }, [rawScenariosData, sid1]);
 
-  console.log(SCENARIOS_RUNNED.sid1Options);
-
   useEffect(() => {
     setBounds({
       bbox,
