@@ -1,13 +1,14 @@
 import React, { MutableRefObject, useCallback, useMemo } from 'react';
-import cx from 'classnames';
-
-import Icon from 'components/icon';
-import Select from 'components/forms/select';
-import Checkbox from 'components/forms/checkbox';
-
-import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 
 import { useInView } from 'react-intersection-observer';
+
+import cx from 'classnames';
+
+import Checkbox from 'components/forms/checkbox';
+import Select from 'components/forms/select';
+import Icon from 'components/icon';
+
+import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 
 export interface ItemProps {
   id: string | number;

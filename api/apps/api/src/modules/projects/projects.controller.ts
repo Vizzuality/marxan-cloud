@@ -54,12 +54,16 @@ import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
-import { ProjectGridRequestDto } from './dto/project-grid-request.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { isFeatureCollection } from '@marxan/utils';
-import { plainToClass } from 'class-transformer';
+import {
+  AsyncJobDto,
+  JsonApiAsyncJobMeta,
+} from '@marxan-api/dto/async-job.dto';
+import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
+import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -122,6 +126,7 @@ export class ProjectsController {
 
   @ApiOperation({ description: 'Create project' })
   @ApiOkResponse({ type: ProjectResultSingular })
+  @ApiTags(asyncJobTag)
   @Post()
   async create(
     @Body() dto: CreateProjectDTO,
@@ -129,11 +134,14 @@ export class ProjectsController {
   ): Promise<ProjectResultSingular> {
     return await this.projectSerializer.serialize(
       await this.projectsService.create(dto, { authenticatedUser: req.user }),
+      undefined,
+      true,
     );
   }
 
   @ApiOperation({ description: 'Update project' })
   @ApiOkResponse({ type: ProjectResultSingular })
+  @ApiTags(asyncJobTag)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -141,6 +149,8 @@ export class ProjectsController {
   ): Promise<ProjectResultSingular> {
     return await this.projectSerializer.serialize(
       await this.projectsService.update(id, dto),
+      undefined,
+      true,
     );
   }
 
@@ -156,22 +166,18 @@ export class ProjectsController {
     description: 'Upload shapefile for project-specific planning unit grid',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiCreatedResponse({ type: ProjectGridRequestDto })
+  @ApiCreatedResponse({ type: JsonApiAsyncJobMeta })
+  @ApiTags(asyncJobTag)
   @Post(`:id/grid`)
   async setProjectGrid(
     @Param('id') projectId: string,
     @UploadedFile() file: Express.Multer.File,
-  ) {
+  ): Promise<JsonApiAsyncJobMeta> {
     const result = await this.projectsService.setGrid(projectId, file);
     if (isLeft(result)) {
       throw new InternalServerErrorException(result.left);
     }
-    return plainToClass<ProjectGridRequestDto, ProjectGridRequestDto>(
-      ProjectGridRequestDto,
-      {
-        id: result.right.value,
-      },
-    );
+    return AsyncJobDto.forProject([result.right.value]).asJsonApiMetadata();
   }
 
   @ApiOperation({
@@ -200,20 +206,20 @@ export class ProjectsController {
     description: 'Upload shapefile for project-specific protected areas',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiNoContentResponse()
+  @ApiTags(asyncJobTag)
   @Post(':id/protected-areas/shapefile')
   async shapefileForProtectedArea(
     @Param('id') projectId: string,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<void> {
+  ): Promise<JsonApiAsyncJobMeta> {
     const outcome = await this.projectsService.addShapeFor(projectId, file, {
       authenticatedUser: req.user,
     });
     if (outcome) {
       throw new NotFoundException();
     }
-    return;
+    return AsyncJobDto.forProject().asJsonApiMetadata();
   }
 
   @ApiConsumesShapefile({
@@ -222,6 +228,7 @@ export class ProjectsController {
     description: 'Upload shapefile with project planning-area',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiTags(inlineJobTag)
   @Post('planning-area/shapefile')
   async shapefileWithProjectPlanningArea(
     @UploadedFile() file: Express.Multer.File,
@@ -247,6 +254,7 @@ export class ProjectsController {
     description: `Upload shapefiles of species or bioregional features.`,
   })
   @ApiOkResponse({ type: ShapefileUploadResponse })
+  @ApiTags(inlineJobTag)
   @Post(`:id/features/shapefile`)
   @UseInterceptors(
     FileInterceptor('file', {

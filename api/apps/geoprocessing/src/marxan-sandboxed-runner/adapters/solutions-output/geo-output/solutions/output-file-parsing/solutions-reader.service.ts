@@ -31,13 +31,13 @@ export class SolutionsReaderService {
       },
       select: ['id', 'planningUnitMarxanId'],
     });
-    const mapping = planningUnits[0].reduce<PuToScenarioPu>(
-      (previousValue, pu) => {
-        previousValue[pu.planningUnitMarxanId] = pu.id;
-        return previousValue;
-      },
-      {},
-    );
+    const mapping: Record<
+      number,
+      string
+    > = planningUnits[0].reduce<PuToScenarioPu>((previousValue, pu) => {
+      previousValue[pu.planningUnitMarxanId] = pu.id;
+      return previousValue;
+    }, {});
     const duplex: Duplex<SolutionRowResult, string> = new PassThrough({
       objectMode: true,
     });

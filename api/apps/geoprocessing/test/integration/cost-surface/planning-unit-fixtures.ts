@@ -26,7 +26,7 @@ export const getFixtures = async (app: INestApplication) => {
     scenarioId,
   );
 
-  const puIds = scenarioPuData.rows.map((row) => row.puGeometryId);
+  const puIds = scenarioPuData.rows.map((row) => row.id);
 
   return {
     planningUnitDataRepo: scenarioPuData,
@@ -38,11 +38,12 @@ export const getFixtures = async (app: INestApplication) => {
       scenarioId: string,
     ): Promise<{ scenario_id: string; cost: number; spud_id: string }[]> =>
       puCostDataRepo.query(`
-      select spud.scenario_id, spucd."cost", spud.id as spud_id
-      from scenarios_pu_data as spud
-      join scenarios_pu_cost_data as spucd on (spud."id" = spucd.scenarios_pu_data_id)
-      where spud.scenario_id = '${scenarioId}'
-`),
+        select spud.scenario_id, spucd."cost", spud.id as spud_id
+        from scenarios_pu_data as spud
+               join scenarios_pu_cost_data as spucd
+                    on (spud."id" = spucd.scenarios_pu_data_id)
+        where spud.scenario_id = '${scenarioId}'
+      `),
     GivenPuCostDataExists: async () =>
       puCostDataRepo
         .save(
@@ -56,9 +57,7 @@ export const getFixtures = async (app: INestApplication) => {
         )
         .then((rows) => rows.map((row) => row.scenariosPlanningUnit))
         .then((scenarioPlanningUnits) =>
-          scenarioPlanningUnits
-            .map((spu) => spu?.puGeometryId)
-            .filter(isDefined),
+          scenarioPlanningUnits.map((spu) => spu?.id).filter(isDefined),
         ),
     cleanup: async () => {
       await puDataRepo.delete({

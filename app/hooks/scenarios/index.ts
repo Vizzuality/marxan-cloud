@@ -166,7 +166,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 
       return pageData.map((d): ItemProps => {
         const {
-          id, projectId, name, lastModifiedAt,
+          id, projectId, name, lastModifiedAt, metadata,
         } = d;
 
         const status = statusScenarios.find((s) => s.id === id);
@@ -178,11 +178,14 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
           );
         };
 
+        const { lastJobCheck } = metadata?.scenarioEditingMetadata || {};
+
         return {
           id,
           name,
           lastUpdate: lastModifiedAt,
           lastUpdateDistance: lastUpdateDistance(),
+          lastJobCheck,
           warnings: false,
           jobs: status?.jobs || [],
           onEdit: () => {
@@ -249,8 +252,10 @@ export function useSaveScenario({
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
       const { id, projectId } = data?.data?.data;
+      // const { isoDate, started } = data?.data?.meta;
       queryClient.invalidateQueries(['scenarios', projectId]);
       queryClient.setQueryData(['scenarios', id], data?.data);
+
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -399,7 +404,6 @@ export function useUploadCostSurface({
   const [session] = useSession();
 
   const uploadScenarioCostSurface = ({ id, data }: UploadScenarioCostSurfaceProps) => {
-    console.log('data--->', data);
     return UPLOADS.request({
       url: `/scenarios/${id}/cost-surface/shapefile`,
       data,
@@ -503,15 +507,7 @@ export function useSaveScenarioPU({
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
       const { id } = variables;
-
-      // It's impossible to know from the API if the process of lockin has finsished or not,
-      // that's why this piece of sh*** is added here.
-      // If for some reason it takes more that 5000 seconds to process the lockin
-      // we are in troubles
-      // queryClient.invalidateQueries(['scenarios-pu', id]);
-      setTimeout(() => {
-        queryClient.invalidateQueries(['scenarios-pu', id]);
-      }, 2500);
+      queryClient.invalidateQueries(['scenarios-pu', id]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);

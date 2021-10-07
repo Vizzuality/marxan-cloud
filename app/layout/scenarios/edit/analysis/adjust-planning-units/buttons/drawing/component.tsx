@@ -38,7 +38,11 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   const { addToast } = useToasts();
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setDrawing, setDrawingValue, setCache } = scenarioSlice.actions;
+  const {
+    setJob,
+    setDrawing,
+    setDrawingValue,
+  } = scenarioSlice.actions;
   const dispatch = useDispatch();
   const {
     puIncludedValue,
@@ -92,27 +96,24 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
         },
       },
     }, {
-      onSuccess: () => {
+      onSuccess: ({ data: { meta } }) => {
         // Let's wait unitl we can track fast async jobs
-        setTimeout(() => {
-          console.info('SUCCESS');
-          setSubmitting(false);
-          onSelected(null);
-          dispatch(setCache(Date.now()));
-          dispatch(setDrawing(null));
-          dispatch(setDrawingValue(null));
+        dispatch(setJob(new Date(meta.isoDate).getTime()));
+        setSubmitting(false);
+        onSelected(null);
+        dispatch(setDrawing(null));
+        dispatch(setDrawingValue(null));
 
-          addToast('adjust-planning-units-success', (
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <ul className="text-sm">
-                <li>Planning units lock status saved</li>
-              </ul>
-            </>
-          ), {
-            level: 'success',
-          });
-        }, 2500);
+        addToast('adjust-planning-units-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <ul className="text-sm">
+              <li>Planning units lock status saved</li>
+            </ul>
+          </>
+        ), {
+          level: 'success',
+        });
       },
       onError: () => {
         setSubmitting(false);
@@ -137,7 +138,7 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
     dispatch,
     setDrawing,
     setDrawingValue,
-    setCache,
+    setJob,
     addToast,
   ]);
 

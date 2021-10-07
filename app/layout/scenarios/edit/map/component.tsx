@@ -127,11 +127,15 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   }, [tab, subtab]);
 
   const layers = useMemo(() => {
-    if (tab === 'protected-areas' && subtab === 'protected-areas-preview' && !!wdpaCategories?.wdpaIucnCategories?.length) return ['wdpa-preview', 'pugrid'];
-    if (tab === 'protected-areas' && subtab === 'protected-areas-percentage' && !!wdpaCategories?.wdpaIucnCategories?.length) return ['wdpa-percentage', 'pugrid'];
+    const protectedCategories = wdpaCategories?.wdpaIucnCategories
+    || scenarioData?.wdpaIucnCategories
+    || [];
+
+    if (tab === 'protected-areas' && subtab === 'protected-areas-preview' && !!protectedCategories.length) return ['wdpa-preview', 'pugrid'];
+    if (tab === 'protected-areas' && subtab === 'protected-areas-percentage' && !!protectedCategories.length) return ['wdpa-percentage', 'pugrid'];
     if (tab === 'features') {
       return [
-        ...wdpaCategories.wdpaIucnCategories?.length ? ['wdpa-percentage'] : [],
+        ...protectedCategories.length ? ['wdpa-percentage'] : [],
         'bioregional',
         'species',
         'pugrid',
@@ -143,7 +147,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
 
     return ['pugrid'];
-  }, [tab, subtab, wdpaCategories]);
+  }, [tab, subtab, wdpaCategories?.wdpaIucnCategories, scenarioData?.wdpaIucnCategories]);
 
   const featuresIds = useMemo(() => {
     if (allGapAnalysisData) {

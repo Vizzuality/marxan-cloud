@@ -306,6 +306,7 @@ async function getFixtures() {
           id,
           type: 'scenarios',
         },
+        meta: {},
       });
     },
     ThenRequestWasRejected(result: request.Response) {

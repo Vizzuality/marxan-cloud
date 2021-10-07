@@ -111,7 +111,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             metadata,
             {
               tab: 'protected-areas',
-              subtab: 'protected-areas-percentage',
+              subtab: 'protected-areas-preview',
               status: {
                 'protected-areas': 'draft',
                 features: 'empty',
@@ -131,7 +131,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
           ), {
             level: 'success',
           });
-          onSuccess();
         },
         onError: () => {
           setSubmitting(false);

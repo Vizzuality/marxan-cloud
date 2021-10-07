@@ -24,7 +24,7 @@ export class PuCostExtractor implements PuExtractorPort {
     }
 
     return puCosts.map((puCost) => ({
-      puId: puCost.puId,
+      puid: puCost.puid,
       cost: puCost.cost,
     }));
   }
@@ -37,7 +37,7 @@ export class PuCostExtractor implements PuExtractorPort {
     return (
       isDefined(properties) &&
       isDefined(properties.cost) &&
-      isDefined(properties.puId)
+      isDefined(properties.puid)
     );
   }
 }

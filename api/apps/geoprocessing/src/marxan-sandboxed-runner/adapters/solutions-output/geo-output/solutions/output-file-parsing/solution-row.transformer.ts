@@ -3,11 +3,16 @@ import { TransformCallback } from 'stream';
 import { PuToScenarioPu } from './pu-to-scenario-pu';
 import { SolutionRowResult } from '../solution-row-result';
 
+type PuIndex = number;
+type PuNumber = number;
+type PuOrderMapping = Record<PuIndex, PuNumber>;
+
 export class SolutionTransformer extends Transform<
   string,
   SolutionRowResult[]
 > {
   #headerAck = false;
+  #puOrderMap: PuOrderMapping = {};
 
   constructor(private readonly solutionPuMapping: PuToScenarioPu) {
     super({
@@ -22,6 +27,13 @@ export class SolutionTransformer extends Transform<
   ) {
     if (!this.#headerAck) {
       this.#headerAck = true;
+      const [_matrixHeader, ...puNumbers] = chunk.split(',');
+
+      puNumbers.forEach((header, index) => {
+        const puNumber = +header.replace('P', '');
+        this.#puOrderMap[index] = puNumber;
+      });
+
       return callback(null, []);
     }
     const [solutionString, ...puValues] = chunk.split(',');
@@ -33,9 +45,9 @@ export class SolutionTransformer extends Transform<
     })[] = puValues.map((puValue, index) => ({
       value: +puValue === 1 ? 1 : 0,
       runId: solutionNumber,
-      spdId: this.solutionPuMapping[`${index + 1}`],
+      spdId: this.solutionPuMapping[this.#puOrderMap[index]],
       raw: `index: ${index + 1} ; puValue: ${puValue}`,
-      puid: index + 1,
+      puid: this.#puOrderMap[index],
     }));
     for (const k of results) {
       if (!k.spdId) {
