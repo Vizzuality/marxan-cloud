@@ -126,6 +126,7 @@ export interface UsePUCompareLayer {
   active?: boolean;
   sid1?: string;
   sid2?: string;
+  options?: Record<string, unknown>;
 }
 
 export interface UseLegend {

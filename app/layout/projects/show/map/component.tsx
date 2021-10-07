@@ -96,9 +96,12 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   });
 
   const PUCompareLayer = usePUCompareLayer({
-    active: !!selectedSid,
+    active: !!selectedSid, // TODO: active it only with 2 scenarios selected
     sid1: selectedSid,
     sid2: selectedSid,
+    options: {
+      ...layerSettings.compare,
+    },
   });
 
   const AdminPreviewLayer = useAdminPreviewLayer({
@@ -113,7 +116,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const LAYERS = [PUCompareLayer, PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    layers: selectedSid ? ['frequency', 'pugrid'] : ['pugrid'],
+    layers: selectedSid ? ['compare', 'frequency', 'pugrid'] : ['pugrid'],
     options: {
       layerSettings,
     },

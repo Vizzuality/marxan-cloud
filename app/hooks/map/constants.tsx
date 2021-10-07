@@ -34,7 +34,7 @@ export const COLORS = {
     ['#2A511E', '#586527', '#8B7931', '#BD8D3B'],
     ['#30603F', '#5E774D', '#918E5C', '#C5A66B'],
     ['#366E5F', '#648975', '#97A38A', '#CCBDA0'],
-    ['#3C7B7E', '#6A9A9B', '#9EB6B8', '#FFFFFF'],
+    ['#3C7B7E', '#6A9A9B', '#9EB6B8', '#DDDDDD'],
   ],
 };
 
@@ -203,5 +203,25 @@ export const LEGEND_LAYERS = {
       opacity: true,
       visibility: true,
     },
+  }),
+  compare: () => ({
+    id: 'compare',
+    name: 'Solutions distribution',
+    type: 'matrix',
+    settingsManager: {
+      opacity: true,
+      visibility: true,
+    },
+    intersections: [].concat(...COLORS.compare).map((c, i) => ({ id: i, color: c })).reverse(),
+    items: [
+      {
+        value: 'Scenario 2',
+        color: '#3C7B7E',
+      },
+      {
+        value: 'Scenario 3',
+        color: '#DA9827',
+      },
+    ],
   }),
 };

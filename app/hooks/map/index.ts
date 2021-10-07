@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import chroma from 'chroma-js';
+import cx from 'classnames';
 
 import { COLORS, LEGEND_LAYERS } from './constants';
 import {
@@ -582,7 +583,7 @@ export function usePUGridLayer({
 }
 
 export function usePUCompareLayer({
-  active, sid1, sid2, cache = 0,
+  active, sid1, sid2, cache = 0, options,
 }: UsePUCompareLayer) {
   const COLOR_NUMBER = 10;
 
@@ -615,7 +616,7 @@ export function usePUCompareLayer({
 
     // Get the opsite COLOR_NUMBER ramp of colors
     const COLOR_RAMPS_Y = COLOR_ARRAY.map((key) => {
-      return chroma.scale([].concat(...COLOR_RAMPS_X.map((c) => c.filter((cx, j) => {
+      return chroma.scale([].concat(...COLOR_RAMPS_X.map((c) => c.filter((c2, j) => {
         return j === key;
       })))).colors(COLOR_NUMBER + 1);
     });
@@ -637,7 +638,7 @@ export function usePUCompareLayer({
     */
 
     const COLOR_RAMPS = [].concat(...COLOR_ARRAY.map((key) => {
-      return [].concat(...COLOR_RAMPS_Y.map((c) => c.filter((cx, j) => {
+      return [].concat(...COLOR_RAMPS_Y.map((c) => c.filter((c2, j) => {
         return j === key;
       })));
     }));
@@ -660,8 +661,15 @@ export function usePUCompareLayer({
 
     const RESULT = [].concat(
       ...COLOR_RAMPS.map((c, i) => {
+        const step = `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}${i % (COLOR_NUMBER + 1)}`;
+        const color = cx({
+          '#000000': step === '00',
+          '#FFFFFF': step === '1010',
+          [c]: step !== '00' && step !== '1010',
+        });
+
         return [
-          `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}${i % (COLOR_NUMBER + 1)}`, c,
+          step, color,
         ];
       }),
     );
@@ -697,9 +705,13 @@ export function usePUCompareLayer({
   return useMemo(() => {
     if (!active) return null;
 
+    const { opacity = 1, visibility } = options || {};
+
     return {
       id: `pu-grid-layer-${sid1}-${sid2}-${cache}`,
       type: 'vector',
+      opacity,
+      visibility,
       source: {
         type: 'vector',
         // Use correct tiles whenever the API return the compare endpoint
@@ -735,7 +747,7 @@ export function usePUCompareLayer({
         ],
       },
     };
-  }, [active, sid1, sid2, cache, COLOR_RAMP]);
+  }, [active, sid1, sid2, cache, options, COLOR_RAMP]);
 }
 
 // PUGrid
