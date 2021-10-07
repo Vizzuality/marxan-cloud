@@ -705,7 +705,7 @@ export function usePUCompareLayer({
   return useMemo(() => {
     if (!active) return null;
 
-    const { opacity = 1, visibility } = options || {};
+    const { opacity = 1, visibility = true } = options || {};
 
     return {
       id: `pu-grid-layer-${sid1}-${sid2}-${cache}`,
@@ -714,7 +714,7 @@ export function usePUCompareLayer({
       visibility,
       source: {
         type: 'vector',
-        // Use correct tiles whenever the API return the compare endpoint
+        // Use correct tiles using sid1 and sid2 in the correct endpoint: ask BE
         tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid1}/planning-units/tiles/{z}/{x}/{y}.mvt?include=results`],
       },
       render: {

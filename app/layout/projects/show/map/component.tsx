@@ -10,6 +10,7 @@ import { setLayerSettings } from 'store/slices/projects/[id]';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/client';
 
@@ -38,7 +39,8 @@ export interface ProjectMapProps {
 
 export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const [open, setOpen] = useState(false);
-  const [selectedSid, setSelectedSid] = useState(null);
+  const [sid1, setSid1] = useState(null);
+  const [sid2, setSid2] = useState(null);
   const [session] = useSession();
 
   const minZoom = 2;
@@ -71,16 +73,18 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const dispatch = useDispatch();
 
   const sid = useMemo(() => {
-    if (selectedSid) return selectedSid;
+    if (sid1) return sid1;
 
     return rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? `${rawScenariosData[0].id}` : null;
-  }, [selectedSid, rawScenariosData, rawScenariosIsFetched]);
+  }, [sid1, rawScenariosData, rawScenariosIsFetched]);
 
   const PUGridLayer = usePUGridLayer({
-    active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length,
+    active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2,
     sid,
     include: 'results',
-    sublayers: selectedSid ? ['solutions'] : [],
+    sublayers: [
+      ...(sid1 && !sid2) ? ['solutions'] : [],
+    ],
     options: {
       settings: {
         pugrid: layerSettings.pugrid,
@@ -96,9 +100,9 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   });
 
   const PUCompareLayer = usePUCompareLayer({
-    active: !!selectedSid, // TODO: active it only with 2 scenarios selected
-    sid1: selectedSid,
-    sid2: selectedSid,
+    active: !!sid1 && !!sid2,
+    sid1,
+    sid2,
     options: {
       ...layerSettings.compare,
     },
@@ -116,14 +120,18 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const LAYERS = [PUCompareLayer, PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
-    layers: selectedSid ? ['compare', 'frequency', 'pugrid'] : ['pugrid'],
+    layers: [
+      ...!!sid1 && !sid2 ? ['frequency'] : [],
+      ...!!sid1 && !!sid2 ? ['compare'] : [],
+      'pugrid',
+    ],
     options: {
       layerSettings,
     },
   });
 
   const SCENARIOS_RUNNED = useMemo(() => {
-    return rawScenariosData
+    const status = rawScenariosData
       .map((s) => {
         if (s.jobs.find((j) => j.kind === 'run' && j.status === 'done')) {
           return {
@@ -133,9 +141,15 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
         }
 
         return null;
-      })
-      .filter((s) => !!s);
-  }, [rawScenariosData]);
+      });
+
+    return {
+      sid1Options: status.filter((s) => !!s),
+      sid2Options: status.filter((s) => !!s && s.value !== sid1),
+    };
+  }, [rawScenariosData, sid1]);
+
+  console.log(SCENARIOS_RUNNED.sid1Options);
 
   useEffect(() => {
     setBounds({
@@ -277,7 +291,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
             <Legend
               open={open}
               className="w-full"
-              maxHeight={325}
+              maxHeight={300}
               onChangeOpen={() => setOpen(!open)}
             >
               {LEGEND.map((i) => {
@@ -302,18 +316,45 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
             </Legend>
           </div>
 
-          {!!SCENARIOS_RUNNED.length && (
-            <div className="absolute w-full max-w-xs top-5 left-5">
-              <Select
-                theme="dark"
-                size="base"
-                placeholder="Select scenario..."
-                clearSelectionActive
-                options={SCENARIOS_RUNNED}
-                onChange={(s) => {
-                  setSelectedSid(s);
-                }}
-              />
+          {!!SCENARIOS_RUNNED.sid1Options.length && (
+            <div className="absolute top-0 left-0 flex w-full p-5 space-x-5">
+              <div className="w-full">
+                <Select
+                  theme="dark"
+                  size="base"
+                  placeholder="Select scenario..."
+                  clearSelectionActive
+                  options={SCENARIOS_RUNNED.sid1Options}
+                  selected={sid1}
+                  onChange={(s) => {
+                    setSid1(s);
+                    // Remove compare if you unselect a sceanrio or
+                    // if it's the same as the compare one
+                    if (!s || s === sid2) {
+                      setSid2(null);
+                    }
+                  }}
+                />
+              </div>
+
+              <div
+                className={cx({
+                  'w-full': true,
+                  'invisible opacity-0': SCENARIOS_RUNNED.sid1Options.length <= 1,
+                })}
+              >
+                <Select
+                  theme="dark"
+                  size="base"
+                  placeholder="Compare to..."
+                  clearSelectionActive
+                  options={SCENARIOS_RUNNED.sid2Options}
+                  selected={sid2}
+                  onChange={(s) => {
+                    setSid2(s);
+                  }}
+                />
+              </div>
             </div>
           )}
         </motion.div>
