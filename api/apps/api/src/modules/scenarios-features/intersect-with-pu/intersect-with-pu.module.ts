@@ -11,12 +11,14 @@ import {
   intersectFeaturesWithPuQueueProvider,
   setPlanningUnitGridEventsFactoryProvider,
 } from './intersect-queue.providers';
+import { IntersectWithPuEventsService } from './intersect-with-pu-events.service';
 
 @Module({
   imports: [ApiEventsModule, QueueApiEventsModule, CqrsModule],
   providers: [
     FeaturesReadySaga,
     IntersectWithPuHandler,
+    IntersectWithPuEventsService,
     intersectFeaturesWithPuQueueProvider,
     intersectFeaturesWithPuQueueEventsProvider,
     setPlanningUnitGridEventsFactoryProvider,

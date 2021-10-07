@@ -142,7 +142,7 @@ export class ScenariosService {
         }
         if (element == 'features') {
           includeSelections.features.table = `(select spd.scenario_id,
-       spd.id,
+       spd.id as scenario_pu_id,
        array_to_string(spd.feature_list, ','::text)
 from scenarios_pu_data spd
 where spd.scenario_id = '${id}')`;
