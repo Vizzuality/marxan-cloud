@@ -10,8 +10,8 @@ import {
   ScenarioFeaturesData,
 } from '@marxan/features';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { SpecificationProcessingFinishedEvent } from '@marxan-api/modules/scenario-specification';
 import { MoveDataFromPreparationCommand } from './move-data-from-preparation.command';
+import { DataMovedFormPreparationEvent } from '@marxan-api/modules/scenarios-features';
 
 @CommandHandler(MoveDataFromPreparationCommand)
 export class MoveDataFromPreparationHandler
@@ -68,7 +68,7 @@ export class MoveDataFromPreparationHandler
     });
 
     this.eventBus.publish(
-      new SpecificationProcessingFinishedEvent(
+      new DataMovedFormPreparationEvent(
         command.scenarioId,
         command.specificationId,
       ),
