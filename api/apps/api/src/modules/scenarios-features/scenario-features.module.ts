@@ -23,6 +23,11 @@ import { ScenarioFeaturesOutputGapDataService } from './scenario-features-output
 import { MoveDataFromPreparationSaga } from './move-data-from-preparation.saga';
 import { MoveDataFromPreparationHandler } from './move-data-from-preparation.handler';
 import { IntersectWithPuModule } from './intersect-with-pu/intersect-with-pu.module';
+import {
+  StratificationDataProvider,
+  StratificationOperation,
+  StratificationQuery,
+} from './stratification';
 
 @Module({
   imports: [
@@ -53,6 +58,9 @@ import { IntersectWithPuModule } from './intersect-with-pu/intersect-with-pu.mod
     SplitQuery,
     SplitDataProvider,
     SplitOperation,
+    StratificationQuery,
+    StratificationDataProvider,
+    StratificationOperation,
     MoveDataFromPreparationSaga,
     MoveDataFromPreparationHandler,
   ],
