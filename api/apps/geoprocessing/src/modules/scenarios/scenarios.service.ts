@@ -32,9 +32,8 @@ const includeSelections: IncludeSelections = {
   },
   features: {
     attributes: ', "featureList"',
-    select: 'feature_list as "featureList"',
-    alias: 'features',
-    condition: 'test.id = features.scenario_pu_id',
+    select: 'array_to_string(feature_list, \',\') as "featureList"',
+    alias: 'features'
   },
   cost: {
     attributes: ', "costValue"',
@@ -139,13 +138,6 @@ export class ScenariosService {
       _filters.include.forEach((element: string) => {
         if (includeSelections[element].select) {
           qB.addSelect(includeSelections[element].select!);
-        }
-        if (element == 'features') {
-          includeSelections.features.table = `(select spd.scenario_id,
-       spd.id as scenario_pu_id,
-       array_to_string(spd.feature_list, ','::text)
-from scenarios_pu_data spd
-where spd.scenario_id = '${id}')`;
         }
         if (includeSelections[element].table) {
           qB.leftJoin(
