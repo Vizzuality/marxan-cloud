@@ -2,15 +2,11 @@ import React, {
   useCallback, useEffect, useRef,
 } from 'react';
 
-import { useSelector } from 'react-redux';
-
 import { useRouter } from 'next/router';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
-import { useSaveScenario, useScenario, useScenarioStatus } from 'hooks/scenarios';
+import { useScenario, useScenarioStatus } from 'hooks/scenarios';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -37,18 +33,9 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  getScenarioEditSlice(sid);
-  const { lastJobTimestamp } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
   const { data: scenarioData } = useScenario(sid);
   const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
   const { jobs = [] } = scenarioStatusData || {};
-
-  const scenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
 
   // Jobs
   const JOBS = useScenarioJobs(jobs);
@@ -75,23 +62,6 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   // Actions
   const ACTIONS_DONE = useScenarioActionsDone();
   const ACTIONS_FAILURE = useScenarioActionsFailure();
-
-  useEffect(() => {
-    if (lastJobTimestamp) {
-      scenarioMutation.mutate({
-        id: `${sid}`,
-        data: {
-          metadata: {
-            ...scenarioData?.metadata,
-            scenarioEditingMetadata: {
-              ...scenarioData?.metadata?.scenarioEditingMetadata,
-              lastJobCheck: lastJobTimestamp,
-            },
-          },
-        },
-      });
-    }
-  }, [lastJobTimestamp]); // eslint-disable-line
 
   useEffect(() => {
     // If there is a job done execute the actions associated to it
