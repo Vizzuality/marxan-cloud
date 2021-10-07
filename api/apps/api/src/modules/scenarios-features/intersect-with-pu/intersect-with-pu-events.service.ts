@@ -1,3 +1,4 @@
+import { EventBus } from '@nestjs/cqrs';
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
 import {
@@ -10,6 +11,7 @@ import {
 import { intersectFeaturesWithPuQueueEventsFactoryToken } from './intersect-queue.providers';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { JobInput } from '@marxan/planning-unit-features';
+import { SpecificationProcessingFinishedEvent } from '@marxan-api/modules/scenario-specification';
 
 @Injectable()
 export class IntersectWithPuEventsService implements EventFactory<JobInput> {
@@ -18,6 +20,7 @@ export class IntersectWithPuEventsService implements EventFactory<JobInput> {
   constructor(
     @Inject(intersectFeaturesWithPuQueueEventsFactoryToken)
     queueEventsFactory: CreateWithEventFactory<JobInput>,
+    private readonly eventBus: EventBus,
   ) {
     this.queueEvents = queueEventsFactory(this);
     this.queueEvents.on(`completed`, async (data) => {
@@ -49,7 +52,13 @@ export class IntersectWithPuEventsService implements EventFactory<JobInput> {
     };
   }
 
-  private async completed(_data: EventData<JobInput>) {
-    //
+  private async completed(data: EventData<JobInput>) {
+    const jobData = await data.data;
+    this.eventBus.publish(
+      new SpecificationProcessingFinishedEvent(
+        jobData.scenarioId,
+        jobData.specificationId,
+      ),
+    );
   }
 }

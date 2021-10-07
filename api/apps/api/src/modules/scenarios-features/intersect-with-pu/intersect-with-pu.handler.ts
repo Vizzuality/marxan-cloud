@@ -1,4 +1,8 @@
-import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
+import {
+  CommandHandler,
+  EventBus,
+  IInferredCommandHandler,
+} from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { Queue } from 'bullmq';
 
@@ -9,6 +13,7 @@ import { JobInput } from '@marxan/planning-unit-features';
 
 import { IntersectWithPlanningUnits } from './intersect-with-planning-units.command';
 import { intersectFeaturesWithPuQueueToken } from './intersect-queue.providers';
+import { SpecificationProcessingFinishedEvent } from '@marxan-api/modules/scenario-specification';
 
 @CommandHandler(IntersectWithPlanningUnits)
 export class IntersectWithPuHandler
@@ -19,11 +24,15 @@ export class IntersectWithPuHandler
     private readonly apiEvents: ApiEventsService,
   ) {}
 
-  async execute({ scenarioId }: IntersectWithPlanningUnits): Promise<void> {
+  async execute({
+    scenarioId,
+    specificationId,
+  }: IntersectWithPlanningUnits): Promise<void> {
     const { id } = await this.queue.add(
       `intersect-scenario-features-with-pu-${Date.now()}`,
       {
         scenarioId,
+        specificationId,
       },
     );
     assertDefined(id);

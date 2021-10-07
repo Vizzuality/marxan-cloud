@@ -4,7 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
 import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
 
-import { FeaturesReadySaga } from './features-ready.saga';
+import { DataMovedFormPreparationSaga } from './data-moved-form-preparation-saga.service';
 import { IntersectWithPuHandler } from './intersect-with-pu.handler';
 import {
   intersectFeaturesWithPuQueueEventsProvider,
@@ -16,7 +16,7 @@ import { IntersectWithPuEventsService } from './intersect-with-pu-events.service
 @Module({
   imports: [ApiEventsModule, QueueApiEventsModule, CqrsModule],
   providers: [
-    FeaturesReadySaga,
+    DataMovedFormPreparationSaga,
     IntersectWithPuHandler,
     IntersectWithPuEventsService,
     intersectFeaturesWithPuQueueProvider,
