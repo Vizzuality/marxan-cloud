@@ -4,6 +4,7 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { ProjectChecker } from './project-checker.service';
+import { isEqual } from 'lodash';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -11,11 +12,11 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-it(`should form valid request`, () => {
+it(`should form valid request`, async () => {
   // given
   const service = fixtures.getService();
   // when
-  service.isProjectReady(`projectId`);
+  await service.isProjectReady(`projectId`);
   // then
   fixtures.ThenShouldAskAllPlanningUnitsStatuses();
 });
@@ -29,11 +30,7 @@ it.each(
   // given
   const service = fixtures.getService();
   // and
-  fixtures.fakeApiEventsService.getLatestEventForTopic.mockResolvedValueOnce({
-    kind,
-    timestamp: new Date(),
-    topic: `projectId`,
-  });
+  fixtures.GivenPlanningUnitsJob(kind);
   // when
   const isReady = await service.isProjectReady(`projectId`);
   // then
@@ -44,11 +41,40 @@ it(`should return true for finished`, async () => {
   // given
   const service = fixtures.getService();
   // and
-  fixtures.fakeApiEventsService.getLatestEventForTopic.mockResolvedValueOnce({
-    kind: API_EVENT_KINDS.project__planningUnits__finished__v1__alpha as const,
-    timestamp: new Date(),
-    topic: `projectId`,
-  });
+  fixtures.GivenPlanningUnitsJob(
+    API_EVENT_KINDS.project__planningUnits__finished__v1__alpha,
+  );
+  // when
+  const isReady = await service.isProjectReady(`projectId`);
+  // then
+  expect(isReady).toBe(true);
+});
+
+it.each([
+  API_EVENT_KINDS.project__grid__submitted__v1__alpha,
+  API_EVENT_KINDS.project__grid__failed__v1__alpha,
+])(`should return false for %s`, async (gridKind) => {
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenPlanningUnitsAndGridJob(
+    API_EVENT_KINDS.project__planningUnits__finished__v1__alpha,
+    gridKind,
+  );
+  // when
+  const isReady = await service.isProjectReady(`projectId`);
+  // then
+  expect(isReady).toBe(false);
+});
+
+it(`should return true for planningUnits and grid finished`, async () => {
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenPlanningUnitsAndGridJob(
+    API_EVENT_KINDS.project__planningUnits__finished__v1__alpha,
+    API_EVENT_KINDS.project__grid__finished__v1__alpha,
+  );
   // when
   const isReady = await service.isProjectReady(`projectId`);
   // then
@@ -76,16 +102,58 @@ async function getFixtures() {
     getService() {
       return testingModule.get(ProjectChecker);
     },
+    planningUnitsKinds: Object.values(API_EVENT_KINDS)
+      .filter((kind) => kind.startsWith(`project.planningUnits.`))
+      .sort(),
+    gridKinds: Object.values(API_EVENT_KINDS)
+      .filter((kind) => kind.startsWith(`project.grid.`))
+      .sort(),
     ThenShouldAskAllPlanningUnitsStatuses() {
-      expect(fakeApiEventsService.getLatestEventForTopic).toBeCalledTimes(1);
+      expect(fakeApiEventsService.getLatestEventForTopic).toBeCalledTimes(2);
       expect(fakeApiEventsService.getLatestEventForTopic).toBeCalledWith({
         topic: `projectId`,
-        kind: In(
-          Object.values(API_EVENT_KINDS)
-            .filter((kind) => kind.startsWith(`project.planningUnits.`))
-            .sort(),
-        ),
+        kind: In(this.planningUnitsKinds),
       });
+      expect(fakeApiEventsService.getLatestEventForTopic).toBeCalledWith({
+        topic: `projectId`,
+        kind: In(this.gridKinds),
+      });
+    },
+    GivenPlanningUnitsJob(kind: API_EVENT_KINDS) {
+      fixtures.fakeApiEventsService.getLatestEventForTopic.mockImplementation(
+        async (args) => {
+          if (isEqual(args.kind, In(fixtures.planningUnitsKinds))) {
+            return {
+              kind,
+              timestamp: new Date(),
+              topic: `projectId`,
+            };
+          }
+        },
+      );
+    },
+    GivenPlanningUnitsAndGridJob(
+      planningUnitsStatus: API_EVENT_KINDS,
+      gridStatus: API_EVENT_KINDS,
+    ) {
+      fixtures.fakeApiEventsService.getLatestEventForTopic.mockImplementation(
+        async (args) => {
+          if (isEqual(args.kind, In(fixtures.planningUnitsKinds))) {
+            return {
+              kind: planningUnitsStatus,
+              timestamp: new Date(),
+              topic: `projectId`,
+            };
+          }
+          if (isEqual(args.kind, In(fixtures.gridKinds))) {
+            return {
+              kind: gridStatus,
+              timestamp: new Date(),
+              topic: `projectId`,
+            };
+          }
+        },
+      );
     },
   };
 }

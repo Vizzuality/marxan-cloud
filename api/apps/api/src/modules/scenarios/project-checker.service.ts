@@ -9,7 +9,7 @@ export class ProjectChecker {
   constructor(private readonly apiEvents: ApiEventsService) {}
 
   async isProjectReady(projectId: string): Promise<boolean> {
-    const event = await this.apiEvents.getLatestEventForTopic({
+    const planningUnitEvent = await this.apiEvents.getLatestEventForTopic({
       topic: projectId,
       kind: In([
         API_EVENT_KINDS.project__planningUnits__failed__v1__alpha,
@@ -17,9 +17,19 @@ export class ProjectChecker {
         API_EVENT_KINDS.project__planningUnits__submitted__v1__alpha,
       ]),
     });
+    const gridEvent = await this.apiEvents.getLatestEventForTopic({
+      topic: projectId,
+      kind: In([
+        API_EVENT_KINDS.project__grid__failed__v1__alpha,
+        API_EVENT_KINDS.project__grid__finished__v1__alpha,
+        API_EVENT_KINDS.project__grid__submitted__v1__alpha,
+      ]),
+    });
     return (
-      event?.kind ===
-      API_EVENT_KINDS.project__planningUnits__finished__v1__alpha
+      planningUnitEvent?.kind ===
+        API_EVENT_KINDS.project__planningUnits__finished__v1__alpha &&
+      (gridEvent === undefined ||
+        gridEvent.kind === API_EVENT_KINDS.project__grid__finished__v1__alpha)
     );
   }
 }
