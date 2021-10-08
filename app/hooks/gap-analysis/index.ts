@@ -117,6 +117,7 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
         const {
           id,
           name,
+          featureClassName,
           met,
           metArea,
           coverageTarget,
@@ -125,7 +126,7 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
 
         return {
           id,
-          name: name || 'Metadata name',
+          name: name || featureClassName || 'Metadata name',
           current: {
             percent: met / 100,
             value: format('.3s')(metArea / 1000),
