@@ -102,5 +102,12 @@ export class ScenariosPlanningUnitGeoEntity {
   })
   protectedByDefault!: boolean;
 
+  @Column('text', {
+    array: true,
+    name: 'feature_list',
+    default: '{}',
+  })
+  featureList!: string[];
+
   // relations not defined yet until it is necessary
 }
