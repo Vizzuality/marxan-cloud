@@ -132,6 +132,12 @@
       ],
       "@marxan/tiles/*": [
         "libs/tiles/src/*"
+      ],
+      "@marxan/planning-unit-features": [
+        "libs/planning-unit-features/src"
+      ],
+      "@marxan/planning-unit-features/*": [
+        "libs/planning-unit-features/src/*"
       ]
     }
   },

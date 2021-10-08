@@ -31,11 +31,11 @@ clean:
 
 ## Upload Data to Azure
 sync_data_to_azure:
-	@az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/data/ -s data/
+	@az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/data -s data/seed
 
 ## Download Data from Azure
 sync_data_from_azure:
-	@az storage blob download-batch--account-name marxancloudtest --auth-mode login -d data/ -s data-ingestion-test-00/data/ --pattern dir/*
+	@az storage blob download-batch--account-name marxancloudtest --auth-mode login -d data/ -s data-ingestion-test-00/data --pattern dir/*
 
 ## Set up python interpreter environment
 create_environment:
