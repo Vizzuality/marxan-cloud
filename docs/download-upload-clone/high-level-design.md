@@ -7,7 +7,7 @@
   import should be rejected
 * each of the resource above should consider if it is allowed to be used 
   (license issues). In case it cannot be used during export, system should ..
-  <......>
+  take under consideration
 * existing data converted from shapefiles should be converted back to 
   shapefile format (currently the platform doesn't keep the uploaded files, 
   rather consumes them)
@@ -53,3 +53,4 @@ describing why given solution was picked (and others were discarded).
   `shapefiles` and keep their reference?
 * exported zip format/shape
 * exported zip storage location (s3-like)
+* set the policy of licensed resources

@@ -30,7 +30,7 @@ Each phase assumes that given version of exported feature is fully importable.
 # Release 4
 
 * scenario's:
-	* ICUN categories (protected areas) & threshold
+	* IUCN categories (protected areas) & threshold
 	* features specification (only pre-defined features)
 	* spf/targets
 
