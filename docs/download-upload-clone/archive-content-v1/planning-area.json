@@ -1,0 +1,13 @@
+{
+  "gadm": {
+    "country": "BRA",
+    "l1": "bra.2_1",
+    "l2": null
+  },
+  "planningAreaGeometry": {
+    "uuid": "uuid",
+    "[comment]": "may be shapefile or whatever version wants",
+    "file": "./planning-area/project-pa.geojson"
+  },
+  "[comment] may contain one of the (gadm) or (geometry)": null
+}
