@@ -1,0 +1,11 @@
+{
+  "version": "0.1.0",
+  "scenarios": [
+    "scenario-name"
+  ],
+  "pieces": [
+    "project-metadata",
+    "planning-area",
+    "planning-area-grid"
+  ]
+}
