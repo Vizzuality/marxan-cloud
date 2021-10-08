@@ -216,6 +216,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     options: {
       wdpaIucnCategories: tab === 'protected-areas' && subtab === 'protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
       wdpaThreshold: tab === 'protected-areas' && subtab === 'protected-areas-percentage' ? wdpaThreshold : scenarioData?.wdpaThreshold,
+      features: featuresIds,
       cost: costSurfaceRangeData,
       puAction,
       puIncludedValue: puTmpIncludedValue,

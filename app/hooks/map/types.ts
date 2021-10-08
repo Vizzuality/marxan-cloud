@@ -134,6 +134,7 @@ export interface UseLegend {
   options?: {
     wdpaIucnCategories?: string[];
     wdpaThreshold?: number;
+    features?: string[];
     cost?: {
       min: number;
       max: number,

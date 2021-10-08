@@ -17,7 +17,8 @@ export const COLORS = {
   },
   wdpa: '#00F',
   features: '#6F53F7',
-  highlightFeatures: '#37297B',
+  highlightFeatures: '#FFFFFF',
+  features2: ['#B3A5FB', '#6F53F7'],
   include: '#0F0',
   exclude: '#F00',
   cost: [
@@ -88,15 +89,27 @@ export const LEGEND_LAYERS = {
       visibility: true,
     },
   }),
-  features: () => ({
-    id: 'features',
-    name: 'Features',
-    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.features }} />,
-    settingsManager: {
-      opacity: true,
-      visibility: true,
-    },
-  }),
+  features: (options) => {
+    const { features } = options;
+    return ({
+      id: 'features',
+      name: 'Features',
+      type: 'gradient',
+      settingsManager: {
+        opacity: true,
+        visibility: true,
+      },
+      items: [
+        {
+          color: COLORS.features2[0],
+          value: '1',
+        }, {
+          color: COLORS.features2[1],
+          value: `${features.length}`,
+        },
+      ],
+    });
+  },
 
   // ANALYSIS
   cost: (options) => {

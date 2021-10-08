@@ -404,30 +404,6 @@ export function usePUGridLayer({
             },
           },
 
-          // PROTECTED AREAS
-          ...sublayers.includes('wdpa-percentage') && wdpaThreshold !== null
-            ? [
-              {
-                type: 'fill',
-                'source-layer': 'layer0',
-                layout: {
-                  visibility: getLayerVisibility(WdpaPercentageVisibility),
-                },
-                paint: {
-                  'fill-color': COLORS.wdpa,
-                  'fill-opacity': [
-                    'case',
-                    ['all',
-                      ['has', 'percentageProtected'],
-                      ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
-                    ],
-                    0.5 * WdpaPercentageOpacity,
-                    0,
-                  ],
-                },
-              },
-            ] : [],
-
           // ANALYSIS - GAP ANALYSIS
           ...sublayers.includes('features') ? [
             {
@@ -437,7 +413,18 @@ export function usePUGridLayer({
                 visibility: getLayerVisibility(PreGapAnalysisVisibility),
               },
               paint: {
-                'fill-color': COLORS.features,
+                // 'fill-color': COLORS.features,
+                'fill-color': [
+                  'interpolate',
+                  ['linear'],
+                  ['+', 0, ...(features.map((id) => {
+                    return ['case', ['in', id, ['get', 'featureList']], 1, 0];
+                  }))],
+                  1,
+                  COLORS.features2[0],
+                  features.length,
+                  COLORS.features2[1],
+                ],
                 'fill-opacity': [
                   'case',
                   ['any',
@@ -471,6 +458,30 @@ export function usePUGridLayer({
               },
             },
           ] : [],
+
+          // PROTECTED AREAS
+          ...sublayers.includes('wdpa-percentage') && wdpaThreshold !== null
+            ? [
+              {
+                type: 'fill',
+                'source-layer': 'layer0',
+                layout: {
+                  visibility: getLayerVisibility(WdpaPercentageVisibility),
+                },
+                paint: {
+                  'fill-color': COLORS.wdpa,
+                  'fill-opacity': [
+                    'case',
+                    ['all',
+                      ['has', 'percentageProtected'],
+                      ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
+                    ],
+                    0.5 * WdpaPercentageOpacity,
+                    0,
+                  ],
+                },
+              },
+            ] : [],
 
           // ANALYSIS - COST SURFACE
           ...sublayers.includes('cost') ? [
