@@ -37,6 +37,8 @@
   * run scenarios with settings as per normal run once import is finished, 
     as long as the solutions are not included in the imported file 
 * export operation is asynchronous, should block the usage of project/scenarios
+* if there is any job in progress for the project/scenarios, export 
+  shouldn't be allowed
 * import operation is asynchronous
 * keep in mind that feature should be flexible enough to have reusable 
   pieces which can be used for "cloning" without a need to generate archive.
