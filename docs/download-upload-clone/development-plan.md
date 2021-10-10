@@ -15,7 +15,7 @@ Each phase assumes that given version of exported feature is fully importable.
 
 * project's:
 	* planning area: selected GADM & grid config settings
-	* custom planning area: selected GADM & grid config settings (first 
+	* custom planning area: user-uploaded planning are geometries & grid config settings (first 
 	  shapefile handling)
 	* generated PU with geometries
 
