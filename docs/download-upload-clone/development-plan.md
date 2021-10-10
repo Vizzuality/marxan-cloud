@@ -44,15 +44,9 @@ Each phase assumes that given version of exported feature is fully importable.
 # Release 6
 
 * scenario's:
-    * cost data per PU
-    * lock status
-
-# Release 7
-
-* scenario's:
   * previous run results
 
-# Release 8
+# Release 7
 
 * scenario's:
     * custom (uploaded) features
@@ -67,5 +61,4 @@ Each phase assumes that given version of exported feature is fully importable.
 * While Scenario implementation phases aim at delivering full flow with no
   customizations first, Project includes all custom features first to avoid risk
   of having issues with underlying scenarios later.
-* All phases should be preceded with spikes related to relevant points from HLD
-  document (like shapefiles handling)
+* All phases (not before each single) should be preceded with spikes related to relevant points from HLD document (like shapefiles handling)
