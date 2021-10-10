@@ -11,7 +11,7 @@ logging in to the platform) and wish to create a copy within their own account, 
 - A user may need to set up a local instance of the open source Marxan Cloud platform, importing into it a copy of one or more projects previously downloaded from the flagship Marxan Cloud instance
 
 Users should likewise be able to clone Marxan Cloud scenarios (within the same project):
-- Users may wish to undertake a new analysis by changing parameters of an existing scenario, while keeping the original (cloned) scenario intact, so that they can later
+- Users may wish to undertake a new analysis by changing parameters of an existing scenario, while keeping the original (cloned) scenario intact, so that they can later compare the two scenarios.
 
 # User actions
 
