@@ -40,6 +40,11 @@
 * if there is any job in progress for the project/scenarios, export 
   shouldn't be allowed
 * import operation is asynchronous
+* if import of the project (or its underlying scenarios) is ongoing, no 
+  action on given project should be 
+  possible to take by the user
+* if import of the scenario is ongoing, no action on given scenario should 
+  be possible
 * keep in mind that feature should be flexible enough to have reusable 
   pieces which can be used for "cloning" without a need to generate archive.
 
