@@ -1,5 +1,5 @@
 # Cloning Marxan Cloud projects and scenarios
-This document describes the current high-level overview of the Marxan Cloud platform user features related to cloning of projects of scenarios. It is a working document, meant to gather feedback on the requirements before moving on to high level design and detailed implementation plan.
+This document describes the high-level overview of the Marxan Cloud platform user features related to cloning of projects or scenarios.
 
 ## Aim
 
