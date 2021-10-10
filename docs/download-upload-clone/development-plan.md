@@ -45,6 +45,7 @@ Each phase assumes that given version of exported feature is fully importable.
 
 * scenario's:
   * previous run results
+  * custom protected areas
 
 # Release 7
 
