@@ -3,6 +3,7 @@
   "scenarios": [
     "scenario-name"
   ],
+  "kind": "project|scenario",
   "pieces": [
     "project-metadata",
     "planning-area",
