@@ -56,6 +56,7 @@ export function useScenariosStatus(pId) {
     enabled: !!pId,
     placeholderData: {
       data: {
+        jobs: [],
         scenarios: [],
       },
     },
