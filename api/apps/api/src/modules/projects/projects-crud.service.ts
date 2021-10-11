@@ -239,14 +239,11 @@ export class ProjectsCrudService extends AppBaseService<
       ...update,
       planningAreaGeometryId: update.planningAreaId,
     });
-    if (bbox || update.planningAreaId !== undefined) {
-      const updatedModel = await super.setDataUpdate(model, update, _);
-      if (bbox) updatedModel.bbox = bbox;
-      if (update.planningAreaId !== undefined)
-        updatedModel.planningAreaGeometryId = update.planningAreaId;
-      return updatedModel;
-    }
-    return model;
+    const updatedModel = await super.setDataUpdate(model, update, _);
+    if (bbox) updatedModel.bbox = bbox;
+    if (update.planningAreaId !== undefined)
+      updatedModel.planningAreaGeometryId = update.planningAreaId;
+    return updatedModel;
   }
 
   async extendGetByIdResult(
