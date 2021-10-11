@@ -2,6 +2,8 @@ import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
+import { useRouter } from 'next/router';
+
 import { signOut } from 'next-auth/client';
 
 import { useResetPassword } from 'hooks/me';
@@ -33,6 +35,8 @@ export interface ResetPasswordPasswordProps {
 
 export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () => {
   const mutation = useResetPassword({});
+  const { query: { token: resetToken } } = useRouter();
+
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -77,7 +81,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
   return (
     <Wrapper>
 
-      {!submitted && (
+      {!submitted && resetToken && (
         <FormRFF
           onSubmit={handleSubmit}
         >
@@ -131,7 +135,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
         </FormRFF>
       )}
 
-      {submitted && (
+      {submitted && resetToken && (
         <div className="relative flex items-center justify-center h-full">
           <div className="w-full max-w-xs">
             <div className="pb-5">
@@ -149,6 +153,20 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
               >
                 Ok
               </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {!resetToken && (
+        <div className="relative flex items-center justify-center h-full">
+          <div className="w-full max-w-xs">
+            <div className="flex flex-col items-center pb-5 space-y-20">
+              <h2 className="text-lg font-medium text-center text-gray-600 font-heading">
+                Sorry, you are not allowed to reset your password.
+              </h2>
+              <p className="mb-12 text-sm text-gray-500">
+                Please check your email inbox.
+              </p>
             </div>
           </div>
         </div>
