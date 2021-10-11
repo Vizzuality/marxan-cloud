@@ -1,6 +1,9 @@
 import { v4 } from 'uuid';
 import { ClonePiece } from '../../../../shared-kernel/clone-piece';
+
 import { ResourceId } from '../resource.id';
+import { ClonePartSnapshot } from '../clone-part.snapshot';
+
 import { PieceId } from './piece.id';
 import { PieceLocation } from './piece-location';
 
@@ -26,11 +29,23 @@ export class ClonePart {
     return this.finished;
   }
 
-  // TODO
-  toSnapshot() {
-    return {};
+  toSnapshot(): ClonePartSnapshot {
+    return {
+      id: this.id.value,
+      piece: this.piece,
+      resourceId: this.resourceId.value,
+      finished: this.finished,
+      uri: this.uri?.value,
+    };
   }
 
-  // TODO
-  static fromSnapshot() {}
+  static fromSnapshot(snapshot: ClonePartSnapshot) {
+    return new ClonePart(
+      new PieceId(snapshot.id),
+      snapshot.piece,
+      new ResourceId(snapshot.resourceId),
+      snapshot.finished,
+      snapshot.uri ? new PieceLocation(snapshot.uri) : undefined,
+    );
+  }
 }
