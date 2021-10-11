@@ -5,6 +5,7 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { ProjectChecker } from './project-checker.service';
 import { isEqual } from 'lodash';
+import { NotFoundException } from '@nestjs/common';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -85,7 +86,9 @@ async function getFixtures() {
   const fakeApiEventsService: jest.Mocked<
     Pick<ApiEventsService, 'getLatestEventForTopic'>
   > = {
-    getLatestEventForTopic: jest.fn<any, any>(),
+    getLatestEventForTopic: jest.fn<any, any>(async () => {
+      throw new NotFoundException();
+    }),
   };
   const testingModule = await Test.createTestingModule({
     providers: [
@@ -129,6 +132,7 @@ async function getFixtures() {
               topic: `projectId`,
             };
           }
+          throw new NotFoundException();
         },
       );
     },
@@ -152,6 +156,7 @@ async function getFixtures() {
               topic: `projectId`,
             };
           }
+          throw new NotFoundException();
         },
       );
     },
