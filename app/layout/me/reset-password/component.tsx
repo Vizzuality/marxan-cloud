@@ -18,7 +18,6 @@ import {
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 
-import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 import RESET_PASSWORD_SVG from 'svgs/users/reset-password.svg?sprite';
 
 export interface ResetPasswordPasswordProps {
@@ -36,7 +35,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
     setSubmitting(true);
     try {
       // Forgot password mutation
-      console.info('FORGOT PASSWORD', data);
+      console.info('RESET PASSWORD', data);
       setSubmitting(false);
       setSubmitted(true);
     } catch (err) {
@@ -64,8 +63,8 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
           {(props) => (
             <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex items-center justify-center h-full">
               <div className="w-full max-w-xs">
-                <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Reset Password</h2>
-                <p className="mb-5 text-sm text-gray-500">Enter the email associated with your account and we’ll send and email with instructions to reset your password.</p>
+                <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Create new password</h2>
+                <p className="mb-12 text-sm text-gray-500">Your new password must be different from previous used passwords.</p>
 
                 <Loading
                   visible={submitting}
@@ -73,24 +72,32 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
                   iconClassName="w-10 h-10 text-primary-500"
                 />
 
-                {/* EMAIL */}
-                <div>
+                <div className="flex flex-col space-y-12">
                   <FieldRFF
-                    name="username"
-                    validate={composeValidators([{ presence: true, email: true }])}
+                    name="reset-password-draft"
+                    validate={composeValidators([{ presence: true }])}
                   >
                     {(fprops) => (
-                      <Field id="forgot-password-username" {...fprops}>
-                        <Label theme="light" className="mb-3 uppercase">Email</Label>
-                        <Input theme="light" type="email" icon={EMAIL_SVG} />
+                      <Field id="reset-password-draft" {...fprops}>
+                        <Label theme="light" className="mb-3 uppercase">New Password</Label>
+                        <Input theme="light" type="password" />
                       </Field>
                     )}
                   </FieldRFF>
-                </div>
+                  <FieldRFF
+                    name="reset-password"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="reset-password" {...fprops}>
+                        <Label theme="light" className="mb-3 uppercase">Confirm Password</Label>
+                        <Input theme="light" type="password" />
+                      </Field>
+                    )}
+                  </FieldRFF>
 
-                <div className="mt-10">
                   <Button theme="primary" size="lg" type="submit" disabled={submitting} className="w-full">
-                    Recover password
+                    Change password
                   </Button>
                 </div>
               </div>
