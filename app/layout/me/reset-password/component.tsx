@@ -2,6 +2,8 @@ import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
+import { useRouter } from 'next/router';
+
 import { useToasts } from 'hooks/toast';
 
 import Wrapper from 'layout/wrapper';
@@ -17,13 +19,14 @@ import Icon from 'components/icon';
 import Loading from 'components/loading';
 
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
-import CHECK_EMAIL_SVG from 'svgs/users/check-email.svg?sprite';
+import RESET_PASSWORD_SVG from 'svgs/users/reset-password.svg?sprite';
 
 export interface ResetPasswordPasswordProps {
 
 }
 
 export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () => {
+  const { push } = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -53,6 +56,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
 
   return (
     <Wrapper>
+
       {!submitted && (
         <FormRFF
           onSubmit={handleSubmit}
@@ -98,24 +102,25 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
 
       {submitted && (
         <div className="relative flex items-center justify-center h-full">
-          <div className="w-full max-w-xs divide-y-2 divide-gray-100">
+          <div className="w-full max-w-xs">
             <div className="pb-5">
-              <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Check your email</h2>
-              <Icon icon={CHECK_EMAIL_SVG} className="w-16 h-16 mx-auto mb-5 text-gray-500" />
-              <p className="mx-auto text-sm text-center text-gray-400" style={{ maxWidth: 300 }}>We have sent a password recover instructions to your email...</p>
+              <h2 className="mb-24 text-lg font-medium text-center text-gray-600 font-heading">You&apos;ve changed your password</h2>
+              <Icon icon={RESET_PASSWORD_SVG} className="w-56 h-56 mx-auto mb-5 text-gray-500" />
             </div>
-            <div className="pt-5">
-              <p className="mx-auto mb-5 text-sm text-center text-gray-400" style={{ maxWidth: 300 }}>
-                Did not receive the email? Check your spam filter, or
-                {' '}
-                <span
-                  role="presentation"
-                  className="text-black underline"
-                  onClick={() => setSubmitted(false)}
-                >
-                  try another email address.
-                </span>
-              </p>
+            <div className="mt-10">
+              <Button
+                theme="tertiary"
+                size="lg"
+                type="submit"
+                disabled={submitting}
+                onClick={() => {
+                  setSubmitted(false);
+                  push('sign-in');
+                }}
+                className="w-full"
+              >
+                Ok
+              </Button>
             </div>
           </div>
         </div>
