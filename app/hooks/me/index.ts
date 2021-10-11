@@ -12,6 +12,8 @@ import {
   UseSaveMePasswordProps,
   SaveMePasswordProps,
   UseDeleteMeProps,
+  UseResetPasswordProps,
+  ResetPasswordProps,
 } from './types';
 
 // ME
@@ -125,6 +127,38 @@ export function useDeleteMe({
   };
 
   return useMutation(deleteMe, {
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('me');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+// RESET PASSWORD
+export function useResetPassword({
+  requestConfig = {
+    method: 'PATCH',
+  },
+}: UseResetPasswordProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const resetPassword = ({ data }: ResetPasswordProps) => {
+    return USERS.request({
+      url: '/me/reset-password',
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(resetPassword, {
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries('me');
       console.info('Succces', data, variables, context);

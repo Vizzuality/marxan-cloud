@@ -2,8 +2,9 @@ import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-import { useRouter } from 'next/router';
+import { signOut } from 'next-auth/client';
 
+import { useResetPassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 
 import Wrapper from 'layout/wrapper';
@@ -20,38 +21,58 @@ import Loading from 'components/loading';
 
 import RESET_PASSWORD_SVG from 'svgs/users/reset-password.svg?sprite';
 
+export const equalPasswordValidator = (value, allValues) => {
+  const { resetPasswordDraft } = allValues || {};
+  if (resetPasswordDraft !== value) return 'Error';
+
+  return undefined;
+};
 export interface ResetPasswordPasswordProps {
 
 }
 
 export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () => {
-  const { push } = useRouter();
+  const mutation = useResetPassword({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const { addToast } = useToasts();
 
-  const handleSubmit = useCallback(async (data) => {
+  const handleSubmit = useCallback(async (values) => {
     setSubmitting(true);
-    try {
-      // Forgot password mutation
-      console.info('RESET PASSWORD', data);
-      setSubmitting(false);
-      setSubmitted(true);
-    } catch (err) {
-      addToast('error-forgot-password', (
-        <>
-          <h2 className="font-medium">Error!</h2>
-          <p className="text-sm">Invalid username or password.</p>
-        </>
-      ), {
-        level: 'error',
-      });
 
-      setSubmitting(false);
-      console.error(err);
-    }
-  }, [addToast]);
+    const { resetPassword } = values;
+    const data = { resetPassword };
+
+    mutation.mutate({ data }, {
+      onSuccess: () => {
+        addToast('success-reset-password', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">You have changed your password.</p>
+          </>
+        ), {
+          level: 'success',
+        });
+        setSubmitting(false);
+
+        setTimeout(() => {
+          signOut();
+        });
+      },
+      onError: () => {
+        addToast('error-reset-password', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">It has not possible to change your password.</p>
+          </>
+        ), {
+          level: 'error',
+        });
+        setSubmitting(false);
+      },
+    });
+  }, [mutation, addToast]);
 
   return (
     <Wrapper>
@@ -74,7 +95,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
 
                 <div className="flex flex-col space-y-12">
                   <FieldRFF
-                    name="reset-password-draft"
+                    name="resetPasswordDraft"
                     validate={composeValidators([{ presence: true }])}
                   >
                     {(fprops) => (
@@ -85,8 +106,11 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
                     )}
                   </FieldRFF>
                   <FieldRFF
-                    name="reset-password"
-                    validate={composeValidators([{ presence: true }])}
+                    name="resetPassword"
+                    validate={composeValidators([
+                      { presence: true },
+                      equalPasswordValidator,
+                    ])}
                   >
                     {(fprops) => (
                       <Field id="reset-password" {...fprops}>
@@ -120,10 +144,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
                 size="lg"
                 type="submit"
                 disabled={submitting}
-                onClick={() => {
-                  setSubmitted(false);
-                  push('sign-in');
-                }}
+                onClick={() => setSubmitted(false)}
                 className="w-full"
               >
                 Ok

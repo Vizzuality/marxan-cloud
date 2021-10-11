@@ -15,7 +15,13 @@ export interface UseSaveMePasswordProps {
 export interface SaveMePasswordProps {
   data: any
 }
-
 export interface UseDeleteMeProps {
   requestConfig?: AxiosRequestConfig
+}
+export interface UseResetPasswordProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface ResetPasswordProps {
+  data: any
 }
