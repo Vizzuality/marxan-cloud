@@ -71,9 +71,7 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
 import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.serializer';
 import { GeoFeatureSetSerializer } from '../geo-features/geo-feature-set.serializer';
-import { UpdateGeoFeatureSetDTO } from '../geo-features/dto/update.geo-feature-set.dto';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
-import { GeoFeatureSetService } from '../geo-features/geo-feature-set.service';
 import { ScenarioPlanningUnitDto } from './dto/scenario-planning-unit.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ScenarioFeaturesGapDataService } from '../scenarios-features/scenario-features-gap-data.service';
@@ -104,7 +102,6 @@ export class ScenariosController {
     private readonly scenarioFeaturesGapDataService: ScenarioFeaturesGapDataService,
     private readonly scenarioFeaturesOutputGapDataService: ScenarioFeaturesOutputGapDataService,
     private readonly geoFeatureSetSerializer: GeoFeatureSetSerializer,
-    private readonly geoFeatureSetService: GeoFeatureSetService,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeaturesGapData: ScenarioFeaturesGapDataSerializer,
     private readonly scenarioFeaturesOutputGapData: ScenarioFeaturesOutputGapDataSerializer,
@@ -247,34 +244,6 @@ export class ScenariosController {
       result.right,
       undefined,
       true,
-    );
-  }
-
-  @ApiOperation({ description: 'Create feature set for scenario' })
-  @ApiCreatedResponse({ type: GeoFeatureSetResult })
-  @Post(':id/features/specification')
-  async createFeatureSetFor(
-    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<GeoFeatureSetResult> {
-    // TODO once `copy` is in place, replace with implementation as in
-    // id/features/specification/v2
-    return await this.geoFeatureSetSerializer.serialize(
-      await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
-    );
-  }
-
-  @ApiOperation({ description: 'Update feature set for scenario' })
-  @ApiOkResponse({ type: GeoFeatureSetResult })
-  @Put(':id/features/specification')
-  async updateFeatureSetFor(
-    @Body(new ValidationPipe()) dto: UpdateGeoFeatureSetDTO,
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<GeoFeatureSetResult> {
-    // TODO once `copy` is in place, replace with implementation as in
-    // id/features/specification/v2
-    return await this.geoFeatureSetSerializer.serialize(
-      await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
     );
   }
 
