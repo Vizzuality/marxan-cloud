@@ -7,13 +7,13 @@ import { ExportId } from './export.id';
 import { ResourceId } from './resource.id';
 import { ArchiveLocation } from './archive-location';
 
-import { ClonePartRequested } from '../events/clone-part-requested.event';
-import { ClonePartsFinished } from '../events/clone-parts-finished.event';
+import { ExportComponentRequested } from '../events/export-component-requested.event';
+import { ExportComponentFinished } from '../events/export-component-finished.event';
 import { ArchiveReady } from '../events/archive-ready.event';
 
-import { PieceLocation } from './clone-part/piece-location';
-import { ClonePart } from './clone-part/clone-part';
-import { PieceId } from './clone-part/piece.id';
+import { ComponentLocation } from './export-component/component-location';
+import { ExportComponent } from './export-component/export-component';
+import { ComponentId } from './export-component/component.id';
 import { ExportSnapshot } from './export.snapshot';
 
 export const pieceNotFound = Symbol('export piece not found');
@@ -24,13 +24,13 @@ export class Export extends AggregateRoot {
     public readonly id: ExportId,
     public readonly resourceId: ResourceId,
     public readonly resourceKind: ResourceKind,
-    public readonly pieces: ClonePart[],
+    public readonly pieces: ExportComponent[],
     private archiveLocation?: ArchiveLocation,
   ) {
     super();
   }
 
-  static project(id: ResourceId, parts: ClonePart[]): Export {
+  static project(id: ResourceId, parts: ExportComponent[]): Export {
     const exportRequest = new Export(
       new ExportId(v4()),
       id,
@@ -43,7 +43,7 @@ export class Export extends AggregateRoot {
         .filter((part) => !part.isReady())
         .map(
           (part) =>
-            new ClonePartRequested(
+            new ExportComponentRequested(
               exportRequest.id,
               part.id,
               part.resourceId,
@@ -55,9 +55,9 @@ export class Export extends AggregateRoot {
     return exportRequest;
   }
 
-  completePiece(
-    id: PieceId,
-    pieceLocation: PieceLocation,
+  completeComponent(
+    id: ComponentId,
+    pieceLocation: ComponentLocation,
   ): Either<typeof pieceNotFound, true> {
     const piece = this.pieces.find((piece) => piece.id.equals(id));
     if (!piece) {
@@ -66,7 +66,7 @@ export class Export extends AggregateRoot {
     piece.finish(pieceLocation);
 
     if (this.#allPiecesReady()) {
-      this.apply(new ClonePartsFinished(this.id));
+      this.apply(new ExportComponentFinished(this.id));
     }
 
     return right(true);
@@ -96,7 +96,7 @@ export class Export extends AggregateRoot {
       new ExportId(snapshot.id),
       new ResourceId(snapshot.resourceId),
       snapshot.resourceKind,
-      snapshot.exportPieces.map((piece) => ClonePart.fromSnapshot(piece)),
+      snapshot.exportPieces.map((piece) => ExportComponent.fromSnapshot(piece)),
       snapshot.archiveLocation
         ? new ArchiveLocation(snapshot.archiveLocation)
         : undefined,

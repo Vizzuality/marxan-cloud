@@ -1,8 +1,8 @@
-import { EventBus, EventPublisher } from '@nestjs/cqrs';
+import { EventPublisher } from '@nestjs/cqrs';
 
 import { ResourceId } from '../domain/export/resource.id';
 import { ResourceKind } from '../domain/export/resource.kind';
-import { ClonePart } from '../domain/export/clone-part/clone-part';
+import { ExportComponent } from '../domain/export/export-component/export-component';
 import { Export } from '../domain/export/export';
 import { ExportId } from '../domain/export/export.id';
 
@@ -17,7 +17,10 @@ export class RequestExport {
   ) {}
 
   async export(id: ResourceId, kind: ResourceKind): Promise<ExportId> {
-    const parts: ClonePart[] = await this.resourcePieces.resolveFor(id, kind);
+    const parts: ExportComponent[] = await this.resourcePieces.resolveFor(
+      id,
+      kind,
+    );
     const exportInstance = this.eventPublisher.mergeObjectContext(
       Export.project(id, parts),
     );

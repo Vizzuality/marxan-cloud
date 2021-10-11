@@ -1,7 +1,10 @@
 import { ResourceId } from '../domain/export/resource.id';
 import { ResourceKind } from '../domain/export/resource.kind';
-import { ClonePart } from '../domain/export/clone-part/clone-part';
+import { ExportComponent } from '../domain/export/export-component/export-component';
 
 export abstract class ResourcePieces {
-  abstract resolveFor(id: ResourceId, kind: ResourceKind): Promise<ClonePart[]>;
+  abstract resolveFor(
+    id: ResourceId,
+    kind: ResourceKind,
+  ): Promise<ExportComponent[]>;
 }
