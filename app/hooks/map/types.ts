@@ -25,6 +25,7 @@ export interface UsePUGridPreviewLayer {
 }
 
 export interface UseWDPAPreviewLayer {
+  projectId: string,
   cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
