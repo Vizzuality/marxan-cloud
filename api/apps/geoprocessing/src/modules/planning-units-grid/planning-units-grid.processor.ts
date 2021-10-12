@@ -40,27 +40,69 @@ export class PlanningUnitsGridProcessor
 
     const result = this.gridGeoJsonValidator.validate(geoJson);
     if (isLeft(result)) {
-      throw new Error(result.left.toString());
+      const error = new Error(result.left.toString());
+      this.logger.error(error);
+      throw error;
     }
-    const puGeometriesIds: { id: string }[] = await this.entityManager.query(
-      `
-        INSERT INTO "planning_units_geom"("the_geom", "type", "project_id")
-        SELECT ST_SetSRID(
-                 ST_GeomFromGeoJSON(features ->> 'geometry'),
-                 4326)::geometry,
-               $2::shape_type,
-               $3
-        FROM (
-               SELECT json_array_elements($1::json -> 'features') AS features
-             ) AS f
-        ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO UPDATE SET type = 'from_shapefile'::shape_type
-        RETURNING "id"
-      `,
-      [result.right, ShapeType.FromShapefile, projectId],
-    );
+
+    const { puGeometriesIds, planningAreaId, bbox } = await this.entityManager
+      .transaction(async (manager) => {
+        const puGeometriesIds: { id: string }[] = await manager.query(
+          `
+            INSERT INTO "planning_units_geom"("the_geom", "type", "project_id")
+            SELECT ST_SetSRID(
+                     ST_GeomFromGeoJSON(features ->> 'geometry'),
+                     4326)::geometry,
+                   $2::shape_type,
+                   $3
+            FROM (
+                   SELECT json_array_elements($1::json -> 'features') AS features
+                 ) AS f
+            ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO UPDATE SET type = 'from_shapefile'::shape_type
+            RETURNING "id"
+          `,
+          [result.right, ShapeType.FromShapefile, projectId],
+        );
+
+        await manager.query(
+          `DELETE
+           FROM planning_areas
+           where project_id = $1`,
+          [projectId],
+        );
+
+        const planningArea: {
+          id: string;
+          bbox: number[];
+        }[] = await manager.query(
+          `
+            INSERT
+            INTO "planning_areas"("project_id", "the_geom")
+            VALUES ($1,
+                    (SELECT ST_MULTI(ST_UNION(the_geom))
+                     from "planning_units_geom"
+                     where project_id = $1))
+            RETURNING "id", "bbox"
+          `,
+          [projectId],
+        );
+
+        return {
+          puGeometriesIds,
+          planningAreaId: planningArea[0]?.id,
+          bbox: planningArea[0]?.bbox,
+        };
+      })
+      .catch((error) => {
+        this.logger.error(error);
+        throw error;
+      });
+
     const output = plainToClass<JobOutput, JobOutput>(JobOutput, {
       geometryIds: puGeometriesIds.map((row) => row.id),
       projectId,
+      planningAreaId,
+      bbox,
     });
 
     const errors = validateSync(output);

@@ -15,13 +15,19 @@ export class SetProjectGridFromShapefileHandler
     @InjectRepository(Project) private readonly projects: Repository<Project>,
   ) {}
 
-  async execute({ projectId }: SetProjectGridFromShapefile): Promise<void> {
+  async execute({
+    projectId,
+    planningAreaId,
+    bbox,
+  }: SetProjectGridFromShapefile): Promise<void> {
     await this.projects.update(
       {
         id: projectId.value,
       },
       {
         planningUnitGridShape: PlanningUnitGridShape.fromShapefile,
+        planningAreaId: planningAreaId,
+        bbox,
       },
     );
   }
