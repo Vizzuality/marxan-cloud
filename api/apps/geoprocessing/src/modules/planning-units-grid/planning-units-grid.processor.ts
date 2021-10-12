@@ -47,6 +47,14 @@ export class PlanningUnitsGridProcessor
 
     const { puGeometriesIds, planningAreaId, bbox } = await this.entityManager
       .transaction(async (manager) => {
+        await manager.query(
+          `
+            DELETE
+            FROM "planning_units_geom"
+            where "project_id" = $1
+          `,
+          [projectId],
+        );
         const puGeometriesIds: { id: string }[] = await manager.query(
           `
             INSERT INTO "planning_units_geom"("the_geom", "type", "project_id")
@@ -81,10 +89,10 @@ export class PlanningUnitsGridProcessor
             VALUES ($1,
                     (SELECT ST_MULTI(ST_UNION(the_geom))
                      from "planning_units_geom"
-                     where project_id = $1))
+                     where project_id = $2))
             RETURNING "id", "bbox"
           `,
-          [projectId],
+          [projectId, projectId],
         );
 
         return {

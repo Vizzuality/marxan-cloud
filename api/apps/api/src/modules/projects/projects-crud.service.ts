@@ -183,6 +183,13 @@ export class ProjectsCrudService extends AppBaseService<
     _info?: ProjectsInfoDTO,
   ): Promise<void> {
     if (
+      createModel?.planningUnitGridShape === PlanningUnitGridShape.fromShapefile
+    ) {
+      // handled after custom grid processing
+      return;
+    }
+
+    if (
       createModel.planningUnitAreakm2 &&
       createModel.planningUnitGridShape &&
       (createModel.countryId ||
@@ -216,7 +223,7 @@ export class ProjectsCrudService extends AppBaseService<
     if (
       createModel?.planningUnitGridShape === PlanningUnitGridShape.fromShapefile
     ) {
-      await this.planningUnitsService.create(createModel);
+      // handled after custom grid processing
       return;
     }
     if (
