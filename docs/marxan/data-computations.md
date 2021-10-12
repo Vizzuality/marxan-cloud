@@ -9,6 +9,18 @@ tabular or geospatial computations at key steps.
 This document summarises which kinds of computations are performed, and outlines
 areas for improvement.
 
+## Planning area
+
+When users upload a shapefile with a custom planning area (to be later split
+into a regular square or hexagonal grid of planning units), the API validates
+and processes the uploaded shapefile data and returns a GeoJSON representation
+of the supplied planning area.
+
+This operation is carried out synchronously.
+
+The time complexity of this operation depends mostly on the geometries of the
+planning area.
+
 ## Planning unit grid
 
 When users choose to use a generated planning unit grid (rather than uploading a
@@ -52,6 +64,28 @@ The level of isolation for computation of features is each individual scenario.
 The time complexity of computations of features for a scenario depends largely
 on the geometries of the features as well as on the number (and geometries, if
 irregular/user uploaded) of planning units.
+
+## Cost surface - downloading template shapefiles
+
+When a user initiates the download of a shapefile template for a scenario's
+cost surface, the shapefile is generated asynchronously.
+
+The time complexity of this operation may vary from `O(n)` with little
+geoprocessing overhead to cases where the querying of data for inclusion in the
+template may be negligible compared with the geoprocessing part, for very
+complex or numerous planning unit geometries.
+
+## Cost surface - uploading cost data shapefiles
+
+When a user uploads a shapefile that contains cost surface data for a scenario,
+the shapefile is validated/processed, cost data is extracted and persisted to
+database.
+
+The time complexity of this operation should in most cases be close to `O(n)`,
+with some overhead for large shapefiles.
+
+Somewhat mitigating this, a configurable limit on the size of accepted
+shapefiles is in place.
 
 ## Marxan input files
 
