@@ -1,7 +1,7 @@
 # Cloud platform computations
 
 - Document created on: 27 September 2021.
-- Latest updated on: 27 September 2021.
+- Latest updated on: 12 October 2021.
 
 Throughout the lifecycle of a Marxan Cloud project, the platform carries out
 tabular or geospatial computations at key steps.
