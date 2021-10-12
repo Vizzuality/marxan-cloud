@@ -26,9 +26,10 @@ export class SetProjectGridFromShapefileHandler
       },
       {
         planningUnitGridShape: PlanningUnitGridShape.fromShapefile,
-        planningAreaId: planningAreaId,
+        planningAreaGeometryId: planningAreaId,
         bbox,
       },
     );
+    // trigger PU creation
   }
 }

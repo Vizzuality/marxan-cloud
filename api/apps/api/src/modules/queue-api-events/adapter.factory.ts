@@ -3,9 +3,9 @@ import { Queue, QueueEvents } from 'bullmq';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { EventFactory, QueueEventsAdapter } from './adapter';
 
-export type CreateWithEventFactory<JobData> = (
-  eventFactory: EventFactory<JobData>,
-) => QueueEventsAdapter<JobData>;
+export type CreateWithEventFactory<JobData, Result = unknown> = (
+  eventFactory: EventFactory<JobData, Result>,
+) => QueueEventsAdapter<JobData, Result>;
 
 @Injectable()
 export class AdapterFactory {

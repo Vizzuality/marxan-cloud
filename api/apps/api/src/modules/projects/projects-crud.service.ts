@@ -216,7 +216,7 @@ export class ProjectsCrudService extends AppBaseService<
     if (
       createModel?.planningUnitGridShape === PlanningUnitGridShape.fromShapefile
     ) {
-      // handled after custom grid processing
+      await this.planningUnitsService.create(createModel);
       return;
     }
     if (
