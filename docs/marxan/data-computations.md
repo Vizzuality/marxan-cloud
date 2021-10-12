@@ -29,14 +29,14 @@ via PostGIS.
 
 The time complexity of this operation is generally `O(n)`.
 
-## Protected area of planning units
+## Protected portion of planning units
 
 `api/apps/geoprocessing/src/modules/scenario-protected-area-calculation/scenario-protected-area-calculation-processor.ts`
 
-Once users create a scenario, choose relevant IUCN protected area labels or
-upload a shapefile of protected areas, and set the threshold to be used in order
-for a planning unit to be considered as protected, the protected area of each
-planning unit is calculated.
+Once users create or update a scenario, choose relevant IUCN protected area
+labels or upload a shapefile of protected areas, and set the threshold to be
+used in order for a planning unit to be considered as protected, the protected
+portion of each planning unit is calculated.
 
 The time complexity of this operation depends on the geometries of the protected
 areas included in the analysis, as well as on the number (and geometries, if
@@ -46,9 +46,9 @@ irregular/user uploaded) of planning units.
 
 Once users have selected which features they would like to include in the
 analysis, either by picking them as-is or by applying split or stratification
-operations, the geometries of selected features are computed (if stratification
-is applied) or selected (if plainly picked or split, which is equivalent to
-subsetting existing geometries).
+operations, the intersection of geometries of selected features with planning
+units as well as the area of each planning unit where the feature is present are
+calculated.
 
 When users add new features to the analysis, or configure different split or
 stratification operations for previously selected features, only newly added
