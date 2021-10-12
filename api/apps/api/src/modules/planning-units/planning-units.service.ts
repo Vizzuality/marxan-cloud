@@ -44,11 +44,10 @@ export class PlanningUnitsService {
   }
 
   public async create(jobDefinition: PlanningUnitsJob): Promise<void> {
-    const job = await this.queue.add('create-regular-pu', jobDefinition);
-    await this.events.createIfNotExists({
+    await this.queue.add('create-regular-pu', jobDefinition);
+    await this.events.create({
       kind: API_EVENT_KINDS.project__planningUnits__submitted__v1__alpha,
       topic: jobDefinition.projectId,
-      externalId: job.id,
     });
   }
 
