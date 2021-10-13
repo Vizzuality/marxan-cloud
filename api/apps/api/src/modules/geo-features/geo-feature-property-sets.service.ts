@@ -9,6 +9,7 @@ import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.
 import { GeoFeature } from './geo-feature.api.entity';
 import { GeoFeaturePropertySet } from './geo-feature.geo.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { BBox } from 'geojson';
 
 @Injectable()
 export class GeoFeaturePropertySetService {
@@ -23,24 +24,24 @@ export class GeoFeaturePropertySetService {
 
   getFeaturePropertySetsForFeatures(
     geoFeatureIds: string[],
-    forProject?: Project | null | undefined,
+    withinBBox?: BBox | null,
   ): Promise<GeoFeaturePropertySet[]> {
     const query = this.geoFeaturePropertySetsRepository
       .createQueryBuilder('propertySets')
       .distinct(true)
       .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds });
 
-    if (forProject) {
+    if (withinBBox) {
       query.andWhere(
         `st_intersects(
         st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
         "propertySets".bbox
       )`,
         {
-          xmin: forProject.bbox[1],
-          ymin: forProject.bbox[3],
-          xmax: forProject.bbox[0],
-          ymax: forProject.bbox[2],
+          xmin: withinBBox[1],
+          ymin: withinBBox[3],
+          xmax: withinBBox[0],
+          ymax: withinBBox[2],
         },
       );
     }
@@ -111,7 +112,7 @@ export class GeoFeaturePropertySetService {
     Logger.debug(inspect(featuresInSpecification));
     const metadataForFeaturesInSpecification = await this.getFeaturePropertySetsForFeatures(
       idsOfFeaturesInSpecification,
-      project,
+      project?.bbox,
     );
     const featuresInSpecificationWithPropertiesMetadata = this.extendGeoFeaturesWithPropertiesFromPropertySets(
       featuresInSpecification,
