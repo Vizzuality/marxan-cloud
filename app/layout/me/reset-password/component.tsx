@@ -28,7 +28,6 @@ export const equalPasswordValidator = (value, allValues) => {
   return undefined;
 };
 export interface ResetPasswordPasswordProps {
-  resetToken: string;
 }
 
 export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () => {
