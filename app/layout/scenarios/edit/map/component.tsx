@@ -158,7 +158,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
-    projectId: pid,
+    pid,
     cache,
     active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
     bbox,
