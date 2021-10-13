@@ -87,9 +87,10 @@ export function useAdminPreviewLayer({
 
 // WDPApreview
 export function useWDPAPreviewLayer({
-  active, bbox, wdpaIucnCategories, cache = 0, options,
+  pid, active, bbox, wdpaIucnCategories, cache = 0, options,
 }: UseWDPAPreviewLayer) {
   const { opacity = 1 } = options || {};
+
   return useMemo(() => {
     if (!active || !bbox) return null;
 
@@ -99,7 +100,7 @@ export function useWDPAPreviewLayer({
       opacity,
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/${pid}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
       },
       render: {
         layers: [
@@ -126,7 +127,7 @@ export function useWDPAPreviewLayer({
         ],
       },
     };
-  }, [active, bbox, wdpaIucnCategories, cache, opacity]);
+  }, [pid, active, bbox, wdpaIucnCategories, cache, opacity]);
 }
 
 // Featurepreview
