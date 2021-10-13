@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
-import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
 
-import { ProjectsCrudService, ProjectsInfoDTO } from './projects-crud.service';
+import { ProjectsCrudService } from './projects-crud.service';
 import { JobStatusService } from './job-status';
 import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 import { Project } from './project.api.entity';
@@ -13,6 +12,8 @@ import { UpdateProjectDTO } from './dto/update.project.dto';
 import { PlanningAreasService } from './planning-areas';
 import { PlanningUnitGridService, ProjectId } from './planning-unit-grid';
 import { assertDefined } from '@marxan/utils';
+
+import { ProjectsRequest } from './project-requests-info';
 
 export { validationFailed } from './planning-areas';
 
@@ -29,24 +30,35 @@ export class ProjectsService {
 
   async findAllGeoFeatures(
     fetchSpec: FetchSpecification,
-    appInfo?: AppInfoDTO,
+    appInfo: ProjectsRequest,
   ) {
+    const project = await this.assertProject(
+      appInfo.params?.projectId,
+      appInfo.authenticatedUser,
+    );
     // /ACL slot/
-    return this.geoCrud.findAllPaginated(fetchSpec, appInfo);
+    return this.geoCrud.findAllPaginated(fetchSpec, {
+      ...appInfo,
+      params: {
+        ...appInfo.params,
+        projectId: project.id,
+        bbox: project.bbox,
+      },
+    });
   }
 
-  async findAll(fetchSpec: FetchSpecification, info?: ProjectsInfoDTO) {
+  async findAll(fetchSpec: FetchSpecification, info?: ProjectsRequest) {
     return this.projectsCrud.findAllPaginated(fetchSpec, info);
   }
 
-  async findAllPublic(fetchSpec: FetchSpecification, info?: ProjectsInfoDTO) {
+  async findAllPublic(fetchSpec: FetchSpecification, info?: ProjectsRequest) {
     // /ACL slot/
     return this.projectsCrud.findAllPaginated(fetchSpec, info);
   }
 
   async findOne(
     id: string,
-    info?: ProjectsInfoDTO,
+    info?: ProjectsRequest,
   ): Promise<Project | undefined> {
     // /ACL slot/
     try {
@@ -58,7 +70,7 @@ export class ProjectsService {
   }
 
   // TODO debt: shouldn't use API's DTO - avoid relating service to given access layer (Rest)
-  async create(input: CreateProjectDTO, info: AppInfoDTO) {
+  async create(input: CreateProjectDTO, info: ProjectsRequest) {
     assertDefined(info.authenticatedUser);
     const project = await this.projectsCrud.create(input, info);
     await this.projectsCrud.assignCreatorRole(
@@ -81,7 +93,7 @@ export class ProjectsService {
   async addShapeFor(
     projectId: string,
     file: Express.Multer.File,
-    info: ProjectsInfoDTO,
+    info: ProjectsRequest,
   ): Promise<Error | undefined> /** Debt: move to Either<ErrorSymbol,Ok> */ {
     // /ACL slot - can?/
     try {
@@ -99,7 +111,7 @@ export class ProjectsService {
     return this.gridService.setPlanningUnitGrid(new ProjectId(projectId), file);
   }
 
-  async getJobStatusFor(projectId: string, info: ProjectsInfoDTO) {
+  async getJobStatusFor(projectId: string, info: ProjectsRequest) {
     await this.projectsCrud.getById(projectId, undefined, info);
     return await this.jobStatusService.getJobStatusFor(projectId);
   }
@@ -111,4 +123,14 @@ export class ProjectsService {
   savePlanningAreaFromShapefile = this.planningAreaService.savePlanningAreaFromShapefile.bind(
     this.planningAreaService,
   );
+
+  private async assertProject(
+    projectId = '',
+    forUser: ProjectsRequest['authenticatedUser'],
+  ) {
+    /** App Base Service throws 404 */
+    return await this.projectsCrud.getById(projectId, undefined, {
+      authenticatedUser: forUser,
+    });
+  }
 }
