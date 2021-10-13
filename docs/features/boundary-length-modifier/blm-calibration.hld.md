@@ -14,8 +14,8 @@ users to have an “at a glance” overview of the spatial distribution of
 solutions, given a discrete set of BLM values.
 
 The overview is presented to the user via a thumbnail snapshot of the solutions
-for each BLM value being tested, alongside the cost of solutions for each of
-them.
+for each BLM value being tested, alongside the cost of the best solution for
+each of them.
 
 Once the calibration results are presented to the user, they may then choose to:
 
