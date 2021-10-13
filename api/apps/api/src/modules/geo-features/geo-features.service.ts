@@ -134,6 +134,35 @@ export class GeoFeaturesService extends AppBaseService<
     const projectId: string | undefined =
       (info?.params?.projectId as string) ??
       (fetchSpecification?.filter?.projectId as string);
+
+    // find over api.features may not be best, as pagination does reflect
+    // actual page/pageSize vs actual items
+
+    // making search via intersection of whole PA vs all features
+    // may not be best for performance... but ain't we doing it anyway?
+
+    // also, current approach may fail as we are using IDs directly (typeorm
+    // limits - what we cannot overcome unless we duplicate data or make a
+    // special "cache/view" (per project?)
+
+    // current query just 'attaches' 'like' clause in separation of previously
+    // fetched features (so it may get public ones that are not within study area)
+
+    /**
+     * potential solution but it may be messing much?
+     *
+     * 1 keep searching over features_data (intersection) [could be cached
+     * at some point, per project]
+     * 2 move api.features into geo.features_data ...
+     * 3 which also fixes issues with:
+     *    * searching via tag
+     *    * searching via name
+     *    * pagination
+     *    * searching within one query (table) and single db
+     *    * reduces unnecessary relations and system accidental complexity
+     *
+     */
+
     if (projectId && info?.params?.bbox) {
       const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
         .createQueryBuilder('geoFeatureGeometries')
@@ -180,7 +209,7 @@ export class GeoFeaturesService extends AppBaseService<
 
     if (info?.params?.featureClassAndAliasFilter) {
       queryFilteredByPublicOrProjectSpecificFeatures.andWhere(
-        `${this.alias}.alias ilike :featureClassAndAliasFilter OR ${this.alias}.featureClassName ilike :featureClassAndAliasFilter`,
+        `(${this.alias}.alias ilike :featureClassAndAliasFilter OR ${this.alias}.featureClassName ilike :featureClassAndAliasFilter)`,
         {
           featureClassAndAliasFilter: `%${info.params.featureClassAndAliasFilter}%`,
         },
