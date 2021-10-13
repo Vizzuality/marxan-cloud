@@ -20,6 +20,7 @@ export interface UseDeleteMeProps {
 }
 export interface UseResetPasswordProps {
   requestConfig?: AxiosRequestConfig
+  resetToken: string | string[];
 }
 
 export interface ResetPasswordProps {

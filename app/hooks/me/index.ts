@@ -143,16 +143,14 @@ export function useResetPassword({
   requestConfig = {
     method: 'PATCH',
   },
+  resetToken,
 }: UseResetPasswordProps) {
-  const queryClient = useQueryClient();
-  const [session] = useSession();
-
   const resetPassword = ({ data }: ResetPasswordProps) => {
     return USERS.request({
       url: '/me/reset-password',
       data,
       headers: {
-        Authorization: `Bearer ${session.accessToken}`,
+        Authorization: `Bearer ${resetToken}`,
       },
       ...requestConfig,
     });
@@ -160,7 +158,6 @@ export function useResetPassword({
 
   return useMutation(resetPassword, {
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries('me');
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

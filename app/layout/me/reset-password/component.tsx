@@ -4,8 +4,6 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import { signOut } from 'next-auth/client';
-
 import { useResetPassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 
@@ -24,18 +22,18 @@ import Loading from 'components/loading';
 import RESET_PASSWORD_SVG from 'svgs/users/reset-password.svg?sprite';
 
 export const equalPasswordValidator = (value, allValues) => {
-  const { resetPasswordDraft } = allValues || {};
-  if (resetPasswordDraft !== value) return 'Error';
+  const { password } = allValues || {};
+  if (password !== value) return 'Error';
 
   return undefined;
 };
 export interface ResetPasswordPasswordProps {
-
+  resetToken: string;
 }
 
 export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () => {
-  const mutation = useResetPassword({});
-  const { query: { token: resetToken } } = useRouter();
+  const { push, query: { token: resetToken } } = useRouter();
+  const mutation = useResetPassword({ resetToken });
 
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -45,8 +43,8 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
   const handleSubmit = useCallback(async (values) => {
     setSubmitting(true);
 
-    const { resetPassword } = values;
-    const data = { resetPassword };
+    const { passwordConfirm } = values;
+    const data = { passwordConfirm };
 
     mutation.mutate({ data }, {
       onSuccess: () => {
@@ -59,10 +57,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
           level: 'success',
         });
         setSubmitting(false);
-
-        setTimeout(() => {
-          signOut();
-        });
+        push('/sign-in');
       },
       onError: () => {
         addToast('error-reset-password', (
@@ -76,7 +71,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
         setSubmitting(false);
       },
     });
-  }, [mutation, addToast]);
+  }, [mutation, addToast, push]);
 
   return (
     <Wrapper>
@@ -99,25 +94,25 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
 
                 <div className="flex flex-col space-y-12">
                   <FieldRFF
-                    name="resetPasswordDraft"
+                    name="password"
                     validate={composeValidators([{ presence: true }])}
                   >
                     {(fprops) => (
-                      <Field id="reset-password-draft" {...fprops}>
+                      <Field id="password" {...fprops}>
                         <Label theme="light" className="mb-3 uppercase">New Password</Label>
                         <Input theme="light" type="password" />
                       </Field>
                     )}
                   </FieldRFF>
                   <FieldRFF
-                    name="resetPassword"
+                    name="passwordConfirm"
                     validate={composeValidators([
                       { presence: true },
                       equalPasswordValidator,
                     ])}
                   >
                     {(fprops) => (
-                      <Field id="reset-password" {...fprops}>
+                      <Field id="password-confirm" {...fprops}>
                         <Label theme="light" className="mb-3 uppercase">Confirm Password</Label>
                         <Input theme="light" type="password" />
                       </Field>
