@@ -46,7 +46,8 @@
 * if import of the scenario is ongoing, no action on given scenario should 
   be possible
 * keep in mind that feature should be flexible enough to have reusable 
-  pieces which can be used for "cloning" without a need to generate archive.
+  pieces which can be used for "cloning" without a need to generate archive
+* public project can be exported/cloned as well.
 
 # To be declared 
 
