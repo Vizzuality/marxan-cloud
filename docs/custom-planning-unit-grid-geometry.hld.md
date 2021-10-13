@@ -7,7 +7,7 @@ upload.
 
 # Key assumptions
 
-* once set, shape cannot be changed or removed from project
+* shape can be re-uploaded as long as there are no scenarios created yet
 * only `FeatureCollection` with `Polygon` features can be uploaded
 * custom planning unit grid geometry belongs to given project
 * custom planning unit grid geometry has a type of `from_shapefile`
