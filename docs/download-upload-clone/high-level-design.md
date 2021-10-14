@@ -14,6 +14,10 @@
 * each export is a zip file
 * each export includes information about its current version
   * in particular, it may also include what was exported, when, by whom etc...
+* each export includes information about dataset version (protected areas, 
+  features...)
+  * when importing an archive, system should ensure that given instance uses 
+	the very same dataset version
 * components included in the exported files:
   * Project:
     * Project metadata (name, etc.)
