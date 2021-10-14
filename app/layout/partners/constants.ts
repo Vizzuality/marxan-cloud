@@ -1,4 +1,3 @@
-import ALLEN_CORAL_LOGO from 'images/partners/allen-coral_logo.png';
 import BIOPAMA_LOGO from 'images/partners/biopama_logo.png';
 import EU_COMISSION_LOGO from 'images/partners/european-commission_logo.png';
 import MAPBOX_LOGO from 'images/partners/mapbox_logo.png';
@@ -59,12 +58,6 @@ export const ADDITIONAL_SUPPORT_LOGOS = [
   },
   {
     id: 9,
-    alt: 'Allen Coral logo',
-    hyperlink: 'https://allencoralatlas.org',
-    src: ALLEN_CORAL_LOGO,
-  },
-  {
-    id: 10,
     alt: 'Pacmara logo',
     hyperlink: 'https://pacmara.org',
     src: PACMARA_LOGO,
