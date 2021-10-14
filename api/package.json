@@ -213,7 +213,9 @@
       "@marxan/tiles/(.*)": "<rootDir>/libs/tiles/src/$1",
       "@marxan/tiles": "<rootDir>/libs/tiles/src",
       "@marxan/planning-unit-features/(.*)": "<rootDir>/libs/planning-unit-features/src/$1",
-      "@marxan/planning-unit-features": "<rootDir>/libs/planning-unit-features/src"
+      "@marxan/planning-unit-features": "<rootDir>/libs/planning-unit-features/src",
+      "@marxan/projects/(.*)": "<rootDir>/libs/projects/src/$1",
+      "@marxan/projects": "<rootDir>/libs/projects/src"
     }
   }
 }

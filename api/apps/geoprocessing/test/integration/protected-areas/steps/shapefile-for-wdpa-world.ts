@@ -4,16 +4,16 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { Job } from 'bullmq';
 
-import { ProtectedAreasJobInput } from '@marxan-geoprocessing/modules/protected-areas/worker/worker-input';
-import { ProtectedArea } from '@marxan/protected-areas';
+import { ProtectedArea, JobInput } from '@marxan/protected-areas';
 
 export const createWorld = (
   app: INestApplication,
-  file: Express.Multer.File,
+  shapefile: Express.Multer.File,
 ) => {
   const repoToken = getRepositoryToken(ProtectedArea);
   const repo: Repository<ProtectedArea> = app.get(repoToken);
   const projectId = v4();
+  const scenarioId = v4();
 
   return {
     cleanup: async () =>
@@ -33,13 +33,14 @@ export const createWorld = (
       (({
         data: {
           projectId,
-          file: {
-            ...file,
+          scenarioId,
+          shapefile: {
+            ...shapefile,
             filename: name,
           },
         },
         id: 'test-job',
-      } as unknown) as Job<ProtectedAreasJobInput>),
+      } as unknown) as Job<JobInput>),
     projectId,
     ThenOldEntriesAreRemoved: async (oldShapeName: string) =>
       repo

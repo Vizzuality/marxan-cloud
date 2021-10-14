@@ -8,7 +8,6 @@ import { Scenario } from './scenario.api.entity';
 import { ScenariosCrudService } from './scenarios-crud.service';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { ProtectedAreasModule } from '@marxan-api/modules/protected-areas/protected-areas.module';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { ScenarioFeaturesModule } from '../scenarios-features';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
@@ -45,12 +44,13 @@ import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-da
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
 import { CostRangeService } from './cost-range-service';
 import { ProjectChecker } from './project-checker.service';
+import { ProtectedAreaModule } from './protected-area';
+import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
 
 @Module({
   imports: [
     CqrsModule,
     GeoFeaturesModule,
-    ProtectedAreasModule,
     SpecificationModule,
     forwardRef(() => ProjectsModule),
     TypeOrmModule.forFeature([
@@ -75,6 +75,8 @@ import { ProjectChecker } from './project-checker.service';
     MarxanRunModule,
     AdminAreasModule,
     ApiEventsModule,
+    ProtectedAreaModule,
+    ProtectedAreasCrudModule,
   ],
   providers: [
     ProjectChecker,

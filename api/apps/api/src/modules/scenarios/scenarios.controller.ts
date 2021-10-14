@@ -90,6 +90,7 @@ import {
 } from '@marxan-api/dto/async-job.dto';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
+import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -642,5 +643,31 @@ export class ScenariosController {
   ): Promise<void> {
     await this.service.getCostSurfaceCsv(id, res);
     return;
+  }
+
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @ApiOperation({
+    description: 'Upload shapefile for project-specific protected areas',
+  })
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiTags(asyncJobTag)
+  @Post(':id/protected-areas/shapefile')
+  async shapefileForProtectedArea(
+    @Param('id') scenarioId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<JsonApiAsyncJobMeta> {
+    const outcome = await this.service.addProtectedAreaFor(scenarioId, file, {
+      authenticatedUser: req.user,
+    });
+    if (isLeft(outcome)) {
+      switch (outcome.left) {
+        case submissionFailed:
+          throw new InternalServerErrorException();
+        default:
+          throw new NotFoundException();
+      }
+    }
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 }
