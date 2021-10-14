@@ -13,7 +13,11 @@ export class PlanningUnitGridSetSaga {
       ofType(CustomPlanningUnitGridSet),
       map(
         (event) =>
-          new SetProjectGridFromShapefile(new ProjectId(event.projectId)),
+          new SetProjectGridFromShapefile(
+            new ProjectId(event.projectId),
+            event.planningAreaId,
+            event.bbox,
+          ),
       ),
     );
 }

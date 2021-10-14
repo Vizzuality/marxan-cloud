@@ -10,37 +10,41 @@ import {
   duplicate,
 } from '@marxan-api/modules/api-events/api-events.service';
 
-export interface EventData<JobData> {
+export interface EventData<JobData, Result = unknown> {
   jobId: string;
   eventId: string;
   data: Promise<JobData>;
+  result: Promise<Result | undefined>;
 }
 
-interface QueueEvents<JobData> {
-  completed(eventData: EventData<JobData>): void;
+interface QueueEvents<JobData, Result = unknown> {
+  completed(eventData: EventData<JobData, Result>): void;
 
   failed(eventData: EventData<JobData>): void;
 }
 
-export type EventFactory<JobData> = {
+export type EventFactory<JobData, Result = unknown> = {
   createCompletedEvent: (
-    eventData: EventData<JobData>,
+    eventData: EventData<JobData, Result>,
   ) => Promise<CreateApiEventDTO>;
   createFailedEvent: (
     eventData: EventData<JobData>,
   ) => Promise<CreateApiEventDTO>;
 };
 
-const QueueEventsEmitter: new <JobData>() => TypedEmitter<
-  QueueEvents<JobData>
+const QueueEventsEmitter: new <JobData, Result = unknown>() => TypedEmitter<
+  QueueEvents<JobData, Result>
 > = EventEmitter;
 
-export class QueueEventsAdapter<JobData> extends QueueEventsEmitter<JobData> {
+export class QueueEventsAdapter<
+  JobData,
+  Result = unknown
+> extends QueueEventsEmitter<JobData, Result> {
   constructor(
-    private readonly queue: Queue<JobData>,
+    private readonly queue: Queue<JobData, Result>,
     queueEvents: BullmqQueueEvents,
     private readonly apiEvents: ApiEventsService,
-    private readonly eventFactory: EventFactory<JobData>,
+    private readonly eventFactory: EventFactory<JobData, Result>,
   ) {
     super();
     queueEvents.on(`completed`, ({ jobId }, eventId) =>
@@ -53,11 +57,15 @@ export class QueueEventsAdapter<JobData> extends QueueEventsEmitter<JobData> {
 
   private async handleFinished(jobId: string, eventId: string) {
     const lazyDataGetter = this.createLazyDataGetter();
+    const lazyResultGetter = this.createLazyResultGetter();
     const eventDto = await this.eventFactory.createCompletedEvent({
       jobId,
       eventId,
       get data() {
         return lazyDataGetter(jobId);
+      },
+      get result() {
+        return lazyResultGetter(jobId);
       },
     });
     const result = await this.apiEvents.createIfNotExists(eventDto);
@@ -70,6 +78,9 @@ export class QueueEventsAdapter<JobData> extends QueueEventsEmitter<JobData> {
       get data() {
         return lazyDataGetter(jobId);
       },
+      get result() {
+        return lazyResultGetter(jobId);
+      },
     });
   }
 
@@ -81,6 +92,9 @@ export class QueueEventsAdapter<JobData> extends QueueEventsEmitter<JobData> {
       get data() {
         return lazyDataGetter(jobId);
       },
+      get result() {
+        return Promise.resolve(undefined);
+      },
     });
     const result = await this.apiEvents.createIfNotExists(eventDto);
     if (this.isDuplicate(result)) {
@@ -91,6 +105,9 @@ export class QueueEventsAdapter<JobData> extends QueueEventsEmitter<JobData> {
       eventId,
       get data() {
         return lazyDataGetter(jobId);
+      },
+      get result() {
+        return Promise.resolve(undefined);
       },
     });
   }
@@ -107,6 +124,18 @@ export class QueueEventsAdapter<JobData> extends QueueEventsEmitter<JobData> {
       }
       const job = await this.getJob(jobId);
       data = job.data;
+      return data;
+    };
+  }
+
+  private createLazyResultGetter() {
+    let data: Result | undefined;
+    return async (jobId: string) => {
+      if (data) {
+        return data;
+      }
+      const job = await this.getJob(jobId);
+      data = job.returnvalue;
       return data;
     };
   }

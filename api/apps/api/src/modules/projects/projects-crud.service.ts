@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { assertDefined, isDefined } from '@marxan/utils';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { Project } from './project.api.entity';
+import { PlanningUnitGridShape, Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { UsersService } from '@marxan-api/modules/users/users.service';
@@ -183,6 +183,13 @@ export class ProjectsCrudService extends AppBaseService<
     _info?: ProjectsInfoDTO,
   ): Promise<void> {
     if (
+      createModel?.planningUnitGridShape === PlanningUnitGridShape.fromShapefile
+    ) {
+      // handled after custom grid processing
+      return;
+    }
+
+    if (
       createModel.planningUnitAreakm2 &&
       createModel.planningUnitGridShape &&
       (createModel.countryId ||
@@ -213,13 +220,15 @@ export class ProjectsCrudService extends AppBaseService<
     createModel: UpdateProjectDTO,
     _info?: ProjectsInfoDTO,
   ): Promise<void> {
-    /**
-     * @deprecated Workers and jobs should be move to the new functionality
-     */
-
+    if (
+      createModel?.planningUnitGridShape === PlanningUnitGridShape.fromShapefile
+    ) {
+      // handled after custom grid processing
+      return;
+    }
     if (
       createModel.planningUnitAreakm2 &&
-      createModel.planningUnitGridShape &&
+      createModel?.planningUnitGridShape &&
       (createModel.countryId ||
         createModel.adminAreaLevel1Id ||
         createModel.adminAreaLevel2Id ||
