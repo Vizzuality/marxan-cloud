@@ -8,6 +8,7 @@ import MetaIcons from 'layout/meta-icons';
 import ProjectHeader from 'layout/projects/show/header';
 import ProjectMap from 'layout/projects/show/map';
 import ProjectScenarios from 'layout/projects/show/scenarios';
+import ProjectStatus from 'layout/projects/show/status';
 import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
 import Wrapper from 'layout/wrapper';
@@ -25,6 +26,8 @@ const ShowProjectsPage: React.FC = () => {
         <Header size="base" />
 
         <Help />
+
+        <ProjectStatus />
 
         <div className="pt-2.5">
           <ProjectHeader />
