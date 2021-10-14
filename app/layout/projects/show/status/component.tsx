@@ -72,12 +72,20 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
       JOB_DONE_REF.current = JOB_DONE;
 
       // Execute the action
-      ACTIONS_DONE[JOB_DONE.kind](JOB_DONE_REF);
+      if (ACTIONS_DONE[JOB_DONE.kind]) {
+        ACTIONS_DONE[JOB_DONE.kind](JOB_DONE_REF);
+      } else {
+        ACTIONS_DONE.default(JOB_DONE_REF);
+      }
     }
   }, [ACTIONS_DONE, JOB_DONE]);
 
   const onTryAgain = useCallback(() => {
-    ACTIONS_FAILURE[JOB_FAILURE.kind]();
+    if (ACTIONS_FAILURE[JOB_FAILURE.kind]) {
+      ACTIONS_FAILURE[JOB_FAILURE.kind]();
+    } else {
+      ACTIONS_FAILURE.default();
+    }
   }, [ACTIONS_FAILURE, JOB_FAILURE?.kind]);
 
   return (

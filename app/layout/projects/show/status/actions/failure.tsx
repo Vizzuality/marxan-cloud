@@ -4,14 +4,13 @@ import React, {
 
 import { useRouter } from 'next/router';
 
-import { useProject, useSaveProject } from 'hooks/projects';
+import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 export const useProjectActionsFailure = () => {
   const { query } = useRouter();
   const { pid } = query;
 
-  const { data: projectData } = useProject(pid);
   const projectMutation = useSaveProject({
     requestConfig: {
       method: 'PATCH',
@@ -20,18 +19,19 @@ export const useProjectActionsFailure = () => {
 
   const { addToast } = useToasts();
 
-  const onPlanningUnitsFailure = useCallback((JOB_REF) => {
+  const onFailure = useCallback(() => {
     projectMutation.mutate({
       id: `${pid}`,
       data: {
-        name: projectData.name,
+        metadata: {
+          cache: new Date().getTime(),
+        },
       },
     }, {
       onSuccess: () => {
-        JOB_REF.current = null;
       },
       onError: () => {
-        addToast('onPlanningAreaProtectedCalculationDone', (
+        addToast('onFailure', (
           <>
             <h2 className="font-medium">Error!</h2>
           </>
@@ -40,9 +40,10 @@ export const useProjectActionsFailure = () => {
         });
       },
     });
-  }, [pid, projectData, projectMutation, addToast]);
+  }, [pid, projectMutation, addToast]);
 
   return {
-    planningUnits: onPlanningUnitsFailure,
+    default: onFailure,
+    planningUnits: onFailure,
   };
 };
