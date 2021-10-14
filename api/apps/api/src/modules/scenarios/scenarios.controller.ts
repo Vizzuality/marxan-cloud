@@ -238,7 +238,7 @@ export class ScenariosController {
 
   @ApiOperation({ description: 'Create feature set for scenario' })
   @ApiTags(asyncJobTag)
-  @Post(':id/features/specification/v2')
+  @Post(':id/features/specification')
   async createSpecification(
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
