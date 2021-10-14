@@ -1,4 +1,5 @@
 import { IsNumber, IsUUID } from 'class-validator';
+import { BBox } from 'geojson';
 
 export class JobOutput {
   /**
@@ -24,5 +25,5 @@ export class JobOutput {
       each: true,
     },
   )
-  bbox!: number[];
+  bbox!: BBox;
 }

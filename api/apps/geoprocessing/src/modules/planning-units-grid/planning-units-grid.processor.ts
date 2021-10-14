@@ -4,6 +4,8 @@ import { plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
+import { isLeft } from 'fp-ts/Either';
+import { BBox } from 'geojson';
 
 import { JobInput, JobOutput, queueName } from '@marxan/planning-units-grid';
 import { ShapefileService } from '@marxan/shapefile-converter';
@@ -14,7 +16,6 @@ import {
 
 import { ShapeType } from '@marxan-jobs/planning-unit-geometry';
 import { GridGeoJsonValidator } from './grid-geojson-validator';
-import { isLeft } from 'fp-ts/Either';
 
 @Injectable()
 export class PlanningUnitsGridProcessor
@@ -81,7 +82,7 @@ export class PlanningUnitsGridProcessor
 
         const planningArea: {
           id: string;
-          bbox: number[];
+          bbox: BBox;
         }[] = await manager.query(
           `
             INSERT
@@ -89,10 +90,10 @@ export class PlanningUnitsGridProcessor
             VALUES ($1,
                     (SELECT ST_MULTI(ST_UNION(the_geom))
                      from "planning_units_geom"
-                     where project_id = $2))
+                     where project_id = $1))
             RETURNING "id", "bbox"
           `,
-          [projectId, projectId],
+          [projectId],
         );
 
         return {
