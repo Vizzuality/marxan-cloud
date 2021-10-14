@@ -477,7 +477,7 @@ export function useSaveSelectedFeatures({
 
   const saveFeature = ({ id, data }: SaveSelectedFeaturesProps) => {
     return SCENARIOS.request({
-      url: `/${id}/features/specification/v2`,
+      url: `/${id}/features/specification`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
