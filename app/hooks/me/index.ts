@@ -16,6 +16,8 @@ import {
   ResetPasswordProps,
   SignUpConfirmationProps,
   UseSignUpConfirmationProps,
+  PasswordChangeConfirmationProps,
+  UsePasswordChangeConfirmationProps,
 } from './types';
 
 // ME
@@ -188,6 +190,35 @@ export function useSignUpConfirmation({
   };
 
   return useMutation(signUpConfirmation, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+// CONFIRM PASSWORD CHANGE
+export function usePasswordChangeConfirmation({
+  requestConfig = {
+    method: 'POST',
+  },
+  changePasswordConfirmationToken,
+}: UsePasswordChangeConfirmationProps) {
+  const passwordChangeConfirmation = ({ data }: PasswordChangeConfirmationProps) => {
+    return USERS.request({
+      url: '/me/sign-up-confirmation',
+      data,
+      headers: {
+        Authorization: `Bearer ${changePasswordConfirmationToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(passwordChangeConfirmation, {
     onSuccess: (data, variables, context) => {
       console.info('Succces', data, variables, context);
     },
