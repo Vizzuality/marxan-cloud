@@ -12,7 +12,7 @@ export const setPlanningUnitGridQueueToken = Symbol(
   `set planning unit grid queue token`,
 );
 export const setPlanningUnitGridQueueProvider: FactoryProvider<
-  Queue<JobInput>
+  Queue<JobInput, JobOutput>
 > = {
   provide: setPlanningUnitGridQueueToken,
   useFactory: (queueBuilder: QueueBuilder) => {
@@ -36,7 +36,7 @@ export const setPlanningUnitGridEventsFactoryToken = Symbol(
   `set planning unit grid queue events factory token`,
 );
 export const setPlanningUnitGridEventsFactoryProvider: FactoryProvider<
-  CreateWithEventFactory<JobInput>
+  CreateWithEventFactory<JobInput, JobOutput>
 > = {
   provide: setPlanningUnitGridEventsFactoryToken,
   useFactory: (

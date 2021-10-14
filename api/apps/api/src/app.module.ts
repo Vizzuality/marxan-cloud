@@ -23,7 +23,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from '@marxan-api/filters/all-exceptions.exception.filter';
 import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.module';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
-import { ProtectedAreasModule } from '@marxan-api/modules/protected-areas/protected-areas.module';
+import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
 import { ProxyModule } from '@marxan-api/modules/proxy/proxy.module';
 import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/scenarios-planning-unit.module';
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
@@ -50,7 +50,7 @@ import { ScenarioSpecificationModule } from './modules/scenario-specification';
     GeoFeaturesModule,
     OrganizationsModule,
     ProjectsModule,
-    ProtectedAreasModule,
+    ProtectedAreasCrudModule,
     ScenariosModule,
     UsersModule,
     AuthenticationModule,

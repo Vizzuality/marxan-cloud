@@ -5,8 +5,8 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
-  NotFoundException,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -24,7 +24,6 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -64,7 +63,7 @@ import {
 } from '@marxan-api/dto/async-job.dto';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
-import { FeatureTags } from "@marxan-api/modules/geo-features/geo-feature-set.api.entity";
+import { FeatureTags } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -92,7 +91,7 @@ export class ProjectsController {
   @Get(':projectId/features')
   async findAllGeoFeaturesForProject(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-    @Param() params: { projectId: string },
+    @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Query('q') featureClassAndAliasFilter?: string,
     @Query('tag') featureTag?: FeatureTags,
@@ -102,7 +101,7 @@ export class ProjectsController {
       {
         authenticatedUser: req.user,
         params: {
-          projectId: params.projectId,
+          projectId: projectId,
           featureClassAndAliasFilter: featureClassAndAliasFilter,
           featureTag,
         },
@@ -204,27 +203,6 @@ export class ProjectsController {
       projectId,
       projectWithScenarios,
     );
-  }
-
-  @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @ApiOperation({
-    description: 'Upload shapefile for project-specific protected areas',
-  })
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiTags(asyncJobTag)
-  @Post(':id/protected-areas/shapefile')
-  async shapefileForProtectedArea(
-    @Param('id') projectId: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<JsonApiAsyncJobMeta> {
-    const outcome = await this.projectsService.addShapeFor(projectId, file, {
-      authenticatedUser: req.user,
-    });
-    if (outcome) {
-      throw new NotFoundException();
-    }
-    return AsyncJobDto.forProject().asJsonApiMetadata();
   }
 
   @ApiConsumesShapefile({

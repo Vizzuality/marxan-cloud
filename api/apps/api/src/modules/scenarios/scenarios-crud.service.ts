@@ -14,7 +14,7 @@ import {
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { ProtectedAreasService } from '@marxan-api/modules/protected-areas/protected-areas.service';
+import { ProtectedAreasCrudService } from '@marxan-api/modules/protected-areas/protected-areas-crud.service';
 import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.service';
 import { concat } from 'lodash';
 import { AppConfig } from '@marxan-api/utils/config.utils';
@@ -49,8 +49,8 @@ export class ScenariosCrudService extends AppBaseService<
     @InjectRepository(Project)
     protected readonly projectRepository: Repository<Project>,
     @Inject(UsersService) protected readonly usersService: UsersService,
-    @Inject(ProtectedAreasService)
-    protected readonly protectedAreasService: ProtectedAreasService,
+    @Inject(ProtectedAreasCrudService)
+    protected readonly protectedAreasService: ProtectedAreasCrudService,
     @Inject(forwardRef(() => ProjectsCrudService))
     protected readonly projectsService: ProjectsCrudService,
     private readonly wdpaCalculationsDetector: WdpaAreaCalculationService,

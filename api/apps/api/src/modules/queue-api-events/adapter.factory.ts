@@ -11,12 +11,12 @@ export type CreateWithEventFactory<JobData, Result = unknown> = (
 export class AdapterFactory {
   constructor(private readonly apiEvents: ApiEventsService) {}
 
-  create<JobData>(
-    queue: Queue<JobData>,
+  create<JobData, Result = unknown>(
+    queue: Queue<JobData, Result>,
     queueEvents: QueueEvents,
-  ): CreateWithEventFactory<JobData> {
+  ): CreateWithEventFactory<JobData, Result> {
     return (eventFactory) => {
-      return new QueueEventsAdapter<JobData>(
+      return new QueueEventsAdapter<JobData, Result>(
         queue,
         queueEvents,
         this.apiEvents,

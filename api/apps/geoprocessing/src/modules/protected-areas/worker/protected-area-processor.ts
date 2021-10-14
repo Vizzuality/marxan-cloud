@@ -6,20 +6,20 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { ShapefileService } from '@marxan/shapefile-converter';
 
 import { WorkerProcessor } from '../../worker';
-import { ProtectedAreasJobInput } from './worker-input';
-import { ProtectedArea } from '@marxan/protected-areas';
+import { ProtectedArea, JobInput, JobOutput } from '@marxan/protected-areas';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ProtectedAreaProcessor
-  implements WorkerProcessor<ProtectedAreasJobInput, void> {
+  implements WorkerProcessor<JobInput, JobOutput> {
   constructor(
     private readonly shapefileService: ShapefileService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
-  async process(job: Job<ProtectedAreasJobInput, void>): Promise<void> {
+  async process(job: Job<JobInput, JobOutput>): Promise<JobOutput> {
     const { data: geo } = await this.shapefileService.transformToGeoJson(
-      job.data.file,
+      job.data.shapefile,
     );
 
     return this.entityManager.transaction(async (transaction) => {
@@ -27,7 +27,7 @@ export class ProtectedAreaProcessor
         projectId: job.data.projectId,
       });
 
-      await transaction.query(
+      const entities: { id: string }[] = await transaction.query(
         `
           INSERT INTO "wdpa"("the_geom", "project_id", "full_name")
           SELECT ST_SetSRID(
@@ -39,9 +39,16 @@ export class ProtectedAreaProcessor
           FROM (
                  SELECT json_array_elements($1::json -> 'features') AS features
                ) AS f
+          RETURNING "id"
         `,
-        [geo, job.data.projectId, job.data.file.filename],
+        [geo, job.data.projectId, job.data.shapefile.filename],
       );
+
+      return plainToClass<JobOutput, JobOutput>(JobOutput, {
+        protectedAreaId: entities.map((entity) => entity.id),
+        projectId: job.data.projectId,
+        scenarioId: job.data.scenarioId,
+      });
     });
   }
 }

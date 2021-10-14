@@ -39,7 +39,7 @@ export const setPlanningUnitGridEventsFactoryProvider: FactoryProvider<
   provide: intersectFeaturesWithPuQueueEventsFactoryToken,
   useFactory: (
     factory: QueueEventsAdapterFactory,
-    queue: Queue<JobInput, void>,
+    queue: Queue<JobInput>,
     queueEvents: QueueEvents,
   ) => factory.create(queue, queueEvents),
   inject: [
