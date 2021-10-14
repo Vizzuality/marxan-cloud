@@ -14,6 +14,8 @@ import {
   UseDeleteMeProps,
   UseResetPasswordProps,
   ResetPasswordProps,
+  SignUpConfirmationProps,
+  UseSignUpConfirmationProps,
 } from './types';
 
 // ME
@@ -157,6 +159,35 @@ export function useResetPassword({
   };
 
   return useMutation(resetPassword, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+// CONFIRM SIGN UP
+export function useSignUpConfirmation({
+  requestConfig = {
+    method: 'POST',
+  },
+  confirmAccountToken,
+}: UseSignUpConfirmationProps) {
+  const signUpConfirmation = ({ data }: SignUpConfirmationProps) => {
+    return USERS.request({
+      url: '/me/sign-up-confirmation',
+      data,
+      headers: {
+        Authorization: `Bearer ${confirmAccountToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(signUpConfirmation, {
     onSuccess: (data, variables, context) => {
       console.info('Succces', data, variables, context);
     },
