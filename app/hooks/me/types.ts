@@ -38,5 +38,5 @@ export interface UsePasswordChangeConfirmationProps {
 }
 
 export interface PasswordChangeConfirmationProps {
-  token: string | string[];
+  data: any;
 }

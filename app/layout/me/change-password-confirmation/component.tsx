@@ -12,13 +12,14 @@ export interface ChangePasswordConfirmationProps {
 }
 
 export const ChangePasswordConfirmation: React.FC<ChangePasswordConfirmationProps> = () => {
-  const { push, query: { token } } = useRouter();
+  const { push, query: { token: confirmToken } } = useRouter();
   const [confirmChangePasswordToken, setConfirmChangePasswordToken] = useState(false);
 
   const passwordChangeConfirmationMutation = usePasswordChangeConfirmation({});
 
   const confirmPasswordChange = useCallback(() => {
-    passwordChangeConfirmationMutation.mutate({ token }, {
+    const data = { confirmToken };
+    passwordChangeConfirmationMutation.mutate({ data }, {
       onSuccess: () => {
         setConfirmChangePasswordToken(true);
       },
@@ -26,13 +27,14 @@ export const ChangePasswordConfirmation: React.FC<ChangePasswordConfirmationProp
         setConfirmChangePasswordToken(false);
       },
     });
-  }, [passwordChangeConfirmationMutation, token]);
+  }, [passwordChangeConfirmationMutation, confirmToken]);
 
   useEffect(() => {
     return () => {
       confirmPasswordChange();
     };
-  }, [confirmPasswordChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [confirmToken]);
 
   return (
     <Wrapper>

@@ -201,12 +201,10 @@ export function usePasswordChangeConfirmation({
     method: 'POST',
   },
 }: UsePasswordChangeConfirmationProps) {
-  const passwordChangeConfirmation = ({ token }: PasswordChangeConfirmationProps) => {
+  const passwordChangeConfirmation = ({ data }: PasswordChangeConfirmationProps) => {
     return USERS.request({
       url: '/me/change-password',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      data,
       ...requestConfig,
     });
   };
