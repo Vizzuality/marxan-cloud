@@ -72,11 +72,8 @@ export class ScenariosController {
     @Param() tileRequest: ScenariosTileRequest,
     @Query() scenariosPuFilters: ScenariosPUFilters,
     @Res() response: Response,
-  ): Promise<Object> {
-    const tile: Buffer = await this.service.findTile(
-      tileRequest,
-      scenariosPuFilters,
-    );
-    return response.send(tile);
+  ): Promise<void> {
+    const tile = await this.service.findTile(tileRequest, scenariosPuFilters);
+    response.send(tile);
   }
 }
