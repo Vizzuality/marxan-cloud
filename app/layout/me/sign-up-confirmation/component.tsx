@@ -12,26 +12,28 @@ export interface SignUpConfirmationProps {
 }
 
 export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
-  const { push, query: { token } } = useRouter();
+  const { push, query: { token: confirmToken } } = useRouter();
   const [confirmAccountToken, setConfirmAccountToken] = useState(false);
   const confirmationAccountMutation = useSignUpConfirmation({});
 
   const confirmAccount = useCallback(() => {
-    confirmationAccountMutation.mutate({ token }, {
+    const data = { confirmToken };
+    confirmationAccountMutation.mutate({ data }, {
       onSuccess: () => {
-        // setConfirmAccountToken(true);
-      },
-      onError: () => {
         setConfirmAccountToken(true);
       },
+      onError: () => {
+        setConfirmAccountToken(false);
+      },
     });
-  }, [confirmationAccountMutation, token]);
+  }, [confirmationAccountMutation, confirmToken]);
 
   useEffect(() => {
     return () => {
       confirmAccount();
     };
-  }, [confirmAccount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [confirmToken]);
 
   return (
     <Wrapper>

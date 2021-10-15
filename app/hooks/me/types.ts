@@ -30,11 +30,11 @@ export interface UseSignUpConfirmationProps {
 }
 
 export interface SignUpConfirmationProps {
-  token: string | string[];
+  data: any;
 }
 
 export interface UsePasswordChangeConfirmationProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface PasswordChangeConfirmationProps {

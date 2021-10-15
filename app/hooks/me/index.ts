@@ -177,12 +177,10 @@ export function useSignUpConfirmation({
     method: 'POST',
   },
 }: UseSignUpConfirmationProps) {
-  const signUpConfirmation = ({ token }: SignUpConfirmationProps) => {
+  const signUpConfirmation = ({ data }: SignUpConfirmationProps) => {
     return USERS.request({
       url: '/me/validate',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      data,
       ...requestConfig,
     });
   };
