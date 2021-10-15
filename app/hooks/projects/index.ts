@@ -263,8 +263,6 @@ export function useUploadProjectPA({
 }
 
 export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
-  const [session] = useSession();
-
   const {
     search,
     filters = {},
@@ -281,10 +279,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 
   const fetchPublishedProjects = ({ pageParam = 1 }) => PROJECTS.request({
     method: 'GET',
-    url: '/',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
+    url: '/published',
     params: {
       'page[number]': pageParam,
       ...parsedFilters,
@@ -345,14 +340,9 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 }
 
 export function usePublishedProject(id) {
-  const [session] = useSession();
-
   const query = useQuery(['published-projects', id], async () => PROJECTS.request({
     method: 'GET',
-    url: `/${id}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
+    url: `/published/${id}`,
     params: {
       include: 'scenarios,users',
     },
