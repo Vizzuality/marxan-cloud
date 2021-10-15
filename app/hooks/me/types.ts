@@ -35,9 +35,8 @@ export interface SignUpConfirmationProps {
 
 export interface UsePasswordChangeConfirmationProps {
   requestConfig?: AxiosRequestConfig
-  changePasswordConfirmationToken: string | string[];
 }
 
 export interface PasswordChangeConfirmationProps {
-  data: any
+  token: string | string[];
 }

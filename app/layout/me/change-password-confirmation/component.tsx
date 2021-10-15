@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -12,12 +12,31 @@ export interface ChangePasswordConfirmationProps {
 }
 
 export const ChangePasswordConfirmation: React.FC<ChangePasswordConfirmationProps> = () => {
-  const { push, query: { token: changePasswordConfirmationToken } } = useRouter();
-  usePasswordChangeConfirmation({ changePasswordConfirmationToken });
+  const { push, query: { token } } = useRouter();
+  const [confirmChangePasswordToken, setConfirmChangePasswordToken] = useState(false);
+
+  const passwordChangeConfirmationMutation = usePasswordChangeConfirmation({});
+
+  const confirmPasswordChange = useCallback(() => {
+    passwordChangeConfirmationMutation.mutate({ token }, {
+      onSuccess: () => {
+        setConfirmChangePasswordToken(true);
+      },
+      onError: () => {
+        setConfirmChangePasswordToken(false);
+      },
+    });
+  }, [passwordChangeConfirmationMutation, token]);
+
+  useEffect(() => {
+    return () => {
+      confirmPasswordChange();
+    };
+  }, [confirmPasswordChange]);
 
   return (
     <Wrapper>
-      {changePasswordConfirmationToken && (
+      {confirmChangePasswordToken && (
         <div className="relative flex items-center justify-center h-full">
           <div className="w-full max-w-xs">
             <div className="pb-5">
@@ -40,7 +59,7 @@ export const ChangePasswordConfirmation: React.FC<ChangePasswordConfirmationProp
         </div>
       )}
 
-      {!changePasswordConfirmationToken && (
+      {!confirmChangePasswordToken && (
         <div className="relative flex items-center justify-center h-full">
           <div className="w-full max-w-xs">
             <div className="flex flex-col items-center pb-5 space-y-20">

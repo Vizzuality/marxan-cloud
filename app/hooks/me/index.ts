@@ -151,7 +151,7 @@ export function useResetPassword({
 }: UseResetPasswordProps) {
   const resetPassword = ({ data }: ResetPasswordProps) => {
     return USERS.request({
-      url: '/me/reset-password',
+      url: '/me/recover-password',
       data,
       headers: {
         Authorization: `Bearer ${resetToken}`,
@@ -192,7 +192,6 @@ export function useSignUpConfirmation({
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });
@@ -203,14 +202,12 @@ export function usePasswordChangeConfirmation({
   requestConfig = {
     method: 'POST',
   },
-  changePasswordConfirmationToken,
 }: UsePasswordChangeConfirmationProps) {
-  const passwordChangeConfirmation = ({ data }: PasswordChangeConfirmationProps) => {
+  const passwordChangeConfirmation = ({ token }: PasswordChangeConfirmationProps) => {
     return USERS.request({
-      url: '/me/sign-up-confirmation',
-      data,
+      url: '/me/change-password',
       headers: {
-        Authorization: `Bearer ${changePasswordConfirmationToken}`,
+        Authorization: `Bearer ${token}`,
       },
       ...requestConfig,
     });
@@ -221,7 +218,6 @@ export function usePasswordChangeConfirmation({
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });

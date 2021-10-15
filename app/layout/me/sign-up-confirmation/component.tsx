@@ -19,9 +19,11 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
   const confirmAccount = useCallback(() => {
     confirmationAccountMutation.mutate({ token }, {
       onSuccess: () => {
+        // setConfirmAccountToken(true);
+      },
+      onError: () => {
         setConfirmAccountToken(true);
       },
-      onError: () => { },
     });
   }, [confirmationAccountMutation, token]);
 
