@@ -24,3 +24,17 @@ Some users may have Marxan input (.dat) files, planning unit shapefiles and feat
 
 This operation (cloning) can be seen, essentially, as a way to create an exact 
 replica of an existing project.
+
+### From user perspective:
+
+#### Scenarios:
+
+* Only cloning is available.
+* User will click on a "duplicate" button and the scenario will get duplicated on the same project without further interaction.
+
+#### Project:
+
+* Three possible actions: Clone, Export, Import
+* Clone: User clicks on a button, the project gets duplicated in their account without further interaction.
+* Export: User clicks on a button and gets a file.
+* Import: User uploads a file to the platform and a project is created within their account.
