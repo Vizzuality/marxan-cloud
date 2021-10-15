@@ -102,7 +102,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return 'lock-status,protection';
 
     if (tab === 'solutions' && subtab !== 'solutions-gap-analysis') return 'results';
-    if (tab === 'solutions' && subtab === 'solutions-gap-analysis') return 'features';
+    if (tab === 'solutions' && subtab === 'solutions-gap-analysis') return 'results,features';
 
     return 'protection';
   }, [tab, subtab]);
