@@ -93,12 +93,14 @@ export class ProjectsController {
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Param() params: { projectId: string },
     @Query('q') featureClassAndAliasFilter: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<GeoFeatureResult> {
     const { data, metadata } = await this.projectsService.findAllGeoFeatures(
       fetchSpecification,
       {
+        authenticatedUser: req.user,
         params: {
-          ...params,
+          projectId: params.projectId,
           featureClassAndAliasFilter: featureClassAndAliasFilter,
         },
       },

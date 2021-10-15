@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -25,9 +25,16 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
   const { query } = useRouter();
   const { sid } = query;
 
-  getScenarioSlice(sid);
+  const scenarioSlice = getScenarioSlice(sid);
+  const {
+    setHighlightFeatures,
+  } = scenarioSlice.actions;
+  const dispatch = useDispatch();
 
-  const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const {
+    selectedSolution,
+    highlightFeatures,
+  } = useSelector((state) => state[`/scenarios/${sid}`]);
 
   const {
     data: bestSolutionData,
@@ -52,6 +59,31 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
       if (hasNextPage) allFeaturesfetchNextPage();
     },
   );
+
+  const toggleHighlight = useCallback((id) => {
+    const newHighlightFeatures = [...highlightFeatures];
+    if (!newHighlightFeatures.includes(id)) {
+      newHighlightFeatures.push(id);
+    } else {
+      const i = newHighlightFeatures.indexOf(id);
+      newHighlightFeatures.splice(i, 1);
+    }
+    dispatch(setHighlightFeatures(newHighlightFeatures));
+  }, [dispatch, setHighlightFeatures, highlightFeatures]);
+
+  const isHighlighted = useCallback((id) => {
+    if (!highlightFeatures.includes(id)) {
+      return false;
+    }
+    return true;
+  }, [highlightFeatures]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(setHighlightFeatures([]));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="relative flex flex-col flex-grow overflow-hidden" style={{ minHeight: 200 }}>
@@ -92,6 +124,8 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
                 <Item
                   {...item}
                   scrollRoot={scrollRef}
+                  highlighted={isHighlighted(item.id)}
+                  onHighlight={() => toggleHighlight(item.id)}
                 />
               </div>
             );

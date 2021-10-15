@@ -7,7 +7,7 @@ import {
   EventFactory,
   QueueEventsAdapter,
 } from '@marxan-api/modules/queue-api-events';
-import { JobInput } from '@marxan/planning-units-grid';
+import { JobInput, JobOutput } from '@marxan/planning-units-grid';
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 
@@ -16,12 +16,13 @@ import { CustomPlanningUnitGridSet } from '../events/custom-planning-unit-grid-s
 import { setPlanningUnitGridEventsFactoryToken } from './queue.providers';
 
 @Injectable()
-export class PlanningUnitGridEventsHandler implements EventFactory<JobInput> {
-  private queueEvents: QueueEventsAdapter<JobInput>;
+export class PlanningUnitGridEventsHandler
+  implements EventFactory<JobInput, JobOutput> {
+  private queueEvents: QueueEventsAdapter<JobInput, JobOutput>;
 
   constructor(
     @Inject(setPlanningUnitGridEventsFactoryToken)
-    queueEventsFactory: CreateWithEventFactory<JobInput>,
+    queueEventsFactory: CreateWithEventFactory<JobInput, JobOutput>,
     private readonly eventBus: EventBus,
   ) {
     this.queueEvents = queueEventsFactory(this);
@@ -58,8 +59,17 @@ export class PlanningUnitGridEventsHandler implements EventFactory<JobInput> {
     };
   }
 
-  private async completed(eventData: EventData<JobInput>) {
-    const { projectId } = await eventData.data;
-    this.eventBus.publish(new CustomPlanningUnitGridSet(projectId));
+  private async completed(eventData: EventData<JobInput, JobOutput>) {
+    const result = await eventData.result;
+    if (!result) {
+      return;
+    }
+    this.eventBus.publish(
+      new CustomPlanningUnitGridSet(
+        result.projectId,
+        result.planningAreaId,
+        result.bbox,
+      ),
+    );
   }
 }

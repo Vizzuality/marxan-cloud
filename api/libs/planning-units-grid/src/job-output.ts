@@ -1,4 +1,5 @@
-import { IsUUID } from 'class-validator';
+import { IsNumber, IsUUID } from 'class-validator';
+import { BBox } from 'geojson';
 
 export class JobOutput {
   /**
@@ -14,4 +15,15 @@ export class JobOutput {
 
   @IsUUID()
   projectId!: string;
+
+  @IsUUID()
+  planningAreaId!: string;
+
+  @IsNumber(
+    {},
+    {
+      each: true,
+    },
+  )
+  bbox!: BBox;
 }

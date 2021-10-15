@@ -21,6 +21,7 @@ import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { CostSurfaceTemplateModule } from './cost-surface-template';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import {
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuOutputGeoEntity,
@@ -43,6 +44,7 @@ import { SpecificationModule } from './specification';
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
 import { CostRangeService } from './cost-range-service';
+import { ProjectChecker } from './project-checker.service';
 
 @Module({
   imports: [
@@ -72,8 +74,10 @@ import { CostRangeService } from './cost-range-service';
     OutputFilesModule,
     MarxanRunModule,
     AdminAreasModule,
+    ApiEventsModule,
   ],
   providers: [
+    ProjectChecker,
     ScenariosService,
     ScenariosCrudService,
     ProxyService,

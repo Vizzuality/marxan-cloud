@@ -1,8 +1,10 @@
 import { Job } from 'bullmq';
-import { PlanningUnitsJob } from '../src/modules/planning-units/dto/create.regular.planning-units.dto';
+import { createConnection } from 'typeorm';
+import { PlanningUnitsJob } from '@marxan-jobs/planning-unit-geometry/create.regular.planning-units.dto';
 import createPlanningUnitGridFromJobSpec from '../src/modules/planning-units/planning-units.job';
 
 import { E2E_CONFIG } from './e2e.config';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 /**
  * @TODO
@@ -24,6 +26,7 @@ describe('planning units jobs (e2e)', () => {
       };
       const value = await createPlanningUnitGridFromJobSpec(
         createPlanningUnitsDTO,
+        await createConnection(geoprocessingConnections.default),
       );
 
       // TODO do actual verification & cleanup (table: planning_units_geom) after test

@@ -128,8 +128,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const layers = useMemo(() => {
     const protectedCategories = wdpaCategories?.wdpaIucnCategories
-    || scenarioData?.wdpaIucnCategories
-    || [];
+      || scenarioData?.wdpaIucnCategories
+      || [];
 
     if (tab === 'protected-areas' && subtab === 'protected-areas-preview' && !!protectedCategories.length) return ['wdpa-preview', 'pugrid'];
     if (tab === 'protected-areas' && subtab === 'protected-areas-percentage' && !!protectedCategories.length) return ['wdpa-percentage', 'pugrid'];
@@ -158,6 +158,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
+    pid,
     cache,
     active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
     bbox,

@@ -29,6 +29,7 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { GeometrySource } from './geometry-source.enum';
 import { v4 } from 'uuid';
 import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
+import { GeoFeaturesRequestInfo } from './geo-features-request-info';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -45,16 +46,12 @@ type GeoFeatureFilterKeys = keyof Pick<
 >;
 type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
 
-type ServiceRequestInfo = AppInfoDTO & {
-  forProject?: Project;
-};
-
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
   GeoFeature,
   GeoFeatureSetSpecification,
   GeoFeatureSetSpecification,
-  ServiceRequestInfo
+  GeoFeaturesRequestInfo
 > {
   constructor(
     @InjectRepository(GeoFeatureGeometry, DbConnections.geoprocessingDB)
@@ -99,7 +96,7 @@ export class GeoFeaturesService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<GeoFeature>,
     filters: GeoFeatureFilters,
-    info?: ServiceRequestInfo,
+    info?: GeoFeaturesRequestInfo,
   ): SelectQueryBuilder<GeoFeature> {
     this._processBaseFilters<GeoFeatureFilters>(
       query,
@@ -115,7 +112,7 @@ export class GeoFeaturesService extends AppBaseService<
   async extendFindAllQuery(
     query: SelectQueryBuilder<GeoFeature>,
     fetchSpecification: FetchSpecification,
-    info: ServiceRequestInfo,
+    info: GeoFeaturesRequestInfo,
   ): Promise<SelectQueryBuilder<GeoFeature>> {
     /**
      * We should either list only "public" features (i.e. they are not from a
@@ -137,15 +134,36 @@ export class GeoFeaturesService extends AppBaseService<
     const projectId: string | undefined =
       (info?.params?.projectId as string) ??
       (fetchSpecification?.filter?.projectId as string);
-    if (projectId) {
-      const relatedProject = await this.projectRepository
-        .findOneOrFail(projectId)
-        .then((project) => project)
-        .catch((_error) => {
-          throw new NotFoundException(
-            `No project with id ${projectId} exists.`,
-          );
-        });
+
+    // find over api.features may not be best, as pagination does reflect
+    // actual page/pageSize vs actual items
+
+    // making search via intersection of whole PA vs all features
+    // may not be best for performance... but ain't we doing it anyway?
+
+    // also, current approach may fail as we are using IDs directly (typeorm
+    // limits - what we cannot overcome unless we duplicate data or make a
+    // special "cache/view" (per project?)
+
+    // current query just 'attaches' 'like' clause in separation of previously
+    // fetched features (so it may get public ones that are not within study area)
+
+    /**
+     * potential solution but it may be messing much?
+     *
+     * 1 keep searching over features_data (intersection) [could be cached
+     * at some point, per project]
+     * 2 move api.features into geo.features_data ...
+     * 3 which also fixes issues with:
+     *    * searching via tag
+     *    * searching via name
+     *    * pagination
+     *    * searching within one query (table) and single db
+     *    * reduces unnecessary relations and system accidental complexity
+     *
+     */
+
+    if (projectId && info?.params?.bbox) {
       const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
         .createQueryBuilder('geoFeatureGeometries')
         .distinctOn(['"geoFeatureGeometries"."feature_id"'])
@@ -155,10 +173,10 @@ export class GeoFeaturesService extends AppBaseService<
         "geoFeatureGeometries".the_geom
       )`,
           {
-            xmin: relatedProject.bbox[1],
-            ymin: relatedProject.bbox[3],
-            xmax: relatedProject.bbox[0],
-            ymax: relatedProject.bbox[2],
+            xmin: info.params.bbox[1],
+            ymin: info.params.bbox[3],
+            xmax: info.params.bbox[0],
+            ymax: info.params.bbox[2],
           },
         )
         .getMany()
@@ -191,7 +209,7 @@ export class GeoFeaturesService extends AppBaseService<
 
     if (info?.params?.featureClassAndAliasFilter) {
       queryFilteredByPublicOrProjectSpecificFeatures.andWhere(
-        `${this.alias}.alias ilike :featureClassAndAliasFilter OR ${this.alias}.featureClassName ilike :featureClassAndAliasFilter`,
+        `(${this.alias}.alias ilike :featureClassAndAliasFilter OR ${this.alias}.featureClassName ilike :featureClassAndAliasFilter)`,
         {
           featureClassAndAliasFilter: `%${info.params.featureClassAndAliasFilter}%`,
         },
@@ -210,7 +228,7 @@ export class GeoFeaturesService extends AppBaseService<
   async extendFindAllResults(
     entitiesAndCount: [any[], number],
     fetchSpecification?: DeepReadonly<FetchSpecification>,
-    info?: ServiceRequestInfo,
+    info?: GeoFeaturesRequestInfo,
   ): Promise<[any[], number]> {
     /**
      * Short-circuit if there's no result to extend, or if the API client has
@@ -239,7 +257,7 @@ export class GeoFeaturesService extends AppBaseService<
     );
 
     const entitiesWithProperties = await this.geoFeaturesPropertySet
-      .getFeaturePropertySetsForFeatures(geoFeatureIds, info?.forProject)
+      .getFeaturePropertySetsForFeatures(geoFeatureIds, info?.params?.bbox)
       .then((results) => {
         return this.geoFeaturesPropertySet.extendGeoFeaturesWithPropertiesFromPropertySets(
           entitiesAndCount[0],

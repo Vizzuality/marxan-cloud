@@ -98,7 +98,7 @@ describe('GeoFeaturesModule (e2e)', () => {
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
 
-        expect(response.body.data).toHaveLength(6);
+        expect(response.body.data).toHaveLength(4);
       });
       test('should return all available features if query param has no value', async () => {
         const response = await request(app.getHttpServer())

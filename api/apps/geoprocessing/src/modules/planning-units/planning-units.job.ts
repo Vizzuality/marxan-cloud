@@ -1,16 +1,28 @@
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import { createConnection } from 'typeorm';
+import { Connection } from 'typeorm';
 import { validate } from 'class-validator';
+import { InjectConnection } from '@nestjs/typeorm';
+import { plainToClass } from 'class-transformer';
 
 import {
   PlanningUnitsJob,
   PlanningUnitGridShape,
-} from './dto/create.regular.planning-units.dto';
-import { plainToClass } from 'class-transformer';
+} from '@marxan-jobs/planning-unit-geometry';
 
 const logger = new Logger('planning-units-job-processor');
+
+@Injectable()
+export class PlanningUnitsJobProcessor {
+  constructor(
+    @InjectConnection()
+    private readonly geoConnection: Connection,
+  ) {}
+
+  async process(job: Pick<Job<PlanningUnitsJob>, 'data' | 'id' | 'name'>) {
+    await createPlanningUnitGridFromJobSpec(job, this.geoConnection);
+  }
+}
 
 /**
  * @deprecated Workers and jobs should be move to the new functionality
@@ -27,6 +39,7 @@ const logger = new Logger('planning-units-job-processor');
  */
 const createPlanningUnitGridFromJobSpec = async (
   job: Pick<Job<PlanningUnitsJob>, 'data' | 'id' | 'name'>,
+  connection: Connection,
 ) => {
   logger.debug(`Start planning-units processing for ${job.id}...`);
   /**
@@ -41,7 +54,6 @@ const createPlanningUnitGridFromJobSpec = async (
   }
 
   if (job.name === 'create-regular-pu') {
-    const connection = await createConnection(geoprocessingConnections.default);
     try {
       let subquery: string;
       const gridShape: { [value in PlanningUnitGridShape]?: string } = {
@@ -90,8 +102,6 @@ const createPlanningUnitGridFromJobSpec = async (
     } catch (err) {
       logger.error(err);
       throw err;
-    } finally {
-      await connection.close();
     }
   }
 };

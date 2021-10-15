@@ -13,6 +13,8 @@ test(`uploading shapefile as planning units`, async () => {
     shapefile,
   );
   await fixtures.ThenGeoJsonMatchesInput(output);
+  await fixtures.ThenPlanningAreaIsCreated(output);
+  await fixtures.ThenPlanningAreaBBoxIsValid(output);
 });
 
 afterEach(async () => fixtures?.cleanup());

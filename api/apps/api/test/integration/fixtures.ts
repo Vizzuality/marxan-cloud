@@ -2,10 +2,12 @@ import { v4 } from 'uuid';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '@marxan-api/app.module';
 import { SpecificationRepository } from '@marxan-api/modules/specification/application/specification.repository';
+import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
+import { fakeProjectChecker } from '../utils/api-application';
 
 import { SpecificationAdaptersModule } from '@marxan-api/modules/specification/adapters/specification-adapters.module';
 import {
@@ -16,7 +18,10 @@ import {
 export const getFixtures = async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule, SpecificationAdaptersModule],
-  }).compile();
+  })
+    .overrideProvider(ProjectChecker)
+    .useValue(fakeProjectChecker)
+    .compile();
   const app = await moduleFixture.createNestApplication().init();
   const specificationRepository = app.get(SpecificationRepository);
 

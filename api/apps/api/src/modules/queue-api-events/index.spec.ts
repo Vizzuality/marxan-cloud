@@ -114,6 +114,7 @@ async function getFixtures() {
         async (data: EventData<unknown>) => {
           expect(data).toStrictEqual({
             data: Promise.resolve({}),
+            result: Promise.resolve({}),
             eventId: `event 123`,
             jobId: `123`,
           });
@@ -136,6 +137,7 @@ async function getFixtures() {
         async (data: EventData<unknown>) => {
           expect(data).toStrictEqual({
             data: Promise.resolve({}),
+            result: Promise.resolve({}),
             eventId: `event 123`,
             jobId: `123`,
           });
@@ -200,6 +202,7 @@ async function getFixtures() {
         expect(reemitedHandler.completed).toBeCalledTimes(1);
         expect(reemitedHandler.completed).toBeCalledWith({
           data: Promise.resolve({}),
+          result: Promise.resolve({}),
           eventId: `event 123`,
           jobId: `123`,
         });
@@ -215,6 +218,7 @@ async function getFixtures() {
         expect(reemitedHandler.failed).toBeCalledTimes(1);
         expect(reemitedHandler.failed).toBeCalledWith({
           data: Promise.resolve({}),
+          result: Promise.resolve({}),
           eventId: `event 123`,
           jobId: `123`,
         });

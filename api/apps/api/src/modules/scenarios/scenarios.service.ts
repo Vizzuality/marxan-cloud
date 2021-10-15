@@ -9,7 +9,7 @@ import {
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
-import { isLeft } from 'fp-ts/Either';
+import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { pick } from 'lodash';
 
 import { MarxanInput, MarxanParameters } from '@marxan/marxan-input';
@@ -33,7 +33,7 @@ import { OutputFilesService } from './output-files/output-files.service';
 import { InputFilesArchiverService, InputFilesService } from './input-files';
 import { notFound, RunService } from './marxan-run';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
-import { SimpleJobStatus } from './scenario.api.entity';
+import { Scenario, SimpleJobStatus } from './scenario.api.entity';
 import { assertDefined } from '@marxan/utils';
 import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from '@marxan/scenarios-planning-unit';
 import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-property-sets.service';
@@ -42,12 +42,16 @@ import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-pl
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { SpecificationService } from './specification';
 import { CostRange, CostRangeService } from './cost-range-service';
+import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
   status: SimpleJobStatus.draft,
   features: [],
 };
+
+export const projectNotReady = Symbol('project not ready');
+export type ProjectNotReady = typeof projectNotReady;
 
 @Injectable()
 export class ScenariosService {
@@ -73,6 +77,7 @@ export class ScenariosService {
     private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,
     private readonly specificationService: SpecificationService,
     private readonly costService: CostRangeService,
+    private readonly projectChecker: ProjectChecker,
   ) {}
 
   async findAllPaginated(
@@ -91,15 +96,24 @@ export class ScenariosService {
     return this.crudService.remove(scenarioId);
   }
 
-  async create(input: CreateScenarioDTO, info: AppInfoDTO) {
+  async create(
+    input: CreateScenarioDTO,
+    info: AppInfoDTO,
+  ): Promise<Either<ProjectNotReady, Scenario>> {
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
+    const isProjectReady = await this.projectChecker.isProjectReady(
+      input.projectId,
+    );
+    if (!isProjectReady) {
+      return left(projectNotReady);
+    }
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
     await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
       scenario,
       input,
     );
-    return scenario;
+    return right(scenario);
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
