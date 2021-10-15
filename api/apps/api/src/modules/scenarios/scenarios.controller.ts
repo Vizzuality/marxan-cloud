@@ -11,7 +11,6 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-  Put,
   Query,
   Req,
   Res,

@@ -8,6 +8,7 @@ import {
 import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
 import { TileRequest } from '@marxan/tiles';
+import { promisify } from 'util';
 
 /**
  * @description The required input values for the tile renderer
@@ -131,16 +132,9 @@ export class TileService {
   /**
    * @description Data compression
    */
-  zip(data: any): Promise<Buffer> {
-    return new Promise<Buffer>((resolve, reject) => {
-      zlib.gzip(data, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-
-        resolve(result);
-      });
-    });
+  public async zip(data: Buffer): Promise<Buffer> {
+    const gzip = promisify(zlib.gzip);
+    return await gzip(data);
   }
 
   /**
@@ -153,18 +147,13 @@ export class TileService {
    * @todo add tile render type to promise
    */
   async getTile(tileInput: TileInput<string>): Promise<Buffer> {
-    let data: Buffer = Buffer.from('');
     try {
-      const queryResult: Record<
-        'mvt',
-        Buffer
-      >[] = await this.fetchTileFromDatabase(tileInput);
-      // zip data
-      data = await this.zip(queryResult[0].mvt);
+      const queryResult = await this.fetchTileFromDatabase(tileInput);
+      const data = this.zip(queryResult[0].mvt);
+      return data;
     } catch (error: any) {
       this.logger.error(`Database error: ${error.message}`);
       throw new BadRequestException(error.message);
     }
-    return data;
   }
 }
