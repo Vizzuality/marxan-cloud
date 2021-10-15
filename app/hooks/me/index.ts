@@ -176,14 +176,12 @@ export function useSignUpConfirmation({
   requestConfig = {
     method: 'POST',
   },
-  confirmAccountToken,
 }: UseSignUpConfirmationProps) {
-  const signUpConfirmation = ({ data }: SignUpConfirmationProps) => {
+  const signUpConfirmation = ({ token }: SignUpConfirmationProps) => {
     return USERS.request({
-      url: '/me/sign-up-confirmation',
-      data,
+      url: '/me/validate',
       headers: {
-        Authorization: `Bearer ${confirmAccountToken}`,
+        Authorization: `Bearer ${token}`,
       },
       ...requestConfig,
     });

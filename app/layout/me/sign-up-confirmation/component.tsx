@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -12,8 +12,24 @@ export interface SignUpConfirmationProps {
 }
 
 export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
-  const { push, query: { token: confirmAccountToken } } = useRouter();
-  useSignUpConfirmation({ confirmAccountToken });
+  const { push, query: { token } } = useRouter();
+  const [confirmAccountToken, setConfirmAccountToken] = useState(false);
+  const confirmationAccountMutation = useSignUpConfirmation({});
+
+  const confirmAccount = useCallback(() => {
+    confirmationAccountMutation.mutate({ token }, {
+      onSuccess: () => {
+        setConfirmAccountToken(true);
+      },
+      onError: () => { },
+    });
+  }, [confirmationAccountMutation, token]);
+
+  useEffect(() => {
+    return () => {
+      confirmAccount();
+    };
+  }, [confirmAccount]);
 
   return (
     <Wrapper>

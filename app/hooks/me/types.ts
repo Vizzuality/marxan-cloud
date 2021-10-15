@@ -27,11 +27,10 @@ export interface ResetPasswordProps {
 }
 export interface UseSignUpConfirmationProps {
   requestConfig?: AxiosRequestConfig
-  confirmAccountToken: string | string[];
 }
 
 export interface SignUpConfirmationProps {
-  data: any
+  token: string | string[];
 }
 
 export interface UsePasswordChangeConfirmationProps {
