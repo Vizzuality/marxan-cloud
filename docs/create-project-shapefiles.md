@@ -13,8 +13,8 @@ There is some simple mechanism that collects unused persisted planning areas.
 ## Custom feature
 
 Frontend sends Shapefile which is persisted in geo database and attached to 
-scenario (without explicit marking it as used). Neither ID nor GeoJSON is 
-returned.
+the project (without explicit marking it as used within scenario). Neither ID 
+nor GeoJSON is returned.
 
 ## Protected area
 
