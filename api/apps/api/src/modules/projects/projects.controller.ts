@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -96,7 +97,7 @@ export class ProjectsController {
     @Query('q') featureClassAndAliasFilter?: string,
     @Query('tag') featureTag?: FeatureTags,
   ): Promise<GeoFeatureResult> {
-    const { data, metadata } = await this.projectsService.findAllGeoFeatures(
+    const result = await this.projectsService.findAllGeoFeatures(
       fetchSpecification,
       {
         authenticatedUser: req.user,
@@ -107,6 +108,10 @@ export class ProjectsController {
         },
       },
     );
+    if (isLeft(result)) {
+      throw new NotFoundException();
+    }
+    const { data, metadata } = result.right;
 
     return this.geoFeatureSerializer.serialize(data, metadata);
   }

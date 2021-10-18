@@ -646,7 +646,8 @@ export class ScenariosController {
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
-    description: 'Upload shapefile for project-specific protected areas',
+    description:
+      'Upload shapefile for with protected areas for project&scenario',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   @ApiTags(asyncJobTag)
