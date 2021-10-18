@@ -10,7 +10,7 @@ export const WhenChangingPlanningUnitInclusivity = async (
 ) =>
   (
     await request(app.getHttpServer())
-      .patch(`/api/v1/scenarios/${scenarioId}/planning-units`)
+      .post(`/api/v1/scenarios/${scenarioId}/planning-units`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .send(getDtoByIds(puIds, []))
   ).body;
