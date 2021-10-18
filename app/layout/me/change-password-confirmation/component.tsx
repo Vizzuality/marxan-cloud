@@ -30,9 +30,7 @@ export const ChangePasswordConfirmation: React.FC<ChangePasswordConfirmationProp
   }, [passwordChangeConfirmationMutation, confirmToken]);
 
   useEffect(() => {
-    return () => {
-      confirmPasswordChange();
-    };
+    confirmPasswordChange();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirmToken]);
 

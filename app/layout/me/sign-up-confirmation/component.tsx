@@ -29,9 +29,7 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
   }, [confirmationAccountMutation, confirmToken]);
 
   useEffect(() => {
-    return () => {
-      confirmAccount();
-    };
+    confirmAccount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirmToken]);
 
