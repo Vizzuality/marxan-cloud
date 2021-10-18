@@ -67,7 +67,6 @@
     "fp-ts": "2.10.5",
     "geojson": "0.5.0",
     "helmet": "^4.3.1",
-    "http-proxy": "^1.18.1",
     "jsonapi-serializer": "^3.6.7",
     "lodash": "^4.17.20",
     "mapshaper": "0.5.68",
