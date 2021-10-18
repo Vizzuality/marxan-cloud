@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { QueryBus } from '@nestjs/cqrs';
+import { isLeft, Either, right } from 'fp-ts/Either';
 
-import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
+import {
+  GeoFeaturesService,
+  FindResult,
+} from '@marxan-api/modules/geo-features/geo-features.service';
 import { GeoFeaturesRequestInfo } from '@marxan-api/modules/geo-features';
 
 import { ProjectsCrudService } from './projects-crud.service';
@@ -15,8 +19,7 @@ import { PlanningUnitGridService, ProjectId } from './planning-unit-grid';
 import { assertDefined } from '@marxan/utils';
 
 import { ProjectsRequest } from './project-requests-info';
-import { GetProjectQuery, ProjectSnapshot } from '@marxan/projects';
-import { isLeft } from 'fp-ts/Either';
+import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 
 export { validationFailed } from './planning-areas';
 
@@ -34,27 +37,26 @@ export class ProjectsService {
   async findAllGeoFeatures(
     fetchSpec: FetchSpecification,
     appInfo: GeoFeaturesRequestInfo,
-  ) {
+  ): Promise<Either<GetProjectErrors, FindResult>> {
     const project = await this.assertProject(
       appInfo.params?.projectId,
       appInfo.authenticatedUser,
     );
 
     if (isLeft(project)) {
-      return {
-        data: [],
-        metadata: undefined,
-      };
+      return project;
     }
 
-    return this.geoCrud.findAllPaginated(fetchSpec, {
-      ...appInfo,
-      params: {
-        ...appInfo.params,
-        projectId: project.right.id,
-        bbox: project.right.bbox,
-      },
-    });
+    return right(
+      await this.geoCrud.findAllPaginated(fetchSpec, {
+        ...appInfo,
+        params: {
+          ...appInfo.params,
+          projectId: project.right.id,
+          bbox: project.right.bbox,
+        },
+      }),
+    );
   }
 
   async findAll(fetchSpec: FetchSpecification, info?: ProjectsRequest) {
