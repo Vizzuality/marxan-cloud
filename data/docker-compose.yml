@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   marxan-science-notebooks:
+      user: root
       build:
         context: ./notebooks
         dockerfile: Dockerfile
@@ -15,3 +16,13 @@ services:
       container_name: marxan-science_jupyter_notebook
       command: "start-notebook.sh \
         --NotebookApp.token=''"
+
+volumes:
+  tmpfs:
+    driver: local
+    driver_opts:
+      o:
+        size=20g
+        uid=1000
+      device: tmpfs
+      type: tmpfs
