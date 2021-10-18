@@ -42,7 +42,10 @@ import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-pl
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { SpecificationService } from './specification';
 import { CostRange, CostRangeService } from './cost-range-service';
-import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
+import {
+  DoesntExist,
+  ProjectChecker,
+} from '@marxan-api/modules/scenarios/project-checker.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -52,6 +55,9 @@ const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
 
 export const projectNotReady = Symbol('project not ready');
 export type ProjectNotReady = typeof projectNotReady;
+
+export const projectDoesntExist = Symbol(`project doesn't exist`);
+export type ProjectDoesntExist = typeof projectDoesntExist;
 
 @Injectable()
 export class ScenariosService {
@@ -99,14 +105,20 @@ export class ScenariosService {
   async create(
     input: CreateScenarioDTO,
     info: AppInfoDTO,
-  ): Promise<Either<ProjectNotReady, Scenario>> {
+  ): Promise<Either<ProjectNotReady | ProjectDoesntExist, Scenario>> {
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
     const isProjectReady = await this.projectChecker.isProjectReady(
       input.projectId,
     );
-    if (!isProjectReady) {
-      return left(projectNotReady);
+    if (isLeft(isProjectReady)) {
+      const _exhaustiveCheck: DoesntExist = isProjectReady.left;
+      return left(projectDoesntExist);
+    } else {
+      if (!isProjectReady.right) {
+        return left(projectNotReady);
+      }
     }
+
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
     await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
