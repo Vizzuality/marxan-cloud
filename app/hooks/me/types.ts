@@ -32,11 +32,3 @@ export interface UseSignUpConfirmationProps {
 export interface SignUpConfirmationProps {
   data: any;
 }
-
-export interface UsePasswordChangeConfirmationProps {
-  requestConfig?: AxiosRequestConfig;
-}
-
-export interface PasswordChangeConfirmationProps {
-  data: any;
-}

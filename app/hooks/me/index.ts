@@ -16,8 +16,6 @@ import {
   ResetPasswordProps,
   SignUpConfirmationProps,
   UseSignUpConfirmationProps,
-  PasswordChangeConfirmationProps,
-  UsePasswordChangeConfirmationProps,
 } from './types';
 
 // ME
@@ -186,30 +184,6 @@ export function useSignUpConfirmation({
   };
 
   return useMutation(signUpConfirmation, {
-    onSuccess: (data, variables, context) => {
-      console.info('Succces', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      console.info('Error', error, variables, context);
-    },
-  });
-}
-
-// CONFIRM PASSWORD CHANGE
-export function usePasswordChangeConfirmation({
-  requestConfig = {
-    method: 'POST',
-  },
-}: UsePasswordChangeConfirmationProps) {
-  const passwordChangeConfirmation = ({ data }: PasswordChangeConfirmationProps) => {
-    return USERS.request({
-      url: '/me/change-password',
-      data,
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(passwordChangeConfirmation, {
     onSuccess: (data, variables, context) => {
       console.info('Succces', data, variables, context);
     },
