@@ -24,22 +24,4 @@ export class ProxyService {
       response.pipe(res);
     });
   }
-
-  async proxyUploadShapeFile(req: Request, res: Response): Promise<any> {
-    req.url = req.originalUrl.replace(
-      'api/v1/scenarios',
-      'api/v1/planning-units',
-    );
-
-    const url =
-      this.geoprocessingServiceUrl +
-      req.path +
-      new URL(req.originalUrl, this.geoprocessingServiceUrl).search;
-    get(url, { headers: req.headers }, (response) => {
-      res.statusCode = response.statusCode!;
-      res.statusMessage = response.statusMessage!;
-      res.header(response.headers);
-      response.pipe(res);
-    });
-  }
 }
