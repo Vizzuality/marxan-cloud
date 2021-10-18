@@ -17,6 +17,10 @@ export class ProxyService {
       req.path +
       new URL(req.originalUrl, this.geoprocessingServiceUrl).search;
     get(url, { headers: req.headers }, (response) => {
+      // As we're proxying, set status code/message and headers from upstream
+      res.statusCode = response.statusCode!;
+      res.statusMessage = response.statusMessage!;
+      res.header(response.headers);
       response.pipe(res);
     });
   }
@@ -32,6 +36,9 @@ export class ProxyService {
       req.path +
       new URL(req.originalUrl, this.geoprocessingServiceUrl).search;
     get(url, { headers: req.headers }, (response) => {
+      res.statusCode = response.statusCode!;
+      res.statusMessage = response.statusMessage!;
+      res.header(response.headers);
       response.pipe(res);
     });
   }
