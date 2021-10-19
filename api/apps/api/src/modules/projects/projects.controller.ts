@@ -64,6 +64,7 @@ import {
 } from '@marxan-api/dto/async-job.dto';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
+import { GeoJSON } from 'geojson';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -168,14 +169,16 @@ export class ProjectsController {
     description: 'Upload shapefile for project-specific planning unit grid',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiCreatedResponse({ type: JsonApiAsyncJobMeta })
+  @ApiCreatedResponse({ type: {} })
   @ApiTags(asyncJobTag)
-  @Post(`:id/grid`)
-  async setProjectGrid(
-    @Param('id') projectId: string,
+  @Post(`grid`)
+  async uploadCustomGridShapefile(
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<JsonApiAsyncJobMeta> {
-    const result = await this.projectsService.setGrid(projectId, file);
+  ): Promise<{
+    planningAreaId: string;
+    geoJson: GeoJSON;
+  }> {
+    const result = await this.projectsService.setGrid(file);
     if (isLeft(result)) {
       throw new InternalServerErrorException(result.left);
     }

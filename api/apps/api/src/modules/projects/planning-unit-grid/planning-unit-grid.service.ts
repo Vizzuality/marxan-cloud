@@ -28,27 +28,25 @@ export class PlanningUnitGridService {
   ) {}
 
   async setPlanningUnitGrid(
-    projectId: ProjectId,
     shapefile: Shapefile,
   ): Promise<Either<setGridError, RequestId>> {
     try {
       const jobId = v4();
       const payload = plainToClass<JobInput, JobInput>(JobInput, {
         requestId: jobId,
-        projectId: projectId.value,
         shapefile,
       });
-      await this.queue.add(`set-grid-for-${projectId.value}`, payload, {
+      await this.queue.add(`create-grid`, payload, {
         jobId,
       });
-      await this.apiEvents.create({
-        kind: API_EVENT_KINDS.project__grid__submitted__v1__alpha,
-        topic: projectId.value,
-        externalId: jobId,
-        data: {
-          payload,
-        },
-      });
+      // await this.apiEvents.create({
+      //   kind: API_EVENT_KINDS.project__grid__submitted__v1__alpha,
+      //   topic: projectId.value,
+      //   externalId: jobId,
+      //   data: {
+      //     payload,
+      //   },
+      // });
       return right(new RequestId(jobId));
     } catch (error) {
       this.logger.error(error);

@@ -107,8 +107,8 @@ export class ProjectsService {
     return;
   }
 
-  async setGrid(projectId: string, file: Express.Multer.File) {
-    return this.gridService.setPlanningUnitGrid(new ProjectId(projectId), file);
+  async setGrid(file: Express.Multer.File) {
+    return this.gridService.setPlanningUnitGrid(file);
   }
 
   async getJobStatusFor(projectId: string, info: ProjectsRequest) {

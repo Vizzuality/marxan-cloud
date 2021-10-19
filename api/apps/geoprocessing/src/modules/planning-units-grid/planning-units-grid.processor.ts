@@ -32,8 +32,9 @@ export class PlanningUnitsGridProcessor
     this.worker = workerBuilder.build(queueName, this);
   }
 
+  // replace this to be a common service which consumes proxied shapefile
   async process({
-    data: { projectId, shapefile },
+    data: { shapefile },
   }: Job<JobInput, JobOutput>): Promise<JobOutput> {
     const { data: geoJson } = await this.shapefileConverter.transformToGeoJson(
       shapefile,
@@ -48,14 +49,18 @@ export class PlanningUnitsGridProcessor
 
     const { puGeometriesIds, planningAreaId, bbox } = await this.entityManager
       .transaction(async (manager) => {
-        await manager.query(
-          `
-            DELETE
-            FROM "planning_units_geom"
-            where "project_id" = $1
-          `,
-          [projectId],
-        );
+        // now, either use request-id as a fake project id to connect PU to
+        // planning area later
+        // or create some table to keep the relation between those
+
+        // await manager.query(
+        //   `
+        //     DELETE
+        //     FROM "planning_units_geom"
+        //     where "project_id" = $1
+        //   `,
+        //   [projectId],
+        // );
         const puGeometriesIds: { id: string }[] = await manager.query(
           `
             INSERT INTO "planning_units_geom"("the_geom", "type", "project_id")
@@ -70,7 +75,7 @@ export class PlanningUnitsGridProcessor
             ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO UPDATE SET type = 'from_shapefile'::shape_type
             RETURNING "id"
           `,
-          [result.right, ShapeType.FromShapefile, projectId],
+          [result.right, ShapeType.FromShapefile],
         );
 
         await manager.query(
@@ -112,6 +117,7 @@ export class PlanningUnitsGridProcessor
       projectId,
       planningAreaId,
       bbox,
+      geoJson,
     });
 
     const errors = validateSync(output);
