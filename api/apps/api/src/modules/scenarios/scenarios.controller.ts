@@ -321,7 +321,7 @@ export class ScenariosController {
 
   @ApiTags(asyncJobTag)
   @ApiOkResponse()
-  @Patch(':id/planning-units')
+  @Post(':id/planning-units')
   async changePlanningUnits(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateScenarioPlanningUnitLockStatusDto,
