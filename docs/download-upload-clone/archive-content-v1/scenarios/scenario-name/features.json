@@ -1,0 +1,8 @@
+{
+  "features": [
+    {
+      "name": "bioregional-custom",
+      "file": "./features/shape.zip"
+    }
+  ]
+}
