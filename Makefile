@@ -177,6 +177,14 @@ upload-data-for-demo:
 restore-dumps:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
 
+## To generate volumes instances must be stop
+create-volumes-data:
+	docker run --rm --volumes-from marxan-postgresql-api -v $(pwd):/backup ubuntu tar cvf /backup/psql-api-data.tar /var/lib/postgresql/data && \
+	docker run --rm --volumes-from marxan-postgresql-geo-api -v $(pwd):/backup ubuntu tar cvzf /backup/psql-geo-data.tar.gz /var/lib/postgresql/data
+
+restore-volumes-data:
+	docker run --rm --volumes-from marxan-postgresql-api -v $(pwd):/backup ubuntu bash -c "rm -rf /var/lib/postgresql/data/* && cd / && tar xvf /backup/psql-api-data.tar" \
+	&& docker run --rm --volumes-from marxan-postgresql-geo-api -v $(pwd):/backup ubuntu bash -c "rm -rf /var/lib/postgresql/data/* && cd / && tar xvf /backup/psql-geo-data.tar"
 extract-geo-test-data:
 	#This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
 	TEST_GEOMETRY=$(shell cat api/apps/api/test/fixtures/test-geometry.json | jq 'tostring'); \
