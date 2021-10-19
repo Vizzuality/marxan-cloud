@@ -17,12 +17,12 @@ export class RequestExport {
   ) {}
 
   async export(id: ResourceId, kind: ResourceKind): Promise<ExportId> {
-    const parts: ExportComponent[] = await this.resourcePieces.resolveFor(
+    const pieces: ExportComponent[] = await this.resourcePieces.resolveFor(
       id,
       kind,
     );
     const exportInstance = this.eventPublisher.mergeObjectContext(
-      Export.project(id, parts),
+      Export.newOne(id, kind, pieces),
     );
     await this.exportRepository.save(exportInstance);
 

@@ -30,13 +30,12 @@ export class Export extends AggregateRoot {
     super();
   }
 
-  static project(id: ResourceId, parts: ExportComponent[]): Export {
-    const exportRequest = new Export(
-      new ExportId(v4()),
-      id,
-      ResourceKind.Project,
-      parts,
-    );
+  static newOne(
+    id: ResourceId,
+    kind: ResourceKind,
+    parts: ExportComponent[],
+  ): Export {
+    const exportRequest = new Export(new ExportId(v4()), id, kind, parts);
 
     exportRequest.apply(
       parts
