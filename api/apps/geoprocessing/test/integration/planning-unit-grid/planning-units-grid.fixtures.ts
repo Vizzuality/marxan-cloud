@@ -1,18 +1,16 @@
 import { bootstrapApplication } from '../../utils';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { copyFileSync, readFileSync } from 'fs';
-import { plainToClass } from 'class-transformer';
 import { v4 } from 'uuid';
-import { Job } from 'bullmq';
 import { Repository } from 'typeorm';
 import { booleanEqual } from '@turf/turf';
 import { FeatureCollection } from 'geojson';
 
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
-import { JobInput, JobOutput } from '@marxan/planning-units-grid';
-import { PlanningUnitsGridProcessor } from '@marxan-geoprocessing/modules/planning-units-grid/planning-units-grid.processor';
+import { PlanningUnitsGridProcessor } from '@marxan-geoprocessing/modules/planning-area/planning-units-grid/planning-units-grid.processor';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
+import { PromiseType } from 'utility-types';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -35,7 +33,7 @@ export const getFixtures = async () => {
       await app.close();
     },
     projectId,
-    GivenShapefileWasUploaded: (): JobInput['shapefile'] => {
+    GivenShapefileWasUploaded: (): Express.Multer.File => {
       const fileName = 'nam-shapefile';
       const baseDir = AppConfig.get<string>(
         'storage.sharedFileStorage.localPath',
@@ -46,20 +44,16 @@ export const getFixtures = async () => {
         filename: fileName,
         path: shapePath,
         destination: baseDir,
-      };
+      } as any;
     },
     WhenConvertingShapefileToPlanningUnits: async (
-      input: JobInput['shapefile'],
-    ): Promise<JobOutput> => {
-      return await sut.process(({
-        data: plainToClass<JobInput, JobInput>(JobInput, {
-          projectId,
-          shapefile: input,
-          requestId: v4(),
-        }),
-      } as unknown) as Job<JobInput, JobOutput>);
+      input: Express.Multer.File,
+    ) => {
+      return await sut.save(input);
     },
-    ThenGeoJsonMatchesInput: async (output: JobOutput) => {
+    ThenGeoJsonMatchesInput: async (
+      output: PromiseType<ReturnType<PlanningUnitsGridProcessor['save']>>,
+    ) => {
       const underlyingGeoJson = JSON.parse(
         readFileSync(__dirname + `/nam.geojson`, {
           encoding: 'utf8',
@@ -81,7 +75,7 @@ export const getFixtures = async () => {
                      and project_id = $1
                  ) as t(geom)
           `,
-          [projectId],
+          [output.id],
         )
       )[0].json_build_object;
 
@@ -92,13 +86,10 @@ export const getFixtures = async () => {
           ),
         ).toBeTruthy();
       }
-
-      expect(output.projectId).toEqual(projectId);
-      expect(output.geometryIds.length).toEqual(
-        underlyingGeoJson.features.length,
-      );
     },
-    ThenPlanningAreaIsCreated: async (output: JobOutput) => {
+    ThenPlanningAreaIsCreated: async (
+      output: PromiseType<ReturnType<PlanningUnitsGridProcessor['save']>>,
+    ) => {
       const underlyingGeoJson = JSON.parse(
         readFileSync(__dirname + `/nam-output-pa.geojson`, {
           encoding: 'utf8',
@@ -117,12 +108,11 @@ export const getFixtures = async () => {
                  where project_id = $1
                ) as t(geom)
         `,
-        [projectId],
+        [output.id],
       );
       const geoJsonFromGeometries: FeatureCollection =
         rows[0].json_build_object;
       expect(rows.length).toEqual(1);
-      expect(output.projectId).toEqual(projectId);
 
       for (const geo of underlyingGeoJson.features) {
         expect(
@@ -132,13 +122,14 @@ export const getFixtures = async () => {
         ).toBeTruthy();
       }
     },
-    ThenPlanningAreaBBoxIsValid: async (output: JobOutput) => {
+    ThenPlanningAreaBBoxIsValid: async (
+      output: PromiseType<ReturnType<PlanningUnitsGridProcessor['save']>>,
+    ) => {
       const pa = await planningAreaRepo.findOne({
         where: {
-          id: output.planningAreaId,
+          id: output.id,
         },
       });
-      expect(pa?.projectId).toEqual(output.projectId);
       expect(pa?.bbox).toEqual([
         20.752019662388175,
         14.905718900381117,

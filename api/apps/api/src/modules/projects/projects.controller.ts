@@ -58,10 +58,6 @@ import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { isFeatureCollection } from '@marxan/utils';
-import {
-  AsyncJobDto,
-  JsonApiAsyncJobMeta,
-} from '@marxan-api/dto/async-job.dto';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 import { FeatureTags } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
@@ -175,18 +171,20 @@ export class ProjectsController {
     description: 'Upload shapefile for project-specific planning unit grid',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiCreatedResponse({ type: JsonApiAsyncJobMeta })
+  @ApiCreatedResponse({ type: PlanningAreaResponseDto })
   @ApiTags(asyncJobTag)
-  @Post(`:id/grid`)
-  async setProjectGrid(
-    @Param('id') projectId: string,
+  @Post(`planning-area/shapefile-grid`)
+  async uploadCustomGridShapefile(
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<JsonApiAsyncJobMeta> {
-    const result = await this.projectsService.setGrid(projectId, file);
+  ): Promise<PlanningAreaResponseDto> {
+    const result = await this.projectsService.savePlanningAreaFromShapefile(
+      file,
+      true,
+    );
     if (isLeft(result)) {
       throw new InternalServerErrorException(result.left);
     }
-    return AsyncJobDto.forProject([result.right.value]).asJsonApiMetadata();
+    return result.right;
   }
 
   @ApiOperation({

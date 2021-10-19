@@ -15,7 +15,6 @@ import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { PlanningAreasService } from './planning-areas';
-import { PlanningUnitGridService, ProjectId } from './planning-unit-grid';
 import { assertDefined } from '@marxan/utils';
 
 import { ProjectsRequest } from './project-requests-info';
@@ -30,7 +29,6 @@ export class ProjectsService {
     private readonly projectsCrud: ProjectsCrudService,
     private readonly jobStatusService: JobStatusService,
     private readonly planningAreaService: PlanningAreasService,
-    private readonly gridService: PlanningUnitGridService,
     private readonly queryBus: QueryBus,
   ) {}
 
@@ -100,10 +98,6 @@ export class ProjectsService {
   async remove(projectId: string) {
     // /ACL slot - can?/
     return this.projectsCrud.remove(projectId);
-  }
-
-  async setGrid(projectId: string, file: Express.Multer.File) {
-    return this.gridService.setPlanningUnitGrid(new ProjectId(projectId), file);
   }
 
   async getJobStatusFor(projectId: string, info: ProjectsRequest) {

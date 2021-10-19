@@ -6,14 +6,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 
-import {
-  setPlanningUnitGridEventsFactoryProvider,
-  setPlanningUnitGridQueueEventsProvider,
-  setPlanningUnitGridQueueProvider,
-} from './queue.providers';
-import { PlanningUnitGridEventsHandler } from './planning-unit-grid-events.handler';
-import { PlanningUnitGridService } from './planning-unit-grid.service';
-import { PlanningUnitGridSetSaga } from './planning-unit-grid-set.saga';
 import { SetProjectGridFromShapefileHandler } from './set-project-grid-from-shapefile.handler';
 
 @Module({
@@ -23,15 +15,7 @@ import { SetProjectGridFromShapefileHandler } from './set-project-grid-from-shap
     CqrsModule,
     TypeOrmModule.forFeature([Project]),
   ],
-  providers: [
-    setPlanningUnitGridQueueProvider,
-    setPlanningUnitGridQueueEventsProvider,
-    setPlanningUnitGridEventsFactoryProvider,
-    PlanningUnitGridEventsHandler,
-    PlanningUnitGridService,
-    PlanningUnitGridSetSaga,
-    SetProjectGridFromShapefileHandler,
-  ],
-  exports: [PlanningUnitGridService],
+  providers: [SetProjectGridFromShapefileHandler],
+  exports: [],
 })
 export class PlanningUnitGridModule {}
