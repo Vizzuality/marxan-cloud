@@ -180,7 +180,8 @@ export class ProjectsCrudService extends AppBaseService<
     if (
       createModel?.planningUnitGridShape === PlanningUnitGridShape.fromShapefile
     ) {
-      // handled after custom grid processing
+      // depending how we kept the relation in geoprocessing
+      // assign PA & PU to project
       return;
     }
 
