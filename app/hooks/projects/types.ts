@@ -38,12 +38,12 @@ export interface UploadProjectPAProps {
   data: any,
 }
 
-// useUploadProjectGridPA
+// useUploadProjectPAGrid
 
-export interface UseUploadProjectGridPAProps {
+export interface UseUploadProjectPAGridProps {
   requestConfig?: AxiosRequestConfig
 }
-export interface UploadProjectGridPAProps {
+export interface UploadProjectPAGridProps {
   data: any,
 }
 

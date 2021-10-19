@@ -30,8 +30,8 @@ import {
   UsePublishedProjectsProps,
   UseDuplicateProjectProps,
   DuplicateProjectProps,
-  UseUploadProjectGridPAProps,
-  UploadProjectGridPAProps,
+  UseUploadProjectPAGridProps,
+  UploadProjectPAGridProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -264,14 +264,14 @@ export function useUploadProjectPA({
   });
 }
 
-export function useUploadProjectGridPA({
+export function useUploadProjectPAGrid({
   requestConfig = {
     method: 'POST',
   },
-}: UseUploadProjectGridPAProps) {
+}: UseUploadProjectPAGridProps) {
   const [session] = useSession();
 
-  const uploadProjectPAShapefileGrid = ({ data }: UploadProjectGridPAProps) => {
+  const uploadProjectPAShapefileGrid = ({ data }: UploadProjectPAGridProps) => {
     return UPLOADS.request({
       url: '/projects/planning-area/shapefile-grid',
       data,

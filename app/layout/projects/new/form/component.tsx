@@ -19,6 +19,7 @@ import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
 import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
+import PlanningAreaGridUploader from 'layout/projects/new/form/planning-area-grid-uploader';
 import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
 import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
 import ProjectNewMap from 'layout/projects/new/map';
@@ -106,6 +107,19 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   };
 
   const resetPlanningArea = (form) => {
+    dispatch(setUploadingPlanningArea(null));
+    dispatch(setBbox(null));
+
+    const registeredFields = form.getRegisteredFields();
+    registeredFields.forEach((f) => {
+      const omitFields = ['name', 'description', 'planningUnitGridShape'];
+      if (!omitFields.includes(f)) {
+        form.change(f, null);
+      }
+    });
+  };
+
+  const resetPlanningAreaGrid = (form) => {
     dispatch(setUploadingPlanningArea(null));
     dispatch(setBbox(null));
 
@@ -295,25 +309,45 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                     )}
 
                     {hasPlanningArea && (
-                      <div className="mt-3">
-                        <FieldRFF
-                          name="planningAreaId"
-                          validate={composeValidators([{ presence: true }])}
-                        >
-                          {(fprops) => {
-                            return (
-                              <PlanningAreaUploader
-                                {...fprops}
-                                resetPlanningArea={resetPlanningArea}
-                                form={form}
-                              />
-                            );
-                          }}
-                        </FieldRFF>
-                        <PlanningAreaSelector
-                          values={values}
-                        />
-                      </div>
+                      <>
+                        {/* CUSTOM SHAPEFILE PLANNING AREA */}
+                        <div className="mt-3">
+                          <FieldRFF
+                            name="planningAreaId"
+                            validate={composeValidators([{ presence: true }])}
+                          >
+                            {(fprops) => {
+                              return (
+                                <PlanningAreaUploader
+                                  {...fprops}
+                                  resetPlanningArea={resetPlanningArea}
+                                  form={form}
+                                />
+                              );
+                            }}
+                          </FieldRFF>
+                          <PlanningAreaSelector
+                            values={values}
+                          />
+                        </div>
+                        {/* CUSTOM GRID SHAPEFILE PLANNING AREA */}
+                        <div className="mt-3">
+                          <FieldRFF
+                            name="planningAreaGridId"
+                            validate={composeValidators([{ presence: true }])}
+                          >
+                            {(fprops) => {
+                              return (
+                                <PlanningAreaGridUploader
+                                  {...fprops}
+                                  resetPlanningAreaGrid={resetPlanningAreaGrid}
+                                  form={form}
+                                />
+                              );
+                            }}
+                          </FieldRFF>
+                        </div>
+                      </>
                     )}
                   </div>
                   <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
