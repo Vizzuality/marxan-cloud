@@ -66,6 +66,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   }, [dispatch]);
 
   const onSubmit = (values) => {
+    delete values.PAOptionSelected;
     // TEMPORARY!!
     // This should be removed once organizations IDs are handled in the user
     const data = {
@@ -295,7 +296,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                       </FieldRFF>
                     </div>
 
-                    {PAOptionSelected === 'default' && (
+                    {PAOptionSelected === 'regular' && (
                       <>
                         <CountryRegionSelector
                           country={values.countryId}
@@ -307,6 +308,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                         />
                       </>
                     )}
+
                     {/* CUSTOM SHAPEFILE PLANNING AREA */}
                     {PAOptionSelected === 'customPAshapefile' && (
                       <div className="mt-3">
