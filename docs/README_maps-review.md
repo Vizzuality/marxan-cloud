@@ -121,3 +121,14 @@ As in edit mode.
 - Planning unit grid
 - Planning units where at least one feature is present are highlighted (indigo)
 - Planning units where each feature is present are highlighted (lavender)
+
+## Non-authenticated users
+
+### Community projects / detail
+
+For the scenario configured as "featured":
+
+- Selection frequency for each planning unit
+- Planning units included in the best solution
+
+The panning may be disabled on this map.
