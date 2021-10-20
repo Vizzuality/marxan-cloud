@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { useSignUpConfirmation } from 'hooks/me';
@@ -68,7 +69,12 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
                 Sorry, it seems that you have not created an account.
               </h2>
               <p className="mb-12 text-sm text-gray-500">
-                Please check your email inbox.
+                You can
+                {' '}
+
+                <Link href="/auth/sign-up">
+                  <a href="/auth/sign-up" className="text-black underline hover:no-underline">create an account.</a>
+                </Link>
               </p>
             </div>
           </div>
