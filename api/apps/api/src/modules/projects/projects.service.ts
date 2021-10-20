@@ -10,7 +10,6 @@ import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { PlanningAreasService } from './planning-areas';
-import { PlanningUnitGridService, ProjectId } from './planning-unit-grid';
 import { assertDefined } from '@marxan/utils';
 
 import { ProjectsRequest } from './project-requests-info';
@@ -25,7 +24,6 @@ export class ProjectsService {
     private readonly protectedAreaShapefile: ProtectedAreasFacade,
     private readonly jobStatusService: JobStatusService,
     private readonly planningAreaService: PlanningAreasService,
-    private readonly gridService: PlanningUnitGridService,
   ) {}
 
   async findAllGeoFeatures(
@@ -105,10 +103,6 @@ export class ProjectsService {
 
     this.protectedAreaShapefile.convert(projectId, file);
     return;
-  }
-
-  async setGrid(file: Express.Multer.File) {
-    return this.gridService.setPlanningUnitGrid(file);
   }
 
   async getJobStatusFor(projectId: string, info: ProjectsRequest) {

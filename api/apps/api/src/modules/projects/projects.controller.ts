@@ -169,20 +169,20 @@ export class ProjectsController {
     description: 'Upload shapefile for project-specific planning unit grid',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiCreatedResponse({ type: {} })
+  @ApiCreatedResponse({ type: PlanningAreaResponseDto })
   @ApiTags(asyncJobTag)
-  @Post(`grid`)
+  @Post(`planning-area/shapefile-grid`)
   async uploadCustomGridShapefile(
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<{
-    planningAreaId: string;
-    geoJson: GeoJSON;
-  }> {
-    const result = await this.projectsService.setGrid(file);
+  ): Promise<PlanningAreaResponseDto> {
+    const result = await this.projectsService.savePlanningAreaFromShapefile(
+      file,
+      true,
+    );
     if (isLeft(result)) {
       throw new InternalServerErrorException(result.left);
     }
-    return AsyncJobDto.forProject([result.right.value]).asJsonApiMetadata();
+    return result.right;
   }
 
   @ApiOperation({
