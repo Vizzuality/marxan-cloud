@@ -1,10 +1,12 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
   Header,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -17,7 +19,6 @@ import {
   UseGuards,
   UseInterceptors,
   ValidationPipe,
-  ConflictException,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -61,7 +62,11 @@ import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ProjectNotReady, ScenariosService } from './scenarios.service';
+import {
+  projectDoesntExist,
+  projectNotReady,
+  ScenariosService,
+} from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
@@ -226,8 +231,15 @@ export class ScenariosController {
       authenticatedUser: req.user,
     });
     if (isLeft(result)) {
-      const _exhaustiveCheck: ProjectNotReady = result.left;
-      throw new ConflictException();
+      switch (result.left) {
+        case projectNotReady:
+          throw new ConflictException();
+        case projectDoesntExist:
+          throw new NotFoundException(`Project doesn't exist`);
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
     }
     return await this.scenarioSerializer.serialize(
       result.right,
@@ -321,7 +333,7 @@ export class ScenariosController {
 
   @ApiTags(asyncJobTag)
   @ApiOkResponse()
-  @Patch(':id/planning-units')
+  @Post(':id/planning-units')
   async changePlanningUnits(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateScenarioPlanningUnitLockStatusDto,

@@ -1,11 +1,12 @@
-import { In } from 'typeorm';
+import { FindConditions, In, Repository } from 'typeorm';
 import { Test } from '@nestjs/testing';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
-import { ProjectChecker } from './project-checker.service';
+import { doesntExist, ProjectChecker } from './project-checker.service';
 import { isEqual } from 'lodash';
 import { NotFoundException } from '@nestjs/common';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -16,6 +17,8 @@ beforeEach(async () => {
 it(`should form valid request`, async () => {
   // given
   const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectHavePlanningAreaAssigned();
   // when
   await service.isProjectReady(`projectId`);
   // then
@@ -32,10 +35,15 @@ it.each(
   const service = fixtures.getService();
   // and
   fixtures.GivenPlanningUnitsJob(kind);
+  // and
+  fixtures.GivenProjectHavePlanningAreaAssigned();
   // when
   const isReady = await service.isProjectReady(`projectId`);
   // then
-  expect(isReady).toBe(false);
+  expect(isReady).toEqual({
+    _tag: 'Right',
+    right: false,
+  });
 });
 
 it(`should return true for finished`, async () => {
@@ -45,10 +53,15 @@ it(`should return true for finished`, async () => {
   fixtures.GivenPlanningUnitsJob(
     API_EVENT_KINDS.project__planningUnits__finished__v1__alpha,
   );
+  // and
+  fixtures.GivenProjectHavePlanningAreaAssigned();
   // when
   const isReady = await service.isProjectReady(`projectId`);
   // then
-  expect(isReady).toBe(true);
+  expect(isReady).toEqual({
+    _tag: 'Right',
+    right: true,
+  });
 });
 
 it.each([
@@ -62,10 +75,15 @@ it.each([
     API_EVENT_KINDS.project__planningUnits__finished__v1__alpha,
     gridKind,
   );
+  // and
+  fixtures.GivenProjectHavePlanningAreaAssigned();
   // when
   const isReady = await service.isProjectReady(`projectId`);
   // then
-  expect(isReady).toBe(false);
+  expect(isReady).toEqual({
+    _tag: 'Right',
+    right: false,
+  });
 });
 
 it(`should return true for planningUnits and grid finished`, async () => {
@@ -76,10 +94,51 @@ it(`should return true for planningUnits and grid finished`, async () => {
     API_EVENT_KINDS.project__planningUnits__finished__v1__alpha,
     API_EVENT_KINDS.project__grid__finished__v1__alpha,
   );
+  // and
+  fixtures.GivenProjectHavePlanningAreaAssigned();
   // when
   const isReady = await service.isProjectReady(`projectId`);
   // then
-  expect(isReady).toBe(true);
+  expect(isReady).toEqual({
+    _tag: 'Right',
+    right: true,
+  });
+});
+
+it(`should return false for projects without planning area assigned yet`, async () => {
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenPlanningUnitsJob(
+    API_EVENT_KINDS.project__planningUnits__finished__v1__alpha,
+  );
+  // and
+  fixtures.GivenPlanningAreaNotAssigned();
+  // when
+  const isReady = await service.isProjectReady(`projectId`);
+  // then
+  expect(isReady).toEqual({
+    _tag: 'Right',
+    right: false,
+  });
+});
+
+it(`should fail when project can't be find`, async () => {
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenPlanningUnitsJob(
+    API_EVENT_KINDS.project__planningUnits__finished__v1__alpha,
+  );
+  // and
+  fixtures.GivenProjectDoesntExist();
+  // when
+  const isReady = await service.isProjectReady(`projectId`);
+  // then
+  expect(isReady).toEqual({
+    _tag: 'Left',
+    left: doesntExist,
+  });
 });
 
 async function getFixtures() {
@@ -90,11 +149,20 @@ async function getFixtures() {
       throw new NotFoundException();
     }),
   };
+  const fakeProjectsService: jest.Mocked<
+    Pick<Repository<Project>, 'findOne'>
+  > = {
+    findOne: jest.fn(),
+  };
   const testingModule = await Test.createTestingModule({
     providers: [
       {
         provide: ApiEventsService,
         useValue: fakeApiEventsService,
+      },
+      {
+        provide: `ProjectRepository`,
+        useValue: fakeProjectsService,
       },
       ProjectChecker,
     ],
@@ -121,6 +189,12 @@ async function getFixtures() {
         topic: `projectId`,
         kind: In(this.gridKinds),
       });
+    },
+    GivenProjectHavePlanningAreaAssigned: () => {
+      fakeProjectsService.findOne.mockImplementation(
+        (_id: string | undefined | FindConditions<Project>) =>
+          Promise.resolve(({ planningAreaId: '123' } as unknown) as Project),
+      );
     },
     GivenPlanningUnitsJob(kind: API_EVENT_KINDS) {
       fixtures.fakeApiEventsService.getLatestEventForTopic.mockImplementation(
@@ -158,6 +232,20 @@ async function getFixtures() {
           }
           throw new NotFoundException();
         },
+      );
+    },
+    GivenPlanningAreaNotAssigned() {
+      fakeProjectsService.findOne.mockImplementation(
+        (_id: string | undefined | FindConditions<Project>) =>
+          Promise.resolve(({
+            planningAreaId: undefined,
+          } as unknown) as Project),
+      );
+    },
+    GivenProjectDoesntExist() {
+      fakeProjectsService.findOne.mockImplementation(
+        (_id: string | undefined | FindConditions<Project>) =>
+          Promise.resolve(undefined),
       );
     },
   };

@@ -484,7 +484,7 @@ export function useScenarioPU(sid) {
 
 export function useSaveScenarioPU({
   requestConfig = {
-    method: 'PATCH',
+    method: 'POST',
   },
 }: UseSaveScenarioPUProps) {
   const queryClient = useQueryClient();

@@ -23,6 +23,7 @@ import { ScenarioPlanningUnitsFeaturesAggregateModule } from '@marxan-geoprocess
     TypeOrmModule.forRoot({
       ...geoprocessingConnections.default,
       keepConnectionAlive: true,
+      migrationsTransactionMode: 'each',
     }),
     TypeOrmModule.forRoot({
       ...geoprocessingConnections.apiDB,
