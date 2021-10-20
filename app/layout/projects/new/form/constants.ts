@@ -16,6 +16,6 @@ export const PA_OPTIONS = [
   },
   {
     label: 'No, I don’t have any shapefiles',
-    value: 'default',
+    value: 'regular',
   },
 ];
