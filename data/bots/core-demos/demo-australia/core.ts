@@ -99,6 +99,8 @@ export const runBot = async (settings: MarxanBotConfig) => {
     "some",
   );
 
+  await bot.scenarios.setNumberOfRuns(scenario.id, 100);
+
   await bot.marxanExecutor.runForScenario(scenario.id);
 
   await bot.scenarioStatus.waitForMarxanCalculationsFor(
