@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class PuGeometryUniqueWithinProject1631080265630
   implements MigrationInterface {
-  async down(queryRunner: QueryRunner): Promise<void> {
+  async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       alter table planning_units_geom
         drop constraint planning_units_geom_the_geom_type_key;
@@ -13,7 +13,7 @@ export class PuGeometryUniqueWithinProject1631080265630
     `);
   }
 
-  async up(queryRunner: QueryRunner): Promise<void> {
+  async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       alter table planning_units_geom
         drop constraint planning_units_geom_the_geom_type_key;
