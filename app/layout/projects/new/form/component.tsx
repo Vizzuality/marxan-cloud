@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
@@ -28,6 +28,7 @@ import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
+import Select from 'components/forms/select';
 import Textarea from 'components/forms/textarea';
 import {
   composeValidators,
@@ -36,7 +37,7 @@ import InfoButton from 'components/info-button';
 
 import REGION_PU from 'images/info-buttons/img_planning_region_grid.png';
 
-import { DEFAULT_AREA } from './constants';
+import { DEFAULT_AREA, PA_OPTIONS } from './constants';
 import ProjectFormProps from './types';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
@@ -44,9 +45,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const { push } = useRouter();
   const plausible = usePlausible();
 
+  const [PAOptionSelected, setPAOptionSelected] = useState('');
+
   const { user } = useMe();
 
-  const [hasPlanningArea, setHasPlanningArea] = useState(false);
   const { data: organizationsData } = useOrganizations();
 
   const dispatch = useDispatch();
@@ -131,6 +133,11 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
       }
     });
   };
+
+  // Constants
+  const OPTIONS = useMemo(() => {
+    return PA_OPTIONS.filter((o) => o.value !== PAOptionSelected);
+  }, [PAOptionSelected]);
 
   return (
     <FormRFF
@@ -233,69 +240,62 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
                     {/* PLANNING AREA */}
                     <div className="flex flex-col justify-between mt-6">
-                      <h2 className="mb-5 text-lg font-medium font-heading">Do you have a planning region shapefile of your own?</h2>
-
-                      <div className="flex flex-row items-center justify-between">
-                        <div className="flex items-center">
-                          <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
-                          <InfoButton>
-                            <span>
-                              <h4 className="font-heading text-lg mb-2.5">Planning Area</h4>
-                              <div className="space-y-2">
-                                <p>
-                                  The planning area (also named planning
-                                  region, study region
-                                  or study area) is
-                                  the outer boundary
-                                  of the region where you want to create a
-                                  plan.
-                                </p>
-                                <p>
-                                  These regions
-                                  often represent administrative units
-                                  (such as countries or
-                                  smaller regions), but you can also upload your
-                                  own geometry.
-                                </p>
-                                <p>
-                                  The planning region is converted to a
-                                  grid of planning units, that are the
-                                  central pieces that Marxan uses in its analyses.
-                                </p>
-                                <img src={REGION_PU} alt="Region-PU" />
-                              </div>
-                            </span>
-
-                          </InfoButton>
-                        </div>
-                        <div className="flex flex-row">
-                          <Button
-                            className="w-20 h-6 mr-4"
-                            size="xs"
-                            theme={hasPlanningArea !== null && !hasPlanningArea ? 'white' : 'secondary'}
-                            onClick={() => {
-                              setHasPlanningArea(false);
-                              resetPlanningArea(form);
-                            }}
-                          >
-                            No
-                          </Button>
-                          <Button
-                            className="w-20 h-6"
-                            size="xs"
-                            theme={hasPlanningArea ? 'white' : 'secondary'}
-                            onClick={() => {
-                              setHasPlanningArea(true);
-                              resetPlanningArea(form);
-                            }}
-                          >
-                            Yes
-                          </Button>
-                        </div>
+                      <div className="flex items-center mb-5 space-x-3">
+                        <h2 className="text-lg font-medium font-heading">Do you have a planning region or grid shapefile?</h2>
+                        <InfoButton>
+                          <span>
+                            <h4 className="font-heading text-lg mb-2.5">Planning Area</h4>
+                            <div className="space-y-2">
+                              <p>
+                                The planning area (also named planning
+                                region, study region
+                                or study area) is
+                                the outer boundary
+                                of the region where you want to create a
+                                plan.
+                              </p>
+                              <p>
+                                These regions
+                                often represent administrative units
+                                (such as countries or
+                                smaller regions), but you can also upload your
+                                own geometry.
+                              </p>
+                              <p>
+                                The planning region is converted to a
+                                grid of planning units, that are the
+                                central pieces that Marxan uses in its analyses.
+                              </p>
+                              <img src={REGION_PU} alt="Region-PU" />
+                            </div>
+                          </span>
+                        </InfoButton>
                       </div>
+
+                      {/* PLANNING AREA TYPE SELECTOR */}
+                      <FieldRFF
+                        name="PAOptionSelected"
+                      >
+                        {(fprops) => (
+                          <Field id="PAOptionSelected" {...fprops}>
+                            <Select
+                              theme="dark"
+                              size="base"
+                              status="none"
+                              placeholder="Select option..."
+                              initialSelected={PAOptionSelected}
+                              options={OPTIONS}
+                              onChange={(value: string) => {
+                                setPAOptionSelected(value);
+                                resetPlanningArea(form);
+                              }}
+                            />
+                          </Field>
+                        )}
+                      </FieldRFF>
                     </div>
 
-                    {hasPlanningArea !== null && !hasPlanningArea && (
+                    {PAOptionSelected === 'default' && (
                       <>
                         <CountryRegionSelector
                           country={values.countryId}
@@ -307,47 +307,47 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                         />
                       </>
                     )}
+                    {/* CUSTOM SHAPEFILE PLANNING AREA */}
+                    {PAOptionSelected === 'customPAshapefile' && (
+                      <div className="mt-3">
+                        <FieldRFF
+                          name="planningAreaId"
+                          validate={composeValidators([{ presence: true }])}
+                        >
+                          {(fprops) => {
+                            return (
+                              <PlanningAreaUploader
+                                {...fprops}
+                                resetPlanningArea={resetPlanningArea}
+                                form={form}
+                              />
+                            );
+                          }}
+                        </FieldRFF>
+                        <PlanningAreaSelector
+                          values={values}
+                        />
+                      </div>
+                    )}
 
-                    {hasPlanningArea && (
-                      <>
-                        {/* CUSTOM SHAPEFILE PLANNING AREA */}
-                        <div className="mt-3">
-                          <FieldRFF
-                            name="planningAreaId"
-                            validate={composeValidators([{ presence: true }])}
-                          >
-                            {(fprops) => {
-                              return (
-                                <PlanningAreaUploader
-                                  {...fprops}
-                                  resetPlanningArea={resetPlanningArea}
-                                  form={form}
-                                />
-                              );
-                            }}
-                          </FieldRFF>
-                          <PlanningAreaSelector
-                            values={values}
-                          />
-                        </div>
-                        {/* CUSTOM GRID SHAPEFILE PLANNING AREA */}
-                        <div className="mt-3">
-                          <FieldRFF
-                            name="planningAreaGridId"
-                            validate={composeValidators([{ presence: true }])}
-                          >
-                            {(fprops) => {
-                              return (
-                                <PlanningAreaGridUploader
-                                  {...fprops}
-                                  resetPlanningAreaGrid={resetPlanningAreaGrid}
-                                  form={form}
-                                />
-                              );
-                            }}
-                          </FieldRFF>
-                        </div>
-                      </>
+                    {/* CUSTOM GRID SHAPEFILE PLANNING AREA */}
+                    {PAOptionSelected === 'customPAshapefileGrid' && (
+                      <div className="mt-3">
+                        <FieldRFF
+                          name="planningAreaGridId"
+                          validate={composeValidators([{ presence: true }])}
+                        >
+                          {(fprops) => {
+                            return (
+                              <PlanningAreaGridUploader
+                                {...fprops}
+                                resetPlanningAreaGrid={resetPlanningAreaGrid}
+                                form={form}
+                              />
+                            );
+                          }}
+                        </FieldRFF>
+                      </div>
                     )}
                   </div>
                   <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
