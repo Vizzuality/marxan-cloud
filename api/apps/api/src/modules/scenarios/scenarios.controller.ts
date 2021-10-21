@@ -593,12 +593,14 @@ export class ScenariosController {
   async getScenarioFeaturesOutputGapData(
     @Param('id', ParseUUIDPipe) id: string,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
     const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(
       fetchSpecification,
       {
         params: {
           scenarioId: id,
+          searchPhrase: featureClassAndAliasFilter,
         },
       },
     );
