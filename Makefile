@@ -166,7 +166,7 @@ dump-geodb-data:
 	docker-compose exec -T postgresql-geo-api pg_dump -T migrations -a -U "${_GEO_POSTGRES_USER}" -F t ${_GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
 
 dump-api-data:
-	docker-compose exec -T postgresql-api pg_dump -T '(migrations|api_event_kinds)' -a -U "${_API_POSTGRES_USER}" -F t ${_API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
+	docker-compose exec -T postgresql-api pg_dump -T '(migrations|api_event_kinds|roles)' -a -U "${_API_POSTGRES_USER}" -F t ${_API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
 
 upload-dump-data:
 	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps -s data/data/processed/db_dumps
