@@ -64,8 +64,8 @@ export class ProjectChecker {
 
   private static hasRequiredStudyArea({
     countryId,
-    planningAreaId,
+    planningAreaGeometryId,
   }: Project): boolean {
-    return !!(countryId || planningAreaId);
+    return !!(countryId || planningAreaGeometryId);
   }
 }

@@ -193,7 +193,9 @@ async function getFixtures() {
     GivenProjectHavePlanningAreaAssigned: () => {
       fakeProjectsService.findOne.mockImplementation(
         (_id: string | undefined | FindConditions<Project>) =>
-          Promise.resolve(({ planningAreaId: '123' } as unknown) as Project),
+          Promise.resolve(({
+            planningAreaGeometryId: '123',
+          } as unknown) as Project),
       );
     },
     GivenPlanningUnitsJob(kind: API_EVENT_KINDS) {
@@ -238,7 +240,7 @@ async function getFixtures() {
       fakeProjectsService.findOne.mockImplementation(
         (_id: string | undefined | FindConditions<Project>) =>
           Promise.resolve(({
-            planningAreaId: undefined,
+            planningAreaGeometryId: undefined,
           } as unknown) as Project),
       );
     },
