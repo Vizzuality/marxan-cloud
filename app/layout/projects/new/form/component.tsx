@@ -66,11 +66,15 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   }, [dispatch]);
 
   const onSubmit = (values) => {
+    const { planningAreaGridId } = values;
     delete values.PAOptionSelected;
+    delete values.planningAreaGridId;
+
     // TEMPORARY!!
     // This should be removed once organizations IDs are handled in the user
     const data = {
       ...values,
+      planningAreaId: planningAreaGridId,
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
     };
 
