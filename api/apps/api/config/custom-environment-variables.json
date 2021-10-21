@@ -54,5 +54,13 @@
     "limits": {
       "shapefileMaxSize": "API_UPLOAD_SHAPEFILE_MAX_SIZE"
     }
+  },
+  "sparkpost": {
+    "apikey": "SPARKPOST_APIKEY",
+    "origin": "SPARKPOST_ORIGIN"
+  },
+  "passwordReset": {
+    "tokenPrefix": "PASSWORD_RESET_TOKEN_PREFIX",
+    "expiration": "PASSWORD_RESET_EXPIRATION"
   }
 }

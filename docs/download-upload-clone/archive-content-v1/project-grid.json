@@ -1,0 +1,12 @@
+{
+  "shape": "square",
+  "areaKm2": 4000,
+  "bbox": [
+    -35.15182495,
+    -38.23633957,
+    -8.81498718,
+    -10.50143528
+  ],
+  "[comment]": "may be shapefile or whatever version wants",
+  "file": "./project-grid/custom-grid.geojson"
+}

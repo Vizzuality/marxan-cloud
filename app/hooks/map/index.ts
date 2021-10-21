@@ -437,6 +437,12 @@ export function usePUGridLayer({
               layout: {
                 visibility: getLayerVisibility(PreGapAnalysisVisibility),
               },
+              ...runId && {
+                filter: [
+                  'all',
+                  ['in', `-${runId}-`, ['get', 'valuePosition']],
+                ],
+              },
               paint: {
                 'fill-color': COLORS.features,
                 'fill-opacity': [

@@ -1,0 +1,14 @@
+{
+  "pieces": [
+    "scenario-metadata",
+    "protected-areas",
+    "features",
+    "specification",
+    "cost-surface",
+    "lock-status",
+    "run-results"
+  ],
+  "marxanSettings": {
+
+  }
+}
