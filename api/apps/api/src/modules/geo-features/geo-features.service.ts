@@ -162,7 +162,6 @@ export class GeoFeaturesService extends AppBaseService<
      *    * reduces unnecessary relations and system accidental complexity
      *
      */
-
     if (projectId && info?.params?.bbox) {
       const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
         .createQueryBuilder('geoFeatureGeometries')
@@ -213,6 +212,13 @@ export class GeoFeaturesService extends AppBaseService<
         {
           featureClassAndAliasFilter: `%${info.params.featureClassAndAliasFilter}%`,
         },
+      );
+    }
+
+    if (info.params?.featureTag) {
+      queryFilteredByPublicOrProjectSpecificFeatures.andWhere(
+        `${this.alias}.tag = :tag`,
+        { tag: info.params.featureTag },
       );
     }
     return queryFilteredByPublicOrProjectSpecificFeatures;
