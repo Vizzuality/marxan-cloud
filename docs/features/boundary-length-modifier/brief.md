@@ -1,4 +1,4 @@
-# BLM Calibration - high-level design
+# BLM Calibration - brief
 
 This document describes the current high-level overview of the Marxan Cloud
 platform user features related to calibration of the BLM (boundary length
