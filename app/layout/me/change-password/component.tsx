@@ -36,9 +36,7 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
 
   const handleSubmit = useCallback(async (values) => {
     setSubmitting(true);
-
     const { currentPassword, newPassword } = values;
-
     const data = {
       currentPassword,
       newPassword,

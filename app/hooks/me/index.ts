@@ -12,6 +12,8 @@ import {
   UseSaveMePasswordProps,
   SaveMePasswordProps,
   UseDeleteMeProps,
+  UseRequestRecoverPasswordProps,
+  RequestRecoverPasswordProps,
   UseResetPasswordProps,
   ResetPasswordProps,
   SignUpConfirmationProps,
@@ -140,7 +142,31 @@ export function useDeleteMe({
   });
 }
 
-// RESET PASSWORD
+// REQUEST RECOVER PASSWORD
+export function useRequestRecoverPassword({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseRequestRecoverPasswordProps) {
+  const requestRecoverPassword = ({ data }: RequestRecoverPasswordProps) => {
+    return USERS.request({
+      url: '/me/recover-password',
+      data,
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(requestRecoverPassword, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+// RECOVER PASSWORD
 export function useResetPassword({
   requestConfig = {
     method: 'PATCH',
@@ -149,7 +175,7 @@ export function useResetPassword({
 }: UseResetPasswordProps) {
   const resetPassword = ({ data }: ResetPasswordProps) => {
     return USERS.request({
-      url: '/me/recover-password',
+      url: '/me/reset-password',
       data,
       headers: {
         Authorization: `Bearer ${resetToken}`,
