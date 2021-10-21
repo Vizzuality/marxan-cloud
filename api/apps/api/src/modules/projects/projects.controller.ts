@@ -64,6 +64,7 @@ import {
 } from '@marxan-api/dto/async-job.dto';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
+import { FeatureTags } from "@marxan-api/modules/geo-features/geo-feature-set.api.entity";
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -92,8 +93,9 @@ export class ProjectsController {
   async findAllGeoFeaturesForProject(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Param() params: { projectId: string },
-    @Query('q') featureClassAndAliasFilter: string,
     @Req() req: RequestWithAuthenticatedUser,
+    @Query('q') featureClassAndAliasFilter?: string,
+    @Query('tag') featureTag?: FeatureTags,
   ): Promise<GeoFeatureResult> {
     const { data, metadata } = await this.projectsService.findAllGeoFeatures(
       fetchSpecification,
@@ -102,6 +104,7 @@ export class ProjectsController {
         params: {
           projectId: params.projectId,
           featureClassAndAliasFilter: featureClassAndAliasFilter,
+          featureTag,
         },
       },
     );
