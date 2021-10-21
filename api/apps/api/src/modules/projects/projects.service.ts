@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
+import { GeoFeaturesRequestInfo } from '@marxan-api/modules/geo-features';
 
 import { ProjectsCrudService } from './projects-crud.service';
 import { JobStatusService } from './job-status';
@@ -28,7 +29,7 @@ export class ProjectsService {
 
   async findAllGeoFeatures(
     fetchSpec: FetchSpecification,
-    appInfo: ProjectsRequest,
+    appInfo: GeoFeaturesRequestInfo,
   ) {
     const project = await this.assertProject(
       appInfo.params?.projectId,

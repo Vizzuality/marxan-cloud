@@ -24,7 +24,7 @@ export class GeoFeatureSpecifications {
     };
 
     return await this.baseHttpClient.post(
-      `/scenarios/${scenarioId}/features/specification/v2`,
+      `/scenarios/${scenarioId}/features/specification`,
       specification,
     )
       .then(getJsonApiDataFromResponse)
