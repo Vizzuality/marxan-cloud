@@ -318,7 +318,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                             multiple
                             placeholder="Select..."
                             clearSelectionActive
-                            clearSelectionLabel="Clear Selection"
+                            clearSelectionLabel="Clear selection"
                             batchSelectionActive
                             batchSelectionLabel="All protected areas"
                             selected={values.wdpaIucnCategories}
