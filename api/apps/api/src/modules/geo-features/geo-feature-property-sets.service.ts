@@ -56,14 +56,14 @@ export class GeoFeaturePropertySetService {
       const propertySetForFeature = propertySet.filter(
         (ps) => ps.featureId === i.id,
       );
+      const properties: Record<string, (string | number)[]> = {};
+      for (const set of propertySetForFeature) {
+        properties[set.key] ??= [];
+        properties[set.key].push(set.value[0]);
+      }
       return {
         ...i,
-        properties: propertySetForFeature.reduce((acc, cur) => {
-          return {
-            ...acc,
-            [cur.key]: [...(acc[cur.key] || []), cur.value[0]],
-          };
-        }, {} as Record<string, Array<string | number>>),
+        properties,
       };
     });
   }
