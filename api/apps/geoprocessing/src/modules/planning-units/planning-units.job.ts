@@ -74,12 +74,18 @@ const createPlanningUnitGridFromJobSpec = async (
         const filterSQL: string[] = [];
         if (job.data.countryId?.length) {
           filterSQL.push(`gid_0 = '${job.data.countryId}'`);
+        } else {
+          filterSQL.push(`gid_0 is null`);
         }
         if (job.data.adminAreaLevel1Id?.length) {
           filterSQL.push(`gid_1 = '${job.data.adminAreaLevel1Id}'`);
+        } else {
+          filterSQL.push(`gid_1 is null`);
         }
         if (job.data.adminAreaLevel2Id?.length) {
           filterSQL.push(`gid_2 = '${job.data.adminAreaLevel2Id}'`);
+        } else {
+          filterSQL.push(`gid_2 is null`);
         }
         subquery = `SELECT (${gridShape[job.data.planningUnitGridShape]}(${
           Math.sqrt(job.data.planningUnitAreakm2) * 1000
@@ -97,7 +103,7 @@ const createPlanningUnitGridFromJobSpec = async (
                         select st_transform(geom, 4326) as the_geom,
                         '${job.data.planningUnitGridShape}' as type,
                         ${job.data.planningUnitAreakm2} as size from (${subquery}) grid
-                        ON CONFLICT ON CONSTRAINT planning_units_geom_the_geom_type_key DO NOTHING;`);
+                        ON CONFLICT (the_geom, type, COALESCE(project_id, '00000000-0000-0000-0000-000000000000')) DO NOTHING;`);
       return queryResult;
     } catch (err) {
       logger.error(err);
