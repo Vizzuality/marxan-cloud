@@ -1,7 +1,10 @@
 import { Repository } from 'typeorm';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 
-import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
+import {
+  PlanningUnitsGeom,
+  ShapeType,
+} from '@marxan-jobs/planning-unit-geometry';
 import { assertDefined } from '@marxan/utils';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import {
@@ -74,8 +77,20 @@ async function getFixtures() {
   );
   return {
     async GivenCostDataInDbForMultipleScenarios() {
-      const pu = await planningUnitsGeoms.findOne();
+      const pu = await planningUnitsGeoms.save(
+        planningUnitsGeoms.create({
+          theGeom: {
+            type: 'Point',
+            coordinates: [20.545450150966644, 52.08397788419048],
+          },
+          type: ShapeType.Square,
+          size: 100,
+        }),
+      );
       assertDefined(pu);
+      cleanups.push(async () => {
+        await planningUnitsGeoms.remove(pu);
+      });
       let planningUnitMarxanId = 0;
       const puDatas = await scenariosPuDatas.save(
         [
