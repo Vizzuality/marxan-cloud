@@ -63,7 +63,7 @@ const createPlanningUnitGridFromJobSpec = async (
       if (job.data.planningAreaId) {
         subquery = `SELECT (${gridShape[job.data.planningUnitGridShape]}(${
           Math.sqrt(job.data.planningUnitAreakm2) * 1000
-        }, ST_Transform(a.the_geom, 3410))).*
+        }, ST_Transform(ST_Union(a.the_geom), 3410))).*
                     FROM planning_areas a
                     WHERE id = '${job.data.planningAreaId}'`;
       } else if (
@@ -84,7 +84,7 @@ const createPlanningUnitGridFromJobSpec = async (
         subquery = `SELECT (${gridShape[job.data.planningUnitGridShape]}(${
           Math.sqrt(job.data.planningUnitAreakm2) * 1000
         },
-                            ST_Transform(a.the_geom, 3410))).*
+                            ST_Transform(ST_Union(a.the_geom), 3410))).*
                     FROM admin_regions a
                     WHERE ${filterSQL.join(' AND ')}`;
       } else {
