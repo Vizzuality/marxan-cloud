@@ -40,6 +40,9 @@ https://invis.io/G211WEUZFST9#/459986030_Marxan_09a
   would compound by the number of calibration runs the already very high
   overhead to marxan runs due to the initial generation of these files instead
   of resorting to precalculated data
+* Status of BLM calibration should be exposed via the existing scenario status
+  data (this could be either just started/finished/failed, or M total iterations
+  completed of N*10 to be scheduled).
 
 Two main options for running Marxan N times:
 
