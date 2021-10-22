@@ -35,6 +35,7 @@ depend on choices such as whether to adapt and reuse
 
 ## Release 3
 
+* BLM calibration status data in scenario status data
 * GET endpoint for BLM calibration results for a scenario (pairs of `{ blm:
   number, score: number }` values). Maybe the shell interface could be created
   as part of Release 1 to allow frontend to prepare things.
