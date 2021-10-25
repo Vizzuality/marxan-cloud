@@ -91,6 +91,7 @@ import {
   GeometryFileInterceptor,
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
+import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-area.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -645,6 +646,27 @@ export class ScenariosController {
     return;
   }
 
+
+  @ApiOkResponse({
+    type: ProtectedAreaDto,
+    isArray: true,
+  })
+  @Get(`:id/protected-areas`)
+  async getProtectedAreasForScenario(
+    @Param('id') scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ProtectedAreaDto[]> {
+    const result = await this.service.getProtectedAreasFor(scenarioId, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      throw new NotFoundException();
+    }
+
+    return result.right;
+  }
+
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
     description:
@@ -671,4 +693,5 @@ export class ScenariosController {
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
+
 }

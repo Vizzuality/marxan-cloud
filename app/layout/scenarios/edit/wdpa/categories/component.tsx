@@ -63,6 +63,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     customAreaId: !projectData?.adminAreaLevel2Id
       && !projectData?.adminAreaLevel1I
       && !projectData?.countryId ? projectData?.planningAreaId : null,
+    scenarioId: sid,
   });
 
   const { addToast } = useToasts();
@@ -78,7 +79,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     if (!wdpaData) return [];
 
     return wdpaData.map((w) => ({
-      label: `IUCN ${w.iucnCategory}`,
+      label: `${w.kind === 'global' ? 'IUCN' : '👤'} ${w.name}`,
       value: w.id,
     }));
   }, [wdpaData]);
