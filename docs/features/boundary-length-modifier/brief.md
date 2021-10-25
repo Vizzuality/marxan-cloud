@@ -13,9 +13,20 @@ The BLM calibration process designed for the Marxan Cloud platform will allow
 users to have an “at a glance” overview of the spatial distribution of
 solutions, given a discrete set of BLM values.
 
-The overview is presented to the user via a thumbnail snapshot of the solutions
-for each BLM value being tested, alongside the cost of the best solution for
-each of them.
+This process is optional for the user, and it is designed to be run once all
+the other settings of a scenario have been finalized, just before running the
+Marxan solver on a scenario.
+
+If the user doesn't provide a BLM value either directly (if they have calculated
+it through their own process/tooling) or by running the calibration process and
+choosing one of the values suggested, a default BLM value of `0` will be used
+(therefore removing boundary length from scenario considerations altogether: see
+section 5.3.1.1 of the Marxan manual).
+
+The overview is presented to the user via a plot of the cost of the best
+solution for each of the BLM values being used in the calibration process (x
+axis) vs the related boundary length (y axis); to each of these data points is
+associated a thumbnail snapshot of the best solution for the given BLM value.
 
 Once the calibration results are presented to the user, they may then choose to:
 
@@ -50,15 +61,18 @@ other assumptions).
 This will apply for the majority of projects, which are expected to use a
 constant PU area. Some projects may use irregularly-shaped planning units with
 varying area: in this case the mean of the areas of the planning units in the
-study area should be used [*], with option to further tune this in the future (as
-above, it is ok to hardcode this, as long as using a different aggregation
+study area should be used [*], with option to further tune this in the future
+(as above, it is ok to hardcode this, as long as using a different aggregation
 formula that doesn't depend on other inputs than PU area and PU count will not
 break other assumptions).
 
 [*] Pending confirmation.
 
-- Thumbnails of each run’s solutions displayed alongside the curve for visual
-  inspection.
+- For each of the BLM values being used in the calibration process:
+
+  - Cost vs boundary length of the best solution, plotted on a chart
+  - Thumbnail of the best solution, displayed alongside the curve for visual
+    inspection.
 
 - No need to do curve fitting and elbow search.
 
@@ -72,7 +86,7 @@ For reference, the initial functional design involved:
 - Using a *fixed* set of BLM values (6 of them), to be used for every
   project/scenario.
 
-- Curve fitting across the resulting scores.
+- Curve fitting across the resulting cost vs boundary length points.
 
 - Optimal value selected as the “elbow” of the curve (see Marxan manual, page
   5-36, Box 12).
