@@ -92,6 +92,26 @@ Two main options for running Marxan N times:
       its cost, as well as PU selection for the best result: no need to zip
       input and output files, persist individual result rows, etc.
 
+Either way, it may make sense to refactor the current Marxan worker to allow
+this to coexist with a BLM calibration worker without having to
+diverge/duplicate too much code:
+
+- creating a `RunWorker` for calibration runs specifically
+- letting `MarxanSandboxRunnerService` be constructed by a factory, so that
+  relevant parts could be created by it (and thus replacing
+  `SolutionsOutputService` within the factory)
+- scheduling a first "asset fetcher" job that fetches input `.dat` files and
+  prepares the workspace, before any of the 6 calibration runs can start
+- executing `N` jobs per calibration process (with `N = number of calibration
+  values`), to allow them to run in parallel
+- possibly creating `CalibrationRunsMetadata`-like entity, which holds the
+  results from all runs
+- (api?) when each job in a set of 6 for a calibration process finishes
+  successfully, listen to queue events and emit relevant CQRS command so that a
+  handler can mark the run as done (with write lock?); once all 6 runs are done,
+  emit final event to signal that the whole calibration process has finished (or
+  failed, if any of its runs have failed).
+
 Once the N calibration runs have finished:
 
 * Previous calibration results for the scenario, if they exist, should be
