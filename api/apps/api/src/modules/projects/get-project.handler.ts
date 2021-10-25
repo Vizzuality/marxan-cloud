@@ -28,6 +28,14 @@ export class GetProjectHandler
       return right({
         id: project.id,
         bbox: project.bbox,
+        customPlanningArea: project.planningAreaGeometryId,
+        adminAreaRegion:
+          project.adminAreaLevel2Id ||
+          project.adminAreaLevel1Id ||
+          project.countryId,
+        adminAreaLevel1: project.adminAreaLevel1Id,
+        adminAreaLevel2: project.adminAreaLevel2Id,
+        countryId: project.countryId,
       });
     } catch (error) {
       /** App Base Service throws 404

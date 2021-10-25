@@ -25,6 +25,7 @@ export class AdminPlanningAreasService implements AbstractPlanningAreasService {
   constructor(
     private readonly adminAreasRepository: AdminPlanningAreasRepository,
   ) {}
+
   async getPlanningAreaIdAndName(ids: {
     adminAreaLevel1Id?: string;
     adminAreaLevel2Id?: string;

@@ -49,6 +49,7 @@ import {
 import { QueryBus } from '@nestjs/cqrs';
 import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
 import { ProtectedAreaService, submissionFailed } from './protected-area';
+import { ScenarioProtectedArea } from '@marxan-api/modules/scenarios/protected-area/scenario-protected-area';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -68,6 +69,8 @@ export type SubmitProtectedAreaError =
   | GetProjectErrors
   | typeof submissionFailed
   | typeof scenarioNotFound;
+
+export type GetProtectedAreasError = GetProjectErrors | typeof scenarioNotFound;
 
 @Injectable()
 export class ScenariosService {
@@ -432,6 +435,33 @@ export class ScenariosService {
       }
 
       return right(true);
+    } catch {
+      return left(scenarioNotFound);
+    }
+  }
+
+  async getProtectedAreasFor(
+    scenarioId: string,
+    info: AppInfoDTO,
+  ): Promise<Either<GetProtectedAreasError, ScenarioProtectedArea[]>> {
+    try {
+      const scenario = await this.assertScenario(scenarioId);
+      const projectResponse = await this.queryBus.execute(
+        new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
+      );
+      if (isLeft(projectResponse)) {
+        return projectResponse;
+      }
+
+      const areas = await this.protectedArea.getFor(
+        {
+          id: scenarioId,
+          protectedAreaIds: scenario.protectedAreaFilterByIds ?? [],
+        },
+        projectResponse.right,
+      );
+
+      return right(areas);
     } catch {
       return left(scenarioNotFound);
     }

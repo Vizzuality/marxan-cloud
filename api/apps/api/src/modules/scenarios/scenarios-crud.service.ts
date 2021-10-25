@@ -260,6 +260,7 @@ export class ScenariosCrudService extends AppBaseService<
   /**
    * Link protected areas to the scenario.
    */
+  // TODO get rid?
   async getWDPAAreasWithinProjectByIUCNCategory(
     {
       projectId,
