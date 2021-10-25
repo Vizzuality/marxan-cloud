@@ -46,6 +46,7 @@ export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> =
     customAreaId: !projectData?.adminAreaLevel2Id
                   && !projectData?.adminAreaLevel1I
                   && !projectData?.countryId ? projectData?.planningAreaId : null,
+    scenarioId: sid,
   });
 
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {

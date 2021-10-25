@@ -53,6 +53,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
     customAreaId: !projectData?.adminAreaLevel2Id
                   && !projectData?.adminAreaLevel1I
                   && !projectData?.countryId ? projectData?.planningAreaId : null,
+    scenarioId: sid,
   });
 
   useEffect(() => {

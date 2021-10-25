@@ -22,7 +22,7 @@ import { FetchSpecification } from 'nestjs-base-service';
 import {
   MultiplePlanningAreaIds,
   PlanningAreasService,
-} from './planning-areas';
+} from '@marxan-api/modules/planning-areas';
 import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/users/role.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';

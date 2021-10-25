@@ -9,6 +9,20 @@ export type GetProjectErrors = typeof notFound;
 export interface ProjectSnapshot {
   id: string;
   bbox: BBox;
+
+  /**
+   *
+   * lowest available level
+   *
+   * eg BRA.2.13_1
+   */
+  adminAreaRegion?: string;
+
+  countryId?: string;
+  adminAreaLevel1?: string;
+  adminAreaLevel2?: string;
+
+  customPlanningArea?: string;
 }
 
 export class GetProjectQuery extends Query<
