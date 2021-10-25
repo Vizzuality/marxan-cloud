@@ -4,9 +4,11 @@ Reference to latest (draft) designs:
 https://invis.io/G211WEUZFST9#/459986030_Marxan_09a
 
 * BLM calibration can be run *on a scenario*.
-* Running a BLM calibration process does not need to block editing or even
-  running a scenario, as the outcomes of such a process are merely informative
-  for the user.
+* Running a BLM calibration process should block editing or even running a
+  scenario: whereas the outcomes of BLM calibration are informative only (i.e.
+  they don't affect the outcomes of a Marxan run), they do however depend on a
+  specific configuration of a scenario as input, so any changes to a scenario
+  may make results of a previous or still-running BLM calibration process stale
 * It may however be desirable from a UX perspective to inform the user that a
   BLM calibration process is running for a given scenario; this may be used both
   to visually inform the user about the running process (frontend app) and
@@ -25,9 +27,9 @@ https://invis.io/G211WEUZFST9#/459986030_Marxan_09a
 * This could be read via an ad-hoc endpoint, or by including this information in
   the project result DTO; probably the former would be preferrable, to avoid
   overloading the project result DTO
-* POST endpoint to request a calibration task with specific BLM values (either
+* `POST` endpoint to request a calibration task with specific BLM values (either
   the initial recommended ones, or those set by users)
-* user-set values should also be persisted and associated to a scenario: once
+* User-set values should also be persisted and associated to a scenario: once
   the BLM calibration process has finished the values will also be inferrable
   from the results, but until then there must be a way for the frontend to
   request the latest set values in order to render things even while calibration
@@ -39,7 +41,10 @@ https://invis.io/G211WEUZFST9#/459986030_Marxan_09a
   https://github.com/Vizzuality/marxan-cloud/pull/541); the current approach
   would compound by the number of calibration runs the already very high
   overhead to marxan runs due to the initial generation of these files instead
-  of resorting to precalculated data
+  of resorting to precalculated data. Alternatively, to avoid extensive
+  refactoring while implementing BLM calibration, the BLM calibration processor
+  should only request input .dat files once (rather than for each of the six
+  runs it will orchestrate).
 * Status of BLM calibration should be exposed via the existing scenario status
   data (this could be either just started/finished/failed, or M total iterations
   completed of N*10 to be scheduled).
@@ -81,6 +86,8 @@ Two main options for running Marxan N times:
       significantly impacting run times (a future setup using Kubernetes
       workers, if desirable, may allow to run BLM calibration runs faster by
       letting the Kubernetes scheduler scale resources as needed)
+    * jobs for BLM calculation runs should be handled through their own queue,
+      in order not to affect jobs queued for full runs
     * `SolutionsOutputService` only needs to parse output for best solution and
       its cost, as well as PU selection for the best result: no need to zip
       input and output files, persist individual result rows, etc.
@@ -89,8 +96,10 @@ Once the N calibration runs have finished:
 
 * Previous calibration results for the scenario, if they exist, should be
   discarded
-* An array of `{ blm: number, score: number}` results should be persisted for
-  the scenario (one for each of the N input BLM values)
+* An array of `{ blm: number, score: number, boundaryLength: number }` results
+  should be persisted for the scenario (one for each of the N input BLM values)
+* These results should be made available either via an ad-hoc `GET` endpoint,
+  or added to the `ScenarioResult` DTO.
 * An array of sets of selected PU ids should be persisted for the scenario (one
   for each of the N input BLM values)
 * Workspace should be cleaned up, as with full Marxan runs (also in case of
