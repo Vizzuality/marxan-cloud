@@ -7,16 +7,14 @@ depend on choices such as whether to adapt and reuse
 
 ## Release 1
 
-* Refactor of input .dat file generation to use precalculated data (i.e. no
-  on-the-fly geo calculations for `pu.dat`, `puvspr.dat`, `bound.dat`, etc. -
-  see `docs/marxan/data-computations.md` in
-  https://github.com/Vizzuality/marxan-cloud/pull/541)
+* Workspace setup for BLM calibration runs: fetch input `.dat` files only once
+  per set of runs to be scheduled for the calibration process.
 * API interface (endpoint and payload DTO) to accept a BLM calibration request
   this also needs to persist the set of BLM values chosen (even if they are
   the initial recommended ones)
-* API endpoint to query latest BLM values set for a scenario
+* Add latest BLM values for calibration to the scenario DTO
 * API events to handle start/finish/failure events of a BLM calibration process
-* API endpoint to retrieve initial recommended values; these could be hardcoded
+* Add initial recommended values to scenario DTO; these could be hardcoded
   at this stage, or only provided for regular generated grids (as the PU area is
   known in this case) while defaulting to a range of default values without PU
   area multiplier for custom grids (see [Brief](./brief.md) document, ignoring
@@ -37,8 +35,9 @@ depend on choices such as whether to adapt and reuse
 
 * BLM calibration status data in scenario status data
 * GET endpoint for BLM calibration results for a scenario (pairs of `{ blm:
-  number, score: number }` values). Maybe the shell interface could be created
-  as part of Release 1 to allow frontend to prepare things.
+  number, score: number; boundaryLength: number }` values). Maybe the shell
+  interface could be created as part of Release 1 to allow frontend to prepare
+  things.
 * Tile endpoint (new or adapted) to render MVT tiles of the best solution for
   each BLM value; as this endpoint will use persisted PU selection for each BLM
   value the performance overhead should be acceptable compared to storing a
