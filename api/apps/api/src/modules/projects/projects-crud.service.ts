@@ -307,8 +307,6 @@ export class ProjectsCrudService extends AppBaseService<
         .andWhere(`acl.role_id = :roleId`, {
           roleId: Roles.project_owner,
         });
-    } else {
-      query.andWhere(`${this.alias}.is_public = true`);
     }
 
     return query;
@@ -358,8 +356,6 @@ export class ProjectsCrudService extends AppBaseService<
         .andWhere(`acl.role_id = :roleId`, {
           roleId: Roles.project_owner,
         });
-    } else {
-      query.andWhere(`${this.alias}.is_public = true`);
     }
 
     return query;

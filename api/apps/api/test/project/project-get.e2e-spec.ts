@@ -13,7 +13,7 @@ afterEach(async () => {
 test(`getting public project as guest`, async () => {
   const projectId = await fixtures.GivenPublicProjectWasCreated();
   const response = await fixtures.WhenGettingPublicProject(projectId);
-  fixtures.ThenProjectDetailsArePresent(projectId, response);
+  fixtures.ThenPublicProjectDetailsArePresent(projectId, response);
 });
 
 test(`getting non-public project as guest`, async () => {

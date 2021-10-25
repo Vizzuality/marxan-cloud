@@ -45,16 +45,6 @@ export class ProjectDetailsController {
       }),
     );
   }
-
-  @SingleProject()
-  @Get('published/:id')
-  async getPublishedOne(
-    @Param('id') id: string,
-  ): Promise<ProjectResultSingular> {
-    return await this.projectSerializer.serialize(
-      await this.projectsService.findOne(id),
-    );
-  }
 }
 
 function SingleProject() {

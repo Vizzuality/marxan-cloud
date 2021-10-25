@@ -18,7 +18,10 @@ import { PlanningAreasService } from './planning-areas';
 import { PlanningUnitGridService, ProjectId } from './planning-unit-grid';
 import { assertDefined } from '@marxan/utils';
 
-import { ProjectsRequest } from './project-requests-info';
+import {
+  ProjectsRequest,
+  ProjectsServiceRequest,
+} from './project-requests-info';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 
 export { validationFailed } from './planning-areas';
@@ -59,18 +62,13 @@ export class ProjectsService {
     );
   }
 
-  async findAll(fetchSpec: FetchSpecification, info?: ProjectsRequest) {
-    return this.projectsCrud.findAllPaginated(fetchSpec, info);
-  }
-
-  async findAllPublic(fetchSpec: FetchSpecification, info?: ProjectsRequest) {
-    // /ACL slot/
+  async findAll(fetchSpec: FetchSpecification, info: ProjectsServiceRequest) {
     return this.projectsCrud.findAllPaginated(fetchSpec, info);
   }
 
   async findOne(
     id: string,
-    info?: ProjectsRequest,
+    info: ProjectsServiceRequest,
   ): Promise<Project | undefined> {
     // /ACL slot/
     try {

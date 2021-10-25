@@ -62,15 +62,12 @@ import { GetProjectHandler } from './get-project.handler';
     JobStatusSerializer,
     GetProjectHandler,
   ],
-  /**
-   * Order is important due to `GET projects/published` clash with
-   * `GET projects/:id`
-   */
   controllers: [
     ProjectsListingController,
     ProjectDetailsController,
     ProjectsController,
   ],
-  exports: [ProjectsCrudService],
+  // @ToDo Remove TypeOrmModule after project publish will stop use the ProjectRepository
+  exports: [ProjectsCrudService, TypeOrmModule],
 })
 export class ProjectsModule {}
