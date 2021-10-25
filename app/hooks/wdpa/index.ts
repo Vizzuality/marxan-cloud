@@ -8,26 +8,34 @@ import WDPA from 'services/wdpa';
 
 import { UseWDPACategoriesProps } from './types';
 
-export function useWDPACategories({ adminAreaId, customAreaId }: UseWDPACategoriesProps) {
+export function useWDPACategories({
+  adminAreaId,
+  customAreaId,
+  scenarioId,
+}: UseWDPACategoriesProps) {
   const [session] = useSession();
 
-  const query = useQuery(['wdpa-categories', adminAreaId, customAreaId], async () => WDPA.request({
-    method: 'GET',
-    url: '/iucn-categories',
-    params: {
-      ...adminAreaId && {
-        'filter[adminAreaId]': adminAreaId,
-      },
-      ...customAreaId && {
-        'filter[customAreaId]': customAreaId,
-      },
+  const query = useQuery(
+    ['scenarios', adminAreaId, customAreaId],
+    async () => WDPA.request({
+        method: 'GET',
+        url: `/${scenarioId}/protected-areas`,
+        params: {
+          ...(adminAreaId && {
+            'filter[adminAreaId]': adminAreaId,
+          }),
+          ...(customAreaId && {
+            'filter[customAreaId]': customAreaId,
+          }),
+        },
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }),
+    {
+      enabled: !!adminAreaId || !!customAreaId,
     },
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }), {
-    enabled: !!adminAreaId || !!customAreaId,
-  });
+  );
 
   const { data } = query;
 
