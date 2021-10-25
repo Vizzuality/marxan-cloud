@@ -317,11 +317,13 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                             size="base"
                             multiple
                             placeholder="Select..."
-                            clearSelectionActive={false}
+                            clearSelectionActive
+                            clearSelectionLabel="Clear selection"
                             batchSelectionActive
                             batchSelectionLabel="All protected areas"
                             selected={values.wdpaIucnCategories}
                             options={WDPA_CATEGORIES_OPTIONS}
+                            onChange={flprops.input.onChange}
                           />
                         )}
                       </Field>
