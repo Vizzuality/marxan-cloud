@@ -56,7 +56,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
           level: 'success',
         });
         setSubmitting(false);
-        push('/auth/sign-in');
+        push('/auth/reset-password-confirmation');
       },
       onError: () => {
         addToast('error-reset-password', (
