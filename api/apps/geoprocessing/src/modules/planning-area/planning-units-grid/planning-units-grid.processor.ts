@@ -49,9 +49,6 @@ export class PlanningUnitsGridProcessor {
           [geoJson, ShapeType.FromShapefile, fakeProjectId],
         );
 
-        console.log(u);
-        console.log(fakeProjectId);
-
         const planningArea: {
           id: string;
           bbox: BBox;
