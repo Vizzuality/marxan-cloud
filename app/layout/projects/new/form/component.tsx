@@ -74,7 +74,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     // This should be removed once organizations IDs are handled in the user
     const data = {
       ...values,
-      planningAreaId: planningAreaGridId,
+      ...(planningAreaGridId && { planningAreaId: planningAreaGridId }),
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
     };
 
@@ -132,7 +132,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
     const registeredFields = form.getRegisteredFields();
     registeredFields.forEach((f) => {
-      const omitFields = ['name', 'description', 'planningUnitGridShape'];
+      const omitFields = ['name', 'description'];
       if (!omitFields.includes(f)) {
         form.change(f, null);
       }
