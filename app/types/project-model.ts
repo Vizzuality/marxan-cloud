@@ -16,7 +16,7 @@ export interface PlanningArea {
 export enum PlanningUnit {
   SQUARE = 'square',
   HEXAGON = 'hexagon',
-  IRREGULAR = 'irregular',
+  FROM_SHAPEFILE = 'from_shapefile',
 }
 
 export enum PlanningUnitAreaSizeUnit {
