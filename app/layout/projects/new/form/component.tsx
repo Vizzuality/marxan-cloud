@@ -75,6 +75,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     const data = {
       ...values,
       ...(planningAreaGridId && { planningAreaId: planningAreaGridId }),
+      ...(planningAreaGridId && { planningUnitGridShape: 'from_shapefile' }),
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
     };
 
