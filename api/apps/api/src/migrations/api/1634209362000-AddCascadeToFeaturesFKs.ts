@@ -7,7 +7,7 @@ export class AddCascadeToFeaturesFKs1634209362000
     ALTER TABLE public.features DROP CONSTRAINT features_project_id_fkey;
     ALTER TABLE public.features DROP CONSTRAINT features_created_by_fkey;
     ALTER TABLE public.features ADD CONSTRAINT features_project_id_fkey FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
-    ALTER TABLE public.features ADD CONSTRAINT features_created_by_fkey FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE;
+    ALTER TABLE public.features ADD CONSTRAINT features_created_by_fkey FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL;
     `);
   }
 
