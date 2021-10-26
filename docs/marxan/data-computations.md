@@ -1,7 +1,7 @@
 # Cloud platform computations
 
 - Document created on: 27 September 2021.
-- Latest updated on: 12 October 2021.
+- Latest updated on: 26 October 2021.
 
 Throughout the lifecycle of a Marxan Cloud project, the platform carries out
 tabular or geospatial computations at key steps.
@@ -86,6 +86,17 @@ with some overhead for large shapefiles.
 
 Somewhat mitigating this, a configurable limit on the size of accepted
 shapefiles is in place.
+
+## Values for BLM calibration
+
+When the planning grid for a project is set, an initial set of values for BLM
+calibration is calculated (see [BLM Calibration -
+brief](./features/boundary-length-modifier/brief.md)).
+
+The time complexity of this operation is `O(1)`. For grids with regular units,
+the values are derived (with multipliers) from the planning unit area; for grids
+with irregular units, the values are derived from the total area of the planning
+area, divided by the number of planning units (average area).
 
 ## Marxan input files
 
