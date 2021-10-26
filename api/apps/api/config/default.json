@@ -53,6 +53,14 @@
     "limits": {
       "shapefileMaxSize": 10240000
     }
+  },
+  "sparkpost": {
+    "apikey": "invalidSparkpostApikey",
+    "origin": "https://api.eu.sparkpost.com:443"
+  },
+  "passwordReset": {
+    "tokenPrefix": "http://localhost:3000/auth/reset-password?token=",
+    "expiration": 1800000
   }
 }
 

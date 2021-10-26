@@ -4,6 +4,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 
 export async function bootstrap() {
   const app = await bootstrapSetUp();
+
   const swaggerDocument = addSwagger(app);
 
   SwaggerModule.setup('/swagger', app, swaggerDocument);

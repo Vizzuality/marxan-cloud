@@ -1,1 +1,7 @@
-export type FeatureIdToScenarioFeatureData = Record<number, string>;
+export type FeatureIdToScenarioFeatureData = Record<
+  number,
+  {
+    id: string;
+    prop: number;
+  }
+>;

@@ -4,7 +4,7 @@ interface ProjectShowStateProps {
   bbox: number[];
   minPuAreaSize: number;
   maxPuAreaSize: number;
-  uploadingPlanningArea: Record<string, object>
+  uploadingPlanningArea: Record<string, object>;
 }
 
 const initialState = {

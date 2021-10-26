@@ -116,7 +116,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             metadata,
             {
               tab: 'protected-areas',
-              subtab: 'protected-areas-percentage',
+              subtab: 'protected-areas-preview',
               status: {
                 'protected-areas': 'draft',
                 features: 'empty',
@@ -136,7 +136,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
           ), {
             level: 'success',
           });
-          onSuccess();
         },
         onError: () => {
           setSubmitting(false);
@@ -275,7 +274,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                           <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
                           <InfoButton>
                             <span>
-                              <h4 className="font-heading text-lg mb-2.5">IUCN categrories</h4>
+                              <h4 className="font-heading text-lg mb-2.5">IUCN categories</h4>
                               <div className="space-y-2">
                                 <p>
                                   You can select to include protected areas
@@ -323,11 +322,13 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                             size="base"
                             multiple
                             placeholder="Select..."
-                            clearSelectionActive={false}
+                            clearSelectionActive
+                            clearSelectionLabel="Clear selection"
                             batchSelectionActive
                             batchSelectionLabel="All protected areas"
                             selected={values.wdpaIucnCategories}
                             options={WDPA_CATEGORIES_OPTIONS}
+                            onChange={flprops.input.onChange}
                           />
                         )}
                       </Field>

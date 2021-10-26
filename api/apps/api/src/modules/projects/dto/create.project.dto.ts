@@ -14,7 +14,6 @@ import { PlanningUnitGridShape } from '../project.api.entity';
 
 /**
  * @todo We have this dto partially duplicated in the geoprocessing service
- * @file geoprocessing/src/modules/planning-units/planning-units.job.ts
  */
 export class CreateProjectDTO {
   @ApiProperty()

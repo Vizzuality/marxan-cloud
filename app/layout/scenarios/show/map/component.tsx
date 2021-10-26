@@ -80,7 +80,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const {
     data: bestSolutionData,
   } = useBestSolution(sid);
-  const bestSolution = bestSolutionData || {};
+  const bestSolution = bestSolutionData;
 
   const {
     data: allGapAnalysisData,
@@ -95,23 +95,30 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
 
   const include = useMemo(() => {
     if (tab === 'protected-areas' || tab === 'features') return 'protection';
+
     if (tab === 'analysis' && subtab === 'analysis-preview') return 'protection,features';
     if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return 'features';
     if (tab === 'analysis' && subtab === 'analysis-cost-surface') return 'cost';
     if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return 'lock-status,protection';
-    if (tab === 'solutions') return 'results';
+
+    if (tab === 'solutions' && subtab !== 'solutions-gap-analysis') return 'results';
+    if (tab === 'solutions' && subtab === 'solutions-gap-analysis') return 'results,features';
 
     return 'protection';
   }, [tab, subtab]);
 
   const sublayers = useMemo(() => {
     if (tab === 'protected-areas') return ['wdpa-percentage'];
+
     if (tab === 'features') return ['wdpa-percentage'];
+
     if (tab === 'analysis' && subtab === 'analysis-preview') return ['wdpa-percentage', 'features'];
     if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features'];
     if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost'];
     if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out'];
-    if (tab === 'solutions') return ['solutions'];
+
+    if (tab === 'solutions' && subtab !== 'solutions-gap-analysis') return ['solutions'];
+    if (tab === 'solutions' && subtab === 'solutions-gap-analysis') return ['features'];
 
     return [];
   }, [tab, subtab]);
@@ -119,6 +126,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const layers = useMemo(() => {
     if (tab === 'protected-areas' && subtab === 'protected-areas-preview' && !!wdpaIucnCategories?.length) return ['wdpa-preview', 'pugrid'];
     if (tab === 'protected-areas' && subtab === 'protected-areas-percentage' && !!wdpaIucnCategories?.length) return ['wdpa-percentage', 'pugrid'];
+
     if (tab === 'features') {
       return [
         ...wdpaIucnCategories?.length ? ['wdpa-percentage'] : [],
@@ -127,11 +135,14 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
         'pugrid',
       ];
     }
+
     if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features', 'pugrid'];
     if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost', 'pugrid'];
     if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
     if (tab === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
-    if (tab === 'solutions') return ['frequency', 'solution', 'pugrid'];
+
+    if (tab === 'solutions' && subtab !== 'solutions-gap-analysis') return ['frequency', 'solution', 'pugrid'];
+    if (tab === 'solutions' && subtab === 'solutions-gap-analysis') return ['features'];
 
     return ['pugrid'];
   }, [tab, subtab, wdpaIucnCategories?.length]);
@@ -142,6 +153,10 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
     }
     return [];
   }, [allGapAnalysisData]);
+
+  const highlightedFeaturesIds = useMemo(() => {
+    return highlightFeatures.map((h) => h.replace(`_run${selectedSolution?.runId || bestSolution?.runId}`, ''));
+  }, [highlightFeatures, selectedSolution, bestSolution]);
 
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
@@ -167,7 +182,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       puIncludedValue: included,
       puExcludedValue: excluded,
       features: featuresIds,
-      highlightFeatures,
+      highlightFeatures: highlightedFeaturesIds,
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
         pugrid: layerSettings.pugrid,

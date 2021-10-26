@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { ResultRow } from '@marxan/marxan-output';
 import { ResultParserService } from './result-parser.service';
 import { MostDifferentService } from './most-different.service';
+import { BestSolutionService } from './best-solution.service';
 
 let sut: ResultParserService;
 
@@ -9,6 +10,12 @@ beforeEach(async () => {
   const sandbox = await Test.createTestingModule({
     providers: [
       ResultParserService,
+      {
+        provide: BestSolutionService,
+        useValue: {
+          map: (source: ResultRow[]) => source,
+        },
+      },
       {
         provide: MostDifferentService,
         useValue: {
@@ -28,33 +35,35 @@ beforeEach(async () => {
 });
 
 describe(`given empty content`, () => {
-  it(`should return empty array`, () => {
-    expect(sut.parse('')).toEqual([]);
+  it(`should return empty array`, async () => {
+    expect(await sut.parse('')).toEqual([]);
   });
 });
 
 describe(`given headers only`, () => {
-  it(`should return empty array`, () => {
-    expect(sut.parse('one,two,three')).toEqual([]);
+  it(`should return empty array`, async () => {
+    expect(await sut.parse('one,two,three')).toEqual([]);
   });
 });
 
 describe(`given invalid data in a row (2.1 planning units)`, () => {
-  it(`should throw an error`, () => {
-    expect(() =>
+  it(`should throw an error`, async () => {
+    await expect(() =>
       sut.parse(`headers...
 1,16640,640,2.1,16000,5.1664e+07,0,16000,5.1648e+07,0,0,0,0,1
 
     `),
-    ).toThrow(
-      `Unexpected values in Marxan output at value [0]: [1,16640,640,2.1,16000,5.1664e+07,0,16000,5.1648e+07,0,0,0,0,1]`,
+    ).rejects.toEqual(
+      new Error(
+        `Unexpected values in Marxan output at value [1,16640,640,2.1,16000,5.1664e+07,0,16000,5.1648e+07,0,0,0,0,1]`,
+      ),
     );
   });
 });
 
 describe(`given data`, () => {
-  it(`should return parsed values`, () => {
-    expect(sut.parse(content)).toMatchInlineSnapshot(`
+  it(`should return parsed values`, async () => {
+    expect(await sut.parse(content)).toMatchInlineSnapshot(`
       Array [
         ResultRow {
           "best": true,

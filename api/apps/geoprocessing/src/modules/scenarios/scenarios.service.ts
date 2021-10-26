@@ -1,15 +1,12 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
-import {
-  TileService,
-  TileRequest,
-} from '@marxan-geoprocessing/modules/tile/tile.service';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { IsString, IsArray, IsIn, IsOptional } from 'class-validator';
+import { IsArray, IsIn, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
-import { string } from 'fp-ts';
+import { TileRequest } from '@marxan/tiles';
 
 interface SelectionsProperties {
   attributes: string;
@@ -18,11 +15,12 @@ interface SelectionsProperties {
   alias?: string;
   condition?: string;
 }
+
 interface IncludeSelections {
   [key: string]: SelectionsProperties;
 }
 
-let includeSelections: IncludeSelections = {
+const includeSelections: IncludeSelections = {
   protection: {
     attributes: ', "percentageProtected"',
     select:
@@ -34,9 +32,8 @@ let includeSelections: IncludeSelections = {
   },
   features: {
     attributes: ', "featureList"',
-    select: 'feature_list as "featureList"',
+    select: 'array_to_string(feature_list, \',\') as "featureList"',
     alias: 'features',
-    condition: 'test.id = features.scenario_pu_id',
   },
   cost: {
     attributes: ', "costValue"',
@@ -64,13 +61,16 @@ export class ScenariosPUFilters {
   @Transform((value: string) => value.split(','))
   include?: Array<string>;
 }
+
 export class ScenariosTileRequest extends TileRequest {
   @IsString()
   id!: string;
 }
+
 @Injectable()
 export class ScenariosService {
   private readonly logger: Logger = new Logger(ScenariosService.name);
+
   constructor(
     @InjectRepository(ScenariosPuPaDataGeo)
     private readonly ScenariosPlanningUnitGeoEntityRepository: Repository<ScenariosPuPaDataGeo>,
@@ -81,7 +81,7 @@ export class ScenariosService {
   /**
    * @todo get attributes from Entity, based on user selection
    */
-  public findTile(
+  public async findTile(
     tileSpecification: ScenariosTileRequest,
     _filters?: ScenariosPUFilters,
   ): Promise<Buffer> {
@@ -103,7 +103,8 @@ export class ScenariosService {
      * @todo: provide features id array
      * @todo: provide results/output data
      */
-    const sql = this.selectJoins(id, z,x,y,
+    const sql = this.selectJoins(
+      id,
       this.ScenariosPlanningUnitGeoEntityRepository.createQueryBuilder('test')
         .addSelect('plan.the_geom')
         .leftJoin('planning_units_geom', 'plan', `test.pu_geom_id = plan.id`)
@@ -113,7 +114,7 @@ export class ScenariosService {
 
     const table = `(${sql.getSql()})`;
 
-    return this.tileService.getTile({
+    return await this.tileService.getTile({
       z,
       x,
       y,
@@ -121,6 +122,7 @@ export class ScenariosService {
       attributes,
     });
   }
+
   /**
    * @description this will control the logic to properly build the includes.
    * @param qB
@@ -129,9 +131,6 @@ export class ScenariosService {
    */
   private selectJoins(
     id: string,
-    z: number,
-    x: number,
-    y: number,
     qB: SelectQueryBuilder<ScenariosPuPaDataGeo>,
     _filters?: ScenariosPUFilters,
   ): SelectQueryBuilder<ScenariosPuPaDataGeo> {
@@ -139,22 +138,6 @@ export class ScenariosService {
       _filters.include.forEach((element: string) => {
         if (includeSelections[element].select) {
           qB.addSelect(includeSelections[element].select!);
-        }
-        if (element == 'features'){
-          includeSelections.features.table = `(select pu.scenario_id,
-            pu.id AS scenario_pu_id,
-            string_agg(DISTINCT species.feature_id::text, ','::text) AS feature_list from (SELECT sfd.scenario_id,
-                    (st_dump(fd.the_geom)).geom AS the_geom,
-                    fd.feature_id
-                   FROM scenario_features_data sfd
-                   inner JOIN features_data fd ON sfd.feature_class_id = fd.id) species, (SELECT pug.the_geom,
-                    spd.id,
-                    spd.scenario_id
-                   FROM planning_units_geom pug
-                     inner JOIN scenarios_pu_data spd ON pug.id = spd.pu_geom_id
-                  ORDER BY spd.puid) as pu where st_intersects(species.the_geom, pu.the_geom)
-                 and species.scenario_id='${id}'::uuid
-                and st_intersects(pu.the_geom, st_transform(ST_TileEnvelope(${z}, ${x}, ${y}),4326)) group by 1,2)`;
         }
         if (includeSelections[element].table) {
           qB.leftJoin(

@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Confirm</title>
+</head>
+<style>
+  /*
+   Color-Primary: #5d73f9
+   White: #FFF;
+   Black: #111;
+   Gray: #eaeaea;
+ */
+
+  @import url(https://fonts.googleapis.com/css?family=Montserrat:400,700);
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    background-color: #FFF;
+    box-sizing: border-box;
+    color: #111;
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    padding: 0;
+    font-weight: normal;
+  }
+
+  h1 {
+    font-size: 45px;
+    margin: 0;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  a {
+    color: #111;
+    text-decoration: none;
+  }
+
+  hr {
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .body {
+    width: 75%;
+    margin: 0 auto;
+    background: #FFF;
+    padding: 30px 15px;
+    margin-top: 30px;
+    margin-bottom: 0;
+    /*box-shadow: 1px 1px 0 1px #b1b1b1;*/
+    max-width: 700px;
+  }
+
+  .line {
+    display: block;
+    margin: 0 auto;
+    max-width: 700px;
+    width: 75%;
+    height: 2px;
+    background-color: #eaeaea;
+  }
+
+  .body-second {
+    width: 75%;
+    margin: 0 auto;
+    background: #FFF;
+    padding: 15px 15px;
+    margin-top: 0;
+    margin-bottom: 30px;
+    /*box-shadow: 1px 1px 0 1px #b1b1b1;*/
+    max-width: 700px;
+  }
+
+  .body-second a {
+    text-decoration: underline;
+  }
+
+  .body-second .colgrid p {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-weight: 100;
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .body .container {
+    width: 100%;
+  }
+
+  .body .header {
+    width: 100%;
+  }
+
+  .body .header img {
+    width: 175px;
+  }
+
+  .butn-email {
+    color: #FFF;
+    text-align: center;
+    padding: 15px;
+    font-size: 20px;
+    background-color: #5d73f9;
+    display: block;
+    max-width: 250px;
+    margin: 0 auto;
+    transition: .2s;
+  }
+
+  .butn-email:hover {
+    background-color: #4159ea;
+  }
+
+  .underline::after {
+    content: '';
+    display: block;
+    margin: 20px auto;
+    width: 75px;
+    height: 5px;
+    background-color: #5d73f9;
+  }
+
+  .row {
+    width: 100%;
+  }
+
+  .colgrid {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .colgrid p {
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .col-full {
+    width: 100%;
+  }
+</style>
+
+<body>
+  <table class="body">
+    <tr>
+      <td align="center" valign="middle">
+        <center data-parsed="">
+          <table align="center" class="container">
+            <tbody>
+              <tr>
+                <td>
+                  <table class="header">
+                    <tbody>
+                      <tr>
+                        <th>
+                          <table class="colgrid">
+                            <tr>
+                              <th class="underline">
+                                <img src="{{{logo}}}" alt="logo application">
+                            </tr>
+                          </table>
+                        </th>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table class="row">
+                    <tbody>
+                      <tr>
+                        <th>
+                          <table class="colgrid">
+                            <tr>
+                              <th>
+                                <h1 class="text-center">Confirm account.</h1>
+                                <p>Click the link below to confirm your account.</p>
+                                <table class="colgrid">
+                                  <tr>
+                                    <td>
+                                      <table class="col-full">
+                                        <tr>
+                                          <td align="center" valign="middle">
+                                            <a href="{{{urlConfirm}}}" align="center" class="butn-email">Confirm</a>
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </table>
+                                <hr>
+                                <p>Your new password is:</p>
+                                <table class="colgrid">
+                                  <tr>
+                                    <td>
+                                      <table class="col-full">
+                                        <tr>
+                                          <td align="center" valign="middle">
+                                            {{password}}
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </th>
+                            </tr>
+                          </table>
+                        </th>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </center>
+      </td>
+    </tr>
+  </table>
+  <!-- Other table -->
+  <div class="line"></div>
+  <table class="body-second" data-made-with-foundation="">
+    <tr>
+      <td class="float-center" align="center" valign="top">
+        <center data-parsed="">
+          <table align="center" class="container">
+            <tbody>
+              <tr>
+                <td>
+                  <table class="row">
+                    <tbody>
+                      <tr>
+                        <th>
+                          <table class="colgrid">
+                            <tr>
+                              <th>
+                                <p>
+                                  You are receiving this email because you signed up for an account for {{{appName}}}.
+                                </p>
+                                <table class="colgrid">
+                                  <tr>
+                                    <td>
+                                      <table class="col-full">
+                                        <tr>
+                                          <td>
+
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </table>
+                                <!--<hr>-->
+                              </th>
+                            </tr>
+                          </table>
+                        </th>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </center>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

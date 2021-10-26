@@ -114,6 +114,36 @@
       ],
       "@marxan/shapefile-converter/*": [
         "libs/shapefile-converter/src/*"
+      ],
+      "@marxan/planning-units-grid": [
+        "libs/planning-units-grid/src"
+      ],
+      "@marxan/planning-units-grid/*": [
+        "libs/planning-units-grid/src/*"
+      ],
+      "@marxan/protected-areas": [
+        "libs/protected-areas/src"
+      ],
+      "@marxan/protected-areas/*": [
+        "libs/protected-areas/src/*"
+      ],
+      "@marxan/tiles": [
+        "libs/tiles/src"
+      ],
+      "@marxan/tiles/*": [
+        "libs/tiles/src/*"
+      ],
+      "@marxan/planning-unit-features": [
+        "libs/planning-unit-features/src"
+      ],
+      "@marxan/planning-unit-features/*": [
+        "libs/planning-unit-features/src/*"
+      ],
+      "@marxan/projects": [
+        "libs/projects/src"
+      ],
+      "@marxan/projects/*": [
+        "libs/projects/src/*"
       ]
     }
   },

@@ -1,22 +1,23 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
   Header,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
   Query,
-  Put,
   Req,
   Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -31,7 +32,6 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -61,7 +61,11 @@ import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ScenariosService } from './scenarios.service';
+import {
+  projectDoesntExist,
+  projectNotReady,
+  ScenariosService,
+} from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
@@ -71,9 +75,7 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { ZipFilesSerializer } from './dto/zip-files.serializer';
 import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.serializer';
 import { GeoFeatureSetSerializer } from '../geo-features/geo-feature-set.serializer';
-import { UpdateGeoFeatureSetDTO } from '../geo-features/dto/update.geo-feature-set.dto';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
-import { GeoFeatureSetService } from '../geo-features/geo-feature-set.service';
 import { ScenarioPlanningUnitDto } from './dto/scenario-planning-unit.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ScenarioFeaturesGapDataService } from '../scenarios-features/scenario-features-gap-data.service';
@@ -81,6 +83,13 @@ import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-da
 import { ScenarioFeaturesOutputGapDataService } from '../scenarios-features/scenario-features-output-gap-data.service';
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
 import { CostRangeDto } from './dto/cost-range.dto';
+import {
+  AsyncJobDto,
+  JsonApiAsyncJobMeta,
+} from '@marxan-api/dto/async-job.dto';
+import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
+import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
+import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -98,7 +107,6 @@ export class ScenariosController {
     private readonly scenarioFeaturesGapDataService: ScenarioFeaturesGapDataService,
     private readonly scenarioFeaturesOutputGapDataService: ScenarioFeaturesOutputGapDataService,
     private readonly geoFeatureSetSerializer: GeoFeatureSetSerializer,
-    private readonly geoFeatureSetService: GeoFeatureSetService,
     private readonly scenarioSerializer: ScenarioSerializer,
     private readonly scenarioFeaturesGapData: ScenarioFeaturesGapDataSerializer,
     private readonly scenarioFeaturesOutputGapData: ScenarioFeaturesOutputGapDataSerializer,
@@ -213,18 +221,36 @@ export class ScenariosController {
 
   @ApiOperation({ description: 'Create scenario' })
   @ApiCreatedResponse({ type: ScenarioResult })
+  @ApiTags(asyncJobTag)
   @Post()
   async create(
     @Body(new ValidationPipe()) dto: CreateScenarioDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ScenarioResult> {
+    const result = await this.service.create(dto, {
+      authenticatedUser: req.user,
+    });
+    if (isLeft(result)) {
+      switch (result.left) {
+        case projectNotReady:
+          throw new ConflictException();
+        case projectDoesntExist:
+          throw new NotFoundException(`Project doesn't exist`);
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
+    }
     return await this.scenarioSerializer.serialize(
-      await this.service.create(dto, { authenticatedUser: req.user }),
+      result.right,
+      undefined,
+      true,
     );
   }
 
   @ApiOperation({ description: 'Create feature set for scenario' })
-  @Post(':id/features/specification/v2')
+  @ApiTags(asyncJobTag)
+  @Post(':id/features/specification')
   async createSpecification(
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
@@ -233,34 +259,10 @@ export class ScenariosController {
     if (isLeft(result)) {
       throw new InternalServerErrorException(result.left.description);
     }
-    return await this.geoFeatureSetSerializer.serialize(result.right);
-  }
-
-  @ApiOperation({ description: 'Create feature set for scenario' })
-  @ApiCreatedResponse({ type: GeoFeatureSetResult })
-  @Post(':id/features/specification')
-  async createFeatureSetFor(
-    @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<GeoFeatureSetResult> {
-    // TODO once `copy` is in place, replace with implementation as in
-    // id/features/specification/v2
     return await this.geoFeatureSetSerializer.serialize(
-      await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
-    );
-  }
-
-  @ApiOperation({ description: 'Update feature set for scenario' })
-  @ApiOkResponse({ type: GeoFeatureSetResult })
-  @Put(':id/features/specification')
-  async updateFeatureSetFor(
-    @Body(new ValidationPipe()) dto: UpdateGeoFeatureSetDTO,
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<GeoFeatureSetResult> {
-    // TODO once `copy` is in place, replace with implementation as in
-    // id/features/specification/v2
-    return await this.geoFeatureSetSerializer.serialize(
-      await this.geoFeatureSetService.createOrReplaceFeatureSet(id, dto),
+      result.right,
+      undefined,
+      true,
     );
   }
 
@@ -278,13 +280,15 @@ export class ScenariosController {
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @ApiNoContentResponse()
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiTags(asyncJobTag)
   @Post(`:id/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
     @Param('id') scenarioId: string,
-    @Req() request: Request,
-  ): Promise<void> {
-    this.service.processCostSurfaceShapefile(scenarioId, request.file);
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<JsonApiAsyncJobMeta> {
+    this.service.processCostSurfaceShapefile(scenarioId, file);
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
   @Get(`:id/cost-surface`)
@@ -295,6 +299,7 @@ export class ScenariosController {
   }
 
   @ApiConsumesShapefile()
+  @ApiTags(inlineJobTag)
   @Post(':id/planning-unit-shapefile')
   @UseInterceptors(FileInterceptor('file', uploadOptions))
   async uploadLockInShapeFile(
@@ -306,6 +311,7 @@ export class ScenariosController {
 
   @ApiOperation({ description: 'Update scenario' })
   @ApiOkResponse({ type: ScenarioResult })
+  @ApiTags(asyncJobTag)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -313,6 +319,8 @@ export class ScenariosController {
   ): Promise<ScenarioResult> {
     return await this.scenarioSerializer.serialize(
       await this.service.update(id, dto),
+      undefined,
+      true,
     );
   }
 
@@ -323,13 +331,23 @@ export class ScenariosController {
     return await this.service.remove(id);
   }
 
-  @Patch(':id/planning-units')
+  @ApiTags(asyncJobTag)
   @ApiOkResponse()
+  @Post(':id/planning-units')
   async changePlanningUnits(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateScenarioPlanningUnitLockStatusDto,
-  ): Promise<void> {
+  ): Promise<JsonApiAsyncJobMeta> {
     await this.service.changeLockStatus(id, input);
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
+  }
+
+  @Delete(`:id/planning-units`)
+  @ApiOkResponse()
+  async resetPlanningUnitsLockStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    await this.service.resetLockStatus(id);
     return;
   }
 
@@ -369,12 +387,14 @@ export class ScenariosController {
   async getScenarioFeaturesGapData(
     @Param('id', ParseUUIDPipe) id: string,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesGapData>[]> {
     const result = await this.scenarioFeaturesGapDataService.findAllPaginated(
       fetchSpecification,
       {
         params: {
           scenarioId: id,
+          searchPhrase: featureClassAndAliasFilter,
         },
       },
     );
@@ -492,21 +512,22 @@ export class ScenariosController {
     description: `Request start of the Marxan execution.`,
     summary: `Request start of the Marxan execution.`,
   })
-  @ApiTags(marxanRunTag)
+  @ApiTags(marxanRunTag, asyncJobTag)
   @ApiQuery({
     name: `blm`,
     required: false,
     type: Number,
   })
   @ApiAcceptedResponse({
-    description: `No content.`,
+    type: JsonApiAsyncJobMeta,
   })
   @Post(`:id/marxan`)
   async executeMarxanRun(
     @Param(`id`, ParseUUIDPipe) id: string,
     @Query(`blm`) blm?: number,
-  ) {
+  ): Promise<JsonApiAsyncJobMeta> {
     await this.service.run(id, blm);
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
   @ApiOperation({
@@ -572,12 +593,14 @@ export class ScenariosController {
   async getScenarioFeaturesOutputGapData(
     @Param('id', ParseUUIDPipe) id: string,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
     const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(
       fetchSpecification,
       {
         params: {
           scenarioId: id,
+          searchPhrase: featureClassAndAliasFilter,
         },
       },
     );
@@ -619,5 +642,32 @@ export class ScenariosController {
   ): Promise<void> {
     await this.service.getCostSurfaceCsv(id, res);
     return;
+  }
+
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @ApiOperation({
+    description:
+      'Upload shapefile for with protected areas for project&scenario',
+  })
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiTags(asyncJobTag)
+  @Post(':id/protected-areas/shapefile')
+  async shapefileForProtectedArea(
+    @Param('id') scenarioId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<JsonApiAsyncJobMeta> {
+    const outcome = await this.service.addProtectedAreaFor(scenarioId, file, {
+      authenticatedUser: req.user,
+    });
+    if (isLeft(outcome)) {
+      switch (outcome.left) {
+        case submissionFailed:
+          throw new InternalServerErrorException();
+        default:
+          throw new NotFoundException();
+      }
+    }
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 }

@@ -22,7 +22,7 @@ import { RunService } from './run.service';
 import { AssetsService } from './assets.service';
 import { blmDefaultToken, runEventsToken, runQueueToken } from './tokens';
 import { RunHandler } from './run.handler';
-import { CancelHandler, notFound } from './cancel.handler';
+import { CancelHandler } from './cancel.handler';
 import { EventsHandler } from './events.handler';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
@@ -99,11 +99,15 @@ test(`canceling job`, async () => {
 });
 
 test(`canceling job`, async () => {
+  fixtures.setupForCancelingNotFoundJob();
   fixtures.GivenNoJobsInQueue();
 
   const result = await runService.cancel(`scenario-1`);
 
-  expect(result).toStrictEqual(left(notFound));
+  expect(result).toStrictEqual(right(void 0));
+  await fixtures.ThenEventCreated(
+    API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
+  );
 });
 
 test(`canceling active job`, async () => {
@@ -142,6 +146,9 @@ test(`failed job`, async () => {
   await fixtures.ThenEventCreatedIfNotExisted(
     API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
     `eventid1`,
+    {
+      reason: 'fail description',
+    },
   );
 });
 
@@ -261,8 +268,10 @@ async function getFixtures() {
   const fakeAssets = {
     forScenario: jest.fn(),
   };
+
   class FakeOutputRepository implements FieldsOf<OutputRepository> {
     db: ScenariosOutputResultsApiEntity[] = [];
+
     async saveOutput(job: {
       returnvalue: ExecutionResult | undefined;
       data: { scenarioId: string };
@@ -275,6 +284,7 @@ async function getFixtures() {
       });
     }
   }
+
   const testingModule = await Test.createTestingModule({
     providers: [
       RunHandler,
@@ -375,6 +385,9 @@ async function getFixtures() {
       fakeApiEvents.createIfNotExists.mockImplementation(() => {
         return right({});
       });
+    },
+    setupForCancelingNotFoundJob() {
+      fakeApiEvents.create.mockImplementation(() => ({}));
     },
     setupMocksForCompletedJob() {
       fakeApiEvents.createIfNotExists.mockImplementation(() => {
@@ -500,6 +513,7 @@ async function getFixtures() {
           data: {
             scenarioId: `scenario-1`,
           },
+          failedReason: `fail description`,
         };
       });
     },

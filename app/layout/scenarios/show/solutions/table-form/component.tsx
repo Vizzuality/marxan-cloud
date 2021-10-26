@@ -106,8 +106,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   return (
     <div className="relative flex flex-col flex-grow mt-8 overflow-hidden text-gray-800">
-
-      <div className="relative flex flex-col flex-grow overflow-hidden overflow-x-hidden overflow-y-auto">
+      <div ref={scrollRef} className="relative flex flex-col flex-grow overflow-hidden overflow-x-hidden overflow-y-auto">
         <div className="items-center px-8 pb-8 space-y-6 flex-column">
 
           <div className="flex items-center space-x-3">
@@ -213,10 +212,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             </Button>
           </div>
         </div>
-        <div
-          ref={scrollRef}
-          className=""
-        >
+        <div className="relative">
           {solutionsAreLoading && (
             <div className="absolute top-0 left-0 z-30 flex flex-col items-center justify-center w-full h-full">
               <Loading
@@ -242,7 +238,9 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
               onSelectSolution={(solution) => setSelectSolution(solution)}
             />
           )}
-          <LoadingMore visible={isFetchingNextPage} />
+          <LoadingMore
+            visible={isFetchingNextPage}
+          />
         </div>
       </div>
 

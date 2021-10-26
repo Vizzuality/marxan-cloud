@@ -23,12 +23,12 @@ export const SECTIONS = [
   {
     id: 'details',
     name: 'Details',
-    description: 'Each solution gives an alternative answer to your planning problem. The result of each solution reflects whether a planning unit is selected or not in the conservation network.',
+    description: 'Each solution gives you an alternative answer to your planning problem showing which planning units have been selected in the proposed conservation network, the overall cost, and whether targets have been met.',
   },
   {
     id: 'gap-analysis',
     name: 'Gap Analysis',
-    description: 'A gap analysis calculates how much of each feature is under the existing protected area network and then summarises the representation as a percentage.',
+    description: 'This gap analysis shows the amount of each feature that would be included if the new conservation plan your are working on is implemented.',
   },
 ];
 

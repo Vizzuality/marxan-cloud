@@ -35,7 +35,7 @@ export class CostTemplateDumper {
                     FROM
                       (
                         SELECT
-                          spd.id AS uid,
+                          spd.id AS puid,
                           1 AS cost
                       ) properties_attributes
                   ) AS "properties"

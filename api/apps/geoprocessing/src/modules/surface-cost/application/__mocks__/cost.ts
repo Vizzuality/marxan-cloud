@@ -5,5 +5,5 @@ export const getCostByPlanningUnit = (
 ): PlanningUnitCost[] =>
   planningUnitsIds.map((pu) => ({
     cost: 200,
-    puId: pu,
+    puid: pu,
   }));

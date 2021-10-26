@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { DeleteResult, Repository } from 'typeorm';
 import { Either, left, right } from 'fp-ts/lib/Either';
+import { FindOperator } from 'typeorm/find-options/FindOperator';
 
 import {
   ApiEvent,
@@ -23,6 +24,12 @@ import { CreateApiEventDTO } from './dto/create.api-event.dto';
 import { UpdateApiEventDTO } from './dto/update.api-event.dto';
 import { AppInfoDTO } from '../../dto/info.dto';
 import { AppConfig } from '../../utils/config.utils';
+
+export interface QualifiedEventTopicSearch
+  extends Omit<QualifiedEventTopic, 'kind'> {
+  topic: string;
+  kind: FindOperator<QualifiedEventTopic['kind']> | QualifiedEventTopic['kind'];
+}
 
 export const duplicate = Symbol();
 
@@ -57,12 +64,19 @@ export class ApiEventsService extends AppBaseService<
    * return the matching event with latest timestamp.
    */
   public async getLatestEventForTopic(
-    qualifiedTopic: QualifiedEventTopic,
-  ): Promise<ApiEventByTopicAndKind | undefined> {
-    const result = await this.latestEventByTopicAndKindRepo.findOne({
-      topic: qualifiedTopic.topic,
-      kind: qualifiedTopic.kind,
-    });
+    qualifiedTopic: QualifiedEventTopicSearch,
+  ): Promise<ApiEventByTopicAndKind> {
+    const result = await this.latestEventByTopicAndKindRepo.findOne(
+      {
+        topic: qualifiedTopic.topic,
+        kind: qualifiedTopic.kind,
+      },
+      {
+        order: {
+          timestamp: 'DESC',
+        },
+      },
+    );
     if (!result) {
       throw new NotFoundException(
         `No events found for topic ${qualifiedTopic.topic} and kind ${qualifiedTopic.kind}.`,
@@ -98,7 +112,7 @@ export class ApiEventsService extends AppBaseService<
    * `QualifiedEventTopic` (i.e. a topic qualified by `kind` and `apiVersion`).
    */
   public async purgeAll(
-    qualifiedTopic?: QualifiedEventTopic,
+    qualifiedTopic?: QualifiedEventTopicSearch,
   ): Promise<DeleteResult> {
     if (!isNil(qualifiedTopic)) {
       this.logger.log(

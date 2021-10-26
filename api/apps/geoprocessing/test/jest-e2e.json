@@ -1,7 +1,15 @@
 {
-  "modulePaths": ["./"],
-  "moduleFileExtensions": ["js", "json", "ts"],
-  "moduleDirectories": ["node_modules"],
+  "modulePaths": [
+    "./"
+  ],
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "moduleDirectories": [
+    "node_modules"
+  ],
   "rootDir": "../",
   "testEnvironment": "node",
   "testRegex": "/test/.*.e2e-spec.ts$",
@@ -10,18 +18,42 @@
   },
   "moduleNameMapper": {
     "@marxan-geoprocessing/(.*)": "<rootDir>/src/$1",
-    "^@marxan/utils": ["<rootDir>/../../libs/utils/src"],
-    "^@marxan/utils/(.*)$": ["<rootDir>/../../libs/utils/src/$1"],
-    "^@marxan/scenarios-planning-unit": ["<rootDir>/../../libs/scenarios-planning-unit/src"],
-    "^@marxan/scenarios-planning-unit/(.*)$": ["<rootDir>/../../libs/scenarios-planning-unit/src/$1"],
-    "^@marxan/admin-regions": ["<rootDir>/../../libs/admin-regions/src"],
-    "^@marxan/admin-regions/(.*)$": ["<rootDir>/../../libs/admin-regions/src/$1"],
-    "^@marxan/api-events": ["<rootDir>/../../libs/api-events/src"],
-    "^@marxan/api-events/(.*)$": ["<rootDir>/../../libs/api-events/src/$1"],
-    "^@marxan-jobs/planning-unit-geometry": ["<rootDir>/../../libs/planning-unit-geometry/src"],
-    "^@marxan-jobs/planning-unit-geometry/(.*)$": ["<rootDir>/../../libs/planning-unit-geometry/src/$1"],
-    "^@marxan-jobs/planning-unit-protection-level/(.*)": ["<rootDir>/../../libs/planning-unit-protection-level/src/$1"],
-    "^@marxan-jobs/planning-unit-protection-level": ["<rootDir>/../../libs/planning-unit-protection-level/src"],
+    "^@marxan/utils": [
+      "<rootDir>/../../libs/utils/src"
+    ],
+    "^@marxan/utils/(.*)$": [
+      "<rootDir>/../../libs/utils/src/$1"
+    ],
+    "^@marxan/scenarios-planning-unit": [
+      "<rootDir>/../../libs/scenarios-planning-unit/src"
+    ],
+    "^@marxan/scenarios-planning-unit/(.*)$": [
+      "<rootDir>/../../libs/scenarios-planning-unit/src/$1"
+    ],
+    "^@marxan/admin-regions": [
+      "<rootDir>/../../libs/admin-regions/src"
+    ],
+    "^@marxan/admin-regions/(.*)$": [
+      "<rootDir>/../../libs/admin-regions/src/$1"
+    ],
+    "^@marxan/api-events": [
+      "<rootDir>/../../libs/api-events/src"
+    ],
+    "^@marxan/api-events/(.*)$": [
+      "<rootDir>/../../libs/api-events/src/$1"
+    ],
+    "^@marxan-jobs/planning-unit-geometry": [
+      "<rootDir>/../../libs/planning-unit-geometry/src"
+    ],
+    "^@marxan-jobs/planning-unit-geometry/(.*)$": [
+      "<rootDir>/../../libs/planning-unit-geometry/src/$1"
+    ],
+    "^@marxan-jobs/planning-unit-protection-level/(.*)": [
+      "<rootDir>/../../libs/planning-unit-protection-level/src/$1"
+    ],
+    "^@marxan-jobs/planning-unit-protection-level": [
+      "<rootDir>/../../libs/planning-unit-protection-level/src"
+    ],
     "@marxan/scenario-cost-surface/(.*)": "<rootDir>/../../libs/scenario-cost-surface/src/$1",
     "@marxan/scenario-cost-surface": "<rootDir>/../../libs/scenario-cost-surface/src",
     "@marxan/marxan-input/(.*)": "<rootDir>/../../libs/marxan-input/src/$1",
@@ -39,6 +71,16 @@
     "@marxan/iucn/(.*)": "<rootDir>/../../libs/iucn/src/$1",
     "@marxan/iucn": "<rootDir>/../../libs/iucn/src",
     "@marxan/shapefile-converter/(.*)": "<rootDir>/../../libs/shapefile-converter/src/$1",
-    "@marxan/shapefile-converter": "<rootDir>/../../libs/shapefile-converter/src"
+    "@marxan/shapefile-converter": "<rootDir>/../../libs/shapefile-converter/src",
+    "@marxan/planning-units-grid/(.*)": "<rootDir>/../../libs/planning-units-grid/src/$1",
+    "@marxan/planning-units-grid": "<rootDir>/../../libs/planning-units-grid/src",
+    "@marxan/protected-areas/(.*)": "<rootDir>/../../libs/protected-areas/src/$1",
+    "@marxan/protected-areas": "<rootDir>/../../libs/protected-areas/src",
+    "@marxan/tiles/(.*)": "<rootDir>/../../libs/tiles/src/$1",
+    "@marxan/tiles": "<rootDir>/../../libs/tiles/src",
+    "@marxan/planning-unit-features/(.*)": "<rootDir>/../../libs/planning-unit-features/src/$1",
+    "@marxan/planning-unit-features": "<rootDir>/../../libs/planning-unit-features/src",
+    "@marxan/projects/(.*)": "<rootDir>/../../libs/projects/src/$1",
+    "@marxan/projects": "<rootDir>/../../libs/projects/src"
   }
 }

@@ -70,7 +70,10 @@ export class FakeQueue implements Partial<Queue> {
     data: any,
     opts: JobsOptions | undefined,
   ): Promise<Job<any, any, string>> {
-    const job: Job = new Job(this.queueBase, name, data, opts);
+    const job: Job = new Job(this.queueBase, name, data, opts, opts?.jobId);
+    if (!job.id) {
+      job.id = v4();
+    }
     this.jobs[name] = job;
     return job;
   }

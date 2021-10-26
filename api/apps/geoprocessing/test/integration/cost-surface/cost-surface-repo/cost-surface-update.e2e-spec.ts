@@ -35,11 +35,11 @@ describe(`when updating some of the costs`, () => {
     await sut.save(world.scenarioId, [
       {
         cost: 9999,
-        puId: costOf9999Id,
+        puid: costOf9999Id,
       },
       {
         cost: 1,
-        puId: costOf1Id,
+        puid: costOf1Id,
       },
     ]);
 

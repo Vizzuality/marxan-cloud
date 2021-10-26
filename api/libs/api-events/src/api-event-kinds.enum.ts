@@ -34,13 +34,27 @@ export enum API_EVENT_KINDS {
   scenario__specification__submitted__v1__alpha1 = 'scenario.specification.submitted/v1alpha',
   scenario__specification__failed__v1__alpha1 = 'scenario.specification.failed/v1alpha',
   scenario__specification__finished__v1__alpha1 = 'scenario.specification.finished/v1alpha',
+  scenario__featuresWithPuIntersection__submitted__v1__alpha1 = 'scenario.featuresWithPuIntersection.submitted/v1alpha',
+  scenario__featuresWithPuIntersection__failed__v1__alpha1 = 'scenario.featuresWithPuIntersection.failed/v1alpha',
+  scenario__featuresWithPuIntersection__finished__v1__alpha1 = 'scenario.featuresWithPuIntersection.finished/v1alpha',
   project__protectedAreas__submitted__v1__alpha = 'project.protectedAreas.submitted/v1/alpha',
   project__protectedAreas__finished__v1__alpha = 'project.protectedAreas.finished/v1/alpha',
   project__protectedAreas__failed__v1__alpha = 'project.protectedAreas.failed/v1/alpha',
+  project__planningUnits__submitted__v1__alpha = 'project.planningUnits.submitted/v1/alpha',
+  project__planningUnits__finished__v1__alpha = 'project.planningUnits.finished/v1/alpha',
+  project__planningUnits__failed__v1__alpha = 'project.planningUnits.failed/v1/alpha',
+  project__grid__submitted__v1__alpha = 'project.grid.submitted/v1/alpha',
+  project__grid__finished__v1__alpha = 'project.grid.finished/v1/alpha',
+  project__grid__failed__v1__alpha = 'project.grid.failed/v1/alpha',
   scenario__planningAreaProtectedCalculation__submitted__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.submitted/v1/alpha',
   scenario__planningAreaProtectedCalculation__finished__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.finished/v1/alpha',
   scenario__planningAreaProtectedCalculation__failed__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.failed/v1/alpha',
 }
+
+export type ProjectEvents = Pick<
+  typeof API_EVENT_KINDS,
+  Extract<keyof typeof API_EVENT_KINDS, `project__${string}`>
+>;
 
 export type ScenarioEvents = Pick<
   typeof API_EVENT_KINDS,

@@ -1,60 +1,54 @@
 import { Injectable } from '@nestjs/common';
-import { Connection } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { Job } from 'bullmq';
+import { InjectEntityManager } from '@nestjs/typeorm';
+
+import { ShapefileService } from '@marxan/shapefile-converter';
 
 import { WorkerProcessor } from '../../worker';
-import { ProtectedAreasJobInput } from './worker-input';
-import { ShapefileService } from '@marxan/shapefile-converter';
-import { ProtectedArea } from '../protected-areas.geo.entity';
-import { GeoJSON } from 'geojson';
-import { GeometryExtractor } from './geometry-extractor';
+import { ProtectedArea, JobInput, JobOutput } from '@marxan/protected-areas';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ProtectedAreaProcessor
-  implements WorkerProcessor<ProtectedAreasJobInput, void> {
+  implements WorkerProcessor<JobInput, JobOutput> {
   constructor(
     private readonly shapefileService: ShapefileService,
-    private readonly geometryExtractor: GeometryExtractor,
-    private connection: Connection,
+    @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
-  async process(job: Job<ProtectedAreasJobInput, void>): Promise<void> {
-    const geo: GeoJSON = (
-      await this.shapefileService.transformToGeoJson(job.data.file)
-    ).data;
+  async process(job: Job<JobInput, JobOutput>): Promise<JobOutput> {
+    const { data: geo } = await this.shapefileService.transformToGeoJson(
+      job.data.shapefile,
+    );
 
-    const geometries = this.geometryExtractor.extract(geo);
-
-    if (geometries.length === 0) {
-      throw new Error(
-        'No supported geometries found. Ensure that file contains FeatureCollection / Multipolygon / Polygon.',
-      );
-    }
-
-    const queryRunner = this.connection.createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      await queryRunner.manager.delete(ProtectedArea, {
+    return this.entityManager.transaction(async (transaction) => {
+      await transaction.delete(ProtectedArea, {
         projectId: job.data.projectId,
       });
-      await queryRunner.manager.insert(
-        ProtectedArea,
-        geometries.map((geometry) => ({
-          projectId: job.data.projectId,
-          fullName: job.data.file.filename,
-          theGeom: () =>
-            `st_multi(ST_GeomFromGeoJSON('${JSON.stringify(geometry)}'))`,
-        })),
+
+      const entities: { id: string }[] = await transaction.query(
+        `
+          INSERT INTO "wdpa"("the_geom", "project_id", "full_name")
+          SELECT ST_SetSRID(
+                   ST_CollectionExtract(ST_Collect(
+                                          ST_GeomFromGeoJSON(features ->> 'geometry')
+                                          ), 3), 4326)::geometry,
+                 $2,
+                 $3
+          FROM (
+                 SELECT json_array_elements($1::json -> 'features') AS features
+               ) AS f
+          RETURNING "id"
+        `,
+        [geo, job.data.projectId, job.data.shapefile.filename],
       );
 
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+      return plainToClass<JobOutput, JobOutput>(JobOutput, {
+        protectedAreaId: entities.map((entity) => entity.id),
+        projectId: job.data.projectId,
+        scenarioId: job.data.scenarioId,
+      });
+    });
   }
 }

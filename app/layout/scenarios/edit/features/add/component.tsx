@@ -6,7 +6,9 @@ import { useRouter } from 'next/router';
 
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+import {
+  useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures,
+} from 'hooks/features';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import List from 'layout/scenarios/edit/features/add/list';
@@ -14,6 +16,8 @@ import Toolbar from 'layout/scenarios/edit/features/add/toolbar';
 
 import Button from 'components/button';
 import Loading from 'components/loading';
+
+import Uploader from './uploader';
 
 export interface ScenariosFeaturesAddProps {
   onSuccess?: () => void;
@@ -27,6 +31,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   const [search, setSearch] = useState(null);
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
+
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -165,6 +170,11 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
             iconClassName="w-10 h-10 text-primary-500"
           />
 
+          {/* Field to upload */}
+          <div className="mx-8 mt-3 mb-5">
+            <Uploader />
+          </div>
+
           <Toolbar
             search={search}
             filters={filters}
@@ -197,6 +207,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
                 theme="secondary"
                 size="lg"
                 onClick={onCancel}
+
               >
                 Cancel
               </Button>

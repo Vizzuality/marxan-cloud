@@ -45,7 +45,7 @@ export class CostSurfaceViewService {
         const tsvRow = [
           data.puid,
           data.spucd_cost ?? 0,
-          data.lockin_status ?? 0,
+          this.#fixMarxanIssue(data.lockin_status) ?? 0,
         ].join(this.#separator);
         responseStream.write(`\n`);
         responseStream.write(tsvRow);
@@ -56,4 +56,22 @@ export class CostSurfaceViewService {
       responseStream.end();
     });
   }
+
+  /**
+   * alicia.arenzana 27.09.2021 10:24
+   even though the manual covers a values 0, 1, 2 for maybe, yes and no (inclusion/exclusion)
+   the software still uses the old version setup 0, 1, 2, 3 for maybe, we don't know, yes and no (exclusion/inclusion) so our 2 should be an exclusion but is intead an inclusion
+   * @param lockinStatus
+   */
+  #fixMarxanIssue = (lockinStatus: number | null): number | null => {
+    if (lockinStatus === 1) {
+      return 2;
+    }
+
+    if (lockinStatus === 2) {
+      return 3;
+    }
+
+    return lockinStatus;
+  };
 }

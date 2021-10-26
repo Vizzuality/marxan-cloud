@@ -62,7 +62,7 @@ export interface ItemProps {
   warnings: boolean;
   progress?: number;
   lastUpdate: string;
-  jobs?: Record<string, unknown>[];
+  jobs?: Record<string, any>[];
   lastUpdateDistance: string;
   className?: string;
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -96,7 +96,6 @@ export const Item: React.FC<ItemProps> = ({
     const geofeatureSplit = jobs.find((j) => j.kind === 'geofeatureSplit');
     const geofeatureStratification = jobs.find((j) => j.kind === 'geofeatureStratification');
     const specification = jobs.find((j) => j.kind === 'specification');
-
     const run = jobs.find((j) => j.kind === 'run');
 
     // PROTECTED AREAS
@@ -105,7 +104,6 @@ export const Item: React.FC<ItemProps> = ({
 
     // PLANNING UNITS LOCK
     if (planningUnitsInclusion && planningUnitsInclusion.status === 'running') return 'pu-running';
-    if (planningUnitsInclusion && planningUnitsInclusion.status === 'failure') return 'pu-failure';
 
     // GEO FEATURES
     if (

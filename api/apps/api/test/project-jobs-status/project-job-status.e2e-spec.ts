@@ -1,6 +1,5 @@
 import { INestApplication } from '@nestjs/common';
 import { PromiseType } from 'utility-types';
-import * as request from 'supertest';
 
 import { createWorld } from './world';
 import { bootstrapApplication } from '../utils/api-application';
@@ -18,37 +17,47 @@ afterAll(async () => {
   await app.close();
 });
 
-describe(`Given scenario has some jobs running`, () => {
-  let result: request.Response;
-  beforeAll(async () => {
-    // Asset
-    await world.GivenCostSurfaceFinished();
-    await world.GivenScenarioPlanningInclusionInProgress();
+test(`job statuses for project`, async () => {
+  await world.GivenCostSurfaceFinished();
+  await world.GivenScenarioPlanningInclusionInProgress();
+  await world.GivenGridSettingInProgress();
 
-    // Act
-    result = await world.WhenGettingProjectJobsStatus();
-  });
+  const result = await world.WhenGettingProjectJobsStatus();
 
-  it(`should contain only pending job`, () => {
-    expect(result.body.data.attributes.scenarios).toEqual([
-      {
-        id: world.scenarioIdWithCostSurfaceFinished(),
-        jobs: [
-          {
-            kind: 'costSurface',
-            status: 'done',
-          },
-        ],
-      },
-      {
-        id: world.scenarioIdWithPendingJob(),
-        jobs: [
-          {
-            kind: 'planningUnitsInclusion',
-            status: 'running',
-          },
-        ],
-      },
-    ]);
-  });
+  expect(result.body.data.attributes.jobs).toEqual([
+    {
+      data: null,
+      kind: 'grid',
+      status: 'running',
+      isoDate: expect.any(String),
+    },
+    {
+      data: null,
+      kind: 'planningUnits',
+      status: 'running',
+      isoDate: expect.any(String),
+    },
+  ]);
+  expect(result.body.data.attributes.scenarios).toEqual([
+    {
+      id: world.scenarioIdWithCostSurfaceFinished(),
+      jobs: [
+        {
+          kind: 'costSurface',
+          status: 'done',
+          isoDate: expect.any(String),
+        },
+      ],
+    },
+    {
+      id: world.scenarioIdWithPendingJob(),
+      jobs: [
+        {
+          kind: 'planningUnitsInclusion',
+          status: 'running',
+          isoDate: expect.any(String),
+        },
+      ],
+    },
+  ]);
 });

@@ -16,12 +16,15 @@ import { PlanningAreaModule } from '@marxan-geoprocessing/modules/planning-area/
 import { MarxanSandboxedRunnerModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandboxed-runner.module';
 import { ScenariosModule } from '@marxan-geoprocessing/modules/scenarios/scenarios.module';
 import { ScenarioProtectedAreaCalculationModule } from '@marxan-geoprocessing/modules/scenario-protected-area-calculation/scenario-protected-area-calculation.module';
+import { PlanningUnitsGridModule } from '@marxan-geoprocessing/modules/planning-units-grid';
+import { ScenarioPlanningUnitsFeaturesAggregateModule } from '@marxan-geoprocessing/modules/scenario-planning-units-features-aggregate/scenario-planning-units-features-aggregate.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       ...geoprocessingConnections.default,
       keepConnectionAlive: true,
+      migrationsTransactionMode: 'each',
     }),
     TypeOrmModule.forRoot({
       ...geoprocessingConnections.apiDB,
@@ -40,6 +43,8 @@ import { ScenarioProtectedAreaCalculationModule } from '@marxan-geoprocessing/mo
     PlanningAreaModule,
     MarxanSandboxedRunnerModule,
     ScenariosModule,
+    PlanningUnitsGridModule,
+    ScenarioPlanningUnitsFeaturesAggregateModule,
   ],
   controllers: [AppController],
   providers: [AppService],

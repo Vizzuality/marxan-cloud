@@ -1,0 +1,11 @@
+{
+  "selected": [
+    "IUCN III",
+    "IUCN Ib"
+  ],
+  "custom": {
+    "file": "./protected-areas/shapefile-or-geo.ext",
+    "name": "area-name"
+  },
+  "threshold": 70
+}

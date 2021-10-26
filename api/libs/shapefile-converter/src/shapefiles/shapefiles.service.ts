@@ -11,9 +11,12 @@ const mapshaper = require('mapshaper');
 export class ShapefileService {
   private readonly logger: Logger = new Logger(ShapefileService.name);
   private readonly minRequiredFiles = ['.prj', '.dbf', '.shx', '.shp'];
+
   constructor(private readonly fileService: FileService) {}
 
-  private async shapeFileToGeoJson(fileInfo: Express.Multer.File) {
+  private async shapeFileToGeoJson(
+    fileInfo: Pick<Express.Multer.File, 'path' | 'filename' | 'destination'>,
+  ) {
     if (
       !(await this.areRequiredShapefileFilesInFolder(
         fileInfo.path.replace('.zip', ''),
@@ -30,10 +33,10 @@ export class ShapefileService {
     );
 
     await mapshaper.runCommandsXL(
-      `-i no-topology snap ${fileInfo.path.replace(
+      `-i snap "${fileInfo.path.replace(
         '.zip',
         '',
-      )}/*.shp -proj EPSG:4326 -clean rewind -info -o ${outputFile}`,
+      )}/*.shp" -proj EPSG:4326 -clean rewind -info -o "${outputFile}"`,
     );
 
     const geoJsonBuffer = await readFile(outputFile);
@@ -64,7 +67,11 @@ export class ShapefileService {
   /**
    * converts file to a geojson and *removes* it
    */
-  async transformToGeoJson(shapeFile: Express.Multer.File) {
+  async transformToGeoJson(
+    shapeFile: Pick<Express.Multer.File, 'path' | 'filename' | 'destination'>,
+  ): Promise<{
+    data: GeoJSON;
+  }> {
     try {
       this.logger.log(
         await this.fileService.unzipFile(

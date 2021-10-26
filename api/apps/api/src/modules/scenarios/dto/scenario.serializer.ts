@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PaginationMeta } from '@marxan-api/utils/app-base.service';
-import { Scenario } from '../scenario.api.entity';
+import { Scenario, ScenarioResult } from '../scenario.api.entity';
 import { ScenariosCrudService } from '../scenarios-crud.service';
+import { plainToClass } from 'class-transformer';
+import { AsyncJobDto } from '@marxan-api/dto/async-job.dto';
 
 @Injectable()
 export class ScenarioSerializer {
@@ -10,7 +12,18 @@ export class ScenarioSerializer {
   async serialize(
     entities: Partial<Scenario> | (Partial<Scenario> | undefined)[],
     paginationMeta?: PaginationMeta,
-  ): Promise<any> {
-    return this.scenariosCrudService.serialize(entities, paginationMeta);
+    asyncJobTriggered?: boolean,
+  ): Promise<ScenarioResult> {
+    const result = await this.scenariosCrudService.serialize(
+      entities,
+      paginationMeta,
+    );
+    return plainToClass(ScenarioResult, {
+      ...result,
+      meta: {
+        ...(result?.meta ?? {}),
+        ...(asyncJobTriggered ? AsyncJobDto.forScenario() : {}),
+      },
+    });
   }
 }

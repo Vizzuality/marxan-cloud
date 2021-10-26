@@ -50,7 +50,7 @@ export class ProjectsListingController {
       },
       authenticatedUser: req.user,
     });
-    return this.projectSerializer.serialize(results.data, results.metadata);
+    return this.projectSerializer.serializeAll(results.data, results.metadata);
   }
 
   @ProjectsListing()
@@ -64,7 +64,7 @@ export class ProjectsListingController {
         namesSearch,
       },
     });
-    return this.projectSerializer.serialize(results.data, results.metadata);
+    return this.projectSerializer.serializeAll(results.data, results.metadata);
   }
 }
 

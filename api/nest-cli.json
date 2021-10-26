@@ -169,6 +169,51 @@
       "compilerOptions": {
         "tsConfigPath": "libs/shapefile-converter/tsconfig.lib.json"
       }
+    },
+    "planning-units-grid": {
+      "type": "library",
+      "root": "libs/planning-units-grid",
+      "entryFile": "index",
+      "sourceRoot": "libs/planning-units-grid/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/planning-units-grid/tsconfig.lib.json"
+      }
+    },
+    "protected-areas": {
+      "type": "library",
+      "root": "libs/protected-areas",
+      "entryFile": "index",
+      "sourceRoot": "libs/protected-areas/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/protected-areas/tsconfig.lib.json"
+      }
+    },
+    "tiles": {
+      "type": "library",
+      "root": "libs/tiles",
+      "entryFile": "index",
+      "sourceRoot": "libs/tiles/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/tiles/tsconfig.lib.json"
+      }
+    },
+    "planning-unit-features": {
+      "type": "library",
+      "root": "libs/planning-unit-features",
+      "entryFile": "index",
+      "sourceRoot": "libs/planning-unit-features/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/planning-unit-features/tsconfig.lib.json"
+      }
+    },
+    "projects": {
+      "type": "library",
+      "root": "libs/projects",
+      "entryFile": "index",
+      "sourceRoot": "libs/projects/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/projects/tsconfig.lib.json"
+      }
     }
   }
 }

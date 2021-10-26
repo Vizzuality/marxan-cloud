@@ -14,13 +14,14 @@ import {
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { ProtectedAreasService } from '@marxan-api/modules/protected-areas/protected-areas.service';
+import { ProtectedAreasCrudService } from '@marxan-api/modules/protected-areas/protected-areas-crud.service';
 import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.service';
 import { concat } from 'lodash';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { CommandBus } from '@nestjs/cqrs';
 import { CalculatePlanningUnitsProtectionLevel } from '../planning-units-protection-level';
+import { assertDefined } from '@marxan/utils';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
@@ -48,8 +49,8 @@ export class ScenariosCrudService extends AppBaseService<
     @InjectRepository(Project)
     protected readonly projectRepository: Repository<Project>,
     @Inject(UsersService) protected readonly usersService: UsersService,
-    @Inject(ProtectedAreasService)
-    protected readonly protectedAreasService: ProtectedAreasService,
+    @Inject(ProtectedAreasCrudService)
+    protected readonly protectedAreasService: ProtectedAreasCrudService,
     @Inject(forwardRef(() => ProjectsCrudService))
     protected readonly projectsService: ProjectsCrudService,
     private readonly wdpaCalculationsDetector: WdpaAreaCalculationService,
@@ -63,11 +64,14 @@ export class ScenariosCrudService extends AppBaseService<
   async actionAfterCreate(
     model: Scenario,
     createModel: CreateScenarioDTO,
-    _?: AppInfoDTO,
+    _?: ScenarioInfoDTO,
   ): Promise<void> {
     if (this.wdpaCalculationsDetector.shouldTrigger(model, createModel)) {
       await this.commandBus.execute(
-        new CalculatePlanningUnitsProtectionLevel(model.id, model.protectedAreaFilterByIds),
+        new CalculatePlanningUnitsProtectionLevel(
+          model.id,
+          model.protectedAreaFilterByIds,
+        ),
       );
     }
   }
@@ -75,11 +79,14 @@ export class ScenariosCrudService extends AppBaseService<
   async actionAfterUpdate(
     model: Scenario,
     updateModel: UpdateScenarioDTO,
-    _?: AppInfoDTO,
+    _?: ScenarioInfoDTO,
   ): Promise<void> {
     if (this.wdpaCalculationsDetector.shouldTrigger(model, updateModel)) {
       await this.commandBus.execute(
-        new CalculatePlanningUnitsProtectionLevel(model.id, model.protectedAreaFilterByIds),
+        new CalculatePlanningUnitsProtectionLevel(
+          model.id,
+          model.protectedAreaFilterByIds,
+        ),
       );
     }
   }
@@ -167,7 +174,7 @@ export class ScenariosCrudService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<Scenario>,
     filters: ScenarioFilters,
-    _info?: AppInfoDTO,
+    _info?: ScenarioInfoDTO,
   ): SelectQueryBuilder<Scenario> {
     query = this._processBaseFilters<ScenarioFilters>(
       query,
@@ -179,9 +186,10 @@ export class ScenariosCrudService extends AppBaseService<
 
   async setDataCreate(
     create: CreateScenarioDTO,
-    info?: AppInfoDTO,
+    info?: ScenarioInfoDTO,
   ): Promise<Scenario> {
     const model = await super.setDataCreate(create, info);
+    assertDefined(model.projectId);
     /**
      * We always compute the list of protected areas to associate to a scenario
      * from the list of IUCN categories and the list of project-specific protected
@@ -208,8 +216,16 @@ export class ScenariosCrudService extends AppBaseService<
   async setDataUpdate(
     model: Scenario,
     update: UpdateScenarioDTO,
-    info?: AppInfoDTO,
+    info?: ScenarioInfoDTO,
   ): Promise<Scenario> {
+    update.projectId = (
+      await this.projectRepository.findOne({
+        where: {
+          id: model.projectId,
+        },
+      })
+    )?.id;
+    assertDefined(update.projectId);
     model = await super.setDataUpdate(model, update, info);
     /**
      * We always compute the list of protected areas to associate to a scenario
@@ -251,7 +267,7 @@ export class ScenariosCrudService extends AppBaseService<
     }:
       | Pick<CreateScenarioDTO, 'projectId' | 'wdpaIucnCategories'>
       | Pick<UpdateScenarioDTO, 'projectId' | 'wdpaIucnCategories'>,
-    _info?: AppInfoDTO,
+    _info?: ScenarioInfoDTO,
   ): Promise<string[] | undefined> {
     /**
      * If no IUCN categories were supplied, we're done.

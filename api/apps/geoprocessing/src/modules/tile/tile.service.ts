@@ -7,36 +7,8 @@ import {
 } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import * as zlib from 'zlib';
-import { Transform } from 'class-transformer';
-import { IsInt, Max, Min } from 'class-validator';
-
-/**
- * @description The specification of the tile request
- */
-export class TileRequest {
-  /**
-   * @description The zoom level ranging from 0 - 20
-   */
-  @IsInt()
-  @Min(0)
-  @Max(20)
-  @Transform((i) => Number.parseInt(i))
-  z!: number;
-
-  /**
-   * @description The tile x offset on Mercator Projection
-   */
-  @IsInt()
-  @Transform((i) => Number.parseInt(i))
-  x!: number;
-
-  /**
-   * @description The tile y offset on Mercator Projection
-   */
-  @IsInt()
-  @Transform((i) => Number.parseInt(i))
-  y!: number;
-}
+import { TileRequest } from '@marxan/tiles';
+import { promisify } from 'util';
 
 /**
  * @description The required input values for the tile renderer
@@ -83,7 +55,6 @@ export type TileRenderer<TileInput> = (args: TileInput) => Promise<Buffer>;
 @Injectable()
 export class TileService {
   /**
-   * @todo add constructor
    * @todo move generation of specific query for each point to the api. Generate this query with the query builder
    * @todo fix geometry issue with gid_0 = 'ATA'. Once is fixed, remove this condition from the query.
    * @description The default base query builder
@@ -101,6 +72,7 @@ export class TileService {
       ? `${geometry}`
       : `ST_RemoveRepeatedPoints(${geometry}, ${0.1 / (z * 2)})`;
   }
+
   /**
    * All database interaction is encapsulated in this function. The design-goal is to keep the time where a database-
    * connection is open to a minimum. This reduces the risk for the database-instance to run out of connections.
@@ -160,16 +132,9 @@ export class TileService {
   /**
    * @description Data compression
    */
-  zip(data: any): Promise<Buffer> {
-    return new Promise<Buffer>((resolve, reject) => {
-      zlib.gzip(data, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-
-        resolve(result);
-      });
-    });
+  public async zip(data: Buffer): Promise<Buffer> {
+    const gzip = promisify(zlib.gzip);
+    return await gzip(data);
   }
 
   /**
@@ -182,18 +147,13 @@ export class TileService {
    * @todo add tile render type to promise
    */
   async getTile(tileInput: TileInput<string>): Promise<Buffer> {
-    let data: Buffer = Buffer.from('');
     try {
-      const queryResult: Record<
-        'mvt',
-        Buffer
-      >[] = await this.fetchTileFromDatabase(tileInput);
-      // zip data
-      data = await this.zip(queryResult[0].mvt);
+      const queryResult = await this.fetchTileFromDatabase(tileInput);
+      const data = this.zip(queryResult[0].mvt);
+      return data;
     } catch (error: any) {
       this.logger.error(`Database error: ${error.message}`);
       throw new BadRequestException(error.message);
     }
-    return data;
   }
 }

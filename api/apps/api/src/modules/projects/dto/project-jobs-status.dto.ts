@@ -29,6 +29,9 @@ export class ScenarioJobStatus {
     oneOf: [{ $ref: getSchemaPath(ProgressJobDTO) }],
   })
   data?: ProgressJobDTO;
+
+  @ApiPropertyOptional()
+  isoDate?: string;
 }
 
 export class ScenarioStatus {
@@ -50,6 +53,12 @@ export class ProjectStatus {
     type: ScenarioStatus,
   })
   scenarios!: ScenarioStatus[];
+
+  @ApiProperty({
+    isArray: true,
+    type: ScenarioJobStatus,
+  })
+  jobs!: ScenarioJobStatus[];
 }
 
 export class JSONAPIProjectJobStatusData {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
-import { queueName } from '@marxan-jobs/planning-unit-geometry';
+import { updateQueueName } from '@marxan-jobs/planning-unit-geometry';
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
 import { ScenariosPlanningUnitModule } from '@marxan-api/modules/scenarios-planning-unit/scenarios-planning-unit.module';
 
@@ -20,7 +20,7 @@ import { UpdatePlanningUnitsEventsPort } from './providers/planning-units/update
     ScenariosPlanningUnitModule,
     PlanningUnitsModule,
     QueueModule.register({
-      name: queueName,
+      name: updateQueueName,
     }),
   ],
   providers: [

@@ -79,7 +79,7 @@ export class MarxanSandboxRunnerService {
           marxanRun.stdError,
         );
         await workspace.cleanup();
-        reject(result);
+        reject(JSON.stringify(result));
       });
       marxanRun.on('finished', async () => {
         try {
@@ -93,7 +93,6 @@ export class MarxanSandboxRunnerService {
           await workspace.cleanup();
           resolve(output);
         } catch (error) {
-          reject(error);
           await outputFilesRepository
             .dumpFailure(
               workspace,
@@ -104,6 +103,7 @@ export class MarxanSandboxRunnerService {
             .catch((error) => {
               this.#logger.error(error);
             });
+          reject(error);
         } finally {
           this.clearAbortController(forScenarioId);
         }

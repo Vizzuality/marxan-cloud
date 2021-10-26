@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { assertDefined, isDefined } from '@marxan/utils';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { Project } from './project.api.entity';
+import { PlanningUnitGridShape, Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { UsersService } from '@marxan-api/modules/users/users.service';
@@ -24,7 +24,10 @@ import {
 } from './planning-areas';
 import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/users/role.api.entity';
-import { AppInfoDTO } from '@marxan-api/dto/info.dto';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { ProtectedArea } from '@marxan/protected-areas';
+
+import { ProjectsRequest } from './project-requests-info';
 
 const projectFilterKeyNames = [
   'name',
@@ -39,18 +42,12 @@ type ProjectFilterKeys = keyof Pick<
 >;
 type ProjectFilters = Record<ProjectFilterKeys, string[]>;
 
-export type ProjectsInfoDTO = AppInfoDTO & {
-  params?: {
-    nameSearch?: string;
-  };
-};
-
 @Injectable()
 export class ProjectsCrudService extends AppBaseService<
   Project,
   CreateProjectDTO,
   UpdateProjectDTO,
-  ProjectsInfoDTO
+  ProjectsRequest
 > {
   constructor(
     @InjectRepository(Project)
@@ -67,6 +64,8 @@ export class ProjectsCrudService extends AppBaseService<
     private readonly planningAreasService: PlanningAreasService,
     @InjectRepository(UsersProjectsApiEntity)
     private readonly userProjects: Repository<UsersProjectsApiEntity>,
+    @InjectRepository(ProtectedArea, DbConnections.geoprocessingDB)
+    private readonly protectedAreas: Repository<ProtectedArea>,
   ) {
     super(repository, 'project', 'projects', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -90,6 +89,7 @@ export class ProjectsCrudService extends AppBaseService<
         'planningAreaId',
         'planningAreaName',
         'bbox',
+        'customProtectedAreas',
       ],
       keyForAttribute: 'camelCase',
       users: {
@@ -126,7 +126,7 @@ export class ProjectsCrudService extends AppBaseService<
   setFilters(
     query: SelectQueryBuilder<Project>,
     filters: ProjectFilters,
-    _info?: ProjectsInfoDTO,
+    _info?: ProjectsRequest,
   ): SelectQueryBuilder<Project> {
     this._processBaseFilters<ProjectFilters>(
       query,
@@ -138,7 +138,7 @@ export class ProjectsCrudService extends AppBaseService<
 
   async setDataCreate(
     create: CreateProjectDTO,
-    info?: ProjectsInfoDTO,
+    info?: ProjectsRequest,
   ): Promise<Project> {
     assertDefined(info?.authenticatedUser?.id);
     /**
@@ -175,8 +175,15 @@ export class ProjectsCrudService extends AppBaseService<
   async actionAfterCreate(
     model: Project,
     createModel: CreateProjectDTO,
-    _info?: ProjectsInfoDTO,
+    _info?: ProjectsRequest,
   ): Promise<void> {
+    if (
+      createModel?.planningUnitGridShape === PlanningUnitGridShape.fromShapefile
+    ) {
+      // handled after custom grid processing
+      return;
+    }
+
     if (
       createModel.planningUnitAreakm2 &&
       createModel.planningUnitGridShape &&
@@ -189,7 +196,12 @@ export class ProjectsCrudService extends AppBaseService<
         'creating planning unit job and assigning project to area',
       );
       await Promise.all([
-        this.planningUnitsService.create(createModel),
+        this.planningUnitsService.create({
+          ...createModel,
+          planningUnitAreakm2: createModel.planningUnitAreakm2,
+          planningUnitGridShape: createModel.planningUnitGridShape,
+          projectId: model.id,
+        }),
         this.planningAreasService.assignProject({
           projectId: model.id,
           planningAreaGeometryId: createModel.planningAreaId,
@@ -201,22 +213,29 @@ export class ProjectsCrudService extends AppBaseService<
   async actionAfterUpdate(
     model: Project,
     createModel: UpdateProjectDTO,
-    _info?: ProjectsInfoDTO,
+    _info?: ProjectsRequest,
   ): Promise<void> {
-    /**
-     * @deprecated Workers and jobs should be move to the new functionality
-     */
-
+    if (
+      createModel?.planningUnitGridShape === PlanningUnitGridShape.fromShapefile
+    ) {
+      // handled after custom grid processing
+      return;
+    }
     if (
       createModel.planningUnitAreakm2 &&
-      createModel.planningUnitGridShape &&
+      createModel?.planningUnitGridShape &&
       (createModel.countryId ||
         createModel.adminAreaLevel1Id ||
         createModel.adminAreaLevel2Id ||
         createModel.planningAreaId)
     ) {
       await Promise.all([
-        this.planningUnitsService.create(createModel),
+        this.planningUnitsService.create({
+          ...createModel,
+          planningUnitAreakm2: createModel.planningUnitAreakm2,
+          planningUnitGridShape: createModel.planningUnitGridShape,
+          projectId: model.id,
+        }),
         this.planningAreasService.assignProject({
           projectId: model.id,
           planningAreaGeometryId: createModel.planningAreaId,
@@ -228,26 +247,23 @@ export class ProjectsCrudService extends AppBaseService<
   async setDataUpdate(
     model: Project,
     update: UpdateProjectDTO,
-    _?: ProjectsInfoDTO,
+    _?: ProjectsRequest,
   ): Promise<Project> {
     const bbox = await this.planningAreasService.getPlanningAreaBBox({
       ...update,
       planningAreaGeometryId: update.planningAreaId,
     });
-    if (bbox || update.planningAreaId !== undefined) {
-      const updatedModel = await super.setDataUpdate(model, update, _);
-      if (bbox) updatedModel.bbox = bbox;
-      if (update.planningAreaId !== undefined)
-        updatedModel.planningAreaGeometryId = update.planningAreaId;
-      return updatedModel;
-    }
-    return model;
+    const updatedModel = await super.setDataUpdate(model, update, _);
+    if (bbox) updatedModel.bbox = bbox;
+    if (update.planningAreaId !== undefined)
+      updatedModel.planningAreaGeometryId = update.planningAreaId;
+    return updatedModel;
   }
 
   async extendGetByIdResult(
     entity: Project,
     _fetchSpecification?: FetchSpecification,
-    _info?: ProjectsInfoDTO,
+    _info?: ProjectsRequest,
   ): Promise<Project> {
     const ids: MultiplePlanningAreaIds = entity;
     const idAndName = await this.planningAreasService.getPlanningAreaIdAndName(
@@ -257,13 +273,24 @@ export class ProjectsCrudService extends AppBaseService<
       entity.planningAreaId = idAndName.planningAreaId;
       entity.planningAreaName = idAndName.planningAreaName;
     }
+
+    const customProtectedAreas = await this.protectedAreas.find({
+      where: {
+        projectId: entity.id,
+      },
+    });
+    entity.customProtectedAreas = customProtectedAreas.map((area) => ({
+      name: area.fullName ?? undefined,
+      id: area.id,
+    }));
+
     return entity;
   }
 
   extendGetByIdQuery(
     query: SelectQueryBuilder<Project>,
     fetchSpecification?: FetchSpecification,
-    info?: ProjectsInfoDTO,
+    info?: ProjectsRequest,
   ): SelectQueryBuilder<Project> {
     const loggedUser = Boolean(info?.authenticatedUser);
     query.leftJoin(
@@ -290,7 +317,7 @@ export class ProjectsCrudService extends AppBaseService<
   async extendFindAllQuery(
     query: SelectQueryBuilder<Project>,
     fetchSpecification: FetchSpecification,
-    info?: ProjectsInfoDTO,
+    info?: ProjectsRequest,
   ): Promise<SelectQueryBuilder<Project>> {
     const loggedUser = Boolean(info?.authenticatedUser);
 
@@ -356,7 +383,7 @@ export class ProjectsCrudService extends AppBaseService<
   async extendFindAllResults(
     entitiesAndCount: [Project[], number],
     _fetchSpecification?: FetchSpecification,
-    _info?: ProjectsInfoDTO,
+    _info?: ProjectsRequest,
   ): Promise<[Project[], number]> {
     const extendedEntities: Promise<Project>[] = entitiesAndCount[0].map(
       (entity) => this.extendGetByIdResult(entity),

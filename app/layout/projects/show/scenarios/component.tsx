@@ -295,7 +295,6 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                         >
                           <ScenarioItem
                             {...s}
-                            status="draft"
                             onDelete={() => {
                               setDelete(s);
                             }}
@@ -303,7 +302,6 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                             onCancelRun={() => onCancelRun(s.id, s.name)}
                             SettingsC={<ScenarioSettings sid={s.id} />}
                           />
-
                         </div>
                       </TAG>
                     );

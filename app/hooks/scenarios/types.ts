@@ -29,7 +29,7 @@ export interface UseUploadScenarioPUProps {
 
 export interface UploadScenarioPUProps {
   id?: string,
-  data: any,
+  data: FormData,
 }
 export interface UseUploadPAProps {
   requestConfig?: AxiosRequestConfig

@@ -144,6 +144,9 @@ export class DbSpecificationRepository implements SpecificationRepository {
 
     for (const config of configs) {
       const specification = specificationLookup[config.specificationId];
+      if (!specification) {
+        continue;
+      }
       specification.specificationFeaturesConfiguration ??= [];
       specification.specificationFeaturesConfiguration.push(config);
     }

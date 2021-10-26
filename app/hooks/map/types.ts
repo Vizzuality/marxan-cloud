@@ -25,6 +25,7 @@ export interface UsePUGridPreviewLayer {
 }
 
 export interface UseWDPAPreviewLayer {
+  pid: string,
   cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
@@ -45,6 +46,7 @@ export interface UseFeaturePreviewLayers {
   bbox?: number[] | unknown;
   features?: SelectedItemProps[];
   options?: {
+    featuresRecipe?: Record<string, any>[],
     featureHoverId?: string;
     settings?: {
       bioregional?: {
@@ -118,6 +120,14 @@ export interface UsePUGridLayer {
       },
     };
   };
+}
+
+export interface UsePUCompareLayer {
+  cache?: number;
+  active?: boolean;
+  sid1?: string;
+  sid2?: string;
+  options?: Record<string, unknown>;
 }
 
 export interface UseLegend {

@@ -10,6 +10,7 @@ interface ScenarioEditStateProps {
   wdpaThreshold: number;
 
   // FEATURES
+  features: Record<string, any>;
   featureHoverId: string;
   highlightFeatures: string[];
 
@@ -31,6 +32,9 @@ interface ScenarioEditStateProps {
 
   // SETTINGS
   layerSettings: Record<string, Record<string, unknown>>
+
+  // JOBS
+  lastJobTimestamp: number;
 }
 
 const initialState = {
@@ -42,6 +46,7 @@ const initialState = {
   wdpaThreshold: 0.75,
 
   // FEATURES
+  features: [],
   featureHoverId: null,
   highlightFeatures: [],
 
@@ -60,6 +65,9 @@ const initialState = {
 
   // SETTINGS
   layerSettings: {},
+
+  // ASYNC
+  lastJobTimestamp: null,
 } as ScenarioEditStateProps;
 
 export function getScenarioEditSlice(id) {
@@ -83,6 +91,9 @@ export function getScenarioEditSlice(id) {
       },
 
       // FEATURES
+      setFeatures: (state, action: PayloadAction<Record<string, any>>) => {
+        state.features = action.payload;
+      },
       setFeatureHoverId: (state, action: PayloadAction<string>) => {
         state.featureHoverId = action.payload;
       },
@@ -139,6 +150,11 @@ export function getScenarioEditSlice(id) {
           },
         };
         state.layerSettings = newSettings;
+      },
+
+      // ASYNC JOBS
+      setJob: (state, action: PayloadAction<number>) => {
+        state.lastJobTimestamp = action.payload;
       },
     },
   });

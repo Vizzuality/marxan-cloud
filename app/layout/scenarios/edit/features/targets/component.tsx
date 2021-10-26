@@ -7,7 +7,9 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
+import {
+  useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures,
+} from 'hooks/features';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Button from 'components/button';

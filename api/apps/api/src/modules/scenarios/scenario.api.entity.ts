@@ -15,6 +15,7 @@ import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
+import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
@@ -215,7 +216,7 @@ export class JSONAPIScenarioData {
   attributes!: Scenario;
 }
 
-export class ScenarioResult {
+export class ScenarioResult extends JsonApiAsyncJobMeta {
   @ApiProperty()
   data!: JSONAPIScenarioData;
 }

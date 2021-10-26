@@ -35,7 +35,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   form,
 }: ProtectedAreaUploaderProps) => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { sid } = query;
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
@@ -94,7 +94,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadPAMutation.mutate({ id: `${pid}`, data }, {
+    uploadPAMutation.mutate({ id: `${sid}`, data }, {
       onSuccess: ({ data: { data: PAdata, id: PAid } }) => {
         setLoading(false);
         input.onChange(PAid);

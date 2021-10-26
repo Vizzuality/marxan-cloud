@@ -172,13 +172,19 @@ export class UsersService extends AppBaseService<
       user &&
       (await compare(currentAndNewPasswords.currentPassword, user.passwordHash))
     ) {
-      user.passwordHash = await hash(currentAndNewPasswords.newPassword, 10);
+      user.passwordHash = await this.hash(currentAndNewPasswords.newPassword);
       await this.repository.save(user);
       return;
     }
     throw new ForbiddenException(
       'Updating the password is not allowed: the password provided for validation as current one does not match the actual current password. If you have forgotten your password, try resetting it instead.',
     );
+  }
+
+  async updatePassword(userId: string, newPassword: string): Promise<void> {
+    const user = await this.getById(userId);
+    user.passwordHash = await this.hash(newPassword);
+    await this.repository.save(user);
   }
 
   /**
@@ -205,5 +211,9 @@ export class UsersService extends AppBaseService<
         "Updating a user's email address is not supported yet. This will be allowed once email address verification is implemented.",
       );
     }
+  }
+
+  private hash(password: string) {
+    return hash(password, 10);
   }
 }

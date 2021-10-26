@@ -25,11 +25,7 @@ import {
 
 import { DeleteResult } from 'typeorm';
 
-import {
-  ApiEvent,
-  ApiEventResult,
-  QualifiedEventTopic,
-} from './api-event.api.entity';
+import { ApiEvent, ApiEventResult } from './api-event.api.entity';
 import { ApiEventsService } from './api-events.service';
 import { CreateApiEventDTO } from './dto/create.api-event.dto';
 import { API_EVENT_KINDS } from '@marxan/api-events';
@@ -88,6 +84,6 @@ export class ApiEventsController {
     @Param('kind') kind: API_EVENT_KINDS,
     @Param('topic') topic: string,
   ): Promise<DeleteResult> {
-    return await this.service.purgeAll({ kind, topic } as QualifiedEventTopic);
+    return await this.service.purgeAll({ kind, topic });
   }
 }

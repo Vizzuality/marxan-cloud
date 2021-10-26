@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -22,8 +23,8 @@ import {
 } from './project.api.entity';
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -56,6 +57,14 @@ import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ShapefileService } from '@marxan/shapefile-converter';
+import { isFeatureCollection } from '@marxan/utils';
+import {
+  AsyncJobDto,
+  JsonApiAsyncJobMeta,
+} from '@marxan-api/dto/async-job.dto';
+import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
+import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
+import { FeatureTags } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -83,18 +92,26 @@ export class ProjectsController {
   @Get(':projectId/features')
   async findAllGeoFeaturesForProject(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-    @Param() params: { projectId: string },
-    @Query('q') featureClassAndAliasFilter: string,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Query('q') featureClassAndAliasFilter?: string,
+    @Query('tag') featureTag?: FeatureTags,
   ): Promise<GeoFeatureResult> {
-    const { data, metadata } = await this.projectsService.findAllGeoFeatures(
+    const result = await this.projectsService.findAllGeoFeatures(
       fetchSpecification,
       {
+        authenticatedUser: req.user,
         params: {
-          ...params,
+          projectId: projectId,
           featureClassAndAliasFilter: featureClassAndAliasFilter,
+          featureTag,
         },
       },
     );
+    if (isLeft(result)) {
+      throw new NotFoundException();
+    }
+    const { data, metadata } = result.right;
 
     return this.geoFeatureSerializer.serialize(data, metadata);
   }
@@ -118,6 +135,7 @@ export class ProjectsController {
 
   @ApiOperation({ description: 'Create project' })
   @ApiOkResponse({ type: ProjectResultSingular })
+  @ApiTags(asyncJobTag)
   @Post()
   async create(
     @Body() dto: CreateProjectDTO,
@@ -125,11 +143,14 @@ export class ProjectsController {
   ): Promise<ProjectResultSingular> {
     return await this.projectSerializer.serialize(
       await this.projectsService.create(dto, { authenticatedUser: req.user }),
+      undefined,
+      true,
     );
   }
 
   @ApiOperation({ description: 'Update project' })
   @ApiOkResponse({ type: ProjectResultSingular })
+  @ApiTags(asyncJobTag)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -137,6 +158,8 @@ export class ProjectsController {
   ): Promise<ProjectResultSingular> {
     return await this.projectSerializer.serialize(
       await this.projectsService.update(id, dto),
+      undefined,
+      true,
     );
   }
 
@@ -145,6 +168,25 @@ export class ProjectsController {
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
     return await this.projectsService.remove(id);
+  }
+
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @ApiOperation({
+    description: 'Upload shapefile for project-specific planning unit grid',
+  })
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiCreatedResponse({ type: JsonApiAsyncJobMeta })
+  @ApiTags(asyncJobTag)
+  @Post(`:id/grid`)
+  async setProjectGrid(
+    @Param('id') projectId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<JsonApiAsyncJobMeta> {
+    const result = await this.projectsService.setGrid(projectId, file);
+    if (isLeft(result)) {
+      throw new InternalServerErrorException(result.left);
+    }
+    return AsyncJobDto.forProject([result.right.value]).asJsonApiMetadata();
   }
 
   @ApiOperation({
@@ -156,31 +198,16 @@ export class ProjectsController {
     @Param('id') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectJobsStatusDto> {
-    const scenarios = await this.projectsService.getJobStatusFor(projectId, {
-      authenticatedUser: req.user,
-    });
-    return this.jobsStatusSerizalizer.serialize(projectId, scenarios);
-  }
-
-  @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @ApiOperation({
-    description: 'Upload shapefile for project-specific protected areas',
-  })
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiNoContentResponse()
-  @Post(':id/protected-areas/shapefile')
-  async shapefileForProtectedArea(
-    @Param('id') projectId: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<void> {
-    const outcome = await this.projectsService.addShapeFor(projectId, file, {
-      authenticatedUser: req.user,
-    });
-    if (outcome) {
-      throw new NotFoundException();
-    }
-    return;
+    const projectWithScenarios = await this.projectsService.getJobStatusFor(
+      projectId,
+      {
+        authenticatedUser: req.user,
+      },
+    );
+    return this.jobsStatusSerizalizer.serialize(
+      projectId,
+      projectWithScenarios,
+    );
   }
 
   @ApiConsumesShapefile({
@@ -189,6 +216,7 @@ export class ProjectsController {
     description: 'Upload shapefile with project planning-area',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiTags(inlineJobTag)
   @Post('planning-area/shapefile')
   async shapefileWithProjectPlanningArea(
     @UploadedFile() file: Express.Multer.File,
@@ -214,6 +242,7 @@ export class ProjectsController {
     description: `Upload shapefiles of species or bioregional features.`,
   })
   @ApiOkResponse({ type: ShapefileUploadResponse })
+  @ApiTags(inlineJobTag)
   @Post(`:id/features/shapefile`)
   @UseInterceptors(
     FileInterceptor('file', {
@@ -232,14 +261,16 @@ export class ProjectsController {
     @UploadedFile() shapefile: Express.Multer.File,
     @Body() body: UploadShapefileDTO,
   ): Promise<ShapefileUploadResponse> {
-    const shapefileData = await this.shapefileService.transformToGeoJson(
-      shapefile,
-    );
+    const { data } = await this.shapefileService.transformToGeoJson(shapefile);
+
+    if (!isFeatureCollection(data)) {
+      throw new BadRequestException(`Only FeatureCollection is supported.`);
+    }
 
     await this.geoFeatureService.createFeaturesForShapefile(
       projectId,
       body,
-      shapefileData.data.features,
+      data.features,
     );
 
     return { success: true };

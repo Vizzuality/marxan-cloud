@@ -10,7 +10,7 @@ import { ExpectBadRequest } from './assertions/expect-bad-request';
 import { HasRelevantJobName } from './assertions/has-relevant-job-name';
 import { HasExpectedJobDetails } from './assertions/has-expected-job-details';
 import { tearDown } from '../utils/tear-down';
-import { queueName } from '@marxan-jobs/planning-unit-geometry';
+import { updateQueueName } from '@marxan-jobs/planning-unit-geometry';
 
 let app: INestApplication;
 let jwtToken: string;
@@ -23,7 +23,7 @@ beforeAll(async () => {
   jwtToken = await GivenUserIsLoggedIn(app);
   world = await createWorld(app, jwtToken);
   await world.GivenScenarioPuDataExists();
-  queue = FakeQueue.getByName(queueName);
+  queue = FakeQueue.getByName(updateQueueName);
 });
 
 afterAll(async () => {
@@ -41,8 +41,9 @@ describe(`when requesting to change inclusive options`, () => {
 
   describe(`when desired PU ids are available`, () => {
     it(`triggers the job`, async () => {
-      await world.WhenChangingPlanningUnitInclusivityWithExistingPu();
+      const result = await world.WhenChangingPlanningUnitInclusivityWithExistingPu();
       const job = Object.values(queue.jobs)[0];
+      expect(result.meta.started).toBeTruthy();
       HasExpectedJobDetails(job);
       HasRelevantJobName(job, world.scenarioId);
     });

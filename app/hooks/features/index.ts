@@ -17,15 +17,18 @@ import { ItemProps as SelectedItemProps } from 'components/features/selected-ite
 import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
+import UPLOADS from 'services/uploads';
 
 import {
   UseFeaturesFiltersProps,
   UseFeaturesOptionsProps,
   UseSaveSelectedFeaturesProps,
   SaveSelectedFeaturesProps,
+  UseUploadFeaturesShapefileProps,
+  UploadFeaturesShapefileProps,
 } from './types';
 
-interface AllItemProps extends IntersectItemProps, RawItemProps {}
+interface AllItemProps extends IntersectItemProps, RawItemProps { }
 
 export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
   const [session] = useSession();
@@ -81,7 +84,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
     const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
       const { data: { data: pageData } } = p;
 
-      return pageData.map((d):AllItemProps => {
+      return pageData.map((d): AllItemProps => {
         const {
           id,
           alias,
@@ -162,7 +165,7 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
       features = [],
     } = parsedData;
 
-    parsedData = features.map((d):SelectedItemProps => {
+    parsedData = features.map((d): SelectedItemProps => {
       const {
         featureId,
         geoprocessingOperations,
@@ -266,11 +269,135 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
   }, [query, data?.data?.data, search]);
 }
 
-export function useTargetedFeatures(sid) {
-  const { data, ...rest } = useSelectedFeatures(sid);
+export function useTargetedFeatures(
+  sid,
+  filters: UseFeaturesFiltersProps = {},
+  queryOptions = {},
+) {
+  const [session] = useSession();
+  const { search } = filters;
+
+  const fetchFeatures = () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${sid}/features/specification`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  });
+
+  const query = useQuery(['selected-features', sid], fetchFeatures, {
+    ...queryOptions,
+    refetchOnWindowFocus: false,
+    retry: false,
+    enabled: !!sid,
+  });
+
+  const { data } = query;
 
   return useMemo(() => {
-    const features = flatten(data.map((s) => {
+    let parsedData = data?.data?.data || {};
+
+    const {
+      features = [],
+    } = parsedData;
+
+    parsedData = features.map((d): SelectedItemProps => {
+      const {
+        featureId,
+        geoprocessingOperations,
+        metadata = {},
+      } = d;
+
+      const {
+        alias,
+        featureClassName,
+        tag,
+        description,
+        properties = {},
+      } = metadata;
+
+      let splitOptions = [];
+      let splitFeaturesOptions = [];
+      let splitSelected;
+      let splitFeaturesSelected = [];
+
+      if (tag === 'bioregional') {
+        splitOptions = Object.keys(properties).map((k) => {
+          return {
+            key: k,
+            label: k,
+            values: properties[k].map((v) => ({ id: v, name: v })),
+          };
+        });
+
+        if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
+          splitSelected = geoprocessingOperations[0].splitByProperty;
+
+          splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
+            .find((s) => s.key === splitSelected).values
+            .map((v) => ({ label: v.name, value: v.id }))
+            : [];
+
+          splitFeaturesSelected = geoprocessingOperations[0].splits.map((s) => {
+            return {
+              ...s,
+              id: s.value,
+              name: s.value,
+            };
+          });
+        }
+      }
+
+      let intersectFeaturesSelected = [];
+
+      if (tag === 'species') {
+        if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'stratification/v1')) {
+          intersectFeaturesSelected = flatten(geoprocessingOperations
+            .map((ifs) => {
+              return ifs.splits.map((v) => {
+                return {
+                  ...v,
+                  label: v.value,
+                  value: v.value,
+                };
+              });
+            }));
+        }
+      }
+
+      return {
+        ...d,
+        id: featureId,
+        name: alias || featureClassName,
+        type: tag,
+        description,
+
+        // SPLIT
+        splitOptions,
+        splitSelected,
+        splitFeaturesSelected,
+        splitFeaturesOptions,
+
+        // INTERSECTION
+        intersectFeaturesSelected,
+      };
+    });
+
+    // Filter
+    if (search) {
+      const fuse = new Fuse(parsedData, {
+        keys: ['name'],
+        threshold: 0.25,
+      });
+      parsedData = fuse.search(search).map((f) => {
+        return f.item;
+      });
+    }
+
+    // Sort
+    parsedData = orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
+
+    parsedData = flatten(parsedData.map((s) => {
       const {
         id, name, splitSelected, splitFeaturesSelected, intersectFeaturesSelected, marxanSettings,
       } = s;
@@ -334,10 +461,10 @@ export function useTargetedFeatures(sid) {
     }));
 
     return {
-      ...rest,
-      data: features,
+      ...query,
+      data: parsedData,
     };
-  }, [data, rest]);
+  }, [query, data?.data?.data, search]);
 }
 
 export function useSaveSelectedFeatures({
@@ -350,7 +477,7 @@ export function useSaveSelectedFeatures({
 
   const saveFeature = ({ id, data }: SaveSelectedFeaturesProps) => {
     return SCENARIOS.request({
-      url: `/${id}/features/specification/v2`,
+      url: `/${id}/features/specification`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
@@ -394,4 +521,36 @@ export function useFeature(id) {
       data: data?.data?.data,
     };
   }, [query, data?.data?.data]);
+}
+
+export function useUploadFeaturesShapefile({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadFeaturesShapefileProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const uploadFeatureShapefile = ({ id, data }: UploadFeaturesShapefileProps) => {
+    return UPLOADS.request({
+      url: `/projects/${id}/features/shapefile`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadFeatureShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries(['all-features']);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
 }

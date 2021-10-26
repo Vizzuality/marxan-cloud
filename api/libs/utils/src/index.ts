@@ -1,3 +1,5 @@
 export { isDefined } from './is-defined';
 export { assertDefined } from './assert-defined';
 export { FieldsOf } from './fields-of.type';
+export * from './geo';
+export { TimeUserEntityMetadata } from './time-user-entity-metadata';

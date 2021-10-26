@@ -36,6 +36,7 @@ describe(`when every piece of data is valid`, () => {
           "runId": 0,
           "separation": 3306597,
           "target": false,
+          "totalArea": 0,
         },
         ScenarioFeatureRunData {
           "amount": 0,
@@ -45,6 +46,7 @@ describe(`when every piece of data is valid`, () => {
           "runId": 0,
           "separation": 3306597,
           "target": false,
+          "totalArea": 1,
         },
         ScenarioFeatureRunData {
           "amount": 30000,
@@ -54,6 +56,7 @@ describe(`when every piece of data is valid`, () => {
           "runId": 0,
           "separation": 3306597,
           "target": true,
+          "totalArea": 1,
         },
       ]
     `);
@@ -63,12 +66,30 @@ describe(`when every piece of data is valid`, () => {
 const getFixtures = async () => {
   return {
     withMapping: (): FeatureIdToScenarioFeatureData => ({
-      1: `8de6c866-f98b-4f7d-8ef3-b5db5ae80d97`,
-      2: `de450c37-889e-4817-8ec6-d16bd5cb47ce`,
-      3: `fc4ad6dc-a2c1-48e2-9af5-ad8373b05d6e`,
-      4: `79b524b0-ccae-4073-9a16-8855a9658172`,
-      5: `5c7ce4eb-ab61-4dba-adf3-f34c44366d72`,
-      6: `4242a3d3-0433-4f1b-b264-685f6461abcf`,
+      1: {
+        id: `8de6c866-f98b-4f7d-8ef3-b5db5ae80d97`,
+        prop: 0.5,
+      },
+      2: {
+        id: `de450c37-889e-4817-8ec6-d16bd5cb47ce`,
+        prop: 0.5,
+      },
+      3: {
+        id: `fc4ad6dc-a2c1-48e2-9af5-ad8373b05d6e`,
+        prop: 0.5,
+      },
+      4: {
+        id: `79b524b0-ccae-4073-9a16-8855a9658172`,
+        prop: 0.5,
+      },
+      5: {
+        id: `5c7ce4eb-ab61-4dba-adf3-f34c44366d72`,
+        prop: 0.5,
+      },
+      6: {
+        id: `4242a3d3-0433-4f1b-b264-685f6461abcf`,
+        prop: 0.5,
+      },
     }),
     withValidOutput: () =>
       stream.Readable.from(

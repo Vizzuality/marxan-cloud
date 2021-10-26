@@ -383,7 +383,7 @@ export const FIELDS = [
     input: {
       className: 'text-2xl',
       min: -1,
-      max: 100000,
+      max: 1000000,
       type: 'number',
       step: '1000',
     },
@@ -392,7 +392,7 @@ export const FIELDS = [
         presence: true,
         numericality: {
           greaterThanOrEqualTo: -1,
-          lessThanOrEqualTo: 100000,
+          lessThanOrEqualTo: 1000000,
         },
       },
     ],

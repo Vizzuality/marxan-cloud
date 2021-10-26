@@ -88,6 +88,14 @@ details.
      Redis service should listen on the local machine
    * `REDIS_COMMANDER_PORT` (number, required): the port on which the
      Redis Commander service should listen on the local machine
+   * `SPARKPOST_APIKEY` (string, required): an API key to be used for Sparkpost, 
+     an email service
+   * `SPARKPOST_ORIGIN` (string, required): an address of Sparkpost server, please check
+     Sparkpost's documentation for details
+   * `PASSWORD_RESET_TOKEN_PREFIX` (string, required): a prefix of an address to reset
+     a password should point to a reset password screen; the token for reset is appended at the end
+   * `PASSWORD_RESET_EXPIRATION` (string, optional, default is 30 minutes): a time that a token
+     for a password reset is valid
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted

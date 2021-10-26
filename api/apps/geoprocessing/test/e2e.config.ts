@@ -2,7 +2,7 @@ import * as faker from 'faker';
 import {
   PlanningUnitsJob,
   PlanningUnitGridShape,
-} from '@marxan-geoprocessing/modules/planning-units/dto/create.regular.planning-units.dto';
+} from '@marxan-jobs/planning-unit-geometry';
 
 interface OptionsWithCountryCode {
   countryCode: string;
@@ -31,6 +31,7 @@ export const E2E_CONFIG: {
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
           planningUnitGridShape: PlanningUnitGridShape.hexagon,
           planningUnitAreakm2: 100,
+          projectId: 'a9d965a2-35ce-44b2-8112-50bcdfe98447',
         }),
         adminRegion: (options: OptionsWithCountryCode): PlanningUnitsJob => ({
           countryId: options.countryCode,
@@ -38,6 +39,7 @@ export const E2E_CONFIG: {
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
           planningUnitGridShape: PlanningUnitGridShape.square,
           planningUnitAreakm2: 100,
+          projectId: 'a9d965a2-35ce-44b2-8112-50bcdfe98447',
         }),
       },
       invalid: {
@@ -47,6 +49,7 @@ export const E2E_CONFIG: {
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
           planningUnitGridShape: PlanningUnitGridShape.hexagon,
           planningUnitAreakm2: -100,
+          projectId: 'a9d965a2-35ce-44b2-8112-50bcdfe98447',
         }),
         adminRegion: (options: OptionsWithCountryCode): PlanningUnitsJob => ({
           countryId: options.countryCode,
@@ -54,6 +57,7 @@ export const E2E_CONFIG: {
           adminAreaLevel2Id: faker.random.alphaNumeric(12),
           planningUnitGridShape: PlanningUnitGridShape.square,
           planningUnitAreakm2: 100,
+          projectId: 'a9d965a2-35ce-44b2-8112-50bcdfe98447',
         }),
       },
     },

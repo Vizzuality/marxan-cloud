@@ -81,9 +81,6 @@ export class ScenarioPlanningUnitsLinkerService {
     project: Project,
   ): QueryPartsForLinker | undefined {
     /**
-     * @TODO selection by planning_units_geom.project_id needs project_id column
-     * to be added and set.
-     *
      * We still intersect in case planning unit grid is not fully included in
      * the planning area.
      */

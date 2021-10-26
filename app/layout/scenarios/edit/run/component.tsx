@@ -72,7 +72,10 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
       boundaryLengthModifier: values.BLM,
       metadata: {
         marxanInputParameterFile: values,
-        scenarioEditingMetadata,
+        scenarioEditingMetadata: {
+          lastJobCheck: new Date().getTime(),
+          ...scenarioEditingMetadata,
+        },
       },
     };
 
