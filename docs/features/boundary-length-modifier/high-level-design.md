@@ -27,8 +27,9 @@ https://invis.io/G211WEUZFST9#/459986030_Marxan_09a
 * This could be read via an ad-hoc endpoint, or by including this information in
   the project result DTO; probably the former would be preferrable, to avoid
   overloading the project result DTO
-* `POST` endpoint to request a calibration task with specific BLM values (either
-  the initial recommended ones, or those set by users)
+* `POST` endpoint (e.g. `/api/v1/scenarios/:id/calibration`) to request a
+  calibration task with specific BLM values (either the initial recommended
+  ones, or those set by users)
 * User-set values should also be persisted and associated to a scenario: once
   the BLM calibration process has finished the values will also be inferrable
   from the results, but until then there must be a way for the frontend to
