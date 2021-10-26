@@ -8,16 +8,6 @@ import {
 } from '@marxan-api/modules/projects/project.api.entity';
 
 import { SetProjectGridFromShapefile } from './set-project-grid-from-shapefile.command';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
-
-// TODO Debt - move grid shape to totally standalone lib
-// may be not so easy, as Project's enum is used as a type within database
-// some "transform" could be used tho
-const mapping: Record<PlanningUnitGridShape, ProjectGridShape> = {
-  [PlanningUnitGridShape.fromShapefile]: ProjectGridShape.fromShapefile,
-  [PlanningUnitGridShape.hexagon]: ProjectGridShape.hexagon,
-  [PlanningUnitGridShape.square]: ProjectGridShape.square,
-};
 
 @CommandHandler(SetProjectGridFromShapefile)
 export class SetProjectGridFromShapefileHandler
@@ -36,7 +26,7 @@ export class SetProjectGridFromShapefileHandler
         id: projectId.value,
       },
       {
-        planningUnitGridShape: mapping[PlanningUnitGridShape.fromShapefile],
+        planningUnitGridShape: ProjectGridShape.fromShapefile,
         planningAreaGeometryId: planningAreaId,
         bbox,
       },
