@@ -57,10 +57,11 @@ Two main options for running Marxan N times:
   * for example, run results should not be persisted to the same db tables as
     "real" runs to avoid mixing up actual run results with BLM calibration run
     results; this could be handled somewhat by tagging each set with their
-    origin (BLM calibration or actual scenario run), but this may end up being
-    brittle, especially until a stable workflow is in place to allow to handle
-    multiple run results for the same scenario, garbage-collect stale results
-    data, etc.
+    origin (BLM calibration or actual scenario run) and deleting data from
+    previous runs in a transaction together with persisting results from the
+    latest run, but this may end up being brittle, especially until a stable
+    workflow is in place to allow to handle multiple run results for the same
+    scenario, garbage-collect stale results data, etc.
 * create an ad-hoc, minimal `MarxanSandboxBlmCalibrationRunnerService` focused
   on the task at hand:
   * possibly no need to allow users to cancel the N calibration runs: the BLM
@@ -122,6 +123,13 @@ Once the N calibration runs have finished:
   or added to the `ScenarioResult` DTO.
 * An array of sets of selected PU ids should be persisted for the scenario (one
   for each of the N input BLM values)
+* This data will then be used to generate MVTs for the thumbnails of solutions
+  shown for each BLM value (cfr design): data-wise, these MVT tiles would carry
+  similar information as the tiles used when displaying scenario run results:
+  for full Marxan runs, MVTs state - for each planning unit - which iteration of
+  the run did include that planning unit in the solution; for BLM calibration
+  tiles, each PU would instead carry the BLM value for which the best solution
+  did include that planning unit
 * Workspace should be cleaned up, as with full Marxan runs (also in case of
   failure)
 
