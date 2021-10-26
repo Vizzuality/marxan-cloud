@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
+import { QueryBus } from '@nestjs/cqrs';
+import { isLeft, Either, right } from 'fp-ts/Either';
 
-import { GeoFeaturesService } from '@marxan-api/modules/geo-features/geo-features.service';
+import {
+  GeoFeaturesService,
+  FindResult,
+} from '@marxan-api/modules/geo-features/geo-features.service';
 import { GeoFeaturesRequestInfo } from '@marxan-api/modules/geo-features';
 
 import { ProjectsCrudService } from './projects-crud.service';
 import { JobStatusService } from './job-status';
-import { ProtectedAreasFacade } from './protected-areas/protected-areas.facade';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
@@ -15,6 +19,7 @@ import { PlanningUnitGridService, ProjectId } from './planning-unit-grid';
 import { assertDefined } from '@marxan/utils';
 
 import { ProjectsRequest } from './project-requests-info';
+import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 
 export { validationFailed } from './planning-areas';
 
@@ -23,29 +28,35 @@ export class ProjectsService {
   constructor(
     private readonly geoCrud: GeoFeaturesService,
     private readonly projectsCrud: ProjectsCrudService,
-    private readonly protectedAreaShapefile: ProtectedAreasFacade,
     private readonly jobStatusService: JobStatusService,
     private readonly planningAreaService: PlanningAreasService,
     private readonly gridService: PlanningUnitGridService,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async findAllGeoFeatures(
     fetchSpec: FetchSpecification,
     appInfo: GeoFeaturesRequestInfo,
-  ) {
+  ): Promise<Either<GetProjectErrors, FindResult>> {
     const project = await this.assertProject(
       appInfo.params?.projectId,
       appInfo.authenticatedUser,
     );
-    // /ACL slot/
-    return this.geoCrud.findAllPaginated(fetchSpec, {
-      ...appInfo,
-      params: {
-        ...appInfo.params,
-        projectId: project.id,
-        bbox: project.bbox,
-      },
-    });
+
+    if (isLeft(project)) {
+      return project;
+    }
+
+    return right(
+      await this.geoCrud.findAllPaginated(fetchSpec, {
+        ...appInfo,
+        params: {
+          ...appInfo.params,
+          projectId: project.right.id,
+          bbox: project.right.bbox,
+        },
+      }),
+    );
   }
 
   async findAll(fetchSpec: FetchSpecification, info?: ProjectsRequest) {
@@ -91,23 +102,6 @@ export class ProjectsService {
     return this.projectsCrud.remove(projectId);
   }
 
-  async addShapeFor(
-    projectId: string,
-    file: Express.Multer.File,
-    info: ProjectsRequest,
-  ): Promise<Error | undefined> /** Debt: move to Either<ErrorSymbol,Ok> */ {
-    // /ACL slot - can?/
-    try {
-      // throws HttpException
-      await this.projectsCrud.getById(projectId, undefined, info);
-    } catch {
-      return new Error(`Not Found`);
-    }
-
-    this.protectedAreaShapefile.convert(projectId, file);
-    return;
-  }
-
   async setGrid(projectId: string, file: Express.Multer.File) {
     return this.gridService.setPlanningUnitGrid(new ProjectId(projectId), file);
   }
@@ -129,9 +123,8 @@ export class ProjectsService {
     projectId = '',
     forUser: ProjectsRequest['authenticatedUser'],
   ) {
-    /** App Base Service throws 404 */
-    return await this.projectsCrud.getById(projectId, undefined, {
-      authenticatedUser: forUser,
-    });
+    return await this.queryBus.execute(
+      new GetProjectQuery(projectId, forUser?.id),
+    );
   }
 }

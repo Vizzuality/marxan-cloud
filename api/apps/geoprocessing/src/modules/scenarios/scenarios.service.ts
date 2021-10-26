@@ -81,7 +81,7 @@ export class ScenariosService {
   /**
    * @todo get attributes from Entity, based on user selection
    */
-  public findTile(
+  public async findTile(
     tileSpecification: ScenariosTileRequest,
     _filters?: ScenariosPUFilters,
   ): Promise<Buffer> {
@@ -114,7 +114,7 @@ export class ScenariosService {
 
     const table = `(${sql.getSql()})`;
 
-    return this.tileService.getTile({
+    return await this.tileService.getTile({
       z,
       x,
       y,

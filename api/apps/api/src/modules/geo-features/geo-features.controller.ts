@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { geoFeatureResource, GeoFeatureResult } from './geo-feature.geo.entity';
 import { GeoFeaturesService } from './geo-features.service';
 import {
@@ -15,7 +15,6 @@ import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import {
   JSONAPIQueryParams,
-  JSONAPISingleEntityQueryParams,
 } from '@marxan-api/decorators/json-api-parameters.decorator';
 import {
   FetchSpecification,

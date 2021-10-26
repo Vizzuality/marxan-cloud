@@ -138,6 +138,12 @@
       ],
       "@marxan/planning-unit-features/*": [
         "libs/planning-unit-features/src/*"
+      ],
+      "@marxan/projects": [
+        "libs/projects/src"
+      ],
+      "@marxan/projects/*": [
+        "libs/projects/src/*"
       ]
     }
   },

@@ -46,6 +46,9 @@ import {
   DoesntExist,
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker.service';
+import { QueryBus } from '@nestjs/cqrs';
+import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
+import { ProtectedAreaService, submissionFailed } from './protected-area';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -58,6 +61,13 @@ export type ProjectNotReady = typeof projectNotReady;
 
 export const projectDoesntExist = Symbol(`project doesn't exist`);
 export type ProjectDoesntExist = typeof projectDoesntExist;
+
+export const scenarioNotFound = Symbol(`scenario not found`);
+
+export type SubmitProtectedAreaError =
+  | GetProjectErrors
+  | typeof submissionFailed
+  | typeof scenarioNotFound;
 
 @Injectable()
 export class ScenariosService {
@@ -84,6 +94,8 @@ export class ScenariosService {
     private readonly specificationService: SpecificationService,
     private readonly costService: CostRangeService,
     private readonly projectChecker: ProjectChecker,
+    private readonly protectedArea: ProtectedAreaService,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async findAllPaginated(
@@ -393,5 +405,35 @@ export class ScenariosService {
   async resetLockStatus(scenarioId: string) {
     await this.assertScenario(scenarioId);
     await this.planningUnitsService.resetLockStatus(scenarioId);
+  }
+
+  async addProtectedAreaFor(
+    scenarioId: string,
+    file: Express.Multer.File,
+    info: AppInfoDTO,
+  ): Promise<Either<SubmitProtectedAreaError, true>> {
+    try {
+      const scenario = await this.assertScenario(scenarioId);
+      const projectResponse = await this.queryBus.execute(
+        new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
+      );
+      if (isLeft(projectResponse)) {
+        return projectResponse;
+      }
+
+      const submission = await this.protectedArea.addShapeFor(
+        projectResponse.right.id,
+        scenarioId,
+        file,
+      );
+
+      if (isLeft(submission)) {
+        return submission;
+      }
+
+      return right(true);
+    } catch {
+      return left(scenarioNotFound);
+    }
   }
 }

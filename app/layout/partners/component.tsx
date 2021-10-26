@@ -48,7 +48,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
                 With additional support from:
               </h2>
             </div>
-            <div className="grid w-full grid-cols-1 px-32 pt-24 md:px-0 md:grid-cols-4 gap-y-24 md:gap-y-0 md:gap-x-16">
+            <div className="grid w-full grid-cols-1 px-32 pt-24 md:px-0 md:grid-cols-4 gap-y-24 md:gap-y-0 md:gap-x-20">
               {ADDITIONAL_SUPPORT_LOGOS.map((sl) => (
                 <a href={sl.hyperlink} key={sl.id} rel="noreferrer" target="_blank" className="place-self-center">
                   <img alt={sl.alt} src={sl.src} height="auto" width="auto" />

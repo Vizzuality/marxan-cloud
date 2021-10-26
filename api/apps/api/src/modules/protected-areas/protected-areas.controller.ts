@@ -30,8 +30,8 @@ import {
 } from 'nestjs-base-service';
 import {
   protectedAreaResource,
-  ProtectedAreasService,
-} from './protected-areas.service';
+  ProtectedAreasCrudService,
+} from './protected-areas-crud.service';
 import { IUCNProtectedAreaCategoryResult } from './dto/iucn-protected-area-category.dto';
 import { Request, Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
@@ -43,7 +43,7 @@ import { TilesOpenApi } from '@marxan/tiles';
 @Controller(`${apiGlobalPrefixes.v1}/protected-areas`)
 export class ProtectedAreasController {
   constructor(
-    public readonly service: ProtectedAreasService,
+    public readonly service: ProtectedAreasCrudService,
     private readonly proxyService: ProxyService,
   ) {}
 

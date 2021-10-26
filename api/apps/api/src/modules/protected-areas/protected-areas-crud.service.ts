@@ -66,7 +66,7 @@ class ProtectedAreaFilters {
 }
 
 @Injectable()
-export class ProtectedAreasService extends AppBaseService<
+export class ProtectedAreasCrudService extends AppBaseService<
   ProtectedArea,
   CreateProtectedAreaDTO,
   UpdateProtectedAreaDTO,
@@ -150,15 +150,6 @@ export class ProtectedAreasService extends AppBaseService<
       ],
       keyForAttribute: 'camelCase',
     };
-  }
-
-  /**
-   * @todo This is just a stub.
-   */
-  async importProtectedAreaShapefile(
-    _file: Express.Multer.File,
-  ): Promise<ProtectedArea> {
-    return new ProtectedArea();
   }
 
   /**

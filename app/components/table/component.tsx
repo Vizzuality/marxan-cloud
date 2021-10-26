@@ -52,7 +52,8 @@ export const Table: React.FC<TableProps> = ({
 
   useEffect(() => {
     setSortedBody(body);
-  }, [body]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <table

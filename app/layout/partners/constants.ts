@@ -57,7 +57,7 @@ export const ADDITIONAL_SUPPORT_LOGOS = [
     src: UN_ENVIRONMENT_LOGO,
   },
   {
-    id: 9,
+    id: 8,
     alt: 'Pacmara logo',
     hyperlink: 'https://pacmara.org',
     src: PACMARA_LOGO,

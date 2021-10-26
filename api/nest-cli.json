@@ -205,6 +205,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/planning-unit-features/tsconfig.lib.json"
       }
+    },
+    "projects": {
+      "type": "library",
+      "root": "libs/projects",
+      "entryFile": "index",
+      "sourceRoot": "libs/projects/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/projects/tsconfig.lib.json"
+      }
     }
   }
 }
