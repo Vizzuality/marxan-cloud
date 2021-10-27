@@ -152,7 +152,14 @@ export class ProjectsCrudService extends AppBaseService<
      */
     const project = await super.setDataCreate(create, info);
     project.createdBy = info.authenticatedUser?.id;
-    project.planningAreaGeometryId = create.planningAreaId;
+
+    if (project.planningUnitGridShape === PlanningUnitGridShape.fromShapefile) {
+      // isProjectUsingCustomPlanningUnitGrid requires planningUnitAreakm2
+      // to be empty
+      project.planningUnitAreakm2 = undefined;
+    } else {
+      project.planningAreaGeometryId = create.planningAreaId;
+    }
 
     const bbox = await this.planningAreasService.getPlanningAreaBBox({
       ...create,
