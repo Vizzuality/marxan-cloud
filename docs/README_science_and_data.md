@@ -1,7 +1,11 @@
 ### Marxan - Overview
 Marxan is the most widely used decision-support software for conservation planning globally, and supports the design of cost-efficient networks that meet conservation targets for biodiversity.
 
+<<<<<<< HEAD
+* [User manual](https://marxansolutions.org/wp-content/uploads/2020/04/Marxan_User_Manual_2008.pdf)
+=======
 * [User manual](https://marxansolutions.org/wp-content/uploads/2021/02/Marxan-User-Manual_2021.pdf)
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 * [Best practices](https://marxansolutions.org/wp-content/uploads/2020/04/Marxan-Good-Practices-Handbook-v2-2013.pdf)
 * [Tutorial](https://marxansolutions.org/wp-content/uploads/2020/04/Tutorial.zip)
 * [Marxan web](https://app.marxanweb.org/)

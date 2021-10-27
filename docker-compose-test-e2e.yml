@@ -4,6 +4,32 @@ services:
   api:
     build:
       context: ./api
+<<<<<<< HEAD
+      dockerfile: Dockerfile
+      args:
+        UID: 5000
+        GID: 5000
+    ports:
+      - "${API_SERVICE_PORT}:3000"
+    container_name: marxan-test-e2e-api
+    command: test-e2e
+    user: "$UID:$GID"
+    volumes:
+      - ./api/src:/opt/marxan-api/src
+      - ./api/test:/opt/marxan-api/test
+    environment:
+      - NODE_PATH=src
+      - NODE_ENV=development
+      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-test-e2e-postgresql-api:5432/${API_POSTGRES_DB}
+      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-test-e2e-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
+    depends_on:
+      - test-e2e-postgresql-api
+      - test-e2e-postgresql-geo-api
+  geoprocessing:
+    build:
+      context: ./geoprocessing
+      dockerfile: Dockerfile
+=======
       dockerfile: api.Dockerfile
       args:
         UID: 5000
@@ -34,12 +60,29 @@ services:
     build:
       context: ./api
       dockerfile: geo.Dockerfile
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
       args:
         UID: 5000
         GID: 5000
     ports:
       - "${GEOPROCESSING_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-geoprocessing
+<<<<<<< HEAD
+    command: test-e2e
+    user: "$UID:$GID"
+    volumes:
+      - ./geoprocessing/src:/opt/marxan-geoprocessing/src
+      - ./geoprocessing/test:/opt/marxan-geoprocessing/test
+    environment:
+      - NODE_PATH=src
+      - NODE_ENV=development
+      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-test-e2e-postgresql-api:5432/${API_POSTGRES_DB}
+      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-test-e2e-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
+    depends_on:
+      - test-e2e-postgresql-geo-api
+      - test-e2e-postgresql-api
+      - api
+=======
     command: develop
     user: "5000:5000"
     volumes:
@@ -59,20 +102,28 @@ services:
       - test-e2e-redis
       - api
 
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
   test-e2e-postgresql-api:
     build:
       context: ./postgresql
       dockerfile: Dockerfile
     container_name: marxan-test-e2e-postgresql-api
     volumes:
+<<<<<<< HEAD
+      - ./api/test/fixtures/test-data.sql:/docker-entrypoint-initdb.d/test-data.sql
+=======
       - "./api/test/fixtures:/opt"
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
     ports:
       - "${POSTGRES_API_SERVICE_PORT}:5432"
     environment:
       - POSTGRES_PASSWORD=${API_POSTGRES_PASSWORD}
       - POSTGRES_USER=${API_POSTGRES_USER}
     restart: on-failure
+<<<<<<< HEAD
+=======
 
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
   test-e2e-postgresql-geo-api:
     build:
       context: ./postgresql
@@ -83,6 +134,9 @@ services:
     environment:
       - POSTGRES_PASSWORD=${GEO_POSTGRES_PASSWORD}
       - POSTGRES_USER=${GEO_POSTGRES_USER}
+<<<<<<< HEAD
+    restart: always
+=======
     restart: on-failure
 
   test-e2e-redis:
@@ -97,3 +151,4 @@ services:
 
 volumes:
   marxan-cloud-backend-e2e-temp-storage:
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149

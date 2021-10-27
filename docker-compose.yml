@@ -3,26 +3,44 @@ services:
   api:
     build:
       context: ./api
+<<<<<<< HEAD
+      dockerfile: Dockerfile
+      args:
+        UID: 5000
+        GID: 5000
+=======
       dockerfile: api.Dockerfile
       args:
         UID: 5000
         GID: 5000
         UPLOADS_TEMP_DIR: "/tmp/storage"
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
     ports:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-api
     command: develop
     user: "5000:5000"
     volumes:
+<<<<<<< HEAD
+      - ./api/src:/opt/marxan-api/src
+      - ./api/test:/opt/marxan-api/test
+=======
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
       - marxan-cloud-backend-temp-storage:/tmp/storage
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
     env_file: .env
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
       - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
       - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
+<<<<<<< HEAD
+    depends_on:
+      - postgresql-api
+      - postgresql-geo-api
+      - redis-api
+=======
       - REDIS_HOST=marxan-redis
       - NODE_CONFIG_DIR=apps/api/config
     depends_on:
@@ -30,6 +48,7 @@ services:
       - postgresql-geo-api
       - redis
 
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
   app:
     build:
       context: ./app
@@ -45,11 +64,18 @@ services:
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
+<<<<<<< HEAD
+  geoprocessing:
+    build:
+      context: ./geoprocessing
+      dockerfile: Dockerfile
+=======
 
   geoprocessing:
     build:
       context: ./api
       dockerfile: geo.Dockerfile
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
       args:
         UID: 5000
         GID: 5000
@@ -59,23 +85,34 @@ services:
     command: develop
     user: "5000:5000"
     volumes:
+<<<<<<< HEAD
+      - ./geoprocessing/src:/opt/marxan-geoprocessing/src
+      - ./geoprocessing/test:/opt/marxan-geoprocessing/test
+=======
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs
       - marxan-cloud-backend-temp-storage:/tmp/storage
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
     env_file: .env
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
       - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
       - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
+<<<<<<< HEAD
+=======
       - REDIS_HOST=marxan-redis
       - NODE_CONFIG_DIR=apps/geoprocessing/config
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
     depends_on:
       - postgresql-geo-api
       - postgresql-api
       - api
+<<<<<<< HEAD
+=======
       - redis
 
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
   postgresql-api:
     build:
       context: ./postgresql
@@ -84,6 +121,13 @@ services:
     ports:
       - "${POSTGRES_API_SERVICE_PORT}:5432"
     volumes:
+<<<<<<< HEAD
+      - marxan-cloud-postgresql-api-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${API_POSTGRES_PASSWORD}
+      - POSTGRES_USER=${API_POSTGRES_USER}
+    restart: on-failure
+=======
       - "marxan-cloud-postgresql-api-data:/var/lib/postgresql/data"
       - "./api/apps/api/test/fixtures:/opt:ro"
     environment:
@@ -92,6 +136,7 @@ services:
       - POSTGRES_DB=${API_POSTGRES_DB}
     restart: on-failure
 
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
   postgresql-geo-api:
     build:
       context: ./postgresql
@@ -106,6 +151,21 @@ services:
     environment:
       - POSTGRES_PASSWORD=${GEO_POSTGRES_PASSWORD}
       - POSTGRES_USER=${GEO_POSTGRES_USER}
+<<<<<<< HEAD
+    restart: always
+  redis-api:
+    build:
+      context: ./redis
+      dockerfile: Dockerfile
+    container_name: marxan-redis-api
+    ports:
+      - "${REDIS_API_SERVICE_PORT}:6379"
+    volumes:
+      - marxan-cloud-redis-api-data:/data
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    restart: on-failure
+=======
       - POSTGRES_DB=${GEO_POSTGRES_DB}
     restart: always
 
@@ -133,6 +193,7 @@ services:
     depends_on:
       - redis
 
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
   postgresql-airflow:
     image: postgres
     container_name: marxan-postgresql-airflow
@@ -140,7 +201,10 @@ services:
       - POSTGRES_USER=airflow
       - POSTGRES_PASSWORD=airflow
       - POSTGRES_DB=airflow
+<<<<<<< HEAD
+=======
 
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
   airflow-scheduler:
     container_name: marxan-airflow-scheduler
     image: apache/airflow:2.0.0
@@ -154,7 +218,10 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - marxan-airflow-logs:/opt/airflow/logs
+<<<<<<< HEAD
+=======
 
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
   airflow-webserver:
     container_name: marxan-airflow-webserver
     image: apache/airflow:2.0.0
@@ -175,6 +242,14 @@ services:
       - postgresql-airflow
       - airflow-scheduler
 
+<<<<<<< HEAD
+networks:
+  default:
+    external:
+      name: marxan-cloud-network
+
+=======
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 volumes:
   marxan-cloud-postgresql-api-data:
 
@@ -183,5 +258,8 @@ volumes:
   marxan-cloud-redis-api-data:
 
   marxan-airflow-logs:
+<<<<<<< HEAD
+=======
 
   marxan-cloud-backend-temp-storage:
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149

@@ -45,9 +45,15 @@ merge-simplify: data/wdpa/simp/0 data/wdpa/simp/1 data/wdpa/simp/2
 data/wdpa/simp/%: data/wdpa/geojson/%
 	mkdir -p $@
 	mapshaper-xl 16gb -i $</*.json snap \
+<<<<<<< HEAD
+				-simplify 15% planar keep-shapes \
+				-filter-islands min-vertices=3 min-area=100 remove-empty \
+				-filter-slivers min-area=100 \
+=======
 				-simplify 20% planar keep-shapes \
 				-filter-islands min-vertices=3 min-area=10000m2 remove-empty \
 				-filter-slivers min-area=10000m2 remove-empty \
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 				-clean rewind \
 				-o $@ format=geojson force ndjson
 	rm -rf $<

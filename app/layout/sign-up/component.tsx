@@ -2,13 +2,14 @@ import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
+import omit from 'lodash/omit';
+
 import Link from 'next/link';
 
-import { useToasts } from 'hooks/toast';
-
-import omit from 'lodash/omit';
 import { signIn } from 'next-auth/client';
 import { usePlausible } from 'next-plausible';
+
+import { useToasts } from 'hooks/toast';
 
 import ConfirmSignUp from 'layout/sign-up/confirm';
 import Wrapper from 'layout/wrapper';

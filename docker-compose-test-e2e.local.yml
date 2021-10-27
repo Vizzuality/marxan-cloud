@@ -2,6 +2,14 @@ version: "3.8"
 services:
   api:
     env_file: .env-test-e2e
+<<<<<<< HEAD
+  geoprocessing:
+    env_file: .env-test-e2e
+  test-e2e-postgresql-api:
+    env_file: .env-test-e2e
+  test-e2e-postgresql-geo-api:
+    env_file: .env-test-e2e
+=======
 
   geoprocessing:
     env_file: .env-test-e2e
@@ -14,3 +22,4 @@ services:
 
   test-e2e-redis:
     env_file: .env-test-e2e
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149

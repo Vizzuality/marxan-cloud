@@ -1,0 +1,14 @@
+{
+  "network": {
+    "cors": {
+      "origins": [
+        "http://localhost:3010"
+      ]
+    }
+  },
+  "auth": {
+    "jwt": {
+      "expiresIn": "2h"
+    }
+  }
+}

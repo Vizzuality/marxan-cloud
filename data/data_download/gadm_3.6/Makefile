@@ -16,9 +16,15 @@ import: data/gadm/gadm36_simp.geojson
 
 data/gadm/gadm36_simp.geojson: data/gadm/gadm36_0.shp data/gadm/gadm36_1.shp data/gadm/gadm36_2.shp
 	mapshaper-xl -i data/gadm/gadm36_0.shp data/gadm/gadm36_1.shp data/gadm/gadm36_2.shp snap combine-files \
+<<<<<<< HEAD
+				-simplify 10% planar keep-shapes \
+				-filter-islands min-vertices=3 remove-empty \
+				-filter-slivers \
+=======
 				-simplify 25% planar keep-shapes \
 				-filter-islands min-vertices=3 min-area=10000m2 remove-empty \
 				-filter-slivers min-area=10000m2 remove-empty \
+>>>>>>> fbf3f123f8cc06fb4b1eda6e3680ba304ca80149
 				-clean rewind \
 				-each 'level= this.layer_name =="gadm36_0" ? "country" \
 							: this.layer_name =="gadm36_1" ? "adm_1" \

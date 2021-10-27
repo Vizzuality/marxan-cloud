@@ -1,0 +1,13 @@
+{
+  "postgresApi": {
+    "url": "API_POSTGRES_URL"
+   },
+   "postgresGeoApi": {
+    "url": "GEO_POSTGRES_URL"
+   },
+  "network": {
+    "cors": {
+        "origins_extra": "NETWORK_CORS_ORIGINS"
+    }
+  }
+}
