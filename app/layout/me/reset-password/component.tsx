@@ -19,7 +19,7 @@ import {
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 
-import RESET_PASSWORD_SVG from 'svgs/users/reset-password.svg?sprite';
+import RECOVER_PASSWORD_SVG from 'svgs/users/reset-password.svg?sprite';
 
 export const equalPasswordValidator = (value, allValues) => {
   const { password } = allValues || {};
@@ -56,7 +56,6 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
           level: 'success',
         });
         setSubmitting(false);
-        push('/sign-in');
       },
       onError: () => {
         addToast('error-reset-password', (
@@ -70,7 +69,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
         setSubmitting(false);
       },
     });
-  }, [mutation, addToast, push]);
+  }, [mutation, addToast]);
 
   return (
     <Wrapper>
@@ -133,8 +132,10 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
         <div className="relative flex items-center justify-center h-full">
           <div className="w-full max-w-xs">
             <div className="pb-5">
-              <h2 className="mb-24 text-lg font-medium text-center text-gray-600 font-heading">You&apos;ve changed your password</h2>
-              <Icon icon={RESET_PASSWORD_SVG} className="w-56 h-56 mx-auto mb-5 text-gray-500" />
+              <h2 className="mb-24 text-lg font-medium text-center text-gray-600 font-heading">
+                You&apos;ve changed your password
+              </h2>
+              <Icon icon={RECOVER_PASSWORD_SVG} className="w-56 h-56 mx-auto mb-5 text-gray-500" />
             </div>
             <div className="mt-10">
               <Button
@@ -142,7 +143,10 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
                 size="lg"
                 type="submit"
                 disabled={submitting}
-                onClick={() => setSubmitted(false)}
+                onClick={() => {
+                  setSubmitted(false);
+                  push('/auth/sign-in');
+                }}
                 className="w-full"
               >
                 Ok

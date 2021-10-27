@@ -1,19 +1,21 @@
 import React, { useCallback, useState } from 'react';
-import Wrapper from 'layout/wrapper';
-import Button from 'components/button';
-import Loading from 'components/loading';
-import Icon from 'components/icon';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import Field from 'components/forms/field';
-import Label from 'components/forms/label';
-import Input from 'components/forms/input';
 
+import { useRequestRecoverPassword } from 'hooks/me';
+import { useToasts } from 'hooks/toast';
+
+import Wrapper from 'layout/wrapper';
+
+import Button from 'components/button';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
 import {
   composeValidators,
 } from 'components/forms/validations';
-
-import { useToasts } from 'hooks/toast';
+import Icon from 'components/icon';
+import Loading from 'components/loading';
 
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 import CHECK_EMAIL_SVG from 'svgs/users/check-email.svg?sprite';
@@ -25,30 +27,42 @@ export interface ForgotPasswordProps {
 export const ForgotPassword: React.FC<ForgotPasswordProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
+  const requestRecoverMutation = useRequestRecoverPassword({});
   const { addToast } = useToasts();
 
-  const handleSubmit = useCallback(async (data) => {
+  const handleSubmit = useCallback(async (values) => {
     setSubmitting(true);
-    try {
-      // Forgot password mutation
-      console.info('FORGOT PASSWORD', data);
-      setSubmitting(false);
-      setSubmitted(true);
-    } catch (err) {
-      addToast('error-forgot-password', (
-        <>
-          <h2 className="font-medium">Error!</h2>
-          <p className="text-sm">Invalid username or password.</p>
-        </>
-      ), {
-        level: 'error',
-      });
+    const { forgotPasswordEmail } = values;
+    const data = {
+      email: forgotPasswordEmail,
+    };
 
-      setSubmitting(false);
-      console.error(err);
-    }
-  }, [addToast]);
+    requestRecoverMutation.mutate({ data }, {
+      onSuccess: () => {
+        addToast('success-request-recover-password', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Request sent.</p>
+          </>
+        ), {
+          level: 'success',
+        });
+        setSubmitting(false);
+        setSubmitted(true);
+      },
+      onError: () => {
+        addToast('error--request-recover-password', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Invalid email.</p>
+          </>
+        ), {
+          level: 'error',
+        });
+        setSubmitting(false);
+      },
+    });
+  }, [requestRecoverMutation, addToast]);
 
   return (
     <Wrapper>
@@ -71,11 +85,11 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = () => {
                 {/* EMAIL */}
                 <div>
                   <FieldRFF
-                    name="username"
+                    name="forgotPasswordEmail"
                     validate={composeValidators([{ presence: true, email: true }])}
                   >
                     {(fprops) => (
-                      <Field id="forgot-password-username" {...fprops}>
+                      <Field id="forgot-password-email" {...fprops}>
                         <Label theme="light" className="mb-3 uppercase">Email</Label>
                         <Input theme="light" type="email" icon={EMAIL_SVG} />
                       </Field>

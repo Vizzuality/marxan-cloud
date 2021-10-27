@@ -5,7 +5,7 @@ export interface UseSaveMeProps {
 }
 
 export interface SaveMeProps {
-  data: any
+  data: unknown;
 }
 
 export interface UseSaveMePasswordProps {
@@ -13,16 +13,29 @@ export interface UseSaveMePasswordProps {
 }
 
 export interface SaveMePasswordProps {
-  data: any
+  data: unknown;
 }
 export interface UseDeleteMeProps {
   requestConfig?: AxiosRequestConfig
+}
+
+export interface UseRequestRecoverPasswordProps {
+  requestConfig?: AxiosRequestConfig
+}
+export interface RequestRecoverPasswordProps {
+  data: unknown;
 }
 export interface UseResetPasswordProps {
   requestConfig?: AxiosRequestConfig
   resetToken: string | string[];
 }
-
 export interface ResetPasswordProps {
-  data: any
+  data: unknown;
+}
+export interface UseSignUpConfirmationProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface SignUpConfirmationProps {
+  data: unknown;
 }
