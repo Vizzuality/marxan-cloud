@@ -19,7 +19,7 @@ export const runBot = async (settings: MarxanBotConfig) => {
     description: "",
   });
 
-  const planningUnitAreakm2 = 2000;
+  const planningUnitAreakm2 = 25;
 
   const planningAreaId = await bot.planningAreaUploader.uploadFromFile(
     `${scriptPath}/kimberley.zip`,
@@ -68,15 +68,15 @@ export const runBot = async (settings: MarxanBotConfig) => {
   //Setup features in the project
   const wantedFeatures = [
     // "demo_ecoregions_new_class_split",
-    // "calidris_(erolia)_ferruginea",
-    // "chlamydosaurus_kingii",
-    // "erythrura_(chloebia)_gouldiae",
-    // "haliaeetus_(pontoaetus)_leucogaster",
-    // "malurus_(malurus)_coronatus",
-    // "mesembriomys_macrurus",
-    // "onychogalea_unguifera",
-    // "pseudechis_australis",
-    // "wyulda_squamicaudata",
+    "calidris_(erolia)_ferruginea",
+    "chlamydosaurus_kingii",
+    "erythrura_(chloebia)_gouldiae",
+    "haliaeetus_(pontoaetus)_leucogaster",
+    "malurus_(malurus)_coronatus",
+    "mesembriomys_macrurus",
+    "onychogalea_unguifera",
+    "pseudechis_australis",
+    "wyulda_squamicaudata",
     "zyzomys_woodwardi",
   ];
 
