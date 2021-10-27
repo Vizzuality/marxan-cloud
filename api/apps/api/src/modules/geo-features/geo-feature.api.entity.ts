@@ -82,6 +82,10 @@ export class GeoFeature extends BaseEntity {
   @ManyToOne((_type) => User,  {
     onDelete: 'SET NULL',
   })
+  @JoinColumn({
+    name: 'created_by',
+    referencedColumnName: 'id',
+  })
   createdBy?: User;
 }
 
