@@ -8,6 +8,7 @@ import { Queue } from './queue';
 import { BullmqQueue, queueName, queueProvider } from './bullmq-queue';
 import { ScenarioCostSurfaceTemplateService } from './scenario-cost-surface-template.service';
 import { QueuedCostTemplateService } from './queued-cost-template.service';
+import { WaitingCostTemplateService } from './waiting-cost-template.service';
 import { CostSurfaceTemplateController } from './cost-surface-template.controller';
 
 @Module({
@@ -27,9 +28,11 @@ import { CostSurfaceTemplateController } from './cost-surface-template.controlle
       useClass: BullmqQueue,
     },
     queueProvider,
+    QueuedCostTemplateService,
+    WaitingCostTemplateService,
     {
       provide: ScenarioCostSurfaceTemplateService,
-      useClass: QueuedCostTemplateService,
+      useExisting: WaitingCostTemplateService,
     },
   ],
   controllers: [CostSurfaceTemplateController],
