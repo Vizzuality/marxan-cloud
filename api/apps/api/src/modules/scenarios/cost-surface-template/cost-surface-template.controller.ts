@@ -18,7 +18,6 @@ import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { scenarioResource } from '../scenario.api.entity';
 import {
-  FileNotFound,
   FileNotReady,
   ScenarioCostSurfaceTemplateService,
 } from './scenario-cost-surface-template.service';
@@ -51,15 +50,7 @@ export class CostSurfaceTemplateController {
     );
 
     if (shapefileStatus === FileNotReady) {
-      res.status(HttpStatus.ACCEPTED).send();
-      return;
-    }
-
-    if (shapefileStatus === FileNotFound) {
-      this.scenarioCostSurfaceTemplateService.scheduleTemplateShapefileCreation(
-        id,
-      );
-      res.status(HttpStatus.ACCEPTED).send();
+      res.status(HttpStatus.GATEWAY_TIMEOUT).send();
       return;
     }
   }

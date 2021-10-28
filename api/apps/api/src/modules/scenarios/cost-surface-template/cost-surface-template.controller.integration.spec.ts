@@ -16,86 +16,28 @@ beforeEach(async () => {
   app = fixtures.getApp();
 });
 
-describe(`given a template cost file was never requested`, () => {
-  beforeEach(() => {
-    // given
-    fixtures.noRequestedTemplates();
-  });
-
-  describe(`when requesting a file for scenario 123`, () => {
-    let test: request.Test;
-    beforeEach(async () => {
-      // when
-      test = request(app.getHttpServer()).get(
-        '/api/v1/scenarios/123/cost-surface/shapefile-template',
-      );
-    });
-
-    // then
-    it(`should schedule creation`, async () => {
-      await test;
-      fixtures.expectScheduled(['123']);
-    });
-
-    it(`should return accepted status`, async () => {
-      await test.expect(202);
-    });
-  });
+test(`should return a file when it is calculated`, async () => {
+  // given
+  fixtures.templateAvailable('123', 'sample shapefile');
+  // when
+  const test = request(app.getHttpServer()).get(
+    '/api/v1/scenarios/123/cost-surface/shapefile-template',
+  );
+  // then
+  const response = await test.expect(200);
+  expect(response.text).toBe(`sample shapefile`);
+  expect(response.headers['content-type']).toBe(`application/zip`);
 });
 
-describe(`given a template file is being prepared for scenario 123`, () => {
-  beforeEach(() => {
-    // given
-    fixtures.templateInProgress('123');
-  });
-
-  describe(`when requesting a file for scenario 123`, () => {
-    let test: request.Test;
-    beforeEach(() => {
-      // when
-      test = request(app.getHttpServer()).get(
-        '/api/v1/scenarios/123/cost-surface/shapefile-template',
-      );
-    });
-
-    // then
-    it(`should not start a creating process`, async () => {
-      await test;
-      fixtures.expectScheduled([]);
-    });
-
-    it(`should return accepted status`, async () => {
-      await test.expect(202);
-    });
-  });
-});
-
-describe(`given a template file is available for scenario 123`, () => {
-  beforeEach(() => {
-    // given
-    fixtures.templateAvailable('123', 'sample shapefile');
-  });
-  describe(`when requesting a file for scenario 123`, () => {
-    let test: request.Test;
-    beforeEach(() => {
-      // when
-      test = request(app.getHttpServer()).get(
-        '/api/v1/scenarios/123/cost-surface/shapefile-template',
-      );
-    });
-
-    // then
-    it(`should not schedule creation`, async () => {
-      await test;
-      fixtures.expectScheduled([]);
-    });
-
-    it(`should return ok status and stream the file`, async () => {
-      const response = await test.expect(200);
-      expect(response.text).toBe(`sample shapefile`);
-      expect(response.headers['content-type']).toBe(`application/zip`);
-    });
-  });
+it(`should return a timeout when file is in progress`, async () => {
+  // given
+  fixtures.templateInProgress(`123`);
+  // when
+  const test = request(app.getHttpServer()).get(
+    '/api/v1/scenarios/123/cost-surface/shapefile-template',
+  );
+  // then
+  await test.expect(504);
 });
 
 const getFixtures = async () => {
@@ -122,15 +64,9 @@ const getFixtures = async () => {
     noRequestedTemplates() {
       fakeShapefileService.availableTemplatesForScenarios = {};
       fakeShapefileService.templatesInProgress = [];
-      fakeShapefileService.scheduledTemplateCreation = [];
     },
     getApp() {
       return app;
-    },
-    expectScheduled(scenarioId: string[]) {
-      expect(fakeShapefileService.scheduledTemplateCreation).toStrictEqual(
-        scenarioId,
-      );
     },
     templateInProgress(scenarioId: string) {
       fakeShapefileService.templatesInProgress.push(scenarioId);
