@@ -22,6 +22,7 @@ import { SolutionResultCrudService } from './solutions-result/solution-result-cr
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import {
+  ProtectionStatusModule,
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuOutputGeoEntity,
 } from '@marxan/scenarios-planning-unit';
@@ -37,7 +38,6 @@ import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.ser
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { AdminAreasModule } from '../admin-areas/admin-areas.module';
-import { ProtectionStatusModule } from '@marxan/scenarios-planning-unit';
 
 import { SpecificationModule } from './specification';
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
@@ -46,6 +46,7 @@ import { CostRangeService } from './cost-range-service';
 import { ProjectChecker } from './project-checker.service';
 import { ProtectedAreaModule } from './protected-area';
 import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
+import { PlanningAreasModule } from '@marxan-api/modules/projects/planning-areas';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/pr
       DbConnections.geoprocessingDB,
     ),
     ProtectionStatusModule.for(DbConnections.geoprocessingDB),
+    PlanningAreasModule,
     UsersModule,
     ScenarioFeaturesModule,
     AnalysisModule,

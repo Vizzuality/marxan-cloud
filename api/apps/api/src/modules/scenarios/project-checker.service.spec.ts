@@ -7,6 +7,7 @@ import { doesntExist, ProjectChecker } from './project-checker.service';
 import { isEqual } from 'lodash';
 import { NotFoundException } from '@nestjs/common';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { PlanningAreasFacade } from '@marxan-api/modules/projects/planning-areas/planning-areas.facade';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -152,7 +153,12 @@ async function getFixtures() {
   const fakeProjectsService: jest.Mocked<
     Pick<Repository<Project>, 'findOne'>
   > = {
-    findOne: jest.fn(),
+    findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
+  };
+  const fakePlaningAreaFacade: jest.Mocked<
+    Pick<PlanningAreasFacade, 'locatePlanningAreaEntity'>
+  > = {
+    locatePlanningAreaEntity: jest.fn(),
   };
   const testingModule = await Test.createTestingModule({
     providers: [
@@ -163,6 +169,10 @@ async function getFixtures() {
       {
         provide: `ProjectRepository`,
         useValue: fakeProjectsService,
+      },
+      {
+        provide: PlanningAreasFacade,
+        useValue: fakePlaningAreaFacade,
       },
       ProjectChecker,
     ],
@@ -191,11 +201,11 @@ async function getFixtures() {
       });
     },
     GivenProjectHavePlanningAreaAssigned: () => {
-      fakeProjectsService.findOne.mockImplementation(
-        (_id: string | undefined | FindConditions<Project>) =>
-          Promise.resolve(({
-            planningAreaGeometryId: '123',
-          } as unknown) as Project),
+      fakePlaningAreaFacade.locatePlanningAreaEntity.mockImplementation(() =>
+        Promise.resolve({
+          id: '123',
+          tableName: 'test',
+        }),
       );
     },
     GivenPlanningUnitsJob(kind: API_EVENT_KINDS) {
@@ -237,11 +247,8 @@ async function getFixtures() {
       );
     },
     GivenPlanningAreaNotAssigned() {
-      fakeProjectsService.findOne.mockImplementation(
-        (_id: string | undefined | FindConditions<Project>) =>
-          Promise.resolve(({
-            planningAreaGeometryId: undefined,
-          } as unknown) as Project),
+      fakePlaningAreaFacade.locatePlanningAreaEntity.mockImplementation(() =>
+        Promise.resolve(undefined),
       );
     },
     GivenProjectDoesntExist() {
