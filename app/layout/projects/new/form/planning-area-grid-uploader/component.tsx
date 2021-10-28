@@ -222,7 +222,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                               <input {...getInputProps()} />
 
                               <p className="text-sm text-center text-gray-500">
-                                Drag and drop your polygon data file
+                                Drag and drop your planning unit shapefile
                                 <br />
                                 or
                                 {' '}
