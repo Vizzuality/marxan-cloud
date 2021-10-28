@@ -18,6 +18,10 @@ beforeEach(async () => {
   uploader = fixtures.getUploader();
 });
 
+afterEach(async () => {
+  await fixtures.cleanup();
+});
+
 describe(`when file validated successfully`, () => {
   let result: Either<typeof validationFailed, any>;
   beforeEach(async () => {
@@ -110,6 +114,9 @@ async function getFixtures() {
           isEqual(body, fixtures.aFile),
         )
         .reply(500, 'failed');
+    },
+    cleanup() {
+      nock.enableNetConnect();
     },
   };
   return fixtures;
