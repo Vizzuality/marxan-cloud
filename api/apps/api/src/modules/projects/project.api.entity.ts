@@ -46,13 +46,6 @@ export class Project extends TimeUserEntityMetadata {
   @Column('character varying')
   description?: string;
 
-  @Column({
-    type: `boolean`,
-    name: `is_public`,
-    default: false,
-  })
-  isPublic!: boolean;
-
   /**
    * The organization to which this scenario belongs.
    */

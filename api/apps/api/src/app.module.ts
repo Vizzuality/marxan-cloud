@@ -31,6 +31,7 @@ import { AnalysisModule } from '@marxan-api/modules/analysis/analysis.module';
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
 import { SpecificationModule } from '@marxan-api/modules/specification';
 import { ScenarioSpecificationModule } from './modules/scenario-specification';
+import { PublishedProjectModule } from '@marxan-api/modules/published-project/published-project.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { ScenarioSpecificationModule } from './modules/scenario-specification';
     PlanningUnitsModule,
     SpecificationModule,
     ScenarioSpecificationModule,
+    PublishedProjectModule,
   ],
   controllers: [AppController, PingController],
   providers: [
