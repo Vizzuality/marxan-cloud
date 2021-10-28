@@ -157,7 +157,10 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                 id="cancel-shapefile-btn"
                 type="button"
                 className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-black"
-                onClick={() => onUploadRemove(form)}
+                onClick={() => {
+                  onUploadRemove(form);
+                  setOpened(false);
+                }}
               >
                 <Icon
                   className="w-1.5 h-1.5 text-white group-hover:text-white"

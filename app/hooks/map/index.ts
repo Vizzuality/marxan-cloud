@@ -321,7 +321,6 @@ export function usePUGridLayer({
       runId,
       settings = {},
     } = options;
-
     const {
       pugrid: PUgridSettings = {},
       'wdpa-percentage': WdpaPercentageSettings = {},
