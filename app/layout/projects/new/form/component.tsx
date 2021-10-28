@@ -418,6 +418,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   subregion={values.adminAreaLevel2Id}
                   planningUnitGridShape={values.planningUnitGridShape}
                   planningUnitAreakm2={values.planningUnitAreakm2}
+                  paOptionSelected={PAOptionSelected}
                 />
               </div>
             </HelpBeacon>

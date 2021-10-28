@@ -2,16 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 
-import { useAdminPreviewLayer, usePUGridPreviewLayer, useGeoJsonLayer } from 'hooks/map';
-
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
-
 // Map
 import { useSession } from 'next-auth/client';
 
-import Map from 'components/map';
+import { useAdminPreviewLayer, usePUGridPreviewLayer, useGeoJsonLayer } from 'hooks/map';
 
+import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
@@ -25,6 +23,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
   subregion,
   planningUnitAreakm2,
   planningUnitGridShape,
+  paOptionSelected,
 }: ProjectMapProps) => {
   const minZoom = 2;
   const maxZoom = 20;
@@ -41,6 +40,9 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       id: 'uploaded-geojson',
       active: !!uploadingPlanningArea,
       data: uploadingPlanningArea,
+      options: {
+        customPAshapefileGrid: paOptionSelected === 'customPAshapefileGrid',
+      },
     }),
     useAdminPreviewLayer({
       active: true,
@@ -49,7 +51,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       subregion,
     }),
     usePUGridPreviewLayer({
-      active: true,
+      active: paOptionSelected !== 'customPAshapefileGrid',
       bbox,
       planningUnitGridShape,
       planningUnitAreakm2,

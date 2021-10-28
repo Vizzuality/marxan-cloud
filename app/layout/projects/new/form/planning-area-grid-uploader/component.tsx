@@ -171,7 +171,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
 
       {!uploadingPlanningArea && (
         <Uploader
-          caption="Upload shapefile grid"
+          caption="Upload shapefile"
           open={opened}
           onOpen={() => setOpened(true)}
           onClose={() => setOpened(false)}

@@ -18,8 +18,10 @@ import {
 
 // GeoJSON
 export function useGeoJsonLayer({
-  id, active, data,
+  id, active, data, options,
 }: UseGeoJSONLayer) {
+  const { customPAshapefileGrid } = options || {};
+
   return useMemo(() => {
     if (!active || !id || !data) return null;
 
@@ -35,14 +37,14 @@ export function useGeoJsonLayer({
           {
             type: 'line',
             paint: {
-              'line-color': '#FFF',
+              'line-color': customPAshapefileGrid ? COLORS.primary : '#FFF',
               'line-width': 3,
             },
           },
         ],
       },
     };
-  }, [id, active, data]);
+  }, [id, active, data, customPAshapefileGrid]);
 }
 
 // AdminPreview
