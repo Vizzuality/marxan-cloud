@@ -54,6 +54,13 @@ export const getFixtures = async () => {
         id: projectId,
         name: 'Published',
       });
+      cleanups.push(() =>
+        publishedProjectsRepo
+          .delete({
+            id: projectId,
+          })
+          .then(() => void 0),
+      );
       cleanups.push(cleanup);
       return projectId;
     },
@@ -65,7 +72,6 @@ export const getFixtures = async () => {
       expect(response.body.data[0].id).toEqual(publicProjectId);
     },
     ThenNotFoundIsReturned: (response: request.Response) => {
-      console.log(response.status);
       expect(response.status).toEqual(404);
     },
     ThenProjectDetailsArePresent: (

@@ -7,9 +7,14 @@ import { PublishedProject } from '@marxan-api/modules/published-project/entities
 import { PublishedProjectReadController } from '@marxan-api/modules/published-project/controllers/published-project-read.controller';
 import { PublishProjectController } from '@marxan-api/modules/published-project/controllers/publish-project.controller';
 import { PublishedProjectSerializer } from '@marxan-api/modules/published-project/published-project.serializer';
+import { ProjectAclModule } from '@marxan-api/modules/projects-acl';
 
 @Module({
-  imports: [ProjectsModule, TypeOrmModule.forFeature([PublishedProject])],
+  imports: [
+    ProjectAclModule,
+    ProjectsModule,
+    TypeOrmModule.forFeature([PublishedProject]),
+  ],
   controllers: [PublishProjectController, PublishedProjectReadController],
   providers: [
     PublishedProjectService,
