@@ -16,10 +16,13 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories } from 'hooks/wdpa';
 
+import ProtectedAreaUploader from 'layout/scenarios/edit/wdpa/categories/pa-uploader';
+
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Select from 'components/forms/select';
+import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
@@ -331,6 +334,22 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     )}
                   </FieldRFF>
                 </div>
+
+                <p className="py-4 text-sm text-center">or</p>
+                <FieldRFF
+                  name="protectedAreaId"
+                  validate={composeValidators([{ presence: true }])}
+                >
+                  {(fprops) => {
+                    return (
+                      <ProtectedAreaUploader
+                        {...fprops}
+                        // resetProtectedArea={resetProtectedArea}
+                        form={form}
+                      />
+                    );
+                  }}
+                </FieldRFF>
 
                 {!!values.wdpaIucnCategories.length && (
                   <div className="mt-10">
