@@ -47,7 +47,9 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
   // const { submitFailed, valid } = meta;
 
-  console.log('meta', meta);
+  console.log({ successFile });
+
+  console.log('meta', meta.submitFailed);
 
   const dispatch = useDispatch();
 
@@ -56,12 +58,6 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   };
 
   const maxSize = 3000000;
-
-  // const {
-  //   data: scenarioData,
-  // } = useScenario(sid);
-
-  // const { customProtectedAreaIds = [] } = scenarioData;
 
   const scenarioSlice = getScenarioEditSlice(sid);
 
@@ -123,8 +119,6 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         });
 
         dispatch(setCache(Date.now()));
-
-        // updateCustomProtectedAreasIds(PAid);
         console.info('Protected area shapefile uploaded', PAdata);
       },
       onError: () => {
@@ -173,8 +167,6 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     onDropAccepted,
     onDropRejected,
   });
-
-  console.log('successFile', successFile);
 
   return (
     <Uploader
