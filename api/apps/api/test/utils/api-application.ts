@@ -6,7 +6,7 @@ import { QueueToken } from '../../src/modules/queue/queue.tokens';
 import { FakeQueue, FakeQueueBuilder } from './queues';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
 import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
-import { right } from 'fp-ts/Either'
+import { right } from 'fp-ts/Either';
 
 export const fakeProjectChecker: Pick<ProjectChecker, 'isProjectReady'> = {
   isProjectReady: async () => right(true),
@@ -26,7 +26,7 @@ export const bootstrapApplication = async (
     .useValue(fakeProjectChecker)
     .compile();
 
-  return moduleFixture
+  return await moduleFixture
     .createNestApplication()
     .enableShutdownHooks()
     .useGlobalPipes(
