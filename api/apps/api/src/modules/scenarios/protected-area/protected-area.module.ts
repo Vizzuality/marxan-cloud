@@ -15,16 +15,30 @@ import { ProtectedAreaService } from './protected-area.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { apiConnections } from '@marxan-api/ormconfig';
+import { Scenario } from '../scenario.api.entity';
+import {
+  ScenariosPlanningUnitGeoEntity,
+  ScenariosPuOutputGeoEntity,
+  ProtectionStatusModule,
+} from '@marxan/scenarios-planning-unit';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Module({
   imports: [
     QueueApiEventsModule,
     ApiEventsModule,
     CqrsModule,
+    ProtectionStatusModule.for(DbConnections.geoprocessingDB),
     TypeOrmModule.forFeature(
-      [ProtectedArea],
+      [
+        ProtectedArea,
+        ScenariosPlanningUnitGeoEntity,
+        ScenariosPuOutputGeoEntity,
+      ],
       apiConnections.geoprocessingDB.name,
     ),
+
+    TypeOrmModule.forFeature([Scenario]),
     PlanningAreasModule,
   ],
   providers: [

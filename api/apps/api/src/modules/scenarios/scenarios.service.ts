@@ -35,7 +35,6 @@ import { notFound, RunService } from './marxan-run';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 import { Scenario, SimpleJobStatus } from './scenario.api.entity';
 import { assertDefined } from '@marxan/utils';
-import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from '@marxan/scenarios-planning-unit';
 import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-property-sets.service';
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
@@ -48,8 +47,16 @@ import {
 } from '@marxan-api/modules/scenarios/project-checker.service';
 import { QueryBus } from '@nestjs/cqrs';
 import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
-import { ProtectedAreaService, submissionFailed } from './protected-area';
-import { ScenarioProtectedArea } from '@marxan-api/modules/scenarios/protected-area/scenario-protected-area';
+import {
+  ProtectedAreaService,
+  ScenarioProtectedArea,
+  ChangeProtectedAreasError,
+  submissionFailed,
+} from './protected-area';
+import {
+  ProtectedAreaChangeDto,
+  ProtectedAreasChangeDto,
+} from './dto/protected-area-change.dto';
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 
 /** @debt move to own module */
@@ -73,6 +80,11 @@ export type SubmitProtectedAreaError =
 
 export type GetProtectedAreasError = GetProjectErrors | typeof scenarioNotFound;
 
+export type UpdateProtectedAreasError =
+  | ChangeProtectedAreasError
+  | GetProjectErrors
+  | typeof scenarioNotFound;
+
 @Injectable()
 export class ScenariosService {
   private readonly geoprocessingUrl: string = AppConfig.get(
@@ -94,7 +106,6 @@ export class ScenariosService {
     private readonly inputArchiveService: InputFilesArchiverService,
     private readonly planningUnitsService: ScenarioPlanningUnitsService,
     private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
-    private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,
     private readonly specificationService: SpecificationService,
     private readonly costService: CostRangeService,
     private readonly projectChecker: ProjectChecker,
@@ -137,25 +148,13 @@ export class ScenariosService {
 
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
-    await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
-      scenario,
-      input,
-    );
     return right(scenario);
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
     await this.assertScenario(scenarioId);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
-    const scenario = await this.crudService.update(
-      scenarioId,
-      validatedMetadata,
-    );
-    await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
-      scenario,
-      input,
-    );
-    return scenario;
+    return await this.crudService.update(scenarioId, validatedMetadata);
   }
 
   async getFeatures(scenarioId: string) {
@@ -468,5 +467,30 @@ export class ScenariosService {
     } catch {
       return left(scenarioNotFound);
     }
+  }
+
+  async updateProtectedAreasFor(
+    scenarioId: string,
+    dto: ProtectedAreasChangeDto,
+    info: AppInfoDTO,
+  ): Promise<Either<UpdateProtectedAreasError, ScenarioProtectedArea[]>> {
+    const scenario = await this.assertScenario(scenarioId);
+    const projectResponse = await this.queryBus.execute(
+      new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
+    );
+
+    if (isLeft(projectResponse)) {
+      return projectResponse;
+    }
+
+    return await this.protectedArea.selectFor(
+      {
+        id: scenarioId,
+        protectedAreaIds: scenario.protectedAreaFilterByIds ?? [],
+        threshold: dto.threshold,
+      },
+      projectResponse.right,
+      dto.areas,
+    );
   }
 }
