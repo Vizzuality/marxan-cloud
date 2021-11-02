@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useDropzone } from 'react-dropzone';
 import { Field, Form } from 'react-final-form';
@@ -34,8 +34,7 @@ export interface ProtectedAreaUploaderProps {
 
 export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   input,
-  meta,
-  // resetProtectedArea,
+  // meta,
   form,
 }: ProtectedAreaUploaderProps) => {
   const { query } = useRouter();
@@ -43,13 +42,8 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
+  const [fileData, saveFileData] = useState(null);
   const { addToast } = useToasts();
-
-  // const { submitFailed, valid } = meta;
-
-  console.log({ successFile });
-
-  console.log('meta', meta.submitFailed);
 
   const dispatch = useDispatch();
 
@@ -71,30 +65,12 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     },
   });
 
-  // const saveScenarioMutation = useSaveScenario({
-  //   requestConfig: {
-  //     method: 'PATCH',
-  //   },
-  // });
-
-  // Effects
   useEffect(() => {
     return () => {
       input.onChange(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // const updateCustomProtectedAreasIds = useCallback((PAid) => {
-  //   saveScenarioMutation.mutate({
-  //     id: `${sid}`,
-  //     data: {
-  //       customProtectedAreaIds: customProtectedAreaIds
-  //         ? customProtectedAreaIds.push(PAid) : [PAid],
-  //     },
-  //   });
-  //   return null;
-  // }, [saveScenarioMutation, sid, customProtectedAreaIds]);
 
   const onDropAccepted = async (acceptedFiles) => {
     setLoading(true);
@@ -103,38 +79,8 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadPAMutation.mutate({ id: `${sid}`, data }, {
-      onSuccess: ({ data: { data: PAdata, id: PAid } }) => {
-        setLoading(false);
-        setSuccessFile({ id: PAid, name: f.name, geom: PAdata });
-        input.onChange(PAid);
-
-        addToast('success-upload-protected-area', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Protected area uploaded</p>
-          </>
-        ), {
-          level: 'success',
-        });
-
-        dispatch(setCache(Date.now()));
-        console.info('Protected area shapefile uploaded', PAdata);
-      },
-      onError: () => {
-        setLoading(false);
-        setSuccessFile(null);
-
-        addToast('error-upload-protected-area', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Protected area could not be uploaded</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+    setSuccessFile({ ...successFile, name: f.name });
+    saveFileData(data);
   };
 
   const onDropRejected = (rejectedFiles) => {
@@ -154,6 +100,43 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
       level: 'error',
     });
   };
+
+  const handleSubmit = useCallback(() => {
+    uploadPAMutation.mutate({ id: `${sid}`, data: fileData }, {
+
+      onSuccess: ({ data: { data: PAdata, id: PAid } }) => {
+        setLoading(false);
+        setSuccessFile({ ...successFile, id: PAid, geom: PAdata });
+        input.onChange(PAid);
+
+        addToast('success-upload-protected-area', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Protected area uploaded</p>
+          </>
+        ), {
+          level: 'success',
+        });
+
+        dispatch(setCache(Date.now()));
+        setOpened(false);
+        console.info('Protected area shapefile uploaded', PAdata);
+      },
+      onError: () => {
+        setLoading(false);
+        setSuccessFile(null);
+
+        addToast('error-upload-protected-area', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Protected area could not be uploaded</p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [uploadPAMutation, addToast, dispatch, setCache, input, sid, successFile, fileData]);
 
   const {
     getRootProps,
@@ -177,7 +160,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     >
       <Form
         onSubmit={onDropAccepted}
-        render={({ handleSubmit }) => {
+        render={() => {
           return (
             <form onSubmit={handleSubmit}>
               <div className="p-9">
@@ -262,8 +245,9 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                           className="flex items-center justify-center w-5 h-5 border border-black rounded-full group hover:bg-black"
                           onClick={() => {
                             setSuccessFile(null);
+                            saveFileData(null);
+                            setLoading(false);
                             input.onChange(null);
-                            // resetProtectedArea(form);
                           }}
                         >
                           <Icon
@@ -280,7 +264,10 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                   <Button
                     theme="secondary"
                     size="xl"
-                    onClick={() => setOpened(false)}
+                    onClick={() => {
+                      setOpened(false);
+                      saveFileData(null);
+                    }}
                   >
                     Cancel
                   </Button>
