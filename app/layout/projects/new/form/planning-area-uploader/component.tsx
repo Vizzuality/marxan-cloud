@@ -180,7 +180,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
           onClose={() => setOpened(false)}
         >
           <Form
-            onSubmit={onUploadSubmit}
+            onSubmit={successFile && onUploadSubmit}
             render={({ handleSubmit }) => {
               return (
                 <form onSubmit={handleSubmit}>
