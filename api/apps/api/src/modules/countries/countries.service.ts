@@ -11,8 +11,8 @@ import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
-import { apiConnections } from '../../ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class CountriesService extends AppBaseService<
@@ -22,7 +22,7 @@ export class CountriesService extends AppBaseService<
   AppInfoDTO
 > {
   constructor(
-    @InjectRepository(Country, apiConnections.geoprocessingDB.name)
+    @InjectRepository(Country, DbConnections.geoprocessingDB)
     private readonly countriesRepository: Repository<Country>,
   ) {
     super(countriesRepository, 'country', 'countries', {

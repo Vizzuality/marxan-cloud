@@ -13,12 +13,16 @@ describe('AppController (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+    try {
+      const moduleFixture: TestingModule = await Test.createTestingModule({
+        imports: [AppModule],
+      }).compile();
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+      app = moduleFixture.createNestApplication();
+      await app.init();
+    } catch (e) {
+      console.error(e)
+    }
   });
 
   afterAll(async () => {

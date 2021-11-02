@@ -1,6 +1,5 @@
 import { PromiseType } from 'utility-types';
 import {
-  ScenarioCostSurfaceTemplateService,
   FileNotFound,
   FileNotReady,
   FilePiped,
@@ -14,7 +13,7 @@ import { FakeStorage } from './__mocks__/fake.storage';
 import { FakeQueue } from './__mocks__/fake.queue';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
-let service: ScenarioCostSurfaceTemplateService;
+let service: QueuedCostTemplateService;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
@@ -107,10 +106,7 @@ const getFixtures = async () => {
         provide: Queue,
         useClass: FakeQueue,
       },
-      {
-        provide: ScenarioCostSurfaceTemplateService,
-        useClass: QueuedCostTemplateService,
-      },
+      QueuedCostTemplateService,
     ],
   }).compile();
   const storage: FakeStorage = testingModule.get(Storage);
@@ -123,8 +119,8 @@ const getFixtures = async () => {
     noPendingJobs() {
       queue.activeJobs = [];
     },
-    getService(): ScenarioCostSurfaceTemplateService {
-      return testingModule.get(ScenarioCostSurfaceTemplateService);
+    getService(): QueuedCostTemplateService {
+      return testingModule.get(QueuedCostTemplateService);
     },
     setPendingJobFor(scenarioId: string) {
       queue.activeJobs.push(scenarioId);

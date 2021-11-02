@@ -38,8 +38,8 @@ details.
    * `API_AUTH_X_API_KEY` (string, required): a secret used as API key for
      requests from the Geoprocessing service to the API; can be generated
      similarly to `API_AUTH_JWT_SECRET`
-   * `API_SERVICE_PORT` (number, required): the port on which the API service should
-     listen on the local machine
+   * `API_SERVICE_PORT` (number, required): the port on which the API service
+     should listen on the local machine
    * `API_SERVICE_URL` (URL, optional, default is http://api:3000): the internal
      (docker-compose or k8s cluster) where the API service can be reached by
      other services running in the cluster
@@ -57,8 +57,8 @@ details.
      mount point for shared storage (via Docker volumes in development
      environments and via Persistent Volumes in Kubernetes environments) should
      be set accordingly
-   * `APP_SERVICE_PORT` (number, required): the port on which the App service should
-     listen on the local machine
+   * `APP_SERVICE_PORT` (number, required): the port on which the App service
+     should listen on the local machine
    * `POSTGRES_API_SERVICE_PORT` (number, required): the port on which the
      PostgreSQL service should listen on the local machine
    * `API_POSTGRES_USER` (string, required): username to be used for the
@@ -90,12 +90,21 @@ details.
      Redis Commander service should listen on the local machine
    * `SPARKPOST_APIKEY` (string, required): an API key to be used for Sparkpost, 
      an email service
-   * `SPARKPOST_ORIGIN` (string, required): an address of Sparkpost server, please check
-     Sparkpost's documentation for details
-   * `PASSWORD_RESET_TOKEN_PREFIX` (string, required): a prefix of an address to reset
-     a password should point to a reset password screen; the token for reset is appended at the end
-   * `PASSWORD_RESET_EXPIRATION` (string, optional, default is 30 minutes): a time that a token
-     for a password reset is valid
+   * `SPARKPOST_ORIGIN` (string, required): the URL of a SparkPost API service:
+     this would normally be either `https://api.sparkpost.com` or
+     `https://api.eu.sparkpost.com` (note: **no trailing `/` character** or the
+     SparkPost API [client library](https://github.com/SparkPost/node-sparkpost)
+     will not work correctly); please check [SparkPost's
+     documentation](https://developers.sparkpost.com/api/#header-sparkpost-eu)
+     and the client library's own documentation for details
+   * `PASSWORD_RESET_TOKEN_PREFIX` (string, required): the public URL of the
+     **frontend** page on the running instance where users are redirected from
+     password reset emails to complete the process of resetting their
+     password; the reset token is appended at the end of this URL to compose
+     the actual link that is included in password reset emails
+   * `PASSWORD_RESET_EXPIRATION` (string, optional, default is 1800000
+     milliseconds: 30 minutes): a time (in milliseconds) that a token for a
+     password reset is valid for
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted

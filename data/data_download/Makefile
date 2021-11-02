@@ -2,7 +2,6 @@
 
 
 seed-data: seed-gadm seed-wdpa seed-demo-features-species seed-demo-features-bioregion
-
 seed-gadm:
 	@echo "Starting seeding gadm data... "
 	@time $(MAKE) -C ./gadm_3.6 import

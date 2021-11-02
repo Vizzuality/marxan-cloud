@@ -6,6 +6,8 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { Either, left, right } from 'fp-ts/Either';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PlanningAreasFacade } from '@marxan-api/modules/projects/planning-areas/planning-areas.facade';
+import { isDefined } from '@marxan/utils';
 
 export const doesntExist = Symbol(`doesn't exist`);
 export type DoesntExist = typeof doesntExist;
@@ -15,7 +17,8 @@ export class ProjectChecker {
   constructor(
     private readonly apiEvents: ApiEventsService,
     @InjectRepository(Project)
-    protected readonly repository: Repository<Project>,
+    private readonly repository: Repository<Project>,
+    private readonly planningAreasFacade: PlanningAreasFacade,
   ) {}
 
   async isProjectReady(
@@ -46,7 +49,7 @@ export class ProjectChecker {
       })
       .catch(this.createNotFoundHandler());
     return right(
-      ProjectChecker.hasRequiredStudyArea(project) &&
+      (await this.hasRequiredPlanningArea(project)) &&
         planningUnitEvent?.kind ===
           API_EVENT_KINDS.project__planningUnits__finished__v1__alpha &&
         (gridEvent === undefined ||
@@ -62,10 +65,10 @@ export class ProjectChecker {
     };
   }
 
-  private static hasRequiredStudyArea({
-    countryId,
-    planningAreaGeometryId,
-  }: Project): boolean {
-    return !!(countryId || planningAreaGeometryId);
+  private async hasRequiredPlanningArea(project: Project): Promise<boolean> {
+    const area = await this.planningAreasFacade.locatePlanningAreaEntity(
+      project,
+    );
+    return isDefined(area);
   }
 }
