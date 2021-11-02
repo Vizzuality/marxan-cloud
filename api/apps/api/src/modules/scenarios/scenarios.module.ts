@@ -46,7 +46,7 @@ import { CostRangeService } from './cost-range-service';
 import { ProjectChecker } from './project-checker.service';
 import { ProtectedAreaModule } from './protected-area';
 import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
-import { PlanningAreasModule } from '@marxan-api/modules/projects/planning-areas';
+import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 
 @Module({
   imports: [
