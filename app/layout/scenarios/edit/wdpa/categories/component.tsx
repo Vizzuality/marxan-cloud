@@ -357,7 +357,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                       return (
                         <ProtectedAreaUploader
                           {...fprops}
-                          // resetProtectedArea={resetProtectedArea}
                           form={form}
                         />
                       );
