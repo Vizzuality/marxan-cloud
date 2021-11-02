@@ -288,6 +288,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                         theme="primary"
                         size="xl"
                         type="submit"
+                        onClick={() => setOpened(false)}
                       >
                         Save
                       </Button>

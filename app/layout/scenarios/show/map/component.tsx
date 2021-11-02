@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import { getScenarioSlice } from 'store/slices/scenarios/detail';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -47,16 +48,21 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const { pid, sid } = query;
 
   const scenarioSlice = getScenarioSlice(sid);
+  getScenarioEditSlice(sid);
+
   const { setLayerSettings } = scenarioSlice.actions;
 
   const {
     tab,
     subtab,
-    cache,
     selectedSolution,
     highlightFeatures,
     layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}`]);
+
+  const {
+    cache,
+  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const {
     data = {},
@@ -172,6 +178,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   });
 
   const PUGridLayer = usePUGridLayer({
+    cache,
     active: true,
     sid: sid ? `${sid}` : null,
     include,
