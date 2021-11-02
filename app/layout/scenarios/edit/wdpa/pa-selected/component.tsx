@@ -5,7 +5,7 @@ import Icon from 'components/icon';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface ProtectedAreasSelectedProps {
-  form: any;
+  form?: any;
   options: Record<string, any>[];
   title: string;
   wdpaIucnCategories: Record<string, any>[];

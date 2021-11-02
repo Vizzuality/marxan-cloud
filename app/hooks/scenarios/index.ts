@@ -87,7 +87,7 @@ export function useScenarioStatus(pId, sId) {
   }).then((response) => {
     return response.data;
   }), {
-    enabled: !!pId,
+    enabled: !!sId,
     placeholderData: {
       data: {
         scenarios: [],
