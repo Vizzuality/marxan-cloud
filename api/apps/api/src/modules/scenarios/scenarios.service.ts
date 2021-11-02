@@ -473,7 +473,7 @@ export class ScenariosService {
     scenarioId: string,
     dto: ProtectedAreasChangeDto,
     info: AppInfoDTO,
-  ): Promise<Either<UpdateProtectedAreasError, ScenarioProtectedArea[]>> {
+  ): Promise<Either<UpdateProtectedAreasError, true>> {
     const scenario = await this.assertScenario(scenarioId);
     const projectResponse = await this.queryBus.execute(
       new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
@@ -483,7 +483,7 @@ export class ScenariosService {
       return projectResponse;
     }
 
-    return await this.protectedArea.selectFor(
+    const result = await this.protectedArea.selectFor(
       {
         id: scenarioId,
         protectedAreaIds: scenario.protectedAreaFilterByIds ?? [],
@@ -492,5 +492,9 @@ export class ScenariosService {
       projectResponse.right,
       dto.areas,
     );
+    if (isLeft(result)) {
+      return result;
+    }
+    return right(true);
   }
 }

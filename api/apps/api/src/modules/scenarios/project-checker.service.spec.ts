@@ -7,7 +7,7 @@ import { doesntExist, ProjectChecker } from './project-checker.service';
 import { isEqual } from 'lodash';
 import { NotFoundException } from '@nestjs/common';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { PlanningAreasFacade } from '@marxan-api/modules/projects/planning-areas/planning-areas.facade';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -155,28 +155,31 @@ async function getFixtures() {
   > = {
     findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
   };
-  const fakePlaningAreaFacade: jest.Mocked<
-    Pick<PlanningAreasFacade, 'locatePlanningAreaEntity'>
-  > = {
+  const fakePlaningAreaFacade = {
     locatePlanningAreaEntity: jest.fn(),
   };
   const testingModule = await Test.createTestingModule({
     providers: [
       {
-        provide: ApiEventsService,
+        provide: `ApiEventsService`,
         useValue: fakeApiEventsService,
       },
       {
-        provide: `ProjectRepository`,
+        provide: getRepositoryToken(Project),
         useValue: fakeProjectsService,
       },
       {
-        provide: PlanningAreasFacade,
+        provide: `PlanningAreasService`,
         useValue: fakePlaningAreaFacade,
       },
       ProjectChecker,
     ],
-  }).compile();
+  })
+    .compile()
+    .catch((error) => {
+      console.log(error);
+      throw error;
+    });
 
   return {
     fakeApiEventsService,

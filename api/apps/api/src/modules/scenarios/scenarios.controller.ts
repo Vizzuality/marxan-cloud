@@ -675,6 +675,7 @@ export class ScenariosController {
     type: ProtectedAreaDto,
     isArray: true,
   })
+  @Post(`:id/protected-areas`)
   async updateProtectedAreasForScenario(
     @Param('id') scenarioId: string,
     @Body(new ValidationPipe()) dto: ProtectedAreasChangeDto,

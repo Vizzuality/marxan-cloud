@@ -97,7 +97,7 @@ export class ProtectedAreaService {
     },
     project: ProjectSnapshot,
     newSelection: SelectProtectedArea[],
-  ): Promise<Either<ChangeProtectedAreasError, ScenarioProtectedArea[]>> {
+  ): Promise<Either<ChangeProtectedAreasError, true>> {
     const currentSelection = await this.getFor(scenario, project);
 
     const idsToAdd: string[] = [];
@@ -105,6 +105,7 @@ export class ProtectedAreaService {
     const projectScopedIdsRemoved: string[] = [];
 
     // TODO refactor to pieces
+    const { areas } = await this.getGlobalProtectedAreas(project);
 
     for (const change of newSelection) {
       const entry = currentSelection.find((item) => item.id === change.id);
@@ -112,15 +113,22 @@ export class ProtectedAreaService {
         return left(invalidProtectedAreaId);
       }
 
-      if (entry.selected !== change.selected) {
+      if (entry.kind === ProtectedAreaKind.Global) {
+        const relatedAreas = areas[change.id];
+
+        if (change.selected) {
+          idsToAdd.push(...relatedAreas);
+        } else {
+          idsToRemove.push(...relatedAreas);
+        }
+      }
+
+      if (entry.kind === ProtectedAreaKind.Project) {
         if (change.selected) {
           idsToAdd.push(change.id);
         } else {
           idsToRemove.push(change.id);
-
-          if (entry.kind === ProtectedAreaKind.Project) {
-            projectScopedIdsRemoved.push(change.id);
-          }
+          projectScopedIdsRemoved.push(change.id);
         }
       }
     }
@@ -155,7 +163,7 @@ export class ProtectedAreaService {
       );
     }
 
-    return right([]);
+    return right(true);
   }
 
   async getFor(

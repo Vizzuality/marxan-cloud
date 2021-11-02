@@ -62,7 +62,6 @@ import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],
       DbConnections.geoprocessingDB,
     ),
-    ProtectionStatusModule.for(DbConnections.geoprocessingDB),
     PlanningAreasModule,
     UsersModule,
     ScenarioFeaturesModule,

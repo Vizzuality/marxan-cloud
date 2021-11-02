@@ -1,6 +1,7 @@
 import {
   IsBoolean,
   IsInt,
+  IsString,
   IsUUID,
   Max,
   Min,
@@ -11,7 +12,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ProtectedAreaChangeDto {
   @ApiProperty()
-  @IsUUID()
+  @IsString() // TODO could be uuid (custom PA) or IUCN Category enum
   id!: string;
 
   @ApiProperty()
