@@ -56,6 +56,8 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
 
   const { uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
 
+  console.log('uploadingPlanningArea', uploadingPlanningArea);
+
   const onDropAccepted = async (acceptedFiles) => {
     const f = acceptedFiles[0];
 
@@ -288,6 +290,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                         theme="primary"
                         size="xl"
                         type="submit"
+                        onClick={() => setOpened(false)}
                       >
                         Save
                       </Button>
