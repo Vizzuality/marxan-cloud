@@ -4,4 +4,5 @@ export default interface ProjectMapProps {
   subregion: string;
   planningUnitAreakm2: number;
   planningUnitGridShape: string;
+  paOptionSelected: string;
 }

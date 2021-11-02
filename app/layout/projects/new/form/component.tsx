@@ -247,7 +247,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                     {/* PLANNING AREA */}
                     <div className="flex flex-col justify-between mt-6">
                       <div className="flex items-center mb-5 space-x-3">
-                        <h2 className="text-lg font-medium font-heading">Do you have a planning region or grid shapefile?</h2>
+                        <h2 className="text-lg font-medium font-heading">Do you have a planning region or planning unit shapefile?</h2>
                         <InfoButton>
                           <span>
                             <h4 className="font-heading text-lg mb-2.5">Planning Area</h4>
@@ -418,6 +418,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   subregion={values.adminAreaLevel2Id}
                   planningUnitGridShape={values.planningUnitGridShape}
                   planningUnitAreakm2={values.planningUnitAreakm2}
+                  paOptionSelected={PAOptionSelected}
                 />
               </div>
             </HelpBeacon>
