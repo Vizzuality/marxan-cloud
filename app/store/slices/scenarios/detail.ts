@@ -6,6 +6,7 @@ interface ScenarioShowStateProps {
   tab: string,
   subtab: string,
   selectedSolution: Solution,
+  cache: number;
   // FEATURES
   highlightFeatures: string[],
   // SETTINGS
@@ -16,6 +17,7 @@ const initialState = {
   tab: 'solutions',
   subtab: null,
   selectedSolution: null,
+  cache: Date.now(),
   // FEATURES
   highlightFeatures: [],
   // SETTINGS
@@ -36,7 +38,9 @@ export function getScenarioSlice(id) {
       setSelectedSolution: (state, action: PayloadAction<Solution>) => {
         state.selectedSolution = action.payload;
       },
-
+      setCache: (state, action: PayloadAction<number>) => {
+        state.cache = action.payload;
+      },
       // FEATURES
       setHighlightFeatures: (state, action: PayloadAction<string[]>) => {
         state.highlightFeatures = action.payload;

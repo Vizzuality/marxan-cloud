@@ -308,6 +308,8 @@ export function usePUGridLayer({
   return useMemo(() => {
     if (!active || !sid) return null;
 
+    console.log('options', options.runId);
+
     const {
       wdpaThreshold = 0,
       cost = {
@@ -438,12 +440,12 @@ export function usePUGridLayer({
               layout: {
                 visibility: getLayerVisibility(PreGapAnalysisVisibility),
               },
-              ...runId && {
-                filter: [
-                  'all',
-                  ['in', `-${runId}-`, ['get', 'valuePosition']],
-                ],
-              },
+              // ...runId && {
+              //   filter: [
+              //     'all',
+              //     ['in', `-${runId}-`, ['get', 'valuePosition']],
+              //   ],
+              // },
               paint: {
                 'fill-color': COLORS.features,
                 'fill-opacity': [
