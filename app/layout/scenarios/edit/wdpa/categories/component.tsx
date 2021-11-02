@@ -16,8 +16,8 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import ProtectedAreasSelected from 'layout/scenarios/edit/wdpa/categories/pa-selected';
 import ProtectedAreaUploader from 'layout/scenarios/edit/wdpa/categories/pa-uploader';
+import ProtectedAreasSelected from 'layout/scenarios/edit/wdpa/pa-selected';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -82,11 +82,12 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     return wdpaData.map((w) => ({
       label: `${w.kind === 'global' ? 'IUCN' : '👤'} ${w.name}`,
       value: w.id,
+      ...w.kind === 'global' && { kind: 'global' },
     }));
   }, [wdpaData]);
 
-  const CUSTOM_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.label.charAt(0) !== 'I');
-  const WDPA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((o) => o.label?.charAt(0) === 'I');
+  const CUSTOM_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => !w.kind);
+  const WDPA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((o) => o.kind === 'global');
 
   const ORDERED_WDPA_CATEGORIES_OPTIONS = useMemo(() => {
     if (!WDPA_CATEGORIES_OPTIONS) return [];
@@ -393,7 +394,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                 type={values.wdpaIucnCategories.length ? 'submit' : 'button'}
                 className="relative px-20"
                 disabled={submitting}
-                onClick={!values.wdpaIucnCategories.length ? onSkip : null}
+                onClick={!values.wdpaIucnCategories.length ? onSkip : onSuccess}
               >
                 {!!values.wdpaIucnCategories.length && (
                   <span>Continue</span>
