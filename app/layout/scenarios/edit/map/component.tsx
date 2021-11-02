@@ -211,7 +211,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   });
 
   const LAYERS = [PUGridLayer, WDPApreviewLayer, ...FeaturePreviewLayers].filter((l) => !!l);
-  console.log('LAYERS EDIT', LAYERS);
+
   const LEGEND = useLegend({
     layers,
     options: {

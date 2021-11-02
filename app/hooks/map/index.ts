@@ -308,8 +308,6 @@ export function usePUGridLayer({
   return useMemo(() => {
     if (!active || !sid) return null;
 
-    console.log('options', options.runId);
-
     const {
       wdpaThreshold = 0,
       cost = {

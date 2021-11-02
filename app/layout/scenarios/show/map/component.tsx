@@ -205,7 +205,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   });
 
   const LAYERS = [PUGridLayer, ...FeaturePreviewLayers].filter((l) => !!l);
-  console.log('LAYERS SHOW', LAYERS);
+
   const LEGEND = useLegend({
     layers,
     options: {
