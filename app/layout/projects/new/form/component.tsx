@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {
+  useState, useEffect, useMemo, useRef,
+} from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
@@ -46,6 +48,8 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const plausible = usePlausible();
 
   const [PAOptionSelected, setPAOptionSelected] = useState('');
+
+  const planningAreaScrollRef = useRef(null);
 
   const { user } = useMe();
 
@@ -112,6 +116,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
         console.error('Project could not be created');
       },
     });
+  };
+
+  const scrollDown = (ref) => {
+    ref?.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   };
 
   const resetPlanningArea = (form) => {
@@ -303,14 +311,18 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
                     {PAOptionSelected === 'regular' && (
                       <>
+
                         <CountryRegionSelector
                           country={values.countryId}
                           region={values.adminAreaLevel1Id}
                           subRegion={values.adminAreaLevel2Id}
+                          onClick={scrollDown(planningAreaScrollRef)}
                         />
+
                         <PlanningAreaSelector
                           values={values}
                         />
+                        <div ref={planningAreaScrollRef} />
                       </>
                     )}
 
