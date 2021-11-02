@@ -28,13 +28,11 @@ import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 export interface ProtectedAreaUploaderProps {
   input: any;
   meta: any;
-  // resetProtectedArea?: any,
   form: any,
 }
 
 export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   input,
-  // meta,
   form,
 }: ProtectedAreaUploaderProps) => {
   const { query } = useRouter();
@@ -155,7 +153,12 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     <Uploader
       caption="Upload your protected area network"
       open={opened}
-      onOpen={() => setOpened(true)}
+      onOpen={() => {
+        setOpened(true);
+        setSuccessFile(null);
+        saveFileData(null);
+        setLoading(false);
+      }}
       onClose={() => setOpened(false)}
     >
       <Form
