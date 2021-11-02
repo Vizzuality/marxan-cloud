@@ -18,22 +18,23 @@ export function useWDPACategories({
   const query = useQuery(
     ['scenarios', adminAreaId, customAreaId],
     async () => WDPA.request({
-        method: 'GET',
-        url: `/${scenarioId}/protected-areas`,
-        params: {
-          ...(adminAreaId && {
-            'filter[adminAreaId]': adminAreaId,
-          }),
-          ...(customAreaId && {
-            'filter[customAreaId]': customAreaId,
-          }),
-        },
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-        },
-      }),
+      method: 'GET',
+      url: `/${scenarioId}/protected-areas`,
+      params: {
+        ...(adminAreaId && {
+          'filter[adminAreaId]': adminAreaId,
+        }),
+        ...(customAreaId && {
+          'filter[customAreaId]': customAreaId,
+        }),
+      },
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    }),
     {
       enabled: !!adminAreaId || !!customAreaId,
+      refetchInterval: 1000,
     },
   );
 
