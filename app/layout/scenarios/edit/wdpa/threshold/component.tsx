@@ -16,6 +16,8 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories } from 'hooks/wdpa';
 
+import ProtectedAreasSelected from 'layout/scenarios/edit/wdpa/pa-selected';
+
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
@@ -83,6 +85,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     return wdpaData.map((w) => ({
       label: `IUCN ${w.iucnCategory}`,
       value: w.id,
+      ...w.kind === 'global' && { kind: 'global' },
     }));
   }, [wdpaData]);
 
@@ -275,29 +278,15 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                   </FieldRFF>
                 </div>
 
-                <div className="mt-10">
-                  <h3 className="text-sm">Selected protected areas:</h3>
+                {INITIAL_VALUES.wdpaIucnCategories
+                  && (
+                    <ProtectedAreasSelected
+                      options={WDPA_CATEGORIES_OPTIONS}
+                      title="Selected protected areas:"
+                      wdpaIucnCategories={INITIAL_VALUES.wdpaIucnCategories}
+                    />
+                  )}
 
-                  <div className="flex flex-wrap mt-2.5">
-                    {INITIAL_VALUES.wdpaIucnCategories
-                      && INITIAL_VALUES.wdpaIucnCategories.map((w) => {
-                        const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
-
-                        if (!wdpa) return null;
-
-                        return (
-                          <div
-                            key={`${wdpa.value}`}
-                            className="flex mb-2.5 mr-5"
-                          >
-                            <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
-                              {wdpa.label}
-                            </span>
-                          </div>
-                        );
-                      })}
-                  </div>
-                </div>
               </div>
             </div>
             <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
