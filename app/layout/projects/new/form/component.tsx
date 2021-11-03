@@ -1,5 +1,5 @@
 import React, {
-  useState, useEffect, useMemo, useRef,
+  useState, useEffect, useMemo, useRef, useCallback,
 } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
@@ -118,9 +118,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     });
   };
 
-  const scrollDown = (ref) => {
+  const scrollDown = useCallback((ref) => {
+    console.log('Hola', ref);
     ref?.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  };
+  }, []);
 
   const resetPlanningArea = (form) => {
     dispatch(setUploadingPlanningArea(null));

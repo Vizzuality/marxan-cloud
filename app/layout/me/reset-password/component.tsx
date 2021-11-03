@@ -56,6 +56,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
           level: 'success',
         });
         setSubmitting(false);
+        setSubmitted(true);
       },
       onError: () => {
         addToast('error-reset-password', (
