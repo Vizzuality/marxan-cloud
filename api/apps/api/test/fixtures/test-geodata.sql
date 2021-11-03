@@ -3,8 +3,8 @@ INSERT INTO planning_units_geom
 (the_geom, type, size)
 select st_transform(geom, 4326) as the_geom, 'square' as type, 100 as size from
 (SELECT (ST_SquareGrid(10000, ST_Transform(ST_GeomFromGeoJSON('{"type":"Polygon","coordinates":[[[21.654052734375,-20.756113874762068],[23.719482421875,-20.756113874762068],[23.719482421875,-18.802318121688117],[21.654052734375,-18.802318121688117],[21.654052734375,-20.756113874762068]]]}'), 3857))).*
- ) grid
-ON CONFLICT  (planning_units_geom_the_geom_type_project_id_check) DO NOTHING;
+ ) grid;
+--- ON CONFLICT (planning_units_geom_the_geom_type_project_id_check) DO NOTHING;
 
 --- Associate scenario with PU for scenario 1 project 1
 INSERT INTO scenarios_pu_data (pu_geom_id, scenario_id, puid)
