@@ -1,0 +1,8 @@
+{
+  "version": "0.0.1",
+  "name": "scenario-name",
+  "description": "description",
+  "type": "marxan",
+  "hasResults": false,
+  "executeRunOnceImported": false
+}

@@ -61,11 +61,11 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     isFetched: wdpaIsFetched,
   } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
-                 || projectData?.adminAreaLevel1I
-                 || projectData?.countryId,
+      || projectData?.adminAreaLevel1I
+      || projectData?.countryId,
     customAreaId: !projectData?.adminAreaLevel2Id
-                  && !projectData?.adminAreaLevel1I
-                  && !projectData?.countryId ? projectData?.planningAreaId : null,
+      && !projectData?.adminAreaLevel1I
+      && !projectData?.countryId ? projectData?.planningAreaId : null,
   });
 
   const saveScenarioMutation = useSaveScenario({
@@ -279,22 +279,22 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
                   <div className="flex flex-wrap mt-2.5">
                     {INITIAL_VALUES.wdpaIucnCategories
-                    && INITIAL_VALUES.wdpaIucnCategories.map((w) => {
-                      const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
+                      && INITIAL_VALUES.wdpaIucnCategories.map((w) => {
+                        const wdpa = WDPA_CATEGORIES_OPTIONS.find((o) => o.value === w);
 
-                      if (!wdpa) return null;
+                        if (!wdpa) return null;
 
-                      return (
-                        <div
-                          key={`${wdpa.value}`}
-                          className="flex mb-2.5 mr-5"
-                        >
-                          <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
-                            {wdpa.label}
-                          </span>
-                        </div>
-                      );
-                    })}
+                        return (
+                          <div
+                            key={`${wdpa.value}`}
+                            className="flex mb-2.5 mr-5"
+                          >
+                            <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
+                              {wdpa.label}
+                            </span>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               </div>
@@ -307,7 +307,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
               theme="secondary"
               size="lg"
               type="button"
-              className="relative px-20"
+              className="relative px-20 md:px-9 lg:px-16 xl:px-20"
               disabled={submitting}
               onClick={handleBack}
             >
@@ -318,7 +318,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
               theme="primary"
               size="lg"
               type="submit"
-              className="relative px-20"
+              className="relative px-20 md:px-9 lg:px-16 xl:px-20"
               disabled={submitting}
             >
               <span>Save</span>

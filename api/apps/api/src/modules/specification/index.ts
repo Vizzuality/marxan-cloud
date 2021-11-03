@@ -18,4 +18,5 @@ export {
   SpecificationOperation,
   FeatureConfigSplit,
   FeatureConfigCopy,
+  FeatureConfigStratification,
 } from './domain';

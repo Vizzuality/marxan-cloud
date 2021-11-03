@@ -1,15 +1,16 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
   Header,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
-  Put,
   Query,
   Req,
   Res,
@@ -17,7 +18,6 @@ import {
   UseGuards,
   UseInterceptors,
   ValidationPipe,
-  ConflictException,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
 import { Request, Response } from 'express';
@@ -61,7 +61,11 @@ import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ProjectNotReady, ScenariosService } from './scenarios.service';
+import {
+  projectDoesntExist,
+  projectNotReady,
+  ScenariosService,
+} from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
@@ -85,6 +89,7 @@ import {
 } from '@marxan-api/dto/async-job.dto';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
+import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -226,8 +231,15 @@ export class ScenariosController {
       authenticatedUser: req.user,
     });
     if (isLeft(result)) {
-      const _exhaustiveCheck: ProjectNotReady = result.left;
-      throw new ConflictException();
+      switch (result.left) {
+        case projectNotReady:
+          throw new ConflictException();
+        case projectDoesntExist:
+          throw new NotFoundException(`Project doesn't exist`);
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
     }
     return await this.scenarioSerializer.serialize(
       result.right,
@@ -321,7 +333,7 @@ export class ScenariosController {
 
   @ApiTags(asyncJobTag)
   @ApiOkResponse()
-  @Patch(':id/planning-units')
+  @Post(':id/planning-units')
   async changePlanningUnits(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateScenarioPlanningUnitLockStatusDto,
@@ -375,12 +387,14 @@ export class ScenariosController {
   async getScenarioFeaturesGapData(
     @Param('id', ParseUUIDPipe) id: string,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesGapData>[]> {
     const result = await this.scenarioFeaturesGapDataService.findAllPaginated(
       fetchSpecification,
       {
         params: {
           scenarioId: id,
+          searchPhrase: featureClassAndAliasFilter,
         },
       },
     );
@@ -579,12 +593,14 @@ export class ScenariosController {
   async getScenarioFeaturesOutputGapData(
     @Param('id', ParseUUIDPipe) id: string,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
     const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(
       fetchSpecification,
       {
         params: {
           scenarioId: id,
+          searchPhrase: featureClassAndAliasFilter,
         },
       },
     );
@@ -626,5 +642,32 @@ export class ScenariosController {
   ): Promise<void> {
     await this.service.getCostSurfaceCsv(id, res);
     return;
+  }
+
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @ApiOperation({
+    description:
+      'Upload shapefile for with protected areas for project&scenario',
+  })
+  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @ApiTags(asyncJobTag)
+  @Post(':id/protected-areas/shapefile')
+  async shapefileForProtectedArea(
+    @Param('id') scenarioId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<JsonApiAsyncJobMeta> {
+    const outcome = await this.service.addProtectedAreaFor(scenarioId, file, {
+      authenticatedUser: req.user,
+    });
+    if (isLeft(outcome)) {
+      switch (outcome.left) {
+        case submissionFailed:
+          throw new InternalServerErrorException();
+        default:
+          throw new NotFoundException();
+      }
+    }
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 }

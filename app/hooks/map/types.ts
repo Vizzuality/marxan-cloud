@@ -5,6 +5,7 @@ export interface UseGeoJSONLayer {
   id: string;
   active?: boolean;
   data: Record<string, unknown>;
+  options?: Record<string, unknown>;
 }
 export interface UseAdminPreviewLayer {
   cache?: number;

@@ -3,14 +3,14 @@ import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { Repository } from 'typeorm';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const randomUserToken = await GivenUserIsLoggedIn(app);
-  const projectsRepo: Repository<Project> = app.get(
-    getRepositoryToken(Project),
+  const publishedProjectsRepo: Repository<PublishedProject> = app.get(
+    getRepositoryToken(PublishedProject),
   );
   const cleanups: (() => Promise<void>)[] = [];
 
@@ -22,10 +22,10 @@ export const getFixtures = async () => {
 
     WhenGettingPublicProject: async (projectId: string) =>
       await request(app.getHttpServer()).get(
-        `/api/v1/projects/published/${projectId}`,
+        `/api/v1/published-projects/${projectId}`,
       ),
     WhenGettingPublicProjects: async () =>
-      await request(app.getHttpServer()).get(`/api/v1/projects/published`),
+      await request(app.getHttpServer()).get(`/api/v1/published-projects`),
     ThenNoProjectIsAvailable: (response: request.Response) => {
       expect(response.body).toEqual({
         data: [],
@@ -50,13 +50,16 @@ export const getFixtures = async () => {
         app,
         randomUserToken,
       );
-      await projectsRepo.update(
-        {
-          id: projectId,
-        },
-        {
-          isPublic: true,
-        },
+      await publishedProjectsRepo.save({
+        id: projectId,
+        name: 'Published',
+      });
+      cleanups.push(() =>
+        publishedProjectsRepo
+          .delete({
+            id: projectId,
+          })
+          .then(() => void 0),
       );
       cleanups.push(cleanup);
       return projectId;
@@ -69,7 +72,6 @@ export const getFixtures = async () => {
       expect(response.body.data[0].id).toEqual(publicProjectId);
     },
     ThenNotFoundIsReturned: (response: request.Response) => {
-      console.log(response.status);
       expect(response.status).toEqual(404);
     },
     ThenProjectDetailsArePresent: (
@@ -93,6 +95,22 @@ export const getFixtures = async () => {
           },
           id: publicProjectId,
           type: 'projects',
+        },
+        meta: {},
+      });
+    },
+    ThenPublicProjectDetailsArePresent: (
+      publicProjectId: string,
+      response: request.Response,
+    ) => {
+      expect(response.body).toEqual({
+        data: {
+          attributes: {
+            description: null,
+            name: expect.any(String),
+          },
+          id: publicProjectId,
+          type: 'published_projects',
         },
         meta: {},
       });

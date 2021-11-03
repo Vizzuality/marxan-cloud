@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { assertDefined, isDefined } from '@marxan/utils';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CommandBus } from '@nestjs/cqrs';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PlanningUnitGridShape, Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
@@ -28,6 +29,7 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProtectedArea } from '@marxan/protected-areas';
 
 import { ProjectsRequest } from './project-requests-info';
+import { ProjectId, SetProjectGridFromShapefile } from './planning-unit-grid';
 
 const projectFilterKeyNames = [
   'name',
@@ -66,6 +68,7 @@ export class ProjectsCrudService extends AppBaseService<
     private readonly userProjects: Repository<UsersProjectsApiEntity>,
     @InjectRepository(ProtectedArea, DbConnections.geoprocessingDB)
     private readonly protectedAreas: Repository<ProtectedArea>,
+    private readonly commandBus: CommandBus,
   ) {
     super(repository, 'project', 'projects', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -149,7 +152,14 @@ export class ProjectsCrudService extends AppBaseService<
      */
     const project = await super.setDataCreate(create, info);
     project.createdBy = info.authenticatedUser?.id;
-    project.planningAreaGeometryId = create.planningAreaId;
+
+    if (project.planningUnitGridShape === PlanningUnitGridShape.fromShapefile) {
+      // isProjectUsingCustomPlanningUnitGrid requires planningUnitAreakm2
+      // to be empty
+      project.planningUnitAreakm2 = undefined;
+    } else {
+      project.planningAreaGeometryId = create.planningAreaId;
+    }
 
     const bbox = await this.planningAreasService.getPlanningAreaBBox({
       ...create,
@@ -178,9 +188,17 @@ export class ProjectsCrudService extends AppBaseService<
     _info?: ProjectsRequest,
   ): Promise<void> {
     if (
-      createModel?.planningUnitGridShape === PlanningUnitGridShape.fromShapefile
+      createModel?.planningUnitGridShape ===
+        PlanningUnitGridShape.fromShapefile &&
+      createModel.planningAreaId
     ) {
-      // handled after custom grid processing
+      await this.commandBus.execute(
+        new SetProjectGridFromShapefile(
+          new ProjectId(model.id),
+          createModel.planningAreaId,
+          model.bbox,
+        ),
+      );
       return;
     }
 
@@ -216,9 +234,17 @@ export class ProjectsCrudService extends AppBaseService<
     _info?: ProjectsRequest,
   ): Promise<void> {
     if (
-      createModel?.planningUnitGridShape === PlanningUnitGridShape.fromShapefile
+      createModel?.planningUnitGridShape ===
+        PlanningUnitGridShape.fromShapefile &&
+      createModel.planningAreaId
     ) {
-      // handled after custom grid processing
+      await this.commandBus.execute(
+        new SetProjectGridFromShapefile(
+          new ProjectId(model.id),
+          createModel.planningAreaId,
+          model.bbox,
+        ),
+      );
       return;
     }
     if (
@@ -307,8 +333,6 @@ export class ProjectsCrudService extends AppBaseService<
         .andWhere(`acl.role_id = :roleId`, {
           roleId: Roles.project_owner,
         });
-    } else {
-      query.andWhere(`${this.alias}.is_public = true`);
     }
 
     return query;
@@ -358,8 +382,6 @@ export class ProjectsCrudService extends AppBaseService<
         .andWhere(`acl.role_id = :roleId`, {
           roleId: Roles.project_owner,
         });
-    } else {
-      query.andWhere(`${this.alias}.is_public = true`);
     }
 
     return query;

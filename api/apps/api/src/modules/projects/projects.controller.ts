@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -24,7 +25,6 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -58,12 +58,9 @@ import { GeoFeaturesService } from '../geo-features/geo-features.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { isFeatureCollection } from '@marxan/utils';
-import {
-  AsyncJobDto,
-  JsonApiAsyncJobMeta,
-} from '@marxan-api/dto/async-job.dto';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
+import { FeatureTags } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -91,20 +88,26 @@ export class ProjectsController {
   @Get(':projectId/features')
   async findAllGeoFeaturesForProject(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-    @Param() params: { projectId: string },
-    @Query('q') featureClassAndAliasFilter: string,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
+    @Query('q') featureClassAndAliasFilter?: string,
+    @Query('tag') featureTag?: FeatureTags,
   ): Promise<GeoFeatureResult> {
-    const { data, metadata } = await this.projectsService.findAllGeoFeatures(
+    const result = await this.projectsService.findAllGeoFeatures(
       fetchSpecification,
       {
         authenticatedUser: req.user,
         params: {
-          projectId: params.projectId,
+          projectId: projectId,
           featureClassAndAliasFilter: featureClassAndAliasFilter,
+          featureTag,
         },
       },
     );
+    if (isLeft(result)) {
+      throw new NotFoundException();
+    }
+    const { data, metadata } = result.right;
 
     return this.geoFeatureSerializer.serialize(data, metadata);
   }
@@ -168,18 +171,20 @@ export class ProjectsController {
     description: 'Upload shapefile for project-specific planning unit grid',
   })
   @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiCreatedResponse({ type: JsonApiAsyncJobMeta })
+  @ApiCreatedResponse({ type: PlanningAreaResponseDto })
   @ApiTags(asyncJobTag)
-  @Post(`:id/grid`)
-  async setProjectGrid(
-    @Param('id') projectId: string,
+  @Post(`planning-area/shapefile-grid`)
+  async uploadCustomGridShapefile(
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<JsonApiAsyncJobMeta> {
-    const result = await this.projectsService.setGrid(projectId, file);
+  ): Promise<PlanningAreaResponseDto> {
+    const result = await this.projectsService.savePlanningAreaFromShapefile(
+      file,
+      true,
+    );
     if (isLeft(result)) {
       throw new InternalServerErrorException(result.left);
     }
-    return AsyncJobDto.forProject([result.right.value]).asJsonApiMetadata();
+    return result.right;
   }
 
   @ApiOperation({
@@ -201,27 +206,6 @@ export class ProjectsController {
       projectId,
       projectWithScenarios,
     );
-  }
-
-  @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @ApiOperation({
-    description: 'Upload shapefile for project-specific protected areas',
-  })
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @ApiTags(asyncJobTag)
-  @Post(':id/protected-areas/shapefile')
-  async shapefileForProtectedArea(
-    @Param('id') projectId: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<JsonApiAsyncJobMeta> {
-    const outcome = await this.projectsService.addShapeFor(projectId, file, {
-      authenticatedUser: req.user,
-    });
-    if (outcome) {
-      throw new NotFoundException();
-    }
-    return AsyncJobDto.forProject().asJsonApiMetadata();
   }
 
   @ApiConsumesShapefile({

@@ -33,10 +33,10 @@ export class ShapefileService {
     );
 
     await mapshaper.runCommandsXL(
-      `-i snap ${fileInfo.path.replace(
+      `-i snap "${fileInfo.path.replace(
         '.zip',
         '',
-      )}/*.shp -proj EPSG:4326 -clean rewind -info -o ${outputFile}`,
+      )}/*.shp" -proj EPSG:4326 -clean rewind -info -o "${outputFile}"`,
     );
 
     const geoJsonBuffer = await readFile(outputFile);

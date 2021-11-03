@@ -14,9 +14,6 @@ export class JobInput {
   @IsUUID()
   requestId!: string;
 
-  @IsUUID()
-  projectId!: string;
-
   @ValidateNested()
   @Type(() => Shapefile)
   shapefile!: Shapefile;

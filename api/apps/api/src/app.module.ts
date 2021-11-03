@@ -23,7 +23,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from '@marxan-api/filters/all-exceptions.exception.filter';
 import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.module';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
-import { ProtectedAreasModule } from '@marxan-api/modules/protected-areas/protected-areas.module';
+import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
 import { ProxyModule } from '@marxan-api/modules/proxy/proxy.module';
 import { ScenariosPlanningUnitModule } from './modules/scenarios-planning-unit/scenarios-planning-unit.module';
 import { PlanningUnitsProtectionLevelModule } from '@marxan-api/modules/planning-units-protection-level';
@@ -31,6 +31,7 @@ import { AnalysisModule } from '@marxan-api/modules/analysis/analysis.module';
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
 import { SpecificationModule } from '@marxan-api/modules/specification';
 import { ScenarioSpecificationModule } from './modules/scenario-specification';
+import { PublishedProjectModule } from '@marxan-api/modules/published-project/published-project.module';
 
 @Module({
   imports: [
@@ -50,7 +51,7 @@ import { ScenarioSpecificationModule } from './modules/scenario-specification';
     GeoFeaturesModule,
     OrganizationsModule,
     ProjectsModule,
-    ProtectedAreasModule,
+    ProtectedAreasCrudModule,
     ScenariosModule,
     UsersModule,
     AuthenticationModule,
@@ -61,6 +62,7 @@ import { ScenarioSpecificationModule } from './modules/scenario-specification';
     PlanningUnitsModule,
     SpecificationModule,
     ScenarioSpecificationModule,
+    PublishedProjectModule,
   ],
   controllers: [AppController, PingController],
   providers: [

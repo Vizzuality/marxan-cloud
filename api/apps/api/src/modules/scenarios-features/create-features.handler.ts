@@ -13,6 +13,7 @@ import { CreateFeaturesCommand } from './create-features.command';
 import { FeaturesCreated } from './features-created.event';
 import { CopyOperation } from './copy';
 import { SplitOperation } from './split';
+import { StratificationOperation } from './stratification';
 
 @CommandHandler(CreateFeaturesCommand)
 export class CreateFeaturesHandler
@@ -21,6 +22,7 @@ export class CreateFeaturesHandler
     private readonly eventBus: EventBus,
     private readonly copyOperation: CopyOperation,
     private readonly splitOperation: SplitOperation,
+    private readonly stratificationOperation: StratificationOperation,
     @InjectEntityManager(DbConnections.geoprocessingDB)
     private readonly geoEntityManager: EntityManager,
     private readonly events: ApiEventsService,
@@ -30,6 +32,17 @@ export class CreateFeaturesHandler
     try {
       switch (command.input.operation) {
         case SpecificationOperation.Stratification: {
+          const ids = await this.stratificationOperation.stratificate({
+            scenarioId: command.scenarioId,
+            specificationId: command.specificationId,
+            input: command.input,
+          });
+          this.eventBus.publish(
+            new FeaturesCreated(command.scenarioId, command.specificationId, {
+              ...command.input,
+              features: ids.map(({ id }) => ({ id, calculated: true })),
+            }),
+          );
           break;
         }
         case SpecificationOperation.Copy: {

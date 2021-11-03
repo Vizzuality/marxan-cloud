@@ -26,6 +26,7 @@ export class CustomPlanningAreasUploader {
 
   async savePlanningAreaFromShapefile(
     file: Express.Multer.File,
+    grid = false,
   ): Promise<
     Either<
       typeof validationFailed,
@@ -37,7 +38,9 @@ export class CustomPlanningAreasUploader {
   > {
     const { data, status } = await this.httpService
       .post(
-        `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/projects/planning-area/shapefile`,
+        `${this.geoprocessingUrl}${
+          apiGlobalPrefixes.v1
+        }/projects/planning-area/shapefile${grid ? '/grid' : ''}`,
         file,
         {
           headers: { 'Content-Type': 'application/json' },

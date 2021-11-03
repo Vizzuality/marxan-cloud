@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepReadonly } from 'utility-types';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -18,6 +18,7 @@ import { Geometry } from 'geojson';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
+  PaginationMeta,
 } from '@marxan-api/utils/app-base.service';
 import { GeoFeature } from './geo-feature.api.entity';
 import { FetchSpecification } from 'nestjs-base-service';
@@ -45,6 +46,11 @@ type GeoFeatureFilterKeys = keyof Pick<
   typeof geoFeatureFilterKeyNames[number]
 >;
 type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
+
+export type FindResult = {
+  data: (Partial<GeoFeature> | undefined)[];
+  metadata: PaginationMeta | undefined;
+};
 
 @Injectable()
 export class GeoFeaturesService extends AppBaseService<
@@ -162,7 +168,6 @@ export class GeoFeaturesService extends AppBaseService<
      *    * reduces unnecessary relations and system accidental complexity
      *
      */
-
     if (projectId && info?.params?.bbox) {
       const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
         .createQueryBuilder('geoFeatureGeometries')
@@ -213,6 +218,13 @@ export class GeoFeaturesService extends AppBaseService<
         {
           featureClassAndAliasFilter: `%${info.params.featureClassAndAliasFilter}%`,
         },
+      );
+    }
+
+    if (info.params?.featureTag) {
+      queryFilteredByPublicOrProjectSpecificFeatures.andWhere(
+        `${this.alias}.tag = :tag`,
+        { tag: info.params.featureTag },
       );
     }
     return queryFilteredByPublicOrProjectSpecificFeatures;

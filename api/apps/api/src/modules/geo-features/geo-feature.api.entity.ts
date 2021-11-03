@@ -1,8 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import { FeatureTag } from '@marxan/features/domain';
 import { JobStatus } from '../scenarios/scenario.api.entity';
+import { Project } from '../projects/project.api.entity';
+import { User } from '../users/user.api.entity';
 
 export const geoFeatureResource: BaseServiceResource = {
   className: 'GeoFeature',
@@ -66,6 +68,25 @@ export class GeoFeature extends BaseEntity {
   @ApiPropertyOptional()
   @Column('uuid', { name: 'project_id' })
   projectId?: string;
+
+  @ApiProperty({ type: () => Project })
+  @ManyToOne((_type) => Project,  {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'project_id',
+    referencedColumnName: 'id',
+  })
+  project?: Project;
+
+  @ManyToOne((_type) => User,  {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({
+    name: 'created_by',
+    referencedColumnName: 'id',
+  })
+  createdBy?: User;
 }
 
 export class JSONAPIGeoFeaturesData {

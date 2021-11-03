@@ -1,5 +1,4 @@
 import {
-  ScenarioCostSurfaceTemplateService,
   FileNotFound,
   FileNotReady,
   FilePiped,
@@ -10,13 +9,11 @@ import { Queue } from './queue';
 import { Storage } from './storage';
 
 @Injectable()
-export class QueuedCostTemplateService extends ScenarioCostSurfaceTemplateService {
+export class QueuedCostTemplateService {
   constructor(
     private readonly queue: Queue,
     private readonly storage: Storage,
-  ) {
-    super();
-  }
+  ) {}
 
   async getTemplateShapefile(
     scenarioId: string,

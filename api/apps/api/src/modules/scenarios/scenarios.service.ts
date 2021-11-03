@@ -42,7 +42,13 @@ import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-pl
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { SpecificationService } from './specification';
 import { CostRange, CostRangeService } from './cost-range-service';
-import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
+import {
+  DoesntExist,
+  ProjectChecker,
+} from '@marxan-api/modules/scenarios/project-checker.service';
+import { QueryBus } from '@nestjs/cqrs';
+import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
+import { ProtectedAreaService, submissionFailed } from './protected-area';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -52,6 +58,16 @@ const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
 
 export const projectNotReady = Symbol('project not ready');
 export type ProjectNotReady = typeof projectNotReady;
+
+export const projectDoesntExist = Symbol(`project doesn't exist`);
+export type ProjectDoesntExist = typeof projectDoesntExist;
+
+export const scenarioNotFound = Symbol(`scenario not found`);
+
+export type SubmitProtectedAreaError =
+  | GetProjectErrors
+  | typeof submissionFailed
+  | typeof scenarioNotFound;
 
 @Injectable()
 export class ScenariosService {
@@ -78,6 +94,8 @@ export class ScenariosService {
     private readonly specificationService: SpecificationService,
     private readonly costService: CostRangeService,
     private readonly projectChecker: ProjectChecker,
+    private readonly protectedArea: ProtectedAreaService,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async findAllPaginated(
@@ -99,14 +117,20 @@ export class ScenariosService {
   async create(
     input: CreateScenarioDTO,
     info: AppInfoDTO,
-  ): Promise<Either<ProjectNotReady, Scenario>> {
+  ): Promise<Either<ProjectNotReady | ProjectDoesntExist, Scenario>> {
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
     const isProjectReady = await this.projectChecker.isProjectReady(
       input.projectId,
     );
-    if (!isProjectReady) {
-      return left(projectNotReady);
+    if (isLeft(isProjectReady)) {
+      const _exhaustiveCheck: DoesntExist = isProjectReady.left;
+      return left(projectDoesntExist);
+    } else {
+      if (!isProjectReady.right) {
+        return left(projectNotReady);
+      }
     }
+
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
     await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
@@ -381,5 +405,35 @@ export class ScenariosService {
   async resetLockStatus(scenarioId: string) {
     await this.assertScenario(scenarioId);
     await this.planningUnitsService.resetLockStatus(scenarioId);
+  }
+
+  async addProtectedAreaFor(
+    scenarioId: string,
+    file: Express.Multer.File,
+    info: AppInfoDTO,
+  ): Promise<Either<SubmitProtectedAreaError, true>> {
+    try {
+      const scenario = await this.assertScenario(scenarioId);
+      const projectResponse = await this.queryBus.execute(
+        new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
+      );
+      if (isLeft(projectResponse)) {
+        return projectResponse;
+      }
+
+      const submission = await this.protectedArea.addShapeFor(
+        projectResponse.right.id,
+        scenarioId,
+        file,
+      );
+
+      if (isLeft(submission)) {
+        return submission;
+      }
+
+      return right(true);
+    } catch {
+      return left(scenarioNotFound);
+    }
   }
 }

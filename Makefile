@@ -166,10 +166,13 @@ dump-geodb-data:
 	docker-compose exec -T postgresql-geo-api pg_dump -T migrations -a -U "${_GEO_POSTGRES_USER}" -F t ${_GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
 
 dump-api-data:
-	docker-compose exec -T postgresql-api pg_dump -T '(migrations|api_event_kinds)' -a -U "${_API_POSTGRES_USER}" -F t ${_API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
+	docker-compose exec -T postgresql-api pg_dump -T '(migrations|api_event_kinds|roles)' -a -U "${_API_POSTGRES_USER}" -F t ${_API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
 
 upload-dump-data:
 	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps -s data/data/processed/db_dumps
+
+upload-volumes-data:
+	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-volumes -s data/data/processed/db_volumes
 
 upload-data-for-demo:
 	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/data-demo -s data/data/data_demo/organized
@@ -177,6 +180,14 @@ upload-data-for-demo:
 restore-dumps:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-restore-data
 
+## To generate volumes instances must be stop
+create-volumes-data:
+	docker run --rm --volumes-from marxan-postgresql-api -v $$(pwd)/data/data/processed/db_volumes:/backup ubuntu tar cvf /backup/psql-api-data.tar /var/lib/postgresql/data && \
+	docker run --rm --volumes-from marxan-postgresql-geo-api -v $$(pwd)/data/data/processed/db_volumes:/backup ubuntu tar cvzf /backup/psql-geo-data.tar.gz /var/lib/postgresql/data
+
+restore-volumes-data:
+	docker run --rm --volumes-from marxan-postgresql-api -v $$(pwd)/data/data/processed/db_volumes:/backup ubuntu bash -c "rm -rf /var/lib/postgresql/data/* && cd / && tar xvf /backup/psql-api-data.tar" && \
+	docker run --rm --volumes-from marxan-postgresql-geo-api -v $$(pwd)/data/data/processed/db_volumes:/backup ubuntu bash -c "rm -rf /var/lib/postgresql/data/* && cd / && tar xvf /backup/psql-geo-data.tar"
 extract-geo-test-data:
 	#This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
 	TEST_GEOMETRY=$(shell cat api/apps/api/test/fixtures/test-geometry.json | jq 'tostring'); \

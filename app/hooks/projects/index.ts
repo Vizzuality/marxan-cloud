@@ -30,6 +30,8 @@ import {
   UsePublishedProjectsProps,
   UseDuplicateProjectProps,
   DuplicateProjectProps,
+  UseUploadProjectPAGridProps,
+  UploadProjectPAGridProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -253,6 +255,35 @@ export function useUploadProjectPA({
   };
 
   return useMutation(uploadProjectPAShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUploadProjectPAGrid({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadProjectPAGridProps) {
+  const [session] = useSession();
+
+  const uploadProjectPAShapefileGrid = ({ data }: UploadProjectPAGridProps) => {
+    return UPLOADS.request({
+      url: '/projects/planning-area/shapefile-grid',
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadProjectPAShapefileGrid, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
     },

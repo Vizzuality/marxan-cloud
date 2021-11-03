@@ -12,8 +12,12 @@ import {
   UseSaveMePasswordProps,
   SaveMePasswordProps,
   UseDeleteMeProps,
+  UseRequestRecoverPasswordProps,
+  RequestRecoverPasswordProps,
   UseResetPasswordProps,
   ResetPasswordProps,
+  SignUpConfirmationProps,
+  UseSignUpConfirmationProps,
 } from './types';
 
 // ME
@@ -138,7 +142,31 @@ export function useDeleteMe({
   });
 }
 
-// RESET PASSWORD
+// REQUEST RECOVER PASSWORD
+export function useRequestRecoverPassword({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseRequestRecoverPasswordProps) {
+  const requestRecoverPassword = ({ data }: RequestRecoverPasswordProps) => {
+    return USERS.request({
+      url: '/me/recover-password',
+      data,
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(requestRecoverPassword, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+// RECOVER PASSWORD
 export function useResetPassword({
   requestConfig = {
     method: 'PATCH',
@@ -162,6 +190,30 @@ export function useResetPassword({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+// CONFIRM SIGN UP
+export function useSignUpConfirmation({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSignUpConfirmationProps) {
+  const signUpConfirmation = ({ data }: SignUpConfirmationProps) => {
+    return USERS.request({
+      url: '/me/validate',
+      data,
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(signUpConfirmation, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

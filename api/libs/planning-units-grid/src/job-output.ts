@@ -1,5 +1,5 @@
 import { IsNumber, IsUUID } from 'class-validator';
-import { BBox } from 'geojson';
+import { BBox, GeoJSON } from 'geojson';
 
 export class JobOutput {
   /**
@@ -26,4 +26,6 @@ export class JobOutput {
     },
   )
   bbox!: BBox;
+
+  geoJson!: GeoJSON;
 }

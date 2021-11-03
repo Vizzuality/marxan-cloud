@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {
+  useState, useEffect, useMemo, useRef, useCallback,
+} from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
@@ -19,6 +21,7 @@ import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
 import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
+import PlanningAreaGridUploader from 'layout/projects/new/form/planning-area-grid-uploader';
 import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
 import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
 import ProjectNewMap from 'layout/projects/new/map';
@@ -27,6 +30,7 @@ import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
+import Select from 'components/forms/select';
 import Textarea from 'components/forms/textarea';
 import {
   composeValidators,
@@ -35,7 +39,7 @@ import InfoButton from 'components/info-button';
 
 import REGION_PU from 'images/info-buttons/img_planning_region_grid.png';
 
-import { DEFAULT_AREA } from './constants';
+import { DEFAULT_AREA, PA_OPTIONS } from './constants';
 import ProjectFormProps from './types';
 
 const ProjectForm: React.FC<ProjectFormProps> = () => {
@@ -43,9 +47,12 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   const { push } = useRouter();
   const plausible = usePlausible();
 
+  const [PAOptionSelected, setPAOptionSelected] = useState('');
+
+  const planningAreaScrollRef = useRef(null);
+
   const { user } = useMe();
 
-  const [hasPlanningArea, setHasPlanningArea] = useState(false);
   const { data: organizationsData } = useOrganizations();
 
   const dispatch = useDispatch();
@@ -63,10 +70,16 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   }, [dispatch]);
 
   const onSubmit = (values) => {
+    const { planningAreaGridId } = values;
+    delete values.PAOptionSelected;
+    delete values.planningAreaGridId;
+
     // TEMPORARY!!
     // This should be removed once organizations IDs are handled in the user
     const data = {
       ...values,
+      ...(planningAreaGridId && { planningAreaId: planningAreaGridId }),
+      ...(planningAreaGridId && { planningUnitGridShape: 'from_shapefile' }),
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
     };
 
@@ -105,6 +118,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     });
   };
 
+  const scrollDown = useCallback((ref) => {
+    ref?.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }, []);
+
   const resetPlanningArea = (form) => {
     dispatch(setUploadingPlanningArea(null));
     dispatch(setBbox(null));
@@ -117,6 +134,24 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
       }
     });
   };
+
+  const resetPlanningAreaGrid = (form) => {
+    dispatch(setUploadingPlanningArea(null));
+    dispatch(setBbox(null));
+
+    const registeredFields = form.getRegisteredFields();
+    registeredFields.forEach((f) => {
+      const omitFields = ['name', 'description'];
+      if (!omitFields.includes(f)) {
+        form.change(f, null);
+      }
+    });
+  };
+
+  // Constants
+  const OPTIONS = useMemo(() => {
+    return PA_OPTIONS.filter((o) => o.value !== PAOptionSelected);
+  }, [PAOptionSelected]);
 
   return (
     <FormRFF
@@ -160,70 +195,68 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
                   <div className="flex flex-col flex-grow p-8 overflow-auto">
-                    <h1 className="max-w-xs text-2xl text-white font-heading">
-                      Name your project and define a planning area:
-                    </h1>
+                    <div>
+                      <h1 className="max-w-xs text-2xl text-white font-heading">
+                        Name your project and define a planning area:
+                      </h1>
 
-                    {/* NAME */}
-                    <div className="mt-8">
-                      <FieldRFF
-                        name="name"
-                        validate={composeValidators([{ presence: true }])}
-                      >
-                        {(fprops) => (
-                          <Field id="name" {...fprops}>
-                            <div className="flex items-center mb-3 space-x-2">
-                              <Label theme="dark" className="uppercase" id="name">
-                                Project Name
-                              </Label>
+                      {/* NAME */}
+                      <div className="mt-8">
+                        <FieldRFF
+                          name="name"
+                          validate={composeValidators([{ presence: true }])}
+                        >
+                          {(fprops) => (
+                            <Field id="name" {...fprops}>
+                              <div className="flex items-center mb-3 space-x-2">
+                                <Label theme="dark" className="uppercase" id="name">
+                                  Project Name
+                                </Label>
 
-                              <InfoButton>
-                                <span>
-                                  <h4 className="font-heading text-lg mb-2.5">Project Name</h4>
-                                  <div className="space-y-2">
-                                    <p>
-                                      One project can aggregate multiple scenarios
-                                      with the same planning region and grid.
-                                      Therefore, using a generic name for the project is
-                                      recommended (eg: the name of the planning region)
-                                      as well as a generic overview for the description.
-                                    </p>
-                                    <p>
-                                      In each Scenario you will be able
-                                      to provide more specific details.
-                                    </p>
-                                  </div>
-                                </span>
-                              </InfoButton>
-                            </div>
-                            <Input theme="dark" type="text" placeholder="Write project name..." />
-                          </Field>
-                        )}
-                      </FieldRFF>
-                    </div>
+                                <InfoButton>
+                                  <span>
+                                    <h4 className="font-heading text-lg mb-2.5">Project Name</h4>
+                                    <div className="space-y-2">
+                                      <p>
+                                        One project can aggregate multiple scenarios
+                                        with the same planning region and grid.
+                                        Therefore, using a generic name for the project is
+                                        recommended (eg: the name of the planning region)
+                                        as well as a generic overview for the description.
+                                      </p>
+                                      <p>
+                                        In each Scenario you will be able
+                                        to provide more specific details.
+                                      </p>
+                                    </div>
+                                  </span>
+                                </InfoButton>
+                              </div>
+                              <Input theme="dark" type="text" placeholder="Write project name..." />
+                            </Field>
+                          )}
+                        </FieldRFF>
+                      </div>
 
-                    {/* DESCRIPTION */}
-                    <div className="mt-8">
-                      <FieldRFF
-                        name="description"
-                        validate={composeValidators([{ presence: true }])}
-                      >
-                        {(fprops) => (
-                          <Field id="description" {...fprops}>
-                            <Label theme="dark" className="mb-3 uppercase">Description</Label>
-                            <Textarea rows={4} placeholder="Write your project description..." />
-                          </Field>
-                        )}
-                      </FieldRFF>
-                    </div>
+                      {/* DESCRIPTION */}
+                      <div className="mt-8">
+                        <FieldRFF
+                          name="description"
+                          validate={composeValidators([{ presence: true }])}
+                        >
+                          {(fprops) => (
+                            <Field id="description" {...fprops}>
+                              <Label theme="dark" className="mb-3 uppercase">Description</Label>
+                              <Textarea rows={4} placeholder="Write your project description..." />
+                            </Field>
+                          )}
+                        </FieldRFF>
+                      </div>
 
-                    {/* PLANNING AREA */}
-                    <div className="flex flex-col justify-between mt-6">
-                      <h2 className="mb-5 text-lg font-medium font-heading">Do you have a planning region shapefile of your own?</h2>
-
-                      <div className="flex flex-row items-center justify-between">
-                        <div className="flex items-center">
-                          <Label theme="dark" className="mr-2 uppercase text-xxs">Planning area</Label>
+                      {/* PLANNING AREA */}
+                      <div className="flex flex-col justify-between mt-6">
+                        <div className="flex items-center mb-5 space-x-3">
+                          <h2 className="text-lg font-medium font-heading">Do you have a planning region or planning unit shapefile?</h2>
                           <InfoButton>
                             <span>
                               <h4 className="font-heading text-lg mb-2.5">Planning Area</h4>
@@ -251,70 +284,93 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                                 <img src={REGION_PU} alt="Region-PU" />
                               </div>
                             </span>
-
                           </InfoButton>
                         </div>
-                        <div className="flex flex-row">
-                          <Button
-                            className="w-20 h-6 mr-4"
-                            size="xs"
-                            theme={hasPlanningArea !== null && !hasPlanningArea ? 'white' : 'secondary'}
-                            onClick={() => {
-                              setHasPlanningArea(false);
-                              resetPlanningArea(form);
-                            }}
-                          >
-                            No
-                          </Button>
-                          <Button
-                            className="w-20 h-6"
-                            size="xs"
-                            theme={hasPlanningArea ? 'white' : 'secondary'}
-                            onClick={() => {
-                              setHasPlanningArea(true);
-                              resetPlanningArea(form);
-                            }}
-                          >
-                            Yes
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
 
-                    {hasPlanningArea !== null && !hasPlanningArea && (
-                      <>
-                        <CountryRegionSelector
-                          country={values.countryId}
-                          region={values.adminAreaLevel1Id}
-                          subRegion={values.adminAreaLevel2Id}
-                        />
-                        <PlanningAreaSelector
-                          values={values}
-                        />
-                      </>
-                    )}
-
-                    {hasPlanningArea && (
-                      <div className="mt-3">
+                        {/* PLANNING AREA TYPE SELECTOR */}
                         <FieldRFF
-                          name="planningAreaId"
-                          validate={composeValidators([{ presence: true }])}
+                          name="PAOptionSelected"
                         >
-                          {(fprops) => {
-                            return (
-                              <PlanningAreaUploader
-                                {...fprops}
-                                resetPlanningArea={resetPlanningArea}
-                                form={form}
+                          {(fprops) => (
+                            <Field id="PAOptionSelected" {...fprops}>
+                              <Select
+                                theme="dark"
+                                size="base"
+                                status="none"
+                                placeholder="Select option..."
+                                initialSelected={PAOptionSelected}
+                                options={OPTIONS}
+                                onChange={(value: string) => {
+                                  setPAOptionSelected(value);
+                                  resetPlanningArea(form);
+                                }}
                               />
-                            );
-                          }}
+                            </Field>
+                          )}
                         </FieldRFF>
-                        <PlanningAreaSelector
-                          values={values}
-                        />
                       </div>
-                    )}
+
+                      {PAOptionSelected === 'regular' && (
+                        <>
+
+                          <CountryRegionSelector
+                            country={values.countryId}
+                            region={values.adminAreaLevel1Id}
+                            subRegion={values.adminAreaLevel2Id}
+                            onClick={() => scrollDown(planningAreaScrollRef)}
+                          />
+                          {(!!values.countryId || !!values.planningAreaId) && (
+                            <PlanningAreaSelector
+                              values={values}
+                            />
+                          )}
+                          <div ref={planningAreaScrollRef} />
+                        </>
+                      )}
+
+                      {/* CUSTOM SHAPEFILE PLANNING AREA */}
+                      {PAOptionSelected === 'customPAshapefile' && (
+                        <div className="mt-3">
+                          <FieldRFF
+                            name="planningAreaId"
+                            validate={composeValidators([{ presence: true }])}
+                          >
+                            {(fprops) => {
+                              return (
+                                <PlanningAreaUploader
+                                  {...fprops}
+                                  resetPlanningArea={resetPlanningArea}
+                                  form={form}
+                                />
+                              );
+                            }}
+                          </FieldRFF>
+                          <PlanningAreaSelector
+                            values={values}
+                          />
+                        </div>
+                      )}
+
+                      {/* CUSTOM GRID SHAPEFILE PLANNING AREA */}
+                      {PAOptionSelected === 'customPAshapefileGrid' && (
+                        <div className="mt-3">
+                          <FieldRFF
+                            name="planningAreaGridId"
+                            validate={composeValidators([{ presence: true }])}
+                          >
+                            {(fprops) => {
+                              return (
+                                <PlanningAreaGridUploader
+                                  {...fprops}
+                                  resetPlanningAreaGrid={resetPlanningAreaGrid}
+                                  form={form}
+                                />
+                              );
+                            }}
+                          </FieldRFF>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
                 </div>
@@ -377,8 +433,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   subregion={values.adminAreaLevel2Id}
                   planningUnitGridShape={values.planningUnitGridShape}
                   planningUnitAreakm2={values.planningUnitAreakm2}
+                  paOptionSelected={PAOptionSelected}
                 />
               </div>
+
             </HelpBeacon>
           </div>
         </form>

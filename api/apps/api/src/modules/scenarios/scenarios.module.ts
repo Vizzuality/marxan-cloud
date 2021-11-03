@@ -8,7 +8,6 @@ import { Scenario } from './scenario.api.entity';
 import { ScenariosCrudService } from './scenarios-crud.service';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { ProtectedAreasModule } from '@marxan-api/modules/protected-areas/protected-areas.module';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { ScenarioFeaturesModule } from '../scenarios-features';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
@@ -23,6 +22,7 @@ import { SolutionResultCrudService } from './solutions-result/solution-result-cr
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import {
+  ProtectionStatusModule,
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuOutputGeoEntity,
 } from '@marxan/scenarios-planning-unit';
@@ -38,19 +38,20 @@ import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.ser
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { AdminAreasModule } from '../admin-areas/admin-areas.module';
-import { ProtectionStatusModule } from '@marxan/scenarios-planning-unit';
 
 import { SpecificationModule } from './specification';
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
 import { CostRangeService } from './cost-range-service';
 import { ProjectChecker } from './project-checker.service';
+import { ProtectedAreaModule } from './protected-area';
+import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
+import { PlanningAreasModule } from '@marxan-api/modules/projects/planning-areas';
 
 @Module({
   imports: [
     CqrsModule,
     GeoFeaturesModule,
-    ProtectedAreasModule,
     SpecificationModule,
     forwardRef(() => ProjectsModule),
     TypeOrmModule.forFeature([
@@ -63,6 +64,7 @@ import { ProjectChecker } from './project-checker.service';
       DbConnections.geoprocessingDB,
     ),
     ProtectionStatusModule.for(DbConnections.geoprocessingDB),
+    PlanningAreasModule,
     UsersModule,
     ScenarioFeaturesModule,
     AnalysisModule,
@@ -75,6 +77,8 @@ import { ProjectChecker } from './project-checker.service';
     MarxanRunModule,
     AdminAreasModule,
     ApiEventsModule,
+    ProtectedAreaModule,
+    ProtectedAreasCrudModule,
   ],
   providers: [
     ProjectChecker,

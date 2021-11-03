@@ -1,45 +1,76 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
+import { v4 } from 'uuid';
 
 import {
   PlanningUnitGridShape as ProjectGridShape,
   Project,
 } from '@marxan-api/modules/projects/project.api.entity';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { ApiEventsService } from '@marxan-api/modules/api-events';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 
 import { SetProjectGridFromShapefile } from './set-project-grid-from-shapefile.command';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
-
-// TODO Debt - move grid shape to totally standalone lib
-// may be not so easy, as Project's enum is used as a type within database
-// some "transform" could be used tho
-const mapping: Record<PlanningUnitGridShape, ProjectGridShape> = {
-  [PlanningUnitGridShape.fromShapefile]: ProjectGridShape.fromShapefile,
-  [PlanningUnitGridShape.hexagon]: ProjectGridShape.hexagon,
-  [PlanningUnitGridShape.square]: ProjectGridShape.square,
-};
 
 @CommandHandler(SetProjectGridFromShapefile)
 export class SetProjectGridFromShapefileHandler
   implements IInferredCommandHandler<SetProjectGridFromShapefile> {
   constructor(
     @InjectRepository(Project) private readonly projects: Repository<Project>,
+    private readonly events: ApiEventsService,
+    @InjectEntityManager(DbConnections.geoprocessingDB)
+    private readonly entityManager: EntityManager,
   ) {}
 
   async execute({
-    projectId,
+    projectId: project,
     planningAreaId,
     bbox,
   }: SetProjectGridFromShapefile): Promise<void> {
+    const projectId = project.value;
+    await this.events.create({
+      kind: API_EVENT_KINDS.project__planningUnits__submitted__v1__alpha,
+      topic: projectId,
+      data: {
+        source: `custom-grid`,
+      },
+    });
+
+    await this.entityManager.transaction(async (manager) => {
+      await manager.query(
+        `
+          UPDATE "planning_units_geom"
+          SET "project_id" = $1
+          WHERE "project_id" = $2
+        `,
+        [projectId, planningAreaId],
+      );
+
+      await manager.query(
+        `
+          UPDATE "planning_areas"
+          SET "project_id" = $1
+          WHERE "project_id" = $2
+        `,
+        [projectId, planningAreaId],
+      );
+    });
     await this.projects.update(
       {
-        id: projectId.value,
+        id: projectId,
       },
       {
-        planningUnitGridShape: mapping[PlanningUnitGridShape.fromShapefile],
+        planningUnitGridShape: ProjectGridShape.fromShapefile,
         planningAreaGeometryId: planningAreaId,
         bbox,
       },
     );
+
+    await this.events.createIfNotExists({
+      kind: API_EVENT_KINDS.project__planningUnits__finished__v1__alpha,
+      topic: projectId,
+      externalId: v4(),
+    });
   }
 }

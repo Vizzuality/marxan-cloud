@@ -38,6 +38,15 @@ export interface UploadProjectPAProps {
   data: any,
 }
 
+// useUploadProjectPAGrid
+
+export interface UseUploadProjectPAGridProps {
+  requestConfig?: AxiosRequestConfig
+}
+export interface UploadProjectPAGridProps {
+  data: any,
+}
+
 // usePublicProjects
 export interface UsePublishedProjectsProps {
   search?: string;

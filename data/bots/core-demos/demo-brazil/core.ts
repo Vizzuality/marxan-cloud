@@ -19,7 +19,7 @@ export const runBot = async (settings: MarxanBotConfig) => {
     description: "",
   });
 
-  const planningUnitAreakm2 = 2000;
+  const planningUnitAreakm2 = 50;
 
   const planningAreaId = await bot.planningAreaUploader.uploadFromFile(
     `${scriptPath}/test_mata.zip`,
@@ -69,15 +69,15 @@ export const runBot = async (settings: MarxanBotConfig) => {
   //Setup features in the project
   const wantedFeatures = [
     // "demo_ecoregions_new_class_split",
-    // "buteogallus_urubitinga",
-    // "caluromys_philander",
-    // "chiroxiphia_caudata",
-    // "leopardus_pardalis",
-    // "megarynchus_pitangua",
-    // "phyllodytes_tuberculosus",
-    // "priodontes_maximus",
-    // "proceratophrys_bigibbosa",
-    // "tapirus_terrestris",
+    "buteogallus_urubitinga",
+    "caluromys_philander",
+    "chiroxiphia_caudata",
+    "leopardus_pardalis",
+    "megarynchus_pitangua",
+    "phyllodytes_tuberculosus",
+    "priodontes_maximus",
+    "proceratophrys_bigibbosa",
+    "tapirus_terrestris",
     "thalurania_glaucopis",
   ];
 
@@ -99,6 +99,8 @@ export const runBot = async (settings: MarxanBotConfig) => {
     scenario.id,
     "short",
   );
+
+  await bot.scenarios.setNumberOfRuns(scenario.id, 100);
 
   await bot.marxanExecutor.runForScenario(scenario.id);
 

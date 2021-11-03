@@ -1,11 +1,12 @@
 import { INestApplication } from '@nestjs/common';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { bootstrapApplication } from '../utils/api-application';
-import { createWorld, World } from './steps/world';
+import { createWorld } from './steps/world';
 import { tearDown } from '../utils/tear-down';
 import { v4 } from 'uuid';
 
 let app: INestApplication;
-let world: World;
+let world: FixtureType<typeof createWorld>;
 
 beforeAll(async () => {
   app = await bootstrapApplication();
@@ -13,29 +14,31 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await world.cleanup();
+  await world?.cleanup();
   await app.close();
   await tearDown();
 });
 
-describe(`when project is not available`, () => {
+describe(`when scenario is not available`, () => {
   it(`should fail`, async () => {
-    expect((await world.WhenSubmittingShapefileFor(v4())).status).toEqual(404);
+    const result = await world.WhenSubmittingShapefileFor(v4());
+    expect(result.status).toEqual(404);
   });
 });
 
 describe(`when project is available`, () => {
   it(`submits shapefile to the system`, async () => {
-    const result = await world.WhenSubmittingShapefileFor(world.projectId);
+    const result = await world.WhenSubmittingShapefileFor(world.scenarioId);
 
     expect(result.status).toEqual(201);
     expect(result.body.meta.started).toBeTruthy();
     const job = world.GetSubmittedJobs()[0];
     expect(job).toMatchObject({
-      name: `protected-areas-for-${world.projectId}`,
+      name: `add-protected-area`,
       data: {
+        scenarioId: world.scenarioId,
         projectId: world.projectId,
-        file: expect.anything(),
+        shapefile: expect.anything(),
       },
     });
   });

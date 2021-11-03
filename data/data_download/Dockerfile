@@ -10,6 +10,6 @@ RUN apt-get update \
            time \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm i -g mapshaper@0.5.34
+RUN npm i -g mapshaper@0.5.67
 
 COPY ./ ./

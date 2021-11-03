@@ -52,20 +52,6 @@ export class ProjectsListingController {
     });
     return this.projectSerializer.serializeAll(results.data, results.metadata);
   }
-
-  @ProjectsListing()
-  @Get(`published`)
-  async findAllPublic(
-    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
-    @Query('q') namesSearch?: string,
-  ): Promise<ProjectResultPlural> {
-    const results = await this.projectsService.findAll(fetchSpecification, {
-      params: {
-        namesSearch,
-      },
-    });
-    return this.projectSerializer.serializeAll(results.data, results.metadata);
-  }
 }
 
 function ProjectsListing() {

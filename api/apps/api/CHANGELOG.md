@@ -33,6 +33,8 @@ Unreleased
 - The JSON:API serialization settings of IUCN categories did not map the `id`
   property as appropriate, leading to undefined `id` properties being included
   in JSON:API response payloads; this has now been fixed [MARXAN-335].
+- Deleting projects that use custom (project-specific) features was not possible
+  due to a missing db cascade; this has now been fixed ([MARXAN-897]).
 
 ## [0.3.0]
 

@@ -28,7 +28,7 @@ export type EventFactory<JobData, Result = unknown> = {
     eventData: EventData<JobData, Result>,
   ) => Promise<CreateApiEventDTO>;
   createFailedEvent: (
-    eventData: EventData<JobData>,
+    eventData: EventData<JobData, Result>,
   ) => Promise<CreateApiEventDTO>;
 };
 

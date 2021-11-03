@@ -76,4 +76,8 @@ export class Scenarios {
     logDebug(`Scenario:\n${Deno.inspect(result)}`);
     return result;
   }
+
+  async setNumberOfRuns(scenarioId: string, numberOfRuns: number = 100) {
+    await this.baseHttpClient.patch(`/scenarios/${scenarioId}`, { numberOfRuns });
+  }
 }

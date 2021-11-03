@@ -1,4 +1,4 @@
-import { In, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, In, Repository, SelectQueryBuilder } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -6,12 +6,16 @@ import {
   JSONAPISerializerConfig,
 } from '../../utils/app-base.service';
 
-import { ScenarioFeaturesOutputGapData } from '@marxan/features';
+import {
+  ScenarioFeaturesGapData,
+  ScenarioFeaturesOutputGapData,
+} from '@marxan/features';
 import { UserSearchCriteria } from './search-criteria';
 import { AppConfig } from '../../utils/config.utils';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 import { isInt, isPositive } from 'class-validator';
+import { FiltersSpecification } from 'nestjs-base-service';
 
 const scenarioFeaturesOutputGapDataFilterKeyNames = ['runId'] as const;
 type ScenarioFeaturesOutputGapDataFilterKeys = keyof Pick<
@@ -66,6 +70,48 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
         scenarioId,
       });
     }
+    return query;
+  }
+
+  async extendFindAllQuery(
+    query: SelectQueryBuilder<ScenarioFeaturesOutputGapData>,
+    filters?: FiltersSpecification,
+    info?: UserSearchCriteria,
+  ): Promise<SelectQueryBuilder<ScenarioFeaturesOutputGapData>> {
+    // DEBT same issue as
+    // `api/apps/api/src/modules/geo-features/geo-features.service.ts`
+    // https://github.com/Vizzuality/marxan-cloud/pull/572/files#diff-2b4e531cc05bd4686fb0fc6e5cbf9fd3e2684e40a818179750dc8095bc93d49dR138-R149
+
+    if (!info?.params?.searchPhrase) {
+      return query;
+    }
+
+    const featuresIds = (
+      await this.features
+        .createQueryBuilder('features')
+        .select('features.id')
+        .where(
+          new Brackets((orBuilder) =>
+            orBuilder
+              .where('feature_class_name like :phrase', {
+                phrase: `%${info?.params?.searchPhrase}%`,
+              })
+              .orWhere('alias like :phrase', {
+                phrase: `%${info?.params?.searchPhrase}%`,
+              }),
+          ),
+        )
+        .getMany()
+    ).map((feature) => feature.id);
+
+    if (featuresIds.length > 0) {
+      query.andWhere(`feature_id IN (:...featuresIds)`, {
+        featuresIds,
+      });
+    } else {
+      query.andWhere(`false`);
+    }
+
     return query;
   }
 

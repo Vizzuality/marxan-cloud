@@ -11,7 +11,6 @@ import { CountriesModule } from '@marxan-api/modules/countries/countries.module'
 import { PlanningUnitsModule } from '@marxan-api/modules/planning-units/planning-units.module';
 import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
-import { ProtectedAreasModule } from './protected-areas/protected-areas.module';
 import { ProjectsService } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
@@ -27,9 +26,12 @@ import { ShapefilesModule } from '@marxan/shapefile-converter';
 import { PlanningUnitGridModule } from './planning-unit-grid';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { apiConnections } from '@marxan-api/ormconfig';
+import { CqrsModule } from '@nestjs/cqrs';
+import { GetProjectHandler } from './get-project.handler';
 
 @Module({
   imports: [
+    CqrsModule,
     AdminAreasModule,
     CountriesModule,
     PlanningAreasModule,
@@ -47,7 +49,6 @@ import { apiConnections } from '@marxan-api/ormconfig';
     ),
     UsersModule,
     PlanningUnitsModule,
-    ProtectedAreasModule,
     ApiEventsModule,
     ShapefilesModule,
     PlanningUnitGridModule,
@@ -59,16 +60,14 @@ import { apiConnections } from '@marxan-api/ormconfig';
     ProjectSerializer,
     JobStatusService,
     JobStatusSerializer,
+    GetProjectHandler,
   ],
-  /**
-   * Order is important due to `GET projects/published` clash with
-   * `GET projects/:id`
-   */
   controllers: [
     ProjectsListingController,
     ProjectDetailsController,
     ProjectsController,
   ],
-  exports: [ProjectsCrudService],
+  // @ToDo Remove TypeOrmModule after project publish will stop use the ProjectRepository
+  exports: [ProjectsCrudService, TypeOrmModule],
 })
 export class ProjectsModule {}

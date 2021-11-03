@@ -7,19 +7,13 @@ import { GivenProjectExists } from '../../steps/given-project';
 
 import { SubmitsProjectsPaShapefile } from './submits-projects-pa-shapefile';
 import { FakeQueue } from '../../utils/queues';
-import { queueName } from '@marxan-api/modules/projects/protected-areas/queue-name';
 
-export interface World {
-  cleanup: () => Promise<void>;
-  projectId: string;
-  organizationId: string;
-  WhenSubmittingShapefileFor: (projectId: string) => supertest.Test;
-  GetSubmittedJobs: () => Job[];
-}
+import { addProtectedAreaQueueName } from '@marxan/protected-areas';
+import { GivenScenarioExists } from '../../steps/given-scenario-exists';
 
-export const createWorld = async (app: INestApplication): Promise<World> => {
+export const createWorld = async (app: INestApplication) => {
   const jwtToken = await GivenUserIsLoggedIn(app);
-  const queue = FakeQueue.getByName(queueName);
+  const queue = FakeQueue.getByName(addProtectedAreaQueueName);
   const {
     projectId,
     cleanup: projectCleanup,
@@ -29,13 +23,17 @@ export const createWorld = async (app: INestApplication): Promise<World> => {
     adminAreaLevel1Id: 'BWA.12_1',
     adminAreaLevel2Id: 'BWA.12.1_1',
   });
+  const scenario = await GivenScenarioExists(app, projectId, jwtToken, {
+    name: `${new Date().getTime()}`,
+  });
   const shapeFilePath = __dirname + '/stations-shapefile.zip';
 
   return {
+    scenarioId: scenario.id,
     projectId,
     organizationId,
-    WhenSubmittingShapefileFor: (projectId: string) =>
-      SubmitsProjectsPaShapefile(app, jwtToken, projectId, shapeFilePath),
+    WhenSubmittingShapefileFor: (scenarioId: string) =>
+      SubmitsProjectsPaShapefile(app, jwtToken, scenarioId, shapeFilePath),
     GetSubmittedJobs: () => Object.values(queue.jobs),
     cleanup: async () => Promise.all([projectCleanup()]).then(() => undefined),
   };

@@ -5,8 +5,6 @@ export class ShapeTypeFromShapefile1631266860142 implements MigrationInterface {
     await queryRunner.query(
       `alter type shape_type add value 'from_shapefile';`,
     );
-    // https://stackoverflow.com/questions/65130629/new-enum-values-must-be-committed-before-they-can-be-used
-    await queryRunner.commitTransaction();
   }
 
   async down(_queryRunner: QueryRunner) {
