@@ -119,8 +119,8 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   };
 
   const scrollDown = useCallback((ref) => {
-    console.log('Hola', ref);
-    ref?.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      console.log('scroll down', ref);
+      ref?.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
   }, []);
 
   const resetPlanningArea = (form) => {
@@ -196,6 +196,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
 
                   <div className="flex flex-col flex-grow p-8 overflow-auto">
+                   <div>
                     <h1 className="max-w-xs text-2xl text-white font-heading">
                       Name your project and define a planning area:
                     </h1>
@@ -317,12 +318,13 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           country={values.countryId}
                           region={values.adminAreaLevel1Id}
                           subRegion={values.adminAreaLevel2Id}
-                          onClick={scrollDown(planningAreaScrollRef)}
+                          onClick={() => scrollDown(planningAreaScrollRef)}
                         />
-
-                        <PlanningAreaSelector
-                          values={values}
-                        />
+                        {(!!values.countryId || !!values.planningAreaId) && (
+                          <PlanningAreaSelector
+                            values={values}
+                          />
+                        )}
                         <div ref={planningAreaScrollRef} />
                       </>
                     )}
@@ -369,6 +371,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                         </FieldRFF>
                       </div>
                     )}
+                  </div>
                   </div>
                   <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
                 </div>
@@ -434,6 +437,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                   paOptionSelected={PAOptionSelected}
                 />
               </div>
+
             </HelpBeacon>
           </div>
         </form>
