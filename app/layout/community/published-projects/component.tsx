@@ -6,7 +6,7 @@ import { setSearch } from 'store/slices/community/projects';
 
 import { useDebouncedCallback } from 'use-debounce';
 
-import { usePublishedProjects } from 'hooks/projects';
+import { usePublishedProjects } from 'hooks/published-projects';
 
 import Wrapper from 'layout/wrapper';
 

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 import { format } from 'd3';
 
-import { usePublishedProject } from 'hooks/projects';
+import { usePublishedProject } from 'hooks/published-projects';
 import { useScenarios } from 'hooks/scenarios';
 
 import PublishedProjectMap from 'layout/community/published-projects/detail/map';

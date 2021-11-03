@@ -47,13 +47,6 @@ export interface UploadProjectPAGridProps {
   data: any,
 }
 
-// usePublicProjects
-export interface UsePublishedProjectsProps {
-  search?: string;
-  sort?: string,
-  filters?: Record<string, unknown>
-}
-
 // useDuplicateProject
 export interface UseDuplicateProjectProps {
   requestConfig?: AxiosRequestConfig;
