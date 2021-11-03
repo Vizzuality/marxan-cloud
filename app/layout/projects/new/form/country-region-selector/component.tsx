@@ -23,6 +23,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
   country,
   region,
   subRegion,
+  onClick
 }: CountryRegionSelectorProps) => {
   const [selectedCountry, setSelectedCountry] = useState(country);
   const [selectedRegion, setSelectedRegion] = useState(region);
@@ -55,7 +56,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
       {isFetchedCountries && countriesData?.length > 0 && (
         <div>
           {/* Country selector */}
-          <div className="mb-3">
+          <div aria-hidden="true" className="mb-3" onClick={onClick}>
             <FieldRFF
               name="countryId"
               validate={composeValidators([{ presence: true }])}
@@ -76,7 +77,6 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                       dispatch(setBbox(bbox));
                       dispatch(setMinPuAreaSize(minPuAreaSize));
                       dispatch(setMaxPuAreaSize(maxPuAreaSize));
-
                       setSelectedCountry(value);
                       fprops.input.onChange(value);
                     }}
