@@ -23,6 +23,7 @@ import { useScenarios } from 'hooks/scenarios';
 import HelpBeacon from 'layout/help/beacon';
 
 import Select from 'components/forms/select';
+import Loading from 'components/loading';
 import Map from 'components/map';
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
@@ -357,6 +358,13 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           )}
         </motion.div>
       )}
+
+      <Loading
+        visible={!PUGridLayer?.render?.layers}
+        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+        iconClassName="w-10 h-10 text-primary-500"
+      />
+
     </AnimatePresence>
   );
 };

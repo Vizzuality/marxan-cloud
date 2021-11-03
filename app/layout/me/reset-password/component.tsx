@@ -47,6 +47,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
 
     mutation.mutate({ data }, {
       onSuccess: () => {
+        setSubmitted(true);
         addToast('success-reset-password', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -56,7 +57,6 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
           level: 'success',
         });
         setSubmitting(false);
-        setSubmitted(true);
       },
       onError: () => {
         addToast('error-reset-password', (
