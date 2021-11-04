@@ -91,6 +91,7 @@ import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
 import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-area.dto';
+import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -645,7 +646,6 @@ export class ScenariosController {
     return;
   }
 
-
   @ApiOkResponse({
     type: ProtectedAreaDto,
     isArray: true,
@@ -678,10 +678,14 @@ export class ScenariosController {
     @Param('id') scenarioId: string,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: UploadShapefileDto,
   ): Promise<JsonApiAsyncJobMeta> {
-    const outcome = await this.service.addProtectedAreaFor(scenarioId, file, {
-      authenticatedUser: req.user,
-    });
+    const outcome = await this.service.addProtectedAreaFor(
+      scenarioId,
+      file,
+      { authenticatedUser: req.user },
+      dto,
+    );
     if (isLeft(outcome)) {
       switch (outcome.left) {
         case submissionFailed:
@@ -692,5 +696,4 @@ export class ScenariosController {
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
-
 }
