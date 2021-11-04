@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 import { useRouter } from 'next/router';
 
+import cx from 'classnames';
+
 import Title from 'layout/header/title';
 import ComingSoon from 'layout/help/coming-soon';
 import Contributors from 'layout/projects/show/header/contributors';
@@ -36,9 +38,24 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
       <div className="flex justify-between mt-5">
         <div className="flex-col">
           <div className="flex items-center space-x-5">
-            <Title />
-            <button type="button" onClick={handleEdition} className="cursor-pointer focus:outline-none">
-              <Icon icon={EDIT_SVG} className="text-white fill-current w-9 h-9" />
+            <Title editable={editable} />
+            <button
+              type="button"
+              onClick={handleEdition}
+              className={cx({
+                'cursor-pointer focus:outline-none h-10 w-10 rounded-full border border-gray-500 flex items-center justify-center': true,
+                'bg-transparent': !editable,
+                'bg-white': editable,
+              })}
+            >
+              <Icon
+                icon={EDIT_SVG}
+                className={cx({
+                  'w-4 h-4': true,
+                  'text-white': !editable,
+                  'text-black': editable,
+                })}
+              />
             </button>
           </div>
           <Description editable={editable} />

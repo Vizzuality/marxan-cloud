@@ -17,10 +17,11 @@ import {
 import Tooltip from 'components/tooltip';
 
 export interface TitleProps {
+  editable?: boolean;
   header?: boolean;
 }
 
-export const Title: React.FC<TitleProps> = ({ header = false }) => {
+export const Title: React.FC<TitleProps> = ({ header = false, editable = false }: TitleProps) => {
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid, sid } = query;
@@ -171,7 +172,7 @@ export const Title: React.FC<TitleProps> = ({ header = false }) => {
                       <Tooltip
                         arrow
                         placement="bottom"
-                        disabled={meta.active}
+                        disabled={meta.active || editable || !header}
                         content={(
                           <div className="px-2 py-1 text-gray-500 bg-white rounded">
                             <span>Edit name</span>
@@ -184,13 +185,15 @@ export const Title: React.FC<TitleProps> = ({ header = false }) => {
                           'h-16': !header,
                         })}
                         >
+
                           <input
                             {...input}
                             className={cx({
-                              'absolute left-0 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none': true,
+                              'absolute left-0 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none cursor-pointer': true,
                               'focus:bg-primary-300 focus:text-gray-500 px-1 leading-4': header,
                               'text-4xl': !header,
                             })}
+                            disabled={!editable}
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();
@@ -199,7 +202,8 @@ export const Title: React.FC<TitleProps> = ({ header = false }) => {
                           />
 
                           <h1 className={cx({
-                            'invisible h-full px-1.5 font-heading font-normal': true,
+                            'invisible h-full px-1.5 font-heading font-normal overflow-ellipsis': true,
+
                           })}
                           >
                             {input.value}
