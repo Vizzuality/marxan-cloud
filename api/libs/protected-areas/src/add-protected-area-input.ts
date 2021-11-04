@@ -20,4 +20,7 @@ export class JobInput {
   @ValidateNested()
   @Type(() => Shapefile)
   shapefile!: Shapefile;
+
+  @IsString()
+  name?: string;
 }
