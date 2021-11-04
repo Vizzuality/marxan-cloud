@@ -48,6 +48,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
+  const [mapInteractive, setMapInteractive] = useState(false);
 
   const { query } = useRouter();
   const { pid } = query;
@@ -248,6 +249,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                 mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
                 mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
                 onMapViewportChange={handleViewportChange}
+                onMapLoad={() => setMapInteractive(true)}
                 transformRequest={handleTransformRequest}
               >
                 {(map) => {
@@ -360,7 +362,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
       )}
 
       <Loading
-        visible={!PUGridLayer?.render?.layers}
+        visible={!mapInteractive}
         className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
       />
