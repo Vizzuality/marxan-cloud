@@ -41,7 +41,7 @@ export class ProtectedAreaProcessor
                ) AS f
           RETURNING "id"
         `,
-        [geo, job.data.projectId, job.data.shapefile.filename],
+        [geo, job.data.projectId, job.data.name || job.data.shapefile.filename],
       );
 
       return plainToClass<JobOutput, JobOutput>(JobOutput, {

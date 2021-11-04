@@ -39,11 +39,13 @@ export class ProtectedAreaService {
     projectId: string,
     scenarioId: string,
     shapefile: JobInput['shapefile'],
+    name: JobInput['name'],
   ): Promise<Either<typeof submissionFailed, true>> {
     const job = await this.queue.add(`add-protected-area`, {
       projectId,
       scenarioId,
       shapefile,
+      name,
     });
 
     // bad typing? may happen that job wasn't added
@@ -61,6 +63,7 @@ export class ProtectedAreaService {
           kind,
           scenarioId,
           projectId,
+          name,
         },
       });
     } catch (error: unknown) {
