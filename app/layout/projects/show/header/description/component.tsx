@@ -4,6 +4,7 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useProject, useSaveProject } from 'hooks/projects';
@@ -15,9 +16,10 @@ import {
 import Tooltip from 'components/tooltip';
 
 export interface DescriptionProps {
+  editable?: boolean;
 }
 
-export const Description: React.FC<DescriptionProps> = () => {
+export const Description: React.FC<DescriptionProps> = ({ editable }: DescriptionProps) => {
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid } = query;
@@ -115,7 +117,7 @@ export const Description: React.FC<DescriptionProps> = () => {
                       <Tooltip
                         arrow
                         placement="bottom"
-                        disabled={meta.active}
+                        disabled={meta.active || editable}
                         content={(
                           <div className="px-2 py-1 text-gray-500 bg-white rounded">
                             <span>Edit description</span>
@@ -123,17 +125,24 @@ export const Description: React.FC<DescriptionProps> = () => {
                         )}
                       >
                         <div className="relative h-12">
-                          <input
-                            {...input}
-                            className="absolute top-0 left-0 w-full h-full text-xl font-normal leading-4 bg-transparent border-none overflow-ellipsis opacity-80 font-heading focus:outline-none"
-                            value={`${input.value}`}
-                            onBlur={() => {
-                              input.onBlur();
-                              fprops.handleSubmit();
-                            }}
-                          />
+                          {editable && (
+                            <input
+                              {...input}
+                              className="absolute top-0 left-0 w-full h-full text-xl font-normal leading-4 bg-transparent border-none overflow-ellipsis opacity-80 font-heading focus:outline-none"
+                              value={`${input.value}`}
+                              onBlur={() => {
+                                input.onBlur();
+                                fprops.handleSubmit();
+                              }}
+                            />
+                          )}
 
-                          <h1 className="invisible h-full px-1.5 font-heading font-normal leading-4">
+                          <h1 className={cx({
+                            'h-full px-1.5 font-heading font-normal leading-4': true,
+                            invisible: editable,
+                            'absolute top-0 left-0 text-xl font-normal overflow-ellipsis opacity-80 font-heading focus:outline-none': !editable,
+                          })}
+                          >
                             {input.value}
                           </h1>
                         </div>

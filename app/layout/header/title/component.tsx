@@ -181,14 +181,14 @@ export const Title: React.FC<TitleProps> = ({ header = false }) => {
                         <div className={cx({
                           relative: true,
                           'h-6': header,
-                          'h-12': !header,
+                          'h-16': !header,
                         })}
                         >
                           <input
                             {...input}
                             className={cx({
-                              'absolute left-0 w-full h-full font-normal leading-4 top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none': true,
-                              'focus:bg-primary-300 focus:text-gray-500 px-1': header,
+                              'absolute left-0 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none': true,
+                              'focus:bg-primary-300 focus:text-gray-500 px-1 leading-4': header,
                               'text-4xl': !header,
                             })}
                             value={`${input.value}`}
@@ -199,7 +199,7 @@ export const Title: React.FC<TitleProps> = ({ header = false }) => {
                           />
 
                           <h1 className={cx({
-                            'invisible h-full px-1.5 font-heading font-normal leading-4': true,
+                            'invisible h-full px-1.5 font-heading font-normal': true,
                           })}
                           >
                             {input.value}
