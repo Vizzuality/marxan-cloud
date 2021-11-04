@@ -2,15 +2,17 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
-import { useDebouncedCallback } from 'use-debounce';
 import { useSelector, useDispatch } from 'react-redux';
+
 import { setSearch, setFilters, setSort } from 'store/slices/projects/[id]';
 
-import Search from 'components/search';
-import Icon from 'components/icon';
-import Modal from 'components/modal';
+import { useDebouncedCallback } from 'use-debounce';
 
 import Filters from 'layout/projects/show/scenarios/filters';
+
+import Icon from 'components/icon';
+import Modal from 'components/modal';
+import Search from 'components/search';
 
 import FILTER_SVG from 'svgs/ui/filter.svg?sprite';
 
