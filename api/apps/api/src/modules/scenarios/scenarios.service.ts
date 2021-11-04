@@ -50,6 +50,7 @@ import { QueryBus } from '@nestjs/cqrs';
 import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
 import { ProtectedAreaService, submissionFailed } from './protected-area';
 import { ScenarioProtectedArea } from '@marxan-api/modules/scenarios/protected-area/scenario-protected-area';
+import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -414,6 +415,7 @@ export class ScenariosService {
     scenarioId: string,
     file: Express.Multer.File,
     info: AppInfoDTO,
+    dto: UploadShapefileDto,
   ): Promise<Either<SubmitProtectedAreaError, true>> {
     try {
       const scenario = await this.assertScenario(scenarioId);
@@ -428,6 +430,7 @@ export class ScenariosService {
         projectResponse.right.id,
         scenarioId,
         file,
+        dto.name,
       );
 
       if (isLeft(submission)) {
