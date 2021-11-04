@@ -4,6 +4,7 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useProject, useSaveProject } from 'hooks/projects';
@@ -16,9 +17,10 @@ import {
 import Tooltip from 'components/tooltip';
 
 export interface TitleProps {
+  header?: boolean;
 }
 
-export const Title: React.FC<TitleProps> = () => {
+export const Title: React.FC<TitleProps> = ({ header = false }) => {
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid, sid } = query;
@@ -147,7 +149,16 @@ export const Title: React.FC<TitleProps> = () => {
               }}
             >
               {(fprops) => (
-                <form id="form-title-project" onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
+                <form
+                  id="form-title-project"
+                  onSubmit={fprops.handleSubmit}
+                  autoComplete="off"
+                  className={cx({
+                    'relative px-2': true,
+                    'max-w-xs': header,
+                    'h-16 w-full': !header,
+                  })}
+                >
                   <FieldRFF
                     name="name"
                     validate={composeValidators([{ presence: true }])}
@@ -167,10 +178,19 @@ export const Title: React.FC<TitleProps> = () => {
                           </div>
                         )}
                       >
-                        <div className="relative h-6">
+                        <div className={cx({
+                          relative: true,
+                          'h-6': header,
+                          'h-12': !header,
+                        })}
+                        >
                           <input
                             {...input}
-                            className="absolute top-0 left-0 w-full h-full px-1 font-normal leading-4 bg-transparent border-none font-heading overflow-ellipsis focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
+                            className={cx({
+                              'absolute left-0 w-full h-full font-normal leading-4 top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none': true,
+                              'focus:bg-primary-300 focus:text-gray-500 px-1': header,
+                              'text-4xl': !header,
+                            })}
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();
@@ -178,7 +198,12 @@ export const Title: React.FC<TitleProps> = () => {
                             }}
                           />
 
-                          <h1 className="invisible h-full px-1.5 font-heading font-normal leading-4">{input.value}</h1>
+                          <h1 className={cx({
+                            'invisible h-full px-1.5 font-heading font-normal leading-4': true,
+                          })}
+                          >
+                            {input.value}
+                          </h1>
                         </div>
                       </Tooltip>
                     )}
@@ -221,7 +246,7 @@ export const Title: React.FC<TitleProps> = () => {
                           <div className="px-2 py-1 text-gray-500 bg-white rounded">
                             <span>Edit name</span>
                           </div>
-                          )}
+                        )}
                       >
                         <div className="relative h-6">
                           <input

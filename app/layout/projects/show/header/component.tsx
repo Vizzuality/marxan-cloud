@@ -2,9 +2,10 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
+import Title from 'layout/header/title';
 import ComingSoon from 'layout/help/coming-soon';
 import Contributors from 'layout/projects/show/header/contributors';
-import Title from 'layout/projects/show/header/title';
+import Description from 'layout/projects/show/header/description';
 import Toolbar from 'layout/projects/show/header/toolbar';
 import Wrapper from 'layout/wrapper';
 
@@ -28,7 +29,10 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
       </Breadcrumb>
 
       <div className="flex justify-between mt-5">
-        <Title />
+        <div className="flex-col">
+          <Title />
+          <Description />
+        </div>
 
         <div className="flex flex-col items-end flex-shrink-0 space-y-6">
           <ComingSoon>
