@@ -31,20 +31,10 @@ export const Description: React.FC<DescriptionProps> = ({ editable = false }: De
     },
   });
 
-  const handleProjectSubmit = useCallback((data, form) => {
-    // Blur children
-    const $form = document.getElementById('form-description-project');
-    form.getRegisteredFields().forEach((n) => {
-      const element = $form.querySelector(`[description="${n}"]`);
-
-      if (element instanceof HTMLElement) {
-        element.blur();
-      }
-    });
-
+  const handleProjectSubmit = useCallback((data) => {
     const { description } = data;
 
-    saveProjectMutation.mutate({ id: projectData.id, ...data, description }, {
+    saveProjectMutation.mutate({ id: projectData.id, data: { description } }, {
 
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-project-description', (

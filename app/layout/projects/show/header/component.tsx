@@ -36,14 +36,14 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
       </Breadcrumb>
 
       <div className="flex justify-between mt-5">
-        <div className="flex-col">
+        <div className="flex-col w-2/4">
           <div className="flex items-center space-x-5">
             <Title editable={editable} />
             <button
               type="button"
               onClick={handleEdition}
               className={cx({
-                'cursor-pointer focus:outline-none h-10 w-10 rounded-full border border-gray-500 flex items-center justify-center': true,
+                'cursor-pointer focus:outline-none h-10 w-10 px-3 rounded-full border border-gray-500 flex items-center justify-center': true,
                 'bg-transparent': !editable,
                 'bg-white': editable,
               })}
