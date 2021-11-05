@@ -34,6 +34,9 @@ to custom actions that might be subject to RBAC: for instance, if publishing a p
 subject to RBAC, then it is up to the controller action to check that the user performing the request has the required role 
 (e.g. `Owner`) to perform that action.
 
+The mapping between the different platform actions and the role required to perform such action is kept in the following
+spreadsheet: https://docs.google.com/spreadsheets/d/1vz-YHdoAAG2nv_B1QUR7LQ-eU_DnKBexrqULrzMMOtw/edit?usp=sharing
+
 ## Association between roles and users for resources
 
 The association between roles and users for resources will be stored in database tables in the `marxan-api` database,
