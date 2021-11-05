@@ -23,6 +23,9 @@ import {
 } from '@marxan/scenarios-planning-unit';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
+import { SelectionGetService } from './selection/selection-get.service';
+import { SelectionUpdateService } from './selection/selection-update.service';
+
 @Module({
   imports: [
     QueueApiEventsModule,
@@ -44,6 +47,8 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
   providers: [
     AddProtectedAreaHandler,
     ProtectedAreaService,
+    SelectionGetService,
+    SelectionUpdateService,
     scenarioProtectedAreaQueueProvider,
     scenarioProtectedAreaQueueEventsProvider,
     scenarioProtectedAreaEventsFactoryProvider,
