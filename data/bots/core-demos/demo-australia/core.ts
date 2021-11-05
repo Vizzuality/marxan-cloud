@@ -3,7 +3,6 @@ import {
   fromFileUrl,
   relative,
 } from "https://deno.land/std@0.103.0/path/mod.ts";
-import { sleep } from "https://deno.land/x/sleep@v1.2.0/mod.ts";
 import { createBot } from "../../lib/libbot/init.ts";
 import { MarxanBotConfig } from "../../lib/libbot/marxan-bot.ts";
 import { SpecificationStatus } from "../../lib/libbot/geo-feature-specifications.ts";
