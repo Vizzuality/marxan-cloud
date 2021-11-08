@@ -15,7 +15,7 @@ import { useSession } from 'next-auth/client';
 import { useSelectedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
-  useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers, useLegend,
+  useAdminPreviewLayer, useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers, useLegend,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
@@ -46,6 +46,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const { query } = useRouter();
   const { pid, sid } = query;
+
+  const { data: projectData } = useProject(pid);
+  const {
+    countryId, adminAreaLevel1Id, adminAreaLevel2Id,
+  } = projectData;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
@@ -158,6 +163,13 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     return [];
   }, [allGapAnalysisData]);
 
+  const AdminPreviewLayer = useAdminPreviewLayer({
+    active: !sid,
+    country: countryId,
+    region: adminAreaLevel1Id,
+    subregion: adminAreaLevel2Id,
+  });
+
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
     pid,
@@ -212,7 +224,12 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     },
   });
 
-  const LAYERS = [PUGridLayer, WDPApreviewLayer, ...FeaturePreviewLayers].filter((l) => !!l);
+  const LAYERS = [
+    AdminPreviewLayer,
+    PUGridLayer,
+    WDPApreviewLayer,
+    ...FeaturePreviewLayers,
+  ].filter((l) => !!l);
 
   const LEGEND = useLegend({
     layers,

@@ -1,8 +1,10 @@
 import React from 'react';
 
-import { useProject } from 'hooks/projects';
 import { useRouter } from 'next/router';
+
 import { AnimatePresence, motion } from 'framer-motion';
+
+import { useProject } from 'hooks/projects';
 
 export interface TitleProps {
 }

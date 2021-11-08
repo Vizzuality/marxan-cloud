@@ -121,6 +121,8 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
   const LAYERS = [PUCompareLayer, PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
 
+  console.log('LAYERS', LAYERS);
+
   const LEGEND = useLegend({
     layers: [
       ...!!sid1 && !sid2 ? ['frequency'] : [],
