@@ -36,6 +36,14 @@ describe(`when worker processes the job for known project`, () => {
   });
 });
 
+describe(`when providing name in job input`, () => {
+  it(`uses provided name as protected area's "fullName"`, async () => {
+    await sut.process(world.WhenShapefileAndNameAreSubmitted('custom name'));
+    await delay(2000);
+    expect(await world.ThenNewEntriesArePublished('custom name')).toEqual(true);
+  });
+});
+
 afterAll(async () => {
   await world.cleanup();
   await app?.close();
