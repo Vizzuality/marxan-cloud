@@ -126,7 +126,6 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   });
 
   const PUGridPreviewLayer = usePUGridPreviewLayer({
-
     active: planningUnitGridShape !== 'from_shapefile' && !sid,
     bbox,
     planningUnitGridShape,
