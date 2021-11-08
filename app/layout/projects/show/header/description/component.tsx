@@ -106,7 +106,7 @@ export const Description: React.FC<DescriptionProps> = ({ editable = false }: De
                       <div className="relative h-12">
                         <input
                           {...input}
-                          className="absolute top-0 left-0 w-full h-full text-xl font-normal leading-4 bg-transparent border-none cursor-pointer overflow-ellipsis opacity-80 font-heading focus:outline-none"
+                          className="absolute top-0 left-0 w-full h-full font-normal bg-transparent border-none cursor-pointer text-s leading-1 overflow-ellipsis opacity-80 font-heading focus:outline-none"
                           value={`${input.value}`}
                           disabled={!editable}
                           onBlur={() => {

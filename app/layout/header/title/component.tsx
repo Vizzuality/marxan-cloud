@@ -130,7 +130,9 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
       {!projectIsLoading && !scenarioIsLoading && (
         <motion.div
           key="project-scenario-loading"
-          className="flex divide-x"
+          className={cx({
+            'flex divide-x': true,
+          })}
           initial={{ y: -10 }}
           animate={{ y: 0 }}
           exit={{ y: -10 }}
@@ -157,7 +159,7 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                   className={cx({
                     'relative px-2': true,
                     'max-w-xs': header,
-                    'h-16 w-full': !header,
+                    'h-16 max-w-max': !header,
                   })}
                 >
                   <FieldRFF
@@ -190,7 +192,7 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                             {...input}
                             className={cx({
                               'absolute left-0 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none cursor-pointer': true,
-                              'focus:bg-primary-300 focus:text-gray-500 px-1 leading-4': header,
+                              'focus:bg-primary-300 focus:text-gray-500': header,
                               'text-4xl': !header,
                             })}
                             disabled={!editable}
@@ -203,7 +205,6 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
 
                           <h1 className={cx({
                             'invisible h-full px-1.5 font-heading font-normal overflow-ellipsis': true,
-
                           })}
                           >
                             {input.value}
