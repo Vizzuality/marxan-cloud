@@ -5,11 +5,17 @@ the Marxan platform.
 
 ## Roles
 
-Platform administrators should be identified by a boolean attribute in the users table (`is_admin`). This attribute can
-only be edited by other platform administrators, and it must not be editable by the user when editing their profile.
+Platform administrators should be identified in a database table dedicated for the purpose. Adding users to the admins
+DB table should only be done by other admin users.
 
 The remaining roles supported by the platform (`Owner`, `Contributor` and `Viewer`) will be stored in the `roles` 
-database in the `marxan-api` database.
+database in the `marxan-api` database. These roles should cover the roles defined in the project requirements:
+
+* "Platform admin" would be achieved with the implementation of a dedicated DB table for platform admins;
+* "Project owner" -> role Owner for resource Project;
+* "Project contributor" -> role Contributor for resource Project;
+* "Project reviewer (read-only)" -> role Viewer for resource Project;
+* "Project solution-viewer" -> role Viewer for resource "Solutions";
 
 Roles should have numerical values associated to them, to identify the hierarchical order between them. For instance:
 
@@ -29,13 +35,20 @@ resource (which usually includes calls to `PATCH/PUT resource/:id` endpoints).
   * user with `Owner` role can perform all the actions a `Contributor` can, as well as deleting actions for the given
 resource (which usually includes calls to `DELETE resource/:id` endpoints).
 
-**However, it is up to each controller method to correctly check permissions for the action being performed.** This also applies
+**However, it is up to the functions implementing each feature (modules, controllers, services or any other kind of 
+object in the context of the API) to correctly check permissions for the action being performed.** This also applies
 to custom actions that might be subject to RBAC: for instance, if publishing a project is a custom action that should be
-subject to RBAC, then it is up to the controller action to check that the user performing the request has the required role 
-(e.g. `Owner`) to perform that action.
+subject to RBAC, then it is up to the controller action, service method, or wherever we need to do this, to check that 
+the user performing the request has the required role (e.g. `Owner`) to perform that action.
 
-The mapping between the different platform actions and the role required to perform such action is kept in the following
-spreadsheet: https://docs.google.com/spreadsheets/d/1vz-YHdoAAG2nv_B1QUR7LQ-eU_DnKBexrqULrzMMOtw/edit?usp=sharing
+Currently, these are the roles required to perform the following actions in the platform:
+
+| Actions / Roles    | Scenario Viewer | Scenario Contributor | Scenario Owner | Project Viewer | Project Contributor | Project Owner | Organization Viewer | Organization Contributor | Organization Owner | Platform admin |
+|--------------------|:---------------:|:--------------------:|:--------------:|:--------------:|:-------------------:|:-------------:|:-------------------:|:------------------------:|:------------------:|:--------------:|
+| Edit project       | n               | n                    | n              | n              | Y                   | Y             | n                   | Y                        | Y                  | Y              |
+| Publish my project | n               | n                    | n              | n              | n                   | Y             | n                   | n                        | Y                  | Y              |
+| Delete project     | n               | n                    | n              | n              | n                   | Y             | n                   | n                        | Y                  | Y              |
+| Delete scenario    | n               | n                    | Y              | n              | n                   | n             | n                   | n                        | Y                  | Y              |
 
 ## Association between roles and users for resources
 
