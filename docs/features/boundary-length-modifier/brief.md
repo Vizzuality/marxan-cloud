@@ -48,15 +48,32 @@ across each of the runs.
 
 ## Requirements
 
-- Users should be able to set their BLM values.
+- Users should be able to set their BLM values, by supplying a `[min, max]`
+  range, from which the BLM calibration process will derive a set of BLM values
+  to use by splitting the domain in equal intervals, according to the formula
+  below.
 
-The set should be limited to a small cardinality: 6 values for the initial
-implementation, but leaving space for adjustments in the future (i.e. it is ok
-to hardcode the size of the set, but changing it in the future should not break
-other assumptions).
+Whereas the user input consists in exactly two values, the derived set of values
+to be used for the calibration process should be limited to a small cardinality:
+6 values for the initial implementation, but leaving space for adjustments in
+the future (i.e. it is ok to hardcode the size of the set, but changing it in
+the future should not break other assumptions).
 
-- The 6 values given by default will be `BLM = Z*sqrt(PU area)` (with `Z`  being
-  `0.001`, `0.01`, `0.1`, `1`, `10` and `100`).
+- Given a `[min, max]` range and a cardinality of `N` for the set of BLM values
+  to be used, the actual values are derived as:
+
+```
+blmValues(min, max) = [
+  min,
+  (min + ((max-min) / N-1)) * 1,
+  (min + ((max-min) / N-1)) * 2,
+  ...,
+  (min + ((max-min) / N-1)) * N-1
+]
+```
+
+- The 6 values given by default will be `BLM = Z*sqrt(PU area)` (with `Z ∈
+  blmValues(0.001, 100)`).
   
 This will apply for the majority of projects, which are expected to use a
 constant PU area. Some projects may use irregularly-shaped planning units with
