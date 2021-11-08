@@ -29,7 +29,8 @@
    }
   },
   "api": {
-    "url": "API_SERVICE_URL"
+    "url": "API_SERVICE_URL",
+    "port": "API_SERVICE_PORT"
   },
   "storage": {
     "sharedFileStorage": {

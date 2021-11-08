@@ -20,8 +20,16 @@
       "secret": "API_AUTH_X_API_KEY"
     }
   },
+  "redisApi": {
+    "connection": {
+      "host": "REDIS_HOST"
+    }
+  },
   "api": {
     "url": "API_SERVICE_URL"
+  },
+  "geo": {
+    "port": "GEO_SERVICE_PORT"
   },
   "storage": {
     "sharedFileStorage": {
