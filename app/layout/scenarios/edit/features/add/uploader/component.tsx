@@ -36,7 +36,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
 
-  const maxSize = 1000000;
+  const maxSize = 5000000;
 
   const { query } = useRouter();
   const { pid } = query;
