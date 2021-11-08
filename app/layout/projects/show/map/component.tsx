@@ -15,7 +15,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/client';
 
 import {
-  useAdminPreviewLayer, useLegend, usePUCompareLayer, usePUGridLayer,
+  useAdminPreviewLayer, useLegend, usePUCompareLayer, usePUGridLayer, usePUGridPreviewLayer,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -54,7 +54,13 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const { pid } = query;
   const { data = {} } = useProject(pid);
   const {
-    id, bbox, countryId, adminAreaLevel1Id, adminAreaLevel2Id,
+    id,
+    bbox,
+    countryId,
+    adminAreaLevel1Id,
+    adminAreaLevel2Id,
+    planningUnitGridShape,
+    planningUnitAreakm2,
   } = data;
 
   const {
@@ -119,7 +125,23 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     subregion: adminAreaLevel2Id,
   });
 
-  const LAYERS = [PUCompareLayer, PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
+  const PUGridPreviewLayer = usePUGridPreviewLayer({
+
+    active: planningUnitGridShape !== 'from_shapefile' && !sid,
+    bbox,
+    planningUnitGridShape,
+    planningUnitAreakm2: planningUnitAreakm2 || null,
+    options: {
+      settings: layerSettings.pugrid,
+    },
+  });
+
+  const LAYERS = [
+    PUCompareLayer,
+    PUGridLayer,
+    AdminPreviewLayer,
+    PUGridPreviewLayer,
+  ].filter((l) => !!l);
 
   const LEGEND = useLegend({
     layers: [

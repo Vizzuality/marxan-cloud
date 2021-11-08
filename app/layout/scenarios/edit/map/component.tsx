@@ -169,10 +169,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   }, [allGapAnalysisData]);
 
   const PUGridPreviewLayer = usePUGridPreviewLayer({
+    cache,
     active: projectData.planningUnitGridShape !== 'from_shapefile' && !sid,
     bbox,
     planningUnitGridShape: projectData.planningUnitGridShape,
-    planningUnitAreakm2: projectData.planningUnitAreakm2,
+    planningUnitAreakm2: projectData.planningUnitAreakm2 || null,
     options: {
       settings: layerSettings.pugrid,
     },
