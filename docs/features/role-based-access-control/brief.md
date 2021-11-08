@@ -17,7 +17,7 @@ In the context of the Marxan platform, we will consider the following roles:
 a project). This role is typically attributed to the user who created the resource (i.e. they own the resource).
 * **Contributor**: represents a user with read-write access to a specific resource. Users with this role cannot manage 
 the roles of users associated with a resource or delete the resource.
-* **Viewer**: represents a user with read-only access to a given resource.
+* **Viewer**: represents a user with read-only access to a given resource or particular part of the resource (think of `solutions` for scenario, or map tiles)
 
 Note: initially, we thought about considering "Temporal users" as a role, but since this feature will be achieved by 
 using dedicated instances for training, this role will not be implemented.
