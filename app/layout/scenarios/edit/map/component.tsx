@@ -15,7 +15,12 @@ import { useSession } from 'next-auth/client';
 import { useSelectedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
-  useAdminPreviewLayer, useWDPAPreviewLayer, usePUGridLayer, useFeaturePreviewLayers, useLegend,
+  usePUGridPreviewLayer,
+  useAdminPreviewLayer,
+  useWDPAPreviewLayer,
+  usePUGridLayer,
+  useFeaturePreviewLayers,
+  useLegend,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
@@ -163,6 +168,16 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     return [];
   }, [allGapAnalysisData]);
 
+  const PUGridPreviewLayer = usePUGridPreviewLayer({
+    active: projectData.planningUnitGridShape !== 'from_shapefile' && !sid,
+    bbox,
+    planningUnitGridShape: projectData.planningUnitGridShape,
+    planningUnitAreakm2: projectData.planningUnitAreakm2,
+    options: {
+      settings: layerSettings.pugrid,
+    },
+  });
+
   const AdminPreviewLayer = useAdminPreviewLayer({
     active: !sid,
     country: countryId,
@@ -172,7 +187,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
-    pid,
+    pid: `${pid}`,
     cache,
     active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
     bbox,
@@ -225,6 +240,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   });
 
   const LAYERS = [
+    PUGridPreviewLayer,
     AdminPreviewLayer,
     PUGridLayer,
     WDPApreviewLayer,
