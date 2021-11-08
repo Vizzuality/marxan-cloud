@@ -41,6 +41,18 @@ export const createWorld = (
         },
         id: 'test-job',
       } as unknown) as Job<JobInput>),
+    WhenShapefileAndNameAreSubmitted: (customName: string) =>
+      (({
+        data: {
+          projectId,
+          scenarioId,
+          shapefile: {
+            ...shapefile,
+          },
+          name: customName,
+        },
+        id: 'test-job',
+      } as unknown) as Job<JobInput>),
     projectId,
     ThenOldEntriesAreRemoved: async (oldShapeName: string) =>
       repo
