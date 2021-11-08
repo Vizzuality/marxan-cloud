@@ -6,41 +6,40 @@ import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 
 import {
-  scenarioProtectedAreaQueueProvider,
-  scenarioProtectedAreaQueueEventsProvider,
   scenarioProtectedAreaEventsFactoryProvider,
+  scenarioProtectedAreaQueueEventsProvider,
+  scenarioProtectedAreaQueueProvider,
 } from './queue.providers';
 import { AddProtectedAreaHandler } from './add-protected-area.handler';
 import { ProtectedAreaService } from './protected-area.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProtectedArea } from '@marxan/protected-areas';
-import { apiConnections } from '@marxan-api/ormconfig';
 import { Scenario } from '../scenario.api.entity';
 import {
+  ProtectionStatusModule,
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuOutputGeoEntity,
-  ProtectionStatusModule,
 } from '@marxan/scenarios-planning-unit';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
-import { SelectionGetService } from './selection/selection-get.service';
-import { SelectionUpdateService } from './selection/selection-update.service';
+import { SelectionGetService } from './selection-get.service';
+import { SelectionChangeModule } from './selection/selection-change.module';
 
 @Module({
   imports: [
     QueueApiEventsModule,
     ApiEventsModule,
     CqrsModule,
-    ProtectionStatusModule.for(DbConnections.geoprocessingDB),
     TypeOrmModule.forFeature(
       [
         ProtectedArea,
         ScenariosPlanningUnitGeoEntity,
         ScenariosPuOutputGeoEntity,
       ],
-      apiConnections.geoprocessingDB.name,
+      DbConnections.geoprocessingDB,
     ),
-
+    ProtectionStatusModule.for(DbConnections.geoprocessingDB),
+    SelectionChangeModule,
     TypeOrmModule.forFeature([Scenario]),
     PlanningAreasModule,
   ],
@@ -48,7 +47,6 @@ import { SelectionUpdateService } from './selection/selection-update.service';
     AddProtectedAreaHandler,
     ProtectedAreaService,
     SelectionGetService,
-    SelectionUpdateService,
     scenarioProtectedAreaQueueProvider,
     scenarioProtectedAreaQueueEventsProvider,
     scenarioProtectedAreaEventsFactoryProvider,

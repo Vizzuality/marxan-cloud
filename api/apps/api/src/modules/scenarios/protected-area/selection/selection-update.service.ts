@@ -1,19 +1,18 @@
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommandBus, EventBus } from '@nestjs/cqrs';
-import { Either, left, right } from 'fp-ts/Either';
+import { EventBus } from '@nestjs/cqrs';
+import { Either, right } from 'fp-ts/Either';
 
 import { ProjectSnapshot } from '@marxan/projects';
 
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { CalculatePlanningUnitsProtectionLevel } from '@marxan-api/modules/planning-units-protection-level';
-import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from '@marxan/scenarios-planning-unit';
 
-import { SelectionGetService } from './selection-get.service';
+import { SelectionGetService } from '../selection-get.service';
 import { SelectProtectedArea } from '../select-protected-area';
 import { ProtectedAreaKind } from '../protected-area.kind';
 import { ProtectedAreaUnlinked } from '../protected-area-unlinked';
+import { SelectionChangedEvent } from '@marxan-api/modules/scenarios/protected-area/selection/selection-changed.event';
 
 export const invalidProtectedAreaId = Symbol(`invalid protected area id`);
 export type ChangeProtectedAreasError = typeof invalidProtectedAreaId;
@@ -25,8 +24,6 @@ export class SelectionUpdateService {
     @InjectRepository(Scenario)
     protected readonly scenarios: Repository<Scenario>,
     private readonly events: EventBus,
-    private readonly commands: CommandBus,
-    private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,
   ) {}
 
   async selectFor(
@@ -52,28 +49,38 @@ export class SelectionUpdateService {
       project,
     );
 
-    for (const change of newSelection) {
-      const entry = currentSelection.find((item) => item.id === change.id);
+    for (const currentAreaState of currentSelection) {
+      const entry = newSelection.find(
+        (item) => item.id === currentAreaState.id,
+      );
+
       if (!entry) {
-        return left(invalidProtectedAreaId);
+        if (currentAreaState.selected) {
+          idsToRemove.push(currentAreaState.id);
+
+          if (currentAreaState.kind === ProtectedAreaKind.Project) {
+            projectScopedIdsRemoved.push(currentAreaState.id);
+          }
+        }
+        continue;
       }
 
-      if (entry.kind === ProtectedAreaKind.Global) {
-        const relatedAreas = areas[change.id];
+      if (currentAreaState.kind === ProtectedAreaKind.Global) {
+        const relatedAreas = areas[entry.id];
 
-        if (change.selected) {
+        if (entry.selected) {
           idsToAdd.push(...relatedAreas);
         } else {
           idsToRemove.push(...relatedAreas);
         }
       }
 
-      if (entry.kind === ProtectedAreaKind.Project) {
-        if (change.selected) {
-          idsToAdd.push(change.id);
+      if (currentAreaState.kind === ProtectedAreaKind.Project) {
+        if (entry.selected) {
+          idsToAdd.push(entry.id);
         } else {
-          idsToRemove.push(change.id);
-          projectScopedIdsRemoved.push(change.id);
+          idsToRemove.push(entry.id);
+          projectScopedIdsRemoved.push(entry.id);
         }
       }
     }
@@ -89,14 +96,8 @@ export class SelectionUpdateService {
     );
 
     if (idsToAdd.length > 0 || idsToRemove.length > 0) {
-      await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
-        {
-          id: scenario.id,
-          threshold: scenario.threshold,
-        },
-      );
-      await this.commands.execute(
-        new CalculatePlanningUnitsProtectionLevel(scenario.id, idsToAdd),
+      this.events.publish(
+        new SelectionChangedEvent(scenario.id, scenario.threshold, idsToAdd),
       );
     }
 

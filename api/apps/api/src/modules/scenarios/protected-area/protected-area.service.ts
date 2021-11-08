@@ -14,7 +14,7 @@ import {
   ChangeProtectedAreasError,
   SelectionUpdateService,
 } from './selection/selection-update.service';
-import { SelectionGetService } from './selection/selection-get.service';
+import { SelectionGetService } from './selection-get.service';
 import { ScenarioProtectedArea } from '@marxan-api/modules/scenarios/protected-area/scenario-protected-area';
 
 export const submissionFailed = Symbol(

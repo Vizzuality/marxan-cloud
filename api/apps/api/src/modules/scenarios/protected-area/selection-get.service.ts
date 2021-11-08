@@ -10,15 +10,15 @@ import { IUCNCategory } from '@marxan/iucn';
 
 import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';
 import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
-import { apiConnections } from '@marxan-api/ormconfig';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
-import { ScenarioProtectedArea } from '../scenario-protected-area';
-import { ProtectedAreaKind } from '../protected-area.kind';
+import { ScenarioProtectedArea } from './scenario-protected-area';
+import { ProtectedAreaKind } from './protected-area.kind';
 
 @Injectable()
 export class SelectionGetService {
   constructor(
-    @InjectRepository(ProtectedArea, apiConnections.geoprocessingDB.name)
+    @InjectRepository(ProtectedArea, DbConnections.geoprocessingDB)
     protected readonly repository: Repository<ProtectedArea>,
     private readonly planningArea: PlanningAreasService,
   ) {}
