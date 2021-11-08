@@ -61,53 +61,21 @@ using one database table for each resource:
 These tables should contain columns for `user_id`, `role` and the resource id (`organization_id`, `project_id` and 
 `scenario_id`, respectively).
 
-## Implementation details
+## Architecture
 
-In terms of implementation, the existing module `projects-acl` should be renamed to a more generic name such as 
-`access-control` or `rbac` (though I'm not a fan of acronyms as names of modules). This module will be used across 
-the platform as the "single-source-of-truth" to check whether users are allowed to access given resources.
+A main module `access-control` should be created, which will be the main point-of-contact for checking permissions. 
+Additionally, we will have specific modules for checking permissions for each of the resources supported:
+* `organizations-acl`: module that controls access to organizations;
+* `projects-acl`: module that controls access to projects;
+* `scenarios-acl`: module that controls access to scenarios;
+* `solutions-acl`: module that controls access to solutions;
 
-This module, for now, will support checking permissions for the 3 resources subject to RBAC: organizations, projects and
-scenarios. For this, this module should provide 3 services, each of them implementing the following interface:
+This `access-control` module will expose a public service, and this is the point of entry that should be used by other 
+services to control access to resources. The `access-control` module will also contain the interface that should be 
+implemented the services in the resource-specific modules, which these should implement.
 
+This interface is called `IAccessControlService` and it is located in `api/apps/api/src/modules/access-control/access-control-service.interface.ts`.
 
-`isOwner(resourceId: string, userId: string): boolean`
+The following diagram illustrates how access should be controlled across the application:
 
-Checks if the given user can perform the actions of a `Owner` for the provided resource id. This method should return 
-`true` if one of the following conditions apply:
-
-* the user is a platform admin;
-* the user has a role greater or equal to `Owner` for the resource being checked in the corresponding table (e.g. when 
- checking if a user is owner of a project, `this.projectAclService.isOwner(projectId, userId)`, there must be a record 
- in the `users_projects` table with role greater or equal to `Owner`).
-* the user has a role greater or equal to `Owner` for a resource hierarchically superior to the one being checked (e.g. 
- again using projects as an example, if there is no record in the `users_projects` table, but there is a record for the 
- given user with role greater or equal to `Owner` for the organization that owns the project).
-
-
-`isContributor(resourceId: string, userId: string): boolean`
-
-Checks if the given user can perform the actions of a `Contributor` for the provided resource id. This method should 
-return `true` if one of the following conditions apply:
-
-* the user is a platform admin;
-* the user has a role higher than `Contributor` for the resource being checked in the corresponding table (e.g. when 
- checking if a user is contributor of a project, `this.projectAclService.isContributor(projectId, userId)`, there must 
- be a record in the `users_projects` table for the role greater or equal to `Contributor`).
-* the user has the role higher than `Contributor` for a resource hierarchically superior to the one being checked (e.g. 
- again using projects as an example, if there is no record in the `users_projects` table, but the user has a role higher 
- or equal to `Contributor` for the organization that owns the project).
-
-
-`isViewer(resourceId: string, userId: string): boolean`
-
-Checks if the given user can perform the actions of a `Viewer` for the provided resource id. This method should return 
-`true` if one of the following conditions apply:
-
-* the user is a platform admin;
-* the user has a role higher than `Viewer` for the resource being checked in the corresponding table (e.g. when
-  checking if a user is contributor of a project, `this.projectAclService.isViewer(projectId, userId)`, there must
-  be a record in the `users_projects` table for the role greater or equal to `Viewer`).
-* the user has the role higher than `Viewer` for a resource hierarchically superior to the one being checked (e.g.
-  again using projects as an example, if there is no record in the `users_projects` table, but the user has a role higher
-  or equal to `Viewer` for the organization that owns the project).
+![Access control architecture diagram](./architecture-diagram.png)
