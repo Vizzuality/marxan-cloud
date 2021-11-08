@@ -29,7 +29,7 @@ export class PlanningAreas extends ShapefileUploader {
     throw new Error(`Unknown planning area shapefile kind: ${kind}`);
   }
 
-  async uploadFromFile(shapefile: PlanningAreaShapefile): Promise<string> {
+  private async uploadFromFile(shapefile: PlanningAreaShapefile): Promise<string> {
     const opStart = Process.hrtime();
 
     const data = new Blob([await Deno.readFile(shapefile.localFilePath)]);
