@@ -9,14 +9,16 @@ This document describes the initial plan for the implementation of Role based ac
 * Update the already existing `projects-acl` implementation module to implement the defined interface.
 * Create point-of-entry service in the `access-control` module that wraps the `projects-acl` module.
 * Update existing calls of the `projects-acl` module to use `access-control` instead.
-* Call the `access-control` service to check permissions for projects in the required places in the code.
+* Implement CRUD actions for the `projects-acl` module.
+* Call the `access-control` service to check permissions for projects in the required places in the code (according
+to the permissions defined in the HLD document).
 
 ## Release 2 (later)
 
 * Implement platform admin users.
-* Create `organizations-acl` module with a service to check access implementing the IAccessControlService interface
-defined in the `access-control` module.
-* Create `solutions-acl` module with a service to check access implementing the IAccessControlService interface
-defined in the `access-control` module.
-* Create `scenarios-acl` module with a service to check access implementing the IAccessControlService interface
-defined in the `access-control` module.
+* Create `organizations-acl` module with a service to check access implementing the defined interface.
+* Implement CRUD actions for the `organizations-acl` module.
+* Create `solutions-acl` module with a service to check access implementing the defined interface.
+* Implement CRUD actions for the `solutions-acl` module.
+* Create `scenarios-acl` module with a service to check access implementing the defined interface.
+* Implement CRUD actions for the `scenarios-acl` module.
