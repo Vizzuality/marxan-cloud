@@ -29,7 +29,7 @@ export class GeoFeatureShapefiles extends ShapefileUploader {
     const opStart = Process.hrtime();
     const data = new Blob([await Deno.readFile(shapefile.localFilePath)]);
     const success = await (await this.sendData({
-      url: `${this.baseUrl}/api/v1/projects/${projectId}/shapefile`,
+      url: `${this.baseUrl}/api/v1/projects/${projectId}/features/shapefile`,
       formField: "file",
       data,
       fileName: `${crypto.randomUUID()}.zip`,
