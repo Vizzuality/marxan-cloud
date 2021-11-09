@@ -5,8 +5,7 @@ the Marxan platform.
 
 ## Roles
 
-Platform administrators should be identified in a database table dedicated for the purpose. Adding users to the admins
-DB table should only be done by other admin users.
+**Platform admins** should be stored and identified separately from the remaining platform roles.
 
 The remaining roles supported by the platform (`Owner`, `Contributor` and `Viewer`) will be stored in the `roles` 
 database in the `marxan-api` database. These roles should cover the roles defined in the project requirements:
@@ -17,38 +16,54 @@ database in the `marxan-api` database. These roles should cover the roles define
 * "Project reviewer (read-only)" -> role Viewer for resource Project;
 * "Project solution-viewer" -> role Viewer for resource "Solutions";
 
-Roles should have numerical values associated to them, to identify the hierarchical order between them. For instance:
-
-* `Owner` -> 1000
-* `Contributor` -> 500
-* `Viewer` -> 250
-
-Roles with fewer privileges should have lower numerical values than roles with more privileges. Using numerical values
-for roles allows for easily comparing if a given user has certain privileges (e.g. checking if a user has the role 
-`Contributor` can be easily done: `role >= Contributor (500)`).
-
-There is also an implicit relationship between platform actions and the supported roles. By default, it is assumed that:
-  * a user with role `Viewer` can read the information for the given resource (which usually includes calls to 
+The following list describes some conventions that will be followed in the implementation of the RBAC - keep in mind
+these behaviors might be overwritten by each resource, so make sure to check the **permissions matrix** for a more
+comprehensive list of actions and their permissions:
+* a user with role `Viewer` can read the information for the given resource (which usually includes calls to 
 `GET resource` and `GET resource/:id` endpoints).
-  * user with role `Contributor` can perform all the actions a `Viewer` can, as well as edition actions for the given
+* user with role `Contributor` can perform the same actions as a `Viewer`, as well as edition actions for the given
 resource (which usually includes calls to `PATCH/PUT resource/:id` endpoints).
-  * user with `Owner` role can perform all the actions a `Contributor` can, as well as deleting actions for the given
+* user with `Owner` role can perform the same actions as a `Contributor`, as well as deleting actions for the given
 resource (which usually includes calls to `DELETE resource/:id` endpoints).
 
-**However, it is up to the functions implementing each feature (modules, controllers, services or any other kind of 
-object in the context of the API) to correctly check permissions for the action being performed.** This also applies
-to custom actions that might be subject to RBAC: for instance, if publishing a project is a custom action that should be
-subject to RBAC, then it is up to the controller action, service method, or wherever we need to do this, to check that 
-the user performing the request has the required role (e.g. `Owner`) to perform that action.
+*Note: creation actions may be subject to more specific permissions, depending on the resource.*
+
+**However, it is up to the functions implementing each feature (controllers, services or any other entity 
+in the context of the platform) to correctly check permissions for the action being performed.** Checking permissions
+should be done by calling the appropriate function in the Access Control service class for the resource being accessed.
+
+For example, if a user with id `1` is trying to publish a `project` with id `2`, then the `publish` function
+needs to check if that user can publish that project. This can be done by calling the `canPublish` function in the 
+access control service in the `projects-acl` module.
+
+## Permissions matrix
 
 Currently, these are the roles required to perform the following actions in the platform:
 
-| Actions / Roles    | Scenario Viewer | Scenario Contributor | Scenario Owner | Project Viewer | Project Contributor | Project Owner | Organization Viewer | Organization Contributor | Organization Owner | Platform admin |
-|--------------------|:---------------:|:--------------------:|:--------------:|:--------------:|:-------------------:|:-------------:|:-------------------:|:------------------------:|:------------------:|:--------------:|
-| Edit project       | n               | n                    | n              | n              | Y                   | Y             | n                   | Y                        | Y                  | Y              |
-| Publish my project | n               | n                    | n              | n              | n                   | Y             | n                   | n                        | Y                  | Y              |
-| Delete project     | n               | n                    | n              | n              | n                   | Y             | n                   | n                        | Y                  | Y              |
-| Delete scenario    | n               | n                    | Y              | n              | n                   | n             | n                   | n                        | Y                  | Y              |
+| Actions / Roles                | Solution Viewer | Solution Contributor | Solution Owner | Scenario Viewer | Scenario Contributor | Scenario Owner | Project Viewer | Project Contributor | Project Owner | Organization Viewer | Organization Contributor | Organization Owner | Platform admin |
+|--------------------------------|:---------------:|:--------------------:|:--------------:|:---------------:|:--------------------:|:--------------:|:--------------:|:-------------------:|:-------------:|:-------------------:|:------------------------:|:------------------:|:--------------:|
+| Create organization            |                 |                      |                |                 |                      |                |                |                     |               |                     |                          |                    |        ✔️       |
+| Read organization              |                 |                      |                |                 |                      |                |                |                     |               |          ✔️          |             ✔️            |          ✔️         |        ✔️       |
+| Update organization            |                 |                      |                |                 |                      |                |                |                     |               |                     |             ✔️            |          ✔️         |        ✔️       |
+| Delete organization            |                 |                      |                |                 |                      |                |                |                     |               |                     |                          |          ✔️         |        ✔️       |
+| Manage organization user roles |                 |                      |                |                 |                      |                |                |                     |               |                     |                          |          ✔️         |        ✔️       |
+| Create project                 |                 |                      |                |                 |                      |                |                |                     |               |                     |             ✔️            |          ✔️         |        ✔️       |
+| Read project                   |                 |                      |                |                 |                      |                |        ✔️       |          ✔️          |       ✔️       |                     |                          |                    |        ✔️       |
+| Update project                 |                 |                      |                |                 |                      |                |                |          ✔️          |       ✔️       |                     |                          |                    |                |
+| Delete project                 |                 |                      |                |                 |                      |                |                |                     |       ✔️       |                     |                          |                    |        ✔️       |
+| Manage project user roles      |                 |                      |                |                 |                      |                |                |                     |       ✔️       |                     |                          |                    |                |
+| Publish project                |                 |                      |                |                 |                      |                |                |                     |       ✔️       |                     |                          |                    |                |
+| Run Marxan                     |                 |                      |                |                 |                      |                |                |          ✔️          |       ✔️       |                     |                          |                    |                |
+| Create scenario                |                 |                      |                |                 |                      |                |                |          ✔️          |       ✔️       |                     |                          |                    |                |
+| Read scenario                  |                 |                      |                |        ✔️        |           ✔️          |        ✔️       |                |                     |               |                     |                          |                    |                |
+| Update scenario                |                 |                      |                |                 |           ✔️          |        ✔️       |                |                     |               |                     |                          |                    |                |
+| Delete scenario                |                 |                      |                |                 |                      |        ✔️       |                |                     |               |                     |                          |                    |                |
+| Manage scenario user roles     |                 |                      |                |                 |                      |        ✔️       |                |                     |               |                     |                          |                    |                |
+| Create solution                |                 |                      |                |                 |           ✔️          |        ✔️       |                |                     |               |                     |                          |                    |                |
+| Read solution                  |        ✔️        |           ✔️          |        ✔️       |                 |                      |                |                |                     |               |                     |                          |                    |                |
+| Update solution                |                 |           ✔️          |        ✔️       |                 |                      |                |                |                     |               |                     |                          |                    |                |
+| Delete solution                |                 |                      |        ✔️       |                 |                      |                |                |                     |               |                     |                          |                    |                |
+| Manage solution user roles     |                 |                      |        ✔️       |                 |                      |                |                |                     |               |                     |                          |                    |                |
 
 ## Association between roles and users for resources
 
@@ -57,9 +72,10 @@ using one database table for each resource:
 * `users_organizations` will store the roles of users inside organizations.
 * `users_projects` will store the roles of users inside projects.
 * `users_scenarios` will store the roles of users inside scenarios.
+* `users_solutions` will store the roles of users inside solutions.
 
-These tables should contain columns for `user_id`, `role` and the resource id (`organization_id`, `project_id` and 
-`scenario_id`, respectively).
+These tables should contain columns for `user_id`, `role` and the resource id (`organization_id`, `project_id`, `scenario_id` 
+or `solution_id`, respectively).
 
 ## Architecture
 
@@ -72,10 +88,7 @@ Additionally, we will have specific modules for checking permissions for each of
 
 This `access-control` module will expose a public service, and this is the point of entry that should be used by other 
 services to control access to resources. The `access-control` module will also contain the interface that should be 
-implemented the services in the resource-specific modules, which these should implement.
-
-This interface is called `IAccessControlService` and it is located in `api/apps/api/src/modules/access-control/access-control-service.interface.ts`.
-
-The following diagram illustrates how access should be controlled across the application:
+implemented the services in the resource-specific modules, which these should implement. The following diagram illustrates 
+how access should be controlled across the application:
 
 ![Access control architecture diagram](./architecture-diagram.png)
