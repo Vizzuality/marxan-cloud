@@ -78,12 +78,10 @@ blmValues(min, max) = [
 This will apply for the majority of projects, which are expected to use a
 constant PU area. Some projects may use irregularly-shaped planning units with
 varying area: in this case the mean of the areas of the planning units in the
-study area should be used [*], with option to further tune this in the future
+study area should be used, with option to further tune this in the future
 (as above, it is ok to hardcode this, as long as using a different aggregation
 formula that doesn't depend on other inputs than PU area and PU count will not
 break other assumptions).
-
-[*] Pending confirmation.
 
 - For each of the BLM values being used in the calibration process:
 
