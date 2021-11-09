@@ -6,7 +6,7 @@ In broad strokes, RBAC assumes the existence of a set of roles, which are associ
 can perform in the platform. Users can then be associated with roles for specific resources, which will grant them the 
 role privileges for that specific resource.
 
-The current implementation is based on the requirements described in the [User requirements document](https://docs.google.com/document/d/16x4wQYTKov0JkO1ue6iQzJ3-RXpdgQ38ygGJWW86Zo0/edit#heading=h.58xbt2es73r2).
+The current implementation is based on the requirements described in the Requirements document.
 
 ## Roles
 
