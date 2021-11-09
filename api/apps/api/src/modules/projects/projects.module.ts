@@ -28,6 +28,7 @@ import { ProtectedArea } from '@marxan/protected-areas';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { CqrsModule } from '@nestjs/cqrs';
 import { GetProjectHandler } from './get-project.handler';
+import { ProjectBlmModule } from './blm';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { GetProjectHandler } from './get-project.handler';
     ApiEventsModule,
     ShapefilesModule,
     PlanningUnitGridModule,
+    ProjectBlmModule,
   ],
   providers: [
     ProjectsCrudService,
