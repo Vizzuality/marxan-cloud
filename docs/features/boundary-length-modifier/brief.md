@@ -32,8 +32,8 @@ Once the calibration results are presented to the user, they may then choose to:
 
 - Select one of the calibrated BLM values, to implement in the scenario (this
   will set the BLM property for the scenario)
-- Change one or more 6 values of the previous calibration run, and re-run the
-  calibration
+- Change the settings (`[min, max]` range, see below) of the previous
+  calibration run and then re-run the calibration
 - Input their own BLM value (without using the platform's calibration feature)
 
 ## Overview of the process
