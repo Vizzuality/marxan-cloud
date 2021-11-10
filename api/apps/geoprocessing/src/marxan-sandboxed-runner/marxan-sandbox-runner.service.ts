@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
 import AbortController from 'abort-controller';
 
 import { ExecutionResult } from '@marxan/marxan-output';
@@ -7,19 +6,25 @@ import { ExecutionResult } from '@marxan/marxan-output';
 import { MarxanRun } from './marxan-run';
 import { WorkspaceBuilder } from './ports/workspace-builder';
 import { Cancellable } from './ports/cancellable';
-import { Assets, InputFilesFs } from './adapters/scenario-data/input-files-fs';
-import { SolutionsOutputService } from './adapters/solutions-output/solutions-output.service';
+import { Assets } from './adapters/scenario-data/input-files-fs';
+import { SandboxRunner } from './sandbox-runner';
+
+import { SandboxRunnerInputFiles } from './sandbox-runner-input-files';
+import { SandboxRunnerOutputHandler } from './sandbox-runner-output-handler';
+import { JobData } from '@marxan/scenario-run-queue';
 
 export { Assets };
 
 @Injectable()
-export class MarxanSandboxRunnerService {
+export class MarxanSandboxRunnerService
+  implements SandboxRunner<JobData, ExecutionResult> {
   readonly #controllers: Record<string, AbortController> = {};
   readonly #logger = new Logger(this.constructor.name);
 
   constructor(
     private readonly workspaceService: WorkspaceBuilder,
-    private readonly moduleRef: ModuleRef,
+    private readonly inputFilesHandler: SandboxRunnerInputFiles,
+    private readonly outputFilesHandler: SandboxRunnerOutputHandler<ExecutionResult>,
   ) {}
 
   kill(ofScenarioId: string): void {
@@ -30,20 +35,16 @@ export class MarxanSandboxRunnerService {
   }
 
   async run(
-    forScenarioId: string,
-    assets: Assets,
+    input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<ExecutionResult> {
+    const { scenarioId: forScenarioId, assets } = input;
     const workspace = await this.workspaceService.get();
-    const inputFiles = await this.moduleRef.create(InputFilesFs);
-    const outputFilesRepository = await this.moduleRef.create(
-      SolutionsOutputService,
-    );
     const marxanRun = new MarxanRun();
 
     const cancellables: Cancellable[] = [
-      inputFiles,
-      outputFilesRepository,
+      this.inputFilesHandler,
+      this.outputFilesHandler,
       marxanRun,
     ];
 
@@ -64,7 +65,7 @@ export class MarxanSandboxRunnerService {
     };
 
     await interruptIfKilled();
-    await inputFiles.include(workspace, assets);
+    await this.inputFilesHandler.include(workspace, assets);
     await interruptIfKilled();
     await workspace.arrangeOutputSpace();
     await interruptIfKilled();
@@ -72,7 +73,7 @@ export class MarxanSandboxRunnerService {
     return new Promise(async (resolve, reject) => {
       marxanRun.on('error', async (result) => {
         this.clearAbortController(forScenarioId);
-        await outputFilesRepository.dumpFailure(
+        await this.outputFilesHandler.dumpFailure(
           workspace,
           forScenarioId,
           marxanRun.stdOut,
@@ -84,7 +85,7 @@ export class MarxanSandboxRunnerService {
       marxanRun.on('finished', async () => {
         try {
           await interruptIfKilled();
-          const output = await outputFilesRepository.dump(
+          const output = await this.outputFilesHandler.dump(
             workspace,
             forScenarioId,
             marxanRun.stdOut,
@@ -93,7 +94,7 @@ export class MarxanSandboxRunnerService {
           await workspace.cleanup();
           resolve(output);
         } catch (error) {
-          await outputFilesRepository
+          await this.outputFilesHandler
             .dumpFailure(
               workspace,
               forScenarioId,

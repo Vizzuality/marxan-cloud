@@ -1,22 +1,13 @@
 import { Job, QueueEvents, Worker } from 'bullmq';
-import { Inject, Injectable, ValueProvider } from '@nestjs/common';
-import {
-  JobData,
-  ProgressData,
-  queueName as scenarioRunQueueName,
-} from '@marxan/scenario-run-queue';
+import { Inject, Injectable } from '@nestjs/common';
+import { JobData, ProgressData } from '@marxan/scenario-run-queue';
 import { ExecutionResult } from '@marxan/marxan-output';
 import {
-  WorkerBuilder,
   QueueEventsBuilder,
+  WorkerBuilder,
 } from '@marxan-geoprocessing/modules/worker';
-import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
-
-export const runWorkerQueueNameToken = Symbol(`run worker queue name token`);
-export const runWorkerQueueNameProvider: ValueProvider<string> = {
-  provide: runWorkerQueueNameToken,
-  useValue: scenarioRunQueueName,
-};
+import { SandboxRunner } from '@marxan-geoprocessing/marxan-sandboxed-runner/sandbox-runner';
+import { runWorkerQueueNameToken, sandboxRunnerToken } from './tokens';
 
 @Injectable()
 export class RunWorker {
@@ -27,7 +18,8 @@ export class RunWorker {
     queueEventsBuilder: QueueEventsBuilder,
     workerBuilder: WorkerBuilder,
     @Inject(runWorkerQueueNameToken) queueName: string,
-    private readonly marxanRunner: MarxanSandboxRunnerService,
+    @Inject(sandboxRunnerToken)
+    private readonly marxanRunner: SandboxRunner<JobData, ExecutionResult>,
   ) {
     this.worker = workerBuilder.build<JobData, ExecutionResult>(queueName, {
       process: async (job) => {
@@ -45,17 +37,13 @@ export class RunWorker {
   }
 
   private async run(job: Job<JobData>) {
-    return await this.marxanRunner.run(
-      job.data.scenarioId,
-      job.data.assets,
-      async (progress) => {
-        const progressData: ProgressData = {
-          scenarioId: job.data.scenarioId,
-          fractionalProgress: progress,
-        };
-        await job.updateProgress(progressData);
-      },
-    );
+    return await this.marxanRunner.run(job.data, async (progress) => {
+      const progressData: ProgressData = {
+        scenarioId: job.data.scenarioId,
+        fractionalProgress: progress,
+      };
+      await job.updateProgress(progressData);
+    });
   }
 
   private handleProgress(data: ProgressData) {

@@ -9,9 +9,11 @@ import { GeoOutputRepository } from './geo-output';
 import { ResultParserService } from './result-parser.service';
 import { MarxanDirectory } from '../marxan-directory.service';
 import { RunDirectories } from './run-directories';
+import { SandboxRunnerOutputHandler } from '../../sandbox-runner-output-handler';
 
 @Injectable()
-export class SolutionsOutputService implements Cancellable {
+export class SolutionsOutputService
+  implements SandboxRunnerOutputHandler<ExecutionResult> {
   constructor(
     private readonly geoOutputRepository: GeoOutputRepository,
     private readonly resultParserService: ResultParserService,

@@ -9,7 +9,7 @@ import { JobData, ProgressData } from '@marxan/scenario-run-queue';
 import {
   RunWorker,
   runWorkerQueueNameToken,
-} from '@marxan-geoprocessing/modules/scenarios/run.worker';
+} from '@marxan-geoprocessing/modules/scenarios/runs/run.worker';
 import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;

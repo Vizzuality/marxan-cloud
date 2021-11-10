@@ -214,6 +214,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/projects/tsconfig.lib.json"
       }
+    },
+    "blm-calibration": {
+      "type": "library",
+      "root": "libs/blm-calibration",
+      "entryFile": "index",
+      "sourceRoot": "libs/blm-calibration/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/blm-calibration/tsconfig.lib.json"
+      }
     }
   }
 }
