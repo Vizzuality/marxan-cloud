@@ -55,6 +55,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
     },
     params: {
       'page[number]': pageParam,
+      omitFields: 'properties',
       ...parsedFilters,
       ...search && {
         q: search,
