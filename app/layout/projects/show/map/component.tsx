@@ -15,7 +15,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/client';
 
 import {
-  useAdminPreviewLayer, useLegend, usePUCompareLayer, usePUGridLayer, usePUGridPreviewLayer,
+  /* useAdminPreviewLayer, */
+  useLegend,
+  usePUCompareLayer,
+  usePUGridLayer,
+  /* usePUGridPreviewLayer, */
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -56,11 +60,11 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const {
     id,
     bbox,
-    countryId,
-    adminAreaLevel1Id,
-    adminAreaLevel2Id,
-    planningUnitGridShape,
-    planningUnitAreakm2,
+    // countryId,
+    // adminAreaLevel1Id,
+    // adminAreaLevel2Id,
+    // planningUnitGridShape,
+    // planningUnitAreakm2,
   } = data;
 
   const {
@@ -116,30 +120,30 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     },
   });
 
-  const AdminPreviewLayer = useAdminPreviewLayer({
-    active: (
-      rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length
-      && (countryId || adminAreaLevel1Id || adminAreaLevel2Id)),
-    country: countryId,
-    region: adminAreaLevel1Id,
-    subregion: adminAreaLevel2Id,
-  });
+  // const AdminPreviewLayer = useAdminPreviewLayer({
+  //   active: (
+  //     rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length
+  //     && (countryId || adminAreaLevel1Id || adminAreaLevel2Id)),
+  //   country: countryId,
+  //   region: adminAreaLevel1Id,
+  //   subregion: adminAreaLevel2Id,
+  // });
 
-  const PUGridPreviewLayer = usePUGridPreviewLayer({
-    active: /* planningUnitGridShape !== 'from_shapefile' && */ !sid,
-    bbox,
-    planningUnitGridShape,
-    planningUnitAreakm2: planningUnitAreakm2 || 10,
-    options: {
-      settings: layerSettings.pugrid,
-    },
-  });
+  // const PUGridPreviewLayer = usePUGridPreviewLayer({
+  //   active: !sid,
+  //   bbox,
+  //   planningUnitGridShape,
+  //   planningUnitAreakm2: planningUnitAreakm2 || 10,
+  //   options: {
+  //     settings: layerSettings.pugrid,
+  //   },
+  // });
 
   const LAYERS = [
     PUCompareLayer,
     PUGridLayer,
-    AdminPreviewLayer,
-    PUGridPreviewLayer,
+    // AdminPreviewLayer,
+    // PUGridPreviewLayer,
   ].filter((l) => !!l);
 
   const LEGEND = useLegend({
