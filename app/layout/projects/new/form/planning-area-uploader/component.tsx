@@ -52,7 +52,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     },
   });
 
-  const maxSize = 3000000;
+  const maxSize = 3e6;
 
   const { uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
 
