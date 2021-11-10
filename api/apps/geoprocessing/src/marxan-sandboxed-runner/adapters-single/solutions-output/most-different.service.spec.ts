@@ -19,7 +19,7 @@ describe(`when given result rows`, () => {
       Array [
         ResultRow {
           "best": false,
-          "connectivity": 0,
+          "connectivity": 1,
           "connectivityEdge": 0,
           "connectivityIn": 0,
           "connectivityInFraction": 0,

@@ -21,12 +21,13 @@ const defaults = (): Omit<
 export const lowestScoreRunId = 1;
 export const secondLowestScoreRunId = 8;
 
-export const subjectRows: ResultRow[] = [
+export const subjectRows: (ResultRow & {puValues: number[]})[] = [
   {
     runId: lowestScoreRunId,
     score: 10,
     cost: 5,
     planningUnits: 4,
+    puValues: [1, 1, 1, 1, 1, 1, 1],
     ...defaults(),
   },
   {
@@ -34,13 +35,16 @@ export const subjectRows: ResultRow[] = [
     score: 1000,
     cost: 5,
     planningUnits: 4,
+    puValues: [1, 1, 0, 1, 0, 1, 1],
     ...defaults(),
+
   },
   {
     runId: 3,
     score: 2000,
     cost: 200,
     planningUnits: 5,
+    puValues: [1, 1, 1, 0, 1, 1, 1],
     ...defaults(),
   },
   {
@@ -48,6 +52,7 @@ export const subjectRows: ResultRow[] = [
     score: 5000,
     cost: 50,
     planningUnits: 1,
+    puValues: [0, 0, 1, 1, 1, 1, 1],
     ...defaults(),
   },
   {
@@ -55,6 +60,7 @@ export const subjectRows: ResultRow[] = [
     score: 6000,
     cost: 50,
     planningUnits: 14,
+    puValues: [1, 1, 1, 1, 1, 1, 1],
     ...defaults(),
   },
   {
@@ -62,6 +68,7 @@ export const subjectRows: ResultRow[] = [
     score: 15000,
     cost: 75,
     planningUnits: 4,
+    puValues: [0, 1, 1, 0, 1, 1, 0],
     ...defaults(),
   },
   {
@@ -69,6 +76,7 @@ export const subjectRows: ResultRow[] = [
     score: 2000,
     cost: 95,
     planningUnits: 4,
+    puValues: [1, 1, 0, 1, 0, 1, 0],
     ...defaults(),
   },
   {
@@ -76,6 +84,7 @@ export const subjectRows: ResultRow[] = [
     score: 10,
     cost: 5,
     planningUnits: 4,
+    puValues: [1, 0, 1, 1, 1, 0, 1],
     ...defaults(),
   },
 ];
