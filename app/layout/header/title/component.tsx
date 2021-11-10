@@ -181,11 +181,15 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                           </div>
                         )}
                       >
-                        <div className={cx({
-                          relative: true,
-                          'h-6': header,
-                          'h-16': !header,
-                        })}
+                        <div
+                          className={cx({
+                            relative: true,
+                            'h-6': header,
+                            'h-16': !header,
+                          })}
+                          style={{
+                            minWidth: '150px',
+                          }}
                         >
 
                           <input
@@ -199,7 +203,10 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();
-                              fprops.handleSubmit();
+                              if (fprops.values.name !== projectData?.name) {
+                                return fprops.handleSubmit();
+                              }
+                              return null;
                             }}
                           />
 
