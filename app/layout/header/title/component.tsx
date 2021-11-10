@@ -195,11 +195,10 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                           <input
                             {...input}
                             className={cx({
-                              'absolute left-0 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none cursor-pointer': true,
-                              'focus:bg-primary-300 focus:text-gray-500': header,
+                              'absolute left-0 focus:bg-primary-300 focus:text-gray-500 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none cursor-pointer': true,
                               'text-4xl': !header,
                             })}
-                            disabled={!editable}
+                            disabled={!editable && !header}
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();
@@ -274,7 +273,6 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                           <h1 className="invisible px-1.5 h-full font-sans font-normal leading-4">{input.value}</h1>
                         </div>
                       </Tooltip>
-
                     )}
                   </FieldRFF>
                 </form>
