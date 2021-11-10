@@ -15,8 +15,8 @@ https://invis.io/G211WEUZFST9#/459986030_Marxan_09a
   possibly to cancel a current calibration process (force-starting a new one
   will need a currently-running one to be cancelled)
 * The Marxan solver must be run N (6) times, each time for 10 iterations and
-  with one of the N BLM values provided by default in the BLM calibration
-  screen, or set there by the user
+  with one of the N BLM values generated from the initial default range bounds
+  in the BLM calibration screen, or set there by the user
 * It may be desirable to set number of runs N as a config default; this number
   is not expected to change once confirmed, and doing so would have implications
   for the frontend, but it would help to make it a configurable setting at least
@@ -28,8 +28,8 @@ https://invis.io/G211WEUZFST9#/459986030_Marxan_09a
   the project result DTO; probably the former would be preferrable, to avoid
   overloading the project result DTO
 * `POST` endpoint (e.g. `/api/v1/scenarios/:id/calibration`) to request a
-  calibration task with specific BLM values (either the initial recommended
-  ones, or those set by users)
+  calibration task using a given `[min, max]` range for BLM values (either the
+  initial recommended ones, or those set by users)
 * User-set values should also be persisted and associated to a scenario: once
   the BLM calibration process has finished the values will also be inferrable
   from the results, but until then there must be a way for the frontend to

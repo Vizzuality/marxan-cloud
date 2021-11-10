@@ -31,7 +31,9 @@ export class StratificationQuery {
               .join(', ')
           : undefined,
       protectedArea:
-        protectedAreaFilterByIds.length > 0 ? 'protected.area' : 'NULL',
+        protectedAreaFilterByIds.length > 0
+          ? 'st_area(st_intersection(protected.area, ifd.intersected_geom))'
+          : 'NULL',
       createdFeatureId: `$${parameters.push(createdFeatureId)}`,
       baseFeatureId: `$${parameters.push(input.baseFeatureId)}`,
       intersectedFeatureId: `$${parameters.push(input.againstFeatureId)}`,
@@ -47,7 +49,7 @@ export class StratificationQuery {
     };
     const protectedAreaJoin = fields.protectedAreaIds
       ? `cross join (
-                   select st_area(st_union(wdpa.the_geom)) as area
+                   select st_union(wdpa.the_geom) as area
                    from wdpa where wdpa.id in (${fields.protectedAreaIds})
                  ) as protected`
       : '';

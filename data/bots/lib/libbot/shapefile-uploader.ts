@@ -9,10 +9,12 @@ interface FileUpload {
 }
 
 export class ShapefileUploader {
-  protected currentJwt;
+  protected currentJwt: string;
+  protected baseUrl: string;
 
   constructor(httpClient: BotHttpClient) {
     this.currentJwt = httpClient.currentJwt;
+    this.baseUrl = httpClient.apiBaseUrl;
   }
 
   async sendData(config: FileUpload) {

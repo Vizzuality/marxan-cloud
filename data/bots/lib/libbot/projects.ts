@@ -10,7 +10,7 @@ interface Project {
   adminAreaLevel1Id?: string;
   adminAreaLevel2Id?: string;
   planningUnitGridShape: "hexagon" | "square" | "from_shapefile";
-  planningUnitAreakm2: number;
+  planningUnitAreakm2?: number;
   planningAreaId?: string;
 }
 
