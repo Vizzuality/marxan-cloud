@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({ published = false, size, theme =
           </Link>
 
           {!published && (
-            <Title />
+            <Title header />
           )}
 
           <div
