@@ -188,7 +188,7 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                             'h-16': !header,
                           })}
                           style={{
-                            minWidth: '150px',
+                            minWidth: !header && '150px',
                           }}
                         >
 

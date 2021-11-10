@@ -15,7 +15,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/client';
 
 import {
-  useAdminPreviewLayer, useLegend, usePUCompareLayer, usePUGridLayer,
+  /* useAdminPreviewLayer, */
+  useLegend,
+  usePUCompareLayer,
+  usePUGridLayer,
+  /* usePUGridPreviewLayer, */
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -54,7 +58,13 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const { pid } = query;
   const { data = {} } = useProject(pid);
   const {
-    id, bbox, countryId, adminAreaLevel1Id, adminAreaLevel2Id,
+    id,
+    bbox,
+    // countryId,
+    // adminAreaLevel1Id,
+    // adminAreaLevel2Id,
+    // planningUnitGridShape,
+    // planningUnitAreakm2,
   } = data;
 
   const {
@@ -82,7 +92,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2,
-    sid,
+    sid: sid ? `${sid}` : null,
     include: 'results',
     sublayers: [
       ...(sid1 && !sid2) ? ['solutions'] : [],
@@ -110,16 +120,31 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     },
   });
 
-  const AdminPreviewLayer = useAdminPreviewLayer({
-    active: (
-      rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length
-      && (countryId || adminAreaLevel1Id || adminAreaLevel2Id)),
-    country: countryId,
-    region: adminAreaLevel1Id,
-    subregion: adminAreaLevel2Id,
-  });
+  // const AdminPreviewLayer = useAdminPreviewLayer({
+  //   active: (
+  //     rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length
+  //     && (countryId || adminAreaLevel1Id || adminAreaLevel2Id)),
+  //   country: countryId,
+  //   region: adminAreaLevel1Id,
+  //   subregion: adminAreaLevel2Id,
+  // });
 
-  const LAYERS = [PUCompareLayer, PUGridLayer, AdminPreviewLayer].filter((l) => !!l);
+  // const PUGridPreviewLayer = usePUGridPreviewLayer({
+  //   active: !sid,
+  //   bbox,
+  //   planningUnitGridShape,
+  //   planningUnitAreakm2: planningUnitAreakm2 || 10,
+  //   options: {
+  //     settings: layerSettings.pugrid,
+  //   },
+  // });
+
+  const LAYERS = [
+    PUCompareLayer,
+    PUGridLayer,
+    // AdminPreviewLayer,
+    // PUGridPreviewLayer,
+  ].filter((l) => !!l);
 
   const LEGEND = useLegend({
     layers: [

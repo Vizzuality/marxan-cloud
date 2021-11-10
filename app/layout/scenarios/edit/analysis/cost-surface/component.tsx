@@ -47,7 +47,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     setJob,
   } = scenarioSlice.actions;
 
-  const maxSize = 1000000;
+  const maxSize = 1e6;
 
   const bytesToMb = (bytes) => {
     return (bytes / 1048576).toFixed(0);
@@ -259,64 +259,64 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                           <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
 
                           {!successFile && (
-                          <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
-                            {(props) => (
-                              <div>
-                                <div className="flex items-center mb-2.5 space-x-3">
-                                  <h5 className="text-xs text-gray-400">Supported formats</h5>
-                                  <InfoButton
-                                    size="s"
-                                    theme="secondary"
+                            <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
+                              {(props) => (
+                                <div>
+                                  <div className="flex items-center mb-2.5 space-x-3">
+                                    <h5 className="text-xs text-gray-400">Supported formats</h5>
+                                    <InfoButton
+                                      size="s"
+                                      theme="secondary"
+                                    >
+                                      <span className="text-xs">
+                                        {' '}
+                                        <h4 className="font-heading mb-2.5">
+                                          List of supported file formats:
+                                        </h4>
+                                        <ul>
+                                          Zipped: .shp (zipped shapefiles must include
+                                          <br />
+                                          .shp, .shx, .dbf, and .prj files)
+                                        </ul>
+                                      </span>
+                                    </InfoButton>
+                                  </div>
+
+                                  <div
+                                    {...props}
+                                    {...getRootProps()}
+                                    className={cx({
+                                      'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
+                                      'bg-gray-500': isDragActive,
+                                      'border-green-800': isDragAccept,
+                                      'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
+                                    })}
                                   >
-                                    <span className="text-xs">
+
+                                    <input {...getInputProps()} />
+
+                                    <p className="text-sm text-center text-gray-500">
+                                      Drag and drop your polygon data file
+                                      <br />
+                                      or
                                       {' '}
-                                      <h4 className="font-heading mb-2.5">
-                                        List of supported file formats:
-                                      </h4>
-                                      <ul>
-                                        Zipped: .shp (zipped shapefiles must include
-                                        <br />
-                                        .shp, .shx, .dbf, and .prj files)
-                                      </ul>
-                                    </span>
-                                  </InfoButton>
+                                      <b>click here</b>
+                                      {' '}
+                                      to upload
+                                    </p>
+
+                                    <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMb(maxSize)} MB`}</p>
+
+                                    <Loading
+                                      visible={loading}
+                                      className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                                      iconClassName="w-5 h-5 text-primary-500"
+                                    />
+
+                                  </div>
                                 </div>
-
-                                <div
-                                  {...props}
-                                  {...getRootProps()}
-                                  className={cx({
-                                    'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
-                                    'bg-gray-500': isDragActive,
-                                    'border-green-800': isDragAccept,
-                                    'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
-                                  })}
-                                >
-
-                                  <input {...getInputProps()} />
-
-                                  <p className="text-sm text-center text-gray-500">
-                                    Drag and drop your polygon data file
-                                    <br />
-                                    or
-                                    {' '}
-                                    <b>click here</b>
-                                    {' '}
-                                    to upload
-                                  </p>
-
-                                  <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMb(maxSize)} MB`}</p>
-
-                                  <Loading
-                                    visible={loading}
-                                    className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-                                    iconClassName="w-5 h-5 text-primary-500"
-                                  />
-
-                                </div>
-                              </div>
-                            )}
-                          </Field>
+                              )}
+                            </Field>
                           )}
 
                           {successFile && (
