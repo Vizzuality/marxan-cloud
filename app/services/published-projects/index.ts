@@ -4,8 +4,8 @@ import { signOut } from 'next-auth/client';
 
 const dataFormatter = new Jsona();
 
-const PROJECTS = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_URL || process.env.STORYBOOK_API_URL}/api/v1/projects`,
+const PUBLISHED_PROJECTS = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL || process.env.STORYBOOK_API_URL}/api/v1/published-projects`,
   headers: { 'Content-Type': 'application/json' },
   transformResponse: (data) => {
     try {
@@ -31,6 +31,6 @@ const onResponseError = (error) => {
   return Promise.reject(error);
 };
 
-PROJECTS.interceptors.response.use(onResponseSuccess, onResponseError);
+PUBLISHED_PROJECTS.interceptors.response.use(onResponseSuccess, onResponseError);
 
-export default PROJECTS;
+export default PUBLISHED_PROJECTS;
