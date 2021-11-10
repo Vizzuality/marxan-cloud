@@ -27,10 +27,16 @@ export class BotHttpClient {
     });
 
     this.currentJwt = jwt;
+    this.baseUrl = config.apiUrl;
   }
 
   public baseHttpClient;
   public currentJwt;
+  private baseUrl: string;
+
+  get apiBaseUrl() {
+    return this.baseUrl;
+  }
 
   static async init(config: MarxanBotConfig) {
     const jwt = await axiod

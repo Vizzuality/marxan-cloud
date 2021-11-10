@@ -21,7 +21,7 @@ export const runBot = async (settings: MarxanBotConfig) => {
 
   const planningUnitAreakm2 = 50;
 
-  const planningAreaId = await bot.planningAreaUploader.uploadFromFile(
+  const planningAreaId = await bot.planningAreaUploader.setFromShapefile(
     `${scriptPath}/test_mata.zip`,
   );
 

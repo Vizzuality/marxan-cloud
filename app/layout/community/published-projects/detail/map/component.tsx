@@ -19,6 +19,7 @@ import { useScenarios } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 
+import Loading from 'components/loading';
 import Map from 'components/map';
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
@@ -35,6 +36,8 @@ export interface PublishedProjectMapProps {
 
 export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
   const [open, setOpen] = useState(false);
+  const [mapInteractive, setMapInteractive] = useState(false);
+
   const [session] = useSession();
 
   const minZoom = 2;
@@ -194,6 +197,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
                 mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
                 mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
                 onMapViewportChange={handleViewportChange}
+                onMapLoad={() => setMapInteractive(true)}
                 transformRequest={handleTransformRequest}
               >
                 {(map) => {
@@ -262,6 +266,11 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
           </div>
         </motion.div>
       )}
+      <Loading
+        visible={!mapInteractive}
+        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+        iconClassName="w-10 h-10 text-primary-500"
+      />
     </AnimatePresence>
   );
 };
