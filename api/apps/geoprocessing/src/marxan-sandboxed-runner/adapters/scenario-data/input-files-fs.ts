@@ -16,10 +16,15 @@ export type Assets = {
   relativeDestination: string;
 }[];
 import { AssetFetcher } from './asset-fetcher';
+import { SandboxRunnerInputFiles } from '../../sandbox-runner-input-files';
 
 @Injectable()
-export class InputFilesFs implements Cancellable {
-  constructor(private readonly fetchService: AssetFetcher) {}
+export class InputFilesFs
+  extends SandboxRunnerInputFiles
+  implements Cancellable {
+  constructor(private readonly fetchService: AssetFetcher) {
+    super();
+  }
 
   async include(workspace: Workspace, assets: Assets): Promise<void> {
     assets.forEach((asset) => this.validateInput(asset.relativeDestination));
