@@ -88,7 +88,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2,
-    sid,
+    sid: sid ? `${sid}` : null,
     include: 'results',
     sublayers: [
       ...(sid1 && !sid2) ? ['solutions'] : [],
@@ -126,10 +126,10 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   });
 
   const PUGridPreviewLayer = usePUGridPreviewLayer({
-    active: planningUnitGridShape !== 'from_shapefile' && !sid,
+    active: /* planningUnitGridShape !== 'from_shapefile' && */ !sid,
     bbox,
     planningUnitGridShape,
-    planningUnitAreakm2: planningUnitAreakm2 || null,
+    planningUnitAreakm2: planningUnitAreakm2 || 10,
     options: {
       settings: layerSettings.pugrid,
     },
