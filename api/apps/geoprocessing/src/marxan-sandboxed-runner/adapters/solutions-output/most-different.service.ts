@@ -1,16 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
-import { minBy } from 'lodash';
+import { minBy,reduce } from 'lodash';
 import { ResultRow } from '@marxan/marxan-output';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { clusterData, averageDistance } from '@greenelab/hclust';
 import { isDefined } from '@marxan/utils';
+import { number } from 'fp-ts';
 
-type TargetCluster<T = ResultRow[]> = [T, T, T, T, T];
-type SolutionPerClusterGroup<T = ResultRow> = TargetCluster<T>;
 
+type TargetCluster<T = (ResultRow & {puValues: number[]})[]> = [T, T, T, T, T];
+type SolutionPerClusterGroup<T = (ResultRow & {puValues: number[]})> = TargetCluster<T>;
+
+const logger = new Logger('5 most different Test')
 @Injectable()
 export class MostDifferentService {
   map(fromState: ResultRow[]): ResultRow[] {
@@ -40,7 +43,7 @@ export class MostDifferentService {
     if (!selectedSolutions) {
       return fromState;
     }
-
+    logger.debug(fromState)
     return fromState.map((state) =>
       plainToClass(ResultRow, {
         ...state,
@@ -50,17 +53,18 @@ export class MostDifferentService {
   }
 
   #getClusterOfFiveGroup = (
-    solutions: ResultRow[],
+    solutions: (ResultRow & {puValues: number[]}),
   ): TargetCluster | undefined => {
     const clusters = clusterData({
       data: solutions.map((state) => ({
         raw: state,
       })),
       key: 'raw',
-      distance: (setA: ResultRow, setB: ResultRow) =>
-        Math.abs(setA.score - setB.score),
-      linkage: (setA: number[], setB: number[], distanceMatrix: number[][]) =>
-        averageDistance(setA, setB, distanceMatrix),
+      distance: (setA: (ResultRow & {puValues: number[]}), setB: (ResultRow & {puValues: number[]})): number => {
+        return this.#getJaccardBinaryDistance(setA.puValues, setB.puValues);
+      }),
+      linkage: (setA: number[], setB: number[], distanceMatrix: number[][]): number =>
+      this.#getMeanPairGroup(setA, setB, distanceMatrix),
     });
 
     const fiveGroups = clusters.clustersGivenK[5];
@@ -92,4 +96,31 @@ export class MostDifferentService {
     cluster: SolutionPerClusterGroup<ResultRow | undefined>,
   ): cluster is SolutionPerClusterGroup =>
     cluster.every((element) => isDefined(element));
+
+  #getJaccardBinaryDistance = (setA: [],setB:[]): number => {
+    if (setA.length !== setB.length) throw new Error("Need to be equal length");
+    const response = reduce(
+      setA,
+      (accumulator: {a1:number, a2:number}, value:number, index:number):{a1:number, a2:number} => {
+        const xor: Byte = !(value ^ setB[index]); // inverse xor operation over binary par
+        accumulator.a1 += xor;
+        accumulator.a2 += xor & value;
+        // Return the current iteration `result` value, this will be taken as next iteration `result` value and accumulate
+        return accumulator;
+      },
+      { a1: 0, a2: 0 }
+    );
+
+    return 1 - response.a2 / (setA.length - (response.a1 - response.a2)); // jaccard distance
+  };
+
+  #getMeanPairGroup = (setA: number[], setB: number[], distances: number[][]): number => {
+    let distance = 0;
+    // methodology for linkage https://en.wikipedia.org/wiki/UPGMA
+    for (const a of setA) {
+      for (const b of setB) distance += distances[a][b];
+    }
+
+    return distance / (setA.length * setB.length);
+  };
 }
