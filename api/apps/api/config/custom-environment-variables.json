@@ -30,7 +30,7 @@
   },
   "api": {
     "url": "API_SERVICE_URL",
-    "port": "API_SERVICE_PORT"
+    "daemonListenPort": "API_DAEMON_LISTEN_PORT"
   },
   "storage": {
     "sharedFileStorage": {

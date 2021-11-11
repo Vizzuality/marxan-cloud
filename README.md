@@ -38,8 +38,10 @@ details.
    * `API_AUTH_X_API_KEY` (string, required): a secret used as API key for
      requests from the Geoprocessing service to the API; can be generated
      similarly to `API_AUTH_JWT_SECRET`
-   * `API_SERVICE_PORT` (number, required): the port on which the API service
-     should listen on the local machine
+   * `API_SERVICE_PORT` (number, required): the port exposed by Docker for the
+     API service; when running an instance under Docker Compose, NestJS will
+     always be listening on port 3000 internally, and this is mapped to
+     `API_SERVICE_PORT` when exposed outside of the container
    * `API_SERVICE_URL` (URL, optional, default is http://api:3000): the internal
      (docker-compose or k8s cluster) where the API service can be reached by
      other services running in the cluster
@@ -67,8 +69,11 @@ details.
      PostgreSQL connection (API)
    * `API_POSTGRES_DB` (string, required): name of the database to be used for
      the PostgreSQL connection (API)
-   * `GEOPROCESSING_SERVICE_PORT` (number, required): the port on which the
-     Geoprocessing service should listen on the local machine
+   * `GEOPROCESSING_SERVICE_PORT` (number, required): the port exposed by Docker
+     for the Geoprocessing service; when running an instance under Docker
+     Compose, NestJS will always be listening on port 3000 internally, and this
+     is mapped to `GEOPROCESSING_SERVICE_PORT` when exposed outside of the
+     container
    * `POSTGRES_GEO_SERVICE_PORT` (number, required): the port on which the
      geoprocessing PostgreSQL service should listen on the local machine
    * `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default
@@ -109,6 +114,18 @@ details.
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted
 via a Docker volume.
+
+#### Running API and Geoprocessing services natively
+
+When running the API and Geoprocessing services without relying on Docker
+Compose for container orchestration, the following two environment variables can
+be used to set on which port the NestJS/Express daemon should be listening,
+instead of the hardcoded port `3000` which is used in Docker setups.
+
+* `API_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port on which
+  the Express daemon of the API service will listen
+* `GEOPROCESSING_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port
+  on which the Express daemon of the Geoprocessing service will listen
 
 ### Running the Marxan Cloud platform
 
