@@ -1,5 +1,5 @@
 import { BotHttpClient, MarxanBotConfig } from "./marxan-bot.ts";
-import { CostSurface  } from "./cost-surface";
+import { CostSurface  } from "./cost-surface.ts";
 import { Organizations } from "./organizations.ts";
 import { Projects } from "./projects.ts";
 import { Scenarios } from "./scenarios.ts";
