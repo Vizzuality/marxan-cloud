@@ -5,9 +5,8 @@ import { ResultRow } from '@marxan/marxan-output';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { clusterData, averageDistance } from '@greenelab/hclust';
+import { clusterData } from '@greenelab/hclust';
 import { isDefined } from '@marxan/utils';
-import { number } from 'fp-ts';
 
 
 type TargetCluster<T = (ResultRow & {puValues: number[]})[]> = [T, T, T, T, T];
@@ -102,7 +101,7 @@ export class MostDifferentService {
     const response = reduce(
       setA,
       (accumulator: {a1:number, a2:number}, value:number, index:number):{a1:number, a2:number} => {
-        const xor: Byte = !(value ^ setB[index]); // inverse xor operation over binary par
+        const xor: number = +!(value ^ setB[index]); // inverse xor operation over binary par
         accumulator.a1 += xor;
         accumulator.a2 += xor & value;
         // Return the current iteration `result` value, this will be taken as next iteration `result` value and accumulate
