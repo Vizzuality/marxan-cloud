@@ -5,7 +5,10 @@ import { intersection } from 'lodash';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/users/role.api.entity';
 import { Injectable } from '@nestjs/common';
-import { AccessControlService } from '../access-control/access-control-service.interface';
+import {
+  AccessControlService,
+  Permit,
+} from '../access-control/access-control-service.interface';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -13,7 +16,6 @@ import { AccessControlService } from '../access-control/access-control-service.i
  */
 @Injectable()
 export class ProjectAclService extends AccessControlService {
-  private readonly canCreateProjectRoles = [Roles.organization_owner];
   private readonly canCreateScenarioRoles = [Roles.project_owner];
   private readonly canEditScenarioRoles = [Roles.project_owner];
   private readonly canViewSolutionRoles = [Roles.project_owner];
@@ -30,21 +32,12 @@ export class ProjectAclService extends AccessControlService {
   ) {
     super();
   }
-
-  async canCreateProject(userId: string, projectId: string): Promise<boolean> {
-    const roles = (
-      await this.roles.find({
-        where: {
-          projectId,
-          userId,
-        },
-      })
-    ).flatMap((role) => role.roleName);
-
-    return intersection(roles, this.canCreateProjectRoles).length > 0;
+  // TODO: create a proper workflow to check project creation capabilities
+  async canCreateProject(_userId: string, _projectId: string): Promise<Permit> {
+    return true;
   }
 
-  async canViewProject(userId: string, projectId: string): Promise<boolean> {
+  async canViewProject(userId: string, projectId: string): Promise<Permit> {
     const roles = (
       await this.roles.find({
         where: {
@@ -57,7 +50,7 @@ export class ProjectAclService extends AccessControlService {
     return intersection(roles, this.canViewProjectRoles).length > 0;
   }
 
-  async canPublishProject(userId: string, projectId: string): Promise<boolean> {
+  async canPublishProject(userId: string, projectId: string): Promise<Permit> {
     const roles = (
       await this.roles.find({
         where: {
@@ -70,7 +63,7 @@ export class ProjectAclService extends AccessControlService {
     return intersection(roles, this.canPublishProjectRoles).length > 0;
   }
 
-  async canCreateScenario(userId: string, projectId: string): Promise<boolean> {
+  async canCreateScenario(userId: string, projectId: string): Promise<Permit> {
     const roles = (
       await this.roles.find({
         where: {
@@ -82,7 +75,7 @@ export class ProjectAclService extends AccessControlService {
 
     return intersection(roles, this.canCreateScenarioRoles).length > 0;
   }
-  async canEditScenario(userId: string, projectId: string): Promise<boolean> {
+  async canEditScenario(userId: string, projectId: string): Promise<Permit> {
     const roles = (
       await this.roles.find({
         where: {
@@ -94,7 +87,7 @@ export class ProjectAclService extends AccessControlService {
 
     return intersection(roles, this.canEditScenarioRoles).length > 0;
   }
-  async canViewSolutions(userId: string, projectId: string): Promise<boolean> {
+  async canViewSolutions(userId: string, projectId: string): Promise<Permit> {
     const roles = (
       await this.roles.find({
         where: {
