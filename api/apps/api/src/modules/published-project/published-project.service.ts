@@ -37,7 +37,7 @@ export class PublishedProjectService {
         return left(notFound);
       }
 
-      if (!(await this.acl.canPublish(requestingUserId, id))) {
+      if (!(await this.acl.canPublishProject(requestingUserId, id))) {
         return left(accessDenied);
       }
 
