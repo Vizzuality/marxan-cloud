@@ -1,19 +1,19 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import { createPortal } from 'react-dom';
-import cx from 'classnames';
 
+import { createPortal } from 'react-dom';
+import { usePopper } from 'react-popper';
+
+import cx from 'classnames';
 // Downshift;
 import { useSelect } from 'downshift';
-import Toggle from 'components/forms/select/toggle';
-import Menu from 'components/forms/select/menu';
 
 // Popper
-import { usePopper } from 'react-popper';
 import {
   flipModifier, hideModifier, sameWidthModifier, offsetModifier,
 } from 'components/forms/select/constants/popper-modifiers';
 import THEME from 'components/forms/select/constants/theme';
-
+import Menu from 'components/forms/select/menu';
+import Toggle from 'components/forms/select/toggle';
 import { SelectProps, SelectOptionProps } from 'components/forms/select/types';
 
 export const SingleSelect: React.FC<SelectProps> = ({
@@ -175,7 +175,9 @@ export const SingleSelect: React.FC<SelectProps> = ({
       </div>
 
       {/* Menu */}
+
       {createPortal(
+
         <div
           className={cx({
             'z-50': true,
@@ -225,7 +227,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
                     [THEME[theme].item.disabled]: option.disabled,
                     [THEME[theme].item.highlighted]: (
                       (highlightedIndex === index && !option.disabled)
-                        || isSelected(option, selectedItems)
+                      || isSelected(option, selectedItems)
                     ),
                   })}
                   key={`${option.value}`}
