@@ -10,7 +10,7 @@ export async function bootstrap() {
 
   SwaggerModule.setup('/swagger', app, swaggerDocument);
 
-  await app.listen(AppConfig.get('api.port'));
+  await app.listen(AppConfig.get('api.daemonListenPort'));
 }
 
 bootstrap();

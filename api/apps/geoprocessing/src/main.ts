@@ -15,6 +15,6 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new AllExceptionsFilter());
-  await app.listen(AppConfig.get('geo.port'));
+  await app.listen(AppConfig.get('geo.daemonListenPort'));
 }
 bootstrap();
