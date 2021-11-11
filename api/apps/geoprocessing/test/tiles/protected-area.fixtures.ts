@@ -70,7 +70,7 @@ export const getFixtures = async () => {
       );
 
       expect(customFeature.length).toEqual(1);
-      expect(features.length).toEqual(7);
+      expect(features.length).toEqual(17);
 
       /**
        * TODO maybe:
