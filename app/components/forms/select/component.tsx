@@ -16,6 +16,8 @@ export const Select: React.FC<SelectProps> = (props: SelectProps) => {
     onChange,
   } = props;
 
+  const isServer = typeof window === 'undefined';
+
   const initialValues = useMemo(() => {
     if (multiple) {
       if (Array.isArray(initialSelected)) return initialSelected;
@@ -47,7 +49,7 @@ export const Select: React.FC<SelectProps> = (props: SelectProps) => {
     }
   }, [onChange]);
 
-  if (multiple && typeof window !== 'undefined') {
+  if (multiple && !isServer) {
     return (
       <MultipleSelect
         {...props}
@@ -61,7 +63,7 @@ export const Select: React.FC<SelectProps> = (props: SelectProps) => {
     );
   }
 
-  if (!multiple && typeof window !== 'undefined') {
+  if (!multiple && !isServer) {
     return (
       <SingleSelect
         {...props}
