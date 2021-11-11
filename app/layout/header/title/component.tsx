@@ -4,6 +4,7 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useProject, useSaveProject } from 'hooks/projects';
@@ -16,9 +17,11 @@ import {
 import Tooltip from 'components/tooltip';
 
 export interface TitleProps {
+  editable?: boolean;
+  header?: boolean;
 }
 
-export const Title: React.FC<TitleProps> = () => {
+export const Title: React.FC<TitleProps> = ({ header = false, editable = false }: TitleProps) => {
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid, sid } = query;
@@ -127,7 +130,9 @@ export const Title: React.FC<TitleProps> = () => {
       {!projectIsLoading && !scenarioIsLoading && (
         <motion.div
           key="project-scenario-loading"
-          className="flex divide-x"
+          className={cx({
+            'flex divide-x': true,
+          })}
           initial={{ y: -10 }}
           animate={{ y: 0 }}
           exit={{ y: -10 }}
@@ -147,7 +152,16 @@ export const Title: React.FC<TitleProps> = () => {
               }}
             >
               {(fprops) => (
-                <form id="form-title-project" onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
+                <form
+                  id="form-title-project"
+                  onSubmit={fprops.handleSubmit}
+                  autoComplete="off"
+                  className={cx({
+                    'relative px-2': true,
+                    'max-w-xs': header,
+                    'h-16 max-w-max': !header,
+                  })}
+                >
                   <FieldRFF
                     name="name"
                     validate={composeValidators([{ presence: true }])}
@@ -160,25 +174,47 @@ export const Title: React.FC<TitleProps> = () => {
                       <Tooltip
                         arrow
                         placement="bottom"
-                        disabled={meta.active}
+                        disabled={meta.active || editable || !header}
                         content={(
                           <div className="px-2 py-1 text-gray-500 bg-white rounded">
                             <span>Edit name</span>
                           </div>
                         )}
                       >
-                        <div className="relative h-6">
+                        <div
+                          className={cx({
+                            relative: true,
+                            'h-6': header,
+                            'h-16': !header,
+                          })}
+                          style={{
+                            minWidth: !header && '150px',
+                          }}
+                        >
+
                           <input
                             {...input}
-                            className="absolute top-0 left-0 w-full h-full px-1 font-normal leading-4 bg-transparent border-none font-heading overflow-ellipsis focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
+                            className={cx({
+                              'absolute left-0 focus:bg-primary-300 focus:text-gray-500 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none cursor-pointer': true,
+                              'text-4xl': !header,
+                            })}
+                            disabled={!editable && !header}
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();
-                              fprops.handleSubmit();
+                              if (fprops.values.name !== projectData?.name) {
+                                return fprops.handleSubmit();
+                              }
+                              return null;
                             }}
                           />
 
-                          <h1 className="invisible h-full px-1.5 font-heading font-normal leading-4">{input.value}</h1>
+                          <h1 className={cx({
+                            'invisible h-full px-1.5 font-heading font-normal overflow-ellipsis': true,
+                          })}
+                          >
+                            {input.value}
+                          </h1>
                         </div>
                       </Tooltip>
                     )}
@@ -221,7 +257,7 @@ export const Title: React.FC<TitleProps> = () => {
                           <div className="px-2 py-1 text-gray-500 bg-white rounded">
                             <span>Edit name</span>
                           </div>
-                          )}
+                        )}
                       >
                         <div className="relative h-6">
                           <input
@@ -237,7 +273,6 @@ export const Title: React.FC<TitleProps> = () => {
                           <h1 className="invisible px-1.5 h-full font-sans font-normal leading-4">{input.value}</h1>
                         </div>
                       </Tooltip>
-
                     )}
                   </FieldRFF>
                 </form>

@@ -24,7 +24,7 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
         input.onChange(newSize);
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [minPuAreaSize]);
 
   return (
@@ -73,11 +73,7 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
             type="number"
             min={+parseInt(minPuAreaSize, 10)}
             max={+parseInt(maxPuAreaSize, 10)}
-            onChange={(event) => {
-              const newSize = Number(event.target.value);
-
-              input.onChange(newSize);
-            }}
+            onChange={(event) => input.onChange(event.target.value)}
           />
         </div>
         <span>KM2</span>

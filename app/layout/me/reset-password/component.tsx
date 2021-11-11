@@ -144,10 +144,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
                 size="lg"
                 type="submit"
                 disabled={submitting}
-                onClick={() => {
-                  setSubmitted(false);
-                  push('/auth/sign-in');
-                }}
+                onClick={() => push('/auth/sign-in')}
                 className="w-full"
               >
                 Ok

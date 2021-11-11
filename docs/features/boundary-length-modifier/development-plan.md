@@ -9,7 +9,7 @@ depend on choices such as whether to adapt and reuse
 
 * Workspace setup for BLM calibration runs: fetch input `.dat` files only once
   per set of runs to be scheduled for the calibration process.
-* API interface (endpoint and payload DTO) to accept a BLM calibration request
+* API interface (endpoint and payload DTO) to accept a BLM calibration request;
   this also needs to persist the set of BLM values chosen (even if they are
   the initial recommended ones)
 * Add latest BLM values for calibration to the scenario DTO

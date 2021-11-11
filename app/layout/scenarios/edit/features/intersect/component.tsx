@@ -138,12 +138,12 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
               return {
                 kind: 'stratification/v1',
                 intersectWith: {
-                  featureId,
+                  featureId: s.id,
                 },
                 splitByProperty: splitSelected,
                 splits: splitFeaturesSelected.map((sfs) => {
                   return {
-                    value: sfs.id,
+                    value: (sfs.id).toString(),
                     marxanSettings: {
                       fpf: 1,
                       prop: 0.5,

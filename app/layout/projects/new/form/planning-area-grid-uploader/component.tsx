@@ -52,7 +52,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
     },
   });
 
-  const maxSize = 10000000;
+  const maxSize = 1e7;
 
   const { uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
 

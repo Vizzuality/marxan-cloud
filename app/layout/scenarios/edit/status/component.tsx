@@ -71,7 +71,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
       JOB_DONE_REF.current = JOB_DONE;
 
       // Execute the action
-      ACTIONS_DONE[JOB_DONE.kind](JOB_DONE_REF);
+      ACTIONS_DONE[JOB_DONE?.kind](JOB_DONE_REF);
     }
   }, [ACTIONS_DONE, JOB_DONE]);
 

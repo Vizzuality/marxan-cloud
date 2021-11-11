@@ -68,7 +68,7 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }: AvatarMeP
     multiple: false,
     noClick: true,
     noKeyboard: true,
-    maxSize: 500000,
+    maxSize: 5e5,
     onDropAccepted,
     onDropRejected,
   });

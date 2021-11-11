@@ -273,10 +273,24 @@ export function useFeaturePreviewLayers({
 
 // PUGridpreview
 export function usePUGridPreviewLayer({
-  active, bbox, planningUnitGridShape, planningUnitAreakm2, cache,
+  active, bbox, planningUnitGridShape, planningUnitAreakm2, cache, options = {},
 }: UsePUGridPreviewLayer) {
   return useMemo(() => {
     if (!active || !bbox || !planningUnitGridShape || !planningUnitAreakm2) return null;
+
+    const {
+      settings = {
+        opacity: 1,
+        visibility: true,
+      },
+    } = options;
+
+    const getLayerVisibility = () => {
+      if (!settings?.visibility) {
+        return 'none';
+      }
+      return 'visible';
+    };
 
     return {
       id: `pu-grid-preview-layer-${cache}`,
@@ -290,15 +304,18 @@ export function usePUGridPreviewLayer({
           {
             type: 'line',
             'source-layer': 'layer0',
+            layout: {
+              visibility: getLayerVisibility(),
+            },
             paint: {
               'line-color': COLORS.primary,
-              'line-opacity': 0.5,
+              'line-opacity': 0.5 * settings?.opacity,
             },
           },
         ],
       },
     };
-  }, [active, bbox, planningUnitGridShape, planningUnitAreakm2, cache]);
+  }, [active, bbox, planningUnitGridShape, planningUnitAreakm2, cache, options]);
 }
 
 // PUGrid

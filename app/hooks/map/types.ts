@@ -23,6 +23,12 @@ export interface UsePUGridPreviewLayer {
   bbox?: number[] | unknown;
   planningUnitGridShape?: string;
   planningUnitAreakm2?: number;
+  options?: {
+    settings?: {
+      opacity?: number;
+      visibility?: boolean;
+    },
+  }
 }
 
 export interface UseWDPAPreviewLayer {
