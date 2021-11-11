@@ -18,7 +18,7 @@ const THEME = {
 };
 export interface ComingSoonProps {
   children: ReactChild;
-  placement?: any;
+  placement?: 'bottom' | 'top' | 'left' | 'right';
   theme?: 'dark' | 'light';
 }
 
