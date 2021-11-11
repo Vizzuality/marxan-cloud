@@ -1,5 +1,7 @@
+import Process from "https://deno.land/std@0.103.0/node/process.ts";
 import { BotHttpClient } from "./marxan-bot.ts";
 import { logError, logInfo } from "./logger.ts";
+import { tookMs } from "./util/perf.ts";
 
 export class CostSurface {
   private baseHttpClient;
@@ -12,7 +14,8 @@ export class CostSurface {
     scenarioId: string,
     destinationDirName: string,
   ): Promise<boolean> {
-    return await this.baseHttpClient.get(
+    const opStart = Process.hrtime();
+    const success = await this.baseHttpClient.get(
       `/scenarios/${scenarioId}/cost-surface/shapefile-template`,
     )
       .then(async data => {
@@ -26,6 +29,13 @@ export class CostSurface {
         logError(e);
         return false;
       });
+
+    logInfo(
+      `Custom geofeature shapefile uploaded in ${
+        tookMs(Process.hrtime(opStart))
+      }ms.`,
+    );
+    return success;
   }
 
   private async writeDataToFile(filePath: string, data: Uint8Array): Promise<void> {
