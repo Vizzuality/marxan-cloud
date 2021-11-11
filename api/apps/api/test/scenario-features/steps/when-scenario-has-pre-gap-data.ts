@@ -4,7 +4,9 @@ import { Repository } from 'typeorm';
 
 import { ScenarioFeaturesData } from '@marxan/features';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-
+/**
+ * @TODO: This should be done after recreating an scenario and linking the feature data using a copy operation
+ */
 export const WhenScenarioHasPreGapData = async (
   app: INestApplication,
 ): Promise<{
