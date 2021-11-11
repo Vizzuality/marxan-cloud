@@ -78,6 +78,8 @@ export class Scenarios {
   }
 
   async setNumberOfRuns(scenarioId: string, numberOfRuns: number = 100) {
-    await this.baseHttpClient.patch(`/scenarios/${scenarioId}`, { numberOfRuns });
+    await this.baseHttpClient.patch(`/scenarios/${scenarioId}`, {
+      numberOfRuns,
+    });
   }
 }

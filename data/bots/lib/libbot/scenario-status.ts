@@ -38,7 +38,7 @@ export enum ScenarioJobKinds {
 export enum JobStatuses {
   running = "running",
   done = "done",
-  failure =  "failure",
+  failure = "failure",
 }
 
 interface JobStatus {
@@ -112,7 +112,7 @@ export class ScenarioJobStatus {
         logInfo(`Current status is ${status}.`);
         return true;
       }
-      if(status === JobStatuses.failure) {
+      if (status === JobStatuses.failure) {
         logError(`Operation failed.`);
         return false;
       }

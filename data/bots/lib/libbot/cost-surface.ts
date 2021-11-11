@@ -18,8 +18,9 @@ export class CostSurface {
     const success = await this.baseHttpClient.get(
       `/scenarios/${scenarioId}/cost-surface/shapefile-template`,
     )
-      .then(async data => {
-        const filePath = `${destinationDirName}/${scenarioId}_cost-surface-template.zip`;
+      .then(async (data) => {
+        const filePath =
+          `${destinationDirName}/${scenarioId}_cost-surface-template.zip`;
         logInfo(`Writing shapefile template to file ${filePath}`);
         const fileBytes = new Uint8Array(new TextEncoder().encode(data.data));
         await this.writeDataToFile(filePath, fileBytes);
@@ -38,7 +39,10 @@ export class CostSurface {
     return success;
   }
 
-  private async writeDataToFile(filePath: string, data: Uint8Array): Promise<void> {
-      await Deno.writeFile(filePath, data);
+  private async writeDataToFile(
+    filePath: string,
+    data: Uint8Array,
+  ): Promise<void> {
+    await Deno.writeFile(filePath, data);
   }
 }
