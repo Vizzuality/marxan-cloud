@@ -12,7 +12,7 @@ export class CostSurface {
     scenarioId: string,
   ) {
     return await this.baseHttpClient.get(
-      `/projects/${scenarioId}/cost-surface`,
+      `/scenarios/${scenarioId}/cost-surface/shapefile-template`,
     )
       .then(data => {
         logInfo('Writing shapefile template to file.');
