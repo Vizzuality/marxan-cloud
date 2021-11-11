@@ -73,7 +73,7 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
             type="number"
             min={+parseInt(minPuAreaSize, 10)}
             max={+parseInt(maxPuAreaSize, 10)}
-            onChange={(event) => input.onChange(event.target.value)}
+            onChange={(event) => input.onChange(+parseInt(event.target.value, 10))}
           />
         </div>
         <span>KM2</span>
