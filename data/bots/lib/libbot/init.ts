@@ -1,4 +1,5 @@
 import { BotHttpClient, MarxanBotConfig } from "./marxan-bot.ts";
+import { CostSurface  } from "./cost-surface";
 import { Organizations } from "./organizations.ts";
 import { Projects } from "./projects.ts";
 import { Scenarios } from "./scenarios.ts";
@@ -12,6 +13,7 @@ import { MarxanCalculations } from "./marxan-calculations.ts";
 import { ScenarioJobStatus } from "./scenario-status.ts";
 
 export interface Bot {
+  costSurface: CostSurface;
   organizations: Organizations;
   projects: Projects;
   scenarios: Scenarios;
@@ -35,6 +37,7 @@ export const createBot = async (botConfig: MarxanBotConfig): Promise<Bot> => {
   });
 
   return {
+    costSurface: new CostSurface(httpClient),
     organizations: new Organizations(httpClient),
     projects: new Projects(httpClient),
     scenarios: new Scenarios(httpClient),
