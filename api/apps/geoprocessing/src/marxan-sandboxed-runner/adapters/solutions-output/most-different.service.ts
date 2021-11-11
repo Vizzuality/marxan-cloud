@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { minBy,reduce } from 'lodash';
 import { ResultRow } from '@marxan/marxan-output';
@@ -12,7 +12,6 @@ import { isDefined } from '@marxan/utils';
 type TargetCluster<T = (ResultRow & {puValues: number[]})[]> = [T, T, T, T, T];
 type SolutionPerClusterGroup<T = (ResultRow & {puValues: number[]})> = TargetCluster<T>;
 
-const logger = new Logger('5 most different Test')
 @Injectable()
 export class MostDifferentService {
   map(fromState: ResultRow[]): ResultRow[] {
@@ -42,7 +41,6 @@ export class MostDifferentService {
     if (!selectedSolutions) {
       return fromState;
     }
-    logger.debug(fromState)
     return fromState.map((state) =>
       plainToClass(ResultRow, {
         ...state,
