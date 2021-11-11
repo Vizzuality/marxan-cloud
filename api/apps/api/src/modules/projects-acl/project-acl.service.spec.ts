@@ -18,17 +18,30 @@ beforeEach(async () => {
 
 test(`no roles assigned at all`, async () => {
   fixtures.GivenNoRoles();
-  await fixtures.ThenCannotPublish();
+  await fixtures.ThenCannotPublishProject();
+  await fixtures.ThenCanCreateProject();
+  await fixtures.ThenCannotViewProject();
 });
 
-test(`user role assigned`, async () => {
+test(`project user role assigned`, async () => {
   fixtures.GivenProjectUserRoleIsAssigned();
-  await fixtures.ThenCannotPublish();
+  await fixtures.ThenCannotPublishProject();
+  await fixtures.ThenCanCreateProject();
+  await fixtures.ThenCanViewProject();
 });
 
-test(`owner role assigned`, async () => {
+test(`project owner role assigned`, async () => {
   fixtures.GivenProjectOwnerRoleIsAssigned();
-  await fixtures.ThenCanPublish();
+  await fixtures.ThenCanPublishProject();
+  await fixtures.ThenCanCreateProject();
+  await fixtures.ThenCanViewProject();
+});
+
+test(`project admin role assigned`, async () => {
+  fixtures.GivenProjectAdminRoleIsAssigned();
+  await fixtures.ThenCannotPublishProject();
+  await fixtures.ThenCanCreateProject();
+  await fixtures.ThenCanViewProject();
 });
 
 const getFixtures = async () => {
@@ -50,9 +63,9 @@ const getFixtures = async () => {
   const userId = v4();
 
   return {
-    GivenNoRoles: () => repo.find.mockImplementationOnce(async () => []),
+    GivenNoRoles: () => repo.find.mockImplementation(async () => []),
     GivenProjectUserRoleIsAssigned: () =>
-      repo.find.mockImplementationOnce(async () => [
+      repo.find.mockImplementation(async () => [
         {
           roleName: Roles.project_user,
           projectId,
@@ -60,18 +73,50 @@ const getFixtures = async () => {
         },
       ]),
     GivenProjectOwnerRoleIsAssigned: () =>
-      repo.find.mockImplementationOnce(async () => [
+      repo.find.mockImplementation(async () => [
         {
           roleName: Roles.project_owner,
           projectId,
           userId,
         },
       ]),
-    ThenCannotPublish: async () => {
-      expect(await sut.canPublish(userId, projectId)).toEqual(false);
+    GivenProjectAdminRoleIsAssigned: () =>
+      repo.find.mockImplementation(async () => [
+        {
+          roleName: Roles.project_admin,
+          projectId,
+          userId,
+        },
+      ]),
+    ThenCannotCreateProject: async () => {
+      expect(await sut.canCreateProject(userId, projectId)).toEqual(false);
     },
-    ThenCanPublish: async () => {
-      expect(await sut.canPublish(userId, projectId)).toEqual(true);
+    ThenCanCreateProject: async () => {
+      expect(await sut.canCreateProject(userId, projectId)).toEqual(true);
+      expect(repo.find).toHaveBeenCalledWith({
+        where: {
+          projectId,
+          userId,
+        },
+      });
+    },
+    ThenCannotViewProject: async () => {
+      expect(await sut.canViewProject(userId, projectId)).toEqual(false);
+    },
+    ThenCanViewProject: async () => {
+      expect(await sut.canViewProject(userId, projectId)).toEqual(true);
+      expect(repo.find).toHaveBeenCalledWith({
+        where: {
+          projectId,
+          userId,
+        },
+      });
+    },
+    ThenCannotPublishProject: async () => {
+      expect(await sut.canPublishProject(userId, projectId)).toEqual(false);
+    },
+    ThenCanPublishProject: async () => {
+      expect(await sut.canPublishProject(userId, projectId)).toEqual(true);
       expect(repo.find).toHaveBeenCalledWith({
         where: {
           projectId,
