@@ -49,6 +49,7 @@ const PublishedProjectPage: React.FC = () => {
         <ProjectDetail />
         <Footer />
       </main>
+
     </>
   );
 };

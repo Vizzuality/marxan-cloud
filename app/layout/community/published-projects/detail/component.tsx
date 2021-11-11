@@ -10,6 +10,7 @@ import { useScenarios } from 'hooks/scenarios';
 import PublishedProjectMap from 'layout/community/published-projects/detail/map';
 import Share from 'layout/community/published-projects/detail/share';
 import DuplicateButton from 'layout/community/published-projects/duplicate-button';
+import ComingSoon from 'layout/help/coming-soon';
 import Backlink from 'layout/statics/backlink';
 import Wrapper from 'layout/wrapper';
 
@@ -55,25 +56,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
           <Backlink href="/community/projects">
             Projects
           </Backlink>
-
           <div className="relative" style={{ minHeight: 600 }}>
-            {publishedProjectIsFetching && publishedProjectScenariosIsFetching && (
-              <div className="absolute flex items-center justify-center w-full h-full py-12">
-                <Loading
-                  className="w-10 h-10"
-                  iconClassName="w-10 h-10"
-                  visible
-                />
-              </div>
-            )}
 
             {publishedProject && scenarios && (
               <div className="flex flex-row">
                 <div className="w-7/12 pr-12">
 
-                  <h2
-                    className="mt-5 mb-12 text-4xl font-medium text-left font-heading"
-                  >
+                  <h2 className="mt-5 mb-12 text-4xl font-medium text-left font-heading">
                     {name}
                   </h2>
 
@@ -83,11 +72,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                   <div className="flex flex-row items-center mb-10">
 
-                    <DuplicateButton
-                      id={id}
-                      name={name}
-                      theme="dark"
-                    />
+                    <ComingSoon theme="dark" placement="top">
+                      <DuplicateButton
+                        id={id}
+                        name={name}
+                        theme="dark"
+                      />
+                    </ComingSoon>
 
                     {timesDuplicated && (
                       <p className="ml-5 text-sm">
@@ -99,7 +90,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 grid-rows-2 gap-y-11 gap-x-9">
+                  <div className="grid grid-cols-2 grid-rows-2 gap-y-9 gap-x-9">
 
                     {/* <div>
                         <h3 className="mb-5 text-sm font-semibold">Creators</h3>
@@ -121,23 +112,21 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                       <p className="text-lg">{planningArea}</p>
                     </div>
 
-                    <div>
-                      <h3 className="mb-6 text-sm font-semibold">Scenarios</h3>
-                      {!!scenarios.length && (
-                        <>
-                          <p className="text-sm">
-                            {scenarios?.length}
-                            {' '}
-                            scenarios
-                          </p>
-                          <p className="text-sm">
-                            Last creation:
-                            {' '}
-                            {scenarios[0].lastUpdateDistance}
-                          </p>
-                        </>
-                      )}
-                    </div>
+                    {!!scenarios.length && (
+                      <div>
+                        <h3 className="mb-6 text-sm font-semibold">Scenarios</h3>
+                        <p className="text-sm">
+                          {scenarios?.length}
+                          {' '}
+                          scenarios
+                        </p>
+                        <p className="text-sm">
+                          Last creation:
+                          {' '}
+                          {scenarios[0].lastUpdateDistance}
+                        </p>
+                      </div>
+                    )}
 
                     <Share />
 
@@ -154,9 +143,14 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
               </div>
             )}
           </div>
-
         </div>
       </Wrapper>
+      <Loading
+        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+        iconClassName="w-10 h-10 text-primary-500"
+        visible={publishedProjectIsFetching && publishedProjectScenariosIsFetching}
+      />
+
     </div>
   );
 };

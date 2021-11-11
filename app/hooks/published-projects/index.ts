@@ -18,7 +18,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
   const {
     search,
     filters = {},
-    sort = '-lastModifiedAt',
+    // sort = '-lastModifiedAt',
   } = options;
 
   const parsedFilters = Object.keys(filters)
@@ -38,9 +38,9 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
       ...search && {
         q: search,
       },
-      ...sort && {
-        sort,
-      },
+      // ...sort && {
+      //   sort,
+      // },
     },
   });
 
