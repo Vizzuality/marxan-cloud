@@ -1,5 +1,5 @@
 import { BotHttpClient, MarxanBotConfig } from "./marxan-bot.ts";
-import { CostSurface  } from "./cost-surface.ts";
+import { CostSurface } from "./cost-surface.ts";
 import { Organizations } from "./organizations.ts";
 import { Projects } from "./projects.ts";
 import { Scenarios } from "./scenarios.ts";
@@ -20,7 +20,7 @@ export interface Bot {
   scenarioStatus: ScenarioJobStatus;
   geoFeatures: GeoFeatures;
   geoFeatureSpecifications: GeoFeatureSpecifications;
-  geoFeatureUploader: GeoFeatureShapefiles,
+  geoFeatureUploader: GeoFeatureShapefiles;
   planningAreaUploader: PlanningAreas;
   protectedAreas: ProtectedAreas;
   marxanExecutor: MarxanCalculations;

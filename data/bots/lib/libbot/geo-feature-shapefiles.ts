@@ -5,19 +5,19 @@ import { logError, logInfo } from "./logger.ts";
 import { tookMs } from "./util/perf.ts";
 
 export interface GeoFeatureShapefile {
-  metadata: GeoFeatureMetadata,
-  localFilePath: string,
+  metadata: GeoFeatureMetadata;
+  localFilePath: string;
 }
 
 export enum FeatureTags {
-  bioregional = 'bioregional',
-  species = 'species',
+  bioregional = "bioregional",
+  species = "species",
 }
 
 interface GeoFeatureMetadata {
-  name: string,
-  type: FeatureTags,
-  description?: string,
+  name: string;
+  type: FeatureTags;
+  description?: string;
 }
 
 export class GeoFeatureShapefiles extends ShapefileUploader {
@@ -25,7 +25,10 @@ export class GeoFeatureShapefiles extends ShapefileUploader {
     super(httpClient);
   }
 
-  private async uploadFromFile(shapefile: GeoFeatureShapefile, projectId: string): Promise<string> {
+  private async uploadFromFile(
+    shapefile: GeoFeatureShapefile,
+    projectId: string,
+  ): Promise<string> {
     const opStart = Process.hrtime();
     const data = new Blob([await Deno.readFile(shapefile.localFilePath)]);
     const success = await (await this.sendData({
@@ -35,11 +38,11 @@ export class GeoFeatureShapefiles extends ShapefileUploader {
       fileName: `${crypto.randomUUID()}.zip`,
       headers: [["Authorization", `Bearer ${this.currentJwt}`]],
       extraFields: [
-        { key: 'name', value: shapefile.metadata.name },
-        { key: 'type', value: shapefile.metadata.type },
+        { key: "name", value: shapefile.metadata.name },
+        { key: "type", value: shapefile.metadata.type },
         // @todo properly handle description when it is available
         // { key: 'description', value: shapefile.metadata.description },
-      ]
+      ],
     }))
       .json()
       .then((data) => data?.success ?? false)
@@ -53,10 +56,14 @@ export class GeoFeatureShapefiles extends ShapefileUploader {
     return success;
   }
 
-  async uploadForProject(projectId: string, localFilePath: string, metadata: GeoFeatureMetadata): Promise<string> {
+  async uploadForProject(
+    projectId: string,
+    localFilePath: string,
+    metadata: GeoFeatureMetadata,
+  ): Promise<string> {
     return this.uploadFromFile({
       metadata,
-      localFilePath
-    }, projectId)
+      localFilePath,
+    }, projectId);
   }
 }

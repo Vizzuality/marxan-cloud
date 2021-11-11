@@ -5,13 +5,13 @@ import { logDebug, logError, logInfo } from "./logger.ts";
 import { tookMs } from "./util/perf.ts";
 
 enum PlanningAreaShapefileKind {
-  planningArea = 'planningArea',
-  planningGrid = 'planningGrid',
+  planningArea = "planningArea",
+  planningGrid = "planningGrid",
 }
 
 interface PlanningAreaShapefile {
-  kind: PlanningAreaShapefileKind,
-  localFilePath: string,
+  kind: PlanningAreaShapefileKind;
+  localFilePath: string;
 }
 
 export class PlanningAreas extends ShapefileUploader {
@@ -20,16 +20,18 @@ export class PlanningAreas extends ShapefileUploader {
   }
 
   private getUrl(kind: PlanningAreaShapefileKind): string {
-    if(kind === PlanningAreaShapefileKind.planningArea) {
+    if (kind === PlanningAreaShapefileKind.planningArea) {
       return `${this.baseUrl}/api/v1/projects/planning-area/shapefile`;
     }
-    if(kind === PlanningAreaShapefileKind.planningGrid) {
+    if (kind === PlanningAreaShapefileKind.planningGrid) {
       return `${this.baseUrl}/api/v1/projects/planning-area/shapefile-grid`;
     }
     throw new Error(`Unknown planning area shapefile kind: ${kind}`);
   }
 
-  private async uploadFromFile(shapefile: PlanningAreaShapefile): Promise<string> {
+  private async uploadFromFile(
+    shapefile: PlanningAreaShapefile,
+  ): Promise<string> {
     const opStart = Process.hrtime();
 
     const data = new Blob([await Deno.readFile(shapefile.localFilePath)]);
@@ -57,13 +59,13 @@ export class PlanningAreas extends ShapefileUploader {
     return this.uploadFromFile({
       kind: PlanningAreaShapefileKind.planningArea,
       localFilePath,
-    })
+    });
   }
 
   async setFromGridShapefile(localFilePath: string): Promise<string> {
     return this.uploadFromFile({
       kind: PlanningAreaShapefileKind.planningGrid,
       localFilePath,
-    })
+    });
   }
 }
