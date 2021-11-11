@@ -30,6 +30,8 @@ import {
   DuplicateProjectProps,
   UseUploadProjectPAGridProps,
   UploadProjectPAGridProps,
+  UsePublishProjectProps,
+  PublishProjectProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -315,6 +317,34 @@ export function useDuplicateProject({
       const { id } = data;
       queryClient.invalidateQueries('projects');
       queryClient.invalidateQueries(['projects', id]);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function usePublishProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UsePublishProjectProps) {
+  const [session] = useSession();
+
+  const publishProject = ({ id }: PublishProjectProps) => {
+    return PROJECTS.request({
+      url: `${id}/publish`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(publishProject, {
+    onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

@@ -55,3 +55,11 @@ export interface UseDuplicateProjectProps {
 export interface DuplicateProjectProps {
   id: string | string[];
 }
+
+// usePublishProject
+export interface UsePublishProjectProps {
+  requestConfig?: AxiosRequestConfig;
+}
+export interface PublishProjectProps {
+  id: string | string[];
+}
