@@ -65,7 +65,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
     });
   }, [pid, publishProjectMutation, addToast]);
 
-  const isPublic = !!publishedProjectsData.find((p) => p.id === projectData.id);
+  const isPublic = !!publishedProjectsData.find((p) => p?.id === projectData?.id);
 
   return (
     <AnimatePresence>
