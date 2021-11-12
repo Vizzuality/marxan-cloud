@@ -455,7 +455,7 @@ export function useScenarioPU(sid) {
   return useMemo(() => {
     const parsedData = data || [];
     const included = parsedData
-      .filter((p) => p.inclusionStatus === 'locked-in' || p.defaultStatus === 'locked-in')
+      .filter((p) => p.inclusionStatus === 'locked-in')
       .map((p) => p.id);
 
     const includedDefault = parsedData
@@ -463,7 +463,7 @@ export function useScenarioPU(sid) {
       .map((p) => p.id);
 
     const excluded = parsedData
-      .filter((p) => p.inclusionStatus === 'locked-out' || p.defaultStatus === 'locked-out')
+      .filter((p) => p.inclusionStatus === 'locked-out')
       .map((p) => p.id);
 
     const excludedDefault = parsedData
