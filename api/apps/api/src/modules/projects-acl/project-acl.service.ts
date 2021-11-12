@@ -22,8 +22,8 @@ export class ProjectAclService extends AccessControlService {
   private readonly canPublishProjectRoles = [Roles.project_owner];
   private readonly canViewProjectRoles = [
     Roles.project_owner,
-    Roles.project_admin,
-    Roles.project_user,
+    Roles.project_contributor,
+    Roles.project_viewer,
   ];
 
   constructor(
