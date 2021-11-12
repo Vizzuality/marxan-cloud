@@ -23,8 +23,8 @@ test(`no roles assigned at all`, async () => {
   await fixtures.ThenCannotViewProject();
 });
 
-test(`project user role assigned`, async () => {
-  fixtures.GivenProjectUserRoleIsAssigned();
+test(`project viewer role assigned`, async () => {
+  fixtures.GivenProjectViewerRoleIsAssigned();
   await fixtures.ThenCannotPublishProject();
   await fixtures.ThenCanCreateProject();
   await fixtures.ThenCanViewProject();
@@ -37,8 +37,8 @@ test(`project owner role assigned`, async () => {
   await fixtures.ThenCanViewProject();
 });
 
-test(`project admin role assigned`, async () => {
-  fixtures.GivenProjectAdminRoleIsAssigned();
+test(`project contributor role assigned`, async () => {
+  fixtures.GivenProjectContributorRoleIsAssigned();
   await fixtures.ThenCannotPublishProject();
   await fixtures.ThenCanCreateProject();
   await fixtures.ThenCanViewProject();
@@ -64,10 +64,10 @@ const getFixtures = async () => {
 
   return {
     GivenNoRoles: () => repo.find.mockImplementation(async () => []),
-    GivenProjectUserRoleIsAssigned: () =>
+    GivenProjectViewerRoleIsAssigned: () =>
       repo.find.mockImplementation(async () => [
         {
-          roleName: Roles.project_user,
+          roleName: Roles.project_viewer,
           projectId,
           userId,
         },
@@ -80,10 +80,10 @@ const getFixtures = async () => {
           userId,
         },
       ]),
-    GivenProjectAdminRoleIsAssigned: () =>
+    GivenProjectContributorRoleIsAssigned: () =>
       repo.find.mockImplementation(async () => [
         {
-          roleName: Roles.project_admin,
+          roleName: Roles.project_contributor,
           projectId,
           userId,
         },
