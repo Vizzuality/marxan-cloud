@@ -32,7 +32,9 @@ export class ProjectAclService extends AccessControlService {
   ) {
     super();
   }
-  // TODO: create a proper workflow to check project creation capabilities
+  // TODO: this will be changed in the following release of user requirements.
+  // For now, anyone should be able to create projects, regardless of having roles or not.
+  // In the future project creation will be limited to organization contributors, so this logic will be moved to the access control module
   async canCreateProject(_userId: string, _projectId: string): Promise<Permit> {
     return true;
   }
