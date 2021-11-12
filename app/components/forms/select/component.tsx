@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 
-import SingleSelect from 'components/forms/select/single';
 import MultipleSelect from 'components/forms/select/multi';
+import SingleSelect from 'components/forms/select/single';
 
 import { SelectProps } from './types';
 
@@ -15,6 +15,8 @@ export const Select: React.FC<SelectProps> = (props: SelectProps) => {
     initialSelected,
     onChange,
   } = props;
+
+  const isServer = typeof window === 'undefined';
 
   const initialValues = useMemo(() => {
     if (multiple) {
@@ -47,7 +49,7 @@ export const Select: React.FC<SelectProps> = (props: SelectProps) => {
     }
   }, [onChange]);
 
-  if (multiple) {
+  if (multiple && !isServer) {
     return (
       <MultipleSelect
         {...props}
@@ -61,17 +63,20 @@ export const Select: React.FC<SelectProps> = (props: SelectProps) => {
     );
   }
 
-  return (
-    <SingleSelect
-      {...props}
-      theme={theme}
-      size={size}
-      placeholder={placeholder}
-      initialValues={initialValues}
-      values={values}
-      onSelect={handleChange}
-    />
-  );
+  if (!multiple && !isServer) {
+    return (
+      <SingleSelect
+        {...props}
+        theme={theme}
+        size={size}
+        placeholder={placeholder}
+        initialValues={initialValues}
+        values={values}
+        onSelect={handleChange}
+      />
+    );
+  }
+  return null;
 };
 
 export default Select;

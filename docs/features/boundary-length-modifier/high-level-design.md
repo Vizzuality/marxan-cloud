@@ -18,9 +18,9 @@ https://invis.io/G211WEUZFST9#/459986030_Marxan_09a
   with one of the N BLM values generated from the initial default range bounds
   in the BLM calibration screen, or set there by the user
 * It may be desirable to set number of runs N as a config default; this number
-  is not expected to change once confirmed, and doing so would have implications
-  for the frontend, but it would help to make it a configurable setting at least
-  to avoid hardcoding assumptions in the code about the number of runs
+  is not expected to change once confirmed, but it would help to make it a
+  configurable setting at least to avoid hardcoding assumptions in the code
+  about the number of runs
 * A set of initial recommended BLM values should be calculated *at project
   creation stage* as this depends on the PU size, which will be known once the
   PU grid is set.
@@ -31,7 +31,7 @@ https://invis.io/G211WEUZFST9#/459986030_Marxan_09a
   calibration task using a given `[min, max]` range for BLM values (either the
   initial recommended ones, or those set by users)
 * User-set values should also be persisted and associated to a scenario: once
-  the BLM calibration process has finished the values will also be inferrable
+  the BLM calibration process has finished, the values will also be inferrable
   from the results, but until then there must be a way for the frontend to
   request the latest set values in order to render things even while calibration
   results are pending

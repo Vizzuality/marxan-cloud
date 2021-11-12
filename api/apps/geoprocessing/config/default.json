@@ -10,7 +10,7 @@
     "url": "http://api:3000"
   },
   "geo": {
-    "port": 3000
+    "daemonListenPort": 3000
   },
   "storage": {
     "sharedFileStorage": {

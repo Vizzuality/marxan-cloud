@@ -8,7 +8,6 @@ import cx from 'classnames';
 import { useSelect, useMultipleSelection } from 'downshift';
 
 import Checkbox from 'components/forms/checkbox';
-// Popper
 import {
   flipModifier, hideModifier, sameWidthModifier, offsetModifier,
 } from 'components/forms/select/constants/popper-modifiers';
