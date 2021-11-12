@@ -47,6 +47,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
   const query = useInfiniteQuery(['published-projects', JSON.stringify(options)], fetchPublishedProjects, {
     retry: false,
     keepPreviousData: true,
+    refetchInterval: 5000,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
       const { page, totalPages } = meta;

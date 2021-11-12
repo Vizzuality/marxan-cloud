@@ -1,20 +1,20 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import { createPortal } from 'react-dom';
-import cx from 'classnames';
 
+import { createPortal } from 'react-dom';
+import { usePopper } from 'react-popper';
+
+import cx from 'classnames';
 // Downshift;
 import { useSelect, useMultipleSelection } from 'downshift';
-import Toggle from 'components/forms/select/toggle';
-import Menu from 'components/forms/select/menu';
-import Checkbox from 'components/forms/checkbox';
 
+import Checkbox from 'components/forms/checkbox';
 // Popper
-import { usePopper } from 'react-popper';
 import {
   flipModifier, hideModifier, sameWidthModifier, offsetModifier,
 } from 'components/forms/select/constants/popper-modifiers';
 import THEME from 'components/forms/select/constants/theme';
-
+import Menu from 'components/forms/select/menu';
+import Toggle from 'components/forms/select/toggle';
 import { SelectProps, SelectOptionProps } from 'components/forms/select/types';
 
 export const MultiSelect: React.FC<SelectProps> = ({
@@ -299,7 +299,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
                       className="absolute bg-opacity-0 left-4 top-1.5"
                       checked={isSelected(option, selectedItems)}
                       disabled={option.disabled}
-                      onChange={() => {}}
+                      onChange={() => { }}
                     />
                   )}
                 </li>

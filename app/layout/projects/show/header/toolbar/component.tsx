@@ -7,6 +7,7 @@ import { usePlausible } from 'next-plausible';
 
 import { useMe } from 'hooks/me';
 import { useProject, usePublishProject } from 'hooks/projects';
+import { usePublishedProjects } from 'hooks/published-projects';
 import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
@@ -28,8 +29,10 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
   const plausible = usePlausible();
   const { addToast } = useToasts();
 
-  const { data } = useProject(pid);
+  const { data: projectData } = useProject(pid);
   const { user } = useMe();
+
+  const { data: publishedProjectsData } = usePublishedProjects({});
 
   const publishProjectMutation = usePublishProject({
     requestConfig: {
@@ -62,9 +65,11 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
     });
   }, [pid, publishProjectMutation, addToast]);
 
+  const isPublic = !!publishedProjectsData.find((p) => p.id === projectData.id);
+
   return (
     <AnimatePresence>
-      {data?.name && (
+      {projectData?.name && (
         <motion.div
           key="project-toolbar"
           initial={{ y: -10, opacity: 0 }}
@@ -74,6 +79,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
           <div className="flex space-x-4">
             <Button
               className="text-white"
+              disabled={isPublic}
               theme="primary-alt"
               size="base"
               onClick={onPublish}
@@ -132,7 +138,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
                         userId: `${user.id}`,
                         userEmail: `${user.email}`,
                         projectId: `${pid}`,
-                        projectName: `${data.name}`,
+                        projectName: `${projectData.name}`,
                       },
                     })}
                   >
