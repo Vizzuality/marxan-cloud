@@ -22,7 +22,10 @@ export class UsersProjectsApiEntity {
     type: `varchar`,
     name: `role_id`,
   })
-  roleName!: Roles.project_user | Roles.project_admin | Roles.project_owner;
+  roleName!:
+    | Roles.project_viewer
+    | Roles.project_contributor
+    | Roles.project_owner;
 
   @ManyToOne(() => Project, {
     onDelete: 'CASCADE',
