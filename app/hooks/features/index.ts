@@ -148,6 +148,9 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+    params: {
+      omitFields: 'properties',
+    },
   });
 
   const query = useQuery(['selected-features', sid], fetchFeatures, {
