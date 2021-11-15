@@ -34,6 +34,7 @@ beforeEach(async () => {
   sut = sandbox.get(ResultParserService);
 });
 
+// TODO fix inputs
 describe(`given empty content`, () => {
   it(`should return empty array`, async () => {
     expect(await sut.parse('')).toEqual([]);
