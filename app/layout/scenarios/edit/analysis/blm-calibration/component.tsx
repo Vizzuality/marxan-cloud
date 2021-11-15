@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
 
+import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+
 import { motion } from 'framer-motion';
 
+import Blm from 'layout/scenarios/edit/analysis/blm-calibration/blm';
+
 import Button from 'components/button';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
+import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Modal from 'components/modal';
@@ -54,21 +62,88 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
         <p>
           Select the BLM range and calibrate.
         </p>
-        <Button
-          theme="primary-alt"
-          size="base"
-          className="w-full"
-          onClick={() => setBlmModal(true)}
+        <FormRFF
+          onSubmit={() => console.log('onSubmit')}
+        // initialValues={INITIAL_VALUES}
         >
-          Calibrate BLM
-        </Button>
+
+          {({ handleSubmit }) => (
+            <form
+              className="flex flex-col flex-grow w-full space-y-5 overflow-hidden text-gray-500"
+              autoComplete="off"
+              noValidate
+              onSubmit={handleSubmit}
+            >
+              <div className="flex items-end">
+                <Label theme="dark" className="mr-5 text-sm uppercase opacity-50">From:</Label>
+                <div className="w-30">
+                  <FieldRFF
+                    name="blmCalibrationFrom"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="blmCalibrationFrom" {...fprops}>
+                        <Input
+                          mode="dashed"
+                          className="text-2xl"
+                          type="number"
+                          min={0}
+                          max={10000000}
+                          onChange={(e) => {
+                            fprops.input.onChange(+parseInt(e.target.value, 10));
+                          }}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
+              </div>
+
+              <div className="flex items-end">
+                <Label theme="dark" className="mr-10 text-sm uppercase opacity-50">To:</Label>
+                <div className="w-30">
+                  <FieldRFF
+                    name="blmCalibrationTo"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="blmCalibrationTo" {...fprops}>
+                        <Input
+                          mode="dashed"
+                          className="text-2xl"
+                          type="number"
+                          min={0}
+                          max={10000000}
+                          onChange={(e) => {
+                            fprops.input.onChange(+parseInt(e.target.value, 10));
+                          }}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
+                <p className="ml-5 text-sm">max 10.000.000</p>
+              </div>
+            </form>
+          )}
+        </FormRFF>
+        <div className="pt-5">
+          <Button
+            theme="primary-alt"
+            size="base"
+            className="w-full"
+            onClick={() => setBlmModal(true)}
+          >
+            Calibrate BLM
+          </Button>
+        </div>
         <Modal
           title="BLM"
           open={blmModal}
           size="wide"
           onDismiss={() => setBlmModal(false)}
         >
-          {/* <Calibrate /> */}
+          <Blm />
         </Modal>
       </div>
     </motion.div>
