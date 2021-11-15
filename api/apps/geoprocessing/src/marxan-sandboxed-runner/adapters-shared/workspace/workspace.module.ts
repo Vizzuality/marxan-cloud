@@ -8,8 +8,8 @@ import { SharedStorage, SharedStoragePath } from './shared-storage';
 
 import { WorkspaceService } from './workspace.service';
 import { MarxanConfig } from '../../marxan-config';
-import { MarxanDirectory } from '../marxan-directory.service';
-import { FileReader } from '../../adapters/file-reader';
+import { MarxanDirectory } from '../../adapters-single/marxan-directory.service';
+import { FileReader } from '../../adapters-single/file-reader';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 @Module({

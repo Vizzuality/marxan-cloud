@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JobData } from '@marxan/blm-calibration';
-import { SandboxRunner } from './sandbox-runner';
-import { WorkspaceBuilder } from './ports/workspace-builder';
-import { SandboxRunnerInputFiles } from './sandbox-runner-input-files';
-import { SandboxRunnerOutputHandler } from './sandbox-runner-output-handler';
+
+import { SandboxRunner } from '../sandbox-runner';
+import { WorkspaceBuilder } from '../ports/workspace-builder';
+import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
+import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
@@ -41,6 +42,11 @@ export class MarxanSandboxBlmRunnerService
      * single "fetch" may be performed there
      * or the SandboxRunnerInputFiles may be implemented
      * in such way to handle "single fetch"
+     */
+
+    /**
+     * it may be necessary to extract some single-run-adapters-single
+     * to be used there as well (like workspace)
      */
 
     return Promise.resolve(undefined);

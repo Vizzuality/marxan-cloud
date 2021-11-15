@@ -5,13 +5,14 @@ import { PassThrough } from 'stream';
 import { createReadStream } from 'fs';
 import { createInterface } from 'readline';
 
-import { SolutionTransformer } from './solution-row.transformer';
-import { SolutionRowResult } from '../solution-row-result';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
-import { PuToScenarioPu } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters/solutions-output/geo-output/solutions/output-file-parsing/pu-to-scenario-pu';
-import { SolutionsEvents } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters/solutions-output/geo-output/solutions/solutions-events';
+
+import { SolutionTransformer } from './solution-row.transformer';
+import { SolutionRowResult } from '../solution-row-result';
+import { PuToScenarioPu } from './pu-to-scenario-pu';
+import { SolutionsEvents } from '../solutions-events';
 
 @Injectable()
 export class SolutionsReaderService {
