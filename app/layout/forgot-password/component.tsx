@@ -42,7 +42,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = () => {
         addToast('success-request-recover-password', (
           <>
             <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Request sent.</p>
+            <p className="text-sm">If that email address is in our database, we will send you an email to reset your password.</p>
           </>
         ), {
           level: 'success',
@@ -54,7 +54,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = () => {
         addToast('error--request-recover-password', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Invalid email.</p>
+            <p className="text-sm">Try again!</p>
           </>
         ), {
           level: 'error',

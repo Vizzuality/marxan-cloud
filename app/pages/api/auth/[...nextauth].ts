@@ -1,9 +1,8 @@
+import JWT from 'jsonwebtoken';
 import NextAuth from 'next-auth';
 import Providers from 'next-auth/providers';
 
 import AUTHENTICATION from 'services/authentication';
-
-import JWT from 'jsonwebtoken';
 
 const MAX_AGE = 2 * 60 * 60; // 2 hours
 const SESSION_BUFFER_TIME = 10 * 60; // 10 minutes
