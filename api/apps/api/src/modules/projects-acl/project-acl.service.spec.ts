@@ -98,6 +98,7 @@ const getFixtures = async () => {
           projectId,
           userId,
         },
+        select: ['roleName'],
       });
     },
     ThenCannotViewProject: async () => {
@@ -110,6 +111,7 @@ const getFixtures = async () => {
           projectId,
           userId,
         },
+        select: ['roleName'],
       });
     },
     ThenCannotPublishProject: async () => {
@@ -122,6 +124,7 @@ const getFixtures = async () => {
           projectId,
           userId,
         },
+        select: ['roleName'],
       });
     },
   };
