@@ -7,17 +7,16 @@ type SomePartialResults = {};
 @Injectable()
 export class BlmPartialResultsRepository
   implements SandboxRunnerOutputHandler<SomePartialResults> {
+  cancel(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
   /**
    * save partial results (for given blm value)
    * to some temporary table
    *
    * would be used within BlmRunnerService, passed down to RunnerService
    */
-
-  cancel(): Promise<void> {
-    return Promise.resolve(undefined);
-  }
-
   async dump(
     workspace: Workspace,
     scenarioId: string,

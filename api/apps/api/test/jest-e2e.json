@@ -76,6 +76,8 @@
     "@marxan/planning-unit-features/(.*)": "<rootDir>/../../../libs/planning-unit-features/src/$1",
     "@marxan/planning-unit-features": "<rootDir>/../../../libs/planning-unit-features/src",
     "@marxan/projects/(.*)": "<rootDir>/../../../libs/projects/src/$1",
-    "@marxan/projects": "<rootDir>/../../../libs/projects/src"
+    "@marxan/projects": "<rootDir>/../../../libs/projects/src",
+    "@marxan/blm-calibration/(.*)": "<rootDir>/../../../libs/blm-calibration/src/$1",
+    "@marxan/blm-calibration": "<rootDir>/../../../libs/blm-calibration/src"
   }
 }

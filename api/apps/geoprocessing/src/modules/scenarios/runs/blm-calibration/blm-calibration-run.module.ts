@@ -1,24 +1,24 @@
 import { Module } from '@nestjs/common';
-import { RunWorker } from '../run.worker';
+
+import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
+import {
+  MarxanSandboxedRunnerModule,
+  SandboxRunner,
+} from '@marxan-geoprocessing/marxan-sandboxed-runner';
+
 import { sandboxRunnerToken } from '../tokens';
+import { RunWorker } from '../run.worker';
 
 import { runWorkerQueueNameProvider } from './queue-providers';
 
 @Module({
-  imports: [],
+  imports: [WorkerModule, MarxanSandboxedRunnerModule.forCalibration()],
   providers: [
     RunWorker,
     runWorkerQueueNameProvider,
     {
       provide: sandboxRunnerToken,
-      /**
-       * useClass and relevant runner
-       *
-       * BLM-specific runner could most likely be a "wrapper"
-       * over coordinating multiple runs -> and thus using
-       * MarxanSandboxRunnerService module itself under the hood
-       */
-      useValue: {},
+      useExisting: SandboxRunner,
     },
   ],
   exports: [],

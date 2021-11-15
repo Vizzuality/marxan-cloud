@@ -4,7 +4,7 @@ import * as nock from 'nock';
 import { v4 } from 'uuid';
 import { last } from 'lodash';
 
-import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
+import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
 import {
   ExecutionResult,
   MarxanExecutionMetadataGeoEntity,
@@ -19,6 +19,8 @@ import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit'
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { FeatureTag, ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
+import { SandboxRunner } from '@marxan-geoprocessing/marxan-sandboxed-runner';
+import { SingleRunAdapterModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/single-run-adapter.module';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -118,7 +120,11 @@ const getFixtures = async () => {
   const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> = app.get(
     getRepositoryToken(OutputScenariosFeaturesDataGeoEntity),
   );
-  const sut: MarxanSandboxRunnerService = app.get(MarxanSandboxRunnerService);
+  // note that SandboxRunner may be both single and blm-calibration one
+  const singleRunModuleContext = app.select(SingleRunAdapterModule);
+  const sut: MarxanSandboxRunnerService = singleRunModuleContext.get(
+    SandboxRunner,
+  );
 
   const nockScope = nock(host, {
     reqheaders: {
@@ -145,11 +151,13 @@ const getFixtures = async () => {
     progressMock: jest.fn(),
     async GivenMarxanIsRunning() {
       return await sut.run(
-        scenarioId,
-        resources.map((resource) => ({
-          url: host + resource.assetUrl,
-          relativeDestination: resource.targetRelativeDestination,
-        })),
+        {
+          scenarioId,
+          assets: resources.map((resource) => ({
+            url: host + resource.assetUrl,
+            relativeDestination: resource.targetRelativeDestination,
+          })),
+        },
         (value) => {
           this.progressMock(value);
         },

@@ -3,14 +3,15 @@ import { Test } from '@nestjs/testing';
 import { Job, Queue } from 'bullmq';
 import * as config from 'config';
 import waitForExpect from 'wait-for-expect';
-import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
-import { assertDefined, FieldsOf } from '@marxan/utils';
+import { assertDefined } from '@marxan/utils';
 import { JobData, ProgressData } from '@marxan/scenario-run-queue';
-import {
-  RunWorker,
-  runWorkerQueueNameToken,
-} from '@marxan-geoprocessing/modules/scenarios/runs/run.worker';
+import { RunWorker } from '@marxan-geoprocessing/modules/scenarios/runs/run.worker';
 import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
+import { SandboxRunner } from '@marxan-geoprocessing/marxan-sandboxed-runner';
+import {
+  runWorkerQueueNameToken,
+  sandboxRunnerToken,
+} from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -75,18 +76,19 @@ test(`killing run`, async () => {
 
 async function getFixtures() {
   const throwingMock = () => jest.fn<any, any>(fail);
-  type MockedMarxanRunner = jest.Mocked<FieldsOf<MarxanSandboxRunnerService>>;
-  class FakeMarxanRunner implements MockedMarxanRunner {
+
+  class FakeMarxanRunner implements SandboxRunner<any, any> {
     progressCallbacks: ((progress: number) => void)[] = [];
-    kill: MockedMarxanRunner['kill'] = throwingMock();
-    run: MockedMarxanRunner['run'] = throwingMock();
+    kill = throwingMock();
+    run = throwingMock();
   }
+
   const testingModule = await Test.createTestingModule({
     imports: [WorkerModule],
     providers: [
       FakeMarxanRunner,
       {
-        provide: MarxanSandboxRunnerService,
+        provide: sandboxRunnerToken,
         useExisting: FakeMarxanRunner,
       },
       RunWorker,
@@ -149,7 +151,7 @@ async function getFixtures() {
         return [];
       });
       this.fakeMarxanRunner.run.mockImplementation(
-        async (_1, _2, progressCallback) => {
+        async (_1, progressCallback) => {
           this.fakeMarxanRunner.progressCallbacks.push((value) => {
             progressCallback(value);
             release();
@@ -173,8 +175,10 @@ async function getFixtures() {
       await waitForExpect(() => {
         expect(fakeMarxanRunner.run).toBeCalledTimes(1);
         expect(fakeMarxanRunner.run).toBeCalledWith(
-          jobData.scenarioId,
-          jobData.assets,
+          {
+            assets: jobData.assets,
+            scenarioId: jobData.scenarioId,
+          },
           expect.any(Function),
         );
       });

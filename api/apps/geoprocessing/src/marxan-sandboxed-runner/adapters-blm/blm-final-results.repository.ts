@@ -5,17 +5,16 @@ import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
 @Injectable()
 export class BlmFinalResultsRepository
   implements SandboxRunnerOutputHandler<void> {
+  cancel(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
   /**
    * clear previous results, move the new ones to target
    * table - everything within transaction
    *
    * would be used in main BlmRunService after all runs finished
    */
-
-  cancel(): Promise<void> {
-    return Promise.resolve(undefined);
-  }
-
   dump(
     workspace: Workspace,
     scenarioId: string,

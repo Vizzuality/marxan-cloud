@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { MarxanSandboxedRunnerModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandboxed-runner.module';
-import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-sandbox-runner.service';
+import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
+import {
+  MarxanSandboxedRunnerModule,
+  SandboxRunner,
+} from '@marxan-geoprocessing/marxan-sandboxed-runner';
 
 import { sandboxRunnerToken } from '../tokens';
 import { RunWorker } from '../run.worker';
@@ -9,13 +12,13 @@ import { RunWorker } from '../run.worker';
 import { runWorkerQueueNameProvider } from './queue.providers';
 
 @Module({
-  imports: [MarxanSandboxedRunnerModule],
+  imports: [WorkerModule, MarxanSandboxedRunnerModule.forSingle()],
   providers: [
     RunWorker,
     runWorkerQueueNameProvider,
     {
       provide: sandboxRunnerToken,
-      useClass: MarxanSandboxRunnerService,
+      useExisting: SandboxRunner,
     },
   ],
   exports: [],

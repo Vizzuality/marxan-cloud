@@ -2,18 +2,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import AbortController from 'abort-controller';
 
 import { ExecutionResult } from '@marxan/marxan-output';
-
-import { MarxanRun } from './marxan-run';
-import { WorkspaceBuilder } from './ports/workspace-builder';
-import { Cancellable } from './ports/cancellable';
-import { Assets } from './adapters/scenario-data/input-files-fs';
-import { SandboxRunner } from './sandbox-runner';
-
-import { SandboxRunnerInputFiles } from './sandbox-runner-input-files';
-import { SandboxRunnerOutputHandler } from './sandbox-runner-output-handler';
 import { JobData } from '@marxan/scenario-run-queue';
 
-export { Assets };
+import { MarxanRun } from '../marxan-run';
+import { WorkspaceBuilder } from '../ports/workspace-builder';
+import { Cancellable } from '../ports/cancellable';
+import { SandboxRunner } from '../sandbox-runner';
+
+import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
+import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
 
 @Injectable()
 export class MarxanSandboxRunnerService
