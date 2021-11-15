@@ -18,12 +18,13 @@ const THEME = {
 };
 export interface ComingSoonProps {
   children: ReactChild;
-  placement?: string;
+  placement?: 'bottom' | 'top' | 'left' | 'right';
   theme?: 'dark' | 'light';
 }
 
 export const ComingSoon: React.FC<ComingSoonProps> = ({
   children,
+  placement = 'bottom',
   theme = 'light',
 }: ComingSoonProps) => {
   return (
@@ -32,7 +33,7 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
       arrowClassName={cx({
         [THEME[theme].arrow]: true,
       })}
-      placement="bottom"
+      placement={placement}
       maxWidth={350}
       content={(
         <div

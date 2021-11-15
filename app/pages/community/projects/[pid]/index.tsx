@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { withUser } from 'hoc/auth';
 import { withPublishedProject } from 'hoc/projects';
 
-import { usePublishedProject } from 'hooks/projects';
+import { usePublishedProject } from 'hooks/published-projects';
 
 import ProjectDetail from 'layout/community/published-projects/detail';
 import Footer from 'layout/footer';
@@ -49,6 +49,7 @@ const PublishedProjectPage: React.FC = () => {
         <ProjectDetail />
         <Footer />
       </main>
+
     </>
   );
 };

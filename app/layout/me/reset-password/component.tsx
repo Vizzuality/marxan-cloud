@@ -62,7 +62,7 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
         addToast('error-reset-password', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">It has not possible to change your password.</p>
+            <p className="text-sm">It has not been possible to change your password.</p>
           </>
         ), {
           level: 'error',

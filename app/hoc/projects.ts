@@ -11,22 +11,6 @@ export function withPublishedProject(getServerSidePropsFunc?: Function) {
   return async (context: any) => {
     const session = await getSession(context);
 
-    if (!session) {
-      if (getServerSidePropsFunc) {
-        const SSPF = await getServerSidePropsFunc(context) || {};
-
-        return {
-          props: {
-            ...SSPF.props,
-          },
-        };
-      }
-
-      return {
-        props: {},
-      };
-    }
-
     const { params } = context;
 
     const { pid } = params;
@@ -35,10 +19,7 @@ export function withPublishedProject(getServerSidePropsFunc?: Function) {
 
     await queryClient.prefetchQuery(['published-projects', pid], () => PROJECTS.request({
       method: 'GET',
-      url: `/${pid}`,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
+      url: `/published/${pid}`,
     }).then((response) => {
       return response.data;
     }));

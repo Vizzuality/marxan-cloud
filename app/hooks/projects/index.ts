@@ -13,7 +13,6 @@ import { formatDistance } from 'date-fns';
 import { useSession } from 'next-auth/client';
 
 import { ItemProps } from 'components/projects/item/component';
-import { PublishedItemProps } from 'components/projects/published-item/component';
 
 import PROJECTS from 'services/projects';
 import UPLOADS from 'services/uploads';
@@ -27,11 +26,12 @@ import {
   DeleteProjectProps,
   UseUploadProjectPAProps,
   UploadProjectPAProps,
-  UsePublishedProjectsProps,
   UseDuplicateProjectProps,
   DuplicateProjectProps,
   UseUploadProjectPAGridProps,
   UploadProjectPAGridProps,
+  UsePublishProjectProps,
+  PublishProjectProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -293,122 +293,6 @@ export function useUploadProjectPAGrid({
   });
 }
 
-export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
-  const [session] = useSession();
-
-  const {
-    search,
-    filters = {},
-    sort = '-lastModifiedAt',
-  } = options;
-
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k].toString(),
-      };
-    }, {});
-
-  const fetchPublishedProjects = ({ pageParam = 1 }) => PROJECTS.request({
-    method: 'GET',
-    url: '/',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': pageParam,
-      ...parsedFilters,
-      ...search && {
-        q: search,
-      },
-      ...sort && {
-        sort,
-      },
-    },
-  });
-
-  const query = useInfiniteQuery(['published-projects', JSON.stringify(options)], fetchPublishedProjects, {
-    retry: false,
-    keepPreviousData: true,
-    getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
-      const { page, totalPages } = meta;
-
-      const nextPage = page + 1 > totalPages ? null : page + 1;
-      return nextPage;
-    },
-  });
-
-  const { data } = query;
-  const { pages } = data || {};
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: { data: pageData } } = p;
-
-      return pageData.map((d): PublishedItemProps => {
-        const {
-          id, name, description, planningAreaName, timesDuplicated,
-        } = d;
-
-        const contributors = [
-          { id: 1, name: '', bgImage: '' },
-          { id: 2, name: '', bgImage: '' },
-        ];
-
-        return {
-          id,
-          name,
-          area: planningAreaName,
-          description,
-          timesDuplicated,
-          contributors,
-        };
-      });
-    })) : [];
-
-    return {
-      ...query,
-      data: parsedData,
-    };
-  }, [query, pages]);
-}
-
-export function usePublishedProject(id) {
-  const [session] = useSession();
-
-  const query = useQuery(['published-projects', id], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${id}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      include: 'scenarios,users',
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!id,
-  });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    const contributors = [
-      { id: 1, name: '', bgImage: '' },
-      { id: 2, name: '', bgImage: '' },
-    ];
-    const parsedData = { ...data?.data, contributors } || {};
-
-    return {
-      ...query,
-      data: parsedData,
-    };
-  }, [query, data?.data]);
-}
-
 export function useDuplicateProject({
   requestConfig = {
     method: 'POST',
@@ -433,6 +317,34 @@ export function useDuplicateProject({
       const { id } = data;
       queryClient.invalidateQueries('projects');
       queryClient.invalidateQueries(['projects', id]);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function usePublishProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UsePublishProjectProps) {
+  const [session] = useSession();
+
+  const publishProject = ({ id }: PublishProjectProps) => {
+    return PROJECTS.request({
+      url: `${id}/publish`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(publishProject, {
+    onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
