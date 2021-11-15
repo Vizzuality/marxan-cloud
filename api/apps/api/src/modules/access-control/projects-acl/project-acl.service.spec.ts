@@ -4,10 +4,9 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
-
+import { Roles } from '@marxan-api/modules/users/role.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
-import { Roles } from '../users/role.api.entity';
 import { ProjectAclService } from './project-acl.service';
 
 let fixtures: FixtureType<typeof getFixtures>;

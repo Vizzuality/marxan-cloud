@@ -1,22 +1,19 @@
 import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/users/role.api.entity';
-import { Injectable } from '@nestjs/common';
 
-import {
-  ProjectAccessControl,
-  Permit,
-} from '@marxan-api/modules/access-control/project-access-control';
+import { Permit, ProjectAccessControl } from './project-access-control';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
  * nor the Roles should belong to users
  */
 @Injectable()
-export class ProjectAclService extends ProjectAccessControl {
+export class ProjectAclService implements ProjectAccessControl {
   private readonly canCreateScenarioRoles = [Roles.project_owner];
   private readonly canEditScenarioRoles = [Roles.project_owner];
   private readonly canViewSolutionRoles = [Roles.project_owner];
@@ -46,9 +43,7 @@ export class ProjectAclService extends ProjectAccessControl {
   constructor(
     @InjectRepository(UsersProjectsApiEntity)
     private readonly roles: Repository<UsersProjectsApiEntity>,
-  ) {
-    super();
-  }
+  ) {}
 
   // TODO: this will be changed in the following release of user requirements.
   // For now, anyone should be able to create projects, regardless of having roles or not.
