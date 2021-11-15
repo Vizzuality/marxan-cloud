@@ -10,8 +10,20 @@ export type GetFailure = typeof unknownError | typeof projectNotFound;
 
 export interface ProjectBlm {
   id: string;
+
+  /**
+   * User-supplied or defaults if none provided,
+   */
   range: [number, number];
+
+  /**
+   * Calculated from range.
+   */
   values: number[];
+
+  /**
+   * Sets once at the project creation chain - once PU are known.
+   */
   defaults: number[];
 }
 
