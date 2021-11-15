@@ -46,7 +46,7 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
 
   -- Administrative regions table.
         CREATE TABLE "admin_regions" (
-          "id" uuid DEFAULT uuid_generate_v4(),
+          "id" uuid DEFAULT gen_random_uuid(),
           "the_geom" geometry(MultiPolygon,4326) CONSTRAINT admin_regions_geometry_valid_check CHECK (ST_IsValid(the_geom)),
           "name_0" varchar,
           "name_1" varchar,
@@ -69,7 +69,7 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
 
    -- Protected Areas table.
         CREATE TABLE "wdpa" (
-          "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+          "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
           "wdpaid" float8,
           "the_geom" geometry(MultiPolygon, 4326) CONSTRAINT wdpa_geometry_valid_check CHECK (ST_IsValid(the_geom)),
           "full_name" varchar,
@@ -86,7 +86,7 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
 
   -- Features data table (will hold species and bioma data).
         CREATE TABLE "features_data" (
-          "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+          "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
           "the_geom" geometry CONSTRAINT features_geometry_valid_check CHECK (ST_IsValid(the_geom)),
           "properties" jsonb,
           "source" source_type,
@@ -95,7 +95,7 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
 
   -- Usage of features data within scenarios table (will hold species and bioma data).
         CREATE TABLE "scenario_features_data" (
-          "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+          "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
           "feature_class_id" uuid,
           "scenario_id" uuid,
           "total_area" float8,
@@ -113,7 +113,7 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
 
         -- Planning units geometry data table.
         CREATE TABLE "planning_units_geom" (
-          "id" uuid DEFAULT uuid_generate_v4(),
+          "id" uuid DEFAULT gen_random_uuid(),
           "the_geom" geometry NOT NULL CONSTRAINT features_geometry_valid_check CHECK (ST_IsValid(the_geom)),
           "type" shape_type,
           "size" int,
@@ -128,7 +128,7 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
 
         -- Planning units usage by scenario.
         CREATE TABLE "scenarios_pu_data" (
-          "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+          "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
           "pu_geom_id" uuid NOT NULL,
           "scenario_id" uuid NOT NULL,
           "puid" int NOT NULL,
@@ -140,13 +140,13 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
 
         -- Cost data for planning units usage by scenario.
         CREATE TABLE "scenarios_pu_cost_data" (
-          "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+          "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
           "output_results_data_id" uuid NOT NULL,
           "cost" float8
         );
 
         CREATE TABLE "output_results_data" (
-          "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+          "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
           "puid" int,
           "scenario_id" uuid,
           "run_id" uuid,

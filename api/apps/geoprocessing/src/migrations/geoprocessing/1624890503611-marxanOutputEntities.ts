@@ -52,7 +52,7 @@ export class marxanOutputEntities1624890503611 implements MigrationInterface {
 
       -- Create output feature data that maps mv - files
       CREATE TABLE "output_scenarios_features_data" (
-        "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "feature_scenario_id" uuid NOT NULL,
         "run_id" int NOT NULL,
         "amount" float8,

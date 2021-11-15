@@ -17,7 +17,7 @@ export class InitialDataMetadataEntities1611329857558
       );
 
       CREATE TABLE "features" (
-        "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "feature_class_name" varchar,
         "alias" varchar,
         "description" varchar,
@@ -31,7 +31,7 @@ export class InitialDataMetadataEntities1611329857558
       );
 
       CREATE TABLE "scenarios" (
-        "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "name" varchar,
         "project_id" uuid NOT NULL REFERENCES "projects" ("id"),
         "country_id" varchar(3) NOT NULL,
@@ -50,7 +50,7 @@ export class InitialDataMetadataEntities1611329857558
       );
 
       CREATE TABLE "output_results" (
-        "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "scenarios_id" uuid REFERENCES "scenarios" ("id"),
         "run_id" int,
         "score" float8,
