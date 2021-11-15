@@ -26,6 +26,23 @@ export class ProjectAclService extends AccessControlService {
     Roles.project_viewer,
   ];
 
+  private async getRolesWithinProject(
+    roles: Repository<UsersProjectsApiEntity>,
+    userId: string,
+    projectId: string,
+  ): Promise<Array<string>> {
+    const rolesToCheck = (
+      await roles.find({
+        where: {
+          projectId,
+          userId,
+        },
+        select: ['roleName'],
+      })
+    ).flatMap((role) => role.roleName);
+    return rolesToCheck;
+  }
+
   constructor(
     @InjectRepository(UsersProjectsApiEntity)
     private readonly roles: Repository<UsersProjectsApiEntity>,
@@ -40,64 +57,49 @@ export class ProjectAclService extends AccessControlService {
   }
 
   async canViewProject(userId: string, projectId: string): Promise<Permit> {
-    const roles = (
-      await this.roles.find({
-        where: {
-          projectId,
-          userId,
-        },
-      })
-    ).flatMap((role) => role.roleName);
+    const roles = await this.getRolesWithinProject(
+      this.roles,
+      userId,
+      projectId,
+    );
 
     return intersection(roles, this.canViewProjectRoles).length > 0;
   }
 
   async canPublishProject(userId: string, projectId: string): Promise<Permit> {
-    const roles = (
-      await this.roles.find({
-        where: {
-          projectId,
-          userId,
-        },
-      })
-    ).flatMap((role) => role.roleName);
+    const roles = await this.getRolesWithinProject(
+      this.roles,
+      userId,
+      projectId,
+    );
 
     return intersection(roles, this.canPublishProjectRoles).length > 0;
   }
 
   async canCreateScenario(userId: string, projectId: string): Promise<Permit> {
-    const roles = (
-      await this.roles.find({
-        where: {
-          projectId,
-          userId,
-        },
-      })
-    ).flatMap((role) => role.roleName);
+    const roles = await this.getRolesWithinProject(
+      this.roles,
+      userId,
+      projectId,
+    );
 
     return intersection(roles, this.canCreateScenarioRoles).length > 0;
   }
   async canEditScenario(userId: string, projectId: string): Promise<Permit> {
-    const roles = (
-      await this.roles.find({
-        where: {
-          projectId,
-          userId,
-        },
-      })
-    ).flatMap((role) => role.roleName);
+    const roles = await this.getRolesWithinProject(
+      this.roles,
+      userId,
+      projectId,
+    );
 
     return intersection(roles, this.canEditScenarioRoles).length > 0;
   }
   async canViewSolutions(userId: string, projectId: string): Promise<Permit> {
-    const roles = (
-      await this.roles.find({
-        where: {
-          projectId,
-          userId,
-        },
-      })
-    ).flatMap((role) => role.roleName);
+    const roles = await this.getRolesWithinProject(
+      this.roles,
+      userId,
+      projectId,
+    );
 
     return intersection(roles, this.canViewSolutionRoles).length > 0;
   }
