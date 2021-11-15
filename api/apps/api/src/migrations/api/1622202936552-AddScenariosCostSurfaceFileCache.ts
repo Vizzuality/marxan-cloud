@@ -8,7 +8,7 @@ export class AddScenariosCostSurfaceFileCache1622202936552
     `);
     await queryRunner.query(`
       CREATE TABLE "cost_surface_file_cache" (
-          "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
+          "id" uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
           "scenarioId" uuid NOT NULL REFERENCES scenarios(id) ON DELETE CASCADE ON UPDATE CASCADE,
           "artifact" oid,
           "artifactType" "cost_surface_file_cache_artifactType_enum" NOT NULL,

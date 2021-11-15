@@ -12,7 +12,7 @@ UPDATE users SET created_at = now() WHERE created_at IS NULL;
 ALTER TABLE users ALTER COLUMN created_at SET NOT NULL;
 
 CREATE TABLE organizations (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name varchar NOT NULL,
   created_at timestamp NOT NULL default now()
 );
@@ -24,7 +24,7 @@ CREATE TABLE roles (
 );
 
 CREATE TABLE projects (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name varchar NOT NULL,
   organization_id uuid NOT NULL references organizations(id),
   created_at timestamp NOT NULL default now()

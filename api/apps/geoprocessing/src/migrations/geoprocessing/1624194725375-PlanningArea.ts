@@ -5,7 +5,7 @@ export class PlanningArea1624194725375 implements MigrationInterface {
     await queryRunner.query(
       `
 CREATE TABLE planning_areas (
-  id uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
   created_at TIMESTAMP DEFAULT now(),
   project_id uuid,
   the_geom geometry(MultiPolygon, 4326) NOT NULL CONSTRAINT planning_area_the_geom_check CHECK (ST_IsValid(the_geom)),
