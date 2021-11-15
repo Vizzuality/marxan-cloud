@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FetchSpecification } from 'nestjs-base-service';
 import { ProjectsRequest } from '@marxan-api/modules/projects/project-requests-info';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
-import { AccessControlService } from '@marxan-api/modules/access-control';
+import { ProjectAccessControl } from '@marxan-api/modules/access-control';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
@@ -23,7 +23,7 @@ export class PublishedProjectService {
   constructor(
     @InjectRepository(Project) private projectRepository: Repository<Project>,
     private crudService: PublishedProjectCrudService,
-    private readonly acl: AccessControlService,
+    private readonly acl: ProjectAccessControl,
   ) {}
 
   async publish(
