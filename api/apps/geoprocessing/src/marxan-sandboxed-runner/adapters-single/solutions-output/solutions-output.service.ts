@@ -54,15 +54,22 @@ export class SolutionsOutputService
         `Output (solutions matrix) is missing from the marxan run.`,
       );
     }
-    await this.geoOutputRepository.save(scenarioId, runDirectories, {
-      stdOutput,
-      stdError: stdErr,
-    });
+    const planningUnitsSelection = await this.geoOutputRepository.save(
+      scenarioId,
+      runDirectories,
+      {
+        stdOutput,
+        stdError: stdErr,
+      },
+    );
 
     const runsSummary = (
       await promises.readFile(runDirectories.output + `/output_sum.csv`)
     ).toString();
-    return await this.resultParserService.parse(runsSummary);
+    return await this.resultParserService.parse(
+      runsSummary,
+      planningUnitsSelection,
+    );
   }
 
   async dumpFailure(

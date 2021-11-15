@@ -7,6 +7,7 @@ import { chunk } from 'lodash';
 
 import { MostDifferentService } from './most-different.service';
 import { BestSolutionService } from './best-solution.service';
+import { PlanningUnitsSelectionState } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters/solutions-output/geo-output/solutions/planning-unit-selection-state';
 
 @Injectable()
 export class ResultParserService {
@@ -15,7 +16,10 @@ export class ResultParserService {
     private readonly bestSolution: BestSolutionService,
   ) {}
 
-  async parse(csvContent: string): Promise<ExecutionResult> {
+  async parse(
+    csvContent: string,
+    planningUnitSelection: PlanningUnitsSelectionState,
+  ): Promise<ExecutionResult> {
     const chunks = chunk(csvContent.split('\n').slice(1), 100);
 
     const results: ExecutionResult = [];
@@ -57,6 +61,7 @@ export class ResultParserService {
           mpm: +mpm,
           best: false,
           distinctFive: false,
+          puValues: [],
         });
         if (validateSync(entry).length > 0) {
           throw new Error(
@@ -112,6 +117,9 @@ export class ResultParserService {
               // different solutions are tagged as such via
               // `MostDifferentService`.
               distinctFive: false,
+              puValues: planningUnitSelection['1'].values.map((b) =>
+                b ? 1 : 0,
+              ),
             });
             if (validateSync(entry).length > 0) {
               throw new Error(

@@ -15,6 +15,7 @@ export class PlanningUnitSelectionCalculatorService {
       solutionsStream.on('finish', () => resolve(result));
       solutionsStream.on('data', (planningUnits) => {
         for (const pu of planningUnits) {
+          // TODO anotherResult[pu.runId] = values [...]
           result[pu.spdId] ??= {
             values: [],
             usedCount: 0,
