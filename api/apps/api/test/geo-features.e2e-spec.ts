@@ -25,7 +25,7 @@ describe('GeoFeaturesModule (e2e)', () => {
   let jwtToken: string;
 
   const geoFeaturesFilters = {
-    cheeta: { featureClassName: 'iucn_acinonyxjubatus', alias: 'cheetah' },
+    cheeta: { featureClassName: 'demo_acinonyx_jubatus', alias: 'Acinonyx_jubatus' },
     partialMatches: { us: 'us' },
   };
 
@@ -98,7 +98,7 @@ describe('GeoFeaturesModule (e2e)', () => {
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
 
-        expect(response.body.data).toHaveLength(4);
+        expect(response.body.data).toHaveLength(5);
       });
       test('should return all available features if query param has no value', async () => {
         const response = await request(app.getHttpServer())
@@ -106,7 +106,7 @@ describe('GeoFeaturesModule (e2e)', () => {
           .set('Authorization', `Bearer ${jwtToken}`)
           .expect(HttpStatus.OK);
 
-        expect(response.body.data).toHaveLength(7);
+        expect(response.body.data).toHaveLength(9);
       });
     });
   });

@@ -37,9 +37,9 @@ describe('ProxyVectorTilesModule (e2e)', () => {
    */
   const country = 'NAM';
   const l1AdminArea = 'NAM.13_1';
-  const l2AdminArea = 'NAM.13.5_1';
+  const l2AdminArea = 'NAM.13.4_1';
   const _geoFeaturesFilters = {
-    cheeta: { featureClassName: 'iucn_acinonyxjubatus', alias: 'cheetah' },
+    acinonyx: { featureClassName: 'demo_acinonyx_jubatus', alias: 'Acinonyx_jubatus' },
     partialMatches: { us: 'us' },
   };
 

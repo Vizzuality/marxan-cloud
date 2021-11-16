@@ -1,13 +1,5 @@
 
-INSERT INTO features
+INSERT INTO features 
 (feature_class_name, alias, description, property_name, intersection, tag, creation_status, created_by)
 VALUES
-('iucn_acinonyxjubatus', null, null, 'binomial', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')),
-('iucn_anomalurusderbianus', null, null, 'binomial', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')),
-('iucn_antidorcasmarsupialis', null, null, 'binomial', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')),
-('iucn_aonyxcapensis', null, null, 'binomial', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')),
-('iucn_crocidurahirta', null, null, 'binomial', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')),
-('iucn_dendrohyraxarboreus', null, null, 'binomial', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')),
-('iucn_epomophoruswahlbergi', null, null, 'binomial', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')),
-('iucn_otolemurcrassicaudatus', null, null, 'binomial', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')),
-('iucn_pantherapardus', null, null, 'binomial', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com'));
+('demo_acinonyx_jubatus', 'Acinonyx_jubatus', null, ' name', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')), ('demo_bucorvus_leadbeateri', 'Bucorvus_leadbeateri', null, ' id', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')), ('demo_ceratotherium_simum', 'Ceratotherium_simum', null, ' name', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')), ('demo_civettictis_civetta', 'Civettictis_civetta', null, ' id', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')), ('demo_diceros_bicornis', 'Diceros_bicornis', null, ' name', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')), ('demo_equus_quagga', 'Equus_quagga', null, ' name', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')), ('demo_giraffa_camelopardalis', 'Giraffa_camelopardalis', null, ' name', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')), ('demo_kobus_leche', 'Kobus_leche', null, ' name', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com')), ('demo_panthera_pardus', 'Panthera_pardus', null, ' name', null, 'species', 'created', (SELECT id FROM users WHERE email = 'aa@example.com'));

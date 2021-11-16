@@ -80,7 +80,7 @@ clean-slate: stop clean-slate-full-stop-and-cleanup
 test-clean-slate: clean-slate-full-stop-and-cleanup
 
 # setup full testing data
-seed-dbs: seed-api-with-test-data | seed-geoapi-with-test-data
+seed-dbs: seed-api-with-test-data
 
 seed-api-with-test-data: seed-api-init-data | seed-geoapi-init-data
 	@echo "$(RED)seeding db with testing project and scenarios:$(NC) $(API_DB_INSTANCE)"
@@ -89,13 +89,6 @@ seed-api-with-test-data: seed-api-init-data | seed-geoapi-init-data
 seed-api-init-data:
 	@echo "$(RED)seeding initial dbs:$(NC) $(API_DB_INSTANCE)"
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${_API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-init-apidb.sql
-
-seed-geoapi-with-test-data:
-	@echo "$(RED)seeding initial geodata for created projects and scenarios:$(NC) $(GEO_DB_INSTANCE)"
-	@SCENARIOID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from scenarios where name = 'Example scenario 1 Project 1 Org 1'"); \
-	USERID=$(shell docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${_API_POSTGRES_USER}" -c "select id from users limit 1"); \
-	echo "appending data for scenario with id $${SCENARIOID} for user with id $${USERID}"; \
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" -e "s/\$$scenario/$$SCENARIOID/g" api/apps/api/test/fixtures/test-geodata.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${_GEO_POSTGRES_USER}";
 
 seed-geoapi-init-data:
 	@echo "$(RED)seeding dbs with initial geodata:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE)"
@@ -111,7 +104,7 @@ seed-geoapi-init-data:
 
 # need notebook service to execute a expecific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
-	docker-compose -f ./data/docker-compose.yml exec -T marxan-science-notebooks papermill work/notebooks/Lab/convert_csv_sql.ipynb /dev/null
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose.yml exec marxan-science-notebooks papermill --progress-bar --log-output work/notebooks/Lab/convert_csv_sql.ipynb /dev/null
 	mv -f -u -Z data/data/processed/test-wdpa-data.sql api/apps/api/test/fixtures/test-wdpa-data.sql
 	mv -f -u -Z data/data/processed/test-admin-data.sql api/apps/api/test/fixtures/test-admin-data.sql
 	mv -f -u -Z data/data/processed/test-features.sql api/apps/api/test/fixtures/test-features.sql
@@ -190,7 +183,7 @@ restore-volumes-data:
 	docker run --rm --volumes-from marxan-postgresql-geo-api -v $$(pwd)/data/data/processed/db_volumes:/backup ubuntu bash -c "rm -rf /var/lib/postgresql/data/* && cd / && tar xvf /backup/psql-geo-data.tar"
 extract-geo-test-data:
 	#This location correspond with the Okavango delta touching partially Botswana, Angola Zambia and Namibia
-	TEST_GEOMETRY=$(shell cat api/apps/api/test/fixtures/test-geometry.json | jq 'tostring'); \
+	TEST_GEOMETRY=$(shell cat api/apps/api/test/fixtures/test-geometry-subset.json | jq 'tostring'); \
 	docker-compose exec -T postgresql-geo-api psql -U "${_GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM admin_regions WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_admin_regions_okavango.csv; \
 	docker-compose exec -T postgresql-geo-api psql -U "${_GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM wdpa WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_wdpa_okavango.csv; \
 	docker-compose exec -T postgresql-geo-api psql -U "${_GEO_POSTGRES_USER}" -c "COPY (SELECT * FROM features_data WHERE st_intersects(the_geom, st_geomfromgeojson('$${TEST_GEOMETRY}'))) TO STDOUT DELIMITER ',' CSV HEADER;" > data/data/processed/geo_features_data_okavango.csv;
