@@ -1,4 +1,4 @@
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class Shapefile {
@@ -21,6 +21,7 @@ export class JobInput {
   @Type(() => Shapefile)
   shapefile!: Shapefile;
 
+  @IsOptional()
   @IsString()
   name?: string;
 }
