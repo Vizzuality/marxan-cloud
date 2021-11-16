@@ -12,34 +12,37 @@ afterEach(async () => {
   await fixtures?.cleanup();
 });
 
-test(`getting BRA.2_1 protected areas for scenario`, async () => {
-  const scenarioId: string = await fixtures.GivenScenarioInsideBRA21WasCreated();
+test(`selecting protected areas`, async () => {
+  const scenario: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
+  const areaId = await fixtures.GivenCustomProtectedAreaWasAddedToProject();
+  await fixtures.GivenAreasWereSelected(scenario, IUCNCategory.III, areaId);
+
+  const areas = await fixtures.WhenGettingProtectedAreas(scenario);
+
+  await fixtures.ThenItContainsSelectedGlobalArea(areas, IUCNCategory.III);
+  await fixtures.ThenItContainsSelectedCustomArea(areas, areaId);
+
+  await fixtures.ThenCalculationsOfProtectionLevelWereTriggered(scenario);
+});
+
+test(`getting NAM.2_1 protected areas for scenario`, async () => {
+  const scenarioId: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
   const areas = await fixtures.WhenGettingProtectedAreas(scenarioId);
   await fixtures.ThenInContainsRelevantWdpa(areas);
 });
 
-test(`adding custom protected area / selected global area`, async () => {
-  const scenarioIdWithAddedArea: string = await fixtures.GivenScenarioInsideBRA21WasCreated();
-  const scenarioIdWithoutAddedArea: string = await fixtures.GivenScenarioInsideBRA21WasCreated();
-
-  await fixtures.GivenCustomProtectedAreaWasAdded(scenarioIdWithAddedArea);
-  await fixtures.GivenWdpaCategoryWasSelected(
-    scenarioIdWithAddedArea,
-    IUCNCategory.III,
-  );
+test(`adding custom protected area`, async () => {
+  const scenarioIdWithAddedArea: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
+  const scenarioIdWithoutAddedArea: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
+  await fixtures.GivenCustomProtectedAreaWasAddedToProject();
 
   const areasWithCustom = await fixtures.WhenGettingProtectedAreas(
     scenarioIdWithAddedArea,
   );
-
   const areasWithExplicitCustom = await fixtures.WhenGettingProtectedAreas(
     scenarioIdWithoutAddedArea,
   );
 
-  await fixtures.ThenItContainsSelectedGlobalArea(
-    areasWithCustom,
-    IUCNCategory.III,
-  );
-  await fixtures.ThenItContainsSelectedCustomArea(areasWithCustom);
+  await fixtures.ThenItContainsNonSelectedCustomArea(areasWithCustom);
   await fixtures.ThenItContainsNonSelectedCustomArea(areasWithExplicitCustom);
 });
