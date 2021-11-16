@@ -49,7 +49,7 @@ export class ProtectedAreaService {
       return left(submissionFailed);
     }
 
-    const kind = API_EVENT_KINDS.project__protectedAreas__submitted__v1__alpha;
+    const kind = API_EVENT_KINDS.scenario__protectedAreas__submitted__v1__alpha;
     try {
       await this.apiEvents.create({
         externalId: job.id + kind,
