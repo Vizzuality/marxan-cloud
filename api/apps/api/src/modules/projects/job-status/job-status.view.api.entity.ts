@@ -136,4 +136,10 @@ const eventToJobStatusMapping: Record<ValuesType<ScenarioEvents>, JobStatus> = {
     JobStatus.failure,
   [API_EVENT_KINDS.scenario__featuresWithPuIntersection__finished__v1__alpha1]:
     JobStatus.done,
+  [API_EVENT_KINDS.scenario__protectedAreas__submitted__v1__alpha]:
+    JobStatus.running,
+  [API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha]:
+    JobStatus.failure,
+  [API_EVENT_KINDS.scenario__protectedAreas__finished__v1__alpha]:
+    JobStatus.done,
 };
