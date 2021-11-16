@@ -6,15 +6,24 @@ import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 
 import {
-  scenarioProtectedAreaQueueProvider,
-  scenarioProtectedAreaQueueEventsProvider,
   scenarioProtectedAreaEventsFactoryProvider,
+  scenarioProtectedAreaQueueEventsProvider,
+  scenarioProtectedAreaQueueProvider,
 } from './queue.providers';
 import { AddProtectedAreaHandler } from './add-protected-area.handler';
 import { ProtectedAreaService } from './protected-area.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProtectedArea } from '@marxan/protected-areas';
-import { apiConnections } from '@marxan-api/ormconfig';
+import { Scenario } from '../scenario.api.entity';
+import {
+  ProtectionStatusModule,
+  ScenariosPlanningUnitGeoEntity,
+  ScenariosPuOutputGeoEntity,
+} from '@marxan/scenarios-planning-unit';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+
+import { SelectionGetService } from './selection-get.service';
+import { SelectionChangeModule } from './selection/selection-change.module';
 
 @Module({
   imports: [
@@ -22,14 +31,22 @@ import { apiConnections } from '@marxan-api/ormconfig';
     ApiEventsModule,
     CqrsModule,
     TypeOrmModule.forFeature(
-      [ProtectedArea],
-      apiConnections.geoprocessingDB.name,
+      [
+        ProtectedArea,
+        ScenariosPlanningUnitGeoEntity,
+        ScenariosPuOutputGeoEntity,
+      ],
+      DbConnections.geoprocessingDB,
     ),
+    ProtectionStatusModule.for(DbConnections.geoprocessingDB),
+    SelectionChangeModule,
+    TypeOrmModule.forFeature([Scenario]),
     PlanningAreasModule,
   ],
   providers: [
     AddProtectedAreaHandler,
     ProtectedAreaService,
+    SelectionGetService,
     scenarioProtectedAreaQueueProvider,
     scenarioProtectedAreaQueueEventsProvider,
     scenarioProtectedAreaEventsFactoryProvider,

@@ -6,7 +6,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { Either, left, right } from 'fp-ts/Either';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
+import { PlanningAreasService } from '@marxan-api/modules/planning-areas/planning-areas.service';
 import { isDefined } from '@marxan/utils';
 
 export const doesntExist = Symbol(`doesn't exist`);

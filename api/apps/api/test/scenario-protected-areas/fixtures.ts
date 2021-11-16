@@ -11,20 +11,18 @@ import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
-
-import { ProtectedAreaService } from '@marxan-api/modules/scenarios/protected-area';
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { CommandBus, ICommand } from '@nestjs/cqrs';
+import { CalculatePlanningUnitsProtectionLevel } from '@marxan-api/modules/planning-units-protection-level';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const cleanups: (() => Promise<void>)[] = [];
+  const commands: ICommand[] = [];
 
   const wdpa: Repository<ProtectedArea> = app.get(
     getRepositoryToken(ProtectedArea, DbConnections.geoprocessingDB),
   );
-  const scenarios: Repository<Scenario> = app.get(getRepositoryToken(Scenario));
-
-  const protectedAreasService = app.get(ProtectedAreaService);
+  const commandBus = app.get(CommandBus);
   // Namibia, Otjozondjupa
   const countryCode = `NAM`;
   const adminAreaLevel1Id = `NAM.4_1`;
@@ -37,14 +35,25 @@ export const getFixtures = async () => {
     adminAreaLevel1Id,
   });
 
+  commandBus.subscribe((command) => {
+    commands.push(command);
+  });
+
   cleanups.push(cleanup);
+  cleanups.push(() =>
+    wdpa
+      .delete({
+        projectId,
+      })
+      .then(() => void 0),
+  );
 
   return {
     cleanup: async () => {
       await Promise.all(cleanups.map((clean) => clean()));
       await app.close();
     },
-    GivenScenarioInsideBRA21WasCreated: async () => {
+    GivenScenarioInsideNAM41WasCreated: async () => {
       const { id } = await GivenScenarioExists(app, projectId, token);
       return id;
     },
@@ -81,10 +90,8 @@ export const getFixtures = async () => {
         },
       ]);
     },
-    GivenCustomProtectedAreaWasAdded: async (
-      scenarioIdWithAddedArea: string,
-    ) => {
-      await wdpa.query(
+    GivenCustomProtectedAreaWasAddedToProject: async () => {
+      const ids: { id: string }[] = await wdpa.query(
         `
           INSERT INTO "wdpa"("the_geom", "project_id", "full_name")
           SELECT ST_SetSRID(
@@ -96,6 +103,7 @@ export const getFixtures = async () => {
           FROM (
                  SELECT json_array_elements($1::json -> 'features') AS features
                ) AS f
+          RETURNING id;
         `,
         [
           readFileSync(__dirname + `/nam-protected-area.geojson`),
@@ -103,15 +111,17 @@ export const getFixtures = async () => {
           customAreaName,
         ],
       );
-      // TODO emit ProtectedAreaCreatedEvent once it has its handler
-      // to make sure to act as the job was finished
+      return ids[0].id;
     },
-    ThenItContainsSelectedCustomArea: async (response: any[]) => {
-      expect(response.find((e) => e.kind === `project`)).toEqual({
-        id: expect.any(String),
+    ThenItContainsSelectedCustomArea: async (
+      response: any[],
+      areaId: string,
+    ) => {
+      expect(response.find((e) => e.id === areaId)).toEqual({
+        id: areaId,
         kind: `project`,
         name: customAreaName,
-        selected: false, // TODO true once implemented
+        selected: true,
       });
     },
     ThenItContainsNonSelectedCustomArea: async (response: any[]) => {
@@ -122,25 +132,28 @@ export const getFixtures = async () => {
         selected: false,
       });
     },
-    GivenWdpaCategoryWasSelected: async (
-      scenarioIdWithAddedArea: string,
+    GivenAreasWereSelected: async (
+      scenarioId: string,
       category: IUCNCategory,
-    ) => {
-      // replace with common action/rest once it is implemented
-      const globalAreas = await protectedAreasService.getGlobalProtectedAreas({
-        countryId: countryCode,
-        adminAreaLevel1: adminAreaLevel1Id,
-      });
-      const areasInCategory = globalAreas.areas[category];
-      await scenarios.update(
-        {
-          id: scenarioIdWithAddedArea,
-        },
-        {
-          protectedAreaFilterByIds: [areasInCategory[0]],
-        },
-      );
-    },
+      customPaId: string,
+    ) =>
+      request(app.getHttpServer())
+        .post(`/api/v1/scenarios/${scenarioId}/protected-areas`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          areas: [
+            {
+              id: category,
+              selected: true,
+            },
+            {
+              id: customPaId,
+              selected: true,
+            },
+          ],
+          threshold: 50,
+        })
+        .then((response) => response.body),
     ThenItContainsSelectedGlobalArea: async (
       response: any[],
       category: IUCNCategory,
@@ -151,6 +164,15 @@ export const getFixtures = async () => {
         name: category,
         selected: true,
       });
+    },
+    ThenCalculationsOfProtectionLevelWereTriggered: async (
+      scenario: string,
+    ) => {
+      expect(
+        (commands.find(
+          (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
+        ) as CalculatePlanningUnitsProtectionLevel | undefined)?.scenarioId,
+      ).toEqual(scenario);
     },
   };
 };
