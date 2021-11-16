@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useSelector } from 'react-redux';
+
+import { useRouter } from 'next/router';
 
 import { format } from 'd3';
 import { motion } from 'framer-motion';
@@ -25,9 +28,15 @@ export interface ScenariosBLMCalibrationProps {
 export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = ({
   onChangeSection,
 }: ScenariosBLMCalibrationProps) => {
+  const { query } = useRouter();
+  const { sid } = query;
+
   const [blmModal, setBlmModal] = useState(false);
   const minBlmValue = 0;
   const maxBlmValue = 10000000;
+
+  const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
   return (
     <motion.div
       key="cost-surface"
@@ -146,6 +155,9 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
             Calibrate BLM
           </Button>
         </div>
+        {blm && (
+          <p> hay blm </p>
+        )}
         <Modal
           title="BLM"
           open={blmModal}

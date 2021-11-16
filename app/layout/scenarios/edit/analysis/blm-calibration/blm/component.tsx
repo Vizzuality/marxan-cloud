@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useDispatch } from 'react-redux';
+
+import { useRouter } from 'next/router';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { format } from 'd3';
 
@@ -25,9 +30,20 @@ export const ScenariosBlm: React.FC<ScenariosBlmProps> = ({
   minBlmValue,
   setBlmModal,
 }: ScenariosBlmProps) => {
+  const { query } = useRouter();
+  const { sid } = query;
+
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setBlm } = scenarioSlice.actions;
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setBlm(null));
+  }, [dispatch, setBlm]);
+
   const onSaveBlm = (values) => {
-    console.log('blmCalibration', values.blmCalibration);
-    // dispatch blm and get on parent component
+    dispatch(setBlm(values?.blmCalibration));
     setBlmModal(false);
   };
 
