@@ -2,10 +2,10 @@ import {
   CommandBus,
   CommandHandler,
   IInferredCommandHandler,
-  CqrsModule,
   EventBus,
   ICommand,
   IEvent,
+  CqrsModule,
 } from '@nestjs/cqrs';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
@@ -24,10 +24,11 @@ import {
 import { CalculatePlanningUnitsProtectionLevel } from '@marxan-api/modules/planning-units-protection-level';
 
 import { ScenarioProtectedArea } from '../scenario-protected-area';
+import { SelectionGetService } from '../getter/selection-get.service';
 
 import { SelectionUpdateService } from './selection-update.service';
-import { SelectionGetService } from '../selection-get.service';
-import { SelectionChangeModule } from './selection-change.module';
+import { UpdatePlanningUnitsHandler } from './update-planning-units.handler';
+import { SelectionChangedSaga } from './selection-changed.saga';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -57,16 +58,26 @@ test(`selecting protected areas`, async () => {
 const getFixtures = async () => {
   const scenarioRepoToken = getRepositoryToken(Scenario);
   const sandbox = await Test.createTestingModule({
-    imports: [SelectionChangeModule],
-    providers: [CalculatePuHandler],
-  })
-    .overrideProvider(SelectionGetService)
-    .useClass(Selection)
-    .overrideProvider(ScenarioPlanningUnitsProtectedStatusCalculatorService)
-    .useClass(PlanningUnits)
-    .overrideProvider(scenarioRepoToken)
-    .useClass(ScenarioRepo)
-    .compile();
+    imports: [CqrsModule],
+    providers: [
+      SelectionUpdateService,
+      UpdatePlanningUnitsHandler,
+      SelectionChangedSaga,
+      CalculatePuHandler,
+      {
+        provide: SelectionGetService,
+        useClass: Selection,
+      },
+      {
+        provide: ScenarioPlanningUnitsProtectedStatusCalculatorService,
+        useClass: PlanningUnits,
+      },
+      {
+        provide: scenarioRepoToken,
+        useClass: ScenarioRepo,
+      },
+    ],
+  }).compile();
 
   await sandbox.init();
 
