@@ -125,8 +125,7 @@ test-start-services: clean-slate
 
 seed-dbs-e2e: test-start-services
 	$(MAKE) seed-api-with-test-data
-	$(MAKE) seed-geoapi-with-test-data
-	
+
 test-e2e-api: seed-dbs-e2e
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./apps/api/entrypoint.sh test-e2e
 
