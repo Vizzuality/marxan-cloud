@@ -17,7 +17,7 @@ case "$1" in
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (geoprocessing db) for e2e Tests(ESC)[0m"
         sleep 15
-        exec yarn geoprocessing:typeorm migration:run
+        exec yarn geoprocessing:typeorm migration:run -t each
         ;;
     start)
         echo "Running Start"
