@@ -1,87 +1,113 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-import { useRouter } from 'next/router';
+import { format } from 'd3';
 
-import cx from 'classnames';
-
-import { useScenario } from 'hooks/scenarios';
-
+import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
+import InfoButton from 'components/info-button';
+import BLMChart from 'components/scenarios/blm-chart/component';
 
-import { FIELDS } from './constants';
+import { DATA } from './constants';
 
 export interface ScenariosBlmProps {
+  maxBlmValue: number,
+  minBlmValue: number,
+  setBlmModal: (blmModal: boolean) => void,
 }
 
-export const ScenariosBlm: React.FC<ScenariosBlmProps> = () => {
-  const { query } = useRouter();
-  const { sid } = query;
-
-  const { data: scenarioData } = useScenario(sid);
-
-  const INITIAL_VALUES = useMemo(() => {
-    return FIELDS.reduce((acc, f) => {
-      const scenarioParamters = scenarioData?.metadata?.marxanInputParameterFile || {};
-
-      return {
-        ...acc,
-        [f.id]: scenarioParamters[f.id] || f.default,
-      };
-    }, {});
-  }, [scenarioData]);
+export const ScenariosBlm: React.FC<ScenariosBlmProps> = ({
+  maxBlmValue,
+  minBlmValue,
+  setBlmModal,
+}: ScenariosBlmProps) => {
+  const onSaveBlm = (values) => {
+    console.log('blmCalibration', values.blmCalibration);
+    // dispatch blm and get on parent component
+    setBlmModal(false);
+  };
 
   return (
-    <FormRFF
-      onSubmit={() => console.log('onSubmit')}
-      initialValues={INITIAL_VALUES}
-    >
+    <div className="flex">
+      <FormRFF onSubmit={onSaveBlm}>
 
-      {({ handleSubmit }) => (
-        <form
-          className={cx({
-            'px-10 w-full overflow-hidden flex flex-col flex-grow text-gray-500': true,
-          })}
-          autoComplete="off"
-          noValidate
-          onSubmit={handleSubmit}
-        >
-          <h2 className="text-2xl font-medium font-heading">Calibrate BLM</h2>
-          <p className="pt-5 text-sm">Select one of the graph dots or introduce the BLM number.</p>
-          <div className="flex flex-col mt-4">
-            <Label theme="light" className="uppercase text-xxs">BLM:</Label>
+        {({ handleSubmit, form }) => {
+          const { valid } = form.getState();
 
-            <div className="w-full">
-              <FieldRFF
-                name="blmCalibration"
-                validate={composeValidators([{ presence: true }])}
+          return (
+            <form
+              className="flex flex-col flex-grow w-1/5 px-10 overflow-hidden text-gray-500"
+              autoComplete="off"
+              noValidate
+              onSubmit={handleSubmit}
+            >
+
+              <h2 className="text-2xl font-medium font-heading">Calibrate BLM</h2>
+
+              <p className="pt-5 text-sm mb-7">Select one of the graph dots or introduce the BLM number.</p>
+
+              <div className="flex flex-col">
+                <div className="flex items-center space-x-2">
+                  <Label theme="light" className="text-lg font-medium uppercase font-heading">BLM:</Label>
+                  <InfoButton
+                    size="s"
+                    theme="secondary"
+                  >
+                    <h4 className="font-heading text-lg mb-2.5">What is BLM?</h4>
+                  </InfoButton>
+                </div>
+                <div className="flex items-end w-full space-x-5">
+                  <FieldRFF
+                    name="blmCalibration"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="blmCalibration" {...fprops}>
+                        <Input
+                          mode="dashed"
+                          theme="light"
+                          className="text-2xl"
+                          type="number"
+                          min={minBlmValue}
+                          max={maxBlmValue}
+                          onChange={(e) => {
+                            if (!e.target.value) {
+                              return fprops.input.onChange(null);
+                            }
+                            return fprops.input.onChange(+e.target.value);
+                          }}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                  <p className="text-sm whitespace-pre opacity-50">{`max ${format(',d')(maxBlmValue)}`}</p>
+                </div>
+              </div>
+
+              <Button
+                className="mt-auto"
+                disabled={!valid}
+                theme="primary"
+                size="xl"
+                type="submit"
               >
-                {(fprops) => (
-                  <Field id="blmCalibration" {...fprops}>
-                    <Input
-                      mode="dashed"
-                      className="text-2xl"
-                      type="number"
-                      min={0}
-                      max={10000000}
-                      onChange={(e) => {
-                        fprops.input.onChange(+parseInt(e.target.value, 10));
-                      }}
-                    />
-                  </Field>
-                )}
-              </FieldRFF>
-            </div>
-          </div>
-        </form>
+                Save
+              </Button>
 
-      )}
+            </form>
+          );
+        }}
+      </FormRFF>
 
-    </FormRFF>
+      <div className="relative z-20 w-3/5 mt-20 mr-10 h-96">
+        <BLMChart data={DATA} />
+      </div>
+
+    </div>
   );
 };
 

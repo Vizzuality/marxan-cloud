@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
+import { format } from 'd3';
 import { motion } from 'framer-motion';
 
 import Blm from 'layout/scenarios/edit/analysis/blm-calibration/blm';
@@ -25,6 +26,8 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   onChangeSection,
 }: ScenariosBLMCalibrationProps) => {
   const [blmModal, setBlmModal] = useState(false);
+  const minBlmValue = 0;
+  const maxBlmValue = 10000000;
   return (
     <motion.div
       key="cost-surface"
@@ -87,10 +90,13 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                           mode="dashed"
                           className="text-2xl"
                           type="number"
-                          min={0}
-                          max={10000000}
+                          min={minBlmValue}
+                          max={maxBlmValue}
                           onChange={(e) => {
-                            fprops.input.onChange(+parseInt(e.target.value, 10));
+                            if (!e.target.value) {
+                              return fprops.input.onChange(null);
+                            }
+                            return fprops.input.onChange(+e.target.value);
                           }}
                         />
                       </Field>
@@ -112,17 +118,20 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                           mode="dashed"
                           className="text-2xl"
                           type="number"
-                          min={0}
-                          max={10000000}
+                          min={minBlmValue}
+                          max={maxBlmValue}
                           onChange={(e) => {
-                            fprops.input.onChange(+parseInt(e.target.value, 10));
+                            if (!e.target.value) {
+                              return fprops.input.onChange(null);
+                            }
+                            return fprops.input.onChange(+e.target.value);
                           }}
                         />
                       </Field>
                     )}
                   </FieldRFF>
                 </div>
-                <p className="ml-5 text-sm">max 10.000.000</p>
+                <p className="ml-5 text-sm">{`max ${format(',d')(maxBlmValue)}`}</p>
               </div>
             </form>
           )}
@@ -143,7 +152,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
           size="wide"
           onDismiss={() => setBlmModal(false)}
         >
-          <Blm />
+          <Blm setBlmModal={setBlmModal} maxBlmValue={maxBlmValue} minBlmValue={minBlmValue} />
         </Modal>
       </div>
     </motion.div>
