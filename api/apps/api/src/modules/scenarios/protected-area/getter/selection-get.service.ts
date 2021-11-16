@@ -12,8 +12,8 @@ import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.s
 import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
-import { ScenarioProtectedArea } from './scenario-protected-area';
-import { ProtectedAreaKind } from './protected-area.kind';
+import { ScenarioProtectedArea } from '../scenario-protected-area';
+import { ProtectedAreaKind } from '../protected-area.kind';
 
 @Injectable()
 export class SelectionGetService {

@@ -8,7 +8,7 @@ import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { ProtectionStatusModule } from '@marxan/scenarios-planning-unit';
 
-import { SelectionGetService } from '../selection-get.service';
+import { SelectionGetterModule } from '../getter/selection-getter.module';
 
 import { SelectionUpdateService } from './selection-update.service';
 import { SelectionChangedSaga } from './selection-changed.saga';
@@ -21,12 +21,12 @@ import { UpdatePlanningUnitsHandler } from './update-planning-units.handler';
     TypeOrmModule.forFeature([ProtectedArea], DbConnections.geoprocessingDB),
     ProtectionStatusModule.for(DbConnections.geoprocessingDB),
     PlanningAreasModule,
+    SelectionGetterModule,
   ],
   providers: [
     SelectionUpdateService,
     UpdatePlanningUnitsHandler,
     SelectionChangedSaga,
-    SelectionGetService,
   ],
   exports: [SelectionUpdateService],
 })
