@@ -130,13 +130,15 @@ test-start-services: clean-slate
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./apps/api/entrypoint.sh run-migrations-for-e2e-tests && \
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh run-migrations-for-e2e-tests
 
-test-e2e-api:
+seed-dbs-e2e: test-start-services
+
+test-e2e-api: seed-dbs-e2e
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./apps/api/entrypoint.sh test-e2e
 
-test-e2e-geoprocessing:
+test-e2e-geoprocessing: seed-dbs-e2e
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
 
-test-e2e-backend: test-start-services | seed-dbs test-e2e-api test-e2e-geoprocessing
+test-e2e-backend: test-e2e-api test-e2e-geoprocessing
 	$(MAKE) test-clean-slate
 
 run-test-e2e-local:
