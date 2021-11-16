@@ -31,17 +31,18 @@ describe('ScenariosModule (e2e)', () => {
 
   describe('Scenarios', () => {
     let aScenario: { id: string; type: 'scenarios' };
-    let projects: { id: string }[] = [];
+    let projects: { id: string; type: string }[] = [];
 
-    it('Gets projects', async () => {
+    beforeEach(async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200);
+      projects = response.body.data;
+    });
 
-      const resources = response.body.data;
-      projects = resources;
-      expect(resources[0].type).toBe('projects');
+    it('Gets projects', async () => {
+      expect(projects[0].type).toBe('projects');
     });
 
     it('Creating a scenario with incomplete data should fail', async () => {
@@ -80,8 +81,7 @@ describe('ScenariosModule (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .send(createScenarioDTO)
-        .expect(201);
+        .send(createScenarioDTO);
       const job = Object.values(queue.jobs)[0];
 
       aScenario = response.body.data;
@@ -183,10 +183,7 @@ describe('ScenariosModule (e2e)', () => {
             },
           },
         })
-        // .expect(400)
         .then((response) => {
-          console.log(response.body);
-          console.log(response.text);
           expect(
             response.body.errors[0].meta.rawError.response.message[0]
               .constraints.isEnum,
