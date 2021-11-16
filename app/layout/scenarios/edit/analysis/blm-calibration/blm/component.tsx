@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -38,18 +38,25 @@ export const ScenariosBlm: React.FC<ScenariosBlmProps> = ({
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(setBlm(null));
-  }, [dispatch, setBlm]);
+  const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
-  const onSaveBlm = (values) => {
+  const onSaveBlm = useCallback((values) => {
     dispatch(setBlm(values?.blmCalibration));
     setBlmModal(false);
-  };
+  }, [dispatch, setBlm, setBlmModal]);
+
+  const INITIAL_VALUES = useMemo(() => {
+    return {
+      blmCalibration: blm,
+    };
+  }, [blm]);
 
   return (
     <div className="flex">
-      <FormRFF onSubmit={onSaveBlm}>
+      <FormRFF
+        onSubmit={onSaveBlm}
+        initialValues={INITIAL_VALUES}
+      >
 
         {({ handleSubmit, form }) => {
           const { valid } = form.getState();

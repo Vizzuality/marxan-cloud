@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { format } from 'd3';
 import { motion } from 'framer-motion';
@@ -19,6 +21,7 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Modal from 'components/modal';
 
+import HEXAGON_SVG from 'svgs/map/hexagon.svg';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ScenariosBLMCalibrationProps {
@@ -32,10 +35,27 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   const { sid } = query;
 
   const [blmModal, setBlmModal] = useState(false);
+
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setBlm } = scenarioSlice.actions;
+
+  const dispatch = useDispatch();
+
   const minBlmValue = 0;
   const maxBlmValue = 10000000;
 
   const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
+  useEffect(() => {
+    dispatch(setBlm(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const INITIAL_VALUES = useMemo(() => {
+    return {
+      settedBlm: blm,
+    };
+  }, [blm]);
 
   return (
     <motion.div
@@ -76,7 +96,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
         </p>
         <FormRFF
           onSubmit={() => console.log('onSubmit')}
-        // initialValues={INITIAL_VALUES}
+          initialValues={INITIAL_VALUES}
         >
 
           {({ handleSubmit }) => (
@@ -142,22 +162,65 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                 </div>
                 <p className="ml-5 text-sm">{`max ${format(',d')(maxBlmValue)}`}</p>
               </div>
+
+              <div className="pt-5">
+                <Button
+                  theme="primary-alt"
+                  size="base"
+                  className="w-full"
+                  onClick={() => setBlmModal(true)}
+                >
+                  Calibrate BLM
+                </Button>
+              </div>
+
+              {!!blm && (
+                <>
+                  <div className="flex flex-col pt-5">
+                    <Label theme="dark" className="mr-10 text-sm uppercase">BLM</Label>
+                    <div className="w-20">
+                      <FieldRFF
+                        name="settedBlm"
+                        validate={composeValidators([{ presence: true }])}
+                      >
+                        {(fprops) => (
+                          <Field id="settedBlm" {...fprops}>
+                            <Input
+                              mode="dashed"
+                              className="text-2xl"
+                              type="number"
+                              min={minBlmValue}
+                              max={maxBlmValue}
+                              onChange={(e) => {
+                                if (!e.target.value) {
+                                  return fprops.input.onChange(null);
+                                }
+                                return fprops.input.onChange(+e.target.value);
+                              }}
+                            />
+                          </Field>
+                        )}
+                      </FieldRFF>
+                    </div>
+                  </div>
+                  <div className="pt-5">
+                    <Button
+                      theme="secondary"
+                      size="base"
+                      className="relative w-full"
+                      onClick={() => setBlmModal(true)}
+                    >
+                      View BLM Graph
+                      <Icon icon={HEXAGON_SVG} className="absolute right-6 w-3.5 h-3.5 stroke-current text-white stroke-2 fill-none" />
+                    </Button>
+                  </div>
+                </>
+              )}
+
             </form>
           )}
         </FormRFF>
-        <div className="pt-5">
-          <Button
-            theme="primary-alt"
-            size="base"
-            className="w-full"
-            onClick={() => setBlmModal(true)}
-          >
-            Calibrate BLM
-          </Button>
-        </div>
-        {blm && (
-          <p> hay blm </p>
-        )}
+
         <Modal
           title="BLM"
           open={blmModal}
