@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ConflictException,
   Controller,
@@ -93,6 +94,10 @@ import {
 } from '@marxan-api/decorators/file-interceptors.decorator';
 import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-area.dto';
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
+import {
+  ProtectedAreaChangeDto,
+  ProtectedAreasChangeDto,
+} from '@marxan-api/modules/scenarios/dto/protected-area-change.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -665,6 +670,28 @@ export class ScenariosController {
     }
 
     return result.right;
+  }
+
+  @ApiOkResponse({
+    type: ProtectedAreaDto,
+    isArray: true,
+  })
+  @Post(`:id/protected-areas`)
+  async updateProtectedAreasForScenario(
+    @Param('id') scenarioId: string,
+    @Body(new ValidationPipe()) dto: ProtectedAreasChangeDto,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ProtectedAreaDto[]> {
+    const result = await this.service.updateProtectedAreasFor(scenarioId, dto, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      // TODO map error
+      throw new BadRequestException();
+    }
+
+    return this.getProtectedAreasForScenario(scenarioId, req);
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
