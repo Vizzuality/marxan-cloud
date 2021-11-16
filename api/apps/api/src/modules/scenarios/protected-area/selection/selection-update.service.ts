@@ -8,7 +8,7 @@ import { ProjectSnapshot } from '@marxan/projects';
 
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
-import { SelectionGetService } from '../selection-get.service';
+import { SelectionGetService } from '../getter/selection-get.service';
 import { SelectProtectedArea } from '../select-protected-area';
 import { ProtectedAreaKind } from '../protected-area.kind';
 import { ProtectedAreaUnlinked } from '../protected-area-unlinked';
