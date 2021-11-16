@@ -19,17 +19,17 @@ import BLMChart from 'components/scenarios/blm-chart/component';
 
 import { DATA } from './constants';
 
-export interface ScenariosBlmProps {
+export interface ScenariosBlmSettingsGraphProps {
   maxBlmValue: number,
   minBlmValue: number,
   setBlmModal: (blmModal: boolean) => void,
 }
 
-export const ScenariosBlm: React.FC<ScenariosBlmProps> = ({
+export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps> = ({
   maxBlmValue,
   minBlmValue,
   setBlmModal,
-}: ScenariosBlmProps) => {
+}: ScenariosBlmSettingsGraphProps) => {
   const { query } = useRouter();
   const { sid } = query;
 
@@ -134,4 +134,4 @@ export const ScenariosBlm: React.FC<ScenariosBlmProps> = ({
   );
 };
 
-export default ScenariosBlm;
+export default ScenariosBlmSettingsGraph;

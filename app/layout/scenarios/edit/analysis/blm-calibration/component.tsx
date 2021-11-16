@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,7 +12,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { format } from 'd3';
 import { motion } from 'framer-motion';
 
-import Blm from 'layout/scenarios/edit/analysis/blm-calibration/blm';
+import BlmSettingsGraph from 'layout/scenarios/edit/analysis/blm-calibration/blm-settings-graph';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -37,25 +39,36 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   const [blmModal, setBlmModal] = useState(false);
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setBlm } = scenarioSlice.actions;
+  const { setBlm, setBlmRange } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
 
   const minBlmValue = 0;
   const maxBlmValue = 10000000;
 
-  const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { blm, blmRange } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   useEffect(() => {
     dispatch(setBlm(null));
+    dispatch(setBlmRange([]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const onSaveBlmRange = useCallback((values) => {
+    const { blmCalibrationFrom, blmCalibrationTo } = values;
+    const range = [blmCalibrationFrom, blmCalibrationTo];
+    dispatch(setBlmRange(range));
+    setBlmModal(true);
+  }, [dispatch, setBlmRange]);
+
   const INITIAL_VALUES = useMemo(() => {
     return {
+      blmCalibrationFrom: blmRange[0],
+      blmCalibrationTo: blmRange[1],
       settedBlm: blm,
+
     };
-  }, [blm]);
+  }, [blm, blmRange]);
 
   return (
     <motion.div
@@ -95,7 +108,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
           Select the BLM range and calibrate.
         </p>
         <FormRFF
-          onSubmit={() => console.log('onSubmit')}
+          onSubmit={onSaveBlmRange}
           initialValues={INITIAL_VALUES}
         >
 
@@ -165,10 +178,10 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
 
               <div className="pt-5">
                 <Button
+                  type="submit"
                   theme="primary-alt"
                   size="base"
                   className="w-full"
-                  onClick={() => setBlmModal(true)}
                 >
                   Calibrate BLM
                 </Button>
@@ -227,7 +240,11 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
           size="wide"
           onDismiss={() => setBlmModal(false)}
         >
-          <Blm setBlmModal={setBlmModal} maxBlmValue={maxBlmValue} minBlmValue={minBlmValue} />
+          <BlmSettingsGraph
+            setBlmModal={setBlmModal}
+            maxBlmValue={maxBlmValue}
+            minBlmValue={minBlmValue}
+          />
         </Modal>
       </div>
     </motion.div>
