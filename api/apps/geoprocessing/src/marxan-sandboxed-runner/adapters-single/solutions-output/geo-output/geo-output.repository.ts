@@ -70,11 +70,11 @@ export class GeoOutputRepository {
 
       this.logger.debug(
         `Deleting ${
-          Object.keys(planningUnitsState).length
+          Object.keys(planningUnitsState.puSelectionState).length
         } output scenario planning units...`,
       );
       for (const [index, ospuChunk] of chunk(
-        Object.keys(planningUnitsState),
+        Object.keys(planningUnitsState.puSelectionState),
         CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
       ).entries()) {
         this.logger.debug(
@@ -117,13 +117,13 @@ export class GeoOutputRepository {
       }
 
       const chunkedOutputScenariosPuData = chunk(
-        Object.entries(planningUnitsState),
+        Object.entries(planningUnitsState.puSelectionState),
         CHUNK_SIZE_FOR_BATCH_SUMMARY,
       );
 
       this.logger.debug(
         `Inserting ${
-          Object.keys(planningUnitsState).length
+          Object.keys(planningUnitsState.puSelectionState).length
         } output scenario planning units...`,
       );
       await Promise.all(
