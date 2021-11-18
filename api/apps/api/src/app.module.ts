@@ -33,6 +33,7 @@ import { SpecificationModule } from '@marxan-api/modules/specification';
 import { ScenarioSpecificationModule } from './modules/scenario-specification';
 import { PublishedProjectModule } from '@marxan-api/modules/published-project/published-project.module';
 import { BlmValuesModule } from '@marxan-api/modules/blm';
+import { ProjectAclModule } from './modules/access-control/projects-acl/project-acl.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { BlmValuesModule } from '@marxan-api/modules/blm';
     ScenarioSpecificationModule,
     PublishedProjectModule,
     BlmValuesModule,
+    ProjectAclModule,
   ],
   controllers: [AppController, PingController],
   providers: [
