@@ -43,10 +43,32 @@ test(`project contributor role assigned`, async () => {
   await fixtures.ThenCanViewProject();
 });
 
+test(`project has multiple users`, async () => {
+  fixtures.GivenProjectHasMultipleUsers();
+  await fixtures.ThenCanFindNumberOfUsersInProject();
+});
+
+test(`project owner is found in project`, async () => {
+  fixtures.GivenProjectOwnerIsFoundInProject();
+  await fixtures.ThenUserIsOwner();
+});
+
+test(`project owner is found in project`, async () => {
+  fixtures.GivenProjectOwnerIsFoundInProject();
+  await fixtures.ThenUserIsOwner();
+});
+
 const getFixtures = async () => {
   const repo: jest.Mocked<Pick<Repository<UsersProjectsApiEntity>, 'find'>> = {
     find: jest.fn(),
   };
+
+  const repoExtended: jest.Mocked<
+    Pick<Repository<UsersProjectsApiEntity>, 'findOne'>
+  > = {
+    findOne: jest.fn(),
+  };
+
   const sandbox = await Test.createTestingModule({
     providers: [
       ProjectAclService,
@@ -60,6 +82,7 @@ const getFixtures = async () => {
   const sut = sandbox.get(ProjectAclService);
   const projectId = v4();
   const userId = v4();
+  const viewerUserId = v4();
 
   return {
     GivenNoRoles: () => repo.find.mockImplementation(async () => []),
@@ -87,6 +110,27 @@ const getFixtures = async () => {
           userId,
         },
       ]),
+    GivenProjectHasMultipleUsers: () =>
+      repo.find.mockImplementation(async () => [
+        {
+          roleName: Roles.project_contributor,
+          projectId,
+          userId,
+        },
+        {
+          roleName: Roles.project_viewer,
+          projectId,
+          userId: viewerUserId,
+        },
+      ]),
+    GivenProjectOwnerIsFoundInProject: () =>
+      repoExtended.findOne.mockImplementation(async () => {
+        return {
+          roleName: Roles.project_owner,
+          projectId,
+          userId,
+        };
+      }),
     ThenCannotCreateProject: async () => {
       expect(await sut.canCreateProject(userId, projectId)).toEqual(false);
     },
@@ -124,6 +168,26 @@ const getFixtures = async () => {
           userId,
         },
         select: ['roleName'],
+      });
+    },
+    ThenCanFindNumberOfUsersInProject: async () => {
+      expect(await sut.findUsersInProject(projectId)).toHaveLength(2);
+      expect(repo.find).toHaveBeenCalledWith({
+        where: {
+          projectId,
+        },
+        select: ['roleName'],
+        relations: ['user'],
+      });
+    },
+    ThenUserIsOwner: async () => {
+      expect(await sut.checkUserIsOwner(userId, projectId)).toEqual(true);
+      expect(repoExtended.findOne).toHaveBeenCalledWith({
+        where: {
+          projectId,
+          userId,
+          roleName: Roles.project_owner,
+        },
       });
     },
   };

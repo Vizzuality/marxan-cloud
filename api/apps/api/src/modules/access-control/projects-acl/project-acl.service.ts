@@ -8,6 +8,7 @@ import { Roles } from '@marxan-api/modules/users/role.api.entity';
 
 import { Permit } from '../access-control.types';
 import { ProjectAccessControl } from './project-access-control';
+import { UpdateUserRoleinProject } from './dto/update-user-role-project.dto';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -91,5 +92,57 @@ export class ProjectAclService implements ProjectAccessControl {
       await this.getRolesWithinProjectForUser(userId, projectId),
       this.canViewSolutionRoles,
     );
+  }
+
+  async checkUserIsOwner(userId: string, projectId: string): Promise<boolean> {
+    const userIsProjectOwner = await this.roles.findOne({
+      where: {
+        projectId,
+        userId,
+        roleName: Roles.project_owner,
+      },
+    });
+
+    return !!userIsProjectOwner;
+  }
+
+  async findUsersInProject(
+    projectId: string,
+  ): Promise<UsersProjectsApiEntity[]> {
+    const usersInProject = await this.roles.find({
+      where: { projectId },
+      select: ['roleName'],
+      relations: ['user'],
+    });
+    return usersInProject;
+  }
+
+  async updateUserInProject(
+    projectId: string,
+    updateUserInProjectDto: UpdateUserRoleinProject,
+  ): Promise<void> {
+    const { userId, roleName } = updateUserInProjectDto;
+    const existingUserInProject = await this.roles.findOne({
+      where: {
+        projectId,
+        userId,
+      },
+    });
+    if (!existingUserInProject) {
+      await this.roles.save({
+        projectId,
+        userId,
+        roleName,
+      });
+    } else {
+      await this.roles.update({ projectId, userId }, { roleName });
+    }
+  }
+
+  async deleteUserFromProject(
+    projectId: string,
+    userId: string,
+  ): Promise<void> {
+    await this.roles.delete({ projectId, userId });
   }
 }
