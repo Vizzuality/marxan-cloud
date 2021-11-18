@@ -1,4 +1,5 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
+import { isLeft } from 'fp-ts/Either';
 import { ProjectBlmRepository } from '@marxan-api/modules/blm';
 
 import { SetProjectBlm } from './set-project-blm';
@@ -8,10 +9,22 @@ export class SetProjectBlmHandler
   implements IInferredCommandHandler<SetProjectBlm> {
   constructor(private readonly blmRepository: ProjectBlmRepository) {}
 
-  async execute({ projectId }: SetProjectBlm): Promise<void> {
-    // calculate ...
+  async execute({ projectId, planningUnitArea }: SetProjectBlm): Promise<void> {
+    const cardinality = 6;
+    const [min, max] = [0.001, 100];
+    const initialArray = Array(cardinality - 1)
+      .fill(0)
+      .map((_, i) => i + 1);
 
-    // persist + error handling
-    await this.blmRepository.create(projectId, [0, 1, 2, 3, 4, 5]);
+    const formulaResults = initialArray.map(
+      (i) => min + ((max - min) / cardinality - 1) * i,
+    );
+    const blmValues = [min, ...formulaResults];
+    const defaultBlm = blmValues.map(
+      (value) => value * Math.sqrt(planningUnitArea),
+    );
+
+    const result = await this.blmRepository.create(projectId, defaultBlm);
+    if (isLeft(result)) throw new Error('Project BLM already created');
   }
 }
