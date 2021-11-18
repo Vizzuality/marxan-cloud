@@ -30,9 +30,9 @@ export const getFixtures = async () => {
     },
 
     WhenGettingProjectUsers: async (projectId: string) =>
-      await request(app.getHttpServer()).get(
-        `/api/v1/projects/${projectId}/users`,
-      ),
+      await request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${randomUserToken}`),
 
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(403);
