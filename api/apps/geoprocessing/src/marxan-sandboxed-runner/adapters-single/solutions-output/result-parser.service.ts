@@ -15,15 +15,10 @@ export class ResultParserService {
     private readonly bestSolution: BestSolutionService,
   ) {}
 
-  private static calculatePuValues(
-    entry: ResultRow,
+  private static parseRowToResultRow(
+    csvRow: string,
     planningUnitSelection: PlanningUnitsSelectionState,
-  ) {
-    entry.puValues = planningUnitSelection.puUsageByRun[entry.runId - 1];
-    return entry;
-  }
-
-  private static parseRowToResultRow(csvRow: string): ResultRow {
+  ): ResultRow {
     const [
       runId,
       score,
@@ -58,7 +53,7 @@ export class ResultParserService {
       mpm: +mpm,
       best: false,
       distinctFive: false,
-      puValues: [],
+      puValues: planningUnitSelection.puUsageByRun[+runId - 1],
     });
   }
 
@@ -76,8 +71,8 @@ export class ResultParserService {
               return;
             }
 
-            const entry = ResultParserService.calculatePuValues(
-              ResultParserService.parseRowToResultRow(row),
+            const entry = ResultParserService.parseRowToResultRow(
+              row,
               planningUnitSelection,
             );
 
