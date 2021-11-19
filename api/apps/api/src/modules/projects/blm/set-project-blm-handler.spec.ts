@@ -34,12 +34,4 @@ describe('set-project-blm-handler', () => {
       }),
     );
   });
-
-  it('should throw an error when trying to create a project BLM that already has one created', async () => {
-    await setProjectBLMHandler.execute(new SetProjectBlm(projectId, 1500));
-
-    await expect(
-      setProjectBLMHandler.execute(new SetProjectBlm(projectId, 1500)),
-    ).rejects.toThrowError('Project BLM already created');
-  });
 });
