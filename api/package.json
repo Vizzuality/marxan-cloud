@@ -23,7 +23,7 @@
     "api:test:e2e": "jest --config ./apps/api/test/jest-e2e.json",
     "geoprocessing:test:e2e": "jest --config ./apps/geoprocessing/test/jest-e2e.json",
     "ts-coverage": "typescript-coverage-report",
-    "api:typeorm": "NODE_CONFIG_DIR=apps/api/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/api/src/ormconfig.ts",
+    "api:typeorm": "NODE_CONFIG_DIR=apps/api/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/api/ormconfig.ts",
     "geoprocessing:typeorm": "NODE_CONFIG_DIR=apps/geoprocessing/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/geoprocessing/ormconfig.ts"
   },
   "husky": {
