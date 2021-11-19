@@ -24,10 +24,10 @@ export class ProjectAclService implements ProjectAccessControl {
     Roles.project_viewer,
   ];
 
-  private async getRolesWithinProject(
+  private async getRolesWithinProjectForUser(
     userId: string,
     projectId: string,
-  ): Promise<Array<string>> {
+  ): Promise<Array<Roles>> {
     const rolesToCheck = (
       await this.roles.find({
         where: {
@@ -38,6 +38,13 @@ export class ProjectAclService implements ProjectAccessControl {
       })
     ).flatMap((role) => role.roleName);
     return rolesToCheck;
+  }
+
+  private async doesUserHaveRole(
+    roles: Roles[],
+    rolesToCheck: Roles[],
+  ): Promise<Permit> {
+    return intersection(roles, rolesToCheck).length > 0;
   }
 
   constructor(
@@ -53,30 +60,35 @@ export class ProjectAclService implements ProjectAccessControl {
   }
 
   async canViewProject(userId: string, projectId: string): Promise<Permit> {
-    const roles = await this.getRolesWithinProject(userId, projectId);
-
-    return intersection(roles, this.canViewProjectRoles).length > 0;
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canViewProjectRoles,
+    );
   }
 
   async canPublishProject(userId: string, projectId: string): Promise<Permit> {
-    const roles = await this.getRolesWithinProject(userId, projectId);
-
-    return intersection(roles, this.canPublishProjectRoles).length > 0;
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canPublishProjectRoles,
+    );
   }
 
   async canCreateScenario(userId: string, projectId: string): Promise<Permit> {
-    const roles = await this.getRolesWithinProject(userId, projectId);
-
-    return intersection(roles, this.canCreateScenarioRoles).length > 0;
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canCreateScenarioRoles,
+    );
   }
   async canEditScenario(userId: string, projectId: string): Promise<Permit> {
-    const roles = await this.getRolesWithinProject(userId, projectId);
-
-    return intersection(roles, this.canEditScenarioRoles).length > 0;
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canEditScenarioRoles,
+    );
   }
   async canViewSolutions(userId: string, projectId: string): Promise<Permit> {
-    const roles = await this.getRolesWithinProject(userId, projectId);
-
-    return intersection(roles, this.canViewSolutionRoles).length > 0;
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canViewSolutionRoles,
+    );
   }
 }
