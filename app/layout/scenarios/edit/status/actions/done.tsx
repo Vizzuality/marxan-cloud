@@ -81,8 +81,8 @@ export const useScenarioActionsDone = () => {
     addToast,
   ]);
 
-  // WDPA protected calculation
-  const onProtectedAreasCalculationDone = useCallback((JOB_REF) => {
+  // Protected Areas
+  const onProtectedAreasDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
@@ -108,7 +108,7 @@ export const useScenarioActionsDone = () => {
         JOB_REF.current = null;
       },
       onError: () => {
-        addToast('onProtectedAreasCalculationDone', (
+        addToast('onProtectedAreasDone', (
           <>
             <h2 className="font-medium">Error!</h2>
           </>
@@ -164,6 +164,7 @@ export const useScenarioActionsDone = () => {
     setCache,
     addToast,
   ]);
+
   // Cost surface
   const onCostSurfaceDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
@@ -283,7 +284,7 @@ export const useScenarioActionsDone = () => {
   return {
     features: onFeaturesDone,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationDone,
-    protectedAreas: onProtectedAreasCalculationDone,
+    protectedAreas: onProtectedAreasDone,
     costSurface: onCostSurfaceDone,
     planningUnitsInclusion: onPlanningUnitsInclusionDone,
     run: onRunDone,
