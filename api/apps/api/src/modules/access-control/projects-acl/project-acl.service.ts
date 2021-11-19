@@ -6,7 +6,8 @@ import { intersection } from 'lodash';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/users/role.api.entity';
 
-import { Permit, ProjectAccessControl } from './project-access-control';
+import { Permit } from '../access-control.types';
+import { ProjectAccessControl } from './project-access-control';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects

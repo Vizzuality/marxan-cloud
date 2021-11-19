@@ -1,7 +1,4 @@
-export type Allowed = true;
-export type Denied = false;
-export type Permit = Allowed | Denied;
-
+import { Permit } from '../access-control.types';
 export abstract class ProjectAccessControl {
   abstract canCreateProject(userId: string, projectId: string): Promise<Permit>;
   abstract canViewProject(userId: string, projectId: string): Promise<Permit>;
