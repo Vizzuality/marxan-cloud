@@ -5,6 +5,8 @@ import React, {
 import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
+import intersection from 'lodash/intersection';
+
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
@@ -109,58 +111,60 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   }, [scenarioData]); //eslint-disable-line
 
   // Submit
-  const onSubmit = useCallback((values, form) => {
-    const { modified, dirtyFields } = form.getState();
+  // const onSubmit = useCallback((values, form) => {
+  //   const { modified, dirtyFields } = form.getState();
 
-    if (modified.wdpaIucnCategories || dirtyFields.wdpaIucnCategories) {
-      setSubmitting(true);
+  //   if (modified.wdpaIucnCategories || dirtyFields.wdpaIucnCategories) {
+  //     setSubmitting(true);
 
-      mutation.mutate({
-        id: scenarioData?.id,
-        data: {
-          ...values,
-          metadata: mergeScenarioStatusEditingMetaData(
-            metadata,
-            {
-              tab: 'protected-areas',
-              subtab: 'protected-areas-preview',
-              status: {
-                'protected-areas': 'draft',
-                features: 'empty',
-                analysis: 'empty',
-              },
-            },
-          ),
-        },
-      }, {
-        onSuccess: () => {
-          setSubmitting(false);
-          addToast('save-scenario-wdpa', (
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Scenario WDPA saved</p>
-            </>
-          ), {
-            level: 'success',
-          });
-        },
-        onError: () => {
-          setSubmitting(false);
+  //     mutation.mutate({
+  //       id: scenarioData?.id,
+  //       data: {
+  //         ...values,
+  //         metadata: mergeScenarioStatusEditingMetaData(
+  //           metadata,
+  //           {
+  //             tab: 'protected-areas',
+  //             subtab: 'protected-areas-preview',
+  //             status: {
+  //               'protected-areas': 'draft',
+  //               features: 'empty',
+  //               analysis: 'empty',
+  //             },
+  //           },
+  //         ),
+  //       },
+  //     }, {
+  //       onSuccess: () => {
+  //         setSubmitting(false);
+  //         addToast('save-scenario-wdpa', (
+  //           <>
+  //             <h2 className="font-medium">Success!</h2>
+  //             <p className="text-sm">Scenario WDPA saved</p>
+  //           </>
+  //         ), {
+  //           level: 'success',
+  //         });
+  //       },
+  //       onError: () => {
+  //         setSubmitting(false);
 
-          addToast('error-scenario-wdpa', (
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">Scenario WDPA not saved</p>
-            </>
-          ), {
-            level: 'error',
-          });
-        },
-      });
-    } else {
-      onSuccess();
-    }
-  }, [mutation, scenarioData?.id, addToast, onSuccess, metadata]);
+  //         addToast('error-scenario-wdpa', (
+  //           <>
+  //             <h2 className="font-medium">Error!</h2>
+  //             <p className="text-sm">Scenario WDPA not saved</p>
+  //           </>
+  //         ), {
+  //           level: 'error',
+  //         });
+  //       },
+  //     });
+  //   } else {
+  //     onSuccess();
+  //   }
+  // }, [mutation, scenarioData?.id, addToast, onSuccess, metadata]);
+
+  const onSubmit = () => console.log('Hole');
 
   const onSkip = useCallback(() => {
     setSubmitting(true);
@@ -255,10 +259,13 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       initialValues={INITIAL_VALUES}
     >
       {({ form, values, handleSubmit }) => {
-        const customPAAreSelected = !!values.wdpaIucnCategories.length
-          && values.wdpaIucnCategories.some((w) => w.charAt(0) !== 'I');
-        const wdpaAreSelected = !!values.wdpaIucnCategories.length
-          && values.wdpaIucnCategories.some((w) => w.charAt(0) === 'I');
+        const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
+        const plainCustomPAOptions = CUSTOM_PA_OPTIONS.map((o) => o.value);
+
+        const areWDPAreasSelected = intersection(plainWDPAOptions,
+          values.wdpaIucnCategories).length > 0;
+        const areCustomPAreasSelected = intersection(plainCustomPAOptions,
+          values.wdpaIucnCategories).length > 0;
 
         return (
           <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow w-full overflow-hidden">
@@ -364,7 +371,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     }}
                   </FieldRFF>
 
-                  {customPAAreSelected && (
+                  {values.wdpaIucnCategories.length > 0 && areCustomPAreasSelected && (
                     <ProtectedAreasSelected
                       form={form}
                       options={CUSTOM_PA_OPTIONS}
@@ -373,7 +380,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     />
                   )}
 
-                  {wdpaAreSelected && (
+                  {values.wdpaIucnCategories.length > 0 && areWDPAreasSelected && (
                     <ProtectedAreasSelected
                       form={form}
                       options={WDPA_OPTIONS}

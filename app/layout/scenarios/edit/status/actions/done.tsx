@@ -35,8 +35,54 @@ export const useScenarioActionsDone = () => {
 
   const queryClient = useQueryClient();
 
-  // WDPA protected calculation
+  // PLANNING AREA calculation
   const onPlanningAreaProtectedCalculationDone = useCallback((JOB_REF) => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          ...scenarioData?.metadata,
+          scenarioEditingMetadata: {
+            ...scenarioData?.metadata?.scenarioEditingMetadata,
+            tab: 'protected-areas',
+            subtab: 'protected-areas',
+            status: {
+              'protected-areas': 'draft',
+              features: 'empty',
+              analysis: 'empty',
+            },
+            lastJobCheck: new Date().getTime(),
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+        dispatch(setCache(Date.now()));
+        JOB_REF.current = null;
+      },
+      onError: () => {
+        addToast('onPlanningAreaProtectedCalculationDone', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    sid,
+    scenarioMutation,
+    scenarioData?.metadata,
+    dispatch,
+    setJob,
+    setCache,
+    addToast,
+  ]);
+
+  // WDPA protected calculation
+  const onProtectedAreasCalculationDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
@@ -62,7 +108,7 @@ export const useScenarioActionsDone = () => {
         JOB_REF.current = null;
       },
       onError: () => {
-        addToast('onPlanningAreaProtectedCalculationDone', (
+        addToast('onProtectedAreasCalculationDone', (
           <>
             <h2 className="font-medium">Error!</h2>
           </>
@@ -237,6 +283,7 @@ export const useScenarioActionsDone = () => {
   return {
     features: onFeaturesDone,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationDone,
+    protectedAreas: onProtectedAreasCalculationDone,
     costSurface: onCostSurfaceDone,
     planningUnitsInclusion: onPlanningUnitsInclusionDone,
     run: onRunDone,

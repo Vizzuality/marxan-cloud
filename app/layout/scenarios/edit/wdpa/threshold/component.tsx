@@ -3,7 +3,9 @@ import React, {
 } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+
+import intersection from 'lodash/intersection';
 
 import { useRouter } from 'next/router';
 
@@ -44,6 +46,8 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   const { query } = useRouter();
   const { pid, sid } = query;
 
+  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
   const { data: projectData } = useProject(pid);
 
   const scenarioSlice = getScenarioEditSlice(sid);
@@ -79,16 +83,27 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const labelRef = React.useRef(null);
 
+  // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
     if (!wdpaData) return [];
 
     return wdpaData.map((w) => ({
-      label: `IUCN ${w.iucnCategory}`,
+      label: `${w.kind === 'global' ? 'IUCN' : '👤'} ${w.name}`,
       value: w.id,
       ...w.kind === 'global' && { kind: 'global' },
     }));
   }, [wdpaData]);
 
+  const CUSTOM_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => !w.kind);
+  const WDPA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((o) => o.kind === 'global');
+
+  const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
+  const plainCustomPAOptions = CUSTOM_PA_OPTIONS.map((o) => o.value);
+
+  const areWDPAreasSelected = intersection(plainWDPAOptions,
+    wdpaCategories.wdpaIucnCategories).length > 0;
+  const areCustomPAreasSelected = intersection(plainCustomPAOptions,
+    wdpaCategories.wdpaIucnCategories).length > 0;
   const INITIAL_VALUES = useMemo(() => {
     const { wdpaThreshold, wdpaIucnCategories } = scenarioData;
 
@@ -278,15 +293,23 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                   </FieldRFF>
                 </div>
 
-                {INITIAL_VALUES.wdpaIucnCategories
-                  && (
-                    <ProtectedAreasSelected
-                      options={WDPA_CATEGORIES_OPTIONS}
-                      title="Selected protected areas:"
-                      wdpaIucnCategories={INITIAL_VALUES.wdpaIucnCategories}
-                    />
-                  )}
+                {wdpaCategories.wdpaIucnCategories && areWDPAreasSelected && (
+                  <ProtectedAreasSelected
+                    options={WDPA_OPTIONS}
+                    title="Selected protected areas:"
+                    isView
+                    wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
+                  />
+                )}
 
+                {wdpaCategories.wdpaIucnCategories && areCustomPAreasSelected && (
+                  <ProtectedAreasSelected
+                    options={CUSTOM_PA_OPTIONS}
+                    title="Uploaded protected areas:"
+                    isView
+                    wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
+                  />
+                )}
               </div>
             </div>
             <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />

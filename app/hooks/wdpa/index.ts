@@ -34,7 +34,6 @@ export function useWDPACategories({
     }),
     {
       enabled: !!adminAreaId || !!customAreaId,
-      refetchInterval: 1000,
     },
   );
 
