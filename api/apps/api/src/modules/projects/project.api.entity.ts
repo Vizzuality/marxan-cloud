@@ -133,7 +133,7 @@ export class Project extends TimeUserEntityMetadata {
 
   @ApiProperty()
   @OneToOne(() => ProjectBlm)
-  projectBlm!: string;
+  projectBlm!: ProjectBlm;
 
   /**
    * JSONB storage for non-relational attributes

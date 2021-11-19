@@ -13,9 +13,7 @@ import {
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import {
-  JSONAPIQueryParams,
-} from '@marxan-api/decorators/json-api-parameters.decorator';
+import { JSONAPIQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
