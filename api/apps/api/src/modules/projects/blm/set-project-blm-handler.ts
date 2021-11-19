@@ -3,13 +3,20 @@ import { isLeft } from 'fp-ts/Either';
 import { ProjectBlmRepository } from '@marxan-api/modules/blm';
 
 import { SetProjectBlm } from './set-project-blm';
+import { ProjectBlmRepositoryToken } from '@marxan-api/modules/blm/values/repositories/project-blm-repository';
+import { Inject } from '@nestjs/common';
 
 @CommandHandler(SetProjectBlm)
 export class SetProjectBlmHandler
   implements IInferredCommandHandler<SetProjectBlm> {
-  constructor(private readonly blmRepository: ProjectBlmRepository) {}
+  constructor(
+    @Inject(ProjectBlmRepositoryToken)
+    private readonly blmRepository: ProjectBlmRepository,
+  ) {}
 
   async execute({ projectId, planningUnitArea }: SetProjectBlm): Promise<void> {
+    console.dir(this.blmRepository, { depth: Infinity });
+
     const cardinality = 6;
     const [min, max] = [0.001, 100];
     const initialArray = Array(cardinality - 1)

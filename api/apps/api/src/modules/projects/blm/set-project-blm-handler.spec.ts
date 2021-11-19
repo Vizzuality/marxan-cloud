@@ -1,6 +1,6 @@
 import { SetProjectBlmHandler } from '@marxan-api/modules/projects/blm/set-project-blm-handler';
 import { ProjectBlmRepository } from '@marxan-api/modules/blm';
-import { MemoryProjectBlmRepository } from '@marxan-api/modules/blm/values/memory-project-blm-repository';
+import { MemoryProjectBlmRepository } from '@marxan-api/modules/blm/values/repositories/memory-project-blm-repository';
 import { SetProjectBlm } from '@marxan-api/modules/projects/blm/set-project-blm';
 import { right } from 'fp-ts/Either';
 
