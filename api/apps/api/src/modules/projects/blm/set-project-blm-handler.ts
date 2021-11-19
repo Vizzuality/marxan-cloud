@@ -15,8 +15,6 @@ export class SetProjectBlmHandler
   ) {}
 
   async execute({ projectId, planningUnitArea }: SetProjectBlm): Promise<void> {
-    console.dir(this.blmRepository, { depth: Infinity });
-
     const cardinality = 6;
     const [min, max] = [0.001, 100];
     const initialArray = Array(cardinality - 1)

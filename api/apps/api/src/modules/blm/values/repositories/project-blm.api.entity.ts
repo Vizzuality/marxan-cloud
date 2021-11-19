@@ -13,37 +13,20 @@ export const projectBlmResource: BaseServiceResource = {
   },
   entitiesAllowedAsIncludes: [],
 };
-export interface ProjectBlm {
-  id: string;
 
-  /**
-   * User-supplied or defaults if none provided,
-   */
-  range: number[];
-
-  /**
-   * Calculated from range.
-   */
-  values: number[];
-
-  /**
-   * Sets once at the project creation chain - once PU are known.
-   */
-  defaults: number[];
-}
 @Entity('project_blms')
 export class ProjectBlm extends TimeUserEntityMetadata {
   // Should we use PostgreSQL ranges?
   @ApiProperty({ isArray: true })
-  @Column('int', { array: true, default: [0, 0] })
+  @Column('decimal', { array: true, default: [0, 0] })
   range!: number[];
 
   @ApiProperty({ isArray: true })
-  @Column('int', { array: true, default: [] })
+  @Column('decimal', { array: true, default: [] })
   values!: number[];
 
   @ApiProperty({ isArray: true })
-  @Column('int', { array: true, default: [] })
+  @Column('decimal', { array: true, default: [] })
   defaults!: number[];
 
   /**
@@ -52,7 +35,6 @@ export class ProjectBlm extends TimeUserEntityMetadata {
   @ApiProperty()
   @PrimaryColumn('uuid')
   @OneToOne(() => Project)
-  @JoinColumn()
   id!: string;
 }
 

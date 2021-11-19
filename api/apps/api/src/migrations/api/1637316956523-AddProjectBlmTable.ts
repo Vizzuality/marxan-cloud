@@ -4,10 +4,13 @@ export class AddProjectBlmTable1637250496398 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`CREATE TABLE "project_blms"
                              (
-                               "id"          uuid               NOT NULL,
-                               "values"      integer[]          NOT NULL,
-                               "defaults"    integer[]          NOT NULL,
-                               "range"       integer[2]         NOT NULL,
+                               "id"                 uuid               NOT NULL,
+                               "values"             decimal[]          NOT NULL,
+                               "defaults"           decimal[]          NOT NULL,
+                               "range"              decimal[2]         NOT NULL,
+                               "created_at"         timestamptz        DEFAULT now(),
+                               "last_modified_at"   timestamptz        DEFAULT now(),
+                               "created_by"         uuid,
                                CONSTRAINT "REL_46b117f602b62155ceacac2fd6" UNIQUE ("id"),
                                CONSTRAINT "PK_46b117f602b62155ceacac2fde6" PRIMARY KEY ("id")
                              )`);
