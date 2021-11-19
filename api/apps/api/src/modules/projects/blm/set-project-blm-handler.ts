@@ -4,11 +4,13 @@ import { ProjectBlmRepository } from '@marxan-api/modules/blm';
 
 import { SetProjectBlm } from './set-project-blm';
 import { ProjectBlmRepositoryToken } from '@marxan-api/modules/blm/values/repositories/project-blm-repository';
-import { Inject } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 
 @CommandHandler(SetProjectBlm)
 export class SetProjectBlmHandler
   implements IInferredCommandHandler<SetProjectBlm> {
+  private readonly logger: Logger = new Logger(SetProjectBlm.name);
+
   constructor(
     @Inject(ProjectBlmRepositoryToken)
     private readonly blmRepository: ProjectBlmRepository,
@@ -30,6 +32,9 @@ export class SetProjectBlmHandler
     );
 
     const result = await this.blmRepository.create(projectId, defaultBlm);
-    if (isLeft(result)) throw new Error('Project BLM already created');
+    if (isLeft(result))
+      this.logger.error(
+        `Project BLM already created for project with ID: ${projectId}`,
+      );
   }
 }
