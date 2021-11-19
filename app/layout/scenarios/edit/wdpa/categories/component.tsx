@@ -82,20 +82,21 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     if (!wdpaData) return [];
 
     return wdpaData.map((w) => ({
-      label: `${w.kind === 'global' ? 'IUCN' : '👤'} ${w.name}`,
+      label: w.kind === 'global' ? `IUCN ${w.name}` : `${w.name}`,
       value: w.id,
-      ...w.kind === 'global' && { kind: 'global' },
+      kind: w.kind,
+      selected: w.selected,
     }));
   }, [wdpaData]);
 
-  const CUSTOM_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => !w.kind);
-  const WDPA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((o) => o.kind === 'global');
+  const PROJECT_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'project');
+  const WDPA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'global');
 
   const ORDERED_WDPA_CATEGORIES_OPTIONS = useMemo(() => {
-    if (!WDPA_CATEGORIES_OPTIONS) return [];
+    if (!wdpaData) return [];
 
-    return CUSTOM_PA_OPTIONS.concat(WDPA_OPTIONS);
-  }, [WDPA_CATEGORIES_OPTIONS, WDPA_OPTIONS, CUSTOM_PA_OPTIONS]);
+    return PROJECT_PA_OPTIONS.concat(WDPA_OPTIONS);
+  }, [wdpaData, WDPA_OPTIONS, PROJECT_PA_OPTIONS]);
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -260,11 +261,11 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     >
       {({ form, values, handleSubmit }) => {
         const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
-        const plainCustomPAOptions = CUSTOM_PA_OPTIONS.map((o) => o.value);
+        const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
 
         const areWDPAreasSelected = intersection(plainWDPAOptions,
           values.wdpaIucnCategories).length > 0;
-        const areCustomPAreasSelected = intersection(plainCustomPAOptions,
+        const areProjectPAreasSelected = intersection(plainProjectPAOptions,
           values.wdpaIucnCategories).length > 0;
 
         return (
@@ -361,20 +362,19 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     name="protectedAreaId"
                     validate={composeValidators([{ presence: true }])}
                   >
-                    {(fprops) => {
+                    {(flprops) => {
                       return (
                         <ProtectedAreaUploader
-                          {...fprops}
-                          form={form}
+                          {...flprops}
                         />
                       );
                     }}
                   </FieldRFF>
 
-                  {values.wdpaIucnCategories.length > 0 && areCustomPAreasSelected && (
+                  {values.wdpaIucnCategories.length > 0 && areProjectPAreasSelected && (
                     <ProtectedAreasSelected
                       form={form}
-                      options={CUSTOM_PA_OPTIONS}
+                      options={PROJECT_PA_OPTIONS}
                       title="Uploaded protected areas:"
                       wdpaIucnCategories={values.wdpaIucnCategories}
                     />

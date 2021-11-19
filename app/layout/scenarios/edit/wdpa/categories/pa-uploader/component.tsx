@@ -32,13 +32,10 @@ import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface ProtectedAreaUploaderProps {
   input: any;
-  meta: any;
-  form: any,
 }
 
 export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   input,
-  form,
 }: ProtectedAreaUploaderProps) => {
   const { query } = useRouter();
   const { sid } = query;
