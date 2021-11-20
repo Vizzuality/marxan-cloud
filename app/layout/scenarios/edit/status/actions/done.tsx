@@ -91,7 +91,7 @@ export const useScenarioActionsDone = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             tab: 'protected-areas',
-            subtab: 'protected-areas-percentage',
+            subtab: 'protected-areas',
             status: {
               'protected-areas': 'draft',
               features: 'empty',

@@ -77,7 +77,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
-      method: 'PATCH',
+      method: 'POST',
     },
   });
 
@@ -132,7 +132,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       saveScenarioMutation.mutate({
         id: `${sid}`,
         data: {
-          wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
+          threshold: +(wdpaThreshold * 100).toFixed(0),
           metadata: mergeScenarioStatusEditingMetaData(
             metadata,
             {

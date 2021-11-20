@@ -38,7 +38,6 @@ export function useWDPACategories({
   );
 
   const { data } = query;
-  console.log('data', data);
 
   return useMemo(() => {
     return {

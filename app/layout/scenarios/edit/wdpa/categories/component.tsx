@@ -38,9 +38,9 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   onSuccess,
   onDismiss,
 }: WDPACategoriesProps) => {
-  const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
   const { pid, sid } = query;
+  const [submitting, setSubmitting] = useState(false);
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
@@ -59,6 +59,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     data: wdpaData,
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
+    refetch: refetchProtectedAreas,
   } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
       || projectData?.adminAreaLevel1I
@@ -260,6 +261,10 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       initialValues={INITIAL_VALUES}
     >
       {({ form, values, handleSubmit }) => {
+        if (form.getState().touched.uploadedProtectedArea) {
+          refetchProtectedAreas();
+        }
+
         const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
         const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
 
@@ -276,7 +281,10 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               iconClassName="w-10 h-10 text-white"
             />
 
-            <FormSpyRFF onChange={(state) => dispatch(setWDPACategories(state.values))} />
+            <FormSpyRFF onChange={(state) => {
+              dispatch(setWDPACategories(state.values));
+            }}
+            />
 
             <div className="relative flex flex-col flex-grow overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
@@ -359,7 +367,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
                   <p className="py-4 text-sm text-center">or</p>
                   <FieldRFF
-                    name="protectedAreaId"
+                    name="uploadedProtectedArea"
                     validate={composeValidators([{ presence: true }])}
                   >
                     {(flprops) => {
