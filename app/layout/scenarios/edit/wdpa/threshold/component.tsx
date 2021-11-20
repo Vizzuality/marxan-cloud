@@ -5,8 +5,6 @@ import React, {
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import intersection from 'lodash/intersection';
-
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
@@ -77,7 +75,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
-      method: 'POST',
+      method: 'PATCH',
     },
   });
 
@@ -98,13 +96,9 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   const PROJECT_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'project');
   const WDPA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'global');
 
-  const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
-  const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
+  const areWDPAreasSelected = WDPA_OPTIONS.filter((p) => p.selected);
+  const areProjectPAreasSelected = PROJECT_PA_OPTIONS.filter((p) => p.selected);
 
-  const areWDPAreasSelected = intersection(plainWDPAOptions,
-    wdpaCategories.wdpaIucnCategories).length > 0;
-  const areProjectPAreasSelected = intersection(plainProjectPAOptions,
-    wdpaCategories.wdpaIucnCategories).length > 0;
   const INITIAL_VALUES = useMemo(() => {
     const { wdpaThreshold, wdpaIucnCategories } = scenarioData;
 
@@ -127,12 +121,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     if (modified.wdpaThreshold || scenarioEditingMetadata.tab === 'protected-areas') {
       setSubmitting(true);
 
-      const { wdpaThreshold } = values;
+      // const { wdpaThreshold } = values;
 
       saveScenarioMutation.mutate({
         id: `${sid}`,
         data: {
-          threshold: +(wdpaThreshold * 100).toFixed(0),
+          // threshold: +(wdpaThreshold * 100).toFixed(0),
           metadata: mergeScenarioStatusEditingMetaData(
             metadata,
             {
