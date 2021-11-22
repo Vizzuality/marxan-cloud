@@ -14,6 +14,7 @@ import { ProtectedAreaService } from './protected-area.service';
 
 import { SelectionChangeModule } from './selection/selection-change.module';
 import { SelectionGetterModule } from './getter/selection-getter.module';
+import { CleanupModule } from './cleanup';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SelectionGetterModule } from './getter/selection-getter.module';
     CqrsModule,
     SelectionChangeModule,
     SelectionGetterModule,
+    CleanupModule,
   ],
   providers: [
     AddProtectedAreaHandler,
