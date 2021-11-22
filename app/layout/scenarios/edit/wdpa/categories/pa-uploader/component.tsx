@@ -173,6 +173,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         onSubmit={onDropAccepted}
         render={({ form: uploaderForm }) => {
           formRef.current = uploaderForm;
+          const { name } = formRef.current.getState().values;
 
           return (
             <form onSubmit={handleSubmit}>
@@ -302,6 +303,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                     theme="primary"
                     size="xl"
                     type="submit"
+                    disabled={!name}
                   >
                     Save
                   </Button>

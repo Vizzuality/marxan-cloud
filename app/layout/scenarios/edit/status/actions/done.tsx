@@ -95,7 +95,7 @@ export const useScenarioActionsDone = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             tab: wdpaIucnCategories.length > 0 ? 'features' : 'protected-areas',
-            subtab: wdpaIucnCategories.length > 0 ? 'protected-areas-preview' : 'features-preview',
+            subtab: wdpaIucnCategories.length > 0 ? 'features-preview' : 'protected-areas-preview',
             status: {
               'protected-areas': 'draft',
               features: 'empty',
@@ -129,7 +129,7 @@ export const useScenarioActionsDone = () => {
     setJob,
     setCache,
     addToast,
-    wdpaIucnCategories.length,
+    wdpaIucnCategories?.length,
   ]);
 
   const onFeaturesDone = useCallback((JOB_REF) => {
