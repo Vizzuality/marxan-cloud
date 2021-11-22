@@ -45,7 +45,7 @@ export const useScenarioActionsDone = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             tab: 'protected-areas',
-            subtab: 'protected-areas',
+            subtab: 'protected-areas-preview',
             status: {
               'protected-areas': 'draft',
               features: 'empty',
@@ -90,8 +90,8 @@ export const useScenarioActionsDone = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'protected-areas',
-            subtab: 'protected-areas',
+            tab: 'features',
+            subtab: 'features-preview',
             status: {
               'protected-areas': 'draft',
               features: 'empty',

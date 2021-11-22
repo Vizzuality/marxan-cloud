@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 
 import { useSession } from 'next-auth/client';
 
@@ -57,7 +57,6 @@ export function useSaveScenarioProtectedAreas({
     method: 'POST',
   },
 }: UseSaveScenarioProtectedAreasProps) {
-  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const saveScenarioProtectedAreas = ({ id, data }: SaveScenarioProtectedAreasProps) => {
@@ -73,10 +72,6 @@ export function useSaveScenarioProtectedAreas({
 
   return useMutation(saveScenarioProtectedAreas, {
     onSuccess: (data: any, variables, context) => {
-      const { id, projectId } = data?.data?.data;
-      queryClient.invalidateQueries(['scenarios', projectId]);
-      queryClient.setQueryData(['scenarios', id], data?.data);
-
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

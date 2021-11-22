@@ -11,12 +11,9 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { mergeScenarioStatusEditingMetaData } from 'utils/utils-scenarios';
-
 import { useProject } from 'hooks/projects';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
-import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
+import { useScenario } from 'hooks/scenarios';
+import { useWDPACategories } from 'hooks/wdpa';
 
 import ProtectedAreaUploader from 'layout/scenarios/edit/wdpa/categories/pa-uploader';
 import ProtectedAreasSelected from 'layout/scenarios/edit/wdpa/pa-selected';
@@ -53,7 +50,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     isFetching: scenarioIsFetching,
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
-  const { metadata } = scenarioData || {};
 
   const {
     data: wdpaData,
@@ -69,16 +65,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       && !projectData?.countryId ? projectData?.planningAreaId : null,
     scenarioId: sid,
   });
-
-  const { addToast } = useToasts();
-
-  const mutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
-
-  const saveScenarioProtectedAreasMutation = useSaveScenarioProtectedAreas({});
 
   // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
@@ -116,101 +102,8 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
   const onSkip = useCallback(() => {
     setSubmitting(true);
-
-    mutation.mutate({
-      id: scenarioData?.id,
-      data: {
-        metadata: mergeScenarioStatusEditingMetaData(
-          metadata,
-          {
-            tab: 'features',
-            subtab: 'features-preview',
-            status: {
-              'protected-areas': 'draft',
-              features: 'draft',
-              analysis: 'empty',
-            },
-          },
-        ),
-      },
-    }, {
-      onSuccess: () => {
-        setSubmitting(false);
-
-        addToast('save-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario WDPA saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        onDismiss();
-      },
-      onError: () => {
-        setSubmitting(false);
-
-        addToast('error-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario WDPA not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [mutation, addToast, onDismiss, scenarioData?.id, metadata]);
-
-  // Save Selected Protected Areas
-  const onSaveProtectedAreas = useCallback((values) => {
-    const { wdpaIucnCategories } = values;
-    if (!wdpaIucnCategories.length) {
-      onSkip();
-    }
-
-    if (wdpaIucnCategories) {
-      const areas = wdpaData.map((w) => {
-        return {
-          id: w.id,
-          selected: wdpaIucnCategories.includes(w.id),
-        };
-      });
-
-      setSubmitting(true);
-
-      saveScenarioProtectedAreasMutation.mutate({
-        id: `${sid}`,
-        data: {
-          areas,
-          threshold: 75,
-        },
-      }, {
-        onSuccess: ({ data: { data: s } }) => {
-          addToast('save-scenario-name', (
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Protected areas saved</p>
-            </>
-          ), {
-            level: 'success',
-          });
-          console.info('Scenario name saved succesfully', s);
-        },
-        onError: () => {
-          addToast('error-scenario-name', (
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">Protected areas not saved</p>
-            </>
-          ), {
-            level: 'error',
-          });
-        },
-      });
-      onSuccess();
-    }
-  }, [sid, onSkip, onSuccess, wdpaData, saveScenarioProtectedAreasMutation, addToast]);
+    onDismiss();
+  }, [onDismiss]);
 
   const onSubmit = () => console.log('on');
 
@@ -407,7 +300,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                 type={values.wdpaIucnCategories.length > 0 ? 'submit' : 'button'}
                 className="relative px-20"
                 disabled={submitting}
-                onClick={() => onSaveProtectedAreas(values)}
+                onClick={() => (values.wdpaIucnCategories.length > 0 ? onSuccess() : onSkip())}
               >
                 {!!values.wdpaIucnCategories.length && (
                   <span>Continue</span>

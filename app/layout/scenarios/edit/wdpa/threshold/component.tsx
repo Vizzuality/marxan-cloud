@@ -9,12 +9,10 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { mergeScenarioStatusEditingMetaData } from 'utils/utils-scenarios';
-
 import { useProject } from 'hooks/projects';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
-import { useWDPACategories } from 'hooks/wdpa';
+import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
 import ProtectedAreasSelected from 'layout/scenarios/edit/wdpa/pa-selected';
 
@@ -57,7 +55,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     isFetching: scenarioIsFetching,
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
-  const { metadata } = scenarioData || {};
 
   const {
     data: wdpaData,
@@ -73,9 +70,9 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     scenarioId: sid,
   });
 
-  const saveScenarioMutation = useSaveScenario({
+  const saveScenarioProtectedAreasMutation = useSaveScenarioProtectedAreas({
     requestConfig: {
-      method: 'PATCH',
+      method: 'POST',
     },
   });
 
@@ -94,10 +91,17 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   }, [wdpaData]);
 
   const PROJECT_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'project');
-  const WDPA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'global');
+  const GLOBAL_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'global');
 
-  const areWDPAreasSelected = WDPA_OPTIONS.filter((p) => p.selected);
-  const areProjectPAreasSelected = PROJECT_PA_OPTIONS.filter((p) => p.selected);
+  const selectedProtectedAreas = useMemo(() => {
+    const { wdpaIucnCategories } = wdpaCategories;
+    return wdpaData.filter((pa) => wdpaIucnCategories.includes(pa.id)).map((pa) => {
+      return {
+        id: pa.id,
+        selected: true,
+      };
+    });
+  }, [wdpaCategories, wdpaData]);
 
   const INITIAL_VALUES = useMemo(() => {
     const { wdpaThreshold, wdpaIucnCategories } = scenarioData;
@@ -108,90 +112,67 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     };
   }, [scenarioData]);
 
+  const areGlobalPAreasSelected = () => {
+    const { wdpaIucnCategories } = wdpaCategories;
+    return GLOBAL_PA_OPTIONS.map((p) => wdpaIucnCategories.includes(p.value))[0];
+  };
+
+  const areProjectPAreasSelected = () => {
+    const { wdpaIucnCategories } = wdpaCategories;
+    return PROJECT_PA_OPTIONS.map((p) => wdpaIucnCategories.includes(p.value))[0];
+  };
+
   useEffect(() => {
     const { wdpaThreshold } = scenarioData;
     dispatch(setWDPAThreshold(wdpaThreshold ? wdpaThreshold / 100 : 0.75));
+    areGlobalPAreasSelected();
+    areProjectPAreasSelected();
   }, [scenarioData]); //eslint-disable-line
 
-  // EVENTS
-  const handleSubmit = useCallback((values, form) => {
-    const { modified } = form.getState();
-    const { scenarioEditingMetadata } = metadata;
+  const handleSubmit = useCallback((values) => {
+    setSubmitting(true);
 
-    if (modified.wdpaThreshold || scenarioEditingMetadata.tab === 'protected-areas') {
-      setSubmitting(true);
+    const { wdpaThreshold } = values;
 
-      // const { wdpaThreshold } = values;
+    saveScenarioProtectedAreasMutation.mutate({
+      id: `${sid}`,
+      data: {
+        areas: selectedProtectedAreas,
+        threshold: +(wdpaThreshold * 100).toFixed(0),
+      },
+    }, {
+      onSuccess: () => {
+        setSubmitting(false);
 
-      saveScenarioMutation.mutate({
-        id: `${sid}`,
-        data: {
-          // threshold: +(wdpaThreshold * 100).toFixed(0),
-          metadata: mergeScenarioStatusEditingMetaData(
-            metadata,
-            {
-              tab: 'features',
-              subtab: 'features-preview',
-              status: {
-                'protected-areas': 'draft',
-                features: 'draft',
-                analysis: 'empty',
-              },
-            },
-          ),
-        },
-      }, {
-        onSuccess: () => {
-          setSubmitting(false);
+        addToast('save-scenario-wdpa', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Scenario WDPA threshold saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
+        onSuccess();
+      },
+      onError: () => {
+        setSubmitting(false);
 
-          addToast('save-scenario-wdpa', (
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Scenario WDPA threshold saved</p>
-            </>
-          ), {
-            level: 'success',
-          });
-          onSuccess();
-        },
-        onError: () => {
-          setSubmitting(false);
-
-          addToast('error-scenario-wdpa', (
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">Scenario WDPA threshold not saved</p>
-            </>
-          ), {
-            level: 'error',
-          });
-        },
-      });
-    } else {
-      setSubmitting(true);
-
-      saveScenarioMutation.mutate({
-        id: `${sid}`,
-        data: {
-          metadata: mergeScenarioStatusEditingMetaData(
-            metadata,
-            {
-              tab: 'features',
-              subtab: 'features-preview',
-            },
-          ),
-        },
-      }, {
-        onSuccess: () => {
-          setSubmitting(false);
-          onSuccess();
-        },
-        onError: () => {
-          setSubmitting(false);
-        },
-      });
-    }
-  }, [saveScenarioMutation, sid, addToast, onSuccess, metadata]);
+        addToast('error-scenario-wdpa', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario WDPA threshold not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    saveScenarioProtectedAreasMutation,
+    selectedProtectedAreas,
+    sid,
+    addToast,
+    onSuccess]);
 
   const handleBack = useCallback(() => {
     onBack();
@@ -288,16 +269,16 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                   </FieldRFF>
                 </div>
 
-                {wdpaCategories.wdpaIucnCategories && areWDPAreasSelected && (
+                {areGlobalPAreasSelected && (
                   <ProtectedAreasSelected
-                    options={WDPA_OPTIONS}
+                    options={GLOBAL_PA_OPTIONS}
                     title="Selected protected areas:"
                     isView
                     wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
                   />
                 )}
 
-                {wdpaCategories.wdpaIucnCategories && areProjectPAreasSelected && (
+                {areProjectPAreasSelected && (
                   <ProtectedAreasSelected
                     options={PROJECT_PA_OPTIONS}
                     title="Uploaded protected areas:"
