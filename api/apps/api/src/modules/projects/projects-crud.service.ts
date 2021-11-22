@@ -8,7 +8,7 @@ import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { ScenariosCrudService } from '@marxan-api/modules/scenarios/scenarios-crud.service';
-import { PlanningUnitsService } from '@marxan-api/modules/planning-units/planning-units.service';
+import { PlanningUnitsService } from '@marxan-api/modules/planning-units';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
