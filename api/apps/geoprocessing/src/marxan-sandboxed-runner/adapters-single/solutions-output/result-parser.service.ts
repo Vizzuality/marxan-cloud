@@ -6,7 +6,7 @@ import { validateSync } from 'class-validator';
 
 import { MostDifferentService } from './most-different.service';
 import { BestSolutionService } from './best-solution.service';
-import { PlanningUnitsSelectionState } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters/solutions-output/geo-output/solutions/planning-unit-selection-state';
+import { PlanningUnitsSelectionState } from './geo-output/solutions/planning-unit-selection-state';
 
 @Injectable()
 export class ResultParserService {
