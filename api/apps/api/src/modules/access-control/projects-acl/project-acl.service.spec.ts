@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/users/role.api.entity';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
 import { ProjectAclService } from './project-acl.service';

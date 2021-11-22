@@ -10,9 +10,8 @@ afterEach(async () => {
   await fixtures?.cleanup();
 });
 
-test.only(`getting project users as not the owner`, async () => {
+test(`getting project users as not the owner`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
   const response = await fixtures.WhenGettingProjectUsers(projectId);
-  console.log(response);
   fixtures.ThenForbiddenIsReturned(response);
 });

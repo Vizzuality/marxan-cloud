@@ -1,4 +1,7 @@
-import { Role, Roles } from '@marxan-api/modules/users/role.api.entity';
+import {
+  Role,
+  Roles,
+} from '@marxan-api/modules/access-control/role.api.entity';
 import { Check, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { User } from '@marxan-api/modules/users/user.api.entity';

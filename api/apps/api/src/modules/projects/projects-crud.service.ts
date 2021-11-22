@@ -24,7 +24,7 @@ import {
   PlanningAreasService,
 } from './planning-areas';
 import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/users/role.api.entity';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProtectedArea } from '@marxan/protected-areas';
 

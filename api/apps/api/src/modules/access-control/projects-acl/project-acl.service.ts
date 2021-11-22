@@ -1,14 +1,14 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/users/role.api.entity';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
 import { Permit } from '../access-control.types';
 import { ProjectAccessControl } from './project-access-control';
-import { UpdateUserRoleinProject } from './dto/update-user-role-project.dto';
+import { UserRoleInProjectDto } from './dto/user-role-project.dto';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -94,7 +94,7 @@ export class ProjectAclService implements ProjectAccessControl {
     );
   }
 
-  async checkUserIsOwner(userId: string, projectId: string): Promise<boolean> {
+  async checkUserIsOwner(userId: string, projectId: string): Promise<void> {
     const userIsProjectOwner = await this.roles.findOne({
       where: {
         projectId,
@@ -102,8 +102,9 @@ export class ProjectAclService implements ProjectAccessControl {
         roleName: Roles.project_owner,
       },
     });
-
-    return !!userIsProjectOwner;
+    if (!userIsProjectOwner) {
+      throw new ForbiddenException();
+    }
   }
 
   async findUsersInProject(
@@ -119,7 +120,7 @@ export class ProjectAclService implements ProjectAccessControl {
 
   async updateUserInProject(
     projectId: string,
-    updateUserInProjectDto: UpdateUserRoleinProject,
+    updateUserInProjectDto: UserRoleInProjectDto,
   ): Promise<void> {
     const { userId, roleName } = updateUserInProjectDto;
     const existingUserInProject = await this.roles.findOne({
@@ -139,10 +140,7 @@ export class ProjectAclService implements ProjectAccessControl {
     }
   }
 
-  async deleteUserFromProject(
-    projectId: string,
-    userId: string,
-  ): Promise<void> {
+  async revokeAccess(projectId: string, userId: string): Promise<void> {
     await this.roles.delete({ projectId, userId });
   }
 }

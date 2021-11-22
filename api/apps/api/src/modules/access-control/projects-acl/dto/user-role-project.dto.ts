@@ -1,9 +1,11 @@
-import { Roles } from '@marxan-api/modules/users/role.api.entity';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { IsEnum, IsString, IsUUID } from 'class-validator';
-
-export class UpdateUserRoleinProject {
+export class UserRoleInProjectDto {
   @IsUUID()
   userId!: string;
+
+  @IsUUID()
+  projectId!: string;
 
   @IsString()
   @IsEnum(Object.values(Roles))
