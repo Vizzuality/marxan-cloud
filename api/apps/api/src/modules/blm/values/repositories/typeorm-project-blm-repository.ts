@@ -5,16 +5,16 @@ import {
   alreadyCreated,
   CreateFailure,
   GetFailure,
-  ProjectBlmRepository,
+  ProjectBlmRepo,
   projectNotFound,
   SaveFailure,
-} from '../project-blm-repository';
+} from '../project-blm-repo';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectBlm } from './project-blm.api.entity';
 
 @Injectable()
-export class TypeormProjectBlmRepository extends ProjectBlmRepository {
+export class TypeormProjectBlmRepository extends ProjectBlmRepo {
   constructor(
     @InjectRepository(ProjectBlm)
     private readonly repository: Repository<ProjectBlm>,

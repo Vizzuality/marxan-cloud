@@ -3,14 +3,14 @@ import { isLeft } from 'fp-ts/Either';
 
 import { SetProjectBlm } from './set-project-blm';
 import { Logger } from '@nestjs/common';
-import { ProjectBlmRepository } from '@marxan-api/modules/blm';
+import { ProjectBlmRepo } from '@marxan-api/modules/blm';
 
 @CommandHandler(SetProjectBlm)
 export class SetProjectBlmHandler
   implements IInferredCommandHandler<SetProjectBlm> {
   private readonly logger: Logger = new Logger(SetProjectBlm.name);
 
-  constructor(private readonly blmRepository: ProjectBlmRepository) {}
+  constructor(private readonly blmRepository: ProjectBlmRepo) {}
 
   async execute({ projectId, planningUnitArea }: SetProjectBlm): Promise<void> {
     const cardinality = 6;

@@ -1,4 +1,4 @@
-import { ProjectBlmRepository } from '@marxan-api/modules/blm/values/project-blm-repository';
+import { ProjectBlmRepo } from '@marxan-api/modules/blm/values/project-blm-repo';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectBlm } from '@marxan-api/modules/blm/values/repositories/project-blm.api.entity';
@@ -8,10 +8,10 @@ import { TypeormProjectBlmRepository } from '@marxan-api/modules/blm/values/repo
   imports: [TypeOrmModule.forFeature([ProjectBlm])],
   providers: [
     {
-      provide: ProjectBlmRepository,
+      provide: ProjectBlmRepo,
       useClass: TypeormProjectBlmRepository,
     },
   ],
-  exports: [ProjectBlmRepository],
+  exports: [ProjectBlmRepo],
 })
 export class ProjectBlmRepositoryModule {}

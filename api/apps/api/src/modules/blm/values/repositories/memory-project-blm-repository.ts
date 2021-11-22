@@ -6,13 +6,13 @@ import {
   CreateFailure,
   GetFailure,
   ProjectBlm,
-  ProjectBlmRepository,
+  ProjectBlmRepo,
   projectNotFound,
   SaveFailure,
-} from '../project-blm-repository';
+} from '../project-blm-repo';
 
 @Injectable()
-export class MemoryProjectBlmRepository extends ProjectBlmRepository {
+export class MemoryProjectBlmRepository extends ProjectBlmRepo {
   constructor(
     private readonly memory: Record<string, ProjectBlm | undefined> = {},
   ) {
