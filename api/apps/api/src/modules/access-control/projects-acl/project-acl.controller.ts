@@ -6,7 +6,6 @@ import {
   Param,
   ParseUUIDPipe,
   UseGuards,
-  ForbiddenException,
   Delete,
   Patch,
   Body,
