@@ -119,10 +119,9 @@ export class ProjectAclService implements ProjectAccessControl {
   }
 
   async updateUserInProject(
-    projectId: string,
     updateUserInProjectDto: UserRoleInProjectDto,
   ): Promise<void> {
-    const { userId, roleName } = updateUserInProjectDto;
+    const { userId, projectId, roleName } = updateUserInProjectDto;
     const existingUserInProject = await this.roles.findOne({
       where: {
         projectId,

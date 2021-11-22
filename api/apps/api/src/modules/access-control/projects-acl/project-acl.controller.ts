@@ -34,15 +34,14 @@ export class ProjectAclController {
     return await this.projectAclService.findUsersInProject(projectId);
   }
 
-  @Patch(':projectId/users')
+  @Patch('/users')
   async updateUserInProject(
-    @Param('projectId', ParseUUIDPipe) projectId: string,
     @Body() dto: UserRoleInProjectDto,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
-    await this.projectAclService.checkUserIsOwner(req.user.id, projectId);
+    await this.projectAclService.checkUserIsOwner(req.user.id, dto.projectId);
 
-    await this.projectAclService.updateUserInProject(projectId, dto);
+    await this.projectAclService.updateUserInProject(dto);
   }
 
   @Delete(':projectId/users/:userId')
