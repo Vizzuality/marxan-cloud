@@ -97,8 +97,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     }
   }, [scenarioData]); //eslint-disable-line
 
-  const onSubmit = () => console.log('on');
-
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
     return (
@@ -126,7 +124,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
   return (
     <FormRFF
-      onSubmit={onSubmit}
+      onSubmit={() => { }}
       mutators={{
         removeWDPAFilter: (args, state, utils) => {
           const [id, arr] = args;
@@ -160,7 +158,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             className="relative flex flex-col flex-grow w-full overflow-hidden"
           >
             <FormSpyRFF onChange={(state) => {
-              console.log('--->', state.values);
               dispatch(setWDPACategories(state.values));
             }}
             />
@@ -284,7 +281,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               <Button
                 theme="secondary-alt"
                 size="lg"
-                type={values.wdpaIucnCategories.length > 0 ? 'submit' : 'button'}
+                type="button"
                 className="relative px-20"
                 onClick={() => (values.wdpaIucnCategories.length > 0 ? onSuccess() : onDismiss())}
               >

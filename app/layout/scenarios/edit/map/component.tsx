@@ -248,6 +248,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     ...FeaturePreviewLayers,
   ].filter((l) => !!l);
 
+  console.log('LAYERS', LAYERS);
+
   const LEGEND = useLegend({
     layers,
     options: {
