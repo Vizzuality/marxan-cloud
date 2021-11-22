@@ -46,6 +46,14 @@ export class MemoryProjectBlmRepository extends ProjectBlmRepo {
     range: ProjectBlm['range'],
     values: ProjectBlm['values'],
   ): Promise<Either<SaveFailure, true>> {
+    const blm = this.memory[projectId];
+    if (!blm) return left(projectNotFound);
+
+    this.memory[projectId] = {
+      ...blm,
+      range,
+      values,
+    };
     return right(true);
   }
 }

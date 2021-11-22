@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ProjectBlmRepositoryModule } from '@marxan-api/modules/blm/values/repositories/project-blm-repository.module';
+import { ProjectBlmRepositoryModule } from './repositories/project-blm-repository.module';
 
 @Module({
   imports: [ProjectBlmRepositoryModule],
