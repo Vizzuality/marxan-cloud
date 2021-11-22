@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsInt, IsNumber } from 'class-validator';
+import { IsBoolean, IsInt, IsNumber } from 'class-validator';
 
 export type ExecutionResult = ResultRow[];
 
@@ -51,9 +51,11 @@ export class ResultRow {
   @IsBoolean()
   distinctFive!: boolean;
 
-  @IsArray({
-    each: true,
-  })
-  @IsNumber()
+  @IsNumber(
+    {},
+    {
+      each: true,
+    },
+  )
   puValues!: number[];
 }

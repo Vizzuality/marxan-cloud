@@ -69,7 +69,7 @@ describe(`given invalid data in a row (2.1 planning units)`, () => {
       ),
     ).rejects.toEqual(
       new Error(
-        `Unexpected values in Marxan output at value [1,16640,640,2.1,16000,5.1664e+07,0,16000,5.1648e+07,0,0,0,0,1]`,
+        `Unexpected values in Marxan output at value [0]: [1,16640,640,2.1,16000,5.1664e+07,0,16000,5.1648e+07,0,0,0,0,1]`,
       ),
     );
   });
@@ -98,6 +98,7 @@ describe(`given data`, () => {
           "mpm": 1,
           "penalty": 0,
           "planningUnits": 2,
+          "puValues": Array [],
           "runId": 1,
           "score": 16640,
           "shortfall": 0,
@@ -116,6 +117,7 @@ describe(`given data`, () => {
           "mpm": 0,
           "penalty": 8240,
           "planningUnits": 1,
+          "puValues": Array [],
           "runId": 2,
           "score": 16640,
           "shortfall": 0.5,
@@ -134,6 +136,7 @@ describe(`given data`, () => {
           "mpm": 0,
           "penalty": 8240,
           "planningUnits": 2,
+          "puValues": Array [],
           "runId": 3,
           "score": 21040,
           "shortfall": 0.5,
@@ -152,6 +155,7 @@ describe(`given data`, () => {
           "mpm": 1,
           "penalty": 0,
           "planningUnits": 2,
+          "puValues": Array [],
           "runId": 4,
           "score": 16640,
           "shortfall": 0,
@@ -170,6 +174,7 @@ describe(`given data`, () => {
           "mpm": 1,
           "penalty": 0,
           "planningUnits": 5,
+          "puValues": Array [],
           "runId": 5,
           "score": 33840,
           "shortfall": 0,

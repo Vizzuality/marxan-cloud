@@ -53,7 +53,7 @@ export class ResultParserService {
       mpm: +mpm,
       best: false,
       distinctFive: false,
-      puValues: planningUnitSelection.puUsageByRun[+runId - 1],
+      puValues: planningUnitSelection.puUsageByRun[+runId - 1] || [],
     });
   }
 
