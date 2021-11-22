@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
@@ -37,7 +35,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 }: WDPACategoriesProps) => {
   const { query } = useRouter();
   const { pid, sid } = query;
-  const [submitting, setSubmitting] = useState(false);
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
@@ -100,11 +97,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     }
   }, [scenarioData]); //eslint-disable-line
 
-  const onSkip = useCallback(() => {
-    setSubmitting(true);
-    onDismiss();
-  }, [onDismiss]);
-
   const onSubmit = () => console.log('on');
 
   // Loading
@@ -124,7 +116,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         <div className="text-sm">This planning area doesn&apos;t have any protected areas associated with it. You can go directly to the features tab.</div>
 
         <div className="flex justify-center mt-20">
-          <Button theme="secondary-alt" size="lg" type="button" className="relative px-20" onClick={onSkip}>
+          <Button theme="secondary-alt" size="lg" type="button" className="relative px-20" onClick={onDismiss}>
             <span>Continue to features</span>
           </Button>
         </div>
@@ -167,12 +159,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             autoComplete="off"
             className="relative flex flex-col flex-grow w-full overflow-hidden"
           >
-            <Loading
-              visible={submitting}
-              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
-              iconClassName="w-10 h-10 text-white"
-            />
-
             <FormSpyRFF onChange={(state) => {
               dispatch(setWDPACategories(state.values));
             }}
@@ -271,20 +257,20 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     }}
                   </FieldRFF>
 
-                  {values.wdpaIucnCategories.length > 0 && areProjectPAreasSelected && (
-                    <ProtectedAreasSelected
-                      form={form}
-                      options={PROJECT_PA_OPTIONS}
-                      title="Uploaded protected areas:"
-                      wdpaIucnCategories={values.wdpaIucnCategories}
-                    />
-                  )}
-
                   {values.wdpaIucnCategories.length > 0 && areWDPAreasSelected && (
                     <ProtectedAreasSelected
                       form={form}
                       options={WDPA_OPTIONS}
                       title="Selected protected areas:"
+                      wdpaIucnCategories={values.wdpaIucnCategories}
+                    />
+                  )}
+
+                  {values.wdpaIucnCategories.length > 0 && areProjectPAreasSelected && (
+                    <ProtectedAreasSelected
+                      form={form}
+                      options={PROJECT_PA_OPTIONS}
+                      title="Uploaded protected areas:"
                       wdpaIucnCategories={values.wdpaIucnCategories}
                     />
                   )}
@@ -299,8 +285,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                 size="lg"
                 type={values.wdpaIucnCategories.length > 0 ? 'submit' : 'button'}
                 className="relative px-20"
-                disabled={submitting}
-                onClick={() => (values.wdpaIucnCategories.length > 0 ? onSuccess() : onSkip())}
+                onClick={() => (values.wdpaIucnCategories.length > 0 ? onSuccess() : onDismiss())}
               >
                 {!!values.wdpaIucnCategories.length && (
                   <span>Continue</span>

@@ -38,6 +38,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   onBack,
 }: WDPAThresholdCategories) => {
   const [submitting, setSubmitting] = useState(false);
+
   const { addToast } = useToasts();
   const { query } = useRouter();
   const { pid, sid } = query;
@@ -112,21 +113,19 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     };
   }, [scenarioData]);
 
-  const areGlobalPAreasSelected = () => {
+  const areGlobalPAreasSelected = useMemo(() => {
     const { wdpaIucnCategories } = wdpaCategories;
     return GLOBAL_PA_OPTIONS.map((p) => wdpaIucnCategories.includes(p.value))[0];
-  };
+  }, [wdpaCategories, GLOBAL_PA_OPTIONS]);
 
-  const areProjectPAreasSelected = () => {
+  const areProjectPAreasSelected = useMemo(() => {
     const { wdpaIucnCategories } = wdpaCategories;
     return PROJECT_PA_OPTIONS.map((p) => wdpaIucnCategories.includes(p.value))[0];
-  };
+  }, [wdpaCategories, PROJECT_PA_OPTIONS]);
 
   useEffect(() => {
     const { wdpaThreshold } = scenarioData;
     dispatch(setWDPAThreshold(wdpaThreshold ? wdpaThreshold / 100 : 0.75));
-    areGlobalPAreasSelected();
-    areProjectPAreasSelected();
   }, [scenarioData]); //eslint-disable-line
 
   const handleSubmit = useCallback((values) => {
