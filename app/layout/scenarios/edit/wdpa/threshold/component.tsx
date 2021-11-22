@@ -115,12 +115,13 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const areGlobalPAreasSelected = useMemo(() => {
     const { wdpaIucnCategories } = wdpaCategories;
-    return GLOBAL_PA_OPTIONS.map((p) => wdpaIucnCategories.includes(p.value))[0];
+    return GLOBAL_PA_OPTIONS
+      .map((p) => wdpaIucnCategories.includes(p.value)).filter(Boolean).length > 0;
   }, [wdpaCategories, GLOBAL_PA_OPTIONS]);
 
   const areProjectPAreasSelected = useMemo(() => {
     const { wdpaIucnCategories } = wdpaCategories;
-    return PROJECT_PA_OPTIONS.map((p) => wdpaIucnCategories.includes(p.value))[0];
+    return PROJECT_PA_OPTIONS.map((p) => wdpaIucnCategories.includes(p.value));
   }, [wdpaCategories, PROJECT_PA_OPTIONS]);
 
   useEffect(() => {

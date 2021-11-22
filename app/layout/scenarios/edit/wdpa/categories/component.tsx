@@ -160,6 +160,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             className="relative flex flex-col flex-grow w-full overflow-hidden"
           >
             <FormSpyRFF onChange={(state) => {
+              console.log('--->', state.values);
               dispatch(setWDPACategories(state.values));
             }}
             />

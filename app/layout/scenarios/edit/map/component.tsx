@@ -186,8 +186,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   //   subregion: adminAreaLevel2Id,
   // });
 
-  console.log('tab', tab, 'subtab', subtab);
-
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
     pid: `${pid}`,
