@@ -12,7 +12,7 @@ import { SelectionGetService } from '../getter/selection-get.service';
 import { SelectProtectedArea } from '../select-protected-area';
 import { ProtectedAreaKind } from '../protected-area.kind';
 import { ProtectedAreaUnlinked } from '../protected-area-unlinked';
-import { SelectionChangedEvent } from '@marxan-api/modules/scenarios/protected-area/selection/selection-changed.event';
+import { SelectionChangedEvent } from './selection-changed.event';
 
 export const invalidProtectedAreaId = Symbol(`invalid protected area id`);
 export type ChangeProtectedAreasError = typeof invalidProtectedAreaId;
