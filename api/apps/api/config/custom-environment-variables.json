@@ -53,7 +53,9 @@
   },
   "fileUploads": {
     "limits": {
-      "shapefileMaxSize": "API_UPLOAD_SHAPEFILE_MAX_SIZE"
+      "singleGeometry": "API_UPLOAD_SINGLE_MAX_SIZE",
+      "complexGeometryWithoutProperties": "API_UPLOAD_COMPLEX_MAX_SIZE",
+      "complexGeometryWithProperties": "API_UPLOAD_COMPLEX_PROPERTIES_MAX_SIZE"
     }
   },
   "sparkpost": {
