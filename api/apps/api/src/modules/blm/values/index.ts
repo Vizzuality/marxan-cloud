@@ -8,4 +8,4 @@ export {
   alreadyCreated,
   projectNotFound,
   unknownError,
-} from './repositories/project-blm-repository';
+} from './project-blm-repository';

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Either, fromPredicate, left, right } from 'fp-ts/Either';
+import { Either, left, right } from 'fp-ts/Either';
 
 import {
   alreadyCreated,
@@ -9,7 +9,7 @@ import {
   ProjectBlmRepository,
   projectNotFound,
   SaveFailure,
-} from './project-blm-repository';
+} from '../project-blm-repository';
 
 @Injectable()
 export class MemoryProjectBlmRepository extends ProjectBlmRepository {
@@ -34,7 +34,7 @@ export class MemoryProjectBlmRepository extends ProjectBlmRepository {
     this.memory[projectId] = {
       defaults,
       id: projectId,
-      range: [0, 0],
+      range: [0.001, 100],
       values: [],
     };
 

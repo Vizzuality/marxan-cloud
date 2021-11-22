@@ -30,7 +30,6 @@ import { ProtectedArea } from '@marxan/protected-areas';
 
 import { ProjectsRequest } from './project-requests-info';
 import { ProjectId, SetProjectGridFromShapefile } from './planning-unit-grid';
-import { SetProjectBlm } from '@marxan-api/modules/projects/blm/set-project-blm';
 
 const projectFilterKeyNames = [
   'name',
@@ -225,9 +224,6 @@ export class ProjectsCrudService extends AppBaseService<
           projectId: model.id,
           planningAreaGeometryId: createModel.planningAreaId,
         }),
-        this.commandBus.execute(
-          new SetProjectBlm(model.id, createModel.planningUnitAreakm2),
-        ),
       ]);
     }
   }
@@ -270,9 +266,6 @@ export class ProjectsCrudService extends AppBaseService<
           projectId: model.id,
           planningAreaGeometryId: createModel.planningAreaId,
         }),
-        this.commandBus.execute(
-          new SetProjectBlm(model.id, createModel.planningUnitAreakm2),
-        ),
       ]);
     }
   }

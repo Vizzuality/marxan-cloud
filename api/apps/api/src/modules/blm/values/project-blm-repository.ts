@@ -29,8 +29,6 @@ export interface ProjectBlm {
 
 type SaveSuccess = true;
 
-export const ProjectBlmRepositoryToken = 'ProjectBlmRepositoryToken';
-
 export abstract class ProjectBlmRepository {
   abstract create(
     projectId: string,

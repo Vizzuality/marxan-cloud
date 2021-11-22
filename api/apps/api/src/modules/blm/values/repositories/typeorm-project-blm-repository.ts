@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/Either';
 
 import {
-  ProjectBlmRepository,
-  GetFailure,
-  SaveFailure,
-  CreateFailure,
   alreadyCreated,
-} from './project-blm-repository';
+  CreateFailure,
+  GetFailure,
+  ProjectBlmRepository,
+  projectNotFound,
+  SaveFailure,
+} from '../project-blm-repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectBlm } from './project-blm.api.entity';
@@ -21,12 +22,7 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepository {
     super();
   }
   async get(projectId: string): Promise<Either<GetFailure, ProjectBlm>> {
-    return right({
-      id: projectId,
-      range: [0, 0],
-      values: [0, 0, 0, 0, 0, 0],
-      defaults: [0, 0, 0, 0, 0, 0],
-    });
+    return left(projectNotFound);
   }
 
   async create(
@@ -39,7 +35,7 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepository {
     projectBlm.id = projectId;
     projectBlm.defaults = defaults;
     projectBlm.values = [];
-    projectBlm.range = [0, 0];
+    projectBlm.range = [0.001, 100];
     await this.repository.insert(projectBlm);
 
     return right(true);

@@ -1,6 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import { TimeUserEntityMetadata } from '@marxan/utils';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
@@ -36,35 +35,4 @@ export class ProjectBlm extends TimeUserEntityMetadata {
   @PrimaryColumn('uuid')
   @OneToOne(() => Project)
   id!: string;
-}
-
-export class JSONAPIProjectBlmData {
-  @ApiProperty({
-    type: String,
-  })
-  type = 'project_blms';
-
-  @ApiProperty({ description: 'This is the Id of the project' })
-  id!: string;
-
-  @ApiProperty({
-    type: ProjectBlm,
-  })
-  attributes!: ProjectBlm;
-
-  @ApiPropertyOptional()
-  relationships?: Record<string, unknown>;
-}
-
-export class ProjectResultPlural {
-  @ApiProperty({
-    isArray: true,
-    type: JSONAPIProjectBlmData,
-  })
-  data!: JSONAPIProjectBlmData[];
-}
-
-export class ProjectBlmResultSingular extends JsonApiAsyncJobMeta {
-  @ApiProperty()
-  data!: JSONAPIProjectBlmData;
 }

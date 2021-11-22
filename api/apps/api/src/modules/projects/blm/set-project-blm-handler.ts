@@ -1,20 +1,16 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { isLeft } from 'fp-ts/Either';
-import { ProjectBlmRepository } from '@marxan-api/modules/blm';
 
 import { SetProjectBlm } from './set-project-blm';
-import { ProjectBlmRepositoryToken } from '@marxan-api/modules/blm/values/repositories/project-blm-repository';
-import { Inject, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
+import { ProjectBlmRepository } from '@marxan-api/modules/blm';
 
 @CommandHandler(SetProjectBlm)
 export class SetProjectBlmHandler
   implements IInferredCommandHandler<SetProjectBlm> {
   private readonly logger: Logger = new Logger(SetProjectBlm.name);
 
-  constructor(
-    @Inject(ProjectBlmRepositoryToken)
-    private readonly blmRepository: ProjectBlmRepository,
-  ) {}
+  constructor(private readonly blmRepository: ProjectBlmRepository) {}
 
   async execute({ projectId, planningUnitArea }: SetProjectBlm): Promise<void> {
     const cardinality = 6;
