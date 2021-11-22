@@ -32,7 +32,7 @@ export class GeoOutputRepository {
     scenarioId: string,
     runDirectories: RunDirectories,
     metaData: { stdOutput: string[]; stdError?: string[] },
-  ): Promise<void> {
+  ): Promise<PlanningUnitsSelectionState> {
     const inputArchivePath = await this.metadataArchiver.zip(
       runDirectories.input,
     );
@@ -54,7 +54,7 @@ export class GeoOutputRepository {
       scenarioId,
     );
 
-    return this.entityManager.transaction(async (transaction) => {
+    await this.entityManager.transaction(async (transaction) => {
       // We chunk delete and insert operations as the generated SQL statements
       // could otherwise easily end up including tens of thousands of
       // parameters, risking to hit PostgreSQL' limit for this when processing
@@ -70,11 +70,11 @@ export class GeoOutputRepository {
 
       this.logger.debug(
         `Deleting ${
-          Object.keys(planningUnitsState).length
+          Object.keys(planningUnitsState.puSelectionState).length
         } output scenario planning units...`,
       );
       for (const [index, ospuChunk] of chunk(
-        Object.keys(planningUnitsState),
+        Object.keys(planningUnitsState.puSelectionState),
         CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
       ).entries()) {
         this.logger.debug(
@@ -117,13 +117,13 @@ export class GeoOutputRepository {
       }
 
       const chunkedOutputScenariosPuData = chunk(
-        Object.entries(planningUnitsState),
+        Object.entries(planningUnitsState.puSelectionState),
         CHUNK_SIZE_FOR_BATCH_SUMMARY,
       );
 
       this.logger.debug(
         `Inserting ${
-          Object.keys(planningUnitsState).length
+          Object.keys(planningUnitsState.puSelectionState).length
         } output scenario planning units...`,
       );
       await Promise.all(
@@ -151,6 +151,8 @@ export class GeoOutputRepository {
         }),
       );
     });
+
+    return planningUnitsState;
   }
 
   async saveFailure(

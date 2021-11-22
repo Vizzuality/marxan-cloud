@@ -16,6 +16,7 @@ const defaults = (): Omit<
   mpm: 0,
   best: false,
   distinctFive: false,
+  puValues: [],
 });
 
 export const lowestScoreRunId = 1;
@@ -23,59 +24,67 @@ export const secondLowestScoreRunId = 8;
 
 export const subjectRows: ResultRow[] = [
   {
+    ...defaults(),
     runId: lowestScoreRunId,
     score: 10,
     cost: 5,
     planningUnits: 4,
-    ...defaults(),
+    puValues: [1, 1, 1, 1, 1, 1, 1],
   },
   {
+    ...defaults(),
     runId: 2,
     score: 1000,
     cost: 5,
     planningUnits: 4,
-    ...defaults(),
+    puValues: [1, 1, 0, 1, 0, 1, 1],
   },
   {
+    ...defaults(),
     runId: 3,
     score: 2000,
     cost: 200,
     planningUnits: 5,
-    ...defaults(),
+    puValues: [1, 1, 1, 0, 1, 1, 1],
   },
   {
+    ...defaults(),
     runId: 4,
     score: 5000,
     cost: 50,
     planningUnits: 1,
-    ...defaults(),
+    puValues: [0, 0, 1, 1, 1, 1, 1],
   },
   {
+    ...defaults(),
     runId: 5,
     score: 6000,
     cost: 50,
     planningUnits: 14,
-    ...defaults(),
+    puValues: [1, 1, 1, 1, 1, 1, 1],
   },
   {
+    ...defaults(),
     runId: 6,
     score: 15000,
     cost: 75,
     planningUnits: 4,
-    ...defaults(),
+    puValues: [0, 1, 1, 0, 1, 1, 0],
   },
   {
+    ...defaults(),
     runId: 7,
     score: 2000,
     cost: 95,
     planningUnits: 4,
-    ...defaults(),
+    puValues: [1, 1, 0, 1, 0, 1, 0],
   },
   {
+    ...defaults(),
     runId: secondLowestScoreRunId,
     score: 10,
     cost: 5,
     planningUnits: 4,
-    ...defaults(),
+    puValues: [1, 0, 1, 1, 1, 0, 1],
   },
 ];

@@ -50,4 +50,12 @@ export class ResultRow {
 
   @IsBoolean()
   distinctFive!: boolean;
+
+  @IsNumber(
+    {},
+    {
+      each: true,
+    },
+  )
+  puValues!: number[];
 }
