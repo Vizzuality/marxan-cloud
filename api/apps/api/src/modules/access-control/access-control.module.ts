@@ -5,15 +5,21 @@ import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-lev
 
 import { ProjectAccessControl } from './projects-acl/project-access-control';
 import { ProjectAclService } from './projects-acl/project-acl.service';
+import { ProjectAclController } from './projects-acl/project-acl.controller';
+import { ProjectAclModule } from './projects-acl/project-acl.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersProjectsApiEntity])],
+  imports: [
+    TypeOrmModule.forFeature([UsersProjectsApiEntity]),
+    ProjectAclModule,
+  ],
   providers: [
     {
       provide: ProjectAccessControl,
       useClass: ProjectAclService,
     },
   ],
+  controllers: [ProjectAclController],
   exports: [ProjectAccessControl],
 })
 export class AccessControlModule {}
