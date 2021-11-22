@@ -1,17 +1,28 @@
 import { SetProjectBlmHandler } from '@marxan-api/modules/projects/blm/set-project-blm-handler';
 import { ProjectBlmRepo } from '@marxan-api/modules/blm';
-import { MemoryProjectBlmRepository } from '@marxan-api/modules/blm/values/repositories/memory-project-blm-repository';
 import { SetProjectBlm } from '@marxan-api/modules/projects/blm/set-project-blm';
 import { right } from 'fp-ts/Either';
+import { Test } from '@nestjs/testing';
+import { MemoryProjectBlmRepository } from '@marxan-api/modules/blm/values/repositories/memory-project-blm-repository';
 
 describe('set-project-blm-handler', () => {
   const projectId = 'fooId';
   let blmRepository: ProjectBlmRepo;
   let setProjectBLMHandler: SetProjectBlmHandler;
 
-  beforeEach(() => {
-    blmRepository = new MemoryProjectBlmRepository();
-    setProjectBLMHandler = new SetProjectBlmHandler(blmRepository);
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        {
+          provide: ProjectBlmRepo,
+          useFactory: () => new MemoryProjectBlmRepository(),
+        },
+        SetProjectBlmHandler,
+      ],
+    }).compile();
+
+    blmRepository = module.get(ProjectBlmRepo);
+    setProjectBLMHandler = module.get(SetProjectBlmHandler);
   });
 
   it('should set the correct default values', async () => {
@@ -29,7 +40,7 @@ describe('set-project-blm-handler', () => {
           3033.8434095013868,
         ],
         id: projectId,
-        range: [0, 0],
+        range: [0.001, 100],
         values: [],
       }),
     );
