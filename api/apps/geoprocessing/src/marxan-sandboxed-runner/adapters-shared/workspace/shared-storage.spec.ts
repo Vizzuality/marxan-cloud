@@ -1,6 +1,6 @@
 import { SharedStorage, SharedStoragePath } from './shared-storage';
 import { Test } from '@nestjs/testing';
-import { MarxanDirectory } from '../marxan-directory.service';
+import { MarxanDirectory } from '../../adapters-single/marxan-directory.service';
 import { v4 } from 'uuid';
 
 let sut: SharedStorage;

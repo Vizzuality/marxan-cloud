@@ -5,7 +5,7 @@ import { resolve } from 'path';
 
 import { TemporaryDirectory } from './ports/temporary-directory';
 import { WorkingDirectory } from '../../ports/working-directory';
-import { MarxanDirectory } from '../marxan-directory.service';
+import { MarxanDirectory } from '../../adapters-single/marxan-directory.service';
 
 export const SharedStoragePath = Symbol('shared storage temporary directory');
 
