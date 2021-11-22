@@ -190,7 +190,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     ...wdpaCategories,
     pid: `${pid}`,
     cache,
-    active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
+    active: tab === 'protected-areas',
     bbox,
     options: {
       ...layerSettings['wdpa-preview'],
@@ -247,8 +247,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     WDPApreviewLayer,
     ...FeaturePreviewLayers,
   ].filter((l) => !!l);
-
-  console.log('LAYERS', LAYERS);
 
   const LEGEND = useLegend({
     layers,
