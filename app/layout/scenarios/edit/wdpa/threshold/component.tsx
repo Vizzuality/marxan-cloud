@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { useProject } from 'hooks/projects';
-import { useScenario } from 'hooks/scenarios';
+import { useScenario/* , useSaveScenario */ } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
@@ -77,6 +77,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     },
   });
 
+  // const saveScenarioMutation = useSaveScenario({
+  //   requestConfig: {
+  //     method: 'PATCH',
+  //   },
+  // });
+
   const labelRef = React.useRef(null);
 
   // Constants
@@ -113,19 +119,22 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     };
   }, [scenarioData]);
 
-  const areGlobalPAreasSelected = useMemo(() => {
+  const globalPAreasSelectedIds = useMemo(() => {
     const { wdpaIucnCategories } = wdpaCategories;
     return GLOBAL_PA_OPTIONS
-      .map((p) => wdpaIucnCategories.includes(p.value))
-      .filter(Boolean).length > 0;
+      .map((p) => p.value)
+      .filter((p) => wdpaIucnCategories?.includes(p));
   }, [wdpaCategories, GLOBAL_PA_OPTIONS]);
 
-  const areProjectPAreasSelected = useMemo(() => {
+  const projectPAreasSelectedIds = useMemo(() => {
     const { wdpaIucnCategories } = wdpaCategories;
     return PROJECT_PA_OPTIONS
-      .map((p) => wdpaIucnCategories.includes(p.value))
-      .filter(Boolean).length > 0;
+      .map((p) => p.value)
+      .filter((p) => wdpaIucnCategories?.includes(p));
   }, [wdpaCategories, PROJECT_PA_OPTIONS]);
+
+  const areGlobalPAreasSelected = !!globalPAreasSelectedIds.length;
+  const areProjectPAreasSelected = !!projectPAreasSelectedIds.length;
 
   useEffect(() => {
     const { wdpaThreshold } = scenarioData;
@@ -146,6 +155,16 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     }, {
       onSuccess: () => {
         setSubmitting(false);
+        // saveScenarioMutation.mutate({
+        //   id: `${sid}`,
+        //   data: {
+        //     customProtectedAreaIds: projectPAreasSelectedIds || null,
+        //     wdpaIucnCategories: globalPAreasSelectedIds || null,
+        //   },
+        // }, {
+        //   onSuccess: () => { },
+        //   onError: () => { },
+        // });
 
         addToast('save-scenario-wdpa', (
           <>
@@ -172,8 +191,11 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     });
   }, [
     saveScenarioProtectedAreasMutation,
+    // saveScenarioMutation,
     selectedProtectedAreas,
     sid,
+    // projectPAreasSelectedIds,
+    // globalPAreasSelectedIds,
     addToast,
     onSuccess]);
 

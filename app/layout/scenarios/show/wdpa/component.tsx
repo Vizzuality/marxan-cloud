@@ -49,6 +49,9 @@ export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> =
     scenarioId: sid,
   });
 
+  console.log('wdpaData', wdpaData);
+  console.log('scenarioData', scenarioData);
+
   const selectedProtectedAreas = useMemo(() => {
     return wdpaData?.filter((pa) => pa.selected);
   }, [wdpaData]);

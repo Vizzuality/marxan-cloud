@@ -73,6 +73,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const {
     data: scenarioData,
   } = useScenario(sid);
+
   const { wdpaIucnCategories, wdpaThreshold } = scenarioData || {};
 
   const {
