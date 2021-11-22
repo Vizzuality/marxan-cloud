@@ -14,7 +14,7 @@ export interface ProjectBlm {
   /**
    * User-supplied or defaults if none provided,
    */
-  range: number[];
+  range: [number, number];
 
   /**
    * Calculated from range.

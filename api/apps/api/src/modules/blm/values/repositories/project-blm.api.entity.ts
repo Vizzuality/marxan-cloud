@@ -15,10 +15,9 @@ export const projectBlmResource: BaseServiceResource = {
 
 @Entity('project_blms')
 export class ProjectBlm extends TimeUserEntityMetadata {
-  // Should we use PostgreSQL ranges?
   @ApiProperty({ isArray: true })
-  @Column('decimal', { array: true, default: [0, 0] })
-  range!: number[];
+  @Column('decimal', { array: true, default: [0.001, 100] })
+  range!: [number, number];
 
   @ApiProperty({ isArray: true })
   @Column('decimal', { array: true, default: [] })
