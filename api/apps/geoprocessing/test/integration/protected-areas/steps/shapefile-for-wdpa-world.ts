@@ -65,13 +65,5 @@ export const createWorld = async () => {
         })
         // note that the_geom has select: false in entity definition
         .then((results) => results.length > 0),
-    ThenNewEntriesAreNotPublished: async (newShapeName: string) =>
-      repo
-        .find({
-          where: {
-            fullName: newShapeName,
-          },
-        })
-        .then((results) => results.length === 0),
   };
 };
