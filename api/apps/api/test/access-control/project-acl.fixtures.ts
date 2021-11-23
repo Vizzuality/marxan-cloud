@@ -61,7 +61,7 @@ export const getFixtures = async () => {
       userId: string,
     ) =>
       await request(app.getHttpServer())
-        .patch('/api/v1/roles/projects/users')
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
         .set('Authorization', `Bearer ${ownerUserToken}`)
         .send({ projectId, userId, roleName: projectViewerRole }),
 
@@ -70,7 +70,7 @@ export const getFixtures = async () => {
       userId: string,
     ) =>
       await request(app.getHttpServer())
-        .patch('/api/v1/roles/projects/users')
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
         .set('Authorization', `Bearer ${notOwnerUserToken}`)
         .send({ projectId, userId, roleName: projectViewerRole }),
 
