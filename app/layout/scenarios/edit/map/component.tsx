@@ -190,7 +190,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     ...wdpaCategories,
     pid: `${pid}`,
     cache,
-    active: tab === 'protected-areas',
+    active: tab === 'protected-areas' && subtab === 'protected-areas-preview',
     bbox,
     options: {
       ...layerSettings['wdpa-preview'],

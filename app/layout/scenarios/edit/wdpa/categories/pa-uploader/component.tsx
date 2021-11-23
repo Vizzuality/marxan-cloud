@@ -111,7 +111,9 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
       onSuccess: ({ data: { data: PAdata, id: PAid } }) => {
         setLoading(false);
+        console.log('PA', PAdata);
         setSuccessFile({ ...successFile, id: PAid, geom: PAdata });
+
         input.onChange(PAid);
 
         addToast('success-upload-protected-area', (

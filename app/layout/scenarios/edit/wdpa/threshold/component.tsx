@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { useProject } from 'hooks/projects';
-import { useScenario/* , useSaveScenario */ } from 'hooks/scenarios';
+import { useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
@@ -76,12 +76,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       method: 'POST',
     },
   });
-
-  // const saveScenarioMutation = useSaveScenario({
-  //   requestConfig: {
-  //     method: 'PATCH',
-  //   },
-  // });
 
   const labelRef = React.useRef(null);
 
@@ -155,17 +149,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     }, {
       onSuccess: () => {
         setSubmitting(false);
-        // saveScenarioMutation.mutate({
-        //   id: `${sid}`,
-        //   data: {
-        //     customProtectedAreaIds: projectPAreasSelectedIds || null,
-        //     wdpaIucnCategories: globalPAreasSelectedIds || null,
-        //   },
-        // }, {
-        //   onSuccess: () => { },
-        //   onError: () => { },
-        // });
-
         addToast('save-scenario-wdpa', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -191,11 +174,8 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     });
   }, [
     saveScenarioProtectedAreasMutation,
-    // saveScenarioMutation,
     selectedProtectedAreas,
     sid,
-    // projectPAreasSelectedIds,
-    // globalPAreasSelectedIds,
     addToast,
     onSuccess]);
 

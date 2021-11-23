@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import intersection from 'lodash/intersection';
 
@@ -11,7 +11,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
-import { useWDPACategories } from 'hooks/wdpa';
+import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
 import ProtectedAreaUploader from 'layout/scenarios/edit/wdpa/categories/pa-uploader';
 import ProtectedAreasSelected from 'layout/scenarios/edit/wdpa/pa-selected';
@@ -40,6 +40,8 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
+  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
   const { data: projectData } = useProject(pid);
 
   const {
@@ -62,6 +64,36 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       && !projectData?.countryId ? projectData?.planningAreaId : null,
     scenarioId: sid,
   });
+
+  const saveScenarioProtectedAreasMutation = useSaveScenarioProtectedAreas({
+    requestConfig: {
+      method: 'POST',
+    },
+  });
+
+  const selectedProtectedAreas = useMemo(() => {
+    const { wdpaIucnCategories } = wdpaCategories;
+    return wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id)).map((pa) => {
+      return {
+        id: pa.id,
+        selected: true,
+      };
+    });
+  }, [wdpaCategories, wdpaData]);
+
+  const calculatePAs = useCallback(() => {
+    saveScenarioProtectedAreasMutation.mutate({
+      id: `${sid}`,
+      data: {
+        areas: selectedProtectedAreas,
+        threshold: scenarioData.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
+      },
+    }, {
+      onSuccess: () => {
+        onSuccess();
+      },
+    });
+  }, [saveScenarioProtectedAreasMutation, selectedProtectedAreas, scenarioData, sid, onSuccess]);
 
   // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
@@ -95,7 +127,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     if (wdpaThreshold) {
       dispatch(setWDPAThreshold(wdpaThreshold / 100));
     }
-  }, [scenarioData]); //eslint-disable-line
+  }, [scenarioData.wdpaThreshold]); //eslint-disable-line
 
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
@@ -148,6 +180,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
         const areWDPAreasSelected = intersection(plainWDPAOptions,
           values.wdpaIucnCategories).length > 0;
+        // or
         const areProjectPAreasSelected = intersection(plainProjectPAOptions,
           values.wdpaIucnCategories).length > 0;
 
@@ -255,7 +288,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     }}
                   </FieldRFF>
 
-                  {values.wdpaIucnCategories.length > 0 && areWDPAreasSelected && (
+                  {areWDPAreasSelected && (
                     <ProtectedAreasSelected
                       form={form}
                       options={WDPA_OPTIONS}
@@ -264,7 +297,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     />
                   )}
 
-                  {values.wdpaIucnCategories.length > 0 && areProjectPAreasSelected && (
+                  {areProjectPAreasSelected && (
                     <ProtectedAreasSelected
                       form={form}
                       options={PROJECT_PA_OPTIONS}
@@ -283,7 +316,9 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                 size="lg"
                 type="button"
                 className="relative px-20"
-                onClick={() => (values.wdpaIucnCategories.length > 0 ? onSuccess() : onDismiss())}
+                onClick={() => (
+                  values.wdpaIucnCategories.length > 0
+                    ? calculatePAs() : onDismiss())}
               >
                 {!!values.wdpaIucnCategories.length && (
                   <span>Continue</span>
