@@ -13,8 +13,6 @@ export class ProjectBlmSaga {
   calculateBlmDefaults = (events$: Observable<any>): Observable<ICommand> =>
     events$.pipe(
       ofType(PlanningUnitSet),
-      map(
-        (event) => new SetProjectBlm(event.projectId, event.planningUnitArea),
-      ),
+      map((event) => new SetProjectBlm(event.projectId)),
     );
 }

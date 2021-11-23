@@ -9,8 +9,5 @@ import { IEvent } from '@nestjs/cqrs';
  *
  */
 export class PlanningUnitSet implements IEvent {
-  constructor(
-    public readonly projectId: string,
-    public readonly planningUnitArea: number,
-  ) {}
+  constructor(public readonly projectId: string) {}
 }
