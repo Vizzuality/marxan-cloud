@@ -36,7 +36,7 @@ export class ProtectedAreasTilesService {
     const extent = 4096;
     const buffer = 256;
     const inputProjection = 4326;
-    const attributes = 'full_name, status, wdpaid, iucn_cat';
+    const attributes = 'full_name, status, wdpaid, iucn_cat, id';
     const table = 'wdpa';
     const query = this.areas.manager.createQueryBuilder();
 
