@@ -9,11 +9,12 @@ import {
   Delete,
   Patch,
   Body,
+  HttpCode,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ProjectAclService } from './project-acl.service';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserRoleInProjectDto } from './dto/user-role-project.dto';
 
 @UseGuards(JwtAuthGuard)
@@ -28,29 +29,35 @@ export class ProjectAclController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<UserRoleInProjectDto[]> {
-    await this.projectAclService.checkUserIsOwner(req.user.id, projectId);
-
-    return await this.projectAclService.findUsersInProject(projectId);
+    return await this.projectAclService.findUsersInProject(
+      projectId,
+      req.user.id,
+    );
   }
 
-  @Patch('/users')
+  @Patch(':projectId/users')
+  @ApiOkResponse({ status: 204 })
+  @HttpCode(204)
   async updateUserInProject(
     @Body() dto: UserRoleInProjectDto,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
-    await this.projectAclService.checkUserIsOwner(req.user.id, dto.projectId);
-
-    await this.projectAclService.updateUserInProject(dto);
+    await this.projectAclService.updateUserInProject(
+      projectId,
+      dto,
+      req.user.id,
+    );
   }
 
   @Delete(':projectId/users/:userId')
+  @ApiOkResponse({ status: 204 })
+  @HttpCode(204)
   async deleteUserFromProject(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('userId', ParseUUIDPipe) userId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
-    await this.projectAclService.checkUserIsOwner(req.user.id, projectId);
-
-    await this.projectAclService.revokeAccess(projectId, userId);
+    await this.projectAclService.revokeAccess(projectId, userId, req.user.id);
   }
 }

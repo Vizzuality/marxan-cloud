@@ -1,11 +1,12 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { Permit } from '../access-control.types';
 import { ProjectAccessControl } from './project-access-control';
 import { UserRoleInProjectDto } from './dto/user-role-project.dto';
@@ -109,7 +110,9 @@ export class ProjectAclService implements ProjectAccessControl {
 
   async findUsersInProject(
     projectId: string,
+    userId: string,
   ): Promise<UsersProjectsApiEntity[]> {
+    await this.checkUserIsOwner(userId, projectId);
     const usersInProject = await this.roles.find({
       where: { projectId },
       select: ['roleName'],
@@ -119,27 +122,49 @@ export class ProjectAclService implements ProjectAccessControl {
   }
 
   async updateUserInProject(
+    projectId: string,
     updateUserInProjectDto: UserRoleInProjectDto,
+    loggedUserId: string,
   ): Promise<void> {
-    const { userId, projectId, roleName } = updateUserInProjectDto;
-    const existingUserInProject = await this.roles.findOne({
-      where: {
-        projectId,
-        userId,
-      },
-    });
-    if (!existingUserInProject) {
-      await this.roles.save({
-        projectId,
-        userId,
-        roleName,
+    const { userId, roleName } = updateUserInProjectDto;
+    await this.checkUserIsOwner(loggedUserId, projectId);
+
+    const apiDbConnection = getConnection(DbConnections.default);
+    const apiQueryRunner = apiDbConnection.createQueryRunner();
+
+    await apiQueryRunner.connect();
+    await apiQueryRunner.startTransaction();
+
+    try {
+      const existingUserInProject = await this.roles.findOne({
+        where: {
+          projectId,
+          userId,
+        },
       });
-    } else {
-      await this.roles.update({ projectId, userId }, { roleName });
+
+      if (!existingUserInProject) {
+        await this.roles.save({
+          projectId,
+          userId,
+          roleName,
+        });
+      } else {
+        await this.roles.update({ projectId, userId }, { roleName });
+      }
+    } catch (err) {
+      await apiQueryRunner.rollbackTransaction();
+    } finally {
+      await apiQueryRunner.release();
     }
   }
 
-  async revokeAccess(projectId: string, userId: string): Promise<void> {
+  async revokeAccess(
+    projectId: string,
+    userId: string,
+    loggedUserId: string,
+  ): Promise<void> {
+    await this.checkUserIsOwner(loggedUserId, projectId);
     await this.roles.delete({ projectId, userId });
   }
 }
