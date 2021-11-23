@@ -12,15 +12,17 @@ test(`when worker processes the job for known project`, async () => {
   const name = await world.WhenNewShapefileIsSubmitted();
   await delay(2000);
 
-  expect(await world.ThenNewEntriesArePublished(name)).toEqual(true);
-  expect(await world.ThenOldEntriesAreRemoved(`old-shape-name`)).toEqual(true);
+  expect(await world.ThenProtectedAreaIsAvailable(name)).toEqual(true);
+  expect(await world.ThenProtectedAreaIsAvailable(`old-shape-name`)).toEqual(
+    true,
+  );
 });
 
 describe(`when providing name in job input`, () => {
   it(`uses provided name as protected area's "fullName"`, async () => {
     const name = await world.WhenNewShapefileIsSubmitted(`custom name`);
     await delay(2000);
-    expect(await world.ThenNewEntriesArePublished(name)).toEqual(true);
+    expect(await world.ThenProtectedAreaIsAvailable(name)).toEqual(true);
   });
 });
 
