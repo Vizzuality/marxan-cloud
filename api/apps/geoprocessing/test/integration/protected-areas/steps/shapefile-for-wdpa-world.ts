@@ -9,7 +9,11 @@ import { ProtectedAreaProcessor } from '@marxan-geoprocessing/modules/protected-
 import { shapes } from './shapes';
 
 export const createWorld = async () => {
-  const app = await bootstrapApplication();
+  const app = await bootstrapApplication().catch((error) => {
+    console.log(`error`, error);
+    process.stdout.write(`${error}`);
+    throw new Error('ETF');
+  });
   const repoToken = getRepositoryToken(ProtectedArea);
   const repo: Repository<ProtectedArea> = app.get(repoToken);
   const projectId = v4();
@@ -52,23 +56,7 @@ export const createWorld = async () => {
       return name;
     },
     projectId,
-    ThenOldEntriesAreRemoved: async (oldShapeName: string) =>
-      repo
-        .find({
-          where: {
-            fullName: oldShapeName,
-          },
-        })
-        .then((results) => results.length === 0),
-    ThenOldEntriesAreNotRemoved: async (oldShapeName: string) =>
-      repo
-        .find({
-          where: {
-            fullName: oldShapeName,
-          },
-        })
-        .then((results) => results.length > 0),
-    ThenNewEntriesArePublished: async (newShapeName: string) =>
+    ThenProtectedAreaIsAvailable: async (newShapeName: string) =>
       repo
         .find({
           where: {

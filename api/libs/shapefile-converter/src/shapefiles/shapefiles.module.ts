@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ShapefileService } from './shapefiles.service';
 import { FilesModule } from '../files/files.module';
+import { ShapefileExtractorService } from './shapefile-extractor.service';
 
 /**
  * Module purposes:
@@ -10,7 +11,7 @@ import { FilesModule } from '../files/files.module';
  */
 @Module({
   imports: [FilesModule],
-  providers: [ShapefileService],
-  exports: [ShapefileService],
+  providers: [ShapefileService, ShapefileExtractorService],
+  exports: [ShapefileService, ShapefileExtractorService],
 })
 export class ShapefilesModule {}
