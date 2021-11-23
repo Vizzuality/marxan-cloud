@@ -108,11 +108,7 @@ describe('UsersModule (e2e)', () => {
         .expect(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    /**
-     * @todo Enable this test once we drop the temporary automatic whitelisting
-     * of new accounts in development environments.
-     */
-    test.skip('A user should not be able to log in until their account has been validated', async () => {
+    test('A user should not be able to log in until their account has been validated', async () => {
       await request(app.getHttpServer())
         .post('/auth/sign-in')
         .send(loginDto)
@@ -139,10 +135,12 @@ describe('UsersModule (e2e)', () => {
       });
 
       await request(app.getHttpServer())
-        .get(
-          `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
-        )
-        .expect(HttpStatus.OK);
+        .post(`/auth/validate`)
+        .send({
+          sub: newUser.id,
+          validationToken: validationTokenEvent?.data?.validationToken,
+        })
+        .expect(HttpStatus.CREATED);
     });
 
     test('A user account validation token should not be allowed to be spent more than once', async () => {
@@ -151,9 +149,11 @@ describe('UsersModule (e2e)', () => {
       }
 
       await request(app.getHttpServer())
-        .get(
-          `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
-        )
+        .post(`/auth/validate`)
+        .send({
+          sub: newUser.id,
+          validationToken: validationTokenEvent?.data?.validationToken,
+        })
         .expect(HttpStatus.NOT_FOUND);
     });
 
@@ -326,10 +326,12 @@ describe('UsersModule (e2e)', () => {
       });
 
       await request(app.getHttpServer())
-        .get(
-          `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
-        )
-        .expect(HttpStatus.OK);
+        .post(`/auth/validate`)
+        .send({
+          sub: newUser.id,
+          validationToken: validationTokenEvent?.data?.validationToken,
+        })
+        .expect(HttpStatus.CREATED);
     });
 
     test('A user should be able to log in once their account has been validated', async () => {
