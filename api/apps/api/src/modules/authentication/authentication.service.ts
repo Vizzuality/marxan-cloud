@@ -143,7 +143,7 @@ export class AuthenticationService {
      */
     if (process.env['NODE_ENV'] === 'development') {
       this.logger.log(
-        `An account was created for ${newUser.email}. Please validate the account via GET /auth/validate-account/${newUser.id}/${validationToken}.`,
+        `An account was created for ${newUser.email}. Please validate the account via POST /auth/validate and body { sub: "${newUser.id}", validationToken: "${validationToken}" }`,
       );
     }
     await this.mailer.sendSignUpConfirmationEmail(newUser.id, validationToken);
