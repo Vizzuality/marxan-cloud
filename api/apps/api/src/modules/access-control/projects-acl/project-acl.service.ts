@@ -113,11 +113,14 @@ export class ProjectAclService implements ProjectAccessControl {
     userId: string,
   ): Promise<UsersProjectsApiEntity[]> {
     await this.checkUserIsOwner(userId, projectId);
-    const usersInProject = await this.roles.find({
-      where: { projectId },
-      select: ['roleName'],
-      relations: ['user'],
-    });
+
+    const usersInProject = await this.roles
+      .createQueryBuilder('users_projects')
+      .leftJoinAndSelect('users_projects.user', 'userId')
+      .where({ projectId })
+      .select(['users_projects.roleName', 'userId.displayName', 'userId.id'])
+      .getMany();
+
     return usersInProject;
   }
 
