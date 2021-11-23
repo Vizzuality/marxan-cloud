@@ -60,7 +60,7 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${notOwnerUserToken}`)
         .send({ projectId, userId, roleName: projectViewerRole }),
 
-    WhenDeletingUserFromProjectAsOwner: async (
+    WhenRevokingAccessToUserFromProjectAsOwner: async (
       projectId: string,
       userId: string,
     ) =>
@@ -70,6 +70,10 @@ export const getFixtures = async () => {
 
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(403);
+    },
+
+    ThenNoContentIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(204);
     },
 
     ThenSingleOwnerUserInProjectIsReturned: (response: request.Response) => {
