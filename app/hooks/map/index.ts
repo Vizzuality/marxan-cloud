@@ -91,7 +91,7 @@ export function useAdminPreviewLayer({
 export function useWDPAPreviewLayer({
   pid, active, bbox, wdpaIucnCategories, cache = 0, options,
 }: UseWDPAPreviewLayer) {
-  const { opacity = 1 } = options || {};
+  const { opacity = 1, visibility = true } = options || {};
 
   return useMemo(() => {
     if (!active || !bbox) return null;
@@ -109,6 +109,9 @@ export function useWDPAPreviewLayer({
           {
             type: 'fill',
             'source-layer': 'layer0',
+            layout: {
+              visibility: visibility ? 'visible' : 'none',
+            },
             filter: ['all',
               ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
             ],
@@ -119,6 +122,9 @@ export function useWDPAPreviewLayer({
           {
             type: 'line',
             'source-layer': 'layer0',
+            layout: {
+              visibility: visibility ? 'visible' : 'none',
+            },
             filter: ['all',
               ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
             ],
@@ -129,7 +135,7 @@ export function useWDPAPreviewLayer({
         ],
       },
     };
-  }, [pid, active, bbox, wdpaIucnCategories, cache, opacity]);
+  }, [pid, active, bbox, wdpaIucnCategories, cache, opacity, visibility]);
 }
 
 // Featurepreview
