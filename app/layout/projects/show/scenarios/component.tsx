@@ -23,6 +23,7 @@ import ScenarioTypes from 'layout/projects/show/scenarios/types';
 import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
 import ScenarioItem from 'components/scenarios/item';
@@ -227,7 +228,21 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             }}
           >
             <div>
-              <h2 className="text-lg font-medium font-heading">Scenario dashboard</h2>
+              <div className="flex space-x-3">
+                <h2 className="text-lg font-medium font-heading">Scenario dashboard</h2>
+                <InfoButton>
+                  <span className="space-y-2">
+                    <p>
+                      A scenario is an individual planning activity with specific configurations
+                      of conservation areas, features, targets and parameters.
+                    </p>
+                    <p>
+                      You can create as
+                      many scenarios as needed to explore different possibilities.
+                    </p>
+                  </span>
+                </InfoButton>
+              </div>
               <h3 className="mt-1 text-lg font-medium text-gray-300 font-heading">Get started by creating a scenario</h3>
 
               <Button
