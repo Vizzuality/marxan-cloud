@@ -3,18 +3,12 @@ import { isLeft } from 'fp-ts/Either';
 
 import { SetProjectBlm } from './set-project-blm';
 import { Logger } from '@nestjs/common';
-import { ProjectBlmRepo, unknownError } from '@marxan-api/modules/blm';
+import { ProjectBlmRepo } from '@marxan-api/modules/blm';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-
-export const queryFailure = Symbol(
-  `could not query planning unit area for project`,
-);
-export type QueryPlanningUnitAreaFailure =
-  | typeof unknownError
-  | typeof queryFailure;
+import { BlmValuesCalculator } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 
 @CommandHandler(SetProjectBlm)
 export class SetProjectBlmHandler
@@ -41,17 +35,7 @@ export class SetProjectBlmHandler
       return;
     }
 
-    const cardinality = 6;
-    const [min, max] = [0.001, 100];
-    const initialArray = Array(cardinality - 1)
-      .fill(0)
-      .map((_, i) => i + 1);
-
-    const formulaResults = initialArray.map(
-      (i) => min + ((max - min) / cardinality - 1) * i,
-    );
-    const blmValues = [min, ...formulaResults];
-    const defaultBlm = blmValues.map((value) => value * Math.sqrt(area));
+    const defaultBlm = BlmValuesCalculator.withDefaultRange(area);
 
     const result = await this.blmRepository.create(projectId, defaultBlm);
     if (isLeft(result))

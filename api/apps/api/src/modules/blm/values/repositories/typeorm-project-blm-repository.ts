@@ -46,6 +46,11 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepo {
     range: ProjectBlm['range'],
     values: ProjectBlm['values'],
   ): Promise<Either<SaveFailure, true>> {
-    return right(true);
+    const result = await this.repository.update(
+      { id: projectId },
+      { range, values },
+    );
+
+    return Boolean(result) ? right(true) : left(projectNotFound);
   }
 }
