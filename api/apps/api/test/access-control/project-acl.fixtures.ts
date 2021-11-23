@@ -4,16 +4,30 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const ownerUserToken = await GivenUserIsLoggedIn(app, 'aa');
   const notOwnerUserToken = await GivenUserIsLoggedIn(app, 'bb');
   const projectViewerRole = Roles.project_viewer;
+  const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
+    getRepositoryToken(UsersProjectsApiEntity),
+  );
   const cleanups: (() => Promise<void>)[] = [];
 
   return {
     cleanup: async () => {
+      const ownerUserId = await GivenUserExists(app, 'aa');
+      await userProjectsRepo.delete({
+        userId: ownerUserId,
+      });
+      const viewerUserId = await GivenUserExists(app, 'bb');
+      await userProjectsRepo.delete({
+        userId: viewerUserId,
+      });
       await Promise.all(cleanups.map((clean) => clean()));
       await app.close();
     },
@@ -28,8 +42,8 @@ export const getFixtures = async () => {
     },
 
     GivenUserWasCreatedAndNotOwner: async () => {
-      const userId = await GivenUserExists(app, 'bb');
-      return userId;
+      const existingUserId = await GivenUserExists(app, 'bb');
+      return existingUserId;
     },
 
     WhenGettingProjectUsersAsOwner: async (projectId: string) =>
