@@ -110,10 +110,7 @@ export class ProjectAclService implements ProjectAccessControl {
     return true;
   }
 
-  async checkLastOwner(
-    userId: string,
-    projectId: string,
-  ): Promise<void | boolean> {
+  async checkLastOwner(userId: string, projectId: string): Promise<Permit> {
     const allOwnersInProject = await this.roles.find({
       where: {
         projectId,
@@ -126,6 +123,7 @@ export class ProjectAclService implements ProjectAccessControl {
     ) {
       return false;
     }
+    return true;
   }
 
   async findUsersInProject(
@@ -200,7 +198,7 @@ export class ProjectAclService implements ProjectAccessControl {
 
     const isLastOwner = await this.checkLastOwner(userId, projectId);
     if (!isLastOwner) {
-      return isOwner;
+      return isLastOwner;
     }
     await this.roles.delete({ projectId, userId });
   }
