@@ -1,18 +1,3 @@
-export const blmValuesCalculator = (range: [number, number], area: number) => {
-  const cardinality = 6;
-  const [min, max] = range;
-  const initialArray = Array(cardinality - 1)
-    .fill(0)
-    .map((_, i) => i + 1);
-
-  const formulaResults = initialArray.map(
-    (i) => min + ((max - min) / cardinality - 1) * i,
-  );
-  const blmValues = [min, ...formulaResults];
-
-  return blmValues.map((value) => value * Math.sqrt(area));
-};
-
 export class BlmValuesCalculator {
   private static cardinality = 6;
   private static defaultRange: [number, number] = [0.001, 100];
