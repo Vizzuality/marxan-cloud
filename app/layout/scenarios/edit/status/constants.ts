@@ -1,6 +1,6 @@
 export const TEXTS_RUNNING = {
   planningAreaProtectedCalculation: () => 'Calculating planning unit conservation coverage...',
-  features: () => 'Processing the features...',
+  features: () => '',
   planningUnitsInclusion: () => 'Processing inclusion/exclusion of planning units...',
   costSurface: () => 'Processing cost surface...',
   run: () => 'Running Marxan...',
