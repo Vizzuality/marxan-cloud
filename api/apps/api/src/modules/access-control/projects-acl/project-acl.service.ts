@@ -108,6 +108,21 @@ export class ProjectAclService implements ProjectAccessControl {
     }
   }
 
+  async checkLastOwner(userId: string, projectId: string): Promise<void> {
+    const allOwnersInProject = await this.roles.find({
+      where: {
+        projectId,
+        roleName: Roles.project_owner,
+      },
+    });
+    if (
+      allOwnersInProject.length === 1 &&
+      allOwnersInProject[0].userId === userId
+    ) {
+      throw new ForbiddenException();
+    }
+  }
+
   async findUsersInProject(
     projectId: string,
     userId: string,
@@ -168,6 +183,7 @@ export class ProjectAclService implements ProjectAccessControl {
     loggedUserId: string,
   ): Promise<void> {
     await this.checkUserIsOwner(loggedUserId, projectId);
+    await this.checkLastOwner(userId, projectId);
     await this.roles.delete({ projectId, userId });
   }
 }

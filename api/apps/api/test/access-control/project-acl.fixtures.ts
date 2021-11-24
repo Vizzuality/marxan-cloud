@@ -11,8 +11,16 @@ import { Repository } from 'typeorm';
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const ownerUserToken = await GivenUserIsLoggedIn(app, 'aa');
-  const notOwnerUserToken = await GivenUserIsLoggedIn(app, 'bb');
+  const contributorUserToken = await GivenUserIsLoggedIn(app, 'bb');
+  const viewerUserToken = await GivenUserIsLoggedIn(app, 'cc');
+  const otherOwnerUserToken = await GivenUserIsLoggedIn(app, 'dd');
+  const ownerUserId = await GivenUserExists(app, 'aa');
+  const contributorUserId = await GivenUserExists(app, 'bb');
+  const viewerUserId = await GivenUserExists(app, 'cc');
+  const otherOwnerUserId = await GivenUserExists(app, 'dd');
   const projectViewerRole = Roles.project_viewer;
+  const projectContributorRole = Roles.project_contributor;
+  const projectOwnerRole = Roles.project_owner;
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
@@ -20,13 +28,17 @@ export const getFixtures = async () => {
 
   return {
     cleanup: async () => {
-      const ownerUserId = await GivenUserExists(app, 'aa');
       await userProjectsRepo.delete({
         userId: ownerUserId,
       });
-      const viewerUserId = await GivenUserExists(app, 'bb');
+      await userProjectsRepo.delete({
+        userId: contributorUserId,
+      });
       await userProjectsRepo.delete({
         userId: viewerUserId,
+      });
+      await userProjectsRepo.delete({
+        userId: otherOwnerUserId,
       });
       await Promise.all(cleanups.map((clean) => clean()));
       await app.close();
@@ -46,40 +58,154 @@ export const getFixtures = async () => {
       return existingUserId;
     },
 
+    WhenGettingProjectUserAsNotInProject: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${otherOwnerUserToken}`),
+
     WhenGettingProjectUsersAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())
         .get(`/api/v1/roles/projects/${projectId}/users`)
         .set('Authorization', `Bearer ${ownerUserToken}`),
 
-    WhenGettingProjectUsersAsNotOwner: async (projectId: string) =>
+    WhenGettingProjectUsersAsContributor: async (projectId: string) =>
       await request(app.getHttpServer())
         .get(`/api/v1/roles/projects/${projectId}/users`)
-        .set('Authorization', `Bearer ${notOwnerUserToken}`),
+        .set('Authorization', `Bearer ${contributorUserToken}`),
 
-    WhenAddingANewUserToTheProjectAsOwner: async (
-      projectId: string,
-      userId: string,
-    ) =>
+    WhenGettingProjectUsersAsViewer: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${viewerUserToken}`),
+
+    WhenGettingProjectUsersAsOtherOwner: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${otherOwnerUserToken}`),
+
+    WhenAddingANewViewerToTheProjectAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/projects/${projectId}/users`)
         .set('Authorization', `Bearer ${ownerUserToken}`)
-        .send({ projectId, userId, roleName: projectViewerRole }),
-
-    WhenAddingANewUserToTheProjectAsNotOwner: async (
+        .send({ projectId, userId: viewerUserId, roleName: projectViewerRole }),
+    WhenAddingANewContributorToTheProjectAsOwner: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: contributorUserId,
+          roleName: projectContributorRole,
+        }),
+    WhenAddingANewOwnerToTheProjectAsOwner: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: otherOwnerUserId,
+          roleName: projectOwnerRole,
+        }),
+    WhenAddingANewViewerToTheProjectAsContributor: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${contributorUserToken}`)
+        .send({ projectId, userId: viewerUserId, roleName: projectViewerRole }),
+    WhenAddingANewContributorToTheProjectAsContributor: async (
       projectId: string,
-      userId: string,
     ) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/projects/${projectId}/users`)
-        .set('Authorization', `Bearer ${notOwnerUserToken}`)
-        .send({ projectId, userId, roleName: projectViewerRole }),
+        .set('Authorization', `Bearer ${contributorUserToken}`)
+        .send({
+          projectId,
+          userId: otherOwnerUserId,
+          roleName: projectContributorRole,
+        }),
+    WhenAddingANewOwnerToTheProjectAsContributor: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${contributorUserToken}`)
+        .send({
+          projectId,
+          userId: otherOwnerUserId,
+          roleName: projectOwnerRole,
+        }),
+    WhenAddingANewViewerToTheProjectAsViewer: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${viewerUserToken}`)
+        .send({
+          projectId,
+          userId: otherOwnerUserId,
+          roleName: projectViewerRole,
+        }),
+    WhenAddingANewContributorToTheProjectAsViewer: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${viewerUserToken}`)
+        .send({
+          projectId,
+          userId: contributorUserId,
+          roleName: projectContributorRole,
+        }),
+    WhenAddingANewOwnerToTheProjectAsViewer: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${viewerUserToken}`)
+        .send({
+          projectId,
+          userId: otherOwnerUserId,
+          roleName: projectOwnerRole,
+        }),
 
-    WhenRevokingAccessToUserFromProjectAsOwner: async (
+    WhenRevokingAccessToViewerFromProjectAsOwner: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .delete(`/api/v1/roles/projects/${projectId}/users/${viewerUserId}`)
+        .set('Authorization', `Bearer ${ownerUserToken}`),
+    WhenRevokingAccessToContributorFromProjectAsOwner: async (
       projectId: string,
-      userId: string,
     ) =>
       await request(app.getHttpServer())
-        .delete(`/api/v1/roles/projects/${projectId}/users/${userId}`)
+        .delete(
+          `/api/v1/roles/projects/${projectId}/users/${contributorUserId}`,
+        )
+        .set('Authorization', `Bearer ${ownerUserToken}`),
+    WhenRevokingAccessToOwnerFromProjectAsOwner: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .delete(`/api/v1/roles/projects/${projectId}/users/${otherOwnerUserId}`)
+        .set('Authorization', `Bearer ${ownerUserToken}`),
+
+    WhenRevokingAccessToViewerFromProjectAsContributor: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .delete(`/api/v1/roles/projects/${projectId}/users/${viewerUserId}`)
+        .set('Authorization', `Bearer ${contributorUserToken}`),
+    WhenRevokingAccessToContributorFromProjectAsViewer: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .delete(
+          `/api/v1/roles/projects/${projectId}/users/${contributorUserId}`,
+        )
+        .set('Authorization', `Bearer ${viewerUserToken}`),
+    WhenRevokingAccessToOwnerFromProjectAsViewer: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .delete(`/api/v1/roles/projects/${projectId}/users/${otherOwnerUserId}`)
+        .set('Authorization', `Bearer ${viewerUserToken}`),
+    WhenRevokingAccessToOwnerFromProjectAsContributor: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .delete(`/api/v1/roles/projects/${projectId}/users/${otherOwnerUserId}`)
+        .set('Authorization', `Bearer ${contributorUserToken}`),
+
+    WhenRevokingAccessToLastOwnerFromProjectAsOwner: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .delete(`/api/v1/roles/projects/${projectId}/users/${ownerUserId}`)
         .set('Authorization', `Bearer ${ownerUserToken}`),
 
     ThenForbiddenIsReturned: (response: request.Response) => {
@@ -95,16 +221,22 @@ export const getFixtures = async () => {
       expect(response.body).toHaveLength(1);
     },
 
-    ThenAllUsersinProjectAfterAddingOneAreReturned: (
+    ThenAllUsersinProjectAfterAddingAnOwnerAreReturned: (
       response: request.Response,
-      userId: string,
     ) => {
       expect(response.status).toEqual(200);
       expect(response.body).toHaveLength(2);
       const newUserCreated = response.body.find(
-        (user: any) => user.user.id === userId,
+        (user: any) => user.user.id === ownerUserId,
       );
-      expect(newUserCreated.roleName).toEqual(projectViewerRole);
+      expect(newUserCreated.roleName).toEqual(projectOwnerRole);
+    },
+
+    ThenAllUsersinProjectAfterEveryTypeOfUserHasBeenAddedAreReturned: (
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body).toHaveLength(4);
     },
   };
 };

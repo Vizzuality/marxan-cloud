@@ -147,7 +147,7 @@ const getFixtures = async () => {
       });
     },
     ThenCanFindNumberOfUsersInProject: async () => {
-      expect(await sut.findUsersInProject(projectId)).toHaveLength(2);
+      expect(await sut.findUsersInProject(projectId, userId)).toHaveLength(2);
       expect(repo.find).toHaveBeenCalledWith({
         where: {
           projectId,
