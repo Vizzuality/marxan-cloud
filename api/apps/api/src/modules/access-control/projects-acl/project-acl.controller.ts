@@ -10,6 +10,7 @@ import {
   Patch,
   Body,
   HttpCode,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ProjectAclService } from './project-acl.service';
@@ -28,11 +29,17 @@ export class ProjectAclController {
   async findUsersInProject(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<UserRoleInProjectDto[]> {
-    return await this.projectAclService.findUsersInProject(
+  ): Promise<UserRoleInProjectDto[] | boolean> {
+    const result = await this.projectAclService.findUsersInProject(
       projectId,
       req.user.id,
     );
+
+    if (result === false) {
+      throw new ForbiddenException();
+    }
+
+    return result;
   }
 
   @Patch(':projectId/users')
@@ -42,12 +49,16 @@ export class ProjectAclController {
     @Body() dto: UserRoleInProjectDto,
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<void> {
-    await this.projectAclService.updateUserInProject(
+  ): Promise<void | boolean> {
+    const result = await this.projectAclService.updateUserInProject(
       projectId,
       dto,
       req.user.id,
     );
+
+    if (result === false) {
+      throw new ForbiddenException();
+    }
   }
 
   @Delete(':projectId/users/:userId')
@@ -57,7 +68,15 @@ export class ProjectAclController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('userId', ParseUUIDPipe) userId: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<void> {
-    await this.projectAclService.revokeAccess(projectId, userId, req.user.id);
+  ): Promise<void | boolean> {
+    const result = await this.projectAclService.revokeAccess(
+      projectId,
+      userId,
+      req.user.id,
+    );
+
+    if (result === false) {
+      throw new ForbiddenException();
+    }
   }
 }
