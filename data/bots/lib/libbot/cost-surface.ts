@@ -4,10 +4,10 @@ import { logError, logInfo } from "./logger.ts";
 import { tookMs } from "./util/perf.ts";
 
 export class CostSurface {
-  private baseHttpClient;
+  private httpClient;
 
   constructor(httpClient: BotHttpClient) {
-    this.baseHttpClient = httpClient.baseHttpClient;
+    this.httpClient = httpClient;
   }
 
   async downloadTemplateShapefileForScenarioToFolder(
@@ -15,24 +15,30 @@ export class CostSurface {
     destinationDirName: string,
   ): Promise<boolean> {
     const opStart = Process.hrtime();
-    const success = await this.baseHttpClient.get(
-      `/scenarios/${scenarioId}/cost-surface/shapefile-template`,
+    const success = await this.httpClient.get(
+      `/api/v1/scenarios/${scenarioId}/cost-surface/shapefile-template`,
     )
-      .then(async (data) => {
+      .then(async (response) => {
+        const responseArrayBuffer = await response.blob().then(async (data) =>
+          await data.arrayBuffer()
+        );
+        return new Uint8Array(responseArrayBuffer);
+      })
+      .then(async (shapefileData) => {
         const filePath =
           `${destinationDirName}/${scenarioId}_cost-surface-template.zip`;
         logInfo(`Writing shapefile template to file ${filePath}`);
-        const fileBytes = new Uint8Array(new TextEncoder().encode(data.data));
-        await this.writeDataToFile(filePath, fileBytes);
+        await this.writeDataToFile(filePath, shapefileData);
       })
       .then(() => true)
       .catch((e) => {
-        logError(e);
+        logError(e.message);
+        logError(e.stack);
         return false;
       });
 
     logInfo(
-      `Custom geofeature shapefile uploaded in ${
+      `Cost surface template shapefile downloaded in ${
         tookMs(Process.hrtime(opStart))
       }ms.`,
     );
