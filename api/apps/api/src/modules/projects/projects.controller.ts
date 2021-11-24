@@ -61,6 +61,7 @@ import { isFeatureCollection } from '@marxan/utils';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 import { FeatureTags } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
+import { UpdateProjectBlmRangeDTO } from '@marxan-api/modules/projects/dto/update-project-blm-range.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -272,5 +273,21 @@ export class ProjectsController {
     );
 
     return { success: true };
+  }
+
+  @ApiOperation({ description: 'Updates the project BLM range' })
+  @ApiOkResponse({ type: ProjectResultSingular })
+  @ApiTags(asyncJobTag)
+  @Patch(':id/calibration')
+  async updateBlmRange(
+    @Param('id') id: string,
+    @Body() dto: UpdateProjectBlmRangeDTO,
+  ): Promise<void> {
+    console.log(dto);
+    // return await this.projectSerializer.serialize(
+    //   await this.projectsService.update(id, dto),
+    //   undefined,
+    //   true,
+    // );
   }
 }
