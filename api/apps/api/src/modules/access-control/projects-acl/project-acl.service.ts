@@ -139,7 +139,12 @@ export class ProjectAclService implements ProjectAccessControl {
       .createQueryBuilder('users_projects')
       .leftJoinAndSelect('users_projects.user', 'userId')
       .where({ projectId })
-      .select(['users_projects.roleName', 'userId.displayName', 'userId.id'])
+      .select([
+        'users_projects.roleName',
+        'userId.displayName',
+        'userId.id',
+        'userId.avatarDataUrl',
+      ])
       .getMany();
 
     return usersInProject;
