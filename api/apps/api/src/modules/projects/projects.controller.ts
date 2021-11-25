@@ -317,4 +317,30 @@ export class ProjectsController {
 
     return result.right;
   }
+
+  @ApiOperation({
+    description: 'Shows the project BLM values of a project',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the Project',
+  })
+  @ApiOkResponse({ type: ProjectBlmValuesResponseDTO })
+  @ApiTags(inlineJobTag)
+  @Get(':id/calibration')
+  async getProjectBlmValues(
+    @Param('id') id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ProjectBlmValuesResponseDTO> {
+    const result = await this.projectsService.findOne(id, {
+      authenticatedUser: req.user,
+    });
+
+    if (!result)
+      throw new NotFoundException(
+        `Could not find project BLM values for project with ID: ${id}`,
+      );
+
+    return result.projectBlm;
+  }
 }
