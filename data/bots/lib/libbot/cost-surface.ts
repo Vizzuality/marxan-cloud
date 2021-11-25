@@ -18,12 +18,7 @@ export class CostSurface {
     const success = await this.httpClient.get(
       `/api/v1/scenarios/${scenarioId}/cost-surface/shapefile-template`,
     )
-      .then(async (response) => {
-        const responseArrayBuffer = await response.blob().then(async (data) =>
-          await data.arrayBuffer()
-        );
-        return new Uint8Array(responseArrayBuffer);
-      })
+      .then(this.byteArrayFromResponse)
       .then(async (shapefileData) => {
         const filePath =
           `${destinationDirName}/${scenarioId}_cost-surface-template.zip`;
@@ -43,6 +38,13 @@ export class CostSurface {
       }ms.`,
     );
     return success;
+  }
+
+  private async byteArrayFromResponse(response: Response): Promise<Uint8Array> {
+    const responseArrayBuffer = await response.blob().then(async (data) =>
+      await data.arrayBuffer()
+    );
+    return new Uint8Array(responseArrayBuffer);
   }
 
   private async writeDataToFile(
