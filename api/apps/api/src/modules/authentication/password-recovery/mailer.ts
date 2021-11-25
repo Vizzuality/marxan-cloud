@@ -10,6 +10,12 @@ import { CreateTransmission, Recipient } from 'sparkpost';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 
+enum SparkpostTemplate {
+  PasswordChangedConfirmation = 'confirmation-password-changed',
+  PasswordRecovery = 'marxan-reset-password',
+  SignUpConfirmation = 'confirmation-account',
+}
+
 export abstract class Mailer {
   abstract sendRecoveryEmail(userId: string, token: string): Promise<void>;
   abstract sendPasswordChangedConfirmation(userId: string): Promise<void>;
@@ -57,7 +63,7 @@ export class SparkPostMailer implements Mailer {
   ) {}
 
   private async sendEmail(
-    template: string,
+    template: SparkpostTemplate,
     targetEmail: string,
     data: Record<string, any> = {},
   ): Promise<void> {
@@ -77,12 +83,15 @@ export class SparkPostMailer implements Mailer {
 
   async sendPasswordChangedConfirmation(userId: string): Promise<void> {
     const user = await this.usersService.getById(userId);
-    return this.sendEmail('confirmation-password-changed', user.email);
+    return this.sendEmail(
+      SparkpostTemplate.PasswordChangedConfirmation,
+      user.email,
+    );
   }
 
   async sendRecoveryEmail(userId: string, token: string): Promise<void> {
     const user = await this.usersService.getById(userId);
-    return this.sendEmail('marxan-reset-password', user.email, {
+    return this.sendEmail(SparkpostTemplate.PasswordRecovery, user.email, {
       urlRecover: this.passwordResetPrefix + token,
     });
   }
@@ -92,7 +101,7 @@ export class SparkPostMailer implements Mailer {
     token: string,
   ): Promise<void> {
     const user = await this.usersService.getById(userId);
-    return this.sendEmail('confirmation-account', user.email, {
+    return this.sendEmail(SparkpostTemplate.SignUpConfirmation, user.email, {
       urlSignUpConfirmation:
         AppConfig.get('signUpConfirmation.tokenPrefix') + token,
     });
