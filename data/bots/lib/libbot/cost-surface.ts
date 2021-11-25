@@ -1,12 +1,18 @@
 import Process from "https://deno.land/std@0.103.0/node/process.ts";
 import { BotHttpClient } from "./marxan-bot.ts";
+import { ShapefileUploader } from "./shapefile-uploader.ts";
 import { logError, logInfo } from "./logger.ts";
 import { tookMs } from "./util/perf.ts";
 
-export class CostSurface {
+interface CostSurfaceShapefile {
+  localFilePath: string;
+}
+
+export class CostSurface extends ShapefileUploader {
   private httpClient;
 
   constructor(httpClient: BotHttpClient) {
+    super(httpClient);
     this.httpClient = httpClient;
   }
 
@@ -34,6 +40,37 @@ export class CostSurface {
 
     logInfo(
       `Cost surface template shapefile downloaded in ${
+        tookMs(Process.hrtime(opStart))
+      }ms.`,
+    );
+    return success;
+  }
+
+  async uploadForScenario(scenarioId: string, localFilePath: string): Promise<boolean> {
+    return await this.uploadFromFile({
+      localFilePath:`${localFilePath}/processed_${scenarioId}_cost-surface-template.zip`
+    }, scenarioId)
+  }
+
+  async uploadFromFile(
+    shapefile: CostSurfaceShapefile,
+    scenarioId: string,
+  ): Promise<boolean> {
+    const opStart = Process.hrtime();
+    const data = new Blob([await Deno.readFile(shapefile.localFilePath)]);
+    const success = await (await this.sendData({
+      url: `${this.baseUrl}/api/v1/scenarios/${scenarioId}/cost-surface/shapefile`,
+      formField: "file",
+      data,
+      fileName: `${crypto.randomUUID()}.zip`,
+      headers: [["Authorization", `Bearer ${this.currentJwt}`]],
+    }))
+      .json()
+      .then((data) => data?.success ?? false)
+      .catch(logError);
+
+    logInfo(
+      `Cost surface shapefile uploaded in ${
         tookMs(Process.hrtime(opStart))
       }ms.`,
     );
