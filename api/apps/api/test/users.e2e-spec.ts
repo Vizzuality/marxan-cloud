@@ -18,6 +18,10 @@ import { LoginDto } from '@marxan-api/modules/authentication/dto/login.dto';
 import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
 import { tearDown } from './utils/tear-down';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import * as nock from 'nock';
+
+nock.disableNetConnect();
+nock.enableNetConnect(process.env.HOST_IP);
 
 /**
  * Tests for the UsersModule.
@@ -91,6 +95,10 @@ describe('UsersModule (e2e)', () => {
     let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to create an account using an email address not currently in use', async () => {
+      nock('https://api.eu.sparkpost.com')
+        .post(`/api/v1/transmissions`)
+        .reply(200);
+
       await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send(signUpDto)
@@ -300,6 +308,10 @@ describe('UsersModule (e2e)', () => {
     let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to sign up using the same email address as that of an account that has been deleted', async () => {
+      nock('https://api.eu.sparkpost.com')
+        .post(`/api/v1/transmissions`)
+        .reply(200);
+
       await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send(signUpDto)
