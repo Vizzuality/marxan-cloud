@@ -21,6 +21,7 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { v4 } from 'uuid';
 import * as ApiEventsUserData from '@marxan-api/modules/api-events/dto/apiEvents.user.data.dto';
+import { Mailer } from '@marxan-api/modules/authentication/password-recovery/mailer';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 
 /**
@@ -77,6 +78,7 @@ export class AuthenticationService {
     @InjectRepository(IssuedAuthnToken)
     private readonly issuedAuthnTokensRepository: Repository<IssuedAuthnToken>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    private readonly mailer: Mailer,
   ) {}
 
   /**
@@ -106,20 +108,12 @@ export class AuthenticationService {
    * Create a new user from the signup data provided.
    *
    * @todo Allow to set all of a user's data on signup, if needed.
-   * @todo Implement email verification.
    */
   async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
     const user = new User();
     user.displayName = signupDto.displayName;
     user.passwordHash = await hash(signupDto.password, 10);
     user.email = signupDto.email;
-    /**
-     * @todo `isActive` should never be set to true here - we do this only in
-     * dev environments until the email validation feature is ready.
-     */
-    if (process.env['NODE_ENV'] === 'development') {
-      user.isActive = true;
-    }
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
@@ -149,9 +143,10 @@ export class AuthenticationService {
      */
     if (process.env['NODE_ENV'] === 'development') {
       this.logger.log(
-        `An account was created for ${newUser.email}. Please validate the account via GET /auth/validate-account/${newUser.id}/${validationToken}.`,
+        `An account was created for ${newUser.email}. Please validate the account via POST /auth/validate and body { sub: "${newUser.id}", validationToken: "${validationToken}" }`,
       );
     }
+    await this.mailer.sendSignUpConfirmationEmail(newUser.id, validationToken);
     return newUser;
   }
 

@@ -61,6 +61,9 @@
   "passwordReset": {
     "tokenPrefix": "http://localhost:3000/auth/reset-password?token=",
     "expiration": 1800000
+  },
+  "signUpConfirmation": {
+    "tokenPrefix": "http://localhost:3000/auth/sign-up-confirmation?token="
   }
 }
 
