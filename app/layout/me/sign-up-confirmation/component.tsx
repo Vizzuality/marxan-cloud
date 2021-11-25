@@ -3,10 +3,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { signIn } from 'next-auth/client';
-
-import { useMe } from 'hooks/me';
-
 import Wrapper from 'layout/wrapper';
 
 import Button from 'components/button';
@@ -18,14 +14,11 @@ export interface SignUpConfirmationProps {
 
 export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
   const { push, query: { token: confirmToken } } = useRouter();
-  const { user } = useMe();
-
-  const { id: userId, email: userEmail } = user || {};
 
   const [confirmAccountToken, setConfirmAccountToken] = useState(false);
 
   const confirmAccount = useCallback(async () => {
-    const data = { sub: userId, validationToken: confirmToken };
+    const data = { validationToken: confirmToken };
     try {
       const signUpConfirmationResponse = await AUTHENTICATION
         .request({
@@ -35,13 +28,12 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
         });
       if (signUpConfirmationResponse.status === 201) {
         setConfirmAccountToken(true);
-        await signIn('credentials', { ...data, username: userEmail });
       }
     } catch (error) {
       setConfirmAccountToken(false);
       console.error(error);
     }
-  }, [confirmToken, userId, userEmail]);
+  }, [confirmToken]);
 
   useEffect(() => {
     confirmAccount();
