@@ -52,7 +52,7 @@ export class BotHttpClient {
    * Originally added to work around response encoding issues with axiod. In
    * general, this.baseHttpClient should be used instead of this method.
    */
-  async get(url: string) {
+  async get(url: string): Promise<Response> {
     return await fetch(`${this.baseUrl}${url}`, {
       headers: { Authorization: `Bearer ${this.currentJwt}` },
     });
