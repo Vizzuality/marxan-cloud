@@ -16,8 +16,6 @@ import {
   RequestRecoverPasswordProps,
   UseResetPasswordProps,
   ResetPasswordProps,
-  SignUpConfirmationProps,
-  UseSignUpConfirmationProps,
 } from './types';
 
 // ME
@@ -190,30 +188,6 @@ export function useResetPassword({
     },
     onError: (error, variables, context) => {
       // An error happened!
-      console.info('Error', error, variables, context);
-    },
-  });
-}
-
-// CONFIRM SIGN UP
-export function useSignUpConfirmation({
-  requestConfig = {
-    method: 'POST',
-  },
-}: UseSignUpConfirmationProps) {
-  const signUpConfirmation = ({ data }: SignUpConfirmationProps) => {
-    return USERS.request({
-      url: '/me/validate',
-      data,
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(signUpConfirmation, {
-    onSuccess: (data, variables, context) => {
-      console.info('Succces', data, variables, context);
-    },
-    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

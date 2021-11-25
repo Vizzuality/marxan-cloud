@@ -3,31 +3,45 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { useSignUpConfirmation } from 'hooks/me';
+import { signIn } from 'next-auth/client';
+
+import { useMe } from 'hooks/me';
 
 import Wrapper from 'layout/wrapper';
 
 import Button from 'components/button';
+
+import AUTHENTICATION from 'services/authentication';
 
 export interface SignUpConfirmationProps {
 }
 
 export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
   const { push, query: { token: confirmToken } } = useRouter();
-  const [confirmAccountToken, setConfirmAccountToken] = useState(false);
-  const confirmationAccountMutation = useSignUpConfirmation({});
+  const { user } = useMe();
 
-  const confirmAccount = useCallback(() => {
-    const data = { confirmToken };
-    confirmationAccountMutation.mutate({ data }, {
-      onSuccess: () => {
+  const { id: userId, email: userEmail } = user || {};
+
+  const [confirmAccountToken, setConfirmAccountToken] = useState(false);
+
+  const confirmAccount = useCallback(async () => {
+    const data = { sub: userId, validationToken: confirmToken };
+    try {
+      const signUpConfirmationResponse = await AUTHENTICATION
+        .request({
+          method: 'POST',
+          url: '/validate',
+          data,
+        });
+      if (signUpConfirmationResponse.status === 201) {
         setConfirmAccountToken(true);
-      },
-      onError: () => {
-        setConfirmAccountToken(false);
-      },
-    });
-  }, [confirmationAccountMutation, confirmToken]);
+        await signIn('credentials', { ...data, username: userEmail });
+      }
+    } catch (error) {
+      setConfirmAccountToken(false);
+      console.error(error);
+    }
+  }, [confirmToken, userId, userEmail]);
 
   useEffect(() => {
     confirmAccount();
