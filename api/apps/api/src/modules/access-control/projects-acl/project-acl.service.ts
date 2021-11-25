@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { getConnection, Repository } from 'typeorm';
+import { getConnection, Repository, Not } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
@@ -96,18 +96,13 @@ export class ProjectAclService implements ProjectAccessControl {
   }
 
   async checkUserIsOwner(userId: string, projectId: string): Promise<Permit> {
-    const userIsProjectOwner = await this.roles.findOne({
+    return !!(await this.roles.findOne({
       where: {
         projectId,
         userId,
         roleName: Roles.project_owner,
       },
-    });
-    if (!userIsProjectOwner) {
-      return false;
-    }
-
-    return true;
+    }));
   }
 
   async checkLastOwner(userId: string, projectId: string): Promise<Permit> {
@@ -115,24 +110,23 @@ export class ProjectAclService implements ProjectAccessControl {
       where: {
         projectId,
         roleName: Roles.project_owner,
+        userId: Not(userId),
       },
     });
-    if (
-      allOwnersInProject.length === 1 &&
-      allOwnersInProject[0].userId === userId
-    ) {
-      return false;
-    }
-    return true;
+    return allOwnersInProject.length >= 1;
   }
-
+  /**
+   * @debt This module should not involve user details and it should deal with it
+   * using a standalone module that will access the data just to read it. We
+   * have to get back to it once scenarios, organizations and solutions are included
+   * inside the access-module.
+   */
   async findUsersInProject(
     projectId: string,
     userId: string,
   ): Promise<UsersProjectsApiEntity[] | Permit> {
-    const isOwner = await this.checkUserIsOwner(userId, projectId);
-    if (!isOwner) {
-      return isOwner;
+    if (!(await this.checkUserIsOwner(userId, projectId))) {
+      return false;
     }
 
     const usersInProject = await this.roles
@@ -156,9 +150,8 @@ export class ProjectAclService implements ProjectAccessControl {
     loggedUserId: string,
   ): Promise<void | Permit> {
     const { userId, roleName } = updateUserInProjectDto;
-    const isOwner = await this.checkUserIsOwner(loggedUserId, projectId);
-    if (!isOwner) {
-      return isOwner;
+    if (!(await this.checkUserIsOwner(loggedUserId, projectId))) {
+      return false;
     }
 
     const apiDbConnection = getConnection(DbConnections.default);
@@ -196,15 +189,14 @@ export class ProjectAclService implements ProjectAccessControl {
     userId: string,
     loggedUserId: string,
   ): Promise<void | Permit> {
-    const isOwner = await this.checkUserIsOwner(loggedUserId, projectId);
-    if (!isOwner) {
-      return isOwner;
+    if (!(await this.checkUserIsOwner(loggedUserId, projectId))) {
+      return false;
     }
 
-    const isLastOwner = await this.checkLastOwner(userId, projectId);
-    if (!isLastOwner) {
-      return isLastOwner;
+    if (!(await this.checkLastOwner(userId, projectId))) {
+      return false;
     }
+
     await this.roles.delete({ projectId, userId });
   }
 }
