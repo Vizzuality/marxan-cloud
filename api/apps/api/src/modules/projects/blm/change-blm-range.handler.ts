@@ -1,12 +1,14 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
-import { Either, isLeft, left, right } from 'fp-ts/Either';
+import { Either, isLeft, isRight, left } from 'fp-ts/Either';
 
 import {
   ChangeBlmRange,
   ChangeRangeErrors,
+  invalidRange,
   queryFailure,
+  updateFailure,
 } from './change-blm-range.command';
-import { ProjectBlmRepo } from '@marxan-api/modules/blm';
+import { ProjectBlm, ProjectBlmRepo } from '@marxan-api/modules/blm';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { EntityManager, Repository } from 'typeorm';
@@ -31,13 +33,13 @@ export class ChangeBlmRangeHandler
   async execute({
     projectId,
     range,
-  }: ChangeBlmRange): Promise<Either<ChangeRangeErrors, true>> {
+  }: ChangeBlmRange): Promise<Either<ChangeRangeErrors, ProjectBlm>> {
     if (this.isInValidRange(range)) {
       this.logger.error(
         `Received range [${range[0]},${range[1]}] for project with ID: ${projectId} is invalid`,
       );
 
-      return left(queryFailure);
+      return left(invalidRange);
     }
 
     const project = await this.projectRepository.findOneOrFail(projectId);
@@ -54,12 +56,18 @@ export class ChangeBlmRangeHandler
     const blmValues = BlmValuesCalculator.with(range, area);
 
     const result = await this.blmRepository.update(projectId, range, blmValues);
-    if (isLeft(result))
+    if (isLeft(result)) {
       this.logger.error(
         `Could not update BLM for project with ID: ${projectId}`,
       );
 
-    return right(true);
+      return left(updateFailure);
+    }
+
+    const updatedBlmValues = await this.blmRepository.get(projectId);
+    if (isRight(updatedBlmValues)) return updatedBlmValues;
+
+    return left(queryFailure);
   }
 
   private isInValidRange(range: [number, number]) {
