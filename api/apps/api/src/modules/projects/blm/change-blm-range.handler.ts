@@ -1,5 +1,11 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, isRight, left } from 'fp-ts/Either';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
+import { Logger } from '@nestjs/common';
+
+import { ProjectBlm, ProjectBlmRepo } from '@marxan-api/modules/blm';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 import {
   ChangeBlmRange,
@@ -8,14 +14,9 @@ import {
   queryFailure,
   updateFailure,
 } from './change-blm-range.command';
-import { ProjectBlm, ProjectBlmRepo } from '@marxan-api/modules/blm';
-import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { EntityManager, Repository } from 'typeorm';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { Logger } from '@nestjs/common';
-import { SetProjectBlm } from '@marxan-api/modules/projects/blm/set-project-blm';
-import { BlmValuesCalculator } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
+import { Project } from '../project.api.entity';
+import { SetProjectBlm } from './set-project-blm';
+import { BlmValuesCalculator } from './domain/blm-values-calculator';
 
 @CommandHandler(ChangeBlmRange)
 export class ChangeBlmRangeHandler

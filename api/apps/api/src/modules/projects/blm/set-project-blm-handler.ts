@@ -1,14 +1,14 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { isLeft } from 'fp-ts/Either';
+import { Logger } from '@nestjs/common';
+import { EntityManager, Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 
 import { SetProjectBlm } from './set-project-blm';
-import { Logger } from '@nestjs/common';
-import { ProjectBlmRepo } from '@marxan-api/modules/blm';
-import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { Project } from '../project.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { BlmValuesCalculator } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
+import { ProjectBlmRepo } from '@marxan-api/modules/blm';
+import { BlmValuesCalculator } from './domain/blm-values-calculator';
 
 @CommandHandler(SetProjectBlm)
 export class SetProjectBlmHandler
