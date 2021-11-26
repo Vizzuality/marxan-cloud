@@ -18,5 +18,6 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
     TypeOrmModule.forFeature([], DbConnections.geoprocessingDB),
   ],
   providers: [SetProjectBlmHandler, ChangeBlmRangeHandler, ProjectBlmSaga],
+  exports: [BlmModule],
 })
 export class ProjectBlmModule {}
