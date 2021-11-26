@@ -9,6 +9,7 @@ import { SetProjectBlmHandler } from './set-project-blm-handler';
 import { ProjectBlmSaga } from './project-blm.saga';
 import { ChangeBlmRangeHandler } from './change-blm-range.handler';
 import { Project } from '../project.api.entity';
+import { PlanningUnitAreaFetcher } from '@marxan-api/modules/projects/blm/planning-unit-area-fetcher';
 
 @Module({
   imports: [
@@ -17,7 +18,12 @@ import { Project } from '../project.api.entity';
     TypeOrmModule.forFeature([Project]),
     TypeOrmModule.forFeature([], DbConnections.geoprocessingDB),
   ],
-  providers: [SetProjectBlmHandler, ChangeBlmRangeHandler, ProjectBlmSaga],
+  providers: [
+    SetProjectBlmHandler,
+    ChangeBlmRangeHandler,
+    ProjectBlmSaga,
+    PlanningUnitAreaFetcher,
+  ],
   exports: [BlmModule],
 })
 export class ProjectBlmModule {}

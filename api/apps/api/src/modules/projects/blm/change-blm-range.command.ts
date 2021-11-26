@@ -9,11 +9,13 @@ export const planningUnitAreaNotFound = Symbol(
   `could not query planning unit area for project`,
 );
 
+export type PlanningUnitAreaNotFoundError = typeof planningUnitAreaNotFound;
+
 export type ChangeRangeErrors =
   | typeof invalidRange
   | typeof unknownError
   | typeof updateFailure
-  | typeof planningUnitAreaNotFound;
+  | PlanningUnitAreaNotFoundError;
 
 export class ChangeBlmRange extends Command<
   Either<ChangeRangeErrors, ProjectBlm>

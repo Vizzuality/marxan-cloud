@@ -1,11 +1,9 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, isRight, left } from 'fp-ts/Either';
-import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Logger } from '@nestjs/common';
 
 import { ProjectBlm, ProjectBlmRepo } from '@marxan-api/modules/blm';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 import {
   ChangeBlmRange,
@@ -17,6 +15,7 @@ import {
 import { Project } from '../project.api.entity';
 import { SetProjectBlm } from './set-project-blm';
 import { BlmValuesCalculator } from './domain/blm-values-calculator';
+import { PlanningUnitAreaFetcher } from '@marxan-api/modules/projects/blm/planning-unit-area-fetcher';
 
 @CommandHandler(ChangeBlmRange)
 export class ChangeBlmRangeHandler
@@ -25,10 +24,8 @@ export class ChangeBlmRangeHandler
 
   constructor(
     @InjectRepository(Project)
-    protected readonly projectRepository: Repository<Project>,
-    @InjectEntityManager(DbConnections.geoprocessingDB)
-    private readonly entityManager: EntityManager,
     private readonly blmRepository: ProjectBlmRepo,
+    private readonly planningUnitAreaFetcher: PlanningUnitAreaFetcher,
   ) {}
 
   async execute({
@@ -43,21 +40,24 @@ export class ChangeBlmRangeHandler
       return left(invalidRange);
     }
 
-    const project = await this.projectRepository.findOneOrFail(projectId);
-    const area = await this.getPlanningUnitArea(project);
+    const result = await this.planningUnitAreaFetcher.execute(projectId);
 
-    if (!area) {
+    if (isLeft(result)) {
       this.logger.error(
         `Could not get Planning Unit area for project with ID: ${projectId}`,
       );
 
-      return left(planningUnitAreaNotFound);
+      return result;
     }
 
-    const blmValues = BlmValuesCalculator.with(range, area);
+    const blmValues = BlmValuesCalculator.with(range, result.right);
 
-    const result = await this.blmRepository.update(projectId, range, blmValues);
-    if (isLeft(result)) {
+    const updateResult = await this.blmRepository.update(
+      projectId,
+      range,
+      blmValues,
+    );
+    if (isLeft(updateResult)) {
       this.logger.error(
         `Could not update BLM for project with ID: ${projectId}`,
       );
@@ -73,19 +73,5 @@ export class ChangeBlmRangeHandler
 
   private isInValidRange(range: [number, number]) {
     return range.length !== 2 && range[0] < 0 && range[0] > range[1];
-  }
-
-  private async getPlanningUnitArea(
-    project: Project,
-  ): Promise<number | undefined> {
-    return (
-      project?.planningUnitAreakm2 ??
-      (await this.entityManager
-        .query(
-          `SELECT AVG(size) from "planning_units_geom" WHERE "project_id" = $1`,
-          [project.id],
-        )
-        .then((res) => res[0].avg))
-    );
   }
 }
