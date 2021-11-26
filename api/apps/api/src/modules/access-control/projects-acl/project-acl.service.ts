@@ -95,25 +95,29 @@ export class ProjectAclService implements ProjectAccessControl {
     );
   }
 
-  async checkUserIsOwner(userId: string, projectId: string): Promise<Permit> {
-    return !!(await this.roles.findOne({
+  async isOwner(userId: string, projectId: string): Promise<Permit> {
+    const userIsProjectOwner = await this.roles.findOne({
       where: {
         projectId,
         userId,
         roleName: Roles.project_owner,
       },
-    }));
+    });
+    if (!userIsProjectOwner) {
+      return false;
+    }
+    return true;
   }
 
-  async checkLastOwner(userId: string, projectId: string): Promise<Permit> {
-    const allOwnersInProject = await this.roles.find({
+  async isLastOwner(userId: string, projectId: string): Promise<Permit> {
+    const allOwnersInProject = await this.roles.count({
       where: {
         projectId,
         roleName: Roles.project_owner,
         userId: Not(userId),
       },
     });
-    return allOwnersInProject.length >= 1;
+    return allOwnersInProject >= 1;
   }
   /**
    * @debt This module should not involve user details and it should deal with it
@@ -125,7 +129,7 @@ export class ProjectAclService implements ProjectAccessControl {
     projectId: string,
     userId: string,
   ): Promise<UsersProjectsApiEntity[] | Permit> {
-    if (!(await this.checkUserIsOwner(userId, projectId))) {
+    if (!(await this.isOwner(userId, projectId))) {
       return false;
     }
 
@@ -150,7 +154,7 @@ export class ProjectAclService implements ProjectAccessControl {
     loggedUserId: string,
   ): Promise<void | Permit> {
     const { userId, roleName } = updateUserInProjectDto;
-    if (!(await this.checkUserIsOwner(loggedUserId, projectId))) {
+    if (!(await this.isOwner(loggedUserId, projectId))) {
       return false;
     }
 
@@ -189,11 +193,11 @@ export class ProjectAclService implements ProjectAccessControl {
     userId: string,
     loggedUserId: string,
   ): Promise<void | Permit> {
-    if (!(await this.checkUserIsOwner(loggedUserId, projectId))) {
+    if (!(await this.isOwner(loggedUserId, projectId))) {
       return false;
     }
 
-    if (!(await this.checkLastOwner(userId, projectId))) {
+    if (!(await this.isLastOwner(userId, projectId))) {
       return false;
     }
 
