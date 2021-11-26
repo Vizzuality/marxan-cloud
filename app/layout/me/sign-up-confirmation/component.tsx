@@ -20,15 +20,14 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
   const confirmAccount = useCallback(async () => {
     const data = { validationToken: confirmToken };
     try {
-      const signUpConfirmationResponse = await AUTHENTICATION
+      await AUTHENTICATION
         .request({
           method: 'POST',
           url: '/validate',
           data,
         });
-      if (signUpConfirmationResponse.status === 201) {
-        setConfirmedAccountToken(true);
-      }
+
+      setConfirmedAccountToken(true);
     } catch (error) {
       setConfirmedAccountToken(false);
       console.error(error);
