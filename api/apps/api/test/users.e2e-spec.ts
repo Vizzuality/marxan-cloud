@@ -6,18 +6,13 @@ import { AppModule } from '@marxan-api/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { v4 } from 'uuid';
 import { SignUpDto } from '@marxan-api/modules/authentication/dto/sign-up.dto';
-import { User } from '@marxan-api/modules/users/user.api.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { ApiEvent } from '@marxan-api/modules/api-events/api-event.api.entity';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
-import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
-import { UsersService } from '@marxan-api/modules/users/users.service';
 import { LoginDto } from '@marxan-api/modules/authentication/dto/login.dto';
-import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
 import { tearDown } from './utils/tear-down';
-import { API_EVENT_KINDS } from '@marxan/api-events';
 import * as nock from 'nock';
 
 nock.disableNetConnect();
@@ -42,8 +37,6 @@ afterAll(async () => {
 
 describe('UsersModule (e2e)', () => {
   let app: INestApplication;
-  let apiEventsService: ApiEventsService;
-  let usersService: UsersService;
 
   const aNewPassword = faker.random.uuid();
 
@@ -72,9 +65,6 @@ describe('UsersModule (e2e)', () => {
       ],
     }).compile();
 
-    apiEventsService = moduleFixture.get<ApiEventsService>(ApiEventsService);
-    usersService = moduleFixture.get<UsersService>(UsersService);
-
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(
       new ValidationPipe({
@@ -91,18 +81,19 @@ describe('UsersModule (e2e)', () => {
   });
 
   describe('Users - sign up and validation', () => {
-    let newUser: User | undefined;
-    let validationTokenEvent: ApiEventByTopicAndKind | undefined;
+    let validationToken: string;
 
     test('A user should be able to create an account using an email address not currently in use', async () => {
       nock('https://api.eu.sparkpost.com')
         .post(`/api/v1/transmissions`)
         .reply(200);
 
-      await request(app.getHttpServer())
+      const res = await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send(signUpDto)
         .expect(HttpStatus.CREATED);
+
+      validationToken = res.body.validationToken;
     });
 
     test('A user should not be able to create an account using an email address already in use', async () => {
@@ -124,44 +115,16 @@ describe('UsersModule (e2e)', () => {
     });
 
     test('A user should be able to validate their account (within the validity timeframe of the validationToken)', async () => {
-      /**
-       * Here we need to dig into the actual database to retrieve both the id
-       * assigned to the user when their account is created, and the one-time
-       * token that they would normally receive via email as part of the account
-       * validation/email confirmation workflow.
-       */
-      newUser = await usersService.findByEmail(signUpDto.email);
-      expect(newUser).toBeDefined();
-
-      if (!newUser) {
-        throw new Error('Cannot retrieve data for newly created user.');
-      }
-
-      validationTokenEvent = await apiEventsService.getLatestEventForTopic({
-        topic: newUser.id,
-        kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-      });
-
       await request(app.getHttpServer())
         .post(`/auth/validate`)
-        .send({
-          sub: newUser.id,
-          validationToken: validationTokenEvent?.data?.validationToken,
-        })
+        .send({ validationToken })
         .expect(HttpStatus.CREATED);
     });
 
     test('A user account validation token should not be allowed to be spent more than once', async () => {
-      if (!newUser) {
-        throw new Error('Cannot retrieve data for newly created user.');
-      }
-
       await request(app.getHttpServer())
         .post(`/auth/validate`)
-        .send({
-          sub: newUser.id,
-          validationToken: validationTokenEvent?.data?.validationToken,
-        })
+        .send({ validationToken })
         .expect(HttpStatus.NOT_FOUND);
     });
 
@@ -304,45 +267,25 @@ describe('UsersModule (e2e)', () => {
   });
 
   describe('Users - Sign up again', () => {
-    let newUser: User | undefined;
-    let validationTokenEvent: ApiEventByTopicAndKind | undefined;
+    let validationToken: string;
 
     test('A user should be able to sign up using the same email address as that of an account that has been deleted', async () => {
       nock('https://api.eu.sparkpost.com')
         .post(`/api/v1/transmissions`)
         .reply(200);
 
-      await request(app.getHttpServer())
+      const res = await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send(signUpDto)
         .expect(HttpStatus.CREATED);
+
+      validationToken = res.body.validationToken;
     });
 
     test('A user should be able to validate their account (within the validity timeframe of the validationToken)', async () => {
-      /**
-       * Here we need to dig into the actual database to retrieve both the id
-       * assigned to the user when their account is created, and the one-time
-       * token that they would normally receive via email as part of the account
-       * validation/email confirmation workflow.
-       */
-      newUser = await usersService.findByEmail(signUpDto.email);
-      expect(newUser).toBeDefined();
-
-      if (!newUser) {
-        throw new Error('Cannot retrieve data for newly created user.');
-      }
-
-      validationTokenEvent = await apiEventsService.getLatestEventForTopic({
-        topic: newUser.id,
-        kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-      });
-
       await request(app.getHttpServer())
         .post(`/auth/validate`)
-        .send({
-          sub: newUser.id,
-          validationToken: validationTokenEvent?.data?.validationToken,
-        })
+        .send({ validationToken })
         .expect(HttpStatus.CREATED);
     });
 

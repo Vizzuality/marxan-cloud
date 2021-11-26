@@ -21,7 +21,7 @@ describe('AppController (e2e)', () => {
       app = moduleFixture.createNestApplication();
       await app.init();
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   });
 

@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import {
   AccessToken,
   AuthenticationService,
+  ValidationToken,
 } from '@marxan-api/modules/authentication/authentication.service';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -72,8 +73,8 @@ export class AuthenticationController {
   async signUp(
     @Request() _req: Request,
     @Body(new ValidationPipe()) signupDto: SignUpDto,
-  ): Promise<void> {
-    await this.authenticationService.createUser(signupDto);
+  ): Promise<ValidationToken> {
+    return this.authenticationService.createUser(signupDto);
   }
 
   @Post('validate')

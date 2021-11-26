@@ -40,6 +40,16 @@ export interface AccessToken {
 }
 
 /**
+ * Access confirmation token for the app
+ */
+export interface ValidationToken {
+  /**
+   * Token that should be used to confirm the user account.
+   */
+  validationToken: string;
+}
+
+/**
  * JWT payload (decoded)
  */
 export interface JwtDataPayload {
@@ -109,7 +119,7 @@ export class AuthenticationService {
    *
    * @todo Allow to set all of a user's data on signup, if needed.
    */
-  async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
+  async createUser(signupDto: SignUpDto): Promise<ValidationToken> {
     const user = new User();
     user.displayName = signupDto.displayName;
     user.passwordHash = await hash(signupDto.password, 10);
@@ -126,16 +136,15 @@ export class AuthenticationService {
     });
     const validationToken = v4();
     await this.apiEventsService.create({
-      topic: newUser.id,
+      topic: validationToken,
       kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
       data: {
-        validationToken: validationToken,
         exp:
           Date.now() +
           ms(
             '1d',
           ) /** @debt The TTL of validation tokens should be set via config. */,
-        sub: newUser.email,
+        sub: newUser.id,
       },
     });
     /**
@@ -147,7 +156,7 @@ export class AuthenticationService {
       );
     }
     await this.mailer.sendSignUpConfirmationEmail(newUser.id, validationToken);
-    return newUser;
+    return { validationToken };
   }
 
   /**
@@ -159,30 +168,26 @@ export class AuthenticationService {
   async validateActivationToken(
     token: Pick<
       ApiEventsUserData.ActivationTokenGeneratedV1Alpha1DTO,
-      'validationToken' | 'sub'
+      'validationToken'
     >,
   ): Promise<true | never> {
     const invalidOrExpiredActivationTokenMessage =
       'Invalid or expired activation token.';
     const event = await this.apiEventsService.getLatestEventForTopic({
-      topic: token.sub,
+      topic: token.validationToken,
       kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
     });
     if (!event) {
       throw new BadRequestException(invalidOrExpiredActivationTokenMessage);
     }
     const exp = new Date(event?.data?.exp as number);
-    if (
-      new Date() < exp &&
-      event?.topic === token.sub &&
-      event?.data?.validationToken === token.validationToken
-    ) {
+    if (new Date() < exp && event?.topic === token.validationToken) {
       await this.apiEventsService.create({
         topic: event.topic,
         kind: API_EVENT_KINDS.user__accountActivationSucceeded__v1alpha1,
       });
       await this.usersRepository.update(
-        { id: event.topic },
+        { id: event?.data?.sub as string },
         { isActive: true },
       );
       await this.apiEventsService.purgeAll({
