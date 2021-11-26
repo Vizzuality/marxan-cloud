@@ -108,12 +108,12 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
         const validGeoJSON = {
           ...g,
-          features: g.features.map((fe) => {
+          features: g.features.map((fe) => fe.geometry.coordinates.map((c) => {
             return {
-              ...fe,
+              ...c,
               properties: fe.properties || {},
             };
-          }),
+          })),
         };
 
         dispatch(setUploadingValue(validGeoJSON));
