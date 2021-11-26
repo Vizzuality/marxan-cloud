@@ -14,7 +14,7 @@ export enum FeatureTags {
   species = "species",
 }
 
-interface GeoFeatureMetadata {
+export interface GeoFeatureMetadata {
   name: string;
   type: FeatureTags;
   description?: string;
@@ -61,7 +61,7 @@ export class GeoFeatureShapefiles extends ShapefileUploader {
     localFilePath: string,
     metadata: GeoFeatureMetadata,
   ): Promise<string> {
-    return this.uploadFromFile({
+    return await this.uploadFromFile({
       metadata,
       localFilePath,
     }, projectId);
