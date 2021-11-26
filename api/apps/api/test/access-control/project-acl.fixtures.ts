@@ -6,7 +6,7 @@ import { GivenUserExists } from '../steps/given-user-exists';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -29,16 +29,12 @@ export const getFixtures = async () => {
   return {
     cleanup: async () => {
       await userProjectsRepo.delete({
-        userId: ownerUserId,
-      });
-      await userProjectsRepo.delete({
-        userId: contributorUserId,
-      });
-      await userProjectsRepo.delete({
-        userId: viewerUserId,
-      });
-      await userProjectsRepo.delete({
-        userId: otherOwnerUserId,
+        userId: In([
+          ownerUserId,
+          contributorUserId,
+          viewerUserId,
+          otherOwnerUserId,
+        ]),
       });
       await Promise.all(cleanups.map((clean) => clean()));
       await app.close();

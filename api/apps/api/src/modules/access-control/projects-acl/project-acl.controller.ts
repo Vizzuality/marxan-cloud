@@ -36,7 +36,8 @@ export class ProjectAclController {
   @ApiOkResponse({
     status: 200,
     description: 'User roles found',
-    type: [UserRoleInProjectDto],
+    isArray: true,
+    type: UserRoleInProjectDto,
   })
   async findUsersInProject(
     @Param('projectId', ParseUUIDPipe) projectId: string,

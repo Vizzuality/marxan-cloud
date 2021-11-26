@@ -109,7 +109,7 @@ export class ProjectAclService implements ProjectAccessControl {
     return true;
   }
 
-  async isLastOwner(userId: string, projectId: string): Promise<Permit> {
+  async hasOtherOwner(userId: string, projectId: string): Promise<Permit> {
     const allOwnersInProject = await this.roles.count({
       where: {
         projectId,
@@ -128,7 +128,7 @@ export class ProjectAclService implements ProjectAccessControl {
   async findUsersInProject(
     projectId: string,
     userId: string,
-  ): Promise<UsersProjectsApiEntity[] | Permit> {
+  ): Promise<UserRoleInProjectDto[] | Permit> {
     if (!(await this.isOwner(userId, projectId))) {
       return false;
     }
@@ -197,7 +197,7 @@ export class ProjectAclService implements ProjectAccessControl {
       return false;
     }
 
-    if (!(await this.isLastOwner(userId, projectId))) {
+    if (!(await this.hasOtherOwner(userId, projectId))) {
       return false;
     }
 
