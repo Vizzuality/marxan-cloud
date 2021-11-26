@@ -15,7 +15,7 @@ export type Assets = {
   url: string;
   relativeDestination: string;
 }[];
-import { AssetFetcher } from './asset-fetcher';
+import { AssetFetcher } from '../../adapters-shared/assets/asset-fetcher';
 import { SandboxRunnerInputFiles } from '../../sandbox-runner-input-files';
 
 @Injectable()

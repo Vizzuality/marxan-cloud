@@ -3,33 +3,41 @@ import { Module } from '@nestjs/common';
 import { MarxanConfig } from '../marxan-config';
 
 // ports
-import { SandboxRunner } from '../sandbox-runner';
+import { sandboxRunnerToken } from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
 import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
-import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
 
 // adapters
 import { WorkspaceModule } from '../adapters-shared/workspace/workspace.module';
 
 import { MarxanSandboxBlmRunnerService } from './marxan-sandbox-blm-runner.service';
+import { BlmInputFiles } from './blm-input-files';
+import { AssetFactory } from './asset-factory.service';
+
+import { InputFilesFs } from '../adapters-single/scenario-data/input-files-fs';
+import { AssetsModule } from '../adapters-shared';
+
+export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
 @Module({
-  imports: [WorkspaceModule],
+  imports: [WorkspaceModule, AssetsModule],
   providers: [
     MarxanConfig,
     {
-      provide: SandboxRunner,
+      provide: sandboxRunnerToken,
       useClass: MarxanSandboxBlmRunnerService,
     },
-
     {
-      provide: SandboxRunnerInputFiles,
-      useValue: {},
+      provide: blmSandboxRunner,
+      useClass: MarxanSandboxBlmRunnerService,
     },
     {
       provide: SandboxRunnerOutputHandler,
       useValue: {},
     },
+    AssetFactory,
+    BlmInputFiles,
+    InputFilesFs,
   ],
-  exports: [SandboxRunner],
+  exports: [sandboxRunnerToken, blmSandboxRunner],
 })
 export class BlmRunAdapterModule {}
