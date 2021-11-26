@@ -11,7 +11,7 @@ import {
   ChangeBlmRange,
   ChangeRangeErrors,
   invalidRange,
-  queryFailure,
+  planningUnitAreaNotFound,
   updateFailure,
 } from './change-blm-range.command';
 import { Project } from '../project.api.entity';
@@ -51,7 +51,7 @@ export class ChangeBlmRangeHandler
         `Could not get Planning Unit area for project with ID: ${projectId}`,
       );
 
-      return left(queryFailure);
+      return left(planningUnitAreaNotFound);
     }
 
     const blmValues = BlmValuesCalculator.with(range, area);
@@ -68,7 +68,7 @@ export class ChangeBlmRangeHandler
     const updatedBlmValues = await this.blmRepository.get(projectId);
     if (isRight(updatedBlmValues)) return updatedBlmValues;
 
-    return left(queryFailure);
+    return left(planningUnitAreaNotFound);
   }
 
   private isInValidRange(range: [number, number]) {

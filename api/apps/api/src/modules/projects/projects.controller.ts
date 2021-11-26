@@ -65,7 +65,7 @@ import { FeatureTags } from '@marxan-api/modules/geo-features/geo-feature-set.ap
 import { UpdateProjectBlmRangeDTO } from '@marxan-api/modules/projects/dto/update-project-blm-range.dto';
 import { invalidRange } from '@marxan-api/modules/projects/blm';
 import {
-  queryFailure,
+  planningUnitAreaNotFound,
   updateFailure,
 } from '@marxan-api/modules/projects/blm/change-blm-range.command';
 import { ProjectBlmValuesResponseDTO } from '@marxan-api/modules/projects/dto/project-blm-values-response.dto';
@@ -302,7 +302,7 @@ export class ProjectsController {
       switch (result.left) {
         case invalidRange:
           throw new BadRequestException(`Invalid range: ${range}`);
-        case queryFailure:
+        case planningUnitAreaNotFound:
           throw new NotFoundException(
             `Could not find project BLM values for project with ID: ${id}`,
           );
