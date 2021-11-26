@@ -35,7 +35,7 @@ export class PlanningUnitAreaFetcher {
       project?.planningUnitAreakm2 ??
       (await this.entityManager
         .query(
-          `SELECT AVG(size) from "planning_units_geom" WHERE "project_id" = $1`,
+          `SELECT AVG(size)/1e6 from "planning_units_geom" WHERE "project_id" = $1`,
           [project.id],
         )
         .then((res) => res[0].avg));
