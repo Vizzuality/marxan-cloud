@@ -7,6 +7,7 @@ import { ProjectBlm, ProjectBlmRepo } from '@marxan-api/modules/blm';
 import {
   ChangeBlmRange,
   ChangeRangeErrors,
+  invalidRange,
   planningUnitAreaNotFound,
   updateFailure,
 } from './change-blm-range.command';
@@ -28,6 +29,14 @@ export class ChangeBlmRangeHandler
     projectId,
     range,
   }: ChangeBlmRange): Promise<Either<ChangeRangeErrors, ProjectBlm>> {
+    if (this.isInvalidRange(range)) {
+      this.logger.error(
+        `Received invalid range [${range}] for project with ID: ${projectId}`,
+      );
+
+      return left(invalidRange);
+    }
+
     const result = await this.planningUnitAreaFetcher.execute(projectId);
 
     if (isLeft(result)) {
@@ -58,5 +67,14 @@ export class ChangeBlmRangeHandler
     if (isRight(updatedBlmValues)) return updatedBlmValues;
 
     return left(planningUnitAreaNotFound);
+  }
+
+  private isInvalidRange(range: [number, number]) {
+    return (
+      !Array.isArray(range) ||
+      range.length != 2 ||
+      range.some((v) => v < 0) ||
+      range[0] > range[1]
+    );
   }
 }
