@@ -27,6 +27,7 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -61,6 +62,13 @@ import { isFeatureCollection } from '@marxan/utils';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 import { FeatureTags } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
+import { UpdateProjectBlmRangeDTO } from '@marxan-api/modules/projects/dto/update-project-blm-range.dto';
+import { invalidRange } from '@marxan-api/modules/projects/blm';
+import {
+  planningUnitAreaNotFound,
+  updateFailure,
+} from '@marxan-api/modules/projects/blm/change-blm-range.command';
+import { ProjectBlmValuesResponseDto } from '@marxan-api/modules/projects/dto/project-blm-values-response.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -272,5 +280,63 @@ export class ProjectsController {
     );
 
     return { success: true };
+  }
+
+  @ApiOperation({
+    description: 'Updates the project BLM range and calculate its values',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the Project',
+  })
+  @ApiOkResponse({ type: ProjectBlmValuesResponseDto })
+  @ApiTags(inlineJobTag)
+  @Patch(':id/calibration')
+  async updateBlmRange(
+    @Param('id') id: string,
+    @Body() { range }: UpdateProjectBlmRangeDTO,
+  ): Promise<ProjectBlmValuesResponseDto> {
+    const result = await this.projectsService.updateBlmValues(id, range);
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case invalidRange:
+          throw new BadRequestException(`Invalid range: ${range}`);
+        case planningUnitAreaNotFound:
+          throw new NotFoundException(
+            `Could not find project BLM values for project with ID: ${id}`,
+          );
+        case updateFailure:
+          throw new InternalServerErrorException(
+            `Could not update with range ${range} project BLM values for project with ID: ${id}`,
+          );
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return result.right;
+  }
+
+  @ApiOperation({
+    description: 'Shows the project BLM values of a project',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the Project',
+  })
+  @ApiOkResponse({ type: ProjectBlmValuesResponseDto })
+  @ApiTags(inlineJobTag)
+  @Get(':id/calibration')
+  async getProjectBlmValues(
+    @Param('id') id: string,
+  ): Promise<ProjectBlmValuesResponseDto> {
+    const result = await this.projectsService.findProjectBlm(id);
+
+    if (isLeft(result))
+      throw new NotFoundException(
+        `Could not find project BLM values for project with ID: ${id}`,
+      );
+    return result.right;
   }
 }

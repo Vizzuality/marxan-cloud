@@ -1,19 +1,19 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
-import { Either, isLeft, left, right } from 'fp-ts/Either';
+import { Either, isLeft, isRight, left } from 'fp-ts/Either';
+import { Logger } from '@nestjs/common';
+
+import { ProjectBlm, ProjectBlmRepo } from '@marxan-api/modules/blm';
 
 import {
   ChangeBlmRange,
   ChangeRangeErrors,
-  queryFailure,
+  invalidRange,
+  planningUnitAreaNotFound,
+  updateFailure,
 } from './change-blm-range.command';
-import { ProjectBlmRepo } from '@marxan-api/modules/blm';
-import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { EntityManager, Repository } from 'typeorm';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { Logger } from '@nestjs/common';
-import { SetProjectBlm } from '@marxan-api/modules/projects/blm/set-project-blm';
-import { BlmValuesCalculator } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
+import { SetProjectBlm } from './set-project-blm';
+import { PlanningUnitAreaFetcher } from './planning-unit-area-fetcher';
+import { BlmValuesPolicyFactory } from './blm-values-policy-factory';
 
 @CommandHandler(ChangeBlmRange)
 export class ChangeBlmRangeHandler
@@ -21,62 +21,62 @@ export class ChangeBlmRangeHandler
   private readonly logger: Logger = new Logger(SetProjectBlm.name);
 
   constructor(
-    @InjectRepository(Project)
-    protected readonly projectRepository: Repository<Project>,
-    @InjectEntityManager(DbConnections.geoprocessingDB)
-    private readonly entityManager: EntityManager,
     private readonly blmRepository: ProjectBlmRepo,
+    private readonly planningUnitAreaFetcher: PlanningUnitAreaFetcher,
+    private readonly blmPolicyFactory: BlmValuesPolicyFactory,
   ) {}
 
   async execute({
     projectId,
     range,
-  }: ChangeBlmRange): Promise<Either<ChangeRangeErrors, true>> {
-    if (this.isInValidRange(range)) {
+  }: ChangeBlmRange): Promise<Either<ChangeRangeErrors, ProjectBlm>> {
+    if (this.isInvalidRange(range)) {
       this.logger.error(
-        `Received range [${range[0]},${range[1]}] for project with ID: ${projectId} is invalid`,
+        `Received invalid range [${range}] for project with ID: ${projectId}`,
       );
 
-      return left(queryFailure);
+      return left(invalidRange);
     }
 
-    const project = await this.projectRepository.findOneOrFail(projectId);
-    const area = await this.getPlanningUnitArea(project);
+    const result = await this.planningUnitAreaFetcher.execute(projectId);
 
-    if (!area) {
+    if (isLeft(result)) {
       this.logger.error(
         `Could not get Planning Unit area for project with ID: ${projectId}`,
       );
 
-      return left(queryFailure);
+      return result;
     }
 
-    const blmValues = BlmValuesCalculator.with(range, area);
+    const calculator = this.blmPolicyFactory.get();
+    const blmValues = calculator.with(range, result.right);
 
-    const result = await this.blmRepository.update(projectId, range, blmValues);
-    if (isLeft(result))
+    const updateResult = await this.blmRepository.update(
+      projectId,
+      range,
+      blmValues,
+    );
+
+    if (isLeft(updateResult)) {
       this.logger.error(
         `Could not update BLM for project with ID: ${projectId}`,
       );
 
-    return right(true);
+      return left(updateFailure);
+    }
+
+    const updatedBlmValues = await this.blmRepository.get(projectId);
+    if (isRight(updatedBlmValues)) return updatedBlmValues;
+
+    return left(planningUnitAreaNotFound);
   }
 
-  private isInValidRange(range: [number, number]) {
-    return range.length !== 2 && range[0] < 0 && range[0] > range[1];
-  }
-
-  private async getPlanningUnitArea(
-    project: Project,
-  ): Promise<number | undefined> {
+  private isInvalidRange(range: [number, number]) {
     return (
-      project?.planningUnitAreakm2 ??
-      (await this.entityManager
-        .query(
-          `SELECT AVG(size) from "planning_units_geom" WHERE "project_id" = $1`,
-          [project.id],
-        )
-        .then((res) => res[0].avg))
+      !Array.isArray(range) ||
+      range.length != 2 ||
+      range.some((v) => v < 0) ||
+      range[0] > range[1]
     );
   }
 }

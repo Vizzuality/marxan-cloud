@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
-import { QueryBus } from '@nestjs/cqrs';
-import { isLeft, Either, right } from 'fp-ts/Either';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Either, isLeft, right } from 'fp-ts/Either';
 
 import {
-  GeoFeaturesService,
   FindResult,
+  GeoFeaturesService,
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import { GeoFeaturesRequestInfo } from '@marxan-api/modules/geo-features';
 
@@ -22,6 +22,12 @@ import {
   ProjectsServiceRequest,
 } from './project-requests-info';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
+import { ChangeBlmRange } from '@marxan-api/modules/projects/blm';
+import {
+  GetFailure,
+  ProjectBlm,
+  ProjectBlmRepo,
+} from '@marxan-api/modules/blm';
 
 export { validationFailed } from './planning-areas';
 
@@ -32,7 +38,9 @@ export class ProjectsService {
     private readonly projectsCrud: ProjectsCrudService,
     private readonly jobStatusService: JobStatusService,
     private readonly planningAreaService: PlanningAreasService,
+    private readonly projectBlmRepository: ProjectBlmRepo,
     private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
   ) {}
 
   async findAllGeoFeatures(
@@ -77,6 +85,10 @@ export class ProjectsService {
     }
   }
 
+  async findProjectBlm(id: string): Promise<Either<GetFailure, ProjectBlm>> {
+    return await this.projectBlmRepository.get(id);
+  }
+
   // TODO debt: shouldn't use API's DTO - avoid relating service to given access layer (Rest)
   async create(input: CreateProjectDTO, info: ProjectsRequest) {
     assertDefined(info.authenticatedUser);
@@ -91,6 +103,10 @@ export class ProjectsService {
   async update(projectId: string, input: UpdateProjectDTO) {
     // /ACL slot - can?/
     return this.projectsCrud.update(projectId, input);
+  }
+
+  async updateBlmValues(projectId: string, range: [number, number]) {
+    return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
   }
 
   async remove(projectId: string) {
