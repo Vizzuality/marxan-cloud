@@ -11,15 +11,16 @@ import {
   Body,
   HttpCode,
   ForbiddenException,
+  HttpStatus,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ProjectAclService } from './project-acl.service';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import {
   ApiBearerAuth,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { UserRoleInProjectDto } from './dto/user-role-project.dto';
@@ -34,7 +35,6 @@ export class ProjectAclController {
   @Get(':projectId/users')
   @ApiOperation({ summary: 'Get all users with roles in project' })
   @ApiOkResponse({
-    status: 200,
     description: 'User roles found',
     isArray: true,
     type: UserRoleInProjectDto,
@@ -56,9 +56,12 @@ export class ProjectAclController {
   }
 
   @Patch(':projectId/users')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Add user and proper role to a project' })
-  @ApiResponse({ status: 204, description: 'User was updated correctly' })
+  @ApiNoContentResponse({
+    status: 204,
+    description: 'User was updated correctly',
+  })
   async updateUserInProject(
     @Body() dto: UserRoleInProjectDto,
     @Param('projectId', ParseUUIDPipe) projectId: string,
@@ -76,9 +79,12 @@ export class ProjectAclController {
   }
 
   @Delete(':projectId/users/:userId')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Revoke access to user from project' })
-  @ApiResponse({ status: 204, description: 'User was deleted correctly' })
+  @ApiNoContentResponse({
+    status: 204,
+    description: 'User was deleted correctly',
+  })
   async deleteUserFromProject(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('userId', ParseUUIDPipe) userId: string,

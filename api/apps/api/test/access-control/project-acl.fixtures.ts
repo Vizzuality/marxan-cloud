@@ -54,7 +54,7 @@ export const getFixtures = async () => {
       return existingUserId;
     },
 
-    WhenGettingProjectUserAsNotInProject: async (projectId: string) =>
+    WhenGettingProjectUsersAsNotInProject: async (projectId: string) =>
       await request(app.getHttpServer())
         .get(`/api/v1/roles/projects/${projectId}/users`)
         .set('Authorization', `Bearer ${otherOwnerUserToken}`),

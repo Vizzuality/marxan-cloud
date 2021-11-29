@@ -10,28 +10,28 @@ afterEach(async () => {
   await fixtures?.cleanup();
 });
 
-test(`getting project users when user is not added to project`, async () => {
+test(`getting project users when user has no role in the project`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
-  const response = await fixtures.WhenGettingProjectUserAsNotInProject(
+  const response = await fixtures.WhenGettingProjectUsersAsNotInProject(
     projectId,
   );
   fixtures.ThenForbiddenIsReturned(response);
 });
 
-test(`getting project users as the owner and unique user`, async () => {
+test(`getting project users as owner and unique user`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
   const response = await fixtures.WhenGettingProjectUsersAsOwner(projectId);
   fixtures.ThenSingleOwnerUserInProjectIsReturned(response);
 });
 
-test(`getting project users with user in project but is viewer`, async () => {
+test(`getting project users as viewer`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
   await fixtures.WhenAddingANewViewerToTheProjectAsOwner(projectId);
   const response = await fixtures.WhenGettingProjectUsersAsViewer(projectId);
   fixtures.ThenForbiddenIsReturned(response);
 });
 
-test(`getting project users with user in project but is contributor`, async () => {
+test(`getting project users as contributor`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
   await fixtures.WhenAddingANewContributorToTheProjectAsOwner(projectId);
   const response = await fixtures.WhenGettingProjectUsersAsContributor(

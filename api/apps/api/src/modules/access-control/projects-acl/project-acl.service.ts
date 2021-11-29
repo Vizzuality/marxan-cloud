@@ -110,14 +110,14 @@ export class ProjectAclService implements ProjectAccessControl {
   }
 
   async hasOtherOwner(userId: string, projectId: string): Promise<Permit> {
-    const allOwnersInProject = await this.roles.count({
+    const otherOwnersInProject = await this.roles.count({
       where: {
         projectId,
         roleName: Roles.project_owner,
         userId: Not(userId),
       },
     });
-    return allOwnersInProject >= 1;
+    return otherOwnersInProject >= 1;
   }
   /**
    * @debt This module should not involve user details and it should deal with it
