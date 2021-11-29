@@ -112,8 +112,9 @@ export function useWDPAPreviewLayer({
             layout: {
               visibility: visibility ? 'visible' : 'none',
             },
-            filter: ['all',
-              ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
+            filter: ['any',
+              ['all', ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]]],
+              ['all', ['in', ['get', 'id'], ['literal', wdpaIucnCategories]]],
             ],
             paint: {
               'fill-color': COLORS.wdpa,
@@ -125,8 +126,9 @@ export function useWDPAPreviewLayer({
             layout: {
               visibility: visibility ? 'visible' : 'none',
             },
-            filter: ['all',
-              ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
+            filter: ['any',
+              ['all', ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]]],
+              ['all', ['in', ['get', 'id'], ['literal', wdpaIucnCategories]]],
             ],
             paint: {
               'line-color': '#000',
