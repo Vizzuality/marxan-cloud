@@ -23,6 +23,11 @@ import {
 } from './project-requests-info';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 import { ChangeBlmRange } from '@marxan-api/modules/projects/blm';
+import {
+  GetFailure,
+  ProjectBlm,
+  ProjectBlmRepo,
+} from '@marxan-api/modules/blm';
 
 export { validationFailed } from './planning-areas';
 
@@ -33,6 +38,7 @@ export class ProjectsService {
     private readonly projectsCrud: ProjectsCrudService,
     private readonly jobStatusService: JobStatusService,
     private readonly planningAreaService: PlanningAreasService,
+    private readonly projectBlmRepository: ProjectBlmRepo,
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
   ) {}
@@ -77,6 +83,10 @@ export class ProjectsService {
       // library-sourced errors are no longer instances of HttpException
       return undefined;
     }
+  }
+
+  async findProjectBlm(id: string): Promise<Either<GetFailure, ProjectBlm>> {
+    return await this.projectBlmRepository.get(id);
   }
 
   // TODO debt: shouldn't use API's DTO - avoid relating service to given access layer (Rest)

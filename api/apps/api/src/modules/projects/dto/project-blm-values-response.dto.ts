@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ProjectBlmValuesResponseDTO {
+export class ProjectBlmValuesResponseDto {
   @ApiProperty({
     description: 'An ID of the project that owns this BLM values',
     example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
@@ -29,7 +29,8 @@ export class ProjectBlmValuesResponseDTO {
   defaults!: number[];
 
   @ApiProperty({
-    description: 'Calculates BLM values with given range',
+    description:
+      'Calculated BLM values according to given range and planning unit area',
     example: [
       38.72983346207417,
       316.2936399402723,

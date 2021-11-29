@@ -5,13 +5,17 @@ import { ProjectBlm } from '@marxan-api/modules/blm';
 export const invalidRange = Symbol(`invalid range`);
 export const unknownError = Symbol(`unknown error`);
 export const updateFailure = Symbol(`update failure`);
-export const queryFailure = Symbol(`query failure`);
+export const planningUnitAreaNotFound = Symbol(
+  `could not query planning unit area for project`,
+);
+
+export type PlanningUnitAreaNotFoundError = typeof planningUnitAreaNotFound;
 
 export type ChangeRangeErrors =
   | typeof invalidRange
   | typeof unknownError
   | typeof updateFailure
-  | typeof queryFailure;
+  | PlanningUnitAreaNotFoundError;
 
 export class ChangeBlmRange extends Command<
   Either<ChangeRangeErrors, ProjectBlm>
