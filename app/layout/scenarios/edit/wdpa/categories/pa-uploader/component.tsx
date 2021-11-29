@@ -83,6 +83,14 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
     setSuccessFile({ ...successFile, name: f.name });
     saveFileData(data);
+    addToast('success-upload-protected-area', (
+      <>
+        <h2 className="font-medium">Success!</h2>
+        <p className="text-sm">Protected area uploaded</p>
+      </>
+    ), {
+      level: 'success',
+    });
   };
 
   const onDropRejected = (rejectedFiles) => {
@@ -109,24 +117,12 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     fileData.append('name', name);
     uploadPAMutation.mutate({ id: `${sid}`, data: fileData }, {
 
-      onSuccess: ({ data: { data: PAdata, id: PAid } }) => {
+      onSuccess: () => {
         setLoading(false);
-        setSuccessFile({ ...successFile, id: PAid, geom: PAdata });
-
-        input.onChange(PAid);
-
-        addToast('success-upload-protected-area', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Protected area uploaded</p>
-          </>
-        ), {
-          level: 'success',
-        });
+        setSuccessFile({ ...successFile });
 
         dispatch(setCache(Date.now()));
         setOpened(false);
-        console.info('Protected area shapefile uploaded', PAdata);
       },
       onError: () => {
         setLoading(false);
@@ -142,7 +138,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         });
       },
     });
-  }, [uploadPAMutation, addToast, dispatch, setCache, input, sid, successFile, fileData]);
+  }, [uploadPAMutation, addToast, dispatch, setCache, sid, successFile, fileData]);
 
   const {
     getRootProps,

@@ -112,6 +112,8 @@ export function useWDPAPreviewLayer({
             layout: {
               visibility: visibility ? 'visible' : 'none',
             },
+            // wdpaIucnCategories are filtered in two steps as they are custom and WDPA.
+            // We have not way to separate them into two arrays but it would be ideal
             filter: ['any',
               ['all', ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]]],
               ['all', ['in', ['get', 'id'], ['literal', wdpaIucnCategories]]],
