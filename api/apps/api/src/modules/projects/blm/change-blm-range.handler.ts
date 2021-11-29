@@ -12,8 +12,8 @@ import {
   updateFailure,
 } from './change-blm-range.command';
 import { SetProjectBlm } from './set-project-blm';
-import { BlmValuesCalculator } from './domain/blm-values-calculator';
-import { PlanningUnitAreaFetcher } from '@marxan-api/modules/projects/blm/planning-unit-area-fetcher';
+import { PlanningUnitAreaFetcher } from './planning-unit-area-fetcher';
+import { BlmValuesPolicyFactory } from './BlmValuesPolicyFactory';
 
 @CommandHandler(ChangeBlmRange)
 export class ChangeBlmRangeHandler
@@ -23,6 +23,7 @@ export class ChangeBlmRangeHandler
   constructor(
     private readonly blmRepository: ProjectBlmRepo,
     private readonly planningUnitAreaFetcher: PlanningUnitAreaFetcher,
+    private readonly blmPolicyFactory: BlmValuesPolicyFactory,
   ) {}
 
   async execute({
@@ -47,7 +48,8 @@ export class ChangeBlmRangeHandler
       return result;
     }
 
-    const blmValues = BlmValuesCalculator.with(range, result.right);
+    const calculator = this.blmPolicyFactory.get();
+    const blmValues = calculator.with(range, result.right);
 
     const updateResult = await this.blmRepository.update(
       projectId,

@@ -10,6 +10,7 @@ import { ProjectBlmSaga } from './project-blm.saga';
 import { ChangeBlmRangeHandler } from './change-blm-range.handler';
 import { PlanningUnitAreaFetcher } from '@marxan-api/modules/projects/blm/planning-unit-area-fetcher';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { BlmValuesPolicyFactory } from '@marxan-api/modules/projects/blm/BlmValuesPolicyFactory';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
     ChangeBlmRangeHandler,
     ProjectBlmSaga,
     PlanningUnitAreaFetcher,
+    BlmValuesPolicyFactory,
   ],
   exports: [BlmModule],
 })

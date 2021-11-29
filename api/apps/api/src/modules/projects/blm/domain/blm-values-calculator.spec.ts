@@ -1,8 +1,10 @@
 import { BlmValuesCalculator } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 
 describe('blm-values-calculator', () => {
+  const blmValuesCalculator = new BlmValuesCalculator();
+
   it('should calculate the correct default values', async () => {
-    const defaultValues = BlmValuesCalculator.withDefaultRange(1500);
+    const defaultValues = blmValuesCalculator.withDefaultRange(1500);
 
     expect(defaultValues).toStrictEqual([
       0.03872983346207417,
@@ -15,7 +17,7 @@ describe('blm-values-calculator', () => {
   });
 
   it('should calculate the correct values with a given range', async () => {
-    const values = BlmValuesCalculator.with([1, 50], 1500);
+    const values = blmValuesCalculator.with([1, 50], 1500);
 
     expect(values).toStrictEqual([
       38.72983346207417,
