@@ -3,7 +3,7 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
 let world: FixtureType<typeof createWorld>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   world = await createWorld();
 });
 
@@ -12,16 +12,28 @@ test(`when worker processes the job for known project`, async () => {
   const name = await world.WhenNewShapefileIsSubmitted();
   await delay(2000);
 
-  expect(await world.ThenNewEntriesArePublished(name)).toEqual(true);
-  expect(await world.ThenOldEntriesAreRemoved(`old-shape-name`)).toEqual(true);
+  expect(await world.ThenProtectedAreaIsAvailable(name)).toEqual(true);
+  expect(await world.ThenProtectedAreaIsAvailable(`old-shape-name`)).toEqual(
+    true,
+  );
 });
 
-describe(`when providing name in job input`, () => {
-  it(`uses provided name as protected area's "fullName"`, async () => {
-    const name = await world.WhenNewShapefileIsSubmitted(`custom name`);
-    await delay(2000);
-    expect(await world.ThenNewEntriesArePublished(name)).toEqual(true);
-  });
+test(`uses provided name as protected area's "fullName"`, async () => {
+  const name = await world.WhenNewShapefileIsSubmitted(`custom name`);
+  await delay(2000);
+  expect(await world.ThenProtectedAreaIsAvailable(name)).toEqual(true);
+});
+
+test(`adding the same shape twice`, async () => {
+  expect.assertions(1);
+  await world.WhenNewShapefileIsSubmitted(`custom name`);
+  try {
+    await world.WhenNewShapefileIsSubmitted(`custom name`);
+  } catch (error) {
+    expect(
+      error.toString().match(`wpdpa_project_geometries_project_check`),
+    ).toBeTruthy();
+  }
 });
 
 afterAll(async () => {
