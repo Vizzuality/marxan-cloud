@@ -1,13 +1,15 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { getConnection, Repository, Not } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/users/role.api.entity';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { Permit } from '../access-control.types';
 import { ProjectAccessControl } from './project-access-control';
+import { UserRoleInProjectDto } from './dto/user-role-project.dto';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -91,5 +93,114 @@ export class ProjectAclService implements ProjectAccessControl {
       await this.getRolesWithinProjectForUser(userId, projectId),
       this.canViewSolutionRoles,
     );
+  }
+
+  async isOwner(userId: string, projectId: string): Promise<Permit> {
+    const userIsProjectOwner = await this.roles.findOne({
+      where: {
+        projectId,
+        userId,
+        roleName: Roles.project_owner,
+      },
+    });
+    if (!userIsProjectOwner) {
+      return false;
+    }
+    return true;
+  }
+
+  async hasOtherOwner(userId: string, projectId: string): Promise<Permit> {
+    const otherOwnersInProject = await this.roles.count({
+      where: {
+        projectId,
+        roleName: Roles.project_owner,
+        userId: Not(userId),
+      },
+    });
+    return otherOwnersInProject >= 1;
+  }
+  /**
+   * @debt This module should not involve user details and it should deal with it
+   * using a standalone module that will access the data just to read it. We
+   * have to get back to it once scenarios, organizations and solutions are included
+   * inside the access-module.
+   */
+  async findUsersInProject(
+    projectId: string,
+    userId: string,
+  ): Promise<UserRoleInProjectDto[] | Permit> {
+    if (!(await this.isOwner(userId, projectId))) {
+      return false;
+    }
+
+    const usersInProject = await this.roles
+      .createQueryBuilder('users_projects')
+      .leftJoinAndSelect('users_projects.user', 'userId')
+      .where({ projectId })
+      .select([
+        'users_projects.roleName',
+        'userId.displayName',
+        'userId.id',
+        'userId.avatarDataUrl',
+      ])
+      .getMany();
+
+    return usersInProject;
+  }
+
+  async updateUserInProject(
+    projectId: string,
+    updateUserInProjectDto: UserRoleInProjectDto,
+    loggedUserId: string,
+  ): Promise<void | Permit> {
+    const { userId, roleName } = updateUserInProjectDto;
+    if (!(await this.isOwner(loggedUserId, projectId))) {
+      return false;
+    }
+
+    const apiDbConnection = getConnection(DbConnections.default);
+    const apiQueryRunner = apiDbConnection.createQueryRunner();
+
+    await apiQueryRunner.connect();
+    await apiQueryRunner.startTransaction();
+
+    try {
+      const existingUserInProject = await this.roles.findOne({
+        where: {
+          projectId,
+          userId,
+        },
+      });
+
+      if (!existingUserInProject) {
+        await this.roles.save({
+          projectId,
+          userId,
+          roleName,
+        });
+      } else {
+        await this.roles.update({ projectId, userId }, { roleName });
+      }
+    } catch (err) {
+      await apiQueryRunner.rollbackTransaction();
+    } finally {
+      await apiQueryRunner.release();
+    }
+  }
+
+  async revokeAccess(
+    projectId: string,
+    userId: string,
+    loggedUserId: string,
+  ): Promise<void | Permit> {
+    if (!(await this.isOwner(loggedUserId, projectId))) {
+      return false;
+    }
+
+    if (!(await this.hasOtherOwner(userId, projectId))) {
+      return false;
+    }
+
+    await this.roles.delete({ projectId, userId });
   }
 }

@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/users/role.api.entity';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
 import { ProjectAclService } from './project-acl.service';
@@ -43,28 +43,60 @@ test(`project contributor role assigned`, async () => {
   await fixtures.ThenCanViewProject();
 });
 
+test(`project has multiple users`, async () => {
+  await fixtures.GivenProjectHasMultipleUsers();
+  await fixtures.GivenAnOwnerIsAssignedToProject();
+  await fixtures.ThenCanFindNumberOfUsersInProject();
+});
+
 const getFixtures = async () => {
-  const repo: jest.Mocked<Pick<Repository<UsersProjectsApiEntity>, 'find'>> = {
-    find: jest.fn(),
-  };
+  let userProjectsRepoMock: jest.Mocked<Repository<UsersProjectsApiEntity>>;
+
+  const userProjectsToken = getRepositoryToken(UsersProjectsApiEntity);
+
+  const projectId = v4();
+  const userId = v4();
+  const viewerUserId = v4();
+
   const sandbox = await Test.createTestingModule({
     providers: [
       ProjectAclService,
       {
         provide: getRepositoryToken(UsersProjectsApiEntity),
-        useValue: repo,
+        useValue: {
+          find: jest.fn(),
+          findOne: jest.fn(),
+          createQueryBuilder: jest.fn(() => ({
+            leftJoinAndSelect: jest.fn().mockReturnThis(),
+            select: jest.fn().mockReturnThis(),
+            where: jest.fn().mockReturnThis(),
+            getMany: jest.fn(() => [
+              {
+                roleName: Roles.project_owner,
+                projectId,
+                userId,
+              },
+              {
+                roleName: Roles.project_viewer,
+                projectId,
+                userId: viewerUserId,
+              },
+            ]),
+          })),
+        },
       },
     ],
   }).compile();
 
   const sut = sandbox.get(ProjectAclService);
-  const projectId = v4();
-  const userId = v4();
+
+  userProjectsRepoMock = sandbox.get(userProjectsToken);
 
   return {
-    GivenNoRoles: () => repo.find.mockImplementation(async () => []),
+    GivenNoRoles: () =>
+      userProjectsRepoMock.find.mockImplementation(async () => []),
     GivenProjectViewerRoleIsAssigned: () =>
-      repo.find.mockImplementation(async () => [
+      userProjectsRepoMock.find.mockImplementation(async () => [
         {
           roleName: Roles.project_viewer,
           projectId,
@@ -72,7 +104,7 @@ const getFixtures = async () => {
         },
       ]),
     GivenProjectOwnerRoleIsAssigned: () =>
-      repo.find.mockImplementation(async () => [
+      userProjectsRepoMock.find.mockImplementation(async () => [
         {
           roleName: Roles.project_owner,
           projectId,
@@ -80,19 +112,40 @@ const getFixtures = async () => {
         },
       ]),
     GivenProjectContributorRoleIsAssigned: () =>
-      repo.find.mockImplementation(async () => [
+      userProjectsRepoMock.find.mockImplementation(async () => [
         {
           roleName: Roles.project_contributor,
           projectId,
           userId,
         },
       ]),
+    GivenProjectHasMultipleUsers: () =>
+      userProjectsRepoMock.find.mockImplementation(async () => [
+        {
+          roleName: Roles.project_owner,
+          projectId,
+          userId,
+        },
+        {
+          roleName: Roles.project_viewer,
+          projectId,
+          userId: viewerUserId,
+        },
+      ]),
+    GivenAnOwnerIsAssignedToProject: () =>
+      userProjectsRepoMock.findOne.mockReturnValue(
+        Promise.resolve({
+          projectId,
+          userId,
+          roleName: Roles.project_owner,
+        }),
+      ),
     ThenCannotCreateProject: async () => {
       expect(await sut.canCreateProject(userId, projectId)).toEqual(false);
     },
     ThenCanCreateProject: async () => {
       expect(await sut.canCreateProject(userId, projectId)).toEqual(true);
-      expect(repo.find).toHaveBeenCalledWith({
+      expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
         where: {
           projectId,
           userId,
@@ -105,7 +158,7 @@ const getFixtures = async () => {
     },
     ThenCanViewProject: async () => {
       expect(await sut.canViewProject(userId, projectId)).toEqual(true);
-      expect(repo.find).toHaveBeenCalledWith({
+      expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
         where: {
           projectId,
           userId,
@@ -118,13 +171,19 @@ const getFixtures = async () => {
     },
     ThenCanPublishProject: async () => {
       expect(await sut.canPublishProject(userId, projectId)).toEqual(true);
-      expect(repo.find).toHaveBeenCalledWith({
+      expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
         where: {
           projectId,
           userId,
         },
         select: ['roleName'],
       });
+    },
+    ThenCanFindNumberOfUsersInProject: async () => {
+      expect(
+        await sut.findUsersInProject(projectId, viewerUserId),
+      ).toHaveLength(2);
+      expect(userProjectsRepoMock.createQueryBuilder).toHaveBeenCalled();
     },
   };
 };
