@@ -1,1 +1,2 @@
-export class PublishProjectDto {}
+export class PublishProjectDto {
+}

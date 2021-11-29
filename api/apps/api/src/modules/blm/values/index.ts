@@ -1,6 +1,6 @@
 export { BlmValuesModule } from './blm-values.module';
 export {
-  ProjectBlmRepo,
+  ProjectBlmRepository,
   ProjectBlm,
   SaveFailure,
   GetFailure,
@@ -8,4 +8,4 @@ export {
   alreadyCreated,
   projectNotFound,
   unknownError,
-} from './project-blm-repo';
+} from './project-blm-repository';

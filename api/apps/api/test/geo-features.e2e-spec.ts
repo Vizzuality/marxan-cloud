@@ -25,10 +25,7 @@ describe('GeoFeaturesModule (e2e)', () => {
   let jwtToken: string;
 
   const geoFeaturesFilters = {
-    cheeta: {
-      featureClassName: 'demo_acinonyx_jubatus',
-      alias: 'Acinonyx_jubatus',
-    },
+    cheeta: { featureClassName: 'demo_acinonyx_jubatus', alias: 'Acinonyx_jubatus' },
     partialMatches: { us: 'us' },
   };
 

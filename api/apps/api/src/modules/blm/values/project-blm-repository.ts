@@ -29,7 +29,7 @@ export interface ProjectBlm {
 
 type SaveSuccess = true;
 
-export abstract class ProjectBlmRepo {
+export abstract class ProjectBlmRepository {
   abstract create(
     projectId: string,
     defaults: ProjectBlm['defaults'],

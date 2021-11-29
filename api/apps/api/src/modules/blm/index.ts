@@ -4,7 +4,7 @@ export {
   unknownError,
   alreadyCreated,
   ProjectBlm,
-  ProjectBlmRepo,
+  ProjectBlmRepository,
   CreateFailure,
   GetFailure,
   SaveFailure,

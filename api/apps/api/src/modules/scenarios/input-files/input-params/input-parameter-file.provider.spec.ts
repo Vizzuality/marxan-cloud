@@ -225,12 +225,6 @@ async function getFixtures() {
           createdBy: '',
           countryId: '',
           bbox: [0, 0, 0, 0, 0, 0],
-          projectBlm: {
-            id: '',
-            range: [0, 0],
-            values: [],
-            defaults: [],
-          },
         },
         status: JobStatus.done,
         type: ScenarioType.marxanWithZones,
