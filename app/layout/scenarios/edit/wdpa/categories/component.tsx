@@ -171,10 +171,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       }}
       initialValues={INITIAL_VALUES}
       render={({ form, values, handleSubmit }) => {
-        if (form.getState().touched.uploadedProtectedArea) {
-          refetchProtectedAreas();
-        }
-
         const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
         const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
 
@@ -192,6 +188,9 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
           >
             <FormSpyRFF onChange={(state) => {
               dispatch(setWDPACategories(state.values));
+              if (state.touched.uploadedProtectedArea) {
+                refetchProtectedAreas();
+              }
             }}
             />
 
