@@ -6,7 +6,8 @@ import { GivenUserExists } from '../steps/given-user-exists';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { ProjectsACLTestUtils } from '../utils/projects-acl.test.utils';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -21,6 +22,7 @@ export const getFixtures = async () => {
   const projectViewerRole = Roles.project_viewer;
   const projectContributorRole = Roles.project_contributor;
   const projectOwnerRole = Roles.project_owner;
+  let projectCreatedId = '';
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
@@ -28,16 +30,57 @@ export const getFixtures = async () => {
 
   return {
     cleanup: async () => {
-      await userProjectsRepo.delete({
-        userId: In([
-          ownerUserId,
-          contributorUserId,
-          viewerUserId,
-          otherOwnerUserId,
-        ]),
-      });
-      await Promise.all(cleanups.map((clean) => clean()));
+      for (const cleanup of cleanups.reverse()) {
+        await cleanup();
+      }
       await app.close();
+    },
+
+    userRoleCleanup: async () => {
+      if (projectCreatedId) {
+        cleanups.push(
+          async () =>
+            await ProjectsACLTestUtils.deleteUserFromProject(
+              app,
+              ownerUserToken,
+              projectCreatedId,
+              otherOwnerUserId,
+            ),
+        );
+        cleanups.push(
+          async () =>
+            await ProjectsACLTestUtils.deleteUserFromProject(
+              app,
+              ownerUserToken,
+              projectCreatedId,
+              viewerUserId,
+            ),
+        );
+        cleanups.push(
+          async () =>
+            await ProjectsACLTestUtils.deleteUserFromProject(
+              app,
+              ownerUserToken,
+              projectCreatedId,
+              contributorUserId,
+            ),
+        );
+      }
+    },
+
+    GivenProjectExistsAndHasUsers: async () => {
+      const result = await userProjectsRepo.findOne({
+        where: {
+          userId: ownerUserId,
+          roleName: projectOwnerRole,
+        },
+      });
+
+      if (!result) {
+        throw new Error('Project does not exist');
+      }
+
+      return result.projectId;
     },
 
     GivenProjectWasCreated: async () => {
@@ -46,12 +89,28 @@ export const getFixtures = async () => {
         ownerUserToken,
       );
       cleanups.push(cleanup);
+      projectCreatedId = projectId;
       return projectId;
     },
 
-    GivenUserWasCreatedAndNotOwner: async () => {
-      const existingUserId = await GivenUserExists(app, 'bb');
-      return existingUserId;
+    GivenAUserWasGivenViewerRoleOnProject: async (projectId: string) => {
+      const viewerUser = userProjectsRepo.findOne({
+        where: {
+          projectId,
+          userId: viewerUserId,
+        },
+      });
+      return viewerUser;
+    },
+
+    GivenAUserWasGivenContributorRoleOnProject: async (projectId: string) => {
+      const contributorUser = userProjectsRepo.findOne({
+        where: {
+          projectId,
+          userId: contributorUserId,
+        },
+      });
+      return contributorUser;
     },
 
     WhenGettingProjectUsersAsNotInProject: async (projectId: string) =>
@@ -73,11 +132,6 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .get(`/api/v1/roles/projects/${projectId}/users`)
         .set('Authorization', `Bearer ${viewerUserToken}`),
-
-    WhenGettingProjectUsersAsOtherOwner: async (projectId: string) =>
-      await request(app.getHttpServer())
-        .get(`/api/v1/roles/projects/${projectId}/users`)
-        .set('Authorization', `Bearer ${otherOwnerUserToken}`),
 
     WhenAddingANewViewerToTheProjectAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())
