@@ -1,20 +1,8 @@
 import { Module } from '@nestjs/common';
-
-import { ProjectBlmRepository } from './project-blm-repository';
-import { TypeormProjectBlmRepository } from './typeorm-project-blm-repository';
+import { ProjectBlmRepositoryModule } from './repositories/project-blm-repository.module';
 
 @Module({
-  imports: [
-    /**
-     * TypeORM etc.
-     */
-  ],
-  providers: [
-    {
-      provide: ProjectBlmRepository,
-      useClass: TypeormProjectBlmRepository,
-    },
-  ],
-  exports: [ProjectBlmRepository],
+  imports: [ProjectBlmRepositoryModule],
+  exports: [ProjectBlmRepositoryModule],
 })
 export class BlmValuesModule {}
