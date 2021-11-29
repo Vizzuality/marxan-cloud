@@ -192,6 +192,13 @@ export class ProjectsCrudService extends AppBaseService<
         PlanningUnitGridShape.fromShapefile &&
       createModel.planningAreaId
     ) {
+      await this.commandBus.execute(
+        new SetProjectGridFromShapefile(
+          new ProjectId(model.id),
+          createModel.planningAreaId,
+          model.bbox,
+        ),
+      );
       return;
     }
 
