@@ -131,7 +131,6 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
                 onDismiss={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
               />
             )}
-            {console.log('tab', tab)}
             {step === 1 && (
               <ScenariosSidebarWDPAThreshold
                 onSuccess={() => {
