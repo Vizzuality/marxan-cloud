@@ -5,7 +5,7 @@ import { Logger } from '@nestjs/common';
 import { SetProjectBlm } from './set-project-blm';
 import { ProjectBlmRepo } from '@marxan-api/modules/blm';
 import { PlanningUnitAreaFetcher } from '@marxan-api/modules/projects/blm/planning-unit-area-fetcher';
-import { BlmValuesPolicyFactory } from './BlmValuesPolicyFactory';
+import { BlmValuesPolicyFactory } from './blm-values-policy-factory';
 
 @CommandHandler(SetProjectBlm)
 export class SetProjectBlmHandler

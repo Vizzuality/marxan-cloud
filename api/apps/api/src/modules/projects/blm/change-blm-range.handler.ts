@@ -13,7 +13,7 @@ import {
 } from './change-blm-range.command';
 import { SetProjectBlm } from './set-project-blm';
 import { PlanningUnitAreaFetcher } from './planning-unit-area-fetcher';
-import { BlmValuesPolicyFactory } from './BlmValuesPolicyFactory';
+import { BlmValuesPolicyFactory } from './blm-values-policy-factory';
 
 @CommandHandler(ChangeBlmRange)
 export class ChangeBlmRangeHandler
