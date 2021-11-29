@@ -22,7 +22,9 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepo {
     super();
   }
   async get(projectId: string): Promise<Either<GetFailure, ProjectBlm>> {
-    return left(projectNotFound);
+    const projectBlm = await this.repository.findOne(projectId);
+
+    return projectBlm ? right(projectBlm) : left(projectNotFound);
   }
 
   async create(
@@ -36,7 +38,7 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepo {
     projectBlm.defaults = defaults;
     projectBlm.values = [];
     projectBlm.range = [0.001, 100];
-    await this.repository.insert(projectBlm);
+    await this.repository.save(projectBlm);
 
     return right(true);
   }
@@ -46,6 +48,10 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepo {
     range: ProjectBlm['range'],
     values: ProjectBlm['values'],
   ): Promise<Either<SaveFailure, true>> {
-    return right(true);
+    const result = await this.repository.update(
+      { id: projectId },
+      { range, values },
+    );
+    return Boolean(result) ? right(true) : left(projectNotFound);
   }
 }
