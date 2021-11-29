@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
 
 import { ProjectAclService } from './project-acl.service';
+import { ProjectAclController } from './project-acl.controller';
 
 @Module({
   imports: [
@@ -14,5 +15,6 @@ import { ProjectAclService } from './project-acl.service';
   ],
   providers: [ProjectAclService],
   exports: [ProjectAclService],
+  controllers: [ProjectAclController],
 })
 export class ProjectAclModule {}

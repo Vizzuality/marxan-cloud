@@ -3,7 +3,7 @@ export interface PlanningUnitSelectionState {
   usedCount: number;
 }
 
-export type PlanningUnitsSelectionState = Record<
-  string,
-  PlanningUnitSelectionState
->;
+export type PlanningUnitsSelectionState = {
+  puSelectionState: Record<string, PlanningUnitSelectionState>;
+  puUsageByRun: Array<Array<0 | 1>>;
+};

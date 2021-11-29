@@ -3,10 +3,10 @@ import { plainToClass } from 'class-transformer';
 import { ExecutionResult, ResultRow } from '@marxan/marxan-output';
 import { isDefined } from '@marxan/utils';
 import { validateSync } from 'class-validator';
-import { chunk } from 'lodash';
 
 import { MostDifferentService } from './most-different.service';
 import { BestSolutionService } from './best-solution.service';
+import { PlanningUnitsSelectionState } from './geo-output/solutions/planning-unit-selection-state';
 
 @Injectable()
 export class ResultParserService {
@@ -15,58 +15,52 @@ export class ResultParserService {
     private readonly bestSolution: BestSolutionService,
   ) {}
 
-  async parse(csvContent: string): Promise<ExecutionResult> {
-    const chunks = chunk(csvContent.split('\n').slice(1), 100);
+  private static parseRowToResultRow(
+    csvRow: string,
+    planningUnitSelection: PlanningUnitsSelectionState,
+  ): ResultRow {
+    const [
+      runId,
+      score,
+      cost,
+      planningUnits,
+      connectivity,
+      connectivityTotal,
+      connectivityIn,
+      connectivityEdge,
+      connectivityOut,
+      connectivityInFraction,
+      penalty,
+      shortfall,
+      missingValues,
+      mpm,
+    ] = csvRow.split(',');
 
-    const results: ExecutionResult = [];
-    for (const batch of chunks) {
-      for (const row of batch) {
-        if (row === '') {
-          continue;
-        }
-        const [
-          runId,
-          score,
-          cost,
-          planningUnits,
-          connectivity,
-          connectivityTotal,
-          connectivityIn,
-          connectivityEdge,
-          connectivityOut,
-          connectivityInFraction,
-          penalty,
-          shortfall,
-          missingValues,
-          mpm,
-        ] = row.split(',');
-        const entry = await plainToClass<ResultRow, ResultRow>(ResultRow, {
-          runId: +runId,
-          score: +score,
-          cost: +cost,
-          planningUnits: +planningUnits,
-          connectivity: +connectivity,
-          connectivityTotal: +connectivityTotal,
-          connectivityIn: +connectivityIn,
-          connectivityEdge: +connectivityEdge,
-          connectivityOut: +connectivityOut,
-          connectivityInFraction: +connectivityInFraction,
-          penalty: +penalty,
-          shortfall: +shortfall,
-          missingValues: +missingValues,
-          mpm: +mpm,
-          best: false,
-          distinctFive: false,
-        });
-        if (validateSync(entry).length > 0) {
-          throw new Error(
-            `Unexpected values in Marxan output at value [${row}]`,
-          );
-        }
-        results.push(entry);
-      }
-    }
+    return plainToClass<ResultRow, ResultRow>(ResultRow, {
+      runId: +runId,
+      score: +score,
+      cost: +cost,
+      planningUnits: +planningUnits,
+      connectivity: +connectivity,
+      connectivityTotal: +connectivityTotal,
+      connectivityIn: +connectivityIn,
+      connectivityEdge: +connectivityEdge,
+      connectivityOut: +connectivityOut,
+      connectivityInFraction: +connectivityInFraction,
+      penalty: +penalty,
+      shortfall: +shortfall,
+      missingValues: +missingValues,
+      mpm: +mpm,
+      best: false,
+      distinctFive: false,
+      puValues: planningUnitSelection.puUsageByRun[+runId - 1] || [],
+    });
+  }
 
+  async parse(
+    csvContent: string,
+    planningUnitSelection: PlanningUnitsSelectionState,
+  ): Promise<ExecutionResult> {
     return this.bestSolution.map(
       this.mostDifferentSolutions.map(
         csvContent
@@ -76,43 +70,12 @@ export class ResultParserService {
             if (row === '') {
               return;
             }
-            const [
-              runId,
-              score,
-              cost,
-              planningUnits,
-              connectivity,
-              connectivityTotal,
-              connectivityIn,
-              connectivityEdge,
-              connectivityOut,
-              connectivityInFraction,
-              penalty,
-              shortfall,
-              missingValues,
-              mpm,
-            ] = row.split(',');
-            const entry = plainToClass<ResultRow, ResultRow>(ResultRow, {
-              runId: +runId,
-              score: +score,
-              cost: +cost,
-              planningUnits: +planningUnits,
-              connectivity: +connectivity,
-              connectivityTotal: +connectivityTotal,
-              connectivityIn: +connectivityIn,
-              connectivityEdge: +connectivityEdge,
-              connectivityOut: +connectivityOut,
-              connectivityInFraction: +connectivityInFraction,
-              penalty: +penalty,
-              shortfall: +shortfall,
-              missingValues: +missingValues,
-              mpm: +mpm,
-              best: false,
-              // distinctFive should always be set to `false` here: the five most
-              // different solutions are tagged as such via
-              // `MostDifferentService`.
-              distinctFive: false,
-            });
+
+            const entry = ResultParserService.parseRowToResultRow(
+              row,
+              planningUnitSelection,
+            );
+
             if (validateSync(entry).length > 0) {
               throw new Error(
                 `Unexpected values in Marxan output at value [${index}]: [${row}]`,

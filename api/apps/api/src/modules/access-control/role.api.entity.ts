@@ -9,9 +9,9 @@ export enum Roles {
   organization_owner = 'organization_owner',
   project_owner = 'project_owner',
   organization_admin = 'organization_admin',
-  project_admin = 'project_admin',
+  project_contributor = 'project_contributor',
   organization_user = 'organization_user',
-  project_user = 'project_user',
+  project_viewer = 'project_viewer',
 }
 
 @Entity('roles')

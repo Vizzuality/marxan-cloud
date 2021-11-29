@@ -16,7 +16,6 @@ import {
   Res,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
@@ -57,10 +56,8 @@ import {
   ScenarioFeaturesOutputGapData,
 } from '@marxan/features';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
-import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
-import { FileInterceptor } from '@nestjs/platform-express';
 import {
   projectDoesntExist,
   projectNotReady,
@@ -90,6 +87,10 @@ import {
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
+import {
+  GeometryFileInterceptor,
+  GeometryKind,
+} from '@marxan-api/decorators/file-interceptors.decorator';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -280,7 +281,7 @@ export class ScenariosController {
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
   @ApiTags(asyncJobTag)
   @Post(`:id/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
@@ -301,7 +302,7 @@ export class ScenariosController {
   @ApiConsumesShapefile()
   @ApiTags(inlineJobTag)
   @Post(':id/planning-unit-shapefile')
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @GeometryFileInterceptor(GeometryKind.Simple)
   async uploadLockInShapeFile(
     @Param('id', ParseUUIDPipe) scenarioId: string,
     @UploadedFile() file: Express.Multer.File,
@@ -649,7 +650,7 @@ export class ScenariosController {
     description:
       'Upload shapefile for with protected areas for project&scenario',
   })
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @GeometryFileInterceptor(GeometryKind.Complex)
   @ApiTags(asyncJobTag)
   @Post(':id/protected-areas/shapefile')
   async shapefileForProtectedArea(

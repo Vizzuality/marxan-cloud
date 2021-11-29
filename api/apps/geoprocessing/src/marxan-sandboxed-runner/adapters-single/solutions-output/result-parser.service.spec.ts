@@ -36,26 +36,40 @@ beforeEach(async () => {
 
 describe(`given empty content`, () => {
   it(`should return empty array`, async () => {
-    expect(await sut.parse('')).toEqual([]);
+    expect(
+      await sut.parse('', {
+        puSelectionState: {},
+        puUsageByRun: [],
+      }),
+    ).toEqual([]);
   });
 });
 
 describe(`given headers only`, () => {
   it(`should return empty array`, async () => {
-    expect(await sut.parse('one,two,three')).toEqual([]);
+    expect(
+      await sut.parse('one,two,three', {
+        puSelectionState: {},
+        puUsageByRun: [],
+      }),
+    ).toEqual([]);
   });
 });
 
 describe(`given invalid data in a row (2.1 planning units)`, () => {
   it(`should throw an error`, async () => {
     await expect(() =>
-      sut.parse(`headers...
-1,16640,640,2.1,16000,5.1664e+07,0,16000,5.1648e+07,0,0,0,0,1
-
-    `),
+      sut.parse(
+        `headers...
+1,16640,640,2.1,16000,5.1664e+07,0,16000,5.1648e+07,0,0,0,0,1`,
+        {
+          puSelectionState: {},
+          puUsageByRun: [],
+        },
+      ),
     ).rejects.toEqual(
       new Error(
-        `Unexpected values in Marxan output at value [1,16640,640,2.1,16000,5.1664e+07,0,16000,5.1648e+07,0,0,0,0,1]`,
+        `Unexpected values in Marxan output at value [0]: [1,16640,640,2.1,16000,5.1664e+07,0,16000,5.1648e+07,0,0,0,0,1]`,
       ),
     );
   });
@@ -63,7 +77,12 @@ describe(`given invalid data in a row (2.1 planning units)`, () => {
 
 describe(`given data`, () => {
   it(`should return parsed values`, async () => {
-    expect(await sut.parse(content)).toMatchInlineSnapshot(`
+    expect(
+      await sut.parse(content, {
+        puSelectionState: {},
+        puUsageByRun: [],
+      }),
+    ).toMatchInlineSnapshot(`
       Array [
         ResultRow {
           "best": true,
@@ -79,6 +98,7 @@ describe(`given data`, () => {
           "mpm": 1,
           "penalty": 0,
           "planningUnits": 2,
+          "puValues": Array [],
           "runId": 1,
           "score": 16640,
           "shortfall": 0,
@@ -97,6 +117,7 @@ describe(`given data`, () => {
           "mpm": 0,
           "penalty": 8240,
           "planningUnits": 1,
+          "puValues": Array [],
           "runId": 2,
           "score": 16640,
           "shortfall": 0.5,
@@ -115,6 +136,7 @@ describe(`given data`, () => {
           "mpm": 0,
           "penalty": 8240,
           "planningUnits": 2,
+          "puValues": Array [],
           "runId": 3,
           "score": 21040,
           "shortfall": 0.5,
@@ -133,6 +155,7 @@ describe(`given data`, () => {
           "mpm": 1,
           "penalty": 0,
           "planningUnits": 2,
+          "puValues": Array [],
           "runId": 4,
           "score": 16640,
           "shortfall": 0,
@@ -151,6 +174,7 @@ describe(`given data`, () => {
           "mpm": 1,
           "penalty": 0,
           "planningUnits": 5,
+          "puValues": Array [],
           "runId": 5,
           "score": 33840,
           "shortfall": 0,

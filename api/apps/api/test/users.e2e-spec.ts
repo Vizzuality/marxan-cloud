@@ -18,6 +18,10 @@ import { LoginDto } from '@marxan-api/modules/authentication/dto/login.dto';
 import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
 import { tearDown } from './utils/tear-down';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import * as nock from 'nock';
+
+nock.disableNetConnect();
+nock.enableNetConnect(process.env.HOST_IP);
 
 /**
  * Tests for the UsersModule.
@@ -91,6 +95,10 @@ describe('UsersModule (e2e)', () => {
     let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to create an account using an email address not currently in use', async () => {
+      nock('https://api.eu.sparkpost.com')
+        .post(`/api/v1/transmissions`)
+        .reply(200);
+
       await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send(signUpDto)
@@ -108,11 +116,7 @@ describe('UsersModule (e2e)', () => {
         .expect(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    /**
-     * @todo Enable this test once we drop the temporary automatic whitelisting
-     * of new accounts in development environments.
-     */
-    test.skip('A user should not be able to log in until their account has been validated', async () => {
+    test('A user should not be able to log in until their account has been validated', async () => {
       await request(app.getHttpServer())
         .post('/auth/sign-in')
         .send(loginDto)
@@ -139,10 +143,12 @@ describe('UsersModule (e2e)', () => {
       });
 
       await request(app.getHttpServer())
-        .get(
-          `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
-        )
-        .expect(HttpStatus.OK);
+        .post(`/auth/validate`)
+        .send({
+          sub: newUser.id,
+          validationToken: validationTokenEvent?.data?.validationToken,
+        })
+        .expect(HttpStatus.CREATED);
     });
 
     test('A user account validation token should not be allowed to be spent more than once', async () => {
@@ -151,9 +157,11 @@ describe('UsersModule (e2e)', () => {
       }
 
       await request(app.getHttpServer())
-        .get(
-          `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
-        )
+        .post(`/auth/validate`)
+        .send({
+          sub: newUser.id,
+          validationToken: validationTokenEvent?.data?.validationToken,
+        })
         .expect(HttpStatus.NOT_FOUND);
     });
 
@@ -300,6 +308,10 @@ describe('UsersModule (e2e)', () => {
     let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to sign up using the same email address as that of an account that has been deleted', async () => {
+      nock('https://api.eu.sparkpost.com')
+        .post(`/api/v1/transmissions`)
+        .reply(200);
+
       await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send(signUpDto)
@@ -326,10 +338,12 @@ describe('UsersModule (e2e)', () => {
       });
 
       await request(app.getHttpServer())
-        .get(
-          `/auth/validate-account/${newUser.id}/${validationTokenEvent?.data?.validationToken}`,
-        )
-        .expect(HttpStatus.OK);
+        .post(`/auth/validate`)
+        .send({
+          sub: newUser.id,
+          validationToken: validationTokenEvent?.data?.validationToken,
+        })
+        .expect(HttpStatus.CREATED);
     });
 
     test('A user should be able to log in once their account has been validated', async () => {

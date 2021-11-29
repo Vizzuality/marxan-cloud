@@ -56,7 +56,6 @@ import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '../geo-features/geo-features.service';
-import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { isFeatureCollection } from '@marxan/utils';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
@@ -69,6 +68,10 @@ import {
   updateFailure,
 } from '@marxan-api/modules/projects/blm/change-blm-range.command';
 import { ProjectBlmValuesResponseDto } from '@marxan-api/modules/projects/dto/project-blm-values-response.dto';
+import {
+  GeometryFileInterceptor,
+  GeometryKind,
+} from '@marxan-api/decorators/file-interceptors.decorator';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -178,7 +181,7 @@ export class ProjectsController {
   @ApiOperation({
     description: 'Upload shapefile for project-specific planning unit grid',
   })
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @GeometryFileInterceptor(GeometryKind.Complex)
   @ApiCreatedResponse({ type: PlanningAreaResponseDto })
   @ApiTags(asyncJobTag)
   @Post(`planning-area/shapefile-grid`)
@@ -221,7 +224,7 @@ export class ProjectsController {
     type: PlanningAreaResponseDto,
     description: 'Upload shapefile with project planning-area',
   })
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
+  @GeometryFileInterceptor(GeometryKind.Simple)
   @ApiTags(inlineJobTag)
   @Post('planning-area/shapefile')
   async shapefileWithProjectPlanningArea(
@@ -250,18 +253,7 @@ export class ProjectsController {
   @ApiOkResponse({ type: ShapefileUploadResponse })
   @ApiTags(inlineJobTag)
   @Post(`:id/features/shapefile`)
-  @UseInterceptors(
-    FileInterceptor('file', {
-      ...uploadOptions,
-      limits: {
-        fileSize: (() =>
-          AppConfig.get<number>(
-            'fileUploads.limits.shapefileMaxSize',
-            100 * 1024e2,
-          ))(),
-      },
-    }),
-  )
+  @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
   async uploadFeatures(
     @Param('id') projectId: string,
     @UploadedFile() shapefile: Express.Multer.File,

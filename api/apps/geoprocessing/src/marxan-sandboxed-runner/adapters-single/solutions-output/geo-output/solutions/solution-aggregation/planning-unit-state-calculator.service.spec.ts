@@ -31,26 +31,31 @@ describe(`when a pu is included`, () => {
     stream.emit('finish');
     const results = await state;
 
-    expect(results['one']).toEqual({
+    expect(results.puSelectionState['one']).toEqual({
       values: [true, true, true, false],
       usedCount: 3,
     });
-    expect(results['two']).toEqual({
+    expect(results.puSelectionState['two']).toEqual({
       values: [false, false, false, false],
       usedCount: 0,
     });
-    expect(results['three']).toEqual({
+    expect(results.puSelectionState['three']).toEqual({
       values: [false, false, true, false],
       usedCount: 1,
     });
-    expect(results['four']).toEqual({
+    expect(results.puSelectionState['four']).toEqual({
       values: [false, false, false, true],
       usedCount: 1,
     });
-    expect(results['five']).toEqual({
+    expect(results.puSelectionState['five']).toEqual({
       values: [false, true, false, false],
       usedCount: 1,
     });
+
+    expect(results.puUsageByRun[0]).toEqual([1, 0, 0, 0, 0]);
+    expect(results.puUsageByRun[1]).toEqual([1, 0, 0, 0, 1]);
+    expect(results.puUsageByRun[2]).toEqual([1, 0, 1, 0, 0]);
+    expect(results.puUsageByRun[3]).toEqual([0, 0, 0, 1, 0]);
   });
 });
 

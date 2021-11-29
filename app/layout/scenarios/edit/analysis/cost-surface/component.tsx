@@ -228,7 +228,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
         <p className="pt-2">By default all projects have an equal area cost surface which means that planning units with the same area have the same cost</p>
 
         <div className="pt-5">
-          <h4 className="mb-2">1. Download the current cost surface</h4>
+          <h4 className="mb-2">1. Download cost template</h4>
           <Button
             theme="primary-alt"
             size="base"
@@ -240,7 +240,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
         </div>
 
         <div className="pt-5">
-          <h4 className="mb-2">2. Upload your cost surface</h4>
+          <h4 className="mb-2">2. Upload cost template</h4>
 
           <div className="mt-3 mb-5">
             {!successFile && (

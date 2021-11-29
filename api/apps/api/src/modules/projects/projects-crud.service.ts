@@ -8,7 +8,7 @@ import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { ScenariosCrudService } from '@marxan-api/modules/scenarios/scenarios-crud.service';
-import { PlanningUnitsService } from '@marxan-api/modules/planning-units/planning-units.service';
+import { PlanningUnitsService } from '@marxan-api/modules/planning-units';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -24,7 +24,7 @@ import {
   PlanningAreasService,
 } from './planning-areas';
 import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/users/role.api.entity';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProtectedArea } from '@marxan/protected-areas';
 
