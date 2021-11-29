@@ -48,8 +48,8 @@ export const useScenarioActionsDone = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'protected-areas',
-            subtab: 'protected-areas-preview',
+            tab: 'features',
+            subtab: 'features-preview',
             status: {
               'protected-areas': 'draft',
               features: 'empty',
@@ -84,7 +84,6 @@ export const useScenarioActionsDone = () => {
     setCache,
     addToast,
   ]);
-
   // Protected Areas
   const onProtectedAreasDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({

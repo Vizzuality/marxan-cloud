@@ -148,6 +148,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       },
     }, {
       onSuccess: () => {
+        onSuccess();
         setSubmitting(false);
         addToast('save-scenario-wdpa', (
           <>
@@ -157,7 +158,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         ), {
           level: 'success',
         });
-        onSuccess();
       },
       onError: () => {
         setSubmitting(false);
