@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ProjectBlmValuesResponseDTO {
+export class ProjectBlmValuesResponseDto {
   @ApiProperty({
     description: 'An ID of the project that owns this BLM values',
     example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
