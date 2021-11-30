@@ -3,7 +3,6 @@ import { HttpModule, Module } from '@nestjs/common';
 import { MarxanConfig } from '../marxan-config';
 
 // ports
-import { SandboxRunner } from '../sandbox-runner';
 import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
 import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
 
@@ -15,10 +14,11 @@ import { SolutionsOutputService } from './solutions-output/solutions-output.serv
 import { InputFilesFs } from './scenario-data/input-files-fs';
 import { FileReader } from './file-reader';
 import { MarxanDirectory } from './marxan-directory.service';
-import { FetchConfig } from './scenario-data/fetch.config';
-import { AssetFetcher } from './scenario-data/asset-fetcher';
+import { FetchConfig } from '../adapters-shared/assets/fetch.config';
+import { AssetFetcher } from '../adapters-shared/assets/asset-fetcher';
 import { GeoOutputModule } from './solutions-output/geo-output';
 import { MarxanSandboxRunnerService } from './marxan-sandbox-runner.service';
+import { sandboxRunnerToken } from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
 
 @Module({
   imports: [
@@ -30,7 +30,7 @@ import { MarxanSandboxRunnerService } from './marxan-sandbox-runner.service';
   providers: [
     MarxanConfig,
     {
-      provide: SandboxRunner,
+      provide: sandboxRunnerToken,
       useClass: MarxanSandboxRunnerService,
     },
     AssetFetcher,
@@ -46,6 +46,6 @@ import { MarxanSandboxRunnerService } from './marxan-sandbox-runner.service';
       useClass: SolutionsOutputService,
     },
   ],
-  exports: [SandboxRunner],
+  exports: [sandboxRunnerToken],
 })
 export class SingleRunAdapterModule {}

@@ -3,25 +3,37 @@ import { JobData } from '@marxan/blm-calibration';
 
 import { SandboxRunner } from '../sandbox-runner';
 import { WorkspaceBuilder } from '../ports/workspace-builder';
-import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
 import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
+import { BlmInputFiles } from './blm-input-files';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
   implements SandboxRunner<JobData, void> {
   constructor(
     private readonly workspaceService: WorkspaceBuilder,
-    private readonly inputFilesHandler: SandboxRunnerInputFiles,
+    private readonly inputFilesHandler: BlmInputFiles,
     private readonly outputFilesHandler: SandboxRunnerOutputHandler<void>,
   ) {}
 
   kill(ofScenarioId: string): void {}
 
-  run(
+  async run(
     input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<void> {
     const { blmValues } = input;
+    console.log(`running BLM calibration for:`, blmValues);
+    const workspaces = await this.inputFilesHandler.for(
+      blmValues,
+      input.assets,
+    );
+
+    for (const workspace of workspaces) {
+      // run & persist
+      console.log(
+        `running for ${workspace.blmValue} - ${workspace.workspace.workingDirectory}`,
+      );
+    }
 
     /**
      * should have its own AbortController
