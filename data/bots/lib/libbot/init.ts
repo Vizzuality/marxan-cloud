@@ -11,7 +11,7 @@ import { GeoFeatures } from "./geo-features.ts";
 import { GeoFeatureShapefiles } from "./geo-feature-shapefiles.ts";
 import { MarxanCalculations } from "./marxan-calculations.ts";
 import { ScenarioJobStatus } from "./scenario-status.ts";
-
+import { SelectionStatus } from "./selection-status.ts";
 export interface Bot {
   costSurface: CostSurface;
   organizations: Organizations;
@@ -25,6 +25,7 @@ export interface Bot {
   protectedAreas: ProtectedAreas;
   marxanExecutor: MarxanCalculations;
   metadata: ScenarioEditingMetadata;
+  selectionStatus: SelectionStatus;
 }
 
 export const createBot = async (botConfig: MarxanBotConfig): Promise<Bot> => {
@@ -49,5 +50,6 @@ export const createBot = async (botConfig: MarxanBotConfig): Promise<Bot> => {
     geoFeatureUploader: new GeoFeatureShapefiles(httpClient),
     marxanExecutor: new MarxanCalculations(httpClient),
     metadata: new ScenarioEditingMetadata(),
+    selectionStatus: new SelectionStatus(httpClient),
   };
 };
