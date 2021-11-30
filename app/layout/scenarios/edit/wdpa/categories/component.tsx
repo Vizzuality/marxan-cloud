@@ -117,10 +117,13 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   }, [wdpaData, WDPA_OPTIONS, PROJECT_PA_OPTIONS]);
 
   const INITIAL_VALUES = useMemo(() => {
+    const selectedAreas = wdpaData?.filter((pa) => pa.selected) || [];
+    const areas = selectedAreas.map((i) => i.id) || [];
+
     return {
-      wdpaIucnCategories: scenarioData?.wdpaIucnCategories || [],
+      wdpaIucnCategories: areas,
     };
-  }, [scenarioData?.wdpaIucnCategories]);
+  }, [wdpaData]);
 
   useEffect(() => {
     const { wdpaThreshold } = scenarioData;
@@ -176,7 +179,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
         const areWDPAreasSelected = intersection(plainWDPAOptions,
           values.wdpaIucnCategories).length > 0;
-        // or
+
         const areProjectPAreasSelected = intersection(plainProjectPAOptions,
           values.wdpaIucnCategories).length > 0;
 
