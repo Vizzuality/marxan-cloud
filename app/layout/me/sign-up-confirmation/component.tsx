@@ -14,11 +14,10 @@ export interface SignUpConfirmationProps {
 
 export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
   const { push, query: { token: confirmToken, userId } } = useRouter();
-
   const [confirmedAccountToken, setConfirmedAccountToken] = useState(false);
 
   const confirmAccount = useCallback(async () => {
-    const data = { validationToken: confirmToken, userId };
+    const data = { validationToken: confirmToken, sub: userId };
     try {
       await AUTHENTICATION
         .request({
