@@ -65,5 +65,8 @@
   "passwordReset": {
     "tokenPrefix": "PASSWORD_RESET_TOKEN_PREFIX",
     "expiration": "PASSWORD_RESET_EXPIRATION"
+  },
+  "signUpConfirmation": {
+    "tokenPrefix": "SIGNUP_CONFIRMATION_TOKEN_PREFIX"
   }
 }
