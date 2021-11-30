@@ -48,13 +48,6 @@ export const useScenarioActionsDone = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'features',
-            subtab: 'features-preview',
-            status: {
-              'protected-areas': 'draft',
-              features: 'empty',
-              analysis: 'empty',
-            },
             lastJobCheck: new Date().getTime(),
           },
         },

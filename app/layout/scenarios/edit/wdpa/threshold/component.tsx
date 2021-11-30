@@ -9,8 +9,10 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
 import { useProject } from 'hooks/projects';
-import { useScenario } from 'hooks/scenarios';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
@@ -57,6 +59,8 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
 
+  const { metadata } = scenarioData || {};
+
   const {
     data: wdpaData,
     isFetching: wdpaIsFetching,
@@ -69,6 +73,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       && !projectData?.adminAreaLevel1I
       && !projectData?.countryId ? projectData?.planningAreaId : null,
     scenarioId: sid,
+  });
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
   });
 
   const saveScenarioProtectedAreasMutation = useSaveScenarioProtectedAreas({
@@ -158,6 +168,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         ), {
           level: 'success',
         });
+        saveScenarioMutation.mutate({
+          id: `${sid}`,
+          data: {
+            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
+          },
+        });
       },
       onError: () => {
         setSubmitting(false);
@@ -176,6 +192,8 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     saveScenarioProtectedAreasMutation,
     selectedProtectedAreas,
     sid,
+    saveScenarioMutation,
+    metadata,
     addToast,
     onSuccess]);
 

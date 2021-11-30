@@ -113,7 +113,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
           </ul>
 
         </div>
-          )}
+      )}
     >
 
       <motion.div
