@@ -1,14 +1,18 @@
 import { EventPublisher } from '@nestjs/cqrs';
+import { Injectable } from '@nestjs/common';
 
-import { ResourceId } from '../domain/export/resource.id';
-import { ResourceKind } from '../domain/export/resource.kind';
-import { ExportComponent } from '../domain/export/export-component/export-component';
-import { Export } from '../domain/export/export';
-import { ExportId } from '../domain/export/export.id';
+import {
+  Export,
+  ExportComponentSnapshot,
+  ExportId,
+  ResourceId,
+  ResourceKind,
+} from '../domain';
 
 import { ExportRepository } from './export-repository.port';
 import { ResourcePieces } from './resource-pieces.port';
 
+@Injectable()
 export class RequestExport {
   constructor(
     private readonly resourcePieces: ResourcePieces,
@@ -17,17 +21,17 @@ export class RequestExport {
   ) {}
 
   async export(id: ResourceId, kind: ResourceKind): Promise<ExportId> {
-    const pieces: ExportComponent[] = await this.resourcePieces.resolveFor(
+    const pieces: ExportComponentSnapshot[] = await this.resourcePieces.resolveFor(
       id,
       kind,
     );
-    const exportInstance = this.eventPublisher.mergeObjectContext(
+    const exportRequest = this.eventPublisher.mergeObjectContext(
       Export.newOne(id, kind, pieces),
     );
-    await this.exportRepository.save(exportInstance);
+    await this.exportRepository.save(exportRequest);
 
-    exportInstance.commit();
+    exportRequest.commit();
 
-    return exportInstance.id;
+    return exportRequest.id;
   }
 }

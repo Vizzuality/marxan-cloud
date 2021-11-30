@@ -31,7 +31,7 @@ export class ExportComponent {
 
   toSnapshot(): ExportComponentSnapshot {
     return {
-      id: this.id.value,
+      id: this.id,
       piece: this.piece,
       resourceId: this.resourceId.value,
       finished: this.finished,
@@ -41,7 +41,7 @@ export class ExportComponent {
 
   static fromSnapshot(snapshot: ExportComponentSnapshot) {
     return new ExportComponent(
-      new ComponentId(snapshot.id),
+      snapshot.id,
       snapshot.piece,
       new ResourceId(snapshot.resourceId),
       snapshot.finished,
