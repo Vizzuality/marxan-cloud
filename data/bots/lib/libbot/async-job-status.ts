@@ -69,7 +69,7 @@ interface RetryOptions {
   maxTries: number;
 }
 
-export class ScenarioJobStatus {
+export class AsyncJobStatus {
   private baseHttpClient;
 
   constructor(httpClient: BotHttpClient) {

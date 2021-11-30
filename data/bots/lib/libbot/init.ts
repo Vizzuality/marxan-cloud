@@ -10,14 +10,14 @@ import { GeoFeatureSpecifications } from "./geo-feature-specifications.ts";
 import { GeoFeatures } from "./geo-features.ts";
 import { GeoFeatureShapefiles } from "./geo-feature-shapefiles.ts";
 import { MarxanCalculations } from "./marxan-calculations.ts";
-import { ScenarioJobStatus } from "./scenario-status.ts";
+import { AsyncJobStatus } from "./async-job-status.ts";
 import { SelectionStatus } from "./selection-status.ts";
 export interface Bot {
   costSurface: CostSurface;
   organizations: Organizations;
   projects: Projects;
   scenarios: Scenarios;
-  scenarioStatus: ScenarioJobStatus;
+  asyncJobStatus: AsyncJobStatus;
   geoFeatures: GeoFeatures;
   geoFeatureSpecifications: GeoFeatureSpecifications;
   geoFeatureUploader: GeoFeatureShapefiles;
@@ -42,7 +42,7 @@ export const createBot = async (botConfig: MarxanBotConfig): Promise<Bot> => {
     organizations: new Organizations(httpClient),
     projects: new Projects(httpClient),
     scenarios: new Scenarios(httpClient),
-    scenarioStatus: new ScenarioJobStatus(httpClient),
+    asyncJobStatus: new AsyncJobStatus(httpClient),
     planningAreaUploader: new PlanningAreas(httpClient),
     protectedAreas: new ProtectedAreas(httpClient),
     geoFeatures: new GeoFeatures(httpClient),
