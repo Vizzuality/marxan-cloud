@@ -110,6 +110,11 @@ details.
    * `PASSWORD_RESET_EXPIRATION` (string, optional, default is 1800000
      milliseconds: 30 minutes): a time (in milliseconds) that a token for a
      password reset is valid for
+   * `SIGNUP_CONFIRMATION_TOKEN_PREFIX` (string, required): the public URL of the
+     **frontend** page on the running instance where users are redirected from
+     sign-up confirmation emails to complete the process validating their account; 
+     the validation token is appended at the end of this URL to compose the actual 
+     link that is included in sign-up confirmation emails
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted
