@@ -1,5 +1,4 @@
-import { Export } from '../domain/export/export';
-import { ResourceId } from '../domain/export/resource.id';
+import { Export, ResourceId } from '../domain';
 
 export abstract class ExportRepository {
   abstract save(exportInstance: Export): Promise<void>;
