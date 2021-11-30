@@ -10,8 +10,8 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
-import { useSession } from 'next-auth/client';
 
+import { useAccessToken } from 'hooks/auth';
 import { useSelectedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
@@ -47,7 +47,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const [open, setOpen] = useState(true);
   const [mapInteractive, setMapInteractive] = useState(false);
 
-  const [session] = useSession();
+  const accessToken = useAccessToken();
 
   const { query } = useRouter();
   const { pid, sid } = query;
@@ -341,7 +341,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       return {
         url,
         headers: {
-          Authorization: `Bearer ${session.accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       };
     }

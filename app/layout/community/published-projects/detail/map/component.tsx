@@ -11,8 +11,8 @@ import { setLayerSettings } from 'store/slices/projects/[id]';
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useSession } from 'next-auth/client';
 
+import { useAccessToken } from 'hooks/auth';
 import { useLegend, usePUGridLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -38,7 +38,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
   const [open, setOpen] = useState(false);
   const [mapInteractive, setMapInteractive] = useState(false);
 
-  const [session] = useSession();
+  const accessToken = useAccessToken();
 
   const minZoom = 2;
   const maxZoom = 20;
@@ -131,7 +131,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
       return {
         url,
         headers: {
-          Authorization: `Bearer ${session.accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       };
     }

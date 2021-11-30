@@ -4,9 +4,9 @@ import { useSelector } from 'react-redux';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
-// Map
-import { useSession } from 'next-auth/client';
 
+// Map
+import { useAccessToken } from 'hooks/auth';
 import { useAdminPreviewLayer, usePUGridPreviewLayer, useGeoJsonLayer } from 'hooks/map';
 
 import Loading from 'components/loading';
@@ -34,7 +34,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
   const [bounds, setBounds] = useState(null);
   const [mapInteractive, setMapInteractive] = useState(false);
 
-  const [session] = useSession();
+  const accessToken = useAccessToken();
 
   const LAYERS = [
     useGeoJsonLayer({
@@ -99,7 +99,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       return {
         url,
         headers: {
-          Authorization: `Bearer ${session.accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       };
     }
