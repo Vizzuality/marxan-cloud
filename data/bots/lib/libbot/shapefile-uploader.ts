@@ -9,7 +9,7 @@ interface FileUpload {
   extraFields?: { key: string; value: string }[];
 }
 
-export class ShapefileUploader {
+export class FileUploader {
   protected currentJwt: string;
   protected baseUrl: string;
 

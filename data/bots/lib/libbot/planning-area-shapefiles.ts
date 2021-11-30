@@ -1,6 +1,6 @@
 import Process from "https://deno.land/std@0.103.0/node/process.ts";
 import { BotHttpClient } from "./marxan-bot.ts";
-import { ShapefileUploader } from "./shapefile-uploader.ts";
+import { FileUploader } from "./shapefile-uploader.ts";
 import { logDebug, logError, logInfo } from "./logger.ts";
 import { tookMs } from "./util/perf.ts";
 
@@ -14,7 +14,7 @@ interface PlanningAreaShapefile {
   localFilePath: string;
 }
 
-export class PlanningAreas extends ShapefileUploader {
+export class PlanningAreas extends FileUploader {
   constructor(httpClient: BotHttpClient) {
     super(httpClient);
   }

@@ -1,6 +1,6 @@
 import Process from "https://deno.land/std@0.103.0/node/process.ts";
 import { BotHttpClient } from "./marxan-bot.ts";
-import { ShapefileUploader } from "./shapefile-uploader.ts";
+import { FileUploader } from "./shapefile-uploader.ts";
 import { logError, logInfo } from "./logger.ts";
 import { tookMs } from "./util/perf.ts";
 
@@ -20,7 +20,7 @@ export interface GeoFeatureMetadata {
   description?: string;
 }
 
-export class GeoFeatureShapefiles extends ShapefileUploader {
+export class GeoFeatureShapefiles extends FileUploader {
   constructor(httpClient: BotHttpClient) {
     super(httpClient);
   }
