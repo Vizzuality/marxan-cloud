@@ -7,26 +7,30 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 afterEach(async () => {
-  await fixtures?.userRoleCleanup();
   await fixtures?.cleanup();
 });
 
 test(`delete every type of user from the project as owner`, async () => {
-  const projectId = await fixtures.GivenProjectExistsAndHasUsers();
-  let revokeResponse = await fixtures.WhenRevokingAccessToViewerFromProjectAsOwner(
+  const projectId = await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenViewerWasAddedToProject(projectId);
+  await fixtures.GivenContributorWasAddedToProject(projectId);
+  await fixtures.GivenOwnerWasAddedToProject(projectId);
+  const viewerRevokeResponse = await fixtures.WhenRevokingAccessToViewerFromProjectAsOwner(
     projectId,
   );
-  fixtures.ThenNoContentIsReturned(revokeResponse);
-  revokeResponse = await fixtures.WhenRevokingAccessToContributorFromProjectAsOwner(
+  const contributorRevokeResponse = await fixtures.WhenRevokingAccessToContributorFromProjectAsOwner(
     projectId,
   );
-  fixtures.ThenNoContentIsReturned(revokeResponse);
-  revokeResponse = await fixtures.WhenRevokingAccessToOwnerFromProjectAsOwner(
+  const ownerRevokeResponse = await fixtures.WhenRevokingAccessToOwnerFromProjectAsOwner(
     projectId,
   );
-  fixtures.ThenNoContentIsReturned(revokeResponse);
-  const response = await fixtures.WhenGettingProjectUsersAsOwner(projectId);
-  fixtures.ThenSingleOwnerUserInProjectIsReturned(response);
+  const singleUserResponse = await fixtures.WhenGettingProjectUsersAsOwner(
+    projectId,
+  );
+  fixtures.ThenNoContentIsReturned(viewerRevokeResponse);
+  fixtures.ThenNoContentIsReturned(contributorRevokeResponse);
+  fixtures.ThenNoContentIsReturned(ownerRevokeResponse);
+  fixtures.ThenSingleOwnerUserInProjectIsReturned(singleUserResponse);
 });
 
 test(`delete last owner as the only owner`, async () => {

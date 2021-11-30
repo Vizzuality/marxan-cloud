@@ -25,15 +25,15 @@ test(`getting project users as owner and unique user`, async () => {
 });
 
 test(`getting project users as viewer`, async () => {
-  const projectId = await fixtures.GivenProjectExistsAndHasUsers();
-  await fixtures.GivenAUserWasGivenViewerRoleOnProject(projectId);
+  const projectId = await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenViewerWasAddedToProject(projectId);
   const response = await fixtures.WhenGettingProjectUsersAsViewer(projectId);
   fixtures.ThenForbiddenIsReturned(response);
 });
 
 test(`getting project users as contributor`, async () => {
-  const projectId = await fixtures.GivenProjectExistsAndHasUsers();
-  await fixtures.GivenAUserWasGivenContributorRoleOnProject(projectId);
+  const projectId = await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenContributorWasAddedToProject(projectId);
   const response = await fixtures.WhenGettingProjectUsersAsContributor(
     projectId,
   );

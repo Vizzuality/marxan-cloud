@@ -22,7 +22,6 @@ export const getFixtures = async () => {
   const projectViewerRole = Roles.project_viewer;
   const projectContributorRole = Roles.project_contributor;
   const projectOwnerRole = Roles.project_owner;
-  let projectCreatedId = '';
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
@@ -36,81 +35,65 @@ export const getFixtures = async () => {
       await app.close();
     },
 
-    userRoleCleanup: async () => {
-      if (projectCreatedId) {
-        cleanups.push(
-          async () =>
-            await ProjectsACLTestUtils.deleteUserFromProject(
-              app,
-              ownerUserToken,
-              projectCreatedId,
-              otherOwnerUserId,
-            ),
-        );
-        cleanups.push(
-          async () =>
-            await ProjectsACLTestUtils.deleteUserFromProject(
-              app,
-              ownerUserToken,
-              projectCreatedId,
-              viewerUserId,
-            ),
-        );
-        cleanups.push(
-          async () =>
-            await ProjectsACLTestUtils.deleteUserFromProject(
-              app,
-              ownerUserToken,
-              projectCreatedId,
-              contributorUserId,
-            ),
-        );
-      }
-    },
-
-    GivenProjectExistsAndHasUsers: async () => {
-      const result = await userProjectsRepo.findOne({
-        where: {
-          userId: ownerUserId,
-          roleName: projectOwnerRole,
-        },
-      });
-
-      if (!result) {
-        throw new Error('Project does not exist');
-      }
-
-      return result.projectId;
-    },
-
     GivenProjectWasCreated: async () => {
       const { cleanup, projectId } = await GivenProjectExists(
         app,
         ownerUserToken,
       );
       cleanups.push(cleanup);
-      projectCreatedId = projectId;
+      cleanups.push(
+        async () =>
+          await ProjectsACLTestUtils.deleteUserFromProject(
+            app,
+            ownerUserToken,
+            projectId,
+            otherOwnerUserId,
+          ),
+      );
+      cleanups.push(
+        async () =>
+          await ProjectsACLTestUtils.deleteUserFromProject(
+            app,
+            ownerUserToken,
+            projectId,
+            viewerUserId,
+          ),
+      );
+      cleanups.push(
+        async () =>
+          await ProjectsACLTestUtils.deleteUserFromProject(
+            app,
+            ownerUserToken,
+            projectId,
+            contributorUserId,
+          ),
+      );
       return projectId;
     },
 
-    GivenAUserWasGivenViewerRoleOnProject: async (projectId: string) => {
-      const viewerUser = userProjectsRepo.findOne({
-        where: {
-          projectId,
-          userId: viewerUserId,
-        },
+    GivenViewerWasAddedToProject: async (projectId: string) => {
+      const userCreated = await userProjectsRepo.save({
+        projectId,
+        roleName: projectViewerRole,
+        userId: viewerUserId,
       });
-      return viewerUser;
+      return userCreated;
     },
-
-    GivenAUserWasGivenContributorRoleOnProject: async (projectId: string) => {
-      const contributorUser = userProjectsRepo.findOne({
-        where: {
-          projectId,
-          userId: contributorUserId,
-        },
+    GivenContributorWasAddedToProject: async (projectId: string) => {
+      const userCreated = await userProjectsRepo.save({
+        projectId,
+        roleName: projectContributorRole,
+        userId: contributorUserId,
       });
-      return contributorUser;
+      return userCreated;
+    },
+    GivenOwnerWasAddedToProject: async (projectId: string) => {
+      const userCreated = await userProjectsRepo.save({
+        projectId,
+        roleName: projectOwnerRole,
+        userId: otherOwnerUserId,
+      });
+      return userCreated;
     },
 
     WhenGettingProjectUsersAsNotInProject: async (projectId: string) =>

@@ -7,59 +7,61 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 afterEach(async () => {
-  await fixtures?.userRoleCleanup();
   await fixtures?.cleanup();
 });
 
 test(`add every type of user to a project as project owner`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
-  let response = await fixtures.WhenAddingANewViewerToTheProjectAsOwner(
+  const viewerResponse = await fixtures.WhenAddingANewViewerToTheProjectAsOwner(
     projectId,
   );
-  fixtures.ThenNoContentIsReturned(response);
-  response = await fixtures.WhenAddingANewContributorToTheProjectAsOwner(
+  const contributorResponse = await fixtures.WhenAddingANewContributorToTheProjectAsOwner(
     projectId,
   );
-  fixtures.ThenNoContentIsReturned(response);
-  response = await fixtures.WhenAddingANewOwnerToTheProjectAsOwner(projectId);
-  fixtures.ThenNoContentIsReturned(response);
-
-  response = await fixtures.WhenGettingProjectUsersAsOwner(projectId);
+  const ownerResponse = await fixtures.WhenAddingANewOwnerToTheProjectAsOwner(
+    projectId,
+  );
+  const allUsersInProjectResponse = await fixtures.WhenGettingProjectUsersAsOwner(
+    projectId,
+  );
+  fixtures.ThenNoContentIsReturned(viewerResponse);
+  fixtures.ThenNoContentIsReturned(contributorResponse);
+  fixtures.ThenNoContentIsReturned(ownerResponse);
   fixtures.ThenAllUsersinProjectAfterEveryTypeOfUserHasBeenAddedAreReturned(
-    response,
+    allUsersInProjectResponse,
   );
 });
 
 test(`add every type of user to a project as project contributor`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
-  await fixtures.WhenAddingANewContributorToTheProjectAsOwner(projectId);
-
-  let response = await fixtures.WhenAddingANewViewerToTheProjectAsContributor(
+  await fixtures.GivenContributorWasAddedToProject(projectId);
+  const viewerResponse = await fixtures.WhenAddingANewViewerToTheProjectAsContributor(
     projectId,
   );
-  fixtures.ThenForbiddenIsReturned(response);
-  response = await fixtures.WhenAddingANewContributorToTheProjectAsContributor(
+  const contributorResponse = await fixtures.WhenAddingANewContributorToTheProjectAsContributor(
     projectId,
   );
-  fixtures.ThenForbiddenIsReturned(response);
-  response = await fixtures.WhenAddingANewOwnerToTheProjectAsContributor(
+  const ownerResponse = await fixtures.WhenAddingANewOwnerToTheProjectAsContributor(
     projectId,
   );
-  fixtures.ThenForbiddenIsReturned(response);
+  fixtures.ThenForbiddenIsReturned(viewerResponse);
+  fixtures.ThenForbiddenIsReturned(contributorResponse);
+  fixtures.ThenForbiddenIsReturned(ownerResponse);
 });
 
 test(`add every type of user to a project as project viewer`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
-  await fixtures.WhenAddingANewContributorToTheProjectAsOwner(projectId);
-
-  let response = await fixtures.WhenAddingANewViewerToTheProjectAsViewer(
+  await fixtures.GivenViewerWasAddedToProject(projectId);
+  const viewerResponse = await fixtures.WhenAddingANewViewerToTheProjectAsContributor(
     projectId,
   );
-  fixtures.ThenForbiddenIsReturned(response);
-  response = await fixtures.WhenAddingANewContributorToTheProjectAsViewer(
+  const contributorResponse = await fixtures.WhenAddingANewContributorToTheProjectAsContributor(
     projectId,
   );
-  fixtures.ThenForbiddenIsReturned(response);
-  response = await fixtures.WhenAddingANewOwnerToTheProjectAsViewer(projectId);
-  fixtures.ThenForbiddenIsReturned(response);
+  const ownerResponse = await fixtures.WhenAddingANewOwnerToTheProjectAsContributor(
+    projectId,
+  );
+  fixtures.ThenForbiddenIsReturned(viewerResponse);
+  fixtures.ThenForbiddenIsReturned(contributorResponse);
+  fixtures.ThenForbiddenIsReturned(ownerResponse);
 });
