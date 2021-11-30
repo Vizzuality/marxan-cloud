@@ -102,8 +102,9 @@ export class SparkPostMailer implements Mailer {
   ): Promise<void> {
     const user = await this.usersService.getById(userId);
     return this.sendEmail(SparkpostTemplate.SignUpConfirmation, user.email, {
-      urlSignUpConfirmation:
-        AppConfig.get('signUpConfirmation.tokenPrefix') + token,
+      urlSignUpConfirmation: `${AppConfig.get(
+        'signUpConfirmation.tokenPrefix',
+      )}${token}&userId=${userId}`,
     });
   }
 }

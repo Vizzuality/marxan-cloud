@@ -19,6 +19,7 @@ import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event
 import { tearDown } from './utils/tear-down';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import * as nock from 'nock';
+import { CreateTransmission, Recipient } from 'sparkpost';
 
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
@@ -58,6 +59,21 @@ describe('UsersModule (e2e)', () => {
     password: signUpDto.password,
   };
 
+  const mockAccountActivation = () => {
+    nock('https://api.eu.sparkpost.com')
+      .post(`/api/v1/transmissions`, (body: CreateTransmission) => {
+        const recipients = body.recipients as Recipient[];
+        return recipients
+          .map((el) => el.substitution_data)
+          .every(
+            (el) =>
+              el.urlSignUpConfirmation.match(/\?token=\w+/) &&
+              el.urlSignUpConfirmation.match(/&userId=\w+/),
+          );
+      })
+      .reply(200);
+  };
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
@@ -95,9 +111,7 @@ describe('UsersModule (e2e)', () => {
     let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to create an account using an email address not currently in use', async () => {
-      nock('https://api.eu.sparkpost.com')
-        .post(`/api/v1/transmissions`)
-        .reply(200);
+      mockAccountActivation();
 
       await request(app.getHttpServer())
         .post('/auth/sign-up')
@@ -308,9 +322,7 @@ describe('UsersModule (e2e)', () => {
     let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to sign up using the same email address as that of an account that has been deleted', async () => {
-      nock('https://api.eu.sparkpost.com')
-        .post(`/api/v1/transmissions`)
-        .reply(200);
+      mockAccountActivation();
 
       await request(app.getHttpServer())
         .post('/auth/sign-up')
