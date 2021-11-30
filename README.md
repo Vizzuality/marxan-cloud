@@ -102,16 +102,23 @@ details.
      will not work correctly); please check [SparkPost's
      documentation](https://developers.sparkpost.com/api/#header-sparkpost-eu)
      and the client library's own documentation for details
-   * `PASSWORD_RESET_TOKEN_PREFIX` (string, required): the public URL of the
-     **frontend** page on the running instance where users are redirected from
+   * `APPLICATION_BASE_URL` (string, required): the public URL of the
+     **frontend** application on the running instance (without trailing slash). 
+     This URL will be used to compose links sent via email for some flows of the 
+     platform, such as password recovery or sign-up confirmation (see also 
+     `PASSWORD_RESET_TOKEN_PREFIX` and `SIGNUP_CONFIRMATION_TOKEN_PREFIX`)
+   * `PASSWORD_RESET_TOKEN_PREFIX` (string, required): the path that should be 
+     appended after the application base URL (`APPLICATION_BASE_URL`), 
+     corresponding to the **frontend** route where users are redirected from
      password reset emails to complete the process of resetting their
      password; the reset token is appended at the end of this URL to compose
      the actual link that is included in password reset emails
    * `PASSWORD_RESET_EXPIRATION` (string, optional, default is 1800000
      milliseconds: 30 minutes): a time (in milliseconds) that a token for a
      password reset is valid for
-   * `SIGNUP_CONFIRMATION_TOKEN_PREFIX` (string, required): the public URL of the
-     **frontend** page on the running instance where users are redirected from
+   * `SIGNUP_CONFIRMATION_TOKEN_PREFIX` (string, required): the path that should be
+     appended after the application base URL (`APPLICATION_BASE_URL`),
+     corresponding to the **frontend** route where users are redirected from
      sign-up confirmation emails to complete the process validating their account; 
      the validation token is appended at the end of this URL to compose the actual 
      link that is included in sign-up confirmation emails
