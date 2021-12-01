@@ -24,7 +24,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserRoleInProjectDto } from './dto/user-role-project.dto';
-import { isLeft, isRight } from 'fp-ts/lib/These';
+import { isLeft } from 'fp-ts/lib/These';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()

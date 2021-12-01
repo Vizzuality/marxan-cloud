@@ -8,8 +8,11 @@ import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
 import { ProjectAclService } from './project-acl.service';
+import { Either, isLeft } from 'fp-ts/Either';
 
 let fixtures: FixtureType<typeof getFixtures>;
+
+type UsersResult = Either<boolean | typeof UsersProjectsApiEntity, void>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
@@ -180,9 +183,12 @@ const getFixtures = async () => {
       });
     },
     ThenCanFindNumberOfUsersInProject: async () => {
-      expect(
-        await sut.findUsersInProject(projectId, viewerUserId),
-      ).toHaveLength(2);
+      const result = await sut.findUsersInProject(projectId, viewerUserId);
+      if (isLeft(result)) {
+        expect(result.left).toBeUndefined();
+      } else {
+        expect(result.right).toHaveLength(2);
+      }
       expect(userProjectsRepoMock.createQueryBuilder).toHaveBeenCalled();
     },
   };
