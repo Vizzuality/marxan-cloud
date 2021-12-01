@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { getConnection, Repository, Not } from 'typeorm';
 import { intersection } from 'lodash';
 
-import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';

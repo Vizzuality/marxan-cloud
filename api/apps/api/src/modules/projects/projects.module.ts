@@ -19,7 +19,7 @@ import { JobStatusService } from './job-status/job-status.service';
 import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
 import { ProjectJobStatus } from './job-status/project-status.view.api.entity';
 import { PlanningAreasModule } from './planning-areas';
-import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectsListingController } from './projects-listing.controller';
 import { ProjectDetailsController } from './project-details.controller';
 import { ShapefilesModule } from '@marxan/shapefile-converter';
