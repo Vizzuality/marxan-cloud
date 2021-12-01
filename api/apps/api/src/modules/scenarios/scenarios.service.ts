@@ -49,8 +49,11 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
 import { ProtectedAreaService, submissionFailed } from './protected-area';
-import { ChangeBlmRange } from '@marxan-api/modules/projects/blm';
-import { ProjectBlmRepo } from '@marxan-api/modules/blm';
+import {
+  ChangeBlmRange,
+  ChangeRangeErrors,
+} from '@marxan-api/modules/projects/blm';
+import { GetFailure, ProjectBlmRepo } from '@marxan-api/modules/blm';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -248,20 +251,24 @@ export class ScenariosService {
     );
   }
 
-  async startBlmCalibration(id: string, rangeToUpdate?: [number, number]) {
+  async startBlmCalibration(
+    id: string,
+    rangeToUpdate?: [number, number],
+  ): Promise<Either<ChangeRangeErrors | GetFailure, true>> {
     const scenario = await this.getById(id);
     const projectId = scenario.projectId;
-    if (rangeToUpdate)
-      await this.commandBus.execute(
+    if (rangeToUpdate) {
+      const result = await this.commandBus.execute(
         new ChangeBlmRange(projectId, rangeToUpdate),
       );
+      if (isLeft(result)) return result;
+    }
     const projectBlmValues = await this.blmValuesRepository.get(projectId);
-    if (isLeft(projectBlmValues))
-      throw new Error(
-        `Could not find blm values for project with ID: ${projectId}`,
-      );
+    if (isLeft(projectBlmValues)) return projectBlmValues;
 
     await this.runService.runCalibration(id, projectBlmValues.right.values);
+
+    return right(true);
   }
 
   async cancel(scenarioId: string): Promise<void> {
