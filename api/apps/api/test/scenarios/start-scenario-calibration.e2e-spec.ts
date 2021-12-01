@@ -3,40 +3,44 @@ import { getFixtures } from './start-scenario-calibration.fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-beforeEach(async () => {
-  fixtures = await getFixtures();
-});
+describe.only('start-scenario-calibration', () => {
+  beforeEach(async () => {
+    fixtures = await getFixtures();
+  });
 
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
+  afterEach(async () => {
+    await fixtures?.cleanup();
+  });
 
-test(`starting an scenario calibration should work without sending a range`, async () => {
-  await fixtures.GivenScenarioWasCreated();
+  it(`starts an scenario calibration properly without sending a range`, async () => {
+    await fixtures.GivenScenarioWasCreated();
 
-  await fixtures
-    .WhenScenarioCalibrationIsLaunchedItShouldNotFail()
-    .WithoutRange();
-});
+    await fixtures
+      .WhenScenarioCalibrationIsLaunchedItShouldNotFail()
+      .WithoutRange();
+  });
 
-test(`starting an scenario calibration should work when sending a range`, async () => {
-  await fixtures.GivenScenarioWasCreated();
+  it(`starts an scenario calibration properly when sending a range`, async () => {
+    await fixtures.GivenScenarioWasCreated();
 
-  await fixtures.WhenScenarioCalibrationIsLaunchedItShouldNotFail().WithRange();
+    await fixtures
+      .WhenScenarioCalibrationIsLaunchedItShouldNotFail()
+      .WithRange();
 
-  await fixtures.ThenWhenReadingProjectCalibrationItHasTheNewRange();
-});
+    await fixtures.ThenWhenReadingProjectCalibrationItHasTheNewRange();
+  });
 
-test(`updating a project calibration with incorrect ranges should throw an exception`, async () => {
-  await fixtures.GivenScenarioWasCreated();
+  it(`throws an exception when providing an invalid range`, async () => {
+    await fixtures.GivenScenarioWasCreated();
 
-  await fixtures
-    .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
-    .RangeWithAMinGreaterThanMax();
-  await fixtures
-    .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
-    .RangeWithValuesThatAreNotNumbers();
-  await fixtures
-    .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
-    .RangeWithNegativeNumbers();
+    await fixtures
+      .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
+      .RangeWithAMinGreaterThanMax();
+    await fixtures
+      .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
+      .RangeWithValuesThatAreNotNumbers();
+    await fixtures
+      .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
+      .RangeWithNegativeNumbers();
+  });
 });

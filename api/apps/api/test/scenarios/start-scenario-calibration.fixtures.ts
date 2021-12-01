@@ -16,12 +16,14 @@ export const getFixtures = async () => {
       name: `Org name ${Date.now()}`,
     })
   ).data.id;
-  const projectId = (
-    await ProjectsTestUtils.createProject(app, token, {
-      ...E2E_CONFIG.projects.valid.minimal(),
-      name: `Project name ${Date.now()}`,
-    })
-  ).data.id;
+  const response = await ProjectsTestUtils.createProject(app, token, {
+    ...E2E_CONFIG.projects.valid.minimal(),
+    name: `Project name ${Date.now()}`,
+  });
+  console.log('--------PROJECT--------');
+  console.dir(response, { depth: Infinity });
+  console.log('--------PROJECT--------');
+  const projectId = response.data.id;
   let scenarioId: string;
   const updatedRange = [1, 50];
   return {
