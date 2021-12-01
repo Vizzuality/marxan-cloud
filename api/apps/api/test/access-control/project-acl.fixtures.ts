@@ -6,7 +6,8 @@ import { GivenUserExists } from '../steps/given-user-exists';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { ProjectsACLTestUtils } from '../utils/projects-acl.test.utils';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -28,15 +29,9 @@ export const getFixtures = async () => {
 
   return {
     cleanup: async () => {
-      await userProjectsRepo.delete({
-        userId: In([
-          ownerUserId,
-          contributorUserId,
-          viewerUserId,
-          otherOwnerUserId,
-        ]),
-      });
-      await Promise.all(cleanups.map((clean) => clean()));
+      for (const cleanup of cleanups.reverse()) {
+        await cleanup();
+      }
       await app.close();
     },
 
@@ -46,12 +41,59 @@ export const getFixtures = async () => {
         ownerUserToken,
       );
       cleanups.push(cleanup);
+      cleanups.push(
+        async () =>
+          await ProjectsACLTestUtils.deleteUserFromProject(
+            app,
+            ownerUserToken,
+            projectId,
+            otherOwnerUserId,
+          ),
+      );
+      cleanups.push(
+        async () =>
+          await ProjectsACLTestUtils.deleteUserFromProject(
+            app,
+            ownerUserToken,
+            projectId,
+            viewerUserId,
+          ),
+      );
+      cleanups.push(
+        async () =>
+          await ProjectsACLTestUtils.deleteUserFromProject(
+            app,
+            ownerUserToken,
+            projectId,
+            contributorUserId,
+          ),
+      );
       return projectId;
     },
 
-    GivenUserWasCreatedAndNotOwner: async () => {
-      const existingUserId = await GivenUserExists(app, 'bb');
-      return existingUserId;
+    GivenViewerWasAddedToProject: async (projectId: string) => {
+      const userCreated = await userProjectsRepo.save({
+        projectId,
+        roleName: projectViewerRole,
+        userId: viewerUserId,
+      });
+      return userCreated;
+    },
+    GivenContributorWasAddedToProject: async (projectId: string) => {
+      const userCreated = await userProjectsRepo.save({
+        projectId,
+        roleName: projectContributorRole,
+        userId: contributorUserId,
+      });
+      return userCreated;
+    },
+    GivenOwnerWasAddedToProject: async (projectId: string) => {
+      const userCreated = await userProjectsRepo.save({
+        projectId,
+        roleName: projectOwnerRole,
+        userId: otherOwnerUserId,
+      });
+      return userCreated;
     },
 
     WhenGettingProjectUsersAsNotInProject: async (projectId: string) =>
@@ -73,11 +115,6 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .get(`/api/v1/roles/projects/${projectId}/users`)
         .set('Authorization', `Bearer ${viewerUserToken}`),
-
-    WhenGettingProjectUsersAsOtherOwner: async (projectId: string) =>
-      await request(app.getHttpServer())
-        .get(`/api/v1/roles/projects/${projectId}/users`)
-        .set('Authorization', `Bearer ${otherOwnerUserToken}`),
 
     WhenAddingANewViewerToTheProjectAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())
