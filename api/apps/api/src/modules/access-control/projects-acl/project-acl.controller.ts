@@ -24,6 +24,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserRoleInProjectDto } from './dto/user-role-project.dto';
+import { isLeft, isRight } from 'fp-ts/lib/These';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -48,11 +49,11 @@ export class ProjectAclController {
       req.user.id,
     );
 
-    if (result === false) {
+    if (isLeft(result)) {
       throw new ForbiddenException();
     }
 
-    return result;
+    return result.right;
   }
 
   @Patch(':projectId/users')
@@ -73,7 +74,7 @@ export class ProjectAclController {
       req.user.id,
     );
 
-    if (result === false) {
+    if (isLeft(result)) {
       throw new ForbiddenException();
     }
   }
@@ -96,7 +97,7 @@ export class ProjectAclController {
       req.user.id,
     );
 
-    if (result === false) {
+    if (isLeft(result)) {
       throw new ForbiddenException();
     }
   }
