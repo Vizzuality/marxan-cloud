@@ -91,6 +91,7 @@ import {
   GeometryFileInterceptor,
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
+import { StartScenarioBlmCalibrationDto } from '@marxan-api/modules/scenarios/dto/start-scenario-blm-calibration.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -670,5 +671,17 @@ export class ScenariosController {
       }
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
+  }
+
+  @ApiOkResponse({
+    type: ScenarioSolutionResultDto,
+  })
+  @Post(`:id/calibration`)
+  async startCalibration(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() { range }: StartScenarioBlmCalibrationDto,
+  ): Promise<any> {
+    console.log('Controller');
+    await this.service.startBlmCalibration(id, range);
   }
 }

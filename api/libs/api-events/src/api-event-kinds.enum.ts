@@ -49,6 +49,9 @@ export enum API_EVENT_KINDS {
   scenario__planningAreaProtectedCalculation__submitted__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.submitted/v1/alpha',
   scenario__planningAreaProtectedCalculation__finished__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.finished/v1/alpha',
   scenario__planningAreaProtectedCalculation__failed__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.failed/v1/alpha',
+  scenario__calibration__submitted_v1_alpha1 = 'scenario.calibration.submitted/v1/alpha',
+  scenario__calibration__finished_v1_alpha1 = 'scenario.calibration.finished/v1/alpha',
+  scenario__calibration__failed_v1_alpha1 = 'scenario.calibration.failed/v1/alpha',
 }
 
 export type ProjectEvents = Pick<

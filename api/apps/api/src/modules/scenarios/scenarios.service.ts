@@ -46,9 +46,11 @@ import {
   DoesntExist,
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker.service';
-import { QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
 import { ProtectedAreaService, submissionFailed } from './protected-area';
+import { ChangeBlmRange } from '@marxan-api/modules/projects/blm';
+import { ProjectBlmRepo } from '@marxan-api/modules/blm';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -96,6 +98,8 @@ export class ScenariosService {
     private readonly projectChecker: ProjectChecker,
     private readonly protectedArea: ProtectedAreaService,
     private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
+    private readonly blmValuesRepository: ProjectBlmRepo,
   ) {}
 
   async findAllPaginated(
@@ -242,6 +246,22 @@ export class ScenariosService {
       pick(scenario, 'id', 'boundaryLengthModifier'),
       blm,
     );
+  }
+
+  async startBlmCalibration(id: string, rangeToUpdate?: [number, number]) {
+    const scenario = await this.getById(id);
+    const projectId = scenario.projectId;
+    if (rangeToUpdate)
+      await this.commandBus.execute(
+        new ChangeBlmRange(projectId, rangeToUpdate),
+      );
+    const projectBlmValues = await this.blmValuesRepository.get(projectId);
+    if (isLeft(projectBlmValues))
+      throw new Error(
+        `Could not find blm values for project with ID: ${projectId}`,
+      );
+
+    await this.runService.runCalibration(id, projectBlmValues.right.values);
   }
 
   async cancel(scenarioId: string): Promise<void> {

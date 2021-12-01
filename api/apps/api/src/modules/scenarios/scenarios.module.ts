@@ -47,6 +47,7 @@ import { ProjectChecker } from './project-checker.service';
 import { ProtectedAreaModule } from './protected-area';
 import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
 import { PlanningAreasModule } from '@marxan-api/modules/projects/planning-areas';
+import { BlmValuesModule } from '@marxan-api/modules/blm';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { PlanningAreasModule } from '@marxan-api/modules/projects/planning-areas
     ApiEventsModule,
     ProtectedAreaModule,
     ProtectedAreasCrudModule,
+    BlmValuesModule,
   ],
   providers: [
     ProjectChecker,
