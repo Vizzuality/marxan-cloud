@@ -18,6 +18,7 @@ export const getFixtures = async () => {
   ).data.id;
   const response = await ProjectsTestUtils.createProject(app, token, {
     ...E2E_CONFIG.projects.valid.minimal(),
+    organizationId: organizationId,
     name: `Project name ${Date.now()}`,
   });
   console.log('--------PROJECT--------');

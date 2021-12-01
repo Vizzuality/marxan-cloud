@@ -1,5 +1,5 @@
 import * as request from 'supertest';
-import { INestApplication, Logger } from '@nestjs/common';
+import { HttpStatus, INestApplication, Logger } from '@nestjs/common';
 import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
 import { ProjectResultSingular } from '@marxan-api/modules/projects/project.api.entity';
 
@@ -23,6 +23,7 @@ export class ProjectsTestUtils {
       .post('/api/v1/projects')
       .set('Authorization', `Bearer ${jwtToken}`)
       .send(projectDTO)
+      .expect(HttpStatus.CREATED)
       .then((response) => response.body)
       .catch((error) => {
         Logger.error(error);
