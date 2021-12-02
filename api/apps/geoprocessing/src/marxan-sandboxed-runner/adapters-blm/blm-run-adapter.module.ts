@@ -15,6 +15,7 @@ import { AssetFactory } from './asset-factory.service';
 
 import { InputFilesFs } from '../adapters-single/scenario-data/input-files-fs';
 import { AssetsModule } from '../adapters-shared';
+import { BlmPartialResultsFakeRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.fake-repository';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
@@ -32,7 +33,7 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
     },
     {
       provide: SandboxRunnerOutputHandler,
-      useValue: {},
+      useClass: BlmPartialResultsFakeRepository,
     },
     AssetFactory,
     BlmInputFiles,

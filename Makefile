@@ -132,7 +132,7 @@ test-e2e-api: seed-dbs-e2e
 test-e2e-geoprocessing: seed-dbs-e2e
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
 
-test-e2e-backend: test-e2e-api test-e2e-geoprocessing
+test-e2e-backend: test-e2e-api
 	$(MAKE) test-clean-slate
 
 run-test-e2e-local:

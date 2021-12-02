@@ -8,9 +8,10 @@
     "node_modules",
     "src"
   ],
+  "testTimeout": 6000,
   "rootDir": ".",
   "testEnvironment": "node",
-  "testRegex": ".e2e-spec.ts$",
+  "testRegex": "start-scenario-calibration.e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },

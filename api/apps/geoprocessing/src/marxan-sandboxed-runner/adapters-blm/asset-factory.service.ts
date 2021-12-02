@@ -1,10 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { copySync } from 'fs-extra';
+import { copySync, readFileSync } from 'fs-extra';
 import { Workspace } from '../ports/workspace';
 import { Assets } from './blm-input-files';
+import { dirname, resolve } from 'path';
+import { createWriteStream, promises } from 'fs';
+import { AssetFetcher } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-shared';
+import { FileReader } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/file-reader';
 
 @Injectable()
 export class AssetFactory {
+  constructor(
+    private readonly fetchService: AssetFetcher,
+    private readonly reader: FileReader,
+  ) {}
   async copy(
     from: Workspace,
     to: Workspace,
@@ -20,12 +28,44 @@ export class AssetFactory {
       filter: (src, dest) => !src.match(/marxan/),
     });
 
+    console.log('ASSETS');
+    const foo = this.getInputDat(assets);
+    if (!foo) throw new Error('No URL for input.dat found');
+
+    await this.download(
+      foo.url,
+      resolve(to.workingDirectory, foo.relativeDestination),
+    );
+
+    const input = this.reader.read(
+      resolve(to.workingDirectory, foo.relativeDestination),
+    );
+    const matcher = new RegExp(/hola/);
     // TODO modify input.dat file - replace "BLM" with overrideBlmValue
+  }
+
+  private async download(sourceUri: string, dest: string) {
+    await this.ensureWriteDirectoryExists(dest);
+    return new Promise((resolve, reject) => {
+      const writer = createWriteStream(dest);
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+
+      this.fetchService.fetch(sourceUri, writer);
+    });
+  }
+
+  private async ensureWriteDirectoryExists(
+    fileDestination: string,
+  ): Promise<void> {
+    // if directory does not exists, it will silently "success" downloading the file while it won't be there
+    const desiredDirectory = dirname(fileDestination);
+    await promises.mkdir(desiredDirectory, { recursive: true });
   }
 
   private getInputDat(
     assets: Assets,
-  ): { relativeDestination: string } | undefined {
+  ): { relativeDestination: string; url: string } | undefined {
     return assets.find((asset) => asset.url.match(/input.dat/));
   }
 }
