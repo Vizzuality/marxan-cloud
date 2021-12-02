@@ -6,6 +6,7 @@ import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import * as request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
+import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -21,12 +22,11 @@ export const getFixtures = async () => {
     organizationId: organizationId,
     name: `Project name ${Date.now()}`,
   });
-  console.log('--------PROJECT--------');
-  console.dir(response, { depth: Infinity });
-  console.log('--------PROJECT--------');
   const projectId = response.data.id;
+  await ProjectsTestUtils.generateBlmValues(app, projectId);
   let scenarioId: string;
   const updatedRange = [1, 50];
+
   return {
     cleanup: async () => {
       await ProjectsTestUtils.deleteProject(app, token, projectId);
@@ -41,6 +41,7 @@ export const getFixtures = async () => {
     GivenScenarioWasCreated: async () => {
       const result = await ScenariosTestUtils.createScenario(app, token, {
         name: `Test scenario`,
+        type: ScenarioType.marxan,
         projectId,
       });
       scenarioId = result.data.id;
@@ -67,34 +68,35 @@ export const getFixtures = async () => {
 
       expect(projectData.body.range).toEqual(updatedRange);
     },
-    ThenShouldFailWhenUpdatingProjectCalibrationWithA: () => {
+    ThenShouldFailWhenStartingAnScenarioCalibrationWithA: () => {
       return {
         RangeWithNegativeNumbers: async () => {
-          await request(app.getHttpServer())
-            .post(`/api/v1/scenario/${scenarioId}/calibration`)
+          const response = await request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
             .set('Authorization', `Bearer ${token}`)
             .send({
               range: [-1, -50],
-            })
-            .expect(HttpStatus.BAD_REQUEST);
+            });
+          expect(response.status).toBe(HttpStatus.BAD_REQUEST);
         },
         RangeWithAMinGreaterThanMax: async () => {
-          await request(app.getHttpServer())
-            .post(`/api/v1/scenario/${scenarioId}/calibration`)
+          const response = await request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
             .set('Authorization', `Bearer ${token}`)
             .send({
               range: [50, 1],
-            })
-            .expect(HttpStatus.BAD_REQUEST);
+            });
+          expect(response.status).toBe(HttpStatus.BAD_REQUEST);
         },
         RangeWithValuesThatAreNotNumbers: async () => {
-          await request(app.getHttpServer())
-            .post(`/api/v1/scenario/${scenarioId}/calibration`)
+          const response = await request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
             .set('Authorization', `Bearer ${token}`)
             .send({
               range: [1, '50'],
-            })
-            .expect(HttpStatus.BAD_REQUEST);
+            });
+
+          expect(response.status).toBe(HttpStatus.BAD_REQUEST);
         },
       };
     },

@@ -53,7 +53,7 @@ export const getFixtures = async () => {
 
       expect(projectData.body.range).toEqual(updatedRange);
     },
-    ThenShouldFailWhenUpdatingProjectCalibrationWithA: () => {
+    ThenShouldFailWhenStartingAnScenarioCalibrationWithA: () => {
       return {
         RangeWithNegativeNumbers: async () => {
           await request(app.getHttpServer())

@@ -3,7 +3,7 @@ import { getFixtures } from './start-scenario-calibration.fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe.only('start-scenario-calibration', () => {
+describe('start-scenario-calibration', () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   });
@@ -34,13 +34,14 @@ describe.only('start-scenario-calibration', () => {
     await fixtures.GivenScenarioWasCreated();
 
     await fixtures
-      .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
+      .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
       .RangeWithAMinGreaterThanMax();
+
     await fixtures
-      .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
+      .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
       .RangeWithValuesThatAreNotNumbers();
     await fixtures
-      .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
+      .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
       .RangeWithNegativeNumbers();
   });
 });
