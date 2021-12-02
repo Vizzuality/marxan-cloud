@@ -52,6 +52,7 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepo {
       { id: projectId },
       { range, values },
     );
-    return Boolean(result) ? right(true) : left(projectNotFound);
+
+    return Boolean(result.affected) ? right(true) : left(projectNotFound);
   }
 }
