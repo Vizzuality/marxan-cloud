@@ -8,6 +8,7 @@ export interface ProtectedAreasSelectedProps {
   form?: any;
   options: Record<string, any>[];
   title: string;
+  isView?: boolean;
   wdpaIucnCategories: Record<string, any>[];
 }
 
@@ -15,6 +16,7 @@ export const ProtectedAreasSelected: React.FC<ProtectedAreasSelectedProps> = ({
   form,
   options,
   title,
+  isView = false,
   wdpaIucnCategories,
 }: ProtectedAreasSelectedProps) => {
   return (
@@ -40,19 +42,21 @@ export const ProtectedAreasSelected: React.FC<ProtectedAreasSelectedProps> = ({
                 }
               </span>
 
-              <button
-                aria-label="remove"
-                type="button"
-                className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
-                onClick={() => {
-                  form.mutators.removeWDPAFilter(
-                    wdpa.value,
-                    wdpaIucnCategories,
-                  );
-                }}
-              >
-                <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
-              </button>
+              {!isView && (
+                <button
+                  aria-label="remove"
+                  type="button"
+                  className="flex items-center justify-center w-6 h-6 transition bg-transparent border border-gray-400 rounded-full hover:bg-gray-400"
+                  onClick={() => {
+                    form.mutators.removeWDPAFilter(
+                      wdpa.value,
+                      wdpaIucnCategories,
+                    );
+                  }}
+                >
+                  <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
+                </button>
+              )}
 
             </div>
           );

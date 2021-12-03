@@ -1,20 +1,17 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+
+import intersection from 'lodash/intersection';
 
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { mergeScenarioStatusEditingMetaData } from 'utils/utils-scenarios';
-
 import { useProject } from 'hooks/projects';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
-import { useWDPACategories } from 'hooks/wdpa';
+import { useScenario } from 'hooks/scenarios';
+import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
 import ProtectedAreaUploader from 'layout/scenarios/edit/wdpa/categories/pa-uploader';
 import ProtectedAreasSelected from 'layout/scenarios/edit/wdpa/pa-selected';
@@ -36,13 +33,14 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   onSuccess,
   onDismiss,
 }: WDPACategoriesProps) => {
-  const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
   const { pid, sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
   const dispatch = useDispatch();
+
+  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: projectData } = useProject(pid);
 
@@ -51,12 +49,12 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     isFetching: scenarioIsFetching,
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
-  const { metadata } = scenarioData || {};
 
   const {
     data: wdpaData,
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
+    refetch: refetchProtectedAreas,
   } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
       || projectData?.adminAreaLevel1I
@@ -67,149 +65,72 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     scenarioId: sid,
   });
 
-  const { addToast } = useToasts();
-
-  const mutation = useSaveScenario({
+  const saveScenarioProtectedAreasMutation = useSaveScenarioProtectedAreas({
     requestConfig: {
-      method: 'PATCH',
+      method: 'POST',
     },
   });
+
+  const selectedProtectedAreas = useMemo(() => {
+    const { wdpaIucnCategories } = wdpaCategories;
+    return wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id)).map((pa) => {
+      return {
+        id: pa.id,
+        selected: true,
+      };
+    });
+  }, [wdpaCategories, wdpaData]);
+
+  const calculatePAs = useCallback(() => {
+    saveScenarioProtectedAreasMutation.mutate({
+      id: `${sid}`,
+      data: {
+        areas: selectedProtectedAreas,
+        threshold: scenarioData.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
+      },
+    }, {
+      onSuccess: () => {
+        onSuccess();
+      },
+    });
+  }, [saveScenarioProtectedAreasMutation, selectedProtectedAreas, scenarioData, sid, onSuccess]);
 
   // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
     if (!wdpaData) return [];
 
     return wdpaData.map((w) => ({
-      label: `${w.kind === 'global' ? 'IUCN' : '👤'} ${w.name}`,
+      label: w.kind === 'global' ? `IUCN ${w.name}` : `${w.name}`,
       value: w.id,
-      ...w.kind === 'global' && { kind: 'global' },
+      kind: w.kind,
+      selected: w.selected,
     }));
   }, [wdpaData]);
 
-  const CUSTOM_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => !w.kind);
-  const WDPA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((o) => o.kind === 'global');
+  const PROJECT_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'project');
+  const WDPA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'global');
 
   const ORDERED_WDPA_CATEGORIES_OPTIONS = useMemo(() => {
-    if (!WDPA_CATEGORIES_OPTIONS) return [];
+    if (!wdpaData) return [];
 
-    return CUSTOM_PA_OPTIONS.concat(WDPA_OPTIONS);
-  }, [WDPA_CATEGORIES_OPTIONS, WDPA_OPTIONS, CUSTOM_PA_OPTIONS]);
+    return PROJECT_PA_OPTIONS.concat(WDPA_OPTIONS);
+  }, [wdpaData, WDPA_OPTIONS, PROJECT_PA_OPTIONS]);
 
   const INITIAL_VALUES = useMemo(() => {
+    const selectedAreas = wdpaData?.filter((pa) => pa.selected) || [];
+    const areas = selectedAreas.map((i) => i.id) || [];
+
     return {
-      wdpaIucnCategories: scenarioData?.wdpaIucnCategories || [],
+      wdpaIucnCategories: areas,
     };
-  }, [scenarioData?.wdpaIucnCategories]);
+  }, [wdpaData]);
 
   useEffect(() => {
     const { wdpaThreshold } = scenarioData;
     if (wdpaThreshold) {
       dispatch(setWDPAThreshold(wdpaThreshold / 100));
     }
-  }, [scenarioData]); //eslint-disable-line
-
-  // Submit
-  const onSubmit = useCallback((values, form) => {
-    const { modified, dirtyFields } = form.getState();
-
-    if (modified.wdpaIucnCategories || dirtyFields.wdpaIucnCategories) {
-      setSubmitting(true);
-
-      mutation.mutate({
-        id: scenarioData?.id,
-        data: {
-          ...values,
-          metadata: mergeScenarioStatusEditingMetaData(
-            metadata,
-            {
-              tab: 'protected-areas',
-              subtab: 'protected-areas-preview',
-              status: {
-                'protected-areas': 'draft',
-                features: 'empty',
-                analysis: 'empty',
-              },
-            },
-          ),
-        },
-      }, {
-        onSuccess: () => {
-          setSubmitting(false);
-          addToast('save-scenario-wdpa', (
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Scenario WDPA saved</p>
-            </>
-          ), {
-            level: 'success',
-          });
-        },
-        onError: () => {
-          setSubmitting(false);
-
-          addToast('error-scenario-wdpa', (
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">Scenario WDPA not saved</p>
-            </>
-          ), {
-            level: 'error',
-          });
-        },
-      });
-    } else {
-      onSuccess();
-    }
-  }, [mutation, scenarioData?.id, addToast, onSuccess, metadata]);
-
-  const onSkip = useCallback(() => {
-    setSubmitting(true);
-
-    mutation.mutate({
-      id: scenarioData?.id,
-      data: {
-        wdpaIucnCategories: null,
-        metadata: mergeScenarioStatusEditingMetaData(
-          metadata,
-          {
-            tab: 'features',
-            subtab: 'features-preview',
-            status: {
-              'protected-areas': 'draft',
-              features: 'draft',
-              analysis: 'empty',
-            },
-          },
-        ),
-      },
-    }, {
-      onSuccess: () => {
-        setSubmitting(false);
-
-        addToast('save-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario WDPA saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        onDismiss();
-      },
-      onError: () => {
-        setSubmitting(false);
-
-        addToast('error-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario WDPA not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [mutation, addToast, onDismiss, scenarioData?.id, metadata]);
+  }, [scenarioData.wdpaThreshold]); //eslint-disable-line
 
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
@@ -228,7 +149,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         <div className="text-sm">This planning area doesn&apos;t have any protected areas associated with it. You can go directly to the features tab.</div>
 
         <div className="flex justify-center mt-20">
-          <Button theme="secondary-alt" size="lg" type="button" className="relative px-20" onClick={onSkip}>
+          <Button theme="secondary-alt" size="lg" type="button" className="relative px-20" onClick={onDismiss}>
             <span>Continue to features</span>
           </Button>
         </div>
@@ -238,8 +159,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
   return (
     <FormRFF
-      key="wdpa-categories-scenarios-form"
-      onSubmit={onSubmit}
+      onSubmit={() => { }}
       mutators={{
         removeWDPAFilter: (args, state, utils) => {
           const [id, arr] = args;
@@ -253,22 +173,29 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         },
       }}
       initialValues={INITIAL_VALUES}
-    >
-      {({ form, values, handleSubmit }) => {
-        const customPAAreSelected = !!values.wdpaIucnCategories.length
-          && values.wdpaIucnCategories.some((w) => w.charAt(0) !== 'I');
-        const wdpaAreSelected = !!values.wdpaIucnCategories.length
-          && values.wdpaIucnCategories.some((w) => w.charAt(0) === 'I');
+      render={({ form, values, handleSubmit }) => {
+        const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
+        const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
+
+        const areWDPAreasSelected = intersection(plainWDPAOptions,
+          values.wdpaIucnCategories).length > 0;
+
+        const areProjectPAreasSelected = intersection(plainProjectPAOptions,
+          values.wdpaIucnCategories).length > 0;
 
         return (
-          <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow w-full overflow-hidden">
-            <Loading
-              visible={submitting}
-              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
-              iconClassName="w-10 h-10 text-white"
+          <form
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            className="relative flex flex-col flex-grow w-full overflow-hidden"
+          >
+            <FormSpyRFF onChange={(state) => {
+              dispatch(setWDPACategories(state.values));
+              if (state.touched.uploadedProtectedArea) {
+                refetchProtectedAreas();
+              }
+            }}
             />
-
-            <FormSpyRFF onChange={(state) => dispatch(setWDPACategories(state.values))} />
 
             <div className="relative flex flex-col flex-grow overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
@@ -281,8 +208,8 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     <FieldRFF
                       name="wdpaIucnCategories"
                     >
-                      {(flprops) => (
-                        <Field id="scenario-wdpaIucnCategories" {...flprops}>
+                      {(fprops) => (
+                        <Field id="wdpaIucnCategories" {...fprops}>
                           <div className="flex items-center mb-3">
                             <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
                             <InfoButton>
@@ -321,9 +248,9 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                               options={ORDERED_WDPA_CATEGORIES_OPTIONS}
                               onChange={(v) => {
                                 if (v) {
-                                  flprops.input.onChange([v]);
+                                  fprops.input.onChange([v]);
                                 } else {
-                                  flprops.input.onChange([]);
+                                  fprops.input.onChange([]);
                                 }
                               }}
                             />
@@ -341,7 +268,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                               batchSelectionLabel="All protected areas"
                               selected={values.wdpaIucnCategories}
                               options={ORDERED_WDPA_CATEGORIES_OPTIONS}
-                              onChange={flprops.input.onChange}
+                              onChange={fprops.input.onChange}
                             />
                           )}
                         </Field>
@@ -351,29 +278,19 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
                   <p className="py-4 text-sm text-center">or</p>
                   <FieldRFF
-                    name="protectedAreaId"
+                    name="uploadedProtectedArea"
                     validate={composeValidators([{ presence: true }])}
                   >
-                    {(fprops) => {
+                    {(flprops) => {
                       return (
                         <ProtectedAreaUploader
-                          {...fprops}
-                          form={form}
+                          {...flprops}
                         />
                       );
                     }}
                   </FieldRFF>
 
-                  {customPAAreSelected && (
-                    <ProtectedAreasSelected
-                      form={form}
-                      options={CUSTOM_PA_OPTIONS}
-                      title="Uploaded protected areas:"
-                      wdpaIucnCategories={values.wdpaIucnCategories}
-                    />
-                  )}
-
-                  {wdpaAreSelected && (
+                  {areWDPAreasSelected && (
                     <ProtectedAreasSelected
                       form={form}
                       options={WDPA_OPTIONS}
@@ -382,19 +299,28 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     />
                   )}
 
+                  {areProjectPAreasSelected && (
+                    <ProtectedAreasSelected
+                      form={form}
+                      options={PROJECT_PA_OPTIONS}
+                      title="Uploaded protected areas:"
+                      wdpaIucnCategories={values.wdpaIucnCategories}
+                    />
+                  )}
+
                 </div>
               </div>
               <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
-
             <div className="flex justify-center mt-5 space-x-2">
               <Button
                 theme="secondary-alt"
                 size="lg"
-                type={values.wdpaIucnCategories.length ? 'submit' : 'button'}
+                type="button"
                 className="relative px-20"
-                disabled={submitting}
-                onClick={!values.wdpaIucnCategories.length ? onSkip : onSuccess}
+                onClick={() => (
+                  values.wdpaIucnCategories.length > 0
+                    ? calculatePAs() : onDismiss())}
               >
                 {!!values.wdpaIucnCategories.length && (
                   <span>Continue</span>
@@ -408,7 +334,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
           </form>
         );
       }}
-    </FormRFF>
+    />
   );
 };
 
