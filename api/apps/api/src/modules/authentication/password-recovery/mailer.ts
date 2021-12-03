@@ -92,7 +92,9 @@ export class SparkPostMailer implements Mailer {
   async sendRecoveryEmail(userId: string, token: string): Promise<void> {
     const user = await this.usersService.getById(userId);
     return this.sendEmail(SparkpostTemplate.PasswordRecovery, user.email, {
-      urlRecover: this.passwordResetPrefix + token,
+      urlRecover: `${AppConfig.get('application.baseUrl')}${
+        this.passwordResetPrefix
+      }${token}`,
     });
   }
 
@@ -103,6 +105,8 @@ export class SparkPostMailer implements Mailer {
     const user = await this.usersService.getById(userId);
     return this.sendEmail(SparkpostTemplate.SignUpConfirmation, user.email, {
       urlSignUpConfirmation: `${AppConfig.get(
+        'application.baseUrl',
+      )}${AppConfig.get(
         'signUpConfirmation.tokenPrefix',
       )}${token}&userId=${userId}`,
     });

@@ -1,44 +1,43 @@
-import { INestApplication } from '@nestjs/common';
-import { bootstrapApplication } from '../../utils/geo-application';
-import { ProtectedAreaProcessor } from '../../../src/modules/protected-areas/worker/protected-area-processor';
 import { createWorld } from './steps/shapefile-for-wdpa-world';
-import { shapes } from './steps/shapes';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
-let app: INestApplication;
-let sut: ProtectedAreaProcessor;
-let world: ReturnType<typeof createWorld>;
+let world: FixtureType<typeof createWorld>;
 
-const validShape = shapes.valid();
-
-beforeAll(async () => {
-  app = await bootstrapApplication();
-  world = createWorld(app, validShape);
-  sut = app.get(ProtectedAreaProcessor);
+beforeEach(async () => {
+  world = await createWorld();
 });
 
-describe(`when worker processes the job for known project`, () => {
-  beforeAll(async () => {
-    await world.GivenWdpaForProjectAlreadyExists(`old-shape-name`);
-    await sut.process(world.WhenNewShapefileIsSubmitted(validShape.filename));
-    await delay(2000);
-  }, 10000);
+test(`when worker processes the job for known project`, async () => {
+  await world.GivenWdpaForProjectAlreadyExists(`old-shape-name`);
+  const name = await world.WhenNewShapefileIsSubmitted();
+  await delay(2000);
 
-  it(`pushes new geometries`, async () => {
-    expect(await world.ThenNewEntriesArePublished(validShape.filename)).toEqual(
-      true,
-    );
-  });
+  expect(await world.ThenProtectedAreaIsAvailable(name)).toEqual(true);
+  expect(await world.ThenProtectedAreaIsAvailable(`old-shape-name`)).toEqual(
+    true,
+  );
+});
 
-  it(`removes previous geometries assigned to project`, async () => {
-    expect(await world.ThenOldEntriesAreRemoved(`old-shape-name`)).toEqual(
-      true,
-    );
-  });
+test(`uses provided name as protected area's "fullName"`, async () => {
+  const name = await world.WhenNewShapefileIsSubmitted(`custom name`);
+  await delay(2000);
+  expect(await world.ThenProtectedAreaIsAvailable(name)).toEqual(true);
+});
+
+test(`adding the same shape twice`, async () => {
+  expect.assertions(1);
+  await world.WhenNewShapefileIsSubmitted(`custom name`);
+  try {
+    await world.WhenNewShapefileIsSubmitted(`custom name`);
+  } catch (error) {
+    expect(
+      error.toString().match(`wpdpa_project_geometries_project_check`),
+    ).toBeTruthy();
+  }
 });
 
 afterAll(async () => {
   await world.cleanup();
-  await app?.close();
 }, 500 * 1000);
 
 const delay = (ms = 1000) => new Promise((resolve) => setTimeout(resolve, ms));

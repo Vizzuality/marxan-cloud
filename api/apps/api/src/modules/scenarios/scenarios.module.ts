@@ -11,7 +11,6 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { ScenarioFeaturesModule } from '../scenarios-features';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
-import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { AnalysisModule } from '../analysis/analysis.module';
 import { CostSurfaceModule } from './cost-surface/cost-surface.module';
 import { ScenariosService } from './scenarios.service';
@@ -49,6 +48,7 @@ import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/pr
 import { PlanningAreasModule } from '@marxan-api/modules/projects/planning-areas';
 import { BlmValuesModule } from '@marxan-api/modules/blm';
 
+
 @Module({
   imports: [
     CqrsModule,
@@ -64,7 +64,6 @@ import { BlmValuesModule } from '@marxan-api/modules/blm';
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],
       DbConnections.geoprocessingDB,
     ),
-    ProtectionStatusModule.for(DbConnections.geoprocessingDB),
     PlanningAreasModule,
     UsersModule,
     ScenarioFeaturesModule,
@@ -87,7 +86,6 @@ import { BlmValuesModule } from '@marxan-api/modules/blm';
     ScenariosService,
     ScenariosCrudService,
     ProxyService,
-    WdpaAreaCalculationService,
     ScenarioPlanningUnitsService,
     ScenarioPlanningUnitsLinkerService,
     ScenarioSerializer,

@@ -14,7 +14,7 @@ import { JobStatusService } from './job-status';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
-import { PlanningAreasService } from './planning-areas';
+import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
 import { assertDefined } from '@marxan/utils';
 
 import {
@@ -29,7 +29,7 @@ import {
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
 
-export { validationFailed } from './planning-areas';
+export { validationFailed } from '../planning-areas';
 
 @Injectable()
 export class ProjectsService {

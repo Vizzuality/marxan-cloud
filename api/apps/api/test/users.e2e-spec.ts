@@ -20,6 +20,7 @@ import { tearDown } from './utils/tear-down';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import * as nock from 'nock';
 import { CreateTransmission, Recipient } from 'sparkpost';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
@@ -67,7 +68,12 @@ describe('UsersModule (e2e)', () => {
           .map((el) => el.substitution_data)
           .every(
             (el) =>
-              el.urlSignUpConfirmation.match(/\?token=\w+/) &&
+              el.urlSignUpConfirmation.includes(
+                AppConfig.get('application.baseUrl'),
+              ) &&
+              el.urlSignUpConfirmation.includes(
+                AppConfig.get('signUpConfirmation.tokenPrefix'),
+              ) &&
               el.urlSignUpConfirmation.match(/&userId=\w+/),
           );
       })
