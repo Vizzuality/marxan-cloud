@@ -85,7 +85,6 @@ export class ProjectsCrudService extends AppBaseService<
         'adminAreaLevel2Id',
         'planningUnitGridShape',
         'planningUnitAreakm2',
-        'users',
         'scenarios',
         'createdAt',
         'lastModifiedAt',
@@ -95,14 +94,6 @@ export class ProjectsCrudService extends AppBaseService<
         'customProtectedAreas',
       ],
       keyForAttribute: 'camelCase',
-      users: {
-        ref: 'id',
-        attributes: ['fname', 'lname', 'email', 'projectRoles'],
-        projectRoles: {
-          ref: 'name',
-          attributes: ['name'],
-        },
-      },
       scenarios: {
         ref: 'id',
         attributes: [
