@@ -3,18 +3,18 @@ import React, {
 } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { mergeScenarioStatusEditingMetaData } from 'utils/utils-scenarios';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
-import { useWDPACategories } from 'hooks/wdpa';
+import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
 import ProtectedAreasSelected from 'layout/scenarios/edit/wdpa/pa-selected';
 
@@ -40,9 +40,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   onBack,
 }: WDPAThresholdCategories) => {
   const [submitting, setSubmitting] = useState(false);
+
   const { addToast } = useToasts();
   const { query } = useRouter();
   const { pid, sid } = query;
+
+  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: projectData } = useProject(pid);
 
@@ -55,6 +58,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     isFetching: scenarioIsFetching,
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
+
   const { metadata } = scenarioData || {};
 
   const {
@@ -77,17 +81,38 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     },
   });
 
+  const saveScenarioProtectedAreasMutation = useSaveScenarioProtectedAreas({
+    requestConfig: {
+      method: 'POST',
+    },
+  });
+
   const labelRef = React.useRef(null);
 
+  // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
     if (!wdpaData) return [];
 
     return wdpaData.map((w) => ({
-      label: `IUCN ${w.iucnCategory}`,
+      label: w.kind === 'global' ? `IUCN ${w.name}` : `${w.name}`,
       value: w.id,
-      ...w.kind === 'global' && { kind: 'global' },
+      kind: w.kind,
+      selected: w.selected,
     }));
   }, [wdpaData]);
+
+  const PROJECT_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'project');
+  const GLOBAL_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'global');
+
+  const selectedProtectedAreas = useMemo(() => {
+    const { wdpaIucnCategories } = wdpaCategories;
+    return wdpaData.filter((pa) => wdpaIucnCategories.includes(pa.id)).map((pa) => {
+      return {
+        id: pa.id,
+        selected: true,
+      };
+    });
+  }, [wdpaCategories, wdpaData]);
 
   const INITIAL_VALUES = useMemo(() => {
     const { wdpaThreshold, wdpaIucnCategories } = scenarioData;
@@ -98,90 +123,79 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     };
   }, [scenarioData]);
 
+  const globalPAreasSelectedIds = useMemo(() => {
+    const { wdpaIucnCategories } = wdpaCategories;
+    return GLOBAL_PA_OPTIONS
+      .map((p) => p.value)
+      .filter((p) => wdpaIucnCategories?.includes(p));
+  }, [wdpaCategories, GLOBAL_PA_OPTIONS]);
+
+  const projectPAreasSelectedIds = useMemo(() => {
+    const { wdpaIucnCategories } = wdpaCategories;
+    return PROJECT_PA_OPTIONS
+      .map((p) => p.value)
+      .filter((p) => wdpaIucnCategories?.includes(p));
+  }, [wdpaCategories, PROJECT_PA_OPTIONS]);
+
+  const areGlobalPAreasSelected = !!globalPAreasSelectedIds.length;
+  const areProjectPAreasSelected = !!projectPAreasSelectedIds.length;
+
   useEffect(() => {
     const { wdpaThreshold } = scenarioData;
     dispatch(setWDPAThreshold(wdpaThreshold ? wdpaThreshold / 100 : 0.75));
   }, [scenarioData]); //eslint-disable-line
 
-  // EVENTS
-  const handleSubmit = useCallback((values, form) => {
-    const { modified } = form.getState();
-    const { scenarioEditingMetadata } = metadata;
+  const handleSubmit = useCallback((values) => {
+    setSubmitting(true);
 
-    if (modified.wdpaThreshold || scenarioEditingMetadata.tab === 'protected-areas') {
-      setSubmitting(true);
+    const { wdpaThreshold } = values;
 
-      const { wdpaThreshold } = values;
+    saveScenarioProtectedAreasMutation.mutate({
+      id: `${sid}`,
+      data: {
+        areas: selectedProtectedAreas,
+        threshold: +(wdpaThreshold * 100).toFixed(0),
+      },
+    }, {
+      onSuccess: () => {
+        onSuccess();
+        setSubmitting(false);
+        addToast('save-scenario-wdpa', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Scenario WDPA threshold saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
+        saveScenarioMutation.mutate({
+          id: `${sid}`,
+          data: {
+            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
+          },
+        });
+      },
+      onError: () => {
+        setSubmitting(false);
 
-      saveScenarioMutation.mutate({
-        id: `${sid}`,
-        data: {
-          wdpaThreshold: +(wdpaThreshold * 100).toFixed(0),
-          metadata: mergeScenarioStatusEditingMetaData(
-            metadata,
-            {
-              tab: 'features',
-              subtab: 'features-preview',
-              status: {
-                'protected-areas': 'draft',
-                features: 'draft',
-                analysis: 'empty',
-              },
-            },
-          ),
-        },
-      }, {
-        onSuccess: () => {
-          setSubmitting(false);
-
-          addToast('save-scenario-wdpa', (
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Scenario WDPA threshold saved</p>
-            </>
-          ), {
-            level: 'success',
-          });
-          onSuccess();
-        },
-        onError: () => {
-          setSubmitting(false);
-
-          addToast('error-scenario-wdpa', (
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">Scenario WDPA threshold not saved</p>
-            </>
-          ), {
-            level: 'error',
-          });
-        },
-      });
-    } else {
-      setSubmitting(true);
-
-      saveScenarioMutation.mutate({
-        id: `${sid}`,
-        data: {
-          metadata: mergeScenarioStatusEditingMetaData(
-            metadata,
-            {
-              tab: 'features',
-              subtab: 'features-preview',
-            },
-          ),
-        },
-      }, {
-        onSuccess: () => {
-          setSubmitting(false);
-          onSuccess();
-        },
-        onError: () => {
-          setSubmitting(false);
-        },
-      });
-    }
-  }, [saveScenarioMutation, sid, addToast, onSuccess, metadata]);
+        addToast('error-scenario-wdpa', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario WDPA threshold not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    saveScenarioProtectedAreasMutation,
+    selectedProtectedAreas,
+    sid,
+    saveScenarioMutation,
+    metadata,
+    addToast,
+    onSuccess]);
 
   const handleBack = useCallback(() => {
     onBack();
@@ -278,15 +292,23 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                   </FieldRFF>
                 </div>
 
-                {INITIAL_VALUES.wdpaIucnCategories
-                  && (
-                    <ProtectedAreasSelected
-                      options={WDPA_CATEGORIES_OPTIONS}
-                      title="Selected protected areas:"
-                      wdpaIucnCategories={INITIAL_VALUES.wdpaIucnCategories}
-                    />
-                  )}
+                {areGlobalPAreasSelected && (
+                  <ProtectedAreasSelected
+                    options={GLOBAL_PA_OPTIONS}
+                    title="Selected protected areas:"
+                    isView
+                    wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
+                  />
+                )}
 
+                {areProjectPAreasSelected && (
+                  <ProtectedAreasSelected
+                    options={PROJECT_PA_OPTIONS}
+                    title="Uploaded protected areas:"
+                    isView
+                    wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
+                  />
+                )}
               </div>
             </div>
             <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />

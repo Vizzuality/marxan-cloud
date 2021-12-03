@@ -1,7 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 
 import { useDropzone } from 'react-dropzone';
-import { Field, Form } from 'react-final-form';
+import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
@@ -17,6 +19,9 @@ import { useUploadPA } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
@@ -27,16 +32,15 @@ import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface ProtectedAreaUploaderProps {
   input: any;
-  meta: any;
-  form: any,
 }
 
 export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   input,
-  form,
 }: ProtectedAreaUploaderProps) => {
   const { query } = useRouter();
   const { sid } = query;
+  const formRef = useRef(null);
+
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
@@ -79,6 +83,14 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
     setSuccessFile({ ...successFile, name: f.name });
     saveFileData(data);
+    addToast('success-upload-protected-area', (
+      <>
+        <h2 className="font-medium">Success!</h2>
+        <p className="text-sm">Protected area uploaded</p>
+      </>
+    ), {
+      level: 'success',
+    });
   };
 
   const onDropRejected = (rejectedFiles) => {
@@ -100,25 +112,17 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   };
 
   const handleSubmit = useCallback(() => {
+    const { name } = formRef.current.getState().values;
+
+    fileData.append('name', name);
     uploadPAMutation.mutate({ id: `${sid}`, data: fileData }, {
 
-      onSuccess: ({ data: { data: PAdata, id: PAid } }) => {
+      onSuccess: () => {
         setLoading(false);
-        setSuccessFile({ ...successFile, id: PAid, geom: PAdata });
-        input.onChange(PAid);
-
-        addToast('success-upload-protected-area', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Protected area uploaded</p>
-          </>
-        ), {
-          level: 'success',
-        });
+        setSuccessFile({ ...successFile });
 
         dispatch(setCache(Date.now()));
         setOpened(false);
-        console.info('Protected area shapefile uploaded', PAdata);
       },
       onError: () => {
         setLoading(false);
@@ -134,7 +138,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         });
       },
     });
-  }, [uploadPAMutation, addToast, dispatch, setCache, input, sid, successFile, fileData]);
+  }, [uploadPAMutation, addToast, dispatch, setCache, sid, successFile, fileData]);
 
   const {
     getRootProps,
@@ -161,38 +165,35 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
       }}
       onClose={() => setOpened(false)}
     >
-      <Form
+      <FormRFF
+        ref={formRef}
         onSubmit={onDropAccepted}
-        render={() => {
+        render={({ form: uploaderForm }) => {
+          formRef.current = uploaderForm;
+          const { name } = formRef.current.getState().values;
+
           return (
             <form onSubmit={handleSubmit}>
-              <div className="p-9">
-                <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
+              <div className="space-y-5 p-9">
+                <h4 className="text-lg text-black font-heading">Upload shapefile</h4>
+                <div>
+                  <FieldRFF
+                    name="name"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="form-name" {...fprops}>
+                        <Label theme="light" className="mb-3 uppercase">Name</Label>
+                        <Input theme="light" />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
 
                 {!successFile && (
-                  <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
+                  <FieldRFF name="file" validate={composeValidators([{ presence: true }])}>
                     {(props) => (
                       <div>
-                        <div className="flex items-center mb-2.5 space-x-3">
-                          <h5 className="text-xs text-gray-400">Supported formats</h5>
-                          <InfoButton
-                            size="s"
-                            theme="secondary"
-                          >
-                            <span className="text-xs">
-                              {' '}
-                              <h4 className="font-heading mb-2.5">
-                                List of supported file formats:
-                              </h4>
-                              <ul>
-                                Zipped: .shp (zipped shapefiles must include
-                                <br />
-                                .shp, .shx, .dbf, and .prj files)
-                              </ul>
-                            </span>
-                          </InfoButton>
-                        </div>
-
                         <div
                           {...props}
                           {...getRootProps()}
@@ -227,7 +228,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                         </div>
                       </div>
                     )}
-                  </Field>
+                  </FieldRFF>
                 )}
 
                 {successFile && (
@@ -263,6 +264,26 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                   </motion.div>
                 )}
 
+                <div className="flex items-center mb-2.5 space-x-3">
+                  <h5 className="text-xs text-gray-400">Supported formats</h5>
+                  <InfoButton
+                    size="s"
+                    theme="secondary"
+                  >
+                    <span className="text-xs">
+                      {' '}
+                      <h4 className="font-heading mb-2.5">
+                        List of supported file formats:
+                      </h4>
+                      <ul>
+                        Zipped: .shp (zipped shapefiles must include
+                        <br />
+                        .shp, .shx, .dbf, and .prj files)
+                      </ul>
+                    </span>
+                  </InfoButton>
+                </div>
+
                 <div className="flex justify-center mt-16 space-x-6">
                   <Button
                     theme="secondary"
@@ -279,6 +300,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                     theme="primary"
                     size="xl"
                     type="submit"
+                    disabled={!name}
                   >
                     Save
                   </Button>
