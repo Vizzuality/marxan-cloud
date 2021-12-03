@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,6 +18,8 @@ import { JobData as CalibrationJobData } from '@marxan/blm-calibration';
 
 @Injectable()
 export class RunHandler {
+  readonly #logger = new Logger(this.constructor.name);
+
   constructor(
     @Inject(runQueueToken)
     private readonly runQueue: Queue<RunJobData>,
@@ -39,6 +41,13 @@ export class RunHandler {
       assets,
       blmValues,
     });
+
+    if (!job) {
+      this.#logger.error(
+        `Unable to start job CalibrateScenarioJob - adding job failed.`,
+      );
+      return;
+    }
 
     const kind = API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1;
     await this.apiEvents.create({

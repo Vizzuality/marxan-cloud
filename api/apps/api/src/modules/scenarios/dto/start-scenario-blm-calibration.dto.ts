@@ -7,5 +7,5 @@ export class StartScenarioBlmCalibrationDto {
   @IsOptional()
   @IsArray()
   @IsValidRange()
-  range!: [number, number];
+  range?: [number, number];
 }

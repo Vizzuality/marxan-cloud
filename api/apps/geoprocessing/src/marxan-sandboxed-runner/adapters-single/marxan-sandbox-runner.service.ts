@@ -35,7 +35,6 @@ export class MarxanSandboxRunnerService
     input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<ExecutionResult> {
-    console.log('run marxan on scenario');
     const { scenarioId: forScenarioId, assets } = input;
     const workspace = await this.workspaceService.get();
     const marxanRun = new MarxanRun();

@@ -692,7 +692,7 @@ export class ScenariosController {
     if (isLeft(result)) {
       switch (result.left) {
         case planningUnitAreaNotFound:
-          throw new NotFoundException(
+          throw new InternalServerErrorException(
             `Could not found planning units area for scenario with ID: ${id}`,
           );
         case projectNotFound:

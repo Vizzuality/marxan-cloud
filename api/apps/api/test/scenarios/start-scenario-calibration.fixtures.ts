@@ -1,28 +1,29 @@
 import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { E2E_CONFIG } from '../e2e.config';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import * as request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { GivenProjectExists } from '../steps/given-project';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const token = await GivenUserIsLoggedIn(app);
-  const organizationId = (
-    await OrganizationsTestUtils.createOrganization(app, token, {
-      ...E2E_CONFIG.organizations.valid.minimal(),
+
+  const { projectId, organizationId } = await GivenProjectExists(
+    app,
+    token,
+    {
+      countryCode: 'AGO',
+      name: `Project name ${Date.now()}`,
+    },
+    {
       name: `Org name ${Date.now()}`,
-    })
-  ).data.id;
-  const response = await ProjectsTestUtils.createProject(app, token, {
-    ...E2E_CONFIG.projects.valid.minimal(),
-    organizationId: organizationId,
-    name: `Project name ${Date.now()}`,
-  });
-  const projectId = response.data.id;
+    },
+  );
+
   await ProjectsTestUtils.generateBlmValues(app, projectId);
   let scenarioId: string;
   const updatedRange = [1, 50];

@@ -12,7 +12,7 @@ describe('start-scenario-calibration', () => {
     await fixtures?.cleanup();
   });
 
-  it(`starts an scenario calibration properly without sending a range`, async () => {
+  it(`starting a blm calibration without sending a range`, async () => {
     await fixtures.GivenScenarioWasCreated();
 
     await fixtures
