@@ -21,7 +21,6 @@ import { SolutionResultCrudService } from './solutions-result/solution-result-cr
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import {
-  ProtectionStatusModule,
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuOutputGeoEntity,
 } from '@marxan/scenarios-planning-unit';
@@ -46,6 +45,7 @@ import { ProjectChecker } from './project-checker.service';
 import { ProtectedAreaModule } from './protected-area';
 import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
 import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
+import { BlmValuesModule } from '@marxan-api/modules/blm';
 
 @Module({
   imports: [
@@ -77,6 +77,7 @@ import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
     ApiEventsModule,
     ProtectedAreaModule,
     ProtectedAreasCrudModule,
+    BlmValuesModule,
   ],
   providers: [
     ProjectChecker,

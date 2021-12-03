@@ -12,5 +12,6 @@ export class RunService {
   ) {}
 
   run = this.runHandler.run.bind(this.runHandler);
+  runCalibration = this.runHandler.runCalibration.bind(this.runHandler);
   cancel = this.cancelHandler.cancel.bind(this.cancelHandler);
 }

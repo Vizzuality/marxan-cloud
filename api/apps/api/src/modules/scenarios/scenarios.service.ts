@@ -45,7 +45,7 @@ import {
   DoesntExist,
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker.service';
-import { QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
 import {
   ProtectedAreaService,
@@ -58,6 +58,11 @@ import {
   ProtectedAreasChangeDto,
 } from './dto/protected-area-change.dto';
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
+import {
+  ChangeBlmRange,
+  ChangeRangeErrors,
+} from '@marxan-api/modules/projects/blm';
+import { GetFailure, ProjectBlmRepo } from '@marxan-api/modules/blm';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -111,6 +116,8 @@ export class ScenariosService {
     private readonly projectChecker: ProjectChecker,
     private readonly protectedArea: ProtectedAreaService,
     private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
+    private readonly blmValuesRepository: ProjectBlmRepo,
   ) {}
 
   async findAllPaginated(
@@ -245,6 +252,26 @@ export class ScenariosService {
       pick(scenario, 'id', 'boundaryLengthModifier'),
       blm,
     );
+  }
+
+  async startBlmCalibration(
+    id: string,
+    rangeToUpdate?: [number, number],
+  ): Promise<Either<ChangeRangeErrors | GetFailure, true>> {
+    const scenario = await this.getById(id);
+    const projectId = scenario.projectId;
+    if (rangeToUpdate) {
+      const result = await this.commandBus.execute(
+        new ChangeBlmRange(projectId, rangeToUpdate),
+      );
+      if (isLeft(result)) return result;
+    }
+    const projectBlmValues = await this.blmValuesRepository.get(projectId);
+    if (isLeft(projectBlmValues)) return projectBlmValues;
+
+    await this.runService.runCalibration(id, projectBlmValues.right.values);
+
+    return right(true);
   }
 
   async cancel(scenarioId: string): Promise<void> {

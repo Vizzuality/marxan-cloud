@@ -98,6 +98,12 @@ import {
   ProtectedAreaChangeDto,
   ProtectedAreasChangeDto,
 } from '@marxan-api/modules/scenarios/dto/protected-area-change.dto';
+import { StartScenarioBlmCalibrationDto } from '@marxan-api/modules/scenarios/dto/start-scenario-blm-calibration.dto';
+import {
+  invalidRange,
+  planningUnitAreaNotFound,
+} from '@marxan-api/modules/projects/blm/change-blm-range.command';
+import { projectNotFound } from '@marxan-api/modules/blm';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -722,6 +728,38 @@ export class ScenariosController {
           throw new NotFoundException();
       }
     }
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
+  }
+
+  @ApiOkResponse({
+    type: JsonApiAsyncJobMeta,
+  })
+  @Post(`:id/calibration`)
+  async startCalibration(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() { range }: StartScenarioBlmCalibrationDto,
+  ): Promise<JsonApiAsyncJobMeta> {
+    const result = await this.service.startBlmCalibration(id, range);
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case planningUnitAreaNotFound:
+          throw new InternalServerErrorException(
+            `Could not found planning units area for scenario with ID: ${id}`,
+          );
+        case projectNotFound:
+          throw new NotFoundException(
+            `Could not found project for scenario with ID: ${id}`,
+          );
+        case invalidRange:
+          throw new BadRequestException(
+            `Received range is invalid: [${range}]`,
+          );
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 }

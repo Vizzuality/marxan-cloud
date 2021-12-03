@@ -23,12 +23,12 @@ test(`updating a project calibration with incorrect ranges should throw an excep
   await fixtures.GivenProjectWasCreated();
 
   await fixtures
-    .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
+    .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
     .RangeWithAMinGreaterThanMax();
   await fixtures
-    .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
+    .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
     .RangeWithValuesThatAreNotNumbers();
   await fixtures
-    .ThenShouldFailWhenUpdatingProjectCalibrationWithA()
+    .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
     .RangeWithNegativeNumbers();
 });

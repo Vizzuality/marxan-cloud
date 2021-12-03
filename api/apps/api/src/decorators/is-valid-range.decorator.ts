@@ -24,7 +24,7 @@ class IsValidRangeConstraint implements ValidatorConstraintInterface {
     return (
       Array.isArray(value) &&
       value.length === 2 &&
-      !this.someValueIsNotANumber(value) &&
+      !this.someValueIsNotAValidNumber(value) &&
       value[0] < value[1]
     );
   }
@@ -45,13 +45,13 @@ class IsValidRangeConstraint implements ValidatorConstraintInterface {
         return invalidLengthMessage;
       case value[0] > value[1]:
         return minIsGreaterThanMaxMessage;
-      case this.someValueIsNotANumber(value):
+      case this.someValueIsNotAValidNumber(value):
         return someValueIsNotANumberMessage;
       default:
         return defaultMessage;
     }
   }
 
-  private someValueIsNotANumber = (value: any) =>
-    value.some((v: any) => typeof v !== 'number');
+  private someValueIsNotAValidNumber = (value: any) =>
+    value.some((v: any) => typeof v !== 'number' || v < 0);
 }

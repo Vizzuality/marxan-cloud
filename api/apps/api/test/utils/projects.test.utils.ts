@@ -2,6 +2,8 @@ import * as request from 'supertest';
 import { INestApplication, Logger } from '@nestjs/common';
 import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
 import { ProjectResultSingular } from '@marxan-api/modules/projects/project.api.entity';
+import { CommandBus } from '@nestjs/cqrs';
+import { SetProjectBlm } from '@marxan-api/modules/projects/blm/set-project-blm';
 
 /**
  * Utility functions for tests related to Projects.
@@ -27,6 +29,10 @@ export class ProjectsTestUtils {
       .catch((error) => {
         Logger.error(error);
       });
+  }
+  static async generateBlmValues(app: INestApplication, projectId: string) {
+    const commandBus = app.get(CommandBus);
+    await commandBus.execute(new SetProjectBlm(projectId));
   }
 
   static async deleteProject(
