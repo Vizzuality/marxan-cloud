@@ -1,4 +1,4 @@
-import { ClonePiece } from '../../../shared-kernel/clone-piece';
+import { ClonePiece } from '@marxan/cloning/domain';
 import { ComponentId } from './export-component/component.id';
 
 export interface ExportComponentSnapshot {

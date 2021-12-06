@@ -15,7 +15,7 @@ import {
   ResourceId,
   ResourceKind,
 } from '../domain';
-import { ClonePiece } from '../../shared-kernel/clone-piece';
+import { ClonePiece } from '@marxan/cloning/domain';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
