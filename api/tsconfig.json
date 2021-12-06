@@ -156,6 +156,12 @@
       ],
       "@marxan/files-repository/*": [
         "libs/files-repositoryd/src/*"
+      ],
+      "@marxan/cloning": [
+        "libs/cloning/src"
+      ],
+      "@marxan/cloning/*": [
+        "libs/cloning/src/*"
       ]
     }
   },
