@@ -1,7 +1,7 @@
 import { IEvent } from '@nestjs/cqrs';
 
 import { ExportId } from '../export/export.id';
-import { ArchiveLocation } from '../export/archive-location';
+import { ArchiveLocation } from '../../../shared-kernel/archive-location';
 
 export class ArchiveReady implements IEvent {
   constructor(
