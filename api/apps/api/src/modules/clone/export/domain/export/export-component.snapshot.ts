@@ -1,5 +1,4 @@
-import { ClonePiece } from '@marxan/cloning/domain';
-import { ComponentId } from './export-component/component.id';
+import { ClonePiece, ComponentId } from '@marxan/cloning/domain';
 
 export interface ExportComponentSnapshot {
   readonly id: ComponentId;
