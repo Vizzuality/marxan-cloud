@@ -1,5 +1,5 @@
 import { v4 } from 'uuid';
-import { ClonePiece } from '../../../../shared-kernel/clone-piece';
+import { ClonePiece } from '@marxan/cloning/domain';
 
 import { ResourceId } from '../resource.id';
 import { ExportComponentSnapshot } from '../export-component.snapshot';

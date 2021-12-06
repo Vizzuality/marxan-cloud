@@ -223,6 +223,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/blm-calibration/tsconfig.lib.json"
       }
+    },
+    "cloning": {
+      "type": "library",
+      "root": "libs/cloning",
+      "entryFile": "index",
+      "sourceRoot": "libs/cloning/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/cloning/tsconfig.lib.json"
+      }
     }
   }
 }

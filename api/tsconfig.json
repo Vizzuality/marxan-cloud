@@ -150,6 +150,12 @@
       ],
       "@marxan/blm-calibration/*": [
         "libs/blm-calibration/src/*"
+      ],
+      "@marxan/cloning": [
+        "libs/cloning/src"
+      ],
+      "@marxan/cloning/*": [
+        "libs/cloning/src/*"
       ]
     }
   },

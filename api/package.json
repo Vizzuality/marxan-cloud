@@ -40,6 +40,7 @@
     "node": "^14"
   },
   "dependencies": {
+    "@golevelup/nestjs-discovery": "2.3.1",
     "@greenelab/hclust": "0.0.1",
     "@nestjs-architects/typed-cqrs": "0.1.1",
     "@nestjs/common": "7.6.18",
@@ -216,7 +217,9 @@
       "@marxan/projects/(.*)": "<rootDir>/libs/projects/src/$1",
       "@marxan/projects": "<rootDir>/libs/projects/src",
       "@marxan/blm-calibration/(.*)": "<rootDir>/libs/blm-calibration/src/$1",
-      "@marxan/blm-calibration": "<rootDir>/libs/blm-calibration/src"
+      "@marxan/blm-calibration": "<rootDir>/libs/blm-calibration/src",
+      "@marxan/cloning/(.*)": "<rootDir>/libs/cloning/src/$1",
+      "@marxan/cloning": "<rootDir>/libs/cloning/src"
     }
   }
 }
