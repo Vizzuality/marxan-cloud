@@ -2,18 +2,18 @@ import { v4 } from 'uuid';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, left, right } from 'fp-ts/Either';
 
-import { ResourceKind } from './resource.kind';
+import { ResourceKind } from '../../../shared-kernel/resource.kind';
 import { ExportId } from './export.id';
-import { ResourceId } from './resource.id';
-import { ArchiveLocation } from './archive-location';
+import { ResourceId } from '../../../shared-kernel/resource.id';
+import { ArchiveLocation } from '../../../shared-kernel/archive-location';
 
 import { ExportComponentRequested } from '../events/export-component-requested.event';
 import { ExportComponentFinished } from '../events/export-component-finished.event';
 import { ArchiveReady } from '../events/archive-ready.event';
 
-import { ComponentLocation } from './export-component/component-location';
+import { ComponentLocation } from '../../../shared-kernel/component-location';
 import { ExportComponent } from './export-component/export-component';
-import { ComponentId } from './export-component/component.id';
+import { ComponentId } from '../../../shared-kernel/component.id';
 import { ExportSnapshot } from './export.snapshot';
 import { ExportComponentSnapshot } from '@marxan-api/modules/clone/export/domain';
 

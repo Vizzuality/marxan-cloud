@@ -1,11 +1,11 @@
 import { v4 } from 'uuid';
 import { ClonePiece } from '@marxan/cloning/domain';
 
-import { ResourceId } from '../resource.id';
+import { ResourceId } from '../../../../shared-kernel/resource.id';
 import { ExportComponentSnapshot } from '../export-component.snapshot';
 
-import { ComponentId } from './component.id';
-import { ComponentLocation } from './component-location';
+import { ComponentId } from '../../../../shared-kernel/component.id';
+import { ComponentLocation } from '../../../../shared-kernel/component-location';
 
 export class ExportComponent {
   private constructor(
