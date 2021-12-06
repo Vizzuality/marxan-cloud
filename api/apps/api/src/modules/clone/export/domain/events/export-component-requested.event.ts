@@ -1,9 +1,9 @@
 import { IEvent } from '@nestjs/cqrs';
 
+import { ClonePiece } from '@marxan/cloning/domain';
 import { ExportId } from '../export/export.id';
 import { ComponentId } from '../export/export-component/component.id';
 import { ResourceId } from '../export/resource.id';
-import { ClonePiece } from '../../../shared-kernel/clone-piece';
 
 export class ExportComponentRequested implements IEvent {
   constructor(

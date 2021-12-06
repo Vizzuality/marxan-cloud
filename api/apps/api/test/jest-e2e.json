@@ -78,6 +78,8 @@
     "@marxan/projects/(.*)": "<rootDir>/../../../libs/projects/src/$1",
     "@marxan/projects": "<rootDir>/../../../libs/projects/src",
     "@marxan/blm-calibration/(.*)": "<rootDir>/../../../libs/blm-calibration/src/$1",
-    "@marxan/blm-calibration": "<rootDir>/../../../libs/blm-calibration/src"
+    "@marxan/blm-calibration": "<rootDir>/../../../libs/blm-calibration/src",
+    "@marxan/cloning/(.*)": "<rootDir>/../../../libs/cloning/src/$1",
+    "@marxan/cloning": "<rootDir>/../../../libs/cloning/src"
   }
 }
