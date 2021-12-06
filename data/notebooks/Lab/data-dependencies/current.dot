@@ -1,0 +1,44 @@
+digraph G {
+  node [style=filled; color=lightgrey;];
+
+  protected_areas_plus_threshold -> default_lockin_status // also PU protected status
+  protected_areas -> protected_percentage_of_each_feature
+  protected_percentage_of_each_feature -> pre_run_gap_analysis // check if is persisted
+
+  feature_list -> feature_geometries
+  feature_geometries -> puvspr_dat
+  feature_list -> spec_dat
+  prop_per_feature -> spec_dat // @todo avoid geo recalculations
+  fpf_per_feature -> spec_dat // @todo avoid geo recalculations
+
+  feature_geometries -> feature_presence_per_PU
+
+  default_lockin_status -> PU_lock_status
+  user_lock_in_selection -> PU_lock_status
+  user_lock_out_selection -> PU_lock_status
+
+  pu_removal_for_scenario -> list_of_PUs_for_scenario
+
+  list_of_PUs_for_scenario -> default_lockin_status
+
+  list_of_PUs_for_scenario -> PU_cost
+
+  cost_surface -> PU_cost
+
+  list_of_PUs_for_scenario -> bound_dat
+  list_of_PUs_for_scenario -> pu_dat
+  PU_cost -> pu_dat
+
+  pu_dat -> marxan
+  puvspr_dat -> marxan
+  spec_dat -> marxan
+  bound_dat -> marxan
+  blm -> input_dat
+  input_dat -> marxan
+  advanced_input_dat_settings -> input_dat
+
+  // check
+  // removal of PUs - at scenario level only?
+  // (for us: treatment of scenarios with different sets of PUs when comparing 2 scenarios)
+  // if allowing to remove PUs at scenario level, caching of pairwise boundary lengths needs to be rethought
+}
