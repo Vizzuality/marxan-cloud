@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { copySync, readFileSync } from 'fs-extra';
+import { copySync, writeFileSync } from 'fs-extra';
 import { Workspace } from '../ports/workspace';
 import { Assets } from './blm-input-files';
 import { dirname, resolve } from 'path';
@@ -28,20 +28,27 @@ export class AssetFactory {
       filter: (src, dest) => !src.match(/marxan/),
     });
 
-    console.log('ASSETS');
-    const foo = this.getInputDat(assets);
-    if (!foo) throw new Error('No URL for input.dat found');
+    const inputDat = this.getInputDat(assets);
+    if (!inputDat) throw new Error('No URL for input.dat found');
 
     await this.download(
-      foo.url,
-      resolve(to.workingDirectory, foo.relativeDestination),
+      inputDat.url,
+      resolve(to.workingDirectory, inputDat.relativeDestination),
     );
 
     const input = this.reader.read(
-      resolve(to.workingDirectory, foo.relativeDestination),
+      resolve(to.workingDirectory, inputDat.relativeDestination),
     );
-    const matcher = new RegExp(/hola/);
-    // TODO modify input.dat file - replace "BLM" with overrideBlmValue
+    const matcher = new RegExp(/BLM\s.*/);
+    const inputWithCorrectBLM = input.replace(
+      matcher,
+      `BLM ${overrideBlmValue}`,
+    );
+
+    writeFileSync(
+      resolve(to.workingDirectory, inputDat.relativeDestination),
+      inputWithCorrectBLM,
+    );
   }
 
   private async download(sourceUri: string, dest: string) {
