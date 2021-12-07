@@ -1,18 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
-import { isNil } from 'lodash';
-import { IUCNCategory } from '@marxan/iucn';
 
 import { ScenariosPlanningUnitGeoEntity } from './scenarios-planning-unit.geo.entity';
-import { UpdateScenarioDTO } from '@marxan-api/modules/scenarios/dto/update.scenario.dto';
-import { isDefined } from '@marxan/utils';
 
 export const ProtectionStatusEntityManagerToken = Symbol();
 
 export interface ScenarioMetadata {
   id: string;
-  wdpaIucnCategories?: IUCNCategory[];
-  wdpaThreshold?: number | null;
+  threshold?: number | null;
 }
 
 @Injectable()
@@ -23,35 +18,12 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
   ) {}
 
   /**
-   * WDPA IUCN categories and threshold may be undefined on scenario creation
-   * and only be set on update, therefore we should not rely on their presence
-   * here.
-   *
    * @TODO We'll need to handle custom protected areas here once we add support
    * for these.
    */
-  private shouldSetDefaultInclusionStatus(
-    scenario: ScenarioMetadata,
-    input: UpdateScenarioDTO | undefined,
-  ): boolean {
-    const isUpdatingWdpa =
-      isDefined(input?.wdpaThreshold) || isDefined(input?.wdpaIucnCategories);
-
-    if (isDefined(input)) {
-      return isUpdatingWdpa;
-    }
-
-    return Boolean(
-      !isNil(scenario.wdpaIucnCategories) && !isNil(scenario.wdpaThreshold),
-    );
-  }
-
   async calculatedProtectionStatusForPlanningUnitsIn(
     scenario: ScenarioMetadata,
-    input?: UpdateScenarioDTO,
   ): Promise<void> {
-    if (!this.shouldSetDefaultInclusionStatus(scenario, input)) return;
-
     const puRepo = this.entityManager.getRepository<ScenariosPlanningUnitGeoEntity>(
       ScenariosPlanningUnitGeoEntity,
     );
@@ -91,10 +63,6 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
               )
       where scenario_id = $3;
     `;
-    await puRepo.query(query, [
-      scenario.id,
-      scenario.wdpaThreshold,
-      scenario.id,
-    ]);
+    await puRepo.query(query, [scenario.id, scenario.threshold, scenario.id]);
   }
 }

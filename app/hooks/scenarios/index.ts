@@ -32,6 +32,8 @@ import {
   UploadScenarioPUProps,
   UseSaveScenarioPUProps,
   SaveScenarioPUProps,
+  UploadPAProps,
+  UseUploadPAProps,
   UseDuplicateScenarioProps,
   DuplicateScenarioProps,
   UseRunScenarioProps,
@@ -85,7 +87,7 @@ export function useScenarioStatus(pId, sId) {
   }).then((response) => {
     return response.data;
   }), {
-    enabled: !!pId,
+    enabled: !!sId,
     placeholderData: {
       data: {
         scenarios: [],
@@ -317,6 +319,36 @@ export function useUploadScenarioPU({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+// CUSTOM PROTECTED AREAS
+export function useUploadPA({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadPAProps) {
+  const [session] = useSession();
+
+  const uploadPAShapefile = ({ id, data }: UploadPAProps) => {
+    return UPLOADS.request({
+      url: `scenarios/${id}/protected-areas/shapefile`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadPAShapefile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

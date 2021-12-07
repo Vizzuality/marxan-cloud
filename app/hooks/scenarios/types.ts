@@ -58,6 +58,15 @@ export interface SaveScenarioPUProps {
   data: any
 }
 
+// useUploadPA
+export interface UseUploadPAProps {
+  requestConfig?: AxiosRequestConfig
+}
+export interface UploadPAProps {
+  id?: string,
+  data: any,
+}
+
 // useDuplicateScenario
 export interface UseDuplicateScenarioProps {
   requestConfig?: AxiosRequestConfig

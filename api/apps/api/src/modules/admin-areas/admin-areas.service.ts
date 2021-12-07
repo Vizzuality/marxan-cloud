@@ -135,7 +135,6 @@ export class AdminAreasService extends AppBaseService<
     fetchSpecification?: FetchSpecification,
   ): Promise<Partial<AdminArea>> {
     const query = this.repository.createQueryBuilder(this.alias);
-
     const queryWithFilters = FetchUtils.processFetchSpecification<AdminArea>(
       query,
       this.alias,

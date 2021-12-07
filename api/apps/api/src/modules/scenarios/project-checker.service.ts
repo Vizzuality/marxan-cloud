@@ -6,7 +6,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { Either, left, right } from 'fp-ts/Either';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PlanningAreasFacade } from '@marxan-api/modules/projects/planning-areas/planning-areas.facade';
+import { PlanningAreasService } from '@marxan-api/modules/planning-areas/planning-areas.service';
 import { isDefined } from '@marxan/utils';
 
 export const doesntExist = Symbol(`doesn't exist`);
@@ -18,7 +18,7 @@ export class ProjectChecker {
     private readonly apiEvents: ApiEventsService,
     @InjectRepository(Project)
     private readonly repository: Repository<Project>,
-    private readonly planningAreasFacade: PlanningAreasFacade,
+    private readonly planningAreas: PlanningAreasService,
   ) {}
 
   async isProjectReady(
@@ -66,9 +66,7 @@ export class ProjectChecker {
   }
 
   private async hasRequiredPlanningArea(project: Project): Promise<boolean> {
-    const area = await this.planningAreasFacade.locatePlanningAreaEntity(
-      project,
-    );
+    const area = await this.planningAreas.locatePlanningAreaEntity(project);
     return isDefined(area);
   }
 }

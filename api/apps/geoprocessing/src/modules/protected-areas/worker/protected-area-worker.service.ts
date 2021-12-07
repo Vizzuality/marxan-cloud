@@ -21,7 +21,7 @@ export class ProtectedAreaWorkerService {
       this.eventBus.publish(
         new ApiEvent(
           data.projectId,
-          API_EVENT_KINDS.project__protectedAreas__finished__v1__alpha,
+          API_EVENT_KINDS.scenario__protectedAreas__finished__v1__alpha,
         ),
       );
     });
@@ -34,7 +34,7 @@ export class ProtectedAreaWorkerService {
         this.eventBus.publish(
           new ApiEvent(
             data.projectId,
-            API_EVENT_KINDS.project__protectedAreas__failed__v1__alpha,
+            API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha,
             {
               error: failedReason,
             },

@@ -92,6 +92,12 @@ import {
   GeometryFileInterceptor,
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
+import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-area.dto';
+import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
+import {
+  ProtectedAreaChangeDto,
+  ProtectedAreasChangeDto,
+} from '@marxan-api/modules/scenarios/dto/protected-area-change.dto';
 import { StartScenarioBlmCalibrationDto } from '@marxan-api/modules/scenarios/dto/start-scenario-blm-calibration.dto';
 import {
   invalidRange,
@@ -652,6 +658,48 @@ export class ScenariosController {
     return;
   }
 
+  @ApiOkResponse({
+    type: ProtectedAreaDto,
+    isArray: true,
+  })
+  @Get(`:id/protected-areas`)
+  async getProtectedAreasForScenario(
+    @Param('id') scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ProtectedAreaDto[]> {
+    const result = await this.service.getProtectedAreasFor(scenarioId, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      throw new NotFoundException();
+    }
+
+    return result.right;
+  }
+
+  @ApiOkResponse({
+    type: ProtectedAreaDto,
+    isArray: true,
+  })
+  @Post(`:id/protected-areas`)
+  async updateProtectedAreasForScenario(
+    @Param('id') scenarioId: string,
+    @Body(new ValidationPipe()) dto: ProtectedAreasChangeDto,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ProtectedAreaDto[]> {
+    const result = await this.service.updateProtectedAreasFor(scenarioId, dto, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      // TODO map error
+      throw new BadRequestException();
+    }
+
+    return this.getProtectedAreasForScenario(scenarioId, req);
+  }
+
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
     description:
@@ -664,10 +712,14 @@ export class ScenariosController {
     @Param('id') scenarioId: string,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: UploadShapefileDto,
   ): Promise<JsonApiAsyncJobMeta> {
-    const outcome = await this.service.addProtectedAreaFor(scenarioId, file, {
-      authenticatedUser: req.user,
-    });
+    const outcome = await this.service.addProtectedAreaFor(
+      scenarioId,
+      file,
+      { authenticatedUser: req.user },
+      dto,
+    );
     if (isLeft(outcome)) {
       switch (outcome.left) {
         case submissionFailed:
@@ -692,7 +744,7 @@ export class ScenariosController {
     if (isLeft(result)) {
       switch (result.left) {
         case planningUnitAreaNotFound:
-          throw new NotFoundException(
+          throw new InternalServerErrorException(
             `Could not found planning units area for scenario with ID: ${id}`,
           );
         case projectNotFound:

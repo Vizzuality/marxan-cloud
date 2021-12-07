@@ -3,7 +3,7 @@ import { CustomPlanningAreasUploader } from './custom-planning-areas-uploader.se
 import { AllPlanningAreasService } from './all-planning-areas.service';
 
 @Injectable()
-export class PlanningAreasFacade {
+export class PlanningAreasService {
   constructor(
     private readonly uploader: CustomPlanningAreasUploader,
     private readonly allPlanningAreaService: AllPlanningAreasService,

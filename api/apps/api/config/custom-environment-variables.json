@@ -62,8 +62,14 @@
     "apikey": "SPARKPOST_APIKEY",
     "origin": "SPARKPOST_ORIGIN"
   },
+  "application": {
+    "baseUrl": "APPLICATION_BASE_URL"
+  },
   "passwordReset": {
     "tokenPrefix": "PASSWORD_RESET_TOKEN_PREFIX",
     "expiration": "PASSWORD_RESET_EXPIRATION"
+  },
+  "signUpConfirmation": {
+    "tokenPrefix": "SIGNUP_CONFIRMATION_TOKEN_PREFIX"
   }
 }
