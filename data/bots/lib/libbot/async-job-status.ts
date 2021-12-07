@@ -40,7 +40,7 @@ export enum ScenarioJobKinds {
 }
 
 export enum ProjectJobKinds {
-  planningGridCalculation = "planningGridCalculation",
+  planningUnitCalculation = "planningUnits",
 }
 
 export enum JobStatuses {
@@ -147,7 +147,7 @@ export class AsyncJobStatus {
     return false;
   }
 
-  async waitForPlanningGridCalculationsFor(
+  async waitForPlanningUnitCalculationsFor(
     projectId: string,
     waitForTime: keyof typeof WaitForTime = "some",
   ): Promise<boolean> {
@@ -155,7 +155,7 @@ export class AsyncJobStatus {
 
     const waitResult = await this.waitFor(
       {
-        kind: ProjectJobKinds.planningGridCalculation,
+        kind: ProjectJobKinds.planningUnitCalculation,
         for: {
           projectId,
         },
