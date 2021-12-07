@@ -59,7 +59,7 @@ export const runBot = async (settings: MarxanBotConfig) => {
     metadata: bot.metadata.analysisPreview(),
   });
 
-  await bot.scenarioStatus.waitForPlanningAreaProtectedCalculationFor(
+  await bot.asyncJobStatus.waitForPlanningAreaProtectedCalculationFor(
     project.id,
     scenario.id,
     "short",
@@ -93,7 +93,7 @@ export const runBot = async (settings: MarxanBotConfig) => {
     SpecificationStatus.created,
   );
 
-  await bot.scenarioStatus.waitForFeatureSpecificationCalculationFor(
+  await bot.asyncJobStatus.waitForFeatureSpecificationCalculationFor(
     project.id,
     scenario.id,
     "some",
@@ -103,7 +103,7 @@ export const runBot = async (settings: MarxanBotConfig) => {
 
   await bot.marxanExecutor.runForScenario(scenario.id);
 
-  await bot.scenarioStatus.waitForMarxanCalculationsFor(
+  await bot.asyncJobStatus.waitForMarxanCalculationsFor(
     project.id,
     scenario.id,
     "some",
