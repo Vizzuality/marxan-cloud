@@ -150,6 +150,12 @@
       ],
       "@marxan/blm-calibration/*": [
         "libs/blm-calibration/src/*"
+      ],
+      "@marxan/files-repository": [
+        "libs/files-repository/src"
+      ],
+      "@marxan/files-repository/*": [
+        "libs/files-repositoryd/src/*"
       ]
     }
   },
