@@ -10,6 +10,10 @@ const DEFAULT_WATCH_TIMEOUT = 1800;
 
 type WaitKinds = "short" | "some" | "long";
 
+interface JsonApiProjectStatus {
+  attributes: ProjectStatus;
+}
+
 export const WaitForTime: Record<WaitKinds, RetryOptions> = {
   short: {
     delay: "10s",
@@ -35,6 +39,10 @@ export enum ScenarioJobKinds {
   marxanRun = "run",
 }
 
+export enum ProjectJobKinds {
+  planningGridCalculation = "planningGridCalculation",
+}
+
 export enum JobStatuses {
   running = "running",
   done = "done",
@@ -42,7 +50,7 @@ export enum JobStatuses {
 }
 
 interface JobStatus {
-  kind: ScenarioJobKinds;
+  kind: ScenarioJobKinds | ProjectJobKinds;
   status: JobStatuses;
 }
 
@@ -52,13 +60,18 @@ interface ScenarioStatus {
 }
 
 interface ProjectStatus {
+  jobs: JobStatus[];
   scenarios: ScenarioStatus[];
 }
 
+interface ProjectOrScenario {
+  projectId: string;
+  scenarioId?: string;
+}
+
 export interface JobSpecification {
-  jobKind: ScenarioJobKinds;
-  forProject: string;
-  forScenario: string;
+  kind: ScenarioJobKinds | ProjectJobKinds;
+  for: ProjectOrScenario;
 }
 
 type msTime = string;
@@ -76,16 +89,23 @@ export class AsyncJobStatus {
     this.baseHttpClient = httpClient.baseHttpClient;
   }
 
+  /**
+   * Given a specification (description) of an async job for a project or any of
+   * its scenarios, get scenario status data and return the status of the job
+   * described in the specification, if it exists.
+   */
   async get(job: JobSpecification): Promise<JobStatuses | undefined> {
-    const projectStatus: ProjectStatus = await this.baseHttpClient.get(
-      `/projects/${job.forProject}/scenarios/status`,
+    const projectStatus: ProjectStatus | void = await this.baseHttpClient.get(
+      `/projects/${job.for.projectId}/scenarios/status`,
     )
       .then(getJsonApiDataFromResponse)
-      .then((data) => data.attributes)
+      .then((data: JsonApiProjectStatus) => data.attributes)
       .catch(logError);
     logDebug(`Project status:\n${Deno.inspect(projectStatus, { depth: 8 })}`);
-    return projectStatus?.scenarios.find((i) => i.id === job.forScenario)?.jobs
-      .find((i) => i.kind === job.jobKind)?.status;
+    return Object.values(ProjectJobKinds).includes(job.kind as ProjectJobKinds)
+      ? projectStatus?.jobs?.find((i) => i.kind === job.kind)?.status
+      : projectStatus?.scenarios?.find((i) => i.id === job.for.scenarioId)?.jobs
+        .find((i) => i.kind === job.kind)?.status;
   }
 
   async waitFor(
@@ -94,7 +114,11 @@ export class AsyncJobStatus {
     retryOptions: RetryOptions,
   ): Promise<boolean> {
     logInfo(
-      `Polling for ${job.jobKind} until status is ${until} for scenario ${job.forScenario}...`,
+      `Polling for ${job.kind} until status is ${until} for ${
+        job.for.scenarioId
+          ? "scenario " + job.for.scenarioId
+          : "project " + job.for.projectId
+      }...`,
     );
 
     if (retryOptions?.delay) {
@@ -123,6 +147,36 @@ export class AsyncJobStatus {
     return false;
   }
 
+  async waitForPlanningGridCalculationsFor(
+    projectId: string,
+    waitForTime: keyof typeof WaitForTime = "some",
+  ): Promise<boolean> {
+    const opStart = Process.hrtime();
+
+    const waitResult = await this.waitFor(
+      {
+        kind: ProjectJobKinds.planningGridCalculation,
+        for: {
+          projectId,
+        },
+      },
+      JobStatuses.done,
+      WaitForTime[waitForTime],
+    );
+
+    const tookSeconds = tookMs(Process.hrtime(opStart)) / 1e3;
+
+    if (waitResult) {
+      logInfo(`Planning grid calculations done in ${tookSeconds}s.`);
+    } else {
+      logInfo(
+        `Waited for ${tookSeconds}s for planning grid calculations, but operation is still ongoing.`,
+      );
+    }
+
+    return waitResult;
+  }
+
   async waitForPlanningAreaProtectedCalculationFor(
     projectId: string,
     scenarioId: string,
@@ -132,9 +186,11 @@ export class AsyncJobStatus {
 
     const waitResult = await this.waitFor(
       {
-        jobKind: ScenarioJobKinds.planningAreaProtectedCalculation,
-        forProject: projectId,
-        forScenario: scenarioId,
+        kind: ScenarioJobKinds.planningAreaProtectedCalculation,
+        for: {
+          projectId,
+          scenarioId,
+        },
       },
       JobStatuses.done,
       WaitForTime[waitForTime],
@@ -162,9 +218,11 @@ export class AsyncJobStatus {
 
     const waitResult = await this.waitFor(
       {
-        jobKind: ScenarioJobKinds.specification,
-        forProject: projectId,
-        forScenario: scenarioId,
+        kind: ScenarioJobKinds.specification,
+        for: {
+          projectId,
+          scenarioId,
+        },
       },
       JobStatuses.done,
       WaitForTime[waitForTime],
@@ -194,9 +252,11 @@ export class AsyncJobStatus {
 
     const waitResult = await this.waitFor(
       {
-        jobKind: ScenarioJobKinds.marxanRun,
-        forProject: projectId,
-        forScenario: scenarioId,
+        kind: ScenarioJobKinds.marxanRun,
+        for: {
+          projectId,
+          scenarioId,
+        },
       },
       JobStatuses.done,
       WaitForTime[waitForTime],
