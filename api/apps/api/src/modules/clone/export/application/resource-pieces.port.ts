@@ -1,4 +1,5 @@
-import { ResourceId, ResourceKind, ExportComponentSnapshot } from '../domain';
+import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
+import { ExportComponentSnapshot } from '../domain';
 
 export abstract class ResourcePieces {
   abstract resolveFor(

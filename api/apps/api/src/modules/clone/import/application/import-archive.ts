@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EventPublisher } from '@nestjs/cqrs';
 import { Either, isLeft, right } from 'fp-ts/Either';
 
-import { ArchiveLocation } from '@marxan-api/modules/clone/shared-kernel';
+import { ArchiveLocation } from '@marxan/cloning/domain';
 import { Import } from '../domain';
 
 import {
