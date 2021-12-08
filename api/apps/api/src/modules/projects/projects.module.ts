@@ -29,6 +29,7 @@ import { apiConnections } from '@marxan-api/ormconfig';
 import { CqrsModule } from '@nestjs/cqrs';
 import { GetProjectHandler } from './get-project.handler';
 import { ProjectBlmModule } from './blm';
+import { CloneModule } from '@marxan-api/modules/clone';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { ProjectBlmModule } from './blm';
     ShapefilesModule,
     PlanningUnitGridModule,
     ProjectBlmModule,
+    CloneModule,
   ],
   providers: [
     ProjectsCrudService,

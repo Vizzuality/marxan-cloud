@@ -16,6 +16,7 @@ import { PlanningAreaModule } from '@marxan-geoprocessing/modules/planning-area/
 import { ScenariosModule } from '@marxan-geoprocessing/modules/scenarios/scenarios.module';
 import { ScenarioProtectedAreaCalculationModule } from '@marxan-geoprocessing/modules/scenario-protected-area-calculation/scenario-protected-area-calculation.module';
 import { ScenarioPlanningUnitsFeaturesAggregateModule } from '@marxan-geoprocessing/modules/scenario-planning-units-features-aggregate/scenario-planning-units-features-aggregate.module';
+import { ExportModule } from '@marxan-geoprocessing/export/export.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ScenarioPlanningUnitsFeaturesAggregateModule } from '@marxan-geoprocess
     PlanningAreaModule,
     ScenariosModule,
     ScenarioPlanningUnitsFeaturesAggregateModule,
+    ExportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
