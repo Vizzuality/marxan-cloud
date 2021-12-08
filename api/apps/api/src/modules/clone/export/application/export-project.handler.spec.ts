@@ -12,10 +12,12 @@ import {
   ComponentId,
 } from '@marxan/cloning/domain';
 
-import { RequestExport } from './request-export';
+import { Export, ExportComponentSnapshot } from '../domain';
+
+import { ExportProjectHandler } from './export-project.handler';
 import { ResourcePieces } from './resource-pieces.port';
 import { ExportRepository } from './export-repository.port';
-import { Export, ExportComponentSnapshot } from '../domain';
+import { ExportProject } from './export-project.command';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -45,14 +47,14 @@ const getFixtures = async () => {
         provide: ExportRepository,
         useClass: InMemoryExportRepo,
       },
-      RequestExport,
+      ExportProjectHandler,
     ],
   }).compile();
   await sandbox.init();
 
   const events: IEvent[] = [];
 
-  const sut = sandbox.get(RequestExport);
+  const sut = sandbox.get(ExportProjectHandler);
   const repo: InMemoryExportRepo = sandbox.get(ExportRepository);
   const piecesResolver: FakePiecesProvider = sandbox.get(ResourcePieces);
   sandbox.get(EventBus).subscribe((event) => {
@@ -86,7 +88,7 @@ const getFixtures = async () => {
       return { projectId, someScenarioId };
     },
     WhenExportIsRequested: async (projectId: string) =>
-      sut.export(new ResourceId(projectId), ResourceKind.Project),
+      sut.execute(new ExportProject(new ResourceId(projectId))),
     ThenExportRequestIsSaved: async (projectId: string) => {
       expect(
         (await repo.find(new ResourceId(projectId)))?.toSnapshot(),

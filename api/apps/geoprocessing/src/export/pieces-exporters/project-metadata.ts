@@ -10,6 +10,7 @@ export class ProjectMetadata extends PieceProcessor {
   }
 
   async run(input: JobInput): Promise<JobOutput> {
+    console.log(`exporting project metadata`, input);
     return {
       ...input,
       uri: 'http://marxan.bucket.s3.com/some-file.json-or-zip?',
