@@ -1,6 +1,5 @@
 import { IEvent } from '@nestjs/cqrs';
-import { ComponentId } from '@marxan-api/modules/clone/shared-kernel/component.id';
-import { ClonePiece } from '@marxan-api/modules/clone/shared-kernel/clone-piece';
+import { ComponentId, ClonePiece } from '@marxan/cloning/domain';
 
 export class PieceImported implements IEvent {
   constructor(

@@ -3,10 +3,7 @@ import { ImportSnapshot } from './import.snapshot';
 import { ImportComponentSnapshot } from './import.component.snapshot';
 import { Either, left, right } from 'fp-ts/Either';
 import { v4 } from 'uuid';
-import {
-  ResourceKind,
-  ArchiveLocation,
-} from '@marxan-api/modules/clone/shared-kernel';
+import { ResourceKind, ArchiveLocation } from '@marxan/cloning/domain';
 import {
   AllPiecesImported,
   ImportRequested,

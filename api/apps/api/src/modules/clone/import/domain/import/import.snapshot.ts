@@ -1,5 +1,4 @@
-import { ArchiveLocation } from '@marxan-api/modules/clone/shared-kernel/archive-location';
-import { ResourceKind } from '@marxan-api/modules/clone/shared-kernel/resource.kind';
+import { ArchiveLocation, ResourceKind } from '@marxan/cloning/domain';
 import { ImportComponentSnapshot } from './import.component.snapshot';
 
 export type ImportComponents = Array<

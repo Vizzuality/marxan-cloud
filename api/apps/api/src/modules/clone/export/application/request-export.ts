@@ -1,13 +1,9 @@
 import { EventPublisher } from '@nestjs/cqrs';
 import { Injectable } from '@nestjs/common';
 
-import {
-  Export,
-  ExportComponentSnapshot,
-  ExportId,
-  ResourceId,
-  ResourceKind,
-} from '../domain';
+import { ResourceKind, ResourceId } from '@marxan/cloning/domain';
+
+import { Export, ExportComponentSnapshot, ExportId } from '../domain';
 
 import { ExportRepository } from './export-repository.port';
 import { ResourcePieces } from './resource-pieces.port';
