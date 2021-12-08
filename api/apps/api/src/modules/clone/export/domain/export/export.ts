@@ -18,6 +18,7 @@ import { ArchiveReady } from '../events/archive-ready.event';
 import { ExportComponent } from './export-component/export-component';
 import { ExportSnapshot } from './export.snapshot';
 import { ExportComponentSnapshot } from './export-component.snapshot';
+import { ExportAllComponentsFinished } from '../events/export-all-components-finished.event';
 
 export const pieceNotFound = Symbol('export piece not found');
 export const notReady = Symbol('some pieces of export are not yet ready');
@@ -70,9 +71,10 @@ export class Export extends AggregateRoot {
       return left(pieceNotFound);
     }
     piece.finish(pieceLocation);
+    this.apply(new ExportComponentFinished(this.id, id));
 
     if (this.#allPiecesReady()) {
-      this.apply(new ExportComponentFinished(this.id));
+      this.apply(new ExportAllComponentsFinished(this.id));
     }
 
     return right(true);

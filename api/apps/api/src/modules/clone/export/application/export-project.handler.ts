@@ -1,22 +1,27 @@
-import { EventPublisher } from '@nestjs/cqrs';
-import { Injectable } from '@nestjs/common';
+import {
+  CommandHandler,
+  EventPublisher,
+  IInferredCommandHandler,
+} from '@nestjs/cqrs';
 
-import { ResourceKind, ResourceId } from '@marxan/cloning/domain';
-
+import { ResourceKind } from '@marxan/cloning/domain';
 import { Export, ExportComponentSnapshot, ExportId } from '../domain';
 
-import { ExportRepository } from './export-repository.port';
+import { ExportProject } from './export-project.command';
 import { ResourcePieces } from './resource-pieces.port';
+import { ExportRepository } from './export-repository.port';
 
-@Injectable()
-export class RequestExport {
+@CommandHandler(ExportProject)
+export class ExportProjectHandler
+  implements IInferredCommandHandler<ExportProject> {
   constructor(
     private readonly resourcePieces: ResourcePieces,
     private readonly exportRepository: ExportRepository,
     private readonly eventPublisher: EventPublisher,
   ) {}
 
-  async export(id: ResourceId, kind: ResourceKind): Promise<ExportId> {
+  async execute({ id }: ExportProject): Promise<ExportId> {
+    const kind = ResourceKind.Project;
     const pieces: ExportComponentSnapshot[] = await this.resourcePieces.resolveFor(
       id,
       kind,
