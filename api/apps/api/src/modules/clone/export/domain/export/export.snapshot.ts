@@ -1,4 +1,4 @@
-import { ResourceKind } from '../../../shared-kernel/resource.kind';
+import { ResourceKind } from '@marxan/cloning/domain';
 import { ExportComponentSnapshot } from './export-component.snapshot';
 
 export interface ExportSnapshot {

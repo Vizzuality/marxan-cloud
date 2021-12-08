@@ -2,20 +2,22 @@ import { v4 } from 'uuid';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, left, right } from 'fp-ts/Either';
 
-import { ResourceKind } from '../../../shared-kernel/resource.kind';
+import {
+  ResourceKind,
+  ResourceId,
+  ArchiveLocation,
+  ComponentLocation,
+  ComponentId,
+} from '@marxan/cloning/domain';
 import { ExportId } from './export.id';
-import { ResourceId } from '../../../shared-kernel/resource.id';
-import { ArchiveLocation } from '../../../shared-kernel/archive-location';
 
 import { ExportComponentRequested } from '../events/export-component-requested.event';
 import { ExportComponentFinished } from '../events/export-component-finished.event';
 import { ArchiveReady } from '../events/archive-ready.event';
 
-import { ComponentLocation } from '../../../shared-kernel/component-location';
 import { ExportComponent } from './export-component/export-component';
-import { ComponentId } from '../../../shared-kernel/component.id';
 import { ExportSnapshot } from './export.snapshot';
-import { ExportComponentSnapshot } from '@marxan-api/modules/clone/export/domain';
+import { ExportComponentSnapshot } from './export-component.snapshot';
 
 export const pieceNotFound = Symbol('export piece not found');
 export const notReady = Symbol('some pieces of export are not yet ready');

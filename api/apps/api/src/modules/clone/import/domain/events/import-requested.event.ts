@@ -1,5 +1,5 @@
 import { IEvent } from '@nestjs/cqrs';
-import { ResourceKind } from '@marxan-api/modules/clone/shared-kernel/resource.kind';
+import { ResourceKind } from '@marxan/cloning/domain';
 
 export class ImportRequested implements IEvent {
   constructor(

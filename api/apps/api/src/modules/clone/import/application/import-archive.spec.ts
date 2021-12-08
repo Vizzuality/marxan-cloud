@@ -21,7 +21,7 @@ import {
   ClonePiece,
   ComponentId,
   ResourceKind,
-} from '@marxan-api/modules/clone/shared-kernel';
+} from '@marxan/cloning/domain';
 import {
   ImportRequested,
   ImportSnapshot,

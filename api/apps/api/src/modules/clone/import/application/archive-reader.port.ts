@@ -1,4 +1,4 @@
-import { ArchiveLocation } from '@marxan-api/modules/clone/shared-kernel/archive-location';
+import { ArchiveLocation } from '@marxan/cloning/domain';
 import { Either } from 'fp-ts/Either';
 import { ImportSnapshot } from '../domain/import/import.snapshot';
 
