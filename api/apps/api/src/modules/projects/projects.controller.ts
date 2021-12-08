@@ -331,4 +331,9 @@ export class ProjectsController {
       );
     return result.right;
   }
+
+  @Post(`:id/export`)
+  async requestProjectExport(@Param('id') id: string) {
+    await this.projectsService.requestExport(id);
+  }
 }
