@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Either, isLeft, right } from 'fp-ts/Either';
+import { Either, isLeft, right, left } from 'fp-ts/Either';
 
 import {
   FindResult,
@@ -28,6 +28,8 @@ import {
   ProjectBlm,
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
+import { ProjectAccessControl } from '../access-control';
+import { Permit } from '../access-control/access-control.types';
 
 export { validationFailed } from './planning-areas';
 
@@ -41,6 +43,7 @@ export class ProjectsService {
     private readonly projectBlmRepository: ProjectBlmRepo,
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
+    private readonly projectAclService: ProjectAccessControl,
   ) {}
 
   async findAllGeoFeatures(
@@ -101,7 +104,6 @@ export class ProjectsService {
   }
 
   async update(projectId: string, input: UpdateProjectDTO) {
-    // /ACL slot - can?/
     return this.projectsCrud.update(projectId, input);
   }
 
