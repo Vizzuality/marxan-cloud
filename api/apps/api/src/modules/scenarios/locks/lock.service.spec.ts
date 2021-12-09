@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Connection, EntityManager } from 'typeorm';
 import * as faker from 'faker';
 
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -83,13 +83,15 @@ async function getFixtures() {
     lastModifiedAt: new Date(),
   };
 
+  const mockEntityManager = {
+    find: jest.fn(),
+    save: jest.fn(),
+    remove: jest.fn(),
+  };
+
   const mockConnection = () => ({
-    createQueryRunner: () => ({
-      connect: jest.fn(),
-      startTransaction: jest.fn(),
-      release: jest.fn(),
-      rollbackTransaction: jest.fn(),
-    }),
+    transaction: (fn: (em: Partial<EntityManager>) => Promise<void>) =>
+      fn(mockEntityManager),
   });
 
   const sandbox = await Test.createTestingModule({
@@ -101,11 +103,7 @@ async function getFixtures() {
       },
       {
         provide: getRepositoryToken(ScenarioLockEntity),
-        useValue: {
-          findOne: jest.fn(),
-          save: jest.fn(),
-          remove: jest.fn(),
-        },
+        useValue: {},
       },
     ],
   })
@@ -116,20 +114,19 @@ async function getFixtures() {
     });
 
   const sut = sandbox.get(LockService);
-  const locksRepoMock: jest.Mocked<
-    Repository<ScenarioLockEntity>
-  > = sandbox.get(getRepositoryToken(ScenarioLockEntity));
 
   return {
     GivenNoLockHasBeenGrabbed: async () => {
-      locksRepoMock.findOne.mockImplementationOnce(async () => undefined);
+      mockEntityManager.find.mockImplementationOnce(async () => []);
     },
     GivenALockHasBeenGrabbed: async () => {
-      locksRepoMock.findOne.mockImplementationOnce(async () => ({
-        scenarioId: fakeScenario.id,
-        userId: fakeUser.id,
-        grabDate: new Date(),
-      }));
+      mockEntityManager.find.mockImplementationOnce(async () => [
+        {
+          scenarioId: fakeScenario.id,
+          userId: fakeUser.id,
+          grabDate: new Date(),
+        },
+      ]);
     },
     ThenShouldBeAbleToGrabNewLockForGivenScenario: async () => {
       const mockDate = new Date('2021-02-26T22:42:16.652Z');
@@ -138,14 +135,14 @@ async function getFixtures() {
         .mockImplementation(() => (mockDate as unknown) as string);
 
       await expect(
-        sut.grabLock(fakeScenario.id, fakeUser.id),
+        sut.acquireLock(fakeScenario.id, fakeUser.id),
       ).resolves.not.toThrow();
 
-      expect(locksRepoMock.findOne).toHaveBeenCalledWith({
+      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
         where: { scenarioId: fakeScenario.id, userId: fakeUser.id },
       });
 
-      expect(locksRepoMock.save).toHaveBeenCalledWith({
+      expect(mockEntityManager.save).toHaveBeenCalledWith({
         scenarioId: fakeScenario.id,
         userId: fakeUser.id,
         grabDate: mockDate,
@@ -160,25 +157,25 @@ async function getFixtures() {
         .mockImplementation(() => (mockDate as unknown) as string);
 
       await expect(
-        sut.grabLock(fakeScenario.id, fakeUser.id),
+        sut.acquireLock(fakeScenario.id, fakeUser.id),
       ).rejects.toThrowError(new LockedScenarioError());
 
-      expect(locksRepoMock.findOne).toHaveBeenCalledWith({
+      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
         where: { scenarioId: fakeScenario.id, userId: fakeUser.id },
       });
-      expect(locksRepoMock.save).not.toHaveBeenCalled();
+      expect(mockEntityManager.save).not.toHaveBeenCalled();
 
       spy.mockRestore();
     },
     ThenIsLockedReturnsTrue: async () => {
       await expect(sut.isLocked(fakeScenario.id)).resolves.toBeTruthy();
-      expect(locksRepoMock.findOne).toHaveBeenCalledWith({
+      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
         where: { scenarioId: fakeScenario.id },
       });
     },
     ThenIsLockedReturnsFalse: async () => {
       await expect(sut.isLocked(fakeScenario.id)).resolves.toBeFalsy();
-      expect(locksRepoMock.findOne).toHaveBeenCalledWith({
+      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
         where: { scenarioId: fakeScenario.id },
       });
     },
@@ -187,30 +184,30 @@ async function getFixtures() {
         sut.releaseLock(fakeScenario.id, fakeUser.id),
       ).resolves.not.toThrow();
 
-      expect(locksRepoMock.findOne).toHaveBeenCalledWith({
+      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
         where: { scenarioId: fakeScenario.id, userId: fakeUser.id },
       });
-      expect(locksRepoMock.remove).toHaveBeenCalledTimes(1);
+      expect(mockEntityManager.remove).toHaveBeenCalledTimes(1);
     },
     ThenOtherUserShouldNotBeAbleToReleaseLock: async () => {
       await expect(
         sut.releaseLock(fakeScenario.id, 'other-user'),
       ).rejects.toThrowError(new LockNotFoundError());
 
-      expect(locksRepoMock.findOne).toHaveBeenCalledWith({
+      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
         where: { scenarioId: fakeScenario.id, userId: 'other-user' },
       });
-      expect(locksRepoMock.remove).toHaveBeenCalledTimes(0);
+      expect(mockEntityManager.remove).toHaveBeenCalledTimes(0);
     },
     ThenShouldNotBeAbleToReleaseLock: async () => {
       await expect(
         sut.releaseLock(fakeScenario.id, fakeUser.id),
       ).rejects.toThrowError(new LockNotFoundError());
 
-      expect(locksRepoMock.findOne).toHaveBeenCalledWith({
+      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
         where: { scenarioId: fakeScenario.id, userId: fakeUser.id },
       });
-      expect(locksRepoMock.remove).toHaveBeenCalledTimes(0);
+      expect(mockEntityManager.remove).toHaveBeenCalledTimes(0);
     },
   };
 }
