@@ -1,6 +1,6 @@
 import { Permit } from '../access-control.types';
 export abstract class ProjectAccessControl {
-  abstract canCreateProject(userId: string, projectId: string): Promise<Permit>;
+  abstract canCreateProject(userId: string): Promise<Permit>;
   abstract canEditProject(userId: string, projectId: string): Promise<Permit>;
   abstract canViewProject(userId: string, projectId: string): Promise<Permit>;
   abstract canPublishProject(
