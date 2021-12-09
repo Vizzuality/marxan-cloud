@@ -137,8 +137,18 @@ export class ProjectsController {
   @Post('legacy')
   async importLegacyProject(
     @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<Project> {
-    return this.projectsService.importLegacyProject(file);
+    const result = await this.projectsService.importLegacyProject(
+      file,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
+    return result.right;
   }
 
   @ApiOperation({ description: 'Create project' })
