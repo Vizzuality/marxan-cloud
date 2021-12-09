@@ -174,8 +174,16 @@ export class ProjectsController {
   @ApiOperation({ description: 'Delete project' })
   @ApiOkResponse()
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<void> {
-    return await this.projectsService.remove(id);
+  async delete(
+    @Param('id') id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.projectsService.remove(id, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return result.right;
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
