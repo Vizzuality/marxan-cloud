@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
   Param,
