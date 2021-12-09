@@ -149,8 +149,16 @@ export class ProjectsController {
     @Body() dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResultSingular> {
+    const result = await this.projectsService.create(dto, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
     return await this.projectSerializer.serialize(
-      await this.projectsService.create(dto, { authenticatedUser: req.user }),
+      result.right,
       undefined,
       true,
     );
@@ -174,7 +182,10 @@ export class ProjectsController {
   @ApiOperation({ description: 'Delete project' })
   @ApiOkResponse()
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<void> {
+  async delete(
+    @Param('id') id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
     return await this.projectsService.remove(id);
   }
 
