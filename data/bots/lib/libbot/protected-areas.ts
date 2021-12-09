@@ -10,7 +10,7 @@ export enum ProtectedAreaKind {
 }
 
 interface ProtectedAreaSelection {
-  id: IUCNCategory;
+  id: IUCNCategory | string;
   selected: boolean;
 }
 
