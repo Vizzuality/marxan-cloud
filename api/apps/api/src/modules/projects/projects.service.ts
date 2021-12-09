@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Either, isLeft, right, left } from 'fp-ts/Either';
+import { Either, isLeft, left, right } from 'fp-ts/Either';
 
 import {
   FindResult,
@@ -57,7 +57,6 @@ export class ProjectsService {
       appInfo.params?.projectId,
       appInfo.authenticatedUser,
     );
-
     if (isLeft(project)) {
       return project;
     }
@@ -96,14 +95,24 @@ export class ProjectsService {
   }
 
   // TODO debt: shouldn't use API's DTO - avoid relating service to given access layer (Rest)
-  async create(input: CreateProjectDTO, info: ProjectsRequest) {
+  async create(
+    input: CreateProjectDTO,
+    info: ProjectsRequest,
+  ): Promise<Either<Permit, Project>> {
     assertDefined(info.authenticatedUser);
+    if (
+      !(await this.projectAclService.canCreateProject(
+        info.authenticatedUser.id,
+      ))
+    ) {
+      return left(false);
+    }
     const project = await this.projectsCrud.create(input, info);
     await this.projectsCrud.assignCreatorRole(
       project.id,
       info.authenticatedUser.id,
     );
-    return project;
+    return right(project);
   }
 
   async update(projectId: string, input: UpdateProjectDTO) {
