@@ -62,6 +62,7 @@ export class MarxanSandboxBlmRunnerService
 
       await new Promise(async (resolve, reject) => {
         marxanRun.on('error', async (result) => {
+          console.error(result);
           this.clearAbortController(forScenarioId);
           await this.outputFilesHandler.dumpFailure(
             workspace,
@@ -69,7 +70,7 @@ export class MarxanSandboxBlmRunnerService
             marxanRun.stdOut,
             marxanRun.stdError,
           );
-          await workspace.cleanup();
+          // await workspace.cleanup();
           reject(JSON.stringify(result));
         });
         marxanRun.on('finished', async () => {
@@ -81,7 +82,7 @@ export class MarxanSandboxBlmRunnerService
               marxanRun.stdOut,
               marxanRun.stdError,
             );
-            await workspace.cleanup();
+            // await workspace.cleanup();
             resolve(output);
           } catch (error) {
             await this.outputFilesHandler

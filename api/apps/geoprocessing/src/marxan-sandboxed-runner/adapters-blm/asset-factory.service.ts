@@ -31,24 +31,26 @@ export class AssetFactory {
     const inputDat = this.getInputDat(assets);
     if (!inputDat) throw new Error('No URL for input.dat found');
 
-    await this.download(
-      inputDat.url,
-      resolve(to.workingDirectory, inputDat.relativeDestination),
+    const inputDatPath = resolve(
+      to.workingDirectory,
+      inputDat.relativeDestination,
     );
 
-    const input = this.reader.read(
-      resolve(to.workingDirectory, inputDat.relativeDestination),
-    );
+    await this.ensureWriteDirectoryExists(inputDatPath);
+
+    // await this.download(
+    //   inputDat.url,
+    //   resolve(to.workingDirectory, inputDat.relativeDestination),
+    // );
+
+    const input = this.reader.read(inputDatPath);
     const matcher = new RegExp(/BLM\s.*/);
     const inputWithCorrectBLM = input.replace(
       matcher,
       `BLM ${overrideBlmValue}`,
     );
 
-    writeFileSync(
-      resolve(to.workingDirectory, inputDat.relativeDestination),
-      inputWithCorrectBLM,
-    );
+    writeFileSync(inputDatPath, inputWithCorrectBLM);
   }
 
   private async download(sourceUri: string, dest: string) {
