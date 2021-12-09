@@ -181,9 +181,15 @@ export class ProjectsController {
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateProjectDTO,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResultSingular> {
+    const result = await this.projectsService.update(id, dto, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
     return await this.projectSerializer.serialize(
-      await this.projectsService.update(id, dto),
+      result.right,
       undefined,
       true,
     );

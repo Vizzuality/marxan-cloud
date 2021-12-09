@@ -115,8 +115,15 @@ export class ProjectsService {
     return right(project);
   }
 
-  async update(projectId: string, input: UpdateProjectDTO) {
-    return this.projectsCrud.update(projectId, input);
+  async update(
+    projectId: string,
+    input: UpdateProjectDTO,
+    userId: string,
+  ): Promise<Either<Permit, Project>> {
+    if (!(await this.projectAclService.canEditProject(userId, projectId))) {
+      return left(false);
+    }
+    return right(await this.projectsCrud.update(projectId, input));
   }
 
   async updateBlmValues(projectId: string, range: [number, number]) {
