@@ -142,8 +142,11 @@ export class ProjectsService {
     return await this.jobStatusService.getJobStatusFor(projectId);
   }
 
-  async importLegacyProject(_: Express.Multer.File) {
-    return new Project();
+  async importLegacyProject(_: Express.Multer.File, userId: string) {
+    if (!(await this.projectAclService.canCreateProject(userId))) {
+      return left(false);
+    }
+    return right(new Project());
   }
 
   savePlanningAreaFromShapefile = this.planningAreaService.savePlanningAreaFromShapefile.bind(
