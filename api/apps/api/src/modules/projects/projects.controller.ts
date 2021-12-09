@@ -202,7 +202,12 @@ export class ProjectsController {
     @Param('id') id: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
-    return await this.projectsService.remove(id);
+    const result = await this.projectsService.remove(id, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return result.right;
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
