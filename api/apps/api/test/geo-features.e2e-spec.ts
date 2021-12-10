@@ -4,6 +4,7 @@ import { PromiseType } from 'utility-types';
 import {
   GeoFeature,
   geoFeatureResource,
+  JSONAPIGeoFeaturesData,
 } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { tearDown } from './utils/tear-down';
 import { bootstrapApplication } from './utils/api-application';
@@ -78,6 +79,9 @@ describe('GeoFeaturesModule (e2e)', () => {
         expect(response.body.data[0].attributes.featureClassName).toEqual(
           geoFeaturesFilters.cheeta.featureClassName,
         );
+        expect(response.body.data[0].attributes.isCustom).toEqual(
+          !!response.body.data[0].attributes.projectId,
+        );
       });
 
       test.skip('should return a single result of geo-features whose alias property matches a given filter', async () => {
@@ -92,6 +96,9 @@ describe('GeoFeaturesModule (e2e)', () => {
         expect(response.body.data[0].attributes.alias).toEqual(
           geoFeaturesFilters.cheeta.alias,
         );
+        expect(response.body.data[0].attributes.isCustom).toEqual(
+          !!response.body.data[0].attributes.projectId,
+        );
       });
       test('should return a list of geo-features whose featureClassName property match a given substring', async () => {
         const response = await request(app.getHttpServer())
@@ -102,6 +109,11 @@ describe('GeoFeaturesModule (e2e)', () => {
           .expect(HttpStatus.OK);
 
         expect(response.body.data).toHaveLength(5);
+        response.body.data.map((feature: JSONAPIGeoFeaturesData) => {
+          expect(feature.attributes.isCustom).toEqual(
+            !!feature.attributes.projectId,
+          );
+        });
       });
       test('should return all available features if query param has no value', async () => {
         const response = await request(app.getHttpServer())
