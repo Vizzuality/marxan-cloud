@@ -3,7 +3,7 @@ import { copySync, writeFileSync } from 'fs-extra';
 import { Workspace } from '../ports/workspace';
 import { Assets } from './blm-input-files';
 import { dirname, resolve } from 'path';
-import { createWriteStream, promises } from 'fs';
+import { promises } from 'fs';
 import { AssetFetcher } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-shared';
 import { FileReader } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/file-reader';
 
@@ -25,7 +25,7 @@ export class AssetFactory {
 
     copySync(from.workingDirectory, to.workingDirectory, {
       // Marxan binary is already linked
-      filter: (src, dest) => !src.match(/marxan/),
+      filter: (src) => !src.match(/marxan/),
     });
 
     const inputDat = this.getInputDat(assets);
@@ -38,30 +38,17 @@ export class AssetFactory {
 
     await this.ensureWriteDirectoryExists(inputDatPath);
 
-    // await this.download(
-    //   inputDat.url,
-    //   resolve(to.workingDirectory, inputDat.relativeDestination),
-    // );
-
     const input = this.reader.read(inputDatPath);
+
+    // TODO: Why the input.dat is coming wihout BLM?
     const matcher = new RegExp(/BLM\s.*/);
-    const inputWithCorrectBLM = input.replace(
+    const inputWithCorrectBLM = `BLM ${overrideBlmValue}\n${input}`;
+    /*input.replace(
       matcher,
       `BLM ${overrideBlmValue}`,
-    );
+    );*/
 
     writeFileSync(inputDatPath, inputWithCorrectBLM);
-  }
-
-  private async download(sourceUri: string, dest: string) {
-    await this.ensureWriteDirectoryExists(dest);
-    return new Promise((resolve, reject) => {
-      const writer = createWriteStream(dest);
-      writer.on('finish', resolve);
-      writer.on('error', reject);
-
-      this.fetchService.fetch(sourceUri, writer);
-    });
   }
 
   private async ensureWriteDirectoryExists(

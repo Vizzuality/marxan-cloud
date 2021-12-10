@@ -7,10 +7,15 @@ import { SpecificationApiEntity } from '@marxan-api/modules/specification/adapte
 import { ScenarioSpecificationRepo } from '../application/scenario-specification.repo';
 import { DbScenarioSpecificationRepository } from './db-scenario-specification.repository';
 import { SpecificationActivatedHandler } from './specification-activated.handler';
+import { BlmPartialResultEntity } from '@marxan/blm-calibration/blm-partial-results.api.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Scenario, SpecificationApiEntity]),
+    TypeOrmModule.forFeature([
+      Scenario,
+      BlmPartialResultEntity,
+      SpecificationApiEntity,
+    ]),
     ApiEventsModule,
   ],
   providers: [

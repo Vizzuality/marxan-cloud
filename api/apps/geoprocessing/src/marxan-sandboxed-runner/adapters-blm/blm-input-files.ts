@@ -35,11 +35,6 @@ export class BlmInputFiles implements Cancellable {
       })),
     );
 
-    console.log(
-      'UUIDS',
-      workspaces.map((w) => w.workspace.workingDirectory.split('/')[3]),
-    );
-
     await this.singleFetcher.include(rootWorkspace, assets);
 
     for (const workspace of workspaces) {

@@ -3,7 +3,6 @@ import { existsSync, promises } from 'fs';
 
 import { ExecutionResult } from '@marxan/marxan-output';
 import { Workspace } from '../../ports/workspace';
-import { Cancellable } from '../../ports/cancellable';
 
 import { GeoOutputRepository } from './geo-output';
 import { ResultParserService } from './result-parser.service';

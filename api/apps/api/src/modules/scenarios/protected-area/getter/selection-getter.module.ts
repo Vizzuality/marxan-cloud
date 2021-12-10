@@ -7,11 +7,12 @@ import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { SelectionGetService } from './selection-get.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProtectedArea } from '@marxan/protected-areas';
+import { BlmPartialResultEntity } from '@marxan/blm-calibration/blm-partial-results.api.entity';
 
 @Module({
   imports: [
     PlanningAreasModule,
-    TypeOrmModule.forFeature([Scenario]),
+    TypeOrmModule.forFeature([Scenario, BlmPartialResultEntity]),
     TypeOrmModule.forFeature([ProtectedArea], DbConnections.geoprocessingDB),
   ],
   providers: [SelectionGetService],

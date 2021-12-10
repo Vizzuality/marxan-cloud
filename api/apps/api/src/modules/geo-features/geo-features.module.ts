@@ -17,6 +17,7 @@ import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 import { ProcessingModule } from './processing';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { BlmPartialResultEntity } from '@marxan/blm-calibration/blm-partial-results.api.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,12 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
       [GeoFeatureGeometry, GeoFeaturePropertySet, ScenarioFeaturesData],
       DbConnections.geoprocessingDB,
     ),
-    TypeOrmModule.forFeature([GeoFeature, Project, Scenario]),
+    TypeOrmModule.forFeature([
+      GeoFeature,
+      Project,
+      Scenario,
+      BlmPartialResultEntity,
+    ]),
     ProcessingModule,
   ],
   providers: [

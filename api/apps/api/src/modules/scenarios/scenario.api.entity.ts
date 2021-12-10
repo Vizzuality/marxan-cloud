@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -16,6 +17,7 @@ import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
+import { BlmPartialResultEntity } from '@marxan/blm-calibration/blm-partial-results.api.entity';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
@@ -85,6 +87,12 @@ export class Scenario extends TimeUserEntityMetadata {
 
   @Column('uuid', { name: 'project_id' })
   projectId!: string;
+
+  @OneToMany(
+    () => BlmPartialResultEntity,
+    (blmPartialResult) => blmPartialResult.scenario,
+  )
+  partialBlmResults!: BlmPartialResultEntity[];
 
   /**
    * List of IUCN categories used to select WDPA protected areas for the

@@ -34,7 +34,7 @@ export class RunHandler {
   ) {}
 
   async runCalibration(scenarioId: string, blmValues: number[]) {
-    const assets = await this.assets.forScenario(scenarioId, 0);
+    const assets = await this.assets.forScenario(scenarioId, 1);
     assertDefined(assets);
     const job = await this.calibrationQueue.add(`calibrate-scenario`, {
       scenarioId,

@@ -19,12 +19,17 @@ import { RunHandler } from './run.handler';
 import { CancelHandler } from './cancel.handler';
 import { EventsHandler } from './events.handler';
 import { OutputRepository } from './output.repository';
+import { BlmPartialResultEntity } from '@marxan/blm-calibration/blm-partial-results.api.entity';
 
 @Module({
   imports: [
     QueueModule.register(),
     ApiEventsModule,
-    TypeOrmModule.forFeature([Scenario, ScenariosOutputResultsApiEntity]),
+    TypeOrmModule.forFeature([
+      Scenario,
+      ScenariosOutputResultsApiEntity,
+      BlmPartialResultEntity,
+    ]),
     InputFilesModule,
   ],
   providers: [
