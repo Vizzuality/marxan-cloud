@@ -5,17 +5,17 @@ import { v4 } from 'uuid';
 
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
+import {
+  ClonePiece,
+  ResourceId,
+  ResourceKind,
+  ComponentId,
+} from '@marxan/cloning/domain';
+
 import { RequestExport } from './request-export';
 import { ResourcePieces } from './resource-pieces.port';
 import { ExportRepository } from './export-repository.port';
-import {
-  ComponentId,
-  Export,
-  ExportComponentSnapshot,
-  ResourceId,
-  ResourceKind,
-} from '../domain';
-import { ClonePiece } from '@marxan/cloning/domain';
+import { Export, ExportComponentSnapshot } from '../domain';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
