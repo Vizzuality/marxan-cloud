@@ -32,11 +32,9 @@ import {
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
 import { ProjectAccessControl } from '../access-control';
-import { Permit } from '../access-control/access-control.types';
-import { forbidden } from './blm/change-blm-range.command';
+import { Permit, forbiddenError } from '../access-control/access-control.types';
 
 export { validationFailed } from './planning-areas';
-
 @Injectable()
 export class ProjectsService {
   constructor(
@@ -115,9 +113,9 @@ export class ProjectsService {
     userId: string,
     projectId: string,
     range: [number, number],
-  ): Promise<Either<ChangeRangeErrors, ProjectBlm>> {
+  ): Promise<Either<ChangeRangeErrors | typeof forbiddenError, ProjectBlm>> {
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
-      return left(forbidden);
+      return left(forbiddenError);
     }
     return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
   }
