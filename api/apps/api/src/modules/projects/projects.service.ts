@@ -22,7 +22,10 @@ import {
   ProjectsServiceRequest,
 } from './project-requests-info';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
-import { ChangeBlmRange } from '@marxan-api/modules/projects/blm';
+import {
+  ChangeBlmRange,
+  ChangeRangeErrors,
+} from '@marxan-api/modules/projects/blm';
 import {
   GetFailure,
   ProjectBlm,
@@ -30,6 +33,7 @@ import {
 } from '@marxan-api/modules/blm';
 import { ProjectAccessControl } from '../access-control';
 import { Permit } from '../access-control/access-control.types';
+import { forbidden } from './blm/change-blm-range.command';
 
 export { validationFailed } from './planning-areas';
 
@@ -111,9 +115,9 @@ export class ProjectsService {
     userId: string,
     projectId: string,
     range: [number, number],
-  ) {
+  ): Promise<Either<ChangeRangeErrors, ProjectBlm>> {
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
-      return false;
+      return left(forbidden);
     }
     return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
   }

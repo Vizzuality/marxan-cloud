@@ -65,6 +65,7 @@ import { FeatureTags } from '@marxan-api/modules/geo-features/geo-feature-set.ap
 import { UpdateProjectBlmRangeDTO } from '@marxan-api/modules/projects/dto/update-project-blm-range.dto';
 import { invalidRange } from '@marxan-api/modules/projects/blm';
 import {
+  forbidden,
   planningUnitAreaNotFound,
   updateFailure,
 } from '@marxan-api/modules/projects/blm/change-blm-range.command';
@@ -312,6 +313,8 @@ export class ProjectsController {
           throw new InternalServerErrorException(
             `Could not update with range ${range} project BLM values for project with ID: ${id}`,
           );
+        case forbidden:
+          throw new ForbiddenException();
         default:
           throw new InternalServerErrorException();
       }
