@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Connection, EntityManager } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import * as faker from 'faker';
 
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -92,21 +92,16 @@ async function getFixtures() {
     remove: jest.fn(),
   };
 
-  const mockConnection = () => ({
-    transaction: (fn: (em: Partial<EntityManager>) => Promise<void>) =>
-      fn(mockEntityManager),
-  });
-
   const sandbox = await Test.createTestingModule({
     providers: [
       LockService,
       {
-        provide: Connection,
-        useFactory: mockConnection,
-      },
-      {
         provide: getRepositoryToken(ScenarioLockEntity),
         useValue: {
+          manager: {
+            transaction: (fn: (em: Partial<EntityManager>) => Promise<void>) =>
+              fn(mockEntityManager),
+          },
           find: jest.fn(),
         },
       },
@@ -130,7 +125,7 @@ async function getFixtures() {
         {
           scenarioId: fakeScenario.id,
           userId: fakeUser.id,
-          grabDate: new Date(),
+          createdAt: new Date(),
         },
       ]);
     },
@@ -142,7 +137,7 @@ async function getFixtures() {
         {
           scenarioId: fakeScenario.id,
           userId: fakeUser.id,
-          grabDate: new Date(),
+          createdAt: new Date(),
         },
       ]);
     },
@@ -163,7 +158,7 @@ async function getFixtures() {
       expect(mockEntityManager.save).toHaveBeenCalledWith({
         scenarioId: fakeScenario.id,
         userId: fakeUser.id,
-        grabDate: mockDate,
+        createdAt: mockDate,
       });
 
       spy.mockRestore();

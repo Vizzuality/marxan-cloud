@@ -21,9 +21,17 @@ export class AddScenarioLocksTable1638891599444 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "scenario_locks" ADD CONSTRAINT scenario_locks_pk PRIMARY KEY (scenario_id, user_id);`,
     );
+
+    await queryRunner.query(
+      `ALTER TABLE "scenario_locks" ADD CONSTRAINT scenario_locks_un UNIQUE (scenario_id);`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "scenario_locks" DROP CONSTRAINT scenario_locks_un;`,
+    );
+
     await queryRunner.query(
       `ALTER TABLE "scenario_locks" DROP CONSTRAINT scenario_locks_pk;`,
     );

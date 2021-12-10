@@ -18,5 +18,5 @@ export class ScenarioLockEntity {
     type: `date`,
     name: `grab_date`,
   })
-  grabDate!: Date;
+  createdAt!: Date;
 }

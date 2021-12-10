@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Either, left, right } from 'fp-ts/lib/Either';
 
 import { ScenarioLockEntity } from '@marxan-api/modules/scenarios/locks/scenario.lock.entity';
@@ -17,14 +17,13 @@ export class LockService {
   constructor(
     @InjectRepository(ScenarioLockEntity)
     private readonly locksRepo: Repository<ScenarioLockEntity>,
-    private connection: Connection,
   ) {}
 
   async acquireLock(
     scenarioId: string,
     userId: string,
   ): Promise<Either<AcquireFailure, void>> {
-    return this.connection.transaction(async (entityManager) => {
+    return this.locksRepo.manager.transaction(async (entityManager) => {
       const existingLock = await entityManager.find(ScenarioLockEntity, {
         where: { scenarioId, userId },
       });
@@ -36,7 +35,7 @@ export class LockService {
       await entityManager.save({
         scenarioId,
         userId,
-        grabDate: new Date(),
+        createdAt: new Date(),
       });
 
       return right(void 0);
@@ -47,7 +46,7 @@ export class LockService {
     scenarioId: string,
     userId: string,
   ): Promise<Either<ReleaseFailure, void>> {
-    return this.connection.transaction(async (entityManager) => {
+    return this.locksRepo.manager.transaction(async (entityManager) => {
       const existingLock = await entityManager.find(ScenarioLockEntity, {
         where: { scenarioId, userId },
       });
