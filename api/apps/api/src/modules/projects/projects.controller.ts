@@ -74,6 +74,7 @@ import {
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
 import { forbiddenError } from '../access-control/access-control.types';
+import { projectNotFound } from '../blm';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -369,12 +370,14 @@ export class ProjectsController {
 
     if (isLeft(result))
       switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        default:
+        case projectNotFound:
           throw new NotFoundException(
             `Could not find project BLM values for project with ID: ${id}`,
           );
+        case forbiddenError:
+          throw new ForbiddenException();
+        default:
+          throw new InternalServerErrorException();
       }
     return result.right;
   }
