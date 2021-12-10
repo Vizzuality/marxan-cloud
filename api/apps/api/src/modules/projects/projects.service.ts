@@ -33,6 +33,7 @@ import {
 } from '@marxan-api/modules/blm';
 import { ProjectAccessControl } from '../access-control';
 import { forbiddenError } from '@marxan-api/modules/access-control';
+import { Permit } from '../access-control/access-control.types';
 
 import { ExportProject } from '@marxan-api/modules/clone';
 import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
@@ -93,8 +94,15 @@ export class ProjectsService {
     }
   }
 
-  async findProjectBlm(id: string): Promise<Either<GetFailure, ProjectBlm>> {
-    return await this.projectBlmRepository.get(id);
+  async findProjectBlm(
+    projectId: string,
+    userId: string,
+  ): Promise<Either<GetFailure | typeof forbiddenError, ProjectBlm>> {
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
+
+    return await this.projectBlmRepository.get(projectId);
   }
 
   // TODO debt: shouldn't use API's DTO - avoid relating service to given access layer (Rest)
