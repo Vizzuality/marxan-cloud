@@ -82,6 +82,7 @@ export const getFixtures = async () => {
           tag: customFeatureTag,
           creationStatus: `done`,
           projectId,
+          isCustom: true,
         },
       ]);
       expect(
