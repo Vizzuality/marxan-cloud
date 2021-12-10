@@ -329,10 +329,6 @@ export class ProjectsController {
       range,
     );
 
-    if (!result) {
-      throw new ForbiddenException();
-    }
-
     if (isLeft(result)) {
       switch (result.left) {
         case invalidRange:
