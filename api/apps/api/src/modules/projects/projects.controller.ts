@@ -149,8 +149,16 @@ export class ProjectsController {
     @Body() dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResultSingular> {
+    const result = await this.projectsService.create(dto, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
     return await this.projectSerializer.serialize(
-      await this.projectsService.create(dto, { authenticatedUser: req.user }),
+      result.right,
       undefined,
       true,
     );
