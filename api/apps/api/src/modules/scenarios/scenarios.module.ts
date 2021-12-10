@@ -46,7 +46,6 @@ import { ProtectedAreaModule } from './protected-area';
 import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
 import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 import { BlmValuesModule } from '@marxan-api/modules/blm';
-import { BlmPartialResultEntity } from '@marxan/blm-calibration/blm-partial-results.api.entity';
 
 @Module({
   imports: [
@@ -58,7 +57,6 @@ import { BlmPartialResultEntity } from '@marxan/blm-calibration/blm-partial-resu
       Project,
       Scenario,
       ScenariosOutputResultsApiEntity,
-      BlmPartialResultEntity,
     ]),
     TypeOrmModule.forFeature(
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],

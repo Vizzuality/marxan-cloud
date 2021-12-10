@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 const tableName = `blm_partial_results`;
 
@@ -22,13 +15,6 @@ export class BlmPartialResultEntity {
     name: `scenario_id`,
   })
   scenarioId!: string;
-
-  @ManyToOne(() => Scenario, (scenario) => scenario.partialBlmResults)
-  @JoinColumn({
-    name: 'scenario_id',
-    referencedColumnName: 'id',
-  })
-  scenario!: Scenario;
 
   /**
    * BLM Value used for running Marxan

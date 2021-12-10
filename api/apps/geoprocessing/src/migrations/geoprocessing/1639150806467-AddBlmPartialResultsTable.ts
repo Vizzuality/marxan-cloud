@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddBlmPartialResultTable1639141458515
+export class AddBlmPartialResultTable1639150806467
   implements MigrationInterface {
   async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -11,14 +11,10 @@ export class AddBlmPartialResultTable1639141458515
         score           float NOT NULL,
         blm_value       float NOT NULL,
         boundary_length float NOT NULL,
-        PRIMARY KEY (id),
-        CONSTRAINT fk_scenarios_blm_partial_results FOREIGN KEY (scenario_id) REFERENCES scenarios (id))`);
+        PRIMARY KEY (id))`);
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE blm_partial_results.scenario_id DROP CONSTRAINT fk_scenarios_blm_partial_results
-            DROP TABLE blm_partial_results;`,
-    );
+    await queryRunner.query(`DROP TABLE blm_partial_results;`);
   }
 }

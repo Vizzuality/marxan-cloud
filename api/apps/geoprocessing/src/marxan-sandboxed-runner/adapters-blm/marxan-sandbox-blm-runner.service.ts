@@ -3,22 +3,23 @@ import { JobData } from '@marxan/blm-calibration';
 
 import { SandboxRunner } from '../sandbox-runner';
 import { WorkspaceBuilder } from '../ports/workspace-builder';
-import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
 import { BlmInputFiles } from './blm-input-files';
 import { MarxanRun } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-run';
 import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
 import AbortController from 'abort-controller';
+import { BlmPartialResultsRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.repository';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
   implements SandboxRunner<JobData, void> {
   readonly #controllers: Record<string, AbortController> = {};
   readonly #logger = new Logger(this.constructor.name);
-
+  private dumpCalls = 0;
+  private runCalls = 0;
   constructor(
     private readonly workspaceService: WorkspaceBuilder,
     private readonly inputFilesHandler: BlmInputFiles,
-    private readonly outputFilesHandler: SandboxRunnerOutputHandler<void>,
+    private readonly partialBlmResultsRepository: BlmPartialResultsRepository,
   ) {}
 
   kill(ofScenarioId: string): void {}
@@ -27,26 +28,31 @@ export class MarxanSandboxBlmRunnerService
     input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<void> {
+    console.log(`Called run ${++this.runCalls} times`);
+
     const { blmValues, scenarioId: forScenarioId } = input;
     console.log(`running BLM calibration for:`, blmValues);
     const workspaces = await this.inputFilesHandler.for(
       blmValues,
       input.assets,
     );
-    const marxanRun = new MarxanRun();
-    const cancellables: Cancellable[] = [
-      this.inputFilesHandler,
-      this.outputFilesHandler,
-      marxanRun,
-    ];
 
-    const controller = this.getAbortControllerForRun(
-      forScenarioId,
-      cancellables,
-    );
-
+    console.log('----------------');
+    console.log(`There are ${blmValues.length} BLM values`);
+    console.log('----------------');
     for (const { blmValue, workspace } of workspaces) {
       // run & persist
+      const marxanRun = new MarxanRun();
+      const cancellables: Cancellable[] = [
+        this.inputFilesHandler,
+        this.partialBlmResultsRepository,
+        marxanRun,
+      ];
+
+      const controller = this.getAbortControllerForRun(
+        forScenarioId,
+        cancellables,
+      );
       console.log(`running for ${blmValue} - ${workspace.workingDirectory}`);
 
       const interruptIfKilled = async () => {
@@ -63,7 +69,7 @@ export class MarxanSandboxBlmRunnerService
       await new Promise(async (resolve, reject) => {
         marxanRun.on('error', async (result) => {
           this.clearAbortController(forScenarioId);
-          await this.outputFilesHandler.dumpFailure(
+          await this.partialBlmResultsRepository.dumpFailure(
             workspace,
             forScenarioId,
             marxanRun.stdOut,
@@ -75,7 +81,8 @@ export class MarxanSandboxBlmRunnerService
         marxanRun.on('finished', async () => {
           try {
             await interruptIfKilled();
-            const output = await this.outputFilesHandler.dump(
+            console.log(`Called dump ${++this.dumpCalls} times`);
+            const output = await this.partialBlmResultsRepository.dump(
               workspace,
               forScenarioId,
               marxanRun.stdOut,
@@ -84,7 +91,7 @@ export class MarxanSandboxBlmRunnerService
             //  await workspace.cleanup();
             resolve(output);
           } catch (error) {
-            await this.outputFilesHandler
+            await this.partialBlmResultsRepository
               .dumpFailure(
                 workspace,
                 forScenarioId,

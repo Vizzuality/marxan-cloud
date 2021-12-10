@@ -4,7 +4,6 @@ import { MarxanConfig } from '../marxan-config';
 
 // ports
 import { sandboxRunnerToken } from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
-import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
 
 // adapters
 import { WorkspaceModule } from '../adapters-shared/workspace/workspace.module';
@@ -15,17 +14,25 @@ import { AssetFactory } from './asset-factory.service';
 
 import { InputFilesFs } from '../adapters-single/scenario-data/input-files-fs';
 import { AssetsModule } from '../adapters-shared';
-import { BlmPartialResultsFakeRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.fake-repository';
 import { GeoOutputModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/geo-output';
 import { ResultParserService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/result-parser.service';
 import { MostDifferentService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/most-different.service';
 import { BestSolutionService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/best-solution.service';
 import { MarxanDirectory } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-directory.service';
+import { BlmPartialResultsTypeOrmRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.typeorm-repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BlmPartialResultEntity } from '@marxan/blm-calibration/blm-partial-results.geo.entity';
+import { BlmPartialResultsRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.repository';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
 @Module({
-  imports: [WorkspaceModule, AssetsModule, GeoOutputModule],
+  imports: [
+    WorkspaceModule,
+    AssetsModule,
+    GeoOutputModule,
+    TypeOrmModule.forFeature([BlmPartialResultEntity]),
+  ],
   providers: [
     ResultParserService,
     MostDifferentService,
@@ -41,8 +48,8 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
       useClass: MarxanSandboxBlmRunnerService,
     },
     {
-      provide: SandboxRunnerOutputHandler,
-      useClass: BlmPartialResultsFakeRepository,
+      provide: BlmPartialResultsRepository,
+      useClass: BlmPartialResultsTypeOrmRepository,
     },
     AssetFactory,
     BlmInputFiles,

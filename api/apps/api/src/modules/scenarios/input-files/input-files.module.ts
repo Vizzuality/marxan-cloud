@@ -20,11 +20,10 @@ import { CostSurfaceViewService } from './cost-surface-view.service';
 import { ioSettingsProvider } from './input-params/io-settings';
 import { InputParameterFileProvider } from './input-params/input-parameter-file.provider';
 import { InputFilesArchiverService } from './input-files-archiver.service';
-import { BlmPartialResultEntity } from '@marxan/blm-calibration/blm-partial-results.api.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Scenario, BlmPartialResultEntity]),
+    TypeOrmModule.forFeature([Scenario]),
     TypeOrmModule.forFeature(
       [
         PlanningUnitsGeom,
