@@ -126,7 +126,14 @@ export class ProjectsService {
     return right(await this.projectsCrud.update(projectId, input));
   }
 
-  async updateBlmValues(projectId: string, range: [number, number]) {
+  async updateBlmValues(
+    userId: string,
+    projectId: string,
+    range: [number, number],
+  ) {
+    if (!(await this.projectAclService.canEditProject(userId, projectId))) {
+      return false;
+    }
     return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
   }
 

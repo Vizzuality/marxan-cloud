@@ -320,8 +320,17 @@ export class ProjectsController {
   async updateBlmRange(
     @Param('id') id: string,
     @Body() { range }: UpdateProjectBlmRangeDTO,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectBlmValuesResponseDto> {
-    const result = await this.projectsService.updateBlmValues(id, range);
+    const result = await this.projectsService.updateBlmValues(
+      req.user.id,
+      id,
+      range,
+    );
+
+    if (!result) {
+      throw new ForbiddenException();
+    }
 
     if (isLeft(result)) {
       switch (result.left) {
