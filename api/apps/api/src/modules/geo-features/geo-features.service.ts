@@ -91,6 +91,7 @@ export class GeoFeaturesService extends AppBaseService<
         'intersection',
         'tag',
         'properties',
+        'isCustom',
       ],
       keyForAttribute: 'camelCase',
     };
