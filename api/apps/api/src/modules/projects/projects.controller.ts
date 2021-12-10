@@ -363,13 +363,19 @@ export class ProjectsController {
   @Get(':id/calibration')
   async getProjectBlmValues(
     @Param('id') id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectBlmValuesResponseDto> {
-    const result = await this.projectsService.findProjectBlm(id);
+    const result = await this.projectsService.findProjectBlm(id, req.user.id);
 
     if (isLeft(result))
-      throw new NotFoundException(
-        `Could not find project BLM values for project with ID: ${id}`,
-      );
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        default:
+          throw new NotFoundException(
+            `Could not find project BLM values for project with ID: ${id}`,
+          );
+      }
     return result.right;
   }
 }
