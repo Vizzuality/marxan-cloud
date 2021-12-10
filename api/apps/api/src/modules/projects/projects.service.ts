@@ -127,9 +127,14 @@ export class ProjectsService {
     return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
   }
 
-  async remove(projectId: string) {
-    // /ACL slot - can?/
-    return this.projectsCrud.remove(projectId);
+  async remove(
+    projectId: string,
+    userId: string,
+  ): Promise<Either<Permit, void>> {
+    if (!(await this.projectAclService.canDeleteProject(userId, projectId))) {
+      return left(false);
+    }
+    return right(await this.projectsCrud.remove(projectId));
   }
 
   async getJobStatusFor(projectId: string, info: ProjectsRequest) {
