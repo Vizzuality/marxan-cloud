@@ -6,7 +6,7 @@ export class AddScenarioLocksTable1638891599444 implements MigrationInterface {
       `CREATE TABLE "scenario_locks" (
               scenario_id uuid NOT NULL,
               user_id uuid NOT NULL,
-              grab_date timestamptz NOT NULL
+              created_at TIMESTAMP DEFAULT now()
              );`,
     );
 

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity(`scenario_locks`)
 export class ScenarioLockEntity {
@@ -14,9 +14,6 @@ export class ScenarioLockEntity {
   })
   scenarioId!: string;
 
-  @Column({
-    type: `date`,
-    name: `grab_date`,
-  })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt!: Date;
 }

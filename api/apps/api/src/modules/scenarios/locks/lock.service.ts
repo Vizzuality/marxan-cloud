@@ -62,10 +62,6 @@ export class LockService {
   }
 
   async isLocked(scenarioId: string): Promise<boolean> {
-    const locks = await this.locksRepo.find({
-      where: { scenarioId },
-    });
-
-    return locks.length > 0;
+    return (await this.locksRepo.count({ where: { scenarioId } })) > 0;
   }
 }
