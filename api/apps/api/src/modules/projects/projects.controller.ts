@@ -74,7 +74,7 @@ import {
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
 import { forbiddenError } from '../access-control/access-control.types';
-import { projectNotFound } from '../blm';
+import { projectNotFound, unknownError } from '../blm';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -376,8 +376,11 @@ export class ProjectsController {
           );
         case forbiddenError:
           throw new ForbiddenException();
-        default:
+        case unknownError:
           throw new InternalServerErrorException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
       }
     return result.right;
   }
