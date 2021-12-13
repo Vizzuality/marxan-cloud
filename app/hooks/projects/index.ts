@@ -15,6 +15,7 @@ import { useSession } from 'next-auth/client';
 import { ItemProps } from 'components/projects/item/component';
 
 import PROJECTS from 'services/projects';
+import ROLES from 'services/roles';
 import UPLOADS from 'services/uploads';
 
 import {
@@ -233,6 +234,31 @@ export function useDeleteProject({
       console.info('Error', error, variables, context);
     },
   });
+}
+
+export function useProjectUsers(projectId) {
+  const [session] = useSession();
+
+  const query = useQuery(['roles', projectId], async () => ROLES.request({
+    method: 'GET',
+    url: `/${projectId}/users`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!projectId,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
 }
 
 export function useUploadProjectPA({

@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useProject } from 'hooks/projects';
+import { useProject, useProjectUsers } from 'hooks/projects';
 
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';
@@ -26,6 +26,10 @@ export const Contributors: React.FC<ContributorsProps> = () => {
   const { pid } = query;
   const { data = {} } = useProject(pid);
   const { users = [] } = data;
+
+  const { data: projectUsers } = useProjectUsers(pid);
+
+  console.log('projectUsers', projectUsers);
 
   return (
     <AnimatePresence>
