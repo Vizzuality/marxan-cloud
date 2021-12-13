@@ -9,7 +9,7 @@ export const getDemoFeatureSpecificationFromFeatureNamesForProject = async (
 ) => {
   const geoFeatureIds = await Promise.all(
     wantedFeatures.map(async (f) =>
-      (await bot.geoFeatures.getIdFromQueryStringInProject(projectId, f))[0]
+      (await bot.geoFeatures.getIdOfFeaturesBySubstringMatchOnName(projectId, f))[0]
     ),
   );
 
@@ -21,7 +21,7 @@ export const getDemoFeatureSpecificationFromFeatureNamesForProject = async (
 
   const featuresForSpecification = geoFeatureIds.map((i) => ({
     kind: "plain",
-    featureId: i.id,
+    featureId: i,
     marxanSettings: {
       prop: 0.3,
       fpf: 1,
