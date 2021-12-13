@@ -22,6 +22,8 @@ export const E2E_CONFIG: {
     basic: {
       aa: Partial<CreateUserDTO> & { username: string };
       bb: Partial<CreateUserDTO> & { username: string };
+      cc: Partial<CreateUserDTO> & { username: string };
+      dd: Partial<CreateUserDTO> & { username: string };
     };
     updated: {
       bb: () => Partial<UpdateUserDTO>;
@@ -77,6 +79,14 @@ export const E2E_CONFIG: {
       bb: {
         username: 'bb@example.com',
         password: 'bbuserpassword',
+      },
+      cc: {
+        username: 'cc@example.com',
+        password: 'ccuserpassword',
+      },
+      dd: {
+        username: 'dd@example.com',
+        password: 'dduserpassword',
       },
     },
     updated: {
@@ -182,7 +192,6 @@ export const E2E_CONFIG: {
         metadata: {},
         numberOfRuns: 100,
         boundaryLengthModifier: 0,
-        wdpaIucnCategories: [IUCNCategory.IV],
         status: JobStatus.created,
       }),
     },

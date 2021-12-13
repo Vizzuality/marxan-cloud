@@ -92,6 +92,7 @@ async function getFixtures() {
   const fakeMailer: jest.Mocked<Mailer> = {
     sendRecoveryEmail: jest.fn<any, any>(fail),
     sendPasswordChangedConfirmation: jest.fn<any, any>(fail),
+    sendSignUpConfirmationEmail: jest.fn<any, any>(fail),
   };
   class FakeTokenFactory {
     count = 0;

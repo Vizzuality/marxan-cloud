@@ -2,54 +2,62 @@ import { v4 } from 'uuid';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, left, right } from 'fp-ts/Either';
 
-import { ResourceKind } from './resource.kind';
+import {
+  ResourceKind,
+  ResourceId,
+  ArchiveLocation,
+  ComponentLocation,
+  ComponentId,
+} from '@marxan/cloning/domain';
 import { ExportId } from './export.id';
-import { ResourceId } from './resource.id';
-import { ArchiveLocation } from './archive-location';
 
 import { ExportComponentRequested } from '../events/export-component-requested.event';
 import { ExportComponentFinished } from '../events/export-component-finished.event';
 import { ArchiveReady } from '../events/archive-ready.event';
 
-import { ComponentLocation } from './export-component/component-location';
 import { ExportComponent } from './export-component/export-component';
-import { ComponentId } from './export-component/component.id';
 import { ExportSnapshot } from './export.snapshot';
+import { ExportComponentSnapshot } from './export-component.snapshot';
+import { ExportAllComponentsFinished } from '../events/export-all-components-finished.event';
 
 export const pieceNotFound = Symbol('export piece not found');
 export const notReady = Symbol('some pieces of export are not yet ready');
 
 export class Export extends AggregateRoot {
+  #pieces: ExportComponent[] = [];
+
   private constructor(
     public readonly id: ExportId,
     public readonly resourceId: ResourceId,
     public readonly resourceKind: ResourceKind,
-    public readonly pieces: ExportComponent[],
+    pieces: ExportComponentSnapshot[],
     private archiveLocation?: ArchiveLocation,
   ) {
     super();
+    this.#pieces = pieces.map((snapshot) =>
+      ExportComponent.fromSnapshot(snapshot),
+    );
   }
 
   static newOne(
     id: ResourceId,
     kind: ResourceKind,
-    parts: ExportComponent[],
+    parts: ExportComponentSnapshot[],
   ): Export {
     const exportRequest = new Export(new ExportId(v4()), id, kind, parts);
 
-    exportRequest.apply(
-      parts
-        .filter((part) => !part.isReady())
-        .map(
-          (part) =>
-            new ExportComponentRequested(
-              exportRequest.id,
-              part.id,
-              part.resourceId,
-              part.piece,
-            ),
-        ),
-    );
+    parts
+      .filter((part) => !part.finished)
+      .map(
+        (part) =>
+          new ExportComponentRequested(
+            exportRequest.id,
+            part.id,
+            new ResourceId(part.resourceId),
+            part.piece,
+          ),
+      )
+      .forEach((event) => exportRequest.apply(event));
 
     return exportRequest;
   }
@@ -58,14 +66,15 @@ export class Export extends AggregateRoot {
     id: ComponentId,
     pieceLocation: ComponentLocation,
   ): Either<typeof pieceNotFound, true> {
-    const piece = this.pieces.find((piece) => piece.id.equals(id));
+    const piece = this.#pieces.find((piece) => piece.id.equals(id));
     if (!piece) {
       return left(pieceNotFound);
     }
     piece.finish(pieceLocation);
+    this.apply(new ExportComponentFinished(this.id, id));
 
     if (this.#allPiecesReady()) {
-      this.apply(new ExportComponentFinished(this.id));
+      this.apply(new ExportAllComponentsFinished(this.id));
     }
 
     return right(true);
@@ -85,7 +94,7 @@ export class Export extends AggregateRoot {
       id: this.id.value,
       resourceId: this.resourceId.value,
       resourceKind: this.resourceKind,
-      exportPieces: this.pieces.map((piece) => piece.toSnapshot()),
+      exportPieces: this.#pieces.map((piece) => piece.toSnapshot()),
       archiveLocation: this.archiveLocation?.value,
     };
   }
@@ -95,12 +104,12 @@ export class Export extends AggregateRoot {
       new ExportId(snapshot.id),
       new ResourceId(snapshot.resourceId),
       snapshot.resourceKind,
-      snapshot.exportPieces.map((piece) => ExportComponent.fromSnapshot(piece)),
+      snapshot.exportPieces,
       snapshot.archiveLocation
         ? new ArchiveLocation(snapshot.archiveLocation)
         : undefined,
     );
   }
 
-  #allPiecesReady = () => this.pieces.every((piece) => piece.isReady());
+  #allPiecesReady = () => this.#pieces.every((piece) => piece.isReady());
 }

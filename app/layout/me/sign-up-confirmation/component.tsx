@@ -3,31 +3,35 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { useSignUpConfirmation } from 'hooks/me';
-
 import Wrapper from 'layout/wrapper';
 
 import Button from 'components/button';
+
+import AUTHENTICATION from 'services/authentication';
 
 export interface SignUpConfirmationProps {
 }
 
 export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
-  const { push, query: { token: confirmToken } } = useRouter();
-  const [confirmAccountToken, setConfirmAccountToken] = useState(false);
-  const confirmationAccountMutation = useSignUpConfirmation({});
+  const { push, query: { token: confirmToken, userId } } = useRouter();
+  const [confirmedAccountToken, setConfirmedAccountToken] = useState(false);
 
-  const confirmAccount = useCallback(() => {
-    const data = { confirmToken };
-    confirmationAccountMutation.mutate({ data }, {
-      onSuccess: () => {
-        setConfirmAccountToken(true);
-      },
-      onError: () => {
-        setConfirmAccountToken(false);
-      },
-    });
-  }, [confirmationAccountMutation, confirmToken]);
+  const confirmAccount = useCallback(async () => {
+    const data = { validationToken: confirmToken, sub: userId };
+    try {
+      await AUTHENTICATION
+        .request({
+          method: 'POST',
+          url: '/validate',
+          data,
+        });
+
+      setConfirmedAccountToken(true);
+    } catch (error) {
+      setConfirmedAccountToken(false);
+      console.error(error);
+    }
+  }, [confirmToken, userId]);
 
   useEffect(() => {
     confirmAccount();
@@ -36,7 +40,7 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
 
   return (
     <Wrapper>
-      {confirmAccountToken && (
+      {confirmedAccountToken && (
         <div className="relative flex items-center justify-center h-full">
           <div className="w-full max-w-xs">
             <div className="pb-5">
@@ -61,7 +65,7 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
         </div>
       )}
 
-      {!confirmAccountToken && (
+      {!confirmedAccountToken && (
         <div className="relative flex items-center justify-center h-full">
           <div className="w-full max-w-xs">
             <div className="flex flex-col items-center pb-5 space-y-20">

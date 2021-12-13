@@ -1,27 +1,35 @@
-import { INestApplication } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { Job } from 'bullmq';
 
-import { ProtectedArea, JobInput } from '@marxan/protected-areas';
+import { JobInput, ProtectedArea } from '@marxan/protected-areas';
+import { bootstrapApplication } from '../../../utils';
+import { ProtectedAreaProcessor } from '@marxan-geoprocessing/modules/protected-areas/worker/protected-area-processor';
+import { shapes } from './shapes';
 
-export const createWorld = (
-  app: INestApplication,
-  shapefile: Express.Multer.File,
-) => {
+export const createWorld = async () => {
+  const app = await bootstrapApplication().catch((error) => {
+    console.log(`error`, error);
+    process.stdout.write(`${error}`);
+    throw new Error('ETF');
+  });
   const repoToken = getRepositoryToken(ProtectedArea);
   const repo: Repository<ProtectedArea> = app.get(repoToken);
   const projectId = v4();
   const scenarioId = v4();
 
+  const sut = app.get(ProtectedAreaProcessor);
+
   return {
-    cleanup: async () =>
-      Promise.all([
+    cleanup: async () => {
+      await Promise.all([
         repo.delete({
           projectId,
         }),
-      ]),
+      ]);
+      await app.close();
+    },
     GivenWdpaForProjectAlreadyExists: async (name: string) =>
       repo.save(
         repo.create({
@@ -29,36 +37,26 @@ export const createWorld = (
           fullName: name,
         }),
       ),
-    WhenNewShapefileIsSubmitted: (name: string) =>
-      (({
+    WhenNewShapefileIsSubmitted: async (customName?: string) => {
+      const validShape = shapes.valid();
+      const name = customName ?? validShape.filename;
+      const input = ({
         data: {
           projectId,
           scenarioId,
           shapefile: {
-            ...shapefile,
-            filename: name,
+            ...validShape,
           },
+          name,
         },
         id: 'test-job',
-      } as unknown) as Job<JobInput>),
+      } as unknown) as Job<JobInput>;
+
+      await sut.process(input);
+      return name;
+    },
     projectId,
-    ThenOldEntriesAreRemoved: async (oldShapeName: string) =>
-      repo
-        .find({
-          where: {
-            fullName: oldShapeName,
-          },
-        })
-        .then((results) => results.length === 0),
-    ThenOldEntriesAreNotRemoved: async (oldShapeName: string) =>
-      repo
-        .find({
-          where: {
-            fullName: oldShapeName,
-          },
-        })
-        .then((results) => results.length > 0),
-    ThenNewEntriesArePublished: async (newShapeName: string) =>
+    ThenProtectedAreaIsAvailable: async (newShapeName: string) =>
       repo
         .find({
           where: {
@@ -67,13 +65,5 @@ export const createWorld = (
         })
         // note that the_geom has select: false in entity definition
         .then((results) => results.length > 0),
-    ThenNewEntriesAreNotPublished: async (newShapeName: string) =>
-      repo
-        .find({
-          where: {
-            fullName: newShapeName,
-          },
-        })
-        .then((results) => results.length === 0),
   };
 };

@@ -144,6 +144,24 @@
       ],
       "@marxan/projects/*": [
         "libs/projects/src/*"
+      ],
+      "@marxan/blm-calibration": [
+        "libs/blm-calibration/src"
+      ],
+      "@marxan/blm-calibration/*": [
+        "libs/blm-calibration/src/*"
+      ],
+      "@marxan/files-repository": [
+        "libs/files-repository/src"
+      ],
+      "@marxan/files-repository/*": [
+        "libs/files-repositoryd/src/*"
+      ],
+      "@marxan/cloning": [
+        "libs/cloning/src"
+      ],
+      "@marxan/cloning/*": [
+        "libs/cloning/src/*"
       ]
     }
   },

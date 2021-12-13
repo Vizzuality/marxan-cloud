@@ -14,7 +14,7 @@ export class ChangeFeaturesPersistence1630160053768
       alter table specification_feature_configs drop column features;
     `);
     await queryRunner.query(
-      `CREATE TABLE "specification_features" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "specification_feature_config_id" uuid NOT NULL, "feature_id" uuid NOT NULL, "calculated" boolean NOT NULL, CONSTRAINT "PK_8130e0e87aad71c16cad7f72b74" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "specification_features" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "specification_feature_config_id" uuid NOT NULL, "feature_id" uuid NOT NULL, "calculated" boolean NOT NULL, CONSTRAINT "PK_8130e0e87aad71c16cad7f72b74" PRIMARY KEY ("id"))`,
     );
 
     await queryRunner.query(

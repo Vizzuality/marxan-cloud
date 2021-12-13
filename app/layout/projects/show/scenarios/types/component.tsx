@@ -21,7 +21,7 @@ const SCENARIO_TYPES = [
       width: 32,
       height: 20,
     },
-    subtitle: 'Optimization for a standard conservation plan',
+    subtitle: 'Prioritizes for a single action (e.g. a protected area network)',
     disclaimer: 'If just starting out, we recommend Marxan to help you familiarize yourself with the process.',
   },
   {
@@ -33,7 +33,7 @@ const SCENARIO_TYPES = [
       width: 42,
       height: 20,
     },
-    subtitle: 'Optimization for a conservation plan considering multiple zones or priority levels.',
+    subtitle: 'Prioritizes for multiple actions simultaneously (e.g. protected areas, community-use, and sustainable use zones).',
     disabled: true,
   },
   {
@@ -45,7 +45,7 @@ const SCENARIO_TYPES = [
       width: 42,
       height: 20,
     },
-    subtitle: 'Optimization for a conservation plan accounting for ecological processes and flows.',
+    subtitle: 'Prioritizes for one action at a time while accounting for ecological processes and flows.',
     disabled: true,
   },
 ];

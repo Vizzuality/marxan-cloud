@@ -7,6 +7,10 @@ import { FakeQueue, FakeQueueBuilder } from './queues';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
 import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
 import { right } from 'fp-ts/Either';
+import {
+  FileRepository,
+  TempStorageRepository,
+} from '@marxan/files-repository';
 
 export const fakeProjectChecker: Pick<ProjectChecker, 'isProjectReady'> = {
   isProjectReady: async () => right(true),
@@ -24,6 +28,8 @@ export const bootstrapApplication = async (
     .useClass(FakeQueueBuilder)
     .overrideProvider(ProjectChecker)
     .useValue(fakeProjectChecker)
+    .overrideProvider(FileRepository)
+    .useClass(TempStorageRepository)
     .compile();
 
   return await moduleFixture

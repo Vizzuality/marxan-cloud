@@ -12,8 +12,8 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useSession } from 'next-auth/client';
 
+import { useAccessToken } from 'hooks/auth';
 import {
   /* useAdminPreviewLayer, */
   useLegend,
@@ -46,7 +46,8 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const [open, setOpen] = useState(false);
   const [sid1, setSid1] = useState(null);
   const [sid2, setSid2] = useState(null);
-  const [session] = useSession();
+
+  const accessToken = useAccessToken();
 
   const minZoom = 2;
   const maxZoom = 20;
@@ -208,7 +209,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
       return {
         url,
         headers: {
-          Authorization: `Bearer ${session.accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       };
     }

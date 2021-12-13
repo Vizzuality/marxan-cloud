@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class DropCascadeOutputs1629285535432
-  implements MigrationInterface {
+export class DropCascadeOutputs1629285535432 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
     ALTER TABLE public.output_scenarios_summaries DROP CONSTRAINT if exists output_results_scenarios_id_fkey;

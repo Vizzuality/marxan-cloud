@@ -28,7 +28,10 @@ describe(`when requesting update`, () => {
   beforeEach(async () => {
     // could have the whole setup of seeds etc and shoot to API
     await commandBus.execute(
-      new CalculatePlanningUnitsProtectionLevel(scenarioId, protectedAreaFilterByIds),
+      new CalculatePlanningUnitsProtectionLevel(
+        scenarioId,
+        protectedAreaFilterByIds,
+      ),
     );
   });
 

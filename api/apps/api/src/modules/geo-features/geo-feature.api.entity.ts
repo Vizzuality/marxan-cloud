@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import { FeatureTag } from '@marxan/features/domain';
 import { JobStatus } from '../scenarios/scenario.api.entity';
@@ -70,7 +77,7 @@ export class GeoFeature extends BaseEntity {
   projectId?: string;
 
   @ApiProperty({ type: () => Project })
-  @ManyToOne((_type) => Project,  {
+  @ManyToOne((_type) => Project, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({
@@ -79,7 +86,7 @@ export class GeoFeature extends BaseEntity {
   })
   project?: Project;
 
-  @ManyToOne((_type) => User,  {
+  @ManyToOne((_type) => User, {
     onDelete: 'SET NULL',
   })
   @JoinColumn({
@@ -87,6 +94,10 @@ export class GeoFeature extends BaseEntity {
     referencedColumnName: 'id',
   })
   createdBy?: User;
+
+  @ApiPropertyOptional()
+  @Column('boolean', { name: 'is_custom' })
+  isCustom?: boolean;
 }
 
 export class JSONAPIGeoFeaturesData {

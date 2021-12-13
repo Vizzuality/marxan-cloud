@@ -1,11 +1,12 @@
 import { v4 } from 'uuid';
-import { ClonePiece } from '../../../../shared-kernel/clone-piece';
+import {
+  ClonePiece,
+  ResourceId,
+  ComponentId,
+  ComponentLocation,
+} from '@marxan/cloning/domain';
 
-import { ResourceId } from '../resource.id';
 import { ExportComponentSnapshot } from '../export-component.snapshot';
-
-import { ComponentId } from './component.id';
-import { ComponentLocation } from './component-location';
 
 export class ExportComponent {
   private constructor(
@@ -31,7 +32,7 @@ export class ExportComponent {
 
   toSnapshot(): ExportComponentSnapshot {
     return {
-      id: this.id.value,
+      id: this.id,
       piece: this.piece,
       resourceId: this.resourceId.value,
       finished: this.finished,
@@ -41,7 +42,7 @@ export class ExportComponent {
 
   static fromSnapshot(snapshot: ExportComponentSnapshot) {
     return new ExportComponent(
-      new ComponentId(snapshot.id),
+      snapshot.id,
       snapshot.piece,
       new ResourceId(snapshot.resourceId),
       snapshot.finished,

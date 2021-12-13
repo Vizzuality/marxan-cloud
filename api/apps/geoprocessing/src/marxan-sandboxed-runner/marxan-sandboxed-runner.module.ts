@@ -1,30 +1,16 @@
-import { HttpModule, Module } from '@nestjs/common';
-import { MarxanConfig } from './marxan-config';
-import { MarxanSandboxRunnerService } from './marxan-sandbox-runner.service';
+import { Module } from '@nestjs/common';
 
-import { WorkspaceModule } from './adapters/workspace/workspace.module';
-import { MarxanDirectory } from './adapters/marxan-directory.service';
-import { GeoOutputModule } from './adapters/solutions-output/geo-output/geo-output.module';
-import { FileReader } from './adapters/file-reader';
-import { AssetFetcher } from './adapters/scenario-data/asset-fetcher';
-import { FetchConfig } from './adapters/scenario-data/fetch.config';
-import { SolutionsOutputModule } from './adapters/solutions-output/solutions-output.module';
+import { SingleRunAdapterModule } from './adapters-single/single-run-adapter.module';
+import { BlmRunAdapterModule } from './adapters-blm/blm-run-adapter.module';
 
 @Module({
-  imports: [
-    HttpModule,
-    WorkspaceModule,
-    GeoOutputModule,
-    SolutionsOutputModule,
-  ],
-  providers: [
-    MarxanConfig,
-    MarxanSandboxRunnerService,
-    AssetFetcher,
-    FetchConfig,
-    MarxanDirectory,
-    FileReader,
-  ],
-  exports: [MarxanSandboxRunnerService],
+  imports: [SingleRunAdapterModule],
+  exports: [SingleRunAdapterModule],
 })
-export class MarxanSandboxedRunnerModule {}
+export class MarxanSandboxedSingleRunnerModule {}
+
+@Module({
+  imports: [BlmRunAdapterModule],
+  exports: [BlmRunAdapterModule],
+})
+export class MarxanSandboxedBlmRunnerModule {}

@@ -29,7 +29,7 @@ import { UpdatePlanningUnitsEventsPort } from './providers/planning-units/update
       useClass: UpdatePlanningUnitsService,
     },
     UpdatePlanningUnitsService,
-    // internals - should be in adapters.module
+    // internals - should be in adapters-single.module
     {
       provide: UpdatePlanningUnitsEventsPort,
       useClass: UpdatePlanningUnitsApiEvents,

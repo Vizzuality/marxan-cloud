@@ -31,7 +31,7 @@ describe(`when emitting event`, () => {
     await eventBus.publish(
       new ApiEvent(
         'resource',
-        API_EVENT_KINDS.project__protectedAreas__failed__v1__alpha,
+        API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha,
         { 1: 'one' },
       ),
     );
@@ -41,7 +41,7 @@ describe(`when emitting event`, () => {
     expect(eventForwarder.mock.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
         "resource",
-        "project.protectedAreas.failed/v1/alpha",
+        "scenario.protectedAreas.failed/v1/alpha",
         Object {
           "1": "one",
         },

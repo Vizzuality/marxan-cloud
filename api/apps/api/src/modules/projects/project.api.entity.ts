@@ -8,6 +8,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Organization } from '../organizations/organization.api.entity';
@@ -16,6 +17,7 @@ import { BaseServiceResource } from '../../types/resource.interface';
 import { BBox } from 'geojson';
 import { ProtectedAreaDto } from '@marxan-api/modules/projects/dto/protected-area.dto';
 import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
+import { ProjectBlm } from '@marxan-api/modules/blm/values/repositories/project-blm.api.entity';
 
 export const projectResource: BaseServiceResource = {
   className: 'Project',
@@ -127,6 +129,10 @@ export class Project extends TimeUserEntityMetadata {
   })
   @Column('jsonb', { name: 'bbox' })
   bbox!: BBox;
+
+  @ApiProperty()
+  @OneToOne(() => ProjectBlm)
+  projectBlm!: ProjectBlm;
 
   /**
    * JSONB storage for non-relational attributes

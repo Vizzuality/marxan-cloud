@@ -5,15 +5,26 @@ import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 
 import {
-  scenarioProtectedAreaQueueProvider,
-  scenarioProtectedAreaQueueEventsProvider,
   scenarioProtectedAreaEventsFactoryProvider,
+  scenarioProtectedAreaQueueEventsProvider,
+  scenarioProtectedAreaQueueProvider,
 } from './queue.providers';
 import { AddProtectedAreaHandler } from './add-protected-area.handler';
 import { ProtectedAreaService } from './protected-area.service';
 
+import { SelectionChangeModule } from './selection/selection-change.module';
+import { SelectionGetterModule } from './getter/selection-getter.module';
+import { CleanupModule } from './cleanup';
+
 @Module({
-  imports: [QueueApiEventsModule, ApiEventsModule, CqrsModule],
+  imports: [
+    QueueApiEventsModule,
+    ApiEventsModule,
+    CqrsModule,
+    SelectionChangeModule,
+    SelectionGetterModule,
+    CleanupModule,
+  ],
   providers: [
     AddProtectedAreaHandler,
     ProtectedAreaService,

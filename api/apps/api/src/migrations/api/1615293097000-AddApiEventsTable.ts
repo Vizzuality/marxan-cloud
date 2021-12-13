@@ -19,7 +19,7 @@ INSERT INTO api_event_kinds (id) values
 
     await queryRunner.query(`
 CREATE TABLE api_events (
-  id uuid primary key not null default uuid_generate_v4(),
+  id uuid primary key not null default gen_random_uuid(),
   timestamp timestamp not null default now(),
   kind varchar not null references api_event_kinds(id),
   topic uuid not null,

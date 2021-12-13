@@ -1,4 +1,8 @@
-import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
+import {
+  CommandHandler,
+  EventBus,
+  IInferredCommandHandler,
+} from '@nestjs/cqrs';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
@@ -9,6 +13,7 @@ import {
 } from '@marxan-api/modules/projects/project.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
+import { PlanningUnitSet } from '@marxan/planning-units-grid';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 
 import { SetProjectGridFromShapefile } from './set-project-grid-from-shapefile.command';
@@ -21,6 +26,7 @@ export class SetProjectGridFromShapefileHandler
     private readonly events: ApiEventsService,
     @InjectEntityManager(DbConnections.geoprocessingDB)
     private readonly entityManager: EntityManager,
+    private readonly eventBus: EventBus,
   ) {}
 
   async execute({
@@ -72,5 +78,7 @@ export class SetProjectGridFromShapefileHandler
       topic: projectId,
       externalId: v4(),
     });
+
+    await this.eventBus.publish(new PlanningUnitSet(projectId));
   }
 }

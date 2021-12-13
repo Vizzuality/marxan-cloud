@@ -8,7 +8,7 @@ import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { ScenariosCrudService } from '@marxan-api/modules/scenarios/scenarios-crud.service';
-import { PlanningUnitsService } from '@marxan-api/modules/planning-units/planning-units.service';
+import { PlanningUnitsService } from '@marxan-api/modules/planning-units';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -22,9 +22,9 @@ import { FetchSpecification } from 'nestjs-base-service';
 import {
   MultiplePlanningAreaIds,
   PlanningAreasService,
-} from './planning-areas';
+} from '@marxan-api/modules/planning-areas';
 import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/users/role.api.entity';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProtectedArea } from '@marxan/protected-areas';
 
@@ -85,7 +85,6 @@ export class ProjectsCrudService extends AppBaseService<
         'adminAreaLevel2Id',
         'planningUnitGridShape',
         'planningUnitAreakm2',
-        'users',
         'scenarios',
         'createdAt',
         'lastModifiedAt',
@@ -95,14 +94,6 @@ export class ProjectsCrudService extends AppBaseService<
         'customProtectedAreas',
       ],
       keyForAttribute: 'camelCase',
-      users: {
-        ref: 'id',
-        attributes: ['fname', 'lname', 'email', 'projectRoles'],
-        projectRoles: {
-          ref: 'name',
-          attributes: ['name'],
-        },
-      },
       scenarios: {
         ref: 'id',
         attributes: [

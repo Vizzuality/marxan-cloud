@@ -2,31 +2,36 @@ import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { Job } from 'bullmq';
 import { InjectEntityManager } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/Either';
+import { plainToClass } from 'class-transformer';
 
-import { ShapefileService } from '@marxan/shapefile-converter';
+import { ShapefileExtractorService } from '@marxan/shapefile-converter';
+import { JobInput, JobOutput } from '@marxan/protected-areas';
 
 import { WorkerProcessor } from '../../worker';
-import { ProtectedArea, JobInput, JobOutput } from '@marxan/protected-areas';
-import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ProtectedAreaProcessor
   implements WorkerProcessor<JobInput, JobOutput> {
   constructor(
-    private readonly shapefileService: ShapefileService,
+    private readonly shapefileService: ShapefileExtractorService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
   async process(job: Job<JobInput, JobOutput>): Promise<JobOutput> {
-    const { data: geo } = await this.shapefileService.transformToGeoJson(
-      job.data.shapefile,
-    );
+    const result = await this.shapefileService.toGeoJson(job.data.shapefile);
+
+    if (isLeft(result)) {
+      throw new Error(
+        `Couldn't convert ${job.data.shapefile.path} for ${
+          job.data.scenarioId
+        }: ${String(result.left)}`,
+      );
+    }
+
+    const geo = result.right;
 
     return this.entityManager.transaction(async (transaction) => {
-      await transaction.delete(ProtectedArea, {
-        projectId: job.data.projectId,
-      });
-
       const entities: { id: string }[] = await transaction.query(
         `
           INSERT INTO "wdpa"("the_geom", "project_id", "full_name")
@@ -41,8 +46,10 @@ export class ProtectedAreaProcessor
                ) AS f
           RETURNING "id"
         `,
-        [geo, job.data.projectId, job.data.shapefile.filename],
+        [geo, job.data.projectId, job.data.name || job.data.shapefile.filename],
       );
+
+      await this.shapefileService.cleanup(job.data.shapefile);
 
       return plainToClass<JobOutput, JobOutput>(JobOutput, {
         protectedAreaId: entities.map((entity) => entity.id),

@@ -32,10 +32,3 @@ export interface UseResetPasswordProps {
 export interface ResetPasswordProps {
   data: unknown;
 }
-export interface UseSignUpConfirmationProps {
-  requestConfig?: AxiosRequestConfig
-}
-
-export interface SignUpConfirmationProps {
-  data: unknown;
-}

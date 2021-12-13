@@ -39,7 +39,7 @@ export class AddProtectedAreaHandler
     eventData: EventData<JobInput>,
   ): Promise<CreateApiEventDTO> {
     const data = await eventData.data;
-    const kind = API_EVENT_KINDS.project__protectedAreas__finished__v1__alpha;
+    const kind = API_EVENT_KINDS.scenario__protectedAreas__finished__v1__alpha;
     return {
       topic: data.scenarioId,
       kind,
@@ -56,7 +56,7 @@ export class AddProtectedAreaHandler
     eventData: EventData<JobInput, JobOutput>,
   ): Promise<CreateApiEventDTO> {
     const data = await eventData.data;
-    const kind = API_EVENT_KINDS.project__protectedAreas__failed__v1__alpha;
+    const kind = API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha;
     return {
       topic: data.scenarioId,
       kind,

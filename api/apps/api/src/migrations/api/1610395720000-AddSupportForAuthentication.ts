@@ -17,13 +17,13 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
     }
 
     await queryRunner.query(`
-ALTER TABLE users ADD COLUMN password_hash varchar(64) NOT NULL DEFAULT uuid_generate_v4();
+ALTER TABLE users ADD COLUMN password_hash varchar(64) NOT NULL DEFAULT gen_random_uuid();
 ALTER TABLE users ALTER COLUMN password_hash DROP DEFAULT;
     `);
 
     await queryRunner.query(`
 CREATE TABLE issued_authn_tokens (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL references users(id),
   exp timestamp without time zone NOT NULL,
   created_at timestamp NOT NULL default now()

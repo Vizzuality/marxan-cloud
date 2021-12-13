@@ -12,15 +12,15 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
-import { useSession } from 'next-auth/client';
 
+import { useAccessToken } from 'hooks/auth';
 import { useSelectedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
   usePUGridLayer, useLegend, useFeaturePreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useScenario, useScenarioPU } from 'hooks/scenarios';
+import { useScenario, useScenarioPU, useCostSurfaceRange } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 
 import Loading from 'components/loading';
@@ -41,7 +41,8 @@ export interface ScenariosShowMapProps {
 
 export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const [open, setOpen] = useState(true);
-  const [session] = useSession();
+
+  const accessToken = useAccessToken();
 
   const dispatch = useDispatch();
 
@@ -73,11 +74,16 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const {
     data: scenarioData,
   } = useScenario(sid);
+
   const { wdpaIucnCategories, wdpaThreshold } = scenarioData || {};
 
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
+
+  const {
+    data: costSurfaceRangeData,
+  } = useCostSurfaceRange(sid);
 
   const {
     data: PUData,
@@ -192,6 +198,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       puExcludedValue: excluded,
       features: featuresIds,
       highlightFeatures: highlightedFeaturesIds,
+      cost: costSurfaceRangeData,
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
         pugrid: layerSettings.pugrid,
@@ -255,7 +262,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       return {
         url,
         headers: {
-          Authorization: `Bearer ${session.accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       };
     }

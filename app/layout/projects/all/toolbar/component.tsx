@@ -92,7 +92,6 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
                 as a zipfile and you will need to add your planning unit grid
                 as a shapefile. Optionally you can include your output files
                 to visualize the results.
-
               </div>
             )}
           >

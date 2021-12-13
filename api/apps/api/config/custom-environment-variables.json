@@ -53,15 +53,23 @@
   },
   "fileUploads": {
     "limits": {
-      "shapefileMaxSize": "API_UPLOAD_SHAPEFILE_MAX_SIZE"
+      "singleGeometry": "API_UPLOAD_SINGLE_MAX_SIZE",
+      "complexGeometryWithoutProperties": "API_UPLOAD_COMPLEX_MAX_SIZE",
+      "complexGeometryWithProperties": "API_UPLOAD_COMPLEX_PROPERTIES_MAX_SIZE"
     }
   },
   "sparkpost": {
     "apikey": "SPARKPOST_APIKEY",
     "origin": "SPARKPOST_ORIGIN"
   },
+  "application": {
+    "baseUrl": "APPLICATION_BASE_URL"
+  },
   "passwordReset": {
     "tokenPrefix": "PASSWORD_RESET_TOKEN_PREFIX",
     "expiration": "PASSWORD_RESET_EXPIRATION"
+  },
+  "signUpConfirmation": {
+    "tokenPrefix": "SIGNUP_CONFIRMATION_TOKEN_PREFIX"
   }
 }
