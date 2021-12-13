@@ -138,30 +138,32 @@ export class Import extends AggregateRoot {
     lastPiece: ImportComponent,
   ): { components: ImportComponent[]; finished: boolean } {
     const elements = this.pieces.filter((pc) => pc.order === lastPiece.order);
-    if (elements.every((pc) => pc.uri)) {
-      const location = this.pieces.indexOf(lastPiece);
-      const nextComponentLocation = location + 1;
-      const nextComponent = this.pieces[nextComponentLocation];
+    const hasIncompletePiecesForBatch = elements.some((pc) => !Boolean(pc.uri));
 
-      if (nextComponent) {
-        return {
-          components: this.pieces.filter(
-            (pc) => pc.order === nextComponent.order,
-          ),
-          finished: false,
-        };
-      } else {
-        return {
-          components: [],
-          finished: true,
-        };
-      }
-    } else {
+    if (hasIncompletePiecesForBatch) {
       return {
         components: [],
         finished: false,
       };
     }
+
+    const location = this.pieces.indexOf(lastPiece);
+    const nextComponentLocation = location + 1;
+    const nextComponent = this.pieces[nextComponentLocation];
+
+    if (nextComponent) {
+      return {
+        components: this.pieces.filter(
+          (pc) => pc.order === nextComponent.order,
+        ),
+        finished: false,
+      };
+    }
+
+    return {
+      components: [],
+      finished: true,
+    };
   }
 
   private static orderSorter = (a: { order: number }, b: { order: number }) =>
