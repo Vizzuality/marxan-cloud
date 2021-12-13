@@ -94,6 +94,10 @@ export class GeoFeature extends BaseEntity {
     referencedColumnName: 'id',
   })
   createdBy?: User;
+
+  @ApiPropertyOptional()
+  @Column('boolean', { name: 'is_custom' })
+  isCustom?: boolean;
 }
 
 export class JSONAPIGeoFeaturesData {

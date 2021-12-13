@@ -6,10 +6,10 @@ interface FileUpload {
   data: Blob;
   fileName: string;
   headers: [string, string][];
-  extraFields?: { key: string, value: string }[];
+  extraFields?: { key: string; value: string }[];
 }
 
-export class ShapefileUploader {
+export class FileUploader {
   protected currentJwt: string;
   protected baseUrl: string;
 
@@ -22,7 +22,7 @@ export class ShapefileUploader {
     const formData = new FormData();
     formData.append(config.formField, config.data, config.fileName);
 
-    config.extraFields?.forEach(extraField => {
+    config.extraFields?.forEach((extraField) => {
       formData.append(extraField.key, extraField.value);
     });
 

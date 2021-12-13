@@ -29,6 +29,9 @@ import {
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
 
+import { ExportProject } from '@marxan-api/modules/clone';
+import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
+
 export { validationFailed } from '../planning-areas';
 
 @Injectable()
@@ -107,6 +110,15 @@ export class ProjectsService {
 
   async updateBlmValues(projectId: string, range: [number, number]) {
     return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
+  }
+
+  async requestExport(projectId: string): Promise<string> {
+    // ACL slot
+    return (
+      await this.commandBus.execute(
+        new ExportProject(new ResourceId(projectId)),
+      )
+    ).value;
   }
 
   async remove(projectId: string) {

@@ -1,7 +1,7 @@
-import { ClonePiece } from '../../../shared-kernel/clone-piece';
+import { ClonePiece, ComponentId } from '@marxan/cloning/domain';
 
 export interface ExportComponentSnapshot {
-  readonly id: string;
+  readonly id: ComponentId;
   readonly piece: ClonePiece;
   readonly resourceId: string;
   readonly finished: boolean;
