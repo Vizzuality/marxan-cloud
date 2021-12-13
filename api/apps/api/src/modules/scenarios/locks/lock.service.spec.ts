@@ -4,13 +4,7 @@ import { EntityManager } from 'typeorm';
 import { Either, left, right } from 'fp-ts/Either';
 
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import {
-  AcquireFailure,
-  lockedScenario,
-  lockNotFoundError,
-  LockService,
-  ReleaseFailure,
-} from './lock.service';
+import { AcquireFailure, lockedScenario, LockService } from './lock.service';
 import { ScenarioLockEntity } from './scenario.lock.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -33,14 +27,14 @@ it(`should not be able to grab lock if lock is not available`, async () => {
 
 it(`should be able to release the lock if lock exists`, async () => {
   await fixtures.GivenScenarioIsLocked();
-  const lock = await fixtures.WhenTheLockIsReleased();
-  await fixtures.ThenScenarioIsNotLocked(lock);
+  await fixtures.WhenTheLockIsReleased();
+  await fixtures.ThenScenarioIsNotLocked();
 });
 
 it(`should not be able to release the lock if lock does not exist`, async () => {
   await fixtures.GivenScenarioIsNotLocked();
-  const lock = await fixtures.WhenTheLockIsReleased();
-  await fixtures.ThenALockNotFoundErrorIsReturned(lock);
+  await fixtures.WhenTheLockIsReleased();
+  await fixtures.ThenScenarioIsNotLocked();
 });
 
 it(`isLocked should return true if a lock exists`, async () => {
@@ -60,9 +54,7 @@ async function getFixtures() {
   const SCENARIO_ID = 'scenario-id';
 
   const mockEntityManager = {
-    find: jest.fn(),
     save: jest.fn(),
-    delete: jest.fn(),
   };
 
   const sandbox = await Test.createTestingModule({
@@ -75,8 +67,8 @@ async function getFixtures() {
             transaction: (fn: (em: Partial<EntityManager>) => Promise<void>) =>
               fn(mockEntityManager),
           },
-          find: jest.fn(),
           count: jest.fn(),
+          delete: jest.fn(),
         },
       },
     ],
@@ -128,18 +120,10 @@ async function getFixtures() {
         where: { scenarioId: SCENARIO_ID },
       });
     },
-    ThenScenarioIsNotLocked: async (result: Either<ReleaseFailure, void>) => {
-      expect(result).toStrictEqual(right(void 0));
-      expect(mockEntityManager.delete).toHaveBeenCalledWith(
-        ScenarioLockEntity,
-        { where: { scenarioId: SCENARIO_ID } },
-      );
-    },
-    ThenALockNotFoundErrorIsReturned: async (
-      result: Either<ReleaseFailure, void>,
-    ) => {
-      expect(result).toStrictEqual(left(lockNotFoundError));
-      expect(mockEntityManager.delete).not.toHaveBeenCalled();
+    ThenScenarioIsNotLocked: async () => {
+      expect(locksRepoMock.delete).toHaveBeenCalledWith({
+        scenarioId: SCENARIO_ID,
+      });
     },
   };
 }
