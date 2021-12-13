@@ -32,7 +32,7 @@ import {
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
 import { ProjectAccessControl } from '../access-control';
-import { Permit, forbiddenError } from '../access-control/access-control.types';
+import { forbiddenError } from '@marxan-api/modules/access-control';
 
 import { ExportProject } from '@marxan-api/modules/clone';
 import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
