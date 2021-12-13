@@ -3,7 +3,11 @@ import { ImportSnapshot } from './import.snapshot';
 import { ImportComponentSnapshot } from './import.component.snapshot';
 import { Either, left, right } from 'fp-ts/Either';
 import { v4 } from 'uuid';
-import { ResourceKind, ArchiveLocation } from '@marxan/cloning/domain';
+import {
+  ResourceKind,
+  ArchiveLocation,
+  ResourceId,
+} from '@marxan/cloning/domain';
 import {
   AllPiecesImported,
   ImportRequested,
@@ -24,7 +28,7 @@ export type CompletePieceErrors =
 export class Import extends AggregateRoot {
   private constructor(
     private readonly id: string,
-    private readonly resourceId: string,
+    private readonly resourceId: ResourceId,
     private readonly resourceKind: ResourceKind,
     private readonly archiveLocation: ArchiveLocation,
     private readonly pieces: ImportComponent[],
