@@ -7,17 +7,18 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
 import {
   ClonePiece,
+  ComponentId,
   ResourceId,
   ResourceKind,
-  ComponentId,
 } from '@marxan/cloning/domain';
 
-import { Export, ExportComponentSnapshot } from '../domain';
+import { ExportComponentSnapshot, ExportId } from '../domain';
 
 import { ExportProjectHandler } from './export-project.handler';
 import { ResourcePieces } from './resource-pieces.port';
 import { ExportRepository } from './export-repository.port';
 import { ExportProject } from './export-project.command';
+import { InMemoryExportRepo } from '../adapters/in-memory-export.repository';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -27,12 +28,13 @@ beforeEach(async () => {
 
 test(`requesting new project export`, async () => {
   const { projectId, someScenarioId } = fixtures.GivenProjectWasCreated();
-  await fixtures.WhenExportIsRequested(projectId);
-  await fixtures.ThenExportRequestIsSaved(projectId);
+  const exportId = await fixtures.WhenExportIsRequested(projectId);
+  await fixtures.ThenExportRequestIsSaved(exportId);
   await fixtures.ThenUnfinishedExportPiecesAreRequestedToProcess(
     projectId,
     someScenarioId,
   );
+  await fixtures.ThenExportRequestsEventIsPresent(exportId);
 });
 
 const getFixtures = async () => {
@@ -89,10 +91,8 @@ const getFixtures = async () => {
     },
     WhenExportIsRequested: async (projectId: string) =>
       sut.execute(new ExportProject(new ResourceId(projectId))),
-    ThenExportRequestIsSaved: async (projectId: string) => {
-      expect(
-        (await repo.find(new ResourceId(projectId)))?.toSnapshot(),
-      ).toBeDefined();
+    ThenExportRequestIsSaved: async (exportId: ExportId) => {
+      expect((await repo.find(exportId))?.toSnapshot()).toBeDefined();
     },
     ThenUnfinishedExportPiecesAreRequestedToProcess: async (
       projectId: string,
@@ -124,6 +124,11 @@ const getFixtures = async () => {
         },
       });
     },
+    ThenExportRequestsEventIsPresent(exportId: ExportId) {
+      expect(events[1]).toMatchObject({
+        exportId,
+      });
+    },
   };
 };
 
@@ -136,18 +141,5 @@ class FakePiecesProvider implements ResourcePieces {
     kind: ResourceKind,
   ): Promise<ExportComponentSnapshot[]> {
     return this.resolveMock(id, kind);
-  }
-}
-
-@Injectable()
-class InMemoryExportRepo implements ExportRepository {
-  #memory: Record<string, Export> = {};
-
-  async find(projectId: ResourceId): Promise<Export | undefined> {
-    return this.#memory[projectId.value];
-  }
-
-  async save(exportInstance: Export): Promise<void> {
-    this.#memory[exportInstance.resourceId.value] = exportInstance;
   }
 }
