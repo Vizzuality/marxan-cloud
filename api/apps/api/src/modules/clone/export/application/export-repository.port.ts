@@ -1,5 +1,5 @@
-import { Export } from '../domain/export/export';
-import { ResourceId } from '../domain/export/resource.id';
+import { ResourceId } from '@marxan/cloning/domain';
+import { Export } from '../domain';
 
 export abstract class ExportRepository {
   abstract save(exportInstance: Export): Promise<void>;

@@ -1,10 +1,9 @@
-import { ResourceId } from '../domain/export/resource.id';
-import { ResourceKind } from '../domain/export/resource.kind';
-import { ExportComponent } from '../domain/export/export-component/export-component';
+import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
+import { ExportComponentSnapshot } from '../domain';
 
 export abstract class ResourcePieces {
   abstract resolveFor(
     id: ResourceId,
     kind: ResourceKind,
-  ): Promise<ExportComponent[]>;
+  ): Promise<ExportComponentSnapshot[]>;
 }

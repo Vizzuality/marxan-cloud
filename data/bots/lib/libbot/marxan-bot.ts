@@ -1,5 +1,5 @@
-import axiod from "https://deno.land/x/axiod@0.22/mod.ts";
-import { IAxiodResponse } from "https://deno.land/x/axiod@0.22/interfaces.ts";
+import axiod from "https://deno.land/x/axiod@0.23.2/mod.ts";
+import { IAxiodResponse } from "https://deno.land/x/axiod@0.23.2/interfaces.ts";
 
 export interface MarxanBotConfig {
   apiUrl: string;
@@ -44,5 +44,17 @@ export class BotHttpClient {
       .then((result) => result.data.accessToken);
 
     return new BotHttpClient(config, jwt);
+  }
+
+  /**
+   * GET via Fetch API
+   *
+   * Originally added to work around response encoding issues with axiod. In
+   * general, this.baseHttpClient should be used instead of this method.
+   */
+  async get(url: string): Promise<Response> {
+    return await fetch(`${this.baseUrl}${url}`, {
+      headers: { Authorization: `Bearer ${this.currentJwt}` },
+    });
   }
 }

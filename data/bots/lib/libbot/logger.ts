@@ -1,4 +1,4 @@
-import { Logger } from "https://deno.land/x/optic/mod.ts";
+import { Logger } from "https://deno.land/x/optic@1.3.1/mod.ts";
 
 const logger = new Logger();
 
