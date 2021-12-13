@@ -20,6 +20,7 @@ import {
   ArchiveLocation,
   ClonePiece,
   ComponentId,
+  ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
 import {
@@ -90,18 +91,18 @@ const getFixtures = async () => {
       archiveReader.mock.mockImplementation(async () =>
         right({
           archiveLocation: new ArchiveLocation('whatever'),
-          resourceId: `resource-id`,
+          resourceId: new ResourceId(`resource-id`),
           resourceKind: ResourceKind.Project,
           importPieces: [
             {
               order: 0,
-              resourceId: `project-id`,
+              resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`import component unique id`),
               piece: ClonePiece.ProjectMetadata,
             },
             {
               order: 1,
-              resourceId: `project-id`,
+              resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`some other piece`),
               piece: ClonePiece.PlanningAreaGAdm,
             },
@@ -113,18 +114,18 @@ const getFixtures = async () => {
       archiveReader.mock.mockImplementation(async () =>
         right({
           archiveLocation: new ArchiveLocation('whatever'),
-          resourceId: `resource-id`,
+          resourceId: new ResourceId(`resource-id`),
           resourceKind: ResourceKind.Project,
           importPieces: [
             {
               order: 2,
-              resourceId: `project-id`,
+              resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`import component unique id`),
               piece: ClonePiece.ProjectMetadata,
             },
             {
               order: 2,
-              resourceId: `project-id`,
+              resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`some other piece`),
               piece: ClonePiece.PlanningAreaGAdm,
             },
@@ -153,7 +154,7 @@ const getFixtures = async () => {
       ).toEqual([
         {
           id: expect.any(String),
-          resourceId: `resource-id`,
+          resourceId: new ResourceId(`resource-id`),
           resourceKind: `project`,
         },
       ]);
@@ -164,7 +165,7 @@ const getFixtures = async () => {
       ).toEqual([
         {
           id: new ComponentId(`import component unique id`),
-          resourceId: `project-id`,
+          resourceId: new ResourceId(`project-id`),
           piece: `project-metadata`,
         },
       ]);
@@ -175,12 +176,12 @@ const getFixtures = async () => {
       ).toEqual([
         {
           id: new ComponentId(`import component unique id`),
-          resourceId: `project-id`,
+          resourceId: new ResourceId(`project-id`),
           piece: `project-metadata`,
         },
         {
           id: new ComponentId(`some other piece`),
-          resourceId: `project-id`,
+          resourceId: new ResourceId(`project-id`),
           piece: `planning-area-gadm`,
         },
       ]);
