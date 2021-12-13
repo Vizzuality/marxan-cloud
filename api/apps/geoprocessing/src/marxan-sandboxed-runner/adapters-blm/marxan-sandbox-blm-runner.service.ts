@@ -87,6 +87,7 @@ export class MarxanSandboxBlmRunnerService
               marxanRun.stdOut,
               marxanRun.stdError,
             );
+
             await this.blmPartialRepository.save(
               output,
               forScenarioId,
@@ -98,7 +99,7 @@ export class MarxanSandboxBlmRunnerService
               forScenarioId,
               blmValue,
             );
-
+            
             await workspace.cleanup();
             resolve(output);
           } catch (error) {
