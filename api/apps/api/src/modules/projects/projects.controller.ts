@@ -73,6 +73,7 @@ import {
   GeometryFileInterceptor,
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
+import { forbiddenError } from '../access-control/access-control.types';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -320,8 +321,13 @@ export class ProjectsController {
   async updateBlmRange(
     @Param('id') id: string,
     @Body() { range }: UpdateProjectBlmRangeDTO,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectBlmValuesResponseDto> {
-    const result = await this.projectsService.updateBlmValues(id, range);
+    const result = await this.projectsService.updateBlmValues(
+      req.user.id,
+      id,
+      range,
+    );
 
     if (isLeft(result)) {
       switch (result.left) {
@@ -335,6 +341,8 @@ export class ProjectsController {
           throw new InternalServerErrorException(
             `Could not update with range ${range} project BLM values for project with ID: ${id}`,
           );
+        case forbiddenError:
+          throw new ForbiddenException();
         default:
           throw new InternalServerErrorException();
       }

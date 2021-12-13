@@ -22,17 +22,19 @@ import {
   ProjectsServiceRequest,
 } from './project-requests-info';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
-import { ChangeBlmRange } from '@marxan-api/modules/projects/blm';
+import {
+  ChangeBlmRange,
+  ChangeRangeErrors,
+} from '@marxan-api/modules/projects/blm';
 import {
   GetFailure,
   ProjectBlm,
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
 import { ProjectAccessControl } from '../access-control';
-import { Permit } from '../access-control/access-control.types';
+import { forbiddenError } from '@marxan-api/modules/access-control';
 
 export { validationFailed } from './planning-areas';
-
 @Injectable()
 export class ProjectsService {
   constructor(
@@ -123,7 +125,14 @@ export class ProjectsService {
     return right(await this.projectsCrud.update(projectId, input));
   }
 
-  async updateBlmValues(projectId: string, range: [number, number]) {
+  async updateBlmValues(
+    userId: string,
+    projectId: string,
+    range: [number, number],
+  ): Promise<Either<ChangeRangeErrors | typeof forbiddenError, ProjectBlm>> {
+    if (!(await this.projectAclService.canEditProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
     return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
   }
 
