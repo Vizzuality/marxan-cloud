@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -24,10 +24,14 @@ export interface ContributorsProps {
 export const Contributors: React.FC<ContributorsProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
+  const [editUsers, setEditUsers] = useState(false);
+
   const { data = {} } = useProject(pid);
   const { users = [] } = data;
 
   const { data: projectUsers } = useProjectUsers(pid);
+
+  const handleEditUsers = () => setEditUsers(!editUsers);
 
   console.log('projectUsers', projectUsers);
 
@@ -70,14 +74,22 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                 <button
                   aria-label="add-contributor"
                   type="button"
-                  onClick={() => {
-                    console.info('Add contributor');
-                  }}
+                  className="border border-transparent rounded-full hover:border hover:border-white"
+                  onClick={handleEditUsers}
                 >
-                  <Avatar className="text-sm text-white uppercase bg-gray-500">
+                  <Avatar className={cx({
+                    'text-white bg-gray-500': !editUsers,
+                    'bg-white text-gray-500': editUsers,
+                  })}
+                  >
                     <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
                   </Avatar>
                 </button>
+                {editUsers && (
+                  <div className="absolute">
+                    Project members
+                  </div>
+                )}
               </li>
 
             </ul>
