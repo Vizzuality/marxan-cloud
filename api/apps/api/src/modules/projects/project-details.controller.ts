@@ -8,6 +8,7 @@ import {
 import {
   applyDecorators,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   Req,
@@ -22,6 +23,7 @@ import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { projectResource, ProjectResultSingular } from './project.api.entity';
 import { ProjectsService } from './projects.service';
 import { ProjectSerializer } from './dto/project.serializer';
+import { isLeft } from 'fp-ts/lib/Either';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -39,11 +41,15 @@ export class ProjectDetailsController {
     @Param('id') id: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResultSingular> {
-    return await this.projectSerializer.serialize(
-      await this.projectsService.findOne(id, {
-        authenticatedUser: req.user,
-      }),
-    );
+    const result = await this.projectsService.findOne(id, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
+    return await this.projectSerializer.serialize(result.right);
   }
 }
 

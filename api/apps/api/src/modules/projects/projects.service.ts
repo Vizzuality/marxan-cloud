@@ -84,13 +84,21 @@ export class ProjectsService {
   async findOne(
     id: string,
     info: ProjectsServiceRequest,
-  ): Promise<Project | undefined> {
-    // /ACL slot/
+  ): Promise<Either<undefined | typeof forbiddenError, Project>> {
+    assertDefined(info.authenticatedUser);
+    if (
+      !(await this.projectAclService.canViewProject(
+        info.authenticatedUser.id,
+        id,
+      ))
+    ) {
+      return left(forbiddenError);
+    }
     try {
-      return await this.projectsCrud.getById(id, undefined, info);
+      return right(await this.projectsCrud.getById(id, undefined, info));
     } catch (error) {
       // library-sourced errors are no longer instances of HttpException
-      return undefined;
+      return left(undefined);
     }
   }
 
