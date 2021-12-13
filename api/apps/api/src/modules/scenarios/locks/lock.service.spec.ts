@@ -20,43 +20,37 @@ beforeEach(async () => {
 });
 
 it(`should be able to grab lock if lock is available`, async () => {
-  await fixtures.GivenLockForScenarioIsNotFound();
+  await fixtures.GivenScenarioIsNotLocked();
   const lock = await fixtures.WhenAcquiringALock();
   await fixtures.ThenScenarioIsLocked(lock);
 });
 
 it(`should not be able to grab lock if lock is not available`, async () => {
-  await fixtures.GivenLockForScenarioIsFound();
+  await fixtures.GivenScenarioIsLocked();
   const lock = await fixtures.WhenAcquiringALock();
   await fixtures.ThenALockedScenarioErrorIsReturned(lock);
 });
 
 it(`should be able to release the lock if lock exists`, async () => {
-  await fixtures.GivenLockForScenarioIsFound();
-  const lock = await fixtures.WhenSameUserReleasesTheLock();
+  await fixtures.GivenScenarioIsLocked();
+  const lock = await fixtures.WhenTheLockIsReleased();
   await fixtures.ThenScenarioIsNotLocked(lock);
 });
 
-it(`should not be able to release the lock if lock exists for a different user`, async () => {
-  await fixtures.GivenLockForScenarioIsNotFound();
-  const lock = await fixtures.WhenDifferentUserReleasesTheLock();
-  await fixtures.ThenScenarioIsStillLocked(lock);
-});
-
 it(`should not be able to release the lock if lock does not exist`, async () => {
-  await fixtures.GivenLockForScenarioIsNotFound();
-  const lock = await fixtures.WhenSameUserReleasesTheLock();
+  await fixtures.GivenScenarioIsNotLocked();
+  const lock = await fixtures.WhenTheLockIsReleased();
   await fixtures.ThenALockNotFoundErrorIsReturned(lock);
 });
 
 it(`isLocked should return true if a lock exists`, async () => {
-  await fixtures.GivenCountOfLocksForScenarioIsNotZero();
+  await fixtures.GivenScenarioIsLocked();
   const result = await fixtures.WhenCheckingIfAScenarioIsLocked();
   await fixtures.ThenIsLockedReturnsTrue(result);
 });
 
 it(`isLocked should return false if lock no lock exists`, async () => {
-  await fixtures.GivenCountOfLocksForScenarioIsZero();
+  await fixtures.GivenScenarioIsNotLocked();
   const result = await fixtures.WhenCheckingIfAScenarioIsLocked();
   await fixtures.ThenIsLockedReturnsFalse(result);
 });
@@ -68,7 +62,7 @@ async function getFixtures() {
   const mockEntityManager = {
     find: jest.fn(),
     save: jest.fn(),
-    remove: jest.fn(),
+    delete: jest.fn(),
   };
 
   const sandbox = await Test.createTestingModule({
@@ -97,39 +91,19 @@ async function getFixtures() {
   const locksRepoMock = sandbox.get(getRepositoryToken(ScenarioLockEntity));
 
   return {
-    GivenLockForScenarioIsNotFound: async () => {
-      mockEntityManager.find.mockImplementationOnce(async () => []);
-    },
-    GivenLockForScenarioIsFound: async () => {
-      mockEntityManager.find.mockImplementationOnce(async () => [
-        {
-          scenarioId: SCENARIO_ID,
-          userId: USER_ID,
-          createdAt: new Date(),
-        },
-      ]);
-    },
-    GivenCountOfLocksForScenarioIsZero: async () => {
+    GivenScenarioIsNotLocked: async () => {
       locksRepoMock.count.mockImplementationOnce(async () => 0);
     },
-    GivenCountOfLocksForScenarioIsNotZero: async () => {
+    GivenScenarioIsLocked: async () => {
       locksRepoMock.count.mockImplementationOnce(async () => 1);
     },
 
     WhenAcquiringALock: async () => sut.acquireLock(SCENARIO_ID, USER_ID),
-    WhenSameUserReleasesTheLock: async () =>
-      sut.releaseLock(SCENARIO_ID, USER_ID),
-    WhenDifferentUserReleasesTheLock: async () =>
-      sut.releaseLock(SCENARIO_ID, 'other-user'),
+    WhenTheLockIsReleased: async () => sut.releaseLock(SCENARIO_ID),
     WhenCheckingIfAScenarioIsLocked: async () => sut.isLocked(SCENARIO_ID),
 
     ThenScenarioIsLocked: async (result: Either<AcquireFailure, void>) => {
       expect(result).toStrictEqual(right(void 0));
-
-      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
-        where: { scenarioId: SCENARIO_ID, userId: USER_ID },
-      });
-
       expect(mockEntityManager.save).toHaveBeenCalledWith({
         scenarioId: SCENARIO_ID,
         userId: USER_ID,
@@ -140,10 +114,6 @@ async function getFixtures() {
       result: Either<AcquireFailure, void>,
     ) => {
       expect(result).toStrictEqual(left(lockedScenario));
-
-      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
-        where: { scenarioId: SCENARIO_ID, userId: USER_ID },
-      });
       expect(mockEntityManager.save).not.toHaveBeenCalled();
     },
     ThenIsLockedReturnsTrue: async (isLockedResult: boolean) => {
@@ -160,26 +130,16 @@ async function getFixtures() {
     },
     ThenScenarioIsNotLocked: async (result: Either<ReleaseFailure, void>) => {
       expect(result).toStrictEqual(right(void 0));
-      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
-        where: { scenarioId: SCENARIO_ID, userId: USER_ID },
-      });
-      expect(mockEntityManager.remove).toHaveBeenCalledTimes(1);
-    },
-    ThenScenarioIsStillLocked: async (result: Either<ReleaseFailure, void>) => {
-      expect(result).toStrictEqual(left(lockNotFoundError));
-      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
-        where: { scenarioId: SCENARIO_ID, userId: 'other-user' },
-      });
-      expect(mockEntityManager.remove).toHaveBeenCalledTimes(0);
+      expect(mockEntityManager.delete).toHaveBeenCalledWith(
+        ScenarioLockEntity,
+        { where: { scenarioId: SCENARIO_ID } },
+      );
     },
     ThenALockNotFoundErrorIsReturned: async (
       result: Either<ReleaseFailure, void>,
     ) => {
       expect(result).toStrictEqual(left(lockNotFoundError));
-      expect(mockEntityManager.find).toHaveBeenCalledWith(ScenarioLockEntity, {
-        where: { scenarioId: SCENARIO_ID, userId: USER_ID },
-      });
-      expect(mockEntityManager.remove).toHaveBeenCalledTimes(0);
+      expect(mockEntityManager.delete).not.toHaveBeenCalled();
     },
   };
 }

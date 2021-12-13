@@ -24,11 +24,7 @@ export class LockService {
     userId: string,
   ): Promise<Either<AcquireFailure, void>> {
     return this.locksRepo.manager.transaction(async (entityManager) => {
-      const existingLock = await entityManager.find(ScenarioLockEntity, {
-        where: { scenarioId, userId },
-      });
-
-      if (existingLock.length > 0) {
+      if (await this.isLocked(scenarioId)) {
         return left(lockedScenario);
       }
 
@@ -42,20 +38,13 @@ export class LockService {
     });
   }
 
-  async releaseLock(
-    scenarioId: string,
-    userId: string,
-  ): Promise<Either<ReleaseFailure, void>> {
+  async releaseLock(scenarioId: string): Promise<Either<ReleaseFailure, void>> {
     return this.locksRepo.manager.transaction(async (entityManager) => {
-      const existingLock = await entityManager.find(ScenarioLockEntity, {
-        where: { scenarioId, userId },
-      });
-
-      if (existingLock.length < 1) {
+      if (!(await this.isLocked(scenarioId))) {
         return left(lockNotFoundError);
       }
 
-      await entityManager.remove(existingLock[0]);
+      await entityManager.delete(ScenarioLockEntity, { where: { scenarioId } });
 
       return right(void 0);
     });
