@@ -14,6 +14,11 @@ export class ScenarioLockEntity {
   })
   scenarioId!: string;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+    nullable: false,
+    default: 'now()',
+  })
   createdAt!: Date;
 }
