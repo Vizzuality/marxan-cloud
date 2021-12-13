@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { JobData } from '@marxan/blm-calibration';
+import { v4 } from 'uuid';
 
 import { SandboxRunner } from '../sandbox-runner';
 import { WorkspaceBuilder } from '../ports/workspace-builder';
@@ -7,45 +8,45 @@ import { BlmInputFiles } from './blm-input-files';
 import { MarxanRun } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-run';
 import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
 import AbortController from 'abort-controller';
-import { BlmPartialResultsRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.repository';
+import { BlmFinalResultsRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/repositories/final/blm-final-results.repository';
+import { BlmResultsParser } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-results.parser';
+import { BlmPartialResultsRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/repositories/partial/blm-partial-results.repository';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
   implements SandboxRunner<JobData, void> {
   readonly #controllers: Record<string, AbortController> = {};
   readonly #logger = new Logger(this.constructor.name);
-  private dumpCalls = 0;
-  private runCalls = 0;
   constructor(
+    private readonly blmFinalRepository: BlmFinalResultsRepository,
+    private readonly blmPartialRepository: BlmPartialResultsRepository,
     private readonly workspaceService: WorkspaceBuilder,
     private readonly inputFilesHandler: BlmInputFiles,
-    private readonly partialBlmResultsRepository: BlmPartialResultsRepository,
+    private readonly blmResultsParser: BlmResultsParser,
   ) {}
 
-  kill(ofScenarioId: string): void {}
+  kill(ofScenarioId: string): void {
+    const controller = this.#controllers[ofScenarioId];
+
+    if (controller && !controller.signal.aborted) controller.abort();
+  }
 
   async run(
     input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<void> {
-    console.log(`Called run ${++this.runCalls} times`);
-
+    const calibrationId = v4();
     const { blmValues, scenarioId: forScenarioId } = input;
-    console.log(`running BLM calibration for:`, blmValues);
     const workspaces = await this.inputFilesHandler.for(
       blmValues,
       input.assets,
     );
 
-    console.log('----------------');
-    console.log(`There are ${blmValues.length} BLM values`);
-    console.log('----------------');
     for (const { blmValue, workspace } of workspaces) {
-      // run & persist
       const marxanRun = new MarxanRun();
       const cancellables: Cancellable[] = [
         this.inputFilesHandler,
-        this.partialBlmResultsRepository,
+        this.blmResultsParser,
         marxanRun,
       ];
 
@@ -53,11 +54,10 @@ export class MarxanSandboxBlmRunnerService
         forScenarioId,
         cancellables,
       );
-      console.log(`running for ${blmValue} - ${workspace.workingDirectory}`);
 
       const interruptIfKilled = async () => {
         if (controller.signal.aborted) {
-          //  await workspace.cleanup();
+          await workspace.cleanup();
           this.clearAbortController(forScenarioId);
           throw {
             stdError: [],
@@ -69,7 +69,7 @@ export class MarxanSandboxBlmRunnerService
       await new Promise(async (resolve, reject) => {
         marxanRun.on('error', async (result) => {
           this.clearAbortController(forScenarioId);
-          await this.partialBlmResultsRepository.dumpFailure(
+          await this.blmResultsParser.dumpFailure(
             workspace,
             forScenarioId,
             marxanRun.stdOut,
@@ -81,17 +81,28 @@ export class MarxanSandboxBlmRunnerService
         marxanRun.on('finished', async () => {
           try {
             await interruptIfKilled();
-            console.log(`Called dump ${++this.dumpCalls} times`);
-            const output = await this.partialBlmResultsRepository.dump(
+            const output = await this.blmResultsParser.dump(
               workspace,
               forScenarioId,
               marxanRun.stdOut,
               marxanRun.stdError,
             );
-            //  await workspace.cleanup();
+            await this.blmPartialRepository.save(
+              output,
+              forScenarioId,
+              blmValue,
+            );
+            await this.blmFinalRepository.saveBest(
+              output,
+              calibrationId,
+              forScenarioId,
+              blmValue,
+            );
+
+            await workspace.cleanup();
             resolve(output);
           } catch (error) {
-            await this.partialBlmResultsRepository
+            await this.blmResultsParser
               .dumpFailure(
                 workspace,
                 forScenarioId,
@@ -116,32 +127,6 @@ export class MarxanSandboxBlmRunnerService
           reject(error);
         }
       });
-
-      /**
-       * should have its own AbortController
-       * to be able to kill underlying runs
-       */
-
-      /**
-       *   for each blmValue, run (sequence, chunks...)
-       *   single MarxanSandboxRunnerService
-       *
-       *   consider creating specific BlmPartialResultsRepository
-       *   for each run so that BLM value could be attached
-       */
-
-      /**
-       * assets:
-       *
-       * single "fetch" may be performed there
-       * or the SandboxRunnerInputFiles may be implemented
-       * in such way to handle "single fetch"
-       */
-
-      /**
-       * it may be necessary to extract some single-run-adapters-single
-       * to be used there as well (like workspace)
-       */
     }
   }
 

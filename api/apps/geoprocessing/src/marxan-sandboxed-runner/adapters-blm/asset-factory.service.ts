@@ -40,8 +40,8 @@ export class AssetFactory {
 
     const input = this.reader.read(inputDatPath);
 
-    // TODO: Why the input.dat is coming wihout BLM?
-    const matcher = new RegExp(/BLM\s.*/);
+    // TODO: Why the input.dat is coming without BLM?
+    // const matcher = new RegExp(/BLM\s.*/);
     const inputWithCorrectBLM = `BLM ${overrideBlmValue}\n${input}`;
     /*input.replace(
       matcher,

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
 import { Workspace } from '../ports/workspace';
 import { RunDirectories } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/run-directories';
@@ -6,19 +7,12 @@ import { existsSync, promises } from 'fs';
 import { GeoOutputRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/geo-output';
 import { ResultParserService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/result-parser.service';
 import { MarxanDirectory } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-directory.service';
-import { Repository } from 'typeorm';
-import { BlmPartialResultEntity } from '@marxan/blm-calibration/blm-partial-results.geo.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-
-type SomePartialResults = {};
+import { ExecutionResult } from '@marxan/marxan-output';
 
 @Injectable()
-export class BlmPartialResultsTypeOrmRepository
-  implements SandboxRunnerOutputHandler<SomePartialResults> {
-  private foo = 0;
+export class BlmResultsParser
+  implements SandboxRunnerOutputHandler<ExecutionResult> {
   constructor(
-    @InjectRepository(BlmPartialResultEntity)
-    private readonly repository: Repository<BlmPartialResultEntity>,
     private readonly geoOutputRepository: GeoOutputRepository,
     private readonly resultParserService: ResultParserService,
     private readonly marxanDirectory: MarxanDirectory,
@@ -27,18 +21,12 @@ export class BlmPartialResultsTypeOrmRepository
     return Promise.resolve(undefined);
   }
 
-  /**
-   * save partial results (for given blm value)
-   * to some temporary table
-   *
-   * would be used within BlmRunnerService, passed down to RunnerService
-   */
   async dump(
     workspace: Workspace,
     scenarioId: string,
     stdOutput: string[],
     stdErr: string[] | undefined,
-  ): Promise<SomePartialResults> {
+  ): Promise<ExecutionResult> {
     const { fullPath: fullOutputPath } = this.marxanDirectory.get(
       'OUTPUTDIR',
       workspace.workingDirectory,
@@ -87,35 +75,21 @@ export class BlmPartialResultsTypeOrmRepository
 
     if (isNaN(parsedBlmValue)) throw new Error('Invalid BLM value');
 
-    const blmPartialResults = resultRows.map((r, i) => ({
-      blmValue: parsedBlmValue,
-      scenarioId,
-      score: r.score,
-      boundaryLength: r.connectivity,
-      count: i + 1,
-    }));
-
-    console.log('-------------------------------------------');
-    console.dir(resultRows, { depth: Infinity });
-    console.dir(blmPartialResults, { depth: Infinity });
-    console.log('-------------------------------------------');
-    console.log(`Called repository.save ${++this.foo} times`);
-
-    await this.repository.save(blmPartialResults);
-
-    return blmPartialResults;
+    return resultRows;
   }
-  dumpFailure(
+  async dumpFailure(
     workspace: Workspace,
     scenarioId: string,
     stdOutput: string[],
     stdError: string[],
   ): Promise<void> {
-    console.log('DUMP FAILURE');
-    console.dir(workspace, { depth: Infinity });
-    console.log(scenarioId);
-    console.dir(stdOutput, { depth: Infinity });
-    console.dir(stdError, { depth: Infinity });
-    return Promise.resolve(undefined);
+    const { fullPath: fullInputPath } = this.marxanDirectory.get(
+      'INPUTDIR',
+      workspace.workingDirectory,
+    );
+    await this.geoOutputRepository.saveFailure(scenarioId, fullInputPath, {
+      stdOutput,
+      stdError,
+    });
   }
 }
