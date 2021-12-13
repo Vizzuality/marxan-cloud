@@ -4,15 +4,12 @@ import { Workspace } from '../ports/workspace';
 import { Assets } from './blm-input-files';
 import { dirname, resolve } from 'path';
 import { promises } from 'fs';
-import { AssetFetcher } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-shared';
 import { FileReader } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/file-reader';
 
 @Injectable()
 export class AssetFactory {
-  constructor(
-    private readonly fetchService: AssetFetcher,
-    private readonly reader: FileReader,
-  ) {}
+  constructor(private readonly reader: FileReader) {}
+
   async copy(
     from: Workspace,
     to: Workspace,

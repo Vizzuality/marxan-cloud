@@ -1,16 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { JobData } from '@marxan/blm-calibration';
-import { v4 } from 'uuid';
 
 import { SandboxRunner } from '../sandbox-runner';
-import { WorkspaceBuilder } from '../ports/workspace-builder';
 import { BlmInputFiles } from './blm-input-files';
 import { MarxanRun } from '@marxan-geoprocessing/marxan-sandboxed-runner/marxan-run';
 import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
 import AbortController from 'abort-controller';
-import { BlmFinalResultsRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/repositories/final/blm-final-results.repository';
 import { BlmResultsParser } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-results.parser';
-import { BlmPartialResultsRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/repositories/partial/blm-partial-results.repository';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
@@ -18,9 +14,6 @@ export class MarxanSandboxBlmRunnerService
   readonly #controllers: Record<string, AbortController> = {};
   readonly #logger = new Logger(this.constructor.name);
   constructor(
-    private readonly blmFinalRepository: BlmFinalResultsRepository,
-    private readonly blmPartialRepository: BlmPartialResultsRepository,
-    private readonly workspaceService: WorkspaceBuilder,
     private readonly inputFilesHandler: BlmInputFiles,
     private readonly blmResultsParser: BlmResultsParser,
   ) {}
@@ -35,14 +28,13 @@ export class MarxanSandboxBlmRunnerService
     input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<void> {
-    const calibrationId = v4();
     const { blmValues, scenarioId: forScenarioId } = input;
     const workspaces = await this.inputFilesHandler.for(
       blmValues,
       input.assets,
     );
 
-    for (const { blmValue, workspace } of workspaces) {
+    for (const { workspace } of workspaces) {
       const marxanRun = new MarxanRun();
       const cancellables: Cancellable[] = [
         this.inputFilesHandler,
@@ -86,17 +78,6 @@ export class MarxanSandboxBlmRunnerService
               forScenarioId,
               marxanRun.stdOut,
               marxanRun.stdError,
-            );
-            await this.blmPartialRepository.save(
-              output,
-              forScenarioId,
-              blmValue,
-            );
-            await this.blmFinalRepository.saveBest(
-              output,
-              calibrationId,
-              forScenarioId,
-              blmValue,
             );
 
             await workspace.cleanup();
