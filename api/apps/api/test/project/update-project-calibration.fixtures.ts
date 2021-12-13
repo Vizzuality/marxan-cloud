@@ -11,6 +11,7 @@ import { HttpStatus } from '@nestjs/common';
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const token = await GivenUserIsLoggedIn(app);
+  const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
   const organizationId = (
     await OrganizationsTestUtils.createOrganization(app, token, {
       ...E2E_CONFIG.organizations.valid.minimal(),
@@ -43,6 +44,13 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .patch(`/api/v1/projects/${projectId}/calibration`)
         .set('Authorization', `Bearer ${token}`)
+        .send({
+          range: updatedRange,
+        }),
+    WhenProjectCalibrationIsUpdatedAsNotIncludedUser: async () =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}/calibration`)
+        .set('Authorization', `Bearer ${notIncludedUserToken}`)
         .send({
           range: updatedRange,
         }),
@@ -83,6 +91,9 @@ export const getFixtures = async () => {
             .expect(HttpStatus.BAD_REQUEST);
         },
       };
+    },
+    ThenForbiddenIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(403);
     },
   };
 };

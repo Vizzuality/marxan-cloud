@@ -32,3 +32,11 @@ test(`updating a project calibration with incorrect ranges should throw an excep
     .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
     .RangeWithNegativeNumbers();
 });
+
+test(`updating a project calibration range should not work if user is not in project`, async () => {
+  await fixtures.GivenProjectWasCreated();
+
+  const request = await fixtures.WhenProjectCalibrationIsUpdatedAsNotIncludedUser();
+
+  await fixtures.ThenForbiddenIsReturned(request);
+});

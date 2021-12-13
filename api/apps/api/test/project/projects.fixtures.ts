@@ -9,6 +9,7 @@ import { PublishedProject } from '@marxan-api/modules/published-project/entities
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const randomUserToken = await GivenUserIsLoggedIn(app);
+  const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
   const publishedProjectsRepo: Repository<PublishedProject> = app.get(
     getRepositoryToken(PublishedProject),
   );
@@ -115,9 +116,16 @@ export const getFixtures = async () => {
         meta: {},
       });
     },
+    ThenForbiddenIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(403);
+    },
     WhenGettingProject: async (projectId: string) =>
       await request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}`)
         .set('Authorization', `Bearer ${randomUserToken}`),
+    WhenGettingProjectAsNotIncludedUser: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}`)
+        .set('Authorization', `Bearer ${notIncludedUserToken}`),
   };
 };
