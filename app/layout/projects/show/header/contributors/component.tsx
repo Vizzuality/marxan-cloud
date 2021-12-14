@@ -7,6 +7,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import { useProject, useProjectUsers } from 'hooks/projects';
 
+import EditDropdown from 'layout/projects/show/header/contributors/edit-dropdown';
+
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';
 
@@ -74,7 +76,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                 <button
                   aria-label="add-contributor"
                   type="button"
-                  className="border border-transparent rounded-full hover:border hover:border-white"
+                  className="relative border border-transparent rounded-full hover:border hover:border-white"
                   onClick={handleEditUsers}
                 >
                   <Avatar className={cx({
@@ -84,12 +86,11 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                   >
                     <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
                   </Avatar>
+                  {editUsers && (
+                    <EditDropdown />
+                  )}
                 </button>
-                {editUsers && (
-                  <div className="absolute">
-                    Project members
-                  </div>
-                )}
+
               </li>
 
             </ul>
