@@ -44,7 +44,7 @@ export class ProjectMetadata extends PieceProcessor {
     }
 
     const metadata = JSON.stringify({
-      name: projectData[0].name ?? null,
+      name: projectData[0].name,
       description: projectData[0].description ?? null,
     });
 
