@@ -80,20 +80,18 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
             </div>
           )}
 
-          {allFeaturesData && allFeaturesData.map((item, i) => {
-            const selectedIndex = selected.findIndex((f) => f === item.id);
+          {allFeaturesData && allFeaturesData.map((item) => {
+            const isSelected = selected.findIndex((f) => f === item.id) !== -1;
 
             return (
               <div
                 key={`${item.id}`}
-                className={cx({
-                  'border-t border-dashed': i !== 0,
-                })}
+                className="border-t border-dashed first:border-t-0"
               >
                 <Item
                   {...item}
                   scrollRoot={scrollRef}
-                  selected={selectedIndex !== -1}
+                  selected={isSelected}
                   onToggleSelected={() => {
                     handleToggleSelected(item.id);
                   }}
