@@ -40,6 +40,8 @@ import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
 
 export { validationFailed } from '../planning-areas';
 
+export const notFound = Symbol(`project not found`);
+
 @Injectable()
 export class ProjectsService {
   constructor(
@@ -84,7 +86,7 @@ export class ProjectsService {
   async findOne(
     id: string,
     info: ProjectsServiceRequest,
-  ): Promise<Either<undefined | typeof forbiddenError, Project>> {
+  ): Promise<Either<typeof notFound | typeof forbiddenError, Project>> {
     try {
       const project = await this.projectsCrud.getById(id, undefined, info);
       if (
@@ -97,9 +99,8 @@ export class ProjectsService {
       }
       return right(project);
     } catch (error) {
-      console.log(error);
       // library-sourced errors are no longer instances of HttpException
-      return left(undefined);
+      return left(notFound);
     }
   }
 
