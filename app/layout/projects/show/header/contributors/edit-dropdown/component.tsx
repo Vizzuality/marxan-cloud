@@ -4,7 +4,9 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useDebouncedCallback } from 'use-debounce';
 
-import { Button } from 'components/button/component';
+import ContributorCard from 'layout/projects/show/header/contributors/edit-dropdown/card';
+
+import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
@@ -49,6 +51,10 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
         theme="light"
       />
       <p className="self-start py-6 text-xs text-black uppercase font-heading">2 contributors</p>
+      <div className="w-full space-y-2.5">
+        <ContributorCard name="Tamara Huete" image="/images/avatar.png" roleName="Contributor" />
+        <ContributorCard name="Miguel Barrenechea" image="/images/avatar.png" roleName="Owner" />
+      </div>
       <FormRFF
         onSubmit={handleSubmit}
         initialValues={{}}
@@ -60,7 +66,12 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
               {(fprops) => (
                 <Field id="email" {...fprops}>
                   <Label theme="light" className="self-start mb-3 uppercase">EMAIL</Label>
-                  <Input theme="light" icon={EMAIL_SVG} type="password" />
+                  <Input
+                    theme="light"
+                    icon={EMAIL_SVG}
+                    placeholder="Not listed above? invite by email address..."
+                    type="text"
+                  />
                 </Field>
               )}
             </FieldRFF>

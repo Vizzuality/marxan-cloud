@@ -17,12 +17,6 @@ import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 export interface ContributorsProps {
 }
 
-// const USERS = [
-//   { id: 1, avatarDataUrl: '/images/avatar.png', displayName: 'Hello' },
-//   { id: 2, avatarDataUrl: null, displayName: 'Hello 2' },
-//   { id: 3, avatarDataUrl: null, displayName: 'Hello 3' },
-// ];
-
 export const Contributors: React.FC<ContributorsProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
