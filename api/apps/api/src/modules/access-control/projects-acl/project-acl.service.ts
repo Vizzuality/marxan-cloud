@@ -3,13 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { getConnection, Repository, Not } from 'typeorm';
 import { intersection } from 'lodash';
 
-import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { Permit } from '../access-control.types';
 import { ProjectAccessControl } from './project-access-control';
 import { UserRoleInProjectDto } from './dto/user-role-project.dto';
+import { Either, left, right } from 'fp-ts/Either';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -147,9 +148,9 @@ export class ProjectAclService implements ProjectAccessControl {
   async findUsersInProject(
     projectId: string,
     userId: string,
-  ): Promise<UserRoleInProjectDto[] | Permit> {
+  ): Promise<Either<Permit, UserRoleInProjectDto[]>> {
     if (!(await this.isOwner(userId, projectId))) {
-      return false;
+      return left(false);
     }
 
     const usersInProject = await this.roles
@@ -164,17 +165,17 @@ export class ProjectAclService implements ProjectAccessControl {
       ])
       .getMany();
 
-    return usersInProject;
+    return right(usersInProject);
   }
 
   async updateUserInProject(
     projectId: string,
     updateUserInProjectDto: UserRoleInProjectDto,
     loggedUserId: string,
-  ): Promise<void | Permit> {
+  ): Promise<Either<Permit, void>> {
     const { userId, roleName } = updateUserInProjectDto;
     if (!(await this.isOwner(loggedUserId, projectId))) {
-      return false;
+      return left(false);
     }
 
     const apiDbConnection = getConnection(DbConnections.default);
@@ -205,21 +206,23 @@ export class ProjectAclService implements ProjectAccessControl {
     } finally {
       await apiQueryRunner.release();
     }
+    return right(void 0);
   }
 
   async revokeAccess(
     projectId: string,
     userId: string,
     loggedUserId: string,
-  ): Promise<void | Permit> {
+  ): Promise<Either<Permit, void>> {
     if (!(await this.isOwner(loggedUserId, projectId))) {
-      return false;
+      return left(false);
     }
 
     if (!(await this.hasOtherOwner(userId, projectId))) {
-      return false;
+      return left(false);
     }
 
     await this.roles.delete({ projectId, userId });
+    return right(void 0);
   }
 }
