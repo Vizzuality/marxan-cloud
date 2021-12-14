@@ -18,3 +18,11 @@ test(`updating a project should work`, async () => {
 
   await fixtures.ThenWhenReadingProjectItHasNewData();
 });
+
+test(`updating a project does not work if user is not in project`, async () => {
+  await fixtures.GivenProjectWasCreated();
+
+  const request = await fixtures.WhenProjectIsUpdatedAsNotIncludedUser();
+
+  await fixtures.ThenForbiddenIsReturned(request);
+});

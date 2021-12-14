@@ -20,7 +20,7 @@ import {
   usePUGridLayer, useLegend, useFeaturePreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useScenario, useScenarioPU } from 'hooks/scenarios';
+import { useScenario, useScenarioPU, useCostSurfaceRange } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 
 import Loading from 'components/loading';
@@ -74,11 +74,16 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
   const {
     data: scenarioData,
   } = useScenario(sid);
+
   const { wdpaIucnCategories, wdpaThreshold } = scenarioData || {};
 
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
+
+  const {
+    data: costSurfaceRangeData,
+  } = useCostSurfaceRange(sid);
 
   const {
     data: PUData,
@@ -193,6 +198,7 @@ export const ScenariosMap: React.FC<ScenariosShowMapProps> = () => {
       puExcludedValue: excluded,
       features: featuresIds,
       highlightFeatures: highlightedFeaturesIds,
+      cost: costSurfaceRangeData,
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
         pugrid: layerSettings.pugrid,

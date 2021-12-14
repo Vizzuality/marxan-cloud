@@ -91,7 +91,7 @@ export function useAdminPreviewLayer({
 export function useWDPAPreviewLayer({
   pid, active, bbox, wdpaIucnCategories, cache = 0, options,
 }: UseWDPAPreviewLayer) {
-  const { opacity = 1 } = options || {};
+  const { opacity = 1, visibility = true } = options || {};
 
   return useMemo(() => {
     if (!active || !bbox) return null;
@@ -109,8 +109,14 @@ export function useWDPAPreviewLayer({
           {
             type: 'fill',
             'source-layer': 'layer0',
-            filter: ['all',
-              ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
+            layout: {
+              visibility: visibility ? 'visible' : 'none',
+            },
+            // wdpaIucnCategories are filtered in two steps as they are custom and WDPA.
+            // We have not way to separate them into two arrays but it would be ideal
+            filter: ['any',
+              ['all', ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]]],
+              ['all', ['in', ['get', 'id'], ['literal', wdpaIucnCategories]]],
             ],
             paint: {
               'fill-color': COLORS.wdpa,
@@ -119,8 +125,12 @@ export function useWDPAPreviewLayer({
           {
             type: 'line',
             'source-layer': 'layer0',
-            filter: ['all',
-              ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]],
+            layout: {
+              visibility: visibility ? 'visible' : 'none',
+            },
+            filter: ['any',
+              ['all', ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]]],
+              ['all', ['in', ['get', 'id'], ['literal', wdpaIucnCategories]]],
             ],
             paint: {
               'line-color': '#000',
@@ -129,7 +139,7 @@ export function useWDPAPreviewLayer({
         ],
       },
     };
-  }, [pid, active, bbox, wdpaIucnCategories, cache, opacity]);
+  }, [pid, active, bbox, wdpaIucnCategories, cache, opacity, visibility]);
 }
 
 // Featurepreview

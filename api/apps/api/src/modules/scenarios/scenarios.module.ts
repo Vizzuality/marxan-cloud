@@ -11,7 +11,6 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { ScenarioFeaturesModule } from '../scenarios-features';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
-import { WdpaAreaCalculationService } from './wdpa-area-calculation.service';
 import { AnalysisModule } from '../analysis/analysis.module';
 import { CostSurfaceModule } from './cost-surface/cost-surface.module';
 import { ScenariosService } from './scenarios.service';
@@ -22,7 +21,6 @@ import { SolutionResultCrudService } from './solutions-result/solution-result-cr
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import {
-  ProtectionStatusModule,
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuOutputGeoEntity,
 } from '@marxan/scenarios-planning-unit';
@@ -46,7 +44,8 @@ import { CostRangeService } from './cost-range-service';
 import { ProjectChecker } from './project-checker.service';
 import { ProtectedAreaModule } from './protected-area';
 import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
-import { PlanningAreasModule } from '@marxan-api/modules/projects/planning-areas';
+import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
+import { BlmValuesModule } from '@marxan-api/modules/blm';
 
 @Module({
   imports: [
@@ -63,7 +62,6 @@ import { PlanningAreasModule } from '@marxan-api/modules/projects/planning-areas
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],
       DbConnections.geoprocessingDB,
     ),
-    ProtectionStatusModule.for(DbConnections.geoprocessingDB),
     PlanningAreasModule,
     UsersModule,
     ScenarioFeaturesModule,
@@ -79,13 +77,13 @@ import { PlanningAreasModule } from '@marxan-api/modules/projects/planning-areas
     ApiEventsModule,
     ProtectedAreaModule,
     ProtectedAreasCrudModule,
+    BlmValuesModule,
   ],
   providers: [
     ProjectChecker,
     ScenariosService,
     ScenariosCrudService,
     ProxyService,
-    WdpaAreaCalculationService,
     ScenarioPlanningUnitsService,
     ScenarioPlanningUnitsLinkerService,
     ScenarioSerializer,

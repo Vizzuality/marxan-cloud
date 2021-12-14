@@ -37,9 +37,9 @@ export enum API_EVENT_KINDS {
   scenario__featuresWithPuIntersection__submitted__v1__alpha1 = 'scenario.featuresWithPuIntersection.submitted/v1alpha',
   scenario__featuresWithPuIntersection__failed__v1__alpha1 = 'scenario.featuresWithPuIntersection.failed/v1alpha',
   scenario__featuresWithPuIntersection__finished__v1__alpha1 = 'scenario.featuresWithPuIntersection.finished/v1alpha',
-  project__protectedAreas__submitted__v1__alpha = 'project.protectedAreas.submitted/v1/alpha',
-  project__protectedAreas__finished__v1__alpha = 'project.protectedAreas.finished/v1/alpha',
-  project__protectedAreas__failed__v1__alpha = 'project.protectedAreas.failed/v1/alpha',
+  scenario__protectedAreas__submitted__v1__alpha = 'scenario.protectedAreas.submitted/v1/alpha',
+  scenario__protectedAreas__finished__v1__alpha = 'scenario.protectedAreas.finished/v1/alpha',
+  scenario__protectedAreas__failed__v1__alpha = 'scenario.protectedAreas.failed/v1/alpha',
   project__planningUnits__submitted__v1__alpha = 'project.planningUnits.submitted/v1/alpha',
   project__planningUnits__finished__v1__alpha = 'project.planningUnits.finished/v1/alpha',
   project__planningUnits__failed__v1__alpha = 'project.planningUnits.failed/v1/alpha',
@@ -49,6 +49,9 @@ export enum API_EVENT_KINDS {
   scenario__planningAreaProtectedCalculation__submitted__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.submitted/v1/alpha',
   scenario__planningAreaProtectedCalculation__finished__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.finished/v1/alpha',
   scenario__planningAreaProtectedCalculation__failed__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.failed/v1/alpha',
+  scenario__calibration__submitted_v1_alpha1 = 'scenario.calibration.submitted/v1/alpha',
+  scenario__calibration__finished_v1_alpha1 = 'scenario.calibration.finished/v1/alpha',
+  scenario__calibration__failed_v1_alpha1 = 'scenario.calibration.failed/v1/alpha',
 }
 
 export type ProjectEvents = Pick<

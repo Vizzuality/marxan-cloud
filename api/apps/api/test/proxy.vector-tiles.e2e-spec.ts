@@ -13,7 +13,6 @@ import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 import { bootstrapApplication } from './utils/api-application';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { FeaturesTestUtils } from './utils/features.test.utils';
-import { IUCNCategory } from '@marxan/iucn';
 
 afterAll(async () => {
   await tearDown();
@@ -81,7 +80,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
     aScenario = await ScenariosTestUtils.createScenario(app, jwtToken, {
       ...E2E_CONFIG.scenarios.valid.minimal(),
       projectId: aProjectWithCountryAsPlanningArea.id,
-      wdpaIucnCategories: [IUCNCategory.NotReported],
+      // wdpaIucnCategories: [IUCNCategory.NotReported],
     }).then(async (response) => await Deserializer.deserialize(response));
   });
 

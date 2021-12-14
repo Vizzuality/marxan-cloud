@@ -18,7 +18,7 @@ import { JobStatusSerializer } from './dto/job-status.serializer';
 import { JobStatusService } from './job-status/job-status.service';
 import { ScenarioJobStatus } from './job-status/job-status.view.api.entity';
 import { ProjectJobStatus } from './job-status/project-status.view.api.entity';
-import { PlanningAreasModule } from './planning-areas';
+import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectsListingController } from './projects-listing.controller';
 import { ProjectDetailsController } from './project-details.controller';
@@ -29,6 +29,8 @@ import { apiConnections } from '@marxan-api/ormconfig';
 import { CqrsModule } from '@nestjs/cqrs';
 import { GetProjectHandler } from './get-project.handler';
 import { ProjectBlmModule } from './blm';
+import { CloneModule } from '@marxan-api/modules/clone';
+import { AccessControlModule } from '../access-control';
 
 @Module({
   imports: [
@@ -54,6 +56,8 @@ import { ProjectBlmModule } from './blm';
     ShapefilesModule,
     PlanningUnitGridModule,
     ProjectBlmModule,
+    CloneModule,
+    AccessControlModule,
   ],
   providers: [
     ProjectsCrudService,

@@ -20,10 +20,17 @@ import { assertDefined, FieldsOf } from '@marxan/utils';
 import { Scenario } from '../scenario.api.entity';
 import { RunService } from './run.service';
 import { AssetsService } from './assets.service';
-import { blmDefaultToken, runEventsToken, runQueueToken } from './tokens';
+import {
+  blmDefaultToken,
+  calibrationEventsToken,
+  calibrationQueueToken,
+  runEventsToken,
+  runQueueToken,
+} from './tokens';
 import { RunHandler } from './run.handler';
 import { CancelHandler } from './cancel.handler';
 import { EventsHandler } from './events.handler';
+import { blmCalibrationQueueName } from '@marxan/blm-calibration';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let runService: RunService;
@@ -305,6 +312,14 @@ async function getFixtures() {
       },
       {
         provide: runEventsToken,
+        useValue: fakeEvents,
+      },
+      {
+        provide: calibrationQueueToken,
+        useValue: fakeQueue,
+      },
+      {
+        provide: calibrationEventsToken,
         useValue: fakeEvents,
       },
       {

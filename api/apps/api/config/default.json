@@ -58,12 +58,15 @@
     "apikey": "invalidSparkpostApikey",
     "origin": "https://api.eu.sparkpost.com:443"
   },
+  "application": {
+    "baseUrl": "http://localhost:3000"
+  },
   "passwordReset": {
-    "tokenPrefix": "http://localhost:3000/auth/reset-password?token=",
+    "tokenPrefix": "/auth/reset-password?token=",
     "expiration": 1800000
   },
   "signUpConfirmation": {
-    "tokenPrefix": "http://localhost:3000/auth/sign-up-confirmation?token="
+    "tokenPrefix": "/auth/sign-up-confirmation?token="
   }
 }
 

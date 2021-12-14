@@ -48,11 +48,12 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
 
   const { data: wdpaData } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
-                 || projectData?.adminAreaLevel1I
-                 || projectData?.countryId,
+      || projectData?.adminAreaLevel1I
+      || projectData?.countryId,
     customAreaId: !projectData?.adminAreaLevel2Id
-                  && !projectData?.adminAreaLevel1I
-                  && !projectData?.countryId ? projectData?.planningAreaId : null,
+      && !projectData?.adminAreaLevel1I
+      && !projectData?.countryId ? projectData?.planningAreaId : null,
+    scenarioId: sid,
   });
 
   useEffect(() => {
@@ -130,10 +131,12 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
                 onDismiss={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
               />
             )}
-
             {step === 1 && (
               <ScenariosSidebarWDPAThreshold
-                onSuccess={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
+                onSuccess={() => {
+                  dispatch(setTab(ScenarioSidebarTabs.FEATURES));
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
+                }}
                 onBack={() => {
                   setStep(0);
                   dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));

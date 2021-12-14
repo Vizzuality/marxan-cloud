@@ -38,11 +38,26 @@ export const getFixtures = async () => {
       });
       projectId = project.data.id;
       await commandBus.execute(new SetProjectBlm(projectId));
+      return projectId;
+    },
+    GivenUserIsNotInProject: async () => {
+      const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
+      return notIncludedUserToken;
     },
     WhenProjectCalibrationIsUpdated: async () =>
       await request(app.getHttpServer())
         .patch(`/api/v1/projects/${projectId}/calibration`)
         .set('Authorization', `Bearer ${token}`)
+        .send({
+          range: updatedRange,
+        }),
+    WhenProjectCalibrationIsUpdatedAsNotIncludedUser: async (
+      projectId: string,
+      userToken: string,
+    ) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}/calibration`)
+        .set('Authorization', `Bearer ${userToken}`)
         .send({
           range: updatedRange,
         }),
@@ -53,7 +68,7 @@ export const getFixtures = async () => {
 
       expect(projectData.body.range).toEqual(updatedRange);
     },
-    ThenShouldFailWhenUpdatingProjectCalibrationWithA: () => {
+    ThenShouldFailWhenStartingAnScenarioCalibrationWithA: () => {
       return {
         RangeWithNegativeNumbers: async () => {
           await request(app.getHttpServer())
@@ -83,6 +98,9 @@ export const getFixtures = async () => {
             .expect(HttpStatus.BAD_REQUEST);
         },
       };
+    },
+    ThenForbiddenIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(403);
     },
   };
 };

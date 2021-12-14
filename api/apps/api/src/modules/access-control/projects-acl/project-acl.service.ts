@@ -27,6 +27,11 @@ export class ProjectAclService implements ProjectAccessControl {
     Roles.project_contributor,
     Roles.project_viewer,
   ];
+  private readonly canEditProjectRoles = [
+    Roles.project_contributor,
+    Roles.project_owner,
+  ];
+  private readonly canDeleteProjectRoles = [Roles.project_owner];
 
   private async getRolesWithinProjectForUser(
     userId: string,
@@ -59,8 +64,22 @@ export class ProjectAclService implements ProjectAccessControl {
   // TODO: this will be changed in the following release of user requirements.
   // For now, anyone should be able to create projects, regardless of having roles or not.
   // In the future project creation will be limited to organization contributors, so this logic will be moved to the access control module
-  async canCreateProject(_userId: string, _projectId: string): Promise<Permit> {
+  async canCreateProject(_userId: string): Promise<Permit> {
     return true;
+  }
+
+  async canEditProject(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canEditProjectRoles,
+    );
+  }
+
+  async canDeleteProject(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canDeleteProjectRoles,
+    );
   }
 
   async canViewProject(userId: string, projectId: string): Promise<Permit> {

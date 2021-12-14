@@ -65,6 +65,7 @@ class ProtectedAreaFilters {
   customAreaId?: string;
 }
 
+// TODO candidate to deletion; scenario-crud uses one method
 @Injectable()
 export class ProtectedAreasCrudService extends AppBaseService<
   ProtectedArea,

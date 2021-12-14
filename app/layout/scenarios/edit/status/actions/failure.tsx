@@ -31,7 +31,7 @@ export const useScenarioActionsFailure = () => {
 
   const { addToast } = useToasts();
 
-  // WDPA protected calculation
+  // Planning Area calculation
   const onPlanningAreaProtectedCalculationFailure = useCallback(() => {
     scenarioMutation.mutate({
       id: `${sid}`,
@@ -51,6 +51,36 @@ export const useScenarioActionsFailure = () => {
       },
       onError: () => {
         addToast('onPlanningAreaProtectedCalculationFailure', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob, addToast]);
+
+  // Protected Areas
+  const onProtectedAreasFailure = useCallback(() => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          ...scenarioData?.metadata,
+          scenarioEditingMetadata: {
+            ...scenarioData?.metadata?.scenarioEditingMetadata,
+            subtab: 'protected-areas-preview',
+            lastJobCheck: new Date().getTime(),
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+      },
+      onError: () => {
+        addToast('onProtectedAreasFailure', (
           <>
             <h2 className="font-medium">Error!</h2>
           </>
@@ -194,6 +224,7 @@ export const useScenarioActionsFailure = () => {
   return {
     features: onFeaturesFailure,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationFailure,
+    protectedAreas: onProtectedAreasFailure,
     costSurface: onCostSurfaceFailure,
     planningUnitsInclusion: onPlanningUnitsInclusionFailure,
     run: onRunFailure,

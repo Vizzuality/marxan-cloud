@@ -1,7 +1,7 @@
 import { IEvent } from '@nestjs/cqrs';
 
+import { ArchiveLocation } from '@marxan/cloning/domain';
 import { ExportId } from '../export/export.id';
-import { ArchiveLocation } from '../export/archive-location';
 
 export class ArchiveReady implements IEvent {
   constructor(

@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -23,6 +23,10 @@ export const useScenarioActionsDone = () => {
     setCache,
   } = scenarioSlice.actions;
 
+  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
+  const { wdpaIucnCategories } = wdpaCategories;
+
   const { data: scenarioData } = useScenario(sid);
 
   const scenarioMutation = useSaveScenario({
@@ -35,7 +39,7 @@ export const useScenarioActionsDone = () => {
 
   const queryClient = useQueryClient();
 
-  // WDPA protected calculation
+  // PLANNING AREA calculation
   const onPlanningAreaProtectedCalculationDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
       id: `${sid}`,
@@ -44,13 +48,6 @@ export const useScenarioActionsDone = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'protected-areas',
-            subtab: 'protected-areas-percentage',
-            status: {
-              'protected-areas': 'draft',
-              features: 'empty',
-              analysis: 'empty',
-            },
             lastJobCheck: new Date().getTime(),
           },
         },
@@ -79,6 +76,52 @@ export const useScenarioActionsDone = () => {
     setJob,
     setCache,
     addToast,
+  ]);
+  // Protected Areas
+  const onProtectedAreasDone = useCallback((JOB_REF) => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          ...scenarioData?.metadata,
+          scenarioEditingMetadata: {
+            ...scenarioData?.metadata?.scenarioEditingMetadata,
+            tab: wdpaIucnCategories.length > 0 ? 'features' : 'protected-areas',
+            subtab: wdpaIucnCategories.length > 0 ? 'features-preview' : 'protected-areas-preview',
+            status: {
+              'protected-areas': 'draft',
+              features: 'empty',
+              analysis: 'empty',
+            },
+            lastJobCheck: new Date().getTime(),
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+        dispatch(setCache(Date.now()));
+        JOB_REF.current = null;
+      },
+      onError: () => {
+        addToast('onProtectedAreasDone', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    sid,
+    scenarioMutation,
+    scenarioData?.metadata,
+    dispatch,
+    setJob,
+    setCache,
+    addToast,
+    wdpaIucnCategories?.length,
   ]);
 
   const onFeaturesDone = useCallback((JOB_REF) => {
@@ -118,6 +161,7 @@ export const useScenarioActionsDone = () => {
     setCache,
     addToast,
   ]);
+
   // Cost surface
   const onCostSurfaceDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
@@ -237,6 +281,7 @@ export const useScenarioActionsDone = () => {
   return {
     features: onFeaturesDone,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationDone,
+    protectedAreas: onProtectedAreasDone,
     costSurface: onCostSurfaceDone,
     planningUnitsInclusion: onPlanningUnitsInclusionDone,
     run: onRunDone,

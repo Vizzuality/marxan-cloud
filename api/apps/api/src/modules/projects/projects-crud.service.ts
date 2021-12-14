@@ -22,7 +22,7 @@ import { FetchSpecification } from 'nestjs-base-service';
 import {
   MultiplePlanningAreaIds,
   PlanningAreasService,
-} from './planning-areas';
+} from '@marxan-api/modules/planning-areas';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
@@ -85,7 +85,6 @@ export class ProjectsCrudService extends AppBaseService<
         'adminAreaLevel2Id',
         'planningUnitGridShape',
         'planningUnitAreakm2',
-        'users',
         'scenarios',
         'createdAt',
         'lastModifiedAt',
@@ -95,14 +94,6 @@ export class ProjectsCrudService extends AppBaseService<
         'customProtectedAreas',
       ],
       keyForAttribute: 'camelCase',
-      users: {
-        ref: 'id',
-        attributes: ['fname', 'lname', 'email', 'projectRoles'],
-        projectRoles: {
-          ref: 'name',
-          attributes: ['name'],
-        },
-      },
       scenarios: {
         ref: 'id',
         attributes: [
@@ -311,31 +302,6 @@ export class ProjectsCrudService extends AppBaseService<
     }));
 
     return entity;
-  }
-
-  extendGetByIdQuery(
-    query: SelectQueryBuilder<Project>,
-    fetchSpecification?: FetchSpecification,
-    info?: ProjectsRequest,
-  ): SelectQueryBuilder<Project> {
-    const loggedUser = Boolean(info?.authenticatedUser);
-    query.leftJoin(
-      UsersProjectsApiEntity,
-      `acl`,
-      `${this.alias}.id = acl.project_id`,
-    );
-
-    if (loggedUser) {
-      query
-        .andWhere(`acl.user_id = :userId`, {
-          userId: info?.authenticatedUser?.id,
-        })
-        .andWhere(`acl.role_id = :roleId`, {
-          roleId: Roles.project_owner,
-        });
-    }
-
-    return query;
   }
 
   async extendFindAllQuery(

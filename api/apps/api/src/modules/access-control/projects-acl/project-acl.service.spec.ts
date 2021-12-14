@@ -142,10 +142,10 @@ const getFixtures = async () => {
         }),
       ),
     ThenCannotCreateProject: async () => {
-      expect(await sut.canCreateProject(userId, projectId)).toEqual(false);
+      expect(await sut.canCreateProject(userId)).toEqual(false);
     },
     ThenCanCreateProject: async () => {
-      expect(await sut.canCreateProject(userId, projectId)).toEqual(true);
+      expect(await sut.canCreateProject(userId)).toEqual(true);
       expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
         where: {
           projectId,

@@ -35,7 +35,6 @@ import { notFound, RunService } from './marxan-run';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 import { Scenario, SimpleJobStatus } from './scenario.api.entity';
 import { assertDefined } from '@marxan/utils';
-import { ScenarioPlanningUnitsProtectedStatusCalculatorService } from '@marxan/scenarios-planning-unit';
 import { GeoFeaturePropertySetService } from '../geo-features/geo-feature-property-sets.service';
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
@@ -46,9 +45,24 @@ import {
   DoesntExist,
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker.service';
-import { QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
-import { ProtectedAreaService, submissionFailed } from './protected-area';
+import {
+  ProtectedAreaService,
+  ScenarioProtectedArea,
+  ChangeProtectedAreasError,
+  submissionFailed,
+} from './protected-area';
+import {
+  ProtectedAreaChangeDto,
+  ProtectedAreasChangeDto,
+} from './dto/protected-area-change.dto';
+import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
+import {
+  ChangeBlmRange,
+  ChangeRangeErrors,
+} from '@marxan-api/modules/projects/blm';
+import { GetFailure, ProjectBlmRepo } from '@marxan-api/modules/blm';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -67,6 +81,13 @@ export const scenarioNotFound = Symbol(`scenario not found`);
 export type SubmitProtectedAreaError =
   | GetProjectErrors
   | typeof submissionFailed
+  | typeof scenarioNotFound;
+
+export type GetProtectedAreasError = GetProjectErrors | typeof scenarioNotFound;
+
+export type UpdateProtectedAreasError =
+  | ChangeProtectedAreasError
+  | GetProjectErrors
   | typeof scenarioNotFound;
 
 @Injectable()
@@ -90,12 +111,13 @@ export class ScenariosService {
     private readonly inputArchiveService: InputFilesArchiverService,
     private readonly planningUnitsService: ScenarioPlanningUnitsService,
     private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
-    private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,
     private readonly specificationService: SpecificationService,
     private readonly costService: CostRangeService,
     private readonly projectChecker: ProjectChecker,
     private readonly protectedArea: ProtectedAreaService,
     private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
+    private readonly blmValuesRepository: ProjectBlmRepo,
   ) {}
 
   async findAllPaginated(
@@ -133,25 +155,13 @@ export class ScenariosService {
 
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
-    await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
-      scenario,
-      input,
-    );
     return right(scenario);
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
     await this.assertScenario(scenarioId);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
-    const scenario = await this.crudService.update(
-      scenarioId,
-      validatedMetadata,
-    );
-    await this.planningUnitsStatusCalculatorService.calculatedProtectionStatusForPlanningUnitsIn(
-      scenario,
-      input,
-    );
-    return scenario;
+    return await this.crudService.update(scenarioId, validatedMetadata);
   }
 
   async getFeatures(scenarioId: string) {
@@ -242,6 +252,26 @@ export class ScenariosService {
       pick(scenario, 'id', 'boundaryLengthModifier'),
       blm,
     );
+  }
+
+  async startBlmCalibration(
+    id: string,
+    rangeToUpdate?: [number, number],
+  ): Promise<Either<ChangeRangeErrors | GetFailure, true>> {
+    const scenario = await this.getById(id);
+    const projectId = scenario.projectId;
+    if (rangeToUpdate) {
+      const result = await this.commandBus.execute(
+        new ChangeBlmRange(projectId, rangeToUpdate),
+      );
+      if (isLeft(result)) return result;
+    }
+    const projectBlmValues = await this.blmValuesRepository.get(projectId);
+    if (isLeft(projectBlmValues)) return projectBlmValues;
+
+    await this.runService.runCalibration(id, projectBlmValues.right.values);
+
+    return right(true);
   }
 
   async cancel(scenarioId: string): Promise<void> {
@@ -411,6 +441,7 @@ export class ScenariosService {
     scenarioId: string,
     file: Express.Multer.File,
     info: AppInfoDTO,
+    dto: UploadShapefileDto,
   ): Promise<Either<SubmitProtectedAreaError, true>> {
     try {
       const scenario = await this.assertScenario(scenarioId);
@@ -425,6 +456,7 @@ export class ScenariosService {
         projectResponse.right.id,
         scenarioId,
         file,
+        dto.name,
       );
 
       if (isLeft(submission)) {
@@ -435,5 +467,61 @@ export class ScenariosService {
     } catch {
       return left(scenarioNotFound);
     }
+  }
+
+  async getProtectedAreasFor(
+    scenarioId: string,
+    info: AppInfoDTO,
+  ): Promise<Either<GetProtectedAreasError, ScenarioProtectedArea[]>> {
+    try {
+      const scenario = await this.assertScenario(scenarioId);
+      const projectResponse = await this.queryBus.execute(
+        new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
+      );
+      if (isLeft(projectResponse)) {
+        return projectResponse;
+      }
+
+      const areas = await this.protectedArea.getFor(
+        {
+          id: scenarioId,
+          protectedAreaIds: scenario.protectedAreaFilterByIds ?? [],
+        },
+        projectResponse.right,
+      );
+
+      return right(areas);
+    } catch {
+      return left(scenarioNotFound);
+    }
+  }
+
+  async updateProtectedAreasFor(
+    scenarioId: string,
+    dto: ProtectedAreasChangeDto,
+    info: AppInfoDTO,
+  ): Promise<Either<UpdateProtectedAreasError, true>> {
+    const scenario = await this.assertScenario(scenarioId);
+    const projectResponse = await this.queryBus.execute(
+      new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
+    );
+
+    if (isLeft(projectResponse)) {
+      return projectResponse;
+    }
+
+    const result = await this.protectedArea.selectFor(
+      {
+        id: scenarioId,
+        protectedAreaIds: scenario.protectedAreaFilterByIds ?? [],
+        threshold: dto.threshold,
+      },
+      projectResponse.right,
+      dto.areas,
+    );
+    if (isLeft(result)) {
+      return result;
+    }
+    return right(true);
   }
 }
