@@ -30,6 +30,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { GetProjectHandler } from './get-project.handler';
 import { ProjectBlmModule } from './blm';
 import { CloneModule } from '@marxan-api/modules/clone';
+import { AccessControlModule } from '../access-control';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { CloneModule } from '@marxan-api/modules/clone';
     PlanningUnitGridModule,
     ProjectBlmModule,
     CloneModule,
+    AccessControlModule,
   ],
   providers: [
     ProjectsCrudService,
