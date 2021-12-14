@@ -40,6 +40,8 @@ import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
 
 export { validationFailed } from '../planning-areas';
 
+export const notFound = Symbol(`project not found`);
+
 @Injectable()
 export class ProjectsService {
   constructor(
@@ -84,13 +86,21 @@ export class ProjectsService {
   async findOne(
     id: string,
     info: ProjectsServiceRequest,
-  ): Promise<Project | undefined> {
-    // /ACL slot/
+  ): Promise<Either<typeof notFound | typeof forbiddenError, Project>> {
     try {
-      return await this.projectsCrud.getById(id, undefined, info);
+      const project = await this.projectsCrud.getById(id, undefined, info);
+      if (
+        !(await this.projectAclService.canViewProject(
+          info.authenticatedUser.id,
+          id,
+        ))
+      ) {
+        return left(forbiddenError);
+      }
+      return right(project);
     } catch (error) {
       // library-sourced errors are no longer instances of HttpException
-      return undefined;
+      return left(notFound);
     }
   }
 

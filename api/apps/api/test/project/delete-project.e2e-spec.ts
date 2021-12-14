@@ -1,5 +1,5 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { getFixtures } from './update-project.fixtures';
+import { getFixtures } from './delete-project.fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -11,18 +11,18 @@ afterEach(async () => {
   await fixtures?.cleanup();
 });
 
-test(`updating a project should work`, async () => {
+test(`deleting a project should work`, async () => {
   await fixtures.GivenProjectWasCreated();
 
-  await fixtures.WhenProjectIsUpdated();
+  await fixtures.WhenProjectIsDeleted();
 
-  await fixtures.ThenWhenReadingProjectItHasNewData();
+  await fixtures.ThenProjectIsNotFound();
 });
 
-test(`updating a project does not work if user is not in project`, async () => {
+test(`deleting a project does not work if user is not in project`, async () => {
   await fixtures.GivenProjectWasCreated();
 
-  const request = await fixtures.WhenProjectIsUpdatedAsNotIncludedUser();
+  const request = await fixtures.WhenProjectIsDeletedAsNotIncludedUser();
 
   await fixtures.ThenForbiddenIsReturned(request);
 });

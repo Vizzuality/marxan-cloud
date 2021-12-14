@@ -27,3 +27,11 @@ test(`getting non-public project as logged-in owner`, async () => {
   const response = await fixtures.WhenGettingProject(projectId);
   fixtures.ThenProjectDetailsArePresent(projectId, response);
 });
+
+test(`getting a project where the user is not in project`, async () => {
+  const projectId = await fixtures.GivenPrivateProjectWasCreated();
+  const response = await fixtures.WhenGettingProjectAsNotIncludedUser(
+    projectId,
+  );
+  fixtures.ThenForbiddenIsReturned(response);
+});
