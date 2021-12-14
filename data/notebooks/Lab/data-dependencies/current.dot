@@ -1,9 +1,44 @@
 digraph G {
-  node [style=filled; color=lightgrey;];
+  node [fontname=sans; style=filled; color=lightgrey;];
+  pu_dat [label="pu.dat"]
+  spec_dat [label="spec.dat"]
+  puvspr_dat [label="puvspr.dat"]
+  bound_dat [label="bound.dat"]
+  input_dat [label="input.dat"]
 
-  protected_areas_plus_threshold -> default_lockin_status // also PU protected status
-  protected_areas -> protected_percentage_of_each_feature
-  protected_percentage_of_each_feature -> pre_run_gap_analysis // check if is persisted
+  subgraph cluster_legend {
+    planning_unit_tab  [color="/accent7/1", label="Planning unit tab"]
+    features_tab  [color="/accent7/2", label="Features tab"]
+    parameters_tab  [color="/accent7/3", label="Parameters tab"]
+  }
+
+  subgraph marxan_flow {
+  user_lock_in_selection [color="/accent7/1"]
+  user_lock_out_selection [color="/accent7/1"]
+
+  IUCN_categories_for_WDPAs [color="/accent7/1"]
+  custom_protected_area_ids [color="/accent7/1"]
+  protected_threshold [color="/accent7/1"]
+  PU_removal_for_scenario [color="/accent7/1"]
+
+  cost_surface [color="/accent7/2"]
+  feature_list [color="/accent7/2"]
+  fpf_per_feature [color="/accent7/2"]
+  prop_per_feature [color="/accent7/2"]
+
+  advanced_input_dat_settings [color="/accent7/3"]
+  BLM [color="/accent7/3"]
+
+  IUCN_categories_for_WDPAs -> protected_area_geometries
+  custom_protected_area_ids -> protected_area_geometries
+
+  protected_area_geometries -> default_lock_status // also PU protected status
+  protected_threshold -> default_lock_status
+  list_of_PUs_for_scenario -> default_lock_status
+
+  protected_area_geometries -> protected_percentage_of_each_feature
+  // @check if this is persisted
+  protected_percentage_of_each_feature -> pre_run_gap_analysis [label="informational"]
 
   feature_list -> feature_geometries
   feature_geometries -> puvspr_dat
@@ -11,15 +46,17 @@ digraph G {
   prop_per_feature -> spec_dat // @todo avoid geo recalculations
   fpf_per_feature -> spec_dat // @todo avoid geo recalculations
 
-  feature_geometries -> feature_presence_per_PU
+  feature_geometries -> feature_presence_per_PU [label="for map tiles only"]
+  feature_geometries -> protected_percentage_of_each_feature
 
-  default_lockin_status -> PU_lock_status
+  default_lock_status -> PU_lock_status
   user_lock_in_selection -> PU_lock_status
   user_lock_out_selection -> PU_lock_status
+  PU_lock_status -> pu_dat
 
-  pu_removal_for_scenario -> list_of_PUs_for_scenario
-
-  list_of_PUs_for_scenario -> default_lockin_status
+  planning_area_geometry [label="Planning area geometry\n(includes planning area from custom grid)"]
+  planning_area_geometry -> list_of_PUs_for_scenario
+  PU_removal_for_scenario -> list_of_PUs_for_scenario
 
   list_of_PUs_for_scenario -> PU_cost
 
@@ -33,7 +70,7 @@ digraph G {
   puvspr_dat -> marxan
   spec_dat -> marxan
   bound_dat -> marxan
-  blm -> input_dat
+  BLM -> input_dat
   input_dat -> marxan
   advanced_input_dat_settings -> input_dat
 
@@ -41,4 +78,8 @@ digraph G {
   // removal of PUs - at scenario level only?
   // (for us: treatment of scenarios with different sets of PUs when comparing 2 scenarios)
   // if allowing to remove PUs at scenario level, caching of pairwise boundary lengths needs to be rethought
+
+  marxan -> BLM_calibration [label="informational"]
+  marxan -> solution
+  }
 }
