@@ -72,11 +72,11 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                 );
               })}
 
-              <li className="ml-3">
+              <div className="relative ml-3">
                 <button
                   aria-label="add-contributor"
                   type="button"
-                  className="relative border border-transparent rounded-full hover:border hover:border-white"
+                  className="border border-transparent rounded-full hover:border hover:border-white"
                   onClick={handleEditUsers}
                 >
                   <Avatar className={cx({
@@ -86,12 +86,13 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                   >
                     <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
                   </Avatar>
-                  {editUsers && (
-                    <EditDropdown />
-                  )}
-                </button>
 
-              </li>
+                </button>
+                {editUsers && (
+                  <EditDropdown setEditUsers={setEditUsers} />
+                )}
+
+              </div>
 
             </ul>
           </div>
