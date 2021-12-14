@@ -10,6 +10,7 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   Req,
   UseGuards,
@@ -24,6 +25,7 @@ import { projectResource, ProjectResultSingular } from './project.api.entity';
 import { ProjectsService } from './projects.service';
 import { ProjectSerializer } from './dto/project.serializer';
 import { isLeft } from 'fp-ts/lib/Either';
+import { forbiddenError } from '../access-control';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -46,7 +48,15 @@ export class ProjectDetailsController {
     });
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case undefined:
+          throw new NotFoundException(`Project ${id} could not be found`);
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
     }
 
     return await this.projectSerializer.serialize(result.right);

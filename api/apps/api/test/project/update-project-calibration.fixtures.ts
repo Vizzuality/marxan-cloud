@@ -11,7 +11,6 @@ import { HttpStatus } from '@nestjs/common';
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const token = await GivenUserIsLoggedIn(app);
-  const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
   const organizationId = (
     await OrganizationsTestUtils.createOrganization(app, token, {
       ...E2E_CONFIG.organizations.valid.minimal(),
@@ -39,6 +38,11 @@ export const getFixtures = async () => {
       });
       projectId = project.data.id;
       await commandBus.execute(new SetProjectBlm(projectId));
+      return projectId;
+    },
+    GivenUserIsNotInProject: async () => {
+      const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
+      return notIncludedUserToken;
     },
     WhenProjectCalibrationIsUpdated: async () =>
       await request(app.getHttpServer())
@@ -47,10 +51,13 @@ export const getFixtures = async () => {
         .send({
           range: updatedRange,
         }),
-    WhenProjectCalibrationIsUpdatedAsNotIncludedUser: async () =>
+    WhenProjectCalibrationIsUpdatedAsNotIncludedUser: async (
+      projectId: string,
+      userToken: string,
+    ) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/projects/${projectId}/calibration`)
-        .set('Authorization', `Bearer ${notIncludedUserToken}`)
+        .set('Authorization', `Bearer ${userToken}`)
         .send({
           range: updatedRange,
         }),
