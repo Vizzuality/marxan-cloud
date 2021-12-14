@@ -85,17 +85,18 @@ export class ProjectsService {
     id: string,
     info: ProjectsServiceRequest,
   ): Promise<Either<undefined | typeof forbiddenError, Project>> {
-    assertDefined(info.authenticatedUser);
-    if (
-      !(await this.projectAclService.canViewProject(
-        info.authenticatedUser.id,
-        id,
-      ))
-    ) {
-      return left(forbiddenError);
-    }
     try {
-      return right(await this.projectsCrud.getById(id, undefined, info));
+      const project = await this.projectsCrud.getById(id, undefined, info);
+      assertDefined(info.authenticatedUser);
+      if (
+        !(await this.projectAclService.canViewProject(
+          info.authenticatedUser.id,
+          id,
+        ))
+      ) {
+        return left(forbiddenError);
+      }
+      return right(project);
     } catch (error) {
       // library-sourced errors are no longer instances of HttpException
       return left(undefined);
