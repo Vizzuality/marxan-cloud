@@ -87,7 +87,6 @@ export class ProjectsService {
   ): Promise<Either<undefined | typeof forbiddenError, Project>> {
     try {
       const project = await this.projectsCrud.getById(id, undefined, info);
-      assertDefined(info.authenticatedUser);
       if (
         !(await this.projectAclService.canViewProject(
           info.authenticatedUser.id,
@@ -98,6 +97,7 @@ export class ProjectsService {
       }
       return right(project);
     } catch (error) {
+      console.log(error);
       // library-sourced errors are no longer instances of HttpException
       return left(undefined);
     }

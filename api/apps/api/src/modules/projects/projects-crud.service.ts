@@ -304,31 +304,6 @@ export class ProjectsCrudService extends AppBaseService<
     return entity;
   }
 
-  extendGetByIdQuery(
-    query: SelectQueryBuilder<Project>,
-    fetchSpecification?: FetchSpecification,
-    info?: ProjectsRequest,
-  ): SelectQueryBuilder<Project> {
-    const loggedUser = Boolean(info?.authenticatedUser);
-    query.leftJoin(
-      UsersProjectsApiEntity,
-      `acl`,
-      `${this.alias}.id = acl.project_id`,
-    );
-
-    if (loggedUser) {
-      query
-        .andWhere(`acl.user_id = :userId`, {
-          userId: info?.authenticatedUser?.id,
-        })
-        .andWhere(`acl.role_id = :roleId`, {
-          roleId: Roles.project_owner,
-        });
-    }
-
-    return query;
-  }
-
   async extendFindAllQuery(
     query: SelectQueryBuilder<Project>,
     fetchSpecification: FetchSpecification,
