@@ -24,7 +24,7 @@ export class MarxanSandboxBlmRunnerService
     if (controller && !controller.signal.aborted) controller.abort();
   }
 
-  getOutputHandlerBride(): SandboxRunnerOutputHandler<ExecutionResult> {
+  getOutputHandlerBridge(): SandboxRunnerOutputHandler<ExecutionResult> {
     return {
       dump: async (workspace, scenarioId, stdOutput, stdErr) => {
         const result = await this.blmResultsParser.dump(
@@ -77,7 +77,7 @@ export class MarxanSandboxBlmRunnerService
       const singleMarxanRun = new MarxanSandboxRunnerService(
         workspaceBuilder,
         dummySandboxRunnerInputFiles,
-        this.getOutputHandlerBride(),
+        this.getOutputHandlerBridge(),
       );
 
       const partialResult = await singleMarxanRun.run(input, progressCallback);
