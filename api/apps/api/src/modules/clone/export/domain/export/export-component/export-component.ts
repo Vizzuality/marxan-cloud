@@ -14,16 +14,16 @@ export class ExportComponent {
     readonly piece: ClonePiece,
     readonly resourceId: ResourceId,
     private finished: boolean = false,
-    private uri?: ComponentLocation,
+    private uris?: ComponentLocation[],
   ) {}
 
   static newOne(resourceId: ResourceId, piece: ClonePiece): ExportComponent {
     return new ExportComponent(new ComponentId(v4()), piece, resourceId);
   }
 
-  finish(location: ComponentLocation) {
+  finish(location: ComponentLocation[]) {
     this.finished = true;
-    this.uri = location;
+    this.uris = location;
   }
 
   isReady() {
@@ -36,7 +36,7 @@ export class ExportComponent {
       piece: this.piece,
       resourceId: this.resourceId.value,
       finished: this.finished,
-      uri: this.uri?.value,
+      uri: this.uris,
     };
   }
 
@@ -46,7 +46,7 @@ export class ExportComponent {
       snapshot.piece,
       new ResourceId(snapshot.resourceId),
       snapshot.finished,
-      snapshot.uri ? new ComponentLocation(snapshot.uri) : undefined,
+      snapshot.uri,
     );
   }
 }
