@@ -35,8 +35,13 @@ import { ProjectAccessControl } from '../access-control';
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import { Permit } from '../access-control/access-control.types';
 
-import { ExportProject } from '@marxan-api/modules/clone';
+import {
+  ExportId,
+  ExportProject,
+  GetExportArchive,
+} from '@marxan-api/modules/clone';
 import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
+import { createReadStream } from 'fs';
 
 export { validationFailed } from '../planning-areas';
 
@@ -200,5 +205,14 @@ export class ProjectsService {
     return await this.queryBus.execute(
       new GetProjectQuery(projectId, forUser?.id),
     );
+  }
+
+  async getExportedArchive(projectId: string, exportId: string) {
+    // ACL
+    const location = await this.queryBus.execute(
+      new GetExportArchive(new ExportId(exportId)),
+    );
+    // MARXAN-1129
+    return location ? createReadStream(location.value) : null;
   }
 }
