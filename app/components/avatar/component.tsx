@@ -3,15 +3,16 @@ import React, { ButtonHTMLAttributes } from 'react';
 import cx from 'classnames';
 
 const SIZE = {
-  s: 'w-8 h-8',
-  base: 'w-10 h-10',
+  s: 'h-8 w-8',
+  base: 'h-10 w-10',
+  lg: 'h-11 w-11',
 };
 
 export interface AvatarProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
   className?: string;
   bgImage?: string;
-  size?: 's' | 'base';
+  size?: 's' | 'base' | 'lg';
 }
 
 export const Avatar: React.FC<AvatarProps> = ({

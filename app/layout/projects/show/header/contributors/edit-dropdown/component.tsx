@@ -52,7 +52,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
       />
       <p className="self-start py-6 text-xs text-black uppercase font-heading">2 contributors</p>
       <div className="w-full space-y-2.5">
-        <ContributorCard name="Tamara Huete" image="/images/avatar.png" roleName="Contributor" />
+        <ContributorCard name="Tamara Huete" roleName="Contributor" />
         <ContributorCard name="Miguel Barrenechea" image="/images/avatar.png" roleName="Owner" />
       </div>
       <FormRFF
@@ -79,6 +79,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
             <Button
               className="flex-shrink-0 text-xs px-36 whitespace-nowrap"
               theme="primary"
+              disabled={!props.dirty}
               size="lg"
               type="submit"
             >

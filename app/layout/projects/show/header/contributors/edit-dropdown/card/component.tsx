@@ -7,7 +7,7 @@ import Button from 'components/button';
 
 export interface ContributorCardProps {
   name: string,
-  image: string,
+  image?: string,
   roleName: string,
 }
 
@@ -27,27 +27,30 @@ export const ContributorCard: React.FC<ContributorCardProps> = ({
         <form
           onSubmit={props.handleSubmit}
           autoComplete="off"
-          className="flex items-center justify-between w-full p-3 bg-white border rounded-3xl"
-          style={{ borderColor: '#00000033' }}
+          className="box-border flex items-center justify-between w-full py-3 pl-3 pr-6 bg-gray-100 rounded-3xl"
+
         >
           <div className="flex space-x-3">
             <Avatar
-              className="text-sm text-white uppercase bg-primary-700"
+              className="box-border text-sm text-white uppercase border-none bg-primary-700"
               bgImage={image}
               name={name}
-            />
-            <div>
+              size="lg"
+            >
+              {!image && name.slice(0, 2)}
+            </Avatar>
+            <div className="self-center space-y-0.5">
               <p className="text-xs text-black">{name}</p>
-              <p className="text-xs text-black">{roleName}</p>
+              <p className="text-xs text-gray-400">{roleName}</p>
             </div>
           </div>
           <Button
-            className="flex-shrink-0 h-8 py-2 text-sm font-semibold bg-gray-600"
+            className="flex-shrink-0 h-6 py-2 text-sm bg-gray-600"
             theme="secondary-alt"
             size="xs"
             type="submit"
           >
-            Remove
+            <span className="text-white">Remove</span>
           </Button>
         </form>
       )}
