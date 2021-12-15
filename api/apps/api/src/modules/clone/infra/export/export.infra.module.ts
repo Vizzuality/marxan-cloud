@@ -15,6 +15,8 @@ import {
 } from './export-queue.provider';
 import { ExportPieceEventsHandler } from './export-piece.events-handler';
 import { MarkExportAsSubmittedHandler } from './mark-export-as-submitted.handler';
+import { MarkExportAsFinishedHandler } from './mark-export-as-finished.handler';
+import { ArchiveReadySaga } from './archive-ready.saga';
 
 @Module({
   imports: [ApiEventsModule, QueueApiEventsModule, CqrsModule],
@@ -22,11 +24,13 @@ import { MarkExportAsSubmittedHandler } from './mark-export-as-submitted.handler
     SchedulePieceExportHandler,
     PieceExportRequestedSaga,
     ExportStartedSaga,
+    ArchiveReadySaga,
     exportPieceQueueProvider,
     exportPiecenQueueEventsProvider,
     exportPieceEventsFactoryProvider,
     ExportPieceEventsHandler,
     MarkExportAsSubmittedHandler,
+    MarkExportAsFinishedHandler,
   ],
 })
 export class ExportInfraModule {}

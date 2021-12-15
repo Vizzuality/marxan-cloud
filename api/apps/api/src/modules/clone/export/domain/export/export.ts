@@ -93,7 +93,14 @@ export class Export extends AggregateRoot {
       return left(notReady);
     }
     this.archiveLocation = archiveLocation;
-    this.apply(new ArchiveReady(this.id, this.archiveLocation));
+    this.apply(
+      new ArchiveReady(
+        this.id,
+        this.resourceId,
+        this.resourceKind,
+        this.archiveLocation,
+      ),
+    );
     return right(true);
   }
 
