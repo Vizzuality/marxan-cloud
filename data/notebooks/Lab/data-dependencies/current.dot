@@ -21,7 +21,7 @@ digraph G {
   protected_threshold [color="/accent7/1"]
   PU_removal_for_scenario [color="/accent7/1"]
 
-  cost_surface [color="/accent7/2"]
+  cost_surface [color="/accent7/1"]
   feature_list [color="/accent7/2"]
   fpf_per_feature [color="/accent7/2"]
   prop_per_feature [color="/accent7/2"]
@@ -29,12 +29,18 @@ digraph G {
   advanced_input_dat_settings [color="/accent7/3"]
   BLM [color="/accent7/3"]
 
+  default_lock_status -> tiles_for_pu_lock_status
+  PU_cost -> tiles_for_pu_cost
+
   IUCN_categories_for_WDPAs -> protected_area_geometries
   custom_protected_area_ids -> protected_area_geometries
 
   protected_area_geometries -> default_lock_status // also PU protected status
   protected_threshold -> default_lock_status
+  protected_threshold -> protected_percentage_of_each_feature
   list_of_PUs_for_scenario -> default_lock_status
+
+  prop_per_feature -> pre_run_gap_analysis
 
   protected_area_geometries -> protected_percentage_of_each_feature
   // @check if this is persisted
@@ -81,5 +87,7 @@ digraph G {
 
   marxan -> BLM_calibration [label="informational"]
   marxan -> solution
+
+  BLM_calibration -> BLM [label="may affect user decisions regarding BLM"]
   }
 }
