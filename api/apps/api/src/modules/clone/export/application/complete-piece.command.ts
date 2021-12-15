@@ -8,7 +8,7 @@ export class CompletePiece extends Command<void> {
   constructor(
     public readonly exportId: ExportId,
     public readonly componentId: ComponentId,
-    public readonly componentLocation: ComponentLocation,
+    public readonly componentLocation: ComponentLocation[],
   ) {
     super();
   }

@@ -76,7 +76,9 @@ export class ExportPieceEventsHandler
       new CompletePiece(
         new ExportId(result.exportId),
         new ComponentId(result.componentId),
-        new ComponentLocation(result.uri),
+        result.uris.map(
+          ({ uri, relativePath }) => new ComponentLocation(uri, relativePath),
+        ),
       ),
     );
   }

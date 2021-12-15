@@ -72,7 +72,7 @@ export class Export extends AggregateRoot {
 
   completeComponent(
     id: ComponentId,
-    pieceLocation: ComponentLocation,
+    pieceLocation: ComponentLocation[],
   ): Either<typeof pieceNotFound, true> {
     const piece = this.#pieces.find((piece) => piece.id.equals(id));
     if (!piece) {

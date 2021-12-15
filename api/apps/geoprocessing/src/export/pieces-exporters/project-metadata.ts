@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { Readable } from 'stream';
+import { isLeft } from 'fp-ts/Either';
 
 import { ClonePiece, JobInput, JobOutput } from '@marxan/cloning';
 import { FileRepository } from '@marxan/files-repository';
@@ -9,7 +10,6 @@ import { FileRepository } from '@marxan/files-repository';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 import { PieceExportProvider, PieceProcessor } from '../pieces/piece-processor';
-import { isLeft } from 'fp-ts/Either';
 
 @Injectable()
 @PieceExportProvider()
@@ -61,7 +61,12 @@ export class ProjectMetadata extends PieceProcessor {
 
     return {
       ...input,
-      uri: outputFile.right,
+      uris: [
+        {
+          uri: outputFile.right,
+          relativePath: `project-metadata.json`,
+        },
+      ],
     };
   }
 }
