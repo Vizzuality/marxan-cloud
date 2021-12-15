@@ -5,6 +5,7 @@ import { ExportProjectHandler } from './export-project.handler';
 import { CompletePieceHandler } from './complete-piece.handler';
 import { FinalizeArchiveHandler } from './finalize-archive.handler';
 import { AllPiecesReadySaga } from './all-pieces-ready.saga';
+import { GetArchiveHandler } from './get-archive.handler';
 
 @Module({})
 export class ExportApplicationModule {
@@ -19,6 +20,7 @@ export class ExportApplicationModule {
         ExportProjectHandler,
         CompletePieceHandler,
         FinalizeArchiveHandler,
+        GetArchiveHandler,
       ],
       exports: [],
     };
