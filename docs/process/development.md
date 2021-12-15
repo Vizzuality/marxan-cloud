@@ -12,10 +12,10 @@ the purpose and how this will improve users/product. Consider some questions
 below which are helpful to ask:
 
 * `why` this at all?
-* `how` this will imply the product and the users?
-* `how` we will measure the success?
+* `how` will this affect the product and the users?
+* `how` will we measure success?
 * `what` is the added value?
-* `how` people will use it?
+* `how` will people use it?
 
 The above is just a shallow version of Domain Driven Design process which 
 helps business and software to meet at same level - and model software.
@@ -86,26 +86,26 @@ whole team, if prepared correctly.
 
 Now we are ready to create JIRA tasks filling the gaps for each 
 implementation step, as well as estimating them - as they are really 
-granulated, it should help a lot with poker planning or any other methodology.
+granular, it should help a lot with poker planning or any other methodology.
 
-As quite the effort was already made for analysing the  feature, one may say 
+As quite the effort was already made for analysing the feature, one may say 
 the rest is just a formal thing - and it isn't far from the truth (assuming 
 we weren't wrong anywhere) - right now, most obstacles are removed, main 
-entry points are in place, every discussion if finished.
+entry points are in place, every discussion is settled.
 
 # Why?
 
-Why to bother much? Think of `development process funnel`. The fewer 
-mistakes/unknowns we make have at the very beginning, the less they 
+Why bother much? Think of `development process funnel`. The fewer 
+mistakes/unknowns we make at the very beginning, the least they 
 propagate down the stream. The later we find the issue, the harder it is to 
 change plans and the more it costs to undo.
 
 But it still can happen. 
 
 The process above helps to reduce the risk but more importantly - allows the 
-team to understand product and the needs.
+team to understand product and needs.
 
-Is it always right? May not - if we need quick MVP on some feature, it may 
+Is this process always applicable? Maybe not - if we need a quick MVP on some feature, it may 
 be skipped to just deliver something really quick to verify some idea. Don't 
 blindly stick to process - as the Agile Manifesto says, processes are for us,
 not the other way around.
