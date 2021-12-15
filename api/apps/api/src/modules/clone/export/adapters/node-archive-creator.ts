@@ -53,7 +53,7 @@ export class NodeArchiveCreator extends ArchiveCreator {
           this.logger.error(error);
           resolve(left(unknownError));
         });
-        passThrough.on(`close`, onPersistenceFinished);
+        passThrough.on(`close`, () => onPersistenceFinished(resolve));
 
         archive.pipe(passThrough);
 

@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -12,6 +13,7 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -28,6 +30,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiProduces,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -72,6 +75,7 @@ import {
   GeometryFileInterceptor,
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
+import { Response } from 'express';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -334,6 +338,25 @@ export class ProjectsController {
 
   @Post(`:id/export`)
   async requestProjectExport(@Param('id') id: string) {
-    await this.projectsService.requestExport(id);
+    return {
+      id: await this.projectsService.requestExport(id),
+    };
+  }
+
+  @Get(`:id/export/:exportId`)
+  @Header(`Content-Type`, `application/zip`)
+  @Header('Content-Disposition', 'attachment; filename="export.zip"')
+  async getProjectExportArchive(
+    @Param('id') id: string,
+    @Param('exportId') exportId: string,
+    @Res() response: Response,
+  ) {
+    const stream = await this.projectsService.getExportedArchive(id, exportId);
+
+    if (stream) {
+      stream.pipe(response);
+    } else {
+      response.send(null);
+    }
   }
 }
