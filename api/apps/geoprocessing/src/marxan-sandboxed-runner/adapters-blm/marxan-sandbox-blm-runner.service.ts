@@ -1,7 +1,9 @@
 import { BlmInputFiles } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-input-files';
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
 import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
+import { WorkspaceBuilder } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/workspace-builder';
 import { SandboxRunner } from '@marxan-geoprocessing/marxan-sandboxed-runner/sandbox-runner';
+import { SandboxRunnerInputFiles } from '@marxan-geoprocessing/marxan-sandboxed-runner/sandbox-runner-input-files';
 import { SandboxRunnerOutputHandler } from '@marxan-geoprocessing/marxan-sandboxed-runner/sandbox-runner-output-handler';
 import { JobData } from '@marxan/blm-calibration';
 import { ExecutionResult } from '@marxan/marxan-output';
@@ -15,7 +17,7 @@ export class MarxanSandboxBlmRunnerService
 
   constructor(
     private readonly inputFilesHandler: BlmInputFiles,
-    private readonly blmResultsParser: SandboxRunnerOutputHandler<ExecutionResult>,
+    private readonly outputHandler: SandboxRunnerOutputHandler<void>,
   ) {}
 
   kill(ofScenarioId: string): void {
@@ -24,72 +26,47 @@ export class MarxanSandboxBlmRunnerService
     if (controller && !controller.signal.aborted) controller.abort();
   }
 
-  getOutputHandlerBridge(): SandboxRunnerOutputHandler<ExecutionResult> {
-    return {
-      dump: async (workspace, scenarioId, stdOutput, stdErr) => {
-        const result = await this.blmResultsParser.dump(
-          workspace,
-          scenarioId,
-          stdOutput,
-          stdErr,
-        );
-        // TODO Store partial results
-        return result;
-      },
-      dumpFailure: this.blmResultsParser.dumpFailure,
-      cancel: async () => {},
-    };
-  }
-
   async run(
     input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<void> {
-    const { blmValues, scenarioId: forScenarioId } = input;
+    const { blmValues, scenarioId } = input;
     const workspaces = await this.inputFilesHandler.for(
       blmValues,
       input.assets,
     );
-    const dummySandboxRunnerInputFiles = {
-      include: async () => {},
-      cancel: async () => {},
-    };
-    const abortController = this.getAbortControllerForRun(forScenarioId, [
-      this.inputFilesHandler,
-      this.blmResultsParser,
-    ]);
-
-    const interruptIfKilled = async () => {
-      if (abortController.signal.aborted) {
-        this.clearAbortController(forScenarioId);
-        throw {
-          stdError: [],
-          signal: 'SIGTERM',
-        };
-      }
-    };
-
-    const finalResults: ExecutionResult[] = [];
 
     for (const { workspace } of workspaces) {
-      await interruptIfKilled();
-      const workspaceBuilder = { get: async () => workspace };
-      const singleMarxanRun = new MarxanSandboxRunnerService(
+      const workspaceBuilder: WorkspaceBuilder = {
+        get: async () => workspace,
+      };
+      const inputFilesHandler: SandboxRunnerInputFiles = {
+        include: async () => {
+          // noop, already included by original input handler
+        },
+        cancel: async () => {
+          // noop
+        },
+      };
+      const outputHandler: SandboxRunnerOutputHandler<ExecutionResult> = {
+        dump: () => {},
+      } as any;
+
+      const singleRunner = new MarxanSandboxRunnerService(
         workspaceBuilder,
-        dummySandboxRunnerInputFiles,
-        this.getOutputHandlerBridge(),
+        inputFilesHandler,
+        outputHandler,
       );
 
-      const partialResult = await singleMarxanRun.run(input, progressCallback);
-      finalResults.push(partialResult);
+      const cancelablesForThisRun: Cancellable[] = [
+        {
+          cancel: async () => singleRunner.kill(scenarioId),
+        },
+      ];
+      this.getAbortControllerForRun(scenarioId, cancelablesForThisRun);
+
+      await singleRunner.run(input, progressCallback);
     }
-
-    // TODO Store final results
-    this.clearAbortController(forScenarioId);
-  }
-
-  private clearAbortController(ofScenarioId: string) {
-    delete this.#controllers[ofScenarioId];
   }
 
   private getAbortControllerForRun(

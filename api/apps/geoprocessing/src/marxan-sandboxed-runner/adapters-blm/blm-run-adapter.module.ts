@@ -19,7 +19,6 @@ import { ResultParserService } from '@marxan-geoprocessing/marxan-sandboxed-runn
 import { MostDifferentService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/most-different.service';
 import { BestSolutionService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/best-solution.service';
 import { MarxanDirectory } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-directory.service';
-import { BlmResultsParser } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-results.parser';
 import { SandboxRunnerOutputHandler } from '@marxan-geoprocessing/marxan-sandboxed-runner/sandbox-runner-output-handler';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
@@ -32,7 +31,6 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
     BestSolutionService,
     MarxanConfig,
     MarxanDirectory,
-    BlmResultsParser,
     {
       provide: sandboxRunnerToken,
       useClass: MarxanSandboxBlmRunnerService,
@@ -43,7 +41,7 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
     },
     {
       provide: SandboxRunnerOutputHandler,
-      useClass: BlmResultsParser,
+      useValue: {},
     },
     AssetFactory,
     BlmInputFiles,
