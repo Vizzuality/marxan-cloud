@@ -1,14 +1,14 @@
 import { BlmInputFiles } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-input-files';
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
 import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
-import { WorkspaceBuilder } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/workspace-builder';
-import { SandboxRunner } from '@marxan-geoprocessing/marxan-sandboxed-runner/sandbox-runner';
-import { SandboxRunnerInputFiles } from '@marxan-geoprocessing/marxan-sandboxed-runner/sandbox-runner-input-files';
-import { SandboxRunnerOutputHandler } from '@marxan-geoprocessing/marxan-sandboxed-runner/sandbox-runner-output-handler';
 import { JobData } from '@marxan/blm-calibration';
 import { ExecutionResult } from '@marxan/marxan-output';
 import { Injectable } from '@nestjs/common';
 import AbortController from 'abort-controller';
+import { WorkspaceBuilder } from '../ports/workspace-builder';
+import { SandboxRunner } from '../sandbox-runner';
+import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
+import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService

@@ -4,6 +4,7 @@ import { MarxanConfig } from '../marxan-config';
 
 // ports
 import { sandboxRunnerToken } from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
+import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
 
 // adapters
 import { WorkspaceModule } from '../adapters-shared/workspace/workspace.module';
@@ -14,7 +15,6 @@ import { AssetFactory } from './asset-factory.service';
 
 import { InputFilesFs } from '../adapters-single/scenario-data/input-files-fs';
 import { AssetsModule } from '../adapters-shared';
-import { SandboxRunnerOutputHandler } from '@marxan-geoprocessing/marxan-sandboxed-runner/sandbox-runner-output-handler';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
