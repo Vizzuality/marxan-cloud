@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { ExportRequested } from '../../export/domain';
-import { NoteExportStarted } from './note-export-started.command';
+import { MarkExportAsSubmitted } from './mark-export-as-submitted.command';
 
 @Injectable()
 export class ExportStartedSaga {
@@ -14,7 +14,7 @@ export class ExportStartedSaga {
       ofType(ExportRequested),
       map(
         (event) =>
-          new NoteExportStarted(
+          new MarkExportAsSubmitted(
             event.exportId,
             event.resourceId,
             event.resourceKind,

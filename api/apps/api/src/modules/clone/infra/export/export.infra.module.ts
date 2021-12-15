@@ -14,7 +14,7 @@ import {
   exportPieceQueueProvider,
 } from './export-queue.provider';
 import { ExportPieceEventsHandler } from './export-piece.events-handler';
-import { NoteExportStartedHandler } from './note-export-started.handler';
+import { MarkExportAsSubmittedHandler } from './mark-export-as-submitted.handler';
 
 @Module({
   imports: [ApiEventsModule, QueueApiEventsModule, CqrsModule],
@@ -26,7 +26,7 @@ import { NoteExportStartedHandler } from './note-export-started.handler';
     exportPiecenQueueEventsProvider,
     exportPieceEventsFactoryProvider,
     ExportPieceEventsHandler,
-    NoteExportStartedHandler,
+    MarkExportAsSubmittedHandler,
   ],
 })
 export class ExportInfraModule {}

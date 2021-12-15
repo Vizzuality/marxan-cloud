@@ -98,7 +98,10 @@ const getFixtures = async () => {
       projectId: string,
       scenarioId: string,
     ) => {
-      expect(events[0]).toMatchObject({
+      const projectMetadataExport = events[0];
+      const projectSettingsExport = events[1];
+
+      expect(projectMetadataExport).toMatchObject({
         componentId: {
           value: expect.any(String),
         },
@@ -111,7 +114,7 @@ const getFixtures = async () => {
         },
       });
 
-      expect(events[1]).toMatchObject({
+      expect(projectSettingsExport).toMatchObject({
         componentId: {
           value: expect.any(String),
         },
@@ -125,7 +128,8 @@ const getFixtures = async () => {
       });
     },
     ThenExportRequestsEventIsPresent(exportId: ExportId) {
-      expect(events[1]).toMatchObject({
+      const exportRequested = events[2];
+      expect(exportRequested).toMatchObject({
         exportId,
       });
     },
