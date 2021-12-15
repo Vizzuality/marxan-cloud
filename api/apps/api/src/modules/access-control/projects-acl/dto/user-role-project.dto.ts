@@ -18,3 +18,11 @@ export class UserRoleInProjectDto {
     | Roles.project_contributor
     | Roles.project_owner;
 }
+
+export class UsersInProjectResult {
+  @ApiProperty({
+    isArray: true,
+    type: UserRoleInProjectDto,
+  })
+  data!: UserRoleInProjectDto[];
+}

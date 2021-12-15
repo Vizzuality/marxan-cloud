@@ -23,8 +23,11 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserRoleInProjectDto } from './dto/user-role-project.dto';
 import { isLeft } from 'fp-ts/lib/These';
+import {
+  UserRoleInProjectDto,
+  UsersInProjectResult,
+} from './dto/user-role-project.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -43,7 +46,7 @@ export class ProjectAclController {
   async findUsersInProject(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<UserRoleInProjectDto[] | boolean> {
+  ): Promise<UsersInProjectResult> {
     const result = await this.projectAclService.findUsersInProject(
       projectId,
       req.user.id,
@@ -53,7 +56,7 @@ export class ProjectAclController {
       throw new ForbiddenException();
     }
 
-    return result.right;
+    return { data: result.right };
   }
 
   @Patch(':projectId/users')

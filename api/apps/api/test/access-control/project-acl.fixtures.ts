@@ -251,15 +251,15 @@ export const getFixtures = async () => {
 
     ThenSingleOwnerUserInProjectIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(200);
-      expect(response.body).toHaveLength(1);
+      expect(response.body.data).toHaveLength(1);
     },
 
     ThenAllUsersinProjectAfterAddingAnOwnerAreReturned: (
       response: request.Response,
     ) => {
       expect(response.status).toEqual(200);
-      expect(response.body).toHaveLength(2);
-      const newUserCreated = response.body.find(
+      expect(response.body.data).toHaveLength(2);
+      const newUserCreated = response.body.data.find(
         (user: any) => user.user.id === ownerUserId,
       );
       expect(newUserCreated.roleName).toEqual(projectOwnerRole);
@@ -269,7 +269,7 @@ export const getFixtures = async () => {
       response: request.Response,
     ) => {
       expect(response.status).toEqual(200);
-      expect(response.body).toHaveLength(4);
+      expect(response.body.data).toHaveLength(4);
     },
   };
 };
