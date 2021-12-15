@@ -2,18 +2,18 @@ import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { NoteExportStarted } from './note-export-started.command';
+import { MarkExportAsSubmitted } from './mark-export-as-submitted.command';
 
-@CommandHandler(NoteExportStarted)
-export class NoteExportStartedHandler
-  implements IInferredCommandHandler<NoteExportStarted> {
+@CommandHandler(MarkExportAsSubmitted)
+export class MarkExportAsSubmittedHandler
+  implements IInferredCommandHandler<MarkExportAsSubmitted> {
   constructor(private readonly apiEvents: ApiEventsService) {}
 
   async execute({
     exportId,
     resourceId,
     resourceKind,
-  }: NoteExportStarted): Promise<void> {
+  }: MarkExportAsSubmitted): Promise<void> {
     const kind =
       resourceKind === ResourceKind.Project
         ? API_EVENT_KINDS.project__export__submitted__v1__alpha
