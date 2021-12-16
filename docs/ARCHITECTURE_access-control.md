@@ -64,6 +64,11 @@ All tokens have the same validity (7200 seconds).
 The validity timespan of tokens can be configured for each instance, if
 necessary.
 
+Users who are in possession of a valid JWT token can forcibly sign themselves
+out of all their sessions. This is done by removing all the session ids for the
+user, resulting in them being signed out from all the devices/browsers/API
+clients they may have been using.
+
 ## Access control
 
 Access control strategies, roles and role management are described in detail in
