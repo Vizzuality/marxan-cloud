@@ -10,14 +10,14 @@ export class GeoFeatures {
     this.baseHttpClient = httpClient.baseHttpClient;
   }
 
-  async getIdOfFeaturesBySubstringMatchOnName(
+  async searchFeaturesWithinProject(
     projectId: string,
-    name: string,
+    nameFragment: string,
   ): Promise<string[]> {
     const opStart = Process.hrtime();
 
     const id = await this.baseHttpClient.get(
-      `/projects/${projectId}/features?q=${name}&fields=id`,
+      `/projects/${projectId}/features?q=${nameFragment}&fields=id`,
     )
       .then(getJsonApiDataFromResponse)
       .then((data: { id: string; type: string }[]) => {
@@ -26,7 +26,7 @@ export class GeoFeatures {
       .catch(logError);
 
     logInfo(
-      `Id of feature matching query string ${name} retrieved in ${
+      `Id of feature matching query string ${nameFragment} retrieved in ${
         tookMs(Process.hrtime(opStart))
       }ms.`,
     );
