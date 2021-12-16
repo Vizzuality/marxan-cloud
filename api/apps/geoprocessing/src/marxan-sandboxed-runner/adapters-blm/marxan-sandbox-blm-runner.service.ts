@@ -1,66 +1,86 @@
-import { Injectable } from '@nestjs/common';
+import { BlmInputFiles } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-input-files';
+import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
+import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
 import { JobData } from '@marxan/blm-calibration';
-
-import { SandboxRunner } from '../sandbox-runner';
+import { ExecutionResult } from '@marxan/marxan-output';
+import { Injectable } from '@nestjs/common';
+import AbortController from 'abort-controller';
 import { WorkspaceBuilder } from '../ports/workspace-builder';
+import { SandboxRunner } from '../sandbox-runner';
+import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
 import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
-import { BlmInputFiles } from './blm-input-files';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
   implements SandboxRunner<JobData, void> {
+  readonly #controllers: Record<string, AbortController> = {};
+
   constructor(
-    private readonly workspaceService: WorkspaceBuilder,
     private readonly inputFilesHandler: BlmInputFiles,
-    private readonly outputFilesHandler: SandboxRunnerOutputHandler<void>,
+    private readonly outputHandler: SandboxRunnerOutputHandler<void>,
   ) {}
 
-  kill(ofScenarioId: string): void {}
+  kill(ofScenarioId: string): void {
+    const controller = this.#controllers[ofScenarioId];
+
+    if (controller && !controller.signal.aborted) controller.abort();
+  }
 
   async run(
     input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<void> {
-    const { blmValues } = input;
-    console.log(`running BLM calibration for:`, blmValues);
+    const { blmValues, scenarioId } = input;
     const workspaces = await this.inputFilesHandler.for(
       blmValues,
       input.assets,
     );
 
-    for (const workspace of workspaces) {
-      // run & persist
-      console.log(
-        `running for ${workspace.blmValue} - ${workspace.workspace.workingDirectory}`,
+    for (const { workspace } of workspaces) {
+      const workspaceBuilder: WorkspaceBuilder = {
+        get: async () => workspace,
+      };
+      const inputFilesHandler: SandboxRunnerInputFiles = {
+        include: async () => {
+          // noop, already included by original input handler
+        },
+        cancel: async () => {
+          // noop
+        },
+      };
+      const outputHandler: SandboxRunnerOutputHandler<ExecutionResult> = {
+        dump: () => {},
+      } as any;
+
+      const singleRunner = new MarxanSandboxRunnerService(
+        workspaceBuilder,
+        inputFilesHandler,
+        outputHandler,
       );
+
+      const cancelablesForThisRun: Cancellable[] = [
+        {
+          cancel: async () => singleRunner.kill(scenarioId),
+        },
+      ];
+      this.getAbortControllerForRun(scenarioId, cancelablesForThisRun);
+
+      await singleRunner.run(input, progressCallback);
     }
+  }
 
-    /**
-     * should have its own AbortController
-     * to be able to kill underlying runs
-     */
+  private getAbortControllerForRun(
+    scenarioId: string,
+    cancellables: Cancellable[],
+  ) {
+    const controller = (this.#controllers[
+      scenarioId
+    ] ??= new AbortController());
 
-    /**
-     *   for each blmValue, run (sequence, chunks...)
-     *   single MarxanSandboxRunnerService
-     *
-     *   consider creating specific BlmPartialResultsRepository
-     *   for each run so that BLM value could be attached
-     */
+    controller.signal.addEventListener('abort', () => {
+      cancellables.forEach((killMe) => killMe.cancel());
+    });
 
-    /**
-     * assets:
-     *
-     * single "fetch" may be performed there
-     * or the SandboxRunnerInputFiles may be implemented
-     * in such way to handle "single fetch"
-     */
-
-    /**
-     * it may be necessary to extract some single-run-adapters-single
-     * to be used there as well (like workspace)
-     */
-
-    return Promise.resolve(undefined);
+    return controller;
   }
 }

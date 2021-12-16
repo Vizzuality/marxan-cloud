@@ -1,5 +1,5 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
-import { Either, isLeft, isRight, left } from 'fp-ts/Either';
+import { Either, isLeft, left } from 'fp-ts/Either';
 import { Logger } from '@nestjs/common';
 
 import { ProjectBlm, ProjectBlmRepo } from '@marxan-api/modules/blm';
@@ -8,7 +8,6 @@ import {
   ChangeBlmRange,
   ChangeRangeErrors,
   invalidRange,
-  planningUnitAreaNotFound,
   updateFailure,
 } from './change-blm-range.command';
 import { SetProjectBlm } from './set-project-blm';
@@ -65,10 +64,7 @@ export class ChangeBlmRangeHandler
       return left(updateFailure);
     }
 
-    const updatedBlmValues = await this.blmRepository.get(projectId);
-    if (isRight(updatedBlmValues)) return updatedBlmValues;
-
-    return left(planningUnitAreaNotFound);
+    return await this.blmRepository.get(projectId);
   }
 
   private isInvalidRange(range: [number, number]) {

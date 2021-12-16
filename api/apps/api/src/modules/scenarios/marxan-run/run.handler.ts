@@ -34,7 +34,11 @@ export class RunHandler {
   ) {}
 
   async runCalibration(scenarioId: string, blmValues: number[]) {
-    const assets = await this.assets.forScenario(scenarioId, 0);
+    // In order to ensure that boundary data is included in assets array
+    // a non zero value should be provided to `forScenario` method of AssetsService
+    const nonZeroBLMValue = 1;
+
+    const assets = await this.assets.forScenario(scenarioId, nonZeroBLMValue);
     assertDefined(assets);
     const job = await this.calibrationQueue.add(`calibrate-scenario`, {
       scenarioId,

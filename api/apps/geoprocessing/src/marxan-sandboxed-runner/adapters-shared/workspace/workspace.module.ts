@@ -37,6 +37,6 @@ import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
     FileReader,
     MarxanDirectory,
   ],
-  exports: [WorkspaceBuilder],
+  exports: [WorkspaceBuilder, FileReader],
 })
 export class WorkspaceModule {}
