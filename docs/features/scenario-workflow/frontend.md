@@ -12,32 +12,67 @@ In addition, there is a missing call to Recalculate and be able to exempt the ap
 
 ### Protected areas
 
-GET SCENARIO
-'scenarios/${scenarioId}'
+**GET SCENARIO**
+'/scenarios/${scenarioId}'
 
-GET WDPA
-'scenarios/${scenarioId}/protected-areas'
+**GET WDPA**
+'/scenarios/${scenarioId}/protected-areas'
 
-POST upload protected areas
-'scenarios/${scenarioId}/protected-areas/shapefile'
+**POST upload protected areas**
+'/scenarios/${scenarioId}/protected-areas/shapefile'
 
-POST protected areas
-'scenarios/${scenarioId}/protected-areas'
+**POST protected areas**
+'/scenarios/${scenarioId}/protected-areas'
 
-PATCH scenario
-'scenarios/${scenarioId}'
+**PATCH scenario**
+'/scenarios/${scenarioId}'
 
-GET scenario status
-'projects/${projectId}/scenarios/status'
+**GET scenario status**
+'/projects/${projectId}/scenarios/status'
 
 ### Adjusting planning unit
 
+**GET scenario PU**
+'/scenarios/${scenarioId}/planning-units'
+
+**POST scenario PU**
+'/scenarios/${scenarioId}/planning-units'
+
+**POST upload scenario PU**
+'/scenarios/${scenarioId}/planning-unit-shapefile'
+
 ### Cost surface
 
+**GET download cost surface template**
+'/scenarios/${scenarioId}/cost-surface/shapefile-template'
+
+**GET upload cost surface**
+'/scenarios/${scenarioId}/cost-surface/shapefile'
 
 ## Features
 
 ### Set up features
+
+**GET SCENARIO**
+'/scenarios/${scenarioId}'
+
+**PATCH scenario**
+'/scenarios/${scenarioId}'
+
+**GET all features**
+'/projects/${projectId}/features'
+
+**POST upload feature**
+'/projects/${shapefileId}/features/shapefile'
+
+**POST save selected features**
+'/scenarios/${scenarioId}/features/specification'
+
+**GET selected features + target features**
+'/scenarios/${scenarioId}/features/specification'
+
+**GET feature**
+'/geo-features/featureId'
 
 ### Gap analysis
 
