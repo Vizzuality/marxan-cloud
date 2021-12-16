@@ -9,7 +9,7 @@ export const getDemoFeatureSpecificationFromFeatureNamesForProject = async (
 ) => {
   const geoFeatureIds = await Promise.all(
     wantedFeatures.map(async (f) =>
-      (await bot.geoFeatures.getIdOfFeaturesBySubstringMatchOnName(projectId, f))[0]
+      (await bot.geoFeatures.searchFeaturesWithinProject(projectId, f))[0]
     ),
   );
 
