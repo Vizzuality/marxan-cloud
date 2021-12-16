@@ -3,12 +3,14 @@ import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandbox
 import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
 import { JobData } from '@marxan/blm-calibration';
 import { ExecutionResult } from '@marxan/marxan-output';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import AbortController from 'abort-controller';
 import { WorkspaceBuilder } from '../ports/workspace-builder';
 import { SandboxRunner } from '../sandbox-runner';
 import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
 import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
+import { blmFinalResultsRepository } from './blm-final-results.repository';
+import { blmPartialResultsRepository } from './blm-partial-results.repository';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
@@ -17,7 +19,10 @@ export class MarxanSandboxBlmRunnerService
 
   constructor(
     private readonly inputFilesHandler: BlmInputFiles,
-    private readonly outputHandler: SandboxRunnerOutputHandler<void>,
+    @Inject(blmPartialResultsRepository)
+    private readonly partialResultsHandler: SandboxRunnerOutputHandler<ExecutionResult>,
+    @Inject(blmFinalResultsRepository)
+    private readonly finalResultsHandler: SandboxRunnerOutputHandler<void>,
   ) {}
 
   kill(ofScenarioId: string): void {
@@ -48,14 +53,11 @@ export class MarxanSandboxBlmRunnerService
           // noop
         },
       };
-      const outputHandler: SandboxRunnerOutputHandler<ExecutionResult> = {
-        dump: () => {},
-      } as any;
 
       const singleRunner = new MarxanSandboxRunnerService(
         workspaceBuilder,
         inputFilesHandler,
-        outputHandler,
+        this.partialResultsHandler,
       );
 
       const cancelablesForThisRun: Cancellable[] = [

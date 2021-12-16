@@ -14,32 +14,21 @@ import { AssetFactory } from './asset-factory.service';
 
 import { InputFilesFs } from '../adapters-single/scenario-data/input-files-fs';
 import { AssetsModule } from '../adapters-shared';
-import { GeoOutputModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/geo-output';
-import { ResultParserService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/result-parser.service';
-import { MostDifferentService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/most-different.service';
-import { BestSolutionService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/solutions-output/best-solution.service';
-import { MarxanDirectory } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-directory.service';
-import { BlmResultsParser } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-results.parser';
-import { BlmPartialResultsRepositoryModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/repositories/partial/blm-partial-results-repository.module';
-import { BlmFinalResultsRepositoryModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/repositories/final/blm-final-results-repository.module';
+import {
+  BlmFinalResultsRepository,
+  blmFinalResultsRepository,
+} from './blm-final-results.repository';
+import {
+  BlmPartialResultsRepository,
+  blmPartialResultsRepository,
+} from './blm-partial-results.repository';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
 @Module({
-  imports: [
-    WorkspaceModule,
-    AssetsModule,
-    GeoOutputModule,
-    BlmPartialResultsRepositoryModule,
-    BlmFinalResultsRepositoryModule,
-  ],
+  imports: [WorkspaceModule, AssetsModule],
   providers: [
-    ResultParserService,
-    MostDifferentService,
-    BestSolutionService,
     MarxanConfig,
-    MarxanDirectory,
-    BlmResultsParser,
     {
       provide: sandboxRunnerToken,
       useClass: MarxanSandboxBlmRunnerService,
@@ -47,6 +36,14 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
     {
       provide: blmSandboxRunner,
       useClass: MarxanSandboxBlmRunnerService,
+    },
+    {
+      provide: blmFinalResultsRepository,
+      useClass: BlmFinalResultsRepository,
+    },
+    {
+      provide: blmPartialResultsRepository,
+      useClass: BlmPartialResultsRepository,
     },
     AssetFactory,
     BlmInputFiles,

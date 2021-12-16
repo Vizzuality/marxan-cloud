@@ -8,13 +8,6 @@ export class BlmFinalResultEntity {
   id!: string;
 
   /**
-   * The id of the calibration run
-   * **/
-  @Index()
-  @Column({ type: 'uuid', name: 'calibration_id' })
-  calibrationId!: string;
-
-  /**
    * references Scenarios.id
    */
   @Column({
