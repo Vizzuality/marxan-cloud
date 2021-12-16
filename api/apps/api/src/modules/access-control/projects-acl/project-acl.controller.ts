@@ -12,6 +12,7 @@ import {
   HttpCode,
   ForbiddenException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ProjectAclService } from './project-acl.service';
@@ -46,10 +47,12 @@ export class ProjectAclController {
   async findUsersInProject(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
+    @Query('q') nameSearch?: string,
   ): Promise<UsersInProjectResult> {
     const result = await this.projectAclService.findUsersInProject(
       projectId,
       req.user.id,
+      nameSearch,
     );
 
     if (isLeft(result)) {
