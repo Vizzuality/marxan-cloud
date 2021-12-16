@@ -1,4 +1,4 @@
-# Role base access control - Brief
+# Role-based access control - Brief
 
 This document aims at providing an overview of Role-based Access Control (RBAC from here on) for the Marxan platform. 
 
