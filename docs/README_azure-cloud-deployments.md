@@ -16,6 +16,11 @@ The full list of Azure resources needed to run an instance is outlined here:
   - 3x D4 v2 nodes
   - 2x E20 OS disks
 
+- two instances of Azure Database for PostgresSQL
+
+  - one D4 v3 instance (database for API metadata)
+  - one D8 v3 instance (geoprocessing database)
+
 - one VM as bastion host
 
   - one D2a v4 Virtual Machine
@@ -24,6 +29,10 @@ The full list of Azure resources needed to run an instance is outlined here:
 
   - this is used for block blob storage buckets (for downloads of large files
     from the Marxan Cloud platform and for Terraform state management)
+
+The specific SKUs for Azure resources will depend on the load profile of each
+instance; for example, geoprocessing databases may use Memory-Optimized
+instances (Ev4 series).
 
 ### Vercel
 
