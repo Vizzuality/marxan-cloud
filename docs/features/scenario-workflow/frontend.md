@@ -6,7 +6,12 @@ This document still does not contemplate the calls necessary to obtain the infor
 * Which tabs do not need to be updated to be able to run a scenario but do not correspond to the information given in the previous run (outdated information). `yellow warning`
 * When it is necessary to display the Recalculate action and when the Re-run action.
 
-In addition, there is a missing call to Recalculate and be able to exempt the application from an overexertion, in the event that this possibility exists.
+In addition, there will be missing next calls:
+* Add and edit Advanced settings.
+
+* Add, edit and obtain output of BLM.
+
+* Recalculate and be able to exempt the application from an overexertion, in the event that this possibility exists.
 
 ## Planning units
 
@@ -76,16 +81,37 @@ In addition, there is a missing call to Recalculate and be able to exempt the ap
 
 ### Gap analysis
 
+**GET pre gap analysis**
+'/scenarios/${scenarioId}/features/gap-data'
 
+**GET post gap analysis**
+'/scenarios//${scenarioId}/marxan/solutions/gap-data'
 ## Parameters
 
 ### BLM calibration
-
-### Advance settings
+Add new endpoints 
+### Advanced settings
+Add new endpoint (not part of run anymore)
 
 
 ## Solutions
 
 ### Solutions overview
 
+**GET solutions**
+'/scenarios/${scenarioId}/marxan/solutions'
+
+**GET solution**
+'/scenarios/${scenarioId}/marxan/solutions/solutionId'
+
+**GET most diff solutions**
+'scenarios/${scenarioId}/marxan/solutions/most-different'
+
+**GET best solution**
+'/scenarios/${scenarioId}/marxan/solutions/best'
+
+**GET download solutions**
+'/scenarios/${scenarioId}/marxan/output'
+
 ### Schedule scenario
+Not still in scope
