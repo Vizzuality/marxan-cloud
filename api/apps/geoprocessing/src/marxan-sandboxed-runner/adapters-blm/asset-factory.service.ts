@@ -8,17 +8,16 @@ import { FileReader } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapte
 
 @Injectable()
 export class AssetFactory {
-
   constructor(private readonly reader: FileReader) {}
 
   async copy(
     from: Workspace,
     to: Workspace,
     assets: Assets,
-    overrideBlmValue: number,
+    blmValueForCurrentRun: number,
   ): Promise<void> {
     console.log(
-      `copy assets from [${from.workingDirectory}] to ${to.workingDirectory} -> for blm of ${overrideBlmValue}`,
+      `copy assets from [${from.workingDirectory}] to ${to.workingDirectory} -> for blm of ${blmValueForCurrentRun}`,
     );
 
     copySync(from.workingDirectory, to.workingDirectory, {
@@ -34,27 +33,23 @@ export class AssetFactory {
       inputDat.relativeDestination,
     );
 
-    await this.ensureWriteDirectoryExists(inputDatPath);
+    const inputDatContent = this.reader.read(inputDatPath);
+    const inputDatContentWithBlmForCurrentRun = this.replaceBLMValue(
+      inputDatContent,
+      blmValueForCurrentRun,
+    );
 
-    const input = this.reader.read(inputDatPath);
-
-    // TODO: Why the input.dat is coming without BLM?
-    // const matcher = new RegExp(/BLM\s.*/);
-    const inputWithCorrectBLM = `BLM ${overrideBlmValue}\n${input}`;
-    /*input.replace(
-      matcher,
-      `BLM ${overrideBlmValue}`,
-    );*/
-
-    writeFileSync(inputDatPath, inputWithCorrectBLM);
+    writeFileSync(inputDatPath, inputDatContentWithBlmForCurrentRun);
   }
 
-  private async ensureWriteDirectoryExists(
-    fileDestination: string,
-  ): Promise<void> {
-    // if directory does not exists, it will silently "success" downloading the file while it won't be there
-    const desiredDirectory = dirname(fileDestination);
-    await promises.mkdir(desiredDirectory, { recursive: true });
+  private replaceBLMValue(inputDatContent: string, blmValue: number): string {
+    const matcher = new RegExp(/^BLM\s.*$/);
+    const containsBLMValue = matcher.test(inputDatContent);
+
+    if (containsBLMValue)
+      return inputDatContent.replace(matcher, `BLM ${blmValue}\n`);
+
+    return `${inputDatContent}\nBLM ${blmValue}`;
   }
 
   private getInputDat(

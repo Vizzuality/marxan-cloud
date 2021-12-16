@@ -3,11 +3,9 @@ import { Either } from 'fp-ts/Either';
 export const unknownError = Symbol(`unknown error`);
 export const projectNotFound = Symbol(`project not found`);
 export const alreadyCreated = Symbol(`project already has defaults`);
-
 export type CreateFailure = typeof unknownError | typeof alreadyCreated;
 export type SaveFailure = typeof unknownError | typeof projectNotFound;
 export type GetFailure = typeof unknownError | typeof projectNotFound;
-
 export interface ProjectBlm {
   id: string;
 

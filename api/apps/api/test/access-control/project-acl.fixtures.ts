@@ -4,7 +4,7 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
-import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsACLTestUtils } from '../utils/projects-acl.test.utils';
