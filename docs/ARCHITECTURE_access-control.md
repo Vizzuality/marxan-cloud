@@ -32,6 +32,11 @@ update this in their user profile.
 User passwords are stored as salted hashes using the `bcrypt` password hashing
 function.
 
+Users who are in possession of a valid JWT token can update their own account's
+password.
+
+No password entropy is enforced on passwords that users choose.
+
 ## Authentication
 
 Once a user account has been activated, the user can sign in to the Marxan Cloud
