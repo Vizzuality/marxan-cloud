@@ -1,6 +1,6 @@
 {
   "name": "MarxanCloud notebooks",
-  "dockerComposeFile": ["../data/docker-compose.yml"],
+  "dockerComposeFile": ["./docker-compose.yml"],
   "service": "marxan-science-notebooks",
   "shutdownAction": "stopCompose",
   "extensions": [
