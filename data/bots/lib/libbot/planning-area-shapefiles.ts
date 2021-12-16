@@ -41,7 +41,16 @@ export class PlanningAreas extends FileUploader {
       data,
       fileName: `${crypto.randomUUID()}.zip`,
       headers: [["Authorization", `Bearer ${this.currentJwt}`]],
-    }))
+    })
+      .then(response => {
+        if (response.status !== 201) {
+          throw new Error(
+            `Failed to upload planning area shapefile: ${response.status}`,
+          );
+        }
+        return response;
+      })
+    )
       .json()
       .then((data) => data?.id)
       .catch(logError);
