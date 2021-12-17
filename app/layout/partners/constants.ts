@@ -11,15 +11,15 @@ import VIZZUALITY_LOGO from 'images/partners/vizzuality_logo.png';
 export const FOUNDING_LOGOS = [
   {
     id: 1,
-    alt: 'The Nature Conservancy logo',
-    hyperlink: 'https://www.nature.org',
-    src: THE_NATURE_CONSERVANCY_LOGO,
-  },
-  {
-    id: 2,
     alt: 'Microsoft logo',
     hyperlink: 'https://www.microsoft.com',
     src: MICROSOFT_LOGO,
+  },
+  {
+    id: 2,
+    alt: 'The Nature Conservancy logo',
+    hyperlink: 'https://www.nature.org',
+    src: THE_NATURE_CONSERVANCY_LOGO,
   }];
 
 export const PARTNERSHIP_LOGOS = [
