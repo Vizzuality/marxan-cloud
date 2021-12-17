@@ -148,22 +148,32 @@ export class ProjectAclService implements ProjectAccessControl {
   async findUsersInProject(
     projectId: string,
     userId: string,
+    nameSearch?: string,
   ): Promise<Either<Permit, UserRoleInProjectDto[]>> {
     if (!(await this.isOwner(userId, projectId))) {
       return left(false);
     }
 
-    const usersInProject = await this.roles
+    const query = this.roles
       .createQueryBuilder('users_projects')
       .leftJoinAndSelect('users_projects.user', 'userId')
-      .where({ projectId })
+      .where({
+        projectId,
+      })
       .select([
         'users_projects.roleName',
         'userId.displayName',
         'userId.id',
         'userId.avatarDataUrl',
-      ])
-      .getMany();
+      ]);
+
+    if (nameSearch) {
+      query.andWhere('userId.displayName ILIKE :name', {
+        name: `%${nameSearch}%`,
+      });
+    }
+
+    const usersInProject = await query.getMany();
 
     return right(usersInProject);
   }
