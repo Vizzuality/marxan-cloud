@@ -2,15 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration/blm-final-results.geo.entity';
-import { Workspace } from '../ports/workspace';
-import { SandboxRunnerOutputHandler } from '../ports/sandbox-runner-output-handler';
 import { BlmPartialResultEntity } from './blm-partial-results.geo.entity';
 
-export const blmFinalResultsRepository = Symbol('BLM final results repository');
-
 @Injectable()
-export class BlmFinalResultsRepository
-  implements SandboxRunnerOutputHandler<void> {
+export class BlmFinalResultsRepository {
   constructor(
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
@@ -23,15 +18,8 @@ export class BlmFinalResultsRepository
   /**
    * clear previous results, move the new ones to target
    * table - everything within transaction
-   *
-   * would be used in main BlmRunService after all runs finished
    */
-  async dump(
-    workspace: Workspace,
-    scenarioId: string,
-    stdOutput: string[],
-    stdErr: string[] | undefined,
-  ): Promise<void> {
+  async saveFinalResults(scenarioId: string): Promise<void> {
     await this.entityManager.transaction(async (txManager) => {
       await txManager.delete(BlmFinalResultEntity, {
         scenarioId,
@@ -56,15 +44,6 @@ export class BlmFinalResultsRepository
       await txManager.remove(BlmPartialResultEntity, partialResults);
     });
 
-    return Promise.resolve(undefined);
-  }
-
-  dumpFailure(
-    workspace: Workspace,
-    scenarioId: string,
-    stdOutput: string[],
-    stdError: string[],
-  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 }

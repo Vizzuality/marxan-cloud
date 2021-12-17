@@ -14,19 +14,22 @@ import { AssetFactory } from './asset-factory.service';
 
 import { InputFilesFs } from '../adapters-single/scenario-data/input-files-fs';
 import { AssetsModule } from '../adapters-shared';
-import {
-  BlmFinalResultsRepository,
-  blmFinalResultsRepository,
-} from './blm-final-results.repository';
-import {
-  BlmPartialResultsRepository,
-  blmPartialResultsRepository,
-} from './blm-partial-results.repository';
+import { BlmFinalResultsRepository } from './blm-final-results.repository';
+import { BlmPartialResultsRepository } from './blm-partial-results.repository';
+import { MarxanRunnerFactory } from './marxan-runner.factory';
+import { MarxanOutputParserModule } from '../adapters-shared/marxan-output-parser/marxan-output-parser.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BlmPartialResultEntity } from './blm-partial-results.geo.entity';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
 @Module({
-  imports: [WorkspaceModule, AssetsModule],
+  imports: [
+    WorkspaceModule,
+    AssetsModule,
+    MarxanOutputParserModule,
+    TypeOrmModule.forFeature([BlmPartialResultEntity]),
+  ],
   providers: [
     MarxanConfig,
     {
@@ -37,17 +40,12 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
       provide: blmSandboxRunner,
       useClass: MarxanSandboxBlmRunnerService,
     },
-    {
-      provide: blmFinalResultsRepository,
-      useClass: BlmFinalResultsRepository,
-    },
-    {
-      provide: blmPartialResultsRepository,
-      useClass: BlmPartialResultsRepository,
-    },
+    BlmFinalResultsRepository,
+    BlmPartialResultsRepository,
     AssetFactory,
     BlmInputFiles,
     InputFilesFs,
+    MarxanRunnerFactory,
   ],
   exports: [sandboxRunnerToken, blmSandboxRunner],
 })
