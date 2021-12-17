@@ -6,7 +6,7 @@ import {
   QueueEventsBuilder,
   WorkerBuilder,
 } from '@marxan-geoprocessing/modules/worker';
-import { SandboxRunner } from '@marxan-geoprocessing/marxan-sandboxed-runner/sandbox-runner';
+import { SandboxRunner } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/sandbox-runner';
 import { runWorkerQueueNameToken, sandboxRunnerToken } from './tokens';
 
 @Injectable()

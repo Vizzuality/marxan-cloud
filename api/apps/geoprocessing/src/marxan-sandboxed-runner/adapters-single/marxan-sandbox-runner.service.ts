@@ -7,10 +7,10 @@ import { JobData } from '@marxan/scenario-run-queue';
 import { MarxanRun } from '../marxan-run';
 import { WorkspaceBuilder } from '../ports/workspace-builder';
 import { Cancellable } from '../ports/cancellable';
-import { SandboxRunner } from '../sandbox-runner';
 
-import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
-import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
+import { SandboxRunnerInputFiles } from '../ports/sandbox-runner-input-files';
+import { SandboxRunner } from '../ports/sandbox-runner';
+import { SandboxRunnerOutputHandler } from '../ports/sandbox-runner-output-handler';
 
 @Injectable()
 export class MarxanSandboxRunnerService

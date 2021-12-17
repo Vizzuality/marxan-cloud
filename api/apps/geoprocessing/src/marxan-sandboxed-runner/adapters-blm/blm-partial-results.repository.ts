@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
+import { SandboxRunnerOutputHandler } from '../ports/sandbox-runner-output-handler';
 import { Workspace } from '../ports/workspace';
 import { ExecutionResult } from '../../../../../libs/marxan-output/src';
 

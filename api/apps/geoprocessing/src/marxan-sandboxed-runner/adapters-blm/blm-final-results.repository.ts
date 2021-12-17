@@ -3,8 +3,8 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration/blm-final-results.geo.entity';
 import { Workspace } from '../ports/workspace';
-import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
-import { BlmPartialResultEntity } from '../../../../../libs/blm-calibration/src/blm-partial-results.geo.entity';
+import { SandboxRunnerOutputHandler } from '../ports/sandbox-runner-output-handler';
+import { BlmPartialResultEntity } from './blm-partial-results.geo.entity';
 
 export const blmFinalResultsRepository = Symbol('BLM final results repository');
 

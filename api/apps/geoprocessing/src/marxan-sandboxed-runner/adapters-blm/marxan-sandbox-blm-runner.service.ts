@@ -6,9 +6,9 @@ import { ExecutionResult } from '@marxan/marxan-output';
 import { Inject, Injectable } from '@nestjs/common';
 import AbortController from 'abort-controller';
 import { WorkspaceBuilder } from '../ports/workspace-builder';
-import { SandboxRunner } from '../sandbox-runner';
-import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
-import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
+import { SandboxRunner } from '../ports/sandbox-runner';
+import { SandboxRunnerInputFiles } from '../ports/sandbox-runner-input-files';
+import { SandboxRunnerOutputHandler } from '../ports/sandbox-runner-output-handler';
 import { blmFinalResultsRepository } from './blm-final-results.repository';
 import { blmPartialResultsRepository } from './blm-partial-results.repository';
 
