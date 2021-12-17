@@ -36,7 +36,7 @@ export const runBot = async (settings: MarxanBotConfig) => {
     name: "Okavango " + crypto.randomUUID(),
     description: "",
     planningAreaId: planningAreaId,
-    planningUnitGridShape: 'from_shapefile',
+    planningUnitGridShape: "from_shapefile",
   });
 
   // @todo Replace with status polling
