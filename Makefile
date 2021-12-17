@@ -1,10 +1,14 @@
 .PHONY: start
 
 # Read values as needed from .env
+#
+# Optionally pass 'environment=<something>' to load env vars from '.env-something' instead
+# Useful to separate i.e. dev from testing databases
+#
 # If using the same variables in recipes that need to use a dotenv file other
 # than .env, remember to check that no values from .env are being used
 # inadvertently.
-ENVFILE := $(if $(environment), .env-test-e2e, .env)
+ENVFILE := $(if $(environment), .env-$(environment), .env)
 ifneq (,$(wildcard $(ENVFILE)))
     include $(ENVFILE)
     export
@@ -103,7 +107,7 @@ seed-geoapi-init-data:
 		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
 		done;
 
-# need notebook service to execute a expecific notebook. this requires a full geodb
+# need notebook service to execute a specific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose.yml exec marxan-science-notebooks papermill --progress-bar --log-output work/notebooks/Lab/convert_csv_sql.ipynb /dev/null
 	mv -f -u -Z data/data/processed/test-wdpa-data.sql api/apps/api/test/fixtures/test-wdpa-data.sql
@@ -236,4 +240,5 @@ native-seed-geoapi-init-data:
 		done;
 
 native-seed-api-with-test-data: native-db-migrate native-seed-api-init-data | native-seed-geoapi-init-data
+	@echo "seeding db with testing project and scenarios"
 	psql -U "${API_POSTGRES_USER}" -h "${API_POSTGRES_HOST}" ${API_POSTGRES_DB} < api/apps/api/test/fixtures/test-data.sql

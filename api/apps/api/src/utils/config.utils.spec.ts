@@ -8,6 +8,14 @@ process.env.NETWORK_CORS_ORIGINS = extraCorsOrigin;
 import { AppConfig } from './config.utils';
 
 describe('AppConfig', () => {
+  beforeAll(() => {
+    if (process.env.NODE_CONFIG_DIR !== 'apps/api/config') {
+      throw Error(
+        `Running the test suite with NODE_CONFIG_DIR=${process.env.NODE_CONFIG_DIR}, which may cause this test to fail. Please use NODE_CONFIG_DIR=apps/api/config.`,
+      );
+    }
+  });
+
   describe('getFromArrayAndParsedString', () => {
     // Expected full result from `network.cors.origins`. If updating the default
     // list in `config`, relevant tests should break and this list should be
