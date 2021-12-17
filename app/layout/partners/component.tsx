@@ -12,7 +12,7 @@ export interface PartnersListProps {
 
 export const PartnersList: React.FC<PartnersListProps> = () => {
   return (
-    <div className="relative py-24 text-base text-gray-800 bg-blue-500">
+    <div className="relative py-24 text-base text-gray-800 bg-primary-500">
       <div className="absolute w-screen h-px top-2/4 bg-gradient-to-r from-gray-200 opacity-20 to-gray-200 via-black" />
 
       <Wrapper>
