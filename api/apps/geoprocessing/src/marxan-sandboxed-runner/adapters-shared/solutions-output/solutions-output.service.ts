@@ -6,7 +6,7 @@ import { Workspace } from '../../ports/workspace';
 
 import { GeoOutputRepository } from './geo-output';
 import { ResultParserService } from './result-parser.service';
-import { MarxanDirectory } from '../marxan-directory.service';
+import { MarxanDirectory } from '../../adapters-single/marxan-directory.service';
 import { RunDirectories } from './run-directories';
 import { SandboxRunnerOutputHandler } from '../../ports/sandbox-runner-output-handler';
 

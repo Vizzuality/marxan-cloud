@@ -8,8 +8,8 @@ import {
 
 import { GeoOutputRepository } from './geo-output.repository';
 import { MetadataArchiver } from './metadata/data-archiver.service';
-import { MarxanDirectory } from '../../marxan-directory.service';
-import { FileReader } from '../../file-reader';
+import { MarxanDirectory } from '../../../adapters-single/marxan-directory.service';
+import { FileReader } from '../../../adapters-single/file-reader';
 import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
 import { PlanningUnitSelectionCalculatorService } from './solutions/solution-aggregation/planning-unit-selection-calculator.service';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
