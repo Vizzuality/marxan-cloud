@@ -7,7 +7,7 @@ import { withUser } from 'hoc/auth';
 import Footer from 'layout/footer';
 import Head from 'layout/head';
 import Header from 'layout/header';
-import CarouselSection from 'layout/home/carousel-section';
+import Banner from 'layout/home/banner';
 import Features from 'layout/home/features';
 import Hero from 'layout/home/hero';
 import MetaIcons from 'layout/meta-icons';
@@ -37,7 +37,7 @@ const Home: React.FC = () => {
         <Header size="lg" theme="light" />
         <Hero />
         <Features />
-        <CarouselSection />
+        <Banner />
         <PartnersList />
         <Footer />
       </main>
