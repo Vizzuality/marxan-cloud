@@ -11,10 +11,11 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 import { PieceExportProvider, PieceProcessor } from '../pieces/piece-processor';
 import { ResourceKind } from '@marxan/cloning/domain';
+import { GeoJSON } from 'geojson';
 
 @Injectable()
 @PieceExportProvider()
-export class PlanningAreaGadm extends PieceProcessor {
+export class PlanningAreaCustomGrid extends PieceProcessor {
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
@@ -24,7 +25,7 @@ export class PlanningAreaGadm extends PieceProcessor {
   }
 
   isSupported(piece: ClonePiece): boolean {
-    return piece === ClonePiece.PlanningAreaGAdm;
+    return piece === ClonePiece.PlanningAreaGridCustom;
   }
 
   async run(input: JobInput): Promise<JobOutput> {
@@ -32,25 +33,24 @@ export class PlanningAreaGadm extends PieceProcessor {
       throw new Error(`Exporting scenario is not yet supported.`);
     }
 
-    const gadm: {
-      country: string | null;
-      l1: string | null;
-      l2: string | null;
-    }[] = await this.entityManager.query(
-      `
-    SELECT country_id as country, admin_area_l1_id as l1, admin_area_l2_id as l2 from projects
-    WHERE id = $1
-    `,
-      [input.resourceId],
-    );
+    const customProjectAreaFile = 'project-grid/custom-grid.geojson';
 
     const metadata = JSON.stringify({
-      gadm: {
-        country: gadm?.[0]?.country,
-        l1: gadm?.[0]?.l1,
-        l2: gadm?.[0]?.l2,
-      },
+      shape: 'square',
+      areaKm2: 4000,
+      bbox: [],
+      file: customProjectAreaFile,
     });
+
+    const geoJson: GeoJSON = {
+      bbox: [0, 0, 0, 0, 0, 0],
+      coordinates: [],
+      type: 'MultiPolygon',
+    };
+
+    const planningAreaGeoJson = await this.fileRepository.save(
+      Readable.from(JSON.stringify(geoJson)),
+    );
 
     const outputFile = await this.fileRepository.save(
       Readable.from(metadata),
@@ -59,7 +59,13 @@ export class PlanningAreaGadm extends PieceProcessor {
 
     if (isLeft(outputFile)) {
       throw new Error(
-        `${PlanningAreaGadm.name} - Project GADM - couldn't save file - ${outputFile.left.description}`,
+        `${PlanningAreaCustomGrid.name} - Project Custom PA - couldn't save file - ${outputFile.left.description}`,
+      );
+    }
+
+    if (isLeft(planningAreaGeoJson)) {
+      throw new Error(
+        `${PlanningAreaCustomGrid.name} - Project Custom PA - couldn't save file - ${planningAreaGeoJson.left.description}`,
       );
     }
 
@@ -68,7 +74,11 @@ export class PlanningAreaGadm extends PieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: `planning-area.json`,
+          relativePath: `project-grid.json`,
+        },
+        {
+          uri: planningAreaGeoJson.right,
+          relativePath: customProjectAreaFile,
         },
       ],
     };

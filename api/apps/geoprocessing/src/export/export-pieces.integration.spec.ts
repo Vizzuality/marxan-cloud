@@ -38,15 +38,15 @@ test(`exporting supported piece`, async () => {
 
 test(`exporting unsupported piece`, async () => {
   const input = {
-    piece: ClonePiece.ScenarioMetadata,
+    piece: `some piece` as ClonePiece,
     componentId: '1',
     exportId: '2',
     resourceId: '3',
     resourceKind: ResourceKind.Scenario,
-    allPieces: [ClonePiece.ScenarioMetadata],
+    allPieces: [ClonePiece.ProjectMetadata],
   };
   await expect(fixtures.sut.run(input)).rejects.toEqual(
-    new Error(`${ClonePiece.ScenarioMetadata} is not yet supported.`),
+    new Error(`some piece is not yet supported.`),
   );
 });
 

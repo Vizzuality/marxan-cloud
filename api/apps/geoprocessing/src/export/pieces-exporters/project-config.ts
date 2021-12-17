@@ -32,6 +32,8 @@ export class ProjectConfig extends PieceProcessor {
       throw new Error(`Exporting scenario is not yet supported.`);
     }
 
+    await delay();
+
     const scenarios: { name: string }[] = await this.entityManager.query(
       `
        SELECT name FROM scenarios where project_id = $1
@@ -68,3 +70,8 @@ export class ProjectConfig extends PieceProcessor {
     };
   }
 }
+
+const delay = () =>
+  new Promise((resolve) => {
+    setTimeout(resolve, 1000);
+  });
