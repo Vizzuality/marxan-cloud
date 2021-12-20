@@ -12,9 +12,4 @@ export abstract class ProjectAccessControl {
     userId: string,
     projectId: string,
   ): Promise<Permit>;
-  abstract canEditScenario(scenarioId: string, userId: string): Promise<Permit>;
-  abstract canViewSolutions(
-    scenarioId: string,
-    userId: string,
-  ): Promise<Permit>;
 }
