@@ -28,11 +28,16 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
       <Wrapper>
         <div className="flex flex-col items-center space-y-20">
           <div>
-            <h5 className="text-5xl font-heading">Marxan software is</h5>
-            <div className="flex flex-col w-full max-w-4xl m-auto md:px-10 md:-top-8 text-primary-500">
-              {!!claimLines.length && claimLines.map((cl) => (
-                <p key={cl.id}>{cl.text}</p>
-              ))}
+            <h5 className="text-6xl font-heading">Marxan software is</h5>
+            <div
+              className="relative h-40"
+              style={{ clipPath: 'polygon(0 5%, 100% 5%, 100% 40%, 0 40%)' }}
+            >
+              <div className="absolute flex flex-col items-center w-full max-w-4xl animate-banner text-primary-500">
+                {!!claimLines.length && claimLines.map((cl) => (
+                  <p className="mb-16 text-5xl" key={cl.id}>{cl.text}</p>
+                ))}
+              </div>
             </div>
           </div>
 
