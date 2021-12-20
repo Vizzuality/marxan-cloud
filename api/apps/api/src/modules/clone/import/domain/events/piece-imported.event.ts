@@ -6,6 +6,5 @@ export class PieceImported implements IEvent {
     public readonly id: ComponentId,
     public readonly piece: ClonePiece,
     public readonly resourceId: ResourceId,
-    public readonly uri: string,
   ) {}
 }

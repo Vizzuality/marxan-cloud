@@ -75,14 +75,11 @@ export class Import extends AggregateRoot {
       return left(componentAlreadyCompleted);
     }
 
-    pieceToComplete.uri = piece.uri;
-
     this.apply(
       new PieceImported(
         pieceToComplete.id,
         pieceToComplete.piece,
         pieceToComplete.resourceId,
-        pieceToComplete.uri,
       ),
     );
 
@@ -94,9 +91,10 @@ export class Import extends AggregateRoot {
       for (const nextPiece of nextBatch.components) {
         this.apply(
           new PieceImportRequested(
-            pieceToComplete.id,
-            pieceToComplete.piece,
-            pieceToComplete.resourceId,
+            nextPiece.id,
+            nextPiece.piece,
+            nextPiece.resourceId,
+            nextPiece.uri,
           ),
         );
       }
@@ -128,6 +126,7 @@ export class Import extends AggregateRoot {
             component.id,
             component.piece,
             component.resourceId,
+            component.uri,
           ),
         );
       }
