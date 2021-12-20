@@ -7,7 +7,7 @@ import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scen
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
-import { ScenarioAclService } from './scenario-acl.service';
+import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios-acl/scenario-acl.service';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
