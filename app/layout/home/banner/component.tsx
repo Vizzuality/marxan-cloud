@@ -59,11 +59,11 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
 
             <div className="relative flex flex-row space-x-3.5 w-1/3">
 
-              <img alt="Map layers example" src={MAP_LAYERS_IMG} className="self-center w-56 mx-auto" />
+              <img alt="Map layers example" src={MAP_LAYERS_IMG} className="self-center w-56 pr-2 mx-auto" />
 
-              <img alt="Scenario name label" src={SCENARIO_NAME_IMG} className="absolute h-24 top-3 right-3" />
-              <img alt="Run scenario label" src={RUN_SCENARIO_BTN_IMG} className="absolute h-12 right-10 bottom-14" />
-              <img alt="Select planning units label" src={SELECT_PLANNING_UNITS_IMG} className="absolute h-24 left-10 -top-6" />
+              <img alt="Scenario name label" src={SCENARIO_NAME_IMG} className="absolute h-24 top-3 right-5" />
+              <img alt="Run scenario label" src={RUN_SCENARIO_BTN_IMG} className="absolute h-12 right-5 bottom-16" />
+              <img alt="Select planning units label" src={SELECT_PLANNING_UNITS_IMG} className="absolute h-24 left-12 -top-6" />
             </div>
             <div className="absolute w-full h-8 -bottom-16">
               <div
