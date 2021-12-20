@@ -2,10 +2,12 @@ import { BlmInputFiles } from '@marxan-geoprocessing/marxan-sandboxed-runner/ada
 import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
 import { JobData } from '@marxan/blm-calibration';
 import { Injectable } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
 import AbortController from 'abort-controller';
 import { v4 } from 'uuid';
 import { SandboxRunner } from '../ports/sandbox-runner';
 import { BlmFinalResultsRepository } from './blm-final-results.repository';
+import { BlmCalibrationStarted } from './events/blm-calibration-started.event';
 import { MarxanRunnerFactory } from './marxan-runner.factory';
 
 @Injectable()
@@ -17,6 +19,7 @@ export class MarxanSandboxBlmRunnerService
     private readonly inputFilesHandler: BlmInputFiles,
     private readonly finalResultsRepository: BlmFinalResultsRepository,
     private readonly marxanRunnerFactory: MarxanRunnerFactory,
+    private readonly eventBus: EventBus,
   ) {}
 
   kill(ofScenarioId: string): void {
@@ -35,6 +38,10 @@ export class MarxanSandboxBlmRunnerService
       input.assets,
     );
     const calibrationId = v4();
+
+    await this.eventBus.publish(
+      new BlmCalibrationStarted(scenarioId, calibrationId),
+    );
 
     for (const { workspace, blmValue } of workspaces) {
       const singleRunner = this.marxanRunnerFactory.for(

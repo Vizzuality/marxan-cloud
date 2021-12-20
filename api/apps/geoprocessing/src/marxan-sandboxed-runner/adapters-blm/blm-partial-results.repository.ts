@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Workspace } from '../ports/workspace';
 import { BlmBestRunService } from './blm-best-run.service';
 import { BlmPartialResultEntity } from './blm-partial-results.geo.entity';
@@ -35,6 +35,16 @@ export class BlmPartialResultsRepository {
       scenarioId,
       calibrationId,
       score: bestRun.score,
+    });
+  }
+
+  async removePreviousPartialResults(
+    scenarioId: string,
+    currentCalibrationId: string,
+  ): Promise<void> {
+    await this.repository.delete({
+      scenarioId,
+      calibrationId: Not(currentCalibrationId),
     });
   }
 }
