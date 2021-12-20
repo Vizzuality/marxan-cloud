@@ -6,7 +6,7 @@ export class AddRolesForScenarios1640019321726 implements MigrationInterface {
     INSERT INTO roles (name)
     values ('scenario_owner'),
            ('scenario_contributor'),
-           ('scenario_viewer'),
+           ('scenario_viewer');
   `);
   }
 
