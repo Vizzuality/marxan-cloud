@@ -6,17 +6,7 @@ import {
 } from '@marxan/scenario-run-queue';
 import { MarxanParametersDefaults } from '@marxan/marxan-input';
 import { QueueBuilder, QueueEventsBuilder } from '@marxan-api/modules/queue';
-import {
-  blmDefaultToken,
-  calibrationEventsToken,
-  calibrationQueueToken,
-  runEventsToken,
-  runQueueToken,
-} from './tokens';
-import {
-  blmCalibrationQueueName,
-  JobData as CalibrationJobData,
-} from '@marxan/blm-calibration';
+import { blmDefaultToken, runEventsToken, runQueueToken } from './tokens';
 
 export const runQueueProvider: FactoryProvider<Queue<RunJobData>> = {
   provide: runQueueToken,
@@ -30,24 +20,6 @@ export const runQueueEventsProvider: FactoryProvider<QueueEvents> = {
   provide: runEventsToken,
   useFactory: (eventsBuilder: QueueEventsBuilder) => {
     return eventsBuilder.buildQueueEvents(runQueueName);
-  },
-  inject: [QueueEventsBuilder],
-};
-
-export const calibrationQueueProvider: FactoryProvider<
-  Queue<CalibrationJobData>
-> = {
-  provide: calibrationQueueToken,
-  useFactory: (queueBuilder: QueueBuilder<CalibrationJobData>) => {
-    return queueBuilder.buildQueue(blmCalibrationQueueName);
-  },
-  inject: [QueueBuilder],
-};
-
-export const calibrationQueueEventsProvider: FactoryProvider<QueueEvents> = {
-  provide: calibrationEventsToken,
-  useFactory: (eventsBuilder: QueueEventsBuilder) => {
-    return eventsBuilder.buildQueueEvents(blmCalibrationQueueName);
   },
   inject: [QueueEventsBuilder],
 };
