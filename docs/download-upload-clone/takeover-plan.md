@@ -41,8 +41,14 @@ This actually is "more" for the whole project/scenarios - while frontend
 10. Create tasks to implement each of piece-export properly - see 
     `api/apps/geoprocessing/src/export/pieces-exporters` exporters. May 
     require using Shapefile service and getting through database schema. 
+11. https://vizzuality.atlassian.net/browse/MARXAN-1145 - error handling in 
+    case any of the exported pieces fail
+12. https://vizzuality.atlassian.net/browse/MARXAN-1146 - Spike - to figure 
+    out parallel processing of exported pieces
+13. Export state repository - https://vizzuality.atlassian.
+	net/browse/MARXAN-871 & https://vizzuality.atlassian.net/browse/MARXAN-1147
 
-11. Wrapping up task:
+14. Wrapping up task:
 https://vizzuality.atlassian.net/browse/MARXAN-875 to ensure the zip is 
     produced/valid - currently it "works" but due to  all the tasks above, it 
     may break anytime
