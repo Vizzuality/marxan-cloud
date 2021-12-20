@@ -18,9 +18,10 @@ import { Either, left, right } from 'fp-ts/Either';
  */
 @Injectable()
 export class ProjectAclService implements ProjectAccessControl {
-  private readonly canCreateScenarioRoles = [Roles.project_owner];
-  private readonly canEditScenarioRoles = [Roles.project_owner];
-  private readonly canViewSolutionRoles = [Roles.project_owner];
+  private readonly canCreateScenarioRoles = [
+    Roles.project_owner,
+    Roles.project_contributor,
+  ];
   private readonly canPublishProjectRoles = [Roles.project_owner];
   private readonly canViewProjectRoles = [
     Roles.project_owner,
@@ -100,18 +101,6 @@ export class ProjectAclService implements ProjectAccessControl {
     return this.doesUserHaveRole(
       await this.getRolesWithinProjectForUser(userId, projectId),
       this.canCreateScenarioRoles,
-    );
-  }
-  async canEditScenario(userId: string, projectId: string): Promise<Permit> {
-    return this.doesUserHaveRole(
-      await this.getRolesWithinProjectForUser(userId, projectId),
-      this.canEditScenarioRoles,
-    );
-  }
-  async canViewSolutions(userId: string, projectId: string): Promise<Permit> {
-    return this.doesUserHaveRole(
-      await this.getRolesWithinProjectForUser(userId, projectId),
-      this.canViewSolutionRoles,
     );
   }
 
