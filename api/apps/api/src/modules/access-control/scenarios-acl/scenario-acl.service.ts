@@ -4,8 +4,8 @@ import { intersection } from 'lodash';
 import { Repository } from 'typeorm';
 import { Permit } from '../access-control.types';
 import { Roles } from '../role.api.entity';
-import { UsersScenariosApiEntity } from './entity/users-scenarios.api.entity';
-import { ScenarioAccessControl } from './scenario-access-control';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
