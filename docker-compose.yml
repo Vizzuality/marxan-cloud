@@ -17,16 +17,16 @@ services:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
       - marxan-cloud-backend-temp-storage:/tmp/storage
-    env_file: .env
+    env_file: ${ENVFILE}
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
-      - API_POSTGRES_HOST=marxan-postgresql-api
+      - API_POSTGRES_HOST=postgresql-api
       - API_POSTGRES_USER
       - API_POSTGRES_PASSWORD
       - API_POSTGRES_PORT=5432
+      - GEO_POSTGRES_HOST=postgresql-geo-api
       - API_POSTGRES_DB
-      - GEO_POSTGRES_HOST=marxan-postgresql-geo-api
       - GEO_POSTGRES_USER
       - GEO_POSTGRES_PASSWORD
       - GEO_POSTGRES_PORT=5432
@@ -49,7 +49,7 @@ services:
     volumes:
       - ./app/src:/opt/marxan-app/src
       - ./app/test:/opt/marxan-app/test
-    env_file: .env
+    env_file: ${ENVFILE}
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
@@ -70,16 +70,16 @@ services:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs
       - marxan-cloud-backend-temp-storage:/tmp/storage
-    env_file: .env
+    env_file: ${ENVFILE}
     environment:
       - NODE_PATH=src
       - NODE_ENV=development
-      - API_POSTGRES_HOST=marxan-postgresql-api
+      - API_POSTGRES_HOST=postgresql-api
       - API_POSTGRES_USER
       - API_POSTGRES_PASSWORD
       - API_POSTGRES_PORT=5432
       - API_POSTGRES_DB
-      - GEO_POSTGRES_HOST=marxan-postgresql-geo-api
+      - GEO_POSTGRES_HOST=postgresql-geo-api
       - GEO_POSTGRES_USER
       - GEO_POSTGRES_PASSWORD
       - GEO_POSTGRES_PORT=5432
@@ -176,8 +176,7 @@ services:
     image: apache/airflow:2.0.0
     restart: on-failure
     entrypoint: ['sh','./scripts/entrypoint.sh']
-    env_file:
-      - .env
+    env_file: ${ENVFILE}
     environment:
       - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgresql-airflow/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor

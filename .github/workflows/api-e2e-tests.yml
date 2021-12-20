@@ -33,7 +33,7 @@ jobs:
     - name: Checkout envs
       run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
     - name: Run CI tests via make task
-      run: make run-test-e2e-ci
+      run: make test-e2e-backend
   test-api-unit:
     runs-on: ubuntu-18.04
     timeout-minutes: 10

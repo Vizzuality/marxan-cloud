@@ -18,6 +18,7 @@ services:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
       - marxan-cloud-backend-e2e-temp-storage:/tmp/storage
+    env_file: ${ENVFILE}
     environment:
       - NODE_PATH=src
       - NODE_ENV=test
@@ -54,6 +55,7 @@ services:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs
       - marxan-cloud-backend-e2e-temp-storage:/tmp/storage
+    env_file: ${ENVFILE}
     environment:
       - NODE_PATH=src
       - NODE_ENV=test
