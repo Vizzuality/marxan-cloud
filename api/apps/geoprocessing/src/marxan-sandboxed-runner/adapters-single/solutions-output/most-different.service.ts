@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { minBy, reduce } from 'lodash';
-import { ResultRow } from '@marxan/marxan-output';
+import { ResultRow, ResultWithPUValues } from '@marxan/marxan-output';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -13,7 +13,7 @@ type SolutionPerClusterGroup<T = ResultRow> = TargetCluster<T>;
 
 @Injectable()
 export class MostDifferentService {
-  map(fromState: ResultRow[]): ResultRow[] {
+  map(fromState: ResultWithPUValues[]): ResultRow[] {
     if (fromState.length <= 5) {
       return fromState.map((state) =>
         plainToClass(ResultRow, {
@@ -29,7 +29,7 @@ export class MostDifferentService {
       // TODO @alicia @andrea - what if desired cluster was not found?
       // for whatever reason, library couldn't divide it and a cluster of 5
       // groups was not resolved
-      return fromState;
+      return this.#getDefaultValueForDistinctFiveProperty(fromState);
     }
     const selectedSolutions = this.#getSolutionsFromCluster(targetCluster)?.map(
       (solution) => solution.runId,
@@ -38,7 +38,7 @@ export class MostDifferentService {
     // TODO @alicia @andrea - what if we couldn't get the 'desired' item
     //  from group? (very unlikely but possible - group has 0 members)
     if (!selectedSolutions) {
-      return fromState;
+      return this.#getDefaultValueForDistinctFiveProperty(fromState);
     }
     return fromState.map((state) =>
       plainToClass(ResultRow, {
@@ -48,8 +48,19 @@ export class MostDifferentService {
     );
   }
 
+  #getDefaultValueForDistinctFiveProperty = (
+    fromState: ResultWithPUValues[],
+  ): ResultRow[] => {
+    return fromState.map((state) =>
+      plainToClass(ResultRow, {
+        ...state,
+        distinctFive: false,
+      }),
+    );
+  };
+
   #getClusterOfFiveGroup = (
-    solutions: ResultRow[],
+    solutions: ResultWithPUValues[],
   ): TargetCluster | undefined => {
     const clusters = clusterData({
       data: solutions.map((state) => ({

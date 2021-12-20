@@ -3,8 +3,8 @@ import { HttpModule, Module } from '@nestjs/common';
 import { MarxanConfig } from '../marxan-config';
 
 // ports
-import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
-import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
+import { SandboxRunnerOutputHandler } from '../ports/sandbox-runner-output-handler';
+import { SandboxRunnerInputFiles } from '../ports/sandbox-runner-input-files';
 
 // adapters
 import { WorkspaceModule } from '../adapters-shared/workspace/workspace.module';

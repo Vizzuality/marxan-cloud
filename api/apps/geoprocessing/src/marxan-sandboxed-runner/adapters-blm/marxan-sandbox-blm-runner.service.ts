@@ -1,14 +1,14 @@
 import { BlmInputFiles } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-input-files';
-import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
 import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
 import { JobData } from '@marxan/blm-calibration';
-import { ExecutionResult } from '@marxan/marxan-output';
 import { Injectable } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
 import AbortController from 'abort-controller';
-import { WorkspaceBuilder } from '../ports/workspace-builder';
-import { SandboxRunner } from '../sandbox-runner';
-import { SandboxRunnerInputFiles } from '../sandbox-runner-input-files';
-import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
+import { v4 } from 'uuid';
+import { SandboxRunner } from '../ports/sandbox-runner';
+import { BlmFinalResultsRepository } from './blm-final-results.repository';
+import { BlmCalibrationStarted } from './events/blm-calibration-started.event';
+import { MarxanRunnerFactory } from './marxan-runner.factory';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
@@ -17,7 +17,9 @@ export class MarxanSandboxBlmRunnerService
 
   constructor(
     private readonly inputFilesHandler: BlmInputFiles,
-    private readonly outputHandler: SandboxRunnerOutputHandler<void>,
+    private readonly finalResultsRepository: BlmFinalResultsRepository,
+    private readonly marxanRunnerFactory: MarxanRunnerFactory,
+    private readonly eventBus: EventBus,
   ) {}
 
   kill(ofScenarioId: string): void {
@@ -35,27 +37,18 @@ export class MarxanSandboxBlmRunnerService
       blmValues,
       input.assets,
     );
+    const calibrationId = v4();
 
-    for (const { workspace } of workspaces) {
-      const workspaceBuilder: WorkspaceBuilder = {
-        get: async () => workspace,
-      };
-      const inputFilesHandler: SandboxRunnerInputFiles = {
-        include: async () => {
-          // noop, already included by original input handler
-        },
-        cancel: async () => {
-          // noop
-        },
-      };
-      const outputHandler: SandboxRunnerOutputHandler<ExecutionResult> = {
-        dump: () => {},
-      } as any;
+    await this.eventBus.publish(
+      new BlmCalibrationStarted(scenarioId, calibrationId),
+    );
 
-      const singleRunner = new MarxanSandboxRunnerService(
-        workspaceBuilder,
-        inputFilesHandler,
-        outputHandler,
+    for (const { workspace, blmValue } of workspaces) {
+      const singleRunner = this.marxanRunnerFactory.for(
+        scenarioId,
+        calibrationId,
+        blmValue,
+        workspace,
       );
 
       const cancelablesForThisRun: Cancellable[] = [
@@ -67,6 +60,11 @@ export class MarxanSandboxBlmRunnerService
 
       await singleRunner.run(input, progressCallback);
     }
+
+    await this.finalResultsRepository.saveFinalResults(
+      scenarioId,
+      calibrationId,
+    );
   }
 
   private getAbortControllerForRun(

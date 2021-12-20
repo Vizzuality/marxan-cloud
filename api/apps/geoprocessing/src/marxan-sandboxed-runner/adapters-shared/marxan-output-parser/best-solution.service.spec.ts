@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { ResultRow } from '@marxan/marxan-output';
+import { ResultWithBestSolution } from '@marxan/marxan-output';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
 import { BestSolutionService } from './best-solution.service';
@@ -25,7 +25,7 @@ const getFixtures = async () => {
 
   return {
     WhenSearchingForBestSolution: () => sut.map(subjectRows),
-    ThenLowestScoreIsMarked: (result: ResultRow[]) => {
+    ThenLowestScoreIsMarked: (result: ResultWithBestSolution[]) => {
       expect(result.filter((solution) => solution.best)?.[0].runId).toEqual(
         lowestScoreRunId,
       );

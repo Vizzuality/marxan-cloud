@@ -2,7 +2,7 @@ import { IsBoolean, IsInt, IsNumber } from 'class-validator';
 
 export type ExecutionResult = ResultRow[];
 
-export class ResultRow {
+export class ParsedRow {
   @IsInt()
   runId!: number;
 
@@ -44,13 +44,14 @@ export class ResultRow {
 
   @IsNumber()
   mpm!: number;
+}
 
+export class ResultWithBestSolution extends ParsedRow {
   @IsBoolean()
   best!: boolean;
+}
 
-  @IsBoolean()
-  distinctFive!: boolean;
-
+export class ResultWithPUValues extends ResultWithBestSolution {
   @IsNumber(
     {},
     {
@@ -58,4 +59,9 @@ export class ResultRow {
     },
   )
   puValues!: number[];
+}
+
+export class ResultRow extends ResultWithPUValues {
+  @IsBoolean()
+  distinctFive!: boolean;
 }
