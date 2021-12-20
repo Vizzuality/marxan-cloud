@@ -63,6 +63,10 @@ import {
   ChangeRangeErrors,
 } from '@marxan-api/modules/projects/blm';
 import { GetFailure, ProjectBlmRepo } from '@marxan-api/modules/blm';
+import {
+  CalibrationRunResult,
+  ScenarioCalibrationRepo,
+} from '../blm/values/scenario-calibration-repo';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -118,6 +122,7 @@ export class ScenariosService {
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
     private readonly blmValuesRepository: ProjectBlmRepo,
+    private readonly scenarioCalibrationRepository: ScenarioCalibrationRepo,
   ) {}
 
   async findAllPaginated(
@@ -272,6 +277,14 @@ export class ScenariosService {
     await this.runService.runCalibration(id, projectBlmValues.right.values);
 
     return right(true);
+  }
+
+  async getBlmCalibrationResults(
+    scenarioId: string,
+  ): Promise<CalibrationRunResult[]> {
+    return this.scenarioCalibrationRepository.getScenarioCalibrationResults(
+      scenarioId,
+    );
   }
 
   async cancel(scenarioId: string): Promise<void> {

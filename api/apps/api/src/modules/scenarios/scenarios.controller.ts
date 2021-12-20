@@ -104,6 +104,7 @@ import {
   planningUnitAreaNotFound,
 } from '@marxan-api/modules/projects/blm/change-blm-range.command';
 import { projectNotFound } from '@marxan-api/modules/blm';
+import { BlmCalibrationRunResultDto } from './dto/scenario-blm-calibration-results.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -761,5 +762,16 @@ export class ScenariosController {
     }
 
     return AsyncJobDto.forScenario().asJsonApiMetadata();
+  }
+
+  @ApiOkResponse({
+    type: BlmCalibrationRunResultDto,
+    isArray: true,
+  })
+  @Get(`:id/calibration`)
+  async getCalibrationResults(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<BlmCalibrationRunResultDto[]> {
+    return this.service.getBlmCalibrationResults(id);
   }
 }
