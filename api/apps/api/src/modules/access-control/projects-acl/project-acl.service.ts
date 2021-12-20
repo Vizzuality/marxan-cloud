@@ -22,10 +22,10 @@ import { assertDefined } from '@marxan/utils';
 @Injectable()
 export class ProjectAclService implements ProjectAccessControl {
   private readonly canCreateScenarioRoles = [
-    ProjectRoles.project_owner,
-    ProjectRoles.project_contributor,
+    Roles.project_owner,
+    Roles.project_contributor,
   ];
-  private readonly canPublishProjectRoles = [ProjectRoles.project_owner];
+  private readonly canPublishProjectRoles = [Roles.project_owner];
   private readonly canViewProjectRoles = [
     ProjectRoles.project_owner,
     ProjectRoles.project_contributor,
