@@ -3,7 +3,6 @@ import {
   fromFileUrl,
   relative,
 } from "https://deno.land/std@0.103.0/path/mod.ts";
-import { sleep } from "https://deno.land/x/sleep@v1.2.0/mod.ts";
 import { createBot } from "../../lib/libbot/init.ts";
 import { MarxanBotConfig } from "../../lib/libbot/marxan-bot.ts";
 import { SpecificationStatus } from "../../lib/libbot/geo-feature-specifications.ts";
@@ -21,9 +20,10 @@ export const runBot = async (settings: MarxanBotConfig) => {
 
   const planningUnitAreakm2 = 25;
 
-  const planningAreaId = await bot.planningAreaUploader.uploadFromFile(
+  const planningAreaId = await bot.planningAreaUploader.setFromShapefile(
     `${scriptPath}/kimberley.zip`,
   );
+
   const project = await bot.projects.createInOrganization(organization.id, {
     name: "Australia - Kimberley " + crypto.randomUUID(),
     description: "",
@@ -32,10 +32,7 @@ export const runBot = async (settings: MarxanBotConfig) => {
     planningUnitAreakm2,
   });
 
-  // We don't expose status of planning unit grid calculations yet so we cannot
-  // poll for completion of this task, but a reasonable, project-specific wait
-  // here will do when there is nothing else keeping the API and PostgreSQL busy.
-  await sleep(30);
+  await bot.asyncJobStatus.waitForPlanningUnitCalculationsFor(project.id);
 
   // Scenario creation with the bare minimum; From there we need to be setting
   // other traits via patch.
@@ -50,16 +47,19 @@ export const runBot = async (settings: MarxanBotConfig) => {
   const paCategories = await bot.protectedAreas
     .getIucnCategoriesForPlanningAreaWithId(planningAreaId);
 
-  await bot.scenarios.update(scenario.id, {
-    wdpaIucnCategories: paCategories,
+  await bot.protectedAreas.setForScenario(scenario.id, {
+    areas: paCategories.map((category) => ({
+      id: category,
+      selected: true,
+    })),
+    threshold: 75,
   });
 
   await bot.scenarios.update(scenario.id, {
-    wdpaThreshold: 50,
     metadata: bot.metadata.analysisPreview(),
   });
 
-  await bot.scenarioStatus.waitForPlanningAreaProtectedCalculationFor(
+  await bot.asyncJobStatus.waitForPlanningAreaProtectedCalculationFor(
     project.id,
     scenario.id,
     "short",
@@ -93,7 +93,7 @@ export const runBot = async (settings: MarxanBotConfig) => {
     SpecificationStatus.created,
   );
 
-  await bot.scenarioStatus.waitForFeatureSpecificationCalculationFor(
+  await bot.asyncJobStatus.waitForFeatureSpecificationCalculationFor(
     project.id,
     scenario.id,
     "some",
@@ -103,7 +103,7 @@ export const runBot = async (settings: MarxanBotConfig) => {
 
   await bot.marxanExecutor.runForScenario(scenario.id);
 
-  await bot.scenarioStatus.waitForMarxanCalculationsFor(
+  await bot.asyncJobStatus.waitForMarxanCalculationsFor(
     project.id,
     scenario.id,
     "some",

@@ -1,5 +1,5 @@
-import { Cancellable } from './ports/cancellable';
-import { Workspace } from './ports/workspace';
+import { Cancellable } from './cancellable';
+import { Workspace } from './workspace';
 
 export abstract class SandboxRunnerOutputHandler<T> implements Cancellable {
   abstract dump(

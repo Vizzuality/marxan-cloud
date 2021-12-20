@@ -1,66 +1,84 @@
-import { Injectable } from '@nestjs/common';
+import { BlmInputFiles } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-input-files';
+import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
 import { JobData } from '@marxan/blm-calibration';
-
-import { SandboxRunner } from '../sandbox-runner';
-import { WorkspaceBuilder } from '../ports/workspace-builder';
-import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
-import { BlmInputFiles } from './blm-input-files';
+import { Injectable } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
+import AbortController from 'abort-controller';
+import { v4 } from 'uuid';
+import { SandboxRunner } from '../ports/sandbox-runner';
+import { BlmFinalResultsRepository } from './blm-final-results.repository';
+import { BlmCalibrationStarted } from './events/blm-calibration-started.event';
+import { MarxanRunnerFactory } from './marxan-runner.factory';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
   implements SandboxRunner<JobData, void> {
+  readonly #controllers: Record<string, AbortController> = {};
+
   constructor(
-    private readonly workspaceService: WorkspaceBuilder,
     private readonly inputFilesHandler: BlmInputFiles,
-    private readonly outputFilesHandler: SandboxRunnerOutputHandler<void>,
+    private readonly finalResultsRepository: BlmFinalResultsRepository,
+    private readonly marxanRunnerFactory: MarxanRunnerFactory,
+    private readonly eventBus: EventBus,
   ) {}
 
-  kill(ofScenarioId: string): void {}
+  kill(ofScenarioId: string): void {
+    const controller = this.#controllers[ofScenarioId];
+
+    if (controller && !controller.signal.aborted) controller.abort();
+  }
 
   async run(
     input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<void> {
-    const { blmValues } = input;
-    console.log(`running BLM calibration for:`, blmValues);
+    const { blmValues, scenarioId } = input;
     const workspaces = await this.inputFilesHandler.for(
       blmValues,
       input.assets,
     );
+    const calibrationId = v4();
 
-    for (const workspace of workspaces) {
-      // run & persist
-      console.log(
-        `running for ${workspace.blmValue} - ${workspace.workspace.workingDirectory}`,
+    await this.eventBus.publish(
+      new BlmCalibrationStarted(scenarioId, calibrationId),
+    );
+
+    for (const { workspace, blmValue } of workspaces) {
+      const singleRunner = this.marxanRunnerFactory.for(
+        scenarioId,
+        calibrationId,
+        blmValue,
+        workspace,
       );
+
+      const cancelablesForThisRun: Cancellable[] = [
+        {
+          cancel: async () => singleRunner.kill(scenarioId),
+        },
+      ];
+      this.getAbortControllerForRun(scenarioId, cancelablesForThisRun);
+
+      await singleRunner.run(input, progressCallback);
     }
 
-    /**
-     * should have its own AbortController
-     * to be able to kill underlying runs
-     */
+    await this.finalResultsRepository.saveFinalResults(
+      scenarioId,
+      calibrationId,
+    );
+  }
 
-    /**
-     *   for each blmValue, run (sequence, chunks...)
-     *   single MarxanSandboxRunnerService
-     *
-     *   consider creating specific BlmPartialResultsRepository
-     *   for each run so that BLM value could be attached
-     */
+  private getAbortControllerForRun(
+    scenarioId: string,
+    cancellables: Cancellable[],
+  ) {
+    const controller = (this.#controllers[
+      scenarioId
+    ] ??= new AbortController());
 
-    /**
-     * assets:
-     *
-     * single "fetch" may be performed there
-     * or the SandboxRunnerInputFiles may be implemented
-     * in such way to handle "single fetch"
-     */
+    controller.signal.addEventListener('abort', () => {
+      cancellables.forEach((killMe) => killMe.cancel());
+    });
 
-    /**
-     * it may be necessary to extract some single-run-adapters-single
-     * to be used there as well (like workspace)
-     */
-
-    return Promise.resolve(undefined);
+    return controller;
   }
 }

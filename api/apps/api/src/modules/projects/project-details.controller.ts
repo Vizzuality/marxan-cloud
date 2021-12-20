@@ -8,7 +8,9 @@ import {
 import {
   applyDecorators,
   Controller,
+  ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   Req,
   UseGuards,
@@ -20,8 +22,10 @@ import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 
 import { projectResource, ProjectResultSingular } from './project.api.entity';
-import { ProjectsService } from './projects.service';
+import { notFound, ProjectsService } from './projects.service';
 import { ProjectSerializer } from './dto/project.serializer';
+import { isLeft } from 'fp-ts/lib/Either';
+import { forbiddenError } from '../access-control';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -39,11 +43,23 @@ export class ProjectDetailsController {
     @Param('id') id: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResultSingular> {
-    return await this.projectSerializer.serialize(
-      await this.projectsService.findOne(id, {
-        authenticatedUser: req.user,
-      }),
-    );
+    const result = await this.projectsService.findOne(id, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case notFound:
+          throw new NotFoundException(`Project ${id} could not be found`);
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+
+    return await this.projectSerializer.serialize(result.right);
   }
 }
 

@@ -23,7 +23,7 @@ import {
   MultiplePlanningAreaIds,
   PlanningAreasService,
 } from '@marxan-api/modules/planning-areas';
-import { UsersProjectsApiEntity } from './control-level/users-projects.api.entity';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProtectedArea } from '@marxan/protected-areas';
@@ -302,31 +302,6 @@ export class ProjectsCrudService extends AppBaseService<
     }));
 
     return entity;
-  }
-
-  extendGetByIdQuery(
-    query: SelectQueryBuilder<Project>,
-    fetchSpecification?: FetchSpecification,
-    info?: ProjectsRequest,
-  ): SelectQueryBuilder<Project> {
-    const loggedUser = Boolean(info?.authenticatedUser);
-    query.leftJoin(
-      UsersProjectsApiEntity,
-      `acl`,
-      `${this.alias}.id = acl.project_id`,
-    );
-
-    if (loggedUser) {
-      query
-        .andWhere(`acl.user_id = :userId`, {
-          userId: info?.authenticatedUser?.id,
-        })
-        .andWhere(`acl.role_id = :roleId`, {
-          roleId: Roles.project_owner,
-        });
-    }
-
-    return query;
   }
 
   async extendFindAllQuery(

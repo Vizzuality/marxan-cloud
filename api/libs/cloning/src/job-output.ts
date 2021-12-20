@@ -5,5 +5,5 @@ export interface JobOutput {
   readonly componentId: string;
   readonly resourceId: string;
   readonly piece: ClonePiece;
-  readonly uri: string;
+  readonly uris: Array<{ uri: string; relativePath: string }>;
 }

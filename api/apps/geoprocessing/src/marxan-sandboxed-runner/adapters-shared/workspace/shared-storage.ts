@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
-import { promises } from 'fs';
+import { promises, existsSync } from 'fs';
 import { resolve } from 'path';
 
 import { TemporaryDirectory } from './ports/temporary-directory';
@@ -48,6 +48,8 @@ export class SharedStorage implements TemporaryDirectory {
 
   async createOutputDirectory(inside: WorkingDirectory): Promise<void> {
     const outputPath = this.marxanDirectory.get('OUTPUTDIR', inside);
-    await promises.mkdir(outputPath.fullPath);
+    const directoryAlreadyExists = existsSync(outputPath.fullPath);
+
+    if (!directoryAlreadyExists) await promises.mkdir(outputPath.fullPath);
   }
 }

@@ -39,3 +39,21 @@ test(`getting project users as contributor`, async () => {
   );
   fixtures.ThenForbiddenIsReturned(response);
 });
+
+test(`getting project users as owner with a search query`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenViewerWasAddedToProject(projectId);
+  const response = await fixtures.WhenGettingProjectUsersWithSearchTerm(
+    projectId,
+  );
+  fixtures.ThenViewerUserInformationIsReturned(response);
+});
+
+test(`getting project users as owner with a wrong search query`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenViewerWasAddedToProject(projectId);
+  const response = await fixtures.WhenGettingProjectUsersWithWrongSearchTerm(
+    projectId,
+  );
+  fixtures.ThenNoUserInformationIsReturned(response);
+});

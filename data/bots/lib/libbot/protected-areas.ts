@@ -4,11 +4,55 @@ import { IUCNCategory } from "./scenarios.ts";
 import { logDebug, logError, logInfo } from "./logger.ts";
 import { tookMs } from "./util/perf.ts";
 
+export enum ProtectedAreaKind {
+  Global = "global",
+  Project = "project",
+}
+
+interface ProtectedAreaSelection {
+  id: IUCNCategory | string;
+  selected: boolean;
+}
+
+export interface ProtectedAreaSelectionForScenario {
+  areas: ProtectedAreaSelection[];
+  threshold?: number;
+}
+
+interface ProtectedAreaSelectionResult {
+  name: string;
+  id: IUCNCategory | string;
+  kind: ProtectedAreaKind;
+  selected: boolean;
+}
+
 export class ProtectedAreas {
   private baseHttpClient;
 
   constructor(httpClient: BotHttpClient) {
     this.baseHttpClient = httpClient.baseHttpClient;
+  }
+
+  async setForScenario(
+    scenarioId: string,
+    protectedAreas: ProtectedAreaSelectionForScenario,
+  ): Promise<ProtectedAreaSelectionResult[]> {
+    const opStart = Process.hrtime();
+
+    const result = await this.baseHttpClient.post(
+      `/scenarios/${scenarioId}/protected-areas`,
+      protectedAreas,
+    )
+      .then((result) => result?.data.data)
+      .catch(logError);
+
+    logInfo(
+      `Selection of protected areas for scenarios set in ${
+        tookMs(Process.hrtime(opStart))
+      }ms.`,
+    );
+    logDebug(`Protected area selection for scenario:\n${Deno.inspect(result)}`);
+    return result;
   }
 
   async getIucnCategoriesForPlanningAreaWithId(

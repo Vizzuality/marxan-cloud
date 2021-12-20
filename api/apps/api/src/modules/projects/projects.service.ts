@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Either, isLeft, right } from 'fp-ts/Either';
+import { Either, isLeft, left, right } from 'fp-ts/Either';
 
 import {
   FindResult,
@@ -22,17 +22,30 @@ import {
   ProjectsServiceRequest,
 } from './project-requests-info';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
-import { ChangeBlmRange } from '@marxan-api/modules/projects/blm';
+import {
+  ChangeBlmRange,
+  ChangeRangeErrors,
+} from '@marxan-api/modules/projects/blm';
 import {
   GetFailure,
   ProjectBlm,
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
+import { ProjectAccessControl } from '../access-control';
+import { forbiddenError } from '@marxan-api/modules/access-control';
+import { Permit } from '../access-control/access-control.types';
 
-import { ExportProject } from '@marxan-api/modules/clone';
+import {
+  ExportId,
+  ExportProject,
+  GetExportArchive,
+} from '@marxan-api/modules/clone';
 import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
+import { createReadStream } from 'fs';
 
 export { validationFailed } from '../planning-areas';
+
+export const notFound = Symbol(`project not found`);
 
 @Injectable()
 export class ProjectsService {
@@ -44,6 +57,7 @@ export class ProjectsService {
     private readonly projectBlmRepository: ProjectBlmRepo,
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
+    private readonly projectAclService: ProjectAccessControl,
   ) {}
 
   async findAllGeoFeatures(
@@ -54,7 +68,6 @@ export class ProjectsService {
       appInfo.params?.projectId,
       appInfo.authenticatedUser,
     );
-
     if (isLeft(project)) {
       return project;
     }
@@ -78,37 +91,75 @@ export class ProjectsService {
   async findOne(
     id: string,
     info: ProjectsServiceRequest,
-  ): Promise<Project | undefined> {
-    // /ACL slot/
+  ): Promise<Either<typeof notFound | typeof forbiddenError, Project>> {
     try {
-      return await this.projectsCrud.getById(id, undefined, info);
+      const project = await this.projectsCrud.getById(id, undefined, info);
+      if (
+        !(await this.projectAclService.canViewProject(
+          info.authenticatedUser.id,
+          id,
+        ))
+      ) {
+        return left(forbiddenError);
+      }
+      return right(project);
     } catch (error) {
       // library-sourced errors are no longer instances of HttpException
-      return undefined;
+      return left(notFound);
     }
   }
 
-  async findProjectBlm(id: string): Promise<Either<GetFailure, ProjectBlm>> {
-    return await this.projectBlmRepository.get(id);
+  async findProjectBlm(
+    projectId: string,
+    userId: string,
+  ): Promise<Either<GetFailure | typeof forbiddenError, ProjectBlm>> {
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
+
+    return await this.projectBlmRepository.get(projectId);
   }
 
   // TODO debt: shouldn't use API's DTO - avoid relating service to given access layer (Rest)
-  async create(input: CreateProjectDTO, info: ProjectsRequest) {
+  async create(
+    input: CreateProjectDTO,
+    info: ProjectsRequest,
+  ): Promise<Either<Permit, Project>> {
     assertDefined(info.authenticatedUser);
+    if (
+      !(await this.projectAclService.canCreateProject(
+        info.authenticatedUser.id,
+      ))
+    ) {
+      return left(false);
+    }
     const project = await this.projectsCrud.create(input, info);
     await this.projectsCrud.assignCreatorRole(
       project.id,
       info.authenticatedUser.id,
     );
-    return project;
+    return right(project);
   }
 
-  async update(projectId: string, input: UpdateProjectDTO) {
-    // /ACL slot - can?/
-    return this.projectsCrud.update(projectId, input);
+  async update(
+    projectId: string,
+    input: UpdateProjectDTO,
+    userId: string,
+  ): Promise<Either<Permit, Project>> {
+    if (!(await this.projectAclService.canEditProject(userId, projectId))) {
+      return left(false);
+    }
+    return right(await this.projectsCrud.update(projectId, input));
   }
 
-  async updateBlmValues(projectId: string, range: [number, number]) {
+  async updateBlmValues(
+    userId: string,
+    projectId: string,
+    range: [number, number],
+  ): Promise<Either<ChangeRangeErrors | typeof forbiddenError, ProjectBlm>> {
+    if (!(await this.projectAclService.canEditProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
     return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
   }
 
@@ -121,9 +172,14 @@ export class ProjectsService {
     ).value;
   }
 
-  async remove(projectId: string) {
-    // /ACL slot - can?/
-    return this.projectsCrud.remove(projectId);
+  async remove(
+    projectId: string,
+    userId: string,
+  ): Promise<Either<Permit, void>> {
+    if (!(await this.projectAclService.canDeleteProject(userId, projectId))) {
+      return left(false);
+    }
+    return right(await this.projectsCrud.remove(projectId));
   }
 
   async getJobStatusFor(projectId: string, info: ProjectsRequest) {
@@ -131,8 +187,11 @@ export class ProjectsService {
     return await this.jobStatusService.getJobStatusFor(projectId);
   }
 
-  async importLegacyProject(_: Express.Multer.File) {
-    return new Project();
+  async importLegacyProject(_: Express.Multer.File, userId: string) {
+    if (!(await this.projectAclService.canCreateProject(userId))) {
+      return left(false);
+    }
+    return right(new Project());
   }
 
   savePlanningAreaFromShapefile = this.planningAreaService.savePlanningAreaFromShapefile.bind(
@@ -146,5 +205,14 @@ export class ProjectsService {
     return await this.queryBus.execute(
       new GetProjectQuery(projectId, forUser?.id),
     );
+  }
+
+  async getExportedArchive(projectId: string, exportId: string) {
+    // ACL
+    const location = await this.queryBus.execute(
+      new GetExportArchive(new ExportId(exportId)),
+    );
+    // MARXAN-1129
+    return location ? createReadStream(location.value) : null;
   }
 }

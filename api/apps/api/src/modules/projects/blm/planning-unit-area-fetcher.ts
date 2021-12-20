@@ -32,7 +32,7 @@ export class PlanningUnitAreaFetcher {
     project: Project,
   ): Promise<Either<PlanningUnitAreaNotFoundError, number>> {
     const area =
-      project?.planningUnitAreakm2 ??
+      project.planningUnitAreakm2 ??
       (await this.entityManager
         .query(
           `SELECT AVG(size)/1e6 from "planning_units_geom" WHERE "project_id" = $1`,

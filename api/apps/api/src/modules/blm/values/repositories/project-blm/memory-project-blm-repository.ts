@@ -9,7 +9,7 @@ import {
   ProjectBlmRepo,
   projectNotFound,
   SaveFailure,
-} from '../project-blm-repo';
+} from '../../project-blm-repo';
 
 @Injectable()
 export class MemoryProjectBlmRepository extends ProjectBlmRepo {

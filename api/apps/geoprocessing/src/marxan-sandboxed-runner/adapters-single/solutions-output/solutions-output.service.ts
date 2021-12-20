@@ -3,13 +3,12 @@ import { existsSync, promises } from 'fs';
 
 import { ExecutionResult } from '@marxan/marxan-output';
 import { Workspace } from '../../ports/workspace';
-import { Cancellable } from '../../ports/cancellable';
 
 import { GeoOutputRepository } from './geo-output';
 import { ResultParserService } from './result-parser.service';
 import { MarxanDirectory } from '../marxan-directory.service';
 import { RunDirectories } from './run-directories';
-import { SandboxRunnerOutputHandler } from '../../sandbox-runner-output-handler';
+import { SandboxRunnerOutputHandler } from '../../ports/sandbox-runner-output-handler';
 
 @Injectable()
 export class SolutionsOutputService

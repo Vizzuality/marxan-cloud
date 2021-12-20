@@ -3,11 +3,12 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
 import { ProjectAclService } from './project-acl.service';
+import { isLeft } from 'fp-ts/Either';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -141,10 +142,10 @@ const getFixtures = async () => {
         }),
       ),
     ThenCannotCreateProject: async () => {
-      expect(await sut.canCreateProject(userId, projectId)).toEqual(false);
+      expect(await sut.canCreateProject(userId)).toEqual(false);
     },
     ThenCanCreateProject: async () => {
-      expect(await sut.canCreateProject(userId, projectId)).toEqual(true);
+      expect(await sut.canCreateProject(userId)).toEqual(true);
       expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
         where: {
           projectId,
@@ -180,9 +181,12 @@ const getFixtures = async () => {
       });
     },
     ThenCanFindNumberOfUsersInProject: async () => {
-      expect(
-        await sut.findUsersInProject(projectId, viewerUserId),
-      ).toHaveLength(2);
+      const result = await sut.findUsersInProject(projectId, viewerUserId);
+      if (isLeft(result)) {
+        expect(result.left).toBeUndefined();
+      } else {
+        expect(result.right).toHaveLength(2);
+      }
       expect(userProjectsRepoMock.createQueryBuilder).toHaveBeenCalled();
     },
   };

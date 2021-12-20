@@ -1,5 +1,6 @@
 export { FileRepositoryModule } from './file-repository.module';
 export {
+  GetFileError,
   FileRepository,
   SaveFileError,
   unknownError,
