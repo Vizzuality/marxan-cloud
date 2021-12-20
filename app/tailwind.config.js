@@ -555,10 +555,16 @@ module.exports = {
         '0%': {
           marginTop: '10px',
         },
-        '25%': {
+        '15%': {
+          marginTop: '10px',
+        },
+        '30%': {
           marginTop: '-40px',
         },
-        '50%': {
+        '45%': {
+          marginTop: '-40px',
+        },
+        '60%': {
           marginTop: '-80px',
         },
         '75%': {
