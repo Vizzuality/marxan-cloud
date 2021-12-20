@@ -65,9 +65,10 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
               <img alt="Run scenario label" src={RUN_SCENARIO_BTN_IMG} className="absolute h-12 right-10 bottom-14" />
               <img alt="Select planning units label" src={SELECT_PLANNING_UNITS_IMG} className="absolute h-24 left-10 -top-6" />
             </div>
-            <div className="absolute w-full h-10 -bottom-16">
+            <div className="absolute w-full h-8 -bottom-16">
               <div
-                className="top-0 w-56 h-full mx-auto"
+                className="top-0 w-56 h-full mx-auto opacity-30"
+                style={{ background: 'radial-gradient(130px 15px at center, #000000, transparent)' }}
               />
             </div>
             <div className="flex flex-col w-1/3 mx-auto space-y-6">
