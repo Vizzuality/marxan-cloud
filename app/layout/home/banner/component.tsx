@@ -36,25 +36,31 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
             </div>
           </div>
 
-          <div className="flex flex-row justify-between w-full">
-            <div className="relative flex">
-              <img alt="Background" src={BACKGROUND_LEGEND_IMG} className="h-40" />
-              <img alt="Cheetah" src={CHEETAH_CARD_IMG} className="absolute h-24 left-10 top-24" />
-              <div className="absolute bottom-0 left-0 flex">
-                <img alt="Lion hexagon" src={LION_HEXAGON_IMG} className="h-24" />
-                <img alt="Giraffe hexagon" src={GIRAFFE_HEXAGON_IMG} className="h-24" />
-                <img alt="Cheetah hexagon" src={CHEETAH_HEXAGON_IMG} className="h-24" />
+          <div className="relative flex flex-row justify-between w-full">
+
+            <div className="flex w-1/3 pl-28">
+              <img
+                alt="Background"
+                src={BACKGROUND_LEGEND_IMG}
+                className="absolute h-40 bottom-20 -top-28 -left-10"
+              />
+              <img alt="Cheetah" src={CHEETAH_CARD_IMG} className="absolute z-10 h-36 -top-6 left-12" />
+              <div className="relative flex w-80">
+                <img alt="Lion hexagon" src={LION_HEXAGON_IMG} className="absolute h-26 bottom-12" />
+                <img alt="Giraffe hexagon" src={GIRAFFE_HEXAGON_IMG} className="absolute bottom-0 h-26 right-26" />
+                <img alt="Cheetah hexagon" src={CHEETAH_HEXAGON_IMG} className="absolute right-0 z-40 h-26 bottom-12" />
               </div>
             </div>
 
-            <div className="relative flex space-x-3.5">
-              <img alt="Map layers example" src={MAP_LAYERS_IMG} className="w-56" />
-              <img alt="Scenario name label" src={SCENARIO_NAME_IMG} className="h-24 mt-3" />
-              <img alt="Run scenario label" src={RUN_SCENARIO_BTN_IMG} className="absolute right-0 h-12 bottom-12" />
-              <img alt="Select planning units label" src={SELECT_PLANNING_UNITS_IMG} className="absolute h-24 -left-10 -top-6" />
+            <div className="relative flex flex-row space-x-3.5 w-1/3">
+              <img alt="Map layers example" src={MAP_LAYERS_IMG} className="self-center w-56 mx-auto" />
+              <img alt="Scenario name label" src={SCENARIO_NAME_IMG} className="absolute h-24 top-3 right-3" />
+              <img alt="Run scenario label" src={RUN_SCENARIO_BTN_IMG} className="absolute h-12 right-10 bottom-14" />
+              <img alt="Select planning units label" src={SELECT_PLANNING_UNITS_IMG} className="absolute h-24 left-10 -top-6" />
             </div>
-            <div className="flex flex-col space-y-3.5">
-              <div className="flex space-x-3.5">
+
+            <div className="flex flex-col w-1/3 mx-auto space-y-6">
+              <div className="flex mt-3 space-x-3.5">
                 <img alt="Solution distribution legend" src={SOLUTION_DISTRIBUTION_IMG} className="h-24" />
                 <img alt="Schedule scenario label example" src={SCHEDULE_SCENARIO_IMG} className="h-24" />
               </div>
