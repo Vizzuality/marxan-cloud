@@ -553,21 +553,27 @@ module.exports = {
       },
       banner: {
         '0%': {
-          marginTop: '10px',
+          marginTop: '20px',
         },
         '15%': {
-          marginTop: '10px',
+          marginTop: '20px',
         },
         '30%': {
-          marginTop: '-40px',
+          marginTop: '-60px',
         },
         '45%': {
-          marginTop: '-40px',
+          marginTop: '-60px',
         },
         '60%': {
           marginTop: '-80px',
         },
+        '70%': {
+          marginTop: '-80px',
+        },
         '75%': {
+          marginTop: '-230px',
+        },
+        '85%': {
           marginTop: '-230px',
         },
         '100%': {

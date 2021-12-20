@@ -49,7 +49,7 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
                 src={BACKGROUND_LEGEND_IMG}
                 className="absolute h-40 bottom-20 -top-28 -left-10"
               />
-              <img alt="Cheetah" src={CHEETAH_CARD_IMG} className="absolute z-10 h-36 -top-6 left-12" />
+              <img alt="Cheetah" src={CHEETAH_CARD_IMG} className="absolute z-10 h-36 -top-6 left-16" />
               <div className="relative flex w-80">
                 <img alt="Lion hexagon" src={LION_HEXAGON_IMG} className="absolute h-26 bottom-12" />
                 <img alt="Giraffe hexagon" src={GIRAFFE_HEXAGON_IMG} className="absolute bottom-0 h-26 right-26" />
