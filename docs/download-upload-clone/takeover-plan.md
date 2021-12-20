@@ -5,8 +5,8 @@ net/browse/MARXAN-832
 
 Currently, the pieces are "hardcoded". `ProjectMetadata` and `ProjectConfig` 
 should always be there. For release 1, we planned only full project export 
-and metada of its scenarios - nothing more, till full flow is implemented 
-and tested - so the main scope of this is tu return relevant pieces if they 
+and metadata of its scenarios - nothing more, till full flow is implemented 
+and tested - so the main scope of this is to return relevant pieces if they 
 are available for given project.
 
 1. This task may be connected/prefixed with https://vizzuality.atlassian.net/browse/MARXAN-833 - which is designed to do the same for underlying 
