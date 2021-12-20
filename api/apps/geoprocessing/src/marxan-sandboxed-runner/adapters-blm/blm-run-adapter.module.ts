@@ -21,6 +21,7 @@ import { MarxanOutputParserModule } from '../adapters-shared/marxan-output-parse
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BlmPartialResultEntity } from './blm-partial-results.geo.entity';
 import { MarxanDirectory } from '../adapters-single/marxan-directory.service';
+import { BlmBestRunService } from './blm-best-run.service';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
@@ -48,6 +49,7 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
     InputFilesFs,
     MarxanRunnerFactory,
     MarxanDirectory,
+    BlmBestRunService,
   ],
   exports: [sandboxRunnerToken, blmSandboxRunner],
 })

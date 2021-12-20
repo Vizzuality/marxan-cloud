@@ -8,6 +8,7 @@ export class AddBlmPartialResultTable1639150806467
       (
         id              uuid DEFAULT gen_random_uuid(),
         scenario_id     uuid NOT NULL,
+        calibration_id  uuid NOT NULL,
         score           float NOT NULL,
         blm_value       float NOT NULL,
         boundary_length float NOT NULL,

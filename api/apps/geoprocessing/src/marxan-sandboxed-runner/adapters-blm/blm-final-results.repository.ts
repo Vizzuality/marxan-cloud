@@ -19,29 +19,23 @@ export class BlmFinalResultsRepository {
    * clear previous results, move the new ones to target
    * table - everything within transaction
    */
-  async saveFinalResults(scenarioId: string): Promise<void> {
+  async saveFinalResults(
+    scenarioId: string,
+    calibrationId: string,
+  ): Promise<void> {
     await this.entityManager.transaction(async (txManager) => {
       await txManager.delete(BlmFinalResultEntity, {
         scenarioId,
       });
 
-      const partialResults = await txManager.find(BlmPartialResultEntity, {
-        where: {
-          scenarioId,
-        },
-      });
+      const query = `
+        insert into blm_final_results (scenario_id, blm_value, score, boundary_length)
+        select scenario_id, blm_value, score, boundary_length from blm_partial_results
+        where blm_partial_results.scenario_id = $1 and blm_partial_results.calibration_id = $2
+      `;
 
-      await txManager.save(
-        BlmFinalResultEntity,
-        partialResults.map((partial) => ({
-          scenarioId: partial.scenarioId,
-          blmValue: partial.blmValue,
-          score: partial.score,
-          boundaryLength: partial.boundaryLength,
-        })),
-      );
-
-      await txManager.remove(BlmPartialResultEntity, partialResults);
+      await txManager.query(query, [scenarioId, calibrationId]);
+      await txManager.delete(BlmPartialResultEntity, { scenarioId });
     });
 
     return Promise.resolve(undefined);

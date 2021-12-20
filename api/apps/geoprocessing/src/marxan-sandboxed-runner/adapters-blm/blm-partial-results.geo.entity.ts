@@ -17,6 +17,15 @@ export class BlmPartialResultEntity {
   scenarioId!: string;
 
   /**
+   * references Scenarios.id
+   */
+  @Column({
+    type: 'uuid',
+    name: `calibration_id`,
+  })
+  calibrationId!: string;
+
+  /**
    * BLM Value used for running Marxan
    */
   @Column({

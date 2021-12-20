@@ -17,6 +17,7 @@ export class MarxanRunnerFactory {
 
   for(
     scenarioId: string,
+    calibrationId: string,
     blmValue: number,
     workspace: Workspace,
   ): SandboxRunner<JobData, ExecutionResult> {
@@ -32,6 +33,7 @@ export class MarxanRunnerFactory {
         await this.partialResultsRepo.savePartialResult(
           workspace,
           scenarioId,
+          calibrationId,
           blmValue,
         );
         return [];

@@ -3,6 +3,7 @@ import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports
 import { JobData } from '@marxan/blm-calibration';
 import { Injectable } from '@nestjs/common';
 import AbortController from 'abort-controller';
+import { v4 } from 'uuid';
 import { SandboxRunner } from '../ports/sandbox-runner';
 import { BlmFinalResultsRepository } from './blm-final-results.repository';
 import { MarxanRunnerFactory } from './marxan-runner.factory';
@@ -33,10 +34,12 @@ export class MarxanSandboxBlmRunnerService
       blmValues,
       input.assets,
     );
+    const calibrationId = v4();
 
     for (const { workspace, blmValue } of workspaces) {
       const singleRunner = this.marxanRunnerFactory.for(
         scenarioId,
+        calibrationId,
         blmValue,
         workspace,
       );
@@ -51,7 +54,10 @@ export class MarxanSandboxBlmRunnerService
       await singleRunner.run(input, progressCallback);
     }
 
-    await this.finalResultsRepository.saveFinalResults(scenarioId);
+    await this.finalResultsRepository.saveFinalResults(
+      scenarioId,
+      calibrationId,
+    );
   }
 
   private getAbortControllerForRun(
