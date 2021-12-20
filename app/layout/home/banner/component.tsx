@@ -28,10 +28,10 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
       <Wrapper>
         <div className="flex flex-col items-center space-y-20">
           <div>
-            <h5 className="text-6xl font-heading">Marxan software is</h5>
+            <h5 className="text-6xl leading-10 font-heading">Marxan software is</h5>
             <div
               className="relative h-40"
-              style={{ clipPath: 'polygon(0 5%, 100% 5%, 100% 40%, 0 40%)' }}
+              style={{ clipPath: 'polygon(0 5%, 100% 5%, 100% 45%, 0 45%)' }}
             >
               <div className="absolute flex flex-col items-center w-full max-w-4xl animate-banner text-primary-500">
                 {!!claimLines.length && claimLines.map((cl) => (
@@ -47,7 +47,7 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
               <img
                 alt="Background"
                 src={BACKGROUND_LEGEND_IMG}
-                className="absolute h-40 bottom-20 -top-28 -left-10"
+                className="absolute h-40 opacity-30 bottom-20 -top-28 -left-10"
               />
               <img alt="Cheetah" src={CHEETAH_CARD_IMG} className="absolute z-10 h-36 -top-6 left-16" />
               <div className="relative flex w-80">
