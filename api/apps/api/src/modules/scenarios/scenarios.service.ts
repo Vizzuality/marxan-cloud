@@ -68,6 +68,7 @@ import {
   ScenarioCalibrationRepo,
 } from '../blm/values/scenario-calibration-repo';
 import { StartBlmCalibration } from './blm-calibration/start-blm-calibration.command';
+import { CancelBlmCalibration } from './blm-calibration/cancel-blm-calibration.command';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -290,7 +291,13 @@ export class ScenariosService {
     );
   }
 
-  async cancel(scenarioId: string): Promise<void> {
+  async cancelBlmCalibration(scenarioId: string): Promise<void> {
+    await this.assertScenario(scenarioId);
+
+    await this.commandBus.execute(new CancelBlmCalibration(scenarioId));
+  }
+
+  async cancelMarxanRun(scenarioId: string): Promise<void> {
     await this.assertScenario(scenarioId);
     const result = await this.runService.cancel(scenarioId);
     if (isLeft(result)) {

@@ -555,7 +555,7 @@ export class ScenariosController {
   })
   @Delete(`:id/marxan`)
   async cancelMaraxnRun(@Param(`id`, ParseUUIDPipe) id: string) {
-    await this.service.cancel(id);
+    await this.service.cancelMarxanRun(id);
   }
 
   @ApiTags(marxanRunTag)
@@ -732,6 +732,10 @@ export class ScenariosController {
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
+  @ApiOperation({
+    description: `Start BLM calibration process for a scenario.`,
+    summary: `Start BLM calibration process for a scenario.`,
+  })
   @ApiOkResponse({
     type: JsonApiAsyncJobMeta,
   })
@@ -764,6 +768,10 @@ export class ScenariosController {
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
+  @ApiOperation({
+    description: `Retrieve BLM calibration results for a scenario.`,
+    summary: `Retrieve BLM calibration results for a scenario.`,
+  })
   @ApiOkResponse({
     type: BlmCalibrationRunResultDto,
     isArray: true,
@@ -773,5 +781,14 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<BlmCalibrationRunResultDto[]> {
     return this.service.getBlmCalibrationResults(id);
+  }
+
+  @ApiOperation({
+    description: `Cancel BLM calibration execution.`,
+    summary: `Cancel BLM calibration execution.`,
+  })
+  @Delete(`:id/calibration`)
+  async cancelBlmCalibration(@Param(`id`, ParseUUIDPipe) id: string) {
+    await this.service.cancelBlmCalibration(id);
   }
 }

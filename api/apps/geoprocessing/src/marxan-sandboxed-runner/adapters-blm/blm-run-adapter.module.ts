@@ -10,7 +10,6 @@ import { sandboxRunnerToken } from '@marxan-geoprocessing/modules/scenarios/runs
 import { WorkspaceModule } from '../adapters-shared/workspace/workspace.module';
 
 import { MarxanSandboxBlmRunnerService } from './marxan-sandbox-blm-runner.service';
-import { BlmInputFiles } from './blm-input-files';
 import { AssetFactory } from './asset-factory.service';
 
 import { InputFilesFs } from '../adapters-single/scenario-data/input-files-fs';
@@ -25,6 +24,7 @@ import { MarxanDirectory } from '../adapters-single/marxan-directory.service';
 import { BlmBestRunService } from './blm-best-run.service';
 import { RemovePreviousCalibrationPartialResultsHandler } from './cleanup/remove-previous-calibration-partial-results.handler';
 import { BlmCalibrationStartedSaga } from './cleanup/blm-calibration-started.saga';
+import { BlmInputFilesFactory } from './blm-input-files.factory';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
@@ -49,7 +49,7 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
     BlmFinalResultsRepository,
     BlmPartialResultsRepository,
     AssetFactory,
-    BlmInputFiles,
+    BlmInputFilesFactory,
     InputFilesFs,
     MarxanRunnerFactory,
     MarxanDirectory,

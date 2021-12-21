@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { Workspace } from '../ports/workspace';
 import { WorkspaceBuilder } from '../ports/workspace-builder';
 import { InputFilesFs } from '../adapters-single/scenario-data/input-files-fs';
@@ -15,7 +14,6 @@ export type BlmWorkspace = {
   workspace: Workspace;
 };
 
-@Injectable()
 export class BlmInputFiles implements Cancellable {
   #workspaces: Workspace[] = [];
 
