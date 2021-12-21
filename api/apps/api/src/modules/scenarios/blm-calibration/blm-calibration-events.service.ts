@@ -1,4 +1,3 @@
-import { EventBus } from '@nestjs/cqrs';
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
 import {
@@ -10,14 +9,14 @@ import {
 
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { JobData } from '@marxan/blm-calibration';
-import { calibrationEventsToken } from './blm-calibration-queue.providers';
+import { calibrationQueueEventsFactoryToken } from './blm-calibration-queue.providers';
 
 @Injectable()
 export class BlmCalibrationEventsService implements EventFactory<JobData> {
   private queueEvents: QueueEventsAdapter<JobData>;
 
   constructor(
-    @Inject(calibrationEventsToken)
+    @Inject(calibrationQueueEventsFactoryToken)
     queueEventsFactory: CreateWithEventFactory<JobData>,
   ) {
     this.queueEvents = queueEventsFactory(this);

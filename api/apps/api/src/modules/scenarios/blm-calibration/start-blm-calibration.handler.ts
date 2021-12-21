@@ -41,10 +41,12 @@ export class StartBlmCalibrationHandler
       return;
     }
 
+    const kind = API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1;
+
     await this.apiEvents.create({
-      kind: API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1,
+      kind,
       topic: scenarioId,
-      externalId: job.id,
+      externalId: job.id + kind,
       data: {
         blmValues,
       },

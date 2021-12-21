@@ -2,6 +2,10 @@ import { FactoryProvider } from '@nestjs/common';
 import { Queue, QueueEvents } from 'bullmq';
 import { blmCalibrationQueueName, JobData } from '@marxan/blm-calibration';
 import { QueueBuilder, QueueEventsBuilder } from '../../queue';
+import {
+  CreateWithEventFactory,
+  QueueEventsAdapterFactory,
+} from '../../queue-api-events';
 
 export const calibrationQueueToken = Symbol('calibration queue token');
 
@@ -21,4 +25,24 @@ export const calibrationQueueEventsProvider: FactoryProvider<QueueEvents> = {
     return eventsBuilder.buildQueueEvents(blmCalibrationQueueName);
   },
   inject: [QueueEventsBuilder],
+};
+
+export const calibrationQueueEventsFactoryToken = Symbol(
+  `calibration queue events factory token`,
+);
+
+export const calibrationQueueEventsFactoryProvider: FactoryProvider<
+  CreateWithEventFactory<JobData>
+> = {
+  provide: calibrationQueueEventsFactoryToken,
+  useFactory: (
+    factory: QueueEventsAdapterFactory,
+    queue: Queue<JobData>,
+    queueEvents: QueueEvents,
+  ) => factory.create(queue, queueEvents),
+  inject: [
+    QueueEventsAdapterFactory,
+    calibrationQueueToken,
+    calibrationEventsToken,
+  ],
 };
