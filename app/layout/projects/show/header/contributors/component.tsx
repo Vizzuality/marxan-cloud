@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -21,14 +21,24 @@ export const Contributors: React.FC<ContributorsProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
   const [editUsers, setEditUsers] = useState(false);
+  const [search, setSearch] = useState(null);
 
   const { data = {} } = useProject(pid);
 
-  const { data: projectUsers } = useProjectUsers(pid);
+  const {
+    data: projectUsers,
+    refetch: refetchProjectUsers,
+  } = useProjectUsers(pid, { search });
+
+  useEffect(() => {
+    refetchProjectUsers();
+  }, [search, refetchProjectUsers]);
 
   const handleEditUsers = () => setEditUsers(!editUsers);
 
-  console.log('projectUsers', projectUsers);
+  const onSearch = useCallback((s) => {
+    setSearch(s);
+  }, []);
 
   return (
     <AnimatePresence>
@@ -80,9 +90,8 @@ export const Contributors: React.FC<ContributorsProps> = () => {
 
                 </button>
                 {editUsers && (
-                  <EditDropdown setEditUsers={setEditUsers} users={projectUsers} />
+                  <EditDropdown users={projectUsers} search={search} onSearch={onSearch} />
                 )}
-
               </div>
 
             </ul>

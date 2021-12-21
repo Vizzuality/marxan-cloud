@@ -29,10 +29,10 @@ export const ContributorCard: React.FC<ContributorCardProps> = ({
         <form
           onSubmit={props.handleSubmit}
           autoComplete="off"
-          className="box-border flex items-center justify-between w-full py-3 pl-3 pr-6 bg-gray-100 rounded-3xl"
+          className="box-border flex items-center justify-between flex-grow w-full py-3 pl-3 pr-6 bg-gray-100 rounded-3xl"
 
         >
-          <div className="flex space-x-3">
+          <div className="flex flex-grow space-x-3">
             <Avatar
               className="box-border text-sm text-white uppercase border-none bg-primary-700"
               bgImage={image}
@@ -41,9 +41,9 @@ export const ContributorCard: React.FC<ContributorCardProps> = ({
             >
               {!image && name.slice(0, 2)}
             </Avatar>
-            <div className="self-center space-y-0.5">
-              <p className="text-xs text-black">{name}</p>
-              <p className="text-xs text-gray-400">{ROLES[roleName]}</p>
+            <div className="self-center space-y-0.5 flex flex-col flex-grow">
+              <p className="text-xs text-black clamp-1">{name}</p>
+              <p className="text-xs text-gray-400 clamp-1">{ROLES[roleName]}</p>
             </div>
           </div>
           <Button

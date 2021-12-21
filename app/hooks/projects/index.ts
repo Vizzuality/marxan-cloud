@@ -33,6 +33,7 @@ import {
   UploadProjectPAGridProps,
   UsePublishProjectProps,
   PublishProjectProps,
+  UseProjectUsersOptionsProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -236,14 +237,21 @@ export function useDeleteProject({
   });
 }
 
-export function useProjectUsers(projectId) {
+export function useProjectUsers(projectId, options: UseProjectUsersOptionsProps = {}) {
   const [session] = useSession();
+
+  const { search } = options;
 
   const query = useQuery(['roles', projectId], async () => ROLES.request({
     method: 'GET',
     url: `/${projectId}/users`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
+    },
+    params: {
+      ...search && {
+        q: search,
+      },
     },
     transformResponse: (data) => JSON.parse(data),
   }).then((response) => {

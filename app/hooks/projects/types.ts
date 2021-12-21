@@ -29,6 +29,11 @@ export interface DeleteProjectProps {
   id: string
 }
 
+// useProjectUsers
+export interface UseProjectUsersOptionsProps {
+  search?: string;
+}
+
 // useUploadProjectPA
 export interface UseUploadProjectPAProps {
   requestConfig?: AxiosRequestConfig
