@@ -67,6 +67,7 @@ import {
   CalibrationRunResult,
   ScenarioCalibrationRepo,
 } from '../blm/values/scenario-calibration-repo';
+import { StartBlmCalibration } from './blm-calibration/start-blm-calibration.command';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -274,7 +275,9 @@ export class ScenariosService {
     const projectBlmValues = await this.blmValuesRepository.get(projectId);
     if (isLeft(projectBlmValues)) return projectBlmValues;
 
-    await this.runService.runCalibration(id, projectBlmValues.right.values);
+    await this.commandBus.execute(
+      new StartBlmCalibration(id, projectBlmValues.right.values),
+    );
 
     return right(true);
   }
