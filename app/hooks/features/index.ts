@@ -133,11 +133,11 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
     })) : [];
 
     // We want to return custom features first, but preserve the overall sorting
-    const partitionedParsedData = flatten(partition(parsedData, (feature) => feature.isCustom));
+    const sortedByCustomFeature = flatten(partition(parsedData, (feature) => feature.isCustom));
 
     return {
       ...query,
-      data: partitionedParsedData,
+      data: sortedByCustomFeature,
     };
   }, [query, pages]);
 }
