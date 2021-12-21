@@ -23,7 +23,6 @@ export const Contributors: React.FC<ContributorsProps> = () => {
   const [editUsers, setEditUsers] = useState(false);
 
   const { data = {} } = useProject(pid);
-  const { users = [] } = data;
 
   const { data: projectUsers } = useProjectUsers(pid);
 
@@ -44,23 +43,21 @@ export const Contributors: React.FC<ContributorsProps> = () => {
             <div className="text-sm">Contributors to this project:</div>
 
             <ul className="flex ml-2.5">
-              {!!users && !!users.length && users.map((u, i) => {
+              {!!projectUsers && !!projectUsers.length && projectUsers.map((u, i) => {
+                const { user: { displayName, id, avatarDataUrl } } = u;
                 return (
                   <li
-                    key={u.id}
+                    key={id}
                     className={cx({
                       '-ml-3': i !== 0,
                     })}
                   >
-                    {/* <Avatar
-                    className="text-sm text-white uppercase bg-primary-700"
-                    bgImage={u.avatarDataUrl}
-                    name={u.displayName}
+                    <Avatar
+                      className="text-sm text-white uppercase bg-primary-700"
+                      bgImage={avatarDataUrl}
+                      name={displayName}
                     >
-                      {!u.avatarDataUrl && u.displayName.slice(0, 2)}
-                    </Avatar> */}
-                    <Avatar className="text-sm text-white uppercase bg-gray-500">
-                      <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
+                      {!avatarDataUrl && displayName.slice(0, 2)}
                     </Avatar>
                   </li>
                 );
@@ -83,7 +80,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
 
                 </button>
                 {editUsers && (
-                  <EditDropdown setEditUsers={setEditUsers} />
+                  <EditDropdown setEditUsers={setEditUsers} users={projectUsers} />
                 )}
 
               </div>

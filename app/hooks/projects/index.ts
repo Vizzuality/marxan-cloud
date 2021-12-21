@@ -245,8 +245,9 @@ export function useProjectUsers(projectId) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+    transformResponse: (data) => JSON.parse(data),
   }).then((response) => {
-    return response.data;
+    return response;
   }), {
     enabled: !!projectId,
   });
@@ -256,9 +257,9 @@ export function useProjectUsers(projectId) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data,
+      data: data?.data?.data,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data?.data]);
 }
 
 export function useUploadProjectPA({

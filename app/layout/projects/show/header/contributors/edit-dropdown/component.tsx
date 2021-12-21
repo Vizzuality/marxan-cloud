@@ -16,10 +16,11 @@ import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 
 export interface EditContributorsDropdownProps {
   setEditUsers: (editUsers: boolean) => void;
+  users: any,
 }
 
 export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> = ({
-  setEditUsers,
+  setEditUsers, users,
 }: EditContributorsDropdownProps) => {
   const [search, setSearch] = useState(null);
 
@@ -52,8 +53,22 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
       />
       <p className="self-start py-6 text-xs text-black uppercase font-heading">2 contributors</p>
       <div className="w-full space-y-2.5">
-        <ContributorCard name="Tamara Huete" roleName="Contributor" />
-        <ContributorCard name="Miguel Barrenechea" image="/images/avatar.png" roleName="Owner" />
+        {!!users.length && users.map((u) => {
+          const {
+            user: {
+              displayName, id, avatarDataUrl, roleName,
+            },
+          } = u;
+          return (
+            <ContributorCard
+              key={id}
+              image={avatarDataUrl}
+              name={displayName}
+              roleName={roleName}
+            />
+          );
+        })}
+
       </div>
       <FormRFF
         onSubmit={handleSubmit}
