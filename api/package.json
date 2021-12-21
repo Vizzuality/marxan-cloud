@@ -222,7 +222,9 @@
       "@marxan/files-repository/(.*)": "<rootDir>/libs/files-repository/src/$1",
       "@marxan/files-repository": "<rootDir>/libs/files-repository/src",
       "@marxan/cloning/(.*)": "<rootDir>/libs/cloning/src/$1",
-      "@marxan/cloning": "<rootDir>/libs/cloning/src"
+      "@marxan/cloning": "<rootDir>/libs/cloning/src",
+      "@marxan/code-guide/(.*)": "<rootDir>/libs/code-guide/src/$1",
+      "@marxan/code-guide": "<rootDir>/libs/code-guide/src"
     }
   }
 }
