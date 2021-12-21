@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { intersection } from 'lodash';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Permit } from '../access-control.types';
 import { Roles } from '../role.api.entity';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
@@ -78,5 +78,30 @@ export class ScenarioAclService implements ScenarioAccessControl {
       await this.getRolesWithinScenarioForUser(userId, scenarioId),
       this.canViewScenarioRoles,
     );
+  }
+
+  async isOwner(userId: string, scenarioId: string): Promise<Permit> {
+    const userIsProjectOwner = await this.roles.findOne({
+      where: {
+        scenarioId,
+        userId,
+        roleName: Roles.scenario_owner,
+      },
+    });
+    if (!userIsProjectOwner) {
+      return false;
+    }
+    return true;
+  }
+
+  async hasOtherOwner(userId: string, scenarioId: string): Promise<Permit> {
+    const otherOwnersInProject = await this.roles.count({
+      where: {
+        scenarioId,
+        roleName: Roles.scenario_owner,
+        userId: Not(userId),
+      },
+    });
+    return otherOwnersInProject >= 1;
   }
 }
