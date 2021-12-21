@@ -1,12 +1,6 @@
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString, IsUUID } from 'class-validator';
-
-export enum ScenarioRoles {
-  scenario_owner = Roles.scenario_owner,
-  scenario_contributor = Roles.scenario_contributor,
-  scenario_viewer = Roles.scenario_viewer,
-}
 
 export class UserRoleInScenarioDto {
   @IsUUID()
@@ -18,11 +12,12 @@ export class UserRoleInScenarioDto {
   scenarioId!: string;
 
   @IsString()
-  @IsEnum(Object.values(ScenarioRoles))
-  @ApiPropertyOptional({
-    enum: ScenarioRoles,
-  })
-  roleName?: ScenarioRoles;
+  @IsEnum(Object.values(Roles))
+  @ApiProperty()
+  roleName?:
+    | Roles.scenario_viewer
+    | Roles.scenario_contributor
+    | Roles.scenario_owner;
 }
 
 export class UsersInScenarioResult {
