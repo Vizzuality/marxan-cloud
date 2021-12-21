@@ -5,6 +5,8 @@ import { Form as FormRFF } from 'react-final-form';
 import Avatar from 'components/avatar';
 import Button from 'components/button';
 
+import { ROLES } from './constants';
+
 export interface ContributorCardProps {
   name: string,
   image?: string,
@@ -41,7 +43,7 @@ export const ContributorCard: React.FC<ContributorCardProps> = ({
             </Avatar>
             <div className="self-center space-y-0.5">
               <p className="text-xs text-black">{name}</p>
-              <p className="text-xs text-gray-400">{roleName}</p>
+              <p className="text-xs text-gray-400">{ROLES[roleName]}</p>
             </div>
           </div>
           <Button

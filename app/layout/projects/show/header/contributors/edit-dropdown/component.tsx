@@ -56,8 +56,8 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
         {!!users.length && users.map((u) => {
           const {
             user: {
-              displayName, id, avatarDataUrl, roleName,
-            },
+              displayName, id, avatarDataUrl,
+            }, roleName,
           } = u;
           return (
             <ContributorCard
