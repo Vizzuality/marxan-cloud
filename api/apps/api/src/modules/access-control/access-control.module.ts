@@ -11,6 +11,7 @@ import { ProjectAclModule } from './projects-acl/project-acl.module';
 import { ScenarioAclModule } from './scenarios-acl/scenario-acl.module';
 import { ScenarioAccessControl } from './scenarios-acl/scenario-access-control';
 import { ScenarioAclService } from './scenarios-acl/scenario-acl.service';
+import { ScenarioAclController } from './scenarios-acl/scenario-acl.controller';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { ScenarioAclService } from './scenarios-acl/scenario-acl.service';
       useClass: ScenarioAclService,
     },
   ],
-  controllers: [ProjectAclController],
+  controllers: [ProjectAclController, ScenarioAclController],
   exports: [ProjectAccessControl, ScenarioAccessControl],
 })
 export class AccessControlModule {}

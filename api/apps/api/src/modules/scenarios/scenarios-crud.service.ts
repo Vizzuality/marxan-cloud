@@ -16,6 +16,8 @@ import { ProtectedAreasCrudService } from '@marxan-api/modules/protected-areas/p
 import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
+import { UsersScenariosApiEntity } from '../access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { Roles } from '../access-control/role.api.entity';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
@@ -47,6 +49,8 @@ export class ScenariosCrudService extends AppBaseService<
     protected readonly protectedAreasService: ProtectedAreasCrudService,
     @Inject(forwardRef(() => ProjectsCrudService))
     protected readonly projectsService: ProjectsCrudService,
+    @InjectRepository(UsersScenariosApiEntity)
+    private readonly userScenarios: Repository<UsersScenariosApiEntity>,
   ) {
     super(repository, 'scenario', 'scenarios', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -130,6 +134,16 @@ export class ScenariosCrudService extends AppBaseService<
     assertDefined(model.projectId);
     model.createdBy = info?.authenticatedUser?.id!;
     return model;
+  }
+
+  async assignCreatorRole(scenarioId: string, userId: string): Promise<void> {
+    await this.userScenarios.save(
+      this.userScenarios.create({
+        scenarioId,
+        userId,
+        roleName: Roles.scenario_owner,
+      }),
+    );
   }
 
   async setDataUpdate(
