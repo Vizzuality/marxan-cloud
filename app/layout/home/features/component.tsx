@@ -36,7 +36,6 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
             <div
               className="w-full pt-11 place-self-center rounded-3xl"
               style={{ background: 'linear-gradient(to right bottom, #4B48F5, #00BFFF)' }}
-
             >
               <Link href="/community/projects">
                 <p className="text-2xl leading-10 cursor-pointer font-heading mb-14 px-9 hover:underline">
