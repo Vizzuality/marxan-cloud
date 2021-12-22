@@ -27,7 +27,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
 
               return (
                 <div key={`${id}`}>
-                  <Icon icon={icon} className="w-16 h-16 bg-red-300 border" />
+                  <Icon icon={icon} className="w-16 h-16" />
                   <h2 className="mt-2.5 mb-2.5 md:mt-6 md:mb-10 text-2xl font-medium text-gray-800 font-heading">{name}</h2>
                   <p className="text-gray-400">{description}</p>
                 </div>
