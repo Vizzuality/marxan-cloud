@@ -9,13 +9,15 @@ import Select from 'components/forms/select';
 import { ROLES } from './constants';
 
 export interface UserCardProps {
+  id: string,
   name: string,
   image?: string,
   roleName: string,
+
 }
 
 export const UserCard: React.FC<UserCardProps> = ({
-  name, image, roleName,
+  id, name, image, roleName,
 }: UserCardProps) => {
   const handleSubmit = useCallback((values) => {
     console.info('values', values);
@@ -35,23 +37,21 @@ export const UserCard: React.FC<UserCardProps> = ({
         >
           <div className="flex flex-grow space-x-3">
             <Avatar
-              className="box-border text-sm text-white uppercase border-none bg-primary-700"
+              className="box-border px-3 text-sm text-white uppercase border-none bg-primary-700"
               bgImage={image}
               name={name}
               size="lg"
             >
               {!image && name.slice(0, 2)}
             </Avatar>
-            <div className="self-center space-y-0.5 flex w-52 flex-col flex-grow">
+            <div className="flex flex-col self-center flex-grow w-full space-y-1">
               <p className="text-sm text-black clamp-1">{name}</p>
               <div className="pr-20">
+
                 <Select
                   initialSelected={ROLES[roleName]}
                   maxHeight={300}
-                  onBlur={() => { }}
-                  onChange={() => { }}
-                  onFocus={() => { }}
-                  onSelect={() => { }}
+                  onChange={(value: string) => console.log('role selected', value, 'id', id)}
                   options={[
                     {
                       label: 'Owner',
