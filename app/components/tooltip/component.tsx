@@ -13,6 +13,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   arrow,
   arrowClassName,
   interactive,
+  popup,
   maxWidth,
   maxHeight,
   onHide,
@@ -66,7 +67,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
           >
             <div className="relative shadow-2xl">
               <div className="relative flex flex-grow overflow-hidden flex-column" style={{ maxWidth: maxWidth || 'none', maxHeight: maxHeight || '100vh' }}>
-                {interactive && (
+                {interactive && !popup && (
                   <div className="absolute top-0 left-0 z-10 w-full h-5 pointer-events-none bg-gradient-to-b from-white via-white" />
                 )}
 
@@ -74,10 +75,9 @@ export const Tooltip: React.FC<TooltipProps> = ({
                   {content}
                 </div>
 
-                {interactive && (
+                {interactive && !popup && (
                   <div className="absolute bottom-0 left-0 z-10 w-full h-5 pointer-events-none bg-gradient-to-t from-white via-white" />
                 )}
-
               </div>
 
               {arrow && (
