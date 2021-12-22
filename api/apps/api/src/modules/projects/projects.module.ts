@@ -30,7 +30,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { GetProjectHandler } from './get-project.handler';
 import { ProjectBlmModule } from './blm';
 import { CloneModule } from '@marxan-api/modules/clone';
-import { AccessControlModule } from '../access-control';
+import { AccessControlModule } from '@marxan-api/modules/access-control';
 
 @Module({
   imports: [
