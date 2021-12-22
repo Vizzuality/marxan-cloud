@@ -21,15 +21,18 @@ test(`add every type of user to a scenario as scenario owner`, async () => {
   const ownerResponse = await fixtures.WhenAddingANewOwnerToTheScenarioAsOwner(
     scenarioId,
   );
-  const allUsersInScenarioResponse = await fixtures.WhenGettingScenarioUsersAsOwner(
-    scenarioId,
-  );
+  /* This part of the test is done by using the GET endpoint from MARXAN-1079
+     so this will be uncommented when everything is merged into MARXAN-1016
+  */
+  // const allUsersInScenarioResponse = await fixtures.WhenGettingScenarioUsersAsOwner(
+  //   scenarioId,
+  // );
   fixtures.ThenNoContentIsReturned(viewerResponse);
   fixtures.ThenNoContentIsReturned(contributorResponse);
   fixtures.ThenNoContentIsReturned(ownerResponse);
-  fixtures.ThenAllUsersinScenarioAfterEveryTypeOfUserHasBeenAddedAreReturned(
-    allUsersInScenarioResponse,
-  );
+  // fixtures.ThenAllUsersinScenarioAfterEveryTypeOfUserHasBeenAddedAreReturned(
+  //   allUsersInScenarioResponse,
+  // );
 });
 
 test(`add every type of user to a scenario as scenario contributor`, async () => {
