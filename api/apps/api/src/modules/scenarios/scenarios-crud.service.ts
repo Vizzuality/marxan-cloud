@@ -170,6 +170,21 @@ export class ScenariosCrudService extends AppBaseService<
     return model;
   }
 
+  /**
+   * Could be that entity-relations in codebase are wrong
+   * https://github.com/typeorm/typeorm/blob/master/docs/many-to-many-relations.md#many-to-many-relations-with-custom-properties
+   *
+   * Thus, when using `remove(EntityInstance)` it complains on missing
+   * `user_id`.
+   *
+   * `delete` seems to omit code-declarations and use db's cascades
+   */
+  async remove(id: string): Promise<void> {
+    await this.repository.delete({
+      id,
+    });
+  }
+
   async extendFindAllQuery(
     query: SelectQueryBuilder<Scenario>,
     fetchSpecification: FetchSpecification,
