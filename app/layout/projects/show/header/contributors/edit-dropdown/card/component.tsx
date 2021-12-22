@@ -4,18 +4,19 @@ import { Form as FormRFF } from 'react-final-form';
 
 import Avatar from 'components/avatar';
 import Button from 'components/button';
+import Select from 'components/forms/select';
 
 import { ROLES } from './constants';
 
-export interface ContributorCardProps {
+export interface UserCardProps {
   name: string,
   image?: string,
   roleName: string,
 }
 
-export const ContributorCard: React.FC<ContributorCardProps> = ({
+export const UserCard: React.FC<UserCardProps> = ({
   name, image, roleName,
-}: ContributorCardProps) => {
+}: UserCardProps) => {
   const handleSubmit = useCallback((values) => {
     console.info('values', values);
   }, []);
@@ -41,18 +42,46 @@ export const ContributorCard: React.FC<ContributorCardProps> = ({
             >
               {!image && name.slice(0, 2)}
             </Avatar>
-            <div className="self-center space-y-0.5 flex flex-col flex-grow">
-              <p className="text-xs text-black clamp-1">{name}</p>
-              <p className="text-xs text-gray-400 clamp-1">{ROLES[roleName]}</p>
+            <div className="self-center space-y-0.5 flex w-52 flex-col flex-grow">
+              <p className="text-sm text-black clamp-1">{name}</p>
+              <div className="pr-20">
+                <Select
+                  initialSelected={ROLES[roleName]}
+                  maxHeight={300}
+                  onBlur={() => { }}
+                  onChange={() => { }}
+                  onFocus={() => { }}
+                  onSelect={() => { }}
+                  options={[
+                    {
+                      label: 'Owner',
+                      value: 'project_owner',
+                    },
+                    {
+                      label: 'Contributor',
+                      value: 'project_contributor',
+                    },
+                    {
+                      label: 'Viewer',
+                      value: 'project_viewer',
+                    },
+                  ]}
+                  placeholder={ROLES[roleName]}
+                  size="s"
+                  status="none"
+                  theme="light"
+                />
+              </div>
             </div>
+
           </div>
           <Button
-            className="flex-shrink-0 h-6 py-2 text-sm bg-gray-600"
+            className="flex-shrink-0 h-6 py-2 text-sm bg-gray-600 group"
             theme="secondary-alt"
             size="xs"
             type="submit"
           >
-            <span className="text-white">Remove</span>
+            <span className="text-white group-hover:text-gray-600">Remove</span>
           </Button>
         </form>
       )}
@@ -60,4 +89,4 @@ export const ContributorCard: React.FC<ContributorCardProps> = ({
   );
 };
 
-export default ContributorCard;
+export default UserCard;

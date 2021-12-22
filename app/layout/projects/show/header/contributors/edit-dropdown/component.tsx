@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import { useDebouncedCallback } from 'use-debounce';
 
-import ContributorCard from 'layout/projects/show/header/contributors/edit-dropdown/card';
+import UserCard from 'layout/projects/show/header/contributors/edit-dropdown/card';
 
 import Search from 'components/search';
 
@@ -48,7 +48,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
             }, roleName,
           } = u;
           return (
-            <ContributorCard
+            <UserCard
               key={id}
               image={avatarDataUrl}
               name={displayName}
