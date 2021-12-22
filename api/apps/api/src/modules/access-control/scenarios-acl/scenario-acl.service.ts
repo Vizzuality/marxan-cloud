@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { intersection } from 'lodash';
-import { Not, Repository } from 'typeorm';
-import { Permit } from '@marxan-api/modules/access-control/access-control.types';
+import { getConnection, Not, Repository } from 'typeorm';
+import { Permit } from '../access-control.types';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
-import { ScenarioRoles } from './dto/user-role-scenario.dto';
+import {
+  UserRoleInScenarioDto,
+  ScenarioRoles,
+} from './dto/user-role-scenario.dto';
+import { Either, left, right } from 'fp-ts/lib/Either';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
@@ -103,5 +108,46 @@ export class ScenarioAclService implements ScenarioAccessControl {
       },
     });
     return otherOwnersInScenario >= 1;
+  }
+
+  async updateUserInProject(
+    scenarioId: string,
+    updateUserInProjectDto: UserRoleInScenarioDto,
+    loggedUserId: string,
+  ): Promise<Either<Permit, void>> {
+    const { userId, roleName } = updateUserInProjectDto;
+    if (!(await this.isOwner(loggedUserId, scenarioId))) {
+      return left(false);
+    }
+
+    const apiDbConnection = getConnection(DbConnections.default);
+    const apiQueryRunner = apiDbConnection.createQueryRunner();
+
+    await apiQueryRunner.connect();
+    await apiQueryRunner.startTransaction();
+
+    try {
+      const existingUserInProject = await this.roles.findOne({
+        where: {
+          scenarioId,
+          userId,
+        },
+      });
+
+      if (!existingUserInProject) {
+        await this.roles.save({
+          scenarioId,
+          userId,
+          roleName,
+        });
+      } else {
+        await this.roles.update({ scenarioId, userId }, { roleName });
+      }
+    } catch (err) {
+      await apiQueryRunner.rollbackTransaction();
+    } finally {
+      await apiQueryRunner.release();
+    }
+    return right(void 0);
   }
 }
