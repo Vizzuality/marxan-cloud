@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/Either';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ProjectBlm } from './project-blm.api.entity';
 import {
   alreadyCreated,
   CreateFailure,
@@ -8,10 +11,7 @@ import {
   ProjectBlmRepo,
   projectNotFound,
   SaveFailure,
-} from '../project-blm-repo';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ProjectBlm } from './project-blm.api.entity';
+} from '../../project-blm-repo';
 
 @Injectable()
 export class TypeormProjectBlmRepository extends ProjectBlmRepo {

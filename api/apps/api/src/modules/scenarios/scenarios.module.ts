@@ -48,6 +48,7 @@ import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 import { BlmValuesModule } from '@marxan-api/modules/blm';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { BlmCalibrationModule } from './blm-calibration/blm-calibration.module';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scen
     ProtectedAreasCrudModule,
     BlmValuesModule,
     AccessControlModule,
+    BlmCalibrationModule,
   ],
   providers: [
     ProjectChecker,

@@ -25,6 +25,7 @@ export const geoprocessingConnections: {
     ssl: false,
     entities: [
       path.join(__dirname, '/modules/**/*.geo.entity.{ts,js}'),
+      path.join(__dirname, '/marxan-sandboxed-runner/**/*.geo.entity.{ts,js}'),
       path.join(__dirname, '../../../libs/**/*.geo.entity.{ts,js}'),
     ],
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use

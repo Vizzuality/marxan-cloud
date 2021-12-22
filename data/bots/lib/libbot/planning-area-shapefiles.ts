@@ -41,7 +41,15 @@ export class PlanningAreas extends FileUploader {
       data,
       fileName: `${crypto.randomUUID()}.zip`,
       headers: [["Authorization", `Bearer ${this.currentJwt}`]],
-    }))
+    })
+      .then((response) => {
+        if (!this.isResponseSuccessful(response.status)) {
+          throw new Error(
+            `Failed to upload planning area shapefile: ${response.status}`,
+          );
+        }
+        return response;
+      }))
       .json()
       .then((data) => data?.id)
       .catch(logError);
@@ -53,6 +61,10 @@ export class PlanningAreas extends FileUploader {
     );
     logDebug(`Planning area id: ${planningAreaId}`);
     return planningAreaId;
+  }
+
+  isResponseSuccessful(statusCode: number): boolean {
+    return statusCode >= 200 && statusCode < 400;
   }
 
   async setFromShapefile(localFilePath: string): Promise<string> {
