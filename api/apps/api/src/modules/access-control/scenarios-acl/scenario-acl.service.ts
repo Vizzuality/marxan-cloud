@@ -5,7 +5,8 @@ import { Not, Repository } from 'typeorm';
 import { Permit } from '@marxan-api/modules/access-control/access-control.types';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
-import { ScenarioRoles } from './dto/user-role-scenario.dto';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { Either, left, right } from 'fp-ts/lib/Either';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
@@ -103,5 +104,22 @@ export class ScenarioAclService implements ScenarioAccessControl {
       },
     });
     return otherOwnersInScenario >= 1;
+  }
+
+  async revokeAccess(
+    scenarioId: string,
+    userId: string,
+    loggedUserId: string,
+  ): Promise<Either<Permit, void>> {
+    if (!(await this.isOwner(loggedUserId, scenarioId))) {
+      return left(false);
+    }
+
+    if (!(await this.hasOtherOwner(userId, scenarioId))) {
+      return left(false);
+    }
+
+    await this.roles.delete({ scenarioId, userId });
+    return right(void 0);
   }
 }
