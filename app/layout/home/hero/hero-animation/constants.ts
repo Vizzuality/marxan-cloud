@@ -20,14 +20,14 @@ export const BACKGROUND_IMAGES = [{
   image: Bg04Img,
 }];
 
-const HEXAGON_IMAGES_SIZE = {
+const MAIN_IMAGES_SIZE = {
   width: 409,
   height: 368,
 };
 
-export const HEXAGON_IMAGES = [{
+export const MAIN_IMAGES = [{
   image: ToucanImg,
-  size: HEXAGON_IMAGES_SIZE,
+  size: MAIN_IMAGES_SIZE,
   position: {
     right: '10rem',
     bottom: '8rem',
@@ -37,14 +37,17 @@ export const HEXAGON_IMAGES = [{
     filter: 'blur(0px)',
   }, {
     scale: 0.76,
+    filter: 'blur(0px)',
   }, {
-    // No change
+    scale: 0.76,
+    filter: 'blur(0px)',
   }, {
-    // No change
+    scale: 0.76,
+    filter: 'blur(0px)',
   }],
 }, {
   image: FarmerImg,
-  size: HEXAGON_IMAGES_SIZE,
+  size: MAIN_IMAGES_SIZE,
   position: {
     right: '-4rem',
     bottom: '22rem',
@@ -54,6 +57,7 @@ export const HEXAGON_IMAGES = [{
     filter: 'blur(1px)',
     opacity: 1,
   }, {
+    scale: 0.54,
     filter: 'blur(2px)',
     opacity: 0.7,
   }, {
@@ -61,11 +65,13 @@ export const HEXAGON_IMAGES = [{
     filter: 'blur(0px)',
     opacity: 1,
   }, {
-    // No change
+    scale: 0.6,
+    filter: 'blur(0px)',
+    opacity: 1,
   }],
 }, {
   image: BoatImg,
-  size: HEXAGON_IMAGES_SIZE,
+  size: MAIN_IMAGES_SIZE,
   position: {
     right: '12rem',
     bottom: '25rem',
@@ -75,9 +81,13 @@ export const HEXAGON_IMAGES = [{
     filter: 'blur(2px)',
     opacity: 0.7,
   }, {
+    scale: 0.36,
+    filter: 'blur(2px)',
     opacity: 0.5,
   }, {
-    // No change
+    scale: 0.36,
+    filter: 'blur(2px)',
+    opacity: 0.5,
   }, {
     scale: 0.4,
     filter: 'blur(0px)',
