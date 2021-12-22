@@ -303,6 +303,7 @@ export const getFixtures = async () => {
     ThenAllUsersinScenarioAfterEveryTypeOfUserHasBeenAddedAreReturned: (
       response: request.Response,
     ) => {
+      console.log(response);
       expect(response.status).toEqual(200);
       expect(response.body.data).toHaveLength(4);
     },
