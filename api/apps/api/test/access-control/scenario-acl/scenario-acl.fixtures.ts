@@ -3,13 +3,13 @@ import { bootstrapApplication } from '../../utils/api-application';
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../../steps/given-project';
 import { GivenUserExists } from '../../steps/given-user-exists';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsTestUtils } from '../../utils/projects.test.utils';
 import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -21,9 +21,9 @@ export const getFixtures = async () => {
   const contributorUserId = await GivenUserExists(app, 'bb');
   const viewerUserId = await GivenUserExists(app, 'cc');
   const otherOwnerUserId = await GivenUserExists(app, 'dd');
-  const scenarioViewerRole = ScenarioRoles.scenario_viewer;
-  const scenarioContributorRole = ScenarioRoles.scenario_contributor;
-  const scenarioOwnerRole = ScenarioRoles.scenario_owner;
+  const scenarioViewerRole = Roles.scenario_viewer;
+  const scenarioContributorRole = Roles.scenario_contributor;
+  const scenarioOwnerRole = Roles.scenario_owner;
   const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
     getRepositoryToken(UsersScenariosApiEntity),
   );
@@ -55,15 +55,11 @@ export const getFixtures = async () => {
     },
 
     GivenScenarioWasCreated: async () => {
-      const result = await ScenariosTestUtils.createScenario(
-        app,
-        ownerUserToken,
-        {
-          name: `Test scenario`,
-          type: ScenarioType.marxan,
-          projectId,
-        },
-      );
+      const result = await ScenariosTestUtils.createScenario(app, ownerUserToken, {
+        name: `Test scenario`,
+        type: ScenarioType.marxan,
+        projectId,
+      });
       scenarioId = result.data.id;
       return result.data.id;
     },
@@ -125,11 +121,7 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
         .set('Authorization', `Bearer ${ownerUserToken}`)
-        .send({
-          scenarioId,
-          userId: viewerUserId,
-          roleName: scenarioViewerRole,
-        }),
+        .send({ scenarioId, userId: viewerUserId, roleName: scenarioViewerRole }),
     WhenAddingANewContributorToTheScenarioAsOwner: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
@@ -148,19 +140,13 @@ export const getFixtures = async () => {
           userId: otherOwnerUserId,
           roleName: scenarioOwnerRole,
         }),
-    WhenAddingANewViewerToTheScenarioAsContributor: async (
-      scenarioId: string,
-    ) =>
+    WhenAddingANewViewerToTheScenarioAsContributor: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
         .set('Authorization', `Bearer ${contributorUserToken}`)
-        .send({
-          scenarioId,
-          userId: viewerUserId,
-          roleName: scenarioViewerRole,
-        }),
+        .send({ scenarioId, userId: viewerUserId, roleName: scenarioViewerRole }),
     WhenAddingANewContributorToTheScenarioAsContributor: async (
-      scenarioId: string,
+      projectId: string,
     ) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
@@ -188,9 +174,7 @@ export const getFixtures = async () => {
           userId: otherOwnerUserId,
           roleName: scenarioViewerRole,
         }),
-    WhenAddingANewContributorToTheScenarioAsViewer: async (
-      scenarioId: string,
-    ) =>
+    WhenAddingANewContributorToTheScenarioAsViewer: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
         .set('Authorization', `Bearer ${viewerUserToken}`)
@@ -223,9 +207,7 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${ownerUserToken}`),
     WhenRevokingAccessToOwnerFromScenarioAsOwner: async (scenarioId: string) =>
       await request(app.getHttpServer())
-        .delete(
-          `/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`,
-        )
+        .delete(`/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`)
         .set('Authorization', `Bearer ${ownerUserToken}`),
 
     WhenRevokingAccessToViewerFromScenarioAsContributor: async (
@@ -244,17 +226,13 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${viewerUserToken}`),
     WhenRevokingAccessToOwnerFromScenarioAsViewer: async (scenarioId: string) =>
       await request(app.getHttpServer())
-        .delete(
-          `/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`,
-        )
+        .delete(`/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`)
         .set('Authorization', `Bearer ${viewerUserToken}`),
     WhenRevokingAccessToOwnerFromScenarioAsContributor: async (
       scenarioId: string,
     ) =>
       await request(app.getHttpServer())
-        .delete(
-          `/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`,
-        )
+        .delete(`/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`)
         .set('Authorization', `Bearer ${contributorUserToken}`),
 
     WhenRevokingAccessToLastOwnerFromScenarioAsOwner: async (
