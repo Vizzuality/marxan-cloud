@@ -554,7 +554,7 @@ export class ScenariosController {
     description: `No content.`,
   })
   @Delete(`:id/marxan`)
-  async cancelMaraxnRun(@Param(`id`, ParseUUIDPipe) id: string) {
+  async cancelMarxanRun(@Param(`id`, ParseUUIDPipe) id: string) {
     await this.service.cancelMarxanRun(id);
   }
 
