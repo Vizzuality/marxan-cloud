@@ -136,11 +136,11 @@ export const HeroAnimation: React.FC<HeroAnimationProps> = () => {
   }, [startAnimation, visibilityChangeHandler]);
 
   return (
-    <div className="absolute text-white w-full h-screen">
+    <div className="absolute text-white top-0 bottom-0 w-full">
       {BACKGROUND_IMAGES.map(({ image, backgroundColor }, index) => (
         <motion.div
           key={image}
-          className="absolute top-0 bottom-0 right-0 left-0 bg-no-repeat bg-right-bottom"
+          className="absolute w-full h-full bg-no-repeat bg-right-bottom"
           animate={bgControls[index]}
           style={{
             opacity: (index === currBgImageRef.current) ? 1 : 0,

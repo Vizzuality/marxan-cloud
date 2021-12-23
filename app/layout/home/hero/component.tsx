@@ -19,12 +19,12 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
 
   return (
     <div
-      className="text-white w-full h-screen"
+      className="relative text-white w-full md:h-screen min-h-screen flex items-center pt-24 md:pt-0"
       style={{ backgroundColor }}
     >
       <HeroAnimation />
       <Wrapper>
-        <div className="relative z-10 w-full max-w-5xl py-10 m-auto md:py-36">
+        <div className="relative flex flex-col justify-between max-w-5xl z-10 w-full h-full m-auto py-8 md:py-0 md:mt-64 md:mb-48">
           <div className="lg:pr-96">
             <h1
               className="pb-8 text-5xl font-semibold leading-tight"
@@ -56,15 +56,15 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
                 How to
               </Button>
             </div>
+          </div>
 
-            <div className="relative md:absolute bottom-0 mt-10 md:mt-0 text-center md:text-left">
-              <Link href="#features">
-                <a className="mt-8" href="#features">
-                  Scroll down
-                  <ARROW_DOWN_SVG className="inline w-3 ml-3" fill="white" />
-                </a>
-              </Link>
-            </div>
+          <div className="relative md:absolute bottom-0 mt-10 md:mt-0 text-center md:text-left">
+            <Link href="#features">
+              <a className="mt-8" href="#features">
+                Scroll down
+                <ARROW_DOWN_SVG className="inline w-3 ml-3" fill="white" />
+              </a>
+            </Link>
           </div>
         </div>
       </Wrapper>
