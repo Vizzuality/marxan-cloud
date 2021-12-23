@@ -34,7 +34,7 @@ const Home: React.FC = () => {
         twitterSite="@Marxan_Planning"
       />
       <main className="overflow-x-hidden overflow-y-auto">
-        <Header size="lg" theme="light" />
+        <Header className="absolute" size="lg" theme="transparent" />
         <Hero />
         <Features />
         <Banner />
