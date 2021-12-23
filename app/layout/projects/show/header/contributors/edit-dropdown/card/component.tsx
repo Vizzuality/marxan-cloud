@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDeleteProjectUser } from 'hooks/projects';
+import { useEditProjectUserRole, useDeleteProjectUser } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
@@ -32,6 +32,12 @@ export const UserCard: React.FC<UserCardProps> = ({
   const [open, setOpen] = useState(false);
   const [userRole, setUserRole] = useState(ROLES[roleName]);
 
+  const editProjectUserRoleMutation = useEditProjectUserRole({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
   const deleteUserMutation = useDeleteProjectUser({});
   const { addToast } = useToasts();
 
@@ -39,14 +45,40 @@ export const UserCard: React.FC<UserCardProps> = ({
     return ROLE_OPTIONS.filter((o) => o.value !== userRole);
   }, [userRole]);
 
-  const onEditRole = (value) => {
-    console.log('role selected', value, 'id', id);
-  };
+  const onEditRole = useCallback((value) => {
+    editProjectUserRoleMutation.mutate({ projectId: `${pid}`, data: { roleName: value, userId: id, projectId: `${pid}` } }, {
+
+      onSuccess: ({ data: { data: s } }) => {
+        addToast('success-user-role-edition', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">User role changed</p>
+          </>
+        ), {
+          level: 'success',
+        });
+
+        console.info('User role changed succesfully', s);
+      },
+      onError: () => {
+        addToast('error-user-role-edition', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">It is not allowed to change the role of this user</p>
+          </>
+        ), {
+          level: 'error',
+        });
+
+        console.error('User role changed not saved');
+      },
+    });
+  }, [pid, id, addToast, editProjectUserRoleMutation]);
 
   const onDelete = useCallback(() => {
     deleteUserMutation.mutate({ projectId: pid, userId: id }, {
       onSuccess: () => {
-        addToast(`success-user-delete-${name}`, (
+        addToast(`success- user - delete -${name}`, (
           <>
             <h2 className="font-medium">Success!</h2>
             <p className="text-sm">
@@ -59,7 +91,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         setOpen(false);
       },
       onError: () => {
-        addToast(`error-user-delete-${name}`, (
+        addToast(`error - user - delete -${name}`, (
           <>
             <h2 className="font-medium">Error!</h2>
             <p className="text-sm">

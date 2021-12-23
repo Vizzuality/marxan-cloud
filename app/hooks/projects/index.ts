@@ -36,6 +36,8 @@ import {
   UseProjectUsersOptionsProps,
   DeleteProjectUserProps,
   UseDeleteProjectUserProps,
+  UseEditProjectUserRoleProps,
+  EditProjectUserRoleProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -270,6 +272,36 @@ export function useProjectUsers(projectId, options: UseProjectUsersOptionsProps 
       data: data?.data?.data,
     };
   }, [query, data?.data?.data]);
+}
+
+export function useEditProjectUserRole({
+  requestConfig = {
+    method: 'PATCH',
+  },
+}: UseEditProjectUserRoleProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const editProjectUserRole = ({ projectId, data }: EditProjectUserRoleProps) => {
+    return ROLES.request({
+      url: `/${projectId}/users`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(editProjectUserRole, {
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('projects');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
 }
 
 export function useDeleteProjectUser({
