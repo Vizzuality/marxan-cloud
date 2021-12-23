@@ -8,6 +8,7 @@ import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/proje
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsACLTestUtils } from '../utils/projects-acl.test.utils';
+import { async } from 'rxjs';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -146,6 +147,15 @@ export const getFixtures = async () => {
           projectId,
           userId: otherOwnerUserId,
           roleName: projectOwnerRole,
+        }),
+    WhenChangingOwnerUserRoleAsLastOwner: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: ownerUserId,
+          roleName: projectViewerRole,
         }),
     WhenAddingANewViewerToTheProjectAsContributor: async (projectId: string) =>
       await request(app.getHttpServer())

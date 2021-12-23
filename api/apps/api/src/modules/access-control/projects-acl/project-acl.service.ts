@@ -188,6 +188,10 @@ export class ProjectAclService implements ProjectAccessControl {
       return left(false);
     }
 
+    if (!(await this.hasOtherOwner(userId, projectId))) {
+      return left(false);
+    }
+
     const apiDbConnection = getConnection(DbConnections.default);
     const apiQueryRunner = apiDbConnection.createQueryRunner();
 
