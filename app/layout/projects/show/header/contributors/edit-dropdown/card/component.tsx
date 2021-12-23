@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -29,6 +29,8 @@ export const UserCard: React.FC<UserCardProps> = ({
   const { query } = useRouter();
   const { pid } = query;
 
+  const [open, setOpen] = useState(false);
+
   const deleteUserMutation = useDeleteProjectUser({});
   const { addToast } = useToasts();
 
@@ -45,6 +47,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         ), {
           level: 'success',
         });
+        setOpen(false);
       },
       onError: () => {
         addToast(`error-user-delete-${name}`, (
@@ -57,6 +60,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         ), {
           level: 'error',
         });
+        setOpen(false);
       },
     });
   }, [deleteUserMutation, id, name, pid, addToast]);
@@ -90,6 +94,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         arrow
         interactive
         popup
+        visible={open}
         content={(
           <div className="flex flex-row p-2 space-x-3 text-sm text-gray-500 bg-white rounded-2xl">
             <Icon className="w-10 h-10" icon={USER_REMOVE_SVG} />
@@ -120,7 +125,7 @@ export const UserCard: React.FC<UserCardProps> = ({
                 theme="tertiary"
                 size="xs"
                 className="cursor-pointer"
-                onClick={() => { }}
+                onClick={() => setOpen(false)}
               >
                 No
               </Button>
@@ -135,6 +140,7 @@ export const UserCard: React.FC<UserCardProps> = ({
             className="flex-shrink-0 h-6 py-2 text-sm bg-gray-600 group"
             theme="secondary-alt"
             size="xs"
+            onClick={() => setOpen(true)}
           >
             <span className="text-white group-hover:text-gray-600">Remove</span>
           </Button>
