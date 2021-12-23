@@ -346,7 +346,10 @@ export class ProjectsCrudService extends AppBaseService<
           userId: info?.authenticatedUser?.id,
         })
         .andWhere(`acl.role_id = :roleId`, {
-          roleId: Roles.project_owner,
+          roleId:
+            Roles.project_owner ||
+            Roles.project_contributor ||
+            Roles.project_viewer,
         });
     }
 

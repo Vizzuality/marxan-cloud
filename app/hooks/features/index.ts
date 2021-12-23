@@ -6,6 +6,7 @@ import {
 
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
+import partition from 'lodash/partition';
 
 import Fuse from 'fuse.js';
 import { useSession } from 'next-auth/client';
@@ -131,9 +132,12 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
       });
     })) : [];
 
+    // We want to return custom features first, but preserve the overall sorting
+    const sortedByCustomFeature = flatten(partition(parsedData, (feature) => feature.isCustom));
+
     return {
       ...query,
-      data: parsedData,
+      data: sortedByCustomFeature,
     };
   }, [query, pages]);
 }
