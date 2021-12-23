@@ -28,7 +28,6 @@ import { isLeft } from 'fp-ts/lib/These';
 export class ScenarioAclController {
   constructor(private readonly scenarioAclService: ScenarioAclService) {}
 
-
   @Delete(':scenarioId/users/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Revoke access to user from project' })
@@ -38,12 +37,12 @@ export class ScenarioAclController {
   })
   async deleteUserFromProject(
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
-    @Param('userId', ParseUUIDPipe) userId: string,
+    @Param('userId', ParseUUIDPipe) userToDeleteId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void | boolean> {
     const result = await this.scenarioAclService.revokeAccess(
       scenarioId,
-      userId,
+      userToDeleteId,
       req.user.id,
     );
 
