@@ -5,7 +5,8 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useProject, useProjectUsers } from 'hooks/projects';
+import { useProjectUsers } from 'hooks/project-users';
+import { useProject } from 'hooks/projects';
 
 import EditDropdown from 'layout/projects/show/header/contributors/edit-dropdown';
 

@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useEditProjectUserRole, useDeleteProjectUser } from 'hooks/projects';
+import { useEditProjectUserRole, useDeleteProjectUser } from 'hooks/project-users';
 import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
