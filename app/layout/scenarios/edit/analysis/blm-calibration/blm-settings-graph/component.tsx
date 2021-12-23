@@ -22,13 +22,11 @@ import { DATA } from './constants';
 export interface ScenariosBlmSettingsGraphProps {
   maxBlmValue: number,
   minBlmValue: number,
-  setBlmModal: (blmModal: boolean) => void,
 }
 
 export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps> = ({
   maxBlmValue,
   minBlmValue,
-  setBlmModal,
 }: ScenariosBlmSettingsGraphProps) => {
   const { query } = useRouter();
   const { sid } = query;
@@ -42,8 +40,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
 
   const onSaveBlm = useCallback((values) => {
     dispatch(setBlm(values?.blmCalibration));
-    setBlmModal(false);
-  }, [dispatch, setBlm, setBlmModal]);
+  }, [dispatch, setBlm]);
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -63,22 +60,17 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
 
           return (
             <form
-              className="flex flex-col flex-grow w-1/5 px-10 overflow-hidden text-gray-500"
+              className="flex flex-col flex-grow overflow-hidden text-white"
               autoComplete="off"
               noValidate
               onSubmit={handleSubmit}
             >
-
-              <h2 className="text-2xl font-medium font-heading">Calibrate BLM</h2>
-
-              <p className="pt-5 text-sm mb-7">Select one of the graph dots or introduce the BLM number.</p>
-
               <div className="flex flex-col">
                 <div className="flex items-center space-x-2">
-                  <Label theme="light" className="text-lg font-medium uppercase font-heading">BLM:</Label>
+                  <Label theme="dark" className="text-base uppercase">BLM:</Label>
                   <InfoButton
-                    size="s"
-                    theme="secondary"
+                    size="base"
+                    theme="primary"
                   >
                     <h4 className="font-heading text-lg mb-2.5">What is BLM?</h4>
                   </InfoButton>
@@ -92,7 +84,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
                       <Field id="blmCalibration" {...fprops}>
                         <Input
                           mode="dashed"
-                          theme="light"
+                          theme="dark"
                           className="text-2xl"
                           type="number"
                           min={minBlmValue}

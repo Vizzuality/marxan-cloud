@@ -40,7 +40,7 @@ const SECTIONS = [
   },
   {
     id: 'blm-calibration',
-    name: 'Calibrate Boundary lenght modifier (BLM)',
+    name: 'BLM Calibration',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In a iaculis nulla. Duis aliquam lacus massa, id sollicitudin massa.',
   },
 ];

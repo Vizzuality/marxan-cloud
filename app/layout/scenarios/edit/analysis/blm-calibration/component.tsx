@@ -21,9 +21,7 @@ import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
-import Modal from 'components/modal';
 
-import HEXAGON_SVG from 'svgs/map/hexagon.svg';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ScenariosBLMCalibrationProps {
@@ -36,7 +34,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   const { query } = useRouter();
   const { sid } = query;
 
-  const [blmModal, setBlmModal] = useState(false);
+  const [blmGraph, setBlmGraph] = useState(false);
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setBlm, setBlmRange } = scenarioSlice.actions;
@@ -58,7 +56,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
     const { blmCalibrationFrom, blmCalibrationTo } = values;
     const range = [blmCalibrationFrom, blmCalibrationTo];
     dispatch(setBlmRange(range));
-    setBlmModal(true);
+    setBlmGraph(true);
   }, [dispatch, setBlmRange]);
 
   const INITIAL_VALUES = useMemo(() => {
@@ -87,8 +85,11 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
           }}
         >
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading text-primary-500">CALIBRATE BLM</h4>
+          <h4 className="text-xs uppercase font-heading text-primary-500">BLM Calibration</h4>
         </button>
+      </header>
+      <div className="flex items-center space-x-3 mt-9">
+        <p className="text-xs text-white uppercase font-heading">Select the BLM range and calibrate</p>
         <InfoButton>
           <div>
             <h4 className="font-heading text-lg mb-2.5">Calibrate BLM</h4>
@@ -96,17 +97,8 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
 
           </div>
         </InfoButton>
-
-      </header>
-
-      <div className="relative flex flex-col flex-grow w-full min-h-0 pt-2 mt-1 space-y-5 overflow-hidden text-sm">
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          In a iaculis nulla. Duis aliquam lacus massa, id sollicitudin massa.
-        </p>
-        <p>
-          Select the BLM range and calibrate.
-        </p>
+      </div>
+      <div className="relative flex flex-col flex-grow w-full min-h-0 overflow-hidden text-sm">
         <FormRFF
           onSubmit={onSaveBlmRange}
           initialValues={INITIAL_VALUES}
@@ -114,69 +106,72 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
 
           {({ handleSubmit }) => (
             <form
-              className="flex flex-col flex-grow w-full space-y-5 overflow-hidden text-gray-500"
+              className="flex flex-col flex-grow w-full mt-5 overflow-hidden text-gray-500"
               autoComplete="off"
               noValidate
               onSubmit={handleSubmit}
             >
-              <div className="flex items-end">
-                <Label theme="dark" className="mr-5 text-sm uppercase opacity-50">From:</Label>
-                <div className="w-30">
-                  <FieldRFF
-                    name="blmCalibrationFrom"
-                    validate={composeValidators([{ presence: true }])}
-                  >
-                    {(fprops) => (
-                      <Field id="blmCalibrationFrom" {...fprops}>
-                        <Input
-                          mode="dashed"
-                          className="text-2xl"
-                          type="number"
-                          min={minBlmValue}
-                          max={maxBlmValue}
-                          onChange={(e) => {
-                            if (!e.target.value) {
-                              return fprops.input.onChange(null);
-                            }
-                            return fprops.input.onChange(+e.target.value);
-                          }}
-                        />
-                      </Field>
-                    )}
-                  </FieldRFF>
+              <div className="flex space-x-7">
+                <div className="flex items-center">
+                  <Label theme="dark" className="mr-3 text-xs uppercase">From</Label>
+                  <div className="w-18">
+                    <FieldRFF
+                      name="blmCalibrationFrom"
+                      validate={composeValidators([{ presence: true }])}
+                    >
+                      {(fprops) => (
+                        <Field id="blmCalibrationFrom" {...fprops}>
+                          <Input
+                            mode="dashed"
+                            className="text-2xl"
+                            type="number"
+                            min={minBlmValue}
+                            max={maxBlmValue}
+                            onChange={(e) => {
+                              if (!e.target.value) {
+                                return fprops.input.onChange(null);
+                              }
+                              return fprops.input.onChange(+e.target.value);
+                            }}
+                          />
+                        </Field>
+                      )}
+                    </FieldRFF>
+                  </div>
+                  <p className="ml-5 text-xs text-white opacity-60">{`min ${format(',d')(minBlmValue)}`}</p>
+                </div>
+
+                <div className="flex items-center">
+                  <Label theme="dark" className="mr-3 text-xs uppercase">To</Label>
+                  <div className="w-18">
+                    <FieldRFF
+                      name="blmCalibrationTo"
+                      validate={composeValidators([{ presence: true }])}
+                    >
+                      {(fprops) => (
+                        <Field id="blmCalibrationTo" {...fprops}>
+                          <Input
+                            mode="dashed"
+                            className="text-2xl"
+                            type="number"
+                            min={minBlmValue}
+                            max={maxBlmValue}
+                            onChange={(e) => {
+                              if (!e.target.value) {
+                                return fprops.input.onChange(null);
+                              }
+                              return fprops.input.onChange(+e.target.value);
+                            }}
+                          />
+                        </Field>
+                      )}
+                    </FieldRFF>
+                  </div>
+                  <p className="ml-5 text-xs text-white opacity-60">{`max ${format(',d')(maxBlmValue)}`}</p>
                 </div>
               </div>
 
-              <div className="flex items-end">
-                <Label theme="dark" className="mr-10 text-sm uppercase opacity-50">To:</Label>
-                <div className="w-30">
-                  <FieldRFF
-                    name="blmCalibrationTo"
-                    validate={composeValidators([{ presence: true }])}
-                  >
-                    {(fprops) => (
-                      <Field id="blmCalibrationTo" {...fprops}>
-                        <Input
-                          mode="dashed"
-                          className="text-2xl"
-                          type="number"
-                          min={minBlmValue}
-                          max={maxBlmValue}
-                          onChange={(e) => {
-                            if (!e.target.value) {
-                              return fprops.input.onChange(null);
-                            }
-                            return fprops.input.onChange(+e.target.value);
-                          }}
-                        />
-                      </Field>
-                    )}
-                  </FieldRFF>
-                </div>
-                <p className="ml-5 text-sm">{`max ${format(',d')(maxBlmValue)}`}</p>
-              </div>
-
-              <div className="pt-5">
+              <div className="pt-16">
                 <Button
                   type="submit"
                   theme="primary-alt"
@@ -216,36 +211,18 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                       </FieldRFF>
                     </div>
                   </div>
-                  <div className="pt-5">
-                    <Button
-                      theme="secondary"
-                      size="base"
-                      className="relative w-full"
-                      onClick={() => setBlmModal(true)}
-                    >
-                      View BLM Graph
-                      <Icon icon={HEXAGON_SVG} className="absolute right-6 w-3.5 h-3.5 stroke-current text-white stroke-2 fill-none" />
-                    </Button>
-                  </div>
                 </>
               )}
 
             </form>
           )}
         </FormRFF>
-
-        <Modal
-          title="BLM"
-          open={blmModal}
-          size="wide"
-          onDismiss={() => setBlmModal(false)}
-        >
+        {blmGraph && (
           <BlmSettingsGraph
-            setBlmModal={setBlmModal}
             maxBlmValue={maxBlmValue}
             minBlmValue={minBlmValue}
           />
-        </Modal>
+        )}
       </div>
     </motion.div>
   );
