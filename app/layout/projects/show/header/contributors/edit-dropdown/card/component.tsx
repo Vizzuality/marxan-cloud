@@ -1,4 +1,9 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+
+import { useRouter } from 'next/router';
+
+import { useDeleteProjectUser } from 'hooks/projects';
+import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
 import Button from 'components/button';
@@ -21,6 +26,41 @@ export interface UserCardProps {
 export const UserCard: React.FC<UserCardProps> = ({
   id, name, image, roleName,
 }: UserCardProps) => {
+  const { query } = useRouter();
+  const { pid } = query;
+
+  const deleteUserMutation = useDeleteProjectUser({});
+  const { addToast } = useToasts();
+
+  const onDelete = useCallback(() => {
+    deleteUserMutation.mutate({ projectId: pid, userId: id }, {
+      onSuccess: () => {
+        addToast(`success-user-delete-${name}`, (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">
+              {`User "${name}" deleted`}
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
+      },
+      onError: () => {
+        addToast(`error-user-delete-${name}`, (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              {`"${name}" deletion is not allowed`}
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [deleteUserMutation, id, name, pid, addToast]);
+
   return (
     <div className="box-border flex items-center justify-between flex-grow w-full py-3 pl-3 pr-6 space-x-3 bg-gray-100 rounded-3xl">
       <Avatar
@@ -71,7 +111,7 @@ export const UserCard: React.FC<UserCardProps> = ({
                 theme="primary"
                 size="xs"
                 className="cursor-pointer"
-                onClick={() => console.log('remove', id)}
+                onClick={() => onDelete()}
               >
                 Yes
               </Button>

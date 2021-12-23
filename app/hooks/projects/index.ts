@@ -34,6 +34,8 @@ import {
   UsePublishProjectProps,
   PublishProjectProps,
   UseProjectUsersOptionsProps,
+  DeleteProjectUserProps,
+  UseDeleteProjectUserProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -268,6 +270,37 @@ export function useProjectUsers(projectId, options: UseProjectUsersOptionsProps 
       data: data?.data?.data,
     };
   }, [query, data?.data?.data]);
+}
+
+export function useDeleteProjectUser({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseDeleteProjectUserProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const deleteProjectUser = ({ projectId, userId }: DeleteProjectUserProps) => {
+    return ROLES.request({
+      method: 'DELETE',
+      url: `/${projectId}/users/${userId}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(deleteProjectUser, {
+    onSuccess: (data: any, variables, context) => {
+      const { projectId } = data;
+      queryClient.invalidateQueries(['projects', projectId]);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
 }
 
 export function useUploadProjectPA({
