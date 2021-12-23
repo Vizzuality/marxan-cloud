@@ -8,6 +8,7 @@ import * as request from 'supertest';
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const token = await GivenUserIsLoggedIn(app);
+  const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
   const organizationId = (
     await OrganizationsTestUtils.createOrganization(app, token, {
       ...E2E_CONFIG.organizations.valid.minimal(),
@@ -41,12 +42,22 @@ export const getFixtures = async () => {
         .send({
           name: 'Test updated',
         }),
+    WhenProjectIsUpdatedAsNotIncludedUser: async () =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}`)
+        .set('Authorization', `Bearer ${notIncludedUserToken}`)
+        .send({
+          name: 'Test updated',
+        }),
     ThenWhenReadingProjectItHasNewData: async () => {
       const projectData = await request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(projectData.body.data.attributes.name).toBe('Test updated');
+    },
+    ThenForbiddenIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(403);
     },
   };
 };

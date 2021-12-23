@@ -3,13 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { getConnection, Repository, Not } from 'typeorm';
 import { intersection } from 'lodash';
 
-import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { Permit } from '../access-control.types';
 import { ProjectAccessControl } from './project-access-control';
 import { UserRoleInProjectDto } from './dto/user-role-project.dto';
+import { Either, left, right } from 'fp-ts/Either';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -26,6 +27,11 @@ export class ProjectAclService implements ProjectAccessControl {
     Roles.project_contributor,
     Roles.project_viewer,
   ];
+  private readonly canEditProjectRoles = [
+    Roles.project_contributor,
+    Roles.project_owner,
+  ];
+  private readonly canDeleteProjectRoles = [Roles.project_owner];
 
   private async getRolesWithinProjectForUser(
     userId: string,
@@ -58,8 +64,22 @@ export class ProjectAclService implements ProjectAccessControl {
   // TODO: this will be changed in the following release of user requirements.
   // For now, anyone should be able to create projects, regardless of having roles or not.
   // In the future project creation will be limited to organization contributors, so this logic will be moved to the access control module
-  async canCreateProject(_userId: string, _projectId: string): Promise<Permit> {
+  async canCreateProject(_userId: string): Promise<Permit> {
     return true;
+  }
+
+  async canEditProject(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canEditProjectRoles,
+    );
+  }
+
+  async canDeleteProject(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canDeleteProjectRoles,
+    );
   }
 
   async canViewProject(userId: string, projectId: string): Promise<Permit> {
@@ -128,34 +148,44 @@ export class ProjectAclService implements ProjectAccessControl {
   async findUsersInProject(
     projectId: string,
     userId: string,
-  ): Promise<UserRoleInProjectDto[] | Permit> {
+    nameSearch?: string,
+  ): Promise<Either<Permit, UserRoleInProjectDto[]>> {
     if (!(await this.isOwner(userId, projectId))) {
-      return false;
+      return left(false);
     }
 
-    const usersInProject = await this.roles
+    const query = this.roles
       .createQueryBuilder('users_projects')
       .leftJoinAndSelect('users_projects.user', 'userId')
-      .where({ projectId })
+      .where({
+        projectId,
+      })
       .select([
         'users_projects.roleName',
         'userId.displayName',
         'userId.id',
         'userId.avatarDataUrl',
-      ])
-      .getMany();
+      ]);
 
-    return usersInProject;
+    if (nameSearch) {
+      query.andWhere('userId.displayName ILIKE :name', {
+        name: `%${nameSearch}%`,
+      });
+    }
+
+    const usersInProject = await query.getMany();
+
+    return right(usersInProject);
   }
 
   async updateUserInProject(
     projectId: string,
     updateUserInProjectDto: UserRoleInProjectDto,
     loggedUserId: string,
-  ): Promise<void | Permit> {
+  ): Promise<Either<Permit, void>> {
     const { userId, roleName } = updateUserInProjectDto;
     if (!(await this.isOwner(loggedUserId, projectId))) {
-      return false;
+      return left(false);
     }
 
     const apiDbConnection = getConnection(DbConnections.default);
@@ -186,21 +216,23 @@ export class ProjectAclService implements ProjectAccessControl {
     } finally {
       await apiQueryRunner.release();
     }
+    return right(void 0);
   }
 
   async revokeAccess(
     projectId: string,
     userId: string,
     loggedUserId: string,
-  ): Promise<void | Permit> {
+  ): Promise<Either<Permit, void>> {
     if (!(await this.isOwner(loggedUserId, projectId))) {
-      return false;
+      return left(false);
     }
 
     if (!(await this.hasOtherOwner(userId, projectId))) {
-      return false;
+      return left(false);
     }
 
     await this.roles.delete({ projectId, userId });
+    return right(void 0);
   }
 }

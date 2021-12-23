@@ -10,8 +10,6 @@ import { Scenario } from '../scenario.api.entity';
 import { InputFilesModule } from '../input-files';
 import {
   blmDefaultProvider,
-  calibrationQueueEventsProvider,
-  calibrationQueueProvider,
   runQueueEventsProvider,
   runQueueProvider,
 } from './run-service.providers';
@@ -33,8 +31,6 @@ import { OutputRepository } from './output.repository';
     EventsHandler,
     runQueueProvider,
     runQueueEventsProvider,
-    calibrationQueueProvider,
-    calibrationQueueEventsProvider,
     blmDefaultProvider,
     RunService,
     AssetsService,

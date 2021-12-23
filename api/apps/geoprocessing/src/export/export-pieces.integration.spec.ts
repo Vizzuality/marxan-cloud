@@ -23,7 +23,12 @@ test(`exporting supported piece`, async () => {
   const result = await fixtures.sut.run(input);
   expect(result).toEqual({
     ...input,
-    uri: `fake-uri`,
+    uris: [
+      {
+        uri: `fake-uri`,
+        relativePath: `path/file.json`,
+      },
+    ],
   });
 });
 
@@ -64,7 +69,12 @@ class FakeProjectMetadataExporter extends PieceProcessor {
   async run(input: JobInput): Promise<JobOutput> {
     return {
       ...input,
-      uri: `fake-uri`,
+      uris: [
+        {
+          uri: `fake-uri`,
+          relativePath: `path/file.json`,
+        },
+      ],
     };
   }
 }

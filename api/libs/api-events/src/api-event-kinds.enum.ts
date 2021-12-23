@@ -52,6 +52,12 @@ export enum API_EVENT_KINDS {
   scenario__calibration__submitted_v1_alpha1 = 'scenario.calibration.submitted/v1/alpha',
   scenario__calibration__finished_v1_alpha1 = 'scenario.calibration.finished/v1/alpha',
   scenario__calibration__failed_v1_alpha1 = 'scenario.calibration.failed/v1/alpha',
+  project__export__submitted__v1__alpha = 'project.export.submitted/v1/alpha',
+  project__export__finished__v1__alpha = 'project.export.finished/v1/alpha',
+  project__export__failed__v1__alpha = 'project.export.failed/v1/alpha',
+  project__export__piece__submitted__v1__alpha = 'project.export.piece.submitted/v1/alpha',
+  project__export__piece__finished__v1__alpha = 'project.export.piece.finished/v1/alpha',
+  project__export__piece__failed__v1__alpha = 'project.export.piece.failed/v1/alpha',
 }
 
 export type ProjectEvents = Pick<

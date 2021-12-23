@@ -1,37 +1,50 @@
 import { Injectable } from '@nestjs/common';
-import { SandboxRunnerOutputHandler } from '../sandbox-runner-output-handler';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Not, Repository } from 'typeorm';
 import { Workspace } from '../ports/workspace';
-
-type SomePartialResults = {};
+import { BlmBestRunService } from './blm-best-run.service';
+import { BlmPartialResultEntity } from './blm-partial-results.geo.entity';
 
 @Injectable()
-export class BlmPartialResultsRepository
-  implements SandboxRunnerOutputHandler<SomePartialResults> {
+export class BlmPartialResultsRepository {
+  constructor(
+    @InjectRepository(BlmPartialResultEntity)
+    private readonly repository: Repository<BlmPartialResultEntity>,
+    private readonly blmBestRunService: BlmBestRunService,
+  ) {}
+
   cancel(): Promise<void> {
     return Promise.resolve(undefined);
   }
 
-  /**
-   * save partial results (for given blm value)
-   * to some temporary table
-   *
-   * would be used within BlmRunnerService, passed down to RunnerService
-   */
-  async dump(
+  async savePartialResult(
     workspace: Workspace,
     scenarioId: string,
-    stdOutput: string[],
-    stdErr: string[] | undefined,
-  ): Promise<SomePartialResults> {
-    return {};
+    calibrationId: string,
+    blmValue: number,
+  ): Promise<void> {
+    const bestRun = await this.blmBestRunService.getBlmCalibrationBestRun(
+      workspace,
+      calibrationId,
+      blmValue,
+    );
+
+    await this.repository.save({
+      blmValue,
+      boundaryLength: bestRun.connectivity,
+      scenarioId,
+      calibrationId,
+      score: bestRun.score,
+    });
   }
 
-  dumpFailure(
-    workspace: Workspace,
+  async removePreviousPartialResults(
     scenarioId: string,
-    stdOutput: string[],
-    stdError: string[],
+    currentCalibrationId: string,
   ): Promise<void> {
-    return Promise.resolve(undefined);
+    await this.repository.delete({
+      scenarioId,
+      calibrationId: Not(currentCalibrationId),
+    });
   }
 }

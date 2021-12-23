@@ -18,6 +18,7 @@ export interface GeoFeatureMetadata {
   name: string;
   type: FeatureTags;
   description?: string;
+  intersectWith?: string;
 }
 
 export class GeoFeatureShapefiles extends FileUploader {

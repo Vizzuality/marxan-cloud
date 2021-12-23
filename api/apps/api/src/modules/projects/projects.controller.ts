@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  ForbiddenException,
+  Header,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -12,6 +14,7 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -72,6 +75,9 @@ import {
   GeometryFileInterceptor,
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
+import { forbiddenError } from '../access-control/access-control.types';
+import { projectNotFound, unknownError } from '../blm';
+import { Response } from 'express';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -136,8 +142,18 @@ export class ProjectsController {
   @Post('legacy')
   async importLegacyProject(
     @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<Project> {
-    return this.projectsService.importLegacyProject(file);
+    const result = await this.projectsService.importLegacyProject(
+      file,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
+    return result.right;
   }
 
   @ApiOperation({ description: 'Create project' })
@@ -148,8 +164,16 @@ export class ProjectsController {
     @Body() dto: CreateProjectDTO,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResultSingular> {
+    const result = await this.projectsService.create(dto, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
     return await this.projectSerializer.serialize(
-      await this.projectsService.create(dto, { authenticatedUser: req.user }),
+      result.right,
       undefined,
       true,
     );
@@ -162,9 +186,15 @@ export class ProjectsController {
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateProjectDTO,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectResultSingular> {
+    const result = await this.projectsService.update(id, dto, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
     return await this.projectSerializer.serialize(
-      await this.projectsService.update(id, dto),
+      result.right,
       undefined,
       true,
     );
@@ -173,8 +203,16 @@ export class ProjectsController {
   @ApiOperation({ description: 'Delete project' })
   @ApiOkResponse()
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<void> {
-    return await this.projectsService.remove(id);
+  async delete(
+    @Param('id') id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.projectsService.remove(id, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return result.right;
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
@@ -287,8 +325,13 @@ export class ProjectsController {
   async updateBlmRange(
     @Param('id') id: string,
     @Body() { range }: UpdateProjectBlmRangeDTO,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectBlmValuesResponseDto> {
-    const result = await this.projectsService.updateBlmValues(id, range);
+    const result = await this.projectsService.updateBlmValues(
+      req.user.id,
+      id,
+      range,
+    );
 
     if (isLeft(result)) {
       switch (result.left) {
@@ -302,6 +345,8 @@ export class ProjectsController {
           throw new InternalServerErrorException(
             `Could not update with range ${range} project BLM values for project with ID: ${id}`,
           );
+        case forbiddenError:
+          throw new ForbiddenException();
         default:
           throw new InternalServerErrorException();
       }
@@ -322,18 +367,48 @@ export class ProjectsController {
   @Get(':id/calibration')
   async getProjectBlmValues(
     @Param('id') id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectBlmValuesResponseDto> {
-    const result = await this.projectsService.findProjectBlm(id);
+    const result = await this.projectsService.findProjectBlm(id, req.user.id);
 
     if (isLeft(result))
-      throw new NotFoundException(
-        `Could not find project BLM values for project with ID: ${id}`,
-      );
+      switch (result.left) {
+        case projectNotFound:
+          throw new NotFoundException(
+            `Could not find project BLM values for project with ID: ${id}`,
+          );
+        case forbiddenError:
+          throw new ForbiddenException();
+        case unknownError:
+          throw new InternalServerErrorException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
     return result.right;
   }
 
   @Post(`:id/export`)
   async requestProjectExport(@Param('id') id: string) {
-    await this.projectsService.requestExport(id);
+    return {
+      id: await this.projectsService.requestExport(id),
+    };
+  }
+
+  @Get(`:id/export/:exportId`)
+  @Header(`Content-Type`, `application/zip`)
+  @Header('Content-Disposition', 'attachment; filename="export.zip"')
+  async getProjectExportArchive(
+    @Param('id') id: string,
+    @Param('exportId') exportId: string,
+    @Res() response: Response,
+  ) {
+    const stream = await this.projectsService.getExportedArchive(id, exportId);
+
+    if (stream) {
+      stream.pipe(response);
+    } else {
+      response.send(null);
+    }
   }
 }

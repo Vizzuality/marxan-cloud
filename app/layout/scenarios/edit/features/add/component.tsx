@@ -1,8 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useQueryClient } from 'react-query';
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
@@ -15,25 +19,31 @@ import List from 'layout/scenarios/edit/features/add/list';
 import Toolbar from 'layout/scenarios/edit/features/add/toolbar';
 
 import Button from 'components/button';
+import Icon from 'components/icon';
 import Loading from 'components/loading';
+import Modal from 'components/modal';
+
+import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 import Uploader from './uploader';
 
-export interface ScenariosFeaturesAddProps {
-  onSuccess?: () => void;
-  onDismiss?: () => void;
-}
+export interface ScenariosFeaturesAddProps {}
 
-export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
-  onDismiss,
-}: ScenariosFeaturesAddProps) => {
+export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
+  const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState(null);
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
 
+  const dispatch = useDispatch();
   const { query } = useRouter();
   const { pid, sid } = query;
+
+  const queryClient = useQueryClient();
+  const scenarioSlice = getScenarioEditSlice(sid);
+
+  const { setFeatures } = scenarioSlice.actions;
 
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
   const saveScenarioMutation = useSaveScenario({
@@ -46,10 +56,11 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   const { metadata } = scenarioData || {};
 
   const {
-    data: selectedFeaturesData,
+    data: initialSelectedFeatures,
   } = useSelectedFeatures(sid, {});
 
   const {
+    data: allFeaturesData,
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
@@ -58,14 +69,14 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
   });
 
   const INITIAL_VALUES = useMemo(() => {
-    if (selectedFeaturesData) {
+    if (initialSelectedFeatures) {
       return {
-        selected: selectedFeaturesData.map((s) => s.id),
+        selected: initialSelectedFeatures.map((s) => s.id),
       };
     }
 
     return [];
-  }, [selectedFeaturesData]);
+  }, [initialSelectedFeatures]);
 
   const onToggleSelected = useCallback((id, input) => {
     const { value, onChange } = input;
@@ -94,24 +105,22 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
     setSort(s);
   }, []);
 
-  const onSubmit = useCallback((values) => {
-    const { selected } = values;
+  const onSubmit = useCallback(({ selected }) => {
+    const selectedFeaturesData = allFeaturesData.filter((sf) => selected.includes(sf.id));
 
     setSubmitting(true);
+    dispatch(setFeatures(selectedFeaturesData));
 
     // Save current features then dismiss the modal
     selectedFeaturesMutation.mutate({
       id: `${sid}`,
       data: {
         status: 'draft',
-        features: selected.map((s) => {
-          const {
-            marxanSettings,
-            geoprocessingOperations,
-          } = selectedFeaturesData.find((sf) => sf.featureId === s) || {};
+        features: selectedFeaturesData.map((feature) => {
+          const { marxanSettings, geoprocessingOperations } = feature;
 
           return {
-            featureId: s,
+            featureId: feature.id,
             kind: geoprocessingOperations ? 'withGeoprocessing' : 'plain',
             marxanSettings: marxanSettings || {
               fpf: 1,
@@ -130,8 +139,8 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
           },
         }, {
           onSuccess: () => {
-            onDismiss();
             setSubmitting(false);
+            setOpen(false);
           },
           onError: () => {
             setSubmitting(false);
@@ -144,88 +153,108 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = ({
     });
   }, [sid,
     metadata,
-    selectedFeaturesData,
+    allFeaturesData,
     selectedFeaturesMutation,
     saveScenarioMutation,
-    onDismiss,
+    setFeatures,
+    dispatch,
   ]);
 
-  const onCancel = useCallback(() => {
-    onDismiss();
-  }, [onDismiss]);
-
   return (
-    <FormRFF
-      key="features-list"
-      onSubmit={onSubmit}
-      initialValues={INITIAL_VALUES}
-    >
-      {({ handleSubmit, values }) => (
-        <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
-          <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">Add features to your planning area</h2>
+    <>
+      <Button
+        theme="primary"
+        size="base"
+        onClick={() => setOpen(true)}
+      >
+        <span className="mr-3">Add features</span>
+        <Icon icon={PLUS_SVG} className="w-4 h-4" />
+      </Button>
 
-          <Loading
-            visible={submitting}
-            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
-            iconClassName="w-10 h-10 text-primary-500"
-          />
+      <Modal
+        id="all-feaures"
+        title="All features"
+        open={open}
+        size="narrow"
+        onDismiss={() => {
+          setOpen(false);
+          queryClient.removeQueries(['all-features', pid]);
+        }}
+      >
+        <FormRFF
+          key="features-list"
+          onSubmit={onSubmit}
+          initialValues={INITIAL_VALUES}
+        >
+          {({ handleSubmit, values }) => (
+            <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
 
-          {/* Field to upload */}
-          <div className="mx-8 mt-3 mb-5">
-            <Uploader />
-          </div>
+              <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">Add features to your planning area</h2>
 
-          <Toolbar
-            search={search}
-            filters={filters}
-            sort={sort}
-            onSearch={onSearch}
-            onFilters={onFilters}
-            onSort={onSort}
-          />
+              <Loading
+                visible={submitting}
+                className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
+                iconClassName="w-10 h-10 text-primary-500"
+              />
 
-          <FieldRFF
-            name="selected"
-          >
-            {({ input }) => (
-              <List
+              {/* Field to upload */}
+              <div className="mx-8 mt-3 mb-5">
+                <Uploader />
+              </div>
+
+              <Toolbar
                 search={search}
                 filters={filters}
                 sort={sort}
-                selected={values.selected}
-                onToggleSelected={(id) => {
-                  onToggleSelected(id, input);
-                }}
+                onSearch={onSearch}
+                onFilters={onFilters}
+                onSort={onSort}
               />
-            )}
-          </FieldRFF>
 
-          {allFeaturesIsFetched && (
-            <div className="flex justify-center flex-shrink-0 px-8 space-x-3">
-              <Button
-                className="w-full"
-                theme="secondary"
-                size="lg"
-                onClick={onCancel}
-
+              <FieldRFF
+                name="selected"
               >
-                Cancel
-              </Button>
+                {({ input }) => (
+                  <List
+                    search={search}
+                    filters={filters}
+                    sort={sort}
+                    selected={values.selected}
+                    onToggleSelected={(id) => {
+                      onToggleSelected(id, input);
+                    }}
+                  />
+                )}
+              </FieldRFF>
 
-              <Button
-                type="submit"
-                className="w-full"
-                theme="primary"
-                size="lg"
-                disabled={submitting}
-              >
-                Save
-              </Button>
-            </div>
+              {allFeaturesIsFetched && (
+                <div className="flex justify-center flex-shrink-0 px-8 space-x-3">
+                  <Button
+                    className="w-full"
+                    theme="secondary"
+                    size="lg"
+                    onClick={() => setOpen(false)}
+
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    theme="primary"
+                    size="lg"
+                    disabled={submitting}
+                  >
+                    Save
+                  </Button>
+                </div>
+              )}
+            </form>
           )}
-        </form>
-      )}
-    </FormRFF>
+        </FormRFF>
+      </Modal>
+    </>
   );
 };
 

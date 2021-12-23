@@ -3,7 +3,7 @@ import { logDebug, logError, logInfo } from "./logger.ts";
 import { BotHttpClient, getJsonApiDataFromResponse } from "./marxan-bot.ts";
 import { tookMs } from "./util/perf.ts";
 
-interface Project {
+export interface Project {
   name: string;
   description: string;
   countryId?: string;

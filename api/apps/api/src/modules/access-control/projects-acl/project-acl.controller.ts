@@ -12,6 +12,7 @@ import {
   HttpCode,
   ForbiddenException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ProjectAclService } from './project-acl.service';
@@ -23,7 +24,11 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserRoleInProjectDto } from './dto/user-role-project.dto';
+import { isLeft } from 'fp-ts/lib/These';
+import {
+  UserRoleInProjectDto,
+  UsersInProjectResult,
+} from './dto/user-role-project.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -42,17 +47,19 @@ export class ProjectAclController {
   async findUsersInProject(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<UserRoleInProjectDto[] | boolean> {
+    @Query('q') nameSearch?: string,
+  ): Promise<UsersInProjectResult> {
     const result = await this.projectAclService.findUsersInProject(
       projectId,
       req.user.id,
+      nameSearch,
     );
 
-    if (result === false) {
+    if (isLeft(result)) {
       throw new ForbiddenException();
     }
 
-    return result;
+    return { data: result.right };
   }
 
   @Patch(':projectId/users')
@@ -73,7 +80,7 @@ export class ProjectAclController {
       req.user.id,
     );
 
-    if (result === false) {
+    if (isLeft(result)) {
       throw new ForbiddenException();
     }
   }
@@ -96,7 +103,7 @@ export class ProjectAclController {
       req.user.id,
     );
 
-    if (result === false) {
+    if (isLeft(result)) {
       throw new ForbiddenException();
     }
   }

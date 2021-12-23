@@ -25,7 +25,6 @@ export class AssetFetcher {
           cancelToken: this.#cancelTokenSource.token,
         })
         .toPromise();
-
       assetStream.data.pipe(output);
     } catch (error) {
       output.end();

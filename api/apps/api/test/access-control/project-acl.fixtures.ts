@@ -4,7 +4,7 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
-import { UsersProjectsApiEntity } from '@marxan-api/modules/projects/control-level/users-projects.api.entity';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsACLTestUtils } from '../utils/projects-acl.test.utils';
@@ -104,6 +104,14 @@ export const getFixtures = async () => {
     WhenGettingProjectUsersAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())
         .get(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`),
+    WhenGettingProjectUsersWithSearchTerm: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/roles/projects/${projectId}/users?q=C C`)
+        .set('Authorization', `Bearer ${ownerUserToken}`),
+    WhenGettingProjectUsersWithWrongSearchTerm: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/roles/projects/${projectId}/users?q=NotAUser`)
         .set('Authorization', `Bearer ${ownerUserToken}`),
 
     WhenGettingProjectUsersAsContributor: async (projectId: string) =>
@@ -251,15 +259,27 @@ export const getFixtures = async () => {
 
     ThenSingleOwnerUserInProjectIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(200);
-      expect(response.body).toHaveLength(1);
+      expect(response.body.data).toHaveLength(1);
+    },
+
+    ThenViewerUserInformationIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0].user.displayName).toEqual('User C C');
+      expect(response.body.data[0].user.id).toEqual(viewerUserId);
+    },
+
+    ThenNoUserInformationIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(0);
     },
 
     ThenAllUsersinProjectAfterAddingAnOwnerAreReturned: (
       response: request.Response,
     ) => {
       expect(response.status).toEqual(200);
-      expect(response.body).toHaveLength(2);
-      const newUserCreated = response.body.find(
+      expect(response.body.data).toHaveLength(2);
+      const newUserCreated = response.body.data.find(
         (user: any) => user.user.id === ownerUserId,
       );
       expect(newUserCreated.roleName).toEqual(projectOwnerRole);
@@ -269,7 +289,7 @@ export const getFixtures = async () => {
       response: request.Response,
     ) => {
       expect(response.status).toEqual(200);
-      expect(response.body).toHaveLength(4);
+      expect(response.body.data).toHaveLength(4);
     },
   };
 };

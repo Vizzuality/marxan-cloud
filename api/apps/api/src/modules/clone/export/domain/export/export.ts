@@ -19,6 +19,7 @@ import { ExportComponent } from './export-component/export-component';
 import { ExportSnapshot } from './export.snapshot';
 import { ExportComponentSnapshot } from './export-component.snapshot';
 import { ExportAllComponentsFinished } from '../events/export-all-components-finished.event';
+import { ExportRequested } from '@marxan-api/modules/clone/export/domain';
 
 export const pieceNotFound = Symbol('export piece not found');
 export const notReady = Symbol('some pieces of export are not yet ready');
@@ -59,19 +60,26 @@ export class Export extends AggregateRoot {
       )
       .forEach((event) => exportRequest.apply(event));
 
+    exportRequest.apply(
+      new ExportRequested(
+        exportRequest.id,
+        exportRequest.resourceId,
+        exportRequest.resourceKind,
+      ),
+    );
     return exportRequest;
   }
 
   completeComponent(
     id: ComponentId,
-    pieceLocation: ComponentLocation,
+    pieceLocation: ComponentLocation[],
   ): Either<typeof pieceNotFound, true> {
     const piece = this.#pieces.find((piece) => piece.id.equals(id));
     if (!piece) {
       return left(pieceNotFound);
     }
     piece.finish(pieceLocation);
-    this.apply(new ExportComponentFinished(this.id, id));
+    this.apply(new ExportComponentFinished(this.id, id, pieceLocation));
 
     if (this.#allPiecesReady()) {
       this.apply(new ExportAllComponentsFinished(this.id));
@@ -85,7 +93,14 @@ export class Export extends AggregateRoot {
       return left(notReady);
     }
     this.archiveLocation = archiveLocation;
-    this.apply(new ArchiveReady(this.id, this.archiveLocation));
+    this.apply(
+      new ArchiveReady(
+        this.id,
+        this.resourceId,
+        this.resourceKind,
+        this.archiveLocation,
+      ),
+    );
     return right(true);
   }
 
