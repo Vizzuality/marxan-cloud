@@ -16,7 +16,7 @@ export interface HomeFeaturesProps {
 
 export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
   return (
-    <div className="bg-primary-50">
+    <div id="features" className="bg-primary-50">
       <Wrapper>
         <div className="w-full py-10 md:py-32">
           <div className="grid max-w-5xl grid-cols-1 gap-10 mx-auto md:gap-20 sm:grid-cols-2 lg:grid-cols-3">

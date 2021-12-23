@@ -1,8 +1,12 @@
 import React from 'react';
 
+import Link from 'next/link';
+
 import Wrapper from 'layout/wrapper';
 
 import Button from 'components/button';
+
+import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
 import HeroAnimation, { BACKGROUND_IMAGES } from './hero-animation';
 
@@ -34,7 +38,7 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
               and people on land, freshwater and ocean systems.
             </p>
 
-            <div className="mt-10 space-y-4 xs:flex xs:space-x-4 xs:space-y-0 md:mt-18">
+            <div className="space-y-4 xs:flex xs:space-x-4 xs:space-y-0 mt-10 md:mt-18 md:mb-18">
               <Button
                 className="w-full md:w-40"
                 theme="primary"
@@ -51,6 +55,15 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
               >
                 How to
               </Button>
+            </div>
+
+            <div className="relative md:absolute bottom-0 mt-10 md:mt-0 text-center md:text-left">
+              <Link href="#features">
+                <a className="mt-8" href="#features">
+                  Scroll down
+                  <ARROW_DOWN_SVG className="inline w-3 ml-3" fill="white" />
+                </a>
+              </Link>
             </div>
           </div>
         </div>
