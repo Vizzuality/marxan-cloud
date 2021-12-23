@@ -7,16 +7,16 @@ import FarmerImg from 'images/home-hero/image-02.jpg';
 import BoatImg from 'images/home-hero/image-03.jpg';
 
 export const BACKGROUND_IMAGES = [{
-  backgroundColor: '#11233b',
+  backgroundColor: '#10223a',
   image: Bg01Img,
 }, {
-  backgroundColor: '#11161a',
+  backgroundColor: '#0f171a',
   image: Bg02Img,
 }, {
-  backgroundColor: '#11161a',
+  backgroundColor: '#0f171a',
   image: Bg03Img,
 }, {
-  backgroundColor: '#0e1619',
+  backgroundColor: '#11161a',
   image: Bg04Img,
 }];
 
