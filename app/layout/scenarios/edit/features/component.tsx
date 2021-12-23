@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { useQueryClient } from 'react-query';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
@@ -15,15 +14,13 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import AddFeatures from 'layout/scenarios/edit/features/add';
+import AddFeaturesModal from 'layout/scenarios/edit/features/add';
 import ListFeatures from 'layout/scenarios/edit/features/list';
 import TargetFeatures from 'layout/scenarios/edit/features/targets';
 import { ScenarioSidebarSubTabs } from 'layout/scenarios/edit/sidebar/types';
 
-import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
-import Modal from 'components/modal';
 import Steps from 'components/steps';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
@@ -31,7 +28,6 @@ import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
 import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
 
 import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
-import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 export interface ScenariosSidebarEditFeaturesProps {
 
@@ -39,11 +35,8 @@ export interface ScenariosSidebarEditFeaturesProps {
 
 export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeaturesProps> = () => {
   const [step, setStep] = useState(0);
-  const [modal, setModal] = useState(false);
   const { query } = useRouter();
-  const { pid, sid } = query;
-
-  const queryClient = useQueryClient();
+  const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
@@ -227,29 +220,9 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
               </div>
 
               {step === 0 && (
-                <Button
-                  theme="primary"
-                  size="base"
-                  onClick={() => setModal(true)}
-                >
-                  <span className="mr-3">Add features</span>
-                  <Icon icon={PLUS_SVG} className="w-4 h-4" />
-                </Button>
+                <AddFeaturesModal />
               )}
             </header>
-
-            <Modal
-              id="all-feaures"
-              title="All features"
-              open={modal}
-              size="narrow"
-              onDismiss={() => {
-                setModal(false);
-                queryClient.removeQueries(['all-features', pid]);
-              }}
-            >
-              <AddFeatures />
-            </Modal>
 
             {step === 0 && (
               <ListFeatures
