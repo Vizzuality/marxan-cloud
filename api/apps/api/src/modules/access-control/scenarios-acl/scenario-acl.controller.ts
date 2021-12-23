@@ -40,12 +40,12 @@ export class ScenarioAclController {
     status: 204,
     description: 'User was updated correctly',
   })
-  async updateUserInProject(
+  async updateUserInScenario(
     @Body() dto: UserRoleInScenarioDto,
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void | boolean> {
-    const result = await this.scenarioAclService.updateUserInProject(
+    const result = await this.scenarioAclService.updateUserInScenario(
       scenarioId,
       dto,
       req.user.id,

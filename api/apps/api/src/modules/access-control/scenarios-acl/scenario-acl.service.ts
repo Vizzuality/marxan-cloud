@@ -110,12 +110,12 @@ export class ScenarioAclService implements ScenarioAccessControl {
     return otherOwnersInScenario >= 1;
   }
 
-  async updateUserInProject(
+  async updateUserInScenario(
     scenarioId: string,
-    updateUserInProjectDto: UserRoleInScenarioDto,
+    updateUserInScenarioDto: UserRoleInScenarioDto,
     loggedUserId: string,
   ): Promise<Either<Permit, void>> {
-    const { userId, roleName } = updateUserInProjectDto;
+    const { userId, roleName } = updateUserInScenarioDto;
     if (!(await this.isOwner(loggedUserId, scenarioId))) {
       return left(false);
     }
@@ -127,14 +127,14 @@ export class ScenarioAclService implements ScenarioAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInProject = await this.roles.findOne({
+      const existingUserInScenario = await this.roles.findOne({
         where: {
           scenarioId,
           userId,
         },
       });
 
-      if (!existingUserInProject) {
+      if (!existingUserInScenario) {
         await this.roles.save({
           scenarioId,
           userId,
