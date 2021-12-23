@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -30,9 +30,18 @@ export const UserCard: React.FC<UserCardProps> = ({
   const { pid } = query;
 
   const [open, setOpen] = useState(false);
+  const [userRole, setUserRole] = useState(ROLES[roleName]);
 
   const deleteUserMutation = useDeleteProjectUser({});
   const { addToast } = useToasts();
+
+  const OPTIONS = useMemo(() => {
+    return ROLE_OPTIONS.filter((o) => o.value !== userRole);
+  }, [userRole]);
+
+  const onEditRole = (value) => {
+    console.log('role selected', value, 'id', id);
+  };
 
   const onDelete = useCallback(() => {
     deleteUserMutation.mutate({ projectId: pid, userId: id }, {
@@ -81,8 +90,11 @@ export const UserCard: React.FC<UserCardProps> = ({
           <Select
             initialSelected={ROLES[roleName]}
             maxHeight={300}
-            onChange={(value: string) => console.log('role selected', value, 'id', id)}
-            options={ROLE_OPTIONS}
+            onChange={(value: string) => {
+              onEditRole(value);
+              setUserRole(value);
+            }}
+            options={OPTIONS}
             placeholder={ROLES[roleName]}
             size="s"
             status="none"
@@ -133,7 +145,6 @@ export const UserCard: React.FC<UserCardProps> = ({
           </div>
         )}
         placement="top-end"
-        trigger="click"
       >
         <span>
           <Button
