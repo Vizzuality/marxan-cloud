@@ -21,9 +21,9 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
             <h2 className="pb-10 leading-relaxed text-center md:pb-6 md:text-left bg-clip-text">
               In partnership with:
             </h2>
-            <div className="grid w-full grid-cols-1 md:grid-cols-4 gap-y-20">
+            <div className="grid w-full grid-cols-1 md:grid-cols-7 gap-y-20 gap-x-20">
               {FOUNDING_LOGOS.map((fl) => (
-                <a href={fl.hyperlink} key={fl.id} rel="noreferrer" target="_blank" className="place-self-center md:place-self-start">
+                <a href={fl.hyperlink} key={fl.id} rel="noreferrer" target="_blank" className="col-span-2 place-self-center md:place-self-start">
                   <img alt={fl.alt} src={fl.src} height="auto" width="auto" />
                 </a>
               ))}
