@@ -10,9 +10,9 @@ import Header from 'layout/header';
 import Banner from 'layout/home/banner';
 import Features from 'layout/home/features';
 import Hero from 'layout/home/hero';
+import PartnersList from 'layout/home/partners';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
-import PartnersList from 'layout/partners';
 
 export const getServerSideProps = withUser();
 
