@@ -10,10 +10,11 @@ export interface EditContributorsDropdownProps {
   users: any,
   search?: string;
   onSearch: (selected: string) => void;
+  refetch: () => void;
 }
 
 export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> = ({
-  users, search, onSearch,
+  users, search, onSearch, refetch,
 }: EditContributorsDropdownProps) => {
   const onChangeSearchDebounced = useDebouncedCallback((value) => {
     onSearch(value);
@@ -41,13 +42,14 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
           theme="light"
         />
         <p className="self-start py-6 text-xs text-black uppercase font-heading">{`${users.length} ${contributorsSpelling}`}</p>
-        <div className="w-full space-y-2.5 flex-grow flex">
+        <div className="w-full space-y-2.5 flex-grow flex flex-col">
           {!!users.length && users.map((u) => {
             const {
               user: {
                 displayName, id, avatarDataUrl,
               }, roleName,
             } = u;
+
             return (
               <UserCard
                 key={id}
@@ -55,6 +57,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
                 image={avatarDataUrl}
                 name={displayName}
                 roleName={roleName}
+                refetch={refetch}
               />
             );
           })}

@@ -1,6 +1,6 @@
 const Types = {
   Owner: 'project_owner',
-  Contributor: 'project-contributor',
+  Contributor: 'project_contributor',
   Viewer: 'project_viewer',
 };
 

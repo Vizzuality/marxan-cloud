@@ -1,4 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback, useMemo, useState,
+} from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -20,11 +22,11 @@ export interface UserCardProps {
   name: string,
   image?: string,
   roleName: string,
-
+  refetch: () => void,
 }
 
 export const UserCard: React.FC<UserCardProps> = ({
-  id, name, image, roleName,
+  id, name, image, roleName, refetch,
 }: UserCardProps) => {
   const { query } = useRouter();
   const { pid } = query;
@@ -59,6 +61,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         });
 
         console.info('User role changed succesfully', s);
+        refetch();
       },
       onError: () => {
         addToast('error-user-role-edition', (
@@ -73,7 +76,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         console.error('User role changed not saved');
       },
     });
-  }, [pid, id, addToast, editProjectUserRoleMutation]);
+  }, [pid, id, addToast, editProjectUserRoleMutation, refetch]);
 
   const onDelete = useCallback(() => {
     deleteUserMutation.mutate({ projectId: pid, userId: id }, {
@@ -88,6 +91,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         ), {
           level: 'success',
         });
+        refetch();
         setOpen(false);
       },
       onError: () => {
@@ -104,7 +108,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         setOpen(false);
       },
     });
-  }, [deleteUserMutation, id, name, pid, addToast]);
+  }, [deleteUserMutation, id, name, pid, addToast, refetch]);
 
   return (
     <div className="box-border flex items-center justify-between flex-grow w-full py-3 pl-3 pr-6 space-x-3 bg-gray-100 rounded-3xl">

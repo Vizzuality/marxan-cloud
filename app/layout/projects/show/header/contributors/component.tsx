@@ -91,7 +91,12 @@ export const Contributors: React.FC<ContributorsProps> = () => {
 
                 </button>
                 {editUsers && (
-                  <EditDropdown users={projectUsers} search={search} onSearch={onSearch} />
+                  <EditDropdown
+                    users={projectUsers}
+                    search={search}
+                    onSearch={onSearch}
+                    refetch={refetchProjectUsers}
+                  />
                 )}
               </div>
 
