@@ -6,7 +6,6 @@ import {
   ParseUUIDPipe,
   UseGuards,
   ForbiddenException,
-  Query,
   Patch,
   HttpCode,
   HttpStatus,
@@ -22,9 +21,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { isLeft } from 'fp-ts/lib/These';
-import {
-  UserRoleInScenarioDto,
-} from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { UserRoleInScenarioDto } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -41,13 +38,13 @@ export class ScenarioAclController {
     description: 'User was updated correctly',
   })
   async updateUserInScenario(
-    @Body() dto: UserRoleInScenarioDto,
+    @Body() userAndRoleToChange: UserRoleInScenarioDto,
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void | boolean> {
     const result = await this.scenarioAclService.updateUserInScenario(
       scenarioId,
-      dto,
+      userAndRoleToChange,
       req.user.id,
     );
 

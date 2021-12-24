@@ -68,3 +68,14 @@ test(`add every type of user to a scenario as scenario viewer`, async () => {
   fixtures.ThenForbiddenIsReturned(contributorResponse);
   fixtures.ThenForbiddenIsReturned(ownerResponse);
 });
+
+test(`change user role`, async () => {
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+  await fixtures.GivenViewerWasAddedToScenario(scenarioId);
+  const changeRoleResponse = await fixtures.WhenChangingUserRole(scenarioId);
+  fixtures.ThenNoContentIsReturned(changeRoleResponse);
+  // const allUsersInScenarioResponse = await fixtures.WhenGettingScenarioUsersAsOwner(
+  //   scenarioId,
+  // );
+  // fixtures.ThenUsersWithChangedRoleIsOnProject(allUsersInScenarioResponse);
+});

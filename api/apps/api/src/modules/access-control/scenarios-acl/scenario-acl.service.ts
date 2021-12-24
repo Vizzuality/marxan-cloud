@@ -11,6 +11,7 @@ import {
 } from './dto/user-role-scenario.dto';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { assertDefined } from '@marxan/utils';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
@@ -112,14 +113,14 @@ export class ScenarioAclService implements ScenarioAccessControl {
 
   async updateUserInScenario(
     scenarioId: string,
-    updateUserInScenarioDto: UserRoleInScenarioDto,
+    userAndRoleToChange: UserRoleInScenarioDto,
     loggedUserId: string,
   ): Promise<Either<Permit, void>> {
-    const { userId, roleName } = updateUserInScenarioDto;
+    const { userId, roleName } = userAndRoleToChange;
     if (!(await this.isOwner(loggedUserId, scenarioId))) {
       return left(false);
     }
-
+    assertDefined(roleName);
     const apiDbConnection = getConnection(DbConnections.default);
     const apiQueryRunner = apiDbConnection.createQueryRunner();
 
@@ -127,21 +128,30 @@ export class ScenarioAclService implements ScenarioAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInScenario = await this.roles.findOne({
-        where: {
-          scenarioId,
-          userId,
+      const existingUserInScenario = await apiQueryRunner.manager.findOne(
+        UsersScenariosApiEntity,
+        undefined,
+        {
+          where: {
+            scenarioId,
+            userId,
+          },
         },
-      });
+      );
 
       if (!existingUserInScenario) {
-        await this.roles.save({
-          scenarioId,
-          userId,
-          roleName,
-        });
+        const userRoleToSave = new UsersScenariosApiEntity();
+        userRoleToSave.scenarioId = scenarioId;
+        userRoleToSave.userId = userId;
+        userRoleToSave.roleName = roleName;
+
+        await apiQueryRunner.manager.save(userRoleToSave);
       } else {
-        await this.roles.update({ scenarioId, userId }, { roleName });
+        await apiQueryRunner.manager.update(
+          UsersScenariosApiEntity,
+          { scenarioId, userId },
+          { roleName },
+        );
       }
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
