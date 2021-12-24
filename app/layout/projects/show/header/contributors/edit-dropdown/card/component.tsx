@@ -121,8 +121,8 @@ export const UserCard: React.FC<UserCardProps> = ({
         {!image && name.slice(0, 2)}
       </Avatar>
       <div className="flex flex-col self-center flex-grow w-full space-y-1">
-        <p className="text-sm text-black clamp-1">{name}</p>
-        <div className="pr-20">
+        <p className="w-40 text-sm text-black clamp-1">{name}</p>
+        <div className="w-40 pr-4">
           <Select
             initialSelected={ROLES[roleName]}
             maxHeight={300}

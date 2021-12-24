@@ -29,7 +29,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
   const contributorsSpelling = users.length !== 1 ? 'contributors' : 'contributor';
 
   return (
-    <div className="absolute z-40 bg-white top-14 -right-2 p-9 rounded-3xl">
+    <div className="absolute z-40 overflow-x-visible overflow-y-auto bg-white top-14 -right-2 p-9 rounded-3xl">
       <div className="flex flex-col items-center w-96">
         <div className="text-sm text-black pb-9">Project members</div>
         <Search
@@ -42,7 +42,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
           theme="light"
         />
         <p className="self-start py-6 text-xs text-black uppercase font-heading">{`${users.length} ${contributorsSpelling}`}</p>
-        <div className="w-full space-y-2.5 flex-grow flex flex-col">
+        <div className="w-full space-y-2.5 flex-grow flex flex-col overflow-x-visible overflow-y-auto max-h-64">
           {!!users.length && users.map((u) => {
             const {
               user: {
