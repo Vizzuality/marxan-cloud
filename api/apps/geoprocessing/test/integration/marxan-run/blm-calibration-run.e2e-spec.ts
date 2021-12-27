@@ -23,6 +23,8 @@ import {
   blmSandboxRunner,
 } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-run-adapter.module';
 import { MarxanSandboxBlmRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/marxan-sandbox-blm-runner.service';
+import { BlmFinalResultEntity } from '@marxan/blm-calibration';
+import { BlmPartialResultEntity } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.geo.entity';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -30,12 +32,12 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-describe(`given input data is delayed`, () => {
+describe.skip(`given input data is delayed`, () => {
   beforeEach(() => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test.only(`cancelling blm calibration run during fetching assets`, async (done) => {
+  test(`cancelling blm calibration run during fetching assets`, async (done) => {
     expect.assertions(1);
 
     fixtures
@@ -53,18 +55,19 @@ describe(`given input data is delayed`, () => {
   }, 30000);
 });
 
-describe.skip(`given input data is available`, () => {
+describe(`given input data is available`, () => {
   beforeEach(async () => {
     fixtures.GivenInputFilesAreAvailable();
     await fixtures.GivenScenarioDataExists();
     await fixtures.GivenScenarioPuDataExists();
   }, 60000 * 2);
 
-  test(
+  test.only(
     `marxan run during binary execution`,
     async () => {
       await fixtures.GivenMarxanIsRunning();
-      // await fixtures.ThenOutputScenarioPuDataWasPersisted();
+      await fixtures.ThenBlmFinalResultsArePersisted();
+      await fixtures.ThenBlmPartialResultsHaveBeenDeleted();
     },
     60000 * 15,
   );
@@ -120,6 +123,12 @@ const getFixtures = async () => {
   );
   const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> = app.get(
     getRepositoryToken(OutputScenariosFeaturesDataGeoEntity),
+  );
+  const blmFinalResultsRepo: Repository<BlmFinalResultEntity> = app.get(
+    getRepositoryToken(BlmFinalResultEntity),
+  );
+  const blmPartialResultsRepo: Repository<BlmPartialResultEntity> = app.get(
+    getRepositoryToken(BlmPartialResultEntity),
   );
   // note that SandboxRunner may be both single and blm-calibration one
   const runModuleContext = app.select(BlmRunAdapterModule);
@@ -235,6 +244,12 @@ const getFixtures = async () => {
           },
         }),
       ).toEqual(NUMBER_OF_FEATURES_IN_SAMPLE * NUMBER_OF_RUNS);
+    },
+    ThenBlmFinalResultsArePersisted: async () => {
+      expect(await blmFinalResultsRepo.count()).toEqual(3);
+    },
+    ThenBlmPartialResultsHaveBeenDeleted: async () => {
+      expect(await blmPartialResultsRepo.count()).toEqual(0);
     },
     ThenProgressWasReported() {
       // checking only the last call, otherwise the test is flaky as it depends on chunking the buffer

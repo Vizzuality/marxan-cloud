@@ -25,6 +25,7 @@ import { BlmBestRunService } from './blm-best-run.service';
 import { RemovePreviousCalibrationPartialResultsHandler } from './cleanup/remove-previous-calibration-partial-results.handler';
 import { BlmCalibrationStartedSaga } from './cleanup/blm-calibration-started.saga';
 import { BlmInputFilesFactory } from './blm-input-files.factory';
+import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
@@ -33,7 +34,7 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
     WorkspaceModule,
     AssetsModule,
     MarxanOutputParserModule,
-    TypeOrmModule.forFeature([BlmPartialResultEntity]),
+    TypeOrmModule.forFeature([BlmPartialResultEntity, BlmFinalResultEntity]),
     CqrsModule,
   ],
   providers: [
