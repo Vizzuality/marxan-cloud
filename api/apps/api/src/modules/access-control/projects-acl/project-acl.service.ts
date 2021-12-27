@@ -22,10 +22,10 @@ import { assertDefined } from '@marxan/utils';
 @Injectable()
 export class ProjectAclService implements ProjectAccessControl {
   private readonly canCreateScenarioRoles = [
-    Roles.project_owner,
-    Roles.project_contributor,
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
   ];
-  private readonly canPublishProjectRoles = [Roles.project_owner];
+  private readonly canPublishProjectRoles = [ProjectRoles.project_owner];
   private readonly canViewProjectRoles = [
     ProjectRoles.project_owner,
     ProjectRoles.project_contributor,
@@ -174,7 +174,7 @@ export class ProjectAclService implements ProjectAccessControl {
     projectId: string,
     userAndRoleToChange: UserRoleInProjectDto,
     loggedUserId: string,
-  ): Promise<Either<Permit, void>> {
+  ): Promise<Either<Denied, void>> {
     const { userId, roleName } = userAndRoleToChange;
     if (!(await this.isOwner(loggedUserId, projectId))) {
       return left(false);

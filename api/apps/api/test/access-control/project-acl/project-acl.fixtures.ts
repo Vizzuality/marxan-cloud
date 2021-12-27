@@ -8,6 +8,7 @@ import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/proje
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsACLTestUtils } from '../../utils/projects-acl.test.utils';
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -217,6 +218,15 @@ export const getFixtures = async () => {
           projectId,
           userId: viewerUserId,
           roleName: projectContributorRole,
+        }),
+    WhenAddingIncorrectUserRole: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: viewerUserId,
+          roleName: scenarioOwnerRole,
         }),
     WhenRevokingAccessToViewerFromProjectAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())

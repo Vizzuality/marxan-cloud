@@ -1,10 +1,8 @@
-import {
-  Role,
-  Roles,
-} from '@marxan-api/modules/access-control/role.api.entity';
+import { Role } from '@marxan-api/modules/access-control/role.api.entity';
 import { Check, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { ScenarioRoles } from '../dto/user-role-scenario.dto';
 
 @Entity(`users_scenarios`)
 export class UsersScenariosApiEntity {
@@ -25,10 +23,7 @@ export class UsersScenariosApiEntity {
     type: `varchar`,
     name: `role_id`,
   })
-  roleName!:
-    | Roles.scenario_owner
-    | Roles.scenario_contributor
-    | Roles.scenario_viewer;
+  roleName!: ScenarioRoles;
 
   @ManyToOne(() => Scenario, {
     onDelete: 'CASCADE',
