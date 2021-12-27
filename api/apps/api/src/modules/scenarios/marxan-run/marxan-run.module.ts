@@ -17,6 +17,7 @@ import { RunHandler } from './run.handler';
 import { CancelHandler } from './cancel.handler';
 import { EventsHandler } from './events.handler';
 import { OutputRepository } from './output.repository';
+import { ScenarioJobService } from '../scenario-job/scenario-job.service';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { OutputRepository } from './output.repository';
     AssetsService,
     apiUrlProvider,
     OutputRepository,
+    ScenarioJobService,
   ],
   controllers: [MarxanRunController],
   exports: [RunService],

@@ -6,6 +6,7 @@ import { JobData } from '@marxan/scenario-run-queue';
 import { isDefined } from '@marxan/utils';
 import { runQueueToken } from './tokens';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ScenarioJobService } from '../scenario-job/scenario-job.service';
 
 export const notFound = Symbol('not found');
 export type NotFound = typeof notFound;
@@ -16,16 +17,16 @@ export class CancelHandler {
     @Inject(runQueueToken)
     private readonly queue: Queue<JobData>,
     private readonly apiEvents: ApiEventsService,
+    private readonly scenarioJobService: ScenarioJobService,
   ) {}
 
   async cancel(scenarioId: string): Promise<Either<NotFound, void>> {
-    const activeJobs: Job<JobData>[] = await this.queue.getJobs([
-      'active',
-      'waiting',
-    ]);
-    const scenarioJob = activeJobs.find(
-      (job) => job.data.scenarioId === scenarioId,
+    const scenarioJob = await this.scenarioJobService.getScenarioJob(
+      this.queue,
+      scenarioId,
+      ['active', 'waiting'],
     );
+
     if (!isDefined(scenarioJob)) {
       await this.apiEvents.create({
         topic: scenarioId,
@@ -34,12 +35,7 @@ export class CancelHandler {
       return right(void 0);
     }
 
-    if (await scenarioJob.isActive())
-      await scenarioJob.updateProgress({
-        canceled: true,
-        scenarioId,
-      });
-    else if (await scenarioJob.isWaiting()) await scenarioJob.remove();
+    await this.scenarioJobService.cancelScenarioJob(scenarioJob);
 
     return right(void 0);
   }

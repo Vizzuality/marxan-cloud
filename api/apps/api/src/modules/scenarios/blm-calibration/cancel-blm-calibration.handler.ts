@@ -5,6 +5,7 @@ import { Job, Queue } from 'bullmq';
 import { calibrationQueueToken } from './blm-calibration-queue.providers';
 import { JobData } from '@marxan/blm-calibration';
 import { CancelBlmCalibration } from './cancel-blm-calibration.command';
+import { ScenarioJobService } from '../scenario-job/scenario-job.service';
 
 @CommandHandler(CancelBlmCalibration)
 export class CancelBlmCalibrationHandler
@@ -12,26 +13,21 @@ export class CancelBlmCalibrationHandler
   constructor(
     @Inject(calibrationQueueToken)
     private readonly queue: Queue<JobData>,
+    private readonly scenarioJobService: ScenarioJobService,
   ) {}
 
   async execute({ scenarioId }: CancelBlmCalibration): Promise<void> {
-    const activeJobs: Job<JobData>[] = await this.queue.getJobs([
-      'active',
-      'waiting',
-    ]);
-    const scenarioJob = activeJobs.find(
-      (job) => job.data.scenarioId === scenarioId,
+    const scenarioJob = await this.scenarioJobService.getScenarioJob(
+      this.queue,
+      scenarioId,
+      ['active', 'waiting'],
     );
+
     if (!scenarioJob) {
       // Job may have ended or failed
       return;
     }
 
-    if (await scenarioJob.isActive())
-      await scenarioJob.updateProgress({
-        canceled: true,
-        scenarioId,
-      });
-    else if (await scenarioJob.isWaiting()) await scenarioJob.remove();
+    await this.scenarioJobService.cancelScenarioJob(scenarioJob);
   }
 }
