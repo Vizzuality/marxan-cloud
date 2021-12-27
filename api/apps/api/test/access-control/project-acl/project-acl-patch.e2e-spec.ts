@@ -73,3 +73,14 @@ test(`change owner role as last owner`, async () => {
   );
   fixtures.ThenForbiddenIsReturned(response);
 });
+
+test(`change user role`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenViewerWasAddedToProject(projectId);
+  const changeRoleResponse = await fixtures.WhenChangingUserRole(projectId);
+  fixtures.ThenNoContentIsReturned(changeRoleResponse);
+  const allUsersInProjectResponse = await fixtures.WhenGettingProjectUsersAsOwner(
+    projectId,
+  );
+  fixtures.ThenUsersWithChangedRoleIsOnProject(allUsersInProjectResponse);
+});

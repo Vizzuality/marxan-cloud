@@ -55,11 +55,15 @@ export const getFixtures = async () => {
     },
 
     GivenScenarioWasCreated: async () => {
-      const result = await ScenariosTestUtils.createScenario(app, ownerUserToken, {
-        name: `Test scenario`,
-        type: ScenarioType.marxan,
-        projectId,
-      });
+      const result = await ScenariosTestUtils.createScenario(
+        app,
+        ownerUserToken,
+        {
+          name: `Test scenario`,
+          type: ScenarioType.marxan,
+          projectId,
+        },
+      );
       scenarioId = result.data.id;
       return result.data.id;
     },
@@ -121,7 +125,11 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
         .set('Authorization', `Bearer ${ownerUserToken}`)
-        .send({ scenarioId, userId: viewerUserId, roleName: scenarioViewerRole }),
+        .send({
+          scenarioId,
+          userId: viewerUserId,
+          roleName: scenarioViewerRole,
+        }),
     WhenAddingANewContributorToTheScenarioAsOwner: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
@@ -140,13 +148,19 @@ export const getFixtures = async () => {
           userId: otherOwnerUserId,
           roleName: scenarioOwnerRole,
         }),
-    WhenAddingANewViewerToTheScenarioAsContributor: async (scenarioId: string) =>
+    WhenAddingANewViewerToTheScenarioAsContributor: async (
+      scenarioId: string,
+    ) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
         .set('Authorization', `Bearer ${contributorUserToken}`)
-        .send({ scenarioId, userId: viewerUserId, roleName: scenarioViewerRole }),
+        .send({
+          scenarioId,
+          userId: viewerUserId,
+          roleName: scenarioViewerRole,
+        }),
     WhenAddingANewContributorToTheScenarioAsContributor: async (
-      projectId: string,
+      scenarioId: string,
     ) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
@@ -174,7 +188,9 @@ export const getFixtures = async () => {
           userId: otherOwnerUserId,
           roleName: scenarioViewerRole,
         }),
-    WhenAddingANewContributorToTheScenarioAsViewer: async (scenarioId: string) =>
+    WhenAddingANewContributorToTheScenarioAsViewer: async (
+      scenarioId: string,
+    ) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
         .set('Authorization', `Bearer ${viewerUserToken}`)
@@ -207,7 +223,9 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${ownerUserToken}`),
     WhenRevokingAccessToOwnerFromScenarioAsOwner: async (scenarioId: string) =>
       await request(app.getHttpServer())
-        .delete(`/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`)
+        .delete(
+          `/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`,
+        )
         .set('Authorization', `Bearer ${ownerUserToken}`),
 
     WhenRevokingAccessToViewerFromScenarioAsContributor: async (
@@ -226,13 +244,17 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${viewerUserToken}`),
     WhenRevokingAccessToOwnerFromScenarioAsViewer: async (scenarioId: string) =>
       await request(app.getHttpServer())
-        .delete(`/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`)
+        .delete(
+          `/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`,
+        )
         .set('Authorization', `Bearer ${viewerUserToken}`),
     WhenRevokingAccessToOwnerFromScenarioAsContributor: async (
       scenarioId: string,
     ) =>
       await request(app.getHttpServer())
-        .delete(`/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`)
+        .delete(
+          `/api/v1/roles/scenarios/${scenarioId}/users/${otherOwnerUserId}`,
+        )
         .set('Authorization', `Bearer ${contributorUserToken}`),
 
     WhenRevokingAccessToLastOwnerFromScenarioAsOwner: async (

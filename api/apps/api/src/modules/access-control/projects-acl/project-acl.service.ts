@@ -11,6 +11,7 @@ import { Permit } from '../access-control.types';
 import { ProjectAccessControl } from './project-access-control';
 import { UserRoleInProjectDto } from './dto/user-role-project.dto';
 import { Either, left, right } from 'fp-ts/Either';
+import { assertDefined } from '@marxan/utils';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -169,10 +170,10 @@ export class ProjectAclService implements ProjectAccessControl {
 
   async updateUserInProject(
     projectId: string,
-    updateUserInProjectDto: UserRoleInProjectDto,
+    userAndRoleToChange: UserRoleInProjectDto,
     loggedUserId: string,
   ): Promise<Either<Permit, void>> {
-    const { userId, roleName } = updateUserInProjectDto;
+    const { userId, roleName } = userAndRoleToChange;
     if (!(await this.isOwner(loggedUserId, projectId))) {
       return left(false);
     }
@@ -181,6 +182,7 @@ export class ProjectAclService implements ProjectAccessControl {
       return left(false);
     }
 
+    assertDefined(roleName);
     const apiDbConnection = getConnection(DbConnections.default);
     const apiQueryRunner = apiDbConnection.createQueryRunner();
 
@@ -188,21 +190,30 @@ export class ProjectAclService implements ProjectAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInProject = await this.roles.findOne({
-        where: {
-          projectId,
-          userId,
+      const existingUserInScenario = await apiQueryRunner.manager.findOne(
+        UsersProjectsApiEntity,
+        undefined,
+        {
+          where: {
+            projectId,
+            userId,
+          },
         },
-      });
+      );
 
-      if (!existingUserInProject) {
-        await this.roles.save({
-          projectId,
-          userId,
-          roleName,
-        });
+      if (!existingUserInScenario) {
+        const userRoleToSave = new UsersProjectsApiEntity();
+        userRoleToSave.projectId = projectId;
+        userRoleToSave.userId = userId;
+        userRoleToSave.roleName = roleName;
+
+        await apiQueryRunner.manager.save(userRoleToSave);
       } else {
-        await this.roles.update({ projectId, userId }, { roleName });
+        await apiQueryRunner.manager.update(
+          UsersProjectsApiEntity,
+          { projectId, userId },
+          { roleName },
+        );
       }
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
