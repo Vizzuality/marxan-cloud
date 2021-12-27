@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { intersection } from 'lodash';
 import { Not, Repository } from 'typeorm';
-import { Permit } from '@marxan-api/modules/access-control/access-control.types';
+import {
+  Denied,
+  Permit,
+} from '@marxan-api/modules/access-control/access-control.types';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import {
@@ -113,7 +116,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     scenarioId: string,
     userId: string,
     nameSearch?: string,
-  ): Promise<Either<Permit, UserRoleInScenarioDto[]>> {
+  ): Promise<Either<Denied, UserRoleInScenarioDto[]>> {
     if (!(await this.isOwner(userId, scenarioId))) {
       return left(false);
     }
