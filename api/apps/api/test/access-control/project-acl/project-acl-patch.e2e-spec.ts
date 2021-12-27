@@ -66,14 +66,6 @@ test(`add every type of user to a project as project viewer`, async () => {
   fixtures.ThenForbiddenIsReturned(ownerResponse);
 });
 
-test(`change owner role as last owner`, async () => {
-  const projectId = await fixtures.GivenProjectWasCreated();
-  const response = await fixtures.WhenChangingOwnerUserRoleAsLastOwner(
-    projectId,
-  );
-  fixtures.ThenForbiddenIsReturned(response);
-});
-
 test(`change user role`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
   await fixtures.GivenViewerWasAddedToProject(projectId);
@@ -83,12 +75,4 @@ test(`change user role`, async () => {
     projectId,
   );
   fixtures.ThenUsersWithChangedRoleIsOnProject(allUsersInProjectResponse);
-});
-
-test(`adds a not allowed user role to project`, async () => {
-  const projectId = await fixtures.GivenProjectWasCreated();
-  const incorrectRoleResponse = await fixtures.WhenAddingIncorrectUserRole(
-    projectId,
-  );
-  fixtures.ThenBadRequestIsReturned(incorrectRoleResponse);
 });

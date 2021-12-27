@@ -218,15 +218,6 @@ export const getFixtures = async () => {
           userId: viewerUserId,
           roleName: projectContributorRole,
         }),
-    WhenAddingIncorrectUserRole: async (projectId: string) =>
-      await request(app.getHttpServer())
-        .patch(`/api/v1/roles/projects/${projectId}/users`)
-        .set('Authorization', `Bearer ${ownerUserToken}`)
-        .send({
-          projectId,
-          userId: viewerUserId,
-          roleName: scenarioOwnerRole,
-        }),
     WhenRevokingAccessToViewerFromProjectAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())
         .delete(`/api/v1/roles/projects/${projectId}/users/${viewerUserId}`)

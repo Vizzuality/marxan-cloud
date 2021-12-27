@@ -174,16 +174,11 @@ export class ProjectAclService implements ProjectAccessControl {
     projectId: string,
     userAndRoleToChange: UserRoleInProjectDto,
     loggedUserId: string,
-  ): Promise<Either<Denied, void>> {
+  ): Promise<Either<Permit, void>> {
     const { userId, roleName } = userAndRoleToChange;
     if (!(await this.isOwner(loggedUserId, projectId))) {
       return left(false);
     }
-
-    if (!(await this.hasOtherOwner(userId, projectId))) {
-      return left(false);
-    }
-
     assertDefined(roleName);
     const apiDbConnection = getConnection(DbConnections.default);
     const apiQueryRunner = apiDbConnection.createQueryRunner();
