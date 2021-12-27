@@ -16,6 +16,7 @@ export type BlmWorkspace = {
 
 export class BlmInputFiles implements Cancellable {
   #workspaces: Workspace[] = [];
+  #hasBeenCanceled = false;
 
   constructor(
     private readonly workspaceService: WorkspaceBuilder,
@@ -24,8 +25,11 @@ export class BlmInputFiles implements Cancellable {
   ) {}
 
   async for(blmValues: number[], assets: Assets): Promise<BlmWorkspace[]> {
+    await this.interruptIfKilled();
     const rootWorkspace = await this.workspaceService.get();
+    await this.interruptIfKilled();
     this.#workspaces.push(rootWorkspace);
+
     const workspaces: BlmWorkspace[] = await Promise.all(
       blmValues.map(async (blmValue) => ({
         blmValue,
@@ -33,16 +37,24 @@ export class BlmInputFiles implements Cancellable {
       })),
     );
 
+    await this.interruptIfKilled();
     await this.singleFetcher.include(rootWorkspace, assets);
+    await this.interruptIfKilled();
 
     for (const workspace of workspaces) {
+      await this.interruptIfKilled();
+
       this.#workspaces.push(workspace.workspace);
+
       await this.copyAssets.copy(
         rootWorkspace,
         workspace.workspace,
         assets,
         workspace.blmValue,
       );
+
+      await this.interruptIfKilled();
+
       await workspace.workspace.arrangeOutputSpace();
     }
 
@@ -51,7 +63,17 @@ export class BlmInputFiles implements Cancellable {
 
   async cancel(): Promise<void> {
     await this.singleFetcher.cancel();
-    await this.cleanup();
+    this.#hasBeenCanceled = true;
+  }
+
+  async interruptIfKilled() {
+    if (this.#hasBeenCanceled) {
+      await this.cleanup();
+      throw {
+        stdError: [],
+        signal: 'SIGTERM',
+      };
+    }
   }
 
   async cleanup(): Promise<void> {

@@ -33,7 +33,7 @@ describe(`given input data is delayed`, () => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test(`cancelling marxan run during fetching assets`, async (done) => {
+  test.only(`cancelling marxan run during fetching assets`, async (done) => {
     expect.assertions(1);
 
     fixtures

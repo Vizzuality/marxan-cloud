@@ -30,12 +30,12 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-describe.skip(`given input data is delayed`, () => {
+describe(`given input data is delayed`, () => {
   beforeEach(() => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test(`cancelling marxan run during fetching assets`, async (done) => {
+  test.only(`cancelling blm calibration run during fetching assets`, async (done) => {
     expect.assertions(1);
 
     fixtures
@@ -43,7 +43,7 @@ describe.skip(`given input data is delayed`, () => {
       .then(() => {
         done(`Shouldn't finish Marxan run.`);
       })
-      .catch((error) => {
+      .catch(async (error) => {
         expect(error.signal).toEqual('SIGTERM');
         done();
       });
@@ -53,7 +53,7 @@ describe.skip(`given input data is delayed`, () => {
   }, 30000);
 });
 
-describe(`given input data is available`, () => {
+describe.skip(`given input data is available`, () => {
   beforeEach(async () => {
     fixtures.GivenInputFilesAreAvailable();
     await fixtures.GivenScenarioDataExists();

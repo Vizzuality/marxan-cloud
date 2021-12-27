@@ -40,7 +40,7 @@ export class InputFilesFs
     return;
   }
 
-  private async download(sourceUri: string, dest: string) {
+  private async download(sourceUri: string, dest: string): Promise<void> {
     await this.ensureWriteDirectoryExists(dest);
     return new Promise((resolve, reject) => {
       const writer = createWriteStream(dest);

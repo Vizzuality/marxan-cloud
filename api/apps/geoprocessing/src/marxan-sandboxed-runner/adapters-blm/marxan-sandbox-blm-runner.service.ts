@@ -24,14 +24,28 @@ export class MarxanSandboxBlmRunnerService
 
   kill(ofScenarioId: string): void {
     const controller = this.#controllers[ofScenarioId];
-
-    if (controller && !controller.signal.aborted) controller.abort();
+    if (controller && !controller.signal.aborted) {
+      controller.abort();
+    }
   }
 
   async run(
     input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<void> {
+    const interruptIfKilled = async (
+      controller: AbortController,
+      scenarioId: string,
+    ) => {
+      if (controller.signal.aborted) {
+        this.clearAbortController(scenarioId);
+        throw {
+          stdError: [],
+          signal: 'SIGTERM',
+        };
+      }
+    };
+
     const { blmValues, scenarioId } = input;
     const calibrationId = v4();
 
@@ -45,30 +59,49 @@ export class MarxanSandboxBlmRunnerService
       this.finalResultsRepository,
     ]);
 
-    const workspaces = await inputFilesHandler.for(blmValues, input.assets);
+    await interruptIfKilled(abortController, scenarioId);
 
-    for (const { workspace, blmValue } of workspaces) {
-      const singleRunner = this.marxanRunnerFactory.for(
-        scenarioId,
-        calibrationId,
-        blmValue,
-        workspace,
-      );
+    return new Promise<void>(async (resolve, reject) => {
+      await interruptIfKilled(abortController, scenarioId);
+      try {
+        await interruptIfKilled(abortController, scenarioId);
+        const workspaces = await inputFilesHandler.for(blmValues, input.assets);
 
-      const abortEventListener = () => {
-        singleRunner.kill(scenarioId);
-      };
-      abortController.signal.addEventListener('abort', abortEventListener);
+        await interruptIfKilled(abortController, scenarioId);
 
-      await singleRunner.run(input, progressCallback);
-      abortController.signal.removeEventListener('abort', abortEventListener);
-    }
+        for (const { workspace, blmValue } of workspaces) {
+          const singleRunner = this.marxanRunnerFactory.for(
+            scenarioId,
+            calibrationId,
+            blmValue,
+            workspace,
+          );
 
-    await this.finalResultsRepository.saveFinalResults(
-      scenarioId,
-      calibrationId,
-    );
-    this.clearAbortController(scenarioId);
+          const abortEventListener = () => {
+            singleRunner.kill(scenarioId);
+          };
+          abortController.signal.addEventListener('abort', abortEventListener);
+
+          await singleRunner.run(input, progressCallback).catch((err) => {
+            reject(err);
+          });
+          abortController.signal.removeEventListener(
+            'abort',
+            abortEventListener,
+          );
+        }
+        await interruptIfKilled(abortController, scenarioId);
+        await this.finalResultsRepository.saveFinalResults(
+          scenarioId,
+          calibrationId,
+        );
+        this.clearAbortController(scenarioId);
+        await interruptIfKilled(abortController, scenarioId);
+      } catch (err) {
+        reject(err);
+      }
+      resolve();
+    });
   }
 
   private getAbortControllerForRun(
