@@ -54,5 +54,5 @@ export class ScenarioAclController {
     }
 
     return { data: result.right };
-  };
+  }
 }
