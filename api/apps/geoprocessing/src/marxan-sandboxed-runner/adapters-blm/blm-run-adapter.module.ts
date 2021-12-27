@@ -24,7 +24,6 @@ import { MarxanDirectory } from '../adapters-single/marxan-directory.service';
 import { BlmBestRunService } from './blm-best-run.service';
 import { RemovePreviousCalibrationPartialResultsHandler } from './cleanup/remove-previous-calibration-partial-results.handler';
 import { BlmCalibrationStartedSaga } from './cleanup/blm-calibration-started.saga';
-import { BlmInputFilesFactory } from './blm-input-files.factory';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
@@ -49,7 +48,6 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
     BlmFinalResultsRepository,
     BlmPartialResultsRepository,
     AssetFactory,
-    BlmInputFilesFactory,
     InputFilesFs,
     MarxanRunnerFactory,
     MarxanDirectory,
