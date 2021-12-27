@@ -9,13 +9,12 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { format } from 'd3';
 
-import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
-import BLMChart from 'components/scenarios/blm-chart/component';
+import BLMChart2 from 'components/scenarios/blm-chart-2';
 
 import { DATA } from './constants';
 
@@ -56,18 +55,16 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
       >
 
         {({ handleSubmit, form }) => {
-          const { valid } = form.getState();
-
           return (
             <form
-              className="flex flex-col flex-grow overflow-hidden text-white"
+              className="flex flex-col flex-grow space-y-6 overflow-hidden text-white"
               autoComplete="off"
               noValidate
               onSubmit={handleSubmit}
             >
               <div className="flex flex-col">
                 <div className="flex items-center space-x-2">
-                  <Label theme="dark" className="text-base uppercase">BLM:</Label>
+                  <Label theme="dark" className="text-xs uppercase">BLM:</Label>
                   <InfoButton
                     size="base"
                     theme="primary"
@@ -99,28 +96,22 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
                       </Field>
                     )}
                   </FieldRFF>
-                  <p className="text-sm whitespace-pre opacity-50">{`max ${format(',d')(maxBlmValue)}`}</p>
+                  <p className="text-xs whitespace-pre opacity-50">{`max ${format(',d')(maxBlmValue)}`}</p>
                 </div>
               </div>
-
-              <Button
-                className="mt-auto"
-                disabled={!valid}
-                theme="primary"
-                size="xl"
-                type="submit"
-              >
-                Save
-              </Button>
-
+              <div>
+                <h3 className="text-xs font-bold text-white">Boundary Length</h3>
+                <p className="text-xs text-white">
+                  More
+                </p>
+              </div>
+              <div className="w-full h-32">
+                <BLMChart2 data={DATA} />
+              </div>
             </form>
           );
         }}
       </FormRFF>
-
-      <div className="relative z-20 w-3/5 mt-20 mr-10 h-96">
-        <BLMChart data={DATA} />
-      </div>
 
     </div>
   );

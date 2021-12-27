@@ -103,7 +103,6 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
           onSubmit={onSaveBlmRange}
           initialValues={INITIAL_VALUES}
         >
-
           {({ handleSubmit }) => (
             <form
               className="flex flex-col flex-grow w-full mt-5 overflow-hidden text-gray-500"
@@ -138,7 +137,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                       )}
                     </FieldRFF>
                   </div>
-                  <p className="ml-5 text-xs text-white opacity-60">{`min ${format(',d')(minBlmValue)}`}</p>
+                  <p className="ml-5 text-sm text-white opacity-60">{`min ${format(',d')(minBlmValue)}`}</p>
                 </div>
 
                 <div className="flex items-center">
@@ -167,7 +166,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                       )}
                     </FieldRFF>
                   </div>
-                  <p className="ml-5 text-xs text-white opacity-60">{`max ${format(',d')(maxBlmValue)}`}</p>
+                  <p className="ml-5 text-sm text-white opacity-60">{`max ${format(',d')(maxBlmValue)}`}</p>
                 </div>
               </div>
 

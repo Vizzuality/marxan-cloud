@@ -2,12 +2,6 @@ import React, {
   useRef, useState, useMemo, useEffect, useCallback,
 } from 'react';
 
-import { useDispatch } from 'react-redux';
-
-import { useRouter } from 'next/router';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
 import classnames from 'classnames';
 import {
   scaleLinear, line, curveMonotoneX, area,
@@ -52,14 +46,6 @@ export interface BlmChartProps {
 }
 
 export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
-  const { query } = useRouter();
-  const { sid } = query;
-
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setBlm } = scenarioSlice.actions;
-
-  const dispatch = useDispatch();
-
   const containerRef: React.MutableRefObject<HTMLDivElement> = useRef(null);
 
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
@@ -325,7 +311,6 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                   onMouseLeave={
                     () => onMouseLeavePoint([xScale(cost), yScale(boundaryLength)], thumbnail)
                   }
-                  onClick={() => dispatch(setBlm(boundaryLength))}
                   aria-hidden="true"
                 />
               </foreignObject>
