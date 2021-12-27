@@ -16,8 +16,8 @@ import { ProtectedAreasCrudService } from '@marxan-api/modules/protected-areas/p
 import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
-import { UsersScenariosApiEntity } from '../access-control/scenarios-acl/entity/users-scenarios.api.entity';
-import { Roles } from '../access-control/role.api.entity';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
