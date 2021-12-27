@@ -8,6 +8,7 @@ import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/proje
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsACLTestUtils } from '../../utils/projects-acl.test.utils';
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -19,9 +20,10 @@ export const getFixtures = async () => {
   const contributorUserId = await GivenUserExists(app, 'bb');
   const viewerUserId = await GivenUserExists(app, 'cc');
   const otherOwnerUserId = await GivenUserExists(app, 'dd');
-  const projectViewerRole = Roles.project_viewer;
-  const projectContributorRole = Roles.project_contributor;
-  const projectOwnerRole = Roles.project_owner;
+  const projectViewerRole = ProjectRoles.project_viewer;
+  const projectContributorRole = ProjectRoles.project_contributor;
+  const projectOwnerRole = ProjectRoles.project_owner;
+  const scenarioOwnerRole = Roles.scenario_owner;
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
@@ -217,6 +219,15 @@ export const getFixtures = async () => {
           userId: viewerUserId,
           roleName: projectContributorRole,
         }),
+    WhenAddingIncorrectUserRole: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: viewerUserId,
+          roleName: scenarioOwnerRole,
+        }),
     WhenRevokingAccessToViewerFromProjectAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())
         .delete(`/api/v1/roles/projects/${projectId}/users/${viewerUserId}`)
@@ -268,6 +279,10 @@ export const getFixtures = async () => {
 
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(403);
+    },
+
+    ThenBadRequestIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
     },
 
     ThenNoContentIsReturned: (response: request.Response) => {

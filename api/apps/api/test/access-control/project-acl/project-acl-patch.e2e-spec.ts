@@ -84,3 +84,11 @@ test(`change user role`, async () => {
   );
   fixtures.ThenUsersWithChangedRoleIsOnProject(allUsersInProjectResponse);
 });
+
+test(`adds a not allowed user role to project`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  const incorrectRoleResponse = await fixtures.WhenAddingIncorrectUserRole(
+    projectId,
+  );
+  fixtures.ThenBadRequestIsReturned(incorrectRoleResponse);
+});
