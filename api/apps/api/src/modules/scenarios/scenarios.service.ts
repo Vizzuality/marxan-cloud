@@ -67,8 +67,7 @@ import {
   CalibrationRunResult,
   ScenarioCalibrationRepo,
 } from '../blm/values/scenario-calibration-repo';
-import { StartBlmCalibration } from './blm-calibration/start-blm-calibration.command';
-import { CancelBlmCalibration } from './blm-calibration/cancel-blm-calibration.command';
+import { StartBlmCalibration, CancelBlmCalibration } from './blm-calibration';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
