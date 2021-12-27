@@ -27,7 +27,6 @@ export class BlmInputFiles implements Cancellable {
 
   async for(blmValues: number[], assets: Assets): Promise<BlmWorkspace[]> {
     const rootWorkspace = await this.workspaceService.get();
-    this.#workspaces.push(rootWorkspace);
     const workspaces: BlmWorkspace[] = await Promise.all(
       blmValues.map(async (blmValue) => ({
         blmValue,
@@ -48,7 +47,7 @@ export class BlmInputFiles implements Cancellable {
       await workspace.workspace.arrangeOutputSpace();
     }
 
-    console.log(this.#workspaces.length);
+    await rootWorkspace.cleanup();
 
     return workspaces;
   }
