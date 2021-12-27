@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { intersection } from 'lodash';
 import { getConnection, Not, Repository } from 'typeorm';
-import { Permit } from '../access-control.types';
+import { Permit, Denied } from '../access-control.types';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import {
@@ -115,7 +115,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     scenarioId: string,
     userAndRoleToChange: UserRoleInScenarioDto,
     loggedUserId: string,
-  ): Promise<Either<Permit, void>> {
+  ): Promise<Either<Denied, void>> {
     const { userId, roleName } = userAndRoleToChange;
     if (!(await this.isOwner(loggedUserId, scenarioId))) {
       return left(false);
