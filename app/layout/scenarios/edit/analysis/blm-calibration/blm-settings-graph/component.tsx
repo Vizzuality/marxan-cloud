@@ -9,12 +9,13 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { format } from 'd3';
 
+import BLMChart from 'layout/scenarios/edit/analysis/blm-calibration/blm-chart';
+
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
-import BLMChart from 'components/scenarios/blm-chart';
 
 import { DATA } from './constants';
 

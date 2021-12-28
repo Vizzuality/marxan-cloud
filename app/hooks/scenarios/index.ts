@@ -644,7 +644,6 @@ export function useSaveScenarioCalibrationRange({
     method: 'POST',
   },
 }: UseSaveScenarioCalibrationRangeProps) {
-  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const saveScenarioCalibrationRange = ({ id, range }: SaveScenarioCalibrationRangeProps) => {
@@ -660,14 +659,33 @@ export function useSaveScenarioCalibrationRange({
 
   return useMutation(saveScenarioCalibrationRange, {
     onSuccess: (data: any, variables, context) => {
-      const { id, projectId } = data?.data?.data;
-      queryClient.invalidateQueries(['scenarios', projectId]);
-      queryClient.setQueryData(['scenarios', id], data?.data);
-
-      console.info('Succces', data, variables, context);
+      console.info('Succcess', data, variables, context);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });
+}
+
+export function useScenarioCalibrationResults(scenarioId) {
+  const [session] = useSession();
+
+  const query = useQuery('scenario-calibration', async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/calibration`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }));
+
+  const { data } = query;
+
+  return useMemo(() => {
+    const parsedData = Array.isArray(data?.data?.data) ? data?.data?.data : [];
+
+    return {
+      ...query,
+      data: parsedData,
+    };
+  }, [query, data?.data?.data]);
 }

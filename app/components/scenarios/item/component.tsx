@@ -26,6 +26,14 @@ const SCENARIO_STATES = {
     text: 'Run Scenario',
     styles: 'text-green-500',
   },
+  'calibration-running': {
+    text: 'Running Calibration',
+    styles: 'text-white',
+  },
+  'calibration-failure': {
+    text: 'Fail Running Calibration',
+    styles: 'text-red-500',
+  },
   'pa-running': {
     text: 'Running PA percentage',
     styles: 'text-white',
@@ -96,6 +104,7 @@ export const Item: React.FC<ItemProps> = ({
     const geofeatureSplit = jobs.find((j) => j.kind === 'geofeatureSplit');
     const geofeatureStratification = jobs.find((j) => j.kind === 'geofeatureStratification');
     const specification = jobs.find((j) => j.kind === 'specification');
+    const calibration = jobs.find((j) => j.kind === 'calibration');
     const run = jobs.find((j) => j.kind === 'run');
 
     // PROTECTED AREAS
@@ -118,6 +127,14 @@ export const Item: React.FC<ItemProps> = ({
       || (geofeatureStratification && geofeatureStratification.status === 'failure')
       || (specification && specification.status === 'failure')
     ) return 'features-failure';
+
+    // CALIBRATION
+    if (
+      (calibration && calibration.status === 'running')
+    ) return 'calibration-running';
+    if (
+      (calibration && calibration.status === 'failure')
+    ) return 'calibration-failure';
 
     // RUN
     if (run && run.status === 'running') return 'run-running';

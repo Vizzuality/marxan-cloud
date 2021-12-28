@@ -12,7 +12,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { format } from 'd3';
 import { motion } from 'framer-motion';
 
-import { useSaveScenarioCalibrationRange } from 'hooks/scenarios';
+import { useSaveScenarioCalibrationRange, useScenarioCalibrationResults } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import BlmSettingsGraph from 'layout/scenarios/edit/analysis/blm-calibration/blm-settings-graph';
@@ -42,6 +42,13 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
 
   const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
 
+  const {
+    data: calibrationResultsData,
+    isFetching: calibrationResultsAreFetching,
+    isFetched: calibrationResultsAreFetched,
+  } = useScenarioCalibrationResults(sid);
+  console.log('calibrationResultsData', calibrationResultsData, calibrationResultsAreFetching, calibrationResultsAreFetched);
+
   const [blmGraph, setBlmGraph] = useState(false);
 
   const scenarioSlice = getScenarioEditSlice(sid);
@@ -65,17 +72,17 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
       id: `${sid}`,
       range,
     }, {
-      onSuccess: ({ data: { data: p } }) => {
-        addToast('success-project-creation', (
+      onSuccess: () => {
+        addToast('success-calibration-range', (
           <>
             <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Project saved successfully</p>
+            <p className="text-sm">Scenario calibration sent successfully</p>
           </>
         ), {
           level: 'success',
         });
         setBlmGraph(true);
-        console.info('Calibration range sent succesfully', p);
+        console.info('Calibration range sent succesfully');
       },
       onError: () => {
         addToast('error-calibration-range', (
@@ -94,10 +101,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
 
   const INITIAL_VALUES = useMemo(() => {
     return {
-      // blmCalibrationFrom: blmRange[0],
-      // blmCalibrationTo: blmRange[1],
       settedBlm: blm,
-
     };
   }, [blm]);
 
@@ -146,7 +150,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
               <div className="flex space-x-7">
                 <div className="flex items-center">
                   <Label theme="dark" className="mr-3 text-xs uppercase">From</Label>
-                  <div className="w-18">
+                  <div className="w-22">
                     <FieldRFF
                       name="blmCalibrationFrom"
                       validate={composeValidators([{ presence: true }])}
@@ -175,7 +179,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
 
                 <div className="flex items-center">
                   <Label theme="dark" className="mr-3 text-xs uppercase">To</Label>
-                  <div className="w-18">
+                  <div className="w-22">
                     <FieldRFF
                       name="blmCalibrationTo"
                       validate={composeValidators([{ presence: true }])}

@@ -11,7 +11,7 @@ export default {
 };
 
 const Template: Story<BlmChartProps> = ({ ...args }) => (
-  <div style={{ width: 500, height: 280 }} className="bg-transparent pb-28">
+  <div style={{ width: 400, height: 280 }} className="bg-white">
     <BlmChart {...args} />
   </div>
 );
@@ -20,38 +20,38 @@ export const Default: Story<BlmChartProps> = Template.bind({});
 Default.args = {
   data: [
     {
-      boundaryLength: 1.23,
+      boundaryLength: 1.43,
       cost: 1.34,
       isBlm: false,
       thumbnail: '/images/avatar.png',
     },
     {
-      boundaryLength: 1.12,
-      cost: 1.42,
+      boundaryLength: 1.17,
+      cost: 1.35,
       isBlm: false,
       thumbnail: null,
     },
     {
-      boundaryLength: 1.05,
-      cost: 1.54,
+      boundaryLength: 0.49,
+      cost: 1.43,
       isBlm: true,
       thumbnail: '/images/avatar.png',
     },
     {
-      boundaryLength: 0.92,
+      boundaryLength: 0.32,
       cost: 1.82,
       isBlm: false,
       thumbnail: null,
     },
     {
-      boundaryLength: 0.91,
+      boundaryLength: 0.31,
       cost: 2.1,
       isBlm: false,
       thumbnail: '/images/avatar.png',
     },
     {
-      boundaryLength: 0.79,
-      cost: 2.29,
+      boundaryLength: 0.29,
+      cost: 2.89,
       isBlm: false,
       thumbnail: '/images/avatar.png',
     },
