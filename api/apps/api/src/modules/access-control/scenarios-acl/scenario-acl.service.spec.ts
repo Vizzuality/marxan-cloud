@@ -4,10 +4,10 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
-import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
 import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios-acl/scenario-acl.service';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -79,7 +79,7 @@ const getFixtures = async () => {
     GivenScenarioViewerRoleIsAssigned: () =>
       userScenariosRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.scenario_viewer,
+          roleName: ScenarioRoles.scenario_viewer,
           scenarioId,
           userId,
         },
@@ -87,7 +87,7 @@ const getFixtures = async () => {
     GivenScenarioOwnerRoleIsAssigned: () =>
       userScenariosRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.scenario_owner,
+          roleName: ScenarioRoles.scenario_owner,
           scenarioId,
           userId,
         },
@@ -95,7 +95,7 @@ const getFixtures = async () => {
     GivenScenarioContributorRoleIsAssigned: () =>
       userScenariosRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.scenario_contributor,
+          roleName: ScenarioRoles.scenario_contributor,
           scenarioId,
           userId,
         },
@@ -103,12 +103,12 @@ const getFixtures = async () => {
     GivenScenarioHasMultipleUsers: () =>
       userScenariosRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.scenario_owner,
+          roleName: ScenarioRoles.scenario_owner,
           scenarioId,
           userId,
         },
         {
-          roleName: Roles.scenario_viewer,
+          roleName: ScenarioRoles.scenario_viewer,
           scenarioId,
           userId: viewerUserId,
         },
@@ -118,7 +118,7 @@ const getFixtures = async () => {
         Promise.resolve({
           scenarioId,
           userId,
-          roleName: Roles.scenario_owner,
+          roleName: ScenarioRoles.scenario_owner,
         }),
       ),
     ThenCannotCreateSolution: async () => {
