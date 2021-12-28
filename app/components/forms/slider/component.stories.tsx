@@ -52,6 +52,7 @@ export const Default = Template.bind({});
 Default.args = {
   theme: 'dark',
   status: 'none',
+  allowEdit: true,
   disabled: false,
   formatOptions: { style: 'percent' },
   minValue: 0,
