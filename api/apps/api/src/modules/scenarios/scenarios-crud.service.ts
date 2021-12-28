@@ -17,7 +17,7 @@ import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
-import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
@@ -141,7 +141,7 @@ export class ScenariosCrudService extends AppBaseService<
       this.userScenarios.create({
         scenarioId,
         userId,
-        roleName: Roles.scenario_owner,
+        roleName: ScenarioRoles.scenario_owner,
       }),
     );
   }

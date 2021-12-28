@@ -3,13 +3,13 @@ import { bootstrapApplication } from '../../utils/api-application';
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../../steps/given-project';
 import { GivenUserExists } from '../../steps/given-user-exists';
-import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsTestUtils } from '../../utils/projects.test.utils';
 import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -21,9 +21,9 @@ export const getFixtures = async () => {
   const contributorUserId = await GivenUserExists(app, 'bb');
   const viewerUserId = await GivenUserExists(app, 'cc');
   const otherOwnerUserId = await GivenUserExists(app, 'dd');
-  const scenarioViewerRole = Roles.scenario_viewer;
-  const scenarioContributorRole = Roles.scenario_contributor;
-  const scenarioOwnerRole = Roles.scenario_owner;
+  const scenarioViewerRole = ScenarioRoles.scenario_viewer;
+  const scenarioContributorRole = ScenarioRoles.scenario_contributor;
+  const scenarioOwnerRole = ScenarioRoles.scenario_owner;
   const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
     getRepositoryToken(UsersScenariosApiEntity),
   );
