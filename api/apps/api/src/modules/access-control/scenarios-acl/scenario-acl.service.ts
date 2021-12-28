@@ -7,6 +7,7 @@ import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scen
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { Either, left, right } from 'fp-ts/lib/Either';
+import { forbiddenError, lastOwner } from '@marxan-api/modules/access-control';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
@@ -110,13 +111,13 @@ export class ScenarioAclService implements ScenarioAccessControl {
     scenarioId: string,
     userId: string,
     loggedUserId: string,
-  ): Promise<Either<Permit, void>> {
+  ): Promise<Either<typeof lastOwner | typeof forbiddenError, void>> {
     if (!(await this.isOwner(loggedUserId, scenarioId))) {
-      return left(false);
+      return left(forbiddenError);
     }
 
     if (!(await this.hasOtherOwner(userId, scenarioId))) {
-      return left(false);
+      return left(lastOwner);
     }
 
     await this.roles.delete({ scenarioId, userId });

@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Delete,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios-acl/scenario-acl.service';
@@ -20,6 +21,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { isLeft } from 'fp-ts/lib/These';
+import { lastOwner, forbiddenError } from '@marxan-api/modules/access-control';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -47,7 +49,18 @@ export class ScenarioAclController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case lastOwner:
+          throw new ForbiddenException(
+            `There must be at least one owner of scenario ${scenarioId}`,
+          );
+        case forbiddenError:
+          throw new ForbiddenException(`
+            User is not authorized,
+          `);
+        default:
+          throw new InternalServerErrorException();
+      }
     }
   }
 }
