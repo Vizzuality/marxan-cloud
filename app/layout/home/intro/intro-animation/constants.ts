@@ -1,10 +1,10 @@
-import Bg01Img from 'images/home-hero/bg-01.png';
-import Bg02Img from 'images/home-hero/bg-02.png';
-import Bg03Img from 'images/home-hero/bg-03.png';
-import Bg04Img from 'images/home-hero/bg-04.png';
-import ToucanImg from 'images/home-hero/image-01.jpg';
-import FarmerImg from 'images/home-hero/image-02.jpg';
-import BoatImg from 'images/home-hero/image-03.jpg';
+import Bg01Img from 'images/home-intro/bg-01.png';
+import Bg02Img from 'images/home-intro/bg-02.png';
+import Bg03Img from 'images/home-intro/bg-03.png';
+import Bg04Img from 'images/home-intro/bg-04.png';
+import ToucanImg from 'images/home-intro/image-01.jpg';
+import FarmerImg from 'images/home-intro/image-02.jpg';
+import BoatImg from 'images/home-intro/image-03.jpg';
 
 export const BACKGROUND_IMAGES = [{
   backgroundColor: '#10223a',
@@ -32,7 +32,7 @@ export const MAIN_IMAGES = [{
     right: '10rem',
     bottom: '8rem',
   },
-  scenes: [{
+  slides: [{
     scale: 0.7,
     filter: 'blur(0px)',
   }, {
@@ -52,7 +52,7 @@ export const MAIN_IMAGES = [{
     right: '-4rem',
     bottom: '22rem',
   },
-  scenes: [{
+  slides: [{
     scale: 0.54,
     filter: 'blur(1px)',
     opacity: 1,
@@ -76,7 +76,7 @@ export const MAIN_IMAGES = [{
     right: '12rem',
     bottom: '25rem',
   },
-  scenes: [{
+  slides: [{
     scale: 0.36,
     filter: 'blur(2px)',
     opacity: 0.7,

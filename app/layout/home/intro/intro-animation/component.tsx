@@ -8,11 +8,11 @@ import { Media } from 'layout/media';
 
 import { BACKGROUND_IMAGES, MAIN_IMAGES } from './constants';
 
-export interface HeroAnimationProps {
+export interface IntroAnimationProps {
 
 }
 
-export const HeroAnimation: React.FC<HeroAnimationProps> = () => {
+export const IntroAnimation: React.FC<IntroAnimationProps> = () => {
   const shouldStopAnimation = useRef(false);
 
   // Keeping track of the current background image
@@ -81,8 +81,8 @@ export const HeroAnimation: React.FC<HeroAnimationProps> = () => {
       currBgImageRef.current = backgroundIndex;
     };
 
-    // Setting the scene by index. This animates the images, hexagon borders, and background
-    const setScene = async (sceneIndex: number) => {
+    // Setting the slide by index. This animates the images, hexagon borders, and background
+    const setSlide = async (slideIndex: number) => {
       const transitionDuration = 2;
       const transition = { duration: transitionDuration };
 
@@ -90,12 +90,12 @@ export const HeroAnimation: React.FC<HeroAnimationProps> = () => {
         return Promise.resolve();
       }
 
-      setBackground(sceneIndex, transition);
+      setBackground(slideIndex, transition);
 
       MAIN_IMAGES.forEach((image, index) => {
         if (!imageControls[index] || !borderControls[index]) return;
-        imageControls[index].start({ ...image.scenes[sceneIndex], transition });
-        borderControls[index].start({ opacity: (sceneIndex - 1 < index) ? 0 : 1, transition });
+        imageControls[index].start({ ...image.slides[slideIndex], transition });
+        borderControls[index].start({ opacity: (slideIndex - 1 < index) ? 0 : 1, transition });
       });
 
       // Because we're starting multiple animations at once, we're not making use of the
@@ -104,11 +104,11 @@ export const HeroAnimation: React.FC<HeroAnimationProps> = () => {
       return delay(transitionDuration * 2);
     };
 
-    // Setting the sequence. Scene 0 is the default one, but this way it gives it a dela
-    await setScene(1);
-    await setScene(2);
-    await setScene(3);
-    await setScene(0);
+    // Setting the sequence. slide 0 is the default one, but this way it gives it a dela
+    await setSlide(1);
+    await setSlide(2);
+    await setSlide(3);
+    await setSlide(0);
 
     if (shouldStopAnimation.current) return;
 
@@ -152,13 +152,13 @@ export const HeroAnimation: React.FC<HeroAnimationProps> = () => {
 
       <Media greaterThanOrEqual="lg">
         {MAIN_IMAGES.map(({
-          image, size, position, scenes,
+          image, size, position, slides,
         }, index) => (
           <motion.div
             key={image}
             className="absolute"
             animate={imageControls[index]}
-            style={{ ...size, ...position, ...scenes[0] }}
+            style={{ ...size, ...position, ...slides[0] }}
           >
             <div
               className="absolute"
@@ -245,4 +245,4 @@ export const HeroAnimation: React.FC<HeroAnimationProps> = () => {
   );
 };
 
-export default HeroAnimation;
+export default IntroAnimation;

@@ -8,13 +8,13 @@ import Button from 'components/button';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
-import HeroAnimation, { BACKGROUND_IMAGES } from './hero-animation';
+import HeroAnimation, { BACKGROUND_IMAGES } from './intro-animation';
 
-export interface HomeHeroProps {
+export interface HomeIntroProps {
 
 }
 
-export const HomeHero: React.FC<HomeHeroProps> = () => {
+export const HomeIntro: React.FC<HomeIntroProps> = () => {
   const { backgroundColor } = BACKGROUND_IMAGES[0];
 
   return (
@@ -72,4 +72,4 @@ export const HomeHero: React.FC<HomeHeroProps> = () => {
   );
 };
 
-export default HomeHero;
+export default HomeIntro;

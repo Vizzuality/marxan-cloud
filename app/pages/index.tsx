@@ -9,7 +9,7 @@ import Head from 'layout/head';
 import Header from 'layout/header';
 import Banner from 'layout/home/banner';
 import Features from 'layout/home/features';
-import Hero from 'layout/home/hero';
+import Intro from 'layout/home/intro';
 import PartnersList from 'layout/home/partners';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
@@ -35,7 +35,7 @@ const Home: React.FC = () => {
       />
       <main className="overflow-x-hidden overflow-y-auto">
         <Header className="absolute" size="lg" theme="transparent" />
-        <Hero />
+        <Intro />
         <Features />
         <Banner />
         <PartnersList />
