@@ -25,7 +25,7 @@ export class ScenarioJobService {
     const jobIsActive = await scenarioJob.isActive();
 
     if (jobIsActive)
-      await scenarioJob.updateProgress({
+      return await scenarioJob.updateProgress({
         canceled: true,
         scenarioId,
       });

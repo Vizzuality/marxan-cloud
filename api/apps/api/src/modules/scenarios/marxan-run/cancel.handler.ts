@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Job, Queue } from 'bullmq';
+import { Queue } from 'bullmq';
 import { Either, right } from 'fp-ts/Either';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { JobData } from '@marxan/scenario-run-queue';
