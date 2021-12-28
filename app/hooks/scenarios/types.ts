@@ -98,5 +98,5 @@ export interface UseSaveScenarioCalibrationRangeProps {
 }
 export interface SaveScenarioCalibrationRangeProps {
   id?: string,
-  data: any
+  range: number[]
 }

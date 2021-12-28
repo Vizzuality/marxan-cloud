@@ -59,11 +59,11 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
 
   const onSaveBlmRange = useCallback((values) => {
     const { blmCalibrationFrom, blmCalibrationTo } = values;
-    const data = [blmCalibrationFrom, blmCalibrationTo];
+    const range = [blmCalibrationFrom, blmCalibrationTo];
 
     saveScenarioCalibrationRange.mutate({
       id: `${sid}`,
-      data,
+      range,
     }, {
       onSuccess: ({ data: { data: p } }) => {
         addToast('success-project-creation', (
@@ -74,9 +74,8 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
         ), {
           level: 'success',
         });
-
-        console.info('Calibration range sent succesfully', p);
         setBlmGraph(true);
+        console.info('Calibration range sent succesfully', p);
       },
       onError: () => {
         addToast('error-calibration-range', (
