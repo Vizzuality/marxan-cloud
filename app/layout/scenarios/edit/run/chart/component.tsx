@@ -1,6 +1,6 @@
 import React from 'react';
 
-import BLMChart from 'components/scenarios/blm-chart';
+import BLMChart from 'components/scenarios/blm-chart-bis';
 
 import { DATA } from './constants';
 
