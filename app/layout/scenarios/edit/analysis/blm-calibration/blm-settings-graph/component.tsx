@@ -14,7 +14,7 @@ import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
-import BLMChart2 from 'components/scenarios/blm-chart-2';
+import BLMChart from 'components/scenarios/blm-chart';
 
 import { DATA } from './constants';
 
@@ -106,7 +106,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
                 </p>
               </div>
               <div className="w-full h-32">
-                <BLMChart2 data={DATA} />
+                <BLMChart data={DATA} />
               </div>
             </form>
           );
