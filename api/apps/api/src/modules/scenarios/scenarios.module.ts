@@ -46,7 +46,7 @@ import { ProtectedAreaModule } from './protected-area';
 import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
 import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 import { BlmValuesModule } from '@marxan-api/modules/blm';
-import { BlmCalibrationModule } from './blm-calibration/blm-calibration.module';
+import { BlmCalibrationModule } from './blm-calibration';
 
 @Module({
   imports: [

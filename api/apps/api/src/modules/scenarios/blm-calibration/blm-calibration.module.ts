@@ -13,6 +13,7 @@ import { apiUrlProvider, AssetsService } from '../marxan-run/assets.service';
 import { InputFilesModule } from '../input-files';
 import { BlmCalibrationEventsService } from './blm-calibration-events.service';
 import { CancelBlmCalibrationHandler } from './cancel-blm-calibration.handler';
+import { ScenarioJobService } from '../scenario-job/scenario-job.service';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CancelBlmCalibrationHandler } from './cancel-blm-calibration.handler';
     AssetsService,
     apiUrlProvider,
     BlmCalibrationEventsService,
+    ScenarioJobService,
   ],
   exports: [],
 })

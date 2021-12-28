@@ -1,12 +1,13 @@
 import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
 import { JobData } from '@marxan/blm-calibration';
 import { Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { EventBus } from '@nestjs/cqrs';
 import AbortController from 'abort-controller';
 import { v4 } from 'uuid';
 import { SandboxRunner } from '../ports/sandbox-runner';
 import { BlmFinalResultsRepository } from './blm-final-results.repository';
-import { BlmInputFilesFactory } from './blm-input-files.factory';
+import { BlmInputFiles } from './blm-input-files';
 import { BlmCalibrationStarted } from './events/blm-calibration-started.event';
 import { MarxanRunnerFactory } from './marxan-runner.factory';
 
@@ -16,7 +17,7 @@ export class MarxanSandboxBlmRunnerService
   readonly #controllers: Record<string, AbortController> = {};
 
   constructor(
-    private readonly inputFilesHandlerFactory: BlmInputFilesFactory,
+    private readonly moduleRef: ModuleRef,
     private readonly finalResultsRepository: BlmFinalResultsRepository,
     private readonly marxanRunnerFactory: MarxanRunnerFactory,
     private readonly eventBus: EventBus,
@@ -53,7 +54,7 @@ export class MarxanSandboxBlmRunnerService
       new BlmCalibrationStarted(scenarioId, calibrationId),
     );
 
-    const inputFilesHandler = this.inputFilesHandlerFactory.create();
+    const inputFilesHandler = await this.moduleRef.create(BlmInputFiles);
     const abortController = this.getAbortControllerForRun(scenarioId, [
       inputFilesHandler,
       this.finalResultsRepository,
