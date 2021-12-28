@@ -4,6 +4,7 @@ export const TEXTS_RUNNING = {
   features: () => 'Processing the features...',
   planningUnitsInclusion: () => 'Processing inclusion/exclusion of planning units...',
   costSurface: () => 'Processing cost surface...',
+  calibration: () => 'Processing calibration...',
   run: () => 'Running Marxan...',
 };
 
@@ -13,5 +14,6 @@ export const TEXTS_FAILURE = {
   features: () => 'Fail Processing the features',
   planningUnitsInclusion: () => 'Fail Processing inclusion/exclusion of planning units',
   costSurface: () => 'Fail Processing cost surface',
+  calibration: () => 'Fail Processing calibration',
   run: () => 'Fail Running Marxan',
 };
