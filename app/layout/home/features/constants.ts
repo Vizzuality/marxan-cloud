@@ -1,3 +1,6 @@
+import EXAMPLE_PLACEHOLDER_PNG from 'images/home-features/example-placeholder.png';
+import EXAMPLE_PROJECT_PNG from 'images/home-features/example-project.png';
+
 import ANALYZE_AND_REPORT_SVG from 'svgs/home/analyze-report.svg?sprite';
 import CLOUD_STORAGE_SVG from 'svgs/home/cloud-storage.svg?sprite';
 import COLLABORATE_SVG from 'svgs/home/collaborate.svg?sprite';
@@ -34,5 +37,26 @@ export const FEATURES = [
     name: 'Download analysis',
     description: 'Download summary reports, figures, and analytics, as well as whole projects or specific scenarios in formats compatible with other Marxan softwares and companion tools.',
     icon: DOWNLOAD_ANALYSIS_SVG,
+  },
+];
+
+export const EXAMPLE_PROJECTS = [
+  {
+    id: 'project-kenya',
+    alt: 'Project Kenya features example',
+    image: EXAMPLE_PROJECT_PNG,
+  },
+  {
+    id: 'project-placeholder-01',
+    alt: '',
+    image: EXAMPLE_PLACEHOLDER_PNG,
+  }, {
+    id: 'project-placeholder-02',
+    alt: '',
+    image: EXAMPLE_PLACEHOLDER_PNG,
+  }, {
+    id: 'project-placeholder-03',
+    alt: '',
+    image: EXAMPLE_PLACEHOLDER_PNG,
   },
 ];

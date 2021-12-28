@@ -2,19 +2,44 @@ import React from 'react';
 
 import Link from 'next/link';
 
+import { motion } from 'framer-motion';
+
 import Wrapper from 'layout/wrapper';
 
 import Icon from 'components/icon';
 
-import PROJECT_FEATURES_PNG from 'images/home-features/project-features.png';
-
-import { FEATURES } from './constants';
+import { FEATURES, EXAMPLE_PROJECTS } from './constants';
 
 export interface HomeFeaturesProps {
 
 }
 
 export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
+  const exampleProjectsVariants = {
+    initial: (i: number) => ({
+      x: (i <= 1) ? 0 : -(i * 2),
+      y: (i === 0) ? 20 : (i * 20),
+      rotate: 0,
+      originX: 1,
+      originY: 1,
+      transition: {
+        duration: 0.5,
+        ease: 'easeInOut',
+      },
+    }),
+    hover: (i: number) => ({
+      x: -(i * 10),
+      y: (i === 0) ? 0 : i * 4,
+      rotate: -(i * 4),
+      originX: 1,
+      originY: 1,
+      transition: {
+        duration: 0.5,
+        ease: 'easeInOut',
+      },
+    }),
+  };
+
   return (
     <div id="features" className="bg-primary-50">
       <Wrapper>
@@ -33,12 +58,15 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
                 </div>
               );
             })}
-            <div
-              className="w-full pt-11 place-self-center rounded-3xl"
+            <motion.div
+              className="w-full relative overflow-hidden pt-11 pb-24 place-self-center rounded-3xl"
               style={{ background: 'linear-gradient(to right bottom, #4B48F5, #00BFFF)' }}
+              initial="initial"
+              whileHover="hover"
+              animate="initial"
             >
               <Link href="/community/projects">
-                <p className="text-2xl leading-10 cursor-pointer font-heading mb-14 px-9 hover:underline">
+                <p className="text-2xl leading-10 cursor-pointer font-heading px-9 hover:underline">
                   Explore
                   <br />
                   planning
@@ -46,8 +74,22 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
                   examples
                 </p>
               </Link>
-              <img alt="Project Kenya features example" src={PROJECT_FEATURES_PNG} className="w-full -ml-2" />
-            </div>
+              <div className="w-full mt-14 overflow-hidden">
+                {EXAMPLE_PROJECTS.slice(0).reverse().map(({
+                  id, image, alt,
+                }, index) => (
+                  <div key={id} className="absolute bottom-0 w-full px-9 left-1/2 transform -translate-x-2/4">
+                    <motion.img
+                      className="w-full max-h-32 lg:max-h-full"
+                      alt={alt}
+                      src={image}
+                      custom={EXAMPLE_PROJECTS.length - index - 1}
+                      variants={exampleProjectsVariants}
+                    />
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </div>
       </Wrapper>
