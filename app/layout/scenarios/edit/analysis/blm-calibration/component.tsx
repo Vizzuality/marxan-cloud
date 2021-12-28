@@ -12,6 +12,9 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { format } from 'd3';
 import { motion } from 'framer-motion';
 
+import { useSaveScenarioCalibrationRange } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
 import BlmSettingsGraph from 'layout/scenarios/edit/analysis/blm-calibration/blm-settings-graph';
 
 import Button from 'components/button';
@@ -34,39 +37,70 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   const { query } = useRouter();
   const { sid } = query;
 
+  const dispatch = useDispatch();
+  const { addToast } = useToasts();
+
+  const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
+
   const [blmGraph, setBlmGraph] = useState(false);
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setBlm, setBlmRange } = scenarioSlice.actions;
-
-  const dispatch = useDispatch();
+  const { setBlm } = scenarioSlice.actions;
 
   const minBlmValue = 0;
   const maxBlmValue = 10000000;
 
-  const { blm, blmRange } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   useEffect(() => {
     dispatch(setBlm(null));
-    dispatch(setBlmRange([]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSaveBlmRange = useCallback((values) => {
     const { blmCalibrationFrom, blmCalibrationTo } = values;
-    const range = [blmCalibrationFrom, blmCalibrationTo];
-    dispatch(setBlmRange(range));
-    setBlmGraph(true);
-  }, [dispatch, setBlmRange]);
+    const data = [blmCalibrationFrom, blmCalibrationTo];
+
+    saveScenarioCalibrationRange.mutate({
+      id: `${sid}`,
+      data,
+    }, {
+      onSuccess: ({ data: { data: p } }) => {
+        addToast('success-project-creation', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Project saved successfully</p>
+          </>
+        ), {
+          level: 'success',
+        });
+
+        console.info('Calibration range sent succesfully', p);
+        setBlmGraph(true);
+      },
+      onError: () => {
+        addToast('error-calibration-range', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario calibration could not be sent</p>
+          </>
+        ), {
+          level: 'error',
+        });
+
+        console.error('Scenario calibration could not be sent');
+      },
+    });
+  }, [addToast, saveScenarioCalibrationRange, sid]);
 
   const INITIAL_VALUES = useMemo(() => {
     return {
-      blmCalibrationFrom: blmRange[0],
-      blmCalibrationTo: blmRange[1],
+      // blmCalibrationFrom: blmRange[0],
+      // blmCalibrationTo: blmRange[1],
       settedBlm: blm,
 
     };
-  }, [blm, blmRange]);
+  }, [blm]);
 
   return (
     <motion.div

@@ -91,3 +91,12 @@ export interface UseCancelRunScenarioProps {
 export interface CancelRunScenarioProps {
   id: string | string[];
 }
+
+// useSaveScenarioCalibrationRange
+export interface UseSaveScenarioCalibrationRangeProps {
+  requestConfig?: AxiosRequestConfig
+}
+export interface SaveScenarioCalibrationRangeProps {
+  id?: string,
+  data: any
+}

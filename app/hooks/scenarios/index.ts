@@ -40,6 +40,8 @@ import {
   RunScenarioProps,
   UseCancelRunScenarioProps,
   CancelRunScenarioProps,
+  UseSaveScenarioCalibrationRangeProps,
+  SaveScenarioCalibrationRangeProps,
 } from './types';
 
 // SCENARIO STATUS
@@ -631,6 +633,40 @@ export function useCancelRunScenario({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+// BLM
+export function useSaveScenarioCalibrationRange({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveScenarioCalibrationRangeProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveScenarioCalibrationRange = ({ id, data }: SaveScenarioCalibrationRangeProps) => {
+    return SCENARIOS.request({
+      url: `/${id}/calibration`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveScenarioCalibrationRange, {
+    onSuccess: (data: any, variables, context) => {
+      const { id, projectId } = data?.data?.data;
+      queryClient.invalidateQueries(['scenarios', projectId]);
+      queryClient.setQueryData(['scenarios', id], data?.data);
+
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });
