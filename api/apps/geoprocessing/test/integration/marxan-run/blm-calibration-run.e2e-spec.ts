@@ -32,7 +32,7 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-describe.skip(`given input data is delayed`, () => {
+describe(`given input data is delayed`, () => {
   beforeEach(() => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
@@ -41,7 +41,7 @@ describe.skip(`given input data is delayed`, () => {
     expect.assertions(1);
 
     fixtures
-      .GivenMarxanIsRunning()
+      .GivenBLMCalibrationIsRunning()
       .then(() => {
         done(`Shouldn't finish Marxan run.`);
       })
@@ -62,23 +62,23 @@ describe(`given input data is available`, () => {
     await fixtures.GivenScenarioPuDataExists();
   }, 60000 * 2);
 
-  test.only(
+  test(
     `marxan run during binary execution`,
     async () => {
-      await fixtures.GivenMarxanIsRunning();
+      await fixtures.GivenBLMCalibrationIsRunning();
       await fixtures.ThenBlmFinalResultsArePersisted();
       await fixtures.ThenBlmPartialResultsHaveBeenDeleted();
     },
     60000 * 15,
   );
 
-  test.skip(`cancelling marxan run`, async (done) => {
+  test(`cancelling BLM calibration run`, async (done) => {
     expect.assertions(1);
 
     fixtures
-      .GivenMarxanIsRunning()
+      .GivenBLMCalibrationIsRunning()
       .then(() => {
-        done(`Shouldn't finish Marxan run.`);
+        done(`Shouldn't finish BLM calibration run.`);
       })
       .catch((error) => {
         expect(JSON.parse(error).signal).toEqual('SIGTERM');
@@ -160,7 +160,7 @@ const getFixtures = async () => {
       nock.enableNetConnect();
     },
     progressMock: jest.fn(),
-    async GivenMarxanIsRunning() {
+    async GivenBLMCalibrationIsRunning() {
       return await sut.run(
         {
           blmValues: [0.1, 1, 10],

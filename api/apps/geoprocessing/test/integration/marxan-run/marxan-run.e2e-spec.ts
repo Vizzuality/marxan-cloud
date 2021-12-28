@@ -37,7 +37,7 @@ describe(`given input data is delayed`, () => {
     expect.assertions(1);
 
     fixtures
-      .GivenMarxanIsRunning()
+      .GivenBLMCalibrationIsRunning()
       .then(() => {
         done(`Shouldn't finish Marxan run.`);
       })
@@ -60,7 +60,7 @@ describe(`given input data is available`, () => {
   test(
     `marxan run during binary execution`,
     async () => {
-      const output = await fixtures.GivenMarxanIsRunning();
+      const output = await fixtures.GivenBLMCalibrationIsRunning();
       fixtures.ThenHasValidOutput(output);
       await fixtures.ThenOutputScenarioPuDataWasPersisted();
       fixtures.ThenProgressWasReported();
@@ -72,7 +72,7 @@ describe(`given input data is available`, () => {
     expect.assertions(1);
 
     fixtures
-      .GivenMarxanIsRunning()
+      .GivenBLMCalibrationIsRunning()
       .then(() => {
         done(`Shouldn't finish Marxan run.`);
       })
@@ -149,7 +149,7 @@ const getFixtures = async () => {
       nock.enableNetConnect();
     },
     progressMock: jest.fn(),
-    async GivenMarxanIsRunning() {
+    async GivenBLMCalibrationIsRunning() {
       return await sut.run(
         {
           scenarioId,
