@@ -1,9 +1,9 @@
 import React, {
-  useCallback, useEffect, useMemo, useState,
+  useCallback, useEffect, useState,
 } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch/* , useSelector */ } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -57,7 +57,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   const minBlmValue = 0;
   const maxBlmValue = 10000000;
 
-  const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  // const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   useEffect(() => {
     dispatch(setBlm(null));
@@ -99,12 +99,6 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
     });
   }, [addToast, saveScenarioCalibrationRange, sid]);
 
-  const INITIAL_VALUES = useMemo(() => {
-    return {
-      settedBlm: blm,
-    };
-  }, [blm]);
-
   return (
     <motion.div
       key="cost-surface"
@@ -135,11 +129,8 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
           </div>
         </InfoButton>
       </div>
-      <div className="relative flex flex-col flex-grow w-full min-h-0 overflow-hidden text-sm">
-        <FormRFF
-          onSubmit={onSaveBlmRange}
-          initialValues={INITIAL_VALUES}
-        >
+      <div className="relative flex flex-col flex-grow w-full min-h-0 space-y-12 overflow-hidden text-sm">
+        <FormRFF onSubmit={onSaveBlmRange}>
           {({ handleSubmit }) => (
             <form
               className="flex flex-col flex-grow w-full mt-5 overflow-hidden text-gray-500"
@@ -207,49 +198,18 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                 </div>
               </div>
 
-              <div className="pt-16">
-                <Button
-                  type="submit"
-                  theme="primary-alt"
-                  size="base"
-                  className="w-full"
-                >
-                  Calibrate BLM
-                </Button>
-              </div>
-
-              {!!blm && (
-                <>
-                  <div className="flex flex-col pt-5">
-                    <Label theme="dark" className="mr-10 text-sm uppercase">BLM</Label>
-                    <div className="w-20">
-                      <FieldRFF
-                        name="settedBlm"
-                        validate={composeValidators([{ presence: true }])}
-                      >
-                        {(fprops) => (
-                          <Field id="settedBlm" {...fprops}>
-                            <Input
-                              mode="dashed"
-                              className="text-2xl"
-                              type="number"
-                              min={minBlmValue}
-                              max={maxBlmValue}
-                              onChange={(e) => {
-                                if (!e.target.value) {
-                                  return fprops.input.onChange(null);
-                                }
-                                return fprops.input.onChange(+e.target.value);
-                              }}
-                            />
-                          </Field>
-                        )}
-                      </FieldRFF>
-                    </div>
-                  </div>
-                </>
+              {!blmGraph && (
+                <div className="pt-16">
+                  <Button
+                    type="submit"
+                    theme="primary-alt"
+                    size="base"
+                    className="w-full"
+                  >
+                    Calibrate BLM
+                  </Button>
+                </div>
               )}
-
             </form>
           )}
         </FormRFF>

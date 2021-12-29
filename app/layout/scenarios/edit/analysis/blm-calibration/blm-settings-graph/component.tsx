@@ -58,11 +58,12 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
         {({ handleSubmit, form }) => {
           return (
             <form
-              className="flex flex-col flex-grow space-y-6 overflow-hidden text-white"
+              className="relative flex flex-col flex-grow overflow-hidden text-white pt-7"
               autoComplete="off"
               noValidate
               onSubmit={handleSubmit}
             >
+
               <div className="flex flex-col">
                 <div className="flex items-center space-x-2">
                   <Label theme="dark" className="text-xs uppercase">BLM:</Label>
@@ -97,11 +98,11 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
                       </Field>
                     )}
                   </FieldRFF>
-                  <p className="text-xs whitespace-pre opacity-50">{`max ${format(',d')(maxBlmValue)}`}</p>
+                  <p className="text-sm whitespace-pre opacity-50">{`max ${format(',d')(maxBlmValue)}`}</p>
                 </div>
               </div>
-              <div>
-                <h3 className="text-xs font-bold text-white">Boundary Length</h3>
+              <div className="flex flex-col mt-8 space-y-2">
+                <h3 className="text-sm font-bold text-white">Boundary Length</h3>
                 <p className="text-xs text-white">
                   More
                 </p>

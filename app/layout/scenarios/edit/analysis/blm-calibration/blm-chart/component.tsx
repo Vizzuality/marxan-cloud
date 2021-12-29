@@ -130,7 +130,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   return (
     <div ref={containerRef} className="relative w-full h-full">
       {!!blmImage && (
-        <img src={blmImage} alt="selected blm" className="absolute right-0 -top-12" />
+        <img src={blmImage} alt="selected blm" className="absolute right-0 -top-36" />
       )}
       {containerRef.current && (
         <svg width={width} height={height}>
