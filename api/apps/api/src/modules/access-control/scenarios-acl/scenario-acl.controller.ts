@@ -9,7 +9,6 @@ import {
   HttpCode,
   HttpStatus,
   Delete,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios-acl/scenario-acl.service';
@@ -59,7 +58,8 @@ export class ScenarioAclController {
             User is not authorized,
           `);
         default:
-          throw new InternalServerErrorException();
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
       }
     }
   }
