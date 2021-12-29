@@ -36,7 +36,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
 
   const dispatch = useDispatch();
 
-  const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { blm, blmImage } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const onSaveBlm = useCallback((values) => {
     dispatch(setBlm(values?.blmCalibration));
@@ -63,7 +63,9 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
               noValidate
               onSubmit={handleSubmit}
             >
-
+              {!!blmImage && (
+                <img src={blmImage} alt="selected blm" className="absolute right-0 rounded-lg" />
+              )}
               <div className="flex flex-col">
                 <div className="flex items-center space-x-2">
                   <Label theme="dark" className="text-xs uppercase">BLM:</Label>
@@ -74,6 +76,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
                     <h4 className="font-heading text-lg mb-2.5">What is BLM?</h4>
                   </InfoButton>
                 </div>
+
                 <div className="flex items-end w-full space-x-5">
                   <FieldRFF
                     name="blmCalibration"

@@ -57,10 +57,9 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setBlm } = scenarioSlice.actions;
+  const { setBlm, setBlmImage } = scenarioSlice.actions;
 
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
-  const [blmImage, setBlmImage] = useState(null);
 
   const xDomain = useMemo(() => [
     Math.min(...data.map((d) => d.cost)),
@@ -129,9 +128,6 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
-      {!!blmImage && (
-        <img src={blmImage} alt="selected blm" className="absolute right-0 -top-36" />
-      )}
       {containerRef.current && (
         <svg width={width} height={height}>
           {/* X axis */}
@@ -199,7 +195,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                   })}
                   onClick={() => {
                     dispatch(setBlm(boundaryLength));
-                    setBlmImage(thumbnail);
+                    dispatch(setBlmImage(thumbnail));
                   }}
                   aria-hidden="true"
                 />
