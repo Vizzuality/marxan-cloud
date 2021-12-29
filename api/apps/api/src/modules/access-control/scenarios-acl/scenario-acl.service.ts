@@ -12,6 +12,10 @@ import {
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { assertDefined } from '@marxan/utils';
+import {
+  forbiddenError,
+  transactionFailed,
+} from '@marxan-api/modules/access-control';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
@@ -115,10 +119,10 @@ export class ScenarioAclService implements ScenarioAccessControl {
     scenarioId: string,
     userAndRoleToChange: UserRoleInScenarioDto,
     loggedUserId: string,
-  ): Promise<Either<Denied, void>> {
+  ): Promise<Either<typeof forbiddenError | typeof transactionFailed, void>> {
     const { userId, roleName } = userAndRoleToChange;
     if (!(await this.isOwner(loggedUserId, scenarioId))) {
-      return left(false);
+      return left(forbiddenError);
     }
     assertDefined(roleName);
     const apiDbConnection = getConnection(DbConnections.default);
@@ -144,7 +148,6 @@ export class ScenarioAclService implements ScenarioAccessControl {
         userRoleToSave.scenarioId = scenarioId;
         userRoleToSave.userId = userId;
         userRoleToSave.roleName = roleName;
-
         await apiQueryRunner.manager.save(userRoleToSave);
       } else {
         await apiQueryRunner.manager.update(
@@ -153,11 +156,13 @@ export class ScenarioAclService implements ScenarioAccessControl {
           { roleName },
         );
       }
+
+      return right(void 0);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
+      return left(transactionFailed);
     } finally {
       await apiQueryRunner.release();
     }
-    return right(void 0);
   }
 }
