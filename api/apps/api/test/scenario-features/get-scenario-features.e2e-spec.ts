@@ -19,7 +19,7 @@ afterAll(async () => {
 });
 
 describe(`when user is logged in`, () => {
-  describe.skip(`when scenario exists`, () => {
+  describe(`when scenario exists`, () => {
     let scenarioId: string;
 
     beforeEach(async () => {

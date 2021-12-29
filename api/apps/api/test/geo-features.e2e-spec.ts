@@ -82,7 +82,7 @@ describe('GeoFeaturesModule (e2e)', () => {
         expect(response.body.data[0].attributes.isCustom).toEqual(false);
       });
 
-      test.skip('should return a single result of geo-features whose alias property matches a given filter', async () => {
+      test('should return a single result of geo-features whose alias property matches a given filter', async () => {
         const response = await request(app.getHttpServer())
           .get(
             `/api/v1/projects/${world.projectWithCountry}/features?q=${geoFeaturesFilters.cheeta.alias}`,

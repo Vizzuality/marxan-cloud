@@ -50,7 +50,7 @@ describe(`when requesting to change inclusive options`, () => {
   });
 });
 
-describe.skip(`when requesting status of change`, () => {
+describe(`when requesting status of change`, () => {
   let outcome: unknown;
 
   beforeAll(async () => {
