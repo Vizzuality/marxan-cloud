@@ -30,23 +30,22 @@ export class MarxanSandboxBlmRunnerService
     }
   }
 
+  private interruptIfKilled(scenarioId: string): void {
+    const controller = this.#controllers[scenarioId];
+
+    if (controller && controller.signal.aborted) {
+      this.clearAbortController(scenarioId);
+      throw {
+        stdError: [],
+        signal: 'SIGTERM',
+      };
+    }
+  }
+
   async run(
     input: JobData,
     progressCallback: (progress: number) => void,
   ): Promise<void> {
-    const interruptIfKilled = async (
-      controller: AbortController,
-      scenarioId: string,
-    ) => {
-      if (controller.signal.aborted) {
-        this.clearAbortController(scenarioId);
-        throw {
-          stdError: [],
-          signal: 'SIGTERM',
-        };
-      }
-    };
-
     const { blmValues, scenarioId } = input;
     const calibrationId = v4();
 
@@ -60,15 +59,12 @@ export class MarxanSandboxBlmRunnerService
       this.finalResultsRepository,
     ]);
 
-    await interruptIfKilled(abortController, scenarioId);
-
     return new Promise<void>(async (resolve, reject) => {
-      await interruptIfKilled(abortController, scenarioId);
       try {
-        await interruptIfKilled(abortController, scenarioId);
+        this.interruptIfKilled(scenarioId);
         const workspaces = await inputFilesHandler.for(blmValues, input.assets);
 
-        await interruptIfKilled(abortController, scenarioId);
+        this.interruptIfKilled(scenarioId);
 
         for (const { workspace, blmValue } of workspaces) {
           const singleRunner = this.marxanRunnerFactory.for(
@@ -91,13 +87,13 @@ export class MarxanSandboxBlmRunnerService
             abortEventListener,
           );
         }
-        await interruptIfKilled(abortController, scenarioId);
+        this.interruptIfKilled(scenarioId);
         await this.finalResultsRepository.saveFinalResults(
           scenarioId,
           calibrationId,
         );
         this.clearAbortController(scenarioId);
-        await interruptIfKilled(abortController, scenarioId);
+        this.interruptIfKilled(scenarioId);
       } catch (err) {
         reject(err);
       }

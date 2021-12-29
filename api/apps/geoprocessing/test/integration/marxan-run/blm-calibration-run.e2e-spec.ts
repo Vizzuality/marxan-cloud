@@ -43,7 +43,7 @@ describe(`given input data is delayed`, () => {
     fixtures
       .GivenBLMCalibrationIsRunning()
       .then(() => {
-        done(`Shouldn't finish Marxan run.`);
+        done(`Shouldn't finish BLM calibration run.`);
       })
       .catch(async (error) => {
         expect(error.signal).toEqual('SIGTERM');
