@@ -59,7 +59,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
               );
             })}
             <motion.div
-              className="w-full relative overflow-hidden pt-11 pb-24 place-self-center rounded-3xl"
+              className="relative w-full pb-24 overflow-hidden pt-11 place-self-center rounded-3xl"
               style={{ background: 'linear-gradient(to right bottom, #4B48F5, #00BFFF)' }}
               initial="initial"
               whileHover="hover"
@@ -74,13 +74,13 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
                   examples
                 </p>
               </Link>
-              <div className="w-full mt-14 overflow-hidden">
-                {EXAMPLE_PROJECTS.slice(0).reverse().map(({
+              <div className="w-full overflow-hidden mt-14">
+                {EXAMPLE_PROJECTS.map(({
                   id, image, alt,
                 }, index) => (
-                  <div key={id} className="absolute bottom-0 w-full px-9 left-1/2 transform -translate-x-2/4">
+                  <div key={id} className="absolute bottom-0 w-full transform px-9 left-1/2 -translate-x-2/4">
                     <motion.img
-                      className="w-full max-h-32 lg:max-h-full"
+                      className="w-full cursor-pointer max-h-32 lg:max-h-full"
                       alt={alt}
                       src={image}
                       custom={EXAMPLE_PROJECTS.length - index - 1}

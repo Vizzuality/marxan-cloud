@@ -42,21 +42,23 @@ export const FEATURES = [
 
 export const EXAMPLE_PROJECTS = [
   {
-    id: 'project-kenya',
-    alt: 'Project Kenya features example',
-    image: EXAMPLE_PROJECT_PNG,
-  },
-  {
     id: 'project-placeholder-01',
     alt: '',
     image: EXAMPLE_PLACEHOLDER_PNG,
-  }, {
+  },
+  {
     id: 'project-placeholder-02',
     alt: '',
     image: EXAMPLE_PLACEHOLDER_PNG,
-  }, {
+  },
+  {
     id: 'project-placeholder-03',
     alt: '',
     image: EXAMPLE_PLACEHOLDER_PNG,
+  },
+  {
+    id: 'project-kenya',
+    alt: 'Project Kenya features example',
+    image: EXAMPLE_PROJECT_PNG,
   },
 ];
