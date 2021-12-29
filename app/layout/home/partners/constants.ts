@@ -12,7 +12,7 @@ export const PARTNER_LOGOS = [
   {
     // FOUNDING LOGOS
     id: 'founding',
-    title: 'In partnership with:',
+    title: 'Brought to you by:',
     logos: [
       {
         id: 1,
