@@ -54,7 +54,6 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
         onSubmit={onSaveBlm}
         initialValues={INITIAL_VALUES}
       >
-
         {({ handleSubmit, form }) => {
           return (
             <form
@@ -117,7 +116,6 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
           );
         }}
       </FormRFF>
-
     </div>
   );
 };

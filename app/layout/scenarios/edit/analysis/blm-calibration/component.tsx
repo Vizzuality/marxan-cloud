@@ -24,6 +24,7 @@ import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
+import Loading from 'components/loading';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -47,7 +48,8 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
     isFetching: calibrationResultsAreFetching,
     isFetched: calibrationResultsAreFetched,
   } = useScenarioCalibrationResults(sid);
-  console.log('calibrationResultsData', calibrationResultsData, calibrationResultsAreFetching, calibrationResultsAreFetched);
+
+  console.log('calibrationResultsData', calibrationResultsData, calibrationResultsAreFetched);
 
   const [blmGraph, setBlmGraph] = useState(false);
 
@@ -218,6 +220,15 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
             maxBlmValue={maxBlmValue}
             minBlmValue={minBlmValue}
           />
+        )}
+        {!blmGraph && calibrationResultsAreFetching && (
+          <div className="pt-6">
+            <Loading
+              className="flex items-center justify-center w-full h-full text-white"
+              iconClassName="w-10 h-10"
+              visible
+            />
+          </div>
         )}
       </div>
     </motion.div>
