@@ -2,18 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { intersection } from 'lodash';
 import { getConnection, Not, Repository } from 'typeorm';
-import { Permit } from '@marxan-api/modules/access-control/access-control.types';
-import { ScenarioRoles } from './dto/user-role-scenario.dto';
+import {
+  Denied,
+  Permit,
+} from '@marxan-api/modules/access-control/access-control.types';
+import {
+  ScenarioRoles,
+  UserRoleInScenarioDto,
+} from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
-import { UserRoleInScenarioDto } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { assertDefined } from '@marxan/utils';
-import {
-  forbiddenError,
-  transactionFailed,
-} from '@marxan-api/modules/access-control';
+import { assertDefined } from '@marxan/utils';;
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
@@ -111,6 +112,39 @@ export class ScenarioAclService implements ScenarioAccessControl {
       },
     });
     return otherOwnersInScenario >= 1;
+  }
+  
+  async findUsersInScenario(
+    scenarioId: string,
+    userId: string,
+    nameSearch?: string,
+  ): Promise<Either<Denied, UserRoleInScenarioDto[]>> {
+    if (!(await this.isOwner(userId, scenarioId))) {
+      return left(false);
+    }
+
+    const query = this.roles
+      .createQueryBuilder('users_scenarios')
+      .leftJoinAndSelect('users_scenarios.user', 'userId')
+      .where({
+        scenarioId,
+      })
+      .select([
+        'users_scenarios.roleName',
+        'userId.displayName',
+        'userId.id',
+        'userId.avatarDataUrl',
+      ]);
+
+    if (nameSearch) {
+      query.andWhere('userId.displayName ILIKE :name', {
+        name: `%${nameSearch}%`,
+      });
+    }
+
+    const usersInScenario = await query.getMany();
+
+    return right(usersInScenario);
   }
 
   async updateUserInScenario(
