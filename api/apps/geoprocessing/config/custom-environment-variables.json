@@ -1,10 +1,18 @@
 {
   "postgresApi": {
-    "url": "API_POSTGRES_URL",
+    "host": "API_POSTGRES_HOST",
+    "username": "API_POSTGRES_USER",
+    "password": "API_POSTGRES_PASSWORD",
+    "database": "API_POSTGRES_DB",
+    "port": "API_POSTGRES_PORT",
     "runMigrationsOnStartup": "API_RUN_MIGRATIONS_ON_STARTUP"
   },
   "postgresGeoApi": {
-    "url": "GEO_POSTGRES_URL",
+    "host": "GEO_POSTGRES_HOST",
+    "username": "GEO_POSTGRES_USER",
+    "password": "GEO_POSTGRES_PASSWORD",
+    "database": "GEO_POSTGRES_DB",
+    "port": "GEO_POSTGRES_PORT",
     "runMigrationsOnStartup": "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP"
   },
   "network": {
