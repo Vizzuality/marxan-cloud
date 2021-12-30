@@ -46,17 +46,14 @@ import {
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
+import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 import {
+  ChangeProtectedAreasError,
   ProtectedAreaService,
   ScenarioProtectedArea,
-  ChangeProtectedAreasError,
   submissionFailed,
 } from './protected-area';
-import {
-  ProtectedAreaChangeDto,
-  ProtectedAreasChangeDto,
-} from './dto/protected-area-change.dto';
+import { ProtectedAreasChangeDto } from './dto/protected-area-change.dto';
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 import {
   ChangeBlmRange,
@@ -161,10 +158,13 @@ export class ScenariosService {
 
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
+
     return right(scenario);
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
+    await this.canEditGuard(scenarioId);
+
     await this.assertScenario(scenarioId);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
     return await this.crudService.update(scenarioId, validatedMetadata);
@@ -539,5 +539,18 @@ export class ScenariosService {
       return result;
     }
     return right(true);
+  }
+
+  private async canEditGuard(scenarioId: string) {
+    const scenario = await this.crudService.getById(scenarioId);
+    // TODO: Check where do we should use the guard
+    const editIsBlocked = await this.projectChecker.hasProjectPendingExports(
+      scenario.projectId,
+    );
+
+    if (isLeft(editIsBlocked))
+      throw new BadRequestException(
+        `Scenario ${scenarioId} editing is blocked because of pending export`,
+      );
   }
 }

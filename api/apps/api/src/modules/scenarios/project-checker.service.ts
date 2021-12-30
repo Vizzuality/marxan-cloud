@@ -10,7 +10,9 @@ import { PlanningAreasService } from '@marxan-api/modules/planning-areas/plannin
 import { isDefined } from '@marxan/utils';
 
 export const doesntExist = Symbol(`doesn't exist`);
+export const hasPendingExport = Symbol(`has pending export`);
 export type DoesntExist = typeof doesntExist;
+export type HasPendingExport = typeof hasPendingExport;
 
 @Injectable()
 export class ProjectChecker {
@@ -20,6 +22,16 @@ export class ProjectChecker {
     private readonly repository: Repository<Project>,
     private readonly planningAreas: PlanningAreasService,
   ) {}
+
+  async hasProjectPendingExports(
+    projectId: string,
+  ): Promise<Either<HasPendingExport, boolean>> {
+    const pendingExportExist = false;
+
+    if (pendingExportExist) return left(hasPendingExport);
+
+    return right(false);
+  }
 
   async isProjectReady(
     projectId: string,

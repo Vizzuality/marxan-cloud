@@ -5,15 +5,35 @@ import { AppModule } from '@marxan-api/app.module';
 import { QueueToken } from '../../src/modules/queue/queue.tokens';
 import { FakeQueue, FakeQueueBuilder } from './queues';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
-import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
-import { right } from 'fp-ts/Either';
+import {
+  hasPendingExport,
+  ProjectChecker,
+} from '@marxan-api/modules/scenarios/project-checker.service';
+import { left, right } from 'fp-ts/Either';
 import {
   FileRepository,
   TempStorageRepository,
 } from '@marxan/files-repository';
 
-export const fakeProjectChecker: Pick<ProjectChecker, 'isProjectReady'> = {
-  isProjectReady: async () => right(true),
+export type ProjectCheckerFake = Pick<
+  ProjectChecker,
+  'isProjectReady' | 'hasProjectPendingExports'
+> & { setHasProjectPendingResponse: (shouldFail: boolean) => void };
+
+export const fakeProjectChecker = (): ProjectCheckerFake => {
+  let hasProjectPendingExportsShouldFail = false;
+  const hasProjectPendingExportsResponse = hasProjectPendingExportsShouldFail
+    ? left(hasPendingExport)
+    : right(false);
+  console.log(hasProjectPendingExportsResponse);
+  return {
+    isProjectReady: async () => right(true),
+    hasProjectPendingExports: () =>
+      Promise.resolve(hasProjectPendingExportsResponse),
+    setHasProjectPendingResponse: (shouldFail) => {
+      hasProjectPendingExportsShouldFail = shouldFail;
+    },
+  };
 };
 
 export const bootstrapApplication = async (
@@ -27,7 +47,7 @@ export const bootstrapApplication = async (
     .overrideProvider(QueueBuilder)
     .useClass(FakeQueueBuilder)
     .overrideProvider(ProjectChecker)
-    .useValue(fakeProjectChecker)
+    .useValue(fakeProjectChecker())
     .overrideProvider(FileRepository)
     .useClass(TempStorageRepository)
     .compile();
