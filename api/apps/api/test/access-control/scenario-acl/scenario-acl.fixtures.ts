@@ -314,7 +314,6 @@ export const getFixtures = async () => {
       expect(response.status).toEqual(200);
       expect(response.body.data).toHaveLength(4);
     },
-
     ThenUsersWithChangedRoleIsOnProject: (response: request.Response) => {
       expect(response.status).toEqual(200);
       expect(response.body.data).toHaveLength(2);

@@ -49,6 +49,8 @@ import { BlmValuesModule } from '@marxan-api/modules/blm';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { BlmCalibrationModule } from './blm-calibration/blm-calibration.module';
+import { AccessControlModule } from '@marxan-api/modules/access-control';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 
 @Module({
   imports: [
@@ -84,6 +86,7 @@ import { BlmCalibrationModule } from './blm-calibration/blm-calibration.module';
     BlmValuesModule,
     AccessControlModule,
     BlmCalibrationModule,
+    AccessControlModule,
   ],
   providers: [
     ProjectChecker,

@@ -266,7 +266,10 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
 
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow overflow-hidden">
-          <FormSpyRFF onChange={(state) => dispatch(setFeatures(state.values.features))} />
+          <FormSpyRFF
+            subscription={{ dirty: true }}
+            onChange={() => dispatch(setFeatures(values.features))}
+          />
 
           <Loading
             visible={submitting || selectedFeaturesIsFetching}

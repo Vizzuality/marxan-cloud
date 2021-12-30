@@ -149,6 +149,15 @@ export const getFixtures = async () => {
           userId: otherOwnerUserId,
           roleName: projectOwnerRole,
         }),
+    WhenChangingOwnerUserRoleAsLastOwner: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: ownerUserId,
+          roleName: projectViewerRole,
+        }),
     WhenAddingANewViewerToTheProjectAsContributor: async (projectId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/projects/${projectId}/users`)
