@@ -20,6 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { isLeft } from 'fp-ts/lib/These';
+import { lastOwner, forbiddenError } from '@marxan-api/modules/access-control';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -47,7 +48,19 @@ export class ScenarioAclController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case lastOwner:
+          throw new ForbiddenException(
+            `There must be at least one owner of scenario ${scenarioId}`,
+          );
+        case forbiddenError:
+          throw new ForbiddenException(`
+            User is not authorized,
+          `);
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
     }
   }
 }

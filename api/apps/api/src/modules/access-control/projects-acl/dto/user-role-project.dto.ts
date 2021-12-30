@@ -1,6 +1,12 @@
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsString, IsUUID } from 'class-validator';
+
+export enum ProjectRoles {
+  project_owner = Roles.project_owner,
+  project_contributor = Roles.project_contributor,
+  project_viewer = Roles.project_viewer,
+}
 export class UserRoleInProjectDto {
   @IsUUID()
   @ApiProperty()
@@ -11,12 +17,11 @@ export class UserRoleInProjectDto {
   projectId!: string;
 
   @IsString()
-  @IsEnum(Object.values(Roles))
-  @ApiProperty()
-  roleName?:
-    | Roles.project_viewer
-    | Roles.project_contributor
-    | Roles.project_owner;
+  @IsEnum(Object.values(ProjectRoles))
+  @ApiPropertyOptional({
+    enum: ProjectRoles,
+  })
+  roleName?: ProjectRoles;
 }
 
 export class UsersInProjectResult {

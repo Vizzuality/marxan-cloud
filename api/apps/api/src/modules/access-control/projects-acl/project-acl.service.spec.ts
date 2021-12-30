@@ -4,11 +4,11 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
-import { ProjectAclService } from './project-acl.service';
+import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
 import { isLeft } from 'fp-ts/Either';
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -85,12 +85,12 @@ const getFixtures = async () => {
             where: jest.fn().mockReturnThis(),
             getMany: jest.fn(() => [
               {
-                roleName: Roles.project_owner,
+                roleName: ProjectRoles.project_owner,
                 projectId,
                 userId,
               },
               {
-                roleName: Roles.project_viewer,
+                roleName: ProjectRoles.project_viewer,
                 projectId,
                 userId: viewerUserId,
               },
@@ -111,7 +111,7 @@ const getFixtures = async () => {
     GivenProjectViewerRoleIsAssigned: () =>
       userProjectsRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.project_viewer,
+          roleName: ProjectRoles.project_viewer,
           projectId,
           userId,
         },
@@ -119,7 +119,7 @@ const getFixtures = async () => {
     GivenProjectOwnerRoleIsAssigned: () =>
       userProjectsRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.project_owner,
+          roleName: ProjectRoles.project_owner,
           projectId,
           userId,
         },
@@ -127,7 +127,7 @@ const getFixtures = async () => {
     GivenProjectContributorRoleIsAssigned: () =>
       userProjectsRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.project_contributor,
+          roleName: ProjectRoles.project_contributor,
           projectId,
           userId,
         },
@@ -135,12 +135,12 @@ const getFixtures = async () => {
     GivenProjectHasMultipleUsers: () =>
       userProjectsRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.project_owner,
+          roleName: ProjectRoles.project_owner,
           projectId,
           userId,
         },
         {
-          roleName: Roles.project_viewer,
+          roleName: ProjectRoles.project_viewer,
           projectId,
           userId: viewerUserId,
         },
@@ -150,7 +150,7 @@ const getFixtures = async () => {
         Promise.resolve({
           projectId,
           userId,
-          roleName: Roles.project_owner,
+          roleName: ProjectRoles.project_owner,
         }),
       ),
     ThenCannotCreateProject: async () => {
