@@ -95,7 +95,7 @@ export const getFixtures = async () => {
 
     WhenGettingScenarioUsersAsNotInScenario: async (scenarioId: string) =>
       await request(app.getHttpServer())
-        .get(`/api/v1/roles/scenario/${scenarioId}/users`)
+        .get(`/api/v1/roles/scenarios/${scenarioId}/users`)
         .set('Authorization', `Bearer ${otherOwnerUserToken}`),
 
     WhenGettingScenarioUsersAsOwner: async (scenarioId: string) =>

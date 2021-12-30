@@ -30,7 +30,7 @@ import { ProtectedArea } from '@marxan/protected-areas';
 import { ProjectsRequest } from './project-requests-info';
 import { ProjectId, SetProjectGridFromShapefile } from './planning-unit-grid';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
-import { Roles } from '../access-control/role.api.entity';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
 const projectFilterKeyNames = [
   'name',
