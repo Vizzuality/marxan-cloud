@@ -14,7 +14,11 @@ import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scen
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { assertDefined } from '@marxan/utils';;
+import { assertDefined } from '@marxan/utils';
+import {
+  forbiddenError,
+  transactionFailed,
+} from '@marxan-api/modules/access-control';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
@@ -113,7 +117,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     });
     return otherOwnersInScenario >= 1;
   }
-  
+
   async findUsersInScenario(
     scenarioId: string,
     userId: string,

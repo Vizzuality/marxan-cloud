@@ -29,7 +29,10 @@ import {
   forbiddenError,
   transactionFailed,
 } from '@marxan-api/modules/access-control';
-import { UserRoleInScenarioDto } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import {
+  UserRoleInScenarioDto,
+  UsersInScenarioResult,
+} from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -37,7 +40,7 @@ import { UserRoleInScenarioDto } from '@marxan-api/modules/access-control/scenar
 @Controller(`${apiGlobalPrefixes.v1}/roles/scenarios`)
 export class ScenarioAclController {
   constructor(private readonly scenarioAclService: ScenarioAclService) {}
-  
+
   @Get(':scenarioId/users')
   @ApiOperation({ summary: 'Get all users with roles in scenario' })
   @ApiOkResponse({
