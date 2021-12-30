@@ -22,106 +22,123 @@ details.
 
 ![Backend architecture](./docs/ARCHITECTURE_infrastructure/marxan-contexts.png)
 
+### Dependencies
+
+- Nodejs v14
+- PostgreSQL v14
+- Postgis v3
+- Redis v6
+
 ### Prerequisites
 
 1. Install Docker (19.03+):
-   * [MacOS](https://docs.docker.com/docker-for-mac/)
-   * [GNU/Linux](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+	* [MacOS](https://docs.docker.com/docker-for-mac/)
+	* [GNU/Linux](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 2. Install [Docker Compose](https://docs.docker.com/compose/install/)
 3. Create an `.env` at the root of the repository, defining all the required
    environment variables listed below. In most cases, for variables other
    than secrets, the defaults in `env.default` may just work - YMMV.
 
-   * `API_AUTH_JWT_SECRET` (string, required): a base64-encoded secret for the
-     signing of API JWT tokens; can be generated via a command such as `dd
-     if=/dev/urandom bs=1024 count=1 | base64 -w0`
-   * `API_AUTH_X_API_KEY` (string, required): a secret used as API key for
-     requests from the Geoprocessing service to the API; can be generated
-     similarly to `API_AUTH_JWT_SECRET`
-   * `API_SERVICE_PORT` (number, required): the port exposed by Docker for the
-     API service; when running an instance under Docker Compose, NestJS will
-     always be listening on port 3000 internally, and this is mapped to
-     `API_SERVICE_PORT` when exposed outside of the container
-   * `API_SERVICE_URL` (URL, optional, default is http://api:3000): the internal
-     (docker-compose or k8s cluster) where the API service can be reached by
-     other services running in the cluster
-   * `API_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default is
-     `true`): set this to `false` if migrations for the API service should not
-     run automatically on startup
-   * `API_LOGGING_MUTE_ALL` (boolean, optional, default is `false`): can be used
-     to mute all logging (for example, in CI pipelines) irrespective of Node
-     environment and other settings that would normally affect the logging
-     verbosity of the API
-   * `API_SHARED_FILE_STORAGE_LOCAL_PATH` (string, optional, default is
-     `/tmp/storage`): set this to a filesystem path if needing to override the
-     default temporary storage location where shared volumes for files shared
-     from the API to the Geoprocessing service are mounted; configuration of
-     mount point for shared storage (via Docker volumes in development
-     environments and via Persistent Volumes in Kubernetes environments) should
-     be set accordingly
-   * `APP_SERVICE_PORT` (number, required): the port on which the App service
-     should listen on the local machine
-   * `POSTGRES_API_SERVICE_PORT` (number, required): the port on which the
-     PostgreSQL service should listen on the local machine
-   * `API_POSTGRES_USER` (string, required): username to be used for the
-     PostgreSQL connection (API)
-   * `API_POSTGRES_PASSWORD` (string, required): password to be used for the
-     PostgreSQL connection (API)
-   * `API_POSTGRES_DB` (string, required): name of the database to be used for
-     the PostgreSQL connection (API)
-   * `GEOPROCESSING_SERVICE_PORT` (number, required): the port exposed by Docker
-     for the Geoprocessing service; when running an instance under Docker
-     Compose, NestJS will always be listening on port 3000 internally, and this
-     is mapped to `GEOPROCESSING_SERVICE_PORT` when exposed outside of the
-     container
-   * `POSTGRES_GEO_SERVICE_PORT` (number, required): the port on which the
-     geoprocessing PostgreSQL service should listen on the local machine
-   * `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default
-     is `true`): set this to `false` if migrations for the Geoprocessing service
-     should not run automatically on startup
-   * `GEO_POSTGRES_USER` (string, required): username to be used for the
-      geoprocessing PostgreSQL connection (API)
-   * `GEO_POSTGRES_PASSWORD` (string, required): password to be used for the
-     geoprocessing PostgreSQL connection (API)
-   * `GEO_POSTGRES_DB` (string, required): name of the database to be used for
-     the geoprocessing PostgreSQL connection (API)
-   * `POSTGRES_AIRFLOW_SERVICE_PORT` (number, required): the port on which the
-     PostgreSQL for Airflow service should listen on the local machine
-   * `AIRFLOW_PORT` (number, required): the port on which the
-     Airflow service should listen on the local machine
-   * `REDIS_API_SERVICE_PORT` (number, required): the port on which the
-     Redis service should listen on the local machine
-   * `REDIS_COMMANDER_PORT` (number, required): the port on which the
-     Redis Commander service should listen on the local machine
-   * `SPARKPOST_APIKEY` (string, required): an API key to be used for Sparkpost, 
-     an email service
-   * `SPARKPOST_ORIGIN` (string, required): the URL of a SparkPost API service:
-     this would normally be either `https://api.sparkpost.com` or
-     `https://api.eu.sparkpost.com` (note: **no trailing `/` character** or the
-     SparkPost API [client library](https://github.com/SparkPost/node-sparkpost)
-     will not work correctly); please check [SparkPost's
-     documentation](https://developers.sparkpost.com/api/#header-sparkpost-eu)
-     and the client library's own documentation for details
-   * `APPLICATION_BASE_URL` (string, required): the public URL of the
-     **frontend** application on the running instance (without trailing slash). 
-     This URL will be used to compose links sent via email for some flows of the 
-     platform, such as password recovery or sign-up confirmation (see also 
-     `PASSWORD_RESET_TOKEN_PREFIX` and `SIGNUP_CONFIRMATION_TOKEN_PREFIX`)
-   * `PASSWORD_RESET_TOKEN_PREFIX` (string, required): the path that should be 
-     appended after the application base URL (`APPLICATION_BASE_URL`), 
-     corresponding to the **frontend** route where users are redirected from
-     password reset emails to complete the process of resetting their
-     password; the reset token is appended at the end of this URL to compose
-     the actual link that is included in password reset emails
-   * `PASSWORD_RESET_EXPIRATION` (string, optional, default is 1800000
-     milliseconds: 30 minutes): a time (in milliseconds) that a token for a
-     password reset is valid for
-   * `SIGNUP_CONFIRMATION_TOKEN_PREFIX` (string, required): the path that should be
-     appended after the application base URL (`APPLICATION_BASE_URL`),
-     corresponding to the **frontend** route where users are redirected from
-     sign-up confirmation emails to complete the process validating their account; 
-     the validation token is appended at the end of this URL to compose the actual 
-     link that is included in sign-up confirmation emails
+	* `API_AUTH_JWT_SECRET` (string, required): a base64-encoded secret for the
+	  signing of API JWT tokens; can be generated via a command such as `dd
+	  if=/dev/urandom bs=1024 count=1 | base64 -w0`
+	* `API_AUTH_X_API_KEY` (string, required): a secret used as API key for
+	  requests from the Geoprocessing service to the API; can be generated
+	  similarly to `API_AUTH_JWT_SECRET`
+	* `API_SERVICE_PORT` (number, required): the port exposed by Docker for the
+	  API service; when running an instance under Docker Compose, NestJS will
+	  always be listening on port 3000 internally, and this is mapped to
+	  `API_SERVICE_PORT` when exposed outside of the container
+	* `API_SERVICE_URL` (URL, optional, default is http://api:3000): the internal
+	  (docker-compose or k8s cluster) where the API service can be reached by
+	  other services running in the cluster
+	* `API_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default is
+	  `true`): set this to `false` if migrations for the API service should not
+	  run automatically on startup
+	* `API_LOGGING_MUTE_ALL` (boolean, optional, default is `false`): can be used
+	  to mute all logging (for example, in CI pipelines) irrespective of Node
+	  environment and other settings that would normally affect the logging
+	  verbosity of the API
+	* `API_SHARED_FILE_STORAGE_LOCAL_PATH` (string, optional, default is
+	  `/tmp/storage`): set this to a filesystem path if needing to override the
+	  default temporary storage location where shared volumes for files shared
+	  from the API to the Geoprocessing service are mounted; configuration of
+	  mount point for shared storage (via Docker volumes in development
+	  environments and via Persistent Volumes in Kubernetes environments) should
+	  be set accordingly
+	* `APP_SERVICE_PORT` (number, required): the port on which the App service
+	  should listen on the local machine
+	* `POSTGRES_API_SERVICE_PORT` (number, required): the port on which the
+	  Docker PostgreSQL service should listen on the local machine
+	* API PostgreSQL configuration variables:
+		* `API_POSTGRES_HOST` (string, required): host of the database server to be
+		  used for the PostgreSQL connection (API)
+		* `API_POSTGRES_PORT` (number, required): port of the database server to be
+		  used for the PostgreSQL connection (API)
+		* `API_POSTGRES_USER` (string, required): username to be used for the
+		  PostgreSQL connection (API)
+		* `API_POSTGRES_PASSWORD` (string, required): password to be used for the
+		  PostgreSQL connection (API)
+		* `API_POSTGRES_DB` (string, required): name of the database to be used for
+		  the PostgreSQL connection (API)
+	* `GEOPROCESSING_SERVICE_PORT` (number, required): the port exposed by Docker
+	  for the Geoprocessing service; when running an instance under Docker
+	  Compose, NestJS will always be listening on port 3000 internally, and this
+	  is mapped to `GEOPROCESSING_SERVICE_PORT` when exposed outside of the
+	  container
+	* `POSTGRES_GEO_SERVICE_PORT` (number, required): the port on which the
+	  geoprocessing Docker PostgreSQL service should listen on the local machine
+	* `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default
+	  is `true`): set this to `false` if migrations for the Geoprocessing service
+	  should not run automatically on startup
+	* Geoprocessing PostgreSQL configuration variables:
+		* `GEO_POSTGRES_HOST` (string, required): host of the database server to be
+		  used for the geoprocessing PostgreSQL connection (API)
+		* `GEO_POSTGRES_PORT` (number, required): port of the database server to be
+		  used for the geoprocessing PostgreSQL connection (API)
+		* `GEO_POSTGRES_USER` (string, required): username to be used for the
+		  geoprocessing PostgreSQL connection (API)
+		* `GEO_POSTGRES_PASSWORD` (string, required): password to be used for the
+		  geoprocessing PostgreSQL connection (API)
+		* `GEO_POSTGRES_DB` (string, required): name of the database to be used for
+		  the geoprocessing PostgreSQL connection (API)
+	* `POSTGRES_AIRFLOW_SERVICE_PORT` (number, required): the port on which the
+	  PostgreSQL for Airflow service should listen on the local machine
+	* `AIRFLOW_PORT` (number, required): the port on which the
+	  Airflow service should listen on the local machine
+	* `REDIS_API_SERVICE_PORT` (number, required): the port on which the
+	  Redis service should listen on the local machine
+	* `REDIS_COMMANDER_PORT` (number, required): the port on which the
+	  Redis Commander service should listen on the local machine
+	* `SPARKPOST_APIKEY` (string, required): an API key to be used for Sparkpost,
+	  an email service
+	* `SPARKPOST_ORIGIN` (string, required): the URL of a SparkPost API service:
+	  this would normally be either `https://api.sparkpost.com` or
+	  `https://api.eu.sparkpost.com` (note: **no trailing `/` character** or the
+	  SparkPost API [client library](https://github.com/SparkPost/node-sparkpost)
+	  will not work correctly); please check [SparkPost's
+	  documentation](https://developers.sparkpost.com/api/#header-sparkpost-eu)
+	  and the client library's own documentation for details
+	* `APPLICATION_BASE_URL` (string, required): the public URL of the
+	  **frontend** application on the running instance (without trailing slash).
+	  This URL will be used to compose links sent via email for some flows of the
+	  platform, such as password recovery or sign-up confirmation (see also
+	  `PASSWORD_RESET_TOKEN_PREFIX` and `SIGNUP_CONFIRMATION_TOKEN_PREFIX`)
+	* `PASSWORD_RESET_TOKEN_PREFIX` (string, required): the path that should be
+	  appended after the application base URL (`APPLICATION_BASE_URL`),
+	  corresponding to the **frontend** route where users are redirected from
+	  password reset emails to complete the process of resetting their
+	  password; the reset token is appended at the end of this URL to compose
+	  the actual link that is included in password reset emails
+	* `PASSWORD_RESET_EXPIRATION` (string, optional, default is 1800000
+	  milliseconds: 30 minutes): a time (in milliseconds) that a token for a
+	  password reset is valid for
+	* `SIGNUP_CONFIRMATION_TOKEN_PREFIX` (string, required): the path that should be
+	  appended after the application base URL (`APPLICATION_BASE_URL`),
+	  corresponding to the **frontend** route where users are redirected from
+	  sign-up confirmation emails to complete the process validating their account;
+	  the validation token is appended at the end of this URL to compose the actual
+	  link that is included in sign-up confirmation emails
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted
@@ -138,6 +155,14 @@ instead of the hardcoded port `3000` which is used in Docker setups.
   the Express daemon of the API service will listen
 * `GEOPROCESSING_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port
   on which the Express daemon of the Geoprocessing service will listen
+
+Make sure you are running the necessary [dependencies](#Dependencies) locally.
+You may need to tweak some env variables to point to the right URLs and ports -
+see the list above for details on which configuration options are available.
+
+The included Makefile has some useful build targets (commands) specifically
+targeted at native execution (prefixed with `native-`) that you'll find helpful.
+Refer to the Makefile inline documentation for more details.
 
 ### Running the Marxan Cloud platform
 
@@ -160,7 +185,7 @@ This will populate the metadata DB and will trigger the geo-pipelines to seed th
 Note: Full db set up will require at least 16GB of RAM and 40GB of disk space in order to fulfill
 some of these tasks (GADM and WDPA data import pipelines). Also the number of
 CPU cores will impact the time needed to seed a new instance with the complete
-GADM and WDPA datasets.  
+GADM and WDPA datasets.
 ___
 
 or if you only wants to populate the newly fresh instance with a small subset of test data:
