@@ -30,6 +30,7 @@ import { ProtectedArea } from '@marxan/protected-areas';
 import { ProjectsRequest } from './project-requests-info';
 import { ProjectId, SetProjectGridFromShapefile } from './planning-unit-grid';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
 const projectFilterKeyNames = [
   'name',
@@ -347,9 +348,9 @@ export class ProjectsCrudService extends AppBaseService<
         })
         .andWhere(`acl.role_id = :roleId`, {
           roleId:
-            ProjectRoles.project_owner |
-            ProjectRoles.project_contributor |
-            ProjectRoles.project_viewer,
+            Roles.project_owner ||
+            Roles.project_contributor ||
+            Roles.project_viewer,
         });
     }
 
