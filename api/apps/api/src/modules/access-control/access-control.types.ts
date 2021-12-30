@@ -3,3 +3,4 @@ export type Denied = false;
 export type Permit = Allowed | Denied;
 
 export const forbiddenError = Symbol(`unauthorized access`);
+export const transactionFailed = Symbol(`transaction failed`);

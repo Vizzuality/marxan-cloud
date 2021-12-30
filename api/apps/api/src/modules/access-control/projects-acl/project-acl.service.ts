@@ -179,11 +179,9 @@ export class ProjectAclService implements ProjectAccessControl {
     if (!(await this.isOwner(loggedUserId, projectId))) {
       return left(false);
     }
-
     if (!(await this.hasOtherOwner(userId, projectId))) {
       return left(false);
     }
-
     assertDefined(roleName);
     const apiDbConnection = getConnection(DbConnections.default);
     const apiQueryRunner = apiDbConnection.createQueryRunner();

@@ -7,6 +7,11 @@ import {
   ParseUUIDPipe,
   UseGuards,
   ForbiddenException,
+  Patch,
+  HttpCode,
+  HttpStatus,
+  Body,
+  InternalServerErrorException,
   Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
@@ -14,11 +19,16 @@ import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import {
   ApiBearerAuth,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { isLeft } from 'fp-ts/lib/These';
+import {
+  forbiddenError,
+  transactionFailed,
+} from '@marxan-api/modules/access-control';
 import {
   UserRoleInScenarioDto,
   UsersInScenarioResult,
@@ -54,5 +64,36 @@ export class ScenarioAclController {
     }
 
     return { data: result.right };
+  }
+
+  @Patch(':scenarioId/users')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Add user and proper role to a project' })
+  @ApiNoContentResponse({
+    status: 204,
+    description: 'User was updated correctly',
+  })
+  async updateUserInScenario(
+    @Body() userAndRoleToChange: UserRoleInScenarioDto,
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.scenarioAclService.updateUserInScenario(
+      scenarioId,
+      userAndRoleToChange,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case transactionFailed:
+          throw new InternalServerErrorException(`Transaction failed`);
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
   }
 }

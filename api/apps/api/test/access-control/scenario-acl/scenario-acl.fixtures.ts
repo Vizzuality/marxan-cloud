@@ -208,7 +208,15 @@ export const getFixtures = async () => {
           userId: otherOwnerUserId,
           roleName: scenarioOwnerRole,
         }),
-
+    WhenChangingUserRole: async (scenarioId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          scenarioId,
+          userId: viewerUserId,
+          roleName: scenarioContributorRole,
+        }),
     WhenRevokingAccessToViewerFromScenarioAsOwner: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .delete(`/api/v1/roles/scenarios/${scenarioId}/users/${viewerUserId}`)
@@ -305,6 +313,14 @@ export const getFixtures = async () => {
     ) => {
       expect(response.status).toEqual(200);
       expect(response.body.data).toHaveLength(4);
+    },
+    ThenUsersWithChangedRoleIsOnProject: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const newUserCreated = response.body.data.find(
+        (user: any) => user.user.id === viewerUserId,
+      );
+      expect(newUserCreated.roleName).toEqual(scenarioContributorRole);
     },
   };
 };
