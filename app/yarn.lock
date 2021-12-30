@@ -1658,6 +1658,11 @@
   resolved "https://registry.yarnpkg.com/@egjs/component/-/component-3.0.1.tgz#4bf122b5f81fd01126646c63f4fd7aa200a5a057"
   integrity sha512-Hus9GMXOVfHBzyumyeRL1TkN60LhGen+e9FpqXqbS9jA9hDYEE1AH3ulahbBGhRdMs4uXYl3hRnB5kGZRb9n7Q==
 
+"@egjs/flicking-plugins@^4.2.2":
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/@egjs/flicking-plugins/-/flicking-plugins-4.2.2.tgz#993c45dce82e451044a8b0a8cbaeadd4734d3990"
+  integrity sha512-HJigDVl4z7p8rVSyET72/96s45pgJNW0M8KbbABP+Y/aYttpMHmU+c2YtotY/45ViLq4gQfZkm98AJ7p1s1Bzg==
+
 "@egjs/flicking@^4.2.2":
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/@egjs/flicking/-/flicking-4.2.2.tgz#404ff43535939977b5b21628423cc1871bdf596c"

@@ -20,6 +20,7 @@ import {
   ArchiveLocation,
   ClonePiece,
   ComponentId,
+  ComponentLocation,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
@@ -99,12 +100,24 @@ const getFixtures = async () => {
               resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`import component unique id`),
               piece: ClonePiece.ProjectMetadata,
+              uri: [
+                new ComponentLocation(
+                  `/tmp/project-metadata-random-uuid.json`,
+                  `project-metadata.json`,
+                ),
+              ],
             },
             {
               order: 1,
               resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`some other piece`),
               piece: ClonePiece.PlanningAreaGAdm,
+              uri: [
+                new ComponentLocation(
+                  `/tmp/project-planning-area-random-uuid.json`,
+                  `planning-area/config.json`,
+                ),
+              ],
             },
           ],
         }),
@@ -122,12 +135,24 @@ const getFixtures = async () => {
               resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`import component unique id`),
               piece: ClonePiece.ProjectMetadata,
+              uri: [
+                new ComponentLocation(
+                  `/tmp/project-metadata-random-uuid.json`,
+                  `project-metadata.json`,
+                ),
+              ],
             },
             {
               order: 2,
               resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`some other piece`),
               piece: ClonePiece.PlanningAreaGAdm,
+              uri: [
+                new ComponentLocation(
+                  `/tmp/project-planning-area-random-uuid.json`,
+                  `planning-area/config.json`,
+                ),
+              ],
             },
           ],
         }),
@@ -162,27 +187,45 @@ const getFixtures = async () => {
     ThenLowestOrderComponentIsRequested: () => {
       expect(
         events.filter((event) => event instanceof PieceImportRequested),
-      ).toEqual([
+      ).toMatchObject([
         {
           id: new ComponentId(`import component unique id`),
           resourceId: new ResourceId(`project-id`),
           piece: `project-metadata`,
+          assets: [
+            {
+              relativePath: `project-metadata.json`,
+              uri: `/tmp/project-metadata-random-uuid.json`,
+            },
+          ],
         },
       ]);
     },
     ThenAllComponentsAreRequested: () => {
       expect(
         events.filter((event) => event instanceof PieceImportRequested),
-      ).toEqual([
+      ).toMatchObject([
         {
           id: new ComponentId(`import component unique id`),
           resourceId: new ResourceId(`project-id`),
           piece: `project-metadata`,
+          assets: [
+            {
+              relativePath: `project-metadata.json`,
+              uri: `/tmp/project-metadata-random-uuid.json`,
+            },
+          ],
         },
         {
           id: new ComponentId(`some other piece`),
           resourceId: new ResourceId(`project-id`),
           piece: `planning-area-gadm`,
+          assets: [
+            {
+              relativePath: `planning-area/config.json`,
+              uri: `/tmp/project-planning-area-random-uuid.json`,
+            },
+          ],
         },
       ]);
     },
