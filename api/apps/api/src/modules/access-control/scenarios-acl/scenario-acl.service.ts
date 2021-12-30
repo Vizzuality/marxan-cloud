@@ -18,7 +18,7 @@ import { assertDefined } from '@marxan/utils';
 import {
   forbiddenError,
   transactionFailed,
-  lastOwner
+  lastOwner,
 } from '@marxan-api/modules/access-control';
 
 @Injectable()
