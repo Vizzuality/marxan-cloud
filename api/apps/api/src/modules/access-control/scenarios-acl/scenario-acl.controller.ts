@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   UseGuards,
   ForbiddenException,
+  Delete,
   Patch,
   HttpCode,
   HttpStatus,
@@ -26,6 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { isLeft } from 'fp-ts/lib/These';
 import {
+  lastOwner,
   forbiddenError,
   transactionFailed,
 } from '@marxan-api/modules/access-control';
@@ -90,6 +92,41 @@ export class ScenarioAclController {
           throw new ForbiddenException();
         case transactionFailed:
           throw new InternalServerErrorException(`Transaction failed`);
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+  }
+
+  @Delete(':scenarioId/users/:userId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Revoke access to user from project' })
+  @ApiNoContentResponse({
+    status: 204,
+    description: 'User was deleted correctly',
+  })
+  async deleteUserFromProject(
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
+    @Param('userId', ParseUUIDPipe) userToDeleteId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void | boolean> {
+    const result = await this.scenarioAclService.revokeAccess(
+      scenarioId,
+      userToDeleteId,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case lastOwner:
+          throw new ForbiddenException(
+            `There must be at least one owner of scenario ${scenarioId}`,
+          );
+        case forbiddenError:
+          throw new ForbiddenException(`
+            User is not authorized,
+          `);
         default:
           const _exhaustiveCheck: never = result.left;
           throw _exhaustiveCheck;

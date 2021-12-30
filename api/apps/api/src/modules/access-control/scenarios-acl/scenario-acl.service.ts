@@ -18,6 +18,7 @@ import { assertDefined } from '@marxan/utils';
 import {
   forbiddenError,
   transactionFailed,
+  lastOwner,
 } from '@marxan-api/modules/access-control';
 
 @Injectable()
@@ -200,5 +201,22 @@ export class ScenarioAclService implements ScenarioAccessControl {
     } finally {
       await apiQueryRunner.release();
     }
+  }
+
+  async revokeAccess(
+    scenarioId: string,
+    userId: string,
+    loggedUserId: string,
+  ): Promise<Either<typeof lastOwner | typeof forbiddenError, void>> {
+    if (!(await this.isOwner(loggedUserId, scenarioId))) {
+      return left(forbiddenError);
+    }
+
+    if (!(await this.hasOtherOwner(userId, scenarioId))) {
+      return left(lastOwner);
+    }
+
+    await this.roles.delete({ scenarioId, userId });
+    return right(void 0);
   }
 }
