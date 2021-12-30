@@ -22,11 +22,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { isLeft } from 'fp-ts/lib/These';
-import { UserRoleInScenarioDto } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import {
   forbiddenError,
   transactionFailed,
 } from '@marxan-api/modules/access-control';
+import { UserRoleInScenarioDto } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()

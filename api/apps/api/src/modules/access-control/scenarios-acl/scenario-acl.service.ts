@@ -2,13 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { intersection } from 'lodash';
 import { getConnection, Not, Repository } from 'typeorm';
-import { Permit, Denied } from '../access-control.types';
+import { Permit } from '@marxan-api/modules/access-control/access-control.types';
+import { ScenarioRoles } from './dto/user-role-scenario.dto';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
-import {
-  UserRoleInScenarioDto,
-  ScenarioRoles,
-} from './dto/user-role-scenario.dto';
+import { UserRoleInScenarioDto } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { assertDefined } from '@marxan/utils';
