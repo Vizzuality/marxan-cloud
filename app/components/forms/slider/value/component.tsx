@@ -26,24 +26,27 @@ const THEME = {
 export interface ValueProps {
   minValue: number,
   maxValue: number,
+  step?: number;
   allowEdit: boolean,
   isDisabled: boolean,
   theme: 'dark' | 'light' | 'dark-small';
   sliderState: SliderState,
   outputProps: React.OutputHTMLAttributes<HTMLOutputElement>,
+  formatOptions: Intl.NumberFormatOptions;
   style: Record<string, unknown>;
 }
 
 export const Value: React.FC<ValueProps> = ({
   minValue,
   maxValue,
+  step,
   theme,
   allowEdit,
   isDisabled,
   sliderState,
   outputProps,
+  formatOptions,
   style,
-
 }: ValueProps) => {
   const wrapperRef = useRef<HTMLInputElement>(null);
   const outputButtonRef = useRef<HTMLInputElement>(null);
@@ -52,29 +55,33 @@ export const Value: React.FC<ValueProps> = ({
   const [value, setValue] = useState<number>(sliderState.getThumbValue(0));
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  // Saving and Cancelling the edit
+  // Percentages come in a range from 0.0 to 1, so we have to multiply by 100 to display them
+  const displayValue = (formatOptions.style === 'percent') ? value * 100 : value;
+
+  // CANCELLING AND SAVING EDITS
 
   const cancelEdit = () => {
-    setValue(sliderState.getThumbValue(0) * 100);
+    setValue(sliderState.getThumbValue(0));
     setIsEditing(false);
   };
 
   const saveEdit = () => {
-    const thumbValue = value / 100;
-
-    if (thumbValue >= minValue && thumbValue <= maxValue) {
-      sliderState.setThumbValue(0, thumbValue);
+    if (value >= minValue && value <= maxValue) {
+      sliderState.setThumbValue(0, value);
       setIsEditing(false);
     } else {
       cancelEdit();
     }
   };
 
-  // Handling inputs/ouputs interactions
+  // INPUTS/OUTPUTS INTERACTIONS
 
   const handleInputChange = (event: React.ChangeEvent<HTMLElement>) => {
     const target = event.target as HTMLTextAreaElement;
-    setValue(parseInt(target.value, 10));
+    const newValue = parseFloat(target.value);
+
+    // Percentages come in a range from 0.0 to 1, so we have to divide by 100 to set them
+    setValue((formatOptions.style === 'percent') ? newValue / 100 : newValue);
   };
 
   const handleOutputPress = () => {
@@ -108,10 +115,10 @@ export const Value: React.FC<ValueProps> = ({
     onPress: handleOutputPress,
   }, outputButtonRef);
 
-  // Effects
+  // EFFECTS
 
   useEffect(() => {
-    setValue(sliderState.getThumbValue(0) * 100);
+    setValue(sliderState.getThumbValue(0));
   }, [sliderState]);
 
   useEffect(() => {
@@ -137,15 +144,14 @@ export const Value: React.FC<ValueProps> = ({
             className="invisible px-2"
             aria-hidden="true"
           >
-            {/* Math.random To overcome floating point issues */}
-            {Number.isNaN(value) ? '' : Math.round(value)}
+            {Number.isNaN(value) ? '' : displayValue}
           </span>
           <input
             ref={inputRef}
             className={THEME[theme].input}
             type="number"
-            // Math.random To overcome floating point issues
-            value={Math.round(value)}
+            step={step}
+            value={displayValue}
             onChange={handleInputChange}
             {...inputFocusProps}
             {...inputKeyboardProps}

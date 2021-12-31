@@ -100,6 +100,7 @@ export const Slider: React.FC<SliderProps> = ({
   labelRef,
   maxValue,
   minValue,
+  step,
   ...rest
 }: SliderProps) => {
   const status = disabled ? 'disabled' : rawState;
@@ -122,6 +123,7 @@ export const Slider: React.FC<SliderProps> = ({
   const sliderState = useSliderState({
     maxValue,
     minValue,
+    step,
     ...rest,
     ...propsOverride,
     numberFormatter: useNumberFormatter(formatOptions),
@@ -137,6 +139,7 @@ export const Slider: React.FC<SliderProps> = ({
       // input has the `id` attribute and the label has a `for` attribute
       // For this reason, we remove the `id` attribute from the object
       id: undefined,
+      step,
     },
     sliderState,
     trackRef,
@@ -194,11 +197,13 @@ export const Slider: React.FC<SliderProps> = ({
       <Value
         minValue={minValue}
         maxValue={maxValue}
+        step={step}
         allowEdit={allowEdit}
         isDisabled={disabled}
         theme={theme}
         sliderState={sliderState}
         outputProps={outputProps}
+        formatOptions={formatOptions}
         style={{
           left: `${sliderState.getThumbPercent(0) * 100}%`,
         }}
