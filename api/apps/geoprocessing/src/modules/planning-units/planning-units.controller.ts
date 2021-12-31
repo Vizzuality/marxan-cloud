@@ -101,12 +101,12 @@ export class PlanningUnitsController {
   @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() tileSpecification: tileSpecification,
-    @Query() PlanningUnitsFilters: PlanningUnitsFilters,
+    @Query() planningUnitsFilters: PlanningUnitsFilters,
     @Res() response: Response,
-  ): Promise<Object> {
+  ): Promise<Response> {
     const tile: Buffer = await this.service.findTile(
       tileSpecification,
-      PlanningUnitsFilters,
+      planningUnitsFilters,
     );
     return response.send(tile);
   }

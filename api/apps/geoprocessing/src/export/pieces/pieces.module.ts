@@ -16,7 +16,7 @@ export class PiecesModule implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const pieceExportersProviders = await this.discovery.providersWithMetaAtKey<Symbol>(
+    const pieceExportersProviders = await this.discovery.providersWithMetaAtKey<symbol>(
       PieceProcessorProvider,
     );
 

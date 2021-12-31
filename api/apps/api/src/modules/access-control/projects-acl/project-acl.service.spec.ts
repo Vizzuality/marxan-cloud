@@ -51,8 +51,6 @@ test(`project has multiple users`, async () => {
 });
 
 const getFixtures = async () => {
-  let userProjectsRepoMock: jest.Mocked<Repository<UsersProjectsApiEntity>>;
-
   const userProjectsToken = getRepositoryToken(UsersProjectsApiEntity);
 
   const projectId = v4();
@@ -91,7 +89,9 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ProjectAclService);
 
-  userProjectsRepoMock = sandbox.get(userProjectsToken);
+  const userProjectsRepoMock: jest.Mocked<
+    Repository<UsersProjectsApiEntity>
+  > = sandbox.get(userProjectsToken);
 
   return {
     GivenNoRoles: () =>
