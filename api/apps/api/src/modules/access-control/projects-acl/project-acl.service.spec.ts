@@ -23,7 +23,6 @@ test(`no roles assigned at all`, async () => {
   await fixtures.ThenCannotViewProject();
   await fixtures.ThenCannotDeleteProject();
   await fixtures.ThenCannotEditProject();
-  await fixtures.ThenCannotCreateScenario();
 });
 
 test(`project viewer role assigned`, async () => {
@@ -33,7 +32,6 @@ test(`project viewer role assigned`, async () => {
   await fixtures.ThenCanViewProject();
   await fixtures.ThenCannotDeleteProject();
   await fixtures.ThenCannotEditProject();
-  await fixtures.ThenCannotCreateScenario();
 });
 
 test(`project owner role assigned`, async () => {
@@ -43,7 +41,6 @@ test(`project owner role assigned`, async () => {
   await fixtures.ThenCanViewProject();
   await fixtures.ThenCanDeleteProject();
   await fixtures.ThenCanEditProject();
-  await fixtures.ThenCanCreateScenario();
 });
 
 test(`project contributor role assigned`, async () => {
@@ -53,7 +50,6 @@ test(`project contributor role assigned`, async () => {
   await fixtures.ThenCanViewProject();
   await fixtures.ThenCannotDeleteProject();
   await fixtures.ThenCanEditProject();
-  await fixtures.ThenCanCreateScenario();
 });
 
 test(`project has multiple users`, async () => {
@@ -158,19 +154,6 @@ const getFixtures = async () => {
     },
     ThenCanCreateProject: async () => {
       expect(await sut.canCreateProject(userId)).toEqual(true);
-      expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
-        where: {
-          projectId,
-          userId,
-        },
-        select: ['roleName'],
-      });
-    },
-    ThenCannotCreateScenario: async () => {
-      expect(await sut.canCreateScenario(userId, projectId)).toEqual(false);
-    },
-    ThenCanCreateScenario: async () => {
-      expect(await sut.canCreateScenario(userId, projectId)).toEqual(true);
       expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
         where: {
           projectId,

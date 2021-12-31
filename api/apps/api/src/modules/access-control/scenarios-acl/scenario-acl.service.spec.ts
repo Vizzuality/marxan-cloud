@@ -8,6 +8,8 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
 import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios-acl/scenario-acl.service';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
+import { ProjectRoles } from '../projects-acl/dto/user-role-project.dto';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -17,7 +19,6 @@ beforeEach(async () => {
 
 test(`no roles assigned at all`, async () => {
   fixtures.GivenNoRoles();
-  await fixtures.ThenCannotCreateSolution();
   await fixtures.ThenCannotDeleteScenario();
   await fixtures.ThenCannotEditScenario();
   await fixtures.ThenCannotViewScenario();
@@ -25,7 +26,6 @@ test(`no roles assigned at all`, async () => {
 
 test(`scenario viewer role assigned`, async () => {
   fixtures.GivenScenarioViewerRoleIsAssigned();
-  await fixtures.ThenCannotCreateSolution();
   await fixtures.ThenCannotDeleteScenario();
   await fixtures.ThenCannotEditScenario();
   await fixtures.ThenCanViewScenario();
@@ -33,7 +33,6 @@ test(`scenario viewer role assigned`, async () => {
 
 test(`scenario owner role assigned`, async () => {
   fixtures.GivenScenarioOwnerRoleIsAssigned();
-  await fixtures.ThenCanCreateSolution();
   await fixtures.ThenCanDeleteScenario();
   await fixtures.ThenCanEditScenario();
   await fixtures.ThenCanViewScenario();
@@ -41,18 +40,33 @@ test(`scenario owner role assigned`, async () => {
 
 test(`scenario contributor role assigned`, async () => {
   fixtures.GivenScenarioContributorRoleIsAssigned();
-  await fixtures.ThenCanCreateSolution();
   await fixtures.ThenCannotDeleteScenario();
   await fixtures.ThenCanEditScenario();
   await fixtures.ThenCanViewScenario();
 });
 
+test(`project owner role assigned`, async () => {
+  fixtures.GivenProjectOwnerRoleIsAssigned();
+  await fixtures.ThenCanCreateScenario();
+});
+test(`project contributor role assigned`, async () => {
+  fixtures.GivenProjectContributorRoleIsAssigned();
+  await fixtures.ThenCanCreateScenario();
+});
+test(`project viewer role assigned`, async () => {
+  fixtures.GivenProjectViewerRoleIsAssigned();
+  await fixtures.ThenCannotCreateScenario();
+});
+
 const getFixtures = async () => {
   let userScenariosRepoMock: jest.Mocked<Repository<UsersScenariosApiEntity>>;
+  let userProjectsRepoMock: jest.Mocked<Repository<UsersProjectsApiEntity>>;
 
-  const userProjectsToken = getRepositoryToken(UsersScenariosApiEntity);
+  const userScenariosToken = getRepositoryToken(UsersScenariosApiEntity);
+  const userProjectsToken = getRepositoryToken(UsersProjectsApiEntity);
 
   const scenarioId = v4();
+  const projectId = v4();
   const userId = v4();
   const viewerUserId = v4();
 
@@ -66,12 +80,20 @@ const getFixtures = async () => {
           findOne: jest.fn(),
         },
       },
+      {
+        provide: getRepositoryToken(UsersProjectsApiEntity),
+        useValue: {
+          find: jest.fn(),
+          findOne: jest.fn(),
+        },
+      },
     ],
   }).compile();
 
   const sut = sandbox.get(ScenarioAclService);
 
-  userScenariosRepoMock = sandbox.get(userProjectsToken);
+  userScenariosRepoMock = sandbox.get(userScenariosToken);
+  userProjectsRepoMock = sandbox.get(userProjectsToken);
 
   return {
     GivenNoRoles: () =>
@@ -121,19 +143,30 @@ const getFixtures = async () => {
           roleName: ScenarioRoles.scenario_owner,
         }),
       ),
-    ThenCannotCreateSolution: async () => {
-      expect(await sut.canCreateSolution(userId, scenarioId)).toEqual(false);
-    },
-    ThenCanCreateSolution: async () => {
-      expect(await sut.canCreateSolution(userId, scenarioId)).toEqual(true);
-      expect(userScenariosRepoMock.find).toHaveBeenCalledWith({
-        where: {
-          scenarioId,
+    GivenProjectOwnerRoleIsAssigned: () =>
+      userProjectsRepoMock.find.mockImplementation(async () => [
+        {
+          roleName: ProjectRoles.project_owner,
+          projectId,
           userId,
         },
-        select: ['roleName'],
-      });
-    },
+      ]),
+    GivenProjectContributorRoleIsAssigned: () =>
+      userProjectsRepoMock.find.mockImplementation(async () => [
+        {
+          roleName: ProjectRoles.project_contributor,
+          projectId,
+          userId,
+        },
+      ]),
+    GivenProjectViewerRoleIsAssigned: () =>
+      userProjectsRepoMock.find.mockImplementation(async () => [
+        {
+          roleName: ProjectRoles.project_viewer,
+          projectId,
+          userId,
+        },
+      ]),
     ThenCannotViewScenario: async () => {
       expect(await sut.canViewScenario(userId, scenarioId)).toEqual(false);
     },
@@ -168,6 +201,19 @@ const getFixtures = async () => {
       expect(userScenariosRepoMock.find).toHaveBeenCalledWith({
         where: {
           scenarioId,
+          userId,
+        },
+        select: ['roleName'],
+      });
+    },
+    ThenCannotCreateScenario: async () => {
+      expect(await sut.canCreateScenario(userId, projectId)).toEqual(false);
+    },
+    ThenCanCreateScenario: async () => {
+      expect(await sut.canCreateScenario(userId, projectId)).toEqual(true);
+      expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
+        where: {
+          projectId,
           userId,
         },
         select: ['roleName'],

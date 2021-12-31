@@ -2,7 +2,7 @@ import { Role } from '@marxan-api/modules/access-control/role.api.entity';
 import { Check, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { User } from '@marxan-api/modules/users/user.api.entity';
-import { ProjectRoles } from '../dto/user-role-project.dto';
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 
 @Entity(`users_projects`)
 export class UsersProjectsApiEntity {

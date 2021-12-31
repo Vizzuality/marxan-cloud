@@ -35,6 +35,7 @@ import {
   UserRoleInScenarioDto,
   UsersInScenarioResult,
 } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { aclErrorHandler } from '@marxan-api/utils/acl.utils';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -50,7 +51,7 @@ export class ScenarioAclController {
     isArray: true,
     type: UserRoleInScenarioDto,
   })
-  async findUsersInProject(
+  async findUsersInScenario(
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Query('q') nameSearch?: string,
@@ -70,7 +71,7 @@ export class ScenarioAclController {
 
   @Patch(':scenarioId/users')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Add user and proper role to a project' })
+  @ApiOperation({ summary: 'Add user and proper role to a scenario' })
   @ApiNoContentResponse({
     status: 204,
     description: 'User was updated correctly',
@@ -87,26 +88,18 @@ export class ScenarioAclController {
     );
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case transactionFailed:
-          throw new InternalServerErrorException(`Transaction failed`);
-        default:
-          const _exhaustiveCheck: never = result.left;
-          throw _exhaustiveCheck;
-      }
+      aclErrorHandler(result.left);
     }
   }
 
   @Delete(':scenarioId/users/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Revoke access to user from project' })
+  @ApiOperation({ summary: 'Revoke access to user from scenario' })
   @ApiNoContentResponse({
     status: 204,
     description: 'User was deleted correctly',
   })
-  async deleteUserFromProject(
+  async deleteUserFromScenario(
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Param('userId', ParseUUIDPipe) userToDeleteId: string,
     @Req() req: RequestWithAuthenticatedUser,
@@ -118,19 +111,7 @@ export class ScenarioAclController {
     );
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case lastOwner:
-          throw new ForbiddenException(
-            `There must be at least one owner of scenario ${scenarioId}`,
-          );
-        case forbiddenError:
-          throw new ForbiddenException(`
-            User is not authorized,
-          `);
-        default:
-          const _exhaustiveCheck: never = result.left;
-          throw _exhaustiveCheck;
-      }
+      aclErrorHandler(result.left);
     }
   }
 }

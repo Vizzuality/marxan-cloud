@@ -6,14 +6,22 @@ import { intersection } from 'lodash';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { Denied, Permit } from '../access-control.types';
-import { ProjectAccessControl } from './project-access-control';
+import {
+  Denied,
+  Permit,
+} from '@marxan-api/modules/access-control/access-control.types';
+import { ProjectAccessControl } from '@marxan-api/modules/access-control/projects-acl/project-access-control';
 import {
   ProjectRoles,
   UserRoleInProjectDto,
-} from './dto/user-role-project.dto';
+} from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { Either, left, right } from 'fp-ts/Either';
 import { assertDefined } from '@marxan/utils';
+import {
+  forbiddenError,
+  lastOwner,
+  transactionFailed,
+} from '@marxan-api/modules/access-control';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -21,10 +29,6 @@ import { assertDefined } from '@marxan/utils';
  */
 @Injectable()
 export class ProjectAclService implements ProjectAccessControl {
-  private readonly canCreateScenarioRoles = [
-    ProjectRoles.project_owner,
-    ProjectRoles.project_contributor,
-  ];
   private readonly canPublishProjectRoles = [ProjectRoles.project_owner];
   private readonly canViewProjectRoles = [
     ProjectRoles.project_owner,
@@ -100,13 +104,6 @@ export class ProjectAclService implements ProjectAccessControl {
     );
   }
 
-  async canCreateScenario(userId: string, projectId: string): Promise<Permit> {
-    return this.doesUserHaveRole(
-      await this.getRolesWithinProjectForUser(userId, projectId),
-      this.canCreateScenarioRoles,
-    );
-  }
-
   async isOwner(userId: string, projectId: string): Promise<Permit> {
     const userIsProjectOwner = await this.roles.findOne({
       where: {
@@ -174,13 +171,18 @@ export class ProjectAclService implements ProjectAccessControl {
     projectId: string,
     userAndRoleToChange: UserRoleInProjectDto,
     loggedUserId: string,
-  ): Promise<Either<Denied, void>> {
+  ): Promise<
+    Either<
+      typeof transactionFailed | typeof forbiddenError | typeof lastOwner,
+      void
+    >
+  > {
     const { userId, roleName } = userAndRoleToChange;
     if (!(await this.isOwner(loggedUserId, projectId))) {
-      return left(false);
+      return left(forbiddenError);
     }
     if (!(await this.hasOtherOwner(userId, projectId))) {
-      return left(false);
+      return left(lastOwner);
     }
     assertDefined(roleName);
     const apiDbConnection = getConnection(DbConnections.default);
@@ -190,7 +192,7 @@ export class ProjectAclService implements ProjectAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInScenario = await apiQueryRunner.manager.findOne(
+      const existingUserInProject = await apiQueryRunner.manager.findOne(
         UsersProjectsApiEntity,
         undefined,
         {
@@ -201,7 +203,7 @@ export class ProjectAclService implements ProjectAccessControl {
         },
       );
 
-      if (!existingUserInScenario) {
+      if (!existingUserInProject) {
         const userRoleToSave = new UsersProjectsApiEntity();
         userRoleToSave.projectId = projectId;
         userRoleToSave.userId = userId;
@@ -215,25 +217,26 @@ export class ProjectAclService implements ProjectAccessControl {
           { roleName },
         );
       }
+      return right(void 0);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
+      return left(transactionFailed);
     } finally {
       await apiQueryRunner.release();
     }
-    return right(void 0);
   }
 
   async revokeAccess(
     projectId: string,
     userId: string,
     loggedUserId: string,
-  ): Promise<Either<Denied, void>> {
+  ): Promise<Either<typeof forbiddenError | typeof lastOwner, void>> {
     if (!(await this.isOwner(loggedUserId, projectId))) {
-      return left(false);
+      return left(forbiddenError);
     }
 
     if (!(await this.hasOtherOwner(userId, projectId))) {
-      return left(false);
+      return left(lastOwner);
     }
 
     await this.roles.delete({ projectId, userId });

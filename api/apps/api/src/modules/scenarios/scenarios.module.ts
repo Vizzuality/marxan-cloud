@@ -82,8 +82,8 @@ import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scen
     ProtectedAreaModule,
     ProtectedAreasCrudModule,
     BlmValuesModule,
-    AccessControlModule,
     BlmCalibrationModule,
+    AccessControlModule,
   ],
   providers: [
     ProjectChecker,

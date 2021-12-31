@@ -20,9 +20,15 @@ import {
   transactionFailed,
   lastOwner,
 } from '@marxan-api/modules/access-control';
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
+  private readonly canCreateScenarioRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
   private readonly canEditScenarioRoles = [
     ScenarioRoles.scenario_contributor,
     ScenarioRoles.scenario_owner,
@@ -33,10 +39,6 @@ export class ScenarioAclService implements ScenarioAccessControl {
     ScenarioRoles.scenario_owner,
   ];
   private readonly canDeleteScenarioRoles = [ScenarioRoles.scenario_owner];
-  private readonly canCreateSolutionRoles = [
-    ScenarioRoles.scenario_owner,
-    ScenarioRoles.scenario_contributor,
-  ];
 
   private async getRolesWithinScenarioForUser(
     userId: string,
@@ -54,6 +56,22 @@ export class ScenarioAclService implements ScenarioAccessControl {
     return rolesToCheck;
   }
 
+  private async getRolesWithinProjectForUser(
+    userId: string,
+    projectId: string,
+  ): Promise<Array<ProjectRoles>> {
+    const rolesToCheck = (
+      await this.projectRoles.find({
+        where: {
+          projectId,
+          userId,
+        },
+        select: ['roleName'],
+      })
+    ).flatMap((role) => role.roleName);
+    return rolesToCheck;
+  }
+
   private async doesUserHaveRole(
     roles: ScenarioRoles[],
     rolesToCheck: ScenarioRoles[],
@@ -61,15 +79,24 @@ export class ScenarioAclService implements ScenarioAccessControl {
     return intersection(roles, rolesToCheck).length > 0;
   }
 
+  private async doesUserHaveRoleInProject(
+    roles: ProjectRoles[],
+    rolesToCheck: ProjectRoles[],
+  ): Promise<Permit> {
+    return intersection(roles, rolesToCheck).length > 0;
+  }
+
   constructor(
     @InjectRepository(UsersScenariosApiEntity)
     private readonly roles: Repository<UsersScenariosApiEntity>,
+    @InjectRepository(UsersProjectsApiEntity)
+    private readonly projectRoles: Repository<UsersProjectsApiEntity>,
   ) {}
 
-  async canCreateSolution(userId: string, scenarioId: string): Promise<Permit> {
-    return this.doesUserHaveRole(
-      await this.getRolesWithinScenarioForUser(userId, scenarioId),
-      this.canCreateSolutionRoles,
+  async canCreateScenario(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRoleInProject(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canCreateScenarioRoles,
     );
   }
 
@@ -156,11 +183,21 @@ export class ScenarioAclService implements ScenarioAccessControl {
     scenarioId: string,
     userAndRoleToChange: UserRoleInScenarioDto,
     loggedUserId: string,
-  ): Promise<Either<typeof forbiddenError | typeof transactionFailed, void>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof transactionFailed | typeof lastOwner,
+      void
+    >
+  > {
     const { userId, roleName } = userAndRoleToChange;
     if (!(await this.isOwner(loggedUserId, scenarioId))) {
       return left(forbiddenError);
     }
+
+    if (!(await this.hasOtherOwner(userId, scenarioId))) {
+      return left(lastOwner);
+    }
+
     assertDefined(roleName);
     const apiDbConnection = getConnection(DbConnections.default);
     const apiQueryRunner = apiDbConnection.createQueryRunner();
