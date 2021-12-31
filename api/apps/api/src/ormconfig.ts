@@ -52,9 +52,7 @@ export const apiConnections: Record<
     migrationsRun:
       AppConfig.get<string>(
         'postgresApi.runMigrationsOnStartup',
-      )?.toLowerCase() !== 'false'
-        ? true
-        : false,
+      )?.toLowerCase() !== 'false',
     cli: {
       migrationsDir: 'apps/api/src/migrations/api',
     },
