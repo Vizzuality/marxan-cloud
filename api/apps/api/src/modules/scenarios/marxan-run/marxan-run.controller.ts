@@ -7,12 +7,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiProduces,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiProduces } from '@nestjs/swagger';
 import { Response } from 'express';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { XApiGuard } from '@marxan-api/guards/x-api.guard';

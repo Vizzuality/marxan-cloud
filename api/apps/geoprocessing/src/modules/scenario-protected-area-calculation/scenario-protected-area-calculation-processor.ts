@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Job } from 'bullmq';
 
 import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
@@ -13,6 +13,7 @@ export class ScenarioProtectedAreaCalculationProcessor
   private readonly logger: Logger = new Logger(
     ScenarioProtectedAreaCalculationProcessor.name,
   );
+
   constructor(
     @InjectRepository(ScenariosPlanningUnitGeoEntity)
     private readonly scenarioPlanningUnitsRepo: Repository<ScenariosPlanningUnitGeoEntity>,

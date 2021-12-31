@@ -7,7 +7,6 @@ import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.serv
 import { StratificationDataProvider } from './stratification-data.provider';
 import { StratificationQuery } from './stratification-query.service';
 import { FeatureConfigStratification } from '@marxan-api/modules/specification/domain';
-import { Class } from 'utility-types';
 
 @Injectable()
 export class StratificationOperation {
@@ -40,8 +39,7 @@ export class StratificationOperation {
                  'created'
           from features f
                  left join features f2 on f2.id = $2
-          where f.id = $1
-          returning features.id;
+          where f.id = $1 returning features.id;
         `,
         [data.input.baseFeatureId, data.input.againstFeatureId],
       );

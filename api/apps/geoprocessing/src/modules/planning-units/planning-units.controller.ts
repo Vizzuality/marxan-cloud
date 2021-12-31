@@ -1,19 +1,19 @@
 import {
+  BadRequestException,
+  Body,
+  Controller,
   Get,
   Header,
-  Controller,
   Logger,
   Param,
   Post,
   Query,
   Res,
-  Body,
-  BadRequestException,
 } from '@nestjs/common';
 
 import {
-  PlanningUnitsService,
   PlanningUnitsFilters,
+  PlanningUnitsService,
   tileSpecification,
 } from './planning-units.service';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
@@ -22,10 +22,10 @@ import { ApiConsumesShapefile } from '../../decoratos/shapefile.decorator';
 import { ShapefileGeoJSONResponseDTO } from '../../types/shapefile.geojson.response.dto';
 
 import {
+  ApiBadRequestResponse,
   ApiOperation,
   ApiParam,
   ApiQuery,
-  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 
 import { Response } from 'express';
@@ -39,6 +39,7 @@ export class PlanningUnitsController {
   ) {
     this.logger.setContext(PlanningUnitsController.name);
   }
+
   @ApiConsumesShapefile()
   @Post('/planning-unit-shapefile')
   async getShapeFile(

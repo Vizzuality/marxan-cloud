@@ -1,6 +1,4 @@
 import { INestApplication } from '@nestjs/common';
-import supertest from 'supertest';
-import { Job } from 'bullmq';
 
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../../steps/given-project';

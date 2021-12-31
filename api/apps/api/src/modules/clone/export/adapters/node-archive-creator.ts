@@ -9,10 +9,10 @@ import { FileRepository } from '@marxan/files-repository';
 import {
   ArchiveCreationError,
   ArchiveCreator,
-  unknownError,
   cannotCreateArchive,
-  cannotStoreArchive,
   cannotGetFile,
+  cannotStoreArchive,
+  unknownError,
 } from '../application/archive-creator.port';
 
 @Injectable()
