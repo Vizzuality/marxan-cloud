@@ -7,6 +7,3 @@ export const Y_AXIS_WIDTH = -4;
 /** Offset between the smallest Y value and the bottom of the visualization (percentage of the
  * domain) */
 export const Y_BASELINE_OFFSET = 0.55;
-/** Desired offset between a point and its thumbnail, needs to be at least twice the size of
- * BORDER_RADIUS */
-export const THUMBNAIL_OFFSET = 30;
