@@ -19,7 +19,8 @@
     "host": null,
     "username": null,
     "password": null,
-    "database": null
+    "database": null,
+    "runMigrationsOnStartup": false
   },
   "postgresGeoApi": {
     "url": null,
@@ -27,7 +28,8 @@
     "host": null,
     "username": null,
     "password": null,
-    "database": null
+    "database": null,
+    "runMigrationsOnStartup": false
   },
   "api": {
     "url": "http://api:3000",
