@@ -10,5 +10,7 @@ export class DropOutputScenarioSolutionConstraints1626345598624
     );
   }
 
-  public async down(_queryRunner: QueryRunner): Promise<void> {}
+  public async down(_queryRunner: QueryRunner): Promise<void> {
+    // do nothing
+  }
 }

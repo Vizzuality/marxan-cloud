@@ -1,4 +1,4 @@
 export interface JobInput {
   scenarioId: string;
-  protectedAreaFilterByIds?: string[]
+  protectedAreaFilterByIds?: string[];
 }

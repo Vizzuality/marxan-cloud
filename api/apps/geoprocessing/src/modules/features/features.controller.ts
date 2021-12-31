@@ -69,7 +69,7 @@ export class FeaturesController {
     @Param() TileSpecification: TileSpecification,
     @Query() query: FeaturesFilters,
     @Res() response: Response,
-  ): Promise<Object> {
+  ): Promise<Response> {
     const tile: Buffer = await this.service.findTile(
       TileSpecification,
       query.bbox as BBox,
