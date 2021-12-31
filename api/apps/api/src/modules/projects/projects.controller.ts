@@ -58,7 +58,7 @@ import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
-import { GeoFeaturesService } from '../geo-features/geo-features.service';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { isFeatureCollection } from '@marxan/utils';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
@@ -75,7 +75,7 @@ import {
   GeometryFileInterceptor,
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
-import { forbiddenError } from '../access-control/access-control.types';
+import { forbiddenError } from '@marxan-api/modules/access-control';
 import { projectNotFound, unknownError } from '../blm';
 import { Response } from 'express';
 

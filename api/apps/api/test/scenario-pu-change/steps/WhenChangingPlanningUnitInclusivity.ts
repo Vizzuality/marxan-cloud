@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { getDtoByIds } from '../../../src/modules/scenarios/dto/__mocks__/dtos.data';
+import { getDtoByIds } from '@marxan-api/modules/scenarios/dto/__mocks__/dtos.data';
 
 export const WhenChangingPlanningUnitInclusivity = async (
   app: INestApplication,

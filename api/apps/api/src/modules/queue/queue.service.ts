@@ -22,7 +22,7 @@ export class QueueService<NewJobInput, Opts extends JobsOptions = JobsOptions> {
   }
 
   /**
-   * typings arent great...
+   * typings aren't great...
    *
    * could be that base implementations are provided there
    * and overrided (if necessary) in usage

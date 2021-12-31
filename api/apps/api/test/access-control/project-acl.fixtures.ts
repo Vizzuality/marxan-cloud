@@ -8,7 +8,6 @@ import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/proje
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsACLTestUtils } from '../utils/projects-acl.test.utils';
-import { async } from 'rxjs';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();

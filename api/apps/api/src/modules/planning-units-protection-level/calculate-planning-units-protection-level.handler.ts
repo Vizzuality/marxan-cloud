@@ -5,7 +5,7 @@ import {
   CalculatePlanningUnitsProtectionLevel,
 } from './calculate-planning-units-protection-level.command';
 import { QueueService } from '../queue/queue.service';
-import { ApiEventsService } from '../api-events/api-events.service';
+import { ApiEventsService } from '@marxan-api/modules/api-events';
 
 @CommandHandler(CalculatePlanningUnitsProtectionLevel)
 export class CalculatePlanningUnitsProtectionLevelHandler

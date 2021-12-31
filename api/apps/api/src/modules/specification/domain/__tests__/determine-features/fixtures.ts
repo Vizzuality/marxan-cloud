@@ -5,8 +5,8 @@ import {
   SpecificationOperation,
 } from '../../feature-config';
 import { Specification } from '../../specification';
-import { SpecificationPublished } from '../../events/specification-published.event';
-import { SpecificationGotReady } from '../../events/specification-got-ready.event';
+import { SpecificationPublished } from '@marxan-api/modules/specification';
+import { SpecificationGotReady } from '@marxan-api/modules/specification';
 
 export const getFixtures = () => {
   const scenarioId = v4();

@@ -25,8 +25,12 @@ export class MarxanRunnerFactory {
       get: async () => workspace,
     };
     const inputFilesHandler: SandboxRunnerInputFiles = {
-      include: async () => {},
-      cancel: async () => {},
+      include: async () => {
+        //do nothing
+      },
+      cancel: async () => {
+        //do nothing
+      },
     };
     const outputFilesHandler: SandboxRunnerOutputHandler<ExecutionResult> = {
       dump: async () => {
@@ -38,8 +42,12 @@ export class MarxanRunnerFactory {
         );
         return [];
       },
-      dumpFailure: async () => {},
-      cancel: async () => {},
+      dumpFailure: async () => {
+        // do nothing
+      },
+      cancel: async () => {
+        // do nothing
+      },
     };
 
     return new MarxanSandboxRunnerService(

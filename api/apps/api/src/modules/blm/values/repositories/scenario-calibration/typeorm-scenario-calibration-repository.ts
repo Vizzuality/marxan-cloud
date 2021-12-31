@@ -7,7 +7,7 @@ import {
   CalibrationRunResult,
 } from '../../scenario-calibration-repo';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
-import { DbConnections } from '../../../../../ormconfig.connections';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class TypeormScenarioCalibrationRepository

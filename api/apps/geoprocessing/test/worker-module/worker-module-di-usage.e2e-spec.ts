@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Injectable, Module, Logger } from '@nestjs/common';
+import { Injectable, Module } from '@nestjs/common';
 import { Job, Queue, Worker } from 'bullmq';
 import * as config from 'config';
 import {
+  WorkerBuilder,
   WorkerModule,
   WorkerProcessor,
-  WorkerBuilder,
 } from '../../src/modules/worker';
 
 let app: TestingModule;
@@ -17,7 +17,7 @@ const initValue = 5;
 const addValue = 3;
 
 /**
- * This tests USES redis to ensure that workers module works with full flow
+ * This tests USES redis to ensure that the workers' module works with full flow
  */
 beforeAll(async () => {
   const sandbox = await Test.createTestingModule({
@@ -59,22 +59,22 @@ const jobInput = Object.freeze({
 const delay = (ms = 1000) => new Promise((resolve) => setTimeout(resolve, ms));
 
 @Injectable()
-class ModuleADepdendency {
+class ModuleADependency {
   getOne() {
     return addValue;
   }
 }
 
 @Module({
-  providers: [ModuleADepdendency],
-  exports: [ModuleADepdendency],
+  providers: [ModuleADependency],
+  exports: [ModuleADependency],
 })
 class ModuleA {}
 
 @Injectable()
 class JobProcessor
   implements WorkerProcessor<{ init: number }, { finish: number }> {
-  constructor(private readonly moduleADepdendency: ModuleADepdendency) {}
+  constructor(private readonly moduleADepdendency: ModuleADependency) {}
 
   process(
     job: Job<{ init: number }, { finish: number }>,

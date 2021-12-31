@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 
-import { fakeQueryBuilder } from '../../../../../utils/__mocks__/fake-query-builder';
+import { fakeQueryBuilder } from '@marxan-api/utils/__mocks__/fake-query-builder';
 import { validDataWithGivenPuIds } from '../__mocks__/scenario-planning-unit-geo.data';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 

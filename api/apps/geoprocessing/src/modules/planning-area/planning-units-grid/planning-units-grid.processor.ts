@@ -32,7 +32,7 @@ export class PlanningUnitsGridProcessor {
 
     const { bbox } = await this.entityManager
       .transaction(async (manager) => {
-        const u = await manager.query(
+        await manager.query(
           `
             INSERT INTO "planning_units_geom"("the_geom", "type", "project_id")
             SELECT ST_SetSRID(

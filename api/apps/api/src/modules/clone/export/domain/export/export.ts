@@ -11,14 +11,14 @@ import {
 } from '@marxan/cloning/domain';
 import { ExportId } from './export.id';
 
-import { ExportComponentRequested } from '../events/export-component-requested.event';
-import { ExportComponentFinished } from '../events/export-component-finished.event';
+import { ExportComponentRequested } from '@marxan-api/modules/clone/export/domain';
+import { ExportComponentFinished } from '@marxan-api/modules/clone/export/domain';
 import { ArchiveReady } from '../events/archive-ready.event';
 
 import { ExportComponent } from './export-component/export-component';
 import { ExportSnapshot } from './export.snapshot';
 import { ExportComponentSnapshot } from './export-component.snapshot';
-import { ExportAllComponentsFinished } from '../events/export-all-components-finished.event';
+import { ExportAllComponentsFinished } from '@marxan-api/modules/clone/export/domain';
 import { ExportRequested } from '@marxan-api/modules/clone/export/domain';
 
 export const pieceNotFound = Symbol('export piece not found');

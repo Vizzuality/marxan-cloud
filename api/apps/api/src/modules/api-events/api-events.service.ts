@@ -61,7 +61,7 @@ export class ApiEventsService extends AppBaseService<
 
   /**
    * Given a `QualifiedEventTopic` (topic qualified by `kind` and `apiEvent`),
-   * return the matching event with latest timestamp.
+   * return the matching event with the latest timestamp.
    */
   public async getLatestEventForTopic(
     qualifiedTopic: QualifiedEventTopicSearch,

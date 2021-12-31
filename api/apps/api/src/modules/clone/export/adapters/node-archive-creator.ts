@@ -48,7 +48,9 @@ export class NodeArchiveCreator extends ArchiveCreator {
 
     return new Promise<Either<ArchiveCreationError, ArchiveLocation>>(
       async (resolve) => {
-        archive.on('finish', (data: any) => {}); // archive created but not yet written to
+        archive.on('finish', (data: any) => {
+          // do nothing
+        }); // archive created but not yet written to
         archive.on(`error`, (error) => {
           this.logger.error(error);
           resolve(left(unknownError));

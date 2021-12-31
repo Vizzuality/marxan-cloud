@@ -6,9 +6,9 @@ import {
   SpecificationSnapshotInput,
 } from './specification.snapshot';
 
-import { SpecificationGotReady } from './events/specification-got-ready.event';
-import { SpecificationPublished } from './events/specification-published.event';
-import { SpecificationCandidateCreated } from './events/specification-candidate-created.event';
+import { SpecificationGotReady } from '@marxan-api/modules/specification';
+import { SpecificationPublished } from '@marxan-api/modules/specification';
+import { SpecificationCandidateCreated } from '@marxan-api/modules/specification';
 import { DetermineFeaturesInput } from './determine-features-input';
 
 export class Specification extends AggregateRoot {

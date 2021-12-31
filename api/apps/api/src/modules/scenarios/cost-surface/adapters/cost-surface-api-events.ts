@@ -4,7 +4,7 @@ import {
   CostSurfaceEventsPort,
   CostSurfaceState,
 } from '../cost-surface-events.port';
-import { ApiEventsService } from '../../../api-events/api-events.service';
+import { ApiEventsService } from '@marxan-api/modules/api-events';
 
 @Injectable()
 export class CostSurfaceApiEvents

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { DbConnections } from '../../../../../ormconfig.connections';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ScenarioCalibrationRepo } from '../../scenario-calibration-repo';
 import { TypeormScenarioCalibrationRepository } from './typeorm-scenario-calibration-repository';

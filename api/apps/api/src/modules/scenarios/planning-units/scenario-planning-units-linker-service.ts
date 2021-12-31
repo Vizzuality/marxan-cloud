@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -20,6 +20,7 @@ type QueryPartsForLinker = {
   planningUnitSelectionQueryPart: string;
   planningUnitIntersectionQueryPart: string;
 };
+
 @Injectable()
 export class ScenarioPlanningUnitsLinkerService {
   constructor(
@@ -171,9 +172,9 @@ export class ScenarioPlanningUnitsLinkerService {
     // that is needed, this should be fine for a first pass.
     if (queryPartsForLinker) {
       const query = `insert into scenarios_pu_data (pu_geom_id, scenario_id, puid)
-                     select id                   as pu_geom_id,
-                            '${scenario.id}'     as scenario_id,
-                            row_number() over () as puid
+                     select id               as pu_geom_id,
+                            '${scenario.id}' as scenario_id,
+                            row_number()        over () as puid
                      from planning_units_geom pug
                      where ${queryPartsForLinker.planningUnitSelectionQueryPart}
                        and st_intersects(the_geom, ${queryPartsForLinker.planningUnitIntersectionQueryPart});`;

@@ -1,9 +1,5 @@
-import {
-  ApiHideProperty,
-  ApiProperty,
-  ApiPropertyOptional,
-} from '@nestjs/swagger';
-import { Exclude, plainToClass } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
 import { AsyncJobType } from './async-job-type';
 
 export class AsyncJobDto {
