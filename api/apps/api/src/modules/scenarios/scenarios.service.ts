@@ -41,10 +41,6 @@ import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-pl
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { SpecificationService } from './specification';
 import { CostRange, CostRangeService } from './cost-range-service';
-import {
-  DoesntExist,
-  ProjectChecker,
-} from '@marxan-api/modules/scenarios/project-checker.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 import {
@@ -65,6 +61,10 @@ import {
   ScenarioCalibrationRepo,
 } from '../blm/values/scenario-calibration-repo';
 import { StartBlmCalibration } from './blm-calibration/start-blm-calibration.command';
+import {
+  DoesntExist,
+  ProjectChecker,
+} from '@marxan-api/modules/scenarios/project-checker.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -164,9 +164,9 @@ export class ScenariosService {
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
     await this.canEditGuard(scenarioId);
-
     await this.assertScenario(scenarioId);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
+
     return await this.crudService.update(scenarioId, validatedMetadata);
   }
 

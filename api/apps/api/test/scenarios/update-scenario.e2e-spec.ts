@@ -1,8 +1,5 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import {
-  bootstrapApplication,
-  ProjectCheckerFake,
-} from '../utils/api-application';
+import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
@@ -11,6 +8,7 @@ import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { GivenProjectExists } from '../steps/given-project';
 import { HttpStatus } from '@nestjs/common';
+import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -28,9 +26,21 @@ describe('update scenario', () => {
   it(`should update an scenario with new data`, async () => {
     await fixtures.GivenScenarioWasCreated();
 
-    await fixtures.WhenUpdatingNameAndDescriptionFromAnScenario();
+    await fixtures
+      .WhenUpdatingNameAndDescriptionFromAnScenario()
+      .ThatDoesNotHaveAnOngoingExport();
 
     await fixtures.ThenWhenReadingTheScenarioDataItIsUpdated();
+  });
+
+  it(`should not update an scenario if an export is running`, async () => {
+    await fixtures.GivenScenarioWasCreated();
+
+    await fixtures
+      .WhenUpdatingNameAndDescriptionFromAnScenario()
+      .ThatHasAnOngoingExport();
+
+    await fixtures.ThenWhenReadingTheScenarioDataItIsNotUpdated();
   });
 });
 
@@ -54,6 +64,7 @@ async function getFixtures() {
   let scenarioId: string;
   const updatedName = 'Updated name';
   const updatedDescription = 'Updated description';
+  const originalName = 'Test scenario';
 
   return {
     cleanup: async () => {
@@ -68,29 +79,45 @@ async function getFixtures() {
     },
     GivenScenarioWasCreated: async () => {
       const result = await ScenariosTestUtils.createScenario(app, token, {
-        name: `Test scenario`,
+        name: originalName,
         type: ScenarioType.marxan,
         projectId,
       });
       scenarioId = result.data.id;
     },
-    WhenUpdatingNameAndDescriptionFromAnScenario: async () => {
-      await request(app.getHttpServer())
-        .patch(`/api/v1/scenarios/${scenarioId}`)
-        .send({ name: updatedName, description: updatedDescription })
-        .set('Authorization', `Bearer ${token}`)
-        .expect(HttpStatus.OK);
+    WhenUpdatingNameAndDescriptionFromAnScenario: () => {
+      return {
+        ThatDoesNotHaveAnOngoingExport: async () => {
+          await request(app.getHttpServer())
+            .patch(`/api/v1/scenarios/${scenarioId}`)
+            .send({ name: updatedName, description: updatedDescription })
+            .set('Authorization', `Bearer ${token}`)
+            .expect(HttpStatus.OK);
+        },
+        ThatHasAnOngoingExport: async () => {
+          projectChecker.addPendingExportForProject(projectId);
+          await request(app.getHttpServer())
+            .patch(`/api/v1/scenarios/${scenarioId}`)
+            .send({ name: updatedName, description: updatedDescription })
+            .set('Authorization', `Bearer ${token}`)
+            .expect(HttpStatus.BAD_REQUEST);
+        },
+      };
     },
     ThenWhenReadingTheScenarioDataItIsUpdated: async () => {
       const scenarioData = await request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .expect(HttpStatus.OK);
-
+        .set('Authorization', `Bearer ${token}`);
       expect(scenarioData.body.data.attributes.name).toEqual(updatedName);
       expect(scenarioData.body.data.attributes.description).toEqual(
         updatedDescription,
       );
+    },
+    ThenWhenReadingTheScenarioDataItIsNotUpdated: async () => {
+      const scenarioData = await request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(scenarioData.body.data.attributes.name).toEqual(originalName);
     },
   };
 }

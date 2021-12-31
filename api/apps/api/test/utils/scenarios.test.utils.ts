@@ -1,5 +1,5 @@
 import * as request from 'supertest';
-import { HttpStatus, INestApplication, Logger } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
 import { ScenarioResult } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
@@ -23,7 +23,6 @@ export class ScenariosTestUtils {
       .post('/api/v1/scenarios')
       .set('Authorization', `Bearer ${jwtToken}`)
       .send(scenarioDTO)
-      .expect(HttpStatus.CREATED)
       .then((response) => response.body)
       .catch((error) => {
         Logger.error(error);
@@ -37,7 +36,6 @@ export class ScenariosTestUtils {
   ): Promise<void> {
     await request(app.getHttpServer())
       .delete(`/api/v1/scenarios/${id}`)
-      .expect(HttpStatus.OK)
       .set('Authorization', `Bearer ${jwtToken}`);
   }
 }

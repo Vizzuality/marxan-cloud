@@ -6,35 +6,11 @@ import { QueueToken } from '../../src/modules/queue/queue.tokens';
 import { FakeQueue, FakeQueueBuilder } from './queues';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
 import {
-  hasPendingExport,
-  ProjectChecker,
-} from '@marxan-api/modules/scenarios/project-checker.service';
-import { left, right } from 'fp-ts/Either';
-import {
   FileRepository,
   TempStorageRepository,
 } from '@marxan/files-repository';
-
-export type ProjectCheckerFake = Pick<
-  ProjectChecker,
-  'isProjectReady' | 'hasProjectPendingExports'
-> & { setHasProjectPendingResponse: (shouldFail: boolean) => void };
-
-export const fakeProjectChecker = (): ProjectCheckerFake => {
-  let hasProjectPendingExportsShouldFail = false;
-  const hasProjectPendingExportsResponse = hasProjectPendingExportsShouldFail
-    ? left(hasPendingExport)
-    : right(false);
-  console.log(hasProjectPendingExportsResponse);
-  return {
-    isProjectReady: async () => right(true),
-    hasProjectPendingExports: () =>
-      Promise.resolve(hasProjectPendingExportsResponse),
-    setHasProjectPendingResponse: (shouldFail) => {
-      hasProjectPendingExportsShouldFail = shouldFail;
-    },
-  };
-};
+import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
+import { ProjectCheckerFake } from './project-checker.service-fake';
 
 export const bootstrapApplication = async (
   imports: ModuleMetadata['imports'] = [],
@@ -47,7 +23,7 @@ export const bootstrapApplication = async (
     .overrideProvider(QueueBuilder)
     .useClass(FakeQueueBuilder)
     .overrideProvider(ProjectChecker)
-    .useValue(fakeProjectChecker())
+    .useClass(ProjectCheckerFake)
     .overrideProvider(FileRepository)
     .useClass(TempStorageRepository)
     .compile();

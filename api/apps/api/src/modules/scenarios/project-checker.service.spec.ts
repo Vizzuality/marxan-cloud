@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
-import { doesntExist, ProjectChecker } from './project-checker.service';
+import { doesntExist, ProjectChecker } from './project-checker.service-real';
 import { isEqual } from 'lodash';
 import { NotFoundException } from '@nestjs/common';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
