@@ -41,7 +41,8 @@ export class TempStorageRepository implements FileRepository {
     const writer = createWriteStream(path);
 
     return new Promise((resolve) => {
-      writer.on('close', () => {
+      writer.on('close', () => {});
+      writer.on(`finish`, () => {
         resolve(right(path));
       });
       writer.on('error', (error) => {
