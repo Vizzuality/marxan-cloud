@@ -7,10 +7,13 @@ import { HttpStatus } from '@nestjs/common';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { GivenProjectExists } from '../steps/given-project';
+import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
+import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const token = await GivenUserIsLoggedIn(app);
+  const projectChecker = (await app.get(ProjectChecker)) as ProjectCheckerFake;
 
   const { projectId, organizationId } = await GivenProjectExists(
     app,
@@ -95,6 +98,17 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
               range: [1, '50'],
+            });
+
+          expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+        },
+        RunningExport: async () => {
+          projectChecker.addPendingExportForProject(projectId);
+          const response = await request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+              range: [1, 50],
             });
 
           expect(response.status).toBe(HttpStatus.BAD_REQUEST);

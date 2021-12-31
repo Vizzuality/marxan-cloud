@@ -264,6 +264,8 @@ export class ScenariosService {
     id: string,
     rangeToUpdate?: [number, number],
   ): Promise<Either<ChangeRangeErrors | GetFailure, true>> {
+    await this.canEditGuard(id);
+
     const scenario = await this.getById(id);
     const projectId = scenario.projectId;
     if (rangeToUpdate) {

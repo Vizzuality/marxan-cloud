@@ -15,7 +15,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 
 describe('update scenario', () => {
   beforeEach(async () => {
-    console.error = () => {};
     fixtures = await getFixtures();
   });
 

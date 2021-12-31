@@ -3,11 +3,15 @@ import { Test } from '@nestjs/testing';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
-import { doesntExist, ProjectChecker } from './project-checker.service-real';
 import { isEqual } from 'lodash';
 import { NotFoundException } from '@nestjs/common';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import {
+  doesntExist,
+  ProjectChecker,
+} from '@marxan-api/modules/scenarios/project-checker.service';
+import { ProjectCheckerReal } from '@marxan-api/modules/scenarios/project-checker.service-real';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -172,7 +176,10 @@ async function getFixtures() {
         provide: `PlanningAreasService`,
         useValue: fakePlaningAreaFacade,
       },
-      ProjectChecker,
+      {
+        provide: ProjectChecker,
+        useClass: ProjectCheckerReal,
+      },
     ],
   })
     .compile()

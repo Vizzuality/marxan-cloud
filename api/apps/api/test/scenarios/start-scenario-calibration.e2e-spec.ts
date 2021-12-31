@@ -30,6 +30,14 @@ describe('start-scenario-calibration', () => {
     await fixtures.ThenWhenReadingProjectCalibrationItHasTheNewRange();
   });
 
+  it(`throws an exception if an export is running`, async () => {
+    await fixtures.GivenScenarioWasCreated();
+
+    await fixtures
+      .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
+      .RunningExport();
+  });
+
   it(`throws an exception when providing an invalid range`, async () => {
     await fixtures.GivenScenarioWasCreated();
 
