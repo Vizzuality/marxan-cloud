@@ -39,7 +39,7 @@ export class PlanningUnitsCompletionService
   }
 
   async createCompletedEvent(
-    eventData: EventData<PlanningUnitsJob, unknown>,
+    eventData: EventData<PlanningUnitsJob>,
   ): Promise<CreateApiEventDTO> {
     const data = await eventData.data;
     const kind = API_EVENT_KINDS.project__planningUnits__finished__v1__alpha;
@@ -56,7 +56,7 @@ export class PlanningUnitsCompletionService
   }
 
   async createFailedEvent(
-    eventData: EventData<PlanningUnitsJob, unknown>,
+    eventData: EventData<PlanningUnitsJob>,
   ): Promise<CreateApiEventDTO> {
     const data = await eventData.data;
     const kind = API_EVENT_KINDS.project__planningUnits__failed__v1__alpha;

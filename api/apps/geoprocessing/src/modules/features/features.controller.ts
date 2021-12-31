@@ -1,21 +1,24 @@
 import {
   Controller,
   Get,
-  Param,
   Header,
-  Res,
-  Query,
   Logger,
+  Param,
+  Query,
+  Res,
 } from '@nestjs/common';
-import { FeatureService } from './features.service';
+import {
+  FeatureService,
+  FeaturesFilters,
+  TileSpecification,
+} from './features.service';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
 import {
+  ApiBadRequestResponse,
   ApiOperation,
   ApiParam,
   ApiQuery,
-  ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { TileSpecification, FeaturesFilters } from './features.service';
 import { BBox } from 'geojson';
 
 import { Response } from 'express';
@@ -23,6 +26,7 @@ import { Response } from 'express';
 @Controller(`${apiGlobalPrefixes.v1}/geo-features`)
 export class FeaturesController {
   private readonly logger: Logger = new Logger(FeaturesController.name);
+
   constructor(public service: FeatureService) {}
 
   @ApiOperation({

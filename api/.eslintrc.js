@@ -22,10 +22,13 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     // Sometimes it is useful to give a name to discarded variables and
     // arguments to better clarify intent: we use the `_` prefix for these.
-    '@typescript-eslint/no-unused-vars': ['warn', {
-      'varsIgnorePattern': '^_',
-      'argsIgnorePattern': '^_'
-    }],
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+      },
+    ],
   },
-  "reportUnusedDisableDirectives": true
+  reportUnusedDisableDirectives: true,
 };

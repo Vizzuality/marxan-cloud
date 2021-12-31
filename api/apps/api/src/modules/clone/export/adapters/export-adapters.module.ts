@@ -5,8 +5,6 @@ import { FileRepositoryModule } from '@marxan/files-repository';
 import { ExportRepository } from '../application/export-repository.port';
 import { ResourcePieces } from '../application/resource-pieces.port';
 import { ArchiveCreator } from '../application/archive-creator.port';
-
-import { TypeormExportRepository } from './typeorm-export.repository';
 import { ResourcePiecesAdapter } from './resource-pieces.adapter';
 import { InMemoryExportRepo } from './in-memory-export.repository';
 import { NodeArchiveCreator } from './node-archive-creator';

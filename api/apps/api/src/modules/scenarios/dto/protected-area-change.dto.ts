@@ -2,7 +2,6 @@ import {
   IsBoolean,
   IsInt,
   IsString,
-  IsUUID,
   Max,
   Min,
   ValidateNested,
