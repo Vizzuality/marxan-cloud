@@ -24,12 +24,16 @@ export class SchedulePieceExportHandler
     exportId,
     componentId,
     resourceId,
+    resourceKind,
+    allPieces,
   }: SchedulePieceExport): Promise<void> {
     const job = await this.queue.add(`export-piece`, {
       piece,
       exportId: exportId.value,
       componentId: componentId.value,
       resourceId: resourceId.value,
+      resourceKind,
+      allPieces,
     });
 
     if (!job) {

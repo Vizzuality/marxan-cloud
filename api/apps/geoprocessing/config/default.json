@@ -9,6 +9,24 @@
       "port": "6379"
     }
   },
+  "postgresApi": {
+    "url": null,
+    "port": 5432,
+    "host": null,
+    "username": null,
+    "password": null,
+    "database": null,
+    "runMigrationsOnStartup": false
+  },
+  "postgresGeoApi": {
+    "url": null,
+    "port": 5432,
+    "host": null,
+    "username": null,
+    "password": null,
+    "database": null,
+    "runMigrationsOnStartup": false
+  },
   "api": {
     "url": "http://api:3000"
   },

@@ -20,12 +20,16 @@ export const apiConnections: Record<
 > = {
   [DbConnections.default]: {
     // Could be named differently for it to be more descriptive, but keeping
-    // this as `default` allows to avoid explicitly specifying the connection in
+    // this as `default` allows avoiding explicitly specifying the connection in
     // `TypeOrmModule.forFeature()`
     name: DbConnections.default,
     synchronize: false,
     type: 'postgres',
-    url: AppConfig.get('postgresApi.url'),
+    username: AppConfig.get('postgresApi.username'),
+    password: AppConfig.get('postgresApi.password'),
+    port: AppConfig.get('postgresApi.port'),
+    host: AppConfig.get('postgresApi.host'),
+    database: AppConfig.get('postgresApi.database'),
     ssl: false,
     entities: [
       path.join(__dirname, '/modules/**/*.api.entity.{ts,js}'),
@@ -57,7 +61,11 @@ export const apiConnections: Record<
     name: DbConnections.geoprocessingDB,
     synchronize: false,
     type: 'postgres',
-    url: AppConfig.get('postgresGeoApi.url'),
+    username: AppConfig.get('postgresGeoApi.username'),
+    password: AppConfig.get('postgresGeoApi.password'),
+    port: AppConfig.get('postgresGeoApi.port'),
+    host: AppConfig.get('postgresGeoApi.host'),
+    database: AppConfig.get('postgresGeoApi.database'),
     ssl: false,
     entities: [
       path.join(__dirname, '/modules/**/*.geo.entity.{ts,js}'),

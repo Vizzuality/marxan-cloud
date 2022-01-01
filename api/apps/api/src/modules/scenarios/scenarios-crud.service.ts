@@ -132,6 +132,10 @@ export class ScenariosCrudService extends AppBaseService<
   ): Promise<Scenario> {
     const model = await super.setDataCreate(create, info);
     assertDefined(model.projectId);
+    /**
+     * @TODO figure out the best way to re-enable the eslint rule
+     */
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     model.createdBy = info?.authenticatedUser?.id!;
     return model;
   }

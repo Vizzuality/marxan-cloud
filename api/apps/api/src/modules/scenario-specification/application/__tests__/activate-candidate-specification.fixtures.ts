@@ -4,9 +4,9 @@ import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Either, isLeft } from 'fp-ts/Either';
 
 import {
-  SpecificationId,
   ScenarioSpecification,
   SpecificationActivated,
+  SpecificationId,
 } from '../../domain';
 
 import { ActivateCandidateSpecificationHandler } from '../activate-candidate-specification.handler';

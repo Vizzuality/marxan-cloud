@@ -46,17 +46,14 @@ import {
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
+import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 import {
+  ChangeProtectedAreasError,
   ProtectedAreaService,
   ScenarioProtectedArea,
-  ChangeProtectedAreasError,
   submissionFailed,
 } from './protected-area';
-import {
-  ProtectedAreaChangeDto,
-  ProtectedAreasChangeDto,
-} from './dto/protected-area-change.dto';
+import { ProtectedAreasChangeDto } from './dto/protected-area-change.dto';
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 import {
   ChangeBlmRange,

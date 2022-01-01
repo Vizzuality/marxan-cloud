@@ -9,10 +9,10 @@ import { FileRepository } from '@marxan/files-repository';
 import {
   ArchiveCreationError,
   ArchiveCreator,
-  unknownError,
   cannotCreateArchive,
-  cannotStoreArchive,
   cannotGetFile,
+  cannotStoreArchive,
+  unknownError,
 } from '../application/archive-creator.port';
 
 @Injectable()
@@ -48,12 +48,16 @@ export class NodeArchiveCreator extends ArchiveCreator {
 
     return new Promise<Either<ArchiveCreationError, ArchiveLocation>>(
       async (resolve) => {
-        archive.on('finish', () => {}); // archive created but not yet written to
+        archive.on('finish', (data: any) => {
+          // archive created but not yet written to
+        });
         archive.on(`error`, (error) => {
           this.logger.error(error);
           resolve(left(unknownError));
         });
-        passThrough.on(`close`, () => onPersistenceFinished(resolve));
+        passThrough.on(`close`, () => {
+          onPersistenceFinished(resolve);
+        });
 
         archive.pipe(passThrough);
 
@@ -77,7 +81,6 @@ export class NodeArchiveCreator extends ArchiveCreator {
       zlib: { level: 9 },
     });
 
-    // TODO Spike/Performance: do in parallel ?
     for (const file of files) {
       const result = await this.fileRepository.get(file.uri);
       if (isLeft(result)) {
