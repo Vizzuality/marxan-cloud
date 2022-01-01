@@ -46,11 +46,9 @@ export const apiConnections: Record<
      * @debt I think this should be way more resilient to user input.
      */
     migrationsRun:
-      AppConfig.get<string>(
+      `${AppConfig.get<string>(
         'postgresApi.runMigrationsOnStartup',
-      )?.toLowerCase() !== 'false'
-        ? true
-        : false,
+      )}`.toLowerCase() !== 'false',
     cli: {
       migrationsDir: 'apps/api/src/migrations/api',
     },

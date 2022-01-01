@@ -1,4 +1,7 @@
 {
+  "postgresApi": {
+    "runMigrationsOnStartup": false
+  },
   "redisApi": {
     "concurrency": 50,
     "connection": {

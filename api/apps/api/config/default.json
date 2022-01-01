@@ -1,4 +1,7 @@
 {
+  "postgresApi": {
+    "runMigrationsOnStartup": false
+  },
   "network": {
     "cors": {
       "origins": [
