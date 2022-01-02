@@ -5,7 +5,8 @@
     "password": "API_POSTGRES_PASSWORD",
     "database": "API_POSTGRES_DB",
     "port": "API_POSTGRES_PORT",
-    "runMigrationsOnStartup": "API_RUN_MIGRATIONS_ON_STARTUP"
+    "runMigrationsOnStartup": "API_RUN_MIGRATIONS_ON_STARTUP",
+    "logging": "API_POSTGRES_LOGGING"
   },
   "postgresGeoApi": {
     "host": "GEO_POSTGRES_HOST",
@@ -13,7 +14,8 @@
     "password": "GEO_POSTGRES_PASSWORD",
     "database": "GEO_POSTGRES_DB",
     "port": "GEO_POSTGRES_PORT",
-    "runMigrationsOnStartup": "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP"
+    "runMigrationsOnStartup": "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP",
+    "logging": "GEO_POSTGRES_LOGGING"
   },
   "network": {
     "cors": {
