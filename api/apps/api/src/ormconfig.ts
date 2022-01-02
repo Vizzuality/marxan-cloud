@@ -2,6 +2,7 @@ import * as path from 'path';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { DbConnections } from './ormconfig.connections';
+import { LoggerOptions } from 'typeorm';
 
 /**
  * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs
@@ -39,7 +40,9 @@ export const apiConnections: Record<
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
     // logging.
-    logging: ['error'],
+    logging: `${AppConfig.get('postgresApi.logging')}`.split(
+      ',',
+    ) as LoggerOptions,
     cache: false,
     migrations: [__dirname + '/migrations/api/**/*.ts'],
     /** Migrations will run automatically on startup, unless the
@@ -71,7 +74,9 @@ export const apiConnections: Record<
       path.join(__dirname, '/modules/**/*.geo.entity.{ts,js}'),
       path.join(__dirname, '../../../libs/**/*.geo.entity.{ts,js}'),
     ],
-    logging: ['error'],
+    logging: `${AppConfig.get('postgresGeoApi.logging')}`.split(
+      ',',
+    ) as LoggerOptions,
     cache: false,
     // Migrations for this db/data source are handled in the geoprocessing
     // service
