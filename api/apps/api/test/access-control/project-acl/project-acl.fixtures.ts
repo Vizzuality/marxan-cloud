@@ -1,13 +1,14 @@
 import * as request from 'supertest';
-import { bootstrapApplication } from '../utils/api-application';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { GivenProjectExists } from '../steps/given-project';
-import { GivenUserExists } from '../steps/given-user-exists';
+import { bootstrapApplication } from '../../utils/api-application';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
+import { GivenProjectExists } from '../../steps/given-project';
+import { GivenUserExists } from '../../steps/given-user-exists';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ProjectsACLTestUtils } from '../utils/projects-acl.test.utils';
+import { ProjectsACLTestUtils } from '../../utils/projects-acl.test.utils';
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -19,9 +20,10 @@ export const getFixtures = async () => {
   const contributorUserId = await GivenUserExists(app, 'bb');
   const viewerUserId = await GivenUserExists(app, 'cc');
   const otherOwnerUserId = await GivenUserExists(app, 'dd');
-  const projectViewerRole = Roles.project_viewer;
-  const projectContributorRole = Roles.project_contributor;
-  const projectOwnerRole = Roles.project_owner;
+  const projectViewerRole = ProjectRoles.project_viewer;
+  const projectContributorRole = ProjectRoles.project_contributor;
+  const projectOwnerRole = ProjectRoles.project_owner;
+  const scenarioOwnerRole = Roles.scenario_owner;
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
@@ -208,7 +210,24 @@ export const getFixtures = async () => {
           userId: otherOwnerUserId,
           roleName: projectOwnerRole,
         }),
-
+    WhenChangingUserRole: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: viewerUserId,
+          roleName: projectContributorRole,
+        }),
+    WhenAddingIncorrectUserRole: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: viewerUserId,
+          roleName: scenarioOwnerRole,
+        }),
     WhenRevokingAccessToViewerFromProjectAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())
         .delete(`/api/v1/roles/projects/${projectId}/users/${viewerUserId}`)
@@ -262,6 +281,10 @@ export const getFixtures = async () => {
       expect(response.status).toEqual(403);
     },
 
+    ThenBadRequestIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
+    },
+
     ThenNoContentIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(204);
     },
@@ -299,6 +322,14 @@ export const getFixtures = async () => {
     ) => {
       expect(response.status).toEqual(200);
       expect(response.body.data).toHaveLength(4);
+    },
+    ThenUsersWithChangedRoleIsOnProject: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const newUserCreated = response.body.data.find(
+        (user: any) => user.user.id === viewerUserId,
+      );
+      expect(newUserCreated.roleName).toEqual(projectContributorRole);
     },
   };
 };

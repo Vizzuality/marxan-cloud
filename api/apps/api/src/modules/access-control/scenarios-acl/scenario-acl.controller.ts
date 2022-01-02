@@ -6,17 +6,17 @@ import {
   Param,
   ParseUUIDPipe,
   UseGuards,
+  ForbiddenException,
   Delete,
   Patch,
-  Body,
   HttpCode,
-  ForbiddenException,
   HttpStatus,
-  Query,
+  Body,
   InternalServerErrorException,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
+import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios-acl/scenario-acl.service';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import {
   ApiBearerAuth,
@@ -27,37 +27,37 @@ import {
 } from '@nestjs/swagger';
 import { isLeft } from 'fp-ts/lib/These';
 import {
-  UserRoleInProjectDto,
-  UsersInProjectResult,
-} from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
-import {
-  forbiddenError,
   lastOwner,
+  forbiddenError,
   transactionFailed,
 } from '@marxan-api/modules/access-control';
+import {
+  UserRoleInScenarioDto,
+  UsersInScenarioResult,
+} from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { aclErrorHandler } from '@marxan-api/utils/acl.utils';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags('Projects-Users Roles')
-@Controller(`${apiGlobalPrefixes.v1}/roles/projects`)
-export class ProjectAclController {
-  constructor(private readonly projectAclService: ProjectAclService) {}
+@ApiTags('Scenarios-Users Roles')
+@Controller(`${apiGlobalPrefixes.v1}/roles/scenarios`)
+export class ScenarioAclController {
+  constructor(private readonly scenarioAclService: ScenarioAclService) {}
 
-  @Get(':projectId/users')
-  @ApiOperation({ summary: 'Get all users with roles in project' })
+  @Get(':scenarioId/users')
+  @ApiOperation({ summary: 'Get all users with roles in scenario' })
   @ApiOkResponse({
     description: 'User roles found',
     isArray: true,
-    type: UserRoleInProjectDto,
+    type: UserRoleInScenarioDto,
   })
-  async findUsersInProject(
-    @Param('projectId', ParseUUIDPipe) projectId: string,
+  async findUsersInScenario(
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Query('q') nameSearch?: string,
-  ): Promise<UsersInProjectResult> {
-    const result = await this.projectAclService.findUsersInProject(
-      projectId,
+  ): Promise<UsersInScenarioResult> {
+    const result = await this.scenarioAclService.findUsersInScenario(
+      scenarioId,
       req.user.id,
       nameSearch,
     );
@@ -69,21 +69,21 @@ export class ProjectAclController {
     return { data: result.right };
   }
 
-  @Patch(':projectId/users')
+  @Patch(':scenarioId/users')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Add user and proper role to a project' })
+  @ApiOperation({ summary: 'Add user and proper role to a scenario' })
   @ApiNoContentResponse({
     status: 204,
     description: 'User was updated correctly',
   })
-  async updateUserInProject(
-    @Body() dto: UserRoleInProjectDto,
-    @Param('projectId', ParseUUIDPipe) projectId: string,
+  async updateUserInScenario(
+    @Body() userAndRoleToChange: UserRoleInScenarioDto,
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<void | boolean> {
-    const result = await this.projectAclService.updateUserInProject(
-      projectId,
-      dto,
+  ): Promise<void> {
+    const result = await this.scenarioAclService.updateUserInScenario(
+      scenarioId,
+      userAndRoleToChange,
       req.user.id,
     );
 
@@ -92,21 +92,21 @@ export class ProjectAclController {
     }
   }
 
-  @Delete(':projectId/users/:userId')
+  @Delete(':scenarioId/users/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Revoke access to user from project' })
+  @ApiOperation({ summary: 'Revoke access to user from scenario' })
   @ApiNoContentResponse({
     status: 204,
     description: 'User was deleted correctly',
   })
-  async deleteUserFromProject(
-    @Param('projectId', ParseUUIDPipe) projectId: string,
-    @Param('userId', ParseUUIDPipe) userId: string,
+  async deleteUserFromScenario(
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
+    @Param('userId', ParseUUIDPipe) userToDeleteId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void | boolean> {
-    const result = await this.projectAclService.revokeAccess(
-      projectId,
-      userId,
+    const result = await this.scenarioAclService.revokeAccess(
+      scenarioId,
+      userToDeleteId,
       req.user.id,
     );
 

@@ -24,12 +24,13 @@ import {
   PlanningAreasService,
 } from '@marxan-api/modules/planning-areas';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProtectedArea } from '@marxan/protected-areas';
 
 import { ProjectsRequest } from './project-requests-info';
 import { ProjectId, SetProjectGridFromShapefile } from './planning-unit-grid';
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
 const projectFilterKeyNames = [
   'name',
@@ -168,7 +169,7 @@ export class ProjectsCrudService extends AppBaseService<
       this.userProjects.create({
         projectId,
         userId,
-        roleName: Roles.project_owner,
+        roleName: ProjectRoles.project_owner,
       }),
     );
   }

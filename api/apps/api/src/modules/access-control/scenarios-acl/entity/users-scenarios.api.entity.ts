@@ -1,11 +1,11 @@
 import { Role } from '@marxan-api/modules/access-control/role.api.entity';
 import { Check, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { User } from '@marxan-api/modules/users/user.api.entity';
-import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
-@Entity(`users_projects`)
-export class UsersProjectsApiEntity {
+@Entity(`users_scenarios`)
+export class UsersScenariosApiEntity {
   @PrimaryColumn({
     type: `uuid`,
     name: `user_id`,
@@ -14,26 +14,26 @@ export class UsersProjectsApiEntity {
 
   @PrimaryColumn({
     type: `uuid`,
-    name: `project_id`,
+    name: `scenario_id`,
   })
-  projectId!: string;
+  scenarioId!: string;
 
-  @Check(`role_id`, `LIKE 'project_%'`)
+  @Check(`role_id`, `LIKE 'scenario_%'`)
   @PrimaryColumn({
     type: `varchar`,
     name: `role_id`,
   })
-  roleName!: ProjectRoles;
+  roleName!: ScenarioRoles;
 
-  @ManyToOne(() => Project, {
+  @ManyToOne(() => Scenario, {
     onDelete: 'CASCADE',
     primary: true,
   })
   @JoinColumn({
-    name: `project_id`,
+    name: `scenario_id`,
     referencedColumnName: `id`,
   })
-  project?: Project;
+  scenario?: Scenario;
 
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',

@@ -143,6 +143,7 @@ export class ScenariosService {
     input: CreateScenarioDTO,
     info: AppInfoDTO,
   ): Promise<Either<ProjectNotReady | ProjectDoesntExist, Scenario>> {
+    assertDefined(info.authenticatedUser);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
     const isProjectReady = await this.projectChecker.isProjectReady(
       input.projectId,
@@ -158,6 +159,10 @@ export class ScenariosService {
 
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
+    await this.crudService.assignCreatorRole(
+      scenario.id,
+      info.authenticatedUser.id,
+    );
     return right(scenario);
   }
 

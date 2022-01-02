@@ -4,13 +4,24 @@ import { getConnection, Repository, Not } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { Permit } from '../access-control.types';
-import { ProjectAccessControl } from './project-access-control';
-import { UserRoleInProjectDto } from './dto/user-role-project.dto';
+import {
+  Denied,
+  Permit,
+} from '@marxan-api/modules/access-control/access-control.types';
+import { ProjectAccessControl } from '@marxan-api/modules/access-control/projects-acl/project-access-control';
+import {
+  ProjectRoles,
+  UserRoleInProjectDto,
+} from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { Either, left, right } from 'fp-ts/Either';
+import { assertDefined } from '@marxan/utils';
+import {
+  forbiddenError,
+  lastOwner,
+  transactionFailed,
+} from '@marxan-api/modules/access-control';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -18,25 +29,22 @@ import { Either, left, right } from 'fp-ts/Either';
  */
 @Injectable()
 export class ProjectAclService implements ProjectAccessControl {
-  private readonly canCreateScenarioRoles = [Roles.project_owner];
-  private readonly canEditScenarioRoles = [Roles.project_owner];
-  private readonly canViewSolutionRoles = [Roles.project_owner];
-  private readonly canPublishProjectRoles = [Roles.project_owner];
+  private readonly canPublishProjectRoles = [ProjectRoles.project_owner];
   private readonly canViewProjectRoles = [
-    Roles.project_owner,
-    Roles.project_contributor,
-    Roles.project_viewer,
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+    ProjectRoles.project_viewer,
   ];
   private readonly canEditProjectRoles = [
-    Roles.project_contributor,
-    Roles.project_owner,
+    ProjectRoles.project_contributor,
+    ProjectRoles.project_owner,
   ];
-  private readonly canDeleteProjectRoles = [Roles.project_owner];
+  private readonly canDeleteProjectRoles = [ProjectRoles.project_owner];
 
   private async getRolesWithinProjectForUser(
     userId: string,
     projectId: string,
-  ): Promise<Array<Roles>> {
+  ): Promise<Array<ProjectRoles>> {
     const rolesToCheck = (
       await this.roles.find({
         where: {
@@ -50,8 +58,8 @@ export class ProjectAclService implements ProjectAccessControl {
   }
 
   private async doesUserHaveRole(
-    roles: Roles[],
-    rolesToCheck: Roles[],
+    roles: ProjectRoles[],
+    rolesToCheck: ProjectRoles[],
   ): Promise<Permit> {
     return intersection(roles, rolesToCheck).length > 0;
   }
@@ -96,31 +104,12 @@ export class ProjectAclService implements ProjectAccessControl {
     );
   }
 
-  async canCreateScenario(userId: string, projectId: string): Promise<Permit> {
-    return this.doesUserHaveRole(
-      await this.getRolesWithinProjectForUser(userId, projectId),
-      this.canCreateScenarioRoles,
-    );
-  }
-  async canEditScenario(userId: string, projectId: string): Promise<Permit> {
-    return this.doesUserHaveRole(
-      await this.getRolesWithinProjectForUser(userId, projectId),
-      this.canEditScenarioRoles,
-    );
-  }
-  async canViewSolutions(userId: string, projectId: string): Promise<Permit> {
-    return this.doesUserHaveRole(
-      await this.getRolesWithinProjectForUser(userId, projectId),
-      this.canViewSolutionRoles,
-    );
-  }
-
   async isOwner(userId: string, projectId: string): Promise<Permit> {
     const userIsProjectOwner = await this.roles.findOne({
       where: {
         projectId,
         userId,
-        roleName: Roles.project_owner,
+        roleName: ProjectRoles.project_owner,
       },
     });
     if (!userIsProjectOwner) {
@@ -133,7 +122,7 @@ export class ProjectAclService implements ProjectAccessControl {
     const otherOwnersInProject = await this.roles.count({
       where: {
         projectId,
-        roleName: Roles.project_owner,
+        roleName: ProjectRoles.project_owner,
         userId: Not(userId),
       },
     });
@@ -149,7 +138,7 @@ export class ProjectAclService implements ProjectAccessControl {
     projectId: string,
     userId: string,
     nameSearch?: string,
-  ): Promise<Either<Permit, UserRoleInProjectDto[]>> {
+  ): Promise<Either<Denied, UserRoleInProjectDto[]>> {
     if (!(await this.isOwner(userId, projectId))) {
       return left(false);
     }
@@ -180,18 +169,22 @@ export class ProjectAclService implements ProjectAccessControl {
 
   async updateUserInProject(
     projectId: string,
-    updateUserInProjectDto: UserRoleInProjectDto,
+    userAndRoleToChange: UserRoleInProjectDto,
     loggedUserId: string,
-  ): Promise<Either<Permit, void>> {
-    const { userId, roleName } = updateUserInProjectDto;
+  ): Promise<
+    Either<
+      typeof transactionFailed | typeof forbiddenError | typeof lastOwner,
+      void
+    >
+  > {
+    const { userId, roleName } = userAndRoleToChange;
     if (!(await this.isOwner(loggedUserId, projectId))) {
-      return left(false);
+      return left(forbiddenError);
     }
-
     if (!(await this.hasOtherOwner(userId, projectId))) {
-      return left(false);
+      return left(lastOwner);
     }
-
+    assertDefined(roleName);
     const apiDbConnection = getConnection(DbConnections.default);
     const apiQueryRunner = apiDbConnection.createQueryRunner();
 
@@ -199,41 +192,51 @@ export class ProjectAclService implements ProjectAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInProject = await this.roles.findOne({
-        where: {
-          projectId,
-          userId,
+      const existingUserInProject = await apiQueryRunner.manager.findOne(
+        UsersProjectsApiEntity,
+        undefined,
+        {
+          where: {
+            projectId,
+            userId,
+          },
         },
-      });
+      );
 
       if (!existingUserInProject) {
-        await this.roles.save({
-          projectId,
-          userId,
-          roleName,
-        });
+        const userRoleToSave = new UsersProjectsApiEntity();
+        userRoleToSave.projectId = projectId;
+        userRoleToSave.userId = userId;
+        userRoleToSave.roleName = roleName;
+
+        await apiQueryRunner.manager.save(userRoleToSave);
       } else {
-        await this.roles.update({ projectId, userId }, { roleName });
+        await apiQueryRunner.manager.update(
+          UsersProjectsApiEntity,
+          { projectId, userId },
+          { roleName },
+        );
       }
+      return right(void 0);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
+      return left(transactionFailed);
     } finally {
       await apiQueryRunner.release();
     }
-    return right(void 0);
   }
 
   async revokeAccess(
     projectId: string,
     userId: string,
     loggedUserId: string,
-  ): Promise<Either<Permit, void>> {
+  ): Promise<Either<typeof forbiddenError | typeof lastOwner, void>> {
     if (!(await this.isOwner(loggedUserId, projectId))) {
-      return left(false);
+      return left(forbiddenError);
     }
 
     if (!(await this.hasOtherOwner(userId, projectId))) {
-      return left(false);
+      return left(lastOwner);
     }
 
     await this.roles.delete({ projectId, userId });
