@@ -8,8 +8,6 @@ export class AddFeatureIsCustom1638358277397 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `alter table features drop column is_custom;`,
-    );
+    await queryRunner.query(`alter table features drop column is_custom;`);
   }
 }

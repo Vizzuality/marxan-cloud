@@ -62,6 +62,7 @@ export type JSONAPISerializerConfig<
 > = JSONAPISerializerAttributesConfig<Entity> & Record<string, unknown>;
 
 export abstract class AppBaseService<
+  // eslint-disable-next-line @typescript-eslint/ban-types
   Entity extends object,
   CreateModel,
   UpdateModel,

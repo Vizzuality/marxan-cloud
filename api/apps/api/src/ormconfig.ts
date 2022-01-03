@@ -2,6 +2,7 @@ import * as path from 'path';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { DbConnections } from './ormconfig.connections';
+import { LoggerOptions } from 'typeorm';
 
 /**
  * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs
@@ -20,12 +21,16 @@ export const apiConnections: Record<
 > = {
   [DbConnections.default]: {
     // Could be named differently for it to be more descriptive, but keeping
-    // this as `default` allows to avoid explicitly specifying the connection in
+    // this as `default` allows avoiding explicitly specifying the connection in
     // `TypeOrmModule.forFeature()`
     name: DbConnections.default,
     synchronize: false,
     type: 'postgres',
-    url: AppConfig.get('postgresApi.url'),
+    username: AppConfig.get('postgresApi.username'),
+    password: AppConfig.get('postgresApi.password'),
+    port: AppConfig.get('postgresApi.port'),
+    host: AppConfig.get('postgresApi.host'),
+    database: AppConfig.get('postgresApi.database'),
     ssl: false,
     entities: [
       path.join(__dirname, '/modules/**/*.api.entity.{ts,js}'),
@@ -35,7 +40,9 @@ export const apiConnections: Record<
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
     // logging.
-    logging: ['error'],
+    logging: `${AppConfig.get('postgresApi.logging')}`.split(
+      ',',
+    ) as LoggerOptions,
     cache: false,
     migrations: [__dirname + '/migrations/api/**/*.ts'],
     /** Migrations will run automatically on startup, unless the
@@ -46,11 +53,9 @@ export const apiConnections: Record<
      * @debt I think this should be way more resilient to user input.
      */
     migrationsRun:
-      AppConfig.get<string>(
+      `${AppConfig.get<string>(
         'postgresApi.runMigrationsOnStartup',
-      )?.toLowerCase() !== 'false'
-        ? true
-        : false,
+      )}`.toLowerCase() !== 'false',
     cli: {
       migrationsDir: 'apps/api/src/migrations/api',
     },
@@ -59,13 +64,19 @@ export const apiConnections: Record<
     name: DbConnections.geoprocessingDB,
     synchronize: false,
     type: 'postgres',
-    url: AppConfig.get('postgresGeoApi.url'),
+    username: AppConfig.get('postgresGeoApi.username'),
+    password: AppConfig.get('postgresGeoApi.password'),
+    port: AppConfig.get('postgresGeoApi.port'),
+    host: AppConfig.get('postgresGeoApi.host'),
+    database: AppConfig.get('postgresGeoApi.database'),
     ssl: false,
     entities: [
       path.join(__dirname, '/modules/**/*.geo.entity.{ts,js}'),
       path.join(__dirname, '../../../libs/**/*.geo.entity.{ts,js}'),
     ],
-    logging: ['error'],
+    logging: `${AppConfig.get('postgresGeoApi.logging')}`.split(
+      ',',
+    ) as LoggerOptions,
     cache: false,
     // Migrations for this db/data source are handled in the geoprocessing
     // service

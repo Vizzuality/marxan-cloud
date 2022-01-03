@@ -4,11 +4,11 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
-import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
-import { ProjectAclService } from './project-acl.service';
+import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
 import { isLeft } from 'fp-ts/Either';
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -21,6 +21,8 @@ test(`no roles assigned at all`, async () => {
   await fixtures.ThenCannotPublishProject();
   await fixtures.ThenCanCreateProject();
   await fixtures.ThenCannotViewProject();
+  await fixtures.ThenCannotDeleteProject();
+  await fixtures.ThenCannotEditProject();
 });
 
 test(`project viewer role assigned`, async () => {
@@ -28,6 +30,8 @@ test(`project viewer role assigned`, async () => {
   await fixtures.ThenCannotPublishProject();
   await fixtures.ThenCanCreateProject();
   await fixtures.ThenCanViewProject();
+  await fixtures.ThenCannotDeleteProject();
+  await fixtures.ThenCannotEditProject();
 });
 
 test(`project owner role assigned`, async () => {
@@ -35,6 +39,8 @@ test(`project owner role assigned`, async () => {
   await fixtures.ThenCanPublishProject();
   await fixtures.ThenCanCreateProject();
   await fixtures.ThenCanViewProject();
+  await fixtures.ThenCanDeleteProject();
+  await fixtures.ThenCanEditProject();
 });
 
 test(`project contributor role assigned`, async () => {
@@ -42,6 +48,8 @@ test(`project contributor role assigned`, async () => {
   await fixtures.ThenCannotPublishProject();
   await fixtures.ThenCanCreateProject();
   await fixtures.ThenCanViewProject();
+  await fixtures.ThenCannotDeleteProject();
+  await fixtures.ThenCanEditProject();
 });
 
 test(`project has multiple users`, async () => {
@@ -51,8 +59,6 @@ test(`project has multiple users`, async () => {
 });
 
 const getFixtures = async () => {
-  let userProjectsRepoMock: jest.Mocked<Repository<UsersProjectsApiEntity>>;
-
   const userProjectsToken = getRepositoryToken(UsersProjectsApiEntity);
 
   const projectId = v4();
@@ -73,12 +79,12 @@ const getFixtures = async () => {
             where: jest.fn().mockReturnThis(),
             getMany: jest.fn(() => [
               {
-                roleName: Roles.project_owner,
+                roleName: ProjectRoles.project_owner,
                 projectId,
                 userId,
               },
               {
-                roleName: Roles.project_viewer,
+                roleName: ProjectRoles.project_viewer,
                 projectId,
                 userId: viewerUserId,
               },
@@ -91,7 +97,9 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ProjectAclService);
 
-  userProjectsRepoMock = sandbox.get(userProjectsToken);
+  const userProjectsRepoMock: jest.Mocked<
+    Repository<UsersProjectsApiEntity>
+  > = sandbox.get(userProjectsToken);
 
   return {
     GivenNoRoles: () =>
@@ -99,7 +107,7 @@ const getFixtures = async () => {
     GivenProjectViewerRoleIsAssigned: () =>
       userProjectsRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.project_viewer,
+          roleName: ProjectRoles.project_viewer,
           projectId,
           userId,
         },
@@ -107,7 +115,7 @@ const getFixtures = async () => {
     GivenProjectOwnerRoleIsAssigned: () =>
       userProjectsRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.project_owner,
+          roleName: ProjectRoles.project_owner,
           projectId,
           userId,
         },
@@ -115,7 +123,7 @@ const getFixtures = async () => {
     GivenProjectContributorRoleIsAssigned: () =>
       userProjectsRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.project_contributor,
+          roleName: ProjectRoles.project_contributor,
           projectId,
           userId,
         },
@@ -123,12 +131,12 @@ const getFixtures = async () => {
     GivenProjectHasMultipleUsers: () =>
       userProjectsRepoMock.find.mockImplementation(async () => [
         {
-          roleName: Roles.project_owner,
+          roleName: ProjectRoles.project_owner,
           projectId,
           userId,
         },
         {
-          roleName: Roles.project_viewer,
+          roleName: ProjectRoles.project_viewer,
           projectId,
           userId: viewerUserId,
         },
@@ -138,7 +146,7 @@ const getFixtures = async () => {
         Promise.resolve({
           projectId,
           userId,
-          roleName: Roles.project_owner,
+          roleName: ProjectRoles.project_owner,
         }),
       ),
     ThenCannotCreateProject: async () => {
@@ -159,6 +167,32 @@ const getFixtures = async () => {
     },
     ThenCanViewProject: async () => {
       expect(await sut.canViewProject(userId, projectId)).toEqual(true);
+      expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
+        where: {
+          projectId,
+          userId,
+        },
+        select: ['roleName'],
+      });
+    },
+    ThenCannotEditProject: async () => {
+      expect(await sut.canEditProject(userId, projectId)).toEqual(false);
+    },
+    ThenCanEditProject: async () => {
+      expect(await sut.canEditProject(userId, projectId)).toEqual(true);
+      expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
+        where: {
+          projectId,
+          userId,
+        },
+        select: ['roleName'],
+      });
+    },
+    ThenCannotDeleteProject: async () => {
+      expect(await sut.canDeleteProject(userId, projectId)).toEqual(false);
+    },
+    ThenCanDeleteProject: async () => {
+      expect(await sut.canDeleteProject(userId, projectId)).toEqual(true);
       expect(userProjectsRepoMock.find).toHaveBeenCalledWith({
         where: {
           projectId,

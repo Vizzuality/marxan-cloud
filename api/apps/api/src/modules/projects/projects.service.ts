@@ -40,7 +40,7 @@ import {
   ExportProject,
   GetExportArchive,
 } from '@marxan-api/modules/clone';
-import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
+import { ResourceId } from '@marxan/cloning/domain';
 import { createReadStream } from 'fs';
 
 export { validationFailed } from '../planning-areas';

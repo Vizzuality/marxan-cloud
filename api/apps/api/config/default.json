@@ -1,4 +1,7 @@
 {
+  "logging": {
+    "muteAll": "API_LOGGING_MUTE_ALL"
+  },
   "network": {
     "cors": {
       "origins": [
@@ -12,6 +15,26 @@
       "port": 6379
     },
     "concurrency": 50
+  },
+  "postgresApi": {
+    "url": null,
+    "port": 5432,
+    "host": null,
+    "username": null,
+    "password": null,
+    "database": null,
+    "runMigrationsOnStartup": false,
+    "logging": "error"
+  },
+  "postgresGeoApi": {
+    "url": null,
+    "port": 5432,
+    "host": null,
+    "username": null,
+    "password": null,
+    "database": null,
+    "runMigrationsOnStartup": false,
+    "logging": "error"
   },
   "api": {
     "url": "http://api:3000",

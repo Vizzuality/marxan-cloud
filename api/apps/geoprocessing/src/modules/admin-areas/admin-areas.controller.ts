@@ -74,13 +74,13 @@ export class AdminAreasController {
   @Header('Access-Control-Allow-Origin', '*')
   @Header('Content-Encoding', 'gzip')
   async getTile(
-    @Param() TileSpecification: TileSpecification,
-    @Query() AdminAreasFilters: AdminAreasFilters,
+    @Param() tileSpecification: TileSpecification,
+    @Query() adminAreasFilters: AdminAreasFilters,
     @Res() response: Response,
-  ): Promise<Object> {
+  ): Promise<Response> {
     const tile: Buffer = await this.service.findTile(
-      TileSpecification,
-      AdminAreasFilters,
+      tileSpecification,
+      adminAreasFilters,
     );
     return response.send(tile);
   }

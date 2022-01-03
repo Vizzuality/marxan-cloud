@@ -1,4 +1,4 @@
-import { Permit } from '../access-control.types';
+import { Permit } from '@marxan-api/modules/access-control/access-control.types';
 export abstract class ProjectAccessControl {
   abstract canCreateProject(userId: string): Promise<Permit>;
   abstract canEditProject(userId: string, projectId: string): Promise<Permit>;
@@ -8,13 +8,4 @@ export abstract class ProjectAccessControl {
     projectId: string,
   ): Promise<Permit>;
   abstract canDeleteProject(userId: string, projectId: string): Promise<Permit>;
-  abstract canCreateScenario(
-    userId: string,
-    projectId: string,
-  ): Promise<Permit>;
-  abstract canEditScenario(scenarioId: string, userId: string): Promise<Permit>;
-  abstract canViewSolutions(
-    scenarioId: string,
-    userId: string,
-  ): Promise<Permit>;
 }

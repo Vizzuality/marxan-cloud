@@ -3,13 +3,23 @@
     "muteAll": "API_LOGGING_MUTE_ALL"
   },
   "postgresApi": {
-    "url": "API_POSTGRES_URL",
-    "runMigrationsOnStartup": "API_RUN_MIGRATIONS_ON_STARTUP"
-   },
-   "postgresGeoApi": {
-    "url": "GEO_POSTGRES_URL",
-    "runMigrationsOnStartup": "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP"
-   },
+    "host": "API_POSTGRES_HOST",
+    "username": "API_POSTGRES_USER",
+    "password": "API_POSTGRES_PASSWORD",
+    "database": "API_POSTGRES_DB",
+    "port": "API_POSTGRES_PORT",
+    "runMigrationsOnStartup": "API_RUN_MIGRATIONS_ON_STARTUP",
+    "logging": "API_POSTGRES_LOGGING"
+  },
+  "postgresGeoApi": {
+    "host": "GEO_POSTGRES_HOST",
+    "username": "GEO_POSTGRES_USER",
+    "password": "GEO_POSTGRES_PASSWORD",
+    "database": "GEO_POSTGRES_DB",
+    "port": "GEO_POSTGRES_PORT",
+    "runMigrationsOnStartup": "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP",
+    "logging": "GEO_POSTGRES_LOGGING"
+  },
   "network": {
     "cors": {
       "origins_extra": "NETWORK_CORS_ORIGINS"
@@ -23,10 +33,13 @@
       "secret": "API_AUTH_X_API_KEY"
     }
   },
+  "geoprocessing": {
+    "url": "GEOPROCESSING_URL"
+  },
   "redisApi": {
-   "connection": {
-     "host": "REDIS_HOST"
-   }
+    "connection": {
+      "host": "REDIS_HOST"
+    }
   },
   "api": {
     "url": "API_SERVICE_URL",

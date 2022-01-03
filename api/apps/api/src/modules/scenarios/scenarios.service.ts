@@ -46,17 +46,14 @@ import {
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { GetProjectQuery, GetProjectErrors } from '@marxan/projects';
+import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 import {
+  ChangeProtectedAreasError,
   ProtectedAreaService,
   ScenarioProtectedArea,
-  ChangeProtectedAreasError,
   submissionFailed,
 } from './protected-area';
-import {
-  ProtectedAreaChangeDto,
-  ProtectedAreasChangeDto,
-} from './dto/protected-area-change.dto';
+import { ProtectedAreasChangeDto } from './dto/protected-area-change.dto';
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 import {
   ChangeBlmRange,
@@ -146,6 +143,7 @@ export class ScenariosService {
     input: CreateScenarioDTO,
     info: AppInfoDTO,
   ): Promise<Either<ProjectNotReady | ProjectDoesntExist, Scenario>> {
+    assertDefined(info.authenticatedUser);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
     const isProjectReady = await this.projectChecker.isProjectReady(
       input.projectId,
@@ -161,6 +159,10 @@ export class ScenariosService {
 
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
+    await this.crudService.assignCreatorRole(
+      scenario.id,
+      info.authenticatedUser.id,
+    );
     return right(scenario);
   }
 

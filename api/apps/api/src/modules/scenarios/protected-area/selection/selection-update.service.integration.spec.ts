@@ -1,11 +1,11 @@
 import {
   CommandBus,
   CommandHandler,
-  IInferredCommandHandler,
+  CqrsModule,
   EventBus,
   ICommand,
   IEvent,
-  CqrsModule,
+  IInferredCommandHandler,
 } from '@nestjs/cqrs';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
