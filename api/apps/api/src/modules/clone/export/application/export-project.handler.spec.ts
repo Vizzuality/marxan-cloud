@@ -84,7 +84,7 @@ const getFixtures = async () => {
           id: new ComponentId(v4()),
           resourceId: someScenarioId,
           finished: false,
-          piece: ClonePiece.MarxanSettings,
+          piece: ClonePiece.ExportConfig,
         },
       ]);
       return { projectId, someScenarioId };
@@ -121,7 +121,7 @@ const getFixtures = async () => {
         exportId: {
           value: expect.any(String),
         },
-        piece: 'marxan-settings',
+        piece: 'export-config',
         resourceId: {
           value: scenarioId,
         },

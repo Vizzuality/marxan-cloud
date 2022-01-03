@@ -46,7 +46,7 @@ export class Export extends AggregateRoot {
     parts: ExportComponentSnapshot[],
   ): Export {
     const exportRequest = new Export(new ExportId(v4()), id, kind, parts);
-
+    const allPieces = parts.map((part) => part.piece);
     parts
       .filter((part) => !part.finished)
       .map(
@@ -55,7 +55,9 @@ export class Export extends AggregateRoot {
             exportRequest.id,
             part.id,
             new ResourceId(part.resourceId),
+            kind,
             part.piece,
+            allPieces,
           ),
       )
       .forEach((event) => exportRequest.apply(event));

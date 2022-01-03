@@ -29,6 +29,7 @@ export class BlmInputFiles implements Cancellable {
   async for(blmValues: number[], assets: Assets): Promise<BlmWorkspace[]> {
     await this.interruptIfKilled();
     const rootWorkspace = await this.workspaceService.get();
+
     await this.interruptIfKilled();
 
     const workspaces: BlmWorkspace[] = await Promise.all(

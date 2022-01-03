@@ -1,18 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  IsArray,
   IsEnum,
   IsInt,
   IsNumber,
   IsOptional,
   IsString,
   IsUUID,
-  Max,
   Min,
 } from 'class-validator';
 import { JobStatus, ScenarioType } from '../scenario.api.entity';
 import { ScenarioMetadataDto } from './scenario-metadata.dto';
-import { IUCNCategory } from '@marxan/iucn';
 
 export class CreateScenarioDTO {
   @ApiProperty()

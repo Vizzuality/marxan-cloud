@@ -1,17 +1,20 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 
-import { ProjectAclService } from './project-acl.service';
-import { ProjectAclController } from './project-acl.controller';
+import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
+import { ProjectAclController } from '@marxan-api/modules/access-control/projects-acl/project-acl.controller';
+import { UsersModule } from '@marxan-api/modules/users/users.module';
+import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 
 @Module({
   imports: [
     CqrsModule,
-    // this entity most likely shouldn't be under `projects`
     TypeOrmModule.forFeature([UsersProjectsApiEntity]),
+    forwardRef(() => UsersModule),
+    forwardRef(() => ProjectsModule),
   ],
   providers: [ProjectAclService],
   exports: [ProjectAclService],

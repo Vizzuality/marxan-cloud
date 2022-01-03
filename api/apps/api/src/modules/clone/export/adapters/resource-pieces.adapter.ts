@@ -28,6 +28,18 @@ export class ResourcePiecesAdapter implements ResourcePieces {
         piece: ClonePiece.ProjectMetadata,
         finished: false,
       },
+      {
+        id: new ComponentId(v4()),
+        resourceId: id.value,
+        piece: ClonePiece.ExportConfig,
+        finished: false,
+      },
+      {
+        id: new ComponentId(v4()),
+        resourceId: id.value,
+        piece: ClonePiece.PlanningAreaCustom,
+        finished: false,
+      },
     ];
   }
 }

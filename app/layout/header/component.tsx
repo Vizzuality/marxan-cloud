@@ -17,9 +17,10 @@ import LOGO_BLACK from 'svgs/logo-black.svg';
 import LOGO_SVG from 'svgs/logo.svg';
 
 export interface HeaderProps {
+  className?: string;
   published?: boolean;
   size: 'base' | 'lg',
-  theme?: 'dark' | 'light',
+  theme?: 'dark' | 'light' | 'transparent',
 }
 
 const SIZE = {
@@ -37,13 +38,19 @@ const SIZE = {
   },
 };
 
-export const Header: React.FC<HeaderProps> = ({ published = false, size, theme = 'dark' }: HeaderProps) => {
+export const Header: React.FC<HeaderProps> = ({
+  className,
+  published = false,
+  size,
+  theme = 'dark',
+}: HeaderProps) => {
   const { user } = useMe();
 
   return (
     <header
       className={cx({
-        'w-full row-auto': true,
+        [className]: true,
+        'w-full row-auto z-10': true,
         'bg-primary-50 text-gray-800': theme === 'light',
       })}
     >

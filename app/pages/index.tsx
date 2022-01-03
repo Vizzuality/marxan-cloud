@@ -7,12 +7,12 @@ import { withUser } from 'hoc/auth';
 import Footer from 'layout/footer';
 import Head from 'layout/head';
 import Header from 'layout/header';
-import CarouselSection from 'layout/home/carousel-section';
+import Banner from 'layout/home/banner';
 import Features from 'layout/home/features';
-import Hero from 'layout/home/hero';
+import Intro from 'layout/home/intro';
+import PartnersList from 'layout/home/partners';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
-import PartnersList from 'layout/partners';
 
 export const getServerSideProps = withUser();
 
@@ -34,10 +34,10 @@ const Home: React.FC = () => {
         twitterSite="@Marxan_Planning"
       />
       <main className="overflow-x-hidden overflow-y-auto">
-        <Header size="lg" theme="light" />
-        <Hero />
+        <Header className="absolute" size="lg" theme="transparent" />
+        <Intro />
         <Features />
-        <CarouselSection />
+        <Banner />
         <PartnersList />
         <Footer />
       </main>

@@ -59,6 +59,7 @@ export class MarxanSandboxBlmRunnerService
       this.finalResultsRepository,
     ]);
 
+
     return new Promise<void>(async (resolve, reject) => {
       try {
         this.interruptIfKilled(scenarioId);
