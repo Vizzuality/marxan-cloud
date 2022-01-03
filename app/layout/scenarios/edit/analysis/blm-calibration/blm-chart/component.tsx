@@ -24,11 +24,15 @@ type DataRow = {
   /**
    * Value of the X axis
    */
-  cost: number;
+  score: number;
   /**
    * Value of the Y axis
    */
   boundaryLength: number;
+  /**
+   * Blm value of that intersection
+  */
+  blmValue: number;
   /**
    * Whether the point is the Boundary Length Modifier
    */
@@ -62,8 +66,8 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
   const xDomain = useMemo(() => [
-    Math.min(...data.map((d) => d.cost)),
-    Math.max(...data.map((d) => d.cost)),
+    Math.min(...data.map((d) => d.score)),
+    Math.max(...data.map((d) => d.score)),
   ], [data]);
 
   const xScale = useMemo(
@@ -88,11 +92,11 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
 
   const lineGenerator = line<DataRow>()
     // .curve(curveMonotoneX)
-    .x((d) => xScale(d.cost))
+    .x((d) => xScale(d.score))
     .y((d) => yScale(d.boundaryLength));
 
   const areaGenerator = area<DataRow>()
-    .x((d) => xScale(d.cost))
+    .x((d) => xScale(d.score))
     .y0(yScale(yDomain[0]))
     .y1((d) => yScale(d.boundaryLength));
 
@@ -179,12 +183,12 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
           {/* Points */}
           <g>
             {data.map(({
-              cost, boundaryLength, thumbnail,
+              score, boundaryLength, thumbnail, blmValue,
             }, index) => (
               <foreignObject
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
-                x={xScale(cost)}
+                x={xScale(score)}
                 y={yScale(boundaryLength)}
                 className="w-3 h-3 transform -translate-x-1.5 -translate-y-1.5"
               >
@@ -194,7 +198,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                     'cursor-pointer hover:bg-primary-500 hover:border-2': !!thumbnail,
                   })}
                   onClick={() => {
-                    dispatch(setBlm(boundaryLength));
+                    dispatch(setBlm(blmValue));
                     dispatch(setBlmImage(thumbnail));
                   }}
                   aria-hidden="true"

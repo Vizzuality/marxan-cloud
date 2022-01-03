@@ -20,8 +20,6 @@ import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
-import { DATA } from './constants';
-
 export interface ScenariosBlmSettingsGraphProps {
   maxBlmValue: number,
   minBlmValue: number,
@@ -66,7 +64,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
           onSubmit={onSaveBlm}
           initialValues={INITIAL_VALUES}
         >
-          {({ handleSubmit, form }) => {
+          {({ handleSubmit }) => {
             return (
               <form
                 className="relative flex flex-col flex-grow overflow-hidden text-white pt-7"
@@ -122,7 +120,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
                   </p>
                 </div>
                 <div className="w-full h-32">
-                  <BLMChart data={DATA} />
+                  <BLMChart data={calibrationResultsData} />
                 </div>
               </form>
             );
