@@ -676,17 +676,17 @@ export function useScenarioCalibrationResults(scenarioId) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+    transformResponse: (data) => JSON.parse(data),
   }));
 
   const { data } = query;
-  console.log('CALIBRATION', data);
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data?.data?.data) ? data?.data?.data : [];
+    const parsedData = Array.isArray(data?.data) ? data?.data : [];
 
     return {
       ...query,
       data: parsedData,
     };
-  }, [query, data?.data?.data]);
+  }, [query, data?.data]);
 }
