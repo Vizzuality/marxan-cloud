@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
+import { COST_SURFACE_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch } from 'react-redux';
@@ -10,6 +11,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
+import { bytesToMegabytes } from 'utils/units';
 
 import { useDownloadCostSurface, useUploadCostSurface } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -46,12 +48,6 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
   const {
     setJob,
   } = scenarioSlice.actions;
-
-  const maxSize = 1e6;
-
-  const bytesToMb = (bytes) => {
-    return (bytes / 1048576).toFixed(0);
-  };
 
   const downloadMutation = useDownloadCostSurface({});
   const uploadMutation = useUploadCostSurface({
@@ -123,7 +119,14 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
 
   const onDropRejected = (rejectedFiles) => {
     const r = rejectedFiles[0];
-    const { errors } = r;
+
+    // `file-too-large` backend error message is not friendly.
+    // It'll display the max size in bytes which the average user may not understand.
+    const errors = r.errors.map((error) => {
+      return error.code === 'file-too-large'
+        ? { error, message: `File is larger than ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB` }
+        : error;
+    });
 
     addToast('drop-error', (
       <>
@@ -154,7 +157,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     isDragReject,
   } = useDropzone({
     multiple: false,
-    maxSize,
+    maxSize: COST_SURFACE_UPLOADER_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
@@ -305,7 +308,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                                       to upload
                                     </p>
 
-                                    <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMb(maxSize)} MB`}</p>
+                                    <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB`}</p>
 
                                     <Loading
                                       visible={loading}

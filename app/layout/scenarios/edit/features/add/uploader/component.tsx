@@ -2,6 +2,7 @@ import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 
+import { FEATURES_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
@@ -9,6 +10,7 @@ import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
+import { bytesToMegabytes } from 'utils/units';
 
 import { useUploadFeaturesShapefile } from 'hooks/features';
 import { useToasts } from 'hooks/toast';
@@ -36,8 +38,6 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
 
-  const maxSize = 5e6;
-
   const { query } = useRouter();
   const { pid } = query;
 
@@ -48,10 +48,6 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
       method: 'POST',
     },
   });
-
-  const bytesToMb = (bytes) => {
-    return (bytes / 1048576).toFixed(0);
-  };
 
   useEffect(() => {
     return () => {
@@ -77,7 +73,14 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
 
   const onDropRejected = (rejectedFiles) => {
     const r = rejectedFiles[0];
-    const { errors } = r;
+
+    // `file-too-large` backend error message is not friendly.
+    // It'll display the max size in bytes which the average user may not understand.
+    const errors = r.errors.map((error) => {
+      return error.code === 'file-too-large'
+        ? { error, message: `File is larger than ${bytesToMegabytes(FEATURES_UPLOADER_MAX_SIZE)} MB` }
+        : error;
+    });
 
     addToast('drop-error', (
       <>
@@ -141,7 +144,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
     isDragReject,
   } = useDropzone({
     multiple: false,
-    maxSize,
+    maxSize: FEATURES_UPLOADER_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
@@ -249,7 +252,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
                               to upload
                             </p>
 
-                            <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMb(maxSize)} MB`}</p>
+                            <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(FEATURES_UPLOADER_MAX_SIZE)} MB`}</p>
 
                             <Loading
                               visible={loading}

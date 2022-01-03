@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
+import { PLANNING_AREA_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +11,7 @@ import {
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
+import { bytesToMegabytes } from 'utils/units';
 
 import { useUploadProjectPA } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
@@ -42,17 +44,11 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
 
   const dispatch = useDispatch();
 
-  const bytesToMb = (bytes) => {
-    return (bytes / 1048576).toFixed(0);
-  };
-
   const uploadProjectPAMutation = useUploadProjectPA({
     requestConfig: {
       method: 'POST',
     },
   });
-
-  const maxSize = 3e6;
 
   const { uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
 
@@ -95,7 +91,14 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
 
   const onDropRejected = (rejectedFiles) => {
     const r = rejectedFiles[0];
-    const { errors } = r;
+
+    // `file-too-large` backend error message is not friendly.
+    // It'll display the max size in bytes which the average user may not understand.
+    const errors = r.errors.map((error) => {
+      return error.code === 'file-too-large'
+        ? { error, message: `File is larger than ${bytesToMegabytes(PLANNING_AREA_UPLOADER_MAX_SIZE)} MB` }
+        : error;
+    });
 
     addToast('drop-error', (
       <>
@@ -134,7 +137,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     isDragReject,
   } = useDropzone({
     multiple: false,
-    maxSize,
+    maxSize: PLANNING_AREA_UPLOADER_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
@@ -185,7 +188,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
               return (
                 <form onSubmit={handleSubmit}>
                   <div className="p-9">
-                    <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
+                    <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile A</h4>
 
                     {!successFile && (
                       <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
@@ -234,7 +237,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                                 to upload
                               </p>
 
-                              <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMb(maxSize)} MB`}</p>
+                              <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(PLANNING_AREA_UPLOADER_MAX_SIZE)} MB`}</p>
 
                               <Loading
                                 visible={loading}
