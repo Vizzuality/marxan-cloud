@@ -194,8 +194,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
               >
                 <div
                   className={classnames({
-                    'w-3 h-3 rounded-full border-blue-500 border-2 bg-black': true,
-                    'cursor-pointer hover:bg-primary-500 hover:border-2': !!thumbnail,
+                    'w-3 h-3 rounded-full border-blue-500 border-2 bg-black hover:bg-primary-500 cursor-pointer hover:border-2': true,
                   })}
                   onClick={() => {
                     dispatch(setBlm(blmValue));

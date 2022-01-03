@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch/* , useSelector */ } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -49,8 +49,6 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
 
   const minBlmValue = 0;
   const maxBlmValue = 10000000;
-
-  // const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   useEffect(() => {
     dispatch(setBlm(null));
