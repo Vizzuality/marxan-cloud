@@ -7,26 +7,21 @@ import { useSliderState } from '@react-stately/slider';
 import cx from 'classnames';
 
 import Thumb from './thumb';
+import Value from './value';
 
 const THEME = {
   dark: {
-    base: 'w-full h-12 pt-8 touch-action-none',
-    output:
-      'absolute bottom-1 transform -translate-y-full -translate-x-1/2 text-sm text-white border border-t-0 border-l-0 border-r-0 border-dashed border-white',
+    base: 'relative w-full h-12 pt-8 touch-action-none',
     filledTrack: 'absolute left-0 h-1.5 bg-white rounded',
     track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
   },
   light: {
-    base: 'w-full h-12 pt-8 touch-action-none',
-    output:
-      'absolute bottom-1 transform -translate-y-full -translate-x-1/2 text-sm text-gray-800 border border-t-0 border-l-0 border-r-0 border-dashed border-gray-800',
+    base: 'relative w-full h-12 pt-8 touch-action-none',
     filledTrack: 'absolute left-0 h-1.5 bg-gray-800 rounded',
     track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
   },
   'dark-small': {
-    base: 'w-full h-12 pt-8 touch-action-none',
-    output:
-      'absolute bottom-1 transform -translate-y-full -translate-x-1/2 text-xs text-black',
+    base: 'relative w-full h-12 pt-8 touch-action-none',
     filledTrack: 'absolute left-0 h-1.5 bg-black rounded',
     track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
   },
@@ -50,6 +45,10 @@ export interface SliderProps {
    * Whether the input is disabled
    */
   disabled?: boolean;
+  /**
+   * Whether to allow the user to click the output and edit it directly. Defaults to `true`
+   */
+  allowEdit?: boolean,
   /**
    * Format of the value
    */
@@ -95,9 +94,13 @@ export interface SliderProps {
 export const Slider: React.FC<SliderProps> = ({
   theme = 'dark',
   status: rawState = 'none',
+  allowEdit = true,
   disabled = false,
   formatOptions = { style: 'percent' },
   labelRef,
+  maxValue,
+  minValue,
+  step,
   ...rest
 }: SliderProps) => {
   const status = disabled ? 'disabled' : rawState;
@@ -118,6 +121,9 @@ export const Slider: React.FC<SliderProps> = ({
 
   const trackRef = React.useRef(null);
   const sliderState = useSliderState({
+    maxValue,
+    minValue,
+    step,
     ...rest,
     ...propsOverride,
     numberFormatter: useNumberFormatter(formatOptions),
@@ -133,6 +139,7 @@ export const Slider: React.FC<SliderProps> = ({
       // input has the `id` attribute and the label has a `for` attribute
       // For this reason, we remove the `id` attribute from the object
       id: undefined,
+      step,
     },
     sliderState,
     trackRef,
@@ -171,15 +178,6 @@ export const Slider: React.FC<SliderProps> = ({
         ref={trackRef}
         className="relative flex items-center w-full h-full"
       >
-        <output
-          {...outputProps}
-          className={THEME[theme].output}
-          style={{
-            left: `${sliderState.getThumbPercent(0) * 100}%`,
-          }}
-        >
-          {sliderState.getThumbValueLabel(0)}
-        </output>
         <div
           className={THEME[theme].filledTrack}
           style={{
@@ -196,6 +194,20 @@ export const Slider: React.FC<SliderProps> = ({
           isDisabled={disabled}
         />
       </div>
+      <Value
+        minValue={minValue}
+        maxValue={maxValue}
+        step={step}
+        allowEdit={allowEdit}
+        isDisabled={disabled}
+        theme={theme}
+        sliderState={sliderState}
+        outputProps={outputProps}
+        formatOptions={formatOptions}
+        style={{
+          left: `${sliderState.getThumbPercent(0) * 100}%`,
+        }}
+      />
     </div>
   );
 };
