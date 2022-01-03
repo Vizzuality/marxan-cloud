@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
 import { Workspace } from '../ports/workspace';
 import { WorkspaceBuilder } from '../ports/workspace-builder';
 import { InputFilesFs } from '../adapters-single/scenario-data/input-files-fs';
 import { Cancellable } from '../ports/cancellable';
 import { AssetFactory } from './asset-factory.service';
+import { Injectable } from '@nestjs/common';
 
 export type Assets = {
   url: string;
@@ -27,7 +27,6 @@ export class BlmInputFiles implements Cancellable {
 
   async for(blmValues: number[], assets: Assets): Promise<BlmWorkspace[]> {
     const rootWorkspace = await this.workspaceService.get();
-    this.#workspaces.push(rootWorkspace);
     const workspaces: BlmWorkspace[] = await Promise.all(
       blmValues.map(async (blmValue) => ({
         blmValue,
@@ -47,6 +46,8 @@ export class BlmInputFiles implements Cancellable {
       );
       await workspace.workspace.arrangeOutputSpace();
     }
+
+    await rootWorkspace.cleanup();
 
     return workspaces;
   }
