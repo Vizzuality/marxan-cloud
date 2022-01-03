@@ -204,8 +204,13 @@ generate-export-shpfile:
 
 # Native support tasks
 
+
+native-db-destroy:
+	psql -U "${API_POSTGRES_USER}" -h "${API_POSTGRES_HOST}" -c "DROP DATABASE IF EXISTS \"${API_POSTGRES_DB}\" WITH (FORCE);"
+	psql -U "${GEO_POSTGRES_USER}" -h "${GEO_POSTGRES_HOST}" -c "DROP DATABASE IF EXISTS \"${GEO_POSTGRES_DB}\" WITH (FORCE);"
+
 # Create the API and GEO databases. Fails gracefully if the databases already exist.
-native-db-create:
+native-db-create: native-db-destroy
 	@echo "SELECT 'CREATE DATABASE \"${API_POSTGRES_DB}\"' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${API_POSTGRES_DB}')\gexec" | psql -U "${API_POSTGRES_USER}" -h "${API_POSTGRES_HOST}"
 	@echo "SELECT 'CREATE DATABASE \"${GEO_POSTGRES_DB}\"' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${GEO_POSTGRES_DB}')\gexec" | psql -U "${GEO_POSTGRES_USER}" -h "${GEO_POSTGRES_HOST}"
 
@@ -231,3 +236,4 @@ native-seed-geoapi-init-data:
 		done;
 
 native-seed-api-with-test-data: native-db-migrate native-seed-api-init-data | native-seed-geoapi-init-data
+	psql -U "${API_POSTGRES_USER}" -h "${API_POSTGRES_HOST}" ${API_POSTGRES_DB} < api/apps/api/test/fixtures/test-data.sql
