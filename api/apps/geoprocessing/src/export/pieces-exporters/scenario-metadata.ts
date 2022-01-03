@@ -27,8 +27,6 @@ export class ScenarioMetadata extends PieceProcessor {
   }
 
   async run(input: JobInput): Promise<JobOutput> {
-    console.log('hey');
-
     const scenarioData: Array<{
       name: string;
       description: string;
