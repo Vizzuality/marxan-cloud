@@ -1,5 +1,6 @@
 export * from './events';
 
+export { ImportId } from './import/import.id';
 export {
   Import,
   componentAlreadyCompleted,

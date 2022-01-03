@@ -19,6 +19,8 @@ services:
       - NODE_PATH=src
       - NODE_ENV=test
       - NODE_CONFIG_DIR=apps/api/config
+      - API_POSTGRES_URL=postgres://${API_POSTGRES_USER}:${API_POSTGRES_PASSWORD}@marxan-postgresql-api:5432/${API_POSTGRES_DB}
+      - GEO_POSTGRES_URL=postgres://${GEO_POSTGRES_USER}:${GEO_POSTGRES_PASSWORD}@marxan-postgresql-geo-api:5432/${GEO_POSTGRES_DB}
 
   geoprocessing:
     build:

@@ -16,6 +16,8 @@ import { ProtectedAreasCrudService } from '@marxan-api/modules/protected-areas/p
 import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
@@ -47,6 +49,8 @@ export class ScenariosCrudService extends AppBaseService<
     protected readonly protectedAreasService: ProtectedAreasCrudService,
     @Inject(forwardRef(() => ProjectsCrudService))
     protected readonly projectsService: ProjectsCrudService,
+    @InjectRepository(UsersScenariosApiEntity)
+    private readonly userScenarios: Repository<UsersScenariosApiEntity>,
   ) {
     super(repository, 'scenario', 'scenarios', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -128,8 +132,22 @@ export class ScenariosCrudService extends AppBaseService<
   ): Promise<Scenario> {
     const model = await super.setDataCreate(create, info);
     assertDefined(model.projectId);
+    /**
+     * @TODO figure out the best way to re-enable the eslint rule
+     */
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     model.createdBy = info?.authenticatedUser?.id!;
     return model;
+  }
+
+  async assignCreatorRole(scenarioId: string, userId: string): Promise<void> {
+    await this.userScenarios.save(
+      this.userScenarios.create({
+        scenarioId,
+        userId,
+        roleName: ScenarioRoles.scenario_owner,
+      }),
+    );
   }
 
   async setDataUpdate(
@@ -154,6 +172,21 @@ export class ScenariosCrudService extends AppBaseService<
     }
 
     return model;
+  }
+
+  /**
+   * Could be that entity-relations in codebase are wrong
+   * https://github.com/typeorm/typeorm/blob/master/docs/many-to-many-relations.md#many-to-many-relations-with-custom-properties
+   *
+   * Thus, when using `remove(EntityInstance)` it complains on missing
+   * `user_id`.
+   *
+   * `delete` seems to omit code-declarations and use db's cascades
+   */
+  async remove(id: string): Promise<void> {
+    await this.repository.delete({
+      id,
+    });
   }
 
   async extendFindAllQuery(

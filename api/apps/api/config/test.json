@@ -1,1 +1,10 @@
-{}
+{
+  "auth": {
+    "jwt": {
+      "secret": "fakeTestJWTSecret"
+    },
+    "xApiKey": {
+      "secret": "fakeTestXApiKey"
+    }
+  }
+}

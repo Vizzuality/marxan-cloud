@@ -94,10 +94,7 @@ import {
 } from '@marxan-api/decorators/file-interceptors.decorator';
 import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-area.dto';
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
-import {
-  ProtectedAreaChangeDto,
-  ProtectedAreasChangeDto,
-} from '@marxan-api/modules/scenarios/dto/protected-area-change.dto';
+import { ProtectedAreasChangeDto } from '@marxan-api/modules/scenarios/dto/protected-area-change.dto';
 import { StartScenarioBlmCalibrationDto } from '@marxan-api/modules/scenarios/dto/start-scenario-blm-calibration.dto';
 import {
   invalidRange,

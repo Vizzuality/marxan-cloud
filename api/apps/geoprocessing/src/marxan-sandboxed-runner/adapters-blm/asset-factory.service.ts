@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { copySync, writeFileSync } from 'fs-extra';
 import { Workspace } from '../ports/workspace';
 import { Assets } from './blm-input-files';
-import { dirname, resolve } from 'path';
-import { promises } from 'fs';
+import { resolve } from 'path';
 import { FileReader } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/file-reader';
 
 @Injectable()

@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 import { assertDefined, FieldsOf } from '@marxan/utils';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
 import { QueueNameToken } from '@marxan-api/modules/queue/queue.tokens';
+import * as config from 'config';
 
 @Injectable({
   scope: Scope.TRANSIENT,
@@ -32,7 +33,9 @@ export class FakeQueue implements Partial<Queue> {
   private static instances: WeakMap<Key, FakeQueue> = new WeakMap();
   private static instanceKeys: Record<string, Key | undefined> = {};
   public jobs: Record<string, Job> = {};
-  private readonly queueBase = new QueueBase(v4());
+  private readonly queueBase = new QueueBase(v4(), {
+    ...config.get('redisApi'),
+  });
 
   constructor(
     @Inject(QueueNameToken)
@@ -69,7 +72,7 @@ export class FakeQueue implements Partial<Queue> {
     name: string,
     data: any,
     opts: JobsOptions | undefined,
-  ): Promise<Job<any, any, string>> {
+  ): Promise<Job> {
     const job: Job = new Job(this.queueBase, name, data, opts, opts?.jobId);
     if (!job.id) {
       job.id = v4();

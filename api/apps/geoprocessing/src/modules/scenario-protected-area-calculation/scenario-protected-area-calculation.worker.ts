@@ -4,7 +4,10 @@ import { EventBus } from '@nestjs/cqrs';
 
 import { WorkerBuilder } from '@marxan-geoprocessing/modules/worker';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { queueName, JobInput } from '@marxan-jobs/planning-unit-protection-level';
+import {
+  queueName,
+  JobInput,
+} from '@marxan-jobs/planning-unit-protection-level';
 
 import { ScenarioProtectedAreaCalculationProcessor } from './scenario-protected-area-calculation-processor';
 import { ApiEvent } from '../api-events';
