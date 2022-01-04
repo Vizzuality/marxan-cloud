@@ -14,32 +14,19 @@ import {
 } from './types';
 
 export function useWDPACategories({
-  adminAreaId,
-  customAreaId,
   scenarioId,
 }: UseWDPACategoriesProps) {
   const [session] = useSession();
 
   const query = useQuery(
-    ['scenarios', adminAreaId, customAreaId],
+    'scenarios',
     async () => WDPA.request({
       method: 'GET',
       url: `/${scenarioId}/protected-areas`,
-      params: {
-        ...(adminAreaId && {
-          'filter[adminAreaId]': adminAreaId,
-        }),
-        ...(customAreaId && {
-          'filter[customAreaId]': customAreaId,
-        }),
-      },
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
     }),
-    {
-      enabled: !!adminAreaId || !!customAreaId,
-    },
   );
 
   const { data } = query;

@@ -11,7 +11,6 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
@@ -43,11 +42,9 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const { addToast } = useToasts();
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { sid } = query;
 
   const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const { data: projectData } = useProject(pid);
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPAThreshold } = scenarioSlice.actions;
@@ -66,12 +63,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
   } = useWDPACategories({
-    adminAreaId: projectData?.adminAreaLevel2Id
-      || projectData?.adminAreaLevel1I
-      || projectData?.countryId,
-    customAreaId: !projectData?.adminAreaLevel2Id
-      && !projectData?.adminAreaLevel1I
-      && !projectData?.countryId ? projectData?.planningAreaId : null,
     scenarioId: sid,
   });
 

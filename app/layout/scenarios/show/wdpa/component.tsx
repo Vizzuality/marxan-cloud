@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
 
-import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
@@ -24,11 +23,10 @@ export interface ScenariosSidebarShowWDPAProps {
 
 export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> = () => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { sid } = query;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
 
-  const { data: projectData } = useProject(pid);
   const {
     data: scenarioData,
     isFetching: scenarioIsFetching,
@@ -40,12 +38,6 @@ export const ScenariosSidebarShowWDPA: React.FC<ScenariosSidebarShowWDPAProps> =
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
   } = useWDPACategories({
-    adminAreaId: projectData?.adminAreaLevel2Id
-      || projectData?.adminAreaLevel1I
-      || projectData?.countryId,
-    customAreaId: !projectData?.adminAreaLevel2Id
-      && !projectData?.adminAreaLevel1I
-      && !projectData?.countryId ? projectData?.planningAreaId : null,
     scenarioId: sid,
   });
 

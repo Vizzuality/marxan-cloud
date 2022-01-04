@@ -9,7 +9,6 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
@@ -34,15 +33,13 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   onDismiss,
 }: WDPACategoriesProps) => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
   const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const { data: projectData } = useProject(pid);
 
   const {
     data: scenarioData,
@@ -56,12 +53,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     isFetched: wdpaIsFetched,
     refetch: refetchProtectedAreas,
   } = useWDPACategories({
-    adminAreaId: projectData?.adminAreaLevel2Id
-      || projectData?.adminAreaLevel1I
-      || projectData?.countryId,
-    customAreaId: !projectData?.adminAreaLevel2Id
-      && !projectData?.adminAreaLevel1I
-      && !projectData?.countryId ? projectData?.planningAreaId : null,
     scenarioId: sid,
   });
 
