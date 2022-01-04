@@ -54,7 +54,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
             <div className="text-sm">Contributors to this project:</div>
 
             <ul className="flex ml-2.5">
-              {!!projectUsers.length && projectUsers.map((u, i) => {
+              {!!projectUsers?.length && projectUsers.map((u, i) => {
                 const { user: { displayName, id, avatarDataUrl } } = u;
                 return (
                   <li
