@@ -6,6 +6,8 @@ import {
 
 import { useSession } from 'next-auth/client';
 
+import { useMe } from 'hooks/me';
+
 import ROLES from 'services/roles';
 
 import {
@@ -108,4 +110,38 @@ export function useDeleteProjectUser({
       console.info('Error', error, variables, context);
     },
   });
+}
+
+export function useRoleMe(projectId) {
+  const [session] = useSession();
+
+  const { data: me } = useMe();
+  console.log('me', me.data.id);
+
+  console.log('me', projectId);
+
+  const query = useQuery(['roles', projectId], async () => ROLES.request({
+    method: 'GET',
+    url: `/${projectId}/users`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }).then((response) => {
+    return response;
+  }), {
+    enabled: !!projectId,
+  });
+
+  const { data } = query;
+  console.log('PROJECT ROLES', data?.data?.data);
+
+  // const roleMe =
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data?.data,
+    };
+  }, [query, data?.data?.data]);
 }

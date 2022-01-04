@@ -6,6 +6,7 @@ import { usePlausible } from 'next-plausible';
 import type { Project } from 'types/project-model';
 
 import { useMe } from 'hooks/me';
+import { useRoleMe } from 'hooks/project-users';
 
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -45,6 +46,10 @@ export const Item: React.FC<ItemProps> = ({
   const [animate, setAnimate] = useState('leave');
   const plausible = usePlausible();
   const { user } = useMe();
+
+  const roleMe = useRoleMe(id);
+
+  console.log('role Me', roleMe);
 
   const handleMouseEnter = useCallback(() => {
     setAnimate('enter');
