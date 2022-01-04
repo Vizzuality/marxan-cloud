@@ -10,6 +10,8 @@ import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
+import { v4 } from 'uuid';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -24,9 +26,11 @@ export const getFixtures = async () => {
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
   const scenarioOwnerRole = ScenarioRoles.scenario_owner;
+  const projectOwnerRole = Roles.project_owner;
   const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
     getRepositoryToken(UsersScenariosApiEntity),
   );
+  const nonExistantUserId = v4();
 
   const { projectId } = await GivenProjectExists(
     app,
@@ -217,6 +221,34 @@ export const getFixtures = async () => {
           userId: viewerUserId,
           roleName: scenarioContributorRole,
         }),
+    WhenAddingIncorrectUserRole: async (scenarioId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          scenarioId,
+          userId: viewerUserId,
+          roleName: projectOwnerRole,
+        }),
+    WhenAddingNonSenseUserId: async (scenarioId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          scenarioId,
+          userId: 'nonsense',
+          roleName: scenarioOwnerRole,
+        }),
+
+    WhenAddingNonExistantUserId: async (scenarioId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          scenarioId,
+          userId: nonExistantUserId,
+          roleName: scenarioOwnerRole,
+        }),
     WhenRevokingAccessToViewerFromScenarioAsOwner: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .delete(`/api/v1/roles/scenarios/${scenarioId}/users/${viewerUserId}`)
@@ -280,6 +312,14 @@ export const getFixtures = async () => {
       expect(response.status).toEqual(204);
     },
 
+    ThenBadRequestIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
+    },
+
+    ThenTransactionFailedIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(500);
+    },
+
     ThenSingleOwnerUserInScenarioIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(200);
       expect(response.body.data).toHaveLength(1);
@@ -314,13 +354,55 @@ export const getFixtures = async () => {
       expect(response.status).toEqual(200);
       expect(response.body.data).toHaveLength(4);
     },
-    ThenUsersWithChangedRoleIsOnProject: (response: request.Response) => {
+    ThenUsersWithChangedRoleIsOnScenario: (response: request.Response) => {
       expect(response.status).toEqual(200);
       expect(response.body.data).toHaveLength(2);
       const newUserCreated = response.body.data.find(
         (user: any) => user.user.id === viewerUserId,
       );
       expect(newUserCreated.roleName).toEqual(scenarioContributorRole);
+    },
+    ThenThreeCorrectUsersAreReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(3);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === viewerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      const thirdUser = response.body.data.find(
+        (user: any) => user.user.id === otherOwnerUserId,
+      );
+      expect(firstUser.roleName).toEqual(scenarioContributorRole);
+      expect(secondUser.roleName).toEqual(scenarioOwnerRole);
+      expect(thirdUser.roleName).toEqual(scenarioOwnerRole);
+    },
+    ThenCorrectUsersAreReturnedAfterDeletionAndChangingRole: (
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === viewerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      expect(firstUser.roleName).toEqual(scenarioContributorRole);
+      expect(secondUser.roleName).toEqual(scenarioOwnerRole);
+    },
+    ThenLastTwoCorrectUsersAreReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === otherOwnerUserId,
+      );
+      expect(firstUser.roleName).toEqual(scenarioOwnerRole);
+      expect(secondUser.roleName).toEqual(scenarioOwnerRole);
     },
   };
 };

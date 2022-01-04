@@ -231,6 +231,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
         );
       }
 
+      await apiQueryRunner.commitTransaction();
       return right(void 0);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();

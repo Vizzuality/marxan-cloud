@@ -217,6 +217,8 @@ export class ProjectAclService implements ProjectAccessControl {
           { roleName },
         );
       }
+
+      await apiQueryRunner.commitTransaction();
       return right(void 0);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
