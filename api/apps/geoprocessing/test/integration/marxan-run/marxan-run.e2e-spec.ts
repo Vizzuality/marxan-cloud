@@ -53,7 +53,10 @@ describe(`given input data is delayed`, () => {
 
 describe(`given input data is available`, () => {
   beforeEach(async () => {
-    fixtures.GivenInputFilesAreAvailable();
+    // We add a delay to the file loading mocks, so we can
+    // artificially extend the duration of the Marxan run
+    // thus ensuring it's still running when we cancel it
+    fixtures.GivenInputFilesAreAvailable(500);
     await fixtures.GivenScenarioDataExists();
     await fixtures.GivenScenarioPuDataExists();
   }, 60000 * 2);

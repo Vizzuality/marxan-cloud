@@ -54,7 +54,7 @@ export class InputFilesFs
   private async ensureWriteDirectoryExists(
     fileDestination: string,
   ): Promise<void> {
-    // if directory does not exists, it will silently "success" downloading the file while it won't be there
+    // if directory does not exist, it will silently "success" downloading the file while it won't be there
     const desiredDirectory = dirname(fileDestination);
     await promises.mkdir(desiredDirectory, { recursive: true });
   }
