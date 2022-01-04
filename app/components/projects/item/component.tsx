@@ -47,7 +47,7 @@ export const Item: React.FC<ItemProps> = ({
   const plausible = usePlausible();
   const { user } = useMe();
 
-  const roleMe = useRoleMe(id);
+  const { data: roleMe } = useRoleMe(id);
 
   console.log('role Me', roleMe);
 

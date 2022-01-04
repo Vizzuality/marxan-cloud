@@ -116,9 +116,7 @@ export function useRoleMe(projectId) {
   const [session] = useSession();
 
   const { data: me } = useMe();
-  console.log('me', me.data.id);
-
-  console.log('me', projectId);
+  const meId = me?.data?.id;
 
   const query = useQuery(['roles', projectId], async () => ROLES.request({
     method: 'GET',
@@ -134,14 +132,14 @@ export function useRoleMe(projectId) {
   });
 
   const { data } = query;
-  console.log('PROJECT ROLES', data?.data?.data);
+  const projectRoles = data?.data?.data;
 
-  // const roleMe =
+  const roleMe = projectRoles?.find((r) => r.user.id === meId).roleName;
 
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data?.data,
+      data: roleMe,
     };
-  }, [query, data?.data?.data]);
+  }, [query, roleMe]);
 }
