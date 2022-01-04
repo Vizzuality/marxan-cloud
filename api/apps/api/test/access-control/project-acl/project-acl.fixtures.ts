@@ -9,6 +9,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsACLTestUtils } from '../../utils/projects-acl.test.utils';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { v4 } from 'uuid';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -27,6 +28,7 @@ export const getFixtures = async () => {
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
+  const nonExistantUserId = v4();
   const cleanups: (() => Promise<void>)[] = [];
 
   return {
@@ -228,6 +230,25 @@ export const getFixtures = async () => {
           userId: viewerUserId,
           roleName: scenarioOwnerRole,
         }),
+    WhenAddingNonSenseUserId: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: 'nonsense',
+          roleName: projectOwnerRole,
+        }),
+
+    WhenAddingNonExistantUserId: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: nonExistantUserId,
+          roleName: projectOwnerRole,
+        }),
     WhenRevokingAccessToViewerFromProjectAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())
         .delete(`/api/v1/roles/projects/${projectId}/users/${viewerUserId}`)
@@ -285,6 +306,10 @@ export const getFixtures = async () => {
       expect(response.status).toEqual(400);
     },
 
+    ThenTransactionFailedIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(500);
+    },
+
     ThenNoContentIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(204);
     },
@@ -330,6 +355,48 @@ export const getFixtures = async () => {
         (user: any) => user.user.id === viewerUserId,
       );
       expect(newUserCreated.roleName).toEqual(projectContributorRole);
+    },
+    ThenThreeCorrectUsersAreReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(3);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === viewerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      const thirdUser = response.body.data.find(
+        (user: any) => user.user.id === otherOwnerUserId,
+      );
+      expect(firstUser.roleName).toEqual(projectContributorRole);
+      expect(secondUser.roleName).toEqual(projectOwnerRole);
+      expect(thirdUser.roleName).toEqual(projectOwnerRole);
+    },
+    ThenCorrectUsersAreReturnedAfterDeletionAndChangingRole: (
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === viewerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      expect(firstUser.roleName).toEqual(projectContributorRole);
+      expect(secondUser.roleName).toEqual(projectOwnerRole);
+    },
+    ThenLastTwoCorrectUsersAreReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === otherOwnerUserId,
+      );
+      expect(firstUser.roleName).toEqual(projectOwnerRole);
+      expect(secondUser.roleName).toEqual(projectOwnerRole);
     },
   };
 };

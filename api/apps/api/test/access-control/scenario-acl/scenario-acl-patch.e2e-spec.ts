@@ -74,5 +74,67 @@ test(`change user role`, async () => {
   const allUsersInScenarioResponse = await fixtures.WhenGettingScenarioUsersAsOwner(
     scenarioId,
   );
-  fixtures.ThenUsersWithChangedRoleIsOnProject(allUsersInScenarioResponse);
+  fixtures.ThenUsersWithChangedRoleIsOnScenario(allUsersInScenarioResponse);
+});
+
+test(`adds a not allowed user role to project`, async () => {
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+  const incorrectRoleResponse = await fixtures.WhenAddingIncorrectUserRole(
+    scenarioId,
+  );
+  fixtures.ThenBadRequestIsReturned(incorrectRoleResponse);
+});
+
+test(`adds non-sensical userId`, async () => {
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+  const nonSenseUserIdResponse = await fixtures.WhenAddingNonSenseUserId(
+    scenarioId,
+  );
+  fixtures.ThenBadRequestIsReturned(nonSenseUserIdResponse);
+});
+
+test(`adds non-existant userId`, async () => {
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+  const nonExistantUserIdResponse = await fixtures.WhenAddingNonExistantUserId(
+    scenarioId,
+  );
+  fixtures.ThenTransactionFailedIsReturned(nonExistantUserIdResponse);
+});
+
+test(`adds and deletes users alternatively`, async () => {
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+  await fixtures.GivenViewerWasAddedToScenario(scenarioId);
+
+  const viewerResponse = await fixtures.WhenAddingANewViewerToTheScenarioAsOwner(
+    scenarioId,
+  );
+  const contributorResponse = await fixtures.WhenAddingANewContributorToTheScenarioAsOwner(
+    scenarioId,
+  );
+  fixtures.ThenNoContentIsReturned(viewerResponse);
+  fixtures.ThenNoContentIsReturned(contributorResponse);
+
+  await fixtures.WhenRevokingAccessToContributorFromScenarioAsOwner(scenarioId);
+  await fixtures.WhenChangingUserRole(scenarioId);
+  let currentUsersResponse = await fixtures.WhenGettingScenarioUsersAsOwner(
+    scenarioId,
+  );
+  fixtures.ThenCorrectUsersAreReturnedAfterDeletionAndChangingRole(
+    currentUsersResponse,
+  );
+
+  const ownerResponse = await fixtures.WhenAddingANewOwnerToTheScenarioAsOwner(
+    scenarioId,
+  );
+  fixtures.ThenNoContentIsReturned(ownerResponse);
+  currentUsersResponse = await fixtures.WhenGettingScenarioUsersAsOwner(
+    scenarioId,
+  );
+  fixtures.ThenThreeCorrectUsersAreReturned(currentUsersResponse);
+
+  await fixtures.WhenRevokingAccessToViewerFromScenarioAsOwner(scenarioId);
+  currentUsersResponse = await fixtures.WhenGettingScenarioUsersAsOwner(
+    scenarioId,
+  );
+  fixtures.ThenLastTwoCorrectUsersAreReturned(currentUsersResponse);
 });

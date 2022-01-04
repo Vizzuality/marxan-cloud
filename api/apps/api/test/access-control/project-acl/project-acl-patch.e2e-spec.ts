@@ -92,3 +92,57 @@ test(`adds a not allowed user role to project`, async () => {
   );
   fixtures.ThenBadRequestIsReturned(incorrectRoleResponse);
 });
+
+test(`adds non-sensical userId`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  const nonSenseUserIdResponse = await fixtures.WhenAddingNonSenseUserId(
+    projectId,
+  );
+  fixtures.ThenBadRequestIsReturned(nonSenseUserIdResponse);
+});
+
+test(`adds non-existant userId`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  const nonExistantUserIdResponse = await fixtures.WhenAddingNonExistantUserId(
+    projectId,
+  );
+  fixtures.ThenTransactionFailedIsReturned(nonExistantUserIdResponse);
+});
+
+test(`adds and deletes users alternatively`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenViewerWasAddedToProject(projectId);
+
+  const viewerResponse = await fixtures.WhenAddingANewViewerToTheProjectAsOwner(
+    projectId,
+  );
+  const contributorResponse = await fixtures.WhenAddingANewContributorToTheProjectAsOwner(
+    projectId,
+  );
+  fixtures.ThenNoContentIsReturned(viewerResponse);
+  fixtures.ThenNoContentIsReturned(contributorResponse);
+
+  await fixtures.WhenRevokingAccessToContributorFromProjectAsOwner(projectId);
+  await fixtures.WhenChangingUserRole(projectId);
+  let currentUsersResponse = await fixtures.WhenGettingProjectUsersAsOwner(
+    projectId,
+  );
+  fixtures.ThenCorrectUsersAreReturnedAfterDeletionAndChangingRole(
+    currentUsersResponse,
+  );
+
+  const ownerResponse = await fixtures.WhenAddingANewOwnerToTheProjectAsOwner(
+    projectId,
+  );
+  fixtures.ThenNoContentIsReturned(ownerResponse);
+  currentUsersResponse = await fixtures.WhenGettingProjectUsersAsOwner(
+    projectId,
+  );
+  fixtures.ThenThreeCorrectUsersAreReturned(currentUsersResponse);
+
+  await fixtures.WhenRevokingAccessToViewerFromProjectAsOwner(projectId);
+  currentUsersResponse = await fixtures.WhenGettingProjectUsersAsOwner(
+    projectId,
+  );
+  fixtures.ThenLastTwoCorrectUsersAreReturned(currentUsersResponse);
+});
