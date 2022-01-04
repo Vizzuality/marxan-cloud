@@ -8,6 +8,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
+import { useRoleMe } from 'hooks/project-users';
 import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
@@ -46,7 +47,10 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   const [section, setSection] = useState(null);
   const [runOpen, setRunOpen] = useState(false);
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
+
+  const { data: roleMe } = useRoleMe(pid);
+  const VIEWER = roleMe === 'project_viewer';
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
@@ -169,6 +173,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
                 <Button
                   theme="spacial"
                   size="lg"
+                  disabled={VIEWER}
                   onClick={() => setRunOpen(true)}
                 >
                   Run scenario

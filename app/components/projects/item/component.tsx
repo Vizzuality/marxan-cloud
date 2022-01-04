@@ -48,8 +48,7 @@ export const Item: React.FC<ItemProps> = ({
   const { user } = useMe();
 
   const { data: roleMe } = useRoleMe(id);
-
-  console.log('role Me', roleMe);
+  const OWNER = roleMe === 'project_owner';
 
   const handleMouseEnter = useCallback(() => {
     setAnimate('enter');
@@ -237,6 +236,7 @@ export const Item: React.FC<ItemProps> = ({
               theme="secondary"
               size="xs"
               onClick={handleDelete}
+              disabled={!OWNER}
             >
               Delete
             </Button>

@@ -4,7 +4,7 @@ import React, {
 
 import { useRouter } from 'next/router';
 
-import { useEditProjectUserRole, useDeleteProjectUser } from 'hooks/project-users';
+import { useEditProjectUserRole, useDeleteProjectUser, useRoleMe } from 'hooks/project-users';
 import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
@@ -33,6 +33,9 @@ export const UserCard: React.FC<UserCardProps> = ({
 
   const [open, setOpen] = useState(false);
   const [userRole, setUserRole] = useState(ROLES[roleName]);
+
+  const { data: roleMe } = useRoleMe(pid);
+  const OWNER = roleMe === 'project_owner';
 
   const editProjectUserRoleMutation = useEditProjectUserRole({
     requestConfig: {
@@ -126,15 +129,16 @@ export const UserCard: React.FC<UserCardProps> = ({
           <Select
             initialSelected={ROLES[roleName]}
             maxHeight={300}
+            size="s"
+            status="none"
+            theme="light"
+            placeholder={ROLES[roleName]}
+            options={OPTIONS}
+            disabled={!OWNER}
             onChange={(value: string) => {
               onEditRole(value);
               setUserRole(value);
             }}
-            options={OPTIONS}
-            placeholder={ROLES[roleName]}
-            size="s"
-            status="none"
-            theme="light"
           />
         </div>
       </div>
@@ -187,6 +191,7 @@ export const UserCard: React.FC<UserCardProps> = ({
             className="flex-shrink-0 h-6 py-2 text-sm bg-gray-600 group"
             theme="secondary-alt"
             size="xs"
+            disabled={!OWNER}
             onClick={() => setOpen(true)}
           >
             <span className="text-white group-hover:text-gray-600">Remove</span>

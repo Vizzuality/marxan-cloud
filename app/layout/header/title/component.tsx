@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
+import { useRoleMe } from 'hooks/project-users';
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -25,6 +26,10 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid, sid } = query;
+
+  const { data: roleMe } = useRoleMe(pid);
+  const VIEWER = roleMe === 'project_viewer';
+
   const { data: projectData, isLoading: projectIsLoading } = useProject(pid);
   const { data: scenarioData, isLoading: scenarioIsLoading } = useScenario(sid);
 
@@ -174,7 +179,7 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                       <Tooltip
                         arrow
                         placement="bottom"
-                        disabled={meta.active || editable || !header}
+                        disabled={meta.active || editable || !header || VIEWER}
                         content={(
                           <div className="px-2 py-1 text-gray-500 bg-white rounded">
                             <span>Edit name</span>
@@ -198,7 +203,7 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                               'absolute left-0 focus:bg-primary-300 focus:text-gray-500 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none cursor-pointer': true,
                               'text-4xl': !header,
                             })}
-                            disabled={!editable && !header}
+                            disabled={(!editable && !header) || VIEWER}
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();

@@ -4,9 +4,10 @@ import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 
+import { useRoleMe } from 'hooks/project-users';
+
 import Title from 'layout/header/title';
 import Contributors from 'layout/projects/show/header/contributors';
-// import Description from 'layout/projects/show/header/description';
 import Toolbar from 'layout/projects/show/header/toolbar';
 import Wrapper from 'layout/wrapper';
 
@@ -20,8 +21,13 @@ export interface ProjectsHeaderProps {
 }
 
 export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
-  const { push } = useRouter();
+  const { query, push } = useRouter();
   const [editable, setEditable] = useState(false);
+  const { pid } = query;
+
+  const { data: roleMe } = useRoleMe(pid);
+  const VIEWER = roleMe === 'project_viewer';
+
   const handleEdition = () => setEditable(!editable);
 
   return (
@@ -40,12 +46,13 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
             <Title editable={editable} />
             <button
               type="button"
-              onClick={handleEdition}
               className={cx({
                 'cursor-pointer focus:outline-none h-10 w-10 px-3 rounded-full border border-gray-500 flex items-center justify-center': true,
                 'bg-transparent': !editable,
                 'bg-white': editable,
               })}
+              disabled={VIEWER}
+              onClick={handleEdition}
             >
               <Icon
                 icon={EDIT_SVG}
