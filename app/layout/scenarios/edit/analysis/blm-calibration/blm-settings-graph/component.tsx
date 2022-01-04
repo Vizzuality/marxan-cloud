@@ -58,7 +58,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
   return (
     <>
       <div className="flex">
-        {calibrationResultsAreFetched && (
+        {calibrationResultsAreFetched && !!calibrationResultsData.length && (
           <FormRFF
             onSubmit={onSaveBlm}
             initialValues={INITIAL_VALUES}
