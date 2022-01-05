@@ -25,8 +25,21 @@ export class MarxanSandboxBlmRunnerService
 
   kill(ofScenarioId: string): void {
     const controller = this.#controllers[ofScenarioId];
+    if (controller && !controller.signal.aborted) {
+      controller.abort();
+    }
+  }
 
-    if (controller && !controller.signal.aborted) controller.abort();
+  private interruptIfKilled(scenarioId: string): void {
+    const controller = this.#controllers[scenarioId];
+
+    if (controller && controller.signal.aborted) {
+      this.clearAbortController(scenarioId);
+      throw {
+        stdError: [],
+        signal: 'SIGTERM',
+      };
+    }
   }
 
   async run(
@@ -46,30 +59,47 @@ export class MarxanSandboxBlmRunnerService
       this.finalResultsRepository,
     ]);
 
-    const workspaces = await inputFilesHandler.for(blmValues, input.assets);
 
-    for (const { workspace, blmValue } of workspaces) {
-      const singleRunner = this.marxanRunnerFactory.for(
-        scenarioId,
-        calibrationId,
-        blmValue,
-        workspace,
-      );
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        this.interruptIfKilled(scenarioId);
+        const workspaces = await inputFilesHandler.for(blmValues, input.assets);
 
-      const abortEventListener = () => {
-        singleRunner.kill(scenarioId);
-      };
-      abortController.signal.addEventListener('abort', abortEventListener);
+        this.interruptIfKilled(scenarioId);
 
-      await singleRunner.run(input, progressCallback);
-      abortController.signal.removeEventListener('abort', abortEventListener);
-    }
+        for (const { workspace, blmValue } of workspaces) {
+          const singleRunner = this.marxanRunnerFactory.for(
+            scenarioId,
+            calibrationId,
+            blmValue,
+            workspace,
+          );
 
-    await this.finalResultsRepository.saveFinalResults(
-      scenarioId,
-      calibrationId,
-    );
-    this.clearAbortController(scenarioId);
+          const abortEventListener = () => {
+            singleRunner.kill(scenarioId);
+          };
+          abortController.signal.addEventListener('abort', abortEventListener);
+
+          await singleRunner.run(input, progressCallback).catch((err) => {
+            reject(err);
+          });
+          abortController.signal.removeEventListener(
+            'abort',
+            abortEventListener,
+          );
+        }
+        this.interruptIfKilled(scenarioId);
+        await this.finalResultsRepository.saveFinalResults(
+          scenarioId,
+          calibrationId,
+        );
+        this.clearAbortController(scenarioId);
+        this.interruptIfKilled(scenarioId);
+      } catch (err) {
+        reject(err);
+      }
+      resolve();
+    });
   }
 
   private getAbortControllerForRun(

@@ -23,6 +23,8 @@ import {
   blmSandboxRunner,
 } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-run-adapter.module';
 import { MarxanSandboxBlmRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/marxan-sandbox-blm-runner.service';
+import { BlmFinalResultEntity } from '@marxan/blm-calibration';
+import { BlmPartialResultEntity } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.geo.entity';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -30,20 +32,20 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-describe.skip(`given input data is delayed`, () => {
+describe(`given input data is delayed`, () => {
   beforeEach(() => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test(`cancelling marxan run during fetching assets`, async (done) => {
+  test(`cancelling blm calibration run during fetching assets`, async (done) => {
     expect.assertions(1);
 
     fixtures
-      .GivenMarxanIsRunning()
+      .GivenBLMCalibrationIsRunning()
       .then(() => {
-        done(`Shouldn't finish Marxan run.`);
+        throw new Error(`BLM calibration run shouldn't finish`);
       })
-      .catch((error) => {
+      .catch(async (error) => {
         expect(error.signal).toEqual('SIGTERM');
         done();
       });
@@ -63,19 +65,20 @@ describe(`given input data is available`, () => {
   test(
     `marxan run during binary execution`,
     async () => {
-      await fixtures.GivenMarxanIsRunning();
-      // await fixtures.ThenOutputScenarioPuDataWasPersisted();
+      await fixtures.GivenBLMCalibrationIsRunning();
+      await fixtures.ThenBlmFinalResultsArePersisted();
+      await fixtures.ThenBlmPartialResultsHaveBeenDeleted();
     },
     60000 * 15,
   );
 
-  test.skip(`cancelling marxan run`, async (done) => {
+  test(`cancelling BLM calibration run`, async (done) => {
     expect.assertions(1);
 
     fixtures
-      .GivenMarxanIsRunning()
+      .GivenBLMCalibrationIsRunning()
       .then(() => {
-        done(`Shouldn't finish Marxan run.`);
+        done(`Shouldn't finish BLM calibration run.`);
       })
       .catch((error) => {
         expect(JSON.parse(error).signal).toEqual('SIGTERM');
@@ -121,6 +124,12 @@ const getFixtures = async () => {
   const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> = app.get(
     getRepositoryToken(OutputScenariosFeaturesDataGeoEntity),
   );
+  const blmFinalResultsRepo: Repository<BlmFinalResultEntity> = app.get(
+    getRepositoryToken(BlmFinalResultEntity),
+  );
+  const blmPartialResultsRepo: Repository<BlmPartialResultEntity> = app.get(
+    getRepositoryToken(BlmPartialResultEntity),
+  );
   // note that SandboxRunner may be both single and blm-calibration one
   const runModuleContext = app.select(BlmRunAdapterModule);
 
@@ -151,7 +160,7 @@ const getFixtures = async () => {
       nock.enableNetConnect();
     },
     progressMock: jest.fn(),
-    async GivenMarxanIsRunning() {
+    async GivenBLMCalibrationIsRunning() {
       return await sut.run(
         {
           blmValues: [0.1, 1, 10],
@@ -235,6 +244,12 @@ const getFixtures = async () => {
           },
         }),
       ).toEqual(NUMBER_OF_FEATURES_IN_SAMPLE * NUMBER_OF_RUNS);
+    },
+    ThenBlmFinalResultsArePersisted: async () => {
+      expect(await blmFinalResultsRepo.count()).toEqual(3);
+    },
+    ThenBlmPartialResultsHaveBeenDeleted: async () => {
+      expect(await blmPartialResultsRepo.count()).toEqual(0);
     },
     ThenProgressWasReported() {
       // checking only the last call, otherwise the test is flaky as it depends on chunking the buffer
