@@ -162,6 +162,12 @@
       ],
       "@marxan/cloning/*": [
         "libs/cloning/src/*"
+      ],
+      "@marxan/code-guide": [
+        "libs/code-guide/src"
+      ],
+      "@marxan/code-guide/*": [
+        "libs/code-guide/src/*"
       ]
     }
   },

@@ -4,28 +4,39 @@ describe('blm-values-calculator', () => {
   const blmValuesCalculator = new BlmValuesCalculator();
 
   it('should calculate the correct default values', async () => {
-    const defaultValues = blmValuesCalculator.withDefaultRange(1500);
+    const defaultValues = blmValuesCalculator.withDefaultRange();
 
     expect(defaultValues).toStrictEqual([
-      0.03872983346207417,
-      606.799665767047,
-      1213.5606017006319,
-      1820.3215376342168,
-      2427.0824735678016,
-      3033.8434095013868,
+      0.001,
+      20.0008,
+      40.0006,
+      60.0004,
+      80.0002,
+      100,
     ]);
   });
 
   it('should calculate the correct values with a given range', async () => {
-    const values = blmValuesCalculator.with([1, 50], 1500);
+    const values = blmValuesCalculator.with([0, 50]);
 
-    expect(values).toStrictEqual([
-      38.72983346207417,
-      316.2936399402723,
-      593.8574464184705,
-      871.4212528966688,
-      1148.985059374867,
-      1426.548865853065,
-    ]);
+    expect(values).toStrictEqual([0, 10, 20, 30, 40, 50]);
+  });
+
+  it('should return values within the given range', async () => {
+    const ranges: [number, number][] = [
+      [0, 1],
+      [0, 10],
+      [10, 20],
+      [100, 1000],
+      [0, 100000],
+    ];
+
+    ranges.forEach(([min, max]) => {
+      const values = blmValuesCalculator.with([min, max]);
+      values.forEach((value) => {
+        expect(value).toBeGreaterThanOrEqual(min);
+        expect(value).toBeLessThanOrEqual(max);
+      });
+    });
   });
 });

@@ -241,6 +241,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/cloning/tsconfig.lib.json"
       }
+    },
+    "code-guide": {
+      "type": "library",
+      "root": "libs/code-guide",
+      "entryFile": "index",
+      "sourceRoot": "libs/code-guide/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/code-guide/tsconfig.lib.json"
+      }
     }
   }
 }

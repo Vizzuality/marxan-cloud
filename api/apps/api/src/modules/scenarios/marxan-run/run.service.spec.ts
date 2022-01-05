@@ -24,6 +24,7 @@ import { blmDefaultToken, runEventsToken, runQueueToken } from './tokens';
 import { RunHandler } from './run.handler';
 import { CancelHandler } from './cancel.handler';
 import { EventsHandler } from './events.handler';
+import { ScenarioJobService } from '../scenario-job/scenario-job.service';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let runService: RunService;
@@ -320,6 +321,7 @@ async function getFixtures() {
         useValue: fakeAssets,
       },
       RunService,
+      ScenarioJobService,
     ],
   }).compile();
 
