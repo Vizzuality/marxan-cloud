@@ -73,14 +73,20 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
         });
         console.info('Shapefile uploaded', g);
       },
-      onError: () => {
+      onError: ({ response }) => {
+        const { errors } = response.data;
+
         setLoading(false);
         setSuccessFile(null);
 
         addToast('error-upload-shapefile', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Shapefile could not be uploaded</p>
+            <ul className="text-sm">
+              {errors.map((e) => (
+                <li key={`${e.status}`}>{e.title}</li>
+              ))}
+            </ul>
           </>
         ), {
           level: 'error',

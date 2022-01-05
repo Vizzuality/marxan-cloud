@@ -108,6 +108,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
     uploadFeaturesShapefileMutation.mutate({ data, id: `${pid}` }, {
       onSuccess: ({ data: { data: g, id: shapefileId } }) => {
         setLoading(false);
+        setSuccessFile({ ...successFile });
         onClose();
 
         addToast('success-upload-feature-shapefile', (
@@ -121,13 +122,20 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
 
         console.info('Shapefile uploaded', g, 'shapefileId', shapefileId);
       },
-      onError: () => {
+      onError: ({ response }) => {
+        const { errors } = response.data;
+
         setLoading(false);
+        setSuccessFile(null);
 
         addToast('error-upload-feature-shapefile', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Shapefile could not be uploaded</p>
+            <ul className="text-sm">
+              {errors.map((e) => (
+                <li key={`${e.status}`}>{e.title}</li>
+              ))}
+            </ul>
           </>
         ), {
           level: 'error',

@@ -127,14 +127,20 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         dispatch(setCache(Date.now()));
         setOpened(false);
       },
-      onError: () => {
+      onError: ({ response }) => {
+        const { errors } = response.data;
+
         setLoading(false);
         setSuccessFile(null);
 
         addToast('error-upload-protected-area', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Protected area could not be uploaded</p>
+            <ul className="text-sm">
+              {errors.map((e) => (
+                <li key={`${e.status}`}>{e.title}</li>
+              ))}
+            </ul>
           </>
         ), {
           level: 'error',
