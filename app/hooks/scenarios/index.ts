@@ -646,10 +646,10 @@ export function useSaveScenarioCalibrationRange({
 }: UseSaveScenarioCalibrationRangeProps) {
   const [session] = useSession();
 
-  const saveScenarioCalibrationRange = ({ id, range }: SaveScenarioCalibrationRangeProps) => {
+  const saveScenarioCalibrationRange = ({ id, data }: SaveScenarioCalibrationRangeProps) => {
     return SCENARIOS.request({
       url: `/${id}/calibration`,
-      range,
+      data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
