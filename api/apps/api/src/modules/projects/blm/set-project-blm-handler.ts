@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common';
 
 import { SetProjectBlm } from './set-project-blm';
 import { ProjectBlmRepo } from '@marxan-api/modules/blm';
-import { PlanningUnitAreaFetcher } from '@marxan-api/modules/projects/blm/planning-unit-area-fetcher';
+import { PlanningUnitAreaFetcher } from './planning-unit-area-fetcher';
 import { BlmValuesPolicyFactory } from './blm-values-policy-factory';
 
 @CommandHandler(SetProjectBlm)
@@ -29,7 +29,7 @@ export class SetProjectBlmHandler
       return;
     }
     const calculator = this.blmPolicyFactory.get();
-    const defaultBlm = calculator.withDefaultRange(areaResult.right);
+    const defaultBlm = calculator.withDefaultRange();
 
     const result = await this.blmRepository.create(projectId, defaultBlm);
     if (isLeft(result))
