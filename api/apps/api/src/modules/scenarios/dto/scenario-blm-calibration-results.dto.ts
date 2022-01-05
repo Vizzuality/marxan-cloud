@@ -11,7 +11,7 @@ export class BlmCalibrationRunResultDto {
   blmValue!: number;
 
   @ApiProperty({ example: 12345 })
-  score!: number;
+  cost!: number;
 
   @ApiProperty({ example: 12345 })
   boundaryLength!: number;

@@ -2,7 +2,7 @@ export interface CalibrationRunResult {
   id: string;
   scenarioId: string;
   blmValue: number;
-  score: number;
+  cost: number;
   boundaryLength: number;
 }
 

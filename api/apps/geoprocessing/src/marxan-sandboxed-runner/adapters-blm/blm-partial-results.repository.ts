@@ -34,7 +34,7 @@ export class BlmPartialResultsRepository {
       boundaryLength: bestRun.connectivity,
       scenarioId,
       calibrationId,
-      score: bestRun.score,
+      cost: bestRun.cost,
     });
   }
 
