@@ -15,7 +15,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
         <div className="space-y-16 md:space-y-20">
           {PARTNER_LOGOS.map((section) => (
             section.separator ? (
-              <div className="w-screen h-px bg-gradient-to-r from-gray-200 opacity-20 to-gray-200 via-black" />
+              <div key={section.id} className="w-screen h-px bg-gradient-to-r from-gray-200 opacity-20 to-gray-200 via-black" />
             ) : (
               <div key={section.id} className="flex flex-col w-full max-w-5xl mx-auto">
                 <h2 className="pb-10 leading-relaxed text-center md:pb-6 md:text-left bg-clip-text">
