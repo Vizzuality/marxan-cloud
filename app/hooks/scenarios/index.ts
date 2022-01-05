@@ -647,7 +647,6 @@ export function useSaveScenarioCalibrationRange({
   const [session] = useSession();
 
   const saveScenarioCalibrationRange = ({ id, data }: SaveScenarioCalibrationRangeProps) => {
-    console.log('POST HOOKS', data);
     return SCENARIOS.request({
       url: `/${id}/calibration`,
       data,
@@ -682,7 +681,6 @@ export function useScenarioCalibrationResults(scenarioId) {
 
   const { data } = query;
 
-  console.log('GET HOOKS', data);
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data) ? data?.data : [];
 

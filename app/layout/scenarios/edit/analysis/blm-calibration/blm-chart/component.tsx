@@ -2,7 +2,7 @@ import React, {
   useRef, useState, useMemo, useEffect, useCallback,
 } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -55,8 +55,6 @@ export interface BlmChartProps {
 export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   const containerRef: React.MutableRefObject<HTMLDivElement> = useRef(null);
 
-  console.log('data', data);
-
   const dispatch = useDispatch();
 
   const { query } = useRouter();
@@ -64,6 +62,8 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setBlm, setBlmImage } = scenarioSlice.actions;
+
+  const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -197,6 +197,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                 <div
                   className={classnames({
                     'w-3 h-3 rounded-full border-blue-500 border-2 bg-black hover:bg-primary-500 cursor-pointer hover:border-2': true,
+                    'bg-blue-500': blmValue === blm,
                   })}
                   onClick={() => {
                     dispatch(setBlm(blmValue));

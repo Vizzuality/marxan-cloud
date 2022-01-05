@@ -40,9 +40,9 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   const dispatch = useDispatch();
   const { addToast } = useToasts();
 
-  const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
-
   const [blmGraph, setBlmGraph] = useState(false);
+
+  const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setBlm } = scenarioSlice.actions;
