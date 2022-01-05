@@ -24,7 +24,7 @@ type DataRow = {
   /**
    * Value of the X axis
    */
-  score: number;
+  cost: number;
   /**
    * Value of the Y axis
    */
@@ -55,6 +55,8 @@ export interface BlmChartProps {
 export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   const containerRef: React.MutableRefObject<HTMLDivElement> = useRef(null);
 
+  console.log('data', data);
+
   const dispatch = useDispatch();
 
   const { query } = useRouter();
@@ -66,8 +68,8 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
   const xDomain = useMemo(() => [
-    Math.min(...data.map((d) => d.score)),
-    Math.max(...data.map((d) => d.score)),
+    Math.min(...data.map((d) => d.cost)),
+    Math.max(...data.map((d) => d.cost)),
   ], [data]);
 
   const xScale = useMemo(
@@ -92,11 +94,11 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
 
   const lineGenerator = line<DataRow>()
     // .curve(curveMonotoneX)
-    .x((d) => xScale(d.score))
+    .x((d) => xScale(d.cost))
     .y((d) => yScale(d.boundaryLength));
 
   const areaGenerator = area<DataRow>()
-    .x((d) => xScale(d.score))
+    .x((d) => xScale(d.cost))
     .y0(yScale(yDomain[0]))
     .y1((d) => yScale(d.boundaryLength));
 
@@ -183,12 +185,12 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
           {/* Points */}
           <g>
             {data.map(({
-              score, boundaryLength, thumbnail, blmValue,
+              cost, boundaryLength, thumbnail, blmValue,
             }, index) => (
               <foreignObject
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
-                x={xScale(score)}
+                x={xScale(cost)}
                 y={yScale(boundaryLength)}
                 className="w-3 h-3 transform -translate-x-1.5 -translate-y-1.5"
               >
