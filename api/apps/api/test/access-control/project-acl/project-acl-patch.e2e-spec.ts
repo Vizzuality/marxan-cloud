@@ -90,26 +90,30 @@ test(`adds a not allowed user role to project`, async () => {
   const incorrectRoleResponse = await fixtures.WhenAddingIncorrectUserRole(
     projectId,
   );
-  fixtures.ThenBadRequestIsReturned(incorrectRoleResponse);
+  fixtures.ThenBadRequestAndEnumMessageIsReturned(incorrectRoleResponse);
 });
 
-test(`adds non-sensical userId`, async () => {
+test(`adds nonsensical userId`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
-  const nonSenseUserIdResponse = await fixtures.WhenAddingNonSenseUserId(
+  const nonsenseUserIdResponse = await fixtures.WhenAddingNonSenseUserId(
     projectId,
   );
-  fixtures.ThenBadRequestIsReturned(nonSenseUserIdResponse);
+  fixtures.ThenBadRequestAndUserIdMessageIsReturned(nonsenseUserIdResponse);
 });
 
-test(`adds non-existant userId`, async () => {
+test(`adds non-existent userId`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
-  const nonExistantUserIdResponse = await fixtures.WhenAddingNonExistantUserId(
+  const nonExistentUserIdResponse = await fixtures.WhenAddingNonExistentUserId(
     projectId,
   );
-  fixtures.ThenTransactionFailedIsReturned(nonExistantUserIdResponse);
+  fixtures.ThenQueryFailedReturned(nonExistentUserIdResponse);
 });
 
-test(`adds and deletes users alternatively`, async () => {
+test(`adds and deletes users alternately`, async () => {
+  /* The purpose of this test is to check that all the transactions are
+  executed correctly and that no users are deleted/reinstated because
+  the transaction wasn't committed before initiating a new one */
+
   const projectId = await fixtures.GivenProjectWasCreated();
   await fixtures.GivenViewerWasAddedToProject(projectId);
 

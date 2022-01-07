@@ -30,7 +30,7 @@ export const getFixtures = async () => {
   const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
     getRepositoryToken(UsersScenariosApiEntity),
   );
-  const nonExistantUserId = v4();
+  const nonExistentUserId = v4();
 
   const { projectId } = await GivenProjectExists(
     app,
@@ -240,13 +240,13 @@ export const getFixtures = async () => {
           roleName: scenarioOwnerRole,
         }),
 
-    WhenAddingNonExistantUserId: async (scenarioId: string) =>
+    WhenAddingNonExistentUserId: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
         .set('Authorization', `Bearer ${ownerUserToken}`)
         .send({
           scenarioId,
-          userId: nonExistantUserId,
+          userId: nonExistentUserId,
           roleName: scenarioOwnerRole,
         }),
     WhenRevokingAccessToViewerFromScenarioAsOwner: async (scenarioId: string) =>
@@ -312,12 +312,22 @@ export const getFixtures = async () => {
       expect(response.status).toEqual(204);
     },
 
-    ThenBadRequestIsReturned: (response: request.Response) => {
+    ThenBadRequestAndUserIdMessageIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0].meta.rawError.response;
+      expect(error?.message[0]).toEqual('userId must be an UUID');
     },
 
-    ThenTransactionFailedIsReturned: (response: request.Response) => {
-      expect(response.status).toEqual(500);
+    ThenBadRequestAndEnumMessageIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0].meta.rawError.response;
+      expect(error?.message[0]).toEqual('roleName must be a valid enum value');
+    },
+
+    ThenQueryFailedReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0];
+      expect(error.title).toEqual(`Error while adding record to the database`);
     },
 
     ThenSingleOwnerUserInScenarioIsReturned: (response: request.Response) => {

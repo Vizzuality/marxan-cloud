@@ -28,7 +28,7 @@ export const getFixtures = async () => {
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
-  const nonExistantUserId = v4();
+  const nonExistentUserId = v4();
   const cleanups: (() => Promise<void>)[] = [];
 
   return {
@@ -240,13 +240,13 @@ export const getFixtures = async () => {
           roleName: projectOwnerRole,
         }),
 
-    WhenAddingNonExistantUserId: async (projectId: string) =>
+    WhenAddingNonExistentUserId: async (projectId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/projects/${projectId}/users`)
         .set('Authorization', `Bearer ${ownerUserToken}`)
         .send({
           projectId,
-          userId: nonExistantUserId,
+          userId: nonExistentUserId,
           roleName: projectOwnerRole,
         }),
     WhenRevokingAccessToViewerFromProjectAsOwner: async (projectId: string) =>
@@ -302,12 +302,22 @@ export const getFixtures = async () => {
       expect(response.status).toEqual(403);
     },
 
-    ThenBadRequestIsReturned: (response: request.Response) => {
+    ThenBadRequestAndUserIdMessageIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0].meta.rawError.response;
+      expect(error?.message[0]).toEqual('userId must be an UUID');
     },
 
-    ThenTransactionFailedIsReturned: (response: request.Response) => {
-      expect(response.status).toEqual(500);
+    ThenBadRequestAndEnumMessageIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0].meta.rawError.response;
+      expect(error?.message[0]).toEqual('roleName must be a valid enum value');
+    },
+
+    ThenQueryFailedReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0];
+      expect(error.title).toEqual(`Error while adding record to the database`);
     },
 
     ThenNoContentIsReturned: (response: request.Response) => {
